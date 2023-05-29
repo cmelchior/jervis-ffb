@@ -1,0 +1,28 @@
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.serialization)
+    id("application")
+}
+
+group = "dk.ilios"
+version = "1.0.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    mainClass.set("dk.ilios.fumble.MainKt")
+}
+
+dependencies {
+    implementation(project(":game-model"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+//    implementation(project(mapOf("path" to ":game-model")))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+}
+
+tasks.getByName<Test>("test") {
+    useJUnitPlatform()
+}

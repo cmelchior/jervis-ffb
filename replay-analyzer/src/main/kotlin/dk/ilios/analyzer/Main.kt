@@ -1,0 +1,54 @@
+package dk.ilios.analyzer
+
+import dk.ilios.analyzer.fumbbl.net.commands.ServerCommand
+import dk.ilios.analyzer.fumbbl.net.commands.ServerCommandGameState
+import dk.ilios.analyzer.fumbbl.net.commands.ServerCommandGameTime
+import dk.ilios.bloodbowl.model.Game
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.*
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
+import kotlinx.serialization.modules.polymorphic
+import java.io.File
+import java.time.Instant
+import java.time.LocalDateTime
+
+fun main(args: Array<String>) {
+    val fileName = "game-1602474.json"
+//    val fileName = "game.json"
+    val gameFile = File("./replays/$fileName")
+    val json = Json {
+        prettyPrint = true
+        serializersModule = SerializersModule {
+            polymorphic(ServerCommand::class) {
+                subclass(ServerCommandGameState::class, ServerCommandGameState.serializer())
+                subclass(ServerCommandGameTime::class, ServerCommandGameTime.serializer())
+            }
+            contextual(LocalDateTime::class, object: KSerializer<LocalDateTime> {
+                override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("LocalDateTime", PrimitiveKind.STRING)
+
+                override fun deserialize(decoder: Decoder): LocalDateTime {
+                    return LocalDateTime.parse(decoder.decodeString())
+                }
+
+                override fun serialize(encoder: Encoder, value: LocalDateTime) {
+                    encoder.encodeString(value.toString())
+                }
+            })
+        }
+        ignoreUnknownKeys = true
+    }
+
+    val gameCommands: JsonElement = json.parseToJsonElement(gameFile.readText(charset = Charsets.UTF_8))
+    val cmd = json.decodeFromJsonElement<List<ServerCommand>>(gameCommands.jsonArray)
+    println(cmd.joinToString(separator = ",\n"))
+}
+
+fun initialGameAndTeams(command: JsonElement): Game {
+    TODO()
+}

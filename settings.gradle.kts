@@ -23,5 +23,5 @@ dependencyResolutionManagement {
 
 include(":game-model")
 include(":game-downloader")
-
-
+include(":FantasyFootballClient")
+include("replay-analyzer")

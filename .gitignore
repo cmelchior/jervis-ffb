@@ -1,3 +1,11 @@
-/game-downloader/downloads/
 .gradle/
 .idea/
+build/
+
+# All downloaded games. Dont commit them to this repo
+# TODO Find a different way of sharing them
+/replays/
+
+# A copy of the FUMBBL source code decompiled from the jar files.
+# But dont commit it to the repo.
+/FantasyFootballClient/
