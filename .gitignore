@@ -9,3 +9,4 @@ build/
 # A copy of the FUMBBL source code decompiled from the jar files.
 # But dont commit it to the repo.
 /FantasyFootballClient/
+/FantasyFootballClient-Debug/

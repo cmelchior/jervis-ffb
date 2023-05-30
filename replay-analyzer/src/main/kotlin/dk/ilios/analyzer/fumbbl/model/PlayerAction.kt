@@ -1,11 +1,18 @@
 package dk.ilios.analyzer.fumbbl.model
 
+import dk.ilios.analyzer.fumbbl.net.serialization.FumbblEnum
+import dk.ilios.analyzer.fumbbl.net.serialization.FumbblEnumSerializer
+import kotlinx.serialization.Serializable
+
+class PlayerActionSerializer: FumbblEnumSerializer<PlayerAction>(PlayerAction::class)
+
+@Serializable(with = PlayerActionSerializer::class)
 enum class PlayerAction(
-    val id: String,
+    override val id: String,
     val type: Int,
     val description: String?,
     val delegate: PlayerAction? = null
-) {
+): FumbblEnum {
     MOVE("move",1,"starts a Move Action"),
     BLOCK("block",2,"starts a Block Action"),
     BLITZ("blitz",3,null),

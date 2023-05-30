@@ -1,13 +1,14 @@
 package dk.ilios.analyzer
 
-import dk.ilios.analyzer.fumbbl.net.commands.ServerCommand
-import dk.ilios.analyzer.fumbbl.net.commands.ServerCommandGameState
-import dk.ilios.analyzer.fumbbl.net.commands.ServerCommandGameTime
+import dk.ilios.analyzer.fumbbl.model.change.GameSetStartedChange
+import dk.ilios.analyzer.fumbbl.model.change.ModelChange
+import dk.ilios.analyzer.fumbbl.net.commands.*
 import dk.ilios.bloodbowl.model.Game
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.*
@@ -19,16 +20,12 @@ import java.time.Instant
 import java.time.LocalDateTime
 
 fun main(args: Array<String>) {
-    val fileName = "game-1602474.json"
+    val fileName = "game-1624379.json"
 //    val fileName = "game.json"
     val gameFile = File("./replays/$fileName")
     val json = Json {
         prettyPrint = true
         serializersModule = SerializersModule {
-            polymorphic(ServerCommand::class) {
-                subclass(ServerCommandGameState::class, ServerCommandGameState.serializer())
-                subclass(ServerCommandGameTime::class, ServerCommandGameTime.serializer())
-            }
             contextual(LocalDateTime::class, object: KSerializer<LocalDateTime> {
                 override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("LocalDateTime", PrimitiveKind.STRING)
 
