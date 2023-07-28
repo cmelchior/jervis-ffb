@@ -16,15 +16,43 @@ application {
     mainClass.set("dk.ilios.fumbleclient.MainKt")
 }
 
+//// Configure the JAR task
+//jar {
+////    // Set the main class for your JAR (replace 'com.example.MainClass' with your actual main class)
+////    manifest {
+////        attributes["Main-Class"] = "com.example.MainClass"
+////    }
+////
+////    // Include any additional files or directories in your JAR (optional)
+////    from("src/main/resources") {
+////        include("**")
+////    }
+////
+////    from("path/to/additional/files") {
+////        include("**")
+////    }
+//}
+
 dependencies {
+    compileOnly("com.eclipsesource.minimal-json:minimal-json:0.9.5")
+    implementation("org.javassist:javassist:3.29.2-GA")
     implementation("io.ktor:ktor-client-okhttp:${libs.versions.ktor}")
-    implementation(project(":game-model"))
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-////    implementation(project(mapOf("path" to ":game-model")))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
 
-//tasks.getByName<Test>("test") {
-//    useJUnitPlatform()
-//}
+task deleteDebugJar(type: Delete) {
+    delete(file("${projectDir.absolutePath}/../FantasyFootballClient-Debug/${projectDir.name}-${version}.jar"))
+}
+
+task copyDebugInjectionCode(type: Copy) {
+    dependsOn(tasks.getByName("deleteDebugJar"))
+    dependsOn(tasks.getByName("jar"))
+    from "${projectDir.absolutePath}/build/libs/${projectDir.name}-${version}.jar"
+    into "${projectDir.absolutePath}/../FantasyFootballClient-Debug/"
+}
+
+task injectDebugCode {
+    dependsOn(tasks.getByName("copyDebugInjectionCode"))
+//    exec {
+//        workingDir = "${rootDir.absolutePath}/FantasyFootballClient-Debug"
+//    }
+}

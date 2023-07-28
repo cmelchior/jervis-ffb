@@ -98,7 +98,8 @@ fun main(args: Array<String>) {
         System.exit(0);
     }
 
-    val gameId = args[0].toInt() // e.g. 1602474
+    // val gameId = args[0].toInt() // e.g. 1602474
+    val gameId = 1624379
     val saveDir = if (args.size == 2) File(args[1]) else File(System.getProperty("user.dir"))
     if (!saveDir.exists()) {
         saveDir.mkdirs()

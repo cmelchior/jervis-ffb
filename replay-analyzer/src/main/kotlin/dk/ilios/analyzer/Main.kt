@@ -20,7 +20,8 @@ import java.time.Instant
 import java.time.LocalDateTime
 
 fun main(args: Array<String>) {
-    val fileName = "game-1624379.json"
+    val fileName = "test-game/websocket-traffic-team1-filtered.fumbbl"
+//    val fileName = "game-1624379.json"
 //    val fileName = "game.json"
     val gameFile = File("./replays/$fileName")
     val json = Json {
@@ -41,8 +42,14 @@ fun main(args: Array<String>) {
         ignoreUnknownKeys = true
     }
 
-    val gameCommands: JsonElement = json.parseToJsonElement(gameFile.readText(charset = Charsets.UTF_8))
-    val cmd = json.decodeFromJsonElement<List<ServerCommand>>(gameCommands.jsonArray)
+    val gameCommands = gameFile.readLines()
+    val cmd = gameCommands.map {
+        json.parseToJsonElement(it)
+    }
+//    json.parseToJsonElement(ga)
+
+//    val gameCommands: JsonElement = json.parseToJsonElement(gameFile.readText(charset = Charsets.UTF_8))
+//    val cmd = json.decodeFromJsonElement<List<ServerCommand>>(gameCommands.jsonArray)
     println(cmd.joinToString(separator = ",\n"))
 }
 
