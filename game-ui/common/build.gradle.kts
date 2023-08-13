@@ -11,9 +11,9 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
 //    android()
-    wasm {
-        browser()
-    }
+//    wasm {
+//        browser()
+//    }
 //    js(IR) {
 //        browser()
 //    }
@@ -46,6 +46,9 @@ kotlin {
 //        }
         val desktopMain by getting {
             dependencies {
+                api(compose.runtime)
+                api(compose.foundation)
+                api(compose.material)
                 api(compose.preview)
             }
         }

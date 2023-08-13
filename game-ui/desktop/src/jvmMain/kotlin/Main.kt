@@ -1,6 +1,6 @@
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import dk.ilios.bloodbowl.ui.common.App
+import dk.ilios.bloodbowl.ui.App
 
 
 fun main() = application {

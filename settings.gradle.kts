@@ -6,7 +6,7 @@ dependencyResolutionManagement {
             // Versions
             val kotlin = version("kotlinVersion", "1.9.0")
             val ktor = version("ktor", "2.3.0")
-            val compose = version("compose", "1.4.3")
+            val compose = version("compose", "1.5.0-beta01")
 
             // Plugins
             plugin("jvm", "org.jetbrains.kotlin.jvm").versionRef(kotlin)
