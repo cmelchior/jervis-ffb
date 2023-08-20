@@ -3,7 +3,7 @@ package dk.ilios.analyzer
 import dk.ilios.analyzer.fumbbl.model.change.GameSetStartedChange
 import dk.ilios.analyzer.fumbbl.model.change.ModelChange
 import dk.ilios.analyzer.fumbbl.net.commands.*
-import dk.ilios.bloodbowl.model.Game
+import dk.ilios.bowlbot.model.Game
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor

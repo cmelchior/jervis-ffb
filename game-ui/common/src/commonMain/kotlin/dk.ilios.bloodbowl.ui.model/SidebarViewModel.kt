@@ -1,4 +1,4 @@
-package dk.ilios.bloodbowl.model
+package dk.ilios.bloodbowl.ui.model
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshotFlow

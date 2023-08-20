@@ -1,8 +1,8 @@
-package dk.ilios.bloodbowl.ui.common
+package dk.ilios
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
-import dk.ilios.bloodbowl.ui.App
+import dk.ilios.bowlbot.ui.App
 
 @Preview
 @Composable

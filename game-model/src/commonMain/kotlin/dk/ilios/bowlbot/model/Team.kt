@@ -1,25 +1,22 @@
-package dk.ilios.bloodbowl.model
+package dk.ilios.bowlbot.model
 
-import kotlin.jvm.Transient
-
-class Team {
-    val id: String
-    val name: String
-    val race: String
-    val reRolls: Int
-    val apothecaries: Int
-    val cheerLeaders: Int
-    val assistentCoaches: Int
-    val coach: String
-    val fanFactor: Int
-    val teamValue: Int
-    val division: String
-    val treasury: Int
-    val dedicatedFans: Int
-    val players: List<Player>
-    val baseIconPath: String
-    val logoUrl: String
-    v
+//class Team {
+//    val id: String
+//    val name: String
+//    val race: String
+//    val reRolls: Int
+//    val apothecaries: Int
+//    val cheerLeaders: Int
+//    val assistentCoaches: Int
+//    val coach: String
+//    val fanFactor: Int
+//    val teamValue: Int
+//    val division: String
+//    val treasury: Int
+//    val dedicatedFans: Int
+//    val players: List<Player>
+//    val baseIconPath: String
+//    val logoUrl: String
 
 //    private val specialRules: Set<com.fumbbl.ffb.model.SpecialRule>? = null
 //    private val fRosterId: String? = null
@@ -31,4 +28,4 @@ class Team {
 //    private val fPlayerByNr: Map<Int, com.fumbbl.ffb.model.Player<*>>? = null
 //    @Transient
 //    private val currentGameId: Long = 0
-}
+//}

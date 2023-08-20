@@ -1,13 +1,26 @@
-package dk.ilios.bloodbowl.ui
+package dk.ilios.bowlbot.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -18,8 +31,14 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import dk.ilios.bloodbowl.model.*
+import dk.ilios.bloodbowl.ui.model.FieldDetails
+import dk.ilios.bloodbowl.ui.model.FieldViewModel
+import dk.ilios.bloodbowl.ui.model.SidebarView
+import dk.ilios.bloodbowl.ui.model.SidebarViewModel
+import dk.ilios.bloodbowl.ui.model.Square
 import dk.ilios.bloodbowl.ui.model.UIPlayer
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.State
 
 // Theme
 val debugBorder = BorderStroke(2.dp,Color.Red)

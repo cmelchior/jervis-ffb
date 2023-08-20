@@ -1,4 +1,4 @@
-package dk.ilios.bloodbowl.ui
+package dk.ilios.bowlbot.ui
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.*

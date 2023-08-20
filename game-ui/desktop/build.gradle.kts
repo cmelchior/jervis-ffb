@@ -8,20 +8,32 @@ plugins {
 group = "dk.ilios.bloodbowl.ui"
 version = "1.0-SNAPSHOT"
 
-
 kotlin {
     jvm {
-        jvmToolchain(11)
+        jvmToolchain(17)
         withJava()
     }
     sourceSets {
-        val jvmMain by getting {
+        val commonMain by getting {
             dependencies {
                 implementation(project(":game-ui:common"))
-                implementation(compose.desktop.currentOs)
+                implementation(compose.desktop.common)
             }
         }
-        val jvmTest by getting
+        val jvmMain by getting {
+            dependencies {
+                println(compose.desktop.currentOs)
+//                implementation(compose.desktop.currentOs)
+                implementation(compose.desktop.macos_arm64)
+                api(compose.preview)
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTestJUnit4)
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+            }
+        }
     }
 }
 

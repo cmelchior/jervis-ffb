@@ -1,7 +1,7 @@
+package dk.ilios.bowlbot.ui
+
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import dk.ilios.bloodbowl.ui.App
-
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {

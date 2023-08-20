@@ -10,15 +10,8 @@ group = "dk.ilios.bloodbowl.ui"
 version = "1.0-SNAPSHOT"
 
 kotlin {
-//    android()
-//    wasm {
-//        browser()
-//    }
-//    js(IR) {
-//        browser()
-//    }
     jvm("desktop") {
-        jvmToolchain(11)
+        jvmToolchain(17)
     }
     sourceSets {
         val commonMain by getting {
@@ -26,6 +19,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
             }
         }
         val commonTest by getting {
@@ -33,22 +27,8 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
-//        val androidMain by getting {
-//            dependencies {
-//                api("androidx.appcompat:appcompat:1.5.1")
-//                api("androidx.core:core-ktx:1.9.0")
-//            }
-//        }
-//        val androidTest by getting {
-//            dependencies {
-//                implementation("junit:junit:4.13.2")
-//            }
-//        }
         val desktopMain by getting {
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material)
                 api(compose.preview)
             }
         }
