@@ -1,0 +1,164 @@
+package dk.ilios.bowlbot.controller
+
+import compositeActionOf
+import dk.ilios.bowlbot.actions.Action
+import dk.ilios.bowlbot.actions.ActionDescriptor
+import dk.ilios.bowlbot.actions.Continue
+import dk.ilios.bowlbot.commands.Command
+import dk.ilios.bowlbot.commands.EnterProcedure
+import dk.ilios.bowlbot.commands.GotoNode
+import dk.ilios.bowlbot.commands.ReportLog
+import dk.ilios.bowlbot.fsm.ActionNode
+import dk.ilios.bowlbot.fsm.ComputationNode
+import dk.ilios.bowlbot.fsm.Node
+import dk.ilios.bowlbot.fsm.ParentNode
+import dk.ilios.bowlbot.fsm.Procedure
+import dk.ilios.bowlbot.fsm.ProcedureStack
+import dk.ilios.bowlbot.fsm.ProcedureState
+import dk.ilios.bowlbot.logs.LogCategory
+import dk.ilios.bowlbot.logs.LogEntry
+import dk.ilios.bowlbot.logs.SimpleLogEntry
+import dk.ilios.bowlbot.model.Game
+import dk.ilios.bowlbot.procedures.FullGame
+import dk.ilios.bowlbot.rules.Rules
+
+class GameController(
+    rules: Rules,
+    state: Game,
+    val actionProvider: (state: Game, availableActions: List<ActionDescriptor>) -> Action,
+) {
+    val rules: Rules = rules
+    val stack: ProcedureStack = ProcedureStack()
+    val logs: MutableList<LogEntry> = mutableListOf()
+    val commands: MutableList<Command> = mutableListOf()
+    val state: Game = state
+    private var replayMode: Boolean = false
+    private var replayIndex: Int = -1
+    private val isStopped = false
+
+    private fun processNode(currentNode: Node) {
+        when(currentNode) {
+            is ComputationNode -> {
+                // Reduce noise from Continue events
+                val command = currentNode.applyAction(Continue, state)
+                commands.add(command)
+                command.execute(state, this)
+            }
+            is ActionNode -> {
+                val actions = currentNode.getAvailableActions(state)
+                val reportAvailableActions = ReportLog(SimpleLogEntry( "Available actions: ${actions.joinToString()}"))
+                commands.add(reportAvailableActions)
+                reportAvailableActions.execute(state, this)
+                val selectedAction = actionProvider(state, actions)
+                val reportSelectedAction = ReportLog(SimpleLogEntry("Selected action: $selectedAction"))
+                commands.add(reportSelectedAction)
+                reportSelectedAction.execute(state, this)
+                val command = currentNode.applyAction(selectedAction, state)
+                commands.add(command)
+                command.execute(state, this)
+            }
+            is ParentNode -> {
+                val gotoInitialNode = EnterProcedure(currentNode)
+                commands.add(gotoInitialNode)
+                gotoInitialNode.execute(state, this)
+            }
+            else -> {
+                throw IllegalStateException("Unsupported type: ${currentNode::class.simpleName}")
+            }
+        }
+    }
+
+    fun start() {
+        if (replayMode) {
+            throw IllegalStateException("Replay mode is enabled")
+        }
+        setInitialProcedure(FullGame)
+        while (!stack.isEmpty() && !isStopped) {
+            val currentState: Node = stack.currentNode()
+            processNode(currentState)
+        }
+    }
+
+    private fun setInitialProcedure(procedure: Procedure) {
+        val command = compositeActionOf(
+            ReportLog(SimpleLogEntry("Set initial procedure: ${procedure.name()}[${procedure.initialNode.name()}]")),
+            EnterProcedure(procedure)
+        )
+        commands.add(command)
+        command.execute(state, this)
+    }
+
+    fun addLog(entry: LogEntry) {
+        println(entry.render(state))
+        logs.add(entry)
+    }
+
+    fun removeLog(entry: LogEntry) {
+        if (logs.lastOrNull() == entry) {
+            logs.removeLast()
+        } else {
+            throw IllegalStateException("Log could not be removed: ${entry.render(state)}")
+        }
+    }
+
+    fun addProcedure(procedure: Procedure) {
+        stack.pushProcedure(procedure)
+    }
+
+    fun addProcedure(procedure: ProcedureState) {
+        stack.pushProcedure(procedure)
+    }
+
+    fun removeProcedure(): ProcedureState {
+        return stack.popProcedure()
+    }
+
+    fun currentProcedure(): ProcedureState? = stack.firstOrNull()
+
+    fun addNode(nextState: Node) {
+        stack.addNode(nextState)
+    }
+
+    fun removeNode() {
+        stack.removeNode()
+    }
+
+    fun enableReplayMode() {
+        this.replayMode = true
+        this.replayIndex = commands.size
+    }
+
+    fun disableReplayMode() {
+        checkReplayMode()
+        while(forward()) { }
+        this.replayMode = false
+        this.replayIndex = -1
+    }
+
+    fun back(): Boolean {
+        checkReplayMode()
+        if (replayIndex == 0) {
+            return false
+        }
+        replayIndex -= 1
+        val undoCommand = commands[replayIndex]
+        undoCommand.undo(state, this)
+        return true
+    }
+
+    private inline fun checkReplayMode() {
+        if (!replayMode) {
+            throw IllegalStateException("Controller is not in replay mode.")
+        }
+    }
+
+    fun forward(): Boolean {
+        checkReplayMode()
+        if (replayIndex == commands.size) {
+            return false
+        }
+        commands[replayIndex].execute(state, this)
+        replayIndex += 1
+        return true
+    }
+}

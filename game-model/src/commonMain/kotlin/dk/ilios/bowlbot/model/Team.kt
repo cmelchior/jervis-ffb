@@ -1,6 +1,7 @@
 package dk.ilios.bowlbot.model
 
-//class Team {
+class Team {
+    val id: String = ""
 //    val id: String
 //    val name: String
 //    val race: String
@@ -17,7 +18,7 @@ package dk.ilios.bowlbot.model
 //    val players: List<Player>
 //    val baseIconPath: String
 //    val logoUrl: String
-
+//
 //    private val specialRules: Set<com.fumbbl.ffb.model.SpecialRule>? = null
 //    private val fRosterId: String? = null
 //    private val fRoster: com.fumbbl.ffb.model.Roster? = null
@@ -28,4 +29,4 @@ package dk.ilios.bowlbot.model
 //    private val fPlayerByNr: Map<Int, com.fumbbl.ffb.model.Player<*>>? = null
 //    @Transient
 //    private val currentGameId: Long = 0
-//}
+}

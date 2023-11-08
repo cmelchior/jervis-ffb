@@ -1,0 +1,21 @@
+package dk.ilios.bowlbot.procedures
+
+import dk.ilios.bowlbot.commands.Command
+import dk.ilios.bowlbot.commands.ExitProcedure
+import dk.ilios.bowlbot.commands.NoOpCommand
+import dk.ilios.bowlbot.fsm.ComputationNode
+import dk.ilios.bowlbot.fsm.Node
+import dk.ilios.bowlbot.fsm.Procedure
+import dk.ilios.bowlbot.model.Game
+
+/**
+ * Dummy procedure that does nothing.
+ *
+ * This can be used as a placeholder during development or testing.
+ */
+object DummyProcedure: Procedure {
+    override val initialNode: Node = Dummy
+    object Dummy: ComputationNode() {
+        override fun apply(state: Game): Command = ExitProcedure()
+    }
+}
