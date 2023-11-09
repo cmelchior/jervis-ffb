@@ -6,7 +6,6 @@ import dk.ilios.bowlbot.actions.ActionDescriptor
 import dk.ilios.bowlbot.actions.Continue
 import dk.ilios.bowlbot.commands.Command
 import dk.ilios.bowlbot.commands.EnterProcedure
-import dk.ilios.bowlbot.commands.GotoNode
 import dk.ilios.bowlbot.commands.ReportLog
 import dk.ilios.bowlbot.fsm.ActionNode
 import dk.ilios.bowlbot.fsm.ComputationNode
@@ -15,21 +14,28 @@ import dk.ilios.bowlbot.fsm.ParentNode
 import dk.ilios.bowlbot.fsm.Procedure
 import dk.ilios.bowlbot.fsm.ProcedureStack
 import dk.ilios.bowlbot.fsm.ProcedureState
-import dk.ilios.bowlbot.logs.LogCategory
 import dk.ilios.bowlbot.logs.LogEntry
 import dk.ilios.bowlbot.logs.SimpleLogEntry
 import dk.ilios.bowlbot.model.Game
 import dk.ilios.bowlbot.procedures.FullGame
 import dk.ilios.bowlbot.rules.Rules
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+
+sealed interface ListEvent
+data class AddEntry(val log: LogEntry): ListEvent
+data class RemoveEntry(val log: LogEntry): ListEvent
 
 class GameController(
     rules: Rules,
     state: Game,
     val actionProvider: (state: Game, availableActions: List<ActionDescriptor>) -> Action,
 ) {
+    private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 0, extraBufferCapacity = 10_000)
+    val logsEvents: Flow<ListEvent> = _logsEvents
+    val logs: MutableList<LogEntry> = mutableListOf()
     val rules: Rules = rules
     val stack: ProcedureStack = ProcedureStack()
-    val logs: MutableList<LogEntry> = mutableListOf()
     val commands: MutableList<Command> = mutableListOf()
     val state: Game = state
     private var replayMode: Boolean = false
@@ -89,15 +95,17 @@ class GameController(
     }
 
     fun addLog(entry: LogEntry) {
-        println(entry.render(state))
         logs.add(entry)
+        if (!_logsEvents.tryEmit(AddEntry(entry))) {
+            TODO()
+        }
     }
 
     fun removeLog(entry: LogEntry) {
         if (logs.lastOrNull() == entry) {
-            logs.removeLast()
+            _logsEvents.tryEmit(RemoveEntry(logs.removeLast()))
         } else {
-            throw IllegalStateException("Log could not be removed: ${entry.render(state)}")
+            throw IllegalStateException("Log could not be removed: ${entry.message}")
         }
     }
 

@@ -11,7 +11,7 @@ import dk.ilios.bowlbot.rules.BB2020Rules
 // Testing
 
 fun main(args: Array<String>) {
-    val rules = BB2020Rules()
+    val rules = BB2020Rules
     val p1 = Player()
     val p2 = Player()
     val state = Game(p1, p2)

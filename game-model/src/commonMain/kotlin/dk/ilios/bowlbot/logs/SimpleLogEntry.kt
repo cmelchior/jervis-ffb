@@ -1,10 +1,9 @@
 package dk.ilios.bowlbot.logs
 
-import dk.ilios.bowlbot.model.Game
+import kotlin.random.Random
 
-class SimpleLogEntry(
-    private val message: String,
+data class SimpleLogEntry(
+    override val message: String,
     override val category: LogCategory = LogCategory.STATE_MACHINE,
-): LogEntry {
-    override fun render(state: Game): String = message
-}
+    override val id: Long = Random.nextLong()
+): LogEntry

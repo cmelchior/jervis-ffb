@@ -4,9 +4,10 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // Versions
-            val kotlin = version("kotlinVersion", "1.9.0")
+            val kotlin = version("kotlinVersion", "1.9.20")
             val ktor = version("ktor", "2.3.0")
-            val compose = version("compose", "1.5.0-beta01")
+            val compose = version("compose", "1.5.10")
+            val coroutines = version("coroutines", "1.7.3")
 
             // Plugins
             plugin("jvm", "org.jetbrains.kotlin.jvm").versionRef(kotlin)
@@ -15,6 +16,8 @@ dependencyResolutionManagement {
             plugin("ktor", "io.ktor.plugin").versionRef(ktor)
             plugin("compose", "org.jetbrains.compose").versionRef(compose)
 
+            // Libraries
+            library("coroutines", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 //            plugin
 
             //        kotlin("multiplatform").version(extra["kotlin.version"] as String)

@@ -3,15 +3,20 @@ package dk.ilios.bowlbot.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.Text
@@ -39,6 +44,9 @@ import dk.ilios.bloodbowl.ui.model.Square
 import dk.ilios.bloodbowl.ui.model.UIPlayer
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.State
+import dk.ilios.bloodbowl.ui.model.ActionSelectorViewModel
+import dk.ilios.bloodbowl.ui.model.LogViewModel
+import dk.ilios.bloodbowl.ui.model.ReplayViewModel
 
 // Theme
 val debugBorder = BorderStroke(2.dp,Color.Red)
@@ -148,17 +156,87 @@ fun Sidebar(vm: SidebarViewModel, modifier: Modifier) {
 }
 
 @Composable
-fun Screen(field: FieldViewModel, leftDugout: SidebarViewModel, rightDugout: SidebarViewModel) {
+fun Screen(
+    field: FieldViewModel,
+    leftDugout: SidebarViewModel,
+    rightDugout: SidebarViewModel,
+    replayController: ReplayViewModel,
+    actionSelector: ActionSelectorViewModel,
+    logs: LogViewModel
+) {
     Box {
-//        Image(painterResource(""))
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio((145f+782f+145f)/452f),
-            verticalAlignment = Alignment.Top
-        ) {
-            Sidebar(leftDugout, Modifier.weight(145f))
-            Field(field, Modifier.weight(782f))
-            Sidebar(rightDugout, Modifier.weight(145f))
+        Column() {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio((145f+782f+145f)/452f),
+                verticalAlignment = Alignment.Top
+            ) {
+                Sidebar(leftDugout, Modifier.weight(145f))
+                Field(field, Modifier.weight(782f))
+                Sidebar(rightDugout, Modifier.weight(145f))
+            }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+            ) {
+                ReplayController(replayController, modifier = Modifier.height(48.dp))
+            }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+            ) {
+                LogViewer(logs, modifier = Modifier.width(200.dp))
+                ActionSelector(actionSelector, modifier = Modifier.width(200.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun ReplayController(vm: ReplayViewModel, modifier: Modifier) {
+    Box(modifier = modifier
+        .fillMaxSize()
+        .background(color = Color.Red)
+    ) {
+        Row {
+            Button(onClick = { vm.enableReplay() }) {
+                Text("Start replay")
+            }
+            Button(onClick = { vm.rewind() }) {
+                Text("Rewind")
+            }
+            Button(onClick = { vm.back() }) {
+                Text("Back")
+            }
+            Button(onClick = { vm.forward() }) {
+                Text("Forward")
+            }
+            Button(onClick = { vm.stopReplay() }) {
+                Text("Stop replay")
+            }
+        }
+    }
+}
+
+@Composable
+fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
+    Box(modifier = modifier
+        .fillMaxSize()
+        .background(color = Color.Blue)
+    ) {
+        Button(onClick = { vm.start() }) {
+            Text("Start")
+        }
+    }
+}
+
+@Composable
+fun LogViewer(vm: LogViewModel, modifier: Modifier) {
+    val listData by vm.logs.collectAsState(initial = emptyList())
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        items(items = listData, key = { item -> item.hashCode() }) {
+            Text(text = it.message)
         }
     }
 }

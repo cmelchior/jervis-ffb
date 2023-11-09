@@ -1,6 +1,7 @@
 .gradle/
 .idea/
 build/
+.ipynb_checkpoints/
 
 # All downloaded games. Dont commit them to this repo
 # TODO Find a different way of sharing them
@@ -10,3 +11,4 @@ build/
 # But dont commit it to the repo.
 /FantasyFootballClient/
 /FantasyFootballClient-Debug/
+/FantasyFootballClient-Debug-V2/

@@ -16,6 +16,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":game-model"))
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)

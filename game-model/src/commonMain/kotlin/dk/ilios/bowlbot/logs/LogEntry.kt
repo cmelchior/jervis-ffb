@@ -1,8 +1,9 @@
 package dk.ilios.bowlbot.logs
 
-import dk.ilios.bowlbot.model.Game
+import kotlin.random.Random
 
 interface LogEntry {
+    val id: Long
     val category: LogCategory
-    fun render(state: Game): String
+    val message: String
 }
