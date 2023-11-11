@@ -42,9 +42,10 @@ import dk.ilios.bloodbowl.ui.model.SidebarView
 import dk.ilios.bloodbowl.ui.model.SidebarViewModel
 import dk.ilios.bloodbowl.ui.model.Square
 import dk.ilios.bloodbowl.ui.model.UIPlayer
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.State
 import dk.ilios.bloodbowl.ui.model.ActionSelectorViewModel
+import dk.ilios.bloodbowl.ui.model.GameProgress
+import dk.ilios.bloodbowl.ui.model.GameStatusViewModel
 import dk.ilios.bloodbowl.ui.model.LogViewModel
 import dk.ilios.bloodbowl.ui.model.ReplayViewModel
 
@@ -160,6 +161,7 @@ fun Screen(
     field: FieldViewModel,
     leftDugout: SidebarViewModel,
     rightDugout: SidebarViewModel,
+    gameStatusController: GameStatusViewModel,
     replayController: ReplayViewModel,
     actionSelector: ActionSelectorViewModel,
     logs: LogViewModel
@@ -178,6 +180,11 @@ fun Screen(
             Row(modifier = Modifier
                 .fillMaxWidth()
             ) {
+                GameStatus(gameStatusController, modifier = Modifier.height(48.dp))
+            }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+            ) {
                 ReplayController(replayController, modifier = Modifier.height(48.dp))
             }
             Row(modifier = Modifier
@@ -186,6 +193,24 @@ fun Screen(
                 LogViewer(logs, modifier = Modifier.width(200.dp))
                 ActionSelector(actionSelector, modifier = Modifier.width(200.dp))
             }
+        }
+    }
+}
+
+@Composable
+fun GameStatus(vm: GameStatusViewModel, modifier: Modifier) {
+    val progress by vm.progress().collectAsState(GameProgress(0, 0 , 0))
+    val half = if (progress.half == 0) "-" else progress.half.toString()
+    val drive = if (progress.half == 0) "-" else progress.half.toString()
+    val turn = if (progress.half == 0) "-" else progress.half.toString()
+    Box(modifier = modifier
+        .fillMaxSize()
+        .background(color = Color.White)
+    ) {
+        Row {
+            Text("Half: ${ if (progress.half == 0) "-" else progress.half }")
+            Text("Drive: ${ if (progress.drive == 0) "-" else progress.drive }")
+            Text("Turn: ${ if (progress.turn == 0) "-" else progress.turn }")
         }
     }
 }
