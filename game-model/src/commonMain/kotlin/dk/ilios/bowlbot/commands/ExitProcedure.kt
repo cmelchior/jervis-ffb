@@ -3,12 +3,13 @@ package dk.ilios.bowlbot.commands
 import dk.ilios.bowlbot.controller.GameController
 import dk.ilios.bowlbot.fsm.ProcedureState
 import dk.ilios.bowlbot.logs.LogCategory
+import dk.ilios.bowlbot.logs.LogEntry
 import dk.ilios.bowlbot.logs.SimpleLogEntry
 import dk.ilios.bowlbot.model.Game
 
 class ExitProcedure: Command {
-    private var entry2: SimpleLogEntry? = null
-    private lateinit var entry1: SimpleLogEntry
+    private var entry2: LogEntry? = null
+    private lateinit var entry1: LogEntry
     private lateinit var currentProcedure: ProcedureState
 
     override fun execute(state: Game, controller: GameController) {

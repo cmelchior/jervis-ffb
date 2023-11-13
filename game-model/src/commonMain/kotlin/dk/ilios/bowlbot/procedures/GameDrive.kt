@@ -4,7 +4,6 @@ import compositeCommandOf
 import dk.ilios.bowlbot.commands.Command
 import dk.ilios.bowlbot.commands.ExitProcedure
 import dk.ilios.bowlbot.commands.GotoNode
-import dk.ilios.bowlbot.commands.ReportLog
 import dk.ilios.bowlbot.commands.SetActiveTeam
 import dk.ilios.bowlbot.commands.SetTurn
 import dk.ilios.bowlbot.fsm.Node
@@ -23,7 +22,7 @@ object GameDrive: Procedure {
             val turn = state.currentTeam.turnData.currentTurn + 1
             return compositeCommandOf(
                 SetTurn(state.currentTeam, turn),
-                ReportLog(ReportStartingTurn(state.currentTeam, turn))
+                ReportStartingTurn(state.currentTeam, turn)
             )
         }
         override fun onExit(state: Game, rules: Rules): Command {

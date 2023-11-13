@@ -4,7 +4,6 @@ import compositeCommandOf
 import dk.ilios.bowlbot.commands.Command
 import dk.ilios.bowlbot.commands.ExitProcedure
 import dk.ilios.bowlbot.commands.GotoNode
-import dk.ilios.bowlbot.commands.ReportLog
 import dk.ilios.bowlbot.commands.SetDrive
 import dk.ilios.bowlbot.commands.SetHalf
 import dk.ilios.bowlbot.commands.SetTurn
@@ -34,7 +33,7 @@ object FullGame: Procedure {
                 SetDrive(0),
                 SetTurn(state.homeTeam, 0),
                 SetTurn(state.awayTeam, 0),
-                ReportLog(ReportStartingHalf(half))
+                ReportStartingHalf(half)
             )
         }
         override fun onExit(state: Game, rules: Rules): Command {

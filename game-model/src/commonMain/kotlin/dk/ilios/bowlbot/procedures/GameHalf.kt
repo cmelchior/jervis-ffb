@@ -4,8 +4,6 @@ import compositeCommandOf
 import dk.ilios.bowlbot.commands.Command
 import dk.ilios.bowlbot.commands.ExitProcedure
 import dk.ilios.bowlbot.commands.GotoNode
-import dk.ilios.bowlbot.commands.ReportLog
-import dk.ilios.bowlbot.commands.SetActiveTeam
 import dk.ilios.bowlbot.commands.SetDrive
 import dk.ilios.bowlbot.fsm.Node
 import dk.ilios.bowlbot.fsm.ParentNode
@@ -22,9 +20,7 @@ object GameHalf: Procedure {
             val drive: Int = state.driveNo + 1
             return compositeCommandOf(
                 SetDrive(drive),
-//                ResetTeamDriveData(state.homeTeam),
-//                ResetTeamDriveData(state.awayTeam)
-                ReportLog(ReportStartingDrive(drive))
+                ReportStartingDrive(drive)
             )
         }
 

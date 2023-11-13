@@ -6,7 +6,6 @@ import dk.ilios.bowlbot.actions.ActionDescriptor
 import dk.ilios.bowlbot.actions.Continue
 import dk.ilios.bowlbot.commands.Command
 import dk.ilios.bowlbot.commands.EnterProcedure
-import dk.ilios.bowlbot.commands.ReportLog
 import dk.ilios.bowlbot.fsm.ActionNode
 import dk.ilios.bowlbot.fsm.ComputationNode
 import dk.ilios.bowlbot.fsm.Node
@@ -52,11 +51,11 @@ class GameController(
             }
             is ActionNode -> {
                 val actions = currentNode.getAvailableActions(state, rules)
-                val reportAvailableActions = ReportLog(SimpleLogEntry( "Available actions: ${actions.joinToString()}"))
+                val reportAvailableActions = SimpleLogEntry( "Available actions: ${actions.joinToString()}")
                 commands.add(reportAvailableActions)
                 reportAvailableActions.execute(state, this)
                 val selectedAction = actionProvider(state, actions)
-                val reportSelectedAction = ReportLog(SimpleLogEntry("Selected action: $selectedAction"))
+                val reportSelectedAction = SimpleLogEntry("Selected action: $selectedAction")
                 commands.add(reportSelectedAction)
                 reportSelectedAction.execute(state, this)
                 val command = currentNode.applyAction(selectedAction, state, rules)
@@ -87,7 +86,7 @@ class GameController(
 
     private fun setInitialProcedure(procedure: Procedure) {
         val command = compositeCommandOf(
-            ReportLog(SimpleLogEntry("Set initial procedure: ${procedure.name()}[${procedure.initialNode.name()}]")),
+            SimpleLogEntry("Set initial procedure: ${procedure.name()}[${procedure.initialNode.name()}]"),
             EnterProcedure(procedure)
         )
         commands.add(command)

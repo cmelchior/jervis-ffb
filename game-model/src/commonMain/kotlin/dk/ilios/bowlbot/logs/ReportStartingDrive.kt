@@ -1,9 +1,6 @@
 package dk.ilios.bowlbot.logs
 
-import kotlin.random.Random
-
-class ReportStartingDrive(private val drive: Int) : LogEntry {
-    override val id: Long = Random.nextLong()
+class ReportStartingDrive(drive: Int) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String = "Starting drive: $drive"
 }
