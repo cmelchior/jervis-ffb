@@ -2,7 +2,6 @@ package dk.ilios.bowlbot.procedures
 
 import dk.ilios.bowlbot.commands.Command
 import dk.ilios.bowlbot.commands.ExitProcedure
-import dk.ilios.bowlbot.commands.NoOpCommand
 import dk.ilios.bowlbot.fsm.ComputationNode
 import dk.ilios.bowlbot.fsm.Node
 import dk.ilios.bowlbot.fsm.Procedure

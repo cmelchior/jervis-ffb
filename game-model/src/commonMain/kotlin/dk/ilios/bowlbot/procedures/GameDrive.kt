@@ -18,7 +18,8 @@ object GameDrive: Procedure {
     override val initialNode: Node = Turn
 
     object Turn: ParentNode() {
-        override val childProcedure = DummyProcedure
+        override val childProcedure = GameTurn
+
         override fun onEnter(state: Game, rules: Rules): Command {
             val turn = state.currentTeam.turnData.currentTurn + 1
             return compositeCommandOf(
@@ -27,9 +28,7 @@ object GameDrive: Procedure {
             )
         }
         override fun onExit(state: Game, rules: Rules): Command {
-
             val goalScored = state.goalScored
-
             val sharedCommands = compositeCommandOf(
                 ReportEndingTurn(state.currentTeam, state.currentTeam.turnData.currentTurn),
                 SetActiveTeam(state.otherTeam),

@@ -11,6 +11,7 @@ import dk.ilios.bowlbot.controller.GameController
 import dk.ilios.bowlbot.model.Game
 import dk.ilios.bowlbot.model.Player
 import dk.ilios.bowlbot.rules.BB2020Rules
+import dk.ilios.bowlbot.utils.createRandomAction
 import org.jetbrains.skia.*
 import java.io.File
 
@@ -30,7 +31,7 @@ object Imager {
                 val p2 = Player()
                 val state = Game(p1, p1)
                 val actionProvider = { state: Game, availableActions: List<ActionDescriptor> ->
-                    Continue
+                    createRandomAction(state, availableActions)
                 }
                 val controller = GameController(rules, state, actionProvider)
                 App(controller)
