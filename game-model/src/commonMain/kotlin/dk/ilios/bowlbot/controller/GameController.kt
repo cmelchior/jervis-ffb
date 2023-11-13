@@ -37,6 +37,7 @@ class GameController(
     val stack: ProcedureStack = ProcedureStack()
     val commands: MutableList<Command> = mutableListOf()
     val state: Game = state
+    private var isStarted: Boolean = false
     private var replayMode: Boolean = false
     private var replayIndex: Int = -1
     private val isStopped = false
@@ -77,6 +78,10 @@ class GameController(
         if (replayMode) {
             throw IllegalStateException("Replay mode is enabled")
         }
+        if (isStarted) {
+            throw IllegalStateException("Game was already started")
+        }
+        isStarted = true
         setInitialProcedure(FullGame)
         while (!stack.isEmpty() && !isStopped) {
             val currentState: Node = stack.currentNode()
