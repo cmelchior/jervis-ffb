@@ -7,6 +7,7 @@ import dk.ilios.bowlbot.fsm.ComputationNode
 import dk.ilios.bowlbot.fsm.Node
 import dk.ilios.bowlbot.fsm.Procedure
 import dk.ilios.bowlbot.model.Game
+import dk.ilios.bowlbot.rules.Rules
 
 /**
  * Dummy procedure that does nothing.
@@ -16,6 +17,6 @@ import dk.ilios.bowlbot.model.Game
 object DummyProcedure: Procedure {
     override val initialNode: Node = Dummy
     object Dummy: ComputationNode() {
-        override fun apply(state: Game): Command = ExitProcedure()
+        override fun apply(state: Game, rules: Rules): Command = ExitProcedure()
     }
 }

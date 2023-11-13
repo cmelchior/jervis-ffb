@@ -1,7 +1,30 @@
 package dk.ilios.bowlbot.model
 
-class Team {
+import kotlin.properties.Delegates
+
+class TeamHalfData(private val game: Game) {
+    var totalRerolls: Int = 0
+    var usedRerolls: Int = 0
+}
+
+class TeamDriveData(private val game: Game) {
+    // Team related data
+}
+
+class TeamTurnData(private val game: Game) {
+    var currentTurn by Delegates.observable(0) { prop, old, new ->
+        game.gameFlow.tryEmit(game)
+    }
+}
+
+class Team(name: String, private val game: Game) {
     val id: String = ""
+    val name: String = name
+
+    val halfData = TeamHalfData(game)
+    val driveData = TeamDriveData(game)
+    val turnData = TeamTurnData(game)
+
 //    val id: String
 //    val name: String
 //    val race: String

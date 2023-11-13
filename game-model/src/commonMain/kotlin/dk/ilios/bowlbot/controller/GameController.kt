@@ -1,6 +1,6 @@
 package dk.ilios.bowlbot.controller
 
-import compositeActionOf
+import compositeCommandOf
 import dk.ilios.bowlbot.actions.Action
 import dk.ilios.bowlbot.actions.ActionDescriptor
 import dk.ilios.bowlbot.actions.Continue
@@ -46,12 +46,12 @@ class GameController(
         when(currentNode) {
             is ComputationNode -> {
                 // Reduce noise from Continue events
-                val command = currentNode.applyAction(Continue, state)
+                val command = currentNode.applyAction(Continue, state, rules)
                 commands.add(command)
                 command.execute(state, this)
             }
             is ActionNode -> {
-                val actions = currentNode.getAvailableActions(state)
+                val actions = currentNode.getAvailableActions(state, rules)
                 val reportAvailableActions = ReportLog(SimpleLogEntry( "Available actions: ${actions.joinToString()}"))
                 commands.add(reportAvailableActions)
                 reportAvailableActions.execute(state, this)
@@ -59,7 +59,7 @@ class GameController(
                 val reportSelectedAction = ReportLog(SimpleLogEntry("Selected action: $selectedAction"))
                 commands.add(reportSelectedAction)
                 reportSelectedAction.execute(state, this)
-                val command = currentNode.applyAction(selectedAction, state)
+                val command = currentNode.applyAction(selectedAction, state, rules)
                 commands.add(command)
                 command.execute(state, this)
             }
@@ -86,7 +86,7 @@ class GameController(
     }
 
     private fun setInitialProcedure(procedure: Procedure) {
-        val command = compositeActionOf(
+        val command = compositeCommandOf(
             ReportLog(SimpleLogEntry("Set initial procedure: ${procedure.name()}[${procedure.initialNode.name()}]")),
             EnterProcedure(procedure)
         )

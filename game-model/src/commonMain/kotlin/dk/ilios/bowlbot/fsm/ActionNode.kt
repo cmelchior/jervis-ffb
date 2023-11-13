@@ -4,10 +4,11 @@ import dk.ilios.bowlbot.actions.Action
 import dk.ilios.bowlbot.actions.ActionDescriptor
 import dk.ilios.bowlbot.commands.Command
 import dk.ilios.bowlbot.model.Game
+import dk.ilios.bowlbot.rules.Rules
 
 abstract class ActionNode: Node {
-    abstract fun getAvailableActions(state: Game): List<ActionDescriptor>
-    abstract fun applyAction(action: Action, state: Game): Command
+    abstract fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor>
+    abstract fun applyAction(action: Action, state: Game, rules: Rules): Command
     inline fun <reified T: Action> checkType(action: Action): T {
         if (action is T) {
             return action

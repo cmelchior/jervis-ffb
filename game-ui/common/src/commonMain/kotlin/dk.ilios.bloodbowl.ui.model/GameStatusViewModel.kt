@@ -4,17 +4,13 @@ import dk.ilios.bowlbot.controller.GameController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-data class GameProgress(val half: Int, val drive: Int, val turn: Int) {
-    fun halfDesc(): String = if (half == 0) "-" else half.toString()
-    fun drive(): String = if (drive == 0) "-" else drive.toString()
-    fun turn(): String = if (turn == 0) "-" else turn.toString()
-}
+data class GameProgress(val half: Int, val drive: Int, val turn: Int, val name: String)
 
 class GameStatusViewModel(val controller: GameController) {
 
     fun progress(): Flow<GameProgress> {
         return controller.state.gameFlow.map { game ->
-            GameProgress(game.halfNo, game.driveNo, game.turnNo)
+            GameProgress(game.halfNo, game.driveNo, game.currentTeam.turnData.currentTurn, game.currentTeam.name)
         }
 
     }

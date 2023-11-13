@@ -199,7 +199,7 @@ fun Screen(
 
 @Composable
 fun GameStatus(vm: GameStatusViewModel, modifier: Modifier) {
-    val progress by vm.progress().collectAsState(GameProgress(0, 0 , 0))
+    val progress by vm.progress().collectAsState(GameProgress(0, 0, 0, ""))
     val half = if (progress.half == 0) "-" else progress.half.toString()
     val drive = if (progress.half == 0) "-" else progress.half.toString()
     val turn = if (progress.half == 0) "-" else progress.half.toString()
@@ -211,6 +211,7 @@ fun GameStatus(vm: GameStatusViewModel, modifier: Modifier) {
             Text("Half: ${ if (progress.half == 0) "-" else progress.half }")
             Text("Drive: ${ if (progress.drive == 0) "-" else progress.drive }")
             Text("Turn: ${ if (progress.turn == 0) "-" else progress.turn }")
+            Text("Active team :${progress.name}")
         }
     }
 }
