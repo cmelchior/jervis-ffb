@@ -10,7 +10,7 @@ class GameStatusViewModel(val controller: GameController) {
 
     fun progress(): Flow<GameProgress> {
         return controller.state.gameFlow.map { game ->
-            GameProgress(game.halfNo, game.driveNo, game.currentTeam.turnData.currentTurn, game.currentTeam.name)
+            GameProgress(game.halfNo, game.driveNo, game.activeTeam.turnData.currentTurn, game.activeTeam.name)
         }
 
     }

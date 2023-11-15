@@ -52,4 +52,12 @@ class Team(name: String, private val game: Game) {
 //    private val fPlayerByNr: Map<Int, com.fumbbl.ffb.model.Player<*>>? = null
 //    @Transient
 //    private val currentGameId: Long = 0
+
+    fun otherTeam(): Team {
+        if (game.homeTeam == this) {
+            return game.awayTeam
+        } else {
+            return game.homeTeam
+        }
+    }
 }

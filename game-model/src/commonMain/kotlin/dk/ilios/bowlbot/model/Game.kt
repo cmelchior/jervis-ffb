@@ -14,13 +14,23 @@ data class Game(val p1: Player, val p2: Player) {
     }
     val homeTeam: Team = Team("HomeTeam", this)
     val awayTeam: Team = Team("AwayTeam", this)
-    var currentTeam = homeTeam
-        set(team) {
-            otherTeam = currentTeam
-            field = team
-        }
-    var otherTeam = awayTeam
-        private set
+
+    var activeTeam: Team = homeTeam
+    var inactiveTeam: Team = awayTeam
+    var kickingTeam: Team = homeTeam
+    var receivingTeam: Team = awayTeam
+
+    fun swapKickingTeam() {
+        val currentKickingTeam = kickingTeam
+        kickingTeam = receivingTeam
+        receivingTeam = currentKickingTeam
+    }
+
+    fun swapActiveTeam() {
+        val currentTeam = activeTeam
+        activeTeam = inactiveTeam
+        inactiveTeam = currentTeam
+    }
 
     val gameFlow = MutableSharedFlow<Game>(replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 }

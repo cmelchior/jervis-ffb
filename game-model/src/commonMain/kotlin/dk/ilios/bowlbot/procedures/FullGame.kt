@@ -18,7 +18,7 @@ object FullGame: Procedure {
     override val initialNode: Node = PreGame
 
     object PreGame: ParentNode() {
-        override val childProcedure: Procedure = DummyProcedure
+        override val childProcedure: Procedure = dk.ilios.bowlbot.procedures.PreGame
         override fun onExit(state: Game, rules: Rules): Command {
             return GotoNode(RunGame)
         }
