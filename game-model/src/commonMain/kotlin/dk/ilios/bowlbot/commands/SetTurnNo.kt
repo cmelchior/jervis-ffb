@@ -4,7 +4,7 @@ import dk.ilios.bowlbot.controller.GameController
 import dk.ilios.bowlbot.model.Game
 import dk.ilios.bowlbot.model.Team
 
-class SetTurn(private val currentTeam: Team, private val nextTurn: Int) : Command {
+class SetTurnNo(private val currentTeam: Team, private val nextTurn: Int) : Command {
 
     private var originalTurn: Int = 0
 

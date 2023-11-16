@@ -19,6 +19,7 @@ data class Game(val p1: Player, val p2: Player) {
     var inactiveTeam: Team = awayTeam
     var kickingTeam: Team = homeTeam
     var receivingTeam: Team = awayTeam
+    var kickingTeamInLastHalf: Team = kickingTeam
 
     fun swapKickingTeam() {
         val currentKickingTeam = kickingTeam

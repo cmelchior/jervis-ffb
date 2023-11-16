@@ -5,6 +5,7 @@ import dk.ilios.bowlbot.commands.Command
 import dk.ilios.bowlbot.commands.ExitProcedure
 import dk.ilios.bowlbot.commands.GotoNode
 import dk.ilios.bowlbot.commands.SetDrive
+import dk.ilios.bowlbot.commands.SetKickingTeam
 import dk.ilios.bowlbot.fsm.Node
 import dk.ilios.bowlbot.fsm.ParentNode
 import dk.ilios.bowlbot.fsm.Procedure

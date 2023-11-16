@@ -4,9 +4,12 @@ import compositeCommandOf
 import dk.ilios.bowlbot.commands.Command
 import dk.ilios.bowlbot.commands.ExitProcedure
 import dk.ilios.bowlbot.commands.GotoNode
+import dk.ilios.bowlbot.commands.SetActiveTeam
 import dk.ilios.bowlbot.commands.SetDrive
 import dk.ilios.bowlbot.commands.SetHalf
-import dk.ilios.bowlbot.commands.SetTurn
+import dk.ilios.bowlbot.commands.SetKickingTeam
+import dk.ilios.bowlbot.commands.SetKickingTeamAtHalfTime
+import dk.ilios.bowlbot.commands.SetTurnNo
 import dk.ilios.bowlbot.fsm.Node
 import dk.ilios.bowlbot.fsm.ParentNode
 import dk.ilios.bowlbot.fsm.Procedure
@@ -15,37 +18,47 @@ import dk.ilios.bowlbot.model.Game
 import dk.ilios.bowlbot.rules.Rules
 
 object FullGame: Procedure {
-    override val initialNode: Node = PreGame
+    override val initialNode: Node = PreGameSequence
 
-    object PreGame: ParentNode() {
-        override val childProcedure: Procedure = dk.ilios.bowlbot.procedures.PreGame
+    object PreGameSequence: ParentNode() {
+        override val childProcedure: Procedure = PreGame
         override fun onExit(state: Game, rules: Rules): Command {
-            return GotoNode(RunGame)
+            return compositeCommandOf(
+                GotoNode(RunGame)
+            )
         }
     }
 
     object RunGame: ParentNode() {
         override val childProcedure: Procedure = GameHalf
         override fun onEnter(state: Game, rules: Rules): Command {
-            val half = state.halfNo + 1
+            val currentHalf = state.halfNo + 1
+            // At start of game use the kicking team from the pre-game sequence, otherwise alternate teams based
+            // on who kicked off at last half.
+            var kickingTeam = state.kickingTeam
+            if (currentHalf > 1) {
+               kickingTeam = state.kickingTeamInLastHalf.otherTeam()
+            }
             return compositeCommandOf(
-                SetHalf(half),
+                SetHalf(currentHalf),
                 SetDrive(0),
-                SetTurn(state.homeTeam, 0),
-                SetTurn(state.awayTeam, 0),
-                ReportStartingHalf(half)
+                SetKickingTeamAtHalfTime(kickingTeam),
+                SetActiveTeam(kickingTeam.otherTeam()),
+                SetTurnNo(state.homeTeam, 0),
+                SetTurnNo(state.awayTeam, 0),
+                ReportStartingHalf(currentHalf)
             )
         }
         override fun onExit(state: Game, rules: Rules): Command {
             return if (state.halfNo < rules.halfsPrGame) {
                 GotoNode(RunGame)
             } else {
-                GotoNode(PostGame)
+                GotoNode(PostGameSequence)
             }
         }
     }
 
-    object PostGame: ParentNode() {
+    object PostGameSequence: ParentNode() {
         override val childProcedure: Procedure = DummyProcedure
         override fun onExit(state: Game, rules: Rules): Command = ExitProcedure()
     }

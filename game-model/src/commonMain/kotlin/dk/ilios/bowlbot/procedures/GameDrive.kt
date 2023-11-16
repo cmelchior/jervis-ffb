@@ -5,7 +5,8 @@ import dk.ilios.bowlbot.commands.Command
 import dk.ilios.bowlbot.commands.ExitProcedure
 import dk.ilios.bowlbot.commands.GotoNode
 import dk.ilios.bowlbot.commands.SetActiveTeam
-import dk.ilios.bowlbot.commands.SetTurn
+import dk.ilios.bowlbot.commands.SetKickingTeam
+import dk.ilios.bowlbot.commands.SetTurnNo
 import dk.ilios.bowlbot.fsm.Node
 import dk.ilios.bowlbot.fsm.ParentNode
 import dk.ilios.bowlbot.fsm.Procedure
@@ -63,7 +64,7 @@ object GameDrive: Procedure {
         override fun onEnter(state: Game, rules: Rules): Command {
             val turn = state.activeTeam.turnData.currentTurn + 1
             return compositeCommandOf(
-                SetTurn(state.activeTeam, turn),
+                SetTurnNo(state.activeTeam, turn),
                 ReportStartingTurn(state.activeTeam, turn)
             )
         }
@@ -72,6 +73,7 @@ object GameDrive: Procedure {
             val sharedCommands = compositeCommandOf(
                 ReportEndingTurn(state.activeTeam, state.activeTeam.turnData.currentTurn),
                 SetActiveTeam(state.inactiveTeam),
+                SetKickingTeam(state.receivingTeam)
             )
 
             // Goal has been scored

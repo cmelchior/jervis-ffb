@@ -5,6 +5,7 @@ import kotlin.properties.Delegates
 class TeamHalfData(private val game: Game) {
     var totalRerolls: Int = 0
     var usedRerolls: Int = 0
+
 }
 
 class TeamDriveData(private val game: Game) {
