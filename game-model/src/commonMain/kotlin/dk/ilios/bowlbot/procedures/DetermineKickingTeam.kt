@@ -19,8 +19,11 @@ import dk.ilios.bowlbot.rules.Rules
  * Select the kicking team automatically by using a coin toss.
  * TODO Extend this with the winner choosing whether to kick or receive.
  */
-object DetermineKickingTeam: Procedure {
+object DetermineKickingTeam: Procedure() {
     override val initialNode: Node = CoinToss
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+
     object CoinToss: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollD2)
         override fun applyAction(action: Action, state: Game, rules: Rules): Command {

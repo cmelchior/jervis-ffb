@@ -64,9 +64,16 @@ class GameController(
                 command.execute(state, this)
             }
             is ParentNode -> {
-                val gotoInitialNode = EnterProcedure(currentNode)
-                commands.add(gotoInitialNode)
-                gotoInitialNode.execute(state, this)
+                val commands = when(stack.firstOrNull()!!.currentParentNodeState()) {
+                    ParentNode.State.ENTERING -> currentNode.enterNode(state, rules)
+                    ParentNode.State.RUNNING -> currentNode.runNode(state, rules)
+                    ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
+                }
+                this.commands.add(commands)
+                commands.execute(state, this)
+//                val gotoInitialNode = EnterProcedure(currentNode)
+//                commands.add(gotoInitialNode)
+//                gotoInitialNode.execute(state, this)
             }
             else -> {
                 throw IllegalStateException("Unsupported type: ${currentNode::class.simpleName}")

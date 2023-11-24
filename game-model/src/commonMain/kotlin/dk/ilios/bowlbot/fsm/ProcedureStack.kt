@@ -8,7 +8,7 @@ class ProcedureStack {
         history.addFirst(procedure)
     }
     fun pushProcedure(procedure: Procedure) {
-        history.addFirst(ProcedureState(procedure, procedure.initialNode))
+        history.addFirst(ProcedureState(procedure, procedure.enterNode))
     }
     fun popProcedure(): ProcedureState = history.removeFirst()
     fun firstOrNull(): ProcedureState? = history.firstOrNull()

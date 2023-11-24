@@ -12,47 +12,49 @@ import dk.ilios.bowlbot.rules.Rules
 /**
  * Page 37 in the rulebook.
  */
-object PreGame: Procedure {
+object PreGame: Procedure() {
     override val initialNode: Node = TheFans
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object TheFans: ParentNode() {
-        override val childProcedure: Procedure = DummyProcedure
-        override fun onExit(state: Game, rules: Rules): Command {
+        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(TheWeather)
         }
     }
 
     object TheWeather: ParentNode() {
-        override val childProcedure: Procedure = DummyProcedure
-        override fun onExit(state: Game, rules: Rules): Command {
+        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(TakeOnJourneyMen)
         }
     }
 
     object TakeOnJourneyMen: ParentNode() {
-        override val childProcedure: Procedure = DummyProcedure
-        override fun onExit(state: Game, rules: Rules): Command {
+        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(Inducements)
         }
     }
 
     object Inducements: ParentNode() {
-        override val childProcedure: Procedure = DummyProcedure
-        override fun onExit(state: Game, rules: Rules): Command {
+        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(ThePrayersToNuffleTable)
         }
     }
 
     object ThePrayersToNuffleTable: ParentNode() {
-        override val childProcedure: Procedure = DummyProcedure
-        override fun onExit(state: Game, rules: Rules): Command {
+        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(DetermineKickingTeam)
         }
     }
 
     object DetermineKickingTeam: ParentNode() {
-        override val childProcedure: Procedure = dk.ilios.bowlbot.procedures.DetermineKickingTeam
-        override fun onExit(state: Game, rules: Rules): Command {
+        override fun getChildProcedure(state: Game, rules: Rules) = dk.ilios.bowlbot.procedures.DetermineKickingTeam
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }
     }
