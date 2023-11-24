@@ -17,6 +17,7 @@ import dk.ilios.bowlbot.logs.ReportStartingKickOff
 import dk.ilios.bowlbot.logs.ReportStartingTurn
 import dk.ilios.bowlbot.model.Game
 import dk.ilios.bowlbot.rules.Rules
+import dk.ilios.bowlbot.utils.INVALID_GAME_STATE
 
 object GameDrive: Procedure() {
     override val initialNode: Node = SetupKickingTeam
@@ -77,7 +78,7 @@ object GameDrive: Procedure() {
             } else if (state.inactiveTeam.turnData.currentTurn < rules.turnsPrHalf) {
                 return switchTeamCommands + GotoNode(Turn)
             } else {
-                TODO()
+                INVALID_GAME_STATE()
             }
         }
     }

@@ -17,6 +17,19 @@ fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): A
         ContinueWhenReady -> Continue
         EndTurnWhenReady -> EndTurn
         RollD2 -> D2Result(Random.nextInt(1, 2))
-        is SelectAvailableSpace -> TODO()
+        is SelectAvailableSpace -> INVALID_GAME_STATE()
     }
+}
+
+const val enableAsserts = true
+inline fun assert(condition: Boolean) {
+    if (enableAsserts && !condition) {
+        throw IllegalStateException("A invariant failed")
+    }
+}
+
+class InvalidGameState(message: String): RuntimeException(message)
+
+inline fun INVALID_GAME_STATE(message: String = "Unexpected game state"): Nothing {
+    throw InvalidGameState(message)
 }

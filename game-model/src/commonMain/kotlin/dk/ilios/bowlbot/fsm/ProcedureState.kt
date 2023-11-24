@@ -1,5 +1,7 @@
 package dk.ilios.bowlbot.fsm
 
+import dk.ilios.bowlbot.utils.assert
+
 class ProcedureState(val procedure: Procedure) {
     // Track events related to ParentNode. It should only be allowed to modify this
     // if the currentNode is a ParentNode
@@ -41,9 +43,7 @@ class ProcedureState(val procedure: Procedure) {
     }
 
     fun removeParentNodeState(nextState: ParentNode.State) {
-        if (parentNodeStates.isEmpty()) {
-            TODO()
-        }
+        assert(parentNodeStates.isNotEmpty())
         if (parentNodeStates.last() == nextState) {
             parentNodeStates.removeLast()
         }

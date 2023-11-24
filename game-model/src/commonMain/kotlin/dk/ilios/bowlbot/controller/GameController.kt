@@ -71,9 +71,6 @@ class GameController(
                 }
                 this.commands.add(commands)
                 commands.execute(state, this)
-//                val gotoInitialNode = EnterProcedure(currentNode)
-//                commands.add(gotoInitialNode)
-//                gotoInitialNode.execute(state, this)
             }
             else -> {
                 throw IllegalStateException("Unsupported type: ${currentNode::class.simpleName}")

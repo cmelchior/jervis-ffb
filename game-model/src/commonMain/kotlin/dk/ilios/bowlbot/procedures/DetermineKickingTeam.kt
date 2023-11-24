@@ -14,6 +14,7 @@ import dk.ilios.bowlbot.fsm.Procedure
 import dk.ilios.bowlbot.logs.ReportKickingTeamResult
 import dk.ilios.bowlbot.model.Game
 import dk.ilios.bowlbot.rules.Rules
+import dk.ilios.bowlbot.utils.INVALID_GAME_STATE
 
 /**
  * Select the kicking team automatically by using a coin toss.
@@ -43,7 +44,7 @@ object DetermineKickingTeam: Procedure() {
                             ExitProcedure()
                         )
                     }
-                    else -> TODO()
+                    else -> INVALID_GAME_STATE()
                 }
             }
         }

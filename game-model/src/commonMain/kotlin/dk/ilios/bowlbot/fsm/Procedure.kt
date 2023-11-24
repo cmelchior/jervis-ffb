@@ -22,7 +22,7 @@ abstract class Procedure {
     private class EnterProcedureNode(private val procedure: Procedure) : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                procedure.onEnterProcedure(state, rules) ?: NoOpCommand,
+                procedure.onEnterProcedure(state, rules),
                 GotoNode(procedure.initialNode)
             )
         }
@@ -31,7 +31,7 @@ abstract class Procedure {
     private class ExitProcedureNode(private val procedure: Procedure) : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                procedure.onExitProcedure(state, rules) ?: NoOpCommand,
+                procedure.onExitProcedure(state, rules),
                 RemoveCurrentProcedure()
             )
         }
