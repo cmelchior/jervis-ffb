@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+STARTING_DIR=`pwd`
+HERE=$(dirname `realpath "$0"`)
+# TODO Test if file exists
+exec java -jar $HERE/tools/fumbblcli.jar "$@"
+cd "$STARTING_DIR""

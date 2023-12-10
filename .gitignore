@@ -2,13 +2,21 @@
 .idea/
 build/
 .ipynb_checkpoints/
+tools/fumbblcli.jar
+
+
+# Resources are too expensive to store in Git for now
+# They need to be extracted from the FUMBBL client.
+# /modules/game-ui/common/src/commonMain/resources/
 
 # All downloaded games. Dont commit them to this repo
 # TODO Find a different way of sharing them
 /replays/
+/replays-fumbbl/
 
 # A copy of the FUMBBL source code decompiled from the jar files.
 # But dont commit it to the repo.
-/FantasyFootballClient/
-/FantasyFootballClient-Debug/
+/Debug-FantasyFootballClient/src
+/Debug-FantasyFootballClient/libs
+/FantasyFootballClient-Debug-Backup/
 /FantasyFootballClient-Debug-V2/

@@ -1,4 +1,7 @@
-rootProject.name = "FUMBBL AI"
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
+}
+rootProject.name = "Jervis - A Blood Bowl AI"
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -8,6 +11,8 @@ dependencyResolutionManagement {
             val ktor = version("ktor", "2.3.0")
             val compose = version("compose", "1.5.10")
             val coroutines = version("coroutines", "1.7.3")
+            val minimalJson = version("minimalJson", "0.9.5")
+            val javaAssist = version("javaAssist", "3.29.2-GA")
 
             // Plugins
             plugin("jvm", "org.jetbrains.kotlin.jvm").versionRef(kotlin)
@@ -34,12 +39,10 @@ dependencyResolutionManagement {
     }
 }
 
-include(":game-model")
-include(":game-downloader")
-include(":FantasyFootballClient")
-include("replay-analyzer")
-include("fumbbl-client-downloader")
-//include(":game-ui:android")
-include(":game-ui:common")
-include(":game-ui:desktop")
-include(":game-ui:web")
+include(":modules:fumbbl-cli")
+include(":modules:game-model")
+include(":Debug-FantasyFootballClient")
+include(":modules:replay-analyzer")
+include(":modules:game-ui:common")
+include(":modules:game-ui:desktop")
+include(":modules:game-ui:web")
