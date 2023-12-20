@@ -20,13 +20,18 @@ class TeamTurnData(private val game: Game) {
 }
 
 class Team(name: String, roster: Roster, coach: Coach) {
+
     // Fixed Team data, identifying the team
     val id: String = ""
     val name: String = name
     val coach: Coach = coach
     val roster: Roster = roster
-    val players = TeamPlayers()
+    val players = TeamPlayers(this)
 
+//    val dogout
+
+
+//    val race: String
 //    val race: String
     // Variable team data that might change during the game
     var reRolls: Int = 0

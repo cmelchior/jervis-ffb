@@ -3,6 +3,7 @@ package dk.ilios.jervis.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,33 +22,50 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toAwtImage
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition.PlatformDefault.y
+import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.ui.images.IconFactory
+import dk.ilios.jervis.ui.model.ActionSelectorViewModel
 import dk.ilios.jervis.ui.model.FieldDetails
 import dk.ilios.jervis.ui.model.FieldViewModel
-import dk.ilios.jervis.ui.model.SidebarView
-import dk.ilios.jervis.ui.model.SidebarViewModel
-import dk.ilios.jervis.ui.model.Square
-import dk.ilios.jervis.ui.model.UIPlayer
-import androidx.compose.runtime.State
-import dk.ilios.jervis.ui.model.ActionSelectorViewModel
 import dk.ilios.jervis.ui.model.GameProgress
 import dk.ilios.jervis.ui.model.GameStatusViewModel
 import dk.ilios.jervis.ui.model.LogViewModel
 import dk.ilios.jervis.ui.model.ReplayViewModel
+import dk.ilios.jervis.ui.model.SidebarView
+import dk.ilios.jervis.ui.model.SidebarViewModel
+import dk.ilios.jervis.ui.model.Square
+import dk.ilios.jervis.ui.model.UIPlayer
+import kotlinx.coroutines.flow.Flow
+import org.jetbrains.skia.Image
+import java.awt.image.BufferedImage
+import java.io.InputStream
+import kotlin.random.Random
 
 // Theme
 val debugBorder = BorderStroke(2.dp,Color.Red)
@@ -84,7 +102,7 @@ fun SectionHeader(title: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp),
+            .aspectRatio(152.42f/(452f/15)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         SectionDivider(modifier = Modifier.weight(1f))
@@ -99,16 +117,79 @@ fun SectionHeader(title: String) {
     }
 }
 
+fun loadImageBitmapFromResources(path: String): ImageBitmap {
+    // Use the current classloader to get the resource as a stream
+    val inputStream: InputStream = Thread.currentThread().contextClassLoader.getResourceAsStream(path)
+        ?: throw IllegalArgumentException("Resource not found: $path")
+
+    // Decode the image data
+    val skiaImage = Image.makeFromEncoded(inputStream.readBytes())
+    return skiaImage.toComposeImageBitmap()
+}
+
+
 @Composable
-fun Reserves(reserves: SnapshotStateList<UIPlayer>) {
-    val state: SnapshotStateList<UIPlayer> = remember { reserves }
+fun SpriteFromSheet() {
+    val spriteSheet: ImageBitmap = loadImageBitmapFromResources("icons/cached/players/iconsets/human_lineman.png")
+    val skiaImage: BufferedImage = spriteSheet.toAwtImage()
+    val x = (skiaImage.width/28)
+    val y = (skiaImage.height/28)
+    val imageNo = Random.nextInt(x*y)
+    val spriteY: Int = (imageNo/x)*28
+    val spriteX: Int = (imageNo % x)*28
+    println("$x, $y, $imageNo, $spriteX, $spriteY")
+    val spriteWidth: Int = 28
+    val spriteHeight: Int = 28
+    val playerImage = skiaImage.getSubimage(spriteX, spriteY, 28, 28).toComposeImageBitmap()
+    Image(
+        bitmap = playerImage,
+        contentDescription = null,
+        alignment = Alignment.Center,
+        contentScale = ContentScale.Fit,
+        modifier = Modifier.fillMaxSize()
+    )
+}
+
+@Composable
+fun Reserves(reserves: Flow<List<Player>>) {
+    val state: List<Player> by reserves.collectAsState(emptyList())
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionHeader("Reserves")
+        for (index in state.indices step 5) {
+            Row {
+                repeat(5) { x ->
+                    if (index + x < state.size) {
+                        Box(modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(1f)
+                        ) {
+                            val playerImage = remember { IconFactory.getImage(state[index + x]).toComposeImageBitmap() }
+                            Image(
+                                bitmap = playerImage,
+                                contentDescription = null,
+                                alignment = Alignment.Center,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    } else {
+                        // Use empty box. Unsure if we can remove this
+                        // if we want a partial row to scale correctly.
+                        Box(modifier = Modifier.weight(1f).aspectRatio(1f))
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun Injuries() {
+fun Injuries(
+    knockedOut: SnapshotStateList<UIPlayer>,
+    badlyHurt: SnapshotStateList<UIPlayer>,
+    seriousInjuries: SnapshotStateList<UIPlayer>,
+    dead: SnapshotStateList<UIPlayer>
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionHeader("Knocked Out")
         SectionHeader("Badly Hurt")
@@ -121,8 +202,9 @@ fun Injuries() {
 @Composable
 fun Sidebar(vm: SidebarViewModel, modifier: Modifier) {
     Column(modifier = modifier) {
-        Box(modifier = Modifier.aspectRatio(145f/430f)) {
+        Box(modifier = Modifier.aspectRatio(vm.aspectRatio)) {
             Image(
+                alignment = Alignment.TopStart,
                 painter = painterResource("icons/sidebar/background_box.png"),
                 contentDescription = "Box",
                 modifier = modifier.fillMaxSize()
@@ -130,27 +212,31 @@ fun Sidebar(vm: SidebarViewModel, modifier: Modifier) {
             val view by vm.view().collectAsState()
             when(view) {
                 SidebarView.RESERVES -> Reserves(vm.reserves())
-                SidebarView.INJURIES -> Injuries()
+                SidebarView.INJURIES -> Injuries(
+                    vm.knockedOut(),
+                    vm.badlyHurt(),
+                    vm.seriousInjuries(),
+                    vm.dead()
+                )
             }
-        }
-        Row {
-            Button(
-                onClick = { vm.toggleReserves() },
-                colors = FumbblButtonColors(),
-                modifier = Modifier.weight(1f),
-            ) {
-                val reserveCount by vm.reserveCount().collectAsState()
-//                AutoSizeText(text = "$reserveCount Rsv", textStyle = TextStyle.Default)
-                Text(text = "$reserveCount Rsv")
-            }
-            Button(
-                onClick = { vm.toggleInjuries() },
-                colors = FumbblButtonColors(),
-                modifier = Modifier.weight(1f)
-            ) {
-                val injuriesCount by vm.injuriesCount().collectAsState()
-//                AutoSizeText(text = "$injuriesCount Out", textStyle = TextStyle.Default)
-                Text(text = "$injuriesCount Out")
+
+            Row(modifier = Modifier.align(Alignment.BottomCenter)) {
+                Button(
+                    onClick = { vm.toggleReserves() },
+                    colors = FumbblButtonColors(),
+                    modifier = Modifier.weight(1f),
+                ) {
+                    val reserveCount by vm.reserveCount().collectAsState()
+                    Text(text = "$reserveCount Rsv", maxLines = 1)
+                }
+                Button(
+                    onClick = { vm.toggleInjuries() },
+                    colors = FumbblButtonColors(),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    val injuriesCount by vm.injuriesCount().collectAsState()
+                    Text(text = "$injuriesCount Out", maxLines = 1)
+                }
             }
         }
     }
@@ -167,15 +253,15 @@ fun Screen(
     logs: LogViewModel
 ) {
     Box {
-        Column() {
+        Column {
             Row(modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio((145f+782f+145f)/452f),
+                .aspectRatio((152.42f+782f+152.42f)/452f),
                 verticalAlignment = Alignment.Top
             ) {
-                Sidebar(leftDugout, Modifier.weight(145f))
+                Sidebar(leftDugout, Modifier.weight(152.42f))
                 Field(field, Modifier.weight(782f))
-                Sidebar(rightDugout, Modifier.weight(145f))
+                Sidebar(rightDugout, Modifier.weight(152.42f))
             }
             Row(modifier = Modifier
                 .fillMaxWidth()

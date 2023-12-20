@@ -57,8 +57,9 @@ class TeamBuilder(val roster: Roster) {
     fun build(): Team {
         return Team(name, roster, coach!!).apply {
             this@TeamBuilder.players.forEach {
-                players.add(it.value)
+                this.players.add(it.value)
             }
+            this.players.notifyDogoutChange()
         }
     }
 }
@@ -76,7 +77,7 @@ fun AppPreview() {
     val team1: Team = teamBuilder {
         coach = Coach("HomeCoach")
         name = "HomeTeam"
-        roster = HumanTeam
+//        roster = HumanTeam
         addPlayer("Lineman-1", PlayerNo(1), HumanTeam.LINEMAN)
         addPlayer("Lineman-2", PlayerNo(2), HumanTeam.LINEMAN)
         addPlayer("Lineman-3", PlayerNo(3), HumanTeam.LINEMAN)

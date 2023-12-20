@@ -8,13 +8,15 @@ import dk.ilios.jervis.ui.model.LogViewModel
 import dk.ilios.jervis.ui.model.ReplayViewModel
 import dk.ilios.jervis.ui.model.SidebarViewModel
 import dk.ilios.jervis.controller.GameController
+import dk.ilios.jervis.model.Player
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun App(controller: GameController) {
     Screen(
         FieldViewModel(),
-        SidebarViewModel(),
-        SidebarViewModel(),
+        SidebarViewModel(controller.state.homeTeam),
+        SidebarViewModel(controller.state.awayTeam),
         GameStatusViewModel(controller),
         ReplayViewModel(controller),
         ActionSelectorViewModel(controller),
