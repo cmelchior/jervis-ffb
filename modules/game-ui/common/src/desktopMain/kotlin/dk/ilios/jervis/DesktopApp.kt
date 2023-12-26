@@ -2,6 +2,7 @@ package dk.ilios.jervis
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
+import dk.ilios.jervis.actions.Action
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
@@ -16,6 +17,8 @@ import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.ui.App
 import dk.ilios.jervis.utils.createRandomAction
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import java.lang.IllegalArgumentException
 
 class TeamBuilder(val roster: Roster) {
@@ -96,9 +99,11 @@ fun AppPreview() {
     val p2 = team1
     val field = Field.createForRuleset(rules)
     val state = Game(p1, p1, field)
-    val actionProvider = { state: Game, availableActions: List<ActionDescriptor> ->
-        createRandomAction(state, availableActions)
+    val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionSelectedChannel = Channel<Action>(1, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+        createRandomAction(controller.state, availableActions)
     }
     val controller = GameController(rules, state, actionProvider)
-    App(controller)
+    App(controller, actionRequestChannel, actionSelectedChannel)
 }

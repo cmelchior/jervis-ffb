@@ -2,6 +2,7 @@ package dk.ilios.jervis.ui
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
+import dk.ilios.jervis.actions.Action
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
@@ -13,6 +14,8 @@ import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.teamBuilder
 import dk.ilios.jervis.utils.createRandomAction
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 
 @Preview
 @Composable
@@ -54,9 +57,11 @@ fun AppPreview() {
     }
     val field = Field.createForRuleset(BB2020Rules)
     val state = Game(team1, team2, field)
-    val actionProvider = { state: Game, availableActions: List<ActionDescriptor> ->
+    val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionSelectedChannel = Channel<Action>(1, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
         createRandomAction(state, availableActions)
     }
     val controller = GameController(rules, state, actionProvider)
-    App(controller)
+    App(controller, actionRequestChannel, actionSelectedChannel)
 }

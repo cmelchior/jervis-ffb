@@ -66,5 +66,5 @@ class Team(name: String, roster: Roster, coach: Coach) {
         }
     }
 
-    fun isHomeTeam(): Boolean = game.homeTeam == this
+    fun isHomeTeam(): Boolean = (game.homeTeam == this)
 }

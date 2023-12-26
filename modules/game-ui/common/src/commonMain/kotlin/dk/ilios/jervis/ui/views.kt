@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.Text
@@ -41,8 +43,18 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.WindowPosition.PlatformDefault.x
 import androidx.compose.ui.window.WindowPosition.PlatformDefault.y
+import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.Confirm
+import dk.ilios.jervis.actions.Continue
+import dk.ilios.jervis.actions.DieResult
+import dk.ilios.jervis.actions.DogoutSelected
+import dk.ilios.jervis.actions.EndSetup
+import dk.ilios.jervis.actions.EndTurn
+import dk.ilios.jervis.actions.FieldSquareSelected
+import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.ui.images.IconFactory
@@ -330,12 +342,47 @@ fun ReplayController(vm: ReplayViewModel, modifier: Modifier) {
 
 @Composable
 fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
-    Box(modifier = modifier
-        .fillMaxSize()
-        .background(color = Color.Blue)
+    val otherActions: List<Action> by vm.availableActions.collectAsState(emptyList())
+    println(otherActions.size)
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .fillMaxSize()
+            .background(color = Color.Blue),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Button(onClick = { vm.start() }) {
-            Text("Start")
+        Button(
+            modifier = Modifier.padding(0.dp),
+            contentPadding = PaddingValues(2.dp),
+            onClick = { vm.start(randomActions = true) }
+        ) {
+            Text("Start (Random)", fontSize = 10.sp)
+        }
+        Button(
+            modifier = Modifier.padding(0.dp),
+            contentPadding = PaddingValues(2.dp),
+            onClick = { vm.start(randomActions = false) }
+        ) {
+            Text("Start (User)", fontSize = 10.sp)
+        }
+        otherActions.forEach { action: Action ->
+            Button(
+                modifier = Modifier.padding(0.dp),
+                contentPadding = PaddingValues(2.dp),
+                onClick = { vm.actionSelected(action) }
+            ) {
+                val text = when(action) {
+                    Confirm -> "Confirm"
+                    Continue -> "Continue"
+                    is DieResult -> action.toString()
+                    DogoutSelected -> "DogoutSelected"
+                    EndSetup -> "EndSetup"
+                    EndTurn -> "EndTurn"
+                    is FieldSquareSelected -> action.toString()
+                    is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
+                }
+                Text(text, fontSize = 10.sp)
+            }
         }
     }
 }
@@ -356,7 +403,6 @@ fun LogViewer(vm: LogViewModel, modifier: Modifier) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Field(vm: FieldViewModel, modifier: Modifier) {
-
     val field: FieldDetails by vm.field().collectAsState()
     val highlightedSquare: Square? by vm.highlights().collectAsState()
 

@@ -17,6 +17,8 @@ import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.teamBuilder
 import dk.ilios.jervis.utils.createRandomAction
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.EncodedImageFormat
@@ -37,8 +39,10 @@ object Imager {
                     Continue
                 }
             }
-            val controller = GameController(BB2020Rules, state, actionProvider as ((Game, List<ActionDescriptor>) -> Action))
-            App(controller)
+            val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
+            val actionSelectedChannel = Channel<Action>(1, onBufferOverflow = BufferOverflow.SUSPEND)
+            val controller = GameController(BB2020Rules, state, actionProvider as ((GameController, List<ActionDescriptor>) -> Action))
+            App(controller, actionRequestChannel, actionSelectedChannel)
         }
     }
 
@@ -84,11 +88,13 @@ object Imager {
             }
             val field = dk.ilios.jervis.model.Field.createForRuleset(rules)
             val state = Game(team1, team2, field)
-            val actionProvider = { state: Game, availableActions: List<ActionDescriptor> ->
+            val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
+            val actionSelectedChannel = Channel<Action>(1, onBufferOverflow = BufferOverflow.SUSPEND)
+            val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
                 createRandomAction(state, availableActions)
             }
             val controller = GameController(rules, state, actionProvider)
-            App(controller)
+            App(controller, actionRequestChannel, actionSelectedChannel)
         }
     }
 

@@ -28,7 +28,7 @@ data class RemoveEntry(val log: LogEntry): ListEvent
 class GameController(
     rules: Rules,
     state: Game,
-    val actionProvider: (state: Game, availableActions: List<ActionDescriptor>) -> Action,
+    val actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> Action,
 ) {
     private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 0, extraBufferCapacity = 10_000)
     val logsEvents: Flow<ListEvent> = _logsEvents
@@ -55,7 +55,7 @@ class GameController(
                 val reportAvailableActions = SimpleLogEntry( "Available actions: ${actions.joinToString()}")
                 commands.add(reportAvailableActions)
                 reportAvailableActions.execute(state, this)
-                val selectedAction = actionProvider(state, actions)
+                val selectedAction = actionProvider(this@GameController, actions)
                 val reportSelectedAction = SimpleLogEntry("Selected action: $selectedAction")
                 commands.add(reportSelectedAction)
                 reportSelectedAction.execute(state, this)

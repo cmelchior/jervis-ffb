@@ -2,19 +2,20 @@ package dk.ilios.jervis.ui
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import dk.ilios.jervis.actions.Action
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
-import dk.ilios.jervis.rules.roster.bb2020.HumanTeam.apothecary
 import dk.ilios.jervis.teamBuilder
-import dk.ilios.jervis.utils.createRandomAction
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.runBlocking
 
 fun main() = application {
     val rules = BB2020Rules
@@ -54,12 +55,23 @@ fun main() = application {
     }
     val field = dk.ilios.jervis.model.Field.createForRuleset(rules)
     val state = Game(team1, team2, field)
-    val actionRequestChannel = Channel<Pair<Game, List<ActionDescriptor>>> {  }
-    val actionProvider = { state: Game, availableActions: List<ActionDescriptor> ->
-        createRandomAction(state, availableActions)
+    val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionSelectedChannel = Channel<Action>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+        val action: Action = runBlocking {
+            with(Dispatchers.Default) {
+                actionRequestChannel.send(Pair(controller, availableActions))
+                actionSelectedChannel.receive()
+            }
+        }
+        action
     }
+
+//    val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+//        createRandomAction(controller.state, availableActions)
+//    }
     val controller = GameController(rules, state, actionProvider)
     Window(onCloseRequest = ::exitApplication) {
-        App(controller)
+        App(controller, actionRequestChannel, actionSelectedChannel)
     }
 }
