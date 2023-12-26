@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 fun App(controller: GameController) {
     Screen(
-        FieldViewModel(),
+        FieldViewModel(controller.state.field),
         SidebarViewModel(controller.state.homeTeam),
         SidebarViewModel(controller.state.awayTeam),
         GameStatusViewModel(controller),

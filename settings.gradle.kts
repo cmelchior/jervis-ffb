@@ -9,7 +9,7 @@ dependencyResolutionManagement {
             // Versions
             val kotlin = version("kotlinVersion", "1.9.20")
             val ktor = version("ktor", "2.3.0")
-            val compose = version("compose", "1.5.10")
+            val compose = version("compose", "1.5.11")
             val coroutines = version("coroutines", "1.7.3")
             val minimalJson = version("minimalJson", "0.9.5")
             val javaAssist = version("javaAssist", "3.29.2-GA")

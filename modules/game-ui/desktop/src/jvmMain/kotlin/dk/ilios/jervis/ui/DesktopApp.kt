@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
+import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
@@ -18,10 +18,9 @@ import dk.ilios.jervis.utils.createRandomAction
 @Composable
 fun AppPreview() {
     val rules = BB2020Rules
-    val team1: Team = teamBuilder {
+    val team1: Team = teamBuilder(HumanTeam) {
         coach = Coach("HomeCoach")
         name = "HomeTeam"
-//        roster = HumanTeam
         addPlayer("Lineman-1", PlayerNo(1), HumanTeam.LINEMAN)
         addPlayer("Lineman-2", PlayerNo(2), HumanTeam.LINEMAN)
         addPlayer("Lineman-3", PlayerNo(3), HumanTeam.LINEMAN)
@@ -36,10 +35,9 @@ fun AppPreview() {
         reRolls = 4
         apothecary = true
     }
-    val team2: Team = teamBuilder {
+    val team2: Team = teamBuilder(HumanTeam) {
         coach = Coach("AwayCoach")
         name = "AwayTeam"
-//        roster = HumanTeam
         addPlayer("Lineman-1", PlayerNo(1), HumanTeam.LINEMAN)
         addPlayer("Lineman-2", PlayerNo(2), HumanTeam.LINEMAN)
         addPlayer("Lineman-3", PlayerNo(3), HumanTeam.LINEMAN)
@@ -54,7 +52,8 @@ fun AppPreview() {
         reRolls = 4
         apothecary = true
     }
-    val state = Game(team1, team2)
+    val field = Field.createForRuleset(BB2020Rules)
+    val state = Game(team1, team2, field)
     val actionProvider = { state: Game, availableActions: List<ActionDescriptor> ->
         createRandomAction(state, availableActions)
     }

@@ -43,6 +43,10 @@ class BB2020Position(
             // TODO Skills etc
         }
     }
+
+    override fun toString(): String {
+        return "BB2020Position(position='$position')"
+    }
 }
 
 // Page 116 in the rulebook

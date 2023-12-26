@@ -14,7 +14,7 @@ class TeamDriveData(private val game: Game) {
 }
 
 class TeamTurnData(private val game: Game) {
-    var currentTurn by Delegates.observable(0) { prop, old, new ->
+    var currentTurn by Delegates.observable(0u) { prop, old, new ->
         game.gameFlow.tryEmit(game)
     }
 }
@@ -59,10 +59,12 @@ class Team(name: String, roster: Roster, coach: Coach) {
     }
 
     fun otherTeam(): Team {
-        if (game.homeTeam == this) {
-            return game.awayTeam
+        return if (game.homeTeam == this) {
+            game.awayTeam
         } else {
-            return game.homeTeam
+            game.homeTeam
         }
     }
+
+    fun isHomeTeam(): Boolean = game.homeTeam == this
 }

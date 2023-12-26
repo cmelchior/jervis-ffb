@@ -22,7 +22,7 @@ object GameDrive: Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object SetupKickingTeam: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun getChildProcedure(state: Game, rules: Rules) = dk.ilios.jervis.procedures.SetupKickingTeam
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return ReportSetupKickingTeam(state.kickingTeam)
         }

@@ -11,6 +11,7 @@ import kotlin.properties.ObservableProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+// TODO Should we split this into DogoutState and FieldState?
 enum class PlayerState {
     // Dogout states
     RESERVE,
@@ -115,4 +116,9 @@ class Player: Observable<Player>() {
 
     // Expose updats to this class as Flow
     val observePlayer = observeState
+    override fun toString(): String {
+        return "Player(name='$name', number=$number, position=$position)"
+    }
+
+
 }

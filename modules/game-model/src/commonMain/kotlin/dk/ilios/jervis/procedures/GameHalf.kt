@@ -21,11 +21,11 @@ object GameHalf: Procedure() {
     override val initialNode: Node = Drive
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        val currentHalf = state.halfNo + 1
+        val currentHalf = state.halfNo + 1u
         // At start of game use the kicking team from the pre-game sequence, otherwise alternate teams based
         // on who kicked off at last half.
         var kickingTeam = state.kickingTeam
-        if (currentHalf > 1) {
+        if (currentHalf > 1u) {
             kickingTeam = state.kickingTeamInLastHalf.otherTeam()
         }
         return compositeCommandOf(
@@ -33,8 +33,8 @@ object GameHalf: Procedure() {
             SetDrive(0),
             SetKickingTeamAtHalfTime(kickingTeam),
             SetActiveTeam(kickingTeam.otherTeam()),
-            SetTurnNo(state.homeTeam, 0),
-            SetTurnNo(state.awayTeam, 0),
+            SetTurnNo(state.homeTeam, 0u),
+            SetTurnNo(state.awayTeam, 0u),
             ReportStartingHalf(currentHalf)
         )
     }

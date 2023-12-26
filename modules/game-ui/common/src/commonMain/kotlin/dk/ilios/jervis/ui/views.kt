@@ -3,7 +3,6 @@ package dk.ilios.jervis.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,15 +25,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -43,11 +39,11 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition.PlatformDefault.x
 import androidx.compose.ui.window.WindowPosition.PlatformDefault.y
+import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.model.ActionSelectorViewModel
@@ -151,31 +147,35 @@ fun SpriteFromSheet() {
 }
 
 @Composable
+fun Player(modifier: Modifier, player: Player) {
+    Box(modifier = modifier.aspectRatio(1f)
+    ) {
+        val playerImage = remember { IconFactory.getImage(player).toComposeImageBitmap() }
+        Image(
+            bitmap = playerImage,
+            contentDescription = null,
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
 fun Reserves(reserves: Flow<List<Player>>) {
     val state: List<Player> by reserves.collectAsState(emptyList())
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionHeader("Reserves")
         for (index in state.indices step 5) {
             Row {
+                val modifier = Modifier.weight(1f).aspectRatio(1f)
                 repeat(5) { x ->
                     if (index + x < state.size) {
-                        Box(modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f)
-                        ) {
-                            val playerImage = remember { IconFactory.getImage(state[index + x]).toComposeImageBitmap() }
-                            Image(
-                                bitmap = playerImage,
-                                contentDescription = null,
-                                alignment = Alignment.Center,
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
+                        Player(modifier, state[index + x])
                     } else {
                         // Use empty box. Unsure if we can remove this
                         // if we want a partial row to scale correctly.
-                        Box(modifier = Modifier.weight(1f).aspectRatio(1f))
+                        Box(modifier = modifier)
                     }
                 }
             }
@@ -385,9 +385,9 @@ fun Field(vm: FieldViewModel, modifier: Modifier) {
                                 Square(width, height) == highlightedSquare
                             }
                         }
-                        Box(modifier = Modifier
-                            .fillMaxSize()
-                            .weight(1f)
+                        val square: FieldSquare by vm.observeSquare(width, height).collectAsState(FieldSquare(0, 0))
+                        val boxModifier = Modifier.fillMaxSize().weight(1f)
+                        Box(modifier = boxModifier
                             .background(color = if (hover) {
                                 Color.Cyan.copy(alpha = 0.25f)
                             } else {
@@ -396,7 +396,11 @@ fun Field(vm: FieldViewModel, modifier: Modifier) {
                             .onPointerEvent(PointerEventType.Enter) {
                                 vm.hoverOver(Square(width, height))
                             }
-                        )
+                        ) {
+                            square.player?.let {
+                                Player(boxModifier, it)
+                            }
+                        }
                     }
                 }
             }

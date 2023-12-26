@@ -23,7 +23,7 @@ object GameTurn : Procedure() {
     override val initialNode: Node = WaitForAction
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        val turn = state.activeTeam.turnData.currentTurn + 1
+        val turn = state.activeTeam.turnData.currentTurn + 1u
         return compositeCommandOf(
             SetTurnNo(state.activeTeam, turn),
             ReportStartingTurn(state.activeTeam, turn)

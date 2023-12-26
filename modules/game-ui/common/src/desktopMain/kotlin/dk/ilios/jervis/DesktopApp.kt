@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
+import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerNo
@@ -64,8 +65,8 @@ class TeamBuilder(val roster: Roster) {
     }
 }
 
-fun teamBuilder(action: TeamBuilder.() -> Unit): Team {
-    val builder = TeamBuilder(HumanTeam)
+fun teamBuilder(roster: Roster, action: TeamBuilder.() -> Unit): Team {
+    val builder = TeamBuilder(roster)
     action(builder)
     return builder.build()
 }
@@ -74,10 +75,9 @@ fun teamBuilder(action: TeamBuilder.() -> Unit): Team {
 @Composable
 fun AppPreview() {
     val rules = BB2020Rules
-    val team1: Team = teamBuilder {
+    val team1: Team = teamBuilder(HumanTeam) {
         coach = Coach("HomeCoach")
         name = "HomeTeam"
-//        roster = HumanTeam
         addPlayer("Lineman-1", PlayerNo(1), HumanTeam.LINEMAN)
         addPlayer("Lineman-2", PlayerNo(2), HumanTeam.LINEMAN)
         addPlayer("Lineman-3", PlayerNo(3), HumanTeam.LINEMAN)
@@ -94,7 +94,8 @@ fun AppPreview() {
     }
     val p1 = team1
     val p2 = team1
-    val state = Game(p1, p1)
+    val field = Field.createForRuleset(rules)
+    val state = Game(p1, p1, field)
     val actionProvider = { state: Game, availableActions: List<ActionDescriptor> ->
         createRandomAction(state, availableActions)
     }

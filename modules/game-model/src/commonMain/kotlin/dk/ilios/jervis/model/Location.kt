@@ -5,7 +5,8 @@ package dk.ilios.jervis.model
  */
 
 sealed interface Location
-data class FieldCoordinate(val x: UInt, val y: UInt): Location
+// (0, 0) is (top, left)
+data class FieldCoordinate(val x: Int, val y: Int): Location
 data object DogOut: Location
 
 

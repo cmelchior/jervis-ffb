@@ -2,7 +2,7 @@ package dk.ilios.jervis.logs
 
 import dk.ilios.jervis.model.Team
 
-class ReportStartingTurn(team: Team, turn: Int) : LogEntry() {
+class ReportStartingTurn(team: Team, turn: UInt) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String = "Starting turn for ${team.name}: $turn"
 }

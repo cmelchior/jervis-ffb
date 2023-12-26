@@ -4,22 +4,27 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlin.properties.Delegates
 
-class Game(homeTeam: Team, awayTeam: Team) {
+class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var goalScored: Boolean = false
-    var halfNo by Delegates.observable(0) { prop, old, new ->
+    var halfNo by Delegates.observable(0u) { prop, old, new ->
         gameFlow.tryEmit(this)
     }
     var driveNo by Delegates.observable(0) { prop, old, new ->
         gameFlow.tryEmit(this)
     }
+
     val homeTeam = homeTeam
     val awayTeam = awayTeam
+
+    var activePlayer: Player? = null
 
     var activeTeam: Team = this.homeTeam
     var inactiveTeam: Team = this.awayTeam
     var kickingTeam: Team = this.homeTeam
     var receivingTeam: Team = this.awayTeam
     var kickingTeamInLastHalf: Team = kickingTeam
+
+    val field: Field = field
 
     init {
         homeTeam.setGameReference(this)

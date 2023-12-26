@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.builtins.StandardNames.FqNames.target
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -24,19 +25,14 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-//                implementation(compose.desktop.macos_arm64)
-//                implementation("org.jetbrains.skiko:skiko-awt-runtime-macos-arm64:0.7.85")
-//                implementation("org.jetbrains.skiko:skiko-awt-runtime-macos-arm64:1.5.10")
+                implementation("org.jetbrains.skiko:skiko-awt-runtime-macos-arm64:+")
                 api(compose.preview)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.desktop.uiTestJUnit4)
             }
         }
-        val jvmTest by getting {
-            dependencies {
-        }
+        val jvmTest by getting
     }
-}
 }
 
 

@@ -3,9 +3,9 @@ package dk.ilios.jervis.commands
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Game
 
-class SetHalf(private val nextHalf: Int) : Command {
+class SetHalf(private val nextHalf: UInt) : Command {
 
-    private var originalHalf: Int = 0
+    private var originalHalf: UInt = 0u
 
     override fun execute(state: Game, controller: GameController) {
         originalHalf = state.halfNo
