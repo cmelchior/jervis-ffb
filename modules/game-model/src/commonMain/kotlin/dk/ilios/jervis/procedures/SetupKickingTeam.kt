@@ -16,6 +16,7 @@ import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetActivePlayer
 import dk.ilios.jervis.commands.SetPlayerLocation
+import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.ConfirmationNode
@@ -37,7 +38,7 @@ object SetupKickingTeam: Procedure() {
 
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val availablePlayers = state.kickingTeam.players.filter {
-                val inReserve = (it.location == DogOut && it.state == PlayerState.RESERVE)
+                val inReserve = (it.location == DogOut && it.state == PlayerState.STANDING)
                 val onField = (it.location is FieldCoordinate && it.state == PlayerState.STANDING)
                 inReserve || onField
             }.map {
@@ -90,11 +91,13 @@ object SetupKickingTeam: Procedure() {
             return when(action) {
                 DogoutSelected -> compositeCommandOf(
                     SetPlayerLocation(state.activePlayer!!, DogOut),
+                    SetPlayerState(state.activePlayer!!, PlayerState.STANDING),
                     SetActivePlayer(null),
                     GotoNode(SelectPlayerOrEndSetup)
                 )
                 is FieldSquareSelected -> compositeCommandOf(
                     SetPlayerLocation(state.activePlayer!!, FieldCoordinate(action.x, action.y)),
+                    SetPlayerState(state.activePlayer!!, PlayerState.STANDING),
                     SetActivePlayer(null),
                     GotoNode(SelectPlayerOrEndSetup)
                 )

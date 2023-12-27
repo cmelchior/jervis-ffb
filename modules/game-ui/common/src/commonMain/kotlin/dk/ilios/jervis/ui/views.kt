@@ -343,7 +343,6 @@ fun ReplayController(vm: ReplayViewModel, modifier: Modifier) {
 @Composable
 fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
     val otherActions: List<Action> by vm.availableActions.collectAsState(emptyList())
-    println(otherActions.size)
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -431,7 +430,7 @@ fun Field(vm: FieldViewModel, modifier: Modifier) {
                                 Square(width, height) == highlightedSquare
                             }
                         }
-                        val square: FieldSquare by vm.observeSquare(width, height).collectAsState(FieldSquare(0, 0))
+                        val square: FieldSquare by vm.observeSquare(width, height).collectAsState(FieldSquare(-1, -1))
                         val boxModifier = Modifier.fillMaxSize().weight(1f)
                         Box(modifier = boxModifier
                             .background(color = if (hover) {

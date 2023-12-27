@@ -27,7 +27,7 @@ class SidebarViewModel(val team: Team) {
     fun reserves(): Flow<List<Player>> {
         return team.players.dogoutFlow.map { players: List<Player> ->
             players
-                .filter { it.state == PlayerState.RESERVE }
+                .filter { it.state == PlayerState.STANDING }
                 .sortedBy { it.number }
         }
     }

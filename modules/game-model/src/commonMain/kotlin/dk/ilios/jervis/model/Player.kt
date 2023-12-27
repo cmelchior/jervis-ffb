@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlin.jvm.JvmInline
+import kotlin.properties.Delegates.observable
 import kotlin.properties.ObservableProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -83,7 +84,7 @@ class Player: Observable<Player>() {
             team.notifyDogoutChange()
         }
     }
-    var state: PlayerState by observable(PlayerState.RESERVE)
+    var state: PlayerState by observable(PlayerState.STANDING)
     var name: String by observable("")
     var number: PlayerNo = PlayerNo(0)
     var position: Position = HumanTeam.positions.first()
@@ -116,9 +117,8 @@ class Player: Observable<Player>() {
 
     // Expose updats to this class as Flow
     val observePlayer = observeState
+
     override fun toString(): String {
         return "Player(name='$name', number=$number, position=$position)"
     }
-
-
 }

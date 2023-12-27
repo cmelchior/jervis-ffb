@@ -7,22 +7,17 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlin.properties.Delegates
 
-class FieldSquare(coordinate: FieldCoordinate) {
+class FieldSquare(coordinate: FieldCoordinate): Observable<FieldSquare>() {
     constructor(x: Int, y: Int): this(FieldCoordinate(x, y))
     val x = coordinate.x
     val y = coordinate.y
-    var player: Player? by Delegates.observable(null) { prop, oldValue, newValue ->
-        notifyChange()
-    }
+    var player: Player? by observable(null)
+
     fun isEmpty(): Boolean = (player == null)
     fun isOnTeamHalf(team: Team): Boolean {
         TODO("Not yet implemented")
     }
-    fun notifyChange() {
-        _squareChange.tryEmit(this)
-    }
-    private val _squareChange = MutableSharedFlow<FieldSquare>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    val squareFlow: SharedFlow<FieldSquare> = _squareChange
+    val squareFlow: SharedFlow<FieldSquare> = observeState
 }
 
 class Field(width: UInt, height: UInt): Iterable<FieldSquare> {
@@ -34,6 +29,7 @@ class Field(width: UInt, height: UInt): Iterable<FieldSquare> {
     }
 
     operator fun get(x: Int, y: Int): FieldSquare = field[x][y]
+    operator fun get(coordinate: FieldCoordinate): FieldSquare = field[coordinate.x][coordinate.y]
 
     fun addPlayer(player: Player, x: Int, y: Int) {
         assertEmptySquare(x, y)

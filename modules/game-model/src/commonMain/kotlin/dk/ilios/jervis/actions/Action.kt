@@ -1,5 +1,6 @@
 package dk.ilios.jervis.actions
 
+import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
 import kotlin.random.Random
 
@@ -42,6 +43,7 @@ class D2Result(result: Int = Random.nextInt(1, 3)): DieResult(result, 1, 2)
 data class PlayerSelected(val player: Player): Action
 data object DogoutSelected: Action
 data class FieldSquareSelected(val x: Int, val y: Int): Action {
+    constructor(coordinate: FieldCoordinate): this(coordinate.x, coordinate.y)
     override fun toString(): String {
         return "${this::class.simpleName}[$x, $y]"
     }
