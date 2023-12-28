@@ -37,7 +37,7 @@ object SetupTeam: Procedure() {
     object SelectPlayerOrEndSetup: ActionNode() {
 
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val availablePlayers = state.activeTeam.players.filter {
+            val availablePlayers = state.activeTeam.filter {
                 val inReserve = (it.location == DogOut && it.state == PlayerState.STANDING)
                 val onField = (it.location is FieldCoordinate && it.state == PlayerState.STANDING)
                 inReserve || onField
@@ -108,7 +108,7 @@ object SetupTeam: Procedure() {
 
     object EndSetupAndValidate: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            return if (rules.isValidSetupForKicking(state)) {
+            return if (rules.isValidSetup(state)) {
                 ExitProcedure()
             } else {
                 GotoNode(InformOfInvalidSetup)

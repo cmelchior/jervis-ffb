@@ -139,7 +139,7 @@ class ActionSelectorViewModel(
         actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
         actionSelectedChannel: Channel<Action>
     ) {
-        actionSelectedChannel.send(PlayerSelected(team.players[playerNo]!!))
+        actionSelectedChannel.send(PlayerSelected(team[playerNo]!!))
         actionRequestChannel.receive()
         actionSelectedChannel.send(FieldSquareSelected(fieldCoordinate))
         actionRequestChannel.receive()

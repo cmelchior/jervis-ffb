@@ -1,6 +1,9 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.rules.roster.Roster
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlin.properties.Delegates
 
 class TeamHalfData(private val game: Game) {
@@ -19,17 +22,15 @@ class TeamTurnData(private val game: Game) {
     }
 }
 
-class Team(name: String, roster: Roster, coach: Coach) {
+class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
+
+    val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
     // Fixed Team data, identifying the team
     val id: String = ""
     val name: String = name
     val coach: Coach = coach
     val roster: Roster = roster
-    val players = TeamPlayers(this)
-
-//    val dogout
-
 
 //    val race: String
 //    val race: String
@@ -67,4 +68,23 @@ class Team(name: String, roster: Roster, coach: Coach) {
     }
 
     fun isHomeTeam(): Boolean = (game.homeTeam == this)
+
+    fun add(player: Player) {
+        player.team = this
+        noToPlayer[player.number] = player
+    }
+    operator fun get(playerNo: PlayerNo): Player? = noToPlayer[playerNo]
+    override val size: Int = noToPlayer.size
+    override fun isEmpty(): Boolean = noToPlayer.isEmpty()
+    override fun iterator(): Iterator<Player> = noToPlayer.values.iterator()
+    override fun containsAll(elements: Collection<Player>): Boolean = noToPlayer.values.containsAll(elements)
+    override fun contains(element: Player): Boolean = noToPlayer.containsValue(element)
+
+    fun notifyDogoutChange() {
+        val playersInDogout = noToPlayer.values.filter { it.location == DogOut }
+        _dogoutState.tryEmit(playersInDogout)
+    }
+    private val _dogoutState = MutableSharedFlow<List<Player>>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val dogoutFlow: SharedFlow<List<Player>> = _dogoutState
+
 }

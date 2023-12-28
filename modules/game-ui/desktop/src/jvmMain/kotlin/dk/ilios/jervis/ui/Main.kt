@@ -66,7 +66,6 @@ fun main() = application {
         }
         action
     }
-
 //    val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
 //        createRandomAction(controller.state, availableActions)
 //    }

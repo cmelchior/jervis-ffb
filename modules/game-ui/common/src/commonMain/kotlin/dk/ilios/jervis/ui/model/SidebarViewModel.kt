@@ -25,7 +25,7 @@ class SidebarViewModel(val team: Team) {
     fun view(): StateFlow<SidebarView> = _view
     fun reserveCount(): StateFlow<Int?> = _reserveCount
     fun reserves(): Flow<List<Player>> {
-        return team.players.dogoutFlow.map { players: List<Player> ->
+        return team.dogoutFlow.map { players: List<Player> ->
             players
                 .filter { it.state == PlayerState.STANDING }
                 .sortedBy { it.number }

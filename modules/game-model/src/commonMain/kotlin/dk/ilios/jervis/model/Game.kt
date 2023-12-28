@@ -17,6 +17,7 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     val awayTeam = awayTeam
 
     var activePlayer: Player? = null
+    var kickingPlayer: Player? = null
 
     var activeTeam: Team = this.homeTeam
     var inactiveTeam: Team = this.awayTeam

@@ -53,6 +53,7 @@ value class PlayerNo(val number: Int): Comparable<PlayerNo> {
             else ->  1
         }
     }
+    override fun toString(): String = number.toString()
 }
 
 abstract class Observable<T> {
@@ -74,11 +75,11 @@ abstract class Observable<T> {
 }
 
 fun Player.isOnHomeTeam(): Boolean {
-    return this.team.team.game.homeTeam == this.team.team
+    return this.team.game.homeTeam == this.team
 }
 
 class Player: Observable<Player>() {
-    lateinit var team: TeamPlayers
+    lateinit var team: Team
     var location: Location by observable(DogOut) { old, new ->
         if ((old == DogOut && new != DogOut) || old != DogOut && new == DogOut) {
             team.notifyDogoutChange()

@@ -61,9 +61,9 @@ class TeamBuilder(val roster: Roster) {
     fun build(): Team {
         return Team(name, roster, coach!!).apply {
             this@TeamBuilder.players.forEach {
-                this.players.add(it.value)
+                add(it.value)
             }
-            this.players.notifyDogoutChange()
+            notifyDogoutChange()
         }
     }
 }
@@ -98,7 +98,7 @@ fun AppPreview() {
     val p1 = team1
     val p2 = team1
     val field = Field.createForRuleset(rules)
-    val state = Game(p1, p1, field)
+    val state = Game(p1, p2, field)
     val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
     val actionSelectedChannel = Channel<Action>(1, onBufferOverflow = BufferOverflow.SUSPEND)
     val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
