@@ -29,7 +29,7 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 
-object SetupKickingTeam: Procedure() {
+object SetupTeam: Procedure() {
     override val initialNode: Node = SelectPlayerOrEndSetup
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -37,7 +37,7 @@ object SetupKickingTeam: Procedure() {
     object SelectPlayerOrEndSetup: ActionNode() {
 
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val availablePlayers = state.kickingTeam.players.filter {
+            val availablePlayers = state.activeTeam.players.filter {
                 val inReserve = (it.location == DogOut && it.state == PlayerState.STANDING)
                 val onField = (it.location is FieldCoordinate && it.state == PlayerState.STANDING)
                 inReserve || onField
@@ -65,7 +65,7 @@ object SetupKickingTeam: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
-            val isHomeTeam = state.kickingTeam.isHomeTeam()
+            val isHomeTeam = state.activeTeam.isHomeTeam()
             val freeFields: List<SelectFieldLocation> = state.field
                 .filter {
                     // Only select from fields on teams half

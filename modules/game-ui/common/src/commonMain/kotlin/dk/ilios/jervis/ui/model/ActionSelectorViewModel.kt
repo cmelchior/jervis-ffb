@@ -23,7 +23,7 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.procedures.SetupKickingTeam
+import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.utils.createRandomAction
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -62,9 +62,12 @@ class ActionSelectorViewModel(
         scope.launch {
             while(true) {
                 val (controller, actions) = actionRequestChannel.receive()
-                if (controller.stack.firstOrNull()?.procedure == SetupKickingTeam && controller.stack.firstOrNull()?.currentNode() == SetupKickingTeam.SelectPlayerOrEndSetup) {
-                    handleHomeKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
-                    handleAwayKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
+                if (controller.stack.firstOrNull()?.procedure == SetupTeam && controller.stack.firstOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+                    if (controller.state.activeTeam.isHomeTeam()) {
+                        handleHomeKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
+                    } else {
+                        handleAwayKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
+                    }
                     actionSelectedChannel.send(EndSetup)
                 } else {
                     val availableActions: List<Action> = actions.map { action ->
@@ -93,9 +96,7 @@ class ActionSelectorViewModel(
         actionSelectedChannel: Channel<Action>
     ) {
         val game: Game = controller.state
-        if (game.kickingTeam != game.homeTeam) return
-
-        val team = game.kickingTeam
+        val team = game.activeTeam
 
         setupPlayer(team, PlayerNo(1), FieldCoordinate(12, 6), actionRequestChannel, actionSelectedChannel)
         setupPlayer(team, PlayerNo(2), FieldCoordinate(12, 7), actionRequestChannel, actionSelectedChannel)
@@ -116,9 +117,7 @@ class ActionSelectorViewModel(
         actionSelectedChannel: Channel<Action>
     ) {
         val game: Game = controller.state
-        if (game.kickingTeam != game.awayTeam) return
-
-        val team = game.kickingTeam
+        val team = game.activeTeam
 
         setupPlayer(team, PlayerNo(1), FieldCoordinate(13, 6), actionRequestChannel, actionSelectedChannel)
         setupPlayer(team, PlayerNo(2), FieldCoordinate(13, 7), actionRequestChannel, actionSelectedChannel)
@@ -152,9 +151,12 @@ class ActionSelectorViewModel(
                 val (controller, actions) = actionRequestChannel.receive()
                 delay(20)
                 // TODO This wrong as we will create the wrong random action at the end
-                if (controller.stack.firstOrNull()?.procedure == SetupKickingTeam && controller.stack.firstOrNull()?.currentNode() == SetupKickingTeam.SelectPlayerOrEndSetup) {
-                    handleHomeKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
-                    handleAwayKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
+                if (controller.stack.firstOrNull()?.procedure == SetupTeam && controller.stack.firstOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+                    if (controller.state.activeTeam.isHomeTeam()) {
+                        handleHomeKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
+                    } else {
+                        handleAwayKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
+                    }
                     actionSelectedChannel.send(EndSetup)
                 } else {
                     val action: Action = createRandomAction(controller.state, actions)
