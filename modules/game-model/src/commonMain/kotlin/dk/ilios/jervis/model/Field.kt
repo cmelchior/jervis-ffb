@@ -5,19 +5,28 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlin.properties.Delegates
 
-class FieldSquare(coordinate: FieldCoordinate): Observable<FieldSquare>() {
+class FieldSquare(private val coordinate: FieldCoordinate): Observable<FieldSquare>(), Location {
     constructor(x: Int, y: Int): this(FieldCoordinate(x, y))
+
     val x = coordinate.x
     val y = coordinate.y
     var player: Player? by observable(null)
+    var ball: Ball? by observable(null)
 
     fun isEmpty(): Boolean = (player == null)
-    fun isOnTeamHalf(team: Team): Boolean {
-        TODO("Not yet implemented")
+    fun isOnTeamHalf(team: Team, rules: Rules): Boolean {
+        return if (team.isHomeTeam()) isOnHomeSide(rules) else isOnAwaySide(rules)
     }
     val squareFlow: SharedFlow<FieldSquare> = observeState
+    override fun isOnLineOfScrimmage(rules: Rules): Boolean = coordinate.isOnLineOfScrimmage(rules)
+    override fun isInWideZone(rules: Rules): Boolean = coordinate.isInWideZone(rules)
+    override fun isInEndZone(rules: Rules): Boolean = coordinate.isInEndZone(rules)
+    override fun isInCenterField(rules: Rules): Boolean = coordinate.isInCenterField(rules)
+    override fun isOnHomeSide(rules: Rules): Boolean = coordinate.isOnHomeSide(rules)
+    override fun isOnAwaySide(rules: Rules): Boolean = coordinate.isOnAwaySide(rules)
+    override fun isOnField(rules: Rules): Boolean = coordinate.isOnField(rules)
+    override fun isOutOfBounds(rules: Rules): Boolean = false
 }
 
 class Field(width: UInt, height: UInt): Iterable<FieldSquare> {

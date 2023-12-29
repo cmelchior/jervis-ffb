@@ -49,6 +49,7 @@ import androidx.compose.ui.window.WindowPosition.PlatformDefault.y
 import dk.ilios.jervis.actions.Action
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.Continue
+import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndSetup
@@ -71,6 +72,7 @@ import dk.ilios.jervis.ui.model.Square
 import dk.ilios.jervis.ui.model.UIPlayer
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.skia.Image
+import java.awt.SystemColor.text
 import java.awt.image.BufferedImage
 import java.io.InputStream
 import kotlin.random.Random
@@ -379,6 +381,7 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
                     EndTurn -> "EndTurn"
                     is FieldSquareSelected -> action.toString()
                     is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
+                    is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
                 }
                 Text(text, fontSize = 10.sp)
             }

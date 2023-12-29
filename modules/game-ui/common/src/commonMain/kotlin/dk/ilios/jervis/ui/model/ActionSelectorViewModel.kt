@@ -6,7 +6,16 @@ import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.ContinueWhenReady
+import dk.ilios.jervis.actions.D12Result
+import dk.ilios.jervis.actions.D20Result
 import dk.ilios.jervis.actions.D2Result
+import dk.ilios.jervis.actions.D3Result
+import dk.ilios.jervis.actions.D4Result
+import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.actions.D8Result
+import dk.ilios.jervis.actions.Dice
+import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndSetupWhenReady
@@ -14,7 +23,7 @@ import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.EndTurnWhenReady
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.PlayerSelected
-import dk.ilios.jervis.actions.RollD2
+import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
@@ -74,7 +83,24 @@ class ActionSelectorViewModel(
                         when (action) {
                             ContinueWhenReady -> Continue
                             EndTurnWhenReady -> EndTurn
-                            RollD2 -> D2Result(Random.nextInt(1, 2))
+                            is RollDice -> {
+                                val rolls = action.dice.map {
+                                    when(it) {
+                                        Dice.D2 -> D2Result()
+                                        Dice.D3 -> D3Result()
+                                        Dice.D4 -> D4Result()
+                                        Dice.D6 -> D6Result()
+                                        Dice.D8 -> D8Result()
+                                        Dice.D12 -> D12Result()
+                                        Dice.D20 -> D20Result()
+                                    }
+                                }
+                                if (rolls.size == 1) {
+                                    rolls.first()
+                                } else {
+                                    DiceResults(rolls)
+                                }
+                            }
                             ConfirmWhenReady -> Confirm
                             EndSetupWhenReady -> EndSetup
                             SelectDogout -> DogoutSelected

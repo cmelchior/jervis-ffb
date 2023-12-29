@@ -26,6 +26,7 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var kickingTeamInLastHalf: Team = kickingTeam
 
     val field: Field = field
+    val ball: Ball = Ball()
 
     init {
         homeTeam.setGameReference(this)

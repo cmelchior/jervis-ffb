@@ -51,7 +51,7 @@ object GameDrive: Procedure() {
     }
 
     object KickOff: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun getChildProcedure(state: Game, rules: Rules) = TheKickOff
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return ReportStartingKickOff(state.kickingTeam)
         }

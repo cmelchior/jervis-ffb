@@ -1,5 +1,8 @@
 package dk.ilios.jervis.model
 
+import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.actions.D8Result
+import dk.ilios.jervis.rules.Direction
 import dk.ilios.jervis.rules.Rules
 
 /**
@@ -12,7 +15,8 @@ sealed interface Location {
     fun isInCenterField(rules: Rules): Boolean
     fun isOnHomeSide(rules: Rules): Boolean
     fun isOnAwaySide(rules: Rules): Boolean
-    fun isOnField(): Boolean
+    fun isOnField(rules: Rules): Boolean
+    fun isOutOfBounds(rules: Rules): Boolean
 }
 // (0, 0) is (top, left)
 data class FieldCoordinate(val x: Int, val y: Int): Location {
@@ -37,8 +41,14 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
     override fun isOnAwaySide(rules: Rules): Boolean {
         return x.toUInt() >= rules.fieldWidth / 2u
     }
-    override fun isOnField(): Boolean {
-        return true
+    override fun isOnField(rules: Rules): Boolean {
+        return (x >= 0 && x < rules.fieldWidth.toInt() && y >= 0 && y < rules.fieldHeight.toInt())
+    }
+    override fun isOutOfBounds(rules: Rules): Boolean {
+        return x < 0 || x >= rules.fieldWidth.toInt() || y < 0 || y >= rules.fieldHeight.toInt()
+    }
+    fun move(direction: Direction, steps: Int): FieldCoordinate {
+        return FieldCoordinate(x + (direction.xModifier*steps), y + (direction.yModifier*steps))
     }
 }
 data object DogOut: Location {
@@ -48,7 +58,8 @@ data object DogOut: Location {
     override fun isInCenterField(rules: Rules): Boolean = false
     override fun isOnHomeSide(rules: Rules): Boolean = false
     override fun isOnAwaySide(rules: Rules): Boolean = false
-    override fun isOnField(): Boolean = false
+    override fun isOnField(rules: Rules): Boolean = false
+    override fun isOutOfBounds(rules: Rules): Boolean = false
 }
 
 

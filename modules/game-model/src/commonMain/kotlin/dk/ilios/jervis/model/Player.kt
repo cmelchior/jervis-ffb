@@ -115,6 +115,9 @@ class Player: Observable<Player>() {
         get() {
             return baseArmorValue
         }
+    fun hasBall(): Boolean {
+        return team.game.ball.state == BallState.CARRIED && team.game.ball.location == location
+    }
 
     // Expose updats to this class as Flow
     val observePlayer = observeState

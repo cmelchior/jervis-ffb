@@ -3,14 +3,26 @@ package dk.ilios.jervis.procedures
 import compositeCommandOf
 import dk.ilios.jervis.actions.Action
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.actions.D8Result
+import dk.ilios.jervis.actions.Dice
+import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.RollDice
+import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.SetBallLocation
+import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetKickingPlayer
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.logs.ReportKickResult
 import dk.ilios.jervis.logs.ReportKickingPlayer
+import dk.ilios.jervis.model.BallState
+import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.rules.Rules
@@ -76,7 +88,8 @@ object TheKickOff: Procedure() {
             return checkType<PlayerSelected>(action) {
                 compositeCommandOf(
                     SetKickingPlayer(it.player),
-                    ReportKickingPlayer(it.player)
+                    ReportKickingPlayer(it.player),
+                    GotoNode(PlaceTheKick)
                 )
             }
         }
@@ -84,22 +97,37 @@ object TheKickOff: Procedure() {
 
     object PlaceTheKick: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            TODO("Not yet implemented")
+            // Place the ball anywhere on the opposing teams side
+            return state.field
+                .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
+                .map { SelectFieldLocation(it.x, it.y) }
         }
 
         override fun applyAction(action: Action, state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
+            return checkType<FieldSquareSelected>(action) {
+                compositeCommandOf(
+                    SetBallState(BallState.IN_AIR),
+                    SetBallLocation(FieldCoordinate(it.x, it.y)),
+                    GotoNode(TheKickDeviates)
+                )
+            }
         }
     }
 
     object TheKickDeviates: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            TODO("Not yet implemented")
+            return listOf(RollDice(Dice.D8, Dice.D6))
         }
 
         override fun applyAction(action: Action, state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
+            return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
+                val direction = rules.randomDirection(d8)
+                val newLocation = state.ball.location.move(direction, d6.result)
+                compositeCommandOf(
+                    SetBallLocation(newLocation),
+                    ReportKickResult(d8, d6, newLocation, rules)
+                )
+            }
         }
-
     }
 }

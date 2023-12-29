@@ -4,7 +4,8 @@ import compositeCommandOf
 import dk.ilios.jervis.actions.Action
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D2Result
-import dk.ilios.jervis.actions.RollD2
+import dk.ilios.jervis.actions.Dice
+import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.SetKickingTeam
@@ -26,7 +27,7 @@ object DetermineKickingTeam: Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object CoinToss: ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollD2)
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D2))
         override fun applyAction(action: Action, state: Game, rules: Rules): Command {
             return checkType<D2Result>(action) {
                 when(it.result) {
