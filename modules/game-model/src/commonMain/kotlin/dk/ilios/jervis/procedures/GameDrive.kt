@@ -11,9 +11,9 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.logs.ReportSetupKickingTeam
-import dk.ilios.jervis.logs.ReportSetupReceivingTeam
-import dk.ilios.jervis.logs.ReportStartingKickOff
+import dk.ilios.jervis.reports.ReportSetupKickingTeam
+import dk.ilios.jervis.reports.ReportSetupReceivingTeam
+import dk.ilios.jervis.reports.ReportStartingKickOff
 import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
@@ -63,7 +63,7 @@ object GameDrive: Procedure() {
     }
 
     object KickOffEvent: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun getChildProcedure(state: Game, rules: Rules) = TheKickOffEvent
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetActiveTeam(state.receivingTeam),

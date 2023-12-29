@@ -9,5 +9,5 @@ enum class BallState {
 
 class Ball {
     var state: BallState = BallState.ON_GROUND
-    var location: FieldCoordinate = FieldCoordinate(0, 0)
+    var location: FieldCoordinate = FieldCoordinate.UNKNOWN
 }

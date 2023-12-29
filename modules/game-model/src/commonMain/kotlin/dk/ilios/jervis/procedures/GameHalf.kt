@@ -12,8 +12,8 @@ import dk.ilios.jervis.commands.SetTurnNo
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.logs.ReportStartingDrive
-import dk.ilios.jervis.logs.ReportStartingHalf
+import dk.ilios.jervis.reports.ReportStartingDrive
+import dk.ilios.jervis.reports.ReportStartingHalf
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 

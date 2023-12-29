@@ -12,6 +12,7 @@ import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
@@ -19,8 +20,8 @@ import dk.ilios.jervis.commands.SetKickingPlayer
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.logs.ReportKickResult
-import dk.ilios.jervis.logs.ReportKickingPlayer
+import dk.ilios.jervis.reports.ReportKickResult
+import dk.ilios.jervis.reports.ReportKickingPlayer
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
@@ -125,7 +126,8 @@ object TheKickOff: Procedure() {
                 val newLocation = state.ball.location.move(direction, d6.result)
                 compositeCommandOf(
                     SetBallLocation(newLocation),
-                    ReportKickResult(d8, d6, newLocation, rules)
+                    ReportKickResult(state.kickingTeam, d8, d6, newLocation, rules),
+                    ExitProcedure()
                 )
             }
         }

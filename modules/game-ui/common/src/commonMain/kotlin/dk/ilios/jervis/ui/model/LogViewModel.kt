@@ -3,8 +3,8 @@ package dk.ilios.jervis.ui.model
 import dk.ilios.jervis.controller.AddEntry
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.controller.RemoveEntry
-import dk.ilios.jervis.logs.LogCategory
-import dk.ilios.jervis.logs.LogEntry
+import dk.ilios.jervis.reports.LogCategory
+import dk.ilios.jervis.reports.LogEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

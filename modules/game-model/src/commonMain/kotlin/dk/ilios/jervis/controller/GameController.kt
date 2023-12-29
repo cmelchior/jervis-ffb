@@ -13,8 +13,8 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.fsm.ProcedureStack
 import dk.ilios.jervis.fsm.ProcedureState
-import dk.ilios.jervis.logs.LogEntry
-import dk.ilios.jervis.logs.SimpleLogEntry
+import dk.ilios.jervis.reports.LogEntry
+import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.rules.Rules

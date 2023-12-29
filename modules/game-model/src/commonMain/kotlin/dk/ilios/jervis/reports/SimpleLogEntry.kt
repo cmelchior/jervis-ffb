@@ -1,4 +1,4 @@
-package dk.ilios.jervis.logs
+package dk.ilios.jervis.reports
 
 class SimpleLogEntry(
     override val message: String,

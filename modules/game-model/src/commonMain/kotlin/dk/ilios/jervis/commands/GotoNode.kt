@@ -3,8 +3,8 @@ package dk.ilios.jervis.commands
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
-import dk.ilios.jervis.logs.LogEntry
-import dk.ilios.jervis.logs.SimpleLogEntry
+import dk.ilios.jervis.reports.LogEntry
+import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.model.Game
 
 class GotoNode(private val nextNode: Node): Command {

@@ -1,4 +1,4 @@
-package dk.ilios.jervis.logs
+package dk.ilios.jervis.reports
 
 data class ReportStartingHalf(private val half: UInt) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

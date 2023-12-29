@@ -20,6 +20,11 @@ sealed interface Location {
 }
 // (0, 0) is (top, left)
 data class FieldCoordinate(val x: Int, val y: Int): Location {
+
+    companion object {
+        val UNKNOWN = FieldCoordinate(Int.MAX_VALUE, Int.MAX_VALUE)
+    }
+
     override fun isOnLineOfScrimmage(rules: Rules): Boolean {
         return x == rules.lineOfScrimmageHome || x == rules.lineOfScrimmageAway
     }

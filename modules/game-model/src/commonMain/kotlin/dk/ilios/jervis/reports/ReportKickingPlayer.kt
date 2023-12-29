@@ -1,4 +1,4 @@
-package dk.ilios.jervis.logs
+package dk.ilios.jervis.reports
 
 import dk.ilios.jervis.model.Player
 

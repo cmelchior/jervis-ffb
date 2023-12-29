@@ -1,6 +1,7 @@
 package dk.ilios.jervis.rules
 
 import dk.ilios.jervis.actions.D3Result
+import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.model.FieldCoordinate
@@ -8,7 +9,9 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Location
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.procedures.GameDrive
 import dk.ilios.jervis.utils.INVALID_ACTION
+import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -93,7 +96,47 @@ object RandomDirectionTemplate {
     }
 }
 
+enum class KickOffEvent {
+    GET_THE_REF,
+    TIME_OUT,
+    SOLID_DEFENSE,
+    HIGH_KICK,
+    CHEERING_FANS,
+    BRILLIANT_COACHING,
+    CHANGING_WEATHER,
+    QUICK_SNAP,
+    BLITZ,
+    OFFICIOUS_REF,
+    PITCH_INVASION
+}
 
+/**
+ * Class representing the Kick-Off Event Table on page 41 in the rulebook.
+ */
+object KickOffEventTable {
+
+    private val table = mapOf(
+        2 to KickOffEvent.GET_THE_REF,
+        3 to KickOffEvent.TIME_OUT,
+        4 to KickOffEvent.SOLID_DEFENSE,
+        5 to KickOffEvent.HIGH_KICK,
+        6 to KickOffEvent.CHEERING_FANS,
+        7 to KickOffEvent.BRILLIANT_COACHING,
+        8 to KickOffEvent.CHANGING_WEATHER,
+        9 to KickOffEvent.QUICK_SNAP,
+        10 to KickOffEvent.BLITZ,
+        11 to KickOffEvent.OFFICIOUS_REF,
+        12 to KickOffEvent.PITCH_INVASION,
+    )
+
+    /**
+     * Roll on the table and return the result.
+     */
+    fun roll(die1: D6Result, die2: D6Result): KickOffEvent {
+        val result = die1.result + die2.result
+        return table[result] ?: INVALID_GAME_STATE("$result was not found in the Kick-Off Event Table.")
+    }
+}
 
 interface Rules {
 
@@ -215,6 +258,9 @@ interface Rules {
 
     val randomDirectionTemplate
         get() = RandomDirectionTemplate
+
+    val kickOffEventTable
+        get() = KickOffEventTable
 
     // Blood Bowl 7
     // Total width of the field

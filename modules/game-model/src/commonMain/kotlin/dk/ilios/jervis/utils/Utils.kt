@@ -63,7 +63,7 @@ inline fun assert(condition: Boolean) {
 }
 
 class InvalidAction(message: String): RuntimeException(message)
-class InvalidGameState(message: String): RuntimeException(message)
+class InvalidGameState(message: String): IllegalStateException(message)
 
 inline fun INVALID_GAME_STATE(message: String = "Unexpected game state"): Nothing {
     throw InvalidGameState(message)
