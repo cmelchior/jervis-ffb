@@ -71,6 +71,7 @@ import dk.ilios.jervis.ui.model.SidebarViewModel
 import dk.ilios.jervis.ui.model.Square
 import dk.ilios.jervis.ui.model.UIPlayer
 import kotlinx.coroutines.flow.Flow
+import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
 import java.awt.SystemColor.text
 import java.awt.image.BufferedImage
@@ -165,6 +166,7 @@ fun Player(modifier: Modifier, player: Player) {
     Box(modifier = modifier.aspectRatio(1f)
     ) {
         val playerImage = remember { IconFactory.getImage(player).toComposeImageBitmap() }
+        val ballImage = remember { IconFactory.getHeldBallOverlay().toComposeImageBitmap() }
         Image(
             bitmap = playerImage,
             contentDescription = null,
@@ -172,6 +174,15 @@ fun Player(modifier: Modifier, player: Player) {
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize()
         )
+        if (player.hasBall()) {
+            Image(
+                bitmap = ballImage,
+                contentDescription = null,
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 
@@ -447,6 +458,9 @@ fun Field(vm: FieldViewModel, modifier: Modifier) {
                         ) {
                             square.player?.let {
                                 Player(boxModifier, it)
+                            }
+                            square.ball?.let {
+                              Image(bitmap = IconFactory.getBall().toComposeImageBitmap(), contentDescription = "")
                             }
                         }
                     }

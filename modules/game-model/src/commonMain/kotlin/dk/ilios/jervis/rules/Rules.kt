@@ -265,6 +265,10 @@ interface Rules {
         return randomDirectionTemplate.roll(corner, d3)
     }
 
+    fun isKickingOff(state: Game): Boolean {
+        TODO("Not yet implemented")
+    }
+
     // Game length setup
 
     val halfsPrGame: UInt

@@ -1,6 +1,5 @@
 package dk.ilios.jervis.ui.images
 
-import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.isOnHomeTeam
 import dk.ilios.jervis.rules.roster.Position
@@ -77,15 +76,22 @@ object IconFactory {
     private var classLoader: ClassLoader
     private val cachedSpriteSheets: MutableMap<Position, BufferedImage> = mutableMapOf()
     private val cachedPositionVariants: MutableMap<Position, PositionImageFactory> = mutableMapOf()
-    private val cachedImages: MutableMap<Player, PositionImage> = mutableMapOf()
+    private val cachedPlayers: MutableMap<Player, PositionImage> = mutableMapOf()
+    private val cachedImages: MutableMap<String, BufferedImage> = mutableMapOf()
 
     init {
         classLoader = Thread.currentThread().contextClassLoader
     }
 
-    private fun loadImageFromResources(path: String): BufferedImage {
-        val input: InputStream = classLoader.getResourceAsStream(path)
-        return ImageIO.read(input)
+    private fun loadImageFromResources(path: String, cache: Boolean = false): BufferedImage {
+        if (cache && cachedImages.containsKey(path)) {
+            return cachedImages[path]!!
+        } else {
+            val input: InputStream = classLoader.getResourceAsStream(path)
+            val image = ImageIO.read(input)
+            cachedImages[path] = image
+            return image
+        }
     }
 
     private fun getPositionSpriteSheet(position: Position): PositionImageFactory {
@@ -106,12 +112,20 @@ object IconFactory {
         val playerType: Position = player.position
         val isActive = false // game.activePlayer
 
-        if (cachedImages.contains(player)) {
-            return cachedImages[player]!!.default
+        if (cachedPlayers.contains(player)) {
+            return cachedPlayers[player]!!.default
         } else {
             val variants = getPositionSpriteSheet(player.position)
             val playerImage = variants.getVariant(player)
             return playerImage.default
         }
+    }
+
+    fun getHeldBallOverlay(): BufferedImage {
+        return loadImageFromResources("icons/decorations/holdball.png", cache = true)
+    }
+
+    fun getBall(): BufferedImage {
+        return loadImageFromResources("icons/game/sball_30x30.png")
     }
 }

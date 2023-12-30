@@ -121,9 +121,9 @@ class ActionSelectorViewModel(
             }
             actionSelectedChannel.send(EndSetup)
             return true
-        } else if (controller.stack.firstOrNull()?.procedure == TheKickOffEvent && controller.stack.firstOrNull()?.currentNode() == TheKickOffEvent.ResolveKickOffEvent) {
-            actionSelectedChannel.send(DiceResults(listOf(D6Result(2), D6Result(4))))
-            return true
+//        } else if (controller.stack.firstOrNull()?.procedure == TheKickOffEvent && controller.stack.firstOrNull()?.currentNode() == TheKickOffEvent.ResolveKickOffEvent) {
+//            actionSelectedChannel.send(DiceResults(listOf(D6Result(2), D6Result(4))))
+//            return true
         } else {
             return false
         }

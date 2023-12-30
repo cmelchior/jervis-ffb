@@ -19,7 +19,9 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 /**
  * Select the kicking team automatically by using a coin toss.
- * TODO Extend this with the winner choosing whether to kick or receive.
+ * TODO Extend this with the winner choosing whether to kick or receive
+ *
+ * See page 38 of the rulebook.
  */
 object DetermineKickingTeam: Procedure() {
     override val initialNode: Node = CoinToss

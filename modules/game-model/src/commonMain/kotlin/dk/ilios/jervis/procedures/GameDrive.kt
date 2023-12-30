@@ -73,7 +73,7 @@ object GameDrive: Procedure() {
     }
 
     object Turn: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = GameTurn
+        override fun getChildProcedure(state: Game, rules: Rules) = TeamTurn
         override fun onExitNode(state: Game, rules: Rules): Command {
             val switchTeamCommands = compositeCommandOf(
                 SetActiveTeam(state.inactiveTeam),

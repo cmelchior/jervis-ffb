@@ -6,6 +6,7 @@ import kotlin.properties.Delegates
 
 class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var goalScored: Boolean = false
+    var abortIfBallOutOfBounds: Boolean = false
     var halfNo by Delegates.observable(0u) { prop, old, new ->
         gameFlow.tryEmit(this)
     }

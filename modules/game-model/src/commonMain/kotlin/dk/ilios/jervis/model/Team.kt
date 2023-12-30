@@ -75,6 +75,7 @@ class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
     }
 
     fun isHomeTeam(): Boolean = (game.homeTeam == this)
+    fun isAwayTeam(): Boolean = (game.awayTeam == this)
 
     fun add(player: Player) {
         player.team = this

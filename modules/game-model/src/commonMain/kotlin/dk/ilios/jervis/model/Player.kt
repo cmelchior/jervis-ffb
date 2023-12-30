@@ -7,7 +7,6 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlin.jvm.JvmInline
-import kotlin.properties.Delegates.observable
 import kotlin.properties.ObservableProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -78,6 +77,12 @@ fun Player.isOnHomeTeam(): Boolean {
     return this.team.game.homeTeam == this.team
 }
 
+enum class Availability {
+    AVAILABLE,
+    IS_ACTIVE,
+    HAS_BEEN_ACTIVE
+}
+
 class Player: Observable<Player>() {
     lateinit var team: Team
     var location: Location by observable(DogOut) { old, new ->
@@ -86,6 +91,10 @@ class Player: Observable<Player>() {
         }
     }
     var state: PlayerState by observable(PlayerState.STANDING)
+    var isActive: Boolean by observable(false)
+    var available: Availability by observable(Availability.AVAILABLE)
+    var stunnedThisTurn: Boolean? = null
+    var hasTackleZones: Boolean = true
     var name: String by observable("")
     var number: PlayerNo = PlayerNo(0)
     var position: Position = HumanTeam.positions.first()
@@ -115,9 +124,14 @@ class Player: Observable<Player>() {
         get() {
             return baseArmorValue
         }
-    fun hasBall(): Boolean {
-        return team.game.ball.state == BallState.CARRIED && team.game.ball.location == location
-    }
+    val ball: Ball?
+        get() = if (team.game.ball.state == BallState.CARRIED && team.game.ball.location == location) {
+            team.game.ball
+        } else {
+            null
+        }
+
+    fun hasBall(): Boolean = (ball != null)
 
     // Expose updats to this class as Flow
     val observePlayer = observeState

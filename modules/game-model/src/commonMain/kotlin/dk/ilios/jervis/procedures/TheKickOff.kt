@@ -107,7 +107,7 @@ object TheKickOff: Procedure() {
         override fun applyAction(action: Action, state: Game, rules: Rules): Command {
             return checkType<FieldSquareSelected>(action) {
                 compositeCommandOf(
-                    SetBallState(BallState.IN_AIR),
+                    SetBallState.inAir(),
                     SetBallLocation(FieldCoordinate(it.x, it.y)),
                     GotoNode(TheKickDeviates)
                 )
