@@ -269,6 +269,13 @@ interface Rules {
         TODO("Not yet implemented")
     }
 
+    /**
+     * Returns whether a not a player is eligible for catching a ball that landed in his field.
+     */
+    fun canCatch(state: Game, player: Player): Boolean {
+        return player.hasTackleZones && player.state == PlayerState.STANDING && player.location.isOnField(this)
+    }
+
     // Game length setup
 
     val halfsPrGame: UInt

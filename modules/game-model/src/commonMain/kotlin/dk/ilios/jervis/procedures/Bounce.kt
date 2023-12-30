@@ -12,10 +12,13 @@ import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.fsm.ActionNode
+import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.reports.ReportBounce
 import dk.ilios.jervis.rules.Direction
@@ -39,10 +42,12 @@ object Bounce: Procedure() {
         override fun applyAction(action: Action, state: Game, rules: Rules): Command {
             return checkType<D8Result>(action) { d8 ->
                 val direction: Direction = rules.randomDirection(d8)
-                val newLocation = state.ball.location.move(direction, 1)
-                val outOfBounds = newLocation.isOutOfBounds(rules)
-                val nextNode = if (outOfBounds) {
+                val newLocation: FieldCoordinate = state.ball.location.move(direction, 1)
+                val outOfBounds: Boolean = newLocation.isOutOfBounds(rules)
+                val playerAtTarget: Player? = state.field[newLocation].player
+                val nextNode: Command = if (outOfBounds) {
                     // TODO Throw-in or trigger touchback
+                    // TODO For kick-offs, bouncing across the halfline is also considered out-of-bounds
                     compositeCommandOf(
                         SetBallState.outOfBounds(state.ball.location),
                         if (state.abortIfBallOutOfBounds) {
@@ -51,22 +56,32 @@ object Bounce: Procedure() {
                             GotoNode(ResolveThrowIn)
                         }
                     )
-                } else {
-                    val eligiblePlayerForCatching = state.field[newLocation].player?.let {
-                        it.state == PlayerState.STANDING && it.hasTackleZones
-                    } ?: false
+                } else if (playerAtTarget != null) {
+                    val eligiblePlayerForCatching = rules.canCatch(state, playerAtTarget)
                     if (eligiblePlayerForCatching) {
-                        GotoNode(ResolveBounce)
-                    } else {
                         GotoNode(ResolveCatch)
+                    } else {
+                        GotoNode(ResolveBounce)
                     }
+                } else {
+                    GotoNode(ResolveLandingOnTheGround)
                 }
+
                 return compositeCommandOf(
                     SetBallLocation(newLocation),
                     ReportBounce(newLocation, if (outOfBounds) state.ball.location else null),
                     nextNode
                 )
             }
+        }
+    }
+
+    object ResolveLandingOnTheGround: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                SetBallState.onGround(),
+                ExitProcedure()
+            )
         }
     }
 

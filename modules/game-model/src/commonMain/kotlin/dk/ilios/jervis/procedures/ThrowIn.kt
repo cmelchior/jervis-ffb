@@ -30,7 +30,7 @@ object ThrowIn: Procedure() {
     // TODO For now just select an empty field
     object SelectDirection: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val square = state.field.first { it.isEmpty() }
+            val square = state.field.filter { it.isEmpty() }.random()
             return compositeCommandOf(
                 SetBallLocation(square.coordinates),
                 SetBallState.onGround(),
