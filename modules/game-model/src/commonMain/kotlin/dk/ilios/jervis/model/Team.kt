@@ -1,5 +1,6 @@
 package dk.ilios.jervis.model
 
+import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.rules.roster.Roster
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,6 +21,10 @@ class TeamTurnData(private val game: Game) {
     var currentTurn by Delegates.observable(0u) { prop, old, new ->
         game.gameFlow.tryEmit(game)
     }
+}
+
+class TeamTemporaryData(private val game: Game) {
+    val dieRoll = mutableListOf<DieResult>()
 }
 
 class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
@@ -49,6 +54,7 @@ class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
     lateinit var halfData: TeamHalfData
     lateinit var driveData: TeamDriveData
     lateinit var turnData: TeamTurnData
+    lateinit var temporaryData: TeamTemporaryData
 
     // Must be called before using this class.
     // Used to break circular reference between Team and Game instances
@@ -56,6 +62,7 @@ class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
         halfData = TeamHalfData(game)
         driveData = TeamDriveData(game)
         turnData = TeamTurnData(game)
+        temporaryData = TeamTemporaryData(game)
         this.game = game
     }
 

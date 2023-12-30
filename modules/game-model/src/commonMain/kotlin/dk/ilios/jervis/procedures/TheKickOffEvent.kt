@@ -10,27 +10,15 @@ import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.NoOpCommand
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.bb2020.kickoff.Blitz
-import dk.ilios.jervis.procedures.bb2020.kickoff.BrilliantCoaching
-import dk.ilios.jervis.procedures.bb2020.kickoff.ChangingWeather
-import dk.ilios.jervis.procedures.bb2020.kickoff.CheeringFans
-import dk.ilios.jervis.procedures.bb2020.kickoff.GetTheRef
-import dk.ilios.jervis.procedures.bb2020.kickoff.HighKick
-import dk.ilios.jervis.procedures.bb2020.kickoff.OfficiousRef
-import dk.ilios.jervis.procedures.bb2020.kickoff.PitchInvasion
-import dk.ilios.jervis.procedures.bb2020.kickoff.QuickSnap
-import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
-import dk.ilios.jervis.procedures.bb2020.kickoff.TimeOut
 import dk.ilios.jervis.reports.ReportKickOffEventRoll
-import dk.ilios.jervis.rules.KickOffEvent
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.TableResult
 
 /**
  * Run the Kick-Off Event as well as the results of the ball coming back to the field.
@@ -64,24 +52,11 @@ object TheKickOffEvent: Procedure() {
         // the ball leaves the kicking teams half, then this also impacts things like Blitz,
         // where you
         override fun applyAction(action: Action, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result, D6Result>(action) { first, second ->
-                val event: KickOffEvent = rules.kickOffEventTable.roll(first, second)
-                val eventProcedure: Procedure = when(event) {
-                    KickOffEvent.GET_THE_REF -> GetTheRef
-                    KickOffEvent.TIME_OUT -> TimeOut
-                    KickOffEvent.SOLID_DEFENSE -> SolidDefense
-                    KickOffEvent.HIGH_KICK -> HighKick
-                    KickOffEvent.CHEERING_FANS -> CheeringFans
-                    KickOffEvent.BRILLIANT_COACHING -> BrilliantCoaching
-                    KickOffEvent.CHANGING_WEATHER -> ChangingWeather
-                    KickOffEvent.QUICK_SNAP -> QuickSnap
-                    KickOffEvent.BLITZ -> Blitz
-                    KickOffEvent.OFFICIOUS_REF -> OfficiousRef
-                    KickOffEvent.PITCH_INVASION -> PitchInvasion
-                }
+            return checkDiceRoll<D6Result, D6Result>(action) { firstD6, secondD6 ->
+                val result: TableResult = rules.kickOffEventTable.roll(firstD6, secondD6)
                 compositeCommandOf(
-                    ReportKickOffEventRoll(first, second, event),
-                    GotoNode(ResolveKickOffTableEvent(eventProcedure))
+                    ReportKickOffEventRoll(firstD6, secondD6, result),
+                    GotoNode(ResolveKickOffTableEvent(result.procedure))
                 )
             }
         }

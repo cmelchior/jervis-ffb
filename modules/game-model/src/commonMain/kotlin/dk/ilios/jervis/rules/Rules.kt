@@ -1,16 +1,26 @@
 package dk.ilios.jervis.rules
 
+import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.actions.RollDice
+import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.Location
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.procedures.GameDrive
-import dk.ilios.jervis.utils.INVALID_ACTION
+import dk.ilios.jervis.procedures.DummyProcedure
+import dk.ilios.jervis.procedures.bb2020.kickoff.Blitz
+import dk.ilios.jervis.procedures.bb2020.kickoff.BrilliantCoaching
+import dk.ilios.jervis.procedures.bb2020.kickoff.ChangingWeather
+import dk.ilios.jervis.procedures.bb2020.kickoff.CheeringFans
+import dk.ilios.jervis.procedures.bb2020.kickoff.GetTheRef
+import dk.ilios.jervis.procedures.bb2020.kickoff.HighKick
+import dk.ilios.jervis.procedures.bb2020.kickoff.OfficiousRef
+import dk.ilios.jervis.procedures.bb2020.kickoff.PitchInvasion
+import dk.ilios.jervis.procedures.bb2020.kickoff.QuickSnap
+import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
+import dk.ilios.jervis.procedures.bb2020.kickoff.TimeOut
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlin.math.PI
 import kotlin.math.cos
@@ -96,45 +106,72 @@ object RandomDirectionTemplate {
     }
 }
 
-enum class KickOffEvent {
-    GET_THE_REF,
-    TIME_OUT,
-    SOLID_DEFENSE,
-    HIGH_KICK,
-    CHEERING_FANS,
-    BRILLIANT_COACHING,
-    CHANGING_WEATHER,
-    QUICK_SNAP,
-    BLITZ,
-    OFFICIOUS_REF,
-    PITCH_INVASION
-}
-
 /**
  * Class representing the Kick-Off Event Table on page 41 in the rulebook.
  */
 object KickOffEventTable {
 
     private val table = mapOf(
-        2 to KickOffEvent.GET_THE_REF,
-        3 to KickOffEvent.TIME_OUT,
-        4 to KickOffEvent.SOLID_DEFENSE,
-        5 to KickOffEvent.HIGH_KICK,
-        6 to KickOffEvent.CHEERING_FANS,
-        7 to KickOffEvent.BRILLIANT_COACHING,
-        8 to KickOffEvent.CHANGING_WEATHER,
-        9 to KickOffEvent.QUICK_SNAP,
-        10 to KickOffEvent.BLITZ,
-        11 to KickOffEvent.OFFICIOUS_REF,
-        12 to KickOffEvent.PITCH_INVASION,
+        2 to TableResult("Get the Ref", GetTheRef),
+        3 to TableResult("Time Out", TimeOut),
+        4 to TableResult("Solid Defense", SolidDefense),
+        5 to TableResult("High Kick", HighKick),
+        6 to TableResult("Cheering Fans", CheeringFans),
+        7 to TableResult("Brilliant Coaching", BrilliantCoaching),
+        8 to TableResult("Changing Weather", ChangingWeather),
+        9 to TableResult("Quick Snap", QuickSnap),
+        10 to TableResult("Blitz", Blitz),
+        11 to TableResult("Officious Ref", OfficiousRef),
+        12 to TableResult("Pitch Invasion", PitchInvasion),
     )
 
     /**
-     * Roll on the table and return the result.
+     * Roll on the Kick-Off table and return the result.
      */
-    fun roll(die1: D6Result, die2: D6Result): KickOffEvent {
+    fun roll(die1: D6Result, die2: D6Result): TableResult {
         val result = die1.result + die2.result
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Kick-Off Event Table.")
+    }
+}
+
+/**
+ * Wrapper around a table result, e.g. rolling on the Kick-Off Table or
+ * the Prayers To Nuffle Table.
+ *
+ * Rolling on these tables all involve more complicated logic that is
+ * controlled by procedures. So any node that looks up a TableResult should
+ * put the returned procedure on the stack to be executed as the next step.
+ */
+data class TableResult(val name: String, val procedure: Procedure)
+
+/**
+ * Class representing the Prayers To Nuffle Table on page 39 in the rulebook.
+ */
+object PrayersToNuffleTable {
+    private val table = mapOf(
+        1 to TableResult("Treacherous Trapdor", DummyProcedure),
+        2 to TableResult("Friends with the Ref", DummyProcedure),
+        3 to TableResult("Stilleto", DummyProcedure),
+        4 to TableResult("Iron Man", DummyProcedure),
+        5 to TableResult("Knuckle Dusters", DummyProcedure),
+        6 to TableResult("Bad Habits", DummyProcedure),
+        7 to TableResult("Greasy Cleats", DummyProcedure),
+        8 to TableResult("Blessed Statue of Nuffle", DummyProcedure),
+        9 to TableResult("Moles unde the Pitch", DummyProcedure),
+        10 to TableResult("Perfect Passing", DummyProcedure),
+        11 to TableResult("Fan Interaction", DummyProcedure),
+        12 to TableResult("Necessary Violence", DummyProcedure),
+        13 to TableResult("Fouling Frenzy", DummyProcedure),
+        14 to TableResult("Throw a Rock", DummyProcedure),
+        15 to TableResult("Under Scrutiny", DummyProcedure),
+        16 to TableResult("Intensive Training", DummyProcedure),
+    )
+    /**
+     *
+     * Roll on the table and return the result.
+     */
+    fun roll(d16: D16Result): TableResult {
+        return table[d16.result] ?: INVALID_GAME_STATE("${d16.result} was not found in the Kick-Off Event Table.")
     }
 }
 
@@ -261,6 +298,9 @@ interface Rules {
 
     val kickOffEventTable
         get() = KickOffEventTable
+
+    val prayersToNuffleTableEvent
+        get() = PrayersToNuffleTable
 
     // Blood Bowl 7
     // Total width of the field

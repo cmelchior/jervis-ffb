@@ -7,6 +7,7 @@ import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.D12Result
+import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D20Result
 import dk.ilios.jervis.actions.D2Result
 import dk.ilios.jervis.actions.D3Result
@@ -28,11 +29,14 @@ import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.controller.GameController
+import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.SetupTeam
+import dk.ilios.jervis.procedures.TheKickOff
+import dk.ilios.jervis.procedures.TheKickOffEvent
 import dk.ilios.jervis.utils.createRandomAction
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +47,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class ActionSelectorViewModel(
     private val controller: GameController,
@@ -69,50 +72,60 @@ class ActionSelectorViewModel(
 
     private fun startUserActionSelector() {
         scope.launch {
-            while(true) {
+            actions@while(true) {
                 val (controller, actions) = actionRequestChannel.receive()
-                if (controller.stack.firstOrNull()?.procedure == SetupTeam && controller.stack.firstOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
-                    if (controller.state.activeTeam.isHomeTeam()) {
-                        handleHomeKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
-                    } else {
-                        handleAwayKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
-                    }
-                    actionSelectedChannel.send(EndSetup)
-                } else {
-                    val availableActions: List<Action> = actions.map { action ->
-                        when (action) {
-                            ContinueWhenReady -> Continue
-                            EndTurnWhenReady -> EndTurn
-                            is RollDice -> {
-                                val rolls = action.dice.map {
-                                    when(it) {
-                                        Dice.D2 -> D2Result()
-                                        Dice.D3 -> D3Result()
-                                        Dice.D4 -> D4Result()
-                                        Dice.D6 -> D6Result()
-                                        Dice.D8 -> D8Result()
-                                        Dice.D12 -> D12Result()
-                                        Dice.D20 -> D20Result()
-                                    }
-                                }
-                                if (rolls.size == 1) {
-                                    rolls.first()
-                                } else {
-                                    DiceResults(rolls)
+                if (useAutomatedActions(controller)) continue@actions
+                val availableActions: List<Action> = actions.map { action ->
+                    when (action) {
+                        ContinueWhenReady -> Continue
+                        EndTurnWhenReady -> EndTurn
+                        is RollDice -> {
+                            val rolls = action.dice.map {
+                                when(it) {
+                                    Dice.D2 -> D2Result()
+                                    Dice.D3 -> D3Result()
+                                    Dice.D4 -> D4Result()
+                                    Dice.D6 -> D6Result()
+                                    Dice.D8 -> D8Result()
+                                    Dice.D12 -> D12Result()
+                                    Dice.D16 -> D16Result()
+                                    Dice.D20 -> D20Result()
                                 }
                             }
-                            ConfirmWhenReady -> Confirm
-                            EndSetupWhenReady -> EndSetup
-                            SelectDogout -> DogoutSelected
-                            is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
-                            is SelectPlayer -> PlayerSelected(action.player)
+                            if (rolls.size == 1) {
+                                rolls.first()
+                            } else {
+                                DiceResults(rolls)
+                            }
                         }
+                        ConfirmWhenReady -> Confirm
+                        EndSetupWhenReady -> EndSetup
+                        SelectDogout -> DogoutSelected
+                        is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
+                        is SelectPlayer -> PlayerSelected(action.player)
                     }
-                    _availableActions.emit(availableActions)
-                    val selectedAction = userSelectedAction.receive()
-                    actionSelectedChannel.send(selectedAction)
                 }
+                _availableActions.emit(availableActions)
+                val selectedAction = userSelectedAction.receive()
+                actionSelectedChannel.send(selectedAction)
             }
+        }
+    }
+
+    private suspend fun useAutomatedActions(controller: GameController): Boolean {
+        if (controller.stack.firstOrNull()?.procedure == SetupTeam && controller.stack.firstOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+            if (controller.state.activeTeam.isHomeTeam()) {
+                handleHomeKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
+            } else {
+                handleAwayKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
+            }
+            actionSelectedChannel.send(EndSetup)
+            return true
+        } else if (controller.stack.firstOrNull()?.procedure == TheKickOffEvent && controller.stack.firstOrNull()?.currentNode() == TheKickOffEvent.ResolveKickOffEvent) {
+            actionSelectedChannel.send(DiceResults(listOf(D6Result(2), D6Result(4))))
+            return true
+        } else {
+            return false
         }
     }
 
@@ -173,21 +186,12 @@ class ActionSelectorViewModel(
 
     private fun startRandomActionSelector() {
         scope.launch {
-            while(this.isActive) {
+            actions@while(this.isActive) {
                 val (controller, actions) = actionRequestChannel.receive()
                 delay(20)
-                // TODO This wrong as we will create the wrong random action at the end
-                if (controller.stack.firstOrNull()?.procedure == SetupTeam && controller.stack.firstOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
-                    if (controller.state.activeTeam.isHomeTeam()) {
-                        handleHomeKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
-                    } else {
-                        handleAwayKickingSetup(controller, actionRequestChannel, actionSelectedChannel)
-                    }
-                    actionSelectedChannel.send(EndSetup)
-                } else {
-                    val action: Action = createRandomAction(controller.state, actions)
-                    actionSelectedChannel.send(action)
-                }
+                if (useAutomatedActions(controller)) continue@actions
+                val action: Action = createRandomAction(controller.state, actions)
+                actionSelectedChannel.send(action)
             }
         }
     }

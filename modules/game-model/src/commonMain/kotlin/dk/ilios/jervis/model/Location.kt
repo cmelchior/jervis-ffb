@@ -55,6 +55,10 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
     fun move(direction: Direction, steps: Int): FieldCoordinate {
         return FieldCoordinate(x + (direction.xModifier*steps), y + (direction.yModifier*steps))
     }
+
+    fun toLogString(): String {
+        return "[$x, $y]"
+    }
 }
 data object DogOut: Location {
     override fun isOnLineOfScrimmage(rules: Rules): Boolean = false

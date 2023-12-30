@@ -7,6 +7,7 @@ import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.D12Result
+import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D20Result
 import dk.ilios.jervis.actions.D2Result
 import dk.ilios.jervis.actions.D3Result
@@ -42,6 +43,7 @@ fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): A
                     Dice.D6 -> D6Result()
                     Dice.D8 -> D8Result()
                     Dice.D12 -> D12Result()
+                    Dice.D16 -> D16Result()
                     Dice.D20 -> D20Result()
                 }
             }

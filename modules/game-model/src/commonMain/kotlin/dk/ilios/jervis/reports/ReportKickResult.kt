@@ -23,9 +23,9 @@ class ReportKickResult(
             "$msg Ball went out of bounds."
         } else if ((kickingTeam.isHomeTeam() && ballLocation.isOnHomeSide(rules))
             || (!kickingTeam.isHomeTeam() && ballLocation.isOnAwaySide(rules))) {
-            "$msg Ball deviated back to the kicking teams half [${ballLocation.x}, ${ballLocation.y}]."
+            "$msg Ball deviated back to the kicking teams half ${ballLocation.toLogString()}."
         } else {
-            "$msg Will land at [${ballLocation.x}, ${ballLocation.y}]."
+            "$msg The ball will land at ${ballLocation.toLogString()}"
         }
         this.message = msg
     }

@@ -7,7 +7,7 @@ import kotlin.random.Random
 sealed interface Action
 
 enum class Dice {
-    D2, D3, D4, D6, D8, D12, D20
+    D2, D3, D4, D6, D8, D12, D16, D20
 }
 
 // Action descriptors
@@ -39,6 +39,7 @@ open class DieResult(val result: Int, val min: Short, val max: Short): Number(),
     override fun toString(): String {
         return "${this::class.simpleName}[$result]"
     }
+    fun toLogString(): String = "[$result]"
 }
 
 data object Continue: Action
@@ -51,6 +52,7 @@ class D4Result(result: Int = Random.nextInt(1, 5)): DieResult(result, 1, 4)
 class D6Result(result: Int = Random.nextInt(1, 7)): DieResult(result, 1, 6)
 class D8Result(result: Int = Random.nextInt(1, 9)): DieResult(result, 1, 8)
 class D12Result(result: Int = Random.nextInt(1, 13)): DieResult(result, 1, 12)
+class D16Result(result: Int = Random.nextInt(1, 17)): DieResult(result, 1, 16)
 class D20Result(result: Int = Random.nextInt(1, 21)): DieResult(result, 1, 20)
 class DiceResults(val rolls: List<DieResult>): Action
 data class PlayerSelected(val player: Player): Action
