@@ -1,6 +1,6 @@
 package dk.ilios.jervis.utils
 
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
@@ -14,6 +14,7 @@ import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D4Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
+import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
@@ -23,14 +24,17 @@ import dk.ilios.jervis.actions.EndSetupWhenReady
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.EndTurnWhenReady
 import dk.ilios.jervis.actions.FieldSquareSelected
+import dk.ilios.jervis.actions.PlayerActionSelected
+import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RollDice
+import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.model.Game
 
-fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): Action {
+fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): GameAction {
     return when(val action = availableActions.random()) {
         ContinueWhenReady -> Continue
         EndTurnWhenReady -> EndTurn
@@ -54,6 +58,8 @@ fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): A
         SelectDogout -> DogoutSelected
         is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
         is SelectPlayer -> PlayerSelected(action.player)
+        is DeselectPlayer -> PlayerDeselected
+        is SelectAction -> PlayerActionSelected(action.action)
     }
 }
 
@@ -71,6 +77,6 @@ inline fun INVALID_GAME_STATE(message: String = "Unexpected game state"): Nothin
     throw InvalidGameState(message)
 }
 
-inline fun INVALID_ACTION(action: Action): Nothing {
+inline fun INVALID_ACTION(action: GameAction): Nothing {
     throw InvalidAction("Invalid action selected: $action")
 }

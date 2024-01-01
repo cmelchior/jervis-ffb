@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runDesktopComposeUiTest
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.ContinueWhenReady
@@ -40,8 +40,8 @@ object Imager {
                 }
             }
             val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
-            val actionSelectedChannel = Channel<Action>(1, onBufferOverflow = BufferOverflow.SUSPEND)
-            val controller = GameController(BB2020Rules, state, actionProvider as ((GameController, List<ActionDescriptor>) -> Action))
+            val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
+            val controller = GameController(BB2020Rules, state, actionProvider as ((GameController, List<ActionDescriptor>) -> GameAction))
             App(controller, actionRequestChannel, actionSelectedChannel)
         }
     }
@@ -89,7 +89,7 @@ object Imager {
             val field = dk.ilios.jervis.model.Field.createForRuleset(rules)
             val state = Game(team1, team2, field)
             val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
-            val actionSelectedChannel = Channel<Action>(1, onBufferOverflow = BufferOverflow.SUSPEND)
+            val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
             val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
                 createRandomAction(state, availableActions)
             }

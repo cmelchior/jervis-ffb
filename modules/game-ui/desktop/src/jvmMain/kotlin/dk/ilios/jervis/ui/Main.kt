@@ -2,7 +2,7 @@ package dk.ilios.jervis.ui
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
@@ -56,9 +56,9 @@ fun main() = application {
     val field = dk.ilios.jervis.model.Field.createForRuleset(rules)
     val state = Game(team1, team2, field)
     val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
-    val actionSelectedChannel = Channel<Action>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionSelectedChannel = Channel<GameAction>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
     val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
-        val action: Action = runBlocking {
+        val action: GameAction = runBlocking {
             with(Dispatchers.Default) {
                 actionRequestChannel.send(Pair(controller, availableActions))
                 actionSelectedChannel.receive()

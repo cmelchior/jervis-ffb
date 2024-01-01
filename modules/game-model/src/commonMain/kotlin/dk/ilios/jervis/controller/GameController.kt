@@ -1,7 +1,7 @@
 package dk.ilios.jervis.controller
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.commands.Command
@@ -28,7 +28,7 @@ data class RemoveEntry(val log: LogEntry): ListEvent
 class GameController(
     rules: Rules,
     state: Game,
-    val actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> Action,
+    val actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction,
 ) {
     private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 0, extraBufferCapacity = 10_000)
     val logsEvents: Flow<ListEvent> = _logsEvents

@@ -1,6 +1,9 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.actions.DieResult
+import dk.ilios.jervis.rules.PlayerAction
+import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Roster
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,6 +24,32 @@ class TeamTurnData(private val game: Game) {
     var currentTurn by Delegates.observable(0u) { prop, old, new ->
         game.gameFlow.tryEmit(game)
     }
+    var moveActions: Int
+        get() = availableActions[PlayerActionType.MOVE]!!
+        set(value) { availableActions[PlayerActionType.MOVE] = value }
+    var passActions: Int
+        get() = availableActions[PlayerActionType.PASS]!!
+        set(value) { availableActions[PlayerActionType.PASS] = value }
+    var handOffActions: Int
+        get() = availableActions[PlayerActionType.HAND_OFF]!!
+        set(value) { availableActions[PlayerActionType.HAND_OFF] = value }
+    var blockActions: Int
+        get() = availableActions[PlayerActionType.BLOCK]!!
+        set(value) { availableActions[PlayerActionType.BLOCK] = value }
+    var blitzActions: Int
+        get() = availableActions[PlayerActionType.BLITZ]!!
+        set(value) { availableActions[PlayerActionType.BLITZ] = value }
+    var foulActions: Int
+        get() = availableActions[PlayerActionType.FOUL]!!
+        set(value) { availableActions[PlayerActionType.FOUL] = value }
+    val availableActions = mutableMapOf(
+        PlayerActionType.MOVE to 0,
+        PlayerActionType.PASS to 0,
+        PlayerActionType.HAND_OFF to 0,
+        PlayerActionType.BLOCK to 0,
+        PlayerActionType.BLITZ to 0,
+        PlayerActionType.FOUL to 0,
+    )
 }
 
 class TeamTemporaryData(private val game: Game) {

@@ -1,13 +1,12 @@
 package dk.ilios.jervis.procedures
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.EnterProcedure
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
@@ -17,7 +16,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.reports.ReportPrayersOfNuffleRoll
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.TableResult
+import dk.ilios.jervis.rules.tables.TableResult
 
 /**
  * Run a roll on the Prayers of Nuffle table.
@@ -33,7 +32,7 @@ object RollOnPrayersOfNuffleTable: Procedure() {
             return listOf(RollDice(Dice.D16))
         }
 
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D16Result>(action) { d16 ->
                 val result: TableResult = rules.prayersToNuffleTableEvent.roll(d16)
                 compositeCommandOf(

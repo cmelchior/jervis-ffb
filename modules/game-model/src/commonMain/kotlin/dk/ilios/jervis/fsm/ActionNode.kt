@@ -1,6 +1,6 @@
 package dk.ilios.jervis.fsm
 
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
@@ -10,9 +10,9 @@ import dk.ilios.jervis.rules.Rules
 
 abstract class ActionNode: Node {
     abstract fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor>
-    abstract fun applyAction(action: Action, state: Game, rules: Rules): Command
+    abstract fun applyAction(action: GameAction, state: Game, rules: Rules): Command
 
-    inline fun <reified T: Action> checkType(action: Action): T {
+    inline fun <reified T: GameAction> checkType(action: GameAction): T {
         if (action is T) {
             return action
         } else {
@@ -20,7 +20,7 @@ abstract class ActionNode: Node {
         }
     }
 
-    inline fun <reified T: Action> checkType(action: Action, function: (T) -> Command): Command {
+    inline fun <reified T: GameAction> checkType(action: GameAction, function: (T) -> Command): Command {
         val userAction = if (action is DiceResults && action.rolls.size == 1) {
             action.rolls.first()
         } else {
@@ -34,7 +34,7 @@ abstract class ActionNode: Node {
         }
     }
 
-    inline fun <reified D1: DieResult, reified D2: DieResult> checkDiceRoll(action: Action, function: (D1, D2) -> Command): Command {
+    inline fun <reified D1: DieResult, reified D2: DieResult> checkDiceRoll(action: GameAction, function: (D1, D2) -> Command): Command {
         if (action is DiceResults) {
             if (action.rolls.size != 2) {
                 throw IllegalArgumentException("Expected 2 dice rolls, got ${action.rolls.size}")

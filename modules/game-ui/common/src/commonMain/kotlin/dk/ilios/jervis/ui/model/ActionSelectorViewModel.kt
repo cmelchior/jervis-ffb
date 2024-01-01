@@ -1,6 +1,6 @@
 package dk.ilios.jervis.ui.model
 
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
@@ -14,29 +14,29 @@ import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D4Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
+import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
-import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndSetupWhenReady
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.EndTurnWhenReady
 import dk.ilios.jervis.actions.FieldSquareSelected
+import dk.ilios.jervis.actions.PlayerActionSelected
+import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RollDice
+import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.controller.GameController
-import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.SetupTeam
-import dk.ilios.jervis.procedures.TheKickOff
-import dk.ilios.jervis.procedures.TheKickOffEvent
 import dk.ilios.jervis.utils.createRandomAction
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -51,13 +51,13 @@ import kotlinx.coroutines.launch
 class ActionSelectorViewModel(
     private val controller: GameController,
     private val actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
-    private val actionSelectedChannel: Channel<Action>
+    private val actionSelectedChannel: Channel<GameAction>
 ) {
 
     val scope = CoroutineScope(CoroutineName("ActionSelectorScope") + Dispatchers.Default)
-    private val _availableActions: MutableSharedFlow<List<Action>> = MutableSharedFlow(extraBufferCapacity = 1)
-    private val userSelectedAction = Channel<Action>(1)
-    val availableActions: Flow<List<Action>> = _availableActions
+    private val _availableActions: MutableSharedFlow<List<GameAction>> = MutableSharedFlow(extraBufferCapacity = 1)
+    private val userSelectedAction = Channel<GameAction>(1)
+    val availableActions: Flow<List<GameAction>> = _availableActions
 
     fun start(randomActions: Boolean) {
         if (randomActions) {
@@ -75,7 +75,7 @@ class ActionSelectorViewModel(
             actions@while(true) {
                 val (controller, actions) = actionRequestChannel.receive()
                 if (useAutomatedActions(controller)) continue@actions
-                val availableActions: List<Action> = actions.map { action ->
+                val availableActions: List<GameAction> = actions.map { action ->
                     when (action) {
                         ContinueWhenReady -> Continue
                         EndTurnWhenReady -> EndTurn
@@ -103,6 +103,8 @@ class ActionSelectorViewModel(
                         SelectDogout -> DogoutSelected
                         is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
                         is SelectPlayer -> PlayerSelected(action.player)
+                        is DeselectPlayer -> PlayerDeselected
+                        is SelectAction -> PlayerActionSelected(action.action)
                     }
                 }
                 _availableActions.emit(availableActions)
@@ -132,7 +134,7 @@ class ActionSelectorViewModel(
     private suspend fun handleHomeKickingSetup(
         controller: GameController,
         actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
-        actionSelectedChannel: Channel<Action>
+        actionSelectedChannel: Channel<GameAction>
     ) {
         val game: Game = controller.state
         val team = game.activeTeam
@@ -153,7 +155,7 @@ class ActionSelectorViewModel(
     private suspend fun handleAwayKickingSetup(
         controller: GameController,
         actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
-        actionSelectedChannel: Channel<Action>
+        actionSelectedChannel: Channel<GameAction>
     ) {
         val game: Game = controller.state
         val team = game.activeTeam
@@ -176,7 +178,7 @@ class ActionSelectorViewModel(
         playerNo: PlayerNo,
         fieldCoordinate: FieldCoordinate,
         actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
-        actionSelectedChannel: Channel<Action>
+        actionSelectedChannel: Channel<GameAction>
     ) {
         actionSelectedChannel.send(PlayerSelected(team[playerNo]!!))
         actionRequestChannel.receive()
@@ -190,13 +192,13 @@ class ActionSelectorViewModel(
                 val (controller, actions) = actionRequestChannel.receive()
                 delay(20)
                 if (useAutomatedActions(controller)) continue@actions
-                val action: Action = createRandomAction(controller.state, actions)
+                val action: GameAction = createRandomAction(controller.state, actions)
                 actionSelectedChannel.send(action)
             }
         }
     }
 
-    fun actionSelected(action: Action) {
+    fun actionSelected(action: GameAction) {
         scope.launch {
             userSelectedAction.send(action)
         }

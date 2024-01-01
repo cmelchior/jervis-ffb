@@ -1,5 +1,6 @@
 package dk.ilios.jervis.model
 
+import dk.ilios.jervis.rules.PlayerAction
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlin.properties.Delegates
@@ -25,6 +26,8 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var kickingTeam: Team = this.homeTeam
     var receivingTeam: Team = this.awayTeam
     var kickingTeamInLastHalf: Team = kickingTeam
+
+    var activePlayerAction: PlayerAction? = null
 
     val field: Field = field
     val ball: Ball = Ball()

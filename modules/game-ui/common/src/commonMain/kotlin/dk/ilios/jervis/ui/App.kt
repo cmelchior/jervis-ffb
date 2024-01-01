@@ -1,7 +1,7 @@
 package dk.ilios.jervis.ui
 
 import androidx.compose.runtime.Composable
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.ui.model.ActionSelectorViewModel
 import dk.ilios.jervis.ui.model.FieldViewModel
@@ -16,7 +16,7 @@ import kotlinx.coroutines.channels.Channel
 fun App(
     controller: GameController,
     actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
-    actionSelectedChannel: Channel<Action>
+    actionSelectedChannel: Channel<GameAction>
 ) {
     Screen(
         FieldViewModel(controller.state.field),

@@ -78,9 +78,10 @@ fun Player.isOnHomeTeam(): Boolean {
 }
 
 enum class Availability {
-    AVAILABLE,
-    IS_ACTIVE,
-    HAS_BEEN_ACTIVE
+    AVAILABLE, // Are available to be activated in this turn
+    IS_ACTIVE, // Are currently active
+    HAS_ACTIVATED, // Has already activated this turn
+    UNAVAILABLE // Unavailable for this turn
 }
 
 class Player: Observable<Player>() {

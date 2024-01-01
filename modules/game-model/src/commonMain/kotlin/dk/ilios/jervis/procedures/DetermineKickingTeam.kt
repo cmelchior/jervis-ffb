@@ -1,7 +1,7 @@
 package dk.ilios.jervis.procedures
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D2Result
 import dk.ilios.jervis.actions.Dice
@@ -30,7 +30,7 @@ object DetermineKickingTeam: Procedure() {
 
     object CoinToss: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D2))
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D2Result>(action) {
                 when(it.result) {
                     1 -> {

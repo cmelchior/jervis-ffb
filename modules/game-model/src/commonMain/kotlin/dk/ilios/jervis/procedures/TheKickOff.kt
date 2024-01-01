@@ -1,7 +1,7 @@
 package dk.ilios.jervis.procedures
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
@@ -22,7 +22,6 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.reports.ReportKickResult
 import dk.ilios.jervis.reports.ReportKickingPlayer
-import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
@@ -85,7 +84,7 @@ object TheKickOff: Procedure() {
             return eligiblePlayers
         }
 
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<PlayerSelected>(action) {
                 compositeCommandOf(
                     SetKickingPlayer(it.player),
@@ -104,7 +103,7 @@ object TheKickOff: Procedure() {
                 .map { SelectFieldLocation(it.x, it.y) }
         }
 
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<FieldSquareSelected>(action) {
                 compositeCommandOf(
                     SetBallState.inAir(),
@@ -120,7 +119,7 @@ object TheKickOff: Procedure() {
             return listOf(RollDice(Dice.D8, Dice.D6))
         }
 
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
                 val direction = rules.randomDirection(d8)
                 val newLocation = state.ball.location.move(direction, d6.result)

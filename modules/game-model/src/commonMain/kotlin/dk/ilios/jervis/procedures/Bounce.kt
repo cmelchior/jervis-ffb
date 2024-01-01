@@ -1,7 +1,7 @@
 package dk.ilios.jervis.procedures
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.Dice
@@ -19,9 +19,8 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
-import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.reports.ReportBounce
-import dk.ilios.jervis.rules.Direction
+import dk.ilios.jervis.rules.tables.Direction
 import dk.ilios.jervis.rules.Rules
 
 /**
@@ -39,7 +38,7 @@ object Bounce: Procedure() {
             return listOf(RollDice(Dice.D8))
         }
 
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D8Result>(action) { d8 ->
                 val direction: Direction = rules.randomDirection(d8)
                 val newLocation: FieldCoordinate = state.ball.location.move(direction, 1)

@@ -1,14 +1,10 @@
 package dk.ilios.jervis.procedures
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.Action
-import dk.ilios.jervis.actions.ActionDescriptor
-import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
-import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure

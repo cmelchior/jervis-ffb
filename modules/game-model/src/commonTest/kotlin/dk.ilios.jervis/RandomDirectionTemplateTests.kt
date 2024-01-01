@@ -2,9 +2,9 @@ package dk.ilios.jervis
 
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.rules.CornerThrowInPosition
-import dk.ilios.jervis.rules.Direction
-import dk.ilios.jervis.rules.RandomDirectionTemplate
+import dk.ilios.jervis.rules.tables.CornerThrowInPosition
+import dk.ilios.jervis.rules.tables.Direction
+import dk.ilios.jervis.rules.tables.RandomDirectionTemplate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

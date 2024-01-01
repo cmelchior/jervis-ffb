@@ -1,15 +1,33 @@
 package dk.ilios.jervis.rules.skills
 
 interface Skill {
+
+    enum class UsageType {
+        ALWAYS,
+        ONCE_PR_TURN,
+        ONCE_PR_DRIVE,
+        ONCE_PR_HALF,
+        ONCE_PR_GAME,
+        SPECIAL //
+    }
+
     val id: Long
     val name: String
+    val usage: UsageType
     val category: SkillCategory
+    var used: Boolean
+
+    // Modifiers
+
+
 }
 
 interface SkillCategory {
     val id: Long
     val name: String
 }
+
+
 
 //abstract class Skill {
 //    val name: String
@@ -96,7 +114,7 @@ class BB2016Skills {
 }
 
 
-class BB2020SkillsList {
+enum class BB2020SkillsList {
 //
 //Agility
 //    - Catch

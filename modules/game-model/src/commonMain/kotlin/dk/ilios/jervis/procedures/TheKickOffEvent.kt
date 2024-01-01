@@ -1,7 +1,7 @@
 package dk.ilios.jervis.procedures
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.Dice
@@ -25,7 +25,7 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.reports.ReportKickOffEventRoll
 import dk.ilios.jervis.reports.ReportTouchback
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.TableResult
+import dk.ilios.jervis.rules.tables.TableResult
 
 /**
  * Run the Kick-Off Event as well as the results of the ball coming back to the field.
@@ -58,7 +58,7 @@ object TheKickOffEvent: Procedure() {
         // Another node: If it is just rules that are unclear, and the touchback is awarded as soon as
         // the ball leaves the kicking teams half, then this also impacts things like Blitz,
         // where you
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result, D6Result>(action) { firstD6, secondD6 ->
                 val result: TableResult = rules.kickOffEventTable.roll(firstD6, secondD6)
                 compositeCommandOf(
@@ -133,7 +133,7 @@ object TheKickOffEvent: Procedure() {
             }
         }
 
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<PlayerSelected>(action) {
                 return compositeCommandOf(
                     SetBallState.carried(it.player),

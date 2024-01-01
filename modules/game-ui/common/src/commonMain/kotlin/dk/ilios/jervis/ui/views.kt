@@ -44,9 +44,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.WindowPosition.PlatformDefault.x
-import androidx.compose.ui.window.WindowPosition.PlatformDefault.y
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.DiceResults
@@ -55,6 +53,8 @@ import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
+import dk.ilios.jervis.actions.PlayerActionSelected
+import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Player
@@ -71,7 +71,6 @@ import dk.ilios.jervis.ui.model.SidebarViewModel
 import dk.ilios.jervis.ui.model.Square
 import dk.ilios.jervis.ui.model.UIPlayer
 import kotlinx.coroutines.flow.Flow
-import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
 import java.awt.SystemColor.text
 import java.awt.image.BufferedImage
@@ -355,7 +354,7 @@ fun ReplayController(vm: ReplayViewModel, modifier: Modifier) {
 
 @Composable
 fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
-    val otherActions: List<Action> by vm.availableActions.collectAsState(emptyList())
+    val otherActions: List<GameAction> by vm.availableActions.collectAsState(emptyList())
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -377,7 +376,7 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
         ) {
             Text("Start (User)", fontSize = 10.sp)
         }
-        otherActions.forEach { action: Action ->
+        otherActions.forEach { action: GameAction ->
             Button(
                 modifier = Modifier.padding(0.dp),
                 contentPadding = PaddingValues(2.dp),
@@ -393,6 +392,8 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
                     is FieldSquareSelected -> action.toString()
                     is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
                     is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
+                    is PlayerActionSelected -> "Action: ${action.action.name}"
+                    PlayerDeselected -> "Deselect active player"
                 }
                 Text(text, fontSize = 10.sp)
             }

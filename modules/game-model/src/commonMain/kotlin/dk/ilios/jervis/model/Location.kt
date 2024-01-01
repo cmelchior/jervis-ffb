@@ -1,8 +1,6 @@
 package dk.ilios.jervis.model
 
-import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.rules.Direction
+import dk.ilios.jervis.rules.tables.Direction
 import dk.ilios.jervis.rules.Rules
 
 /**

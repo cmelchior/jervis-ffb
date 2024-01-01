@@ -2,7 +2,7 @@ package dk.ilios.jervis.reports
 
 import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.rules.TableResult
+import dk.ilios.jervis.rules.tables.TableResult
 
 class ReportPrayersOfNuffleRoll(
     team: Team,

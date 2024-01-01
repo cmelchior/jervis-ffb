@@ -1,7 +1,7 @@
 package dk.ilios.jervis.procedures.bb2020.kickoff
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.Dice
@@ -41,7 +41,7 @@ object CheeringFans: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D6Result>(action) {
                 compositeCommandOf(
                     SaveTemporaryDieRoll(state.kickingTeam, it),
@@ -56,7 +56,7 @@ object CheeringFans: Procedure() {
             return listOf(RollDice(Dice.D6))
         }
 
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D6Result>(action) {
                 compositeCommandOf(
                     SaveTemporaryDieRoll(state.receivingTeam, it),

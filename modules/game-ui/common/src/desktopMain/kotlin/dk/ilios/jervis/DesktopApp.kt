@@ -2,7 +2,7 @@ package dk.ilios.jervis
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
@@ -100,7 +100,7 @@ fun AppPreview() {
     val field = Field.createForRuleset(rules)
     val state = Game(p1, p2, field)
     val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
-    val actionSelectedChannel = Channel<Action>(1, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
     val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
         createRandomAction(controller.state, availableActions)
     }

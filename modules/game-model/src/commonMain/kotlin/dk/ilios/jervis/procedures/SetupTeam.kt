@@ -1,7 +1,7 @@
 package dk.ilios.jervis.procedures
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.Action
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndSetup
@@ -15,6 +15,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetActivePlayer
+import dk.ilios.jervis.commands.SetPlayerAvailability
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.fsm.ActionNode
@@ -47,7 +48,7 @@ object SetupTeam: Procedure() {
             return availablePlayers + EndSetupWhenReady
         }
 
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when(action) {
                 is PlayerSelected -> {
                     compositeCommandOf(
@@ -87,7 +88,7 @@ object SetupTeam: Procedure() {
             return freeFields + SelectDogout + playerSquare
         }
 
-        override fun applyAction(action: Action, state: Game, rules: Rules): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when(action) {
                 DogoutSelected -> compositeCommandOf(
                     SetPlayerLocation(state.activePlayer!!, DogOut),

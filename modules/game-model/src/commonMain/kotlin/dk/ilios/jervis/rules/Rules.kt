@@ -1,15 +1,12 @@
 package dk.ilios.jervis.rules
 
-import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.procedures.DummyProcedure
 import dk.ilios.jervis.procedures.bb2020.kickoff.Blitz
 import dk.ilios.jervis.procedures.bb2020.kickoff.BrilliantCoaching
 import dk.ilios.jervis.procedures.bb2020.kickoff.ChangingWeather
@@ -21,27 +18,12 @@ import dk.ilios.jervis.procedures.bb2020.kickoff.PitchInvasion
 import dk.ilios.jervis.procedures.bb2020.kickoff.QuickSnap
 import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
 import dk.ilios.jervis.procedures.bb2020.kickoff.TimeOut
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.BadHabits
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.BlessedStatueOfNuffle
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.FanInteraction
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.FoulingFrenzy
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.FriendsWithTheRef
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.GreasyCleats
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.IntensiveTraining
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.IronMan
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.KnuckleDusters
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.MolesUnderThePitch
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.NecessaryViolence
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.PerfectPassing
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.Stiletto
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.ThrowARock
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.TreacherousTrapdoor
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.UnderScrutiny
+import dk.ilios.jervis.rules.tables.CornerThrowInPosition
+import dk.ilios.jervis.rules.tables.Direction
+import dk.ilios.jervis.rules.tables.PrayersToNuffleTable
+import dk.ilios.jervis.rules.tables.RandomDirectionTemplate
+import dk.ilios.jervis.rules.tables.TableResult
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.roundToInt
-import kotlin.math.sin
 
 interface BloodBowl {
 
@@ -55,72 +37,7 @@ interface BloodBowl7 {
 
 }
 
-/**
- * A vector describing the result of a roll using the Random Direction Template.
- *
- * The [xModifier] and [yModifier] are the delta that needs to be applied to a
- * [FieldCoordinate] in order to move it 1 square in the desired direction.
- */
-data class Direction(val xModifier: Int, val yModifier: Int)
 
-/**
- *  Determines in what corner the Random Direction Template is placed.
- *  "Top" is defined as the direction towards 0 on the x-axis for the [FieldCoordinate]
- *  "Left" is defined as the direction towards 0 on the y-axis for the [FieldCoordinate]
- */
-enum class CornerThrowInPosition(val rotateDegrees: Int) {
-    TOP_LEFT(135),
-    TOP_RIGHT(-135),
-    BOTTOM_RIGHT(-45),
-    BOTTOM_LEFT(45)
-}
-
-/**
- * Class representing the Random Direction Template.
- * See page 20 in the rulebook
- */
-object RandomDirectionTemplate {
-
-    // Order of numbers from top and clockwise around the template
-//    private val order = listOf(2, 3, 5, 8, 7, 6, 4, 1)
-    private val results = mapOf(
-        1 to Direction(-1, -1),
-        2 to Direction(0, -1),
-        3 to Direction(1, -1),
-        4 to Direction(-1, 0),
-        5 to Direction(1, 0),
-        6 to Direction(-1, 1),
-        7 to Direction(0, 1),
-        8 to Direction(1, 1)
-    )
-
-    /**
-     * When the template is placed on the field (and not in a corner), roll
-     * a D8 to determine the direction the object is moving in.
-     */
-    fun roll(roll: D8Result): Direction {
-        return results[roll.result] ?:throw IllegalArgumentException("Only values between [1, 8] is allowed: ${roll.result}")
-    }
-
-    /**
-     * When the template is placed in a corner, it needs to be rotated so only the
-     * values 1-3 are visible. Once done, roll the D3 in order to determine the
-     * direction.
-     */
-    fun roll(corner: CornerThrowInPosition, d3: D3Result): Direction {
-        return rotateVector(results[d3.result]!!, corner.rotateDegrees)
-    }
-
-    private fun rotateVector(vector: Direction, angleDegrees: Int): Direction {
-        // Use the Rotation Matrix to rotate the coordinates
-        val angleRadians = angleDegrees * PI / 180.0
-        val cosTheta = cos(angleRadians)
-        val sinTheta = sin(angleRadians)
-        val x: Double = vector.xModifier * cosTheta - vector.yModifier * sinTheta
-        val y = vector.xModifier * sinTheta + vector.yModifier * cosTheta
-        return Direction(x.roundToInt(), y.roundToInt())
-    }
-}
 
 /**
  * Class representing the Kick-Off Event Table on page 41 in the rulebook.
@@ -150,45 +67,6 @@ object KickOffEventTable {
     }
 }
 
-/**
- * Wrapper around a table result, e.g. rolling on the Kick-Off Table or
- * the Prayers To Nuffle Table.
- *
- * Rolling on these tables all involve more complicated logic that is
- * controlled by procedures. So any node that looks up a TableResult should
- * put the returned procedure on the stack to be executed as the next step.
- */
-data class TableResult(val name: String, val procedure: Procedure)
-
-/**
- * Class representing the Prayers To Nuffle Table on page 39 in the rulebook.
- */
-object PrayersToNuffleTable {
-    private val table = mapOf(
-        1 to TableResult("Treacherous Trapdor", TreacherousTrapdoor),
-        2 to TableResult("Friends with the Ref", FriendsWithTheRef),
-        3 to TableResult("Stiletto", Stiletto),
-        4 to TableResult("Iron Man", IronMan),
-        5 to TableResult("Knuckle Dusters", KnuckleDusters),
-        6 to TableResult("Bad Habits", BadHabits),
-        7 to TableResult("Greasy Cleats", GreasyCleats),
-        8 to TableResult("Blessed Statue of Nuffle", BlessedStatueOfNuffle),
-        9 to TableResult("Moles under the Pitch", MolesUnderThePitch),
-        10 to TableResult("Perfect Passing", PerfectPassing),
-        11 to TableResult("Fan Interaction", FanInteraction),
-        12 to TableResult("Necessary Violence", NecessaryViolence),
-        13 to TableResult("Fouling Frenzy", FoulingFrenzy),
-        14 to TableResult("Throw a Rock", ThrowARock),
-        15 to TableResult("Under Scrutiny", UnderScrutiny),
-        16 to TableResult("Intensive Training", IntensiveTraining),
-    )
-    /**
-     * Roll on the Prayers of Nuffle table and return the result.
-     */
-    fun roll(d16: D16Result): TableResult {
-        return table[d16.result] ?: INVALID_GAME_STATE("${d16.result} was not found in the Kick-Off Event Table.")
-    }
-}
 
 interface Rules {
 
@@ -327,6 +205,9 @@ interface Rules {
 
     val prayersToNuffleTableEvent
         get() = PrayersToNuffleTable
+
+    val teamActions: TeamActions
+        get() = BB2020TeamActions()
 
     // Blood Bowl 7
     // Total width of the field
