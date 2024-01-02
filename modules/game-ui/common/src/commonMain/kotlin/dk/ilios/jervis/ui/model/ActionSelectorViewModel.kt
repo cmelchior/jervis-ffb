@@ -18,6 +18,8 @@ import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DogoutSelected
+import dk.ilios.jervis.actions.EndAction
+import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndSetupWhenReady
 import dk.ilios.jervis.actions.EndTurn
@@ -47,6 +49,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 class ActionSelectorViewModel(
     private val controller: GameController,
@@ -66,7 +70,10 @@ class ActionSelectorViewModel(
             startUserActionSelector()
         }
         scope.launch {
+            val now = Instant.now()
             controller.start()
+            val end = Instant.now()
+            println("Time: ${ChronoUnit.MILLIS.between(now, end)}, command: ${controller.commands.size}")
         }
     }
 
@@ -105,6 +112,7 @@ class ActionSelectorViewModel(
                         is SelectPlayer -> PlayerSelected(action.player)
                         is DeselectPlayer -> PlayerDeselected
                         is SelectAction -> PlayerActionSelected(action.action)
+                        EndActionWhenReady -> EndAction
                     }
                 }
                 _availableActions.emit(availableActions)

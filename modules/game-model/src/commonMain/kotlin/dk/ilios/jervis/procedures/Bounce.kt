@@ -43,7 +43,7 @@ object Bounce: Procedure() {
                 val direction: Direction = rules.randomDirection(d8)
                 val newLocation: FieldCoordinate = state.ball.location.move(direction, 1)
                 val outOfBounds: Boolean = newLocation.isOutOfBounds(rules)
-                val playerAtTarget: Player? = state.field[newLocation].player
+                val playerAtTarget: Player? = if (!outOfBounds) state.field[newLocation].player else null
                 val nextNode: Command = if (outOfBounds) {
                     // TODO Throw-in or trigger touchback
                     // TODO For kick-offs, bouncing across the halfline is also considered out-of-bounds

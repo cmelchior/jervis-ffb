@@ -15,10 +15,14 @@ data object ContinueWhenReady: ActionDescriptor // "internal event" for continui
 data object ConfirmWhenReady: ActionDescriptor // An generic action that requires explicit confirmation by a player
 data object EndSetupWhenReady: ActionDescriptor // Mark the setup phase as ended for a team
 data object EndTurnWhenReady: ActionDescriptor // Mark the turn as ended for a team
+data object EndActionWhenReady: ActionDescriptor
 data class RollDice(val dice: List<Dice>): ActionDescriptor {
     constructor(vararg dice: Dice): this(dice.toList())
 }
-data class SelectFieldLocation(val x: Int, val y: Int): ActionDescriptor
+
+data class SelectFieldLocation(val x: Int, val y: Int): ActionDescriptor {
+    constructor(coordinate: FieldCoordinate): this(coordinate.x, coordinate.y)
+}
 data object SelectDogout: ActionDescriptor
 data class SelectPlayer(val player: Player): ActionDescriptor
 data class DeselectPlayer(val player: Player): ActionDescriptor
@@ -47,6 +51,7 @@ sealed interface GameAction
 data object Continue: GameAction
 data object Confirm: GameAction
 data object EndTurn: GameAction
+data object EndAction: GameAction
 data object EndSetup: GameAction
 class D2Result(result: Int = Random.nextInt(1, 3)): DieResult(result, 1, 2)
 class D3Result(result: Int = Random.nextInt(1, 4)): DieResult(result, 1, 3)

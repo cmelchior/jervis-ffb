@@ -99,7 +99,9 @@ class Player: Observable<Player>() {
     var name: String by observable("")
     var number: PlayerNo = PlayerNo(0)
     var position: Position = HumanTeam.positions.first()
+
     var baseMove: Int = 0
+    var moveLeft: Int = 0
     var baseStrenght: Int = 0
     var baseAgility: Int = 0
     var basePassing: Int = 0

@@ -19,6 +19,8 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
+import dk.ilios.jervis.actions.EndAction
+import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndSetupWhenReady
 import dk.ilios.jervis.actions.EndTurn
@@ -60,6 +62,7 @@ fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): G
         is SelectPlayer -> PlayerSelected(action.player)
         is DeselectPlayer -> PlayerDeselected
         is SelectAction -> PlayerActionSelected(action.action)
+        EndActionWhenReady -> EndAction
     }
 }
 

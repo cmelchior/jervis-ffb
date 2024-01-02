@@ -50,6 +50,7 @@ import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
+import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
@@ -394,6 +395,7 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
                     is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
                     is PlayerActionSelected -> "Action: ${action.action.name}"
                     PlayerDeselected -> "Deselect active player"
+                    EndAction -> "End Action"
                 }
                 Text(text, fontSize = 10.sp)
             }

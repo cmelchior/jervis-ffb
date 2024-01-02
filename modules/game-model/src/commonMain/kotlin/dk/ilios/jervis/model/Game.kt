@@ -28,6 +28,7 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var kickingTeamInLastHalf: Team = kickingTeam
 
     var activePlayerAction: PlayerAction? = null
+    var moveStepTarget: Pair<FieldCoordinate, FieldCoordinate>? = null
 
     val field: Field = field
     val ball: Ball = Ball()

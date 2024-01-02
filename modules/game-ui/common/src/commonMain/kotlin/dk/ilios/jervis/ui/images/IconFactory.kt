@@ -110,14 +110,22 @@ object IconFactory {
         val isHomeTeam: Boolean = player.isOnHomeTeam()
         val roster: Roster = player.position.roster
         val playerType: Position = player.position
-        val isActive = false // game.activePlayer
+        val isActive = player.isActive
 
         if (cachedPlayers.contains(player)) {
-            return cachedPlayers[player]!!.default
+            return if (isActive) {
+                cachedPlayers[player]!!.active
+            } else {
+                cachedPlayers[player]!!.default
+            }
         } else {
             val variants = getPositionSpriteSheet(player.position)
             val playerImage = variants.getVariant(player)
-            return playerImage.default
+            return if (isActive) {
+                playerImage.active
+            } else {
+                playerImage.default
+            }
         }
     }
 

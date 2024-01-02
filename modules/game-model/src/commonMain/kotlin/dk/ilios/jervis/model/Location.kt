@@ -1,12 +1,15 @@
 package dk.ilios.jervis.model
 
-import dk.ilios.jervis.rules.tables.Direction
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.tables.Direction
+import kotlin.math.abs
+import kotlin.math.max
 
 /**
  * Top-left is (0,0), bottom-left is (25, 14) for a normal Blood Bowl Field.
  */
 sealed interface Location {
+    val coordinate: FieldCoordinate
     fun isOnLineOfScrimmage(rules: Rules): Boolean
     fun isInWideZone(rules: Rules): Boolean
     fun isInEndZone(rules: Rules): Boolean
@@ -22,6 +25,8 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
     companion object {
         val UNKNOWN = FieldCoordinate(Int.MAX_VALUE, Int.MAX_VALUE)
     }
+
+    override val coordinate: FieldCoordinate = this
 
     override fun isOnLineOfScrimmage(rules: Rules): Boolean {
         return x == rules.lineOfScrimmageHome || x == rules.lineOfScrimmageAway
@@ -57,8 +62,110 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
     fun toLogString(): String {
         return "[$x, $y]"
     }
+
+    /**
+     * Return all on-field coordinates around a specific on-field location.
+     */
+    fun getSurroundingCoordinates(rules: Rules): List<FieldCoordinate> {
+        val result = mutableListOf<FieldCoordinate>()
+        (x-1 .. x+1).forEach { x: Int ->
+            (y-1 .. y+1).forEach { y: Int ->
+                val newCoordinate = FieldCoordinate(x, y)
+                if (newCoordinate != this && newCoordinate.isOnField(rules)) {
+                    result.add(newCoordinate)
+                }
+            }
+        }
+        return result
+    }
+
+    /**
+     * Returns the Chebyshev Distance between this field and the target location.
+     * This is equal to the minimum number of squares between two squares on the game field.
+     *
+     * See https://en.wikipedia.org/wiki/Chebyshev_distance
+     */
+    fun distanceTo(target: FieldCoordinate): UInt {
+        return max(abs(target.x - this.x), abs(target.y - this.y)).toUInt()
+    }
+
+    /**
+     * Return all coordinates that are considered "away" from this coordinate from the point of view of the provided
+     * [location].
+     * 
+     * See page 45 in the rulebook.
+     */
+    fun getCoordinatesAwayFromLocation(
+        rules: Rules,
+        location: FieldCoordinate,
+        includeOutOfBounds: Boolean = false
+    ): List<FieldCoordinate> {
+        // Calculate direction
+        val direction = Direction(this.x - location.x, this.y - location.y)
+
+        val allCoordinates: List<FieldCoordinate> = when {
+            // Top
+            direction.xModifier == 0 && direction.yModifier == -1 -> listOf(
+                FieldCoordinate(this.x - 1, this.y - 1),
+                FieldCoordinate(this.x, this.y - 1),
+                FieldCoordinate(this.x + 1, this.y - 1),
+            )
+            // Bottom
+            direction.xModifier == 0 && direction.yModifier == 1 -> listOf(
+                FieldCoordinate(this.x - 1, this.y + 1),
+                FieldCoordinate(this.x, this.y + 1),
+                FieldCoordinate(this.x + 1, this.y + 1),
+            )
+            // Left
+            direction.xModifier == -1 && direction.yModifier == 0 -> listOf(
+                FieldCoordinate(this.x - 1, this.y - 1),
+                FieldCoordinate(this.x - 1, this.y + 0),
+                FieldCoordinate(this.x - 1, this.y + 1),
+            )
+            // Right
+            direction.xModifier == 1 && direction.yModifier == 0 -> listOf(
+                FieldCoordinate(this.x + 1, this.y - 1),
+                FieldCoordinate(this.x + 1, this.y + 0),
+                FieldCoordinate(this.x + 1, this.y + 1),
+            )
+            // Top-left
+            direction.xModifier == -1 && direction.yModifier == -1 -> listOf(
+                FieldCoordinate(this.x - 1, this.y),
+                FieldCoordinate(this.x - 1, this.y - 1),
+                FieldCoordinate(this.x, this.y - 1),
+            )
+            // Top-right
+            direction.xModifier == 1 && direction.yModifier == -1 -> listOf(
+                FieldCoordinate(this.x, this.y - 1),
+                FieldCoordinate(this.x + 1, this.y - 1),
+                FieldCoordinate(this.x + 1, this.y),
+            )
+            // Bottom-left
+            direction.xModifier == -1 && direction.yModifier == 1 -> listOf(
+                FieldCoordinate(this.x - 1, this.y),
+                FieldCoordinate(this.x - 1, this.y + 1),
+                FieldCoordinate(this.x, this.y + 1),
+            )
+            // Bottom-Right
+            direction.xModifier == 1 && direction.yModifier == 1 -> listOf(
+                FieldCoordinate(this.x + 1, this.y),
+                FieldCoordinate(this.x + 1, this.y + 1),
+                FieldCoordinate(this.x, this.y + 1),
+            )
+            else -> throw IllegalArgumentException("Unsupported direction: $direction")
+        }
+        return if (!includeOutOfBounds) {
+            allCoordinates.filter {
+                it.isOnField(rules)
+            }
+        } else {
+            allCoordinates
+        }
+    }
 }
+
 data object DogOut: Location {
+    override val coordinate: FieldCoordinate = FieldCoordinate.UNKNOWN
     override fun isOnLineOfScrimmage(rules: Rules): Boolean = false
     override fun isInWideZone(rules: Rules): Boolean = false
     override fun isInEndZone(rules: Rules): Boolean = false
