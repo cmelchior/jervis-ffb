@@ -12,6 +12,7 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.teamBuilder
+import dk.ilios.jervis.utils.createRandomAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -59,10 +60,8 @@ fun main() = application {
     val actionSelectedChannel = Channel<GameAction>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
     val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
         val action: GameAction = runBlocking {
-            with(Dispatchers.Default) {
-                actionRequestChannel.send(Pair(controller, availableActions))
-                actionSelectedChannel.receive()
-            }
+            actionRequestChannel.send(Pair(controller, availableActions))
+            actionSelectedChannel.receive()
         }
         action
     }

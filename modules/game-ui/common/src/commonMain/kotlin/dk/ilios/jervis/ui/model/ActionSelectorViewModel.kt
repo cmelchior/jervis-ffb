@@ -70,11 +70,18 @@ class ActionSelectorViewModel(
             startUserActionSelector()
         }
         scope.launch {
-            val now = Instant.now()
+            val start = Instant.now()
             controller.start()
-            val end = Instant.now()
-            println("Time: ${ChronoUnit.MILLIS.between(now, end)}, command: ${controller.commands.size}")
+            printStats(start)
         }
+    }
+
+    private fun printStats(start: Instant) {
+        val end = Instant.now()
+        val duration = ChronoUnit.MILLIS.between(start, end)
+        val commands = controller.commands.size
+        val msPrCommand: Float = duration / commands.toFloat()
+        println("Total time: $duration ms., Commands: $commands, timePrCommand: $msPrCommand ms.")
     }
 
     private fun startUserActionSelector() {
