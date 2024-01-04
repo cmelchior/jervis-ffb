@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":modules:fumbbl-net"))
     compileOnly("com.eclipsesource.minimal-json:minimal-json:0.9.5")
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
     implementation("org.javassist:javassist:3.29.2-GA")

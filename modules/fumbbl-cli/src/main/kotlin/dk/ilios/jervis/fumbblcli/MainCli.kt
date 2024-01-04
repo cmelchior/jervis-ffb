@@ -21,19 +21,27 @@ class PrepareDebugClient : CliktCommand(help = "Downloads and inject debug code 
         val output: File = output?.let {
             File(it)
         } ?: getDefaultOutputLocation()
-        val runner = CreateDebugClientRunner()
+        val runner = CreateDebugClientRunner(getJarFileLocation())
         runner.run(output)
     }
 
-    private fun getDefaultOutputLocation(): File {
-        // Assume this is <root>/tools
-        val jarFileLocation = File(
+    /**
+     * Return a reference to the JAR file running this code.
+     * We need to copy this to the classpath of FantasyFootballClient.jar
+     * as it contains the debug code we are calling.
+     */
+    private fun getJarFileLocation(): File {
+        return File(
             this::class.java.getProtectionDomain()
                 .codeSource
                 .location
                 .toURI()
         )
-        return File("${jarFileLocation.parentFile.absolutePath}/../Debug-FantasyFootballClient/libs")
+    }
+
+    private fun getDefaultOutputLocation(): File {
+        // Assume this is <root>/tools
+        return File("${getJarFileLocation().parentFile.absolutePath}/../Debug-FantasyFootballClient/libs")
     }
 }
 

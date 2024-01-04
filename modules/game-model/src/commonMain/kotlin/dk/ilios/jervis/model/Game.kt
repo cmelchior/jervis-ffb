@@ -5,7 +5,11 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlin.properties.Delegates
 
-class Game(homeTeam: Team, awayTeam: Team, field: Field) {
+class Game(field: Field) {
+    constructor(homeTeam: Team, awayTeam: Team, field: Field): this(field) {
+        this.homeTeam = homeTeam
+        this.awayTeam = awayTeam
+    }
     var goalScored: Boolean = false
     var abortIfBallOutOfBounds: Boolean = false
     var halfNo by Delegates.observable(0u) { prop, old, new ->
@@ -15,8 +19,8 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
         gameFlow.tryEmit(this)
     }
 
-    val homeTeam = homeTeam
-    val awayTeam = awayTeam
+    lateinit var homeTeam: Team
+    lateinit var awayTeam: Team
 
     var activePlayer: Player? = null
     var kickingPlayer: Player? = null

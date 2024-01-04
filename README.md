@@ -5,11 +5,11 @@ can interact with [FUMBBL](https://fumbbl.com/p/news) and [BotBowl](https://njus
 
 It consists of the following modules:
 
-- `fumbbl-client-downloader`: Small script for downloading the FUMBBL Client and modifying it so all
-  websocket traffic is outputted to the console.
+- `fumbbl-cli`: Small commandline tool for either downloading the FUMBBL Client and modifying it so all
+  websocket traffic is outputted to the console or download a replay for futher analysis. Note, the last
+  functionality should only be used sparingly and for testing as it taxes too much if used in bulk. 
 
-- `game-downloader`: Can download a single game file from FUMBBL. Should only be used sparingly and
-  for testing. Written in Kotlin (JVM).
+- `fumbbl-net`: Network code and classes for communicating with the FUMBBL server.
 
 - `game-model`: This is full model of a Blood Bowl game and can be used to model both the game state
   and rules. This module is not supposed to be used stand-alone but is building block for the other 
@@ -25,6 +25,9 @@ It consists of the following modules:
 
 - See match details: https://fumbbl.com/p/match?id=<match_id>
 
+- REST API: An OAuth id can be created at https://fumbbl.com/p/oauth. 
+  It requires you to login at FUMBBL first. With The credentials
+  there, you can call the API described in https://fumbbl.com/apidoc/
 
 ## Other resources
 

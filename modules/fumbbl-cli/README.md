@@ -67,6 +67,23 @@ teamId: 72961
 teamName: "Greendale Ressurected"
 coach: cmelchior
 authToken: 85c88af58bc846e5ee67d9a87f86a2ec
+
+
+</argument><argument>-teamId</argument><argument>1158751</argument><argument>-teamName</argument><argument>Jervis Cybernetic Crusaders</argument><argument>-port</argument><argument>22223</argument><argument>-coach</argument><argument>cmelchior</argument><argument>-auth</argument><argument>037194e7b7ac73bd6b46222646f5056f</argument></application-desc></jnlp>
+
+
+> java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -player \
+-teamId 1158751 -teamName "Team 1" -port 22223 \
+-coach cmelchior -auth 037194e7b7ac73bd6b46222646f5056f
+
+> java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -player \
+-teamId 1158756 -teamName "Team 2" -port 22223 \
+-coach cmelchior -auth 037194e7b7ac73bd6b46222646f5056f
+
+
+````
+
+
 ```
 
 Note, it is possible for the same coach to connect two of their own teams, giving full control over the

@@ -11,11 +11,11 @@ import javassist.ClassPool
 import javassist.expr.ExprEditor
 import javassist.expr.MethodCall
 import kotlinx.coroutines.runBlocking
-import okio.Path
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.jar.JarEntry
@@ -24,11 +24,12 @@ import java.util.jar.JarInputStream
 import java.util.jar.JarOutputStream
 import java.util.jar.Manifest
 import java.util.stream.Collectors
+import kotlin.io.path.name
 
 /**
  * Create
  */
-class CreateDebugClientRunner {
+class CreateDebugClientRunner(private val cliJarFile: File) {
 
     fun run(jarFolder: File) {
         val baseUrl = "https://fumbbl.com"
@@ -68,7 +69,7 @@ class CreateDebugClientRunner {
     }
 
     /**
-     * Helper function for easily download file using HTTP GET.
+     * Helper function for easily downloading a file using HTTP GET.
      */
     suspend fun HttpClient.downloadFile(targetFile: File, url: String) {
         if (targetFile.exists()) {
@@ -147,8 +148,8 @@ class CreateDebugClientRunner {
         })
 
         val jarParentDir = fumbblClientJar.parentFile.absolutePath
-        cc.writeFile(jarParentDir + Path.DIRECTORY_SEPARATOR)
-        val outputFile = File(jarParentDir + "/com/fumbbl/ffb/client/net/CommandEndpoint.class".replace("/", Path.DIRECTORY_SEPARATOR))
+        cc.writeFile(jarParentDir + okio.Path.DIRECTORY_SEPARATOR)
+        val outputFile = File(jarParentDir + "/com/fumbbl/ffb/client/net/CommandEndpoint.class".replace("/", okio.Path.DIRECTORY_SEPARATOR))
         return mapOf("com/fumbbl/ffb/client/net/CommandEndpoint.class" to outputFile)
     }
 
@@ -158,6 +159,13 @@ class CreateDebugClientRunner {
     fun injectDebugCode(fumbblClientJar: File) {
         val modifiedFiles = createClassesWithDebugCode(fumbblClientJar)
         rewriteJarFile(fumbblClientJar, modifiedFiles)
+        copyCLIJarFile(cliJarFile.toPath(), fumbblClientJar.parentFile.toPath())
+    }
+
+    private fun copyCLIJarFile(cliJarFile: Path, targetDirectory: Path) {
+        val targetFile = targetDirectory.resolve(cliJarFile.name)
+        logInfo("Copy CLI Jar file to $targetFile")
+        Files.copy(cliJarFile, targetFile, StandardCopyOption.REPLACE_EXISTING)
     }
 
     /**
