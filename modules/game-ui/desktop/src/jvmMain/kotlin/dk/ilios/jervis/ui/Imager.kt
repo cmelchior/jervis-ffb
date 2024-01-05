@@ -67,7 +67,7 @@ object Imager {
                 addPlayer("Blitzer-3", PlayerNo(10), HumanTeam.BLITZER)
                 addPlayer("Blitzer-4", PlayerNo(11), HumanTeam.BLITZER)
                 reRolls = 4
-                apothecary = true
+                apothecaries = true
             }
             val team2: Team = teamBuilder(HumanTeam) {
                 coach = Coach("AwayCoach")
@@ -84,7 +84,7 @@ object Imager {
                 addPlayer("Blitzer-3", PlayerNo(10), HumanTeam.BLITZER)
                 addPlayer("Blitzer-4", PlayerNo(11), HumanTeam.BLITZER)
                 reRolls = 4
-                apothecary = true
+                apothecaries = true
             }
             val field = dk.ilios.jervis.model.Field.createForRuleset(rules)
             val state = Game(team1, team2, field)

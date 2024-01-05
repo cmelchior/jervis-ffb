@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 fun main(args: Array<String>) {
 //    val fileName = "../../replays/human-starter-game/websocket-traffic-team1.fumbbl"
 //    val fileName = "../../replays/human-starter-game/websocket-traffic-team2.fumbbl"
-    val fileName = "../../replays/game-123744.json"
+    val fileName = "../../replays/game-1624379.json"
 //        val fileName = "../../replays-fumbbl/game-1624379.json"
     //    val fileName = "game-1624379.json"
 //    val fileName = "game.json"

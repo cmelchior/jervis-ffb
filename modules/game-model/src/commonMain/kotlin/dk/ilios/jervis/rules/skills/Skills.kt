@@ -1,7 +1,6 @@
 package dk.ilios.jervis.rules.skills
 
 interface Skill {
-
     enum class UsageType {
         ALWAYS,
         ONCE_PR_TURN,
@@ -10,7 +9,6 @@ interface Skill {
         ONCE_PR_GAME,
         SPECIAL //
     }
-
     val id: Long
     val name: String
     val usage: UsageType
@@ -18,8 +16,6 @@ interface Skill {
     var used: Boolean
 
     // Modifiers
-
-
 }
 
 interface SkillCategory {

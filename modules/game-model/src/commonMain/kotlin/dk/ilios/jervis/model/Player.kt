@@ -104,7 +104,7 @@ class Player: Observable<Player>() {
     var moveLeft: Int = 0
     var baseStrenght: Int = 0
     var baseAgility: Int = 0
-    var basePassing: Int = 0
+    var basePassing: Int? = 0
     var baseArmorValue: Int = 0
     val skills = mutableListOf<Skill>()
     val move: Int
@@ -119,7 +119,7 @@ class Player: Observable<Player>() {
         get() {
             return baseAgility
         }
-    val passing: Int
+    val passing: Int?
         get() {
             return basePassing
         }

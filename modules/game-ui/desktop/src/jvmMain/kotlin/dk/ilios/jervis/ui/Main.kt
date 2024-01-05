@@ -13,10 +13,10 @@ import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.teamBuilder
 import dk.ilios.jervis.utils.createRandomAction
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
+import java.io.File
 
 fun main() = application {
     val rules = BB2020Rules
@@ -35,7 +35,7 @@ fun main() = application {
         addPlayer("Blitzer-3-H", PlayerNo(10), HumanTeam.BLITZER)
         addPlayer("Blitzer-4-H", PlayerNo(11), HumanTeam.BLITZER)
         reRolls = 4
-        apothecary = true
+        apothecaries = true
     }
     val team2: Team = teamBuilder(HumanTeam) {
         coach = Coach("AwayCoach")
@@ -52,24 +52,48 @@ fun main() = application {
         addPlayer("Blitzer-3-A", PlayerNo(10), HumanTeam.BLITZER)
         addPlayer("Blitzer-4-A", PlayerNo(11), HumanTeam.BLITZER)
         reRolls = 4
-        apothecary = true
+        apothecaries = true
     }
     val field = dk.ilios.jervis.model.Field.createForRuleset(rules)
     val state = Game(team1, team2, field)
     val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
     val actionSelectedChannel = Channel<GameAction>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
-    val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+
+    val replayFromFileActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
         val action: GameAction = runBlocking {
             actionRequestChannel.send(Pair(controller, availableActions))
             actionSelectedChannel.receive()
         }
         action
     }
-//    val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
-//        createRandomAction(controller.state, availableActions)
-//    }
-    val controller = GameController(rules, state, actionProvider)
+
+
+    val userActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+        val action: GameAction = runBlocking {
+            actionRequestChannel.send(Pair(controller, availableActions))
+            actionSelectedChannel.receive()
+        }
+        action
+    }
+
+    val randomActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+        createRandomAction(controller.state, availableActions)
+    }
+
+
+
+
+    val controller = GameController(rules, state, randomActionProvider)
     Window(onCloseRequest = ::exitApplication) {
         App(controller, actionRequestChannel, actionSelectedChannel)
     }
+}
+
+fun runReplayFromFile() {
+
+    val replayFile = File("")
+    val fumbblReplayAdapte = FumbblReplayAdapter(replayFile)
+
+
+
 }

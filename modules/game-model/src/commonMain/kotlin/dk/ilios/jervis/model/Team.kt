@@ -5,6 +5,7 @@ import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Roster
+import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -77,6 +78,7 @@ class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
     var teamValue: Int = 0
     var treasury: Int = 0
     var dedicatedFans: Int = 0
+    val specialRules: MutableList<SpecialRules> = mutableListOf()
 
     // Special team state that needs to be tracked for the given period
     lateinit var game: Game

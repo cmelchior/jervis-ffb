@@ -1,5 +1,8 @@
 package dk.ilios.jervis.model
 
-class Coach(val name: String) {
+import kotlin.jvm.JvmInline
 
-}
+@JvmInline
+value class CoachId(val id: String)
+
+data class Coach(val id: CoachId, val name: String)

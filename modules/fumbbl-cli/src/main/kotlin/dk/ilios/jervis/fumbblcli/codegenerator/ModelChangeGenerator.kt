@@ -227,7 +227,7 @@ class ModelChangeGenerator {
                 println("""
                     @Serializable
                     @SerialName("$stringName")
-                    class $className(
+                    data class $className(
                         override val modelChangeId: ModelChangeId = ModelChangeId.$enumName,
                         override val modelChangeKey: $keyType,
                         override val modelChangeValue: $valueType

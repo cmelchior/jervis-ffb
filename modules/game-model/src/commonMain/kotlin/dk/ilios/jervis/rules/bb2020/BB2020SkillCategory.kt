@@ -7,7 +7,10 @@ sealed class BB2020SkillCategory(id: Long, name: String): SkillCategory {
     override val name: String = name
 }
 data object Agility: BB2020SkillCategory(1, "Agility")
-data object General: BB2020SkillCategory(1, "General")
-data object Passing: BB2020SkillCategory(1, "Passing")
-data object Strength: BB2020SkillCategory(1, "Strength")
-data object Traits: BB2020SkillCategory(1, "Traits")
+data object General: BB2020SkillCategory(2, "General")
+data object Mutations: BB2020SkillCategory(3, "Mutations")
+data object Passing: BB2020SkillCategory(4, "Passing")
+data object Strength: BB2020SkillCategory(5, "Strength")
+data object Traits: BB2020SkillCategory(6, "Traits")
+data object StatIncrease: BB2020SkillCategory(7, "Stat Increase")
+

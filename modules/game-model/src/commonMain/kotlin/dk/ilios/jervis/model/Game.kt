@@ -5,11 +5,15 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlin.properties.Delegates
 
-class Game(field: Field) {
-    constructor(homeTeam: Team, awayTeam: Team, field: Field): this(field) {
-        this.homeTeam = homeTeam
-        this.awayTeam = awayTeam
+class Game(homeTeam: Team, awayTeam: Team, field: Field) {
+
+    init {
+        homeTeam.setGameReference(this)
+        awayTeam.setGameReference(this)
     }
+
+    companion object
+
     var goalScored: Boolean = false
     var abortIfBallOutOfBounds: Boolean = false
     var halfNo by Delegates.observable(0u) { prop, old, new ->
@@ -19,8 +23,8 @@ class Game(field: Field) {
         gameFlow.tryEmit(this)
     }
 
-    lateinit var homeTeam: Team
-    lateinit var awayTeam: Team
+    val homeTeam: Team = homeTeam
+    val awayTeam: Team = awayTeam
 
     var activePlayer: Player? = null
     var kickingPlayer: Player? = null
@@ -36,11 +40,6 @@ class Game(field: Field) {
 
     val field: Field = field
     val ball: Ball = Ball()
-
-    init {
-        homeTeam.setGameReference(this)
-        awayTeam.setGameReference(this)
-    }
 
     fun swapKickingTeam() {
         val currentKickingTeam = kickingTeam

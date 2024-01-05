@@ -8,6 +8,7 @@ interface Position {
     val roster: Roster
     val quantity: Int
     val position: String
+    val positionSingular: String
     val cost: Int
 
     val move: Int

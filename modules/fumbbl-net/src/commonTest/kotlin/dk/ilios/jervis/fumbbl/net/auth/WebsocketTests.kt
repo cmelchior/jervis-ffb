@@ -29,7 +29,7 @@ class WebsocketTests {
         launch {
             while(!adapter.isClosed) {
                 delay(1000)
-                adapter.send(S)
+//                adapter.send(S)
             }
         }
 

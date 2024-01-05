@@ -8,18 +8,14 @@ import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
-import dk.ilios.jervis.rules.roster.Position
-import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.ui.App
 import dk.ilios.jervis.utils.createRandomAction
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import java.lang.IllegalArgumentException
 
 @Preview
 @Composable
@@ -40,7 +36,7 @@ fun AppPreview() {
         addPlayer("Blitzer-3", PlayerNo(10), HumanTeam.BLITZER)
         addPlayer("Blitzer-4", PlayerNo(11), HumanTeam.BLITZER)
         reRolls = 4
-        apothecary = true
+        apothecaries = true
     }
     val p1 = team1
     val p2 = team1

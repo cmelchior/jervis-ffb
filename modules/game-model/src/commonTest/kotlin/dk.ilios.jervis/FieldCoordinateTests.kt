@@ -32,7 +32,7 @@ private fun getDefaultTestSetup(rules: Rules): Game {
         addPlayer("Blitzer-3", PlayerNo(10), HumanTeam.BLITZER)
         addPlayer("Blitzer-4", PlayerNo(11), HumanTeam.BLITZER)
         reRolls = 4
-        apothecary = true
+        apothecaries = true
     }
     val p1 = team1
     val p2 = team1

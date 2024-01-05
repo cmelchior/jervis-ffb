@@ -6,6 +6,7 @@ import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.Roster
+import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
 
 class TeamBuilder(val roster: Roster) {
     private val players: MutableMap<PlayerNo, Player> = mutableMapOf()
@@ -24,16 +25,17 @@ class TeamBuilder(val roster: Roster) {
     var teamValue: Int = 0
     var treasury: Int = 0
     var dedicatedFans: Int = 0
+    val specialRules = mutableListOf<SpecialRules>()
 
-    var apothecary: Boolean = false
+    var apothecaries: Int = 0
         set(value) {
-            if (!roster.apothecary && value) {
+            if (!roster.allowApothecary && value > 0) {
                 throw IllegalArgumentException("This team does not allow an apothecary")
             }
             field = value
         }
 
-    fun addPlayer(name: String, number: PlayerNo, type: Position) {
+    fun addPlayer(name: String, number: PlayerNo, type: Position): Player {
         val player = type.createPlayer(name, number)
         if (players.containsKey(number)) {
             throw IllegalArgumentException("Player with number $number already exits: ${players[number]}")
@@ -43,6 +45,7 @@ class TeamBuilder(val roster: Roster) {
             throw IllegalArgumentException("Max number of $type are already on the team.")
         }
         players[number] = player
+        return player
     }
     fun build(): Team {
         return Team(name, roster, coach!!).apply {
