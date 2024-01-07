@@ -35,7 +35,7 @@ class TeamBuilder(val roster: Roster) {
             field = value
         }
 
-    fun addPlayer(name: String, number: PlayerNo, type: Position): Player {
+    fun addPlayer(name: String, number: PlayerNo, type: Position) {
         val player = type.createPlayer(name, number)
         if (players.containsKey(number)) {
             throw IllegalArgumentException("Player with number $number already exits: ${players[number]}")
@@ -45,7 +45,7 @@ class TeamBuilder(val roster: Roster) {
             throw IllegalArgumentException("Max number of $type are already on the team.")
         }
         players[number] = player
-        return player
+//        return player
     }
     fun build(): Team {
         return Team(name, roster, coach!!).apply {

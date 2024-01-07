@@ -33,6 +33,21 @@ abstract class ActionNode: Node {
             throw IllegalArgumentException("Action (${action::class}) is not of the expected type: ${T::class}")
         }
     }
+    inline fun <reified D1: DieResult> checkDiceRoll(action: GameAction, function: (D1) -> Command): Command {
+        if (action is DiceResults) {
+            if (action.rolls.size != 1) {
+                throw IllegalArgumentException("Expected 1 dice rolls, got ${action.rolls.size}")
+            }
+            val first: DieResult = action.rolls.first()
+            if (first !is D1) {
+                throw IllegalArgumentException("Expected first roll to be ${D1::class}, but was ${first::class}")
+            }
+            return function(first)
+        } else {
+            throw IllegalArgumentException("Action (${action::class}) is not of the expected type: ${DiceResults::class}")
+        }
+    }
+
 
     inline fun <reified D1: DieResult, reified D2: DieResult> checkDiceRoll(action: GameAction, function: (D1, D2) -> Command): Command {
         if (action is DiceResults) {

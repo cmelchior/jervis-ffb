@@ -34,7 +34,7 @@ object RollOnPrayersOfNuffleTable: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D16Result>(action) { d16 ->
-                val result: TableResult = rules.prayersToNuffleTableEvent.roll(d16)
+                val result: TableResult = rules.prayersToNuffleTable.roll(d16)
                 compositeCommandOf(
                     ReportPrayersOfNuffleRoll(state.activeTeam, d16, result),
                     GotoNode(ApplyTableResult(result.procedure)),

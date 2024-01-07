@@ -6,6 +6,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
+import dk.ilios.jervis.model.CoachId
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
@@ -13,6 +14,7 @@ import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.teamBuilder
 import dk.ilios.jervis.utils.createRandomAction
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
@@ -21,7 +23,7 @@ import java.io.File
 fun main() = application {
     val rules = BB2020Rules
     val team1: Team = teamBuilder(HumanTeam) {
-        coach = Coach("HomeCoach")
+        coach = Coach(CoachId("home-coach"), "HomeCoach")
         name = "HomeTeam"
         addPlayer("Lineman-1-H", PlayerNo(1), HumanTeam.LINEMAN)
         addPlayer("Lineman-2-H", PlayerNo(2), HumanTeam.LINEMAN)
@@ -35,10 +37,10 @@ fun main() = application {
         addPlayer("Blitzer-3-H", PlayerNo(10), HumanTeam.BLITZER)
         addPlayer("Blitzer-4-H", PlayerNo(11), HumanTeam.BLITZER)
         reRolls = 4
-        apothecaries = true
+        apothecaries = 1
     }
     val team2: Team = teamBuilder(HumanTeam) {
-        coach = Coach("AwayCoach")
+        coach = Coach(CoachId("away-coach"), "AwayCoach")
         name = "AwayTeam"
         addPlayer("Lineman-1-A", PlayerNo(1), HumanTeam.LINEMAN)
         addPlayer("Lineman-2-A", PlayerNo(2), HumanTeam.LINEMAN)
@@ -52,15 +54,35 @@ fun main() = application {
         addPlayer("Blitzer-3-A", PlayerNo(10), HumanTeam.BLITZER)
         addPlayer("Blitzer-4-A", PlayerNo(11), HumanTeam.BLITZER)
         reRolls = 4
-        apothecaries = true
+        apothecaries = 1
     }
     val field = dk.ilios.jervis.model.Field.createForRuleset(rules)
     val state = Game(team1, team2, field)
     val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
     val actionSelectedChannel = Channel<GameAction>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
 
-    val replayFromFileActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
-        val action: GameAction = runBlocking {
+//    val replayFromFileActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+//        val action: GameAction = runBlocking(Dispatchers.Default) {
+//            actionRequestChannel.send(Pair(controller, availableActions))
+//            actionSelectedChannel.receive()
+//        }
+//        action
+//    }
+//
+//    val userActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+//        val action: GameAction = runBlocking {
+//            actionRequestChannel.send(Pair(controller, availableActions))
+//            actionSelectedChannel.receive()
+//        }
+//        action
+//    }
+//
+//    val randomActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+//        createRandomAction(controller.state, availableActions)
+//    }
+
+    val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+        val action: GameAction = runBlocking(Dispatchers.Default) {
             actionRequestChannel.send(Pair(controller, availableActions))
             actionSelectedChannel.receive()
         }
@@ -68,32 +90,14 @@ fun main() = application {
     }
 
 
-    val userActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
-        val action: GameAction = runBlocking {
-            actionRequestChannel.send(Pair(controller, availableActions))
-            actionSelectedChannel.receive()
-        }
-        action
-    }
-
-    val randomActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
-        createRandomAction(controller.state, availableActions)
-    }
-
-
-
-
-    val controller = GameController(rules, state, randomActionProvider)
+    val controller = GameController(rules, state, actionProvider)
     Window(onCloseRequest = ::exitApplication) {
         App(controller, actionRequestChannel, actionSelectedChannel)
     }
 }
 
 fun runReplayFromFile() {
-
-    val replayFile = File("")
-    val fumbblReplayAdapte = FumbblReplayAdapter(replayFile)
-
-
+    val replayFile = File("").path
+//    val fumbblReplayAdapte = FumbblReplay(replayFile)
 
 }

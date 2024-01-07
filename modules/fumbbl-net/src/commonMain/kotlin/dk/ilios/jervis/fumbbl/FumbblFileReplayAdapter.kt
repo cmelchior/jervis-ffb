@@ -31,9 +31,11 @@ import java.time.LocalDateTime
 expect val platformFileSystem: FileSystem
 
 /**
- * Class for controlling the websocket connection with FUMBBL.
+ * Class for loading a FUMBBL replay file and convert it into a stream of
+ * events that is consumable by a Jervis Game Model. This way, it is
+ * possible to replay the entire FUMBBL game inside Jervis.
  *
- * This class controlls
+ * Note, this requires that the FUMBBL and Jervis Rules are setup the same way.
  *
  */
 class FumbblFileReplayAdapter(private val file: Path): FumbblAdapter {
@@ -42,7 +44,7 @@ class FumbblFileReplayAdapter(private val file: Path): FumbblAdapter {
 
     // Messages sent from the server. Users of this class
     // are required to listen to the channel.
-    private val incomingMessages: Channel<ServerCommand> = Channel()
+    private val incomingMessages: Channel<ServerCommandReplay> = Channel()
 
     // Messages that should be sent to the server
     private val outgoingMessages: Channel<ServerCommand> = Channel()
@@ -124,7 +126,7 @@ class FumbblFileReplayAdapter(private val file: Path): FumbblAdapter {
         }
     }
 
-    override suspend fun receive(): ServerCommand = incomingMessages.receive()
+    override suspend fun receive(): ServerCommandReplay = incomingMessages.receive()
 
     override suspend fun send(command: ClientCommand) = TODO("Not yet implemented")
 

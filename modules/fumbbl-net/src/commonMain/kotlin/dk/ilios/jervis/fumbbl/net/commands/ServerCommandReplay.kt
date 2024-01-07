@@ -11,7 +11,7 @@ data class ServerCommandReplay(
     override val netCommandId: String,
     override val commandNr: Int,
     val totalNrOfCommands: Int,
-    val commandArray: List<ServerCommand>,
+    val commandArray: List<ServerCommandModelSync>,
     val lastCommand: Boolean
 ): ServerCommand
 

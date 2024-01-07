@@ -3,7 +3,6 @@ package dk.ilios.jervis.rules
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
@@ -23,6 +22,7 @@ import dk.ilios.jervis.rules.tables.Direction
 import dk.ilios.jervis.rules.tables.PrayersToNuffleTable
 import dk.ilios.jervis.rules.tables.RandomDirectionTemplate
 import dk.ilios.jervis.rules.tables.TableResult
+import dk.ilios.jervis.rules.tables.WeatherTable
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 interface BloodBowl {
@@ -203,8 +203,11 @@ interface Rules {
     val kickOffEventTable
         get() = KickOffEventTable
 
-    val prayersToNuffleTableEvent
+    val prayersToNuffleTable
         get() = PrayersToNuffleTable
+
+    val weatherTable
+        get() = WeatherTable
 
     val teamActions: TeamActions
         get() = BB2020TeamActions()

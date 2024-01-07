@@ -16,7 +16,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":modules:fumbbl-net"))
                 implementation(project(":modules:game-model"))
+                implementation("com.squareup.okio:okio:3.7.0")
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)

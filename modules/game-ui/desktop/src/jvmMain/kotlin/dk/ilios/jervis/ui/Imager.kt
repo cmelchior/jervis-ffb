@@ -10,6 +10,7 @@ import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
+import dk.ilios.jervis.model.CoachId
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
@@ -53,7 +54,7 @@ object Imager {
         return renderScreenshot(width, height) {
             val rules = BB2020Rules
             val team1: Team = teamBuilder(HumanTeam) {
-                coach = Coach("HomeCoach")
+                coach = Coach(CoachId("1"), "HomeCoach")
                 name = "HomeTeam"
                 addPlayer("Lineman-1", PlayerNo(1), HumanTeam.LINEMAN)
                 addPlayer("Lineman-2", PlayerNo(2), HumanTeam.LINEMAN)
@@ -67,10 +68,10 @@ object Imager {
                 addPlayer("Blitzer-3", PlayerNo(10), HumanTeam.BLITZER)
                 addPlayer("Blitzer-4", PlayerNo(11), HumanTeam.BLITZER)
                 reRolls = 4
-                apothecaries = true
+                apothecaries = 1
             }
             val team2: Team = teamBuilder(HumanTeam) {
-                coach = Coach("AwayCoach")
+                coach = Coach(CoachId("2"), "AwayCoach")
                 name = "AwayTeam"
                 addPlayer("Lineman-1", PlayerNo(1), HumanTeam.LINEMAN)
                 addPlayer("Lineman-2", PlayerNo(2), HumanTeam.LINEMAN)
@@ -84,7 +85,7 @@ object Imager {
                 addPlayer("Blitzer-3", PlayerNo(10), HumanTeam.BLITZER)
                 addPlayer("Blitzer-4", PlayerNo(11), HumanTeam.BLITZER)
                 reRolls = 4
-                apothecaries = true
+                apothecaries = 1
             }
             val field = dk.ilios.jervis.model.Field.createForRuleset(rules)
             val state = Game(team1, team2, field)

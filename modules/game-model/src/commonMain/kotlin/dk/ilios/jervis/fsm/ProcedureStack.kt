@@ -14,4 +14,11 @@ class ProcedureStack {
     fun firstOrNull(): ProcedureState? = history.firstOrNull()
     fun addNode(nextNode: Node) = history.first().addNode(nextNode)
     fun removeNode() = history.first().removeLast()
+
+    /**
+     * Check if a certain procedure is part of the current stack
+     */
+    fun contains(procedure: Procedure): Boolean {
+        return history.firstOrNull { it.procedure == procedure } != null
+    }
 }

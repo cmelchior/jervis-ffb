@@ -18,14 +18,14 @@ object PreGame: Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object TheFans: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun getChildProcedure(state: Game, rules: Rules) = RollForStartingFanFactor
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(TheWeather)
         }
     }
 
     object TheWeather: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun getChildProcedure(state: Game, rules: Rules) = RollForTheWeather
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(TakeOnJourneyMen)
         }

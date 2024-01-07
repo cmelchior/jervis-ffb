@@ -6,6 +6,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
+import dk.ilios.jervis.model.CoachId
 import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerNo
@@ -22,7 +23,7 @@ import kotlinx.coroutines.channels.Channel
 fun AppPreview() {
     val rules = BB2020Rules
     val team1: Team = teamBuilder(HumanTeam) {
-        coach = Coach("HomeCoach")
+        coach = Coach(CoachId("1"), "HomeCoach")
         name = "HomeTeam"
         addPlayer("Lineman-1", PlayerNo(1), HumanTeam.LINEMAN)
         addPlayer("Lineman-2", PlayerNo(2), HumanTeam.LINEMAN)
@@ -36,7 +37,7 @@ fun AppPreview() {
         addPlayer("Blitzer-3", PlayerNo(10), HumanTeam.BLITZER)
         addPlayer("Blitzer-4", PlayerNo(11), HumanTeam.BLITZER)
         reRolls = 4
-        apothecaries = true
+        apothecaries = 1
     }
     val p1 = team1
     val p2 = team1
