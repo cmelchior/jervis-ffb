@@ -2,6 +2,7 @@ package dk.ilios.jervis
 
 import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.roster.Position
@@ -35,8 +36,8 @@ class TeamBuilder(val roster: Roster) {
             field = value
         }
 
-    fun addPlayer(name: String, number: PlayerNo, type: Position) {
-        val player = type.createPlayer(name, number)
+    fun addPlayer(id: PlayerId, name: String, number: PlayerNo, type: Position) {
+        val player = type.createPlayer(id, name, number)
         if (players.containsKey(number)) {
             throw IllegalArgumentException("Player with number $number already exits: ${players[number]}")
         }

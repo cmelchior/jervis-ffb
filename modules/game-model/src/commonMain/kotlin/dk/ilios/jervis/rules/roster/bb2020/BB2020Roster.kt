@@ -1,6 +1,7 @@
 package dk.ilios.jervis.rules.roster.bb2020
 
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.rules.bb2020.Agility
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
@@ -32,8 +33,8 @@ class BB2020Position(
     primary: List<BB2020SkillCategory>,
     secondary: List<BB2020SkillCategory>,
 ): Position {
-    override fun createPlayer(name: String, number: PlayerNo): Player {
-        return Player().apply {
+    override fun createPlayer(id: PlayerId, name: String, number: PlayerNo): Player {
+        return Player(id).apply {
             this.name = name
             this.number = number
             position = this@BB2020Position

@@ -37,9 +37,15 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
 
     var activePlayerAction: PlayerAction? = null
     var moveStepTarget: Pair<FieldCoordinate, FieldCoordinate>? = null
+    var coinSideSelected: Coin? = null
+    var coinResult: Coin? = null
 
     val field: Field = field
     val ball: Ball = Ball()
+
+    fun getPlayerById(id: PlayerId): Player? {
+        return homeTeam.firstOrNull { it.id == id } ?: awayTeam.firstOrNull { it.id == id}
+    }
 
     fun swapKickingTeam() {
         val currentKickingTeam = kickingTeam

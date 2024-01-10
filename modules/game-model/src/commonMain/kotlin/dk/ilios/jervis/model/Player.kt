@@ -84,7 +84,11 @@ enum class Availability {
     UNAVAILABLE // Unavailable for this turn
 }
 
-class Player: Observable<Player>() {
+@JvmInline
+value class PlayerId(val value: String)
+
+class Player(id: PlayerId): Observable<Player>() {
+    val id: PlayerId = id
     lateinit var team: Team
     var location: Location by observable(DogOut) { old, new ->
         if ((old == DogOut && new != DogOut) || old != DogOut && new == DogOut) {

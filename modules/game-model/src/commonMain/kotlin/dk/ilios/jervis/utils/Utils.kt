@@ -2,6 +2,10 @@ package dk.ilios.jervis.utils
 
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.Cancel
+import dk.ilios.jervis.actions.CancelWhenReady
+import dk.ilios.jervis.actions.CoinSideSelected
+import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.Continue
@@ -31,10 +35,14 @@ import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
+import dk.ilios.jervis.actions.SelectCoinSide
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
+import dk.ilios.jervis.actions.TossCoin
+import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.Game
+import kotlin.random.Random
 
 fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): GameAction {
     return when(val action = availableActions.random()) {
@@ -63,6 +71,21 @@ fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): G
         is DeselectPlayer -> PlayerDeselected
         is SelectAction -> PlayerActionSelected(action.action)
         EndActionWhenReady -> EndAction
+        CancelWhenReady -> Cancel
+        SelectCoinSide -> {
+            when(Random.nextInt(2)) {
+                0 -> CoinSideSelected(Coin.HEAD)
+                1 -> CoinSideSelected(Coin.TAIL)
+                else -> throw IllegalStateException()
+            }
+        }
+        TossCoin -> {
+            when(Random.nextInt(2)) {
+                0 -> CoinTossResult(Coin.HEAD)
+                1 -> CoinTossResult(Coin.TAIL)
+                else -> throw IllegalStateException()
+            }
+        }
     }
 }
 

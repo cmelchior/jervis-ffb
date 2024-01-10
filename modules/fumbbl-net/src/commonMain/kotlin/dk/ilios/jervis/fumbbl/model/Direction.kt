@@ -1,8 +1,8 @@
 package dk.ilios.jervis.fumbbl.model
 
-import kotlinx.serialization.Serializable
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer
+import kotlinx.serialization.Serializable
 
 class DirectionSerializer: FumbblEnumSerializer<Direction>(Direction::class)
 
@@ -17,14 +17,46 @@ enum class Direction(override val id: String): FumbblEnum {
     WEST("West"),
     NORTHWEST("Northwest");
 
-    fun transform(): Direction {
+    /**
+     * Transform a Direction in FUMBBL to a Direection in Jervis.
+     */
+    fun transformToJervisDirection(): dk.ilios.jervis.rules.tables.Direction {
+        return when(this) {
+            NORTH -> dk.ilios.jervis.rules.tables.Direction(0, -1)
+            NORTHEAST -> dk.ilios.jervis.rules.tables.Direction(1, -1)
+            EAST -> dk.ilios.jervis.rules.tables.Direction(1, 0)
+            SOUTHEAST -> dk.ilios.jervis.rules.tables.Direction(1, 1)
+            SOUTH -> dk.ilios.jervis.rules.tables.Direction(0, 1)
+            SOUTHWEST -> dk.ilios.jervis.rules.tables.Direction(-1, 1)
+            WEST -> dk.ilios.jervis.rules.tables.Direction(-1, 0)
+            NORTHWEST -> dk.ilios.jervis.rules.tables.Direction(-1, -1)
+        }
+    }
+
+    fun reverse(): Direction {
+        return when(this) {
+            NORTH -> SOUTH
+            NORTHEAST -> SOUTHWEST
+            EAST -> WEST
+            SOUTHEAST -> NORTHWEST
+            SOUTH -> NORTH
+            SOUTHWEST -> NORTHEAST
+            WEST -> EAST
+            NORTHWEST -> SOUTHEAST
+        }
+    }
+
+    /**
+     * Swap around the x-axis
+     */
+    fun swap(): Direction {
         return when (this) {
-            Direction.NORTHEAST -> Direction.NORTHWEST
-            Direction.EAST -> Direction.WEST
-            Direction.SOUTHEAST -> Direction.SOUTHWEST
-            Direction.SOUTHWEST -> Direction.SOUTHEAST
-            Direction.WEST -> Direction.EAST
-            Direction.NORTHWEST -> Direction.NORTHEAST
+            NORTHEAST -> NORTHWEST
+            EAST -> WEST
+            SOUTHEAST -> SOUTHWEST
+            SOUTHWEST -> SOUTHEAST
+            WEST -> EAST
+            NORTHWEST -> NORTHEAST
             else -> this
         }
     }

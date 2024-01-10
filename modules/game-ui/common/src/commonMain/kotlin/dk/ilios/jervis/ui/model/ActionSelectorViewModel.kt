@@ -2,6 +2,10 @@ package dk.ilios.jervis.ui.model
 
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.Cancel
+import dk.ilios.jervis.actions.CancelWhenReady
+import dk.ilios.jervis.actions.CoinSideSelected
+import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.Continue
@@ -30,10 +34,13 @@ import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
+import dk.ilios.jervis.actions.SelectCoinSide
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
+import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.controller.GameController
+import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerNo
@@ -49,8 +56,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import kotlin.random.Random
 
 class ActionSelectorViewModel(
     private val controller: GameController,
@@ -64,19 +73,99 @@ class ActionSelectorViewModel(
     val availableActions: Flow<List<GameAction>> = _availableActions
 
     fun start(randomActions: Boolean) {
+//        if (randomActions) {
+//            startRandomActionSelector()
+//        } else {
+//            startUserActionSelector()
+//        }
+
         if (randomActions) {
-            startRandomActionSelector()
+            scope.launch(Dispatchers.Default) {
+                val start = Instant.now()
+                controller.startManualMode()
+                while (!controller.stack.isEmpty()) {
+                    val actions = controller.getAvailableActions()
+                    if (!useManualAutomatedActions(controller)) {
+                        val selectedAction = createRandomAction(controller.state, actions)
+                        delay(20)
+                        controller.processAction(selectedAction)
+                    }
+                }
+                printStats(controller, start)
+            }
         } else {
-            startUserActionSelector()
+            scope.launch(Dispatchers.Default) {
+                controller.startManualMode()
+                while (!controller.stack.isEmpty()) {
+                    if (!useManualAutomatedActions(controller)) {
+                        val availableActions: List<GameAction> = controller.getAvailableActions().map { action ->
+                            when (action) {
+                                ContinueWhenReady -> Continue
+                                EndTurnWhenReady -> EndTurn
+                                is RollDice -> {
+                                    val rolls = action.dice.map {
+                                        when(it) {
+                                            Dice.D2 -> D2Result()
+                                            Dice.D3 -> D3Result()
+                                            Dice.D4 -> D4Result()
+                                            Dice.D6 -> D6Result()
+                                            Dice.D8 -> D8Result()
+                                            Dice.D12 -> D12Result()
+                                            Dice.D16 -> D16Result()
+                                            Dice.D20 -> D20Result()
+                                        }
+                                    }
+                                    if (rolls.size == 1) {
+                                        rolls.first()
+                                    } else {
+                                        DiceResults(rolls)
+                                    }
+                                }
+                                ConfirmWhenReady -> Confirm
+                                EndSetupWhenReady -> EndSetup
+                                SelectDogout -> DogoutSelected
+                                is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
+                                is SelectPlayer -> PlayerSelected(action.player)
+                                is DeselectPlayer -> PlayerDeselected
+                                is SelectAction -> PlayerActionSelected(action.action)
+                                EndActionWhenReady -> EndAction
+                                CancelWhenReady -> Cancel
+                                SelectCoinSide -> {
+                                    when(Random.nextInt(2)) {
+                                        0 -> CoinSideSelected(Coin.HEAD)
+                                        1 -> CoinSideSelected(Coin.TAIL)
+                                        else -> throw IllegalStateException("Unsupported value")
+                                    }
+                                }
+                                TossCoin -> {
+                                    when(Random.nextInt(2)) {
+                                        0 -> CoinTossResult(Coin.HEAD)
+                                        1 -> CoinTossResult(Coin.TAIL)
+                                        else -> throw IllegalStateException("Unsupported value")
+                                    }
+                                }
+                            }
+                        }
+                        _availableActions.emit(availableActions)
+                        val selectedAction = userSelectedAction.receive()
+                        controller.processAction(selectedAction)
+                    }
+                }
+            }
         }
-        scope.launch {
-            val start = Instant.now()
-            controller.start()
-            printStats(start)
-        }
+//
+//                val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+//                    val action: GameAction = runBlocking(Dispatchers.Default) {
+//                        actionRequestChannel.send(Pair(controller, availableActions))
+//                        actionSelectedChannel.receive()
+//                    }
+//                    action
+//                }
+//
+//            }
     }
 
-    private fun printStats(start: Instant) {
+    private fun printStats(controller: GameController, start: Instant) {
         val end = Instant.now()
         val duration = ChronoUnit.MILLIS.between(start, end)
         val commands = controller.commands.size
@@ -84,7 +173,7 @@ class ActionSelectorViewModel(
         println("Total time: $duration ms., Commands: $commands, timePrCommand: $msPrCommand ms.")
     }
 
-    private fun startUserActionSelector() {
+    private suspend fun startUserActionSelector() {
         scope.launch {
             actions@while(true) {
                 val (controller, actions) = actionRequestChannel.receive()
@@ -120,6 +209,21 @@ class ActionSelectorViewModel(
                         is DeselectPlayer -> PlayerDeselected
                         is SelectAction -> PlayerActionSelected(action.action)
                         EndActionWhenReady -> EndAction
+                        CancelWhenReady -> Cancel
+                        SelectCoinSide -> {
+                            when(Random.nextInt(2)) {
+                                0 -> CoinSideSelected(Coin.HEAD)
+                                1 -> CoinSideSelected(Coin.TAIL)
+                                else -> throw IllegalStateException("Unsupported value")
+                            }
+                        }
+                        TossCoin -> {
+                            when(Random.nextInt(2)) {
+                                0 -> CoinTossResult(Coin.HEAD)
+                                1 -> CoinTossResult(Coin.TAIL)
+                                else -> throw IllegalStateException("Unsupported value")
+                            }
+                        }
                     }
                 }
                 _availableActions.emit(availableActions)
@@ -128,6 +232,63 @@ class ActionSelectorViewModel(
             }
         }
     }
+
+    private suspend fun useManualAutomatedActions(controller: GameController): Boolean {
+        if (controller.stack.firstOrNull()?.procedure == SetupTeam && controller.stack.firstOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+            if (controller.state.activeTeam.isHomeTeam()) {
+                handleManualHomeKickingSetup(controller)
+            } else {
+                handleManualAwayKickingSetup(controller)
+            }
+            controller.processAction(EndSetup)
+            return true
+//        } else if (controller.stack.firstOrNull()?.procedure == TheKickOffEvent && controller.stack.firstOrNull()?.currentNode() == TheKickOffEvent.ResolveKickOffEvent) {
+//            actionSelectedChannel.send(DiceResults(listOf(D6Result(2), D6Result(4))))
+//            return true
+        } else {
+            return false
+        }
+    }
+
+    private suspend fun handleManualHomeKickingSetup(
+        controller: GameController
+    ) {
+        val game: Game = controller.state
+        val team = game.activeTeam
+
+        setupPlayer(team, PlayerNo(1), FieldCoordinate(12, 6), controller)
+        setupPlayer(team, PlayerNo(2), FieldCoordinate(12, 7), controller)
+        setupPlayer(team, PlayerNo(3), FieldCoordinate(12, 8), controller)
+        setupPlayer(team, PlayerNo(4), FieldCoordinate(10, 1), controller)
+        setupPlayer(team, PlayerNo(5), FieldCoordinate(10, 4), controller)
+        setupPlayer(team, PlayerNo(6), FieldCoordinate(10, 10), controller)
+        setupPlayer(team, PlayerNo(7), FieldCoordinate(10, 13), controller)
+        setupPlayer(team, PlayerNo(8), FieldCoordinate(8, 1), controller)
+        setupPlayer(team, PlayerNo(9), FieldCoordinate(8, 4), controller)
+        setupPlayer(team, PlayerNo(10), FieldCoordinate(8, 10), controller)
+        setupPlayer(team, PlayerNo(11), FieldCoordinate(8, 13), controller)
+    }
+
+    private suspend fun handleManualAwayKickingSetup(
+        controller: GameController
+    ) {
+        val game: Game = controller.state
+        val team = game.activeTeam
+
+        setupPlayer(team, PlayerNo(1), FieldCoordinate(13, 6), controller)
+        setupPlayer(team, PlayerNo(2), FieldCoordinate(13, 7), controller)
+        setupPlayer(team, PlayerNo(3), FieldCoordinate(13, 8), controller)
+        setupPlayer(team, PlayerNo(4), FieldCoordinate(15, 1), controller)
+        setupPlayer(team, PlayerNo(5), FieldCoordinate(15, 4), controller)
+        setupPlayer(team, PlayerNo(6), FieldCoordinate(15, 10), controller)
+        setupPlayer(team, PlayerNo(7), FieldCoordinate(15, 13), controller)
+        setupPlayer(team, PlayerNo(8), FieldCoordinate(17, 1), controller)
+        setupPlayer(team, PlayerNo(9), FieldCoordinate(17, 4), controller)
+        setupPlayer(team, PlayerNo(10), FieldCoordinate(17, 10), controller)
+        setupPlayer(team, PlayerNo(11), FieldCoordinate(17, 13), controller)
+    }
+
+
 
     private suspend fun useAutomatedActions(controller: GameController): Boolean {
         if (controller.stack.firstOrNull()?.procedure == SetupTeam && controller.stack.firstOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
@@ -187,6 +348,17 @@ class ActionSelectorViewModel(
         setupPlayer(team, PlayerNo(10), FieldCoordinate(17, 10), actionRequestChannel, actionSelectedChannel)
         setupPlayer(team, PlayerNo(11), FieldCoordinate(17, 13), actionRequestChannel, actionSelectedChannel)
     }
+
+    private fun setupPlayer(
+        team: Team,
+        playerNo: PlayerNo,
+        fieldCoordinate: FieldCoordinate,
+        controller: GameController
+    ) {
+        controller.processAction(PlayerSelected(team[playerNo]!!))
+        controller.processAction(FieldSquareSelected(fieldCoordinate))
+    }
+
 
     private suspend fun setupPlayer(
         team: Team,

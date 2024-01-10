@@ -1,6 +1,7 @@
 package dk.ilios.jervis.rules.roster
 
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.rules.skills.Skill
 
@@ -18,5 +19,5 @@ interface Position {
 
     val skills: List<Skill>
 
-    fun createPlayer(name: String, number: PlayerNo): Player
+    fun createPlayer(id: PlayerId, name: String, number: PlayerNo): Player
 }

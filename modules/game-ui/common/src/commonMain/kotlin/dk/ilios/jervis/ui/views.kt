@@ -44,6 +44,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dk.ilios.jervis.actions.Cancel
+import dk.ilios.jervis.actions.CoinSideSelected
+import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.Continue
@@ -396,6 +399,9 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
                     is PlayerActionSelected -> "Action: ${action.action.name}"
                     PlayerDeselected -> "Deselect active player"
                     EndAction -> "End Action"
+                    Cancel -> "Cancel"
+                    is CoinSideSelected -> "Selected: ${action.side}"
+                    is CoinTossResult -> "Coin flip: ${action.result}"
                 }
                 Text(text, fontSize = 10.sp)
             }

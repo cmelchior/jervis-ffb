@@ -35,7 +35,7 @@ expect val platformFileSystem: FileSystem
  * events that is consumable by a Jervis Game Model. This way, it is
  * possible to replay the entire FUMBBL game inside Jervis.
  *
- * Note, this requires that the FUMBBL and Jervis Rules are setup the same way.
+ * Note, this requires that the FUMBBL and Jervis Rules are set up the same way.
  *
  */
 class FumbblFileReplayAdapter(private val file: Path): FumbblAdapter {

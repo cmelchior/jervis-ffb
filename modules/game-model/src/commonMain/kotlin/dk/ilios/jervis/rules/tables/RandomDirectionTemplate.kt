@@ -48,6 +48,18 @@ object RandomDirectionTemplate {
     }
 
     /**
+     * Reverse lookup to figure out what you need to roll for a specific direction
+     * @throws IllegalArgumentException if the direction does not exists
+     */
+    fun getRollForDirection(direction: Direction): D8Result {
+        return results.entries.firstOrNull {
+            it.value == direction
+        }?.let {
+            D8Result(it.key)
+        } ?: throw IllegalArgumentException("Direction not found: $direction")
+    }
+
+    /**
      * When the template is placed in a corner, it needs to be rotated so only the
      * values 1-3 are visible. Once done, roll the D3 in order to determine the
      * direction.

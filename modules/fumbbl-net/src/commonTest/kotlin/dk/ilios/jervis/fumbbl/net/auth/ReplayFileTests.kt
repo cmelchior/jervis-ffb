@@ -1,13 +1,15 @@
 package dk.ilios.jervis.fumbbl.net.auth
 
 import dk.ilios.jervis.fumbbl.FumbblFileReplayAdapter
+import dk.ilios.jervis.fumbbl.FumbblReplayAdapter
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandReplay
 import dk.ilios.jervis.fumbbl.platformFileSystem
+import dk.ilios.jervis.fumbbl.utils.fromFumbblState
+import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.rules.BB2020Rules
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toPath
 import org.junit.jupiter.api.Test
-import dk.ilios.jervis.fumbbl.utils.fromFumbblState
-import dk.ilios.jervis.model.Game
 
 class ReplayFileTests {
 
@@ -27,5 +29,14 @@ class ReplayFileTests {
             }
         }
         adapter.close()
+    }
+
+    @Test
+    fun convertReplayFileToJervisCommands() = runBlocking {
+        val rules = BB2020Rules
+        val fumbbl = FumbblReplayAdapter("../../replays/game-1624379.json".toPath())
+        runBlocking {
+            fumbbl.loadCommands()
+        }
     }
 }

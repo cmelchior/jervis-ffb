@@ -6,6 +6,7 @@ import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.CoachId
 import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.BadlandsBrawl
@@ -35,6 +36,7 @@ typealias FumbblTeam = dk.ilios.jervis.fumbbl.model.Team
 typealias FumbblField = dk.ilios.jervis.fumbbl.model.FieldModel
 typealias FumbblRoster = dk.ilios.jervis.fumbbl.model.Roster
 typealias FumbblPlayer = dk.ilios.jervis.fumbbl.model.Player
+typealias FumbblCoordinate = dk.ilios.jervis.fumbbl.model.FieldCoordinate
 
 /**
  * Convert a FUMBBL Game Model into the equivalent Jervis Game Model.
@@ -95,7 +97,7 @@ private fun extractTeam(team: FumbblTeam): dk.ilios.jervis.model.Team {
             if (position == null) {
                 throw IllegalStateException("Could not find position '${fumbblPosition.positionName}' in '${team.roster.rosterName}'")
             }
-            addPlayer(fumbblPlayer.playerName, PlayerNo(fumbblPlayer.playerNr), position)
+            addPlayer(PlayerId(fumbblPlayer.playerId), fumbblPlayer.playerName, PlayerNo(fumbblPlayer.playerNr), position)
         }
     }
 }

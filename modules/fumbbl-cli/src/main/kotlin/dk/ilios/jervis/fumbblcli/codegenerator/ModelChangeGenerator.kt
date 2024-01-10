@@ -6,7 +6,10 @@ package dk.ilios.jervis.fumbblcli.codegenerator
  */
 
 fun main(vararg args: String) {
-    ModelChangeGenerator().start()
+    ModelChangeGenerator().let {
+//        it.createModelChangeClasses()
+        it.createReportScaffoldingClasses()
+    }
 }
 
 class ModelChangeGenerator {
@@ -186,7 +189,7 @@ class ModelChangeGenerator {
 //    TURN_MODE("turnMode"),
 //    WEATHER("weather");
 
-    fun start() {
+    fun createModelChangeClasses() {
         val pattern = """([A-Z_]+)\("([a-zA-Z]+)",\s*ModelChangeDataType\.([A-Za-z_]+)\)[,;]?""".toRegex()
         data
             .split("\n")
@@ -219,6 +222,7 @@ class ModelChangeGenerator {
                 val keyType = when {
                     stringName.startsWith("actingPlayer") -> "Nothing?"
                     stringName.startsWith("gameSet") -> "String?" // Some of these are also Nothing?
+                    stringName.endsWith("SetPlayerState") -> "String"
                     else -> "String?"
                 }
 
@@ -232,6 +236,173 @@ class ModelChangeGenerator {
                         override val modelChangeKey: $keyType,
                         override val modelChangeValue: $valueType
                     ): ModelChange
+                    
+                """.trimIndent())
+            }
+    }
+
+    val reports = """
+    ALL_YOU_CAN_EAT("allYouCanEat"),
+    ALWAYS_HUNGRY_ROLL("alwaysHungryRoll"),
+    ANIMAL_SAVAGERY("animalSavagery"),
+    ANIMOSITY_ROLL("animosityRoll"),
+    APOTHECARY_CHOICE("apothecaryChoice"),
+    APOTHECARY_ROLL("apothecaryRoll"),
+    ARGUE_THE_CALL("argueTheCall"),
+    BALEFUL_HEX("balefulHex"),
+    BIASED_REF("biasedRef"),
+    BITE_SPECTATOR("biteSpectator"),
+    BLITZ_ROLL("blitzRoll"),
+    BLOCK("block"),
+    BLOCK_CHOICE("blockChoice"),
+    BLOCK_RE_ROLL("blockReRoll"),
+    BLOCK_ROLL("blockRoll"),
+    BLOOD_LUST_ROLL("bloodLustRoll"),
+    BOMB_EXPLODES_AFTER_CATCH("bombExplodesAfterCatch"),
+    BOMB_OUT_OF_BOUNDS("bombOutOfBounds"),
+    BRIBERY_AND_CORRUPTION_RE_ROLL("briberyAndCorruptionReRoll"),
+    BRIBES_ROLL("bribesRoll"),
+    BRILLIANT_COACHING_RE_ROLLS_LOST("brilliantCoachingReRoll"),
+    CARDS_AND_INDUCEMENTS_BOUGHT("cardsAndInducementsBought"),
+    CARDS_BOUGHT("cardsBought"),
+    CARD_DEACTIVATED("cardDeactivated"),
+    CARD_EFFECT_ROLL("cardEffectRoll"),
+    CATCH_ROLL("catchRoll"),
+    CLOUD_BURSTER("cloudBurster"),
+    CHAINSAW_ROLL("chainsawRoll"),
+    COIN_THROW("coinThrow"),
+    CONFUSION_ROLL("confusionRoll"),
+    DAUNTLESS_ROLL("dauntlessRoll"),
+    DEDICATED_FANS("dedicatedFans"),
+    DEFECTING_PLAYERS("defectingPlayers"),
+    DODGE_ROLL("dodgeRoll"),
+    DOUBLE_HIRED_STAFF("doubleHiredStaff"),
+    DOUBLE_HIRED_STAR_PLAYER("doubleHiredStarPlayer"),
+    ESCAPE_ROLL("escapeRoll"),
+    EVENT("event"),
+    FAN_FACTOR("fanFactor"),
+    FAN_FACTOR_ROLL_POST_MATCH("fanFactorRoll"),
+    FOUL("foul"),
+    FOUL_APPEARANCE_ROLL("foulAppearanceRoll"),
+    FREE_PETTY_CASH("freePettyCash"),
+    FUMBBL_RESULT_UPLOAD("fumbblResultUpload"),
+    FUMBLEROOSKIE("fumblerooskie"),
+    GAME_OPTIONS("gameOptions"),
+    GO_FOR_IT_ROLL("goForItRoll"),
+    HAND_OVER("handOver"),
+    HIT_AND_RUN("hitAndRun"),
+    HYPNOTIC_GAZE_ROLL("hypnoticGazeRoll"),
+    INDOMITABLE("indomitable"),
+    INDUCEMENT("inducement"),
+    INDUCEMENTS_BOUGHT("inducementsBought"),
+    INJURY("injury"),
+    INTERCEPTION_ROLL("interceptionRoll"),
+    JUMP_ROLL("leapRoll"),
+    JUMP_UP_ROLL("jumpUpRoll"),
+    KICKOFF_CHEERING_FANS("cheeringFans"),
+    KICKOFF_EXTRA_RE_ROLL("extraReRoll"),
+    KICKOFF_OFFICIOUS_REF("kickoffOfficiousRef"),
+    KICKOFF_PITCH_INVASION("kickoffPitchInvasion"),
+    KICKOFF_RESULT("kickoffResult"),
+    KICKOFF_RIOT("kickoffRiot"),
+    KICKOFF_SCATTER("kickoffScatter"),
+    KICKOFF_SEQUENCE_ACTIVATIONS_COUNT("kickoffSequenceActivationsCount"),
+    KICKOFF_SEQUENCE_ACTIVATIONS_EXHAUSTED("kickoffSequenceActivationsExhausted"),
+    KICKOFF_THROW_A_ROCK("kickoffThrowARock"),
+    KICKOFF_TIMEOUT("kickoffTimeout"),
+    KICK_TEAM_MATE_FUMBLE("kickTeamMateFumble"),
+    KICK_TEAM_MATE_ROLL("kickTeamMateRoll"),
+    LEADER("leader"),
+    LOOK_INTO_MY_EYES_ROLL("lookIntoMyEyesRoll"),
+    MASTER_CHEF_ROLL("masterChefRoll"),
+    MODIFIED_DODGE_RESULT_SUCCESSFUL("modifiedDodgeResultSuccessful"),
+    MODIFIED_PASS_RESULT("modifiedPassResult"),
+    MOST_VALUABLE_PLAYERS("mostValuablePlayers"),
+    NERVES_OF_STEEL("nervesOfSteel"),
+    NONE("none"),
+    NO_PLAYERS_TO_FIELD("noPlayersToField"),
+    OFFICIOUS_REF_ROLL("officiousRefRoll"),
+    OLD_PRO("oldPro"),
+    PASS_BLOCK("passBlock"),
+    PASS_DEVIATE("passDeviate"),
+    PASS_ROLL("passRoll"),
+    PENALTY_SHOOTOUT("penaltyShootout"),
+    PETTY_CASH("pettyCash"),
+    PICK_ME_UP("pickMeUp"),
+    PICK_UP_ROLL("pickUpRoll"),
+    PILING_ON("pilingOn"),
+    PLACE_BALL_DIRECTION("placedBallDirection"),
+    PLAYER_ACTION("playerAction"),
+    PLAYER_EVENT("playerEvent"),
+    PLAY_CARD("playCard"),
+    PRAYER_AMOUNT("prayerAmount"),
+    PRAYER_END("prayerEnd"),
+    PRAYER_ROLL("prayerRoll"),
+    PRAYER_WASTED("prayerWasted"),
+    PROJECTILE_VOMIT("projectileVomit"),
+    PUMP_UP_THE_CROWD_RE_ROLL("pumpUpTheCrowdReRoll"),
+    PUMP_UP_THE_CROWD_RE_ROLLS_LOST("pumpUpTheCrowdReRollLost"),
+    PUSHBACK("pushback"),
+    QUICK_SNAP_ROLL("quickSnapRoll"),
+    RAIDING_PARTY("raidingParty"),
+    RAISE_DEAD("raiseDead"),
+    RECEIVE_CHOICE("receiveChoice"),
+    REFEREE("referee"),
+    REGENERATION_ROLL("regenerationRoll"),
+    RE_ROLL("reRoll"),
+    RIGHT_STUFF_ROLL("rightStuffRoll"),
+    RIOTOUS_ROOKIES("riotousRookies"),
+    SAFE_THROW_ROLL("safeThrowRoll"),
+    SCATTER_BALL("scatterBall"),
+    SCATTER_PLAYER("scatterPlayer"),
+    SECRET_WEAPON_BAN("secretWeaponBan"),
+    SELECT_BLITZ_TARGET("selectBlitzTarget"),
+    SELECT_GAZE_TARGET("selectGazeTarget"),
+    SKILL_USE("skillUse"),
+    SKILL_USE_OTHER_PLAYER("skillUseOtherPlayer"),
+    SKILL_WASTED("skillWasted"),
+    SOLID_DEFENCE_ROLL("solidDefenceRoll"),
+    SPECTATORS("spectators"),
+    SPELL_EFFECT_ROLL("spellEffectRoll"),
+    STALLER_DETECTED("stallerDetected"),
+    STAND_UP_ROLL("standUpRoll"),
+    START_HALF("startHalf"),
+    SWARMING_PLAYERS_ROLL("swarmingPlayersRoll"),
+    SWOOP_PLAYER("swoopPlayer"),
+    TENTACLES_SHADOWING_ROLL("tentaclesShadowingRoll"),
+    THROWN_KEG("thrownKeg"),
+    THROW_AT_STALLING_PLAYER("throwAtStallingPlayer"),
+    THROW_IN("throwIn"),
+    THROW_TEAM_MATE_ROLL("throwTeamMateRoll"),
+    TIMEOUT_ENFORCED("timeoutEnforced"),
+    TRAP_DOOR("trapDoor"),
+    TURN_END("turnEnd"),
+    TWO_FOR_ONE("twoForOne"),
+    WEATHER("weather"),
+    WEATHER_MAGE_RESULT("weatherMageResult"),
+    WEATHER_MAGE_ROLL("weatherMageRoll"),
+    WEEPING_DAGGER_ROLL("weepingDaggerRoll"),
+    WINNINGS("winnings"),
+    WINNINGS_ROLL("winningsRoll"),
+    WIZARD_USE("wizardUse");        
+    """.trimIndent()
+
+    fun createReportScaffoldingClasses() {
+        val pattern = """([A-Z_]+)\("([a-zA-Z]+)"\)[,;]?""".toRegex()
+        reports
+            .split("\n")
+            .map {it.trim() }
+            .map { str ->
+                val matchResult: MatchResult = pattern.matchEntire(str) ?: throw IllegalArgumentException("Didn't match: $str")
+                val (enumName, stringName) = matchResult.destructured
+                val className = stringName.capitalize()
+
+                println("""
+                    @Serializable
+                    @SerialName("$stringName")
+                    data class ${className}Report(
+                         override val reportId: ReportId = ReportId.$enumName,
+                    ): Report
                     
                 """.trimIndent())
             }

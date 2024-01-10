@@ -1,9 +1,9 @@
 package dk.ilios.jervis.controller
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Continue
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.EnterProcedure
 import dk.ilios.jervis.fsm.ActionNode
@@ -28,7 +28,6 @@ data class RemoveEntry(val log: LogEntry): ListEvent
 class GameController(
     rules: Rules,
     state: Game,
-    val actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction,
 ) {
     private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 0, extraBufferCapacity = 10_000)
     val logsEvents: Flow<ListEvent> = _logsEvents
@@ -42,17 +41,21 @@ class GameController(
     private var replayIndex: Int = -1
     private val isStopped = false
 
-    private fun processNode(currentNode: Node) {
-        when(currentNode) {
+    private fun processNode(
+        currentNode: Node,
+        actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction
+    ) {
+        when (currentNode) {
             is ComputationNode -> {
                 // Reduce noise from Continue events
                 val command = currentNode.applyAction(Continue, state, rules)
                 commands.add(command)
                 command.execute(state, this)
             }
+
             is ActionNode -> {
                 val actions = currentNode.getAvailableActions(state, rules)
-                val reportAvailableActions = SimpleLogEntry( "Available actions: ${actions.joinToString()}")
+                val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}")
                 commands.add(reportAvailableActions)
                 reportAvailableActions.execute(state, this)
                 val selectedAction = actionProvider(this@GameController, actions)
@@ -63,8 +66,9 @@ class GameController(
                 commands.add(command)
                 command.execute(state, this)
             }
+
             is ParentNode -> {
-                val commands = when(stack.firstOrNull()!!.currentParentNodeState()) {
+                val commands = when (stack.firstOrNull()!!.currentParentNodeState()) {
                     ParentNode.State.ENTERING -> currentNode.enterNode(state, rules)
                     ParentNode.State.RUNNING -> currentNode.runNode(state, rules)
                     ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
@@ -72,13 +76,70 @@ class GameController(
                 this.commands.add(commands)
                 commands.execute(state, this)
             }
+
             else -> {
                 throw IllegalStateException("Unsupported type: ${currentNode::class.simpleName}")
             }
         }
     }
 
-    fun start() {
+    fun getAvailableActions(): List<ActionDescriptor> {
+        if (stack.isEmpty()) return emptyList()
+        if (stack.currentNode() !is ActionNode || stack.currentNode() is ComputationNode) {
+            throw IllegalStateException("State machine is not waiting at an ActionNode: ${stack.currentNode()}")
+        }
+        val currentNode: ActionNode = stack.currentNode() as ActionNode
+        val actions = currentNode.getAvailableActions(state, rules)
+        val reportAvailableActions = SimpleLogEntry( "Available actions: ${actions.joinToString()}")
+        commands.add(reportAvailableActions)
+        reportAvailableActions.execute(state, this)
+        return actions
+    }
+
+    fun processAction(userAction: GameAction) {
+        val reportSelectedAction = SimpleLogEntry("Selected action: $userAction")
+        commands.add(reportSelectedAction)
+        reportSelectedAction.execute(state, this)
+        val currentNode: ActionNode = stack.currentNode() as ActionNode
+        val command = currentNode.applyAction(userAction, state, rules)
+        commands.add(command)
+        command.execute(state, this)
+        rollForwardToNextActionNode()
+    }
+
+    fun startManualMode() {
+        setupInitialStartingState()
+        rollForwardToNextActionNode()
+    }
+
+    private fun rollForwardToNextActionNode() {
+        if (!stack.isEmpty() && (stack.currentNode() is ComputationNode || stack.currentNode() is ParentNode)) {
+            when(val currentNode: Node = stack.currentNode()) {
+                is ComputationNode -> {
+                    // Reduce noise from Continue events
+                    val command = currentNode.applyAction(Continue, state, rules)
+                    commands.add(command)
+                    command.execute(state, this)
+                }
+                is ActionNode -> throw IllegalStateException("Should not happen")
+                is ParentNode -> {
+                    val commands = when(stack.firstOrNull()!!.currentParentNodeState()) {
+                        ParentNode.State.ENTERING -> currentNode.enterNode(state, rules)
+                        ParentNode.State.RUNNING -> currentNode.runNode(state, rules)
+                        ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
+                    }
+                    this.commands.add(commands)
+                    commands.execute(state, this)
+                }
+                else -> {
+                    throw IllegalStateException("Unsupported type: ${currentNode::class.simpleName}")
+                }
+            }
+            rollForwardToNextActionNode()
+        }
+    }
+
+    private fun setupInitialStartingState() {
         if (replayMode) {
             throw IllegalStateException("Replay mode is enabled")
         }
@@ -87,9 +148,14 @@ class GameController(
         }
         isStarted = true
         setInitialProcedure(FullGame)
+    }
+
+
+    fun startCallbackMode(actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction,) {
+        setupInitialStartingState()
         while (!stack.isEmpty() && !isStopped) {
             val currentState: Node = stack.currentNode()
-            processNode(currentState)
+            processNode(currentState, actionProvider)
         }
     }
 

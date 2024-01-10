@@ -1,5 +1,6 @@
 package dk.ilios.jervis.actions
 
+import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.rules.PlayerAction
@@ -13,9 +14,12 @@ enum class Dice {
 sealed interface ActionDescriptor
 data object ContinueWhenReady: ActionDescriptor // "internal event" for continuing the game state
 data object ConfirmWhenReady: ActionDescriptor // An generic action that requires explicit confirmation by a player
+data object CancelWhenReady: ActionDescriptor // An generic action that requires explicit confirmation by a player
 data object EndSetupWhenReady: ActionDescriptor // Mark the setup phase as ended for a team
 data object EndTurnWhenReady: ActionDescriptor // Mark the turn as ended for a team
 data object EndActionWhenReady: ActionDescriptor
+data object SelectCoinSide: ActionDescriptor
+data object TossCoin: ActionDescriptor
 data class RollDice(val dice: List<Dice>): ActionDescriptor {
     constructor(vararg dice: Dice): this(dice.toList())
 }
@@ -50,9 +54,12 @@ open class DieResult(val result: Int, val min: Short, val max: Short): Number(),
 sealed interface GameAction
 data object Continue: GameAction
 data object Confirm: GameAction
+data object Cancel: GameAction
 data object EndTurn: GameAction
 data object EndAction: GameAction
 data object EndSetup: GameAction
+data class CoinSideSelected(val side: Coin): GameAction
+data class CoinTossResult(val result: Coin): GameAction
 class D2Result(result: Int = Random.nextInt(1, 3)): DieResult(result, 1, 2)
 class D3Result(result: Int = Random.nextInt(1, 4)): DieResult(result, 1, 3)
 class D4Result(result: Int = Random.nextInt(1, 5)): DieResult(result, 1, 4)
@@ -61,7 +68,9 @@ class D8Result(result: Int = Random.nextInt(1, 9)): DieResult(result, 1, 8)
 class D12Result(result: Int = Random.nextInt(1, 13)): DieResult(result, 1, 12)
 class D16Result(result: Int = Random.nextInt(1, 17)): DieResult(result, 1, 16)
 class D20Result(result: Int = Random.nextInt(1, 21)): DieResult(result, 1, 20)
-class DiceResults(val rolls: List<DieResult>): GameAction
+class DiceResults(val rolls: List<DieResult>): GameAction {
+    constructor(vararg roll: DieResult): this(listOf(*roll))
+}
 data class PlayerSelected(val player: Player): GameAction
 data object PlayerDeselected: GameAction
 data class PlayerActionSelected(val action: PlayerAction): GameAction

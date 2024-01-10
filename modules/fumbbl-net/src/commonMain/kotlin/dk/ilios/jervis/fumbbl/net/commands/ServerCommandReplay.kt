@@ -1,7 +1,7 @@
 package dk.ilios.jervis.fumbbl.net.commands
 
-import dk.ilios.jervis.fumbbl.model.ReportId
 import dk.ilios.jervis.fumbbl.model.change.ModelChange
+import dk.ilios.jervis.fumbbl.model.reports.Report
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -95,21 +95,35 @@ data class ServerCommandAddPlayer(
 
 @Serializable
 data class ModelChangeList(
-    val modelChangeArray: List<ModelChange>
-)
+    val modelChangeArray: List<ModelChange>,
+): List<ModelChange> {
+    override val size: Int = modelChangeArray.size
+    override fun get(index: Int): ModelChange = modelChangeArray[index]
+    override fun isEmpty(): Boolean = modelChangeArray.isEmpty()
+    override fun iterator(): Iterator<ModelChange> = modelChangeArray.iterator()
+    override fun listIterator(): ListIterator<ModelChange> = modelChangeArray.listIterator()
+    override fun listIterator(index: Int): ListIterator<ModelChange> = modelChangeArray.listIterator(index)
+    override fun subList(fromIndex: Int, toIndex: Int): List<ModelChange> = modelChangeArray.subList(fromIndex, toIndex)
+    override fun lastIndexOf(element: ModelChange): Int  = modelChangeArray.lastIndexOf(element)
+    override fun indexOf(element: ModelChange): Int = modelChangeArray.indexOf(element)
+    override fun containsAll(elements: Collection<ModelChange>): Boolean = modelChangeArray.containsAll(elements)
+    override fun contains(element: ModelChange): Boolean = modelChangeArray.contains(element)
+}
 
 @Serializable
 data class ReportList(
     val reports: List<Report>
-)
+): List<Report> {
+    override val size: Int = reports.size
+    override fun get(index: Int): Report = reports[index]
+    override fun isEmpty(): Boolean = reports.isEmpty()
+    override fun iterator(): Iterator<Report> = reports.iterator()
+    override fun listIterator(): ListIterator<Report> = reports.listIterator()
+    override fun listIterator(index: Int): ListIterator<Report> = reports.listIterator(index)
+    override fun subList(fromIndex: Int, toIndex: Int): List<Report> = reports.subList(fromIndex, toIndex)
+    override fun lastIndexOf(element: Report): Int  = reports.lastIndexOf(element)
+    override fun indexOf(element: Report): Int = reports.indexOf(element)
+    override fun containsAll(elements: Collection<Report>): Boolean = reports.containsAll(elements)
+    override fun contains(element: Report): Boolean = reports.contains(element)
+}
 
-@Serializable
-data class Report(
-    val reportId: ReportId,
-    val teamId: String? = null,
-    val dedicatedFans: Int? = null,
-    val dedicatedFansRoll: Int? = null,
-    val dedicatedFansResult: Int? = null,
-    val weather: String? = null,
-    val weatherRoll: List<Int> = listOf()
-)

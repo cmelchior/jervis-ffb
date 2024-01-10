@@ -2,6 +2,7 @@ package dk.ilios.jervis.fsm
 
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.commands.Command
@@ -43,6 +44,8 @@ abstract class ActionNode: Node {
                 throw IllegalArgumentException("Expected first roll to be ${D1::class}, but was ${first::class}")
             }
             return function(first)
+        } else if (action is D1) {
+            return function(action)
         } else {
             throw IllegalArgumentException("Action (${action::class}) is not of the expected type: ${DiceResults::class}")
         }
