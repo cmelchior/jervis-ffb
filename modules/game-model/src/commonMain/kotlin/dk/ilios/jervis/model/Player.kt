@@ -144,6 +144,6 @@ class Player(id: PlayerId): Observable<Player>() {
     val observePlayer = observeState
 
     override fun toString(): String {
-        return "Player(name='$name', number=$number, position=$position)"
+        return "Player(id='${id.value}', name='$name', number=$number, position=$position)"
     }
 }

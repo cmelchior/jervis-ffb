@@ -1,5 +1,7 @@
 package dk.ilios.jervis.model
 
+import dk.ilios.jervis.actions.D3Result
+import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.rules.PlayerAction
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,10 +37,17 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var receivingTeam: Team = this.awayTeam
     var kickingTeamInLastHalf: Team = kickingTeam
 
+    // Temporary states - Figure out where/how to store these
     var activePlayerAction: PlayerAction? = null
     var moveStepTarget: Pair<FieldCoordinate, FieldCoordinate>? = null
     var coinSideSelected: Coin? = null
     var coinResult: Coin? = null
+    var pitchInvasionHomeRoll: D6Result? = null
+    var pitchInvasionAwayRoll: D6Result? = null
+    var pitchInvasionHomeResult: Int = 0
+    var pitchInvasionAwayResult: Int = 0
+    var pitchInvasionHomeTeamPlayersAffected: Int = 0
+    var pitchInvasionAwayTeamPlayersAffected: Int = 0
 
     val field: Field = field
     val ball: Ball = Ball()

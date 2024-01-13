@@ -60,8 +60,10 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.model.ActionSelectorViewModel
 import dk.ilios.jervis.ui.model.FieldDetails
@@ -76,7 +78,6 @@ import dk.ilios.jervis.ui.model.Square
 import dk.ilios.jervis.ui.model.UIPlayer
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.skia.Image
-import java.awt.SystemColor.text
 import java.awt.image.BufferedImage
 import java.io.InputStream
 import kotlin.random.Random
@@ -166,8 +167,8 @@ fun SpriteFromSheet() {
 
 @Composable
 fun Player(modifier: Modifier, player: Player) {
-    Box(modifier = modifier.aspectRatio(1f)
-    ) {
+    val backgroundColor = if (player.state == PlayerState.STUNNED) Color.White else Color.Transparent
+    Box(modifier = modifier.aspectRatio(1f).background(color = backgroundColor)) {
         val playerImage = remember { IconFactory.getImage(player).toComposeImageBitmap() }
         val ballImage = remember { IconFactory.getHeldBallOverlay().toComposeImageBitmap() }
         Image(
@@ -402,6 +403,7 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
                     Cancel -> "Cancel"
                     is CoinSideSelected -> "Selected: ${action.side}"
                     is CoinTossResult -> "Coin flip: ${action.result}"
+                    is RandomPlayersSelected -> "Random players: $action"
                 }
                 Text(text, fontSize = 10.sp)
             }

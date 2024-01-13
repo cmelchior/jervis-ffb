@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 // There are quite a lot of functionality to port there.
 @Serializable
 data class InducementSet(
-    val inducementArray: List<Inducement>,
-    val cardsAvailable: List<String>,
-    val cardsActive: List<String>,
-    val cardsDeactivated: List<String>,
-    val prayers: List<String>
+    val inducementArray: MutableList<Inducement>,
+    val cardsAvailable: MutableList<String>,
+    val cardsActive: MutableList<String>,
+    val cardsDeactivated: MutableList<String>,
+    val prayers: MutableList<String>
 )
 
 @Serializable

@@ -2,7 +2,7 @@ package dk.ilios.jervis.rules
 
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.procedures.DummyProcedure
-import dk.ilios.jervis.procedures.Move
+import dk.ilios.jervis.procedures.MoveAction
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 interface Skill
@@ -63,7 +63,7 @@ class BB2020TeamActions: TeamActions() {
 
     init {
         actions = mapOf(
-            PlayerActionType.MOVE to TeamActionDescriptor(Int.MAX_VALUE, PlayerAction("Move", PlayerActionType.MOVE, Move) ),
+            PlayerActionType.MOVE to TeamActionDescriptor(Int.MAX_VALUE, PlayerAction("Move", PlayerActionType.MOVE, MoveAction) ),
 //            PlayerActionType.PASS to TeamActionDescriptor(1, PlayerAction("Pass", PlayerActionType.PASS, DummyProcedure) ),
 //            PlayerActionType.HAND_OFF to TeamActionDescriptor(1,  PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, DummyProcedure) ),
 //            PlayerActionType.BLOCK to TeamActionDescriptor(Int.MAX_VALUE, PlayerAction("Block", PlayerActionType.BLOCK, DummyProcedure)),

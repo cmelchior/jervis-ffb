@@ -200,12 +200,16 @@ class ModelChangeGenerator {
                 val valueEnum = type.removeSuffix("ModelChangeDataType.")
 
                 val valueType = when {
+                    (valueEnum == "ACTING_PLAYER_MARK_SKILL_UNUSED") -> "String"
+                    (valueEnum == "ACTING_PLAYER_MARK_SKILL_USED") -> "String"
                     (valueEnum == "BLOOD_SPOT") -> "BloodSpot"
                     (valueEnum == "BOOLEAN") -> "Boolean"
                     (valueEnum == "DATE") -> "LocalDateTime?"
                     (valueEnum == "DIALOG_PARAMETER") -> "DialogOptions?"
                     (valueEnum == "DICE_DECORATION") -> "DiceDecoration"
                     (valueEnum == "FIELD_COORDINATE") -> "List<Int>?"
+                    (valueEnum == "FIELD_MODEL_SET_BALL_COORDINATE") -> "FieldCoordinate"
+                    (valueEnum == "GAME_SET_LAST_TURN_MODE") -> "TurnMode"
                     (valueEnum == "INDUCEMENT") -> "Inducement"
                     (valueEnum == "INTEGER") -> "Int"
                     (valueEnum == "LONG") -> "Long"
@@ -216,13 +220,31 @@ class ModelChangeGenerator {
                     (valueEnum == "RANGE_RULER") -> "RangeRuler?"
                     (valueEnum == "TARGET_SELECTION_STATE") -> "TargetSelectionState?"
                     (valueEnum == "TRACK_NUMBER") -> "TrackNumber"
+                    (valueEnum == "TURN_DATA_SET_LEADER_STATE") -> "String"
+                    (valueEnum == "GAME_SET_DEFENDER_ACTION") -> "PlayerAction?"
+                    (valueEnum == "GAME_SET_PASS_COORDINATE") -> "FieldCoordinate?"
+                    (valueEnum == "GAME_SET_THROWER_ACTION") -> "PlayerAction?"
+                    (valueEnum == "FIELD_MODEL_SET_WEATHER") -> "String"
+                    (valueEnum == "FIELD_MODEL_REMOVE_PLAYER") -> "Nothing"
+                    (valueEnum == "FIELD_MODEL_REMOVE_FIELD_MARKER") -> "FieldMarker"
+                    (valueEnum == "FIELD_MODEL_SET_BLITZ_STATE") -> "TargetSelectionState?"
+                    (valueEnum == "INDUCEMENT_SET_ADD_PRAYER") -> "String" // Prayer
+                    (valueEnum == "FIELD_MODEL_REMOVE_TRAP_DOOR") -> "TrapDoor"
+                    (valueEnum == "FIELD_MODEL_ADD_TRAP_DOOR") -> "TrapDoor"
                     else -> "String?"
                 }
 
                 val keyType = when {
                     stringName.startsWith("actingPlayer") -> "Nothing?"
                     stringName.startsWith("gameSet") -> "String?" // Some of these are also Nothing?
+                    stringName.endsWith("FieldModelRemoveSkillEnhancements") -> "String"
                     stringName.endsWith("SetPlayerState") -> "String"
+                    stringName.endsWith("SetPlayerCoordinate") -> "String"
+                    stringName.endsWith("actingPlayerSetPlayerId") -> "PlayerId?"
+                    stringName.endsWith("actingPlayerSetPlayerAction") -> "PlayerAction?"
+                    stringName.startsWith("playerResultSet") -> "String"
+                    stringName.endsWith("fieldModelRemovePlayer") -> "FieldCoordinate"
+                    stringName.endsWith("fieldModelAddPrayer") -> "String"
                     else -> "String?"
                 }
 

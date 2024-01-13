@@ -4,7 +4,9 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.isOnHomeTeam
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.Roster
+import dk.ilios.jervis.rules.roster.bb2020.ChaosDwarfTeam
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
+import dk.ilios.jervis.rules.roster.bb2020.KhorneTeam
 import java.awt.image.BufferedImage
 import java.io.InputStream
 import javax.imageio.ImageIO
@@ -16,7 +18,17 @@ val playerIconSpriteSheets = mutableMapOf(
     HumanTeam.CATCHER to "$iconRootPath/human_catcher.png",
     HumanTeam.BLITZER to "$iconRootPath/human_blitzer.png",
     HumanTeam.OGRE to "$iconRootPath/human_ogre.png",
-    HumanTeam.HALFLING_HOPEFUL to "$iconRootPath/human_haflinghopeful.png"
+    HumanTeam.HALFLING_HOPEFUL to "$iconRootPath/human_haflinghopeful.png",
+
+    ChaosDwarfTeam.HOBGOBLIN_LINEMEN to "$iconRootPath/chaosdwarf_hobgoblinlineman.png",
+    ChaosDwarfTeam.CHAOS_DWARF_BLOCKERS to "$iconRootPath/chaosdwarf_chaosdwarfblocker.png",
+    ChaosDwarfTeam.BULL_CENTAUR_BLITZERS to "$iconRootPath/chaosdwarf_bullcentaurblitzer.png",
+    ChaosDwarfTeam.ENSLAVED_MINOTAUR to "$iconRootPath/chaosdwarf_enslavedminotaur.png",
+
+    KhorneTeam.BLOODBORN_MARAUDER_LINEMEN to "$iconRootPath/khorne_bloodbornmarauderlineman.png",
+    KhorneTeam.KHORNGORS to "$iconRootPath/khorne_khorngor.png",
+    KhorneTeam.BLOODSEEKERS to "$iconRootPath/khorne_bloodseeker.png",
+    KhorneTeam.BLOODSPAWN to "$iconRootPath/khorne_bloodspawn.png"
 )
 
 data class PositionImage(
@@ -25,8 +37,6 @@ data class PositionImage(
 )
 
 class PositionImageFactory(spriteSheet: BufferedImage) {
-    private val spriteWidth = 28
-    private val spriteHeight = 28
     private val homeTeamIcons: List<PositionImage>
     private val awayTeamIcons: List<PositionImage>
 
@@ -42,6 +52,8 @@ class PositionImageFactory(spriteSheet: BufferedImage) {
     }
 
     private fun extractSprites(image: BufferedImage): List<Pair<PositionImage, PositionImage>> {
+        val spriteWidth = image.width / 4 // There are always 4 sprites pr line.
+        val spriteHeight = spriteWidth
         val lines = image.height/spriteHeight
         return (0 until lines).map { line ->
             val homeDefaultX = 0
@@ -87,10 +99,14 @@ object IconFactory {
         if (cache && cachedImages.containsKey(path)) {
             return cachedImages[path]!!
         } else {
-            val input: InputStream = classLoader.getResourceAsStream(path)
-            val image = ImageIO.read(input)
-            cachedImages[path] = image
-            return image
+            try {
+                val input: InputStream = classLoader.getResourceAsStream(path)
+                val image = ImageIO.read(input)
+                cachedImages[path] = image
+                return image
+            } catch (ex: NullPointerException) {
+                throw IllegalStateException("Could not find $path")
+            }
         }
     }
 

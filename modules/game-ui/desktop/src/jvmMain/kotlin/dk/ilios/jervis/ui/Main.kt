@@ -5,6 +5,7 @@ import androidx.compose.ui.window.application
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
+import dk.ilios.jervis.fumbbl.FumbblReplayAdapter
 import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.CoachId
 import dk.ilios.jervis.model.Game
@@ -19,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
+import okio.Path.Companion.toPath
 import java.io.File
 
 fun main() = application {
@@ -90,10 +92,13 @@ fun main() = application {
         action
     }
 
-
-    val controller = GameController(rules, state)
+    val fumbbl = FumbblReplayAdapter("../../../replays/game-1624379.json".toPath())
+    runBlocking {
+        fumbbl.loadCommands()
+    }
+    val controller = GameController(rules, fumbbl.getGame())
     Window(onCloseRequest = ::exitApplication) {
-        App(controller, actionRequestChannel, actionSelectedChannel)
+        App(controller, actionRequestChannel, actionSelectedChannel, fumbbl)
     }
 }
 

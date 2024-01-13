@@ -3,6 +3,7 @@ package dk.ilios.jervis.fumbbl.model.reports
 import dk.ilios.jervis.fumbbl.model.Direction
 import dk.ilios.jervis.fumbbl.model.FieldCoordinate
 import dk.ilios.jervis.fumbbl.model.ReportId
+import dk.ilios.jervis.fumbbl.model.change.PlayerId
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
@@ -384,12 +385,18 @@ data class KickoffOfficiousRefReport(
 @SerialName("kickoffPitchInvasion")
 data class KickoffPitchInvasionReport(
     override val reportId: ReportId = ReportId.KICKOFF_PITCH_INVASION,
+    val rollHome: Int,
+    val rollAway: Int,
+    val amount: Int,
+    val playerIds: List<PlayerId>
 ): Report
 
 @Serializable
 @SerialName("kickoffResult")
 data class KickoffResultReport(
     override val reportId: ReportId = ReportId.KICKOFF_RESULT,
+    val kickoffResult: String,
+    val kickoffRoll: List<Int>
 ): Report
 
 @Serializable
@@ -402,6 +409,10 @@ data class KickoffRiotReport(
 @SerialName("kickoffScatter")
 data class KickoffScatterReport(
     override val reportId: ReportId = ReportId.KICKOFF_SCATTER,
+    val ballCoordinateEnd: FieldCoordinate,
+    val scatterDirection: Direction,
+    val rollScatterDirection: Int,
+    val rollScatterDistance: Int,
 ): Report
 
 @Serializable
@@ -692,10 +703,6 @@ data class SafeThrowRollReport(
 @SerialName("scatterBall")
 data class ScatterBallReport(
     override val reportId: ReportId = ReportId.SCATTER_BALL,
-    val ballCoordinateEnd: FieldCoordinate,
-    val scatterDirection: Direction,
-    val rollScatterDirection: Int,
-    val rollScatterDistance: Int,
 ): Report
 
 @Serializable

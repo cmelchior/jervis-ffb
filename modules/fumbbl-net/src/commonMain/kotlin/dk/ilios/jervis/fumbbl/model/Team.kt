@@ -24,4 +24,5 @@ data class Team(
     val specialRules: Set<SpecialRule>,
     val roster: Roster
 //    val fInducementSet: InducementSet? = null
-)
+) {
+}

@@ -17,7 +17,6 @@ class GotoNode(private val nextNode: Node): Command {
             controller.currentProcedure()!!.addParentNodeState(ParentNode.State.ENTERING)
         }
     }
-
     override fun undo(state: Game, controller: GameController) {
         if (controller.currentProcedure()!!.currentNode() is ParentNode) {
             controller.currentProcedure()!!.removeParentNodeState(ParentNode.State.ENTERING)

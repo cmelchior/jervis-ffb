@@ -32,14 +32,19 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectCoinSide
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
+import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.controller.GameController
+import dk.ilios.jervis.fumbbl.CalculatedJervisAction
+import dk.ilios.jervis.fumbbl.FumbblReplayAdapter
+import dk.ilios.jervis.fumbbl.JervisAction
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
@@ -56,7 +61,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.random.Random
@@ -64,9 +68,9 @@ import kotlin.random.Random
 class ActionSelectorViewModel(
     private val controller: GameController,
     private val actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
-    private val actionSelectedChannel: Channel<GameAction>
+    private val actionSelectedChannel: Channel<GameAction>,
+    private val fumbbl: FumbblReplayAdapter?
 ) {
-
     val scope = CoroutineScope(CoroutineName("ActionSelectorScope") + Dispatchers.Default)
     private val _availableActions: MutableSharedFlow<List<GameAction>> = MutableSharedFlow(extraBufferCapacity = 1)
     private val userSelectedAction = Channel<GameAction>(1)
@@ -94,9 +98,33 @@ class ActionSelectorViewModel(
                 printStats(controller, start)
             }
         } else {
+            var index = 0
+            val replayCommands = fumbbl?.getCommands()
             scope.launch(Dispatchers.Default) {
                 controller.startManualMode()
                 while (!controller.stack.isEmpty()) {
+                    if (replayCommands != null && index <= replayCommands.size) {
+                        val commandFromReplay = replayCommands[index]
+                        if (commandFromReplay.expectedNode != controller.stack.currentNode()) {
+                            throw IllegalStateException("""
+                                Current node: ${controller.stack.currentNode()::class.qualifiedName}
+                                Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
+                                Action: ${
+                                    when(commandFromReplay) {
+                                        is CalculatedJervisAction -> commandFromReplay.actionFunc(controller.state, controller.rules)
+                                        is JervisAction -> commandFromReplay.action
+                                    }}
+                            """.trimIndent())
+                        }
+                        when(commandFromReplay) {
+                            is CalculatedJervisAction -> controller.processAction(commandFromReplay.actionFunc(controller.state, controller.rules))
+                            is JervisAction -> controller.processAction(commandFromReplay.action)
+                        }
+                        index += 1
+                        delay(20)
+                        continue
+                    }
+
                     if (!useManualAutomatedActions(controller)) {
                         val availableActions: List<GameAction> = controller.getAvailableActions().map { action ->
                             when (action) {
@@ -143,6 +171,10 @@ class ActionSelectorViewModel(
                                         1 -> CoinTossResult(Coin.TAIL)
                                         else -> throw IllegalStateException("Unsupported value")
                                     }
+                                }
+
+                                is SelectRandomPlayers -> {
+                                    RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
                                 }
                             }
                         }
@@ -223,6 +255,10 @@ class ActionSelectorViewModel(
                                 1 -> CoinTossResult(Coin.TAIL)
                                 else -> throw IllegalStateException("Unsupported value")
                             }
+                        }
+
+                        is SelectRandomPlayers -> {
+                            RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
                         }
                     }
                 }

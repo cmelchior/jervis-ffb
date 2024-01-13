@@ -4,11 +4,17 @@ package dk.ilios.jervis.fumbbl.model.change
 import dk.ilios.jervis.fumbbl.model.BloodSpot
 import dk.ilios.jervis.fumbbl.model.DialogOptions
 import dk.ilios.jervis.fumbbl.model.DiceDecoration
+import dk.ilios.jervis.fumbbl.model.FieldCoordinate
+import dk.ilios.jervis.fumbbl.model.FieldMarker
 import dk.ilios.jervis.fumbbl.model.Inducement
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
+import dk.ilios.jervis.fumbbl.model.PlayerAction
 import dk.ilios.jervis.fumbbl.model.PlayerMarker
+import dk.ilios.jervis.fumbbl.model.PlayerState
 import dk.ilios.jervis.fumbbl.model.RangeRuler
 import dk.ilios.jervis.fumbbl.model.TrackNumber
+import dk.ilios.jervis.fumbbl.model.TrapDoor
+import dk.ilios.jervis.fumbbl.model.TurnMode
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
@@ -18,7 +24,7 @@ import java.time.LocalDateTime
 data class ActingPlayerMarkSkillUsed(
     override val modelChangeId: ModelChangeId = ModelChangeId.ACTING_PLAYER_MARK_SKILL_USED,
     override val modelChangeKey: Nothing?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
@@ -26,7 +32,7 @@ data class ActingPlayerMarkSkillUsed(
 data class ActingPlayerMarkSkillUnused(
     override val modelChangeId: ModelChangeId = ModelChangeId.ACTING_PLAYER_MARK_SKILL_UNUSED,
     override val modelChangeKey: Nothing?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
@@ -114,7 +120,7 @@ data class ActingPlayerSetLeaping(
 data class ActingPlayerSetOldPlayerState(
     override val modelChangeId: ModelChangeId = ModelChangeId.ACTING_PLAYER_SET_OLD_PLAYER_STATE,
     override val modelChangeKey: Nothing?,
-    override val modelChangeValue: Int
+    override val modelChangeValue: PlayerState
 ): ModelChange
 
 @Serializable
@@ -122,7 +128,7 @@ data class ActingPlayerSetOldPlayerState(
 data class ActingPlayerSetPlayerAction(
     override val modelChangeId: ModelChangeId = ModelChangeId.ACTING_PLAYER_SET_PLAYER_ACTION,
     override val modelChangeKey: Nothing?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: PlayerAction?
 ): ModelChange
 
 @Serializable
@@ -130,7 +136,7 @@ data class ActingPlayerSetPlayerAction(
 data class ActingPlayerSetPlayerId(
     override val modelChangeId: ModelChangeId = ModelChangeId.ACTING_PLAYER_SET_PLAYER_ID,
     override val modelChangeKey: Nothing?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: PlayerId?
 ): ModelChange
 
 @Serializable
@@ -177,16 +183,16 @@ data class FieldModelAddBloodSpot(
 @SerialName("fieldModelAddCard")
 data class FieldModelAddCard(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_ADD_CARD,
-    override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeKey: String,
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
 @SerialName("fieldModelAddCardEffect")
 data class FieldModelAddCardEffect(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_ADD_CARD_EFFECT,
-    override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeKey: String,
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
@@ -233,8 +239,8 @@ data class FieldModelAddPlayerMarker(
 @SerialName("fieldModelAddPrayer")
 data class FieldModelAddPrayer(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_ADD_PRAYER,
-    override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeKey: String,
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
@@ -266,7 +272,7 @@ data class FieldModelAddTrackNumber(
 data class FieldModelAddTrapDoor(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_ADD_TRAP_DOOR,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: TrapDoor
 ): ModelChange
 
 @Serializable
@@ -289,16 +295,16 @@ data class FieldModelKeepDeactivatedCard(
 @SerialName("fieldModelRemoveCard")
 data class FieldModelRemoveCard(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_REMOVE_CARD,
-    override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeKey: String,
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
 @SerialName("fieldModelRemoveCardEffect")
 data class FieldModelRemoveCardEffect(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_REMOVE_CARD_EFFECT,
-    override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeKey: String,
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
@@ -314,7 +320,7 @@ data class FieldModelRemoveDiceDecoration(
 data class FieldModelRemoveFieldMarker(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_REMOVE_FIELD_MARKER,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: FieldMarker
 ): ModelChange
 
 @Serializable
@@ -329,8 +335,8 @@ data class FieldModelRemoveMoveSquare(
 @SerialName("fieldModelRemovePlayer")
 data class FieldModelRemovePlayer(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_REMOVE_PLAYER,
-    override val modelChangeKey: String?,
-    override val modelChangeValue: List<Int>?
+    override val modelChangeKey: String,
+    override val modelChangeValue: FieldCoordinate?
 ): ModelChange
 
 @Serializable
@@ -345,15 +351,15 @@ data class FieldModelRemovePlayerMarker(
 @SerialName("fieldModelRemovePrayer")
 data class FieldModelRemovePrayer(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_REMOVE_PRAYER,
-    override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeKey: String,
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
 @SerialName("fieldModelRemoveSkillEnhancements")
 data class FieldModelRemoveSkillEnhancements(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_REMOVE_SKILL_ENHANCEMENTS,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: String?
 ): ModelChange
 
@@ -378,7 +384,7 @@ data class FieldModelRemoveTrackNumber(
 data class FieldModelRemoveTrapDoor(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_REMOVE_TRAP_DOOR,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: TrapDoor
 ): ModelChange
 
 @Serializable
@@ -386,7 +392,7 @@ data class FieldModelRemoveTrapDoor(
 data class FieldModelSetBallCoordinate(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_SET_BALL_COORDINATE,
     override val modelChangeKey: String?,
-    override val modelChangeValue: List<Int>?
+    override val modelChangeValue: FieldCoordinate?
 ): ModelChange
 
 @Serializable
@@ -410,7 +416,7 @@ data class FieldModelSetBallMoving(
 data class FieldModelSetBlitzState(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_SET_BLITZ_STATE,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: TargetSelectionState?
 ): ModelChange
 
 @Serializable
@@ -418,7 +424,7 @@ data class FieldModelSetBlitzState(
 data class FieldModelSetBombCoordinate(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_SET_BOMB_COORDINATE,
     override val modelChangeKey: String?,
-    override val modelChangeValue: List<Int>?
+    override val modelChangeValue: FieldCoordinate?
 ): ModelChange
 
 @Serializable
@@ -433,15 +439,15 @@ data class FieldModelSetBombMoving(
 @SerialName("fieldModelSetPlayerCoordinate")
 data class FieldModelSetPlayerCoordinate(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_SET_PLAYER_COORDINATE,
-    override val modelChangeKey: String?,
-    override val modelChangeValue: List<Int>?
+    override val modelChangeKey: String,
+    override val modelChangeValue: FieldCoordinate?
 ): ModelChange
 
 @Serializable
 @SerialName("fieldModelSetPlayerState")
 data class FieldModelSetPlayerState(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_SET_PLAYER_STATE,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -466,7 +472,7 @@ data class FieldModelSetTargetSelectionState(
 data class FieldModelSetWeather(
     override val modelChangeId: ModelChangeId = ModelChangeId.FIELD_MODEL_SET_WEATHER,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
@@ -498,7 +504,7 @@ data class GameSetConcessionPossible(
 data class GameSetDefenderAction(
     override val modelChangeId: ModelChangeId = ModelChangeId.GAME_SET_DEFENDER_ACTION,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: PlayerAction?
 ): ModelChange
 
 @Serializable
@@ -570,7 +576,7 @@ data class GameSetLastDefenderId(
 data class GameSetLastTurnMode(
     override val modelChangeId: ModelChangeId = ModelChangeId.GAME_SET_LAST_TURN_MODE,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: TurnMode?
 ): ModelChange
 
 @Serializable
@@ -578,7 +584,7 @@ data class GameSetLastTurnMode(
 data class GameSetPassCoordinate(
     override val modelChangeId: ModelChangeId = ModelChangeId.GAME_SET_PASS_COORDINATE,
     override val modelChangeKey: String?,
-    override val modelChangeValue: List<Int>?
+    override val modelChangeValue: FieldCoordinate?
 ): ModelChange
 
 @Serializable
@@ -626,7 +632,7 @@ data class GameSetThrowerId(
 data class GameSetThrowerAction(
     override val modelChangeId: ModelChangeId = ModelChangeId.GAME_SET_THROWER_ACTION,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: PlayerAction?
 ): ModelChange
 
 @Serializable
@@ -650,7 +656,7 @@ data class GameSetTimeoutPossible(
 data class GameSetTurnMode(
     override val modelChangeId: ModelChangeId = ModelChangeId.GAME_SET_TURN_MODE,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: TurnMode
 ): ModelChange
 
 @Serializable
@@ -714,7 +720,7 @@ data class InducementSetDeactivateCard(
 data class InducementSetAddPrayer(
     override val modelChangeId: ModelChangeId = ModelChangeId.INDUCEMENT_SET_ADD_PRAYER,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
@@ -738,30 +744,30 @@ data class InducementSetRemoveInducement(
 data class InducementSetRemovePrayer(
     override val modelChangeId: ModelChangeId = ModelChangeId.INDUCEMENT_SET_REMOVE_PRAYER,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
 @SerialName("playerMarkSkillUsed")
 data class PlayerMarkSkillUsed(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_MARK_SKILL_USED,
-    override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeKey: String,
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
 @SerialName("playerMarkSkillUnused")
 data class PlayerMarkSkillUnused(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_MARK_SKILL_UNUSED,
-    override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeKey: String,
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable
 @SerialName("playerResultSetBlocks")
 data class PlayerResultSetBlocks(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_BLOCKS,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -769,7 +775,7 @@ data class PlayerResultSetBlocks(
 @SerialName("playerResultSetCasualties")
 data class PlayerResultSetCasualties(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_CASUALTIES,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -777,7 +783,7 @@ data class PlayerResultSetCasualties(
 @SerialName("playerResultSetCasualtiesWithAdditionalSpp")
 data class PlayerResultSetCasualtiesWithAdditionalSpp(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_CASUALTIES_WITH_ADDITIONAL_SPP,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -785,7 +791,7 @@ data class PlayerResultSetCasualtiesWithAdditionalSpp(
 @SerialName("playerResultSetCompletions")
 data class PlayerResultSetCompletions(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_COMPLETIONS,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -793,7 +799,7 @@ data class PlayerResultSetCompletions(
 @SerialName("playerResultSetCompletionsWithAdditionalSpp")
 data class PlayerResultSetCompletionsWithAdditionalSpp(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_COMPLETIONS_WITH_ADDITIONAL_SPP,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -801,7 +807,7 @@ data class PlayerResultSetCompletionsWithAdditionalSpp(
 @SerialName("playerResultSetCurrentSpps")
 data class PlayerResultSetCurrentSpps(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_CURRENT_SPPS,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -809,7 +815,7 @@ data class PlayerResultSetCurrentSpps(
 @SerialName("playerResultSetDefecting")
 data class PlayerResultSetDefecting(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_DEFECTING,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Boolean
 ): ModelChange
 
@@ -817,7 +823,7 @@ data class PlayerResultSetDefecting(
 @SerialName("playerResultSetFouls")
 data class PlayerResultSetFouls(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_FOULS,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -825,7 +831,7 @@ data class PlayerResultSetFouls(
 @SerialName("playerResultSetHasUsedSecretWeapon")
 data class PlayerResultSetHasUsedSecretWeapon(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_HAS_USED_SECRET_WEAPON,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Boolean
 ): ModelChange
 
@@ -833,7 +839,7 @@ data class PlayerResultSetHasUsedSecretWeapon(
 @SerialName("playerResultSetInterceptions")
 data class PlayerResultSetInterceptions(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_INTERCEPTIONS,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -841,7 +847,7 @@ data class PlayerResultSetInterceptions(
 @SerialName("playerResultSetDeflections")
 data class PlayerResultSetDeflections(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_DEFLECTIONS,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -849,7 +855,7 @@ data class PlayerResultSetDeflections(
 @SerialName("playerResultSetPassing")
 data class PlayerResultSetPassing(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_PASSING,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -857,7 +863,7 @@ data class PlayerResultSetPassing(
 @SerialName("playerResultSetPlayerAwards")
 data class PlayerResultSetPlayerAwards(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_PLAYER_AWARDS,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -865,7 +871,7 @@ data class PlayerResultSetPlayerAwards(
 @SerialName("playerResultSetRushing")
 data class PlayerResultSetRushing(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_RUSHING,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -873,7 +879,7 @@ data class PlayerResultSetRushing(
 @SerialName("playerResultSetSendToBoxByPlayerId")
 data class PlayerResultSetSendToBoxByPlayerId(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_SEND_TO_BOX_BY_PLAYER_ID,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: String?
 ): ModelChange
 
@@ -881,7 +887,7 @@ data class PlayerResultSetSendToBoxByPlayerId(
 @SerialName("playerResultSetSendToBoxHalf")
 data class PlayerResultSetSendToBoxHalf(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_SEND_TO_BOX_HALF,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -889,7 +895,7 @@ data class PlayerResultSetSendToBoxHalf(
 @SerialName("playerResultSetSendToBoxReason")
 data class PlayerResultSetSendToBoxReason(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_SEND_TO_BOX_REASON,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: String?
 ): ModelChange
 
@@ -897,7 +903,7 @@ data class PlayerResultSetSendToBoxReason(
 @SerialName("playerResultSetSendToBoxTurn")
 data class PlayerResultSetSendToBoxTurn(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_SEND_TO_BOX_TURN,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -905,7 +911,7 @@ data class PlayerResultSetSendToBoxTurn(
 @SerialName("playerResultSetSeriousInjury")
 data class PlayerResultSetSeriousInjury(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_SERIOUS_INJURY,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: String?
 ): ModelChange
 
@@ -913,7 +919,7 @@ data class PlayerResultSetSeriousInjury(
 @SerialName("playerResultSetSeriousInjuryDecay")
 data class PlayerResultSetSeriousInjuryDecay(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_SERIOUS_INJURY_DECAY,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: String?
 ): ModelChange
 
@@ -921,7 +927,7 @@ data class PlayerResultSetSeriousInjuryDecay(
 @SerialName("playerResultSetTouchdowns")
 data class PlayerResultSetTouchdowns(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_TOUCHDOWNS,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -929,7 +935,7 @@ data class PlayerResultSetTouchdowns(
 @SerialName("playerResultSetTurnsPlayed")
 data class PlayerResultSetTurnsPlayed(
     override val modelChangeId: ModelChangeId = ModelChangeId.PLAYER_RESULT_SET_TURNS_PLAYED,
-    override val modelChangeKey: String?,
+    override val modelChangeKey: String,
     override val modelChangeValue: Int
 ): ModelChange
 
@@ -1122,7 +1128,7 @@ data class TurnDataSetHandOverUsed(
 data class TurnDataSetLeaderState(
     override val modelChangeId: ModelChangeId = ModelChangeId.TURN_DATA_SET_LEADER_STATE,
     override val modelChangeKey: String?,
-    override val modelChangeValue: String?
+    override val modelChangeValue: String
 ): ModelChange
 
 @Serializable

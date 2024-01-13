@@ -1,5 +1,29 @@
 package dk.ilios.jervis.fumbbl.model
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+
+object PlayerStateSerializer : KSerializer<PlayerState> {
+    private val decoderSerializer: KSerializer<Int> = Int.serializer()
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("PlayerState", PrimitiveKind.INT)
+
+    override fun serialize(encoder: Encoder, value: PlayerState) {
+        encoder.encodeInt(value.id)
+    }
+
+    override fun deserialize(decoder: Decoder): PlayerState {
+        val value = decoder.decodeSerializableValue(decoderSerializer)
+        return PlayerState(value)
+    }
+}
+
+@Serializable(with = PlayerStateSerializer::class)
 class PlayerState(val id: Int) {
 
     val base: Int

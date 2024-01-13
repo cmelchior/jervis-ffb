@@ -12,6 +12,10 @@ import kotlinx.serialization.UseContextualSerialization
 import kotlinx.serialization.json.JsonClassDiscriminator
 import java.time.LocalDateTime
 
+fun ModelChange.isHomeData(): Boolean {
+    return modelChangeKey == "home"
+}
+
 @Serializable
 @JvmInline
 value class PlayerId(val id: String)

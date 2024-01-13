@@ -1,29 +1,31 @@
 package dk.ilios.jervis.fumbbl.model
 
+import dk.ilios.jervis.fumbbl.model.change.TeamResultDedicatedFansModifier
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class PlayerResult(
     val playerId: String,
-    val completions: Int,
-    val completionsWithAdditionalSpp: Int,
-    val touchdowns: Int,
-    val interceptions: Int,
-    val casualties: Int,
-    val casualtiesWithAdditionalSpp: Int,
-    val playerAwards: Int,
-    val blocks: Int,
-    val fouls: Int,
-    val rushing: Int,
-    val passing: Int,
-    val currentSpps: Int,
-    val seriousInjury: String?,
-    val seriousInjuryDecay: String?,
-    val sendToBoxReason: String?,
-    val sendToBoxTurn: Int,
-    val sendToBoxHalf: Int,
-    val sendToBoxByPlayerId: String?,
-    val turnsPlayed: Int,
-    val hasUsedSecretWeapon: Boolean,
-    val defecting: Boolean
+    var completions: Int,
+    var completionsWithAdditionalSpp: Int,
+    var touchdowns: Int,
+    var interceptions: Int,
+    var casualties: Int,
+    var casualtiesWithAdditionalSpp: Int,
+    var playerAwards: Int,
+    var blocks: Int,
+    var fouls: Int,
+    var rushing: Int,
+    var passing: Int,
+    var currentSpps: Int,
+    var seriousInjury: String?,
+    var seriousInjuryDecay: String?,
+    var sendToBoxReason: String?,
+    var sendToBoxTurn: Int,
+    var sendToBoxHalf: Int,
+    var sendToBoxByPlayerId: String?,
+    var turnsPlayed: Int,
+    var hasUsedSecretWeapon: Boolean,
+    var defecting: Boolean,
+    var deflections: Int = 0,
 )

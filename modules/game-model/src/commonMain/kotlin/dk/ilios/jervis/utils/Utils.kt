@@ -33,12 +33,14 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectCoinSide
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
+import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.Game
@@ -86,7 +88,10 @@ fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): G
                 else -> throw IllegalStateException()
             }
         }
-    }
+
+        is SelectRandomPlayers ->
+            RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
+        }
 }
 
 const val enableAsserts = true

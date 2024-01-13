@@ -5,20 +5,29 @@ import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.Confirm
+import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.EndSetup
+import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.controller.GameController
+import dk.ilios.jervis.ext.d3
+import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
+import dk.ilios.jervis.fumbbl.model.ReportId
 import dk.ilios.jervis.fumbbl.model.change.FieldModelSetPlayerCoordinate
 import dk.ilios.jervis.fumbbl.model.change.FieldModelSetPlayerState
 import dk.ilios.jervis.fumbbl.model.change.GameSetSetupOffense
 import dk.ilios.jervis.fumbbl.model.reports.CoinThrowReport
 import dk.ilios.jervis.fumbbl.model.reports.FanFactorReport
+import dk.ilios.jervis.fumbbl.model.reports.KickoffPitchInvasionReport
+import dk.ilios.jervis.fumbbl.model.reports.KickoffResultReport
+import dk.ilios.jervis.fumbbl.model.reports.KickoffScatterReport
 import dk.ilios.jervis.fumbbl.model.reports.ReceiveChoiceReport
 import dk.ilios.jervis.fumbbl.model.reports.Report
 import dk.ilios.jervis.fumbbl.model.reports.ScatterBallReport
@@ -35,7 +44,10 @@ import dk.ilios.jervis.procedures.DetermineKickingTeam
 import dk.ilios.jervis.procedures.RollForStartingFanFactor
 import dk.ilios.jervis.procedures.RollForTheWeather
 import dk.ilios.jervis.procedures.SetupTeam
+import dk.ilios.jervis.procedures.TeamTurn
 import dk.ilios.jervis.procedures.TheKickOff
+import dk.ilios.jervis.procedures.TheKickOffEvent
+import dk.ilios.jervis.procedures.bb2020.kickoff.PitchInvasion
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.RandomDirectionTemplate
 import kotlinx.coroutines.runBlocking
@@ -50,7 +62,7 @@ data class JervisAction(
     override val expectedNode: Node
 ): JervisActionHolder
 data class CalculatedJervisAction(
-    private val actionFunc: (state: Game, rules: Rules) -> GameAction,
+    val actionFunc: (state: Game, rules: Rules) -> GameAction,
     override val expectedNode: Node
 ): JervisActionHolder
 
@@ -61,8 +73,22 @@ fun MutableList<JervisActionHolder>.add(action: (state: Game, rules: Rules) -> G
     this.add(CalculatedJervisAction(action, expectedNode))
 }
 
+// TODO This approach is ultimately broken. It isn't possible to extract actions
+//  from incomplete data. It looks like FUMBBL is sometimes sending the same
+//  data multiple times, so figuring out which to convert to actions is impossible
+//  without the context of the game.
+//
+// What else can we do
+// Whenever there is a request for action send current Node + actions to a method that will roll forward until it
+// finds what it needs... Counter: Will be tricky, some Fumbbl commands will create multiple actions, then they need to
+// stored somewhere and depleted (might be possible)
+//
+// Only other approach would be to replicate the state machine that FUMBBL use and update the FUMBBL metadata.
+// This will give us a full state to query. It might be more helpful if others want to convert a FUMBBL state into
+// something else as well...but will probably be more work. Hmm, maybe it is just porting the ModelChangeProcessor
+// which is just a lot of trivial code.
 class FumbblReplayAdapter(private var replayFile: Path) {
-
+    private lateinit var gameCommands: MutableList<JervisActionHolder>
     private lateinit var game: FumbblGame
     private lateinit var jervisGame: Game
     private var modelChangeIndex: Int = 0
@@ -154,7 +180,7 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                 ModelChangeId.FIELD_MODEL_REMOVE_TRAP_DOOR -> reportNotHandled(cmd)
                 ModelChangeId.FIELD_MODEL_SET_BALL_COORDINATE -> {
                     // End setup and scatter ball
-                    if (cmd.reportList.size == 1 && cmd.reportList.first() is ScatterBallReport) {
+                    if (cmd.reportList.size == 1 && cmd.reportList.first() is KickoffScatterReport) {
 
                         // FUMBBL does not seem to pick a kicking player (probably because it doesn't really
                         // matter), but instead just asks you if you want to use Kick if an eligible player
@@ -170,7 +196,7 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                             PlayerSelected(eligiblePlayers.random())
                         }, TheKickOff.NominateKickingPlayer)
 
-                        val report = cmd.reportList.first() as ScatterBallReport
+                        val report = cmd.reportList.first() as KickoffScatterReport
 
                         // FUMBBL use a different Random Direction Template than the official rules. Theirs start
                         // with 1 = North and the go clockwise.
@@ -199,15 +225,38 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                 ModelChangeId.FIELD_MODEL_SET_PLAYER_COORDINATE -> reportNotHandled(cmd)
                 ModelChangeId.FIELD_MODEL_SET_PLAYER_STATE -> {
                     // Moving a player for setting up a drive
+                    // This is also being called when starting the half. Not sure why FUMBBL does this
+                    // but we just need to discard these events
                     if (cmd.modelChangeList.size == 2
                         && cmd.reportList.isEmpty()
                         && cmd.modelChangeList[1].modelChangeId == ModelChangeId.FIELD_MODEL_SET_PLAYER_COORDINATE
                     ) {
                         val playerId = (cmd.modelChangeList.first() as FieldModelSetPlayerState).modelChangeKey!!
-                        val coordinates = (cmd.modelChangeList[1] as FieldModelSetPlayerCoordinate).modelChangeValue!!
+                        var coordinates = (cmd.modelChangeList[1] as FieldModelSetPlayerCoordinate).modelChangeValue!!
                         val selectedPlayer = jervisGame.getPlayerById(PlayerId(playerId))!!
                         jervisCommands.add(PlayerSelected(selectedPlayer), SetupTeam.SelectPlayerOrEndSetup)
-                        jervisCommands.add(FieldSquareSelected(coordinates[0], coordinates[1]), SetupTeam.PlacePlayer)
+                        jervisCommands.add(FieldSquareSelected(coordinates.x, coordinates.y), SetupTeam.PlacePlayer)
+                    } else if (cmd.reportList.size == 1 && cmd.reportList.first() is KickoffPitchInvasionReport) {
+                        // Resolve a Pitch Invasion
+                        val report = cmd.reportList.first() as KickoffPitchInvasionReport
+                        val homeRoll = D6Result(report.rollHome)
+                        val awayRoll = D6Result(report.rollAway)
+                        jervisCommands.add(homeRoll, PitchInvasion.RollForHomeTeam)
+                        jervisCommands.add(awayRoll, PitchInvasion.RollForAwayTeam)
+                        // Split stuns into teams to figure out the result
+                        val (homeStuns, awayStuns) = report.playerIds.map {
+                            jervisGame.getPlayerById(PlayerId(it.id))!!
+                        }.partition { player ->
+                            player.team.isHomeTeam()
+                        }
+                        if (homeStuns.isNotEmpty()) {
+                            jervisCommands.add(D3Result(homeStuns.size), PitchInvasion.RollForHomeTeamStuns)
+                            jervisCommands.add(RandomPlayersSelected(homeStuns), PitchInvasion.ResolveHomeTeamStuns)
+                        }
+                        if (awayStuns.isNotEmpty()) {
+                            jervisCommands.add(D3Result(awayStuns.size), PitchInvasion.RollForAwayTeamStuns)
+                            jervisCommands.add(RandomPlayersSelected(awayStuns), PitchInvasion.RollForHomeTeamStuns)
+                        }
                     }
                 }
                 ModelChangeId.FIELD_MODEL_SET_RANGE_RULER -> reportNotHandled(cmd)
@@ -227,11 +276,11 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                         val choseHeads = report.coinChoiceHeads
                         jervisCommands.add(CoinSideSelected(if (choseHeads) Coin.HEAD else Coin.TAIL), DetermineKickingTeam.SelectCoinSide)
                         jervisCommands.add(CoinTossResult(if (throwHeads) Coin.HEAD else Coin.TAIL), DetermineKickingTeam.CoinToss)
-                        jervisCommands.add(CoinSideSelected(if (choseHeads) Coin.HEAD else Coin.TAIL), DetermineKickingTeam.SelectCoinSide)
+//                        jervisCommands.add(CoinSideSelected(if (choseHeads) Coin.HEAD else Coin.TAIL), DetermineKickingTeam.C)
                     } else if (report is ReceiveChoiceReport) {
                         // Handle selecting to receive or kick
                         val kicking = !report.receiveChoice
-                        jervisCommands.add(if (kicking) Confirm else Cancel, DetermineKickingTeam.ChooseKickingTeam)
+                        jervisCommands.add(if (kicking) Cancel else Confirm , DetermineKickingTeam.ChooseKickingTeam)
                     } else {
                         reportNotHandled(cmd)
                     }
@@ -243,6 +292,8 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                     // Switch team during setup
                     if (cmd.modelChangeList.size == 2 && cmd.modelChangeList.last() is GameSetSetupOffense) {
                         jervisCommands.add(EndSetup, SetupTeam.SelectPlayerOrEndSetup)
+//                    } else if (cmd.reportList.singleOrNull()?.reportId == ReportId.TURN_END) {
+//                        jervisCommands.add(EndTurn, TeamTurn.SelectPlayerOrEndTurn)
                     } else {
                         reportNotHandled(cmd)
                     }
@@ -258,8 +309,8 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                     verifyReportSize(2, cmd)
                     val homeTeamRoll = (cmd.reportList.reports[0] as FanFactorReport).dedicatedFansRoll
                     val awayTeamRoll = (cmd.reportList.reports[1] as FanFactorReport).dedicatedFansRoll
-                    jervisCommands.add(D6Result(homeTeamRoll), RollForStartingFanFactor.SetFanFactorForHomeTeam)
-                    jervisCommands.add(D6Result(awayTeamRoll), RollForStartingFanFactor.SetFanFactorForAwayTeam)
+                    jervisCommands.add(homeTeamRoll.d3, RollForStartingFanFactor.SetFanFactorForHomeTeam)
+                    jervisCommands.add(homeTeamRoll.d3, RollForStartingFanFactor.SetFanFactorForAwayTeam)
                 }
                 ModelChangeId.GAME_SET_TESTING -> reportNotHandled(cmd)
                 ModelChangeId.GAME_SET_THROWER_ID -> reportNotHandled(cmd)
@@ -340,15 +391,28 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                 ModelChangeId.TURN_DATA_SET_COACH_BANNED -> reportNotHandled(cmd)
                 null -> {
                     val report: Report? = cmd.reportList.reports.firstOrNull()
-                    if (report is WeatherReport) {
-                        val weatherRoll = report.weatherRoll.map { D6Result(it) }
-                        jervisCommands.add(DiceResults(weatherRoll), RollForTheWeather.RollWeatherDice)
-                    } else {
-                        reportNotHandled(cmd)
+                    when (report) {
+                        is KickoffResultReport -> {
+                            val roll = report.kickoffRoll
+                            jervisCommands.add(DiceResults(roll.first().d6, roll.last().d6), TheKickOffEvent.RollForKickOffEvent)
+
+                        }
+                        is WeatherReport -> {
+                            val weatherRoll = report.weatherRoll.map { D6Result(it) }
+                            jervisCommands.add(DiceResults(weatherRoll), RollForTheWeather.RollWeatherDice)
+                        }
+                        else -> reportNotHandled(cmd)
                     }
                 }
             }
+
+            cmd.modelChangeList.forEach {
+                if (!ModelChangeProcessor.apply(game, it)) {
+                    throw IllegalStateException("Failed at: $it")
+                }
+            }
         }
+        gameCommands = jervisCommands
     }
 
     private fun reportNotHandled(cmd: ServerCommandModelSync) {
@@ -366,4 +430,6 @@ class FumbblReplayAdapter(private var replayFile: Path) {
     fun getActionProvider(): (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction {
         TODO()
     }
+
+    fun getCommands(): List<JervisActionHolder> = gameCommands
 }

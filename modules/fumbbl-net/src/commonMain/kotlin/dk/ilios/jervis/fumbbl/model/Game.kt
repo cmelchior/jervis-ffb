@@ -3,35 +3,37 @@
 )
 package dk.ilios.jervis.fumbbl.model
 
+import dk.ilios.jervis.fumbbl.model.change.GameSetConcessionPossible
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
 import java.time.LocalDateTime
 
 @Serializable
 data class Game(
-    val gameId: Int,
-    val scheduled: LocalDateTime?,
-    val started: LocalDateTime?,
-    val finished: LocalDateTime?,
-    val homePlaying: Boolean?,
-    val half: Int,
-    val homeFirstOffense: Boolean,
-    val setupOffense: Boolean,
-    val waitingForOpponent: Boolean,
-    val turnTime: Int,
-    val gameTime: Int,
-    val timeoutPossible: Boolean,
-    val timeoutEnforced: Boolean,
-    val testing: Boolean,
-    val turnMode: TurnMode,
-    val lastTurnMode: TurnMode?,
-    val defenderId: String?,
-    val lastDefenderId: String?,
-    val defenderAction: PlayerAction?,
-    val passCoordinate: FieldCoordinate?,
-    val throwerId: String?,
-    val throwerAction: PlayerAction?,
-    val teamState: TeamState,
+    var gameId: Long,
+    var scheduled: LocalDateTime?,
+    var started: LocalDateTime?,
+    var finished: LocalDateTime?,
+    var homePlaying: Boolean,
+    var half: Int,
+    var homeFirstOffense: Boolean,
+    var setupOffense: Boolean,
+    var waitingForOpponent: Boolean,
+    var turnTime: Int,
+    var gameTime: Int,
+    var timeoutPossible: Boolean,
+    var timeoutEnforced: Boolean,
+    var concessionPossible: Boolean,
+    var testing: Boolean,
+    var turnMode: TurnMode,
+    var lastTurnMode: TurnMode?,
+    var defenderId: String?,
+    var lastDefenderId: String?,
+    var defenderAction: PlayerAction?,
+    var passCoordinate: FieldCoordinate?,
+    var throwerId: String?,
+    var throwerAction: PlayerAction?,
+    var teamState: TeamState,
     val teamAway: Team,
     val teamHome: Team,
     val turnDataAway: TurnData,
@@ -40,9 +42,16 @@ data class Game(
     val actingPlayer: ActingPlayer,
     val gameResult: GameResult,
     val gameOptions: GameOptions,
-    val dialogParameter: DialogParameter,
-    val concededLegally: Boolean
+    var dialogParameter: DialogOptions?,
+    var concededLegally: Boolean,
+    var adminMode: Boolean = false,
+    var rangeRuler: RangeRuler? = null
 ) {
+    fun getPlayerById(playerId: String): Player? {
+        return teamHome.players.firstOrNull { player ->
+            player.playerId == playerId
+        } ?: teamAway.players.firstOrNull { player -> player.playerId == playerId }
+    }
 
     public enum class TeamState {
         SKELETON, FULL

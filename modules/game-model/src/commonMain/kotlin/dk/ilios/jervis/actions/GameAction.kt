@@ -1,6 +1,8 @@
 package dk.ilios.jervis.actions
 
 import dk.ilios.jervis.model.Coin
+import dk.ilios.jervis.model.DogOut.coordinate
+import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.rules.PlayerAction
@@ -31,6 +33,7 @@ data object SelectDogout: ActionDescriptor
 data class SelectPlayer(val player: Player): ActionDescriptor
 data class DeselectPlayer(val player: Player): ActionDescriptor
 data class SelectAction(val action: PlayerAction): ActionDescriptor
+data class SelectRandomPlayers(val count: Int, val players: List<Player>): ActionDescriptor
 
 // Available actions
 open class DieResult(val result: Int, val min: Short, val max: Short): Number(), GameAction {
@@ -75,9 +78,12 @@ data class PlayerSelected(val player: Player): GameAction
 data object PlayerDeselected: GameAction
 data class PlayerActionSelected(val action: PlayerAction): GameAction
 data object DogoutSelected: GameAction
-data class FieldSquareSelected(val x: Int, val y: Int): GameAction {
-    constructor(coordinate: FieldCoordinate): this(coordinate.x, coordinate.y)
+data class FieldSquareSelected(val coordinate: FieldCoordinate): GameAction {
+    constructor(x: Int, y: Int): this(FieldCoordinate(x, y))
+    val x: Int = coordinate.x
+    val y: Int = coordinate.y
     override fun toString(): String {
         return "${this::class.simpleName}[$x, $y]"
     }
 }
+data class RandomPlayersSelected(val players: List<Player>): GameAction

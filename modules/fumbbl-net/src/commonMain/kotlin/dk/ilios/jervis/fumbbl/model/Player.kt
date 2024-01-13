@@ -30,4 +30,16 @@ data class Player(
     val skillDisplayValuesMap: Map<String, String?>,
     val playerStatus: String? = null,
     val usedSkills: List<String>
-)
+) {
+    fun removeEnhancement(skill: String?) {
+        // TODO Unclear exactly what to do here. Fumbbl has pretty advanced tracking of modifiers/skills
+    }
+
+    fun markUnused(skill: String, game: Game) {
+        // TODO
+    }
+
+    fun markUsed(skill: String, game: Game) {
+        // TODO
+    }
+}

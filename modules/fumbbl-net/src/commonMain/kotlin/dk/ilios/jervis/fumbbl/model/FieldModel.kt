@@ -1,5 +1,8 @@
 package dk.ilios.jervis.fumbbl.model
 
+import dk.ilios.jervis.fumbbl.model.change.MoveSquare
+import dk.ilios.jervis.fumbbl.model.change.PushBackSquare
+import dk.ilios.jervis.fumbbl.model.change.TargetSelectionState
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -48,19 +51,148 @@ data class PlayerData(
 
 @Serializable
 data class FieldModel(
-    val weather: String,
-    val ballCoordinate: List<Int>?,
-    val ballInPlay: Boolean,
-    val ballMoving: Boolean,
-    val bombCoordinate: List<Int>?,
-    val bombMoving: Boolean,
-    val bloodspotArray: List<BloodSpot>,
-    val pushbackSquareArray: List<FieldCoordinate>,
-    val moveSquareArray: List<FieldCoordinate>,
-    val trackNumberArray: List<Int>,
-    val diceDecorationArray: List<DiceDecoration>,
-    val fieldMarkerArray: List<FieldMarker>,
-    val playerMarkerArray: List<PlayerMarker>,
-    val playerDataArray: List<PlayerData>,
-    val trapDoors: List<TrapDoor>
-)
+    var weather: String,
+    var ballCoordinate: FieldCoordinate?,
+    var ballInPlay: Boolean,
+    var ballMoving: Boolean,
+    var bombCoordinate: FieldCoordinate?,
+    var bombMoving: Boolean,
+    var targetSelectionState: TargetSelectionState? = null,
+    var rangeRuler: RangeRuler? = null,
+    val bloodspotArray: MutableList<BloodSpot>,
+    val pushbackSquareArray: MutableList<PushBackSquare>,
+    val moveSquareArray: MutableList<MoveSquare>,
+    val trackNumberArray: MutableList<TrackNumber>,
+    val diceDecorationArray: MutableList<DiceDecoration>,
+    val fieldMarkerArray: MutableList<FieldMarker>,
+    val playerMarkerArray: MutableList<PlayerMarker>,
+    val playerDataArray: MutableList<PlayerData>,
+    val trapDoors: MutableList<TrapDoor>
+) {
+    private val coordinateByPlayerId = mutableMapOf<String, FieldCoordinate>()
+    private val playerIdByCoordinate = mutableMapOf<FieldCoordinate, MutableList<String>>()
+    private val cardsByPlayerId = mutableMapOf<String, MutableSet<String>>()
+    private val cardEffectByPlayerId = mutableMapOf<String, MutableSet<String>>()
+
+    private val stateByPlayerId = mutableMapOf<String, PlayerState>()
+
+    fun setPlayerCoordinate(playerId: String, coordinate: FieldCoordinate) {
+        coordinateByPlayerId[playerId] = coordinate
+    }
+
+    fun getPlayerCoordinate(playerId: String): FieldCoordinate? {
+        return coordinateByPlayerId[playerId]
+    }
+
+    fun setPlayerState(playerId: String, state: Int) {
+        stateByPlayerId[playerId] = PlayerState(state)
+    }
+
+    fun getPlayerState(playerId: String): PlayerState? {
+        return stateByPlayerId[playerId]
+    }
+
+    fun removeSkillEnhancements(player: Player, skill: String?) {
+        player.removeEnhancement(skill)
+    }
+
+    fun addMoveSquare(move: MoveSquare) {
+        moveSquareArray.add(move)
+
+    }
+
+    fun removeMoveSquare(move: MoveSquare) {
+        moveSquareArray.remove(move)
+    }
+
+    fun addTrackNumber(number: TrackNumber) {
+        trackNumberArray.add(number)
+    }
+
+    fun removeTrackNumber(number: TrackNumber) {
+        trackNumberArray.remove(number)
+    }
+
+    fun addDiceDecoration(decoration: DiceDecoration) {
+        diceDecorationArray.add(decoration)
+    }
+
+    fun removeDiceDecoration(decoration: DiceDecoration) {
+        diceDecorationArray.remove(decoration)
+    }
+
+    fun addPushBackSquare(pushback: PushBackSquare) {
+        pushbackSquareArray.add(pushback)
+    }
+
+    fun removePushbackSquare(pushback: PushBackSquare) {
+        pushbackSquareArray.remove(pushback)
+    }
+
+    fun removePlayer(playerId: String) {
+        if (coordinateByPlayerId.remove(playerId) == null) {
+            // Could not find player to remove.
+            // It seems that FUMBBL sometimes run into this for some reason
+        }
+    }
+
+    fun addPlayerMarker(marker: PlayerMarker) {
+        playerMarkerArray.add(marker)
+    }
+
+    fun removePlayerMarker(marker: PlayerMarker) {
+        playerMarkerArray.remove(marker)
+    }
+
+    fun addBloodSpot(spot: BloodSpot) {
+        bloodspotArray.add(spot)
+    }
+
+    fun removeFieldMarker(marker: FieldMarker) {
+        fieldMarkerArray.remove(marker)
+    }
+
+    fun addPrayerEnhancements(playerId: String, prayer: String) {
+        // TODO
+    }
+
+    fun removePrayerEnhancement(playerId: String, prayer: String) {
+        // TODO
+    }
+
+    fun addTrapDoor(trapDoor: TrapDoor) {
+        trapDoors.add(trapDoor)
+    }
+
+    fun removeTrapDoor(trapDoor: TrapDoor) {
+        trapDoors.remove(trapDoor)
+    }
+
+    fun addCard(playerId: String, card: String) {
+        // TODO They also do other stuff. See Java implementation
+        if (!cardsByPlayerId.containsKey(playerId)) {
+            cardsByPlayerId[playerId] = mutableSetOf()
+        }
+        cardsByPlayerId[playerId]!!.add(card)
+    }
+
+    fun removeCard(playerId: String, card: String) {
+        // TODO They also do other stuff. See Java implementation
+        cardsByPlayerId[playerId]?.remove(card)
+    }
+
+    fun addCardEffect(playerId: String, cardEffect: String) {
+        // TODO They also do other stuff. See Java implementation
+        if (!cardEffectByPlayerId.containsKey(playerId)) {
+            cardEffectByPlayerId[playerId] = mutableSetOf()
+        }
+        cardEffectByPlayerId[playerId]!!.add(cardEffect)
+    }
+
+    fun removeCardEffect(playerId: String, cardEffect: String) {
+        // TODO They also do other stuff. See Java implementation
+        cardEffectByPlayerId[playerId]?.remove(cardEffect)
+    }
+
+
+}

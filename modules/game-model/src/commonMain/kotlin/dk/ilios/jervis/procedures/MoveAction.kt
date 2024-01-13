@@ -25,7 +25,7 @@ import dk.ilios.jervis.utils.INVALID_ACTION
 /**
  * Procedure controlling a Move action as described on page XX in the rulebook.
  */
-object Move: Procedure() {
+object MoveAction: Procedure() {
     override val initialNode: Node = SelectSquareOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         return SetPlayerMoveLeft(state.activePlayer!!, state.activePlayer!!.move)

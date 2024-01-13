@@ -33,11 +33,11 @@ import dk.ilios.jervis.rules.tables.TableResult
  * See page 41 in the rulebook.
  */
 object TheKickOffEvent: Procedure() {
-    override val initialNode: Node = ResolveKickOffEvent
+    override val initialNode: Node = RollForKickOffEvent
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object ResolveKickOffEvent: ActionNode() {
+    object RollForKickOffEvent: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6, Dice.D6))
         }

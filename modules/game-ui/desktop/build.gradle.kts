@@ -18,6 +18,7 @@ kotlin {
             dependencies {
                 implementation(project(":modules:game-ui:common"))
                 implementation(project(":modules:game-model"))
+                implementation(project(":modules:fumbbl-net"))
                 implementation("com.squareup.okio:okio:3.7.0")
                 implementation(libs.coroutines)
                 implementation(compose.desktop.common)

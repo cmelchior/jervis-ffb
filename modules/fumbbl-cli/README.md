@@ -52,7 +52,7 @@ The modified client should only be used for testing and not when playing real ga
 ### Play a test game
 
 Playing a test game, requires a valid login on FUMBBL. See https://fumbbl.com/help:Test+mode for how to 
-run a test game. Then goto the directory containing the debug client and start it with this:
+run a test game. Then go to the directory containing the debug client and start it with this:
 
 ````
 > java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -player \ 
@@ -83,11 +83,22 @@ authToken: 85c88af58bc846e5ee67d9a87f86a2ec
 
 ````
 
-
-```
-
 Note, it is possible for the same coach to connect two of their own teams, giving full control over the
 progress of the game to same coach. This can be helpful if you want to reproduce certain game situations.
+
+Commandline arguments for running 3 games on the same computer:
+```
+java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -player \ 
+  -teamId 1158751 -teamName "Human(Home)" -port 22223 \
+  -coach cmelchior
+
+java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -player \ 
+  -teamId 1158756 -teamName "Human(Away)" -port 22223 \
+  -coach cmelchior
+
+java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -spectator \ 
+  -coach cmelchior
+```
 
 ### Replay a game
 

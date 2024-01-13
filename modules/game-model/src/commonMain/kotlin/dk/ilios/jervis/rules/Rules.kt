@@ -96,7 +96,7 @@ interface Rules {
         if (onField.size.toUInt() < playersRequiredOnLineOfScrimmage && onField.size != playersOnLos) {
             return false
         }
-        if (onField.size.toUInt() >= playersRequiredOnLineOfScrimmage && playersOnLos != playersRequiredOnLineOfScrimmage.toInt()) {
+        if (onField.size.toUInt() >= playersRequiredOnLineOfScrimmage && playersOnLos < playersRequiredOnLineOfScrimmage.toInt()) {
             return false
         }
 

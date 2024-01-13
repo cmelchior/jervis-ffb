@@ -96,12 +96,18 @@ object SetupTeam: Procedure() {
                     SetActivePlayer(null),
                     GotoNode(SelectPlayerOrEndSetup)
                 )
-                is FieldSquareSelected -> compositeCommandOf(
-                    SetPlayerLocation(state.activePlayer!!, FieldCoordinate(action.x, action.y)),
-                    SetPlayerState(state.activePlayer!!, PlayerState.STANDING),
-                    SetActivePlayer(null),
-                    GotoNode(SelectPlayerOrEndSetup)
-                )
+                is FieldSquareSelected -> {
+                    when (state.activeTeam.isHomeTeam()) {
+                        true -> if (action.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
+                        false -> if (action.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)
+                    }
+                    compositeCommandOf(
+                        SetPlayerLocation(state.activePlayer!!, FieldCoordinate(action.x, action.y)),
+                        SetPlayerState(state.activePlayer!!, PlayerState.STANDING),
+                        SetActivePlayer(null),
+                        GotoNode(SelectPlayerOrEndSetup)
+                    )
+                }
                 else -> INVALID_ACTION(action)
             }
         }
