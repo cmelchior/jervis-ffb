@@ -7,8 +7,8 @@ package dk.ilios.jervis.fumbblcli.codegenerator
 
 fun main(vararg args: String) {
     ModelChangeGenerator().let {
-//        it.createModelChangeClasses()
-        it.createReportScaffoldingClasses()
+        it.createModelChangeClasses()
+//        it.createReportScaffoldingClasses()
     }
 }
 
@@ -170,24 +170,7 @@ class ModelChangeGenerator {
 
 // These options are not covered. Need to check where/how they are used
 
-//    BLITZ_STATE("blitzState"),
-//    CARD("card"),
-//    CARD_CHOICES("cardChoices"),
-//    CARD_EFFECT("cardEffect"),
-//    DIALOG_ID("dialogId"),
-//    FIELD_MARKER("fieldMarker"),
-//    GAME_OPTION("gameOption"),
-//    LEADER_STATE("leaderState"),
-//    NULL("null"),
-//    PLAYER_ACTION("playerAction"),
-//    PRAYER("prayer"),
-//    SEND_TO_BOX_REASON("sendToBoxReason"),
-//    SERIOUS_INJURY("seriousInjury"),
-//    SKILL("skill"),
-//    STRING("string"),
-//    TRAP_DOOR("trapDoor"),
-//    TURN_MODE("turnMode"),
-//    WEATHER("weather");
+
 
     fun createModelChangeClasses() {
         val pattern = """([A-Z_]+)\("([a-zA-Z]+)",\s*ModelChangeDataType\.([A-Za-z_]+)\)[,;]?""".toRegex()
@@ -199,39 +182,69 @@ class ModelChangeGenerator {
                 val (enumName, stringName, type) = matchResult.destructured
                 val valueEnum = type.removeSuffix("ModelChangeDataType.")
 
-                val valueType = when {
-                    (valueEnum == "ACTING_PLAYER_MARK_SKILL_UNUSED") -> "String"
-                    (valueEnum == "ACTING_PLAYER_MARK_SKILL_USED") -> "String"
+//    BLITZ_STATE("blitzState"),
+//    CARD("card"),
+//    CARD_CHOICES("cardChoices"),
+//    CARD_EFFECT("cardEffect"),
+//    DIALOG_ID("dialogId"),
+//    FIELD_MARKER("fieldMarker"),
+//    GAME_OPTION("gameOption"),
+//    LEADER_STATE("leaderState"),
+//    NULL("null"),
+//    PRAYER("prayer"),
+//    SEND_TO_BOX_REASON("sendToBoxReason"),
+//    SERIOUS_INJURY("seriousInjury"),
+//    SKILL("skill"),
+//    STRING("string"),
+//    TRAP_DOOR("trapDoor"),
+//    WEATHER("weather");
+
+                // Determine value type based on ModelDataChangeType
+                // However this doesn't take into account nullability,
+                // so we override these in the next section
+                var valueType = when {
                     (valueEnum == "BLOOD_SPOT") -> "BloodSpot"
                     (valueEnum == "BOOLEAN") -> "Boolean"
                     (valueEnum == "DATE") -> "LocalDateTime?"
                     (valueEnum == "DIALOG_PARAMETER") -> "DialogOptions?"
                     (valueEnum == "DICE_DECORATION") -> "DiceDecoration"
-                    (valueEnum == "FIELD_COORDINATE") -> "List<Int>?"
-                    (valueEnum == "FIELD_MODEL_SET_BALL_COORDINATE") -> "FieldCoordinate"
-                    (valueEnum == "GAME_SET_LAST_TURN_MODE") -> "TurnMode"
+                    (valueEnum == "FIELD_COORDINATE") -> "FieldCoordinate?"
                     (valueEnum == "INDUCEMENT") -> "Inducement"
+                    (valueEnum == "INDUCEMENT_SET_ADD_PRAYER") -> "String" // Prayer
                     (valueEnum == "INTEGER") -> "Int"
                     (valueEnum == "LONG") -> "Long"
                     (valueEnum == "MOVE_SQUARE") -> "MoveSquare"
+                    (valueEnum == "PLAYER_ACTION") -> "PlayerAction"
                     (valueEnum == "PLAYER_MARKER") -> "PlayerMarker"
-                    (valueEnum == "PLAYER_STATE") -> "Int"
+                    (valueEnum == "PLAYER_STATE") -> "PlayerState"
                     (valueEnum == "PUSHBACK_SQUARE") -> "PushBackSquare"
                     (valueEnum == "RANGE_RULER") -> "RangeRuler?"
                     (valueEnum == "TARGET_SELECTION_STATE") -> "TargetSelectionState?"
                     (valueEnum == "TRACK_NUMBER") -> "TrackNumber"
-                    (valueEnum == "TURN_DATA_SET_LEADER_STATE") -> "String"
-                    (valueEnum == "GAME_SET_DEFENDER_ACTION") -> "PlayerAction?"
-                    (valueEnum == "GAME_SET_PASS_COORDINATE") -> "FieldCoordinate?"
-                    (valueEnum == "GAME_SET_THROWER_ACTION") -> "PlayerAction?"
-                    (valueEnum == "FIELD_MODEL_SET_WEATHER") -> "String"
-                    (valueEnum == "FIELD_MODEL_REMOVE_PLAYER") -> "Nothing"
-                    (valueEnum == "FIELD_MODEL_REMOVE_FIELD_MARKER") -> "FieldMarker"
-                    (valueEnum == "FIELD_MODEL_SET_BLITZ_STATE") -> "TargetSelectionState?"
-                    (valueEnum == "INDUCEMENT_SET_ADD_PRAYER") -> "String" // Prayer
-                    (valueEnum == "FIELD_MODEL_REMOVE_TRAP_DOOR") -> "TrapDoor"
-                    (valueEnum == "FIELD_MODEL_ADD_TRAP_DOOR") -> "TrapDoor"
                     else -> "String?"
+                }
+
+                valueType = when {
+                    (enumName == "ACTING_PLAYER_SET_PLAYER_ID") -> "PlayerId"
+                    (enumName == "ACTING_PLAYER_MARK_SKILL_UNUSED") -> "String"
+                    (enumName == "ACTING_PLAYER_MARK_SKILL_USED") -> "String"
+                    (enumName == "FIELD_MODEL_ADD_TRAP_DOOR") -> "TrapDoor"
+                    (enumName == "FIELD_MODEL_REMOVE_FIELD_MARKER") -> "FieldMarker"
+                    (enumName == "FIELD_MODEL_REMOVE_PLAYER") -> "FieldCoordinate?"
+                    (enumName == "FIELD_MODEL_REMOVE_TRAP_DOOR") -> "TrapDoor"
+                    (enumName == "FIELD_MODEL_SET_BALL_COORDINATE") -> "FieldCoordinate?"
+                    (enumName == "FIELD_MODEL_SET_BLITZ_STATE") -> "TargetSelectionState?"
+                    (enumName == "FIELD_MODEL_SET_PLAYER_COORDINATE") -> "FieldCoordinate?"
+                    (enumName == "FIELD_MODEL_SET_WEATHER") -> "String"
+                    (enumName == "GAME_SET_DEFENDER_ACTION") -> "PlayerAction?"
+                    (enumName == "GAME_SET_DEFENDER_ACTION") -> "PlayerAction?"
+                    (enumName == "GAME_SET_LAST_TURN_MODE") -> "TurnMode?"
+                    (enumName == "GAME_SET_PASS_COORDINATE") -> "FieldCoordinate?"
+                    (enumName == "GAME_SET_PASS_COORDINATE") -> "FieldCoordinate?"
+                    (enumName == "GAME_SET_THROWER_ACTION") -> "PlayerAction?"
+                    (enumName == "GAME_SET_TURN_MODE") -> "TurnMode"
+                    (enumName == "TURN_DATA_SET_LEADER_STATE") -> "String"
+                    else -> valueType
                 }
 
                 val keyType = when {
@@ -243,7 +256,7 @@ class ModelChangeGenerator {
                     stringName.endsWith("actingPlayerSetPlayerId") -> "PlayerId?"
                     stringName.endsWith("actingPlayerSetPlayerAction") -> "PlayerAction?"
                     stringName.startsWith("playerResultSet") -> "String"
-                    stringName.endsWith("fieldModelRemovePlayer") -> "FieldCoordinate"
+                    stringName.endsWith("fieldModelRemovePlayer") -> "PlayerId"
                     stringName.endsWith("fieldModelAddPrayer") -> "String"
                     else -> "String?"
                 }
@@ -254,9 +267,12 @@ class ModelChangeGenerator {
                     @Serializable
                     @SerialName("$stringName")
                     data class $className(
-                        override val modelChangeId: ModelChangeId = ModelChangeId.$enumName,
-                        override val modelChangeKey: $keyType,
-                        override val modelChangeValue: $valueType
+                        @SerialName("modelChangeId")
+                        override val id: ModelChangeId = ModelChangeId.$enumName,
+                        @SerialName("modelChangeKey")
+                        override val key: $keyType,
+                        @SerialName("modelChangeValue")
+                        override val value: $valueType
                     ): ModelChange
                     
                 """.trimIndent())

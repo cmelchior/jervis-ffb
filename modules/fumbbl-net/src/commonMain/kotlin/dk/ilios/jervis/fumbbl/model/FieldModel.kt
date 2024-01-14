@@ -1,8 +1,10 @@
 package dk.ilios.jervis.fumbbl.model
 
 import dk.ilios.jervis.fumbbl.model.change.MoveSquare
+import dk.ilios.jervis.fumbbl.model.change.PlayerId
 import dk.ilios.jervis.fumbbl.model.change.PushBackSquare
 import dk.ilios.jervis.fumbbl.model.change.TargetSelectionState
+import dk.ilios.jervis.model.DogOut.coordinate
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -84,8 +86,8 @@ data class FieldModel(
         return coordinateByPlayerId[playerId]
     }
 
-    fun setPlayerState(playerId: String, state: Int) {
-        stateByPlayerId[playerId] = PlayerState(state)
+    fun setPlayerState(playerId: String, state: PlayerState) {
+        stateByPlayerId[playerId] = state
     }
 
     fun getPlayerState(playerId: String): PlayerState? {
@@ -129,8 +131,8 @@ data class FieldModel(
         pushbackSquareArray.remove(pushback)
     }
 
-    fun removePlayer(playerId: String) {
-        if (coordinateByPlayerId.remove(playerId) == null) {
+    fun removePlayer(player: PlayerId) {
+        if (coordinateByPlayerId.remove(player.id) == null) {
             // Could not find player to remove.
             // It seems that FUMBBL sometimes run into this for some reason
         }

@@ -4,16 +4,14 @@
 package dk.ilios.jervis.fumbbl.model.change
 
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
-import dk.ilios.jervis.fumbbl.model.PlayerAction
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.UseContextualSerialization
 import kotlinx.serialization.json.JsonClassDiscriminator
 import java.time.LocalDateTime
 
 fun ModelChange.isHomeData(): Boolean {
-    return modelChangeKey == "home"
+    return key == "home"
 }
 
 @Serializable
@@ -23,7 +21,7 @@ value class PlayerId(val id: String)
 @Serializable
 @JsonClassDiscriminator("modelChangeId")
 sealed interface ModelChange {
-    val modelChangeId: ModelChangeId
-    val modelChangeKey: Any? // Normally String
-    val modelChangeValue: Any?
+    val id: ModelChangeId
+    val key: Any? // Normally String
+    val value: Any?
 }

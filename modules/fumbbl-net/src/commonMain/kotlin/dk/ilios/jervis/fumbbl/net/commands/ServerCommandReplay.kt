@@ -1,5 +1,6 @@
 package dk.ilios.jervis.fumbbl.net.commands
 
+import dk.ilios.jervis.fumbbl.model.ModelChangeId
 import dk.ilios.jervis.fumbbl.model.change.ModelChange
 import dk.ilios.jervis.fumbbl.model.reports.Report
 import kotlinx.serialization.SerialName
@@ -108,6 +109,7 @@ data class ModelChangeList(
     override fun indexOf(element: ModelChange): Int = modelChangeArray.indexOf(element)
     override fun containsAll(elements: Collection<ModelChange>): Boolean = modelChangeArray.containsAll(elements)
     override fun contains(element: ModelChange): Boolean = modelChangeArray.contains(element)
+    fun contains(changeId: ModelChangeId): Boolean = modelChangeArray.firstOrNull { it.id == changeId } != null
 }
 
 @Serializable

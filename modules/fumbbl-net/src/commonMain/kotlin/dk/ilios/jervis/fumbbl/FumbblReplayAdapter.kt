@@ -20,9 +20,11 @@ import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
 import dk.ilios.jervis.fumbbl.model.ReportId
+import dk.ilios.jervis.fumbbl.model.TurnMode
 import dk.ilios.jervis.fumbbl.model.change.FieldModelSetPlayerCoordinate
 import dk.ilios.jervis.fumbbl.model.change.FieldModelSetPlayerState
 import dk.ilios.jervis.fumbbl.model.change.GameSetSetupOffense
+import dk.ilios.jervis.fumbbl.model.change.GameSetTurnMode
 import dk.ilios.jervis.fumbbl.model.reports.CoinThrowReport
 import dk.ilios.jervis.fumbbl.model.reports.FanFactorReport
 import dk.ilios.jervis.fumbbl.model.reports.KickoffPitchInvasionReport
@@ -30,7 +32,6 @@ import dk.ilios.jervis.fumbbl.model.reports.KickoffResultReport
 import dk.ilios.jervis.fumbbl.model.reports.KickoffScatterReport
 import dk.ilios.jervis.fumbbl.model.reports.ReceiveChoiceReport
 import dk.ilios.jervis.fumbbl.model.reports.Report
-import dk.ilios.jervis.fumbbl.model.reports.ScatterBallReport
 import dk.ilios.jervis.fumbbl.model.reports.WeatherReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandReplay
@@ -131,7 +132,7 @@ class FumbblReplayAdapter(private var replayFile: Path) {
             // This is often not enough, so each entry might contain addtional that either
             // checks reports or other model changes in the same ModelSync batch in order
             // to figure out exactly what is happening.
-            when(cmd.modelChangeList.firstOrNull()?.modelChangeId) {
+            when(cmd.modelChangeList.firstOrNull()?.id) {
                 ModelChangeId.ACTING_PLAYER_MARK_SKILL_USED -> reportNotHandled(cmd)
                 ModelChangeId.ACTING_PLAYER_MARK_SKILL_UNUSED -> reportNotHandled(cmd)
                 ModelChangeId.ACTING_PLAYER_SET_CURRENT_MOVE -> reportNotHandled(cmd)
@@ -186,7 +187,7 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                         // matter), but instead just asks you if you want to use Kick if an eligible player
                         // is present. To mirror this behavior, attempt to find a valid player with Kick
                         // and if not found, just pick a random one
-                        jervisCommands.add(EndSetup, SetupTeam.SelectPlayerOrEndSetup)
+//                        jervisCommands.add(EndSetup, SetupTeam.SelectPlayerOrEndSetup)
                         jervisCommands.add({state: Game, rules: Rules ->
                             // TODO This might return 0 players if all are on the LoS
                             val eligiblePlayers = state.kickingTeam.filter {
@@ -229,10 +230,11 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                     // but we just need to discard these events
                     if (cmd.modelChangeList.size == 2
                         && cmd.reportList.isEmpty()
-                        && cmd.modelChangeList[1].modelChangeId == ModelChangeId.FIELD_MODEL_SET_PLAYER_COORDINATE
+                        && cmd.modelChangeList[1].id == ModelChangeId.FIELD_MODEL_SET_PLAYER_COORDINATE
+                        && game.turnMode == TurnMode.SETUP
                     ) {
-                        val playerId = (cmd.modelChangeList.first() as FieldModelSetPlayerState).modelChangeKey!!
-                        var coordinates = (cmd.modelChangeList[1] as FieldModelSetPlayerCoordinate).modelChangeValue!!
+                        val playerId = (cmd.modelChangeList.first() as FieldModelSetPlayerState).key!!
+                        var coordinates = (cmd.modelChangeList[1] as FieldModelSetPlayerCoordinate).value!!
                         val selectedPlayer = jervisGame.getPlayerById(PlayerId(playerId))!!
                         jervisCommands.add(PlayerSelected(selectedPlayer), SetupTeam.SelectPlayerOrEndSetup)
                         jervisCommands.add(FieldSquareSelected(coordinates.x, coordinates.y), SetupTeam.PlacePlayer)
@@ -289,11 +291,12 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                 ModelChangeId.GAME_SET_HALF -> reportNotHandled(cmd)
                 ModelChangeId.GAME_SET_HOME_FIRST_OFFENSE -> reportNotHandled(cmd)
                 ModelChangeId.GAME_SET_HOME_PLAYING -> {
-                    // Switch team during setup
-                    if (cmd.modelChangeList.size == 2 && cmd.modelChangeList.last() is GameSetSetupOffense) {
+                    if (game.turnMode == TurnMode.SETUP && cmd.modelChangeList.size == 2 && cmd.modelChangeList.last() is GameSetSetupOffense) {
+                        // Ending first team setup
                         jervisCommands.add(EndSetup, SetupTeam.SelectPlayerOrEndSetup)
-//                    } else if (cmd.reportList.singleOrNull()?.reportId == ReportId.TURN_END) {
-//                        jervisCommands.add(EndTurn, TeamTurn.SelectPlayerOrEndTurn)
+                    } else if (game.turnMode == TurnMode.SETUP && cmd.modelChangeList.size == 3 && cmd.modelChangeList.last() is GameSetTurnMode) {
+                        // Ending second team setup
+                        jervisCommands.add(EndSetup, SetupTeam.SelectPlayerOrEndSetup)
                     } else {
                         reportNotHandled(cmd)
                     }
@@ -352,7 +355,13 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                 ModelChangeId.PLAYER_RESULT_SET_SERIOUS_INJURY -> reportNotHandled(cmd)
                 ModelChangeId.PLAYER_RESULT_SET_SERIOUS_INJURY_DECAY -> reportNotHandled(cmd)
                 ModelChangeId.PLAYER_RESULT_SET_TOUCHDOWNS -> reportNotHandled(cmd)
-                ModelChangeId.PLAYER_RESULT_SET_TURNS_PLAYED -> reportNotHandled(cmd)
+                ModelChangeId.PLAYER_RESULT_SET_TURNS_PLAYED -> {
+                    if (cmd.reportList.singleOrNull()?.reportId == ReportId.TURN_END) {
+                        jervisCommands.add(EndTurn, TeamTurn.SelectPlayerOrEndTurn)
+                    } else {
+                        reportNotHandled(cmd)
+                    }
+                }
                 ModelChangeId.TEAM_RESULT_SET_CONCEDED -> reportNotHandled(cmd)
                 ModelChangeId.TEAM_RESULT_SET_DEDICATED_FANS_MODIFIER -> reportNotHandled(cmd)
                 ModelChangeId.TEAM_RESULT_SET_FAME -> reportNotHandled(cmd)

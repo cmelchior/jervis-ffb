@@ -34,7 +34,6 @@ import dk.ilios.jervis.fumbbl.model.change.FieldModelAddPrayer
 import dk.ilios.jervis.fumbbl.model.change.FieldModelAddPushbackSquare
 import dk.ilios.jervis.fumbbl.model.change.FieldModelAddTrackNumber
 import dk.ilios.jervis.fumbbl.model.change.FieldModelAddTrapDoor
-import dk.ilios.jervis.fumbbl.model.change.FieldModelAddWisdom
 import dk.ilios.jervis.fumbbl.model.change.FieldModelRemoveCard
 import dk.ilios.jervis.fumbbl.model.change.FieldModelRemoveCardEffect
 import dk.ilios.jervis.fumbbl.model.change.FieldModelRemoveDiceDecoration
@@ -152,157 +151,157 @@ object ModelChangeProcessor {
 //        val dialogParameter: IDialogParameter
 //        val skillFactory: SkillFactory = pGame.getFactory(FactoryType.Factory.SKILL) as SkillFactory
         when(change) {
-            is ActingPlayerMarkSkillUnused -> game.actingPlayer.markSkillUnused(change.modelChangeValue)
-            is ActingPlayerMarkSkillUsed -> game.actingPlayer.markSkillUsed(change.modelChangeValue)
-            is ActingPlayerSetCurrentMove -> game.actingPlayer.currentMove = change.modelChangeValue
-            is ActingPlayerSetDodging -> game.actingPlayer.dodging = change.modelChangeValue
-            is ActingPlayerSetGoingForIt -> game.actingPlayer.goingForIt = change.modelChangeValue
-            is ActingPlayerSetHasBlocked -> game.actingPlayer.hasBlocked = change.modelChangeValue
-            is ActingPlayerSetHasFed -> game.actingPlayer.hasFed = change.modelChangeValue
-            is ActingPlayerSetHasFouled -> game.actingPlayer.hasFouled = change.modelChangeValue
-            is ActingPlayerSetHasJumped -> game.actingPlayer.hasJumped = change.modelChangeValue
-            is ActingPlayerSetHasMoved -> game.actingPlayer.hasMoved = change.modelChangeValue
-            is ActingPlayerSetHasPassed -> game.actingPlayer.hasPassed = change.modelChangeValue
-            is ActingPlayerSetLeaping -> game.actingPlayer.jumping = change.modelChangeValue
-            is ActingPlayerSetOldPlayerState -> game.actingPlayer.playerStateOld = change.modelChangeValue
-            is ActingPlayerSetPlayerAction -> game.actingPlayer.playerAction = change.modelChangeValue
-            is ActingPlayerSetPlayerId -> game.actingPlayer.playerId = change.modelChangeValue
-            is ActingPlayerSetStandingUp -> game.actingPlayer.standingUp = change.modelChangeValue
-            is ActingPlayerSetStrength -> game.actingPlayer.strenght = change.modelChangeValue
-            is ActingPlayerSetSufferingAnimosity -> game.actingPlayer.sufferingAnimosity = change.modelChangeValue
-            is ActingPlayerSetSufferingBloodLust -> game.actingPlayer.sufferingBloodlust = change.modelChangeValue
-            is FieldModelAddBloodSpot -> game.fieldModel.addBloodSpot(change.modelChangeValue)
-            is FieldModelAddCard -> game.fieldModel.addCard(change.modelChangeKey, change.modelChangeValue)
-            is FieldModelAddCardEffect -> game.fieldModel.addCardEffect(change.modelChangeKey, change.modelChangeValue)
-            is FieldModelAddDiceDecoration -> game.fieldModel.addDiceDecoration(change.modelChangeValue)
+            is ActingPlayerMarkSkillUnused -> game.actingPlayer.markSkillUnused(change.value)
+            is ActingPlayerMarkSkillUsed -> game.actingPlayer.markSkillUsed(change.value)
+            is ActingPlayerSetCurrentMove -> game.actingPlayer.currentMove = change.value
+            is ActingPlayerSetDodging -> game.actingPlayer.dodging = change.value
+            is ActingPlayerSetGoingForIt -> game.actingPlayer.goingForIt = change.value
+            is ActingPlayerSetHasBlocked -> game.actingPlayer.hasBlocked = change.value
+            is ActingPlayerSetHasFed -> game.actingPlayer.hasFed = change.value
+            is ActingPlayerSetHasFouled -> game.actingPlayer.hasFouled = change.value
+            is ActingPlayerSetHasJumped -> game.actingPlayer.hasJumped = change.value
+            is ActingPlayerSetHasMoved -> game.actingPlayer.hasMoved = change.value
+            is ActingPlayerSetHasPassed -> game.actingPlayer.hasPassed = change.value
+            is ActingPlayerSetLeaping -> game.actingPlayer.jumping = change.value
+            is ActingPlayerSetOldPlayerState -> game.actingPlayer.playerStateOld = change.value
+            is ActingPlayerSetPlayerAction -> game.actingPlayer.playerAction = change.value
+            is ActingPlayerSetPlayerId -> game.actingPlayer.playerId = change.value
+            is ActingPlayerSetStandingUp -> game.actingPlayer.standingUp = change.value
+            is ActingPlayerSetStrength -> game.actingPlayer.strenght = change.value
+            is ActingPlayerSetSufferingAnimosity -> game.actingPlayer.sufferingAnimosity = change.value
+            is ActingPlayerSetSufferingBloodLust -> game.actingPlayer.sufferingBloodlust = change.value
+            is FieldModelAddBloodSpot -> game.fieldModel.addBloodSpot(change.value)
+            is FieldModelAddCard -> game.fieldModel.addCard(change.key, change.value)
+            is FieldModelAddCardEffect -> game.fieldModel.addCardEffect(change.key, change.value)
+            is FieldModelAddDiceDecoration -> game.fieldModel.addDiceDecoration(change.value)
 //            is FieldModelAddFieldMarker -> TODO()
 //            is FieldModelAddIntensiveTraining -> TODO()
-            is FieldModelAddMoveSquare -> game.fieldModel.addMoveSquare(change.modelChangeValue)
-            is FieldModelAddPlayerMarker -> game.fieldModel.addPlayerMarker(change.modelChangeValue)
-            is FieldModelAddPrayer -> game.fieldModel.addPrayerEnhancements(change.modelChangeKey, change.modelChangeValue)
-            is FieldModelAddPushbackSquare -> game.fieldModel.addPushBackSquare(change.modelChangeValue)
+            is FieldModelAddMoveSquare -> game.fieldModel.addMoveSquare(change.value)
+            is FieldModelAddPlayerMarker -> game.fieldModel.addPlayerMarker(change.value)
+            is FieldModelAddPrayer -> game.fieldModel.addPrayerEnhancements(change.key, change.value)
+            is FieldModelAddPushbackSquare -> game.fieldModel.addPushBackSquare(change.value)
 //            is FieldModelAddSkillEnhancements -> TODO()
-            is FieldModelAddTrackNumber -> game.fieldModel.addTrackNumber(change.modelChangeValue)
-            is FieldModelAddTrapDoor -> game.fieldModel.addTrapDoor(change.modelChangeValue)
+            is FieldModelAddTrackNumber -> game.fieldModel.addTrackNumber(change.value)
+            is FieldModelAddTrapDoor -> game.fieldModel.addTrapDoor(change.value)
 //            is FieldModelAddWisdom -> TODO()
 //            is FieldModelKeepDeactivatedCard -> TODO()
-            is FieldModelRemoveCard -> game.fieldModel.removeCard(change.modelChangeKey, change.modelChangeValue)
-            is FieldModelRemoveCardEffect -> game.fieldModel.removeCardEffect(change.modelChangeKey, change.modelChangeValue)
-            is FieldModelRemoveDiceDecoration -> game.fieldModel.removeDiceDecoration(change.modelChangeValue)
-            is FieldModelRemoveFieldMarker -> game.fieldModel.removeFieldMarker(change.modelChangeValue)
-            is FieldModelRemoveMoveSquare -> game.fieldModel.removeMoveSquare(change.modelChangeValue)
-            is FieldModelRemovePlayer -> game.fieldModel.removePlayer(change.modelChangeKey)
-            is FieldModelRemovePlayerMarker -> game.fieldModel.removePlayerMarker(change.modelChangeValue)
-            is FieldModelRemovePrayer -> game.fieldModel.removePrayerEnhancement(change.modelChangeKey, change.modelChangeValue)
-            is FieldModelRemovePushbackSquare -> game.fieldModel.removePushbackSquare(change.modelChangeValue)
-            is FieldModelRemoveSkillEnhancements -> game.fieldModel.removeSkillEnhancements(game.getPlayerById(change.modelChangeKey)!!, change.modelChangeValue)
-            is FieldModelRemoveTrackNumber -> game.fieldModel.removeTrackNumber(change.modelChangeValue)
-            is FieldModelRemoveTrapDoor -> game.fieldModel.removeTrapDoor(change.modelChangeValue)
-            is FieldModelSetBallCoordinate -> game.fieldModel.ballCoordinate = change.modelChangeValue
-            is FieldModelSetBallInPlay -> game.fieldModel.ballInPlay = change.modelChangeValue
-            is FieldModelSetBallMoving -> game.fieldModel.ballMoving = change.modelChangeValue
-            is FieldModelSetBlitzState -> game.fieldModel.targetSelectionState = change.modelChangeValue
-            is FieldModelSetBombCoordinate -> game.fieldModel.bombCoordinate = change.modelChangeValue
-            is FieldModelSetBombMoving -> game.fieldModel.bombMoving = change.modelChangeValue
-            is FieldModelSetPlayerCoordinate -> game.fieldModel.setPlayerCoordinate(change.modelChangeKey, change.modelChangeValue!!)
-            is FieldModelSetPlayerState -> game.fieldModel.setPlayerState(change.modelChangeKey, change.modelChangeValue)
-            is FieldModelSetRangeRuler -> game.fieldModel.rangeRuler = change.modelChangeValue
-            is FieldModelSetTargetSelectionState -> game.fieldModel.targetSelectionState = change.modelChangeValue
-            is FieldModelSetWeather -> game.fieldModel.weather = change.modelChangeValue
+            is FieldModelRemoveCard -> game.fieldModel.removeCard(change.key, change.value)
+            is FieldModelRemoveCardEffect -> game.fieldModel.removeCardEffect(change.key, change.value)
+            is FieldModelRemoveDiceDecoration -> game.fieldModel.removeDiceDecoration(change.value)
+            is FieldModelRemoveFieldMarker -> game.fieldModel.removeFieldMarker(change.value)
+            is FieldModelRemoveMoveSquare -> game.fieldModel.removeMoveSquare(change.value)
+            is FieldModelRemovePlayer -> game.fieldModel.removePlayer(change.key)
+            is FieldModelRemovePlayerMarker -> game.fieldModel.removePlayerMarker(change.value)
+            is FieldModelRemovePrayer -> game.fieldModel.removePrayerEnhancement(change.key, change.value)
+            is FieldModelRemovePushbackSquare -> game.fieldModel.removePushbackSquare(change.value)
+            is FieldModelRemoveSkillEnhancements -> game.fieldModel.removeSkillEnhancements(game.getPlayerById(change.key)!!, change.value)
+            is FieldModelRemoveTrackNumber -> game.fieldModel.removeTrackNumber(change.value)
+            is FieldModelRemoveTrapDoor -> game.fieldModel.removeTrapDoor(change.value)
+            is FieldModelSetBallCoordinate -> game.fieldModel.ballCoordinate = change.value
+            is FieldModelSetBallInPlay -> game.fieldModel.ballInPlay = change.value
+            is FieldModelSetBallMoving -> game.fieldModel.ballMoving = change.value
+            is FieldModelSetBlitzState -> game.fieldModel.targetSelectionState = change.value
+            is FieldModelSetBombCoordinate -> game.fieldModel.bombCoordinate = change.value
+            is FieldModelSetBombMoving -> game.fieldModel.bombMoving = change.value
+            is FieldModelSetPlayerCoordinate -> game.fieldModel.setPlayerCoordinate(change.key, change.value!!)
+            is FieldModelSetPlayerState -> game.fieldModel.setPlayerState(change.key, change.value)
+            is FieldModelSetRangeRuler -> game.fieldModel.rangeRuler = change.value
+            is FieldModelSetTargetSelectionState -> game.fieldModel.targetSelectionState = change.value
+            is FieldModelSetWeather -> game.fieldModel.weather = change.value
 //            is GameOptionsAddOption -> TODO()
-            is GameSetAdminMode -> game.adminMode = change.modelChangeValue
-            is GameSetConcededLegally -> game.concededLegally = change.modelChangeValue
-            is GameSetConcessionPossible -> game.concessionPossible = change.modelChangeValue
-            is GameSetDefenderAction -> game.defenderAction = change.modelChangeValue
-            is GameSetDefenderId -> game.defenderId = change.modelChangeValue
-            is GameSetDialogParameter -> game.dialogParameter = change.modelChangeValue
-            is GameSetFinished -> game.finished = change.modelChangeValue
-            is GameSetHalf -> game.half = change.modelChangeValue
-            is GameSetHomeFirstOffense -> game.homeFirstOffense = change.modelChangeValue
-            is GameSetHomePlaying -> game.homePlaying = change.modelChangeValue
-            is GameSetId -> game.gameId = change.modelChangeValue
-            is GameSetLastDefenderId -> game.lastDefenderId = change.modelChangeValue
-            is GameSetLastTurnMode -> game.lastTurnMode = change.modelChangeValue
-            is GameSetPassCoordinate -> game.passCoordinate = change.modelChangeValue
-            is GameSetScheduled -> game.scheduled = change.modelChangeValue
-            is GameSetSetupOffense -> game.setupOffense = change.modelChangeValue
-            is GameSetStarted -> game.started = change.modelChangeValue
-            is GameSetTesting -> game.testing = change.modelChangeValue
-            is GameSetThrowerAction -> game.throwerAction = change.modelChangeValue
-            is GameSetThrowerId -> game.throwerId = change.modelChangeValue
-            is GameSetTimeoutEnforced -> game.timeoutEnforced = change.modelChangeValue
-            is GameSetTimeoutPossible -> game.timeoutPossible = change.modelChangeValue
-            is GameSetTurnMode -> game.turnMode = change.modelChangeValue
-            is GameSetWaitingForOpponent -> game.waitingForOpponent = change.modelChangeValue
+            is GameSetAdminMode -> game.adminMode = change.value
+            is GameSetConcededLegally -> game.concededLegally = change.value
+            is GameSetConcessionPossible -> game.concessionPossible = change.value
+            is GameSetDefenderAction -> game.defenderAction = change.value
+            is GameSetDefenderId -> game.defenderId = change.value
+            is GameSetDialogParameter -> game.dialogParameter = change.value
+            is GameSetFinished -> game.finished = change.value
+            is GameSetHalf -> game.half = change.value
+            is GameSetHomeFirstOffense -> game.homeFirstOffense = change.value
+            is GameSetHomePlaying -> game.homePlaying = change.value
+            is GameSetId -> game.gameId = change.value
+            is GameSetLastDefenderId -> game.lastDefenderId = change.value
+            is GameSetLastTurnMode -> game.lastTurnMode = change.value
+            is GameSetPassCoordinate -> game.passCoordinate = change.value
+            is GameSetScheduled -> game.scheduled = change.value
+            is GameSetSetupOffense -> game.setupOffense = change.value
+            is GameSetStarted -> game.started = change.value
+            is GameSetTesting -> game.testing = change.value
+            is GameSetThrowerAction -> game.throwerAction = change.value
+            is GameSetThrowerId -> game.throwerId = change.value
+            is GameSetTimeoutEnforced -> game.timeoutEnforced = change.value
+            is GameSetTimeoutPossible -> game.timeoutPossible = change.value
+            is GameSetTurnMode -> game.turnMode = change.value
+            is GameSetWaitingForOpponent -> game.waitingForOpponent = change.value
 //            is InducementSetActivateCard -> TODO()
 //            is InducementSetAddAvailableCard -> TODO()
 //            is InducementSetAddInducement -> TODO()
-            is InducementSetAddPrayer -> getInducementSet(game, change.isHomeData()).prayers.add(change.modelChangeValue)
+            is InducementSetAddPrayer -> getInducementSet(game, change.isHomeData()).prayers.add(change.value)
 //            is InducementSetCardChoices -> TODO()
 //            is InducementSetDeactivateCard -> TODO()
 //            is InducementSetRemoveAvailableCard -> TODO()
 //            is InducementSetRemoveInducement -> TODO()
-            is InducementSetRemovePrayer -> getInducementSet(game, change.isHomeData()).prayers.remove(change.modelChangeValue)
-            is PlayerMarkSkillUnused -> game.getPlayerById(change.modelChangeKey)!!.markUnused(change.modelChangeValue, game)
-            is PlayerMarkSkillUsed -> game.getPlayerById(change.modelChangeKey)!!.markUsed(change.modelChangeValue, game)
-            is PlayerResultSetBlocks -> getPlayerResult(game, change.modelChangeKey).blocks = change.modelChangeValue
-            is PlayerResultSetCasualties -> getPlayerResult(game, change.modelChangeKey).casualties = change.modelChangeValue
-            is PlayerResultSetCasualtiesWithAdditionalSpp -> getPlayerResult(game, change.modelChangeKey).casualtiesWithAdditionalSpp = change.modelChangeValue
-            is PlayerResultSetCompletions -> getPlayerResult(game, change.modelChangeKey).completions = change.modelChangeValue
-            is PlayerResultSetCompletionsWithAdditionalSpp -> getPlayerResult(game, change.modelChangeKey).completionsWithAdditionalSpp = change.modelChangeValue
-            is PlayerResultSetCurrentSpps -> getPlayerResult(game, change.modelChangeKey).currentSpps = change.modelChangeValue
-            is PlayerResultSetDefecting -> getPlayerResult(game, change.modelChangeKey).defecting = change.modelChangeValue
-            is PlayerResultSetDeflections -> getPlayerResult(game, change.modelChangeKey).deflections = change.modelChangeValue
-            is PlayerResultSetFouls -> getPlayerResult(game, change.modelChangeKey).fouls = change.modelChangeValue
-            is PlayerResultSetHasUsedSecretWeapon -> getPlayerResult(game, change.modelChangeKey).hasUsedSecretWeapon = change.modelChangeValue
-            is PlayerResultSetInterceptions -> getPlayerResult(game, change.modelChangeKey).interceptions = change.modelChangeValue
-            is PlayerResultSetPassing -> getPlayerResult(game, change.modelChangeKey).passing = change.modelChangeValue
-            is PlayerResultSetPlayerAwards -> getPlayerResult(game, change.modelChangeKey).playerAwards = change.modelChangeValue
-            is PlayerResultSetRushing -> getPlayerResult(game, change.modelChangeKey).rushing = change.modelChangeValue
-            is PlayerResultSetSendToBoxByPlayerId -> getPlayerResult(game, change.modelChangeKey).sendToBoxByPlayerId = change.modelChangeValue
-            is PlayerResultSetSendToBoxHalf -> getPlayerResult(game, change.modelChangeKey).sendToBoxHalf = change.modelChangeValue
-            is PlayerResultSetSendToBoxReason -> getPlayerResult(game, change.modelChangeKey).sendToBoxReason = change.modelChangeValue
-            is PlayerResultSetSendToBoxTurn -> getPlayerResult(game, change.modelChangeKey).sendToBoxTurn = change.modelChangeValue
-            is PlayerResultSetSeriousInjury -> getPlayerResult(game, change.modelChangeKey).seriousInjury = change.modelChangeValue
-            is PlayerResultSetSeriousInjuryDecay -> getPlayerResult(game, change.modelChangeKey).seriousInjuryDecay = change.modelChangeValue
-            is PlayerResultSetTouchdowns -> getPlayerResult(game, change.modelChangeKey).touchdowns = change.modelChangeValue
-            is PlayerResultSetTurnsPlayed -> getPlayerResult(game, change.modelChangeKey).turnsPlayed = change.modelChangeValue
-            is TeamResultDedicatedFansModifier -> getTeamResult(game, change.isHomeData()).dedicatedFans = change.modelChangeValue
-            is TeamResultSetBadlyHurtSuffered -> getTeamResult(game, change.isHomeData()).badlyHurtSuffered = change.modelChangeValue
-            is TeamResultSetConceded -> getTeamResult(game, change.isHomeData()).conceded = change.modelChangeValue
-            is TeamResultSetFame -> getTeamResult(game, change.isHomeData()).fame = change.modelChangeValue
-            is TeamResultSetFanFactor -> getTeamResult(game, change.isHomeData()).fanFactorModifier = change.modelChangeValue
-            is TeamResultSetFanFactorModifier -> getTeamResult(game, change.isHomeData()).fanFactorModifier = change.modelChangeValue
-            is TeamResultSetPenaltyScore -> getTeamResult(game, change.isHomeData()).penaltyScore = change.modelChangeValue
-            is TeamResultSetPettyCashTransferred -> getTeamResult(game, change.isHomeData()).pettyCashTransferred = change.modelChangeValue
-            is TeamResultSetPettyCashUsed -> getTeamResult(game, change.isHomeData()).pettyCashUsed = change.modelChangeValue
-            is TeamResultSetRaisedDead -> getTeamResult(game, change.isHomeData()).raisedDead = change.modelChangeValue
-            is TeamResultSetRipSuffered -> getTeamResult(game, change.isHomeData()).ripSuffered = change.modelChangeValue
-            is TeamResultSetScore -> getTeamResult(game, change.isHomeData()).score = change.modelChangeValue
-            is TeamResultSetSeriousInjurySuffered -> getTeamResult(game, change.isHomeData()).seriousInjurySuffered = change.modelChangeValue
-            is TeamResultSetSpectators -> getTeamResult(game, change.isHomeData()).spectators = change.modelChangeValue
-            is TeamResultSetSpirallingExpenses -> getTeamResult(game, change.isHomeData()).spirallingExpenses = change.modelChangeValue
-            is TeamResultSetTeamValue -> getTeamResult(game, change.isHomeData()).teamValue = change.modelChangeValue
-            is TeamResultSetWinnings -> getTeamResult(game, change.isHomeData()).winnings = change.modelChangeValue
-            is TurnDataSetApothecaries -> getTurnData(game, change.isHomeData()).apothecaries = change.modelChangeValue
-            is TurnDataSetBlitzUsed -> getTurnData(game, change.isHomeData()).blitzUsed = change.modelChangeValue
-            is TurnDataSetBombUsed -> getTurnData(game, change.isHomeData()).bombUsed = change.modelChangeValue
-            is TurnDataSetCoachBanned -> getTurnData(game, change.isHomeData()).coachBanned = change.modelChangeValue
-            is TurnDataSetFirstTurnAfterKickoff -> getTurnData(game, change.isHomeData()).firstTurnAfterKickoff = change.modelChangeValue
-            is TurnDataSetFoulUsed -> getTurnData(game, change.isHomeData()).foulUsed = change.modelChangeValue
-            is TurnDataSetHandOverUsed -> getTurnData(game, change.isHomeData()).handOverUsed = change.modelChangeValue
-            is TurnDataSetKtmUsed -> getTurnData(game, change.isHomeData()).ktmUsed = change.modelChangeValue
-            is TurnDataSetLeaderState -> getTurnData(game, change.isHomeData()).leaderState = change.modelChangeValue
-            is TurnDataSetPassUsed -> getTurnData(game, change.isHomeData()).passUsed = change.modelChangeValue
-            is TurnDataSetPlagueDoctors -> getTurnData(game, change.isHomeData()).plagueDoctors = change.modelChangeValue
-            is TurnDataSetReRollUsed -> getTurnData(game, change.isHomeData()).reRollUsed = change.modelChangeValue
-            is TurnDataSetReRolls -> getTurnData(game, change.isHomeData()).reRolls = change.modelChangeValue
-            is TurnDataSetReRollsBrilliantCoachingOneDrive -> getTurnData(game, change.isHomeData()).rerollBrilliantCoachingOneDrive = change.modelChangeValue
-            is TurnDataSetReRollsPumpUpTheCrowdOneDrive -> getTurnData(game, change.isHomeData()).rerollPumpUpTheCrowdOneDrive = change.modelChangeValue
-            is TurnDataSetReRollsSingleUse -> getTurnData(game, change.isHomeData()).singleUseReRolls = change.modelChangeValue
-            is TurnDataSetTurnNr -> getTurnData(game, change.isHomeData()).turnNr = change.modelChangeValue
-            is TurnDataSetTurnStarted -> getTurnData(game, change.isHomeData()).turnStarted = change.modelChangeValue
-            is TurnDataSetWanderingApothecaries -> getTurnData(game, change.isHomeData()).wanderingApothecaries = change.modelChangeValue
+            is InducementSetRemovePrayer -> getInducementSet(game, change.isHomeData()).prayers.remove(change.value)
+            is PlayerMarkSkillUnused -> game.getPlayerById(change.key)!!.markUnused(change.value, game)
+            is PlayerMarkSkillUsed -> game.getPlayerById(change.key)!!.markUsed(change.value, game)
+            is PlayerResultSetBlocks -> getPlayerResult(game, change.key).blocks = change.value
+            is PlayerResultSetCasualties -> getPlayerResult(game, change.key).casualties = change.value
+            is PlayerResultSetCasualtiesWithAdditionalSpp -> getPlayerResult(game, change.key).casualtiesWithAdditionalSpp = change.value
+            is PlayerResultSetCompletions -> getPlayerResult(game, change.key).completions = change.value
+            is PlayerResultSetCompletionsWithAdditionalSpp -> getPlayerResult(game, change.key).completionsWithAdditionalSpp = change.value
+            is PlayerResultSetCurrentSpps -> getPlayerResult(game, change.key).currentSpps = change.value
+            is PlayerResultSetDefecting -> getPlayerResult(game, change.key).defecting = change.value
+            is PlayerResultSetDeflections -> getPlayerResult(game, change.key).deflections = change.value
+            is PlayerResultSetFouls -> getPlayerResult(game, change.key).fouls = change.value
+            is PlayerResultSetHasUsedSecretWeapon -> getPlayerResult(game, change.key).hasUsedSecretWeapon = change.value
+            is PlayerResultSetInterceptions -> getPlayerResult(game, change.key).interceptions = change.value
+            is PlayerResultSetPassing -> getPlayerResult(game, change.key).passing = change.value
+            is PlayerResultSetPlayerAwards -> getPlayerResult(game, change.key).playerAwards = change.value
+            is PlayerResultSetRushing -> getPlayerResult(game, change.key).rushing = change.value
+            is PlayerResultSetSendToBoxByPlayerId -> getPlayerResult(game, change.key).sendToBoxByPlayerId = change.value
+            is PlayerResultSetSendToBoxHalf -> getPlayerResult(game, change.key).sendToBoxHalf = change.value
+            is PlayerResultSetSendToBoxReason -> getPlayerResult(game, change.key).sendToBoxReason = change.value
+            is PlayerResultSetSendToBoxTurn -> getPlayerResult(game, change.key).sendToBoxTurn = change.value
+            is PlayerResultSetSeriousInjury -> getPlayerResult(game, change.key).seriousInjury = change.value
+            is PlayerResultSetSeriousInjuryDecay -> getPlayerResult(game, change.key).seriousInjuryDecay = change.value
+            is PlayerResultSetTouchdowns -> getPlayerResult(game, change.key).touchdowns = change.value
+            is PlayerResultSetTurnsPlayed -> getPlayerResult(game, change.key).turnsPlayed = change.value
+            is TeamResultDedicatedFansModifier -> getTeamResult(game, change.isHomeData()).dedicatedFans = change.value
+            is TeamResultSetBadlyHurtSuffered -> getTeamResult(game, change.isHomeData()).badlyHurtSuffered = change.value
+            is TeamResultSetConceded -> getTeamResult(game, change.isHomeData()).conceded = change.value
+            is TeamResultSetFame -> getTeamResult(game, change.isHomeData()).fame = change.value
+            is TeamResultSetFanFactor -> getTeamResult(game, change.isHomeData()).fanFactorModifier = change.value
+            is TeamResultSetFanFactorModifier -> getTeamResult(game, change.isHomeData()).fanFactorModifier = change.value
+            is TeamResultSetPenaltyScore -> getTeamResult(game, change.isHomeData()).penaltyScore = change.value
+            is TeamResultSetPettyCashTransferred -> getTeamResult(game, change.isHomeData()).pettyCashTransferred = change.value
+            is TeamResultSetPettyCashUsed -> getTeamResult(game, change.isHomeData()).pettyCashUsed = change.value
+            is TeamResultSetRaisedDead -> getTeamResult(game, change.isHomeData()).raisedDead = change.value
+            is TeamResultSetRipSuffered -> getTeamResult(game, change.isHomeData()).ripSuffered = change.value
+            is TeamResultSetScore -> getTeamResult(game, change.isHomeData()).score = change.value
+            is TeamResultSetSeriousInjurySuffered -> getTeamResult(game, change.isHomeData()).seriousInjurySuffered = change.value
+            is TeamResultSetSpectators -> getTeamResult(game, change.isHomeData()).spectators = change.value
+            is TeamResultSetSpirallingExpenses -> getTeamResult(game, change.isHomeData()).spirallingExpenses = change.value
+            is TeamResultSetTeamValue -> getTeamResult(game, change.isHomeData()).teamValue = change.value
+            is TeamResultSetWinnings -> getTeamResult(game, change.isHomeData()).winnings = change.value
+            is TurnDataSetApothecaries -> getTurnData(game, change.isHomeData()).apothecaries = change.value
+            is TurnDataSetBlitzUsed -> getTurnData(game, change.isHomeData()).blitzUsed = change.value
+            is TurnDataSetBombUsed -> getTurnData(game, change.isHomeData()).bombUsed = change.value
+            is TurnDataSetCoachBanned -> getTurnData(game, change.isHomeData()).coachBanned = change.value
+            is TurnDataSetFirstTurnAfterKickoff -> getTurnData(game, change.isHomeData()).firstTurnAfterKickoff = change.value
+            is TurnDataSetFoulUsed -> getTurnData(game, change.isHomeData()).foulUsed = change.value
+            is TurnDataSetHandOverUsed -> getTurnData(game, change.isHomeData()).handOverUsed = change.value
+            is TurnDataSetKtmUsed -> getTurnData(game, change.isHomeData()).ktmUsed = change.value
+            is TurnDataSetLeaderState -> getTurnData(game, change.isHomeData()).leaderState = change.value
+            is TurnDataSetPassUsed -> getTurnData(game, change.isHomeData()).passUsed = change.value
+            is TurnDataSetPlagueDoctors -> getTurnData(game, change.isHomeData()).plagueDoctors = change.value
+            is TurnDataSetReRollUsed -> getTurnData(game, change.isHomeData()).reRollUsed = change.value
+            is TurnDataSetReRolls -> getTurnData(game, change.isHomeData()).reRolls = change.value
+            is TurnDataSetReRollsBrilliantCoachingOneDrive -> getTurnData(game, change.isHomeData()).rerollBrilliantCoachingOneDrive = change.value
+            is TurnDataSetReRollsPumpUpTheCrowdOneDrive -> getTurnData(game, change.isHomeData()).rerollPumpUpTheCrowdOneDrive = change.value
+            is TurnDataSetReRollsSingleUse -> getTurnData(game, change.isHomeData()).singleUseReRolls = change.value
+            is TurnDataSetTurnNr -> getTurnData(game, change.isHomeData()).turnNr = change.value
+            is TurnDataSetTurnStarted -> getTurnData(game, change.isHomeData()).turnStarted = change.value
+            is TurnDataSetWanderingApothecaries -> getTurnData(game, change.isHomeData()).wanderingApothecaries = change.value
             else -> {
                 println("Ignore $change")
                 return false
@@ -1140,7 +1139,7 @@ object ModelChangeProcessor {
 
 
     private fun isHomeData(pChange: ModelChange): Boolean {
-        return "home" == pChange.modelChangeKey
+        return "home" == pChange.key
     }
 
     private fun getTeamResult(game: Game, homeData: Boolean): TeamResult {
