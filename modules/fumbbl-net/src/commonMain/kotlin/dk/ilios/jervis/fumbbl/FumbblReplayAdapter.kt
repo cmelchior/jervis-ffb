@@ -20,8 +20,10 @@ import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
+import dk.ilios.jervis.fumbbl.model.PlayerAction
 import dk.ilios.jervis.fumbbl.model.ReportId
 import dk.ilios.jervis.fumbbl.model.TurnMode
+import dk.ilios.jervis.fumbbl.model.change.ActingPlayerSetPlayerAction
 import dk.ilios.jervis.fumbbl.model.change.FieldModelSetPlayerCoordinate
 import dk.ilios.jervis.fumbbl.model.change.FieldModelSetPlayerState
 import dk.ilios.jervis.fumbbl.model.change.GameSetSetupOffense
@@ -34,6 +36,7 @@ import dk.ilios.jervis.fumbbl.model.reports.KickoffResultReport
 import dk.ilios.jervis.fumbbl.model.reports.KickoffScatterReport
 import dk.ilios.jervis.fumbbl.model.reports.ReceiveChoiceReport
 import dk.ilios.jervis.fumbbl.model.reports.Report
+import dk.ilios.jervis.fumbbl.model.reports.ScatterBallReport
 import dk.ilios.jervis.fumbbl.model.reports.WeatherReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandReplay
@@ -43,6 +46,7 @@ import dk.ilios.jervis.fumbbl.utils.fromFumbblState
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.Catch
 import dk.ilios.jervis.procedures.CatchRoll
 import dk.ilios.jervis.procedures.DetermineKickingTeam
@@ -153,7 +157,57 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                 ModelChangeId.ACTING_PLAYER_SET_PLAYER_ACTION -> reportNotHandled(cmd)
                 ModelChangeId.ACTING_PLAYER_SET_PLAYER_ID -> reportNotHandled(cmd)
                 ModelChangeId.ACTING_PLAYER_SET_STANDING_UP -> reportNotHandled(cmd)
-                ModelChangeId.ACTING_PLAYER_SET_STRENGTH -> reportNotHandled(cmd)
+                ModelChangeId.ACTING_PLAYER_SET_STRENGTH -> {
+                    if (cmd.modelChangeList.size >= 4 && cmd.modelChangeList[4] is ActingPlayerSetPlayerAction) {
+                        when((cmd.modelChangeList[4] as ActingPlayerSetPlayerAction).value) {
+                            PlayerAction.MOVE -> TODO()
+                            PlayerAction.BLOCK -> TODO()
+                            PlayerAction.BLITZ -> TODO()
+                            PlayerAction.BLITZ_MOVE -> TODO()
+                            PlayerAction.BLITZ_SELECT -> TODO()
+                            PlayerAction.HAND_OVER -> TODO()
+                            PlayerAction.HAND_OVER_MOVE -> TODO()
+                            PlayerAction.PASS -> TODO()
+                            PlayerAction.PASS_MOVE -> TODO()
+                            PlayerAction.FOUL -> TODO()
+                            PlayerAction.FOUL_MOVE -> TODO()
+                            PlayerAction.STAND_UP -> TODO()
+                            PlayerAction.THROW_TEAM_MATE -> TODO()
+                            PlayerAction.THROW_TEAM_MATE_MOVE -> TODO()
+                            PlayerAction.REMOVE_CONFUSION -> TODO()
+                            PlayerAction.GAZE -> TODO()
+                            PlayerAction.GAZE_SELECT -> TODO()
+                            PlayerAction.GAZE_MOVE -> TODO()
+                            PlayerAction.MULTIPLE_BLOCK -> TODO()
+                            PlayerAction.HAIL_MARY_PASS -> TODO()
+                            PlayerAction.DUMP_OFF -> TODO()
+                            PlayerAction.STAND_UP_BLITZ -> TODO()
+                            PlayerAction.THROW_BOMB -> TODO()
+                            PlayerAction.HAIL_MARY_BOMB -> TODO()
+                            PlayerAction.SWOOP -> TODO()
+                            PlayerAction.KICK_TEAM_MATE_MOVE -> TODO()
+                            PlayerAction.KICK_TEAM_MATE -> TODO()
+                            PlayerAction.TREACHEROUS -> TODO()
+                            PlayerAction.WISDOM_OF_THE_WHITE_DWARF -> TODO()
+                            PlayerAction.THROW_KEG -> TODO()
+                            PlayerAction.RAIDING_PARTY -> TODO()
+                            PlayerAction.MAXIMUM_CARNAGE -> TODO()
+                            PlayerAction.LOOK_INTO_MY_EYES -> TODO()
+                            PlayerAction.BALEFUL_HEX -> TODO()
+                            PlayerAction.ALL_YOU_CAN_EAT -> TODO()
+                            PlayerAction.PUTRID_REGURGITATION_MOVE -> TODO()
+                            PlayerAction.PUTRID_REGURGITATION_BLITZ -> TODO()
+                            PlayerAction.PUTRID_REGURGITATION_BLOCK -> TODO()
+                            PlayerAction.KICK_EM_BLOCK -> TODO()
+                            PlayerAction.KICK_EM_BLITZ -> TODO()
+                        }
+
+                    } else if (cmd.modelChangeList.size >= 5 && cmd.modelChangeList[5] is ActingPlayerSetPlayerAction) {
+                        // Standup
+                    } else {
+                        reportNotHandled(cmd)
+                    }
+                }
                 ModelChangeId.ACTING_PLAYER_SET_SUFFERING_ANIMOSITY -> reportNotHandled(cmd)
                 ModelChangeId.ACTING_PLAYER_SET_SUFFERING_BLOOD_LUST -> reportNotHandled(cmd)
                 ModelChangeId.FIELD_MODEL_ADD_BLOOD_SPOT -> reportNotHandled(cmd)
@@ -220,6 +274,15 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                             ),
                             TheKickOff.TheKickDeviates
                         )
+                    } else if (
+                        // Ball bounce
+                        cmd.reportList.size == 1 &&
+                        cmd.reportList.first() is ScatterBallReport &&
+                        cmd.sound == "bounce"
+                    ) {
+                        val direction = (cmd.reportList[0] as ScatterBallReport).directionArray.first().transformToJervisDirection()
+                        val roll = RandomDirectionTemplate.getRollForDirection(direction)
+                        jervisCommands.add(DiceResults(roll), Bounce.RollDirection)
                     }
                 }
                 ModelChangeId.FIELD_MODEL_SET_BALL_IN_PLAY -> reportNotHandled(cmd)

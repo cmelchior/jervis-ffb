@@ -711,6 +711,9 @@ data class SafeThrowRollReport(
 @SerialName("scatterBall")
 data class ScatterBallReport(
     override val reportId: ReportId = ReportId.SCATTER_BALL,
+    val directionArray: List<Direction>,
+    val rolls: List<Int>,
+    val gustOfWind: Boolean
 ): Report
 
 @Serializable

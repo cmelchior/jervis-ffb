@@ -10,8 +10,7 @@ data class ServerCommandModelSync(
     override val commandNr: Int,
     val modelChangeList: ModelChangeList,
     val reportList: ReportList,
-    // val sound: Any?,  // If this could be some specific type, please replace `Any?` with that type
-    // These are not set when reporting Game Winnings
+    val sound: String? = null,
     val gameTime: Long,
     val turnTime: Long
 ): ServerCommand
