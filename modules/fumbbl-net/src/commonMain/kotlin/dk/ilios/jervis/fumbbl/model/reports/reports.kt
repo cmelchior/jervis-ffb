@@ -3,6 +3,8 @@ package dk.ilios.jervis.fumbbl.model.reports
 import dk.ilios.jervis.fumbbl.model.CatchModifier
 import dk.ilios.jervis.fumbbl.model.Direction
 import dk.ilios.jervis.fumbbl.model.FieldCoordinate
+import dk.ilios.jervis.fumbbl.model.Player
+import dk.ilios.jervis.fumbbl.model.PlayerAction
 import dk.ilios.jervis.fumbbl.model.ReportId
 import dk.ilios.jervis.fumbbl.model.change.PlayerId
 import kotlinx.serialization.SerialName
@@ -583,6 +585,8 @@ data class PlacedBallDirectionReport(
 @SerialName("playerAction")
 data class PlayerActionReport(
     override val reportId: ReportId = ReportId.PLAYER_ACTION,
+    val actingPlayerId: PlayerId,
+    val playerAction: PlayerAction
 ): Report
 
 @Serializable
