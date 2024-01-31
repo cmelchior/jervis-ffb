@@ -171,7 +171,9 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                 ModelChangeId.ACTING_PLAYER_SET_HAS_FED -> reportNotHandled(cmd)
                 ModelChangeId.ACTING_PLAYER_SET_HAS_FOULED -> reportNotHandled(cmd)
                 ModelChangeId.ACTING_PLAYER_SET_HAS_JUMPED -> reportNotHandled(cmd)
-                ModelChangeId.ACTING_PLAYER_SET_HAS_MOVED -> reportNotHandled(cmd)
+                ModelChangeId.ACTING_PLAYER_SET_HAS_MOVED -> {
+                    jervisCommands.add(EndAction, MoveAction.SelectSquareOrEndAction)
+                }
                 ModelChangeId.ACTING_PLAYER_SET_HAS_PASSED -> reportNotHandled(cmd)
                 ModelChangeId.ACTING_PLAYER_SET_JUMPING -> reportNotHandled(cmd)
                 ModelChangeId.ACTING_PLAYER_SET_OLD_PLAYER_STATE -> reportNotHandled(cmd)
@@ -500,7 +502,6 @@ class FumbblReplayAdapter(private var replayFile: Path) {
             val coord = FieldCoordinate(it.value.coordinate.x, it.value.coordinate.y)
             jervisCommands.add(FieldSquareSelected(coord), MoveAction.SelectSquareOrEndAction)
         }
-        jervisCommands.add(EndAction, MoveAction.SelectSquareOrEndAction)
     }
 
     private fun reportNotHandled(cmd: ServerCommandModelSync) {
