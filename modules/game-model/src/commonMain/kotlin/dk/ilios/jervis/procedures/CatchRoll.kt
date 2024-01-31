@@ -71,10 +71,10 @@ object CatchRoll: Procedure() {
                     catchingPlayer = rollContext.catchingPlayer,
                     target = target,
                     diceRoll = it,
-                    modifiers = rollContext.diceModifier(),
+                    modifiers = rollContext.modifiers,
                     rerolled = false,
                     rerolledBy = null,
-                    success = it.result != 1 && target <= it.result
+                    success = isCatchSuccess(it, target, rollContext)
                 )
                 return compositeCommandOf(
                     SetRollContext(Game::catchRollResult, resultContext),
@@ -145,10 +145,10 @@ object CatchRoll: Procedure() {
                     catchingPlayer = rollContext.catchingPlayer,
                     target = target,
                     diceRoll = it,
-                    modifiers = rollContext.diceModifier(),
+                    modifiers = rollContext.modifiers,
                     rerolled = true,
                     rerolledBy = state.useRerollContext!!.source,
-                    success = it.result != 1 && target <= it.result
+                    success = isCatchSuccess(it, target, rollContext)
                 )
                 compositeCommandOf(
                     SetRollContext(Game::catchRollResult, rerollResult),
@@ -157,4 +157,11 @@ object CatchRoll: Procedure() {
             }
         }
     }
+
+    private fun isCatchSuccess(
+        it: D6Result,
+        target: Int,
+        rollContext: CatchRollContext
+    ) = it.result != 1 && (target <= it.result + rollContext.diceModifier())
+
 }

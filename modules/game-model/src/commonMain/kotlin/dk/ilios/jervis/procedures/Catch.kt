@@ -2,6 +2,7 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
@@ -44,7 +45,7 @@ data class CatchRollResultContext(
     val catchingPlayer: Player,
     val target: Int,
     val diceRoll: D6Result,
-    val modifiers: Int,
+    val modifiers: List<DiceModifier>,
     val rerolled: Boolean,
     val rerolledBy: RerollSource?,
     val success: Boolean
@@ -77,7 +78,6 @@ object Catch: Procedure() {
         if (state.ball.state == BallState.THROW_IN) modifiers.add(CatchModifier.THROW_IN)
         if (state.ball.state == BallState.DEVIATING) modifiers.add(CatchModifier.DEVIATED)
         if (state.ball.state == BallState.SCATTERED) modifiers.add(CatchModifier.SCATTERED)
-        if (state.ball.state == BallState.DEVIATING) modifiers.add(CatchModifier.DEVIATED)
         // TODO Check for disturbing presence.
         state.ballSquare.coordinates.getSurroundingCoordinates(rules).forEach {
             val markingPlayer: Player? = state.field[it].player

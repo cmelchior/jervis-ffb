@@ -1,5 +1,6 @@
 package dk.ilios.jervis.fumbbl.model.reports
 
+import dk.ilios.jervis.fumbbl.model.CatchModifier
 import dk.ilios.jervis.fumbbl.model.Direction
 import dk.ilios.jervis.fumbbl.model.FieldCoordinate
 import dk.ilios.jervis.fumbbl.model.ReportId
@@ -173,7 +174,7 @@ data class CatchRollReport(
     val roll: Int,
     val minimumRoll: Int,
     val reRolled: Boolean,
-    val rollModifiers: List<String> = emptyList(),
+    val rollModifiers: List<CatchModifier> = emptyList(),
     val bomb: Boolean
 ): Report
 

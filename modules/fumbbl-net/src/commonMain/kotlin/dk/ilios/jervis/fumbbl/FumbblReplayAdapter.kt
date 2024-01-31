@@ -415,6 +415,8 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                             jervisCommands.add(DiceResults(weatherRoll), RollForTheWeather.RollWeatherDice)
                         }
                         is CatchRollReport -> {
+                            // TODO The report gives you the final result. We need to deconstruct it
+                            //
                             val diceRoll = D6Result(report.roll)
                             if (report.reRolled) {
                                 jervisCommands.add(DiceResults(diceRoll), CatchRoll.ReRollDie)
