@@ -5,6 +5,7 @@ import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.Confirm
+import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.DiceResults
@@ -419,7 +420,9 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                                 jervisCommands.add(DiceResults(diceRoll), CatchRoll.ReRollDie)
                             } else {
                                 jervisCommands.add(DiceResults(diceRoll), CatchRoll.RollDie)
+                                jervisCommands.add(Continue, CatchRoll.ChooseReRollSource)
                             }
+
                         }
                         else -> reportNotHandled(cmd)
                     }
