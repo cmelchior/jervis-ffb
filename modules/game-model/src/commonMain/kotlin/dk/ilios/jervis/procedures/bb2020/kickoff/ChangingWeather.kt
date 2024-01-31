@@ -3,7 +3,6 @@ package dk.ilios.jervis.procedures.bb2020.kickoff
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.NoOpCommand
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
@@ -17,11 +16,11 @@ import dk.ilios.jervis.rules.Rules
  * of the rulebook.
  */
 object ChangingWeather: Procedure() {
-    override val initialNode: Node = GiveBribe
+    override val initialNode: Node = ChangeWeather
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object GiveBribe: ComputationNode() {
+    object ChangeWeather: ComputationNode() {
         // TODO Figure out how to do this
         override fun apply(state: Game, rules: Rules): Command {
             return compositeCommandOf(

@@ -1,7 +1,10 @@
 package dk.ilios.jervis.model
 
-import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.procedures.CatchRollContext
+import dk.ilios.jervis.procedures.RerollContext
+import dk.ilios.jervis.procedures.CatchRollResultContext
+import dk.ilios.jervis.procedures.RerollResultContext
 import dk.ilios.jervis.rules.PlayerAction
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -49,8 +52,31 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var pitchInvasionHomeTeamPlayersAffected: Int = 0
     var pitchInvasionAwayTeamPlayersAffected: Int = 0
 
+    // How many different types of rolls are there that might be modified by skills etc
+        // Go-For-It (Rushing)
+        // Dodge
+        // Stand Up
+        // Pick Up Ball
+        // Catch Ball
+        // Hand-Off
+        // Pass
+        //
+        // Block
+        // Armor Roll
+        // Injury Roll
+        //
+
+    var catchRollContext: CatchRollContext? = null
+    var catchRollResult: CatchRollResultContext? = null
+
+    var useRerollContext: RerollContext? = null
+    var useRerollResult: RerollResultContext? = null
+
     val field: Field = field
     val ball: Ball = Ball()
+
+    val ballSquare: FieldSquare
+        get() = this.field[ball.location]
 
     fun getPlayerById(id: PlayerId): Player? {
         return homeTeam.firstOrNull { it.id == id } ?: awayTeam.firstOrNull { it.id == id}

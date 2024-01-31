@@ -5,6 +5,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetActiveTeam
+import dk.ilios.jervis.commands.SetAvailableTeamRerolls
 import dk.ilios.jervis.commands.SetDrive
 import dk.ilios.jervis.commands.SetHalf
 import dk.ilios.jervis.commands.SetKickingTeamAtHalfTime
@@ -33,6 +34,8 @@ object GameHalf: Procedure() {
             SetDrive(0),
             SetKickingTeamAtHalfTime(kickingTeam),
             SetActiveTeam(kickingTeam.otherTeam()),
+            SetAvailableTeamRerolls(state.homeTeam),
+            SetAvailableTeamRerolls(state.awayTeam),
             SetTurnNo(state.homeTeam, 0u),
             SetTurnNo(state.awayTeam, 0u),
             ReportStartingHalf(currentHalf)

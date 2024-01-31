@@ -1,6 +1,90 @@
 package dk.ilios.jervis.rules.skills
 
-interface Skill {
+import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.procedures.UseTeamReroll
+
+public object DiceRoll {
+    val CATCH = DiceRollType.CatchRoll
+}
+
+
+sealed interface DiceRollType {
+    //data object ArmourRoll: DiceRollType
+//data object BloodLustRoll: DiceRollType
+//data object BoneHeadRoll: DiceRollType
+//data object CasultyRoll: DiceRollType
+    data object CatchRoll : DiceRollType
+
+    //data object DodgeRoll: DiceRollType
+//data object FoulRoll: DiceRollType
+//data object HypnoticGazeRoll: DiceRollType
+//data object InjuryRoll: DiceRollType
+//data object InterceptRoll: DiceRollType
+//data object KickOffTableRoll: DiceRollType
+//data object LonerRoll: DiceRollType
+//data object PassRoll: DiceRollType
+//data object PickUpRoll: DiceRollType
+//data object ReallyStupidRoll: DiceRollType
+//data object RegenerationRoll: DiceRollType
+    data object ProRoll : DiceRollType
+//data object RushRoll: DiceRollType
+//data object TakeRootRoll: DiceRollType
+//data object ThrowTeamMateRoll: DiceRollType
+//data object WeatherRoll: DiceRollType
+//data object WildAnimalRoll: DiceRollType
+//data class CustomRoll(val id: String): DiceRollType
+
+}
+enum class TeamRerollDuration {
+    END_OF_HALF,
+    END_OF_DRIVE
+}
+
+sealed interface TeamReroll: RerollSource {
+    val carryOverIntoOvertime: Boolean
+    val isTemporary: Boolean
+    override val rerollProcedure: Procedure
+        get() = UseTeamReroll
+}
+
+class RegularTeamReroll(val team: Team): TeamReroll {
+    override var rerollUsed: Boolean = false
+    override val carryOverIntoOvertime: Boolean = true
+    override val isTemporary: Boolean = false
+    override val rerollDescription: String = "Team reroll"
+    override fun canReroll(type: DiceRollType, wasSuccess: Boolean): Boolean {
+        return true // TODO Some rolls cannot be re-rolled
+    }
+}
+
+class LeaderTeamReroll(val player: Player): TeamReroll {
+    override var rerollUsed: Boolean = false
+    override val carryOverIntoOvertime: Boolean = true
+    override val isTemporary: Boolean = true
+    override val rerollDescription: String = "Team reroll (Leader)"
+    override fun canReroll(type: DiceRollType, wasSuccess: Boolean): Boolean {
+        return true
+    }
+}
+
+//enum class TeamRerollType {
+//    REGULAR,
+//    LEADER,
+//    END_OF_DRIVE,
+//    END_OF_HALF,
+//    END_OF_GAME
+//}
+
+interface RerollSource {
+    val rerollDescription: String
+    var rerollUsed: Boolean
+    val rerollProcedure: Procedure
+    fun canReroll(type: DiceRollType, wasSuccess: Boolean): Boolean
+}
+
+interface Skill: RerollSource {
     enum class UsageType {
         ALWAYS,
         ONCE_PR_TURN,
@@ -13,29 +97,12 @@ interface Skill {
     val name: String
     val usage: UsageType
     val category: SkillCategory
-    var used: Boolean
-
-    // Modifiers
 }
 
 interface SkillCategory {
     val id: Long
     val name: String
 }
-
-
-
-//abstract class Skill {
-//    val name: String
-//    val category: SkillCategory
-//}
-
-//object BB2020Skills {
-//    data object Block: Skill {
-//        override val name: String = "Block"
-//        override val category: SkillCategory = AGILITY
-//    }
-//}
 
 class BB2016Skills {
 //Agility
@@ -108,6 +175,8 @@ class BB2016Skills {
 //    - Stunty
 //    - Throw Team-mate
 }
+
+sealed interface BB2020Skill: Skill
 
 
 enum class BB2020SkillsList {

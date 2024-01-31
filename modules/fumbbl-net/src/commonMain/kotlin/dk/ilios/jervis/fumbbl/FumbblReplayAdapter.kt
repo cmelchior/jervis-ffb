@@ -25,6 +25,7 @@ import dk.ilios.jervis.fumbbl.model.change.FieldModelSetPlayerCoordinate
 import dk.ilios.jervis.fumbbl.model.change.FieldModelSetPlayerState
 import dk.ilios.jervis.fumbbl.model.change.GameSetSetupOffense
 import dk.ilios.jervis.fumbbl.model.change.GameSetTurnMode
+import dk.ilios.jervis.fumbbl.model.reports.CatchRollReport
 import dk.ilios.jervis.fumbbl.model.reports.CoinThrowReport
 import dk.ilios.jervis.fumbbl.model.reports.FanFactorReport
 import dk.ilios.jervis.fumbbl.model.reports.KickoffPitchInvasionReport
@@ -41,6 +42,8 @@ import dk.ilios.jervis.fumbbl.utils.fromFumbblState
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.procedures.Catch
+import dk.ilios.jervis.procedures.CatchRoll
 import dk.ilios.jervis.procedures.DetermineKickingTeam
 import dk.ilios.jervis.procedures.RollForStartingFanFactor
 import dk.ilios.jervis.procedures.RollForTheWeather
@@ -409,6 +412,14 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                         is WeatherReport -> {
                             val weatherRoll = report.weatherRoll.map { D6Result(it) }
                             jervisCommands.add(DiceResults(weatherRoll), RollForTheWeather.RollWeatherDice)
+                        }
+                        is CatchRollReport -> {
+                            val diceRoll = D6Result(report.roll)
+                            if (report.reRolled) {
+                                jervisCommands.add(DiceResults(diceRoll), CatchRoll.ReRollDie)
+                            } else {
+                                jervisCommands.add(DiceResults(diceRoll), CatchRoll.RollDie)
+                            }
                         }
                         else -> reportNotHandled(cmd)
                     }

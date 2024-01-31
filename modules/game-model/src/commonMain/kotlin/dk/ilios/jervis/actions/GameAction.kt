@@ -1,12 +1,13 @@
 package dk.ilios.jervis.actions
 
 import dk.ilios.jervis.model.Coin
-import dk.ilios.jervis.model.DogOut.coordinate
-import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.rules.PlayerAction
+import dk.ilios.jervis.rules.skills.RerollSource
 import kotlin.random.Random
+import dk.ilios.jervis.rules.skills.Skill
+import dk.ilios.jervis.rules.skills.TeamReroll
 
 enum class Dice {
     D2, D3, D4, D6, D8, D12, D16, D20
@@ -33,7 +34,11 @@ data object SelectDogout: ActionDescriptor
 data class SelectPlayer(val player: Player): ActionDescriptor
 data class DeselectPlayer(val player: Player): ActionDescriptor
 data class SelectAction(val action: PlayerAction): ActionDescriptor
-data class SelectRandomPlayers(val count: Int, val players: List<Player>): ActionDescriptor
+data class SelectRandomPlayers(val count: Int, val players: List<Player>): ActionDescriptor // This is not a single action
+
+data class SelectSkillRerollSource(val skill: Skill): ActionDescriptor
+data class SelectTeamRerollSource(val reroll: TeamReroll): ActionDescriptor
+data object SelectNoReroll: ActionDescriptor
 
 // Available actions
 open class DieResult(val result: Int, val min: Short, val max: Short): Number(), GameAction {
@@ -87,3 +92,5 @@ data class FieldSquareSelected(val coordinate: FieldCoordinate): GameAction {
     }
 }
 data class RandomPlayersSelected(val players: List<Player>): GameAction
+data class RerollSourceSelected(val rerollProcedure: RerollSource): GameAction
+data object NoRerollSelected: GameAction

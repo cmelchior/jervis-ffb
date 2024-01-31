@@ -1,11 +1,10 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.actions.DieResult
-import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.PlayerActionType
-import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
+import dk.ilios.jervis.rules.skills.TeamReroll
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -70,7 +69,14 @@ class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
 //    val race: String
 //    val race: String
     // Variable team data that might change during the game
-    var reRolls: Int = 0
+    var rerollsCountOnRoster: Int = 0
+    var rerolls: MutableList<TeamReroll> = mutableListOf()
+    val availableRerolls: List<TeamReroll>
+        get() = rerolls.filter { !it.rerollUsed }
+    val availableRerollCount: Int
+        get() = availableRerolls.size
+    var usedTeamRerollThisTurn: Boolean = false
+
     var apothecaries: Int = 0
     var cheerLeaders: Int = 0
     var assistentCoaches: Int = 0

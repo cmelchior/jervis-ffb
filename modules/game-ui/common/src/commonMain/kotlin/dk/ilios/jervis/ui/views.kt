@@ -57,10 +57,12 @@ import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
+import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
+import dk.ilios.jervis.actions.RerollSourceSelected
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
@@ -404,6 +406,8 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
                     is CoinSideSelected -> "Selected: ${action.side}"
                     is CoinTossResult -> "Coin flip: ${action.result}"
                     is RandomPlayersSelected -> "Random players: $action"
+                    NoRerollSelected -> "No reroll"
+                    is RerollSourceSelected -> action.rerollProcedure.rerollDescription
                 }
                 Text(text, fontSize = 10.sp)
             }

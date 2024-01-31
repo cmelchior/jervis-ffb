@@ -1,6 +1,5 @@
 package dk.ilios.jervis.utils
 
-import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CancelWhenReady
@@ -30,17 +29,23 @@ import dk.ilios.jervis.actions.EndSetupWhenReady
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.EndTurnWhenReady
 import dk.ilios.jervis.actions.FieldSquareSelected
+import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
+import dk.ilios.jervis.actions.RerollSourceSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectCoinSide
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
+import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.actions.SelectRandomPlayers
+import dk.ilios.jervis.actions.SelectSkillRerollSource
+import dk.ilios.jervis.actions.SelectTeamRerollSource
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.Game
@@ -91,7 +96,11 @@ fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): G
 
         is SelectRandomPlayers ->
             RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
-        }
+
+        SelectNoReroll -> NoRerollSelected
+        is SelectSkillRerollSource -> RerollSourceSelected(action.skill)
+        is SelectTeamRerollSource -> RerollSourceSelected(action.reroll)
+    }
 }
 
 const val enableAsserts = true

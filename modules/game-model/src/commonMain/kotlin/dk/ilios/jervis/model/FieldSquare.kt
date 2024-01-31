@@ -12,6 +12,7 @@ class FieldSquare(val coordinates: FieldCoordinate): Observable<FieldSquare>(), 
     var ball: Ball? by observable(null)
 
     fun isEmpty(): Boolean = (player == null)
+    fun isNotEmpty(): Boolean = !isEmpty()
     fun isOnTeamHalf(team: Team, rules: Rules): Boolean {
         return if (team.isHomeTeam()) isOnHomeSide(rules) else isOnAwaySide(rules)
     }

@@ -168,6 +168,13 @@ data class CardEffectRollReport(
 @SerialName("catchRoll")
 data class CatchRollReport(
     override val reportId: ReportId = ReportId.CATCH_ROLL,
+    val playerId: String,
+    val successful: Boolean,
+    val roll: Int,
+    val minimumRoll: Int,
+    val reRolled: Boolean,
+    val rollModifiers: List<String> = emptyList(),
+    val bomb: Boolean
 ): Report
 
 @Serializable

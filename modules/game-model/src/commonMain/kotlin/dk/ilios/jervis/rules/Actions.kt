@@ -5,18 +5,6 @@ import dk.ilios.jervis.procedures.DummyProcedure
 import dk.ilios.jervis.procedures.MoveAction
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
-interface Skill
-
-
-
-//class Skills {
-//
-//    object com
-//
-//}
-
-
-
 /**
  * Wrapper representing a players action
  */

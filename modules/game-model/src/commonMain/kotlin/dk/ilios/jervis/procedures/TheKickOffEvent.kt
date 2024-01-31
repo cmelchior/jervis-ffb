@@ -100,18 +100,23 @@ object TheKickOffEvent: Procedure() {
 
     // Move this logic to its own procedure. It will be needed when blocking, throwing and otherwise.
     class ResolveBallLanding(private val location: FieldCoordinate): ParentNode() {
+        var isFieldEmpty: Boolean = true
+        var canCatch: Boolean = false
+
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             state.abortIfBallOutOfBounds = true // TODO Wrong way to do this
-            return null
+            isFieldEmpty = state.field[location].player != null
+            canCatch = state.field[location].player?.let { rules.canCatch(state, it) } ?: false
+            // If field is empty or the player cannot catch the ball, the ball is now
+            // bouncing rather than deviating.
+            return if (!canCatch) {
+                SetBallState.bouncing()
+            } else {
+                null
+            }
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return state.field[location].player?.let { player: Player ->
-                if (player.hasTackleZones && player.state == PlayerState.STANDING) {
-                    Catch
-                } else {
-                    Bounce// Player is not able to catch the ball
-                }
-            } ?: Bounce // Field is empty
+            return if (canCatch) Catch else Bounce
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {

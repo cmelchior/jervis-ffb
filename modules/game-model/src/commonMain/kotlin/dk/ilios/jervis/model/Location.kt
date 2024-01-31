@@ -66,10 +66,10 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
     /**
      * Return all on-field coordinates around a specific on-field location.
      */
-    fun getSurroundingCoordinates(rules: Rules): List<FieldCoordinate> {
+    fun getSurroundingCoordinates(rules: Rules, distance: UInt = 1u): List<FieldCoordinate> {
         val result = mutableListOf<FieldCoordinate>()
-        (x-1 .. x+1).forEach { x: Int ->
-            (y-1 .. y+1).forEach { y: Int ->
+        (x-distance.toInt() .. x+distance.toInt()).forEach { x: Int ->
+            (y-distance.toInt() .. y+distance.toInt()).forEach { y: Int ->
                 val newCoordinate = FieldCoordinate(x, y)
                 if (newCoordinate != this && newCoordinate.isOnField(rules)) {
                     result.add(newCoordinate)

@@ -13,6 +13,10 @@ abstract class Procedure {
     val enterNode: Node = EnterProcedureNode(this)
     val exitNode: Node = ExitProcedureNode(this)
 
+    open fun isValid(state: Game, rules: Rules) {
+        /* Do nothing */
+    }
+
     // this method will be called just before the procedure transitions to the initialNode
     abstract fun onEnterProcedure(state: Game, rules: Rules): Command?
     // this method will be called just before the Procedure is removed from the stack

@@ -16,6 +16,7 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
@@ -30,7 +31,12 @@ import dk.ilios.jervis.rules.Rules
  */
 object Bounce: Procedure() {
     override val initialNode: Node = RollDirection
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+        if (state.ball.state != BallState.BOUNCING) {
+            throw IllegalStateException("Ball is not bouncing, but ${state.ball.state}")
+        }
+        return null
+    }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollDirection: ActionNode() {

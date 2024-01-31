@@ -19,3 +19,16 @@ class SetTemporaryState<T>(private val property: KMutableProperty1<Game, T>, pri
     }
 
 }
+
+class SetRollContext<T>(private val property: KMutableProperty1<Game, T>, private val value: T) : Command {
+    var originalValue: T? = null
+    override fun execute(state: Game, controller: GameController) {
+        originalValue = property.get(state)
+        property.set(state, value)
+    }
+    override fun undo(state: Game, controller: GameController) {
+        property.set(state, originalValue!!)
+    }
+
+}
+

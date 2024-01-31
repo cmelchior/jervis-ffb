@@ -154,6 +154,26 @@ interface Rules {
         return player.hasTackleZones && player.state == PlayerState.STANDING && player.location.isOnField(this)
     }
 
+    fun canMark(player: Player): Boolean {
+        return player.hasTackleZones
+    }
+
+    // Characteristics limits
+    val moveRange: IntRange
+        get() = 1 .. 9
+
+    val strengthRange: IntRange
+        get() = 1 .. 8
+
+    val agilityRange: IntProgression
+        get() = 6 downTo  1
+
+    val passingRange: IntProgression
+        get() = 6 downTo 1
+
+    val armorValueRange: IntProgression
+        get() = 11 downTo 1
+
     // Game length setup
 
     val halfsPrGame: UInt
@@ -211,6 +231,9 @@ interface Rules {
 
     val teamActions: TeamActions
         get() = BB2020TeamActions()
+
+    val allowMultipleTeamRerollsPrTurn: Boolean
+        get() = true
 
     // Blood Bowl 7
     // Total width of the field
