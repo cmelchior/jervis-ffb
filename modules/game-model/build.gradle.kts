@@ -11,7 +11,7 @@ repositories {
 
 kotlin {
     jvm {
-        jvmToolchain(17)
+        jvmToolchain((project.properties["java.version"] as String).toInt())
         withJava()
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()

@@ -11,7 +11,7 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm("desktop") {
-        jvmToolchain(17)
+        jvmToolchain((project.properties["java.version"] as String).toInt())
     }
     sourceSets {
         val commonMain by getting {

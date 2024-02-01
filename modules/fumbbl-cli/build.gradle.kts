@@ -29,5 +29,5 @@ application {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain((project.properties["java.version"] as String).toInt())
 }

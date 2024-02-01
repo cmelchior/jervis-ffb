@@ -10,8 +10,7 @@ group = "dk.ilios.bloodbowl.ui"
 version = "1.0-SNAPSHOT"
 kotlin {
     jvm {
-        jvmToolchain(17)
-        // withJava()
+        jvmToolchain((project.properties["java.version"] as String).toInt())
     }
     sourceSets {
         val commonMain by getting {
