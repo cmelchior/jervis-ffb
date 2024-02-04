@@ -122,7 +122,7 @@ the following way:
    
    ```
    java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:8000 \
-     -cp FantasyFootballClient.jar:* com.fumbbl.ffb.client.FantasyFootballClient \
+     -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient \
      -replay -gameId <gameId>
    ```
 
