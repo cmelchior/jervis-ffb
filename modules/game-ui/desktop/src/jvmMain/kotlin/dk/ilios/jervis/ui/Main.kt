@@ -98,7 +98,10 @@ fun main() = application {
     }
     val controller = GameController(rules, fumbbl.getGame())
     Window(onCloseRequest = ::exitApplication) {
-        App(controller, actionRequestChannel, actionSelectedChannel, fumbbl)
+        App()
+//
+//
+//        App(controller, actionRequestChannel, actionSelectedChannel, fumbbl)
     }
 }
 

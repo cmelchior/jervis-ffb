@@ -23,6 +23,12 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                val voyagerVersion = "1.0.0"
+                implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
             }
         }
         val commonTest by getting {

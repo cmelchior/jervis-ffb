@@ -66,5 +66,5 @@ fun AppPreview() {
     }
 //    val controller = GameController(rules, state, actionProvider)
     val controller = GameController(rules, state)
-    App(controller, actionRequestChannel, actionSelectedChannel)
+    App() // controller, actionRequestChannel, actionSelectedChannel)
 }
