@@ -56,21 +56,20 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.SetupTeam
+import dk.ilios.jervis.ui.GameMode
+import dk.ilios.jervis.ui.Manual
+import dk.ilios.jervis.ui.Replay
 import dk.ilios.jervis.utils.createRandomAction
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
 class ActionSelectorViewModel(
+    private val mode: GameMode,
     private val controller: GameController,
     private val actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
     private val actionSelectedChannel: Channel<GameAction>,
@@ -81,129 +80,71 @@ class ActionSelectorViewModel(
     private val userSelectedAction = Channel<GameAction>(1)
     val availableActions: Flow<List<GameAction>> = _availableActions
 
-    fun start(randomActions: Boolean) {
-//        if (randomActions) {
-//            startRandomActionSelector()
-//        } else {
-//            startUserActionSelector()
-//        }
-
-        if (randomActions) {
-            scope.launch(Dispatchers.Default) {
-                val start = Instant.now()
-                controller.startManualMode()
-                while (!controller.stack.isEmpty()) {
-                    val actions = controller.getAvailableActions()
-                    if (!useManualAutomatedActions(controller)) {
-                        val selectedAction = createRandomAction(controller.state, actions)
-                        delay(20)
-                        controller.processAction(selectedAction)
-                    }
-                }
-                printStats(controller, start)
-            }
-        } else {
-            var index = 0
-            val replayCommands = fumbbl?.getCommands()
-            scope.launch(Dispatchers.Default) {
-                controller.startManualMode()
-                while (!controller.stack.isEmpty()) {
-                    if (replayCommands != null && index <= replayCommands.size) {
-                        val commandFromReplay = replayCommands[index]
-                        if (commandFromReplay.expectedNode != controller.stack.currentNode()) {
-                            throw IllegalStateException("""
-                                Current node: ${controller.stack.currentNode()::class.qualifiedName}
-                                Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
-                                Action: ${
-                                    when(commandFromReplay) {
-                                        is CalculatedJervisAction -> commandFromReplay.actionFunc(controller.state, controller.rules)
-                                        is JervisAction -> commandFromReplay.action
-                                    }}
-                            """.trimIndent())
-                        }
-                        when(commandFromReplay) {
-                            is CalculatedJervisAction -> controller.processAction(commandFromReplay.actionFunc(controller.state, controller.rules))
-                            is JervisAction -> controller.processAction(commandFromReplay.action)
-                        }
-                        index += 1
-                        delay(20)
-                        continue
-                    }
-
-                    if (!useManualAutomatedActions(controller)) {
-                        val availableActions: List<GameAction> = controller.getAvailableActions().map { action ->
-                            when (action) {
-                                ContinueWhenReady -> Continue
-                                EndTurnWhenReady -> EndTurn
-                                is RollDice -> {
-                                    val rolls = action.dice.map {
-                                        when(it) {
-                                            Dice.D2 -> D2Result()
-                                            Dice.D3 -> D3Result()
-                                            Dice.D4 -> D4Result()
-                                            Dice.D6 -> D6Result()
-                                            Dice.D8 -> D8Result()
-                                            Dice.D12 -> D12Result()
-                                            Dice.D16 -> D16Result()
-                                            Dice.D20 -> D20Result()
-                                        }
-                                    }
-                                    if (rolls.size == 1) {
-                                        rolls.first()
-                                    } else {
-                                        DiceResults(rolls)
-                                    }
-                                }
-                                ConfirmWhenReady -> Confirm
-                                EndSetupWhenReady -> EndSetup
-                                SelectDogout -> DogoutSelected
-                                is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
-                                is SelectPlayer -> PlayerSelected(action.player)
-                                is DeselectPlayer -> PlayerDeselected
-                                is SelectAction -> PlayerActionSelected(action.action)
-                                EndActionWhenReady -> EndAction
-                                CancelWhenReady -> Cancel
-                                SelectCoinSide -> {
-                                    when(Random.nextInt(2)) {
-                                        0 -> CoinSideSelected(Coin.HEAD)
-                                        1 -> CoinSideSelected(Coin.TAIL)
-                                        else -> throw IllegalStateException("Unsupported value")
-                                    }
-                                }
-                                TossCoin -> {
-                                    when(Random.nextInt(2)) {
-                                        0 -> CoinTossResult(Coin.HEAD)
-                                        1 -> CoinTossResult(Coin.TAIL)
-                                        else -> throw IllegalStateException("Unsupported value")
-                                    }
-                                }
-
-                                is SelectRandomPlayers -> {
-                                    RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
-                                }
-
-                                SelectNoReroll -> NoRerollSelected
-                                is SelectSkillRerollSource -> RerollSourceSelected(action.skill)
-                                is SelectTeamRerollSource -> RerollSourceSelected(action.reroll)
+    fun start() {
+        scope.launch {
+            when(mode) {
+                Manual -> {
+                    launch {
+                        val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+                            val action: GameAction = runBlocking(Dispatchers.Default) {
+                                actionRequestChannel.send(Pair(controller, availableActions))
+                                actionSelectedChannel.receive()
                             }
+                            action
                         }
-                        _availableActions.emit(availableActions)
-                        val selectedAction = userSelectedAction.receive()
-                        controller.processAction(selectedAction)
+                        controller.startCallbackMode(actionProvider)
                     }
+                    startUserActionSelector()
+                }
+                dk.ilios.jervis.ui.Random -> startRandomMode()
+                is Replay -> startReplayMode()
+            }
+        }
+    }
+
+    private fun startReplayMode() {
+        var index = 0
+        val replayCommands = fumbbl?.getCommands()
+        scope.launch(Dispatchers.Default) {
+            controller.startManualMode()
+            while (!controller.stack.isEmpty()) {
+                if (replayCommands != null && index <= replayCommands.size) {
+                    val commandFromReplay = replayCommands[index]
+                    if (commandFromReplay.expectedNode != controller.stack.currentNode()) {
+                        throw IllegalStateException("""
+                    Current node: ${controller.stack.currentNode()::class.qualifiedName}
+                    Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
+                    Action: ${
+                            when(commandFromReplay) {
+                                is CalculatedJervisAction -> commandFromReplay.actionFunc(controller.state, controller.rules)
+                                is JervisAction -> commandFromReplay.action
+                            }}
+                """.trimIndent())
+                    }
+                    when(commandFromReplay) {
+                        is CalculatedJervisAction -> controller.processAction(commandFromReplay.actionFunc(controller.state, controller.rules))
+                        is JervisAction -> controller.processAction(commandFromReplay.action)
+                    }
+                    index += 1
+                    delay(20)
+                    continue
                 }
             }
         }
-//
-//                val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
-//                    val action: GameAction = runBlocking(Dispatchers.Default) {
-//                        actionRequestChannel.send(Pair(controller, availableActions))
-//                        actionSelectedChannel.receive()
-//                    }
-//                    action
-//                }
-//
-//            }
+    }
+
+    private suspend fun startRandomMode() {
+        val start = Instant.now()
+        controller.startManualMode()
+        while (!controller.stack.isEmpty()) {
+            val actions = controller.getAvailableActions()
+            if (!useManualAutomatedActions(controller)) {
+                val selectedAction = createRandomAction(controller.state, actions)
+                delay(20)
+                controller.processAction(selectedAction)
+            }
+        }
+        printStats(controller, start)
     }
 
     private fun printStats(controller: GameController, start: Instant) {
@@ -420,18 +361,6 @@ class ActionSelectorViewModel(
         actionRequestChannel.receive()
         actionSelectedChannel.send(FieldSquareSelected(fieldCoordinate))
         actionRequestChannel.receive()
-    }
-
-    private fun startRandomActionSelector() {
-        scope.launch {
-            actions@while(this.isActive) {
-                val (controller, actions) = actionRequestChannel.receive()
-                delay(20)
-                if (useAutomatedActions(controller)) continue@actions
-                val action: GameAction = createRandomAction(controller.state, actions)
-                actionSelectedChannel.send(action)
-            }
-        }
     }
 
     fun actionSelected(action: GameAction) {

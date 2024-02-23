@@ -372,16 +372,9 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
         Button(
             modifier = Modifier.padding(0.dp),
             contentPadding = PaddingValues(2.dp),
-            onClick = { vm.start(randomActions = true) }
+            onClick = { vm.start() }
         ) {
-            Text("Start (Random)", fontSize = 10.sp)
-        }
-        Button(
-            modifier = Modifier.padding(0.dp),
-            contentPadding = PaddingValues(2.dp),
-            onClick = { vm.start(randomActions = false) }
-        ) {
-            Text("Start (User)", fontSize = 10.sp)
+            Text("Start Game", fontSize = 10.sp)
         }
         otherActions.forEach { action: GameAction ->
             Button(
