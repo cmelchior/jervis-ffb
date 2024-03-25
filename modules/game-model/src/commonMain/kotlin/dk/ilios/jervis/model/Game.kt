@@ -1,14 +1,15 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.procedures.BlockContext
 import dk.ilios.jervis.procedures.CatchRollContext
-import dk.ilios.jervis.procedures.RerollContext
 import dk.ilios.jervis.procedures.CatchRollResultContext
+import dk.ilios.jervis.procedures.RerollContext
 import dk.ilios.jervis.procedures.RerollResultContext
 import dk.ilios.jervis.rules.PlayerAction
+import kotlin.properties.Delegates
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlin.properties.Delegates
 
 class Game(homeTeam: Team, awayTeam: Team, field: Field) {
 
@@ -66,8 +67,10 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
         // Injury Roll
         //
 
+    var blockContext: BlockContext? = null
+
     var catchRollContext: CatchRollContext? = null
-    var catchRollResult: CatchRollResultContext? = null
+    var catchRollResultContext: CatchRollResultContext? = null
 
     var useRerollContext: RerollContext? = null
     var useRerollResult: RerollResultContext? = null

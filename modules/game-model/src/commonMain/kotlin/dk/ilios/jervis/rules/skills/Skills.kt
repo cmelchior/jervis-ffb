@@ -3,18 +3,21 @@ package dk.ilios.jervis.rules.skills
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.procedures.BlockDieRoll
+import dk.ilios.jervis.procedures.DieRoll
 import dk.ilios.jervis.procedures.UseTeamReroll
 
 public object DiceRoll {
+    val BLOCK = DiceRollType.BlockRoll
     val CATCH = DiceRollType.CatchRoll
 }
 
-
 sealed interface DiceRollType {
-    //data object ArmourRoll: DiceRollType
+    data object ArmourRoll: DiceRollType
+    data object BlockRoll: DiceRollType
 //data object BloodLustRoll: DiceRollType
 //data object BoneHeadRoll: DiceRollType
-//data object CasultyRoll: DiceRollType
+    data object CasultyRoll: DiceRollType
     data object CatchRoll : DiceRollType
 
     //data object DodgeRoll: DiceRollType
@@ -32,7 +35,7 @@ sealed interface DiceRollType {
 //data object RushRoll: DiceRollType
 //data object TakeRootRoll: DiceRollType
 //data object ThrowTeamMateRoll: DiceRollType
-//data object WeatherRoll: DiceRollType
+    data object WeatherRoll: DiceRollType
 //data object WildAnimalRoll: DiceRollType
 //data class CustomRoll(val id: String): DiceRollType
 
@@ -51,21 +54,54 @@ sealed interface TeamReroll: RerollSource {
 
 class RegularTeamReroll(val team: Team): TeamReroll {
     override var rerollUsed: Boolean = false
+    override fun canReroll(type: DiceRollType, value: List<DieRoll>, wasSuccess: Boolean): Boolean {
+        // TODO Some types cannot be rerolled
+        return value.all { it.rerollSource == null }
+    }
+    override fun calculateRerollOptions(
+        type: DiceRollType,
+        value: List<DieRoll>,
+        wasSuccess: Boolean
+    ): List<DiceRerollOption<DieRoll>> {
+        return listOf(DiceRerollOption(this, value))
+    }
+
+    override fun canRerollBlock(value: List<BlockDieRoll>): Boolean {
+        return value.all { it.rerollSource == null }
+    }
+
+    override fun calculateBlockRerollOptions(value: List<BlockDieRoll>): List<DiceRerollOption<BlockDieRoll>> {
+        return listOf(DiceRerollOption(this, value))
+    }
+
     override val carryOverIntoOvertime: Boolean = true
     override val isTemporary: Boolean = false
     override val rerollDescription: String = "Team reroll"
-    override fun canReroll(type: DiceRollType, wasSuccess: Boolean): Boolean {
-        return true // TODO Some rolls cannot be re-rolled
-    }
 }
 
 class LeaderTeamReroll(val player: Player): TeamReroll {
-    override var rerollUsed: Boolean = false
     override val carryOverIntoOvertime: Boolean = true
     override val isTemporary: Boolean = true
     override val rerollDescription: String = "Team reroll (Leader)"
-    override fun canReroll(type: DiceRollType, wasSuccess: Boolean): Boolean {
-        return true
+    override var rerollUsed: Boolean = false
+    override fun canReroll(type: DiceRollType, value: List<DieRoll>, wasSuccess: Boolean): Boolean {
+        return value.all { it.rerollSource == null }
+    }
+
+    override fun calculateRerollOptions(
+        type: DiceRollType,
+        value: List<DieRoll>,
+        wasSuccess: Boolean
+    ): List<DiceRerollOption<DieRoll>> {
+        return listOf(DiceRerollOption(this, value))
+    }
+
+    override fun canRerollBlock(value: List<BlockDieRoll>): Boolean {
+        return value.all { it.rerollSource == null }
+    }
+
+    override fun calculateBlockRerollOptions(value: List<BlockDieRoll>): List<DiceRerollOption<BlockDieRoll>> {
+        return listOf(DiceRerollOption(this, value))
     }
 }
 
@@ -77,12 +113,24 @@ class LeaderTeamReroll(val player: Player): TeamReroll {
 //    END_OF_GAME
 //}
 
+// Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {
     val rerollDescription: String
     var rerollUsed: Boolean
     val rerollProcedure: Procedure
-    fun canReroll(type: DiceRollType, wasSuccess: Boolean): Boolean
+    fun canReroll(type: DiceRollType, value: List<DieRoll>, wasSuccess: Boolean): Boolean
+    // Maybe overkill, since the only re-rollable rolls are single dice rolls
+    fun calculateRerollOptions(type: DiceRollType, value: List<DieRoll>, wasSuccess: Boolean): List<DiceRerollOption<DieRoll>>
+    fun calculateRerollOptions(type: DiceRollType, value: DieRoll, wasSuccess: Boolean): List<DiceRerollOption<DieRoll>> = calculateRerollOptions(type, listOf(value), wasSuccess)
+    fun canRerollBlock(value: List<BlockDieRoll>): Boolean
+    fun calculateBlockRerollOptions(value: List<BlockDieRoll>): List<DiceRerollOption<BlockDieRoll>>
 }
+
+// `rerollSource` is not set yet
+data class DiceRerollOption<T>(val source: RerollSource, val dice: List<T>)
+
+
+
 
 interface Skill: RerollSource {
     enum class UsageType {

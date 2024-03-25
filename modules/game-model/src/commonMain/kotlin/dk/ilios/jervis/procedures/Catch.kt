@@ -1,8 +1,6 @@
 package dk.ilios.jervis.procedures
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
@@ -17,7 +15,6 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.reports.ReportCatch
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 
@@ -44,12 +41,12 @@ data class CatchRollContext(
 data class CatchRollResultContext(
     val catchingPlayer: Player,
     val target: Int,
-    val diceRoll: D6Result,
     val modifiers: List<DiceModifier>,
-    val rerolled: Boolean,
-    val rerolledBy: RerollSource?,
+    val roll: DieRoll,
     val success: Boolean
-)
+) {
+    val rerolled: Boolean = roll.rerollSource != null && roll.rerolledResult != null
+}
 
 /**
  * Resolve a player attempting to catch the ball.
@@ -97,17 +94,17 @@ object Catch: Procedure() {
     object RollToCatch: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = CatchRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val result = state.catchRollResult!!
+            val result = state.catchRollResultContext!!
             return if (result.success) {
                 compositeCommandOf(
                     SetBallState.carried(result.catchingPlayer),
-                    ReportCatch(result.catchingPlayer, result.target, result.modifiers, result.diceRoll, true),
+                    ReportCatch(result.catchingPlayer, result.target, result.modifiers, result.roll.result, true),
                     ExitProcedure()
                 )
             } else {
                 compositeCommandOf(
                     SetBallState.bouncing(),
-                    ReportCatch(result.catchingPlayer, result.target, result.modifiers, result.diceRoll, false),
+                    ReportCatch(result.catchingPlayer, result.target, result.modifiers, result.roll.result, false),
                     GotoNode(CatchFailed)
                 )
             }

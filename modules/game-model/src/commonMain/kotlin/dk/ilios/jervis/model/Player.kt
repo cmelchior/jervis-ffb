@@ -3,13 +3,13 @@ package dk.ilios.jervis.model
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.skills.Skill
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlin.jvm.JvmInline
 import kotlin.properties.ObservableProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 // TODO Should we split this into DogoutState and FieldState?
 enum class PlayerState {
@@ -90,7 +90,7 @@ value class PlayerId(val value: String)
 class Player(id: PlayerId): Observable<Player>() {
     val id: PlayerId = id
     lateinit var team: Team
-    var location: Location by observable(DogOut) { old, new ->
+    var location: Location by observable(initialValue = DogOut) { old, new ->
         if ((old == DogOut && new != DogOut) || old != DogOut && new == DogOut) {
             team.notifyDogoutChange()
         }

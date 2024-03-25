@@ -154,8 +154,27 @@ interface Rules {
         return player.hasTackleZones && player.state == PlayerState.STANDING && player.location.isOnField(this)
     }
 
+    /**
+     * Return `true` if this player is able to mark other players.
+     */
     fun canMark(player: Player): Boolean {
         return player.hasTackleZones
+    }
+
+    /**
+     * Return `true` if the [assisting] player can assist another player against
+     * [target], `false` if not.
+     */
+    fun canOfferAssistAgainst(assisting: Player, target: Player): Boolean {
+        if (assisting.team == target.team) return false
+        if (!assisting.location.isAdjacent(this, target.location)) return false
+        if (!canMark(assisting)) return false
+        // TODO If player has Guard, player can always assist
+        return assisting.location.coordinate.getSurroundingCoordinates(this).firstOrNull {
+            assisting.team.game.field[it].player?.let { adjacentPlayer ->
+                adjacentPlayer.team != assisting.team && canMark(adjacentPlayer)
+            } ?: false
+        } == null
     }
 
     // Characteristics limits

@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
-import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.DiceResults
@@ -57,12 +56,13 @@ import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
-import dk.ilios.jervis.actions.RerollSourceSelected
+import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
@@ -78,11 +78,11 @@ import dk.ilios.jervis.ui.model.SidebarView
 import dk.ilios.jervis.ui.model.SidebarViewModel
 import dk.ilios.jervis.ui.model.Square
 import dk.ilios.jervis.ui.model.UIPlayer
-import kotlinx.coroutines.flow.Flow
-import org.jetbrains.skia.Image
 import java.awt.image.BufferedImage
 import java.io.InputStream
 import kotlin.random.Random
+import kotlinx.coroutines.flow.Flow
+import org.jetbrains.skia.Image
 
 // Theme
 val debugBorder = BorderStroke(2.dp,Color.Red)
@@ -400,7 +400,7 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
                     is CoinTossResult -> "Coin flip: ${action.result}"
                     is RandomPlayersSelected -> "Random players: $action"
                     NoRerollSelected -> "No reroll"
-                    is RerollSourceSelected -> action.rerollProcedure.rerollDescription
+                    is RerollOptionSelected -> action.option.toString()
                 }
                 Text(text, fontSize = 10.sp)
             }

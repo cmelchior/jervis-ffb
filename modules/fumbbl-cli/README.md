@@ -106,7 +106,7 @@ Replaying games can be done without logging in to FUMBBL, all you need to know i
 replay, using the following command:
 
 ```
-java -cp FantasyFootballClient.jar:* com.fumbbl.ffb.client.FantasyFootballClient -replay -gameId <gameId>
+java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -replay -gameId <gameId>
 ```
 
 ### Debug the Client while it is running

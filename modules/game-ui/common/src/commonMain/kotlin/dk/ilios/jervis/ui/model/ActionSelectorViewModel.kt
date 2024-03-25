@@ -17,6 +17,7 @@ import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D4Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
+import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
@@ -34,7 +35,7 @@ import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
-import dk.ilios.jervis.actions.RerollSourceSelected
+import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectCoinSide
@@ -43,8 +44,7 @@ import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.actions.SelectRandomPlayers
-import dk.ilios.jervis.actions.SelectSkillRerollSource
-import dk.ilios.jervis.actions.SelectTeamRerollSource
+import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fumbbl.CalculatedJervisAction
@@ -175,6 +175,7 @@ class ActionSelectorViewModel(
                                     Dice.D12 -> D12Result()
                                     Dice.D16 -> D16Result()
                                     Dice.D20 -> D20Result()
+                                    Dice.BLOCK -> DBlockResult()
                                 }
                             }
                             if (rolls.size == 1) {
@@ -212,8 +213,7 @@ class ActionSelectorViewModel(
                         }
 
                         SelectNoReroll -> NoRerollSelected
-                        is SelectSkillRerollSource -> RerollSourceSelected(action.skill)
-                        is SelectTeamRerollSource -> RerollSourceSelected(action.reroll)
+                        is SelectRerollOption -> RerollOptionSelected(action.option)
                     }
                 }
                 _availableActions.emit(availableActions)

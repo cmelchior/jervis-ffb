@@ -4,13 +4,36 @@ import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.rules.PlayerAction
-import dk.ilios.jervis.rules.skills.RerollSource
+import dk.ilios.jervis.rules.skills.DiceRerollOption
+import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlin.random.Random
-import dk.ilios.jervis.rules.skills.Skill
-import dk.ilios.jervis.rules.skills.TeamReroll
 
 enum class Dice {
-    D2, D3, D4, D6, D8, D12, D16, D20
+    D2, D3, D4, D6, D8, D12, D16, D20, BLOCK
+}
+
+/**
+ * Representation of a Block die.
+ * See page 57 in the rulebook.
+ */
+enum class BlockDice {
+    PLAYER_DOWN,
+    BOTH_DOWN,
+    PUSH_BACK,
+    STUMBLE,
+    POW;
+    companion object {
+        fun fromD6(roll: D6Result): BlockDice {
+            return when(roll.result) {
+                1 -> PLAYER_DOWN
+                2 -> BOTH_DOWN
+                3, 4 -> PUSH_BACK
+                5 -> STUMBLE
+                6 -> POW
+                else -> INVALID_GAME_STATE("Illegal roll: $roll")
+            }
+        }
+    }
 }
 
 // Action descriptors
@@ -36,8 +59,9 @@ data class DeselectPlayer(val player: Player): ActionDescriptor
 data class SelectAction(val action: PlayerAction): ActionDescriptor
 data class SelectRandomPlayers(val count: Int, val players: List<Player>): ActionDescriptor // This is not a single action
 
-data class SelectSkillRerollSource(val skill: Skill): ActionDescriptor
-data class SelectTeamRerollSource(val reroll: TeamReroll): ActionDescriptor
+//data class SelectSkillRerollSource(val skill: Skill): ActionDescriptor
+//data class SelectTeamRerollSource(val reroll: TeamReroll): ActionDescriptor
+data class SelectRerollOption(val option: DiceRerollOption<*>): ActionDescriptor
 data object SelectNoReroll: ActionDescriptor
 
 // Available actions
@@ -76,6 +100,9 @@ class D8Result(result: Int = Random.nextInt(1, 9)): DieResult(result, 1, 8)
 class D12Result(result: Int = Random.nextInt(1, 13)): DieResult(result, 1, 12)
 class D16Result(result: Int = Random.nextInt(1, 17)): DieResult(result, 1, 16)
 class D20Result(result: Int = Random.nextInt(1, 21)): DieResult(result, 1, 20)
+class DBlockResult(result: Int = Random.nextInt(1, 7)): DieResult(result, 1, 6) {
+    val blockResult: BlockDice = BlockDice.fromD6(D6Result(result))
+}
 class DiceResults(val rolls: List<DieResult>): GameAction {
     constructor(vararg roll: DieResult): this(listOf(*roll))
 }
@@ -92,5 +119,5 @@ data class FieldSquareSelected(val coordinate: FieldCoordinate): GameAction {
     }
 }
 data class RandomPlayersSelected(val players: List<Player>): GameAction
-data class RerollSourceSelected(val rerollProcedure: RerollSource): GameAction
+data class RerollOptionSelected(val option: DiceRerollOption<*>): GameAction
 data object NoRerollSelected: GameAction

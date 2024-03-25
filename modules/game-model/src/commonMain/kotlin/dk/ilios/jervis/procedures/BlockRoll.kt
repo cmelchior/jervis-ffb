@@ -4,7 +4,7 @@ import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.ContinueWhenReady
-import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.NoRerollSelected
@@ -23,7 +23,6 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
-import dk.ilios.jervis.rules.skills.DiceRoll
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -34,67 +33,80 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  * The result is stored in [Game.catchRollResultContext] and it is up to the caller of the procedure to
  * choose the appropriate action depending on the outcome.
  */
-object CatchRoll: Procedure() {
+object BlockRoll: Procedure() {
 
     override fun isValid(state: Game, rules: Rules) {
-        if (state.catchRollContext == null) {
+        if (state.blockContext == null) {
             INVALID_GAME_STATE("No catch roll context found")
         }
     }
 
-    override val initialNode: Node = RollDie
+    override val initialNode: Node = RollDice
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object RollDie: ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+    // Helper method to share logic between roll and reroll
+    private fun calculateNoOfBlockDice(state: Game): Int {
+        val context = state.blockContext!!
+        val attackStrength = context.attacker.strength + context.offensiveAssists
+        val defenderStrength = context.defender.strength + context.defensiveAssists
+        return when {
+            attackStrength == defenderStrength -> 1
+            attackStrength > defenderStrength * 2 -> 3
+            defenderStrength > attackStrength * 2 -> 3
+            else -> 2
+        }
+    }
+
+    object RollDice: ActionNode() {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            val noOfDice = calculateNoOfBlockDice(state)
+            return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
+        }
+
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) {
-                val rollContext = state.catchRollContext!!
-                val target = rollContext.catchingPlayer.agility
-                val resultContext = CatchRollResultContext(
-                    catchingPlayer = rollContext.catchingPlayer,
-                    target = target,
-                    modifiers = rollContext.modifiers,
-                    roll = DieRoll(originalRoll = it),
-                    success = isCatchSuccess(it, target, rollContext)
-                )
+            return checkDiceRollList<DBlockResult>(action) { it: List<DBlockResult> ->
+                val roll = it.map { diceRoll: DBlockResult ->
+                    BlockDieRoll(originalRoll = diceRoll)
+                }
                 return compositeCommandOf(
-                    SetRollContext(Game::catchRollResultContext, resultContext),
+                    SetRollContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
                     GotoNode(ChooseReRollSource)
                 )
             }
         }
     }
 
-    // Team Reroll, Pro, Catch (only if failed), other skills
     object ChooseReRollSource: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.catchRollResultContext!!
-            val successOnFirstRoll = context.success
-            val catchingPlayer = context.catchingPlayer
-            val availableSkills: List<SelectRerollOption> = catchingPlayer.skills
-                .filter { it.canReroll(DiceRoll.CATCH, listOf(context.roll), successOnFirstRoll) }
-                .flatMap { it: Skill -> it.calculateRerollOptions(DiceRoll.CATCH, context.roll, successOnFirstRoll) }
-                .map { SelectRerollOption(it) }
+            val context = state.blockContext!!
+            val attackingPlayer = context.attacker
 
-            val team = catchingPlayer.team
+            // Re-rolling block dice can be pretty complex,
+            // Brawler: Can reroll a single "Both Down"
+            // Pro: Can reroll any single die
+            // Team reroll: Can reroll all of them
+            val availableSkills: List<SelectRerollOption> = attackingPlayer.skills
+                .filter { it.canRerollBlock(context.roll) }
+                .flatMap { skill: Skill -> skill.calculateBlockRerollOptions(context.roll) }
+                .map { rerollOption: DiceRerollOption<BlockDieRoll> -> SelectRerollOption(rerollOption) }
+
+            val team = attackingPlayer.team
             val hasTeamRerolls = team.availableRerollCount > 0
             val allowedToUseTeamReroll = when(team.usedTeamRerollThisTurn) {
                 true -> rules.allowMultipleTeamRerollsPrTurn
                 false -> true
             }
-
             return if (availableSkills.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
                 listOf(ContinueWhenReady)
             } else {
-                val teamReroll = if (hasTeamRerolls && allowedToUseTeamReroll) {
-                    listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf(context.roll))))
+                val teamRerolls = if (hasTeamRerolls && allowedToUseTeamReroll) {
+                    listOf(SelectRerollOption(DiceRerollOption<BlockDieRoll>(team.availableRerolls.last(), context.roll)))
                 } else {
                     emptyList()
                 }
-                listOf(SelectNoReroll) + availableSkills + teamReroll
+                listOf(SelectNoReroll) + availableSkills + teamRerolls
             }
         }
 
@@ -127,31 +139,20 @@ object CatchRoll: Procedure() {
     }
 
     object ReRollDie: ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            val noOfDice = calculateNoOfBlockDice(state)
+            return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
+        }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) {
-                val rollResultContext = state.catchRollResultContext!!
-                val rollContext = state.catchRollContext!!
-                val target = rollContext.catchingPlayer.agility + rollContext.diceModifier()
-                val rerollResult = CatchRollResultContext(
-                    catchingPlayer = rollContext.catchingPlayer,
-                    target = target,
-                    modifiers = rollContext.modifiers,
-                    roll = rollResultContext.roll.copy(rerollSource = state.useRerollContext!!.source, rerolledResult = it),
-                    success = isCatchSuccess(it, target, rollContext)
-                )
-                compositeCommandOf(
-                    SetRollContext(Game::catchRollResultContext, rerollResult),
-                    ExitProcedure()
+            return checkDiceRollList<DBlockResult>(action) { rolls: List<DBlockResult> ->
+                val roll = rolls.map { blockRoll: DBlockResult ->
+                    BlockDieRoll(originalRoll = blockRoll)
+                }
+                return compositeCommandOf(
+                    SetRollContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
+                    GotoNode(ChooseReRollSource)
                 )
             }
         }
     }
-
-    private fun isCatchSuccess(
-        it: D6Result,
-        target: Int,
-        rollContext: CatchRollContext
-    ) = it.result != 1 && (target <= it.result + rollContext.diceModifier())
-
 }

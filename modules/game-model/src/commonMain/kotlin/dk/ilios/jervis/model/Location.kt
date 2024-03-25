@@ -18,6 +18,7 @@ sealed interface Location {
     fun isOnAwaySide(rules: Rules): Boolean
     fun isOnField(rules: Rules): Boolean
     fun isOutOfBounds(rules: Rules): Boolean
+    fun isAdjacent(rules: Rules, location: Location): Boolean
 }
 // (0, 0) is (top, left)
 data class FieldCoordinate(val x: Int, val y: Int): Location {
@@ -55,6 +56,11 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
     override fun isOutOfBounds(rules: Rules): Boolean {
         return x < 0 || x >= rules.fieldWidth.toInt() || y < 0 || y >= rules.fieldHeight.toInt()
     }
+
+    override fun isAdjacent(rules: Rules, location: Location): Boolean {
+        return distanceTo(location.coordinate) == 1u
+    }
+
     fun move(direction: Direction, steps: Int): FieldCoordinate {
         return FieldCoordinate(x + (direction.xModifier*steps), y + (direction.yModifier*steps))
     }
@@ -174,6 +180,7 @@ data object DogOut: Location {
     override fun isOnAwaySide(rules: Rules): Boolean = false
     override fun isOnField(rules: Rules): Boolean = false
     override fun isOutOfBounds(rules: Rules): Boolean = false
+    override fun isAdjacent(rules: Rules, location: Location): Boolean = false
 }
 
 

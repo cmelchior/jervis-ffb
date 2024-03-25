@@ -17,10 +17,10 @@ import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D4Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
+import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
-import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndActionWhenReady
@@ -35,7 +35,7 @@ import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
-import dk.ilios.jervis.actions.RerollSourceSelected
+import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectCoinSide
@@ -44,10 +44,16 @@ import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.actions.SelectRandomPlayers
-import dk.ilios.jervis.actions.SelectSkillRerollSource
-import dk.ilios.jervis.actions.SelectTeamRerollSource
+import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.TossCoin
-import dk.ilios.jervis.model.*
+import dk.ilios.jervis.model.Coach
+import dk.ilios.jervis.model.CoachId
+import dk.ilios.jervis.model.Coin
+import dk.ilios.jervis.model.Field
+import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.model.PlayerNo
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.teamBuilder
@@ -58,7 +64,7 @@ fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): G
         ContinueWhenReady -> Continue
         EndTurnWhenReady -> EndTurn
         is RollDice -> {
-            val results: List<DieResult> = action.dice.map {
+            val results = action.dice.map {
                 when(it) {
                     Dice.D2 -> D2Result()
                     Dice.D3 -> D3Result()
@@ -68,6 +74,7 @@ fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): G
                     Dice.D12 -> D12Result()
                     Dice.D16 -> D16Result()
                     Dice.D20 -> D20Result()
+                    Dice.BLOCK -> DBlockResult()
                 }
             }
             return DiceResults(results)
@@ -100,8 +107,7 @@ fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): G
             RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
 
         SelectNoReroll -> NoRerollSelected
-        is SelectSkillRerollSource -> RerollSourceSelected(action.skill)
-        is SelectTeamRerollSource -> RerollSourceSelected(action.reroll)
+        is SelectRerollOption -> RerollOptionSelected(action.option)
     }
 }
 

@@ -1,10 +1,9 @@
 package dk.ilios.jervis.fsm
 
-import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
-import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
@@ -55,7 +54,6 @@ abstract class ActionNode: Node {
         }
     }
 
-
     inline fun <reified D1: DieResult, reified D2: DieResult> checkDiceRoll(action: GameAction, function: (D1, D2) -> Command): Command {
         if (action is DiceResults) {
             if (action.rolls.size != 2) {
@@ -70,6 +68,19 @@ abstract class ActionNode: Node {
                 throw IllegalArgumentException("Expected first roll to be ${D1::class}, but was ${second::class}")
             }
             return function(first, second)
+        } else {
+            throw IllegalArgumentException("Action (${action::class}) is not of the expected type: ${DiceResults::class}")
+        }
+    }
+
+    inline fun <reified D1: DieResult> checkDiceRollList(action: GameAction, function: (List<D1>) -> Command): Command {
+        if (action is DiceResults) {
+            val first = action.rolls.first()
+            if (first !is D1) {
+                throw IllegalArgumentException("Expected first roll to be ${D1::class}, but was ${first::class}")
+            }
+            @Suppress("UNCHECKED_CAST")
+            return function(action.rolls as List<D1>)
         } else {
             throw IllegalArgumentException("Action (${action::class}) is not of the expected type: ${DiceResults::class}")
         }

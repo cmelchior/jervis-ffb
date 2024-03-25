@@ -25,4 +25,7 @@ class FieldSquare(val coordinates: FieldCoordinate): Observable<FieldSquare>(), 
     override fun isOnAwaySide(rules: Rules): Boolean = coordinates.isOnAwaySide(rules)
     override fun isOnField(rules: Rules): Boolean = coordinates.isOnField(rules)
     override fun isOutOfBounds(rules: Rules): Boolean = false
+    override fun isAdjacent(rules: Rules, location: Location): Boolean {
+        return this.coordinates.distanceTo(location.coordinate) == 1u
+    }
 }
