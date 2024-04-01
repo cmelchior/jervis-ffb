@@ -55,7 +55,15 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.procedures.DetermineKickingTeam
+import dk.ilios.jervis.procedures.RollForStartingFanFactor
+import dk.ilios.jervis.procedures.RollForTheWeather
 import dk.ilios.jervis.procedures.SetupTeam
+import dk.ilios.jervis.rules.tables.Blizzard
+import dk.ilios.jervis.rules.tables.PerfectConditions
+import dk.ilios.jervis.rules.tables.PouringRain
+import dk.ilios.jervis.rules.tables.SwelteringHeat
+import dk.ilios.jervis.rules.tables.VerySunny
 import dk.ilios.jervis.ui.GameMode
 import dk.ilios.jervis.ui.Manual
 import dk.ilios.jervis.ui.Replay
@@ -68,6 +76,11 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
+//
+sealed interface UserInput {
+    val actions: List<GameAction>
+}
+
 class ActionSelectorViewModel(
     private val mode: GameMode,
     private val controller: GameController,
@@ -76,9 +89,9 @@ class ActionSelectorViewModel(
     private val fumbbl: FumbblReplayAdapter?
 ) {
     val scope = CoroutineScope(CoroutineName("ActionSelectorScope") + Dispatchers.Default)
-    private val _availableActions: MutableSharedFlow<List<GameAction>> = MutableSharedFlow(extraBufferCapacity = 1)
+    private val _availableActions: MutableSharedFlow<UserInput> = MutableSharedFlow(extraBufferCapacity = 1)
     private val userSelectedAction = Channel<GameAction>(1)
-    val availableActions: Flow<List<GameAction>> = _availableActions
+    val availableActions: Flow<UserInput> = _availableActions
 
     fun start() {
         scope.launch {
@@ -160,65 +173,105 @@ class ActionSelectorViewModel(
             actions@while(true) {
                 val (controller, actions) = actionRequestChannel.receive()
                 if (useAutomatedActions(controller)) continue@actions
-                val availableActions: List<GameAction> = actions.map { action ->
-                    when (action) {
-                        ContinueWhenReady -> Continue
-                        EndTurnWhenReady -> EndTurn
-                        is RollDice -> {
-                            val rolls = action.dice.map {
-                                when(it) {
-                                    Dice.D2 -> D2Result()
-                                    Dice.D3 -> D3Result()
-                                    Dice.D4 -> D4Result()
-                                    Dice.D6 -> D6Result()
-                                    Dice.D8 -> D8Result()
-                                    Dice.D12 -> D12Result()
-                                    Dice.D16 -> D16Result()
-                                    Dice.D20 -> D20Result()
-                                    Dice.BLOCK -> DBlockResult()
-                                }
-                            }
-                            if (rolls.size == 1) {
-                                rolls.first()
-                            } else {
-                                DiceResults(rolls)
-                            }
-                        }
-                        ConfirmWhenReady -> Confirm
-                        EndSetupWhenReady -> EndSetup
-                        SelectDogout -> DogoutSelected
-                        is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
-                        is SelectPlayer -> PlayerSelected(action.player)
-                        is DeselectPlayer -> PlayerDeselected
-                        is SelectAction -> PlayerActionSelected(action.action)
-                        EndActionWhenReady -> EndAction
-                        CancelWhenReady -> Cancel
-                        SelectCoinSide -> {
-                            when(Random.nextInt(2)) {
-                                0 -> CoinSideSelected(Coin.HEAD)
-                                1 -> CoinSideSelected(Coin.TAIL)
-                                else -> throw IllegalStateException("Unsupported value")
-                            }
-                        }
-                        TossCoin -> {
-                            when(Random.nextInt(2)) {
-                                0 -> CoinTossResult(Coin.HEAD)
-                                1 -> CoinTossResult(Coin.TAIL)
-                                else -> throw IllegalStateException("Unsupported value")
-                            }
-                        }
-
-                        is SelectRandomPlayers -> {
-                            RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
-                        }
-
-                        SelectNoReroll -> NoRerollSelected
-                        is SelectRerollOption -> RerollOptionSelected(action.option)
+                val userInput = when (controller.stack.currentNode()) {
+                    is RollForStartingFanFactor.SetFanFactorForHomeTeam -> {
+                        UserInputDialog.createFanFactorDialog(controller.state.homeTeam, D3Result.allOptions())
                     }
+                    is RollForStartingFanFactor.SetFanFactorForAwayTeam -> {
+                        UserInputDialog.createFanFactorDialog(controller.state.awayTeam, D3Result.allOptions())
+                    }
+                    is RollForTheWeather.RollWeatherDice -> {
+                        // Fake the rolls for the specific results
+                        val rolls = listOf(
+                            DiceResults(D6Result(1), D6Result(1)) to "[2] ${SwelteringHeat.title}",
+                            DiceResults(D6Result(1), D6Result(2)) to "[3] ${VerySunny.title}",
+                            DiceResults(D6Result(2), D6Result(2)) to "[4] ${PerfectConditions.title}",
+                            DiceResults(D6Result(5), D6Result(6)) to "[11] ${PouringRain.title}",
+                            DiceResults(D6Result(6), D6Result(6)) to "[12] ${Blizzard.title}",
+                        ).reversed()
+                        UserInputDialog.createWeatherRollDialog(rolls)
+                    }
+                    is DetermineKickingTeam.SelectCoinSide -> {
+                        UserInputDialog.createSelectKickoffCoinTossResultDialog(controller.state.activeTeam, CoinSideSelected.allOptions())
+                    }
+                    is DetermineKickingTeam.CoinToss -> {
+                        UserInputDialog.createTossDialog(CoinTossResult.allOptions())
+                    }
+                    is DetermineKickingTeam.ChooseKickingTeam -> {
+                        val choices = listOf(
+                            Confirm to "Kickoff",
+                            Cancel to "Receive"
+                        )
+                        UserInputDialog.createChooseToKickoffDialog(controller.state.activeTeam, choices)
+                    }
+                    else -> UnknownInput(mapUnknownActions(actions))
                 }
-                _availableActions.emit(availableActions)
+                _availableActions.emit(userInput)
                 val selectedAction = userSelectedAction.receive()
                 actionSelectedChannel.send(selectedAction)
+            }
+        }
+    }
+
+    /**
+     * If we cannot determine the current state of the game. Just report [UnknownInput]
+     * and convert [ActionDescriptor]'s in a best-effort.
+     */
+    private fun mapUnknownActions(actions: List<ActionDescriptor>): List<GameAction> {
+        return actions.map { action ->
+            when (action) {
+                ContinueWhenReady -> Continue
+                EndTurnWhenReady -> EndTurn
+                is RollDice -> {
+                    val rolls = action.dice.map {
+                        when(it) {
+                            Dice.D2 -> D2Result()
+                            Dice.D3 -> D3Result()
+                            Dice.D4 -> D4Result()
+                            Dice.D6 -> D6Result()
+                            Dice.D8 -> D8Result()
+                            Dice.D12 -> D12Result()
+                            Dice.D16 -> D16Result()
+                            Dice.D20 -> D20Result()
+                            Dice.BLOCK -> DBlockResult()
+                        }
+                    }
+                    if (rolls.size == 1) {
+                        rolls.first()
+                    } else {
+                        DiceResults(rolls)
+                    }
+                }
+                ConfirmWhenReady -> Confirm
+                EndSetupWhenReady -> EndSetup
+                SelectDogout -> DogoutSelected
+                is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
+                is SelectPlayer -> PlayerSelected(action.player)
+                is DeselectPlayer -> PlayerDeselected
+                is SelectAction -> PlayerActionSelected(action.action)
+                EndActionWhenReady -> EndAction
+                CancelWhenReady -> Cancel
+                SelectCoinSide -> {
+                    when(Random.nextInt(2)) {
+                        0 -> CoinSideSelected(Coin.HEAD)
+                        1 -> CoinSideSelected(Coin.TAIL)
+                        else -> throw IllegalStateException("Unsupported value")
+                    }
+                }
+                TossCoin -> {
+                    when(Random.nextInt(2)) {
+                        0 -> CoinTossResult(Coin.HEAD)
+                        1 -> CoinTossResult(Coin.TAIL)
+                        else -> throw IllegalStateException("Unsupported value")
+                    }
+                }
+
+                is SelectRandomPlayers -> {
+                    RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
+                }
+
+                SelectNoReroll -> NoRerollSelected
+                is SelectRerollOption -> RerollOptionSelected(action.option)
             }
         }
     }

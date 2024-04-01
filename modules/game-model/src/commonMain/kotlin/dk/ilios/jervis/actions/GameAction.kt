@@ -90,18 +90,70 @@ data object Cancel: GameAction
 data object EndTurn: GameAction
 data object EndAction: GameAction
 data object EndSetup: GameAction
-data class CoinSideSelected(val side: Coin): GameAction
-data class CoinTossResult(val result: Coin): GameAction
-class D2Result(result: Int = Random.nextInt(1, 3)): DieResult(result, 1, 2)
-class D3Result(result: Int = Random.nextInt(1, 4)): DieResult(result, 1, 3)
-class D4Result(result: Int = Random.nextInt(1, 5)): DieResult(result, 1, 4)
-class D6Result(result: Int = Random.nextInt(1, 7)): DieResult(result, 1, 6)
-class D8Result(result: Int = Random.nextInt(1, 9)): DieResult(result, 1, 8)
-class D12Result(result: Int = Random.nextInt(1, 13)): DieResult(result, 1, 12)
-class D16Result(result: Int = Random.nextInt(1, 17)): DieResult(result, 1, 16)
-class D20Result(result: Int = Random.nextInt(1, 21)): DieResult(result, 1, 20)
+data class CoinSideSelected(val side: Coin): GameAction {
+    companion object {
+        fun allOptions(): List<CoinSideSelected> { return Coin.entries.map { CoinSideSelected(it) }}
+    }
+}
+data class CoinTossResult(val result: Coin): GameAction {
+    companion object {
+        fun allOptions(): List<CoinTossResult> { return Coin.entries.map { CoinTossResult(it) }}
+    }
+}
+class D2Result(result: Int = Random.nextInt(1, 3)): DieResult(result, 1, 2) {
+    companion object {
+        fun allOptions(): List<D2Result> { return (1..2).map { D2Result(it) } }
+    }
+}
+class D3Result(result: Int = Random.nextInt(1, 4)): DieResult(result, 1, 3) {
+    companion object {
+        fun allOptions(): List<D3Result> { return (1..3).map { D3Result(it) } }
+    }
+}
+class D4Result(result: Int = Random.nextInt(1, 5)): DieResult(result, 1, 4) {
+    companion object {
+        fun allOptions(): List<D4Result> { return (1..4).map { D4Result(it) } }
+    }
+}
+class D6Result(result: Int = Random.nextInt(1, 7)): DieResult(result, 1, 6) {
+    companion object {
+        fun allOptions(): List<D6Result> { return (1..6).map { D6Result(it) } }
+        fun allOptions(dice: Int): List<List<D6Result>> {
+            val list = mutableListOf<List<D6Result>>()
+            (1 .. 6).forEach { d1 ->
+                (1 .. 6).forEach { d2 ->
+                    list.add(listOf(D6Result(d1), D6Result(d2)))
+                }
+            }
+            return list
+        }
+    }
+}
+class D8Result(result: Int = Random.nextInt(1, 9)): DieResult(result, 1, 8) {
+    companion object {
+        fun allOptions(): List<D8Result> { return (1..8).map { D8Result(it) } }
+    }
+}
+class D12Result(result: Int = Random.nextInt(1, 13)): DieResult(result, 1, 12) {
+    companion object {
+        fun allOptions(): List<D12Result> { return (1..12).map { D12Result(it) } }
+    }
+}
+class D16Result(result: Int = Random.nextInt(1, 17)): DieResult(result, 1, 16) {
+    companion object {
+        fun allOptions(): List<D16Result> { return (1..16).map { D16Result(it) } }
+    }
+}
+class D20Result(result: Int = Random.nextInt(1, 21)): DieResult(result, 1, 20) {
+    companion object {
+        fun allOptions(): List<D20Result> { return (1..20).map { D20Result(it) } }
+    }
+}
 class DBlockResult(result: Int = Random.nextInt(1, 7)): DieResult(result, 1, 6) {
     val blockResult: BlockDice = BlockDice.fromD6(D6Result(result))
+    companion object {
+        fun allOptions(): List<DBlockResult> { return (1..6).map { DBlockResult(it) } }
+    }
 }
 class DiceResults(val rolls: List<DieResult>): GameAction {
     constructor(vararg roll: DieResult): this(listOf(*roll))

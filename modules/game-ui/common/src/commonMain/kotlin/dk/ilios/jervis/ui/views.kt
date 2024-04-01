@@ -1,5 +1,6 @@
 package dk.ilios.jervis.ui
 
+import UserActionDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -68,6 +69,7 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.model.ActionSelectorViewModel
+import dk.ilios.jervis.ui.model.UserInputDialog
 import dk.ilios.jervis.ui.model.FieldDetails
 import dk.ilios.jervis.ui.model.FieldViewModel
 import dk.ilios.jervis.ui.model.GameProgress
@@ -78,6 +80,8 @@ import dk.ilios.jervis.ui.model.SidebarView
 import dk.ilios.jervis.ui.model.SidebarViewModel
 import dk.ilios.jervis.ui.model.Square
 import dk.ilios.jervis.ui.model.UIPlayer
+import dk.ilios.jervis.ui.model.UnknownInput
+import dk.ilios.jervis.ui.model.UserInput
 import java.awt.image.BufferedImage
 import java.io.InputStream
 import kotlin.random.Random
@@ -361,7 +365,7 @@ fun ReplayController(vm: ReplayViewModel, modifier: Modifier) {
 
 @Composable
 fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
-    val otherActions: List<GameAction> by vm.availableActions.collectAsState(emptyList())
+    val actions: UserInput by vm.availableActions.collectAsState(UnknownInput(emptyList()))
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -376,33 +380,44 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
         ) {
             Text("Start Game", fontSize = 10.sp)
         }
-        otherActions.forEach { action: GameAction ->
-            Button(
-                modifier = Modifier.padding(0.dp),
-                contentPadding = PaddingValues(2.dp),
-                onClick = { vm.actionSelected(action) }
-            ) {
-                val text = when(action) {
-                    Confirm -> "Confirm"
-                    Continue -> "Continue"
-                    is DieResult -> action.toString()
-                    DogoutSelected -> "DogoutSelected"
-                    EndSetup -> "EndSetup"
-                    EndTurn -> "EndTurn"
-                    is FieldSquareSelected -> action.toString()
-                    is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
-                    is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
-                    is PlayerActionSelected -> "Action: ${action.action.name}"
-                    PlayerDeselected -> "Deselect active player"
-                    EndAction -> "End Action"
-                    Cancel -> "Cancel"
-                    is CoinSideSelected -> "Selected: ${action.side}"
-                    is CoinTossResult -> "Coin flip: ${action.result}"
-                    is RandomPlayersSelected -> "Random players: $action"
-                    NoRerollSelected -> "No reroll"
-                    is RerollOptionSelected -> action.option.toString()
+        when (actions) {
+            is UserInputDialog -> {
+                UserActionDialog(actions as UserInputDialog, vm)
+            }
+            else -> {
+                if (actions is UnknownInput) {
+                    actions.actions.forEach { action: GameAction ->
+                        Button(
+                            modifier = Modifier.padding(0.dp),
+                            contentPadding = PaddingValues(2.dp),
+                            onClick = { vm.actionSelected(action) }
+                        ) {
+                            val text = when(action) {
+                                Confirm -> "Confirm"
+                                Continue -> "Continue"
+                                is DieResult -> action.toString()
+                                DogoutSelected -> "DogoutSelected"
+                                EndSetup -> "EndSetup"
+                                EndTurn -> "EndTurn"
+                                is FieldSquareSelected -> action.toString()
+                                is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
+                                is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
+                                is PlayerActionSelected -> "Action: ${action.action.name}"
+                                PlayerDeselected -> "Deselect active player"
+                                EndAction -> "End Action"
+                                Cancel -> "Cancel"
+                                is CoinSideSelected -> "Selected: ${action.side}"
+                                is CoinTossResult -> "Coin flip: ${action.result}"
+                                is RandomPlayersSelected -> "Random players: $action"
+                                NoRerollSelected -> "No reroll"
+                                is RerollOptionSelected -> action.option.toString()
+                            }
+                            Text(text, fontSize = 10.sp)
+                        }
+                    }
+                } else {
+                    TODO("Unsupported type: $actions")
                 }
-                Text(text, fontSize = 10.sp)
             }
         }
     }

@@ -3,12 +3,24 @@ package dk.ilios.jervis.rules.tables
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
-sealed interface Weather
-data object SwelteringHeat: Weather
-data object VerySunny: Weather
-data object PerfectConditions: Weather
-data object PouringRain: Weather
-data object Blizzard: Weather
+sealed interface Weather {
+    val title: String
+}
+data object SwelteringHeat: Weather {
+    override val title: String = "Sweltering Heat"
+}
+data object VerySunny: Weather {
+    override val title: String = "Very Sunny"
+}
+data object PerfectConditions: Weather {
+    override val title: String = "Perfect conditions"
+}
+data object PouringRain: Weather {
+    override val title: String = "Pouring Rain"
+}
+data object Blizzard: Weather {
+    override val title: String = "Blizzard"
+}
 
 /**
  * Class representing the Weather Table on page 37 in the rulebook.

@@ -7,9 +7,9 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // Versions
-            val kotlin = version("kotlinVersion", "1.9.20")
+            val kotlin = version("kotlinVersion", "1.9.23")
             val ktor = version("ktor", "2.3.7")
-            val compose = version("compose", "1.5.11")
+            val compose = version("compose", "1.6.1")
             val coroutines = version("coroutines", "1.7.3")
             val minimalJson = version("minimalJson", "0.9.5")
             val javaAssist = version("javaAssist", "3.29.2-GA")
@@ -37,6 +37,7 @@ dependencyResolutionManagement {
     }
     repositories {
         mavenCentral()
+        google()
     }
 }
 
