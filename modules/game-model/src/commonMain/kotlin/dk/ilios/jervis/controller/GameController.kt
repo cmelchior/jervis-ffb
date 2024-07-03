@@ -18,6 +18,7 @@ import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -170,14 +171,12 @@ class GameController(
 
     fun addLog(entry: LogEntry) {
         logs.add(entry)
-        if (!_logsEvents.tryEmit(AddEntry(entry))) {
-            TODO()
-        }
+        _logsEvents.safeTryEmit(AddEntry(entry))
     }
 
     fun removeLog(entry: LogEntry) {
         if (logs.lastOrNull() == entry) {
-            _logsEvents.tryEmit(RemoveEntry(logs.removeLast()))
+            _logsEvents.safeTryEmit(RemoveEntry(logs.removeLast()))
         } else {
             throw IllegalStateException("Log could not be removed: ${entry.message}")
         }

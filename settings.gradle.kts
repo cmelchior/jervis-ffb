@@ -23,7 +23,7 @@ dependencyResolutionManagement {
             plugin("compose", "org.jetbrains.compose").versionRef(compose)
 
             // Libraries
-            library("coroutines", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+            library("coroutines", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 //            plugin
 
             //        kotlin("multiplatform").version(extra["kotlin.version"] as String)

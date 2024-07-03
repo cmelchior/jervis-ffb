@@ -8,15 +8,10 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fumbbl.FumbblReplayAdapter
 import dk.ilios.jervis.rules.BB2020Rules
-import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.ui.model.*
+import dk.ilios.jervis.ui.viewmodel.*
 import dk.ilios.jervis.utils.createDefaultGameState
-import dk.ilios.jervis.utils.createRandomAction
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
 
@@ -52,6 +47,13 @@ class GameScreenModel(val mode: GameMode): ScreenModel {
 class GameScreen(val screenModel: GameScreenModel): Screen {
     @Composable
     override fun Content() {
+
+        val uiActionFactory = when(screenModel.mode) {
+            Manual -> ManualModeUiActionFactory(screenModel)
+            Random -> RandomModeUiActionFactory(screenModel)
+            is Replay -> ReplayModeUiActionFactory(screenModel)
+        }
+
 //fun App(
 //    controller: GameController,
 //    actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
@@ -59,13 +61,14 @@ class GameScreen(val screenModel: GameScreenModel): Screen {
 //    fumbbl: FumbblReplayAdapter? = null
 //) {
     Screen(
-        FieldViewModel(screenModel.controller.state.field),
-        SidebarViewModel(screenModel.controller.state.homeTeam),
-        SidebarViewModel(screenModel.controller.state.awayTeam),
+        FieldViewModel(uiActionFactory, screenModel.controller.state.field),
+        SidebarViewModel(uiActionFactory, screenModel.controller.state.homeTeam),
+        SidebarViewModel(uiActionFactory, screenModel.controller.state.awayTeam),
         GameStatusViewModel(screenModel.controller),
         ReplayViewModel(screenModel.controller),
-        ActionSelectorViewModel(screenModel.mode, screenModel.controller, screenModel.actionRequestChannel, screenModel.actionSelectedChannel, screenModel.fumbbl),
+        ActionSelectorViewModel(uiActionFactory),
         LogViewModel(screenModel.controller),
+        DialogsViewModel(uiActionFactory)
     )
 //}
     }

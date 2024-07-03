@@ -57,6 +57,7 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.teamBuilder
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlin.random.Random
 
 fun createRandomAction(state: Game, availableActions: List<ActionDescriptor>): GameAction {
@@ -166,4 +167,10 @@ fun createDefaultGameState(rules: BB2020Rules): Game {
     }
     val field = Field.createForRuleset(rules)
     return Game(team1, team2, field)
+}
+
+fun <T: Any?> MutableSharedFlow<T>.safeTryEmit(value: T) {
+    if (!this.tryEmit(value)) {
+        throw IllegalStateException("Failed to emit value: $value")
+    }
 }

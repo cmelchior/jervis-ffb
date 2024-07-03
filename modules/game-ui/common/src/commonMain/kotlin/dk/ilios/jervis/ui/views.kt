@@ -1,9 +1,9 @@
 package dk.ilios.jervis.ui
 
-import UserActionDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,17 +20,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -39,12 +38,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
@@ -64,28 +61,23 @@ import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
-import dk.ilios.jervis.model.FieldSquare
-import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.ui.images.IconFactory
-import dk.ilios.jervis.ui.model.ActionSelectorViewModel
-import dk.ilios.jervis.ui.model.UserInputDialog
-import dk.ilios.jervis.ui.model.FieldDetails
-import dk.ilios.jervis.ui.model.FieldViewModel
-import dk.ilios.jervis.ui.model.GameProgress
-import dk.ilios.jervis.ui.model.GameStatusViewModel
-import dk.ilios.jervis.ui.model.LogViewModel
-import dk.ilios.jervis.ui.model.ReplayViewModel
-import dk.ilios.jervis.ui.model.SidebarView
-import dk.ilios.jervis.ui.model.SidebarViewModel
-import dk.ilios.jervis.ui.model.Square
-import dk.ilios.jervis.ui.model.UIPlayer
-import dk.ilios.jervis.ui.model.UnknownInput
-import dk.ilios.jervis.ui.model.UserInput
+import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
+import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
+import dk.ilios.jervis.ui.viewmodel.UserInputDialog
+import dk.ilios.jervis.ui.viewmodel.FieldViewModel
+import dk.ilios.jervis.ui.viewmodel.GameProgress
+import dk.ilios.jervis.ui.viewmodel.GameStatusViewModel
+import dk.ilios.jervis.ui.viewmodel.LogViewModel
+import dk.ilios.jervis.ui.viewmodel.ReplayViewModel
+import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
+import dk.ilios.jervis.ui.model.UiPlayer
+import dk.ilios.jervis.ui.viewmodel.UnknownInput
+import dk.ilios.jervis.ui.viewmodel.UserInput
 import java.awt.image.BufferedImage
 import java.io.InputStream
 import kotlin.random.Random
-import kotlinx.coroutines.flow.Flow
 import org.jetbrains.skia.Image
 
 // Theme
@@ -171,111 +163,7 @@ fun SpriteFromSheet() {
     )
 }
 
-@Composable
-fun Player(modifier: Modifier, player: Player) {
-    val backgroundColor = if (player.state == PlayerState.STUNNED) Color.White else Color.Transparent
-    Box(modifier = modifier.aspectRatio(1f).background(color = backgroundColor)) {
-        val playerImage = remember { IconFactory.getImage(player).toComposeImageBitmap() }
-        val ballImage = remember { IconFactory.getHeldBallOverlay().toComposeImageBitmap() }
-        Image(
-            bitmap = playerImage,
-            contentDescription = null,
-            alignment = Alignment.Center,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.fillMaxSize()
-        )
-        if (player.hasBall()) {
-            Image(
-                bitmap = ballImage,
-                contentDescription = null,
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
-    }
-}
 
-@Composable
-fun Reserves(reserves: Flow<List<Player>>) {
-    val state: List<Player> by reserves.collectAsState(emptyList())
-    Column(modifier = Modifier.fillMaxWidth()) {
-        SectionHeader("Reserves")
-        for (index in state.indices step 5) {
-            Row {
-                val modifier = Modifier.weight(1f).aspectRatio(1f)
-                repeat(5) { x ->
-                    if (index + x < state.size) {
-                        Player(modifier, state[index + x])
-                    } else {
-                        // Use empty box. Unsure if we can remove this
-                        // if we want a partial row to scale correctly.
-                        Box(modifier = modifier)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun Injuries(
-    knockedOut: SnapshotStateList<UIPlayer>,
-    badlyHurt: SnapshotStateList<UIPlayer>,
-    seriousInjuries: SnapshotStateList<UIPlayer>,
-    dead: SnapshotStateList<UIPlayer>
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        SectionHeader("Knocked Out")
-        SectionHeader("Badly Hurt")
-        SectionHeader("Seriously Injured")
-        SectionHeader("Killed")
-        SectionHeader("Banned")
-    }
-}
-
-@Composable
-fun Sidebar(vm: SidebarViewModel, modifier: Modifier) {
-    Column(modifier = modifier) {
-        Box(modifier = Modifier.aspectRatio(vm.aspectRatio)) {
-            Image(
-                alignment = Alignment.TopStart,
-                painter = painterResource("icons/sidebar/background_box.png"),
-                contentDescription = "Box",
-                modifier = modifier.fillMaxSize()
-            )
-            val view by vm.view().collectAsState()
-            when(view) {
-                SidebarView.RESERVES -> Reserves(vm.reserves())
-                SidebarView.INJURIES -> Injuries(
-                    vm.knockedOut(),
-                    vm.badlyHurt(),
-                    vm.seriousInjuries(),
-                    vm.dead()
-                )
-            }
-
-            Row(modifier = Modifier.align(Alignment.BottomCenter)) {
-                Button(
-                    onClick = { vm.toggleReserves() },
-                    colors = FumbblButtonColors(),
-                    modifier = Modifier.weight(1f),
-                ) {
-                    val reserveCount by vm.reserveCount().collectAsState()
-                    Text(text = "$reserveCount Rsv", maxLines = 1)
-                }
-                Button(
-                    onClick = { vm.toggleInjuries() },
-                    colors = FumbblButtonColors(),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    val injuriesCount by vm.injuriesCount().collectAsState()
-                    Text(text = "$injuriesCount Out", maxLines = 1)
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun Screen(
@@ -285,8 +173,10 @@ fun Screen(
     gameStatusController: GameStatusViewModel,
     replayController: ReplayViewModel,
     actionSelector: ActionSelectorViewModel,
-    logs: LogViewModel
+    logs: LogViewModel,
+    dialogsViewModel: DialogsViewModel
 ) {
+    Dialogs(dialogsViewModel)
     Box {
         Column {
             Row(modifier = Modifier
@@ -363,6 +253,37 @@ fun ReplayController(vm: ReplayViewModel, modifier: Modifier) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun Dialogs(vm: DialogsViewModel) {
+    val actions: UserInput? by vm.availableActions.collectAsState(null)
+    when (actions) {
+        is UserInputDialog -> {
+            val dialog = actions as UserInputDialog
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(text = dialog.title) },
+                text = { Text(text = dialog.message) },
+                confirmButton = {
+                    dialog.actionDescriptions.forEach { (action, description) ->
+                        Button(
+                            onClick = { vm.buttonActionSelected(action) }
+                        ) {
+                            Text(text = description)
+                        }
+                    }
+                },
+                properties = DialogProperties(
+                    usePlatformDefaultWidth = true,
+                    scrimColor = Color.Black.copy(alpha = 0.6f)
+                )
+            )
+        }
+        null -> { /* Do nothing */ }
+        else -> TODO("Not supported: $actions")
+    }
+}
+
 @Composable
 fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
     val actions: UserInput by vm.availableActions.collectAsState(UnknownInput(emptyList()))
@@ -381,44 +302,38 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
             Text("Start Game", fontSize = 10.sp)
         }
         when (actions) {
-            is UserInputDialog -> {
-                UserActionDialog(actions as UserInputDialog, vm)
-            }
-            else -> {
-                if (actions is UnknownInput) {
-                    actions.actions.forEach { action: GameAction ->
-                        Button(
-                            modifier = Modifier.padding(0.dp),
-                            contentPadding = PaddingValues(2.dp),
-                            onClick = { vm.actionSelected(action) }
-                        ) {
-                            val text = when(action) {
-                                Confirm -> "Confirm"
-                                Continue -> "Continue"
-                                is DieResult -> action.toString()
-                                DogoutSelected -> "DogoutSelected"
-                                EndSetup -> "EndSetup"
-                                EndTurn -> "EndTurn"
-                                is FieldSquareSelected -> action.toString()
-                                is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
-                                is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
-                                is PlayerActionSelected -> "Action: ${action.action.name}"
-                                PlayerDeselected -> "Deselect active player"
-                                EndAction -> "End Action"
-                                Cancel -> "Cancel"
-                                is CoinSideSelected -> "Selected: ${action.side}"
-                                is CoinTossResult -> "Coin flip: ${action.result}"
-                                is RandomPlayersSelected -> "Random players: $action"
-                                NoRerollSelected -> "No reroll"
-                                is RerollOptionSelected -> action.option.toString()
-                            }
-                            Text(text, fontSize = 10.sp)
+            is UnknownInput -> {
+                actions.actions.forEach { action: GameAction ->
+                    Button(
+                        modifier = Modifier.padding(0.dp),
+                        contentPadding = PaddingValues(2.dp),
+                        onClick = { vm.actionSelected(action) }
+                    ) {
+                        val text = when(action) {
+                            Confirm -> "Confirm"
+                            Continue -> "Continue"
+                            is DieResult -> action.toString()
+                            DogoutSelected -> "DogoutSelected"
+                            EndSetup -> "EndSetup"
+                            EndTurn -> "EndTurn"
+                            is FieldSquareSelected -> action.toString()
+                            is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
+                            is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
+                            is PlayerActionSelected -> "Action: ${action.action.name}"
+                            PlayerDeselected -> "Deselect active player"
+                            EndAction -> "End Action"
+                            Cancel -> "Cancel"
+                            is CoinSideSelected -> "Selected: ${action.side}"
+                            is CoinTossResult -> "Coin flip: ${action.result}"
+                            is RandomPlayersSelected -> "Random players: $action"
+                            NoRerollSelected -> "No reroll"
+                            is RerollOptionSelected -> action.option.toString()
                         }
+                        Text(text, fontSize = 10.sp)
                     }
-                } else {
-                    TODO("Unsupported type: $actions")
                 }
             }
+            else -> TODO("Unsupported type: $actions")
         }
     }
 }
@@ -436,59 +351,3 @@ fun LogViewer(vm: LogViewModel, modifier: Modifier) {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun Field(vm: FieldViewModel, modifier: Modifier) {
-    val field: FieldDetails by vm.field().collectAsState()
-    val highlightedSquare: Square? by vm.highlights().collectAsState()
-
-    Box(modifier = modifier
-        .fillMaxSize()
-        .aspectRatio(vm.aspectRatio)
-    ) {
-        Image(
-            painter = painterResource(field.resource),
-            contentDescription = field.description,
-            modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.TopStart)
-        )
-        Column(modifier = Modifier
-            .fillMaxSize()
-        ) {
-            repeat(vm.height) { height: Int ->
-                Row(modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-                ) {
-                    repeat(vm.width) { width ->
-                        val hover: Boolean by remember {
-                            derivedStateOf {
-                                Square(width, height) == highlightedSquare
-                            }
-                        }
-                        val square: FieldSquare by vm.observeSquare(width, height).collectAsState(FieldSquare(-1, -1))
-                        val boxModifier = Modifier.fillMaxSize().weight(1f)
-                        Box(modifier = boxModifier
-                            .background(color = if (hover) {
-                                Color.Cyan.copy(alpha = 0.25f)
-                            } else {
-                                Color.Transparent
-                            })
-                            .onPointerEvent(PointerEventType.Enter) {
-                                vm.hoverOver(Square(width, height))
-                            }
-                        ) {
-                            square.player?.let {
-                                Player(boxModifier, it)
-                            }
-                            square.ball?.let {
-                              Image(bitmap = IconFactory.getBall().toComposeImageBitmap(), contentDescription = "")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}

@@ -26,7 +26,8 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation("org.jetbrains.skiko:skiko-awt-runtime-macos-arm64:+")
+//                implementation(compose.desktop.macos_arm64)
+//                implementation("org.jetbrains.skiko:skiko-awt-runtime-macos-arm64:+")
                 api(compose.preview)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.desktop.uiTestJUnit4)

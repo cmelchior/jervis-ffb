@@ -1,20 +1,23 @@
-package dk.ilios.jervis.ui.model
+package dk.ilios.jervis.ui.viewmodel
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.ui.model.UiPlayer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 enum class SidebarView {
     RESERVES, INJURIES
 }
 
-class SidebarViewModel(val team: Team) {
+class SidebarViewModel(private val uiActionFactory: UiActionFactory, val team: Team) {
     // Image is 145f/430f, but we need to stretch to make it fit the field image.
     val aspectRatio: Float = 152.42f/452f
 
@@ -22,19 +25,37 @@ class SidebarViewModel(val team: Team) {
     private val _reserveCount = MutableStateFlow<Int?>(null)
     private val _injuriesCount = MutableStateFlow<Int?>(null)
 
+    init {
+        // How to handle both user input and
+        //
+    }
+
+
     fun view(): StateFlow<SidebarView> = _view
     fun reserveCount(): StateFlow<Int?> = _reserveCount
-    fun reserves(): Flow<List<Player>> {
+    fun reserves(): Flow<List<UiPlayer>> {
         return team.dogoutFlow.map { players: List<Player> ->
             players
                 .filter { it.state == PlayerState.STANDING }
                 .sortedBy { it.number }
+        }.combine(uiActionFactory.fieldActions) { e1: List<Player>, e2: UserInput ->
+            val selectablePlayers = if (e2 is SelectPlayerInput) {
+                e2.actions.associateBy { (it as PlayerSelected).player }
+            } else {
+                emptyMap()
+            }
+            e1.map {
+                val selectAction = selectablePlayers[it]?.let {
+                    { uiActionFactory.userSelectedAction(it) }
+                }
+                UiPlayer(it, selectAction)
+            }
         }
     }
-    fun knockedOut(): SnapshotStateList<UIPlayer> = mutableStateListOf()
-    fun badlyHurt(): SnapshotStateList<UIPlayer> = mutableStateListOf()
-    fun seriousInjuries(): SnapshotStateList<UIPlayer> = mutableStateListOf()
-    fun dead(): SnapshotStateList<UIPlayer> = mutableStateListOf()
+    fun knockedOut(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+    fun badlyHurt(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+    fun seriousInjuries(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+    fun dead(): SnapshotStateList<UiPlayer> = mutableStateListOf()
     fun injuriesCount(): StateFlow<Int?> = _injuriesCount
 
     init {

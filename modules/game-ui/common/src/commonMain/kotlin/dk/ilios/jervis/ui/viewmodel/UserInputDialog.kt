@@ -1,4 +1,4 @@
-package dk.ilios.jervis.ui.model
+package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
@@ -30,7 +30,6 @@ data class UserInputDialog(
 ): UserInput {
     override val actions: List<GameAction> = actionDescriptions.map { it.first }
     companion object {
-
         private fun getDescription(action: GameAction): String {
             return when(action) {
                 Confirm -> "Confirm"
@@ -90,6 +89,12 @@ data class UserInputDialog(
             title = "Kickoff?",
             message = "${team.name} must choose to kick-off or receive",
             actions = actions
+        )
+
+        fun createInvalidSetupDialog(team: Team): UserInputDialog = create(
+            title = "Invalid Setup",
+            message = "Invalid setup, please try again",
+            actions = listOf(Confirm)
         )
     }
 }

@@ -5,6 +5,7 @@ import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
 import dk.ilios.jervis.rules.skills.TeamReroll
+import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -22,7 +23,7 @@ class TeamDriveData(private val game: Game) {
 
 class TeamTurnData(private val game: Game) {
     var currentTurn by Delegates.observable(0u) { prop, old, new ->
-        game.gameFlow.tryEmit(game)
+        game.gameFlow.safeTryEmit(game)
     }
     var moveActions: Int
         get() = availableActions[PlayerActionType.MOVE]!!
@@ -127,9 +128,9 @@ class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
 
     fun notifyDogoutChange() {
         val playersInDogout = noToPlayer.values.filter { it.location == DogOut }
-        _dogoutState.tryEmit(playersInDogout)
+        _dogoutState.safeTryEmit(playersInDogout)
     }
-    private val _dogoutState = MutableSharedFlow<List<Player>>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _dogoutState = MutableSharedFlow<List<Player>>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
     val dogoutFlow: SharedFlow<List<Player>> = _dogoutState
 
 }

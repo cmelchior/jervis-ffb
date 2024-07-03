@@ -3,6 +3,7 @@ package dk.ilios.jervis.model
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.skills.Skill
+import dk.ilios.jervis.utils.safeTryEmit
 import kotlin.jvm.JvmInline
 import kotlin.properties.ObservableProperty
 import kotlin.properties.ReadWriteProperty
@@ -56,12 +57,12 @@ value class PlayerNo(val number: Int): Comparable<PlayerNo> {
 }
 
 abstract class Observable<T> {
-    private val _state = MutableSharedFlow<T>(replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _state = MutableSharedFlow<T>(replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
     protected val observeState: SharedFlow<T> = _state
     protected fun <P> observable(initialValue: P, onChange: ((oldValue: P, newValue: P) -> Unit)? = null): ReadWriteProperty<Any?, P> {
         return object: ObservableProperty<P>(initialValue) {
             override fun afterChange(property: KProperty<*>, oldValue: P, newValue: P) {
-                _state.tryEmit(this@Observable as T)
+                _state.safeTryEmit(this@Observable as T)
                 onChange?.let {
                     onChange(oldValue, newValue)
                 }
@@ -69,7 +70,7 @@ abstract class Observable<T> {
         }
     }
     public fun notifyUpdate() {
-        _state.tryEmit(this as T)
+        _state.safeTryEmit(this as T)
     }
 }
 

@@ -1,4 +1,4 @@
-package dk.ilios.jervis.ui.model
+package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.controller.AddEntry
 import dk.ilios.jervis.controller.GameController

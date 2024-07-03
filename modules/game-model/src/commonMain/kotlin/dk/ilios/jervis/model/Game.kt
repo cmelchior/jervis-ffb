@@ -7,6 +7,7 @@ import dk.ilios.jervis.procedures.CatchRollResultContext
 import dk.ilios.jervis.procedures.RerollContext
 import dk.ilios.jervis.procedures.RerollResultContext
 import dk.ilios.jervis.rules.PlayerAction
+import dk.ilios.jervis.utils.safeTryEmit
 import kotlin.properties.Delegates
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,10 +24,10 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var goalScored: Boolean = false
     var abortIfBallOutOfBounds: Boolean = false
     var halfNo by Delegates.observable(0u) { prop, old, new ->
-        gameFlow.tryEmit(this)
+        gameFlow.safeTryEmit(this)
     }
     var driveNo by Delegates.observable(0) { prop, old, new ->
-        gameFlow.tryEmit(this)
+        gameFlow.safeTryEmit(this)
     }
 
     val homeTeam: Team = homeTeam

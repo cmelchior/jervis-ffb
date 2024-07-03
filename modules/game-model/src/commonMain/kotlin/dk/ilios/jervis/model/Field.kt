@@ -2,11 +2,12 @@ package dk.ilios.jervis.model
 
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
+import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
-class Field(width: UInt, height: UInt): Iterable<FieldSquare> {
+class Field(val width: UInt, val height: UInt): Iterable<FieldSquare> {
 
     private val field: Array<Array<FieldSquare>> = Array(width.toInt()) { x: Int ->
         Array(height.toInt()) {y: Int ->
@@ -54,9 +55,9 @@ class Field(width: UInt, height: UInt): Iterable<FieldSquare> {
 
     fun notifyFieldChange() {
         // TODO Snapshot the field?
-        _fieldState.tryEmit(this)
+        _fieldState.safeTryEmit(this)
     }
-    private val _fieldState = MutableSharedFlow<Field>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _fieldState = MutableSharedFlow<Field>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
     val fieldFlow: SharedFlow<Field> = _fieldState
 
     companion object {
