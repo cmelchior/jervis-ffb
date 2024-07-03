@@ -81,33 +81,40 @@ interface Rules {
         if (totalAvailablePlayers < maxPlayersOnField && inReserve.isNotEmpty()) {
             return false
         }
+
         // Otherwise 11 players must be on the field
         if (onField.size.toUInt() != maxPlayersOnField) {
-            println("${onField.size.toUInt()}, $maxPlayersOnField")
             return false
         }
 
-        // 3 players must be on LoS, or if less than 3 players, all must be on LoS
+        // Check LoS requirements
         val field = state.field
         val losIndex: Int = if (isHomeTeam) lineOfScrimmageHome else lineOfScrimmageAway
         val playersOnLos = (0u + wideZone until fieldHeight - wideZone).filter { y: UInt ->
             !field[losIndex, y.toInt()].isEmpty()
         }.size
-        if (onField.size.toUInt() < playersRequiredOnLineOfScrimmage && onField.size != playersOnLos) {
-            return false
-        }
+
+        // If available, 3 players must be on the widezone LoS
         if (onField.size.toUInt() >= playersRequiredOnLineOfScrimmage && playersOnLos < playersRequiredOnLineOfScrimmage.toInt()) {
             return false
         }
 
-        // Max 2 players in top wide zone
+        // If less than 3 players, all must be on the widezone LoS
+        if (onField.size.toUInt() < playersRequiredOnLineOfScrimmage && onField.size != playersOnLos) {
+            return false
+        }
+
+        // Max 2 players in top wide zone. They must not be on the widezone LoS.
         var count = 0
         if (isHomeTeam) {
-            (0 until lineOfScrimmageHome).forEach { x ->
+            (0 .. lineOfScrimmageHome).forEach { x ->
                 (0 until wideZone.toInt()).forEach { y ->
-                    if (!field[x, y].isEmpty()) {
+                    if (x == 12 && y == 2) {
+                        println("Hello")
+                    }
+                    if (field[x, y].isNotEmpty()) {
                         // They must not be on the LoS
-                        if (x == (lineOfScrimmageHome - 1)) {
+                        if (x == lineOfScrimmageHome) {
                             return false
                         }
                         count++
@@ -115,9 +122,9 @@ interface Rules {
                 }
             }
         } else {
-            (fieldWidth - 1u until lineOfScrimmageAway.toUInt()).forEach { x ->
+            (fieldWidth - 1u downTo lineOfScrimmageAway.toUInt()).forEach { x ->
                 (0u until wideZone).forEach { y ->
-                    if (!field[x.toInt(), y.toInt()].isEmpty()) {
+                    if (field[x.toInt(), y.toInt()].isNotEmpty()) {
                         // They must not be on the LoS
                         if (x == lineOfScrimmageAway.toUInt()) {
                             return false
@@ -131,9 +138,8 @@ interface Rules {
             return false
         }
 
-        // Max 2 players in each wide zone
-        // They must not be on the LoS
-        // TODO
+        // TODO Max 2 players in bottom wide zone
+        // TODO They must not be on the LoS
         return true
     }
 
