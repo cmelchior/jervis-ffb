@@ -17,8 +17,10 @@ import dk.ilios.jervis.rules.roster.bb2020.HumanTeam.HALFLING_HOPEFUL
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam.LINEMAN
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam.OGRE
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam.THROWER
+import kotlinx.serialization.Serializable
 
 // See Spike! Journal Issue 13
+@Serializable
 data object KhorneTeam: BB2020Roster {
     val BLOODBORN_MARAUDER_LINEMEN = BB2020Position(
         KhorneTeam,

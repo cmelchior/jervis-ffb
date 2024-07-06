@@ -11,6 +11,8 @@ import kotlin.reflect.KProperty
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 // TODO Should we split this into DogoutState and FieldState?
 enum class PlayerState {
@@ -44,6 +46,7 @@ enum class PlayerState {
 }
 
 
+@Serializable
 @JvmInline
 value class PlayerNo(val number: Int): Comparable<PlayerNo> {
     override fun compareTo(other: PlayerNo): Int {
@@ -57,7 +60,7 @@ value class PlayerNo(val number: Int): Comparable<PlayerNo> {
 }
 
 abstract class Observable<T> {
-    private val _state = MutableSharedFlow<T>(replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
+    private val _state = MutableSharedFlow<T>(replay = 1, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
     protected val observeState: SharedFlow<T> = _state
     protected fun <P> observable(initialValue: P, onChange: ((oldValue: P, newValue: P) -> Unit)? = null): ReadWriteProperty<Any?, P> {
         return object: ObservableProperty<P>(initialValue) {
@@ -85,11 +88,14 @@ enum class Availability {
     UNAVAILABLE // Unavailable for this turn
 }
 
+
 @JvmInline
+@Serializable
 value class PlayerId(val value: String)
 
-class Player(id: PlayerId): Observable<Player>() {
-    val id: PlayerId = id
+@Serializable
+class Player(val id: PlayerId): Observable<Player>() {
+    @Transient
     lateinit var team: Team
     var location: Location by observable(initialValue = DogOut) { old, new ->
         if ((old == DogOut && new != DogOut) || old != DogOut && new == DogOut) {
@@ -142,6 +148,7 @@ class Player(id: PlayerId): Observable<Player>() {
     fun hasBall(): Boolean = (ball != null)
 
     // Expose updats to this class as Flow
+    @Transient
     val observePlayer = observeState
 
     override fun toString(): String {

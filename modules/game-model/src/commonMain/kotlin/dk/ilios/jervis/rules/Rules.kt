@@ -67,7 +67,6 @@ object KickOffEventTable {
     }
 }
 
-
 interface Rules {
 
     fun isValidSetup(state: Game): Boolean {
@@ -109,9 +108,6 @@ interface Rules {
         if (isHomeTeam) {
             (0 .. lineOfScrimmageHome).forEach { x ->
                 (0 until wideZone.toInt()).forEach { y ->
-                    if (x == 12 && y == 2) {
-                        println("Hello")
-                    }
                     if (field[x, y].isNotEmpty()) {
                         // They must not be on the LoS
                         if (x == lineOfScrimmageHome) {
@@ -144,7 +140,7 @@ interface Rules {
     }
 
     // Roll on the random direction template
-    fun randomDirection(d8: D8Result): Direction = randomDirectionTemplate.roll(d8)
+    fun direction(d8: D8Result): Direction = randomDirectionTemplate.roll(d8)
     fun cornerThrowIn(corner: CornerThrowInPosition, d3: D3Result): Direction {
         return randomDirectionTemplate.roll(corner, d3)
     }

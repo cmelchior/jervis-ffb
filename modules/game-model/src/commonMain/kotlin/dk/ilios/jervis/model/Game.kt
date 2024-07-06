@@ -11,6 +11,7 @@ import dk.ilios.jervis.utils.safeTryEmit
 import kotlin.properties.Delegates
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.serialization.Transient
 
 class Game(homeTeam: Team, awayTeam: Team, field: Field) {
 
@@ -98,5 +99,6 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
         inactiveTeam = currentTeam
     }
 
+    @Transient
     val gameFlow = MutableSharedFlow<Game>(replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 }

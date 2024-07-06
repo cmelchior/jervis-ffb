@@ -6,7 +6,9 @@ import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.RemoveCurrentProcedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
+import kotlinx.serialization.Serializable
 
+@Serializable
 abstract class Procedure {
     open fun name(): String = this::class.simpleName!!
     abstract val initialNode: Node

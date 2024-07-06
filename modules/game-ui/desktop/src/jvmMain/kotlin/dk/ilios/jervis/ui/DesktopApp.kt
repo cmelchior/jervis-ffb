@@ -15,6 +15,7 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.teamBuilder
+import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 import dk.ilios.jervis.utils.createRandomAction
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -66,5 +67,5 @@ fun AppPreview() {
     }
 //    val controller = GameController(rules, state, actionProvider)
     val controller = GameController(rules, state)
-    App() // controller, actionRequestChannel, actionSelectedChannel)
+    App(MenuViewModel()) // controller, actionRequestChannel, actionSelectedChannel)
 }

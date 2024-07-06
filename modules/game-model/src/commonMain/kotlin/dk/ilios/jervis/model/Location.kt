@@ -2,6 +2,7 @@ package dk.ilios.jervis.model
 
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Direction
+import kotlinx.serialization.Serializable
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -21,6 +22,7 @@ sealed interface Location {
     fun isAdjacent(rules: Rules, location: Location): Boolean
 }
 // (0, 0) is (top, left)
+@Serializable
 data class FieldCoordinate(val x: Int, val y: Int): Location {
 
     companion object {

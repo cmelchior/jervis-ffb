@@ -15,7 +15,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
 
-class GameScreenModel(val mode: GameMode): ScreenModel {
+class GameScreenModel(
+    val mode: GameMode,
+    menuViewModel: MenuViewModel,
+    controller: GameController? = null
+): ScreenModel {
     val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
     val actionSelectedChannel = Channel<GameAction>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
     val controller: GameController
@@ -23,53 +27,52 @@ class GameScreenModel(val mode: GameMode): ScreenModel {
     val rules: BB2020Rules = BB2020Rules
 
     init {
-        when(mode) {
-            Manual -> {
-                fumbbl = null
-                controller = GameController(rules, createDefaultGameState(rules))
-            }
-            Random -> {
-                fumbbl = null
-                controller = GameController(rules, createDefaultGameState(rules))
-            }
-            is Replay -> {
-                fumbbl = FumbblReplayAdapter(mode.file.toOkioPath()).also { adapter ->
-                    runBlocking {
-                        adapter.loadCommands()
+        if (controller != null) {
+            this.controller = controller
+            fumbbl = null
+        } else {
+            when (mode) {
+                Manual -> {
+                    fumbbl = null
+                    this.controller = GameController(rules, createDefaultGameState(rules))
+                }
+
+                Random -> {
+                    fumbbl = null
+                    this.controller = GameController(rules, createDefaultGameState(rules))
+                }
+
+                is Replay -> {
+                    fumbbl = FumbblReplayAdapter(mode.file.toOkioPath()).also { adapter ->
+                        runBlocking {
+                            adapter.loadCommands()
+                        }
+                        this.controller = GameController(rules, adapter.getGame())
                     }
-                    controller = GameController(rules, adapter.getGame())
                 }
             }
         }
+        menuViewModel.controller = this.controller
     }
 }
 
-class GameScreen(val screenModel: GameScreenModel): Screen {
+class GameScreen(val screenModel: GameScreenModel, private val actions: List<GameAction>): Screen {
     @Composable
     override fun Content() {
-
         val uiActionFactory = when(screenModel.mode) {
-            Manual -> ManualModeUiActionFactory(screenModel)
+            Manual -> ManualModeUiActionFactory(screenModel, actions)
             Random -> RandomModeUiActionFactory(screenModel)
             is Replay -> ReplayModeUiActionFactory(screenModel)
         }
-
-//fun App(
-//    controller: GameController,
-//    actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
-//    actionSelectedChannel: Channel<GameAction>,
-//    fumbbl: FumbblReplayAdapter? = null
-//) {
-    Screen(
-        FieldViewModel(uiActionFactory, screenModel.controller.state.field),
-        SidebarViewModel(uiActionFactory, screenModel.controller.state.homeTeam),
-        SidebarViewModel(uiActionFactory, screenModel.controller.state.awayTeam),
-        GameStatusViewModel(screenModel.controller),
-        ReplayViewModel(screenModel.controller),
-        ActionSelectorViewModel(uiActionFactory),
-        LogViewModel(screenModel.controller),
-        DialogsViewModel(uiActionFactory)
-    )
-//}
+        Screen(
+            FieldViewModel(uiActionFactory, screenModel.controller.state.field),
+            SidebarViewModel(uiActionFactory, screenModel.controller.state.homeTeam),
+            SidebarViewModel(uiActionFactory, screenModel.controller.state.awayTeam),
+            GameStatusViewModel(screenModel.controller),
+            ReplayViewModel(screenModel.controller),
+            ActionSelectorViewModel(uiActionFactory),
+            LogViewModel(screenModel.controller),
+            DialogsViewModel(uiActionFactory)
+        )
     }
 }

@@ -35,6 +35,7 @@ class GameController(
     val logs: MutableList<LogEntry> = mutableListOf()
     val rules: Rules = rules
     val stack: ProcedureStack = ProcedureStack()
+    val actionHistory: MutableList<GameAction> = mutableListOf() // List all actions provided by the user.
     val commands: MutableList<Command> = mutableListOf()
     val state: Game = state
     private var isStarted: Boolean = false
@@ -98,6 +99,7 @@ class GameController(
     }
 
     fun processAction(userAction: GameAction) {
+        actionHistory.add(userAction)
         val reportSelectedAction = SimpleLogEntry("Selected action: $userAction")
         commands.add(reportSelectedAction)
         reportSelectedAction.execute(state, this)
@@ -152,11 +154,15 @@ class GameController(
     }
 
 
-    fun startCallbackMode(actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction,) {
+    fun startCallbackMode(actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction) {
+        val backupActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+            actionProvider(controller, availableActions).also { selectedAction ->
+                actionHistory.add(selectedAction)
+            }
+        }
         setupInitialStartingState()
-        while (!stack.isEmpty() && !isStopped) {
-            val currentState: Node = stack.currentNode()
-            processNode(currentState, actionProvider)
+        while (!stack.isEmpty()) {
+            processNode(stack.currentNode(), backupActionProvider)
         }
     }
 

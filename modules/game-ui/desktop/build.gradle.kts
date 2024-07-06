@@ -21,6 +21,7 @@ kotlin {
                 implementation("com.squareup.okio:okio:3.7.0")
                 implementation(libs.coroutines)
                 implementation(compose.desktop.common)
+                implementation(libs.jsonserialization)
             }
         }
         val jvmMain by getting {

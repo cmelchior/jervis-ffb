@@ -13,6 +13,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.serialize.JervisSerialization
+import dk.ilios.jervis.ui.viewmodel.MenuViewModel
+import okio.Path
 import java.io.File
 
 sealed interface GameMode
@@ -20,10 +24,15 @@ data object Random: GameMode
 data object Manual: GameMode
 data class Replay(val file: File): GameMode
 
-class IntroScreenModel: ScreenModel {
+class IntroScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
     fun start(navigator: Navigator, mode: GameMode) {
-        navigator.push(GameScreen(GameScreenModel(mode)))
+        navigator.push(GameScreen(GameScreenModel(mode, menuViewModel), emptyList()))
+    }
+
+    fun loadGame(navigator: Navigator, file: Path) {
+        val (controller, actions) = JervisSerialization.loadFromFile(file)
+        navigator.push(GameScreen(GameScreenModel(Manual, menuViewModel, controller), actions))
     }
 
     val availableReplayFiles: List<File>
@@ -33,11 +42,11 @@ class IntroScreenModel: ScreenModel {
         }
 }
 
-class IntroScreen: Screen {
+class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel { IntroScreenModel() }
+        val screenModel = rememberScreenModel { IntroScreenModel(menuViewModel) }
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -60,6 +69,23 @@ class IntroScreen: Screen {
                     modifier = Modifier.padding(16.dp)
                 )
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                FilePicker(
+                    "Load Jervis game file",
+                    null,
+                    "Jervis game file",
+                    "jrvs"
+                ) { filePath ->
+                    screenModel.loadGame(navigator, filePath)
+                }
+            }) {
+                Text(
+                    text = "Load game",
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
             screenModel.availableReplayFiles.forEach { file ->
                 Button(onClick = {

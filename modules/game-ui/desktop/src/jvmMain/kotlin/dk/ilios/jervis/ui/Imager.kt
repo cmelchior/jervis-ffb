@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runDesktopComposeUiTest
-import androidx.compose.ui.unit.dp
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Continue
@@ -19,6 +18,7 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.teamBuilder
+import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 import dk.ilios.jervis.utils.createRandomAction
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -46,7 +46,7 @@ object Imager {
             val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
 //            val controller = GameController(BB2020Rules, state, actionProvider as ((GameController, List<ActionDescriptor>) -> GameAction))
             val controller = GameController(BB2020Rules, state)
-            App() // controller, actionRequestChannel, actionSelectedChannel)
+            App(MenuViewModel()) // controller, actionRequestChannel, actionSelectedChannel)
         }
     }
 
@@ -99,7 +99,7 @@ object Imager {
             }
 //            val controller = GameController(rules, state, actionProvider)
             val controller = GameController(rules, state)
-            App()//controller, actionRequestChannel, actionSelectedChannel)
+            App(MenuViewModel())//controller, actionRequestChannel, actionSelectedChannel)
         }
     }
 

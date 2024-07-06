@@ -13,7 +13,7 @@ dependencyResolutionManagement {
             val coroutines = version("coroutines", "1.7.3")
             val minimalJson = version("minimalJson", "0.9.5")
             val javaAssist = version("javaAssist", "3.29.2-GA")
-            val serialization = version("serialization", "1.5.1")
+//            val serialization = version("serialization", "1.5.1")
 
             // Plugins
             plugin("jvm", "org.jetbrains.kotlin.jvm").versionRef(kotlin)
@@ -24,15 +24,8 @@ dependencyResolutionManagement {
 
             // Libraries
             library("coroutines", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-//            plugin
-
-            //        kotlin("multiplatform").version(extra["kotlin.version"] as String)
-//        kotlin("android").version(extra["kotlin.version"] as String)
-//        id("com.android.application").version(extra["agp.version"] as String)
-//        id("com.android.library").version(extra["agp.version"] as String)
-//        id("org.jetbrains.compose").version(extra["compose.version"] as String)
-
-            // Dependencies
+            library("jsonserialization", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+            library("okio", "com.squareup.okio:okio:3.7.0")
         }
     }
     repositories {

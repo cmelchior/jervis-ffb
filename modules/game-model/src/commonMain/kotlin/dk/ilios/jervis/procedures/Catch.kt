@@ -42,7 +42,7 @@ data class CatchRollResultContext(
     val catchingPlayer: Player,
     val target: Int,
     val modifiers: List<DiceModifier>,
-    val roll: DieRoll,
+    val roll: D6DieRoll,
     val success: Boolean
 ) {
     val rerolled: Boolean = roll.rerollSource != null && roll.rerolledResult != null

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.jvm) apply false
     alias(libs.plugins.multiplatform) apply false
+    alias(libs.plugins.serialization) apply false
 }
 
 tasks.register<Copy>("copyClientDownloaderJar") {

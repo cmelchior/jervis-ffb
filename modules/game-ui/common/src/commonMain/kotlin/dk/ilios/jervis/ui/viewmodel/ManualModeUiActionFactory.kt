@@ -47,11 +47,16 @@ import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.controller.GameController
+import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.procedures.DetermineKickingTeam
+import dk.ilios.jervis.procedures.GameDrive
 import dk.ilios.jervis.procedures.RollForStartingFanFactor
 import dk.ilios.jervis.procedures.RollForTheWeather
 import dk.ilios.jervis.procedures.SetupTeam
+import dk.ilios.jervis.procedures.TheKickOff
+import dk.ilios.jervis.procedures.TheKickOffEvent
+import dk.ilios.jervis.rules.KickOffEventTable
 import dk.ilios.jervis.rules.tables.Blizzard
 import dk.ilios.jervis.rules.tables.PerfectConditions
 import dk.ilios.jervis.rules.tables.PouringRain
@@ -60,20 +65,30 @@ import dk.ilios.jervis.rules.tables.VerySunny
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
-class ManualModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model) {
+class ManualModeUiActionFactory(model: GameScreenModel, private val actions: List<GameAction>) : UiActionFactory(model) {
     override suspend fun start(scope: CoroutineScope) {
         scope.launch {
+            var initialActionsIndex = 0
             _fieldActions.emit(WaitingForUserInput)
             val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
-                val action: GameAction = runBlocking(Dispatchers.Default) {
-                    model.actionRequestChannel.send(Pair(controller, availableActions))
-                    model.actionSelectedChannel.receive()
+                if (initialActionsIndex < actions.size) {
+                    val action = actions[initialActionsIndex]
+                    initialActionsIndex++
+                    Thread.sleep(10) // TODO Give UI a chance to catch up. Right now some events are missed for some reason.
+                    action
+                } else {
+                    val action: GameAction = runBlocking(Dispatchers.Default) {
+                        model.actionRequestChannel.send(Pair(controller, availableActions))
+                        model.actionSelectedChannel.receive()
+                    }
+                    action
+//                }
                 }
-                action
             }
             model.controller.startCallbackMode(actionProvider)
         }
@@ -160,6 +175,35 @@ class ManualModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
 
             is SetupTeam.InformOfInvalidSetup -> {
                 UserInputDialog.createInvalidSetupDialog(controller.state.activeTeam)
+            }
+
+            is TheKickOff.TheKickDeviates -> {
+                // TODO Find a better way to show the options here
+                val diceRolls = mutableListOf<GameAction>()
+                D8Result.allOptions().forEach { d8 ->
+                    D6Result.allOptions().forEach { d6 ->
+                        diceRolls.add(DiceResults(d8, d6))
+                    }
+                }
+                UserInputDialog.createKickOffDeviatesDialog(diceRolls)
+            }
+
+            is TheKickOffEvent.RollForKickOffEvent -> {
+                // Fake the rolls for the specific results
+                val rolls = listOf(
+                    DiceResults(1.d6, 1.d6) to "[2] ${KickOffEventTable.roll(1.d6, 1.d6).name}",
+                    DiceResults(1.d6, 2.d6) to "[2] ${KickOffEventTable.roll(1.d6, 2.d6).name}",
+                    DiceResults(1.d6, 3.d6) to "[2] ${KickOffEventTable.roll(1.d6, 3.d6).name}",
+                    DiceResults(1.d6, 4.d6) to "[2] ${KickOffEventTable.roll(1.d6, 4.d6).name}",
+                    DiceResults(1.d6, 5.d6) to "[2] ${KickOffEventTable.roll(1.d6, 5.d6).name}",
+                    DiceResults(1.d6, 6.d6) to "[2] ${KickOffEventTable.roll(1.d6, 6.d6).name}",
+                    DiceResults(2.d6, 6.d6) to "[2] ${KickOffEventTable.roll(2.d6, 6.d6).name}",
+                    DiceResults(3.d6, 6.d6) to "[2] ${KickOffEventTable.roll(3.d6, 6.d6).name}",
+                    DiceResults(4.d6, 6.d6) to "[2] ${KickOffEventTable.roll(4.d6, 6.d6).name}",
+                    DiceResults(5.d6, 6.d6) to "[2] ${KickOffEventTable.roll(5.d6, 6.d6).name}",
+                    DiceResults(6.d6, 6.d6) to "[2] ${KickOffEventTable.roll(6.d6, 6.d6).name}",
+                )
+                UserInputDialog.createKickOffEventDialog(rolls)
             }
 
             else -> {

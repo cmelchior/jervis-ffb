@@ -57,7 +57,7 @@ object CatchRoll: Procedure() {
                     catchingPlayer = rollContext.catchingPlayer,
                     target = target,
                     modifiers = rollContext.modifiers,
-                    roll = DieRoll(originalRoll = it),
+                    roll = D6DieRoll(originalRoll = it),
                     success = isCatchSuccess(it, target, rollContext)
                 )
                 return compositeCommandOf(
@@ -90,7 +90,7 @@ object CatchRoll: Procedure() {
                 listOf(ContinueWhenReady)
             } else {
                 val teamReroll = if (hasTeamRerolls && allowedToUseTeamReroll) {
-                    listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf(context.roll))))
+                    listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf<DieRoll>(context.roll))))
                 } else {
                     emptyList()
                 }

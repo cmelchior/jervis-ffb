@@ -3,9 +3,11 @@ package dk.ilios.jervis.actions
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.procedures.DieRoll
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
+import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
 enum class Dice {
@@ -61,11 +63,17 @@ data class SelectRandomPlayers(val count: Int, val players: List<Player>): Actio
 
 //data class SelectSkillRerollSource(val skill: Skill): ActionDescriptor
 //data class SelectTeamRerollSource(val reroll: TeamReroll): ActionDescriptor
-data class SelectRerollOption(val option: DiceRerollOption<*>): ActionDescriptor
+data class SelectRerollOption(val option: DiceRerollOption<out DieRoll>): ActionDescriptor
 data object SelectNoReroll: ActionDescriptor
 
 // Available actions
-open class DieResult(val result: Int, val min: Short, val max: Short): Number(), GameAction {
+@Serializable
+sealed class DieResult: Number(), GameAction {
+
+    abstract val result: Int
+    abstract val min: Short
+    abstract val max: Short
+
     init {
         if (result < min || result > max) {
             throw IllegalArgumentException("Result outside range: $min <= $result <= $max")
@@ -84,38 +92,63 @@ open class DieResult(val result: Int, val min: Short, val max: Short): Number(),
 }
 
 sealed interface GameAction
+@Serializable
 data object Continue: GameAction
+@Serializable
 data object Confirm: GameAction
+@Serializable
 data object Cancel: GameAction
+@Serializable
 data object EndTurn: GameAction
+@Serializable
 data object EndAction: GameAction
+@Serializable
 data object EndSetup: GameAction
+@Serializable
 data class CoinSideSelected(val side: Coin): GameAction {
     companion object {
         fun allOptions(): List<CoinSideSelected> { return Coin.entries.map { CoinSideSelected(it) }}
     }
 }
+@Serializable
 data class CoinTossResult(val result: Coin): GameAction {
     companion object {
         fun allOptions(): List<CoinTossResult> { return Coin.entries.map { CoinTossResult(it) }}
     }
 }
-class D2Result(result: Int = Random.nextInt(1, 3)): DieResult(result, 1, 2) {
+@Serializable
+class D2Result(override val result: Int = Random.nextInt(1, 3)): DieResult() {
+    override val min: Short = 1
+    override val max: Short = 2
     companion object {
         fun allOptions(): List<D2Result> { return (1..2).map { D2Result(it) } }
     }
 }
-class D3Result(result: Int = Random.nextInt(1, 4)): DieResult(result, 1, 3) {
+@Serializable
+class D3Result(override val result: Int = Random.nextInt(1, 4)): DieResult() {
+    override val min: Short = 1
+    override val max: Short = 3
+
     companion object {
         fun allOptions(): List<D3Result> { return (1..3).map { D3Result(it) } }
     }
 }
-class D4Result(result: Int = Random.nextInt(1, 5)): DieResult(result, 1, 4) {
+
+@Serializable
+class D4Result(override val result: Int = Random.nextInt(1, 5)): DieResult() {
+    override val min: Short = 1
+    override val max: Short = 4
+
     companion object {
         fun allOptions(): List<D4Result> { return (1..4).map { D4Result(it) } }
     }
 }
-class D6Result(result: Int = Random.nextInt(1, 7)): DieResult(result, 1, 6) {
+
+@Serializable
+class D6Result(override val result: Int = Random.nextInt(1, 7)): DieResult() {
+    override val min: Short = 1
+    override val max: Short = 6
+
     companion object {
         fun allOptions(): List<D6Result> { return (1..6).map { D6Result(it) } }
         fun allOptions(dice: Int): List<List<D6Result>> {
@@ -129,39 +162,71 @@ class D6Result(result: Int = Random.nextInt(1, 7)): DieResult(result, 1, 6) {
         }
     }
 }
-class D8Result(result: Int = Random.nextInt(1, 9)): DieResult(result, 1, 8) {
+
+@Serializable
+class D8Result(override val result: Int = Random.nextInt(1, 9)): DieResult() {
+    override val min: Short = 1
+    override val max: Short = 8
+
     companion object {
         fun allOptions(): List<D8Result> { return (1..8).map { D8Result(it) } }
     }
 }
-class D12Result(result: Int = Random.nextInt(1, 13)): DieResult(result, 1, 12) {
+
+@Serializable
+class D12Result(override val result: Int = Random.nextInt(1, 13)): DieResult() {
+    override val min: Short = 1
+    override val max: Short = 12
+
     companion object {
         fun allOptions(): List<D12Result> { return (1..12).map { D12Result(it) } }
     }
 }
-class D16Result(result: Int = Random.nextInt(1, 17)): DieResult(result, 1, 16) {
+
+@Serializable
+class D16Result(override val result: Int = Random.nextInt(1, 17)): DieResult() {
+    override val min: Short = 1
+    override val max: Short = 16
+
     companion object {
         fun allOptions(): List<D16Result> { return (1..16).map { D16Result(it) } }
     }
 }
-class D20Result(result: Int = Random.nextInt(1, 21)): DieResult(result, 1, 20) {
+
+@Serializable
+class D20Result(override val result: Int = Random.nextInt(1, 21)): DieResult() {
+    override val min: Short = 1
+    override val max: Short = 17
+
     companion object {
         fun allOptions(): List<D20Result> { return (1..20).map { D20Result(it) } }
     }
 }
-class DBlockResult(result: Int = Random.nextInt(1, 7)): DieResult(result, 1, 6) {
+
+@Serializable
+class DBlockResult(override val result: Int = Random.nextInt(1, 7)): DieResult() {
+    override val min: Short = 1
+    override val max: Short = 6
+
     val blockResult: BlockDice = BlockDice.fromD6(D6Result(result))
     companion object {
         fun allOptions(): List<DBlockResult> { return (1..6).map { DBlockResult(it) } }
     }
 }
+
+@Serializable
 class DiceResults(val rolls: List<DieResult>): GameAction {
     constructor(vararg roll: DieResult): this(listOf(*roll))
 }
+@Serializable
 data class PlayerSelected(val player: Player): GameAction
+@Serializable
 data object PlayerDeselected: GameAction
+@Serializable
 data class PlayerActionSelected(val action: PlayerAction): GameAction
+@Serializable
 data object DogoutSelected: GameAction
+@Serializable
 data class FieldSquareSelected(val coordinate: FieldCoordinate): GameAction {
     constructor(x: Int, y: Int): this(FieldCoordinate(x, y))
     val x: Int = coordinate.x
@@ -170,6 +235,9 @@ data class FieldSquareSelected(val coordinate: FieldCoordinate): GameAction {
         return "${this::class.simpleName}[$x, $y]"
     }
 }
+@Serializable
 data class RandomPlayersSelected(val players: List<Player>): GameAction
-data class RerollOptionSelected(val option: DiceRerollOption<*>): GameAction
+@Serializable
+data class RerollOptionSelected(val option: DiceRerollOption<out DieRoll>): GameAction
+@Serializable
 data object NoRerollSelected: GameAction

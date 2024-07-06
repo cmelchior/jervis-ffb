@@ -4,21 +4,85 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.procedures.DummyProcedure
 import dk.ilios.jervis.procedures.MoveAction
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.Transient
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.CompositeDecoder
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlin.reflect.KClass
+
+object PlayerActionSerializer : KSerializer<PlayerAction> {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("PlayerAction") {
+        val stringDescriptor = String.serializer().descriptor
+        val boolDescriptor = Boolean.serializer().descriptor
+        element("name", stringDescriptor)
+        element("type", boolDescriptor)
+        element("procedure", stringDescriptor)
+        element("compulsory", boolDescriptor)
+        element("isSpecial", boolDescriptor)
+    }
+
+    override fun serialize(encoder: Encoder, value: PlayerAction) {
+        val compositeEncoder = encoder.beginStructure(descriptor)
+        compositeEncoder.encodeStringElement(descriptor, 0, value.name)
+        compositeEncoder.encodeSerializableElement(descriptor, 1, PlayerActionType.serializer(), value.type)
+        compositeEncoder.encodeStringElement(descriptor, 2, value.procedure::class.qualifiedName.toString())
+        compositeEncoder.encodeBooleanElement(descriptor, 3, value.compulsory)
+        compositeEncoder.encodeBooleanElement(descriptor, 4, value.isSpecial)
+        compositeEncoder.endStructure(descriptor)
+    }
+
+    override fun deserialize(decoder: Decoder): PlayerAction {
+        val compositeDecoder = decoder.beginStructure(descriptor)
+        var name = ""
+        var type: PlayerActionType? = null
+        var procedure: Procedure? = null
+        var compulsory = false
+        var isSpecial = false
+
+        loop@ while (true) {
+            when (val index = compositeDecoder.decodeElementIndex(descriptor)) {
+                CompositeDecoder.DECODE_DONE -> break@loop
+                0 -> name = compositeDecoder.decodeStringElement(descriptor, index)
+                1 -> type = compositeDecoder.decodeSerializableElement(descriptor, index, PlayerActionType.serializer())
+                2 -> procedure = loadProcedure(compositeDecoder.decodeStringElement(descriptor, index)) // Convert String back to Procedure
+                3 -> compulsory = compositeDecoder.decodeBooleanElement(descriptor, index)
+                4 -> isSpecial = compositeDecoder.decodeBooleanElement(descriptor, index)
+                else -> throw SerializationException("Unknown index $index")
+            }
+        }
+        compositeDecoder.endStructure(descriptor)
+        return PlayerAction(name, type!!, procedure!!, compulsory, isSpecial)
+    }
+
+    private fun loadProcedure(procedureFQN: String): Procedure {
+        TODO()
+//        return Class.forName(procedureFQN).kotlin.objectInstance
+    }
+}
+
 
 /**
  * Wrapper representing a players action
  */
+@Serializable()
 data class PlayerAction(
     val name: String,
     val type: PlayerActionType,
     val procedure: Procedure,
-    val compulsory: Boolean = false, // Players must choose this action
-    val isSpecial: Boolean = false
+    val compulsory: Boolean = false, // If true, players must choose this action
+    val isSpecial: Boolean = false,
 )
 
 /**
  * Enumerate the
  */
+@Serializable
 enum class PlayerActionType {
     MOVE,
     PASS,

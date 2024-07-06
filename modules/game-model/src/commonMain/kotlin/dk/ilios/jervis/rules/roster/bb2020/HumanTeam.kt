@@ -5,8 +5,10 @@ import dk.ilios.jervis.rules.bb2020.General
 import dk.ilios.jervis.rules.bb2020.Passing
 import dk.ilios.jervis.rules.bb2020.Strength
 import dk.ilios.jervis.rules.roster.RosterId
+import kotlinx.serialization.Serializable
 
 // Page 116 in the rulebook
+@Serializable
 data object HumanTeam: BB2020Roster {
     val LINEMAN = BB2020Position(
         HumanTeam,

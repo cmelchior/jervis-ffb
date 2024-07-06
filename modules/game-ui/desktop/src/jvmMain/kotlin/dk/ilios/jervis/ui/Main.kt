@@ -6,22 +6,13 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fumbbl.FumbblReplayAdapter
-import dk.ilios.jervis.model.Coach
-import dk.ilios.jervis.model.CoachId
-import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.PlayerId
-import dk.ilios.jervis.model.PlayerNo
-import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
-import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
-import dk.ilios.jervis.teamBuilder
-import dk.ilios.jervis.utils.createRandomAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toPath
-import java.io.File
+import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 
 fun main() = application {
     val rules = BB2020Rules
@@ -60,8 +51,10 @@ fun main() = application {
     runBlocking {
         fumbbl.loadCommands()
     }
-    val controller = GameController(rules, fumbbl.getGame())
+//    val controller = GameController(rules, fumbbl.getGame())
+    val menuViewModel = MenuViewModel()
     Window(onCloseRequest = ::exitApplication) {
-        App()
+        WindowMenuBar(menuViewModel)
+        App(menuViewModel)
     }
 }

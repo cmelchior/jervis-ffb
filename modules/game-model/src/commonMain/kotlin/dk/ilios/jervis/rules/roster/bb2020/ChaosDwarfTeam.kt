@@ -13,8 +13,10 @@ import dk.ilios.jervis.rules.roster.bb2020.HumanTeam.HALFLING_HOPEFUL
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam.LINEMAN
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam.OGRE
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam.THROWER
+import kotlinx.serialization.Serializable
 
 // See Teams of Legend: https://www.warhammer-community.com/wp-content/uploads/2020/11/lFZy1SIuNmWvxPj1.pdf
+@Serializable
 data object ChaosDwarfTeam: BB2020Roster {
     val HOBGOBLIN_LINEMEN = BB2020Position(
         ChaosDwarfTeam,

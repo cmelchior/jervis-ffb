@@ -9,6 +9,8 @@ import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlin.properties.Delegates
 
 class TeamHalfData(private val game: Game) {
@@ -57,25 +59,25 @@ class TeamTemporaryData(private val game: Game) {
     val dieRoll = mutableListOf<DieResult>()
 }
 
-class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
+@Serializable
+class Team(val name: String, val roster: Roster, val coach: Coach): Collection<Player> {
 
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
     // Fixed Team data, identifying the team
     val id: String = ""
-    val name: String = name
-    val coach: Coach = coach
-    val roster: Roster = roster
 
-//    val race: String
-//    val race: String
     // Variable team data that might change during the game
     var rerollsCountOnRoster: Int = 0
+    @Transient
     var rerolls: MutableList<TeamReroll> = mutableListOf()
+    @Transient
     val availableRerolls: List<TeamReroll>
         get() = rerolls.filter { !it.rerollUsed }
+    @Transient
     val availableRerollCount: Int
         get() = availableRerolls.size
+    @Transient
     var usedTeamRerollThisTurn: Boolean = false
 
     var apothecaries: Int = 0
@@ -88,10 +90,15 @@ class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
     val specialRules: MutableList<SpecialRules> = mutableListOf()
 
     // Special team state that needs to be tracked for the given period
+    @Transient
     lateinit var game: Game
+    @Transient
     lateinit var halfData: TeamHalfData
+    @Transient
     lateinit var driveData: TeamDriveData
+    @Transient
     lateinit var turnData: TeamTurnData
+    @Transient
     lateinit var temporaryData: TeamTemporaryData
 
     // Must be called before using this class.
@@ -120,7 +127,8 @@ class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
         noToPlayer[player.number] = player
     }
     operator fun get(playerNo: PlayerNo): Player? = noToPlayer[playerNo]
-    override val size: Int = noToPlayer.size
+    override val size: Int
+        get() = noToPlayer.size
     override fun isEmpty(): Boolean = noToPlayer.isEmpty()
     override fun iterator(): Iterator<Player> = noToPlayer.values.iterator()
     override fun containsAll(elements: Collection<Player>): Boolean = noToPlayer.values.containsAll(elements)
@@ -130,7 +138,9 @@ class Team(name: String, roster: Roster, coach: Coach): Collection<Player> {
         val playersInDogout = noToPlayer.values.filter { it.location == DogOut }
         _dogoutState.safeTryEmit(playersInDogout)
     }
-    private val _dogoutState = MutableSharedFlow<List<Player>>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
+    @Transient
+    private val _dogoutState = MutableSharedFlow<List<Player>>(replay = 1, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
+    @Transient
     val dogoutFlow: SharedFlow<List<Player>> = _dogoutState
 
 }

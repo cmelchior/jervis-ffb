@@ -121,7 +121,7 @@ object TheKickOff: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
-                val direction = rules.randomDirection(d8)
+                val direction = rules.direction(d8)
                 val newLocation = state.ball.location.move(direction, d6.result)
                 compositeCommandOf(
                     SetBallLocation(newLocation),
@@ -228,7 +228,7 @@ object TheFUMBBLKickOff: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
-                val direction = rules.randomDirection(d8)
+                val direction = rules.direction(d8)
                 val newLocation = state.ball.location.move(direction, d6.result)
                 compositeCommandOf(
                     SetBallLocation(newLocation),

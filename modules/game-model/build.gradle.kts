@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.multiplatform)
+    alias(libs.plugins.serialization)
 }
 
 group = "dk.ilios"
@@ -31,6 +32,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.coroutines)
+                implementation(libs.jsonserialization)
+                implementation(libs.okio)
+                implementation(kotlin("reflect"))
             }
         }
         val commonTest by getting {

@@ -29,6 +29,7 @@ kotlin {
                 implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
                 implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
                 implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
+                implementation(libs.jsonserialization)
             }
         }
         val commonTest by getting {

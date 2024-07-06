@@ -46,7 +46,7 @@ object Bounce: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D8Result>(action) { d8 ->
-                val direction: Direction = rules.randomDirection(d8)
+                val direction: Direction = rules.direction(d8)
                 val newLocation: FieldCoordinate = state.ball.location.move(direction, 1)
                 val outOfBounds: Boolean = newLocation.isOutOfBounds(rules)
                 val playerAtTarget: Player? = if (!outOfBounds) state.field[newLocation].player else null

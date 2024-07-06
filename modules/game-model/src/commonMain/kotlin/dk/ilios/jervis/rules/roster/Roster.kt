@@ -19,11 +19,6 @@ interface Roster {
     val positions: List<Position>
 }
 
-
-
-
-
-
 interface BB20216Roster: Roster {
 
 }

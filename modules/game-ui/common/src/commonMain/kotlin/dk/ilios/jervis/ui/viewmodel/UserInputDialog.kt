@@ -96,6 +96,20 @@ data class UserInputDialog(
             message = "Invalid setup, please try again",
             actions = listOf(Confirm)
         )
+
+        fun createKickOffDeviatesDialog(actions: List<GameAction>): UserInputDialog = create(
+            title = "The KickOff",
+            message = "Roll 1D8 + 1D6 to deviate the ball.",
+            actions = actions
+        )
+
+        fun createKickOffEventDialog(actions: List<Pair<GameAction, String>>): UserInputDialog = createWithDescription(
+            title = "Kickoff Event",
+            message = "Roll 2D6 for the KickOff event",
+            actions = actions
+        )
+
+
     }
 }
 
