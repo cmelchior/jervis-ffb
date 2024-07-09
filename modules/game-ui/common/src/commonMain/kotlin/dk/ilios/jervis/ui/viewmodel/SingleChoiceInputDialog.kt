@@ -22,12 +22,17 @@ import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.model.Team
 import javax.swing.Icon
 
-data class UserInputDialog(
+sealed interface UserInputDialog: UserInput
+
+/**
+ * Class wrapping the intent of choosing a single option between many
+ */
+data class SingleChoiceInputDialog(
     val icon: Icon? = null,
     val title: String,
     val message: String,
     val actionDescriptions: List<Pair<GameAction, String>>
-): UserInput {
+): UserInputDialog {
     override val actions: List<GameAction> = actionDescriptions.map { it.first }
     companion object {
         private fun getDescription(action: GameAction): String {
@@ -53,21 +58,21 @@ data class UserInputDialog(
             }
         }
 
-        private fun create(title: String, message: String, actions: List<GameAction>): UserInputDialog {
-            return UserInputDialog(null, title, message, actions.map { Pair(it, getDescription(it))})
+        private fun create(title: String, message: String, actions: List<GameAction>): SingleChoiceInputDialog {
+            return SingleChoiceInputDialog(null, title, message, actions.map { Pair(it, getDescription(it))})
         }
 
-        private fun createWithDescription(title: String, message: String, actions: List<Pair<GameAction, String>>): UserInputDialog {
-            return UserInputDialog(null, title, message, actions)
+        private fun createWithDescription(title: String, message: String, actions: List<Pair<GameAction, String>>): SingleChoiceInputDialog {
+            return SingleChoiceInputDialog(null, title, message, actions)
         }
 
-        fun createFanFactorDialog(team: Team, actions: List<GameAction>): UserInputDialog = create(
+        fun createFanFactorDialog(team: Team, actions: List<GameAction>): SingleChoiceInputDialog = create(
             title = "Fan Factor Roll",
             message = "Roll D3 for ${team.name}",
             actions = actions
         )
 
-        fun createWeatherRollDialog(actions: List<Pair<GameAction, String>>): UserInputDialog = createWithDescription(
+        fun createWeatherRollDialog(actions: List<Pair<GameAction, String>>): SingleChoiceInputDialog = createWithDescription(
             title = "Weather Roll",
             message = "Roll 2D6 for the weather",
             actions = actions
@@ -79,31 +84,31 @@ data class UserInputDialog(
             actions = actions
         )
 
-        fun createTossDialog(actions: List<GameAction>): UserInputDialog = create(
+        fun createTossDialog(actions: List<GameAction>): SingleChoiceInputDialog = create(
             title = "Coin Toss",
             message = "Flip coin into the air",
             actions = actions
         )
 
-        fun createChooseToKickoffDialog(team: Team, actions: List<Pair<GameAction, String>>): UserInputDialog = createWithDescription(
+        fun createChooseToKickoffDialog(team: Team, actions: List<Pair<GameAction, String>>): SingleChoiceInputDialog = createWithDescription(
             title = "Kickoff?",
             message = "${team.name} must choose to kick-off or receive",
             actions = actions
         )
 
-        fun createInvalidSetupDialog(team: Team): UserInputDialog = create(
+        fun createInvalidSetupDialog(team: Team): SingleChoiceInputDialog = create(
             title = "Invalid Setup",
             message = "Invalid setup, please try again",
             actions = listOf(Confirm)
         )
 
-        fun createKickOffDeviatesDialog(actions: List<GameAction>): UserInputDialog = create(
+        fun createKickOffDeviatesDialog(actions: List<Pair<GameAction, String>>): SingleChoiceInputDialog = createWithDescription(
             title = "The KickOff",
             message = "Roll 1D8 + 1D6 to deviate the ball.",
             actions = actions
         )
 
-        fun createKickOffEventDialog(actions: List<Pair<GameAction, String>>): UserInputDialog = createWithDescription(
+        fun createKickOffEventDialog(actions: List<Pair<GameAction, String>>): SingleChoiceInputDialog = createWithDescription(
             title = "Kickoff Event",
             message = "Roll 2D6 for the KickOff event",
             actions = actions

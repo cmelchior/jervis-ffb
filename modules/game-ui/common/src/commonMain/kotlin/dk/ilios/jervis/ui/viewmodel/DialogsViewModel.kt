@@ -12,7 +12,6 @@ class DialogsViewModel(val uiActionFactory: UiActionFactory) {
         uiActionFactory.userSelectedAction(action)
         // By emitting `null`, recomposing will no longer show dialogs.
         uiActionFactory.dialogActions.safeTryEmit(null)
-
     }
     val availableActions: Flow<UserInputDialog?> = uiActionFactory.dialogActions
 }

@@ -1,9 +1,10 @@
 package dk.ilios.jervis.ui
 
+import MultipleSelectUserActionDialog
+import UserActionDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.Text
@@ -28,10 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -41,7 +39,6 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
@@ -61,24 +58,22 @@ import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
-import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
-import dk.ilios.jervis.ui.viewmodel.UserInputDialog
+import dk.ilios.jervis.ui.viewmodel.DiceRollUserInputDialog
 import dk.ilios.jervis.ui.viewmodel.FieldViewModel
 import dk.ilios.jervis.ui.viewmodel.GameProgress
 import dk.ilios.jervis.ui.viewmodel.GameStatusViewModel
 import dk.ilios.jervis.ui.viewmodel.LogViewModel
 import dk.ilios.jervis.ui.viewmodel.ReplayViewModel
 import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
-import dk.ilios.jervis.ui.model.UiPlayer
+import dk.ilios.jervis.ui.viewmodel.SingleChoiceInputDialog
 import dk.ilios.jervis.ui.viewmodel.UnknownInput
 import dk.ilios.jervis.ui.viewmodel.UserInput
+import org.jetbrains.skia.Image
 import java.awt.image.BufferedImage
 import java.io.InputStream
 import kotlin.random.Random
-import org.jetbrains.skia.Image
 
 // Theme
 val debugBorder = BorderStroke(2.dp,Color.Red)
@@ -253,31 +248,17 @@ fun ReplayController(vm: ReplayViewModel, modifier: Modifier) {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Dialogs(vm: DialogsViewModel) {
     val actions: UserInput? by vm.availableActions.collectAsState(null)
     when (actions) {
-        is UserInputDialog -> {
-            val dialog = actions as UserInputDialog
-            AlertDialog(
-                onDismissRequest = {},
-                title = { Text(text = dialog.title) },
-                text = { Text(text = dialog.message) },
-                confirmButton = {
-                    dialog.actionDescriptions.forEach { (action, description) ->
-                        Button(
-                            onClick = { vm.buttonActionSelected(action) }
-                        ) {
-                            Text(text = description)
-                        }
-                    }
-                },
-                properties = DialogProperties(
-                    usePlatformDefaultWidth = true,
-                    scrimColor = Color.Black.copy(alpha = 0.6f)
-                )
-            )
+        is SingleChoiceInputDialog -> {
+            val dialog = actions as SingleChoiceInputDialog
+            UserActionDialog(dialog, vm)
+        }
+        is DiceRollUserInputDialog -> {
+            val dialog = actions as DiceRollUserInputDialog
+            MultipleSelectUserActionDialog(dialog, vm)
         }
         null -> { /* Do nothing */ }
         else -> TODO("Not supported: $actions")
