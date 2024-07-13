@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,12 +20,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import dk.ilios.jervis.model.BallState
+import androidx.compose.ui.unit.dp
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.model.UiFieldSquare
-import dk.ilios.jervis.ui.model.UiPlayer
 import dk.ilios.jervis.ui.viewmodel.FieldDetails
 import dk.ilios.jervis.ui.viewmodel.FieldViewModel
 import dk.ilios.jervis.ui.viewmodel.Square
@@ -81,6 +82,7 @@ private fun FieldSquare(
         else -> Color.Transparent
     }
     val boxWrapperModifier = boxModifier
+        .fillMaxSize()
         .background(color = bgColor)
         .onPointerEvent(PointerEventType.Enter) {
             vm.hoverOver(Square(width, height))
@@ -91,22 +93,18 @@ private fun FieldSquare(
             }
         }
 
-    extracted(boxWrapperModifier, square.player, square.ball, boxModifier)
-}
-
-@Composable
-private fun extracted(
-    boxWrapperModifier: Modifier,
-    player: UiPlayer?,
-    ball: BallState?,
-    boxModifier: Modifier
-) {
     Box(modifier = boxWrapperModifier) {
-        player?.let {
+        square.player?.let {
             Player(boxModifier, it)
         }
-        ball?.let {
-            Image(bitmap = IconFactory.getBall().toComposeImageBitmap(), contentDescription = "")
+        square.ball?.let {
+            Image(
+                modifier = Modifier.fillMaxSize().padding(4.dp),
+                alignment = Alignment.Center,
+                contentScale = ContentScale.FillBounds,
+                bitmap = IconFactory.getBall().toComposeImageBitmap(),
+                contentDescription = ""
+            )
         }
     }
 }

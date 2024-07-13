@@ -1,12 +1,15 @@
 package dk.ilios.jervis.ui.viewmodel
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.model.Ball
 import dk.ilios.jervis.model.Field
+import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.ui.model.UiFieldSquare
 import dk.ilios.jervis.ui.model.UiPlayer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,67 +29,71 @@ enum class FieldDetails(val resource: String, val description: String) {
 data class SquareData(val field: FieldSquare, val player: Player?, val ball: Ball?) {}
 
 /**
- * This class should only concern itself with the high-level things, like players moving in and out, ball moving
- * in and out.
- *
- * PlayerViewModel and BallViewModel should handle state changes...is this true? Wh
+ * This class collects all the information needed to render the field. This includes all information needed for
+ * each single square on the field.
  */
-class FieldViewModel(private val uiActionFactory: UiActionFactory, private val state: Field) {
+class FieldViewModel(private val rules: Rules, private val uiActionFactory: UiActionFactory, private val state: Field) {
+
     val aspectRatio: Float = 782f/452f
-    val width = 26
-    val height = 15
+    val width = rules.fieldWidth.toInt()
+    val height = rules.fieldHeight.toInt()
 
     private val field = MutableStateFlow(FieldDetails.NICE)
     private val highlights = SnapshotStateList<Square>()
     private val _highlights = MutableStateFlow<Square?>(null)
     fun field(): StateFlow<FieldDetails> = field
+
+    /**
+     * Expose a flow that determines everything needed to render a single square on the field.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     fun observeSquare(x: Int, y: Int): Flow<UiFieldSquare> {
-        val flow: Flow<UiFieldSquare> = state[x, y].squareFlow.flatMapLatest {
+        val flow: Flow<UiFieldSquare> = state[x, y].squareFlow.flatMapLatest { fieldSquare ->
             combine(
-                flow = flowOf(it),
-                flow2 = it.player?.observePlayer ?: flowOf<Player?>(null),
-                flow3 = it.ball?.observeBall ?: flowOf<Ball?>(null),
+                flow = flowOf(fieldSquare),
+                flow2 = fieldSquare.player?.observePlayer ?: flowOf<Player?>(null),
+                flow3 = fieldSquare.ball?.observeBall ?: flowOf<Ball?>(null),
                 flow4 = uiActionFactory.fieldActions,
-                transform = { field: FieldSquare, player: Player?, ball: Ball?, userInput: UserInput ->
-                    val squareAction = if (userInput is SelectFieldLocationInput) {
-                        val ac = userInput.fieldActions[Pair(x, y)]
-                        ac
-                    } else {
-                        null
-                    }
-                    val squareSelectAction = if (squareAction != null) {
-                        { uiActionFactory.userSelectedAction(squareAction) }
-                    } else {
-                        null
-                    }
-
-                    val playerSelectedAction: (() -> Unit)? = if (userInput is SelectPlayerInput) {
-                        field.player?.let {
-                            userInput.actions.firstOrNull { (it as PlayerSelected).player == field.player }
-                                ?.let { playerAction: GameAction ->
-                                    { uiActionFactory.userSelectedAction(playerAction) }
-                                }
+                transform = { square: FieldSquare, player: Player?, ball: Ball?, userInput: UserInput ->
+                    // Determine which action, if any, to take, if this field can be selected
+                    val squareAction = when (userInput) {
+                        is DeselectPlayerInput -> {
+                            // Since `deselect` only applies to the active player, check if the player in the square is active.
+                            if (fieldSquare.player?.isActive == true) {
+                                { uiActionFactory.userSelectedAction(userInput.actions.first()) }
+                            } else {
+                                null
+                            }
                         }
-                    } else {
-                        null
-                    }
-                    if (squareSelectAction != null) {
-                        //                println("Adding onClick to ($x, $y)")
-                    } else if (userInput is SelectFieldLocationInput && squareAction == null && x < 13) {
-                        //                println("Not adding to ($x, $y)")
+                        is SelectFieldLocationInput -> {
+                            // Allow square to be selected if an action is available for this square.
+                            userInput.fieldAction[FieldCoordinate(x, y)]?.let { action: FieldSquareSelected ->
+                                { uiActionFactory.userSelectedAction(action) }
+                            }
+                        }
+                        is SelectPlayerInput -> {
+                            // If the player in this square is among the selectable players, enable the option
+                            square.player?.let {
+                                userInput.actions.firstOrNull { (it as PlayerSelected).player == square.player }
+                                    ?.let { playerAction: GameAction ->
+                                        { uiActionFactory.userSelectedAction(playerAction) }
+                                    }
+                            }
+                        }
+                        else -> null /* No action possible for this field */
                     }
                     UiFieldSquare(
-                        field,
+                        square,
                         ball?.state,
-                        player?.let { UiPlayer(it, playerSelectedAction) },
-                        squareSelectAction,
+                        player?.let { UiPlayer(it, squareAction) },
+                        if (player == null) squareAction else null, // Only allow a Square Action if no player is on the field
                     )
                 }
             )
         }
         return flow
     }
+
     fun highlights(): StateFlow<Square?> = _highlights
 
     fun hoverOver(square: Square) {

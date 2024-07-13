@@ -19,9 +19,9 @@ data class UiFieldSquare(
 data class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?): UiModel<Player> {
     fun hasBall(): Boolean  = model.hasBall()
     val state: PlayerState = model.state
-    val isSelectable = (selectAction != null)
     val isOnHomeTeam = model.isOnHomeTeam()
     val position = model.position
     val isActive = model.isActive
+    val isSelectable = (selectAction != null)
 }
 

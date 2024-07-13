@@ -17,7 +17,8 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.model.UiPlayer
 
-@Composable fun Player(modifier: Modifier, player: UiPlayer) {
+@Composable
+fun Player(modifier: Modifier, player: UiPlayer) {
     val backgroundColor = when {
         player.state == PlayerState.STUNNED -> Color.White
         player.isSelectable -> Color.Red

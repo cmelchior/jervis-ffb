@@ -113,6 +113,9 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 it.key == SelectFieldLocation::class -> {
                     SelectFieldLocationInput(it.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) })
                 }
+                it.key == DeselectPlayer::class -> {
+                    DeselectPlayerInput(listOf(PlayerDeselected))
+                }
                 else -> UnknownInput(mapUnknownActions(it.value)) // TODO This breaks if using multiple times
             }
         }
@@ -202,9 +205,8 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
     // Do it here, so `startUserActionSelector` can be cleaner.
     private suspend fun sendToRelevantUserInputChannel(uiEvent: UserInput) {
         when(uiEvent) {
-            is SelectPlayerInput -> {
-                _fieldActions.emit(uiEvent)
-            }
+            is SelectPlayerInput -> _fieldActions.emit(uiEvent)
+            is DeselectPlayerInput -> _fieldActions.emit(uiEvent)
             is UnknownInput -> _unknownActions.emit(uiEvent)
             is SingleChoiceInputDialog -> dialogActions.emit(uiEvent)
             is DiceRollUserInputDialog -> dialogActions.emit(uiEvent)
@@ -214,6 +216,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 _unknownActions.emit(uiEvent)
                 // Also send to other channels?
             }
+
         }
     }
 

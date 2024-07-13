@@ -2,6 +2,7 @@ package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.model.FieldCoordinate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
@@ -16,8 +17,10 @@ object WaitingForUserInput: UserInput {
 }
 
 class SelectPlayerInput(override val actions: List<GameAction>): UserInput
+class DeselectPlayerInput(override val actions: List<GameAction>): UserInput
 class SelectFieldLocationInput(override val actions: List<FieldSquareSelected>): UserInput {
-    val fieldActions: Map<Pair<Int, Int>, FieldSquareSelected> = actions.associateBy { Pair(it.x, it.y) }
+    // Map action to each field
+    val fieldAction: Map<FieldCoordinate, FieldSquareSelected> = actions.associateBy { FieldCoordinate(it.x, it.y) }
 }
 
 //class SelectKickingPlayer(val team: Team, override val actions: List<GameAction>) : UserInput

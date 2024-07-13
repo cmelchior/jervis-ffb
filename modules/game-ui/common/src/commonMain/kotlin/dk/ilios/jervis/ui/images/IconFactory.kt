@@ -101,7 +101,7 @@ object IconFactory {
             return cachedImages[path]!!
         } else {
             try {
-                val input: InputStream = classLoader.getResourceAsStream(path)
+                val input: InputStream? = classLoader.getResourceAsStream(path)
                 val image = ImageIO.read(input)
                 cachedImages[path] = image
                 return image
