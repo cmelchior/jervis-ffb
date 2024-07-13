@@ -19,6 +19,7 @@ import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
+import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
 import javax.swing.Icon
 
@@ -72,12 +73,6 @@ data class SingleChoiceInputDialog(
             actions = actions
         )
 
-        fun createWeatherRollDialog(actions: List<Pair<GameAction, String>>): SingleChoiceInputDialog = createWithDescription(
-            title = "Weather Roll",
-            message = "Roll 2D6 for the weather",
-            actions = actions
-        )
-
         fun createSelectKickoffCoinTossResultDialog(team: Team, actions: List<GameAction>) = create(
             title = "Call Coin Toss Outcome",
             message = "${team.name} must select a side of the coin",
@@ -102,19 +97,11 @@ data class SingleChoiceInputDialog(
             actions = listOf(Confirm)
         )
 
-        fun createKickOffDeviatesDialog(actions: List<Pair<GameAction, String>>): SingleChoiceInputDialog = createWithDescription(
-            title = "The KickOff",
-            message = "Roll 1D8 + 1D6 to deviate the ball.",
+        fun createCatchBallDialog(player: Player, actions: List<GameAction>): SingleChoiceInputDialog = create(
+            title = "Catch Ball",
+            message = "Roll D6 for ${player.name}",
             actions = actions
         )
-
-        fun createKickOffEventDialog(actions: List<Pair<GameAction, String>>): SingleChoiceInputDialog = createWithDescription(
-            title = "Kickoff Event",
-            message = "Roll 2D6 for the KickOff event",
-            actions = actions
-        )
-
-
     }
 }
 

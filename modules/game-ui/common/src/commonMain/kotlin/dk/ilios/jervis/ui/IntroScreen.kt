@@ -1,6 +1,11 @@
 package dk.ilios.jervis.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -13,7 +18,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.serialize.JervisSerialization
 import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 import okio.Path
@@ -74,7 +78,7 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
                 FilePicker(
                     "Load Jervis game file",
                     null,
-                    "Jervis game file",
+                    "Jervis game file (*.jrvs)",
                     "jrvs"
                 ) { filePath ->
                     screenModel.loadGame(navigator, filePath)

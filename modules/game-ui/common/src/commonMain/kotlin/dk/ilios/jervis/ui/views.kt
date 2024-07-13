@@ -250,18 +250,18 @@ fun ReplayController(vm: ReplayViewModel, modifier: Modifier) {
 
 @Composable
 fun Dialogs(vm: DialogsViewModel) {
-    val actions: UserInput? by vm.availableActions.collectAsState(null)
-    when (actions) {
+    val dialogData: UserInput? by vm.availableActions.collectAsState(null)
+    when (dialogData) {
         is SingleChoiceInputDialog -> {
-            val dialog = actions as SingleChoiceInputDialog
+            val dialog = dialogData as SingleChoiceInputDialog
             UserActionDialog(dialog, vm)
         }
         is DiceRollUserInputDialog -> {
-            val dialog = actions as DiceRollUserInputDialog
+            val dialog = dialogData as DiceRollUserInputDialog
             MultipleSelectUserActionDialog(dialog, vm)
         }
         null -> { /* Do nothing */ }
-        else -> TODO("Not supported: $actions")
+        else -> TODO("Not supported: $dialogData")
     }
 }
 

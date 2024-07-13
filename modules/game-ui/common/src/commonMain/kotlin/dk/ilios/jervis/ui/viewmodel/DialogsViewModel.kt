@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.Flow
  */
 class DialogsViewModel(val uiActionFactory: UiActionFactory) {
     fun buttonActionSelected(action: GameAction) {
-        uiActionFactory.userSelectedAction(action)
         // By emitting `null`, recomposing will no longer show dialogs.
+        // Hide the dialog before sending the event to prevent race conditions
+        // with showing multiple dialogs (which can cause type case errors for the dice rolls)
         uiActionFactory.dialogActions.safeTryEmit(null)
+        uiActionFactory.userSelectedAction(action)
     }
     val availableActions: Flow<UserInputDialog?> = uiActionFactory.dialogActions
 }

@@ -2,6 +2,7 @@
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -11,7 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -51,65 +54,124 @@ fun UserActionDialog(dialog: SingleChoiceInputDialog, vm: DialogsViewModel) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MultipleSelectUserActionDialog(dialog: DiceRollUserInputDialog, vm: DialogsViewModel) {
-    val selectedRolls = remember { mutableStateListOf<DieResult?>(*arrayOfNulls(dialog.dice.size)) }
-    val result by derivedStateOf { DiceResults(selectedRolls.filterNotNull()) }
-    val resultText by derivedStateOf { if (result.rolls.size < dialog.dice.size) null else dialog.result(result) }
-    showDialog(dialog, selectedRolls, vm, result, resultText)
+    var showDialog by remember { mutableStateOf(true) }
+    if (showDialog) {
+        val selectedRolls = remember { mutableStateListOf<DieResult?>(*arrayOfNulls(dialog.dice.size)) }
+        val result = DiceResults(selectedRolls.filterNotNull())
+        val resultText = if (result.rolls.size < dialog.dice.size) null else dialog.result(result)
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+            },
+            title = { Text(text = dialog.title) },
+            text = {
+                Column(modifier = Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(text = dialog.message)
+                    dialog.dice.forEachIndexed { i, el: Pair<Dice, List<DieResult>> ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            el.second.forEach { it: DieResult ->
+                                val isSelected = remember { derivedStateOf { selectedRolls[i] == it } }
+                                val buttonColors = ButtonDefaults.buttonColors(
+                                    backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background
+                                )
+                                Button(
+                                    modifier = Modifier.weight(1f),
+                                    onClick = { selectedRolls[i] = it },
+                                    colors = buttonColors
+                                ) {
+                                    Text(
+                                        text = it.result.toString(),
+                                        color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDialog = false
+                        vm.buttonActionSelected(result)
+
+                    },
+                    enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null)
+                ) {
+                    val suffix by derivedStateOf { if (resultText != null) " - $resultText" else "" }
+                    Text("Confirm$suffix")
+                }
+            },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = true,
+                scrimColor = Color.Black.copy(alpha = 0.6f)
+            )
+        )
+    }
 }
+//    showDiceDialog(dialog, selectedRolls, vm, result, resultText)
 
 // TODO Figure out how to do recomposition correctly here?
+// TODO Looks like the default AlertDialog doesn't really support this very well. At least when it scales.
+//  Looks like a custom implementation is needed. Also make it draggable
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun showDialog(
+private fun showDiceDialog(
     dialog: DiceRollUserInputDialog,
     selectedRolls: SnapshotStateList<DieResult?>,
     vm: DialogsViewModel,
     result: DiceResults,
     resultText: String?
 ) {
-    AlertDialog(
-        onDismissRequest = {  },
-        title = { Text(text = "Select Options") },
-        text = {
-            Column {
-                dialog.dice.forEachIndexed { i, el: Pair<Dice, List<DieResult>> ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        el.second.forEach { it: DieResult ->
-                            val isSelected = remember { derivedStateOf { selectedRolls[i] == it } }
-                            val buttonColors = ButtonDefaults.buttonColors(
-                                backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background
-                            )
-                            Button(
-                                modifier = Modifier.weight(1f),
-                                onClick = { selectedRolls[i] = it },
-                                colors = buttonColors
-                            ) {
-                                Text(
-                                    text = it.result.toString(),
-                                    color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground
+    var showDialog by remember { mutableStateOf(true) }
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+            },
+            title = { Text(text = dialog.title) },
+            text = {
+                Column(modifier = Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(text = dialog.message)
+                    dialog.dice.forEachIndexed { i, el: Pair<Dice, List<DieResult>> ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            el.second.forEach { it: DieResult ->
+                                val isSelected = remember { derivedStateOf { selectedRolls[i] == it } }
+                                val buttonColors = ButtonDefaults.buttonColors(
+                                    backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background
                                 )
+                                Button(
+                                    modifier = Modifier.weight(1f),
+                                    onClick = { selectedRolls[i] = it },
+                                    colors = buttonColors
+                                ) {
+                                    Text(
+                                        text = it.result.toString(),
+                                        color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground
+                                    )
+                                }
                             }
                         }
                     }
                 }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                   // showDialog1 = false
-                    vm.buttonActionSelected(result)
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDialog = false
+                        vm.buttonActionSelected(result)
 
-                },
-                enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null)
-            ) {
-                val suffix by derivedStateOf { if (resultText != null) " - [${result.rolls.sumOf { it.result }}] $resultText" else "" }
-                Text("Confirm$suffix")
-            }
-        },
-        properties = DialogProperties(
-            usePlatformDefaultWidth = true,
-            scrimColor = Color.Black.copy(alpha = 0.6f)
+                    },
+                    enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null)
+                ) {
+                    val suffix by derivedStateOf { if (resultText != null) " - $resultText" else "" }
+                    Text("Confirm$suffix")
+                }
+            },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = true,
+                scrimColor = Color.Black.copy(alpha = 0.6f)
+            )
         )
-    )
+    }
 }

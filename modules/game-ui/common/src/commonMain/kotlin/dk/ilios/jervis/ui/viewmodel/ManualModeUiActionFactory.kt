@@ -47,20 +47,14 @@ import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.controller.GameController
-import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.model.Coin
+import dk.ilios.jervis.procedures.CatchRoll
 import dk.ilios.jervis.procedures.DetermineKickingTeam
 import dk.ilios.jervis.procedures.RollForStartingFanFactor
 import dk.ilios.jervis.procedures.RollForTheWeather
 import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.procedures.TheKickOff
 import dk.ilios.jervis.procedures.TheKickOffEvent
-import dk.ilios.jervis.rules.KickOffEventTable
-import dk.ilios.jervis.rules.tables.Blizzard
-import dk.ilios.jervis.rules.tables.PerfectConditions
-import dk.ilios.jervis.rules.tables.PouringRain
-import dk.ilios.jervis.rules.tables.SwelteringHeat
-import dk.ilios.jervis.rules.tables.VerySunny
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +71,6 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 if (initialActionsIndex < actions.size) {
                     val action = actions[initialActionsIndex]
                     initialActionsIndex++
-                    Thread.sleep(10) // TODO Give UI a chance to catch up. Right now some events are missed for some reason.
                     action
                 } else {
                     val action: GameAction = runBlocking(Dispatchers.Default) {
@@ -141,15 +134,13 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             }
 
             is RollForTheWeather.RollWeatherDice -> {
-                // Fake the rolls for the specific results
-                val rolls = listOf(
-                    DiceResults(D6Result(1), D6Result(1)) to "[2] ${SwelteringHeat.title}",
-                    DiceResults(D6Result(1), D6Result(2)) to "[3] ${VerySunny.title}",
-                    DiceResults(D6Result(2), D6Result(2)) to "[4] ${PerfectConditions.title}",
-                    DiceResults(D6Result(5), D6Result(6)) to "[11] ${PouringRain.title}",
-                    DiceResults(D6Result(6), D6Result(6)) to "[12] ${Blizzard.title}",
-                ).reversed()
-                DiceRollUserInputDialog.createWeatherRollDialog(controller.rules, rolls)
+                val diceRolls = mutableListOf<DiceResults>()
+                D8Result.allOptions().forEach { d8 ->
+                    D6Result.allOptions().forEach { d6 ->
+                        diceRolls.add(DiceResults(d8, d6))
+                    }
+                }
+                DiceRollUserInputDialog.createWeatherRollDialog(controller.rules)
             }
 
             is DetermineKickingTeam.SelectCoinSide -> {
@@ -176,32 +167,23 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             }
 
             is TheKickOff.TheKickDeviates -> {
-                // TODO Find a better way to show the options here
                 val diceRolls = mutableListOf<DiceResults>()
                 D8Result.allOptions().forEach { d8 ->
                     D6Result.allOptions().forEach { d6 ->
                         diceRolls.add(DiceResults(d8, d6))
                     }
                 }
-                SingleChoiceInputDialog.createKickOffDeviatesDialog(diceRolls.map { Pair(it, "[${it.rolls.first().result},${it.rolls.last().result}]") })
+                DiceRollUserInputDialog.createKickOffDeviatesDialog(
+                    controller.rules,
+                )
             }
 
             is TheKickOffEvent.RollForKickOffEvent -> {
-                // Fake the rolls for the specific results
-                val rolls = listOf(
-                    DiceResults(1.d6, 1.d6) to "[2] ${KickOffEventTable.roll(1.d6, 1.d6).name}",
-                    DiceResults(1.d6, 2.d6) to "[3] ${KickOffEventTable.roll(1.d6, 2.d6).name}",
-                    DiceResults(1.d6, 3.d6) to "[4] ${KickOffEventTable.roll(1.d6, 3.d6).name}",
-                    DiceResults(1.d6, 4.d6) to "[5] ${KickOffEventTable.roll(1.d6, 4.d6).name}",
-                    DiceResults(1.d6, 5.d6) to "[6] ${KickOffEventTable.roll(1.d6, 5.d6).name}",
-                    DiceResults(1.d6, 6.d6) to "[7] ${KickOffEventTable.roll(1.d6, 6.d6).name}",
-                    DiceResults(2.d6, 6.d6) to "[8] ${KickOffEventTable.roll(2.d6, 6.d6).name}",
-                    DiceResults(3.d6, 6.d6) to "[9] ${KickOffEventTable.roll(3.d6, 6.d6).name}",
-                    DiceResults(4.d6, 6.d6) to "[10] ${KickOffEventTable.roll(4.d6, 6.d6).name}",
-                    DiceResults(5.d6, 6.d6) to "[11] ${KickOffEventTable.roll(5.d6, 6.d6).name}",
-                    DiceResults(6.d6, 6.d6) to "[12] ${KickOffEventTable.roll(6.d6, 6.d6).name}",
-                ).reversed()
-                SingleChoiceInputDialog.createKickOffEventDialog(rolls)
+                DiceRollUserInputDialog.createKickOffEventDialog(controller.rules)
+            }
+
+            is CatchRoll.RollDie -> {
+                SingleChoiceInputDialog.createCatchBallDialog(controller.state.catchRollContext!!.catchingPlayer, D6Result.allOptions())
             }
 
             else -> {

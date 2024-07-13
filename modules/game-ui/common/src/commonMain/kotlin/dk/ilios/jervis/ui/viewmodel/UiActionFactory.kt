@@ -26,11 +26,11 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
     // FieldActions:
     // - Select Player, Select ball, Select location
     // ----
-    protected val _fieldActions: MutableSharedFlow<UserInput> = MutableSharedFlow(extraBufferCapacity = 1)
+    protected val _fieldActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
     val fieldActions: Flow<UserInput> = _fieldActions
-    protected val _unknownActions: MutableSharedFlow<UserInput> = MutableSharedFlow(extraBufferCapacity = 1)
+    protected val _unknownActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
     val unknownActions: Flow<UserInput> = _unknownActions
-    val dialogActions: MutableSharedFlow<UserInputDialog?> = MutableSharedFlow(extraBufferCapacity = 1)
+    val dialogActions: MutableSharedFlow<UserInputDialog?> = MutableSharedFlow(replay = 1)
     // ----
 
     // All actions selected by the user are sent to this channel.

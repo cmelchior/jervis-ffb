@@ -215,7 +215,7 @@ class DBlockResult(override val result: Int = Random.nextInt(1, 7)): DieResult()
 }
 
 @Serializable
-class DiceResults(val rolls: List<DieResult>): GameAction {
+class DiceResults(val rolls: List<DieResult>): GameAction, List<DieResult> by rolls {
     constructor(vararg roll: DieResult): this(listOf(*roll))
 }
 @Serializable

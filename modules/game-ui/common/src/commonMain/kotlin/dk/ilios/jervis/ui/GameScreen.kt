@@ -8,7 +8,17 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fumbbl.FumbblReplayAdapter
 import dk.ilios.jervis.rules.BB2020Rules
-import dk.ilios.jervis.ui.viewmodel.*
+import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
+import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
+import dk.ilios.jervis.ui.viewmodel.FieldViewModel
+import dk.ilios.jervis.ui.viewmodel.GameStatusViewModel
+import dk.ilios.jervis.ui.viewmodel.LogViewModel
+import dk.ilios.jervis.ui.viewmodel.ManualModeUiActionFactory
+import dk.ilios.jervis.ui.viewmodel.MenuViewModel
+import dk.ilios.jervis.ui.viewmodel.RandomModeUiActionFactory
+import dk.ilios.jervis.ui.viewmodel.ReplayModeUiActionFactory
+import dk.ilios.jervis.ui.viewmodel.ReplayViewModel
+import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
 import dk.ilios.jervis.utils.createDefaultGameState
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -21,7 +31,7 @@ class GameScreenModel(
     controller: GameController? = null
 ): ScreenModel {
     val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
-    val actionSelectedChannel = Channel<GameAction>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionSelectedChannel = Channel<GameAction>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
     val controller: GameController
     val fumbbl: FumbblReplayAdapter?
     val rules: BB2020Rules = BB2020Rules

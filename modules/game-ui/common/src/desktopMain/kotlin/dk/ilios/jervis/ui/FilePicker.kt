@@ -14,6 +14,7 @@ actual fun FilePicker(
     onFileSelected: (Path) -> Unit
 ) {
     val fileChooser = JFileChooser()
+    fileChooser.approveButtonText = "Select"
     fileChooser.dialogTitle = dialogTitle
     if (selectedFile != null) {
         fileChooser.selectedFile = File(selectedFile)

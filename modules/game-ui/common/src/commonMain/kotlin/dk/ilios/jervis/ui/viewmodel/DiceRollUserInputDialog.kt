@@ -1,11 +1,13 @@
 package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.tables.Direction
 import javax.swing.Icon
 
 /**
@@ -23,7 +25,7 @@ data class DiceRollUserInputDialog(
     override val actions: List<GameAction> = emptyList()
     companion object {
 
-        fun createWeatherRollDialog(rules: Rules, actions: List<Pair<GameAction, String>>): UserInput {
+        fun createWeatherRollDialog(rules: Rules): UserInput {
             return DiceRollUserInputDialog(
                 title = "Weather roll",
                 message = "Roll 2D6 for the weather",
@@ -32,48 +34,52 @@ data class DiceRollUserInputDialog(
                     Pair(Dice.D6, D6Result.allOptions())
                 ),
                 result = { rolls: DiceResults ->
-                    rules.weatherTable.roll(rolls.rolls.first() as D6Result , rolls.rolls.last() as D6Result).title
+                    val description = rules.weatherTable.roll(rolls.rolls.first() as D6Result , rolls.rolls.last() as D6Result).title
+                    "$description (${rolls.sumOf { it.result }})"
                 }
             )
-
         }
 
-//        fun createSelectKickoffCoinTossResultDialog(team: Team, actions: List<GameAction>) = create(
-//            title = "Call Coin Toss Outcome",
-//            message = "${team.name} must select a side of the coin",
-//            actions = actions
-//        )
-//
-//        fun createTossDialog(actions: List<GameAction>): UserInputDialog = create(
-//            title = "Coin Toss",
-//            message = "Flip coin into the air",
-//            actions = actions
-//        )
-//
-//        fun createChooseToKickoffDialog(team: Team, actions: List<Pair<GameAction, String>>): UserInputDialog = createWithDescription(
-//            title = "Kickoff?",
-//            message = "${team.name} must choose to kick-off or receive",
-//            actions = actions
-//        )
-//
-//        fun createInvalidSetupDialog(team: Team): UserInputDialog = create(
-//            title = "Invalid Setup",
-//            message = "Invalid setup, please try again",
-//            actions = listOf(Confirm)
-//        )
-//
-//        fun createKickOffDeviatesDialog(actions: List<Pair<GameAction, String>>): UserInputDialog = createWithDescription(
-//            title = "The KickOff",
-//            message = "Roll 1D8 + 1D6 to deviate the ball.",
-//            actions = actions
-//        )
-//
-//        fun createKickOffEventDialog(actions: List<Pair<GameAction, String>>): UserInputDialog = createWithDescription(
-//            title = "Kickoff Event",
-//            message = "Roll 2D6 for the KickOff event",
-//            actions = actions
-//        )
-//
+        fun createKickOffDeviatesDialog(rules: Rules): UserInputDialog {
+            return DiceRollUserInputDialog(
+                title = "The KickOff",
+                message = "Roll Roll 1D8 + 1D6 to deviate the ball.",
+                dice = listOf(
+                    Pair(Dice.D8, D8Result.allOptions()),
+                    Pair(Dice.D6, D6Result.allOptions()),
+                ),
+                result = { rolls: DiceResults ->
+                    val d8 = rolls.first() as? D8Result ?: rolls.last() as D8Result
+                    val d6 = rolls.last() as? D6Result ?: rolls.first() as D6Result
+                    val description = when (val direction = rules.direction(d8)) {
+                        Direction(-1, -1) -> "Up-Left"
+                        Direction(0, -1) -> "Up"
+                        Direction(1, -1) -> "Up-Right"
+                        Direction(-1, 0) -> "Left"
+                        Direction(1, 0) -> "Right"
+                        Direction(-1, 1) -> "Down-Left"
+                        Direction(0, 1) -> "Down"
+                        Direction(1, 1) -> "Down-Right"
+                        else -> TODO("Not supported: $direction")
+                    }
+                    "$description(${d6.result})"
+                }
+            )
+        }
 
+        fun createKickOffEventDialog(rules: Rules): UserInputDialog {
+            return DiceRollUserInputDialog(
+                title = "KickOff Event",
+                message = "Roll 2D6 for the KickOff event.",
+                dice = listOf(
+                    Pair(Dice.D6, D6Result.allOptions()),
+                    Pair(Dice.D6, D6Result.allOptions())
+                ),
+                result = { rolls: DiceResults ->
+                    val description: String = rules.kickOffEventTable.roll(rolls.first() as D6Result, rolls.last() as D6Result).name
+                    "$description(${rolls.sumOf { it.result }})"
+                }
+            )
+        }
     }
 }
