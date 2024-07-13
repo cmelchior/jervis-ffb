@@ -70,6 +70,7 @@ import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
 import dk.ilios.jervis.ui.viewmodel.SingleChoiceInputDialog
 import dk.ilios.jervis.ui.viewmodel.UnknownInput
 import dk.ilios.jervis.ui.viewmodel.UserInput
+import dk.ilios.jervis.ui.viewmodel.WaitingForUserInput
 import org.jetbrains.skia.Image
 import java.awt.image.BufferedImage
 import java.io.InputStream
@@ -267,7 +268,7 @@ fun Dialogs(vm: DialogsViewModel) {
 
 @Composable
 fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
-    val actions: UserInput by vm.availableActions.collectAsState(UnknownInput(emptyList()))
+    val inputs: List<UserInput> by vm.availableActions.collectAsState(emptyList())
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -282,39 +283,45 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
         ) {
             Text("Start Game", fontSize = 10.sp)
         }
-        when (actions) {
-            is UnknownInput -> {
-                actions.actions.forEach { action: GameAction ->
-                    Button(
-                        modifier = Modifier.padding(0.dp),
-                        contentPadding = PaddingValues(2.dp),
-                        onClick = { vm.actionSelected(action) }
-                    ) {
-                        val text = when(action) {
-                            Confirm -> "Confirm"
-                            Continue -> "Continue"
-                            is DieResult -> action.toString()
-                            DogoutSelected -> "DogoutSelected"
-                            EndSetup -> "EndSetup"
-                            EndTurn -> "EndTurn"
-                            is FieldSquareSelected -> action.toString()
-                            is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
-                            is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
-                            is PlayerActionSelected -> "Action: ${action.action.name}"
-                            PlayerDeselected -> "Deselect active player"
-                            EndAction -> "End Action"
-                            Cancel -> "Cancel"
-                            is CoinSideSelected -> "Selected: ${action.side}"
-                            is CoinTossResult -> "Coin flip: ${action.result}"
-                            is RandomPlayersSelected -> "Random players: $action"
-                            NoRerollSelected -> "No reroll"
-                            is RerollOptionSelected -> action.option.toString()
+        inputs.forEach { input ->
+            val actions = input.actions
+            when (input) {
+                is WaitingForUserInput -> {
+                    // Do nothing
+                }
+                is UnknownInput -> {
+                    actions.forEach { action: GameAction ->
+                        Button(
+                            modifier = Modifier.padding(0.dp),
+                            contentPadding = PaddingValues(2.dp),
+                            onClick = { vm.actionSelected(action) }
+                        ) {
+                            val text = when(action) {
+                                Confirm -> "Confirm"
+                                Continue -> "Continue"
+                                is DieResult -> action.toString()
+                                DogoutSelected -> "DogoutSelected"
+                                EndSetup -> "EndSetup"
+                                EndTurn -> "EndTurn"
+                                is FieldSquareSelected -> action.toString()
+                                is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
+                                is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
+                                is PlayerActionSelected -> "Action: ${action.action.name}"
+                                PlayerDeselected -> "Deselect active player"
+                                EndAction -> "End Action"
+                                Cancel -> "Cancel"
+                                is CoinSideSelected -> "Selected: ${action.side}"
+                                is CoinTossResult -> "Coin flip: ${action.result}"
+                                is RandomPlayersSelected -> "Random players: $action"
+                                NoRerollSelected -> "No reroll"
+                                is RerollOptionSelected -> action.option.toString()
+                            }
+                            Text(text, fontSize = 10.sp)
                         }
-                        Text(text, fontSize = 10.sp)
                     }
                 }
+                else -> TODO("Unsupported type: $actions")
             }
-            else -> TODO("Unsupported type: $actions")
         }
     }
 }

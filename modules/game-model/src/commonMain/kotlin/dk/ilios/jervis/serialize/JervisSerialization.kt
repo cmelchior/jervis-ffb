@@ -30,7 +30,6 @@ import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.isOnHomeTeam
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Position
@@ -55,6 +54,8 @@ import okio.use
 object JervisSerialization {
 
     private val jervisModule = SerializersModule {
+
+
         polymorphic(Rules::class) {
             subclass(BB2020Rules::class)
         }

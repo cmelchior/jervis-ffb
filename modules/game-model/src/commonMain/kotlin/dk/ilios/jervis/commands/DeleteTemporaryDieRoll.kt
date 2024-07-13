@@ -4,7 +4,6 @@ import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 class DeleteTemporaryDieRoll(private val team: Team) : Command {
 

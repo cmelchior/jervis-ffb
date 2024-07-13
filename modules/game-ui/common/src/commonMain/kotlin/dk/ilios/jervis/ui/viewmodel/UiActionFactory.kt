@@ -42,6 +42,13 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
     // The user selected an action
     fun userSelectedAction(action: GameAction) {
         scope.launch {
+            // Reset UI so it doesn't allow more input
+            _unknownActions.emit(WaitingForUserInput)
+            _fieldActions.emit(WaitingForUserInput)
+            // By emitting `null`, recomposing will no longer show dialogs.
+            // Hide the dialog before sending the event to prevent race conditions
+            // with showing multiple dialogs (which can cause type case errors for the dice rolls)
+            dialogActions.emit(null)
             userSelectedAction.send(action)
         }
     }

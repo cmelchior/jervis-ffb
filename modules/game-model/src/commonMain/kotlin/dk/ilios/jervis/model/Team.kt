@@ -11,7 +11,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlin.jvm.JvmInline
 import kotlin.properties.Delegates
+import kotlin.random.Random
+
+@Serializable
+@JvmInline
+value class TeamId(val id: String = "")
 
 class TeamHalfData(private val game: Game) {
     var totalRerolls: Int = 0
@@ -56,16 +62,17 @@ class TeamTurnData(private val game: Game) {
 }
 
 class TeamTemporaryData(private val game: Game) {
+    // This contain the result of the last dice rolled
     val dieRoll = mutableListOf<DieResult>()
 }
 
 @Serializable
-class Team(val name: String, val roster: Roster, val coach: Coach): Collection<Player> {
+class Team(val name: String, val roster: Roster, val coach: Coach): Collection<Player>, Observable<Team>() {
 
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
     // Fixed Team data, identifying the team
-    val id: String = ""
+    val id = TeamId("team-${Random.nextLong()}")
 
     // Variable team data that might change during the game
     var rerollsCountOnRoster: Int = 0

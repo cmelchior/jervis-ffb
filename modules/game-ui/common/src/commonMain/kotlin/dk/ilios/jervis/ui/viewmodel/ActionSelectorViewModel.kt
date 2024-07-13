@@ -2,8 +2,8 @@ package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
-import dk.ilios.jervis.actions.SelectFieldLocation
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
 
 //
@@ -28,7 +28,14 @@ class SelectFieldLocationInput(override val actions: List<FieldSquareSelected>):
 class ActionSelectorViewModel(
     private val uiActionFactory: UiActionFactory,
 ) {
-    val availableActions: Flow<UserInput> = uiActionFactory.unknownActions
+    val availableActions: Flow<List<UserInput>> = uiActionFactory.unknownActions.scan(emptyList()) { list, element ->
+        if (element == WaitingForUserInput) {
+            emptyList()
+        } else {
+            list + element
+        }
+    }
+
     fun start() {
         uiActionFactory.scope.launch {
             uiActionFactory.start(this)

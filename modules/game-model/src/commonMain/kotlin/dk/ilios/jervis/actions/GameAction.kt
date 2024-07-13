@@ -117,7 +117,8 @@ data class CoinTossResult(val result: Coin): GameAction {
     }
 }
 @Serializable
-class D2Result(override val result: Int = Random.nextInt(1, 3)): DieResult() {
+class D2Result(override val result: Int): DieResult() {
+    constructor(): this(Random.nextInt(1, 3)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 2
     companion object {
@@ -125,7 +126,8 @@ class D2Result(override val result: Int = Random.nextInt(1, 3)): DieResult() {
     }
 }
 @Serializable
-class D3Result(override val result: Int = Random.nextInt(1, 4)): DieResult() {
+class D3Result(override val result: Int): DieResult() {
+    constructor(): this(Random.nextInt(1, 4)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 3
 
@@ -135,7 +137,8 @@ class D3Result(override val result: Int = Random.nextInt(1, 4)): DieResult() {
 }
 
 @Serializable
-class D4Result(override val result: Int = Random.nextInt(1, 5)): DieResult() {
+class D4Result(override val result: Int): DieResult() {
+    constructor(): this(Random.nextInt(1, 5)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 4
 
@@ -146,25 +149,18 @@ class D4Result(override val result: Int = Random.nextInt(1, 5)): DieResult() {
 
 @Serializable
 class D6Result(override val result: Int = Random.nextInt(1, 7)): DieResult() {
+    constructor(): this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 6
 
     companion object {
         fun allOptions(): List<D6Result> { return (1..6).map { D6Result(it) } }
-        fun allOptions(dice: Int): List<List<D6Result>> {
-            val list = mutableListOf<List<D6Result>>()
-            (1 .. 6).forEach { d1 ->
-                (1 .. 6).forEach { d2 ->
-                    list.add(listOf(D6Result(d1), D6Result(d2)))
-                }
-            }
-            return list
-        }
     }
 }
 
 @Serializable
-class D8Result(override val result: Int = Random.nextInt(1, 9)): DieResult() {
+class D8Result(override val result: Int): DieResult() {
+    constructor(): this(Random.nextInt(1, 9)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 8
 
@@ -174,7 +170,8 @@ class D8Result(override val result: Int = Random.nextInt(1, 9)): DieResult() {
 }
 
 @Serializable
-class D12Result(override val result: Int = Random.nextInt(1, 13)): DieResult() {
+class D12Result(override val result: Int): DieResult() {
+    constructor(): this(Random.nextInt(1, 13)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 12
 
@@ -184,7 +181,8 @@ class D12Result(override val result: Int = Random.nextInt(1, 13)): DieResult() {
 }
 
 @Serializable
-class D16Result(override val result: Int = Random.nextInt(1, 17)): DieResult() {
+class D16Result(override val result: Int): DieResult() {
+    constructor(): this(Random.nextInt(1, 17)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 16
 
@@ -194,9 +192,10 @@ class D16Result(override val result: Int = Random.nextInt(1, 17)): DieResult() {
 }
 
 @Serializable
-class D20Result(override val result: Int = Random.nextInt(1, 21)): DieResult() {
+class D20Result(override val result: Int): DieResult() {
+    constructor(): this(Random.nextInt(1, 21)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
-    override val max: Short = 17
+    override val max: Short = 20
 
     companion object {
         fun allOptions(): List<D20Result> { return (1..20).map { D20Result(it) } }
@@ -204,7 +203,8 @@ class D20Result(override val result: Int = Random.nextInt(1, 21)): DieResult() {
 }
 
 @Serializable
-class DBlockResult(override val result: Int = Random.nextInt(1, 7)): DieResult() {
+class DBlockResult(override val result: Int): DieResult() {
+    constructor(): this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 6
 

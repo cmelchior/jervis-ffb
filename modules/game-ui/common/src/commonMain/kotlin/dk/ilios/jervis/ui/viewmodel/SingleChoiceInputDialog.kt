@@ -5,6 +5,7 @@ import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.Continue
+import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
@@ -21,6 +22,8 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.tables.Direction
 import javax.swing.Icon
 
 sealed interface UserInputDialog: UserInput
@@ -102,6 +105,26 @@ data class SingleChoiceInputDialog(
             message = "Roll D6 for ${player.name}",
             actions = actions
         )
+
+        fun createBounceBallDialog(rules: Rules, actions: List<D8Result>): SingleChoiceInputDialog = createWithDescription(
+            title = "Bounce Ball",
+            message = "Roll D8 for the direction of the ball.",
+            actions = actions.map { roll: D8Result ->
+                val description = when (val direction = rules.direction(roll)) {
+                    Direction(-1, -1) -> "Up-Left"
+                    Direction(0, -1) -> "Up"
+                    Direction(1, -1) -> "Up-Right"
+                    Direction(-1, 0) -> "Left"
+                    Direction(1, 0) -> "Right"
+                    Direction(-1, 1) -> "Down-Left"
+                    Direction(0, 1) -> "Down"
+                    Direction(1, 1) -> "Down-Right"
+                    else -> TODO("Not supported: $direction")
+                }
+                Pair(roll, description)
+            }
+        )
+
     }
 }
 

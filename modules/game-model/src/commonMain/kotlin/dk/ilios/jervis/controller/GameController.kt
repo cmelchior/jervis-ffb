@@ -13,10 +13,10 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.fsm.ProcedureStack
 import dk.ilios.jervis.fsm.ProcedureState
-import dk.ilios.jervis.reports.LogEntry
-import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.FullGame
+import dk.ilios.jervis.reports.LogEntry
+import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.flow.Flow
@@ -64,7 +64,7 @@ class GameController(
                 val reportSelectedAction = SimpleLogEntry("Selected action: $selectedAction")
                 commands.add(reportSelectedAction)
                 reportSelectedAction.execute(state, this)
-                val command = currentNode.applyAction(selectedAction, state, rules)
+                 val command = currentNode.applyAction(selectedAction, state, rules)
                 commands.add(command)
                 command.execute(state, this)
             }

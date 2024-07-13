@@ -36,6 +36,7 @@ class ResetAvailableTeamActions(private val team: Team,
             it.blitzActions = blitzActions
             it.foulActions = foulActions
         }
+        team.notifyUpdate()
     }
 
     override fun undo(state: Game, controller: GameController) {
@@ -47,5 +48,6 @@ class ResetAvailableTeamActions(private val team: Team,
             it.blitzActions = originalBlitzActions
             it.foulActions = originalFoulActions
         }
+        team.notifyUpdate()
     }
 }

@@ -14,24 +14,38 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
         // Remove from old location
         val oldLocation = originalLocation
         if (oldLocation is FieldCoordinate) {
-            state.field[oldLocation].player = null
+//            state.field[oldLocation].player = null
+            state.field[oldLocation].apply {
+                player = null
+                notifyUpdate()
+            }
         }
 
         // Add to new location
         player.location = location
+        player.team.notifyDogoutChange()
         if (location is FieldCoordinate) {
-            state.field[location].player = player
+            state.field[location].apply {
+                player = this@SetPlayerLocation.player
+                notifyUpdate()
+            }
         }
     }
 
     override fun undo(state: Game, controller: GameController) {
         if (location is FieldCoordinate) {
-            state.field[location].player = null
+            state.field[location].apply {
+                player = null
+                notifyUpdate()
+            }
         }
         player.location = originalLocation
         val originalLoc = originalLocation
         if (originalLoc is FieldCoordinate) {
-            state.field[originalLoc].player = player
+            state.field[originalLoc].apply {
+                player = this@SetPlayerLocation.player
+                notifyUpdate()
+            }
         }
     }
 }

@@ -2,14 +2,16 @@ package dk.ilios.jervis.model
 
 import dk.ilios.jervis.rules.Rules
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.serialization.Serializable
 
+@Serializable
 class FieldSquare(val coordinates: FieldCoordinate): Observable<FieldSquare>(), Location {
     constructor(x: Int, y: Int): this(FieldCoordinate(x, y))
     override val coordinate: FieldCoordinate = coordinates
     val x = coordinates.x
     val y = coordinates.y
-    var player: Player? by observable(null)
-    var ball: Ball? by observable(null)
+    var player: Player? = null // observable(null)
+    var ball: Ball? = null //by observable(null)
 
     init {
         notifyUpdate()

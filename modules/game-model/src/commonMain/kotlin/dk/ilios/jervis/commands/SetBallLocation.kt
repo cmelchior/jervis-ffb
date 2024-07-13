@@ -15,20 +15,32 @@ class SetBallLocation(val location: FieldCoordinate) : Command {
         this.originalLocation = state.ball.location
         state.ball.location = location
         if (originalLocation.isOnField(rules)) {
-            state.field[originalLocation].ball = null
+            state.field[originalLocation].apply {
+                ball = null
+                notifyUpdate()
+            }
         }
         if (location.isOnField(rules) && !location.isOutOfBounds(rules)) {
-            state.field[location].ball = state.ball
+            state.field[location].apply {
+                ball = state.ball
+                notifyUpdate()
+            }
         }
     }
 
     override fun undo(state: Game, controller: GameController) {
         val rules = controller.rules
         if (location.isOnField(rules)) {
-            state.field[location].ball = null
+            state.field[location].apply {
+                ball = null
+                notifyUpdate()
+            }
         }
         if (originalLocation.isOnField(rules)) {
-            state.field[originalLocation].ball = state.ball
+            state.field[originalLocation].apply {
+              ball = state.ball
+              notifyUpdate()
+            }
         }
         state.ball.location = originalLocation
     }

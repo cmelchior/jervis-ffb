@@ -1,7 +1,9 @@
 package dk.ilios.jervis.model
 
+import kotlinx.serialization.Serializable
 
 
+@Serializable
 class Ball {
     var state: BallState = BallState.ON_GROUND
     var location: FieldCoordinate = FieldCoordinate.UNKNOWN

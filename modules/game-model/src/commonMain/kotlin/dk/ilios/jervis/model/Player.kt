@@ -3,16 +3,9 @@ package dk.ilios.jervis.model
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.skills.Skill
-import dk.ilios.jervis.utils.safeTryEmit
-import kotlin.jvm.JvmInline
-import kotlin.properties.ObservableProperty
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlin.jvm.JvmInline
 
 // TODO Should we split this into DogoutState and FieldState?
 enum class PlayerState {
@@ -59,23 +52,6 @@ value class PlayerNo(val number: Int): Comparable<PlayerNo> {
     override fun toString(): String = number.toString()
 }
 
-abstract class Observable<T> {
-    private val _state = MutableSharedFlow<T>(replay = 1, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
-    protected val observeState: SharedFlow<T> = _state
-    protected fun <P> observable(initialValue: P, onChange: ((oldValue: P, newValue: P) -> Unit)? = null): ReadWriteProperty<Any?, P> {
-        return object: ObservableProperty<P>(initialValue) {
-            override fun afterChange(property: KProperty<*>, oldValue: P, newValue: P) {
-                _state.safeTryEmit(this@Observable as T)
-                onChange?.let {
-                    onChange(oldValue, newValue)
-                }
-            }
-        }
-    }
-    public fun notifyUpdate() {
-        _state.safeTryEmit(this as T)
-    }
-}
 
 fun Player.isOnHomeTeam(): Boolean {
     return this.team.game.homeTeam == this.team
@@ -93,21 +69,28 @@ enum class Availability {
 @Serializable
 value class PlayerId(val value: String)
 
+
+
+
+
 @Serializable
 class Player(val id: PlayerId): Observable<Player>() {
     @Transient
     lateinit var team: Team
-    var location: Location by observable(initialValue = DogOut) { old, new ->
-        if ((old == DogOut && new != DogOut) || old != DogOut && new == DogOut) {
-            team.notifyDogoutChange()
+    var location: Location = DogOut
+        set(value) {
+            val old = location
+            field = value
+            if ((old == DogOut && value != DogOut) || old != DogOut && value == DogOut) {
+                team.notifyDogoutChange()
+            }
         }
-    }
-    var state: PlayerState by observable(PlayerState.STANDING)
-    var isActive: Boolean by observable(false)
-    var available: Availability by observable(Availability.AVAILABLE)
+    var state: PlayerState = PlayerState.STANDING // by observable(PlayerState.STANDING)
+    var isActive: Boolean = false //by observable(false)
+    var available: Availability = Availability.AVAILABLE // observable(Availability.AVAILABLE)
     var stunnedThisTurn: Boolean? = null
     var hasTackleZones: Boolean = true
-    var name: String by observable("")
+    var name: String = ""
     var number: PlayerNo = PlayerNo(0)
     var position: Position = HumanTeam.positions.first()
 
@@ -118,26 +101,11 @@ class Player(val id: PlayerId): Observable<Player>() {
     var basePassing: Int? = 0
     var baseArmorValue: Int = 0
     val skills = mutableListOf<Skill>()
-    val move: Int
-        get() {
-            return baseMove
-        }
-    val strength: Int
-        get() {
-            return baseStrenght
-        }
-    val agility: Int
-        get() {
-            return baseAgility
-        }
-    val passing: Int?
-        get() {
-            return basePassing
-        }
-    val armorValue: Int
-        get() {
-            return baseArmorValue
-        }
+    val move: Int get() = baseMove
+    val strength: Int get() = baseStrenght
+    val agility: Int get() = baseAgility
+    val passing: Int? get() = basePassing
+    val armorValue: Int get() = baseArmorValue
     val ball: Ball?
         get() = if (team.game.ball.state == BallState.CARRIED && team.game.ball.location == location) {
             team.game.ball

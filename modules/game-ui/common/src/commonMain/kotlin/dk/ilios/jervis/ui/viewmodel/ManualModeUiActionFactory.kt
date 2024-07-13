@@ -48,6 +48,7 @@ import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coin
+import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.CatchRoll
 import dk.ilios.jervis.procedures.DetermineKickingTeam
 import dk.ilios.jervis.procedures.RollForStartingFanFactor
@@ -186,6 +187,10 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 SingleChoiceInputDialog.createCatchBallDialog(controller.state.catchRollContext!!.catchingPlayer, D6Result.allOptions())
             }
 
+            is Bounce.RollDirection -> {
+                SingleChoiceInputDialog.createBounceBallDialog(controller.rules, D8Result.allOptions())
+            }
+
             else -> {
                 null
             }
@@ -206,6 +211,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             is SelectFieldLocationInput -> _fieldActions.emit(uiEvent)
             is WaitingForUserInput -> {
                 _fieldActions.emit(uiEvent)
+                _unknownActions.emit(uiEvent)
                 // Also send to other channels?
             }
         }

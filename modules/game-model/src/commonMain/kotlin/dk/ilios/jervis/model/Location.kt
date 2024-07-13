@@ -9,6 +9,7 @@ import kotlin.math.max
 /**
  * Top-left is (0,0), bottom-left is (25, 14) for a normal Blood Bowl Field.
  */
+@Serializable
 sealed interface Location {
     val coordinate: FieldCoordinate
     fun isOnLineOfScrimmage(rules: Rules): Boolean

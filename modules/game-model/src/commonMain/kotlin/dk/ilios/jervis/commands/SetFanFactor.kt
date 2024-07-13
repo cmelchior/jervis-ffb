@@ -10,10 +10,16 @@ class SetFanFactor(private val team: Team, private val fanFactor: Int) : Command
 
     override fun execute(state: Game, controller: GameController) {
         originalValue = team.fanFactor
-        team.fanFactor = fanFactor
+        team.apply {
+            fanFactor = this@SetFanFactor.fanFactor
+            notifyUpdate()
+        }
     }
 
     override fun undo(state: Game, controller: GameController) {
-        team.fanFactor = originalValue
+        team.apply {
+            fanFactor = originalValue
+            notifyUpdate()
+        }
     }
 }
