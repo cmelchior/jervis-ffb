@@ -1,10 +1,11 @@
 package dk.ilios.jervis.model
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 
 @Serializable
-class Ball {
+class Ball: Observable<Ball>() {
     var state: BallState = BallState.ON_GROUND
     var location: FieldCoordinate = FieldCoordinate.UNKNOWN
 
@@ -13,4 +14,7 @@ class Ball {
 
     // Only set if state = OUT_OF_BOUNDS
     var outOfBoundsAt: FieldCoordinate? = null
+
+    @Transient
+    val observeBall = observeState
 }

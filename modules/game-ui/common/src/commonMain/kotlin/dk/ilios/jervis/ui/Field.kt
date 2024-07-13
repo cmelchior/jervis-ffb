@@ -3,8 +3,15 @@ package dk.ilios.jervis.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -13,9 +20,11 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.res.painterResource
+import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.model.UiFieldSquare
+import dk.ilios.jervis.ui.model.UiPlayer
 import dk.ilios.jervis.ui.viewmodel.FieldDetails
 import dk.ilios.jervis.ui.viewmodel.FieldViewModel
 import dk.ilios.jervis.ui.viewmodel.Square
@@ -64,7 +73,8 @@ private fun FieldSquare(
     vm: FieldViewModel
 ) {
     val hover: Boolean = Square(width, height) == highlightedSquare
-    val square: UiFieldSquare by vm.observeSquare(width, height).collectAsState(UiFieldSquare(FieldSquare(-1, -1)))
+    val squareFlow = remember(width, height) { vm.observeSquare(width, height) }
+    val square by squareFlow.collectAsState(initial = UiFieldSquare(FieldSquare(-1, -1)))
     val bgColor = when {
         hover -> Color.Cyan.copy(alpha = 0.25f)
         square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
@@ -81,11 +91,21 @@ private fun FieldSquare(
             }
         }
 
+    extracted(boxWrapperModifier, square.player, square.ball, boxModifier)
+}
+
+@Composable
+private fun extracted(
+    boxWrapperModifier: Modifier,
+    player: UiPlayer?,
+    ball: BallState?,
+    boxModifier: Modifier
+) {
     Box(modifier = boxWrapperModifier) {
-        square.player?.let {
+        player?.let {
             Player(boxModifier, it)
         }
-        square.ball?.let {
+        ball?.let {
             Image(bitmap = IconFactory.getBall().toComposeImageBitmap(), contentDescription = "")
         }
     }

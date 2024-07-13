@@ -74,7 +74,9 @@ value class PlayerId(val value: String)
 
 
 @Serializable
-class Player(val id: PlayerId): Observable<Player>() {
+class Player(
+    val id: PlayerId
+): Observable<Player>() {
     @Transient
     lateinit var team: Team
     var location: Location = DogOut
@@ -86,7 +88,7 @@ class Player(val id: PlayerId): Observable<Player>() {
             }
         }
     var state: PlayerState = PlayerState.STANDING // by observable(PlayerState.STANDING)
-    var isActive: Boolean = false //by observable(false)
+    val isActive: Boolean get() = team.game.activePlayer == this
     var available: Availability = Availability.AVAILABLE // observable(Availability.AVAILABLE)
     var stunnedThisTurn: Boolean? = null
     var hasTackleZones: Boolean = true

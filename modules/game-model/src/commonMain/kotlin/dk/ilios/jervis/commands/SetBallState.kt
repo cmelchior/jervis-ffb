@@ -37,6 +37,7 @@ class SetBallState private constructor(
             it.state = ballState
             it.carriedBy = carriedBy
             it.outOfBoundsAt = exitLocation
+            it.notifyUpdate()
         }
     }
 
@@ -44,5 +45,6 @@ class SetBallState private constructor(
         state.ball.state = originalState
         state.ball.carriedBy = originalCarriedBy
         state.ball.outOfBoundsAt = originalExit
+        state.ball.notifyUpdate()
     }
 }

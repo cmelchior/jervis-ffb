@@ -1,7 +1,6 @@
 package dk.ilios.jervis
 
 import dk.ilios.jervis.model.Coach
-import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
@@ -9,8 +8,10 @@ import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
 
+private data class PlayerData(val id: PlayerId, val name: String, val number: PlayerNo, val type: Position)
+
 class TeamBuilder(val roster: Roster) {
-    private val players: MutableMap<PlayerNo, Player> = mutableMapOf()
+    private val players: MutableMap<PlayerNo, PlayerData> = mutableMapOf()
     var coach: Coach? = null
     var name: String = ""
     var reRolls: Int = 0
@@ -37,21 +38,21 @@ class TeamBuilder(val roster: Roster) {
         }
 
     fun addPlayer(id: PlayerId, name: String, number: PlayerNo, type: Position) {
-        val player = type.createPlayer(id, name, number)
         if (players.containsKey(number)) {
             throw IllegalArgumentException("Player with number $number already exits: ${players[number]}")
         }
         val allowedOnTeam = type.quantity
-        if (players.values.count { it.position == type } == allowedOnTeam) {
+        if (players.values.count { it.type == type } == allowedOnTeam) {
             throw IllegalArgumentException("Max number of $type are already on the team.")
         }
-        players[number] = player
-//        return player
+        players[number] = PlayerData(id, name, number, type)
     }
+
     fun build(): Team {
         return Team(name, roster, coach!!).apply {
             this@TeamBuilder.players.forEach {
-                add(it.value)
+                val data: PlayerData = it.value
+                add(data.type.createPlayer(this@apply, data.id, data.name, data.number))
             }
             notifyDogoutChange()
         }

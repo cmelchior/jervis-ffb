@@ -3,14 +3,10 @@ package dk.ilios.jervis.rules.roster.bb2020
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
-import dk.ilios.jervis.rules.bb2020.Agility
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
-import dk.ilios.jervis.rules.bb2020.General
-import dk.ilios.jervis.rules.bb2020.Passing
-import dk.ilios.jervis.rules.bb2020.Strength
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.Roster
-import dk.ilios.jervis.rules.roster.RosterId
 import dk.ilios.jervis.rules.skills.Skill
 import kotlinx.serialization.Serializable
 
@@ -35,8 +31,9 @@ data class BB2020Position(
     val primary: List<BB2020SkillCategory>,
     val secondary: List<BB2020SkillCategory>,
 ): Position {
-    override fun createPlayer(id: PlayerId, name: String, number: PlayerNo): Player {
+    override fun createPlayer(team: Team, id: PlayerId, name: String, number: PlayerNo): Player {
         return Player(id).apply {
+            this.team = team
             this.name = name
             this.number = number
             position = this@BB2020Position

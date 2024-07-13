@@ -14,7 +14,6 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
         // Remove from old location
         val oldLocation = originalLocation
         if (oldLocation is FieldCoordinate) {
-//            state.field[oldLocation].player = null
             state.field[oldLocation].apply {
                 player = null
                 notifyUpdate()
@@ -23,6 +22,7 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
 
         // Add to new location
         player.location = location
+        player.notifyUpdate()
         player.team.notifyDogoutChange()
         if (location is FieldCoordinate) {
             state.field[location].apply {

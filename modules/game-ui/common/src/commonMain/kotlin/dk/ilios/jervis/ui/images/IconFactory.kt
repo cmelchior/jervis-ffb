@@ -7,6 +7,7 @@ import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.ChaosDwarfTeam
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.roster.bb2020.KhorneTeam
+import dk.ilios.jervis.ui.model.UiPlayer
 import java.awt.image.BufferedImage
 import java.io.InputStream
 import javax.imageio.ImageIO
@@ -122,21 +123,21 @@ object IconFactory {
         }
     }
 
-    fun getImage(player: Player): BufferedImage {
-        val isHomeTeam: Boolean = player.isOnHomeTeam()
+    fun getImage(player: UiPlayer): BufferedImage {
+        val isHomeTeam: Boolean = player.isOnHomeTeam
         val roster: Roster = player.position.roster
         val playerType: Position = player.position
         val isActive = player.isActive
 
-        if (cachedPlayers.contains(player)) {
+        if (cachedPlayers.contains(player.model)) {
             return if (isActive) {
-                cachedPlayers[player]!!.active
+                cachedPlayers[player.model]!!.active
             } else {
-                cachedPlayers[player]!!.default
+                cachedPlayers[player.model]!!.default
             }
         } else {
             val variants = getPositionSpriteSheet(player.position)
-            val playerImage = variants.getVariant(player)
+            val playerImage = variants.getVariant(player.model)
             return if (isActive) {
                 playerImage.active
             } else {

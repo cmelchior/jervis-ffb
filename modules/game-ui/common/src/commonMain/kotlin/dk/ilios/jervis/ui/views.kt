@@ -192,7 +192,7 @@ fun Screen(
             Row(modifier = Modifier
                 .fillMaxWidth()
             ) {
-                ReplayController(replayController, modifier = Modifier.height(48.dp))
+                ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
             }
             Row(modifier = Modifier
                 .fillMaxWidth()
@@ -224,12 +224,12 @@ fun GameStatus(vm: GameStatusViewModel, modifier: Modifier) {
 }
 
 @Composable
-fun ReplayController(vm: ReplayViewModel, modifier: Modifier) {
+fun ReplayController(vm: ReplayViewModel, actionSelector: ActionSelectorViewModel, modifier: Modifier) {
     Box(modifier = modifier
         .fillMaxSize()
         .background(color = Color.Red)
     ) {
-        Row {
+        Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = { vm.enableReplay() }) {
                 Text("Start replay")
             }
@@ -244,6 +244,9 @@ fun ReplayController(vm: ReplayViewModel, modifier: Modifier) {
             }
             Button(onClick = { vm.stopReplay() }) {
                 Text("Stop replay")
+            }
+            Button(onClick = { actionSelector.start() }) {
+                Text("Start Game")
             }
         }
     }
@@ -276,13 +279,6 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
             .background(color = Color.Blue),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Button(
-            modifier = Modifier.padding(0.dp),
-            contentPadding = PaddingValues(2.dp),
-            onClick = { vm.start() }
-        ) {
-            Text("Start Game", fontSize = 10.sp)
-        }
         inputs.forEach { input ->
             val actions = input.actions
             when (input) {
