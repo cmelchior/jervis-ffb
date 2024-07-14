@@ -5,6 +5,7 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.model.Ball
+import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.FieldSquare
@@ -84,7 +85,10 @@ class FieldViewModel(private val rules: Rules, private val uiActionFactory: UiAc
                     }
                     UiFieldSquare(
                         square,
-                        ball?.state,
+                        ball?.state?.let {
+                            it != BallState.CARRIED && it != BallState.OUT_OF_BOUNDS
+                        } ?: false,
+                        player?.hasBall() == true,
                         player?.let { UiPlayer(it, squareAction) },
                         if (player == null) squareAction else null, // Only allow a Square Action if no player is on the field
                     )

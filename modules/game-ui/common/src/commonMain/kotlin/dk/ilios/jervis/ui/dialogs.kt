@@ -54,9 +54,9 @@ fun UserActionDialog(dialog: SingleChoiceInputDialog, vm: DialogsViewModel) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MultipleSelectUserActionDialog(dialog: DiceRollUserInputDialog, vm: DialogsViewModel) {
-    var showDialog by remember { mutableStateOf(true) }
+    var showDialog by remember(dialog) { mutableStateOf(true) }
     if (showDialog) {
-        val selectedRolls = remember { mutableStateListOf<DieResult?>(*arrayOfNulls(dialog.dice.size)) }
+        val selectedRolls = remember(dialog) { mutableStateListOf<DieResult?>(*arrayOfNulls(dialog.dice.size)) }
         val result = DiceResults(selectedRolls.filterNotNull())
         val resultText = if (result.rolls.size < dialog.dice.size) null else dialog.result(result)
         AlertDialog(
@@ -70,7 +70,7 @@ fun MultipleSelectUserActionDialog(dialog: DiceRollUserInputDialog, vm: DialogsV
                     dialog.dice.forEachIndexed { i, el: Pair<Dice, List<DieResult>> ->
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             el.second.forEach { it: DieResult ->
-                                val isSelected = remember { derivedStateOf { selectedRolls[i] == it } }
+                                val isSelected = remember(dialog) { derivedStateOf { selectedRolls[i] == it } }
                                 val buttonColors = ButtonDefaults.buttonColors(
                                     backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background
                                 )

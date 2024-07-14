@@ -16,6 +16,7 @@ class SetBallState private constructor(
     private lateinit var originalState: BallState
     private var originalCarriedBy: Player? = null
     private var originalExit: FieldCoordinate? = null
+    private var originalLocation: FieldCoordinate? = null
 
     companion object {
         fun inAir(): Command = SetBallState(ballState = BallState.IN_AIR)
@@ -32,10 +33,14 @@ class SetBallState private constructor(
             this.originalState = it.state
             this.originalCarriedBy= it.carriedBy
             this.originalExit = it.outOfBoundsAt
+            this.originalLocation = it.location
         }
         ball.let {
             it.state = ballState
             it.carriedBy = carriedBy
+            if (carriedBy != null) {
+                it.location = FieldCoordinate.UNKNOWN
+            }
             it.outOfBoundsAt = exitLocation
             it.notifyUpdate()
         }
@@ -45,6 +50,9 @@ class SetBallState private constructor(
         state.ball.state = originalState
         state.ball.carriedBy = originalCarriedBy
         state.ball.outOfBoundsAt = originalExit
+        if (originalLocation != null) {
+            state.ball.location = originalLocation!!
+        }
         state.ball.notifyUpdate()
     }
 }

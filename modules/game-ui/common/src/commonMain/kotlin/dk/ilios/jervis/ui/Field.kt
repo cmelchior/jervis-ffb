@@ -97,7 +97,7 @@ private fun FieldSquare(
         square.player?.let {
             Player(boxModifier, it)
         }
-        square.ball?.let {
+        if (square.isBallOnGround) {
             Image(
                 modifier = Modifier.fillMaxSize().padding(4.dp),
                 alignment = Alignment.Center,

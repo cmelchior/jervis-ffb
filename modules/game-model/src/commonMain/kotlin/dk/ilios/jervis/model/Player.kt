@@ -109,7 +109,7 @@ class Player(
     val passing: Int? get() = basePassing
     val armorValue: Int get() = baseArmorValue
     val ball: Ball?
-        get() = if (team.game.ball.state == BallState.CARRIED && team.game.ball.location == location) {
+        get() = if (team.game.ball.carriedBy == this) {
             team.game.ball
         } else {
             null

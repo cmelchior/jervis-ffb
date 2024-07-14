@@ -1,6 +1,5 @@
 package dk.ilios.jervis.ui.model
 
-import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
@@ -11,10 +10,12 @@ import dk.ilios.jervis.model.isOnHomeTeam
  */
 data class UiFieldSquare(
     override val model: FieldSquare,
-    val ball: BallState? = null,
+    val isBallOnGround: Boolean = false,
+    val isBallCarried: Boolean = false,
     val player: UiPlayer? = null,
     val onSelected: (() -> Unit)? = null,
 ): UiModel<FieldSquare>
+
 
 data class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?): UiModel<Player> {
     fun hasBall(): Boolean  = model.hasBall()
