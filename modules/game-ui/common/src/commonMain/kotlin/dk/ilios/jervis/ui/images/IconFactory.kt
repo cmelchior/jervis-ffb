@@ -138,6 +138,7 @@ object IconFactory {
         } else {
             val variants = getPositionSpriteSheet(player.position)
             val playerImage = variants.getVariant(player.model)
+            cachedPlayers[player.model] = playerImage
             return if (isActive) {
                 playerImage.active
             } else {
