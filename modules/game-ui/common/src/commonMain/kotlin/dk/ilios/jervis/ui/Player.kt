@@ -19,6 +19,9 @@ import dk.ilios.jervis.ui.model.UiPlayer
 
 @Composable
 fun Player(modifier: Modifier, player: UiPlayer, parentHandleClick: Boolean) {
+    val playerImage = IconFactory.getImage(player).toComposeImageBitmap()
+    val ballImage = remember { IconFactory.getHeldBallOverlay().toComposeImageBitmap() }
+
     val backgroundColor = when {
         player.state == PlayerState.STUNNED -> Color.White
         player.isSelectable -> Color.Red
@@ -31,8 +34,6 @@ fun Player(modifier: Modifier, player: UiPlayer, parentHandleClick: Boolean) {
     }
 
     Box(modifier = playerModifier) {
-        val playerImage = remember(player) { IconFactory.getImage(player).toComposeImageBitmap() }
-        val ballImage = remember(player) { IconFactory.getHeldBallOverlay().toComposeImageBitmap() }
         Image(
             bitmap = playerImage,
             contentDescription = null,

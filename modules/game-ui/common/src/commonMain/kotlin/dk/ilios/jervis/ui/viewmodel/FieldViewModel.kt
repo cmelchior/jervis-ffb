@@ -107,7 +107,7 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
                                 }
                             }
                             is EndActionInput -> {
-                                if (square.player == game.activePlayer) {
+                                if (fieldSquare.player?.isActive == true) {
                                     contextAction.addAll(
                                         userInput.actions.map {
                                             ContextMenuOption("End action", { this@FieldViewModel.uiActionFactory.userSelectedAction(it) })
@@ -119,17 +119,19 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
                         }
                     }
 
-                    UiFieldSquare(
+                    val uiPlayer = player?.let { UiPlayer(it, squareAction) }
+                    val uiSquare = UiFieldSquare(
                         square,
                         ball?.state?.let {
                             it != BallState.CARRIED && it != BallState.OUT_OF_BOUNDS
                         } ?: false,
                         player?.hasBall() == true,
-                        player?.let { UiPlayer(it, squareAction) },
+                        uiPlayer,
                         squareAction, // Only allow a Square Action if no player is on the field
                         contextAction,
                         showContextMenu
                     )
+                    uiSquare
                 }
             )
         }
@@ -139,6 +141,6 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
     fun highlights(): StateFlow<Square?> = _highlights
 
     fun hoverOver(square: Square) {
-        _highlights.value = square
+        // _highlights.value = square
     }
 }

@@ -9,9 +9,7 @@ class SetActivePlayer(private val player: Player?) : Command {
     private var originalPlayer: Player? = null
 
     override fun execute(state: Game, controller: GameController) {
-        state.activePlayer?.let {
-            originalPlayer = it
-        }
+        originalPlayer = state.activePlayer
         state.activePlayer = player
         originalPlayer?.notifyUpdate()
         state.activePlayer?.notifyUpdate()

@@ -38,22 +38,27 @@ object MoveAction: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val end: List<ActionDescriptor> = listOf(EndActionWhenReady)
 
-            val eligibleEmptySquares: List<ActionDescriptor> = if (state.activePlayer!!.moveLeft > 0) {
-                state.activePlayer!!.location.coordinate.getSurroundingCoordinates(rules)
+            val activePlayer = state.activePlayer!!
+            val eligibleEmptySquares: List<ActionDescriptor> = if (activePlayer.moveLeft > 0) {
+                activePlayer.location.coordinate.getSurroundingCoordinates(rules)
                     .filter { state.field[it].isEmpty() }
                     .map { SelectFieldLocation(it) }
             } else emptyList()
 
-            val eligibleJumpSquares: List<ActionDescriptor> = if (state.activePlayer!!.moveLeft > 0) {
-                val activePlayerLocation = state.activePlayer!!.location.coordinate
-                activePlayerLocation.getSurroundingCoordinates(rules)
-                    .filter { !state.field[it].isEmpty() }
-                    .flatMap {
-                        it.getCoordinatesAwayFromLocation(rules, activePlayerLocation)
-                    }
-                    .toSet()
-                    .map { SelectFieldLocation(it) }
-            } else emptyList()
+            // Figure out how to find square more than 1 away. This could be skill dependant.
+            // Are there more skills that allow you to move, like teleport.
+            val eligibleJumpSquares: List<ActionDescriptor> = emptyList()
+//            val eligibleJumpSquares: List<ActionDescriptor> = if (activePlayer.moveLeft > 0) {
+//                val activePlayerLocation = activePlayer.location.coordinate
+//                activePlayerLocation.getSurroundingCoordinates(rules)
+//                    .filter { !state.field[it].isEmpty() }
+//                    .flatMap {
+//                        it.getCoordinatesAwayFromLocation(rules, activePlayerLocation)
+//                    }
+//                    .toSet()
+//                    .map { SelectFieldLocation(it) }
+//            } else emptyList()
+
             return end + eligibleEmptySquares + eligibleJumpSquares
         }
 

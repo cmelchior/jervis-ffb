@@ -1,5 +1,6 @@
 package dk.ilios.jervis.ui.model
 
+import dk.ilios.jervis.model.Availability
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
@@ -25,6 +26,6 @@ data class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?)
     val state: PlayerState = model.state
     val isOnHomeTeam = model.isOnHomeTeam()
     val position = model.position
-    val isActive = model.isActive
+    val isActive = (model.available == Availability.IS_ACTIVE)
     val isSelectable = (selectAction != null)
 }

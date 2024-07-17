@@ -15,10 +15,8 @@ import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerActionSelected
-import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
-import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
@@ -27,14 +25,11 @@ import dk.ilios.jervis.fumbbl.model.ModelChangeId
 import dk.ilios.jervis.fumbbl.model.PlayerAction
 import dk.ilios.jervis.fumbbl.model.ReportId
 import dk.ilios.jervis.fumbbl.model.TurnMode
-import dk.ilios.jervis.fumbbl.model.change.ActingPlayerSetPlayerAction
 import dk.ilios.jervis.fumbbl.model.change.ActingPlayerSetPlayerId
-import dk.ilios.jervis.fumbbl.model.change.FieldModelAddMoveSquare
 import dk.ilios.jervis.fumbbl.model.change.FieldModelSetPlayerCoordinate
 import dk.ilios.jervis.fumbbl.model.change.FieldModelSetPlayerState
 import dk.ilios.jervis.fumbbl.model.change.GameSetSetupOffense
 import dk.ilios.jervis.fumbbl.model.change.GameSetTurnMode
-import dk.ilios.jervis.fumbbl.model.change.ModelChange
 import dk.ilios.jervis.fumbbl.model.reports.CatchRollReport
 import dk.ilios.jervis.fumbbl.model.reports.CoinThrowReport
 import dk.ilios.jervis.fumbbl.model.reports.FanFactorReport
@@ -66,8 +61,6 @@ import dk.ilios.jervis.procedures.TeamTurn
 import dk.ilios.jervis.procedures.TheKickOff
 import dk.ilios.jervis.procedures.TheKickOffEvent
 import dk.ilios.jervis.procedures.bb2020.kickoff.PitchInvasion
-import dk.ilios.jervis.rules.BB2020TeamActions
-import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.RandomDirectionTemplate
 import kotlinx.coroutines.runBlocking

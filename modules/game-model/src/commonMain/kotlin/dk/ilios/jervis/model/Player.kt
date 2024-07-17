@@ -88,9 +88,9 @@ class Player(
                 team.notifyDogoutChange()
             }
         }
-    var state: PlayerState = PlayerState.STANDING // by observable(PlayerState.STANDING)
-    val isActive: Boolean get() = team.game.activePlayer == this
-    var available: Availability = Availability.AVAILABLE // observable(Availability.AVAILABLE)
+    var state: PlayerState = PlayerState.STANDING
+    val isActive: Boolean get() = (team.game.activePlayer == this)
+    var available: Availability = Availability.AVAILABLE
     var stunnedThisTurn: Boolean? = null
     var hasTackleZones: Boolean = true
     var name: String = ""
