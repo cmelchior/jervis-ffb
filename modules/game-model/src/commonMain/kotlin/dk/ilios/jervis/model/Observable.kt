@@ -27,6 +27,10 @@ abstract class Observable<T> {
     private val _state = MutableSharedFlow<T>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     protected val observeState: SharedFlow<T> = _state
 
+    init {
+        notifyUpdate() // Make sure there is one state in the flow
+    }
+
     protected fun <P> observable(initialValue: P, onChange: ((oldValue: P, newValue: P) -> Unit)? = null): ReadWriteProperty<Any?, P> {
         return object: ObservableProperty<P>(initialValue) {
             override fun afterChange(property: KProperty<*>, oldValue: P, newValue: P) {

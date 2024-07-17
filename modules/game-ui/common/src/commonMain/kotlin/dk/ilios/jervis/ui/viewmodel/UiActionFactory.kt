@@ -2,9 +2,11 @@ package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.ui.GameScreenModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,8 +19,10 @@ import kotlinx.coroutines.launch
  * For other game modes, this class can just return the appropriate action immediately without involving the user.
  */
 abstract class UiActionFactory(protected val model: GameScreenModel) {
-
-    val scope = CoroutineScope(CoroutineName("ActionSelectorScope") + Dispatchers.Default)
+    val errorHandler = CoroutineExceptionHandler { _, exception ->
+        println(exception)
+    }
+    val scope = CoroutineScope(CoroutineName("ActionSelectorScope") + Dispatchers.Default + errorHandler)
 
     // Streams of actions (these roughly correspond to UI elements), so each UI element only need to listen
     // to the stream relevant to it.
@@ -26,7 +30,7 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
     // FieldActions:
     // - Select Player, Select ball, Select location
     // ----
-    protected val _fieldActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
+    protected val _fieldActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val fieldActions: Flow<UserInput> = _fieldActions
     protected val _unknownActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
     val unknownActions: Flow<UserInput> = _unknownActions
@@ -41,7 +45,7 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
 
     // The user selected an action
     fun userSelectedAction(action: GameAction) {
-        scope.launch {
+        scope.launch(errorHandler) {
             // Reset UI so it doesn't allow more input
             _unknownActions.emit(WaitingForUserInput)
             _fieldActions.emit(WaitingForUserInput)

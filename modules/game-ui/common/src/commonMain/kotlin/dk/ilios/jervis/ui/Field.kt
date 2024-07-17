@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -75,12 +77,17 @@ private fun FieldSquare(
 ) {
     val hover: Boolean = Square(width, height) == highlightedSquare
     val squareFlow = remember(width, height) { vm.observeSquare(width, height) }
-    val square by squareFlow.collectAsState(initial = UiFieldSquare(FieldSquare(-1, -1)))
+    val square: UiFieldSquare by squareFlow.collectAsState(initial = UiFieldSquare(
+        FieldSquare(-1, -1),
+    ))
+    var showPopup by remember(square) { mutableStateOf(square.showContextMenu) }
+
     val bgColor = when {
         hover -> Color.Cyan.copy(alpha = 0.25f)
         square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
         else -> Color.Transparent
     }
+
     val boxWrapperModifier = boxModifier
         .fillMaxSize()
         .background(color = bgColor)
@@ -88,14 +95,21 @@ private fun FieldSquare(
             vm.hoverOver(Square(width, height))
         }
         .clickable {
+            showPopup = true
             square.onSelected?.let {
                 it()
             }
         }
 
     Box(modifier = boxWrapperModifier) {
+        if (showPopup) {
+            ContextPopupMenu(
+                hidePopup = { showPopup = false },
+                commands = square.contextMenuOptions
+            )
+        }
         square.player?.let {
-            Player(boxModifier, it)
+            Player(boxModifier, it, true)
         }
         if (square.isBallOnGround) {
             Image(

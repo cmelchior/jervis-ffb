@@ -77,6 +77,7 @@ value class PlayerId(val value: String)
 class Player(
     val id: PlayerId
 ): Observable<Player>() {
+
     @Transient
     lateinit var team: Team
     var location: Location = DogOut
@@ -117,7 +118,7 @@ class Player(
 
     fun hasBall(): Boolean = (ball != null)
 
-    // Expose updats to this class as Flow
+    // Expose updates to this class as Flow
     @Transient
     val observePlayer = observeState
 

@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +60,7 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
+import dk.ilios.jervis.ui.viewmodel.CompositeUserInput
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
 import dk.ilios.jervis.ui.viewmodel.DiceRollUserInputDialog
 import dk.ilios.jervis.ui.viewmodel.FieldViewModel
@@ -271,7 +273,7 @@ fun Dialogs(vm: DialogsViewModel) {
 
 @Composable
 fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
-    val inputs: List<UserInput> by vm.availableActions.collectAsState(emptyList())
+    val inputs: UserInput? by vm.availableActions.collectAsState(null)
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -279,7 +281,16 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
             .background(color = Color.Blue),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        inputs.forEach { input ->
+
+        val userInputs: List<UserInput> = remember(inputs) {
+            when(inputs) {
+                is CompositeUserInput -> (inputs as CompositeUserInput).inputs
+                null -> emptyList()
+                else -> listOf(inputs!!)
+            }
+        }
+
+        userInputs.forEach { input ->
             val actions = input.actions
             when (input) {
                 is WaitingForUserInput -> {

@@ -18,17 +18,19 @@ import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.model.UiPlayer
 
 @Composable
-fun Player(modifier: Modifier, player: UiPlayer) {
+fun Player(modifier: Modifier, player: UiPlayer, parentHandleClick: Boolean) {
     val backgroundColor = when {
         player.state == PlayerState.STUNNED -> Color.White
         player.isSelectable -> Color.Red
         else -> Color.Transparent
     }
-    Box(modifier = modifier.aspectRatio(1f).background(color = backgroundColor).clickable {
-        if (player.isSelectable) {
-            player.selectAction!!()
-        }
-    }) {
+
+    var playerModifier = modifier.aspectRatio(1f).background(color = backgroundColor)
+    if (player.isSelectable && !parentHandleClick) {
+        playerModifier = playerModifier.clickable { player.selectAction!!() }
+    }
+
+    Box(modifier = playerModifier) {
         val playerImage = remember(player) { IconFactory.getImage(player).toComposeImageBitmap() }
         val ballImage = remember(player) { IconFactory.getHeldBallOverlay().toComposeImageBitmap() }
         Image(

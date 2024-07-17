@@ -55,7 +55,7 @@ Playing a test game, requires a valid login on FUMBBL. See https://fumbbl.com/he
 run a test game. Then go to the directory containing the debug client and start it with this:
 
 ````
-> java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -player \ 
+> java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClientAwt -player \ 
   -teamId <teamId> -teamName "<teamName>" -port 22223 \
   -coach <coach> -auth <authToken>
 ````
@@ -72,13 +72,13 @@ authToken: 85c88af58bc846e5ee67d9a87f86a2ec
 </argument><argument>-teamId</argument><argument>1158751</argument><argument>-teamName</argument><argument>Jervis Cybernetic Crusaders</argument><argument>-port</argument><argument>22223</argument><argument>-coach</argument><argument>cmelchior</argument><argument>-auth</argument><argument>037194e7b7ac73bd6b46222646f5056f</argument></application-desc></jnlp>
 
 
-> java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -player \
+> java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClientAwt -player \
 -teamId 1158751 -teamName "Team 1" -port 22223 \
--coach cmelchior -auth 037194e7b7ac73bd6b46222646f5056f
+-coach cmelchior -auth db042b6f6fa9ad56e9b9a06ce7020482
 
-> java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -player \
+> java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClientAwt -player \
 -teamId 1158756 -teamName "Team 2" -port 22223 \
--coach cmelchior -auth 037194e7b7ac73bd6b46222646f5056f
+-coach cmelchior -auth db042b6f6fa9ad56e9b9a06ce7020482
 
 
 ````
@@ -88,15 +88,15 @@ progress of the game to same coach. This can be helpful if you want to reproduce
 
 Commandline arguments for running 3 games on the same computer:
 ```
-java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -player \ 
+java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClientAwt -player \ 
   -teamId 1158751 -teamName "Human(Home)" -port 22223 \
   -coach cmelchior
 
-java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -player \ 
+java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClientAwt -player \ 
   -teamId 1158756 -teamName "Human(Away)" -port 22223 \
   -coach cmelchior
 
-java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClient -spectator \ 
+java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClientAwt -spectator \ 
   -coach cmelchior
 ```
 

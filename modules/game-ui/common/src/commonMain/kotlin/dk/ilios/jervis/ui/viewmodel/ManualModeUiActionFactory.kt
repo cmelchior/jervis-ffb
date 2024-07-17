@@ -48,6 +48,7 @@ import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coin
+import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.CatchRoll
 import dk.ilios.jervis.procedures.DetermineKickingTeam
@@ -65,7 +66,7 @@ import kotlin.random.Random
 
 class ManualModeUiActionFactory(model: GameScreenModel, private val actions: List<GameAction>) : UiActionFactory(model) {
     override suspend fun start(scope: CoroutineScope) {
-        scope.launch {
+        scope.launch(errorHandler) {
             var initialActionsIndex = 0
             _fieldActions.emit(WaitingForUserInput)
             val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
@@ -79,7 +80,6 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                         model.actionSelectedChannel.receive()
                     }
                     action
-//                }
                 }
             }
             model.controller.startCallbackMode(actionProvider)
@@ -88,15 +88,15 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
     }
 
     private suspend fun startUserActionSelector(scope: CoroutineScope) {
-        scope.launch {
+        scope.launch(errorHandler) {
             actions@while(true) {
                 val (controller, actions) = model.actionRequestChannel.receive()
                 // if (useAutomatedActions(controller)) continue@actions
                 val userInput = detectDialogPopup(controller)
                 if (userInput == null) {
-                    detectAndSendUserInput(actions)
+                    detectAndSendUserInput(controller, actions)
                 } else {
-                    sendToRelevantUserInputChannel(userInput)
+                    sendToRelevantUserInputChannel(listOf(userInput))
                 }
                 val selectedAction = userSelectedAction.receive()
                 model.actionSelectedChannel.send(selectedAction)
@@ -104,8 +104,8 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         }
     }
 
-    private suspend fun detectAndSendUserInput(actions: List<ActionDescriptor>) {
-        val actionGroups: List<UserInput> = actions.groupBy { it::class }.map {
+    private suspend fun detectAndSendUserInput(controller: GameController, actions: List<ActionDescriptor>) {
+        val userInputs: List<UserInput> = actions.groupBy { it::class }.map {
             when {
                 it.key == SelectPlayer::class -> {
                     SelectPlayerInput(it.value.map { PlayerSelected((it as SelectPlayer).player) })
@@ -116,12 +116,19 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 it.key == DeselectPlayer::class -> {
                     DeselectPlayerInput(listOf(PlayerDeselected))
                 }
+                it.key == SelectAction::class -> {
+                    val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
+                    SelectPlayerActionInput(playerLocation, it.value.map { PlayerActionSelected((it as SelectAction).action) })
+                }
+                it.key == EndActionWhenReady::class -> {
+                    val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
+                    EndActionInput(playerLocation, listOf(EndAction))
+                }
                 else -> UnknownInput(mapUnknownActions(it.value)) // TODO This breaks if using multiple times
             }
         }
-        actionGroups.forEach {
-            sendToRelevantUserInputChannel(it)
-        }
+
+        sendToRelevantUserInputChannel(userInputs)
     }
 
     /**
@@ -203,20 +210,46 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
 
     // This method will select the relevant channel to send user input to.
     // Do it here, so `startUserActionSelector` can be cleaner.
-    private suspend fun sendToRelevantUserInputChannel(uiEvent: UserInput) {
-        when(uiEvent) {
-            is SelectPlayerInput -> _fieldActions.emit(uiEvent)
-            is DeselectPlayerInput -> _fieldActions.emit(uiEvent)
-            is UnknownInput -> _unknownActions.emit(uiEvent)
-            is SingleChoiceInputDialog -> dialogActions.emit(uiEvent)
-            is DiceRollUserInputDialog -> dialogActions.emit(uiEvent)
-            is SelectFieldLocationInput -> _fieldActions.emit(uiEvent)
-            is WaitingForUserInput -> {
-                _fieldActions.emit(uiEvent)
-                _unknownActions.emit(uiEvent)
-                // Also send to other channels?
-            }
+    // We should group all input to a single channel in on event, this is so,
+    // we can replay the channel correctly. If multiple input is sent it should
+    // be wrapped in a CompositeUserInput.
+    private suspend fun sendToRelevantUserInputChannel(uiEvents: List<UserInput>) {
 
+        // Group events into channels
+        val fieldInputs = mutableListOf<UserInput>()
+        val dialogInputs = mutableListOf<UserInput>()
+        val unknownInputs = mutableListOf<UserInput>()
+
+        uiEvents.forEach {
+            when(it) {
+                is CompositeUserInput -> error("Should not occur here")
+                is DeselectPlayerInput -> fieldInputs.add(it)
+                is EndActionInput -> fieldInputs.add(it)
+                is SelectFieldLocationInput -> fieldInputs.add(it)
+                is SelectPlayerActionInput -> fieldInputs.add(it)
+                is SelectPlayerInput -> fieldInputs.add(it)
+                is UnknownInput -> unknownInputs.add(it)
+                is DiceRollUserInputDialog -> dialogInputs.add(it)
+                is SingleChoiceInputDialog -> dialogInputs.add(it)
+                WaitingForUserInput -> {
+                    fieldInputs.add(it)
+                    unknownInputs.add(it)
+                }
+            }
+        }
+
+        if (fieldInputs.isNotEmpty()) {
+            val action: UserInput = if (fieldInputs.size == 1) fieldInputs.first() else CompositeUserInput(fieldInputs)
+            _fieldActions.emit(action)
+        }
+
+        if (dialogInputs.isNotEmpty()) {
+            val dialogInput = if (dialogInputs.size == 1) dialogInputs.first() else error("Only 1 dialog allow: ${dialogInputs.size}")
+            dialogActions.emit(dialogInput as UserInputDialog?)
+        }
+
+        if (unknownInputs.isNotEmpty()) {
+            _unknownActions.emit(if (unknownInputs.size == 1) unknownInputs.first() else CompositeUserInput(unknownInputs))
         }
     }
 

@@ -75,7 +75,7 @@ class GameScreen(val screenModel: GameScreenModel, private val actions: List<Gam
             is Replay -> ReplayModeUiActionFactory(screenModel)
         }
         Screen(
-            FieldViewModel(screenModel.rules, uiActionFactory, screenModel.controller.state.field),
+            FieldViewModel(screenModel.controller, uiActionFactory, screenModel.controller.state.field),
             SidebarViewModel(uiActionFactory, screenModel.controller.state.homeTeam),
             SidebarViewModel(uiActionFactory, screenModel.controller.state.awayTeam),
             GameStatusViewModel(screenModel.controller),

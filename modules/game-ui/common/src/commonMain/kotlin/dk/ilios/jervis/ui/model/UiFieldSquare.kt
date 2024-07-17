@@ -4,6 +4,7 @@ import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.isOnHomeTeam
+import dk.ilios.jervis.ui.ContextMenuOption
 
 /**
  * Represents all information needed to render a single square
@@ -14,6 +15,8 @@ data class UiFieldSquare(
     val isBallCarried: Boolean = false,
     val player: UiPlayer? = null,
     val onSelected: (() -> Unit)? = null,
+    val contextMenuOptions: List<ContextMenuOption> = emptyList(),
+    val showContextMenu: Boolean = false,
 ): UiModel<FieldSquare>
 
 
@@ -25,4 +28,3 @@ data class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?)
     val isActive = model.isActive
     val isSelectable = (selectAction != null)
 }
-

@@ -1,10 +1,11 @@
 package dk.ilios.jervis.ui.viewmodel
 
+import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.model.FieldCoordinate
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
 
 //
@@ -12,10 +13,17 @@ sealed interface UserInput {
     val actions: List<GameAction>
 }
 
-object WaitingForUserInput: UserInput {
+class CompositeUserInput(val inputs: List<UserInput>): UserInput {
+    override val actions: List<GameAction>
+        get() = TODO("Not supported")
+}
+
+data object WaitingForUserInput: UserInput {
     override val actions: List<GameAction> = emptyList()
 }
 
+class SelectPlayerActionInput(val activePlayerLocation: FieldCoordinate, override val actions: List<PlayerActionSelected>): UserInput
+class EndActionInput(val activePlayerLocation: FieldCoordinate, override val actions:List<EndAction>): UserInput {}
 class SelectPlayerInput(override val actions: List<GameAction>): UserInput
 class DeselectPlayerInput(override val actions: List<GameAction>): UserInput
 class SelectFieldLocationInput(override val actions: List<FieldSquareSelected>): UserInput {
@@ -31,13 +39,7 @@ class SelectFieldLocationInput(override val actions: List<FieldSquareSelected>):
 class ActionSelectorViewModel(
     private val uiActionFactory: UiActionFactory,
 ) {
-    val availableActions: Flow<List<UserInput>> = uiActionFactory.unknownActions.scan(emptyList()) { list, element ->
-        if (element == WaitingForUserInput) {
-            emptyList()
-        } else {
-            list + element
-        }
-    }
+    val availableActions: Flow<UserInput> = uiActionFactory.unknownActions
 
     fun start() {
         uiActionFactory.scope.launch {

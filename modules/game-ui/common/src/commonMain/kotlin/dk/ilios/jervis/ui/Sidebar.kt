@@ -74,7 +74,7 @@ fun Reserves(reserves: Flow<List<UiPlayer>>) {
                 val modifier = Modifier.weight(1f).aspectRatio(1f)
                 repeat(5) { x ->
                     if (index + x < state.size) {
-                        Player(modifier, state[index + x])
+                        Player(modifier, state[index + x], true)
                     } else {
                         // Use empty box. Unsure if we can remove this
                         // if we want a partial row to scale correctly.

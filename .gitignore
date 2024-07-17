@@ -18,5 +18,6 @@ tools/fumbblcli.jar
 # But dont commit it to the repo.
 /Debug-FantasyFootballClient/src
 /Debug-FantasyFootballClient/libs
+/Debug-FantasyFootballClient/libs-2
 /FantasyFootballClient-Debug-Backup/
 /FantasyFootballClient-Debug-V2/
