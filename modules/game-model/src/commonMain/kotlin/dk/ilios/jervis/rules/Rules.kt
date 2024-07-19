@@ -17,6 +17,8 @@ import dk.ilios.jervis.procedures.bb2020.kickoff.PitchInvasion
 import dk.ilios.jervis.procedures.bb2020.kickoff.QuickSnap
 import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
 import dk.ilios.jervis.procedures.bb2020.kickoff.TimeOut
+import dk.ilios.jervis.rules.pathfinder.BB2020PathFinder
+import dk.ilios.jervis.rules.pathfinder.PathFinder
 import dk.ilios.jervis.rules.tables.CornerThrowInPosition
 import dk.ilios.jervis.rules.tables.Direction
 import dk.ilios.jervis.rules.tables.PrayersToNuffleTable
@@ -255,6 +257,9 @@ interface Rules {
 
     val allowMultipleTeamRerollsPrTurn: Boolean
         get() = true
+
+    val pathFinder: PathFinder
+        get() = BB2020PathFinder(this)
 
     // Blood Bowl 7
     // Total width of the field

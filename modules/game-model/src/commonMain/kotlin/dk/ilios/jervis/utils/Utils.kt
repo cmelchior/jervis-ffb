@@ -46,13 +46,19 @@ import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.TossCoin
+import dk.ilios.jervis.commands.SetPlayerLocation
+import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.CoachId
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.Field
+import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
+import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
@@ -168,6 +174,50 @@ fun createDefaultGameState(rules: BB2020Rules): Game {
     }
     val field = Field.createForRuleset(rules)
     return Game(team1, team2, field)
+}
+
+/**
+ * Move all players onto the field as if starting a game.
+ * Only works on the setup defined above
+ */
+fun createStartingTestSetup(state: Game) {
+
+    fun setupPlayer(state: Game, player: Player?, fieldCoordinate: FieldCoordinate) {
+        player?.let {
+            SetPlayerLocation(it, fieldCoordinate).execute(state, GameController(BB2020Rules, state))
+            SetPlayerState(it, PlayerState.STANDING)
+        } ?: error("")
+    }
+
+    // Home
+    with(state.homeTeam) {
+        setupPlayer(state, this[PlayerNo(1)], FieldCoordinate(12, 6))
+        setupPlayer(state, this[PlayerNo(2)], FieldCoordinate(12, 7))
+        setupPlayer(state, this[PlayerNo(3)], FieldCoordinate(12, 8))
+        setupPlayer(state, this[PlayerNo(4)], FieldCoordinate(10, 1))
+        setupPlayer(state, this[PlayerNo(5)], FieldCoordinate(10, 4))
+        setupPlayer(state, this[PlayerNo(6)], FieldCoordinate(10, 10))
+        setupPlayer(state, this[PlayerNo(7)], FieldCoordinate(10, 13))
+        setupPlayer(state, this[PlayerNo(8)], FieldCoordinate(8, 1))
+        setupPlayer(state, this[PlayerNo(9)], FieldCoordinate(8, 4))
+        setupPlayer(state, this[PlayerNo(10)], FieldCoordinate(8, 10))
+        setupPlayer(state, this[PlayerNo(11)], FieldCoordinate(8, 13))
+    }
+
+    // Away
+    with(state.awayTeam) {
+        setupPlayer(state, this[PlayerNo(1)], FieldCoordinate(13, 6))
+        setupPlayer(state, this[PlayerNo(2)], FieldCoordinate(13, 7))
+        setupPlayer(state, this[PlayerNo(3)], FieldCoordinate(13, 8))
+        setupPlayer(state, this[PlayerNo(4)], FieldCoordinate(15, 1))
+        setupPlayer(state, this[PlayerNo(5)], FieldCoordinate(15, 4))
+        setupPlayer(state, this[PlayerNo(6)], FieldCoordinate(15, 10))
+        setupPlayer(state, this[PlayerNo(7)], FieldCoordinate(15, 13))
+        setupPlayer(state, this[PlayerNo(8)], FieldCoordinate(17, 1))
+        setupPlayer(state, this[PlayerNo(9)], FieldCoordinate(17, 4))
+        setupPlayer(state, this[PlayerNo(10)], FieldCoordinate(17, 10))
+        setupPlayer(state, this[PlayerNo(11)], FieldCoordinate(17, 13))
+    }
 }
 
 fun <T: Any?> MutableStateFlow<T>.safeTryEmit(value: T) {
