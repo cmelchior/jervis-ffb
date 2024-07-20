@@ -1,4 +1,4 @@
-package dk.ilios.jervis.ui.dev.shortestpath
+package dk.ilios.jervis.ui.test.manual
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -22,18 +22,26 @@ import dk.ilios.jervis.rules.pathfinder.BB2020PathFinder
 import dk.ilios.jervis.rules.pathfinder.PathFinder
 import dk.ilios.jervis.utils.createDefaultGameState
 import dk.ilios.jervis.utils.createStartingTestSetup
+import org.junit.Test
 
-fun main() = application {
-    val windowState = rememberWindowState()
-    Window(onCloseRequest = ::exitApplication, state = windowState) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Content()
+class AStarTests {
+
+    @Test
+    fun run() {
+        application {
+            val windowState = rememberWindowState()
+            Window(onCloseRequest = ::exitApplication, state = windowState) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    AStarContent()
+                }
+            }
         }
     }
+
 }
 
 @Composable
-fun Content() {
+fun AStarContent() {
     val rules = BB2020Rules
     val state = createDefaultGameState(rules)
     createStartingTestSetup(state)

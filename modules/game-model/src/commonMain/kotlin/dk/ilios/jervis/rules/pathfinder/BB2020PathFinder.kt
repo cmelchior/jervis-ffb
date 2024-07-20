@@ -5,6 +5,7 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.Rules
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.hypot
 import kotlin.math.roundToInt
@@ -13,38 +14,69 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
 
     class DebugInformation(
         val fieldView: Array<Array<Int>>,
-        val openSet: PriorityQueue<Node>,
+        val openSet: PriorityQueue<AStarNode>,
         val cameFrom: Map<FieldCoordinate, FieldCoordinate?>,
         val gScore: Map<FieldCoordinate, Int>,
         val currentLocation: Pair<FieldCoordinate, Int>
     ): PathFinder.DebugInformation
 
-    data class Node(val point: FieldCoordinate, val g: Int, val h: Int) : Comparable<Node> {
+    data class AStarNode(val point: FieldCoordinate, val g: Int, val h: Int) : Comparable<AStarNode> {
         val f = g + h
-        override fun compareTo(other: Node) = f.compareTo(other.f)
+        override fun compareTo(other: AStarNode) = f.compareTo(other.f)
+    }
+
+    data class DjikstraNode(val point: FieldCoordinate, val distance: Int) : Comparable<DjikstraNode> {
+        override fun compareTo(other: DjikstraNode) = distance.compareTo(other.distance)
+    }
+
+    /**
+     * Calculate the straight line (using squares) between two squares using Bresenham's line algorithm.
+     *
+     * See https://en.m.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+     */
+    override fun getStraightLine(state: Game, start: FieldCoordinate, end: FieldCoordinate): List<FieldCoordinate> {
+        val line = mutableListOf<FieldCoordinate>()
+        var x = start.x
+        var y = start.y
+        val dx = abs(end.x - x)
+        val sx = if (x < end.x) 1 else -1
+        val dy = abs(end.y - y)
+        val sy = if (y < end.y) 1 else -1
+        var error = dx - dy
+        while (true) {
+            line.add(FieldCoordinate(x, y))
+            if (x == end.x && y == end.y) break
+            val e2 = 2 * error
+            if (e2 >= -dy) {
+                if (start.x == end.x) break
+                error -= dy
+                x += sx
+            }
+            if (e2 <= dx) {
+                if (start.y == end.y) break
+                error += dx
+                y += sy
+            }
+        }
+        return line
     }
 
     /**
      * Calculate the shortest distance between two locations using A*.
-     *
      * See https://en.wikipedia.org/wiki/A*_search_algorithm
      */
-    override fun calculateShortestPath(state: Game, start: FieldCoordinate, goal: FieldCoordinate, includeDebugInfo: Boolean): PathFinder.Result {
-        // Prepare a primitive version of the field that contains the following values:
-        // - Int.MAX if the location is occupied
-        // - i > 0 is the number of tackle zones.
-        // - 0 = Field is safe to move to
+    override fun calculateShortestPath(state: Game, start: FieldCoordinate, goal: FieldCoordinate, includeDebugInfo: Boolean): PathFinder.SinglePathResult {
         val fieldView: Array<Array<Int>> = prepareFieldView(state.field, state.activeTeam)
         var pathState = listOf<FieldCoordinate>()
 
         // Locations to check. Use a priority queue to always start checking the most promising path.
-        val openSet = PriorityQueue<Node> { a, b -> a.compareTo(b) }
+        val openSet = PriorityQueue<AStarNode> { a, b -> a.compareTo(b) }
         val cameFrom = mutableMapOf<FieldCoordinate, FieldCoordinate?>()
         val gScore = mutableMapOf<FieldCoordinate, Int>().withDefault { Int.MAX_VALUE }
         // Track the closest location to the goal. Only used if goal couldn't be reached
         var closestLocation: Pair<FieldCoordinate, Int> = Pair(start, Int.MAX_VALUE)
 
-        openSet.offer(Node(start, 0, calculateHeuristicValue(start, goal)))
+        openSet.offer(AStarNode(start, 0, calculateHeuristicValue(start, goal)))
         gScore[start] = 0
 
         while (!openSet.isEmpty) {
@@ -68,9 +100,8 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
                     gScore[neighbor] = tentativeGScore
                     val heuristicDistance = calculateHeuristicValue(neighbor, goal)
                     closestLocation = if (heuristicDistance < closestLocation.second) Pair(neighbor, heuristicDistance) else closestLocation
-                    openSet.offer(Node(neighbor, tentativeGScore, heuristicDistance))
+                    openSet.offer(AStarNode(neighbor, tentativeGScore, heuristicDistance))
                 }
-
             }
             pathState = reconstructPath(cameFrom, currentLocation)
         }
@@ -96,7 +127,71 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
         }
     }
 
+    /**
+     * Calculate the shortest distance to all reachable squares using Dijkstra's algorithm.
+     * See https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+     */
+    override fun calculateAllPaths(state: Game, start: FieldCoordinate): PathFinder.AllPathsResult {
+        // Prepare a primitive version of the field that contains the following values:
+        // - Int.MAX if the location is occupied
+        // - i > 0 is the number of tackle zones.
+        // - 0 = Field is safe to move to
+        val fieldView: Array<Array<Int>> = prepareFieldView(state.field, state.activeTeam)
+        // Calculated distances
+        val distances = mutableMapOf<FieldCoordinate, Int>().withDefault { Int.MAX_VALUE }
+        // Nodes being processed
+        val openSet = PriorityQueue<DjikstraNode> { a, b -> a.compareTo(b) }
+        // Used to do backtracking in order to create a path
+        val cameFrom = mutableMapOf<FieldCoordinate, FieldCoordinate?>()
+
+        distances[start] = 0
+        openSet.offer(DjikstraNode(start, 0))
+
+        while (!openSet.isEmpty) {
+            val currentLocation: FieldCoordinate = openSet.poll()!!.point
+            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1u)
+            for (neighbor in neighbors) {
+                val neighborValue: Int = distances.getValue(neighbor)
+                if (fieldView[neighbor.x][neighbor.y] > 0) continue // Skip all intermediate steps going through tackle zones.
+                val tentativeDistance = distances.getValue(currentLocation) + 1
+                if (tentativeDistance < neighborValue) {
+                    distances[neighbor] = tentativeDistance
+                    cameFrom[neighbor] = currentLocation
+                    openSet.offer(DjikstraNode(neighbor, tentativeDistance))
+                }
+            }
+        }
+
+        return object: PathFinder.AllPathsResult {
+            override val distances: Map<FieldCoordinate, Int> = distances
+            val backTrace: Map<FieldCoordinate, FieldCoordinate?> = cameFrom
+
+            override fun getClosestPathTo(goal: FieldCoordinate): List<FieldCoordinate> {
+                if (distances.containsKey(goal)) {
+                    return reconstructPath(backTrace, goal)
+                } else {
+                    TODO()
+                    // We define the closet path as the one lying on a direct line from start to goal
+                    // val path = getStraightLine(start, goal)
+                }
+            }
+
+            override fun getPathTo(goal: FieldCoordinate): List<FieldCoordinate>? {
+                return if (distances.containsKey(goal)) {
+                    getClosestPathTo(goal)
+                } else {
+                    null
+                }
+            }
+        }
+    }
+
     private fun prepareFieldView(field: Field, movingTeam: Team): Array<Array<Int>> {
+        // Prepare a primitive version of the field that contains the following values:
+        // - Int.MAX if the location is occupied
+        // - i > 0 is the number of tackle zones.
+        // - 0 = Field is safe to move to
+
         val fieldView = Array(26) {
             Array(15) { 0 }
         }
@@ -133,5 +228,4 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
         }
         return path.reversed()
     }
-
 }
