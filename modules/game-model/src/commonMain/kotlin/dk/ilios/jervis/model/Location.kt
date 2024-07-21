@@ -5,6 +5,8 @@ import dk.ilios.jervis.rules.tables.Direction
 import kotlinx.serialization.Serializable
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * Top-left is (0,0), bottom-left is (25, 14) for a normal Blood Bowl Field.
@@ -90,12 +92,30 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
 
     /**
      * Returns the Chebyshev Distance between this field and the target location.
-     * This is equal to the minimum number of squares between two squares on the game field.
+     * This is equal to the minimum number of squares between two squares on the game field, if we assume
+     * that the field is a square.
      *
      * See https://en.wikipedia.org/wiki/Chebyshev_distance
      */
     fun distanceTo(target: FieldCoordinate): UInt {
         return max(abs(target.x - this.x), abs(target.y - this.y)).toUInt()
+    }
+
+    /**
+     * Returns the "real" distance between two fields, as if they were points in a coordinate system
+     * This means that unlike [distanceTo] diagonals will have a larger value than squares on a line.
+     */
+    fun realDistanceTo(target: FieldCoordinate): Double {
+        return sqrt((target.x - x).toDouble().pow(2) + (target.y - y).toDouble().pow(2))
+    }
+
+    /**
+     * Returns `true` if a field is diagonal to another, false if they are not.
+     * This only works on two fields next to each other.
+     */
+    fun isDiagonalTo(target: FieldCoordinate): Boolean {
+        val onLine = (x - target.x == 0 || y - target.y == 0)
+        return !onLine
     }
 
     /**

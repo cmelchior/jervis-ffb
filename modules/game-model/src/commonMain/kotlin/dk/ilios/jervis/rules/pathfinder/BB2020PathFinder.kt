@@ -6,9 +6,6 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.Rules
 import kotlin.math.abs
-import kotlin.math.ceil
-import kotlin.math.hypot
-import kotlin.math.roundToInt
 
 class BB2020PathFinder(private val rules: Rules): PathFinder {
 
@@ -18,15 +15,16 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
         val cameFrom: Map<FieldCoordinate, FieldCoordinate?>,
         val gScore: Map<FieldCoordinate, Int>,
         val currentLocation: Pair<FieldCoordinate, Int>
-    ): PathFinder.DebugInformation
-
+    )
     data class AStarNode(val point: FieldCoordinate, val g: Int, val h: Int) : Comparable<AStarNode> {
         val f = g + h
         override fun compareTo(other: AStarNode) = f.compareTo(other.f)
     }
 
-    data class DjikstraNode(val point: FieldCoordinate, val distance: Int) : Comparable<DjikstraNode> {
-        override fun compareTo(other: DjikstraNode) = distance.compareTo(other.distance)
+    data class DjikstraNode(val point: FieldCoordinate, val distanceInSteps: Int, val realDistance: Double) : Comparable<DjikstraNode> {
+        override fun compareTo(other: DjikstraNode): Int {
+            return realDistance.compareTo(other.realDistance)
+        }
     }
 
     /**
@@ -94,7 +92,7 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
                     (isGoal && neighborValue == Int.MAX_VALUE) // Only skip goal if occupied by another player
                     || (neighborValue > 0 && !isGoal) // Skip all intermediate steps going through tackle zones.
                     ) continue
-                val tentativeGScore = gScore.getValue(currentLocation) + 1 // TODO Why + 1?
+                val tentativeGScore = gScore.getValue(currentLocation) + 1
                 if (tentativeGScore < gScore.getValue(neighbor)) {
                     cameFrom[neighbor] = currentLocation
                     gScore[neighbor] = tentativeGScore
@@ -145,7 +143,7 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
         val cameFrom = mutableMapOf<FieldCoordinate, FieldCoordinate?>()
 
         distances[start] = 0
-        openSet.offer(DjikstraNode(start, 0))
+        openSet.offer(DjikstraNode(start, 0, 0.0))
 
         while (!openSet.isEmpty) {
             val currentLocation: FieldCoordinate = openSet.poll()!!.point
@@ -154,25 +152,41 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
                 val neighborValue: Int = distances.getValue(neighbor)
                 if (fieldView[neighbor.x][neighbor.y] > 0) continue // Skip all intermediate steps going through tackle zones.
                 val tentativeDistance = distances.getValue(currentLocation) + 1
+
+                // We found a path that is straight up more optimal.
                 if (tentativeDistance < neighborValue) {
                     distances[neighbor] = tentativeDistance
                     cameFrom[neighbor] = currentLocation
-                    openSet.offer(DjikstraNode(neighbor, tentativeDistance))
+                    val realDistance = start.realDistanceTo(neighbor)
+                    openSet.offer(DjikstraNode(neighbor, tentativeDistance, realDistance))
+                } else if (tentativeDistance == neighborValue) {
+                    // Check if we found a path that would appear more natural to players, but otherwise
+                    // takes the same number of steps. This mostly means trying to find a path that is
+                    // as "direct" as possible. We estimate this by combing both the distance to the start as well as
+                    // the distance to the new location. Using this heuristic will favor straight lines over diagonals,
+                    // while still keeping the line from start to end as straight as possible.
+                    val currentCameFromLocation: FieldCoordinate = cameFrom[neighbor]!!
+                    val oldDistance = currentCameFromLocation.realDistanceTo(neighbor) + currentCameFromLocation.realDistanceTo(start)
+                    val newDistance = currentLocation.realDistanceTo(neighbor) + currentLocation.realDistanceTo(start)
+                    if (newDistance < oldDistance) {
+                        cameFrom[neighbor] = currentLocation
+                    }
                 }
             }
         }
 
         return object: PathFinder.AllPathsResult {
             override val distances: Map<FieldCoordinate, Int> = distances
-            val backTrace: Map<FieldCoordinate, FieldCoordinate?> = cameFrom
 
             override fun getClosestPathTo(goal: FieldCoordinate): List<FieldCoordinate> {
                 if (distances.containsKey(goal)) {
-                    return reconstructPath(backTrace, goal)
+                    return reconstructPath(cameFrom, goal)
                 } else {
-                    TODO()
-                    // We define the closet path as the one lying on a direct line from start to goal
-                    // val path = getStraightLine(start, goal)
+                    // If we cannot reach the goal, we define the closet path as the one lying on a direct
+                    // line from start to goal
+                    val backPath = getStraightLine(state, start, goal).reversed()
+                    val updatedGoal = backPath.first { distances.containsKey(it) } // Guaranteed to return a result (at worst start = goal)
+                    return reconstructPath(cameFrom, updatedGoal)
                 }
             }
 
@@ -214,9 +228,7 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
     }
 
     private fun calculateHeuristicValue(start: FieldCoordinate, end: FieldCoordinate): Int {
-        val a = (end.x - start.x).toDouble()
-        val b = (end.y - start.y).toDouble()
-        return ceil(hypot(a, b)).roundToInt()
+        return start.distanceTo(end).toInt()
     }
 
     private fun reconstructPath(cameFrom: Map<FieldCoordinate, FieldCoordinate?>, currentLocation: FieldCoordinate): List<FieldCoordinate> {

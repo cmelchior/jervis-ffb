@@ -46,7 +46,7 @@ fun AStarContent() {
     val state = createDefaultGameState(rules)
     createStartingTestSetup(state)
 
-    val result = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), FieldCoordinate(20, 8), true)
+    val result = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), FieldCoordinate(0, 14), true)
     when (result) {
         is PathFinder.Failure -> {
             (result.debugInformation as BB2020PathFinder.DebugInformation).let {

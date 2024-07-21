@@ -8,11 +8,11 @@ import dk.ilios.jervis.model.Game
  */
 interface PathFinder {
 
-    interface DebugInformation
-
-    sealed interface SinglePathResult
-    class Success(val path: List<FieldCoordinate>, val debugInformation: DebugInformation?): SinglePathResult
-    class Failure(val path: List<FieldCoordinate>, val debugInformation: DebugInformation?): SinglePathResult
+    sealed interface SinglePathResult {
+        val path: List<FieldCoordinate>
+    }
+    class Success(override val path: List<FieldCoordinate>, val debugInformation: Any?): SinglePathResult
+    class Failure(override val path: List<FieldCoordinate>, val debugInformation: Any?): SinglePathResult
 
     interface AllPathsResult {
         // Return a map of all known distances

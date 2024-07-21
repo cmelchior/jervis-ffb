@@ -9,9 +9,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -44,27 +49,38 @@ fun DjiekstraContent() {
     createStartingTestSetup(state)
 
     val result = rules.pathFinder.calculateAllPaths(state, FieldCoordinate(12, 6))
+    val path = remember { mutableStateOf(listOf<FieldCoordinate>()) }
     DjiekstraBoxGrid(
         rules.fieldHeight.toInt(),
         rules.fieldWidth.toInt(),
-        result.distances
+        result.distances,
+        path.value,
+        { end: FieldCoordinate ->
+            val newPath = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), end, false)
+            path.value = result.getClosestPathTo(end) // newPath.path
+        }
+
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun DjiekstraBoxGrid(rows: Int, cols: Int, distances: Map<FieldCoordinate, Int>) {
+fun DjiekstraBoxGrid(rows: Int, cols: Int, distances: Map<FieldCoordinate, Int>, path: List<FieldCoordinate>, update: (end: FieldCoordinate) -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
         repeat(rows) { y ->
             Row {
                 repeat(cols) { x ->
                     val squareValue: Int? = distances[FieldCoordinate(x, y)]
+                    val onPath = path.contains(FieldCoordinate(x, y))
                     val (text: String, bgColor: Color) = when {
-//                        fieldView[x][y] == Int.MAX_VALUE -> "" to Color.Black
-//                        fieldView[x][y] > 0 -> fieldView[x][y].toString() to Color.Gray
+                        onPath -> (squareValue?.toString() ?: "") to Color.Blue
                         else -> (squareValue?.toString() ?: "") to Color.White
                     }
                     Box(
                         modifier = Modifier
+                            .onPointerEvent(PointerEventType.Enter) {
+                                update(FieldCoordinate(x, y))
+                            }
                             .size(30.dp)
                             .padding(1.dp)
                             .background(bgColor),
