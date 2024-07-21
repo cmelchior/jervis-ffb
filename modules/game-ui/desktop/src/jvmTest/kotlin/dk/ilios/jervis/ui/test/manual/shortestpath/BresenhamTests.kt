@@ -1,4 +1,4 @@
-package dk.ilios.jervis.ui.test.manual
+package dk.ilios.jervis.ui.test.manual.shortestpath
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
