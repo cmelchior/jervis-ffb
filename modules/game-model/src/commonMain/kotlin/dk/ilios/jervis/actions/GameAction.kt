@@ -92,6 +92,7 @@ sealed class DieResult: Number(), GameAction {
 }
 
 sealed interface GameAction
+
 @Serializable
 data object Continue: GameAction
 @Serializable

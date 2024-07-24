@@ -19,9 +19,9 @@ interface PathFinder {
         val distances: Map<FieldCoordinate, Int>
         // Returns the path from the start to the goal square. If no path exists, the path
         // that is closets is returned instead.
-        fun getClosestPathTo(goal: FieldCoordinate): List<FieldCoordinate>
+        fun getClosestPathTo(goal: FieldCoordinate, maxMove: Int = Int.MAX_VALUE): List<FieldCoordinate>
         // Returns the path from start to goal or `null` or no path exists.
-        fun getPathTo(goal: FieldCoordinate): List<FieldCoordinate>?
+        fun getPathTo(goal: FieldCoordinate, maxMove: Int = Int.MAX_VALUE): List<FieldCoordinate>?
     }
 
     /**
@@ -32,6 +32,7 @@ interface PathFinder {
         state: Game,
         start: FieldCoordinate,
         goal: FieldCoordinate,
+        maxMove: Int,
         includeDebugInfo: Boolean = false
     ): SinglePathResult
 
@@ -42,7 +43,8 @@ interface PathFinder {
      */
     fun calculateAllPaths(
         state: Game,
-        start: FieldCoordinate
+        start: FieldCoordinate,
+        maxMove: Int,
     ): AllPathsResult
 
     /**

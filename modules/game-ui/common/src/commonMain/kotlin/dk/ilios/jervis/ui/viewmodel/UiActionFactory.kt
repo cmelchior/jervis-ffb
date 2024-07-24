@@ -6,11 +6,13 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 /**
  * Class responsible for handling action descriptors. For manual games, this means mapping the game descriptor
@@ -23,6 +25,7 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
         println(exception)
     }
     val scope = CoroutineScope(CoroutineName("ActionSelectorScope") + Dispatchers.Default + errorHandler)
+    var blockEvents = false
 
     // Streams of actions (these roughly correspond to UI elements), so each UI element only need to listen
     // to the stream relevant to it.
@@ -30,10 +33,10 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
     // FieldActions:
     // - Select Player, Select ball, Select location
     // ----
-    protected val _fieldActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    val fieldActions: Flow<UserInput> = _fieldActions
+    protected val _fieldActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
+    val fieldActions: Flow<UserInput> = _fieldActions.takeWhile { !blockEvents }
     protected val _unknownActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
-    val unknownActions: Flow<UserInput> = _unknownActions
+    val unknownActions: Flow<UserInput> = _unknownActions.takeWhile { !blockEvents }
     val dialogActions: MutableSharedFlow<UserInputDialog?> = MutableSharedFlow(replay = 1)
     // ----
 
@@ -56,4 +59,27 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
             userSelectedAction.send(action)
         }
     }
+
+    fun userSelectedMultipleActions(actions: List<GameAction>) {
+        scope.launch(errorHandler) {
+            // Reset UI so it doesn't allow more input
+            _unknownActions.emit(WaitingForUserInput)
+            _fieldActions.emit(WaitingForUserInput)
+            // By emitting `null`, recomposing will no longer show dialogs.
+            // Hide the dialog before sending the event to prevent race conditions
+            // with showing multiple dialogs (which can cause type case errors for the dice rolls)
+            dialogActions.emit(null)
+
+            _fieldActions.emit(IgnoreUserInput)
+            actions.forEachIndexed { i, el ->
+               if (i == max(0, actions.size - 2)) {
+                    _fieldActions.emit(ResumeUserInput)
+               }
+                userSelectedAction.send(el)
+                delay(200)
+            }
+        }
+    }
+
+
 }

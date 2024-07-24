@@ -13,10 +13,10 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
         val fieldView: Array<Array<Int>>,
         val openSet: PriorityQueue<AStarNode>,
         val cameFrom: Map<FieldCoordinate, FieldCoordinate?>,
-        val gScore: Map<FieldCoordinate, Int>,
+        val gScore: Map<FieldCoordinate, Double>,
         val currentLocation: Pair<FieldCoordinate, Int>
     )
-    data class AStarNode(val point: FieldCoordinate, val g: Int, val h: Int) : Comparable<AStarNode> {
+    data class AStarNode(val point: FieldCoordinate, val g: Double, val h: Int) : Comparable<AStarNode> {
         val f = g + h
         override fun compareTo(other: AStarNode) = f.compareTo(other.f)
     }
@@ -63,24 +63,24 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
      * Calculate the shortest distance between two locations using A*.
      * See https://en.wikipedia.org/wiki/A*_search_algorithm
      */
-    override fun calculateShortestPath(state: Game, start: FieldCoordinate, goal: FieldCoordinate, includeDebugInfo: Boolean): PathFinder.SinglePathResult {
+    override fun calculateShortestPath(state: Game, start: FieldCoordinate, goal: FieldCoordinate, maxMove: Int, includeDebugInfo: Boolean): PathFinder.SinglePathResult {
         val fieldView: Array<Array<Int>> = prepareFieldView(state.field, state.activeTeam)
         var pathState = listOf<FieldCoordinate>()
 
         // Locations to check. Use a priority queue to always start checking the most promising path.
         val openSet = PriorityQueue<AStarNode> { a, b -> a.compareTo(b) }
         val cameFrom = mutableMapOf<FieldCoordinate, FieldCoordinate?>()
-        val gScore = mutableMapOf<FieldCoordinate, Int>().withDefault { Int.MAX_VALUE }
+        val gScore = mutableMapOf<FieldCoordinate, Double>().withDefault { Double.MAX_VALUE }
         // Track the closest location to the goal. Only used if goal couldn't be reached
         var closestLocation: Pair<FieldCoordinate, Int> = Pair(start, Int.MAX_VALUE)
 
-        openSet.offer(AStarNode(start, 0, calculateHeuristicValue(start, goal)))
-        gScore[start] = 0
+        openSet.offer(AStarNode(start, 0.0, calculateHeuristicValue(start, goal)))
+        gScore[start] = 0.0
 
         while (!openSet.isEmpty) {
             val currentLocation: FieldCoordinate = openSet.poll()!!.point
             if (currentLocation == goal) {
-                pathState = reconstructPath(cameFrom, currentLocation)
+                pathState = reconstructPath(cameFrom, currentLocation, maxMove)
                 break
             }
             val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1u)
@@ -92,7 +92,7 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
                     (isGoal && neighborValue == Int.MAX_VALUE) // Only skip goal if occupied by another player
                     || (neighborValue > 0 && !isGoal) // Skip all intermediate steps going through tackle zones.
                     ) continue
-                val tentativeGScore = gScore.getValue(currentLocation) + 1
+                val tentativeGScore = gScore.getValue(currentLocation) + currentLocation.realDistanceTo(neighbor)
                 if (tentativeGScore < gScore.getValue(neighbor)) {
                     cameFrom[neighbor] = currentLocation
                     gScore[neighbor] = tentativeGScore
@@ -101,7 +101,7 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
                     openSet.offer(AStarNode(neighbor, tentativeGScore, heuristicDistance))
                 }
             }
-            pathState = reconstructPath(cameFrom, currentLocation)
+            pathState = reconstructPath(cameFrom, currentLocation, maxMove)
         }
 
         val debugInfo: DebugInformation? = if (includeDebugInfo) {
@@ -118,7 +118,7 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
 
         // If the goal location wasn't reached, instead calculate the path to the closest possible
         return if (pathState.lastOrNull() != goal) {
-            pathState = reconstructPath(cameFrom, closestLocation.first)
+            pathState = reconstructPath(cameFrom, closestLocation.first, maxMove)
             PathFinder.Failure(pathState, debugInfo)
         } else {
             PathFinder.Success(pathState, debugInfo)
@@ -129,7 +129,7 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
      * Calculate the shortest distance to all reachable squares using Dijkstra's algorithm.
      * See https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
      */
-    override fun calculateAllPaths(state: Game, start: FieldCoordinate): PathFinder.AllPathsResult {
+    override fun calculateAllPaths(state: Game, start: FieldCoordinate, maxMove: Int): PathFinder.AllPathsResult {
         // Prepare a primitive version of the field that contains the following values:
         // - Int.MAX if the location is occupied
         // - i > 0 is the number of tackle zones.
@@ -154,7 +154,7 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
                 val tentativeDistance = distances.getValue(currentLocation) + 1
 
                 // We found a path that is straight up more optimal.
-                if (tentativeDistance < neighborValue) {
+                if (tentativeDistance < neighborValue && tentativeDistance <= maxMove) {
                     distances[neighbor] = tentativeDistance
                     cameFrom[neighbor] = currentLocation
                     val realDistance = start.realDistanceTo(neighbor)
@@ -178,19 +178,19 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
         return object: PathFinder.AllPathsResult {
             override val distances: Map<FieldCoordinate, Int> = distances
 
-            override fun getClosestPathTo(goal: FieldCoordinate): List<FieldCoordinate> {
+            override fun getClosestPathTo(goal: FieldCoordinate, maxMove: Int): List<FieldCoordinate> {
                 if (distances.containsKey(goal)) {
-                    return reconstructPath(cameFrom, goal)
+                    return reconstructPath(cameFrom, goal, maxMove)
                 } else {
                     // If we cannot reach the goal, we define the closet path as the one lying on a direct
                     // line from start to goal
                     val backPath = getStraightLine(state, start, goal).reversed()
                     val updatedGoal = backPath.first { distances.containsKey(it) } // Guaranteed to return a result (at worst start = goal)
-                    return reconstructPath(cameFrom, updatedGoal)
+                    return reconstructPath(cameFrom, updatedGoal, maxMove)
                 }
             }
 
-            override fun getPathTo(goal: FieldCoordinate): List<FieldCoordinate>? {
+            override fun getPathTo(goal: FieldCoordinate, maxMove: Int): List<FieldCoordinate>? {
                 return if (distances.containsKey(goal)) {
                     getClosestPathTo(goal)
                 } else {
@@ -231,13 +231,18 @@ class BB2020PathFinder(private val rules: Rules): PathFinder {
         return start.distanceTo(end).toInt()
     }
 
-    private fun reconstructPath(cameFrom: Map<FieldCoordinate, FieldCoordinate?>, currentLocation: FieldCoordinate): List<FieldCoordinate> {
+    private fun reconstructPath(
+        cameFrom: Map<FieldCoordinate, FieldCoordinate?>,
+        currentLocation: FieldCoordinate,
+        maxMove: Int
+    ): List<FieldCoordinate> {
         val path = mutableListOf(currentLocation)
         var currentPoint = currentLocation
         while (cameFrom[currentPoint] != null) {
             currentPoint = cameFrom[currentPoint]!!
             path.add(currentPoint)
         }
-        return path.reversed()
+        path.removeLast()
+        return path.reversed().subList(0, maxMove.coerceAtMost(path.size))
     }
 }

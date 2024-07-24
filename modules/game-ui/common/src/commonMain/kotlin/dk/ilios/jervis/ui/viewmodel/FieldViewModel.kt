@@ -22,13 +22,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 
-data class Square(val x: Int, val y: Int)
-
 enum class FieldDetails(val resource: String, val description: String) {
     NICE("icons/cached/pitches/default/nice.png", "Nice Weather")
 }
-
-data class SquareData(val field: FieldSquare, val player: Player?, val ball: Ball?) {}
 
 /**
  * This class collects all the information needed to render the field. This includes all information needed for
@@ -43,15 +39,52 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
     val height = rules.fieldHeight.toInt()
 
     private val field = MutableStateFlow(FieldDetails.NICE)
-    private val highlights = SnapshotStateList<Square>()
-    private val _highlights = MutableStateFlow<Square?>(null)
+    private val highlights = SnapshotStateList<FieldCoordinate>()
+    private val _highlights = MutableStateFlow<FieldCoordinate?>(null)
     fun field(): StateFlow<FieldDetails> = field
+
+    data class PathInfo(
+        val path: List<FieldCoordinate>,
+        val pathSteps: Map<FieldCoordinate, Int>,
+        val target: FieldCoordinate,
+        val action: () -> Unit
+    )
+
+
+    fun observeOverlays(): Flow<PathInfo?> {
+        var ignoreUserInput = false
+        return combine(_highlights, uiActionFactory.fieldActions) { square, ac ->
+            when (ac) {
+                is IgnoreUserInput -> ignoreUserInput = true
+                is ResumeUserInput -> ignoreUserInput = false
+                else -> { /* Do nothing */ }
+            }
+            if (!ignoreUserInput && ac is CompositeUserInput) {
+                ac.inputs.firstOrNull { it is SelectMoveActionFieldLocationInput }?.let {
+                    val activePlayer: Player? = game.activePlayer
+                    if (activePlayer != null && square != null && activePlayer.location.coordinate != square) {
+                        val path: List<FieldCoordinate> = rules.pathFinder.calculateShortestPath(game, activePlayer.location.coordinate, square, activePlayer.moveLeft).path
+                        val pathSteps = path.mapIndexed { index, fieldCoordinate ->
+                            fieldCoordinate to (index + 1)
+                        }.toMap()
+                        val action = { uiActionFactory.userSelectedMultipleActions(path.map { FieldSquareSelected(it)} ) }
+                        PathInfo(path, pathSteps, path.lastOrNull() ?: activePlayer.location as FieldCoordinate, action)
+                    } else {
+                        null
+                    }
+                }
+            } else {
+                null
+            }
+        }
+    }
 
     /**
      * Expose a flow that determines everything needed to render a single square on the field.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     fun observeSquare(x: Int, y: Int): Flow<UiFieldSquare> {
+        var ignoreUserInput = false
         val flow: Flow<UiFieldSquare> = state[x, y].squareFlow.flatMapLatest { fieldSquare ->
             combine(
                 flow = flowOf(fieldSquare),
@@ -64,60 +97,69 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
                     var contextAction: MutableList<ContextMenuOption> = mutableListOf()
                     var showContextMenu = false
 
-                    val inputs = when(userInput) {
-                        is CompositeUserInput -> {
-                            userInput.inputs
+                    when (userInput) {
+                        is IgnoreUserInput -> ignoreUserInput = true
+                        is ResumeUserInput -> ignoreUserInput = false
+                        else -> { /* do Nothing */ }
+                    }
+
+                    if (!ignoreUserInput) {
+                        val inputs = when(userInput) {
+                            is CompositeUserInput -> {
+                                userInput.inputs
+                            }
+                            else -> {
+                                listOf(userInput)
+                            }
                         }
-                        else -> {
-                            listOf(userInput)
+
+                        inputs.forEach { userInput ->
+                            when (userInput) {
+                                is DeselectPlayerInput -> {
+                                    // Since `deselect` only applies to the active player, check if the player in the square is active.
+                                    if (fieldSquare.player?.isActive == true) {
+                                        squareAction = { uiActionFactory.userSelectedAction(userInput.actions.first()) }
+                                    }
+                                }
+                                is SelectFieldLocationInput -> {
+                                    // Allow square to be selected if an action is available for this square.
+                                    squareAction = userInput.fieldAction[FieldCoordinate(x, y)]?.let { action: FieldSquareSelected ->
+                                        { uiActionFactory.userSelectedAction(action) }
+                                    }
+                                }
+                                is SelectPlayerInput -> {
+                                    // If the player in this square is among the selectable players, enable the option
+                                    squareAction = square.player?.let {
+                                        userInput.actions.firstOrNull { (it as PlayerSelected).player == square.player }
+                                            ?.let { playerAction: GameAction ->
+                                                { uiActionFactory.userSelectedAction(playerAction) }
+                                            }
+                                    }
+                                }
+                                is SelectPlayerActionInput -> {
+                                    if (square.x == userInput.activePlayerLocation.x && square.y == userInput.activePlayerLocation.y) {
+                                        contextAction.addAll(
+                                            userInput.actions.map {
+                                                ContextMenuOption(it.action.name, { this@FieldViewModel.uiActionFactory.userSelectedAction(it) })
+                                            }
+                                        )
+                                        showContextMenu = userInput.actions.isNotEmpty()
+                                    }
+                                }
+                                is EndActionInput -> {
+                                    if (fieldSquare.player?.isActive == true) {
+                                        contextAction.addAll(
+                                            userInput.actions.map {
+                                                ContextMenuOption("End action", { this@FieldViewModel.uiActionFactory.userSelectedAction(it) })
+                                            }
+                                        )
+                                    }
+                                }
+                                else -> null /* No action possible for this field */
+                            }
                         }
                     }
 
-                    inputs.forEach { userInput ->
-                        when (userInput) {
-                            is DeselectPlayerInput -> {
-                                // Since `deselect` only applies to the active player, check if the player in the square is active.
-                                if (fieldSquare.player?.isActive == true) {
-                                    squareAction = { uiActionFactory.userSelectedAction(userInput.actions.first()) }
-                                }
-                            }
-                            is SelectFieldLocationInput -> {
-                                // Allow square to be selected if an action is available for this square.
-                                squareAction = userInput.fieldAction[FieldCoordinate(x, y)]?.let { action: FieldSquareSelected ->
-                                    { uiActionFactory.userSelectedAction(action) }
-                                }
-                            }
-                            is SelectPlayerInput -> {
-                                // If the player in this square is among the selectable players, enable the option
-                                squareAction = square.player?.let {
-                                    userInput.actions.firstOrNull { (it as PlayerSelected).player == square.player }
-                                        ?.let { playerAction: GameAction ->
-                                            { uiActionFactory.userSelectedAction(playerAction) }
-                                        }
-                                }
-                            }
-                            is SelectPlayerActionInput -> {
-                                if (square.x == userInput.activePlayerLocation.x && square.y == userInput.activePlayerLocation.y) {
-                                    contextAction.addAll(
-                                        userInput.actions.map {
-                                            ContextMenuOption(it.action.name, { this@FieldViewModel.uiActionFactory.userSelectedAction(it) })
-                                        }
-                                    )
-                                    showContextMenu = userInput.actions.isNotEmpty()
-                                }
-                            }
-                            is EndActionInput -> {
-                                if (fieldSquare.player?.isActive == true) {
-                                    contextAction.addAll(
-                                        userInput.actions.map {
-                                            ContextMenuOption("End action", { this@FieldViewModel.uiActionFactory.userSelectedAction(it) })
-                                        }
-                                    )
-                                }
-                            }
-                            else -> null /* No action possible for this field */
-                        }
-                    }
 
                     val uiPlayer = player?.let { UiPlayer(it, squareAction) }
                     val uiSquare = UiFieldSquare(
@@ -138,9 +180,9 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
         return flow
     }
 
-    fun highlights(): StateFlow<Square?> = _highlights
+    fun highlights(): StateFlow<FieldCoordinate?> = _highlights
 
-    fun hoverOver(square: Square) {
-        // _highlights.value = square
+    fun hoverOver(square: FieldCoordinate) {
+         _highlights.value = square
     }
 }

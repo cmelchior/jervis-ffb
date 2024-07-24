@@ -5,6 +5,7 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.rules.pathfinder.PathFinder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -22,11 +23,28 @@ data object WaitingForUserInput: UserInput {
     override val actions: List<GameAction> = emptyList()
 }
 
+data object IgnoreUserInput: UserInput {
+    override val actions: List<GameAction>
+        get() = TODO()
+}
+
+data object ResumeUserInput: UserInput {
+    override val actions: List<GameAction>
+        get() = TODO()
+}
+
 class SelectPlayerActionInput(val activePlayerLocation: FieldCoordinate, override val actions: List<PlayerActionSelected>): UserInput
 class EndActionInput(val activePlayerLocation: FieldCoordinate, override val actions:List<EndAction>): UserInput {}
 class SelectPlayerInput(override val actions: List<GameAction>): UserInput
 class DeselectPlayerInput(override val actions: List<GameAction>): UserInput
 class SelectFieldLocationInput(override val actions: List<FieldSquareSelected>): UserInput {
+    // Map action to each field
+    val fieldAction: Map<FieldCoordinate, FieldSquareSelected> = actions.associateBy { FieldCoordinate(it.x, it.y) }
+}
+class SelectMoveActionFieldLocationInput(
+    override val actions: List<FieldSquareSelected>,
+    distances: PathFinder.AllPathsResult
+): UserInput {
     // Map action to each field
     val fieldAction: Map<FieldCoordinate, FieldSquareSelected> = actions.associateBy { FieldCoordinate(it.x, it.y) }
 }

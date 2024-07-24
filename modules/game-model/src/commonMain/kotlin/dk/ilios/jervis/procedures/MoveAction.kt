@@ -66,10 +66,13 @@ object MoveAction: Procedure() {
             return when(action) {
                 EndAction -> ExitProcedure()
                 // TODO How to tell the difference between Move and Leap here?
-                is FieldSquareSelected -> compositeCommandOf(
-                    SetMoveStepTarget(state.activePlayer!!.location.coordinate, FieldCoordinate(action.x, action.y)),
-                    GotoNode(MoveToSquare)
-                )
+                is FieldSquareSelected -> {
+                    if (!getAvailableActions(state, rules).contains(SelectFieldLocation(action.coordinate))) INVALID_ACTION(action)
+                    compositeCommandOf(
+                        SetMoveStepTarget(state.activePlayer!!.location.coordinate, FieldCoordinate(action.x, action.y)),
+                        GotoNode(MoveToSquare)
+                    )
+                }
                 else -> INVALID_ACTION(action)
             }
         }

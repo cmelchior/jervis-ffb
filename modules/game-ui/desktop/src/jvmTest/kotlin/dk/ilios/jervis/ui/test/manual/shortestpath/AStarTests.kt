@@ -46,7 +46,7 @@ fun AStarContent() {
     val state = createDefaultGameState(rules)
     createStartingTestSetup(state)
 
-    val result = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), FieldCoordinate(0, 14), true)
+    val result = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), FieldCoordinate(0, 14), 4,true)
     when (result) {
         is PathFinder.Failure -> {
             (result.debugInformation as BB2020PathFinder.DebugInformation).let {
@@ -75,7 +75,7 @@ fun AStarContent() {
 }
 
 @Composable
-fun BoxGrid(rows: Int, cols: Int, field: Array<Array<Int>>, gScore: Map<FieldCoordinate, Int>, path: List<FieldCoordinate>) {
+fun BoxGrid(rows: Int, cols: Int, field: Array<Array<Int>>, gScore: Map<FieldCoordinate, Double>, path: List<FieldCoordinate>) {
     Column(modifier = Modifier.fillMaxSize()) {
         repeat(rows) { y ->
             Row {
@@ -83,10 +83,10 @@ fun BoxGrid(rows: Int, cols: Int, field: Array<Array<Int>>, gScore: Map<FieldCoo
                     val onPath = path.contains(FieldCoordinate(x, y))
                     val squareValue = field[x][y]
                     val (text: String, bgColor: Color) = when {
-                        onPath -> gScore[FieldCoordinate(x, y)]!!.toString() to Color.Blue
+                        onPath -> gScore[FieldCoordinate(x, y)].formatToString(1) to Color.Blue
                         squareValue == Int.MAX_VALUE -> "" to Color.Black
                         squareValue > 0 -> "(${squareValue})" to Color.LightGray
-                        squareValue == 0 -> (gScore[FieldCoordinate(x, y)]?.toString() ?: "") to Color.White
+                        squareValue == 0 -> gScore[FieldCoordinate(x, y)].formatToString(1) to Color.White
                         else -> "" to Color.Red
                     }
                     Box(
@@ -101,5 +101,13 @@ fun BoxGrid(rows: Int, cols: Int, field: Array<Array<Int>>, gScore: Map<FieldCoo
                 }
             }
         }
+    }
+}
+
+private fun Double?.formatToString(decimals: Int): String {
+    return if (this != null) {
+        "%.${decimals}f".format(this)
+    } else {
+        ""
     }
 }

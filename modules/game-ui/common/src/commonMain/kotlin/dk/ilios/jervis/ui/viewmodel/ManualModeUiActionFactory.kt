@@ -52,6 +52,7 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.CatchRoll
 import dk.ilios.jervis.procedures.DetermineKickingTeam
+import dk.ilios.jervis.procedures.MoveAction
 import dk.ilios.jervis.procedures.RollForStartingFanFactor
 import dk.ilios.jervis.procedures.RollForTheWeather
 import dk.ilios.jervis.procedures.SetupTeam
@@ -87,21 +88,36 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         startUserActionSelector(scope)
     }
 
-    private suspend fun startUserActionSelector(scope: CoroutineScope) {
+    private fun startUserActionSelector(scope: CoroutineScope) {
         scope.launch(errorHandler) {
             actions@while(true) {
                 val (controller, actions) = model.actionRequestChannel.receive()
-                // if (useAutomatedActions(controller)) continue@actions
-                val userInput = detectDialogPopup(controller)
-                if (userInput == null) {
-                    detectAndSendUserInput(controller, actions)
-                } else {
-                    sendToRelevantUserInputChannel(listOf(userInput))
+                var selectedAction = calculateAutomaticResponse(controller, actions)
+                if (selectedAction == null) {
+                    val userInput = detectDialogPopup(controller)
+                    if (userInput == null) {
+                        detectAndSendUserInput(controller, actions)
+                    } else {
+                        sendToRelevantUserInputChannel(listOf(userInput))
+                    }
+                    selectedAction = userSelectedAction.receive()
                 }
-                val selectedAction = userSelectedAction.receive()
                 model.actionSelectedChannel.send(selectedAction)
             }
         }
+    }
+
+    /**
+     * Check if we can respond automatically to an event without having to involve the user.
+     * Some examples:
+     * - During an action and the only choice is EndAction
+     */
+    private fun calculateAutomaticResponse(controller: GameController, actions: List<ActionDescriptor>): GameAction? {
+        if (actions.size == 1 && actions.first() is EndActionWhenReady) {
+            return EndAction
+        }
+
+        return null
     }
 
     private suspend fun detectAndSendUserInput(controller: GameController, actions: List<ActionDescriptor>) {
@@ -109,6 +125,15 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             when {
                 it.key == SelectPlayer::class -> {
                     SelectPlayerInput(it.value.map { PlayerSelected((it as SelectPlayer).player) })
+                }
+                it.key == SelectFieldLocation::class && controller.currentProcedure()?.currentNode() == MoveAction.SelectSquareOrEndAction -> {
+                    val pathFinder = controller.rules.pathFinder
+                    val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
+                    SelectMoveActionFieldLocationInput(
+                        it.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) },
+                        pathFinder.calculateAllPaths(controller.state, startLocation, controller.state.activePlayer!!.moveLeft)
+
+                    )
                 }
                 it.key == SelectFieldLocation::class -> {
                     SelectFieldLocationInput(it.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) })
@@ -231,7 +256,10 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 is UnknownInput -> unknownInputs.add(it)
                 is DiceRollUserInputDialog -> dialogInputs.add(it)
                 is SingleChoiceInputDialog -> dialogInputs.add(it)
-                WaitingForUserInput -> {
+                is SelectMoveActionFieldLocationInput -> fieldInputs.add(it)
+                is IgnoreUserInput -> fieldInputs.add(it)
+                is ResumeUserInput -> fieldInputs.add(it)
+                is WaitingForUserInput -> {
                     fieldInputs.add(it)
                     unknownInputs.add(it)
                 }
