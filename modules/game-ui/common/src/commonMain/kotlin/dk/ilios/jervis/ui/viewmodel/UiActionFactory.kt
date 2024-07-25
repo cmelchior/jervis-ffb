@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import kotlin.math.max
 
 /**
  * Class responsible for handling action descriptors. For manual games, this means mapping the game descriptor
@@ -33,7 +32,7 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
     // FieldActions:
     // - Select Player, Select ball, Select location
     // ----
-    protected val _fieldActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
+    protected val  _fieldActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
     val fieldActions: Flow<UserInput> = _fieldActions.takeWhile { !blockEvents }
     protected val _unknownActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
     val unknownActions: Flow<UserInput> = _unknownActions.takeWhile { !blockEvents }
@@ -61,6 +60,13 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
     }
 
     fun userSelectedMultipleActions(actions: List<GameAction>) {
+        when (actions.size) {
+            0 -> return
+            1 -> {
+                userSelectedAction(actions.first())
+                return
+            }
+        }
         scope.launch(errorHandler) {
             // Reset UI so it doesn't allow more input
             _unknownActions.emit(WaitingForUserInput)
@@ -72,9 +78,9 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
 
             _fieldActions.emit(IgnoreUserInput)
             actions.forEachIndexed { i, el ->
-               if (i == max(0, actions.size - 2)) {
-                    _fieldActions.emit(ResumeUserInput)
-               }
+                if (i == actions.size - 1) {
+                    _fieldActions.emit(ResumeUserInput) // This doesn't work because these events don't reach all fields
+                }
                 userSelectedAction.send(el)
                 delay(200)
             }

@@ -121,35 +121,35 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
     }
 
     private suspend fun detectAndSendUserInput(controller: GameController, actions: List<ActionDescriptor>) {
-        val userInputs: List<UserInput> = actions.groupBy { it::class }.map {
+        val userInputs: List<UserInput> = actions.groupBy { it::class }.map { action ->
             when {
-                it.key == SelectPlayer::class -> {
-                    SelectPlayerInput(it.value.map { PlayerSelected((it as SelectPlayer).player) })
+                action.key == SelectPlayer::class -> {
+                    SelectPlayerInput(action.value.map { PlayerSelected((it as SelectPlayer).player) })
                 }
-                it.key == SelectFieldLocation::class && controller.currentProcedure()?.currentNode() == MoveAction.SelectSquareOrEndAction -> {
+                action.key == SelectFieldLocation::class && controller.currentProcedure()?.currentNode() == MoveAction.SelectSquareOrEndAction -> {
                     val pathFinder = controller.rules.pathFinder
                     val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
                     SelectMoveActionFieldLocationInput(
-                        it.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) },
+                        action.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) },
                         pathFinder.calculateAllPaths(controller.state, startLocation, controller.state.activePlayer!!.moveLeft)
 
                     )
                 }
-                it.key == SelectFieldLocation::class -> {
-                    SelectFieldLocationInput(it.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) })
+                action.key == SelectFieldLocation::class -> {
+                    SelectFieldLocationInput(action.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) })
                 }
-                it.key == DeselectPlayer::class -> {
+                action.key == DeselectPlayer::class -> {
                     DeselectPlayerInput(listOf(PlayerDeselected))
                 }
-                it.key == SelectAction::class -> {
+                action.key == SelectAction::class -> {
                     val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
-                    SelectPlayerActionInput(playerLocation, it.value.map { PlayerActionSelected((it as SelectAction).action) })
+                    SelectPlayerActionInput(playerLocation, action.value.map { PlayerActionSelected((it as SelectAction).action) })
                 }
-                it.key == EndActionWhenReady::class -> {
+                action.key == EndActionWhenReady::class -> {
                     val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
                     EndActionInput(playerLocation, listOf(EndAction))
                 }
-                else -> UnknownInput(mapUnknownActions(it.value)) // TODO This breaks if using multiple times
+                else -> UnknownInput(mapUnknownActions(action.value)) // TODO This breaks if using multiple times
             }
         }
 

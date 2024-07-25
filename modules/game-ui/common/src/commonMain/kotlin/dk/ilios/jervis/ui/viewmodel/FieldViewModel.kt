@@ -67,7 +67,14 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
                         val pathSteps = path.mapIndexed { index, fieldCoordinate ->
                             fieldCoordinate to (index + 1)
                         }.toMap()
-                        val action = { uiActionFactory.userSelectedMultipleActions(path.map { FieldSquareSelected(it)} ) }
+                        val action = {
+                            val selectedSquares = path.map { FieldSquareSelected(it) }
+                            if (selectedSquares.size == 1) {
+                                uiActionFactory.userSelectedAction(selectedSquares.first())
+                            } else {
+                                uiActionFactory.userSelectedMultipleActions(selectedSquares)
+                            }
+                        }
                         PathInfo(path, pathSteps, path.lastOrNull() ?: activePlayer.location as FieldCoordinate, action)
                     } else {
                         null
@@ -117,7 +124,7 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
                             when (input) {
                                 is DeselectPlayerInput -> {
                                     // Since `deselect` only applies to the active player, check if the player in the square is active.
-                                    if (fieldSquare.player?.isActive == true) {
+                                    if (square.player?.isActive == true) {
                                         squareAction = { uiActionFactory.userSelectedAction(input.actions.first()) }
                                     }
                                 }
@@ -146,8 +153,14 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
                                         showContextMenu = input.actions.isNotEmpty()
                                     }
                                 }
+                                is SelectMoveActionFieldLocationInput -> {
+                                    // Allow square to be selected if an action is available for this square.
+                                    squareAction = input.fieldAction[FieldCoordinate(x, y)]?.let { action: FieldSquareSelected ->
+                                        { uiActionFactory.userSelectedAction(action) }
+                                    }
+                                }
                                 is EndActionInput -> {
-                                    if (fieldSquare.player?.isActive == true) {
+                                    if (square.player?.isActive == true) {
                                         contextAction.addAll(
                                             input.actions.map {
                                                 ContextMenuOption("End action", { this@FieldViewModel.uiActionFactory.userSelectedAction(it) })

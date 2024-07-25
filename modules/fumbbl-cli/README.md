@@ -88,11 +88,11 @@ progress of the game to same coach. This can be helpful if you want to reproduce
 
 Commandline arguments for running 3 games on the same computer:
 ```
-java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClientAwt -player \ 
+java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClientAwt -player \
   -teamId 1158751 -teamName "Human(Home)" -port 22223 \
   -coach cmelchior
 
-java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClientAwt -player \ 
+java -cp "FantasyFootballClient.jar:*" com.fumbbl.ffb.client.FantasyFootballClientAwt -player \
   -teamId 1158756 -teamName "Human(Away)" -port 22223 \
   -coach cmelchior
 
