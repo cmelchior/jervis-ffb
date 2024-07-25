@@ -113,43 +113,43 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
                             }
                         }
 
-                        inputs.forEach { userInput ->
-                            when (userInput) {
+                        inputs.forEach { input ->
+                            when (input) {
                                 is DeselectPlayerInput -> {
                                     // Since `deselect` only applies to the active player, check if the player in the square is active.
                                     if (fieldSquare.player?.isActive == true) {
-                                        squareAction = { uiActionFactory.userSelectedAction(userInput.actions.first()) }
+                                        squareAction = { uiActionFactory.userSelectedAction(input.actions.first()) }
                                     }
                                 }
                                 is SelectFieldLocationInput -> {
                                     // Allow square to be selected if an action is available for this square.
-                                    squareAction = userInput.fieldAction[FieldCoordinate(x, y)]?.let { action: FieldSquareSelected ->
+                                    squareAction = input.fieldAction[FieldCoordinate(x, y)]?.let { action: FieldSquareSelected ->
                                         { uiActionFactory.userSelectedAction(action) }
                                     }
                                 }
                                 is SelectPlayerInput -> {
                                     // If the player in this square is among the selectable players, enable the option
                                     squareAction = square.player?.let {
-                                        userInput.actions.firstOrNull { (it as PlayerSelected).player == square.player }
+                                        input.actions.firstOrNull { (it as PlayerSelected).player == square.player }
                                             ?.let { playerAction: GameAction ->
                                                 { uiActionFactory.userSelectedAction(playerAction) }
                                             }
                                     }
                                 }
                                 is SelectPlayerActionInput -> {
-                                    if (square.x == userInput.activePlayerLocation.x && square.y == userInput.activePlayerLocation.y) {
+                                    if (square.x == input.activePlayerLocation.x && square.y == input.activePlayerLocation.y) {
                                         contextAction.addAll(
-                                            userInput.actions.map {
+                                            input.actions.map {
                                                 ContextMenuOption(it.action.name, { this@FieldViewModel.uiActionFactory.userSelectedAction(it) })
                                             }
                                         )
-                                        showContextMenu = userInput.actions.isNotEmpty()
+                                        showContextMenu = input.actions.isNotEmpty()
                                     }
                                 }
                                 is EndActionInput -> {
                                     if (fieldSquare.player?.isActive == true) {
                                         contextAction.addAll(
-                                            userInput.actions.map {
+                                            input.actions.map {
                                                 ContextMenuOption("End action", { this@FieldViewModel.uiActionFactory.userSelectedAction(it) })
                                             }
                                         )
@@ -171,7 +171,7 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
                         uiPlayer,
                         squareAction, // Only allow a Square Action if no player is on the field
                         contextAction,
-                        showContextMenu
+                        showContextMenu,
                     )
                     uiSquare
                 }

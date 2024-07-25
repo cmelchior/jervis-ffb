@@ -28,4 +28,5 @@ class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?): UiM
     val position = model.position
     val isActive = (model.available == Availability.IS_ACTIVE)
     val isSelectable = (selectAction != null)
+    val hasActivated = (model.available == Availability.HAS_ACTIVATED || model.available == Availability.UNAVAILABLE)
 }

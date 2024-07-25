@@ -13,7 +13,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
@@ -64,7 +63,7 @@ fun ContextPopupMenu(
         hidePopup()
         return
     }
-    Box(modifier = Modifier.fillMaxSize().background(Color.Red).clickable { /* Intercept events outside popup */ }) {
+    Box(modifier = Modifier.fillMaxSize().clickable { /* Intercept events outside popup */ }) {
         Popup(
             popupPositionProvider = object : PopupPositionProvider {
                 override fun calculatePosition(

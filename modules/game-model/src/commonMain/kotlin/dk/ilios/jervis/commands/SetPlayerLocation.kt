@@ -16,18 +16,26 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
         if (oldLocation is FieldCoordinate) {
             state.field[oldLocation].apply {
                 player = null
-                notifyUpdate()
             }
         }
 
         // Add to new location
         player.location = location
-        player.notifyUpdate()
-        player.team.notifyDogoutChange()
         if (location is FieldCoordinate) {
             state.field[location].apply {
                 player = this@SetPlayerLocation.player
-                notifyUpdate()
+            }
+        }
+
+        // Only run notifications after all changes are applied
+        if (oldLocation is FieldCoordinate) {
+            state.field[oldLocation].notifyUpdate()
+        }
+        player.notifyUpdate()
+        player.team.notifyDogoutChange()
+        player.location.let {
+            if (it is FieldCoordinate) {
+                state.field[it].notifyUpdate()
             }
         }
     }
@@ -36,7 +44,6 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
         if (location is FieldCoordinate) {
             state.field[location].apply {
                 player = null
-                notifyUpdate()
             }
         }
         player.location = originalLocation
@@ -44,7 +51,17 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
         if (originalLoc is FieldCoordinate) {
             state.field[originalLoc].apply {
                 player = this@SetPlayerLocation.player
-                notifyUpdate()
+            }
+        }
+        // Only run notifications after all changes are applied
+        if (location is FieldCoordinate) {
+            state.field[location].notifyUpdate()
+        }
+        player.notifyUpdate()
+        player.team.notifyDogoutChange()
+        originalLoc.let {
+            if (it is FieldCoordinate) {
+                state.field[it].notifyUpdate()
             }
         }
     }
