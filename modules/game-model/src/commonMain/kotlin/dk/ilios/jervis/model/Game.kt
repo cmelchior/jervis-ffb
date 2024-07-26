@@ -99,6 +99,10 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
         inactiveTeam = currentTeam
     }
 
+    fun notifyUpdate() {
+        gameFlow.safeTryEmit(this)
+    }
+
     @Transient
     val gameFlow = MutableSharedFlow<Game>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 }

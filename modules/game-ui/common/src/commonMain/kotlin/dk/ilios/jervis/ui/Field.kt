@@ -38,6 +38,8 @@ import dk.ilios.jervis.ui.viewmodel.FieldViewModel
 @Composable
 fun Field(vm: FieldViewModel, modifier: Modifier) {
     val field: FieldDetails by vm.field().collectAsState()
+    val flow = remember { vm.observeField() }
+    val fieldData: Map<FieldCoordinate, UiFieldSquare> by flow.collectAsState(emptyMap())
 
     Box(modifier = modifier
         .fillMaxSize()
@@ -51,7 +53,7 @@ fun Field(vm: FieldViewModel, modifier: Modifier) {
                 .align(Alignment.TopStart)
         )
         FieldUnderlay(vm)
-        FieldData(vm)
+        FieldData(vm, fieldData)
         FieldOverlay(vm)
     }
 }
@@ -78,7 +80,8 @@ fun FieldSquares(vm: FieldViewModel, content: @Composable (modifier: Modifier, x
 
 @Composable
 fun FieldOverlay(vm: FieldViewModel) {
-    val pathInfo by vm.observeOverlays().collectAsState(initial = null)
+    val flow = remember { vm.observeOverlays() }
+    val pathInfo by flow.collectAsState(initial = null)
     FieldSquares(vm) { modifier: Modifier, x, y ->
         val number = pathInfo?.pathSteps?.get(FieldCoordinate(x, y))
         val isTarget = pathInfo?.target == FieldCoordinate(x, y)
@@ -94,7 +97,7 @@ fun FieldOverlay(vm: FieldViewModel) {
             modifier = clickableModifier,
             contentAlignment = Alignment.Center
         ) {
-            if (number != null) {
+            if (number != null && (pathInfo?.path?.size ?: 0) > 1) {
                 Text(text = number.toString(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
             }
         }
@@ -102,10 +105,11 @@ fun FieldOverlay(vm: FieldViewModel) {
 }
 
 @Composable
-fun FieldData(vm: FieldViewModel) {
+fun FieldData(vm: FieldViewModel, fieldData: Map<FieldCoordinate, UiFieldSquare>) {
     // Players/Ball
     FieldSquares(vm) { modifier, x, y ->
-        FieldSquare(modifier, null, x, y, vm)
+        val squareData = fieldData[FieldCoordinate(x, y)]
+        FieldSquare(modifier, null, x, y, vm, squareData ?: UiFieldSquare(FieldSquare(-1, -1)))
     }
 }
 
@@ -132,13 +136,14 @@ private fun FieldSquare(
     highlightedSquare: FieldCoordinate?,
     width: Int,
     height: Int,
-    vm: FieldViewModel
+    vm: FieldViewModel,
+    square: UiFieldSquare,
 ) {
     val hover: Boolean = FieldCoordinate(width, height) == highlightedSquare
-    val squareFlow = remember(width, height) { vm.observeSquare(width, height) }
-    val square: UiFieldSquare by squareFlow.collectAsState(initial = UiFieldSquare(
-        FieldSquare(-1, -1),
-    ))
+//    val squareFlow = remember(width, height) { vm.observeSquare(width, height) }
+//    val square: UiFieldSquare by squareFlow.collectAsState(initial = UiFieldSquare(
+//        FieldSquare(-1, -1),
+//    ))
     var showPopup by remember(square) { mutableStateOf(square.showContextMenu) }
 
     val bgColor = when {

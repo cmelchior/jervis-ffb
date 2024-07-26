@@ -67,6 +67,7 @@ class GameController(
                  val command = currentNode.applyAction(selectedAction, state, rules)
                 commands.add(command)
                 command.execute(state, this)
+                state.notifyUpdate()
             }
 
             is ParentNode -> {
