@@ -106,6 +106,12 @@ data class SingleChoiceInputDialog(
             actions = actions
         )
 
+        fun createPickupBallDialog(player: Player, actions: List<GameAction>): SingleChoiceInputDialog = create(
+            title = "Pickup Ball",
+            message = "Roll D6 for ${player.name}",
+            actions = actions
+        )
+
         fun createBounceBallDialog(rules: Rules, actions: List<D8Result>): SingleChoiceInputDialog = createWithDescription(
             title = "Bounce Ball",
             message = "Roll D8 for the direction of the ball.",

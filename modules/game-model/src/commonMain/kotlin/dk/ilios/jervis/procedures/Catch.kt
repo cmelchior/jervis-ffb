@@ -6,6 +6,7 @@ import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetRollContext
+import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -56,6 +57,7 @@ data class CatchRollResultContext(
 object Catch: Procedure() {
     override val initialNode: Node = RollToCatch
     override fun isValid(state: Game, rules: Rules) {
+        super.isValid(state, rules)
         // Check that this is only called on a standing player with tacklezones
         val ballLocation = state.ball.location
         if (state.field[ballLocation].player == null) {
@@ -76,14 +78,8 @@ object Catch: Procedure() {
         if (state.ball.state == BallState.DEVIATING) modifiers.add(CatchModifier.DEVIATED)
         if (state.ball.state == BallState.SCATTERED) modifiers.add(CatchModifier.SCATTERED)
         // TODO Check for disturbing presence.
-        state.ballSquare.coordinates.getSurroundingCoordinates(rules).forEach {
-            val markingPlayer: Player? = state.field[it].player
-            if (markingPlayer != null) {
-                if (markingPlayer.team != catchingPlayer.team && rules.canMark(markingPlayer)) {
-                    modifiers.add(CatchModifier.MARKED)
-                }
-            }
-        }
+        // Check for field being marked
+        rules.addMarkedModifiers(state, catchingPlayer.team, state.ballSquare, modifiers)
         val rollContext = CatchRollContext(catchingPlayer, diceRollTarget, modifiers)
         return compositeCommandOf(
             SetRollContext(Game::catchRollContext, rollContext)
@@ -114,7 +110,10 @@ object Catch: Procedure() {
     object CatchFailed: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure() // TODO Not 100% sure what to do here?
+            return compositeCommandOf(
+                state.activePlayer?.let { SetTurnOver(true) },
+                ExitProcedure() // TODO Not 100% sure what to do here?
+            )
         }
     }
 }

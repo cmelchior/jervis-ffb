@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
  */
 abstract class UiActionFactory(protected val model: GameScreenModel) {
     val errorHandler = CoroutineExceptionHandler { _, exception ->
-        println(exception)
+        exception.printStackTrace()
     }
     val scope = CoroutineScope(CoroutineName("ActionSelectorScope") + Dispatchers.Default + errorHandler)
     var blockEvents = false

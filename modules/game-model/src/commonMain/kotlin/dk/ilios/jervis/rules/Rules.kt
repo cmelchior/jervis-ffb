@@ -3,9 +3,13 @@ package dk.ilios.jervis.rules
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
+import dk.ilios.jervis.model.DiceModifier
+import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.procedures.CatchModifier
 import dk.ilios.jervis.procedures.bb2020.kickoff.Blitz
 import dk.ilios.jervis.procedures.bb2020.kickoff.BrilliantCoaching
 import dk.ilios.jervis.procedures.bb2020.kickoff.ChangingWeather
@@ -181,7 +185,19 @@ interface Rules {
         } == null
     }
 
-    // Characteristics limits
+    // Only call this method for the active team
+    fun addMarkedModifiers(game: Game, activeTeam: Team, square: FieldSquare, modifiers: MutableList<DiceModifier>) {
+        square.coordinates.getSurroundingCoordinates(this).forEach {
+            val markingPlayer: Player? = game.field[it].player
+            if (markingPlayer != null) {
+                if (markingPlayer.team != activeTeam && canMark(markingPlayer)) {
+                    modifiers.add(CatchModifier.MARKED)
+                }
+            }
+        }
+    }
+
+    // Characteristic limits
     val moveRange: IntRange
         get() = 1 .. 9
 

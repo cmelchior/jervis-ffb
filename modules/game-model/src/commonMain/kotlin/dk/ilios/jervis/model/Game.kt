@@ -4,6 +4,8 @@ import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.procedures.BlockContext
 import dk.ilios.jervis.procedures.CatchRollContext
 import dk.ilios.jervis.procedures.CatchRollResultContext
+import dk.ilios.jervis.procedures.PickupRollContext
+import dk.ilios.jervis.procedures.PickupRollResultContext
 import dk.ilios.jervis.procedures.RerollContext
 import dk.ilios.jervis.procedures.RerollResultContext
 import dk.ilios.jervis.rules.PlayerAction
@@ -22,6 +24,7 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
 
     companion object
 
+    var isTurnOver = false
     var goalScored: Boolean = false
     var abortIfBallOutOfBounds: Boolean = false
     var halfNo by Delegates.observable(0u) { prop, old, new ->
@@ -73,6 +76,8 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
 
     var catchRollContext: CatchRollContext? = null
     var catchRollResultContext: CatchRollResultContext? = null
+    var pickupRollContext: PickupRollContext? = null
+    var pickupRollResultContext: PickupRollResultContext? = null
 
     var useRerollContext: RerollContext? = null
     var useRerollResult: RerollResultContext? = null

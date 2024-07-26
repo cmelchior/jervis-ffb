@@ -85,6 +85,12 @@ object MoveAction: Procedure() {
 
     object MoveToSquare: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = MoveStep
-        override fun onExitNode(state: Game, rules: Rules): Command = GotoNode(SelectSquareOrEndAction)
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return if (state.isTurnOver) {
+                ExitProcedure()
+            } else {
+                GotoNode(SelectSquareOrEndAction)
+            }
+        }
     }
 }

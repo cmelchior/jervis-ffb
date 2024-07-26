@@ -53,6 +53,7 @@ import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.CatchRoll
 import dk.ilios.jervis.procedures.DetermineKickingTeam
 import dk.ilios.jervis.procedures.MoveAction
+import dk.ilios.jervis.procedures.PickupRoll
 import dk.ilios.jervis.procedures.RollForStartingFanFactor
 import dk.ilios.jervis.procedures.RollForTheWeather
 import dk.ilios.jervis.procedures.SetupTeam
@@ -224,6 +225,10 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
 
             is Bounce.RollDirection -> {
                 SingleChoiceInputDialog.createBounceBallDialog(controller.rules, D8Result.allOptions())
+            }
+
+            is PickupRoll.RollDie -> {
+                SingleChoiceInputDialog.createPickupBallDialog(controller.state.pickupRollContext!!.player, D6Result.allOptions())
             }
 
             else -> {

@@ -20,6 +20,7 @@ import dk.ilios.jervis.commands.SetActivePlayer
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetPlayerAvailability
 import dk.ilios.jervis.commands.SetTurnNo
+import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -53,6 +54,13 @@ object TeamTurn : Procedure() {
             getResetTurnActionCommands(state, rules),
             *getResetAvailablePlayers(state, rules),
             ReportStartingTurn(state.activeTeam, turn)
+        )
+    }
+
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        return compositeCommandOf(
+            SetTurnOver(false),
+            ReportEndingTurn(state.activeTeam, state.activeTeam.turnData.currentTurn)
         )
     }
 
@@ -158,7 +166,11 @@ object TeamTurn : Procedure() {
                 SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
                 SetActivePlayer(null),
                 SetActiveAction(null),
-                GotoNode(SelectPlayerOrEndTurn)
+                if (state.isTurnOver) {
+                    GotoNode(ResolveEndOfTurn)
+                } else {
+                    GotoNode(SelectPlayerOrEndTurn)
+                }
             )
         }
     }
@@ -170,11 +182,6 @@ object TeamTurn : Procedure() {
             return ExitProcedure()
         }
     }
-
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        return ReportEndingTurn(state.activeTeam, state.activeTeam.turnData.currentTurn)
-    }
-
 
     private fun getResetTurnActionCommands(state: Game, rules: Rules): ResetAvailableTeamActions {
         val moveActions = rules.teamActions.move.availablePrTurn
