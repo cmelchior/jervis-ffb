@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 public object DiceRoll {
     val BLOCK = DiceRollType.BlockRoll
     val CATCH = DiceRollType.CatchRoll
+    val PICKUP = DiceRollType.ProRoll
 }
 
 sealed interface DiceRollType {
@@ -30,7 +31,7 @@ sealed interface DiceRollType {
 //data object KickOffTableRoll: DiceRollType
 //data object LonerRoll: DiceRollType
 //data object PassRoll: DiceRollType
-//data object PickUpRoll: DiceRollType
+data object PickUpRoll: DiceRollType
 //data object ReallyStupidRoll: DiceRollType
 //data object RegenerationRoll: DiceRollType
     data object ProRoll : DiceRollType

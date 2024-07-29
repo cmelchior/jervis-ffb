@@ -57,6 +57,11 @@ fun Player.isOnHomeTeam(): Boolean {
     return this.team.game.homeTeam == this.team
 }
 
+fun Player.isOnAwayTeam(): Boolean {
+    return this.team.game.awayTeam == this.team
+}
+
+
 enum class Availability {
     AVAILABLE, // Are available to be activated in this turn
     IS_ACTIVE, // Are currently active

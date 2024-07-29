@@ -7,6 +7,7 @@ import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fumbbl.FumbblReplayAdapter
+import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
@@ -22,6 +23,7 @@ import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
 import dk.ilios.jervis.utils.createDefaultGameState
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
 
@@ -32,6 +34,8 @@ class GameScreenModel(
 ): ScreenModel {
     val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
     val actionSelectedChannel = Channel<GameAction>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
+    val hoverPlayerFlow = MutableSharedFlow<Player?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
     val controller: GameController
     val fumbbl: FumbblReplayAdapter?
     val rules: BB2020Rules = BB2020Rules
@@ -75,9 +79,9 @@ class GameScreen(val screenModel: GameScreenModel, private val actions: List<Gam
             is Replay -> ReplayModeUiActionFactory(screenModel)
         }
         Screen(
-            FieldViewModel(screenModel.controller, uiActionFactory, screenModel.controller.state.field),
-            SidebarViewModel(uiActionFactory, screenModel.controller.state.homeTeam),
-            SidebarViewModel(uiActionFactory, screenModel.controller.state.awayTeam),
+            FieldViewModel(screenModel.controller, uiActionFactory, screenModel.controller.state.field, screenModel.hoverPlayerFlow),
+            SidebarViewModel(uiActionFactory, screenModel.controller.state.homeTeam, screenModel.hoverPlayerFlow),
+            SidebarViewModel(uiActionFactory, screenModel.controller.state.awayTeam, screenModel.hoverPlayerFlow),
             GameStatusViewModel(screenModel.controller),
             ReplayViewModel(screenModel.controller),
             ActionSelectorViewModel(uiActionFactory),

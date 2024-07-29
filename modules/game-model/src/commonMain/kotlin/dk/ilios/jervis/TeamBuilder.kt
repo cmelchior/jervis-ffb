@@ -54,6 +54,12 @@ class TeamBuilder(val roster: Roster) {
                 val data: PlayerData = it.value
                 add(data.type.createPlayer(this@apply, data.id, data.name, data.number))
             }
+            rerollsCountOnRoster = this@TeamBuilder.reRolls
+            var cheerLeaders: Int = 0
+            var assistentCoaches: Int = 0
+
+
+
             notifyDogoutChange()
         }
     }

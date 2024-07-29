@@ -21,7 +21,7 @@ data class UiFieldSquare(
 ): UiModel<FieldSquare>
 
 
-class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?): UiModel<Player> {
+class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?, val onHover: (() -> Unit)? = null): UiModel<Player> {
     fun hasBall(): Boolean  = model.hasBall()
     val state: PlayerState = model.state
     val isOnHomeTeam = model.isOnHomeTeam()
@@ -30,3 +30,7 @@ class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?): UiM
     val isSelectable = (selectAction != null)
     val hasActivated = (model.available == Availability.HAS_ACTIVATED || model.available == Availability.UNAVAILABLE)
 }
+
+class UiPlayerCard(
+    override val model: Player
+): UiModel<Player> {}

@@ -71,15 +71,15 @@ object PickupRoll: Procedure() {
     // Team Reroll, Pro, Catch (only if failed), other skills
     object ChooseReRollSource: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.catchRollResultContext!!
+            val context = state.pickupRollResultContext!!
             val successOnFirstRoll = context.success
-            val catchingPlayer = context.catchingPlayer
-            val availableSkills: List<SelectRerollOption> = catchingPlayer.skills
-                .filter { it.canReroll(DiceRoll.CATCH, listOf(context.roll), successOnFirstRoll) }
+            val pickupPlayer = context.player
+            val availableSkills: List<SelectRerollOption> = pickupPlayer.skills
+                .filter { skill -> skill.canReroll(DiceRoll.PICKUP, listOf(context.roll), successOnFirstRoll) }
                 .flatMap { it: Skill -> it.calculateRerollOptions(DiceRoll.CATCH, context.roll, successOnFirstRoll) }
                 .map { SelectRerollOption(it) }
 
-            val team = catchingPlayer.team
+            val team = pickupPlayer.team
             val hasTeamRerolls = team.availableRerollCount > 0
             val allowedToUseTeamReroll = when(team.usedTeamRerollThisTurn) {
                 true -> rules.allowMultipleTeamRerollsPrTurn

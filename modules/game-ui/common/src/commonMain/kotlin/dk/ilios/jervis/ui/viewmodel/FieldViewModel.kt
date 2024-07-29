@@ -15,8 +15,10 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.ui.ContextMenuOption
 import dk.ilios.jervis.ui.model.UiFieldSquare
 import dk.ilios.jervis.ui.model.UiPlayer
+import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -31,7 +33,12 @@ enum class FieldDetails(val resource: String, val description: String) {
  * This class collects all the information needed to render the field. This includes all information needed for
  * each single square on the field.
  */
-class FieldViewModel(controller: GameController, private val uiActionFactory: UiActionFactory, private val state: Field) {
+class FieldViewModel(
+    controller: GameController,
+    private val uiActionFactory: UiActionFactory,
+    private val state: Field,
+    private val hoverPlayerChannel: MutableSharedFlow<Player?>
+) {
 
     val rules = controller.rules
     val game = controller.state
@@ -217,6 +224,9 @@ class FieldViewModel(controller: GameController, private val uiActionFactory: Ui
     fun highlights(): StateFlow<FieldCoordinate?> = _highlights
 
     fun hoverOver(square: FieldCoordinate) {
+        game.field[square].player.let { player: Player? ->
+            hoverPlayerChannel.safeTryEmit(player)
+        }
         _highlights.value = square
     }
 
