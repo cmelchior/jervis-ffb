@@ -86,6 +86,4 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
             }
         }
     }
-
-
 }

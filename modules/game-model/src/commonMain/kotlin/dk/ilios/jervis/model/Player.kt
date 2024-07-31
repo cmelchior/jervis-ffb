@@ -114,6 +114,8 @@ class Player(
     val agility: Int get() = baseAgility
     val passing: Int? get() = basePassing
     val armorValue: Int get() = baseArmorValue
+    var starPlayerPoints: Int = 0
+    var level: PlayerLevel = PlayerLevel.ROOKIE
     val ball: Ball?
         get() = if (team.game.ball.carriedBy == this) {
             team.game.ball

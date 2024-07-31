@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.builtins.StandardNames.FqNames.target
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -22,6 +21,12 @@ kotlin {
                 implementation(libs.coroutines)
                 implementation(compose.desktop.common)
                 implementation(libs.jsonserialization)
+                val voyagerVersion = "1.0.0"
+                implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
             }
         }
         val jvmMain by getting {
@@ -34,7 +39,6 @@ kotlin {
                 implementation(compose.desktop.uiTestJUnit4)
             }
         }
-        val jvmTest by getting
     }
 }
 
