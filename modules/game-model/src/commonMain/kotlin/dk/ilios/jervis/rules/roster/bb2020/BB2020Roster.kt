@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
 interface BB2020Roster: Roster {
     val tier: Int
     val specialRules: List<SpecialRules>
+    override val positions: List<BB2020Position>
 }
 
 @Serializable

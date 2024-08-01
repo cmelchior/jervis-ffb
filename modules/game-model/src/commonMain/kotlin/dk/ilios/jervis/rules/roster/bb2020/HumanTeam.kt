@@ -57,8 +57,8 @@ data object HumanTeam: BB2020Roster {
     val HALFLING_HOPEFUL = BB2020Position(
         HumanTeam,
         3,
-        "Halfing Hopefuls",
-        "Hafling Hopeful",
+        "Halfling Hopefuls",
+        "Halfling Hopeful",
         30_000,
         5,2,3,4,7,
         emptyList(),

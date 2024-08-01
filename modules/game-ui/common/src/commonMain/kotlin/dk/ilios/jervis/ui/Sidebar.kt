@@ -126,7 +126,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                         Text(
                             modifier = Modifier.padding(4.dp).fillMaxWidth(),
                             textAlign = TextAlign.Center,
-                            text = player.model?.name ?: "",
+                            text = player.model.name ?: "",
                             color = Color.White,
                             maxLines = 1,
                             fontWeight = FontWeight.Bold,

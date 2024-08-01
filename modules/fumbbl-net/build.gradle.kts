@@ -24,6 +24,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(kotlin("reflect"))
                 implementation(libs.coroutines)
                 implementation(project(":modules:game-model"))
                 implementation("com.squareup.okio:okio:3.7.0")
