@@ -103,6 +103,11 @@ object JervisSerialization {
             subclass(DBlockResult::class)
 //            }
         }
+
+//        polymorphic(SkillFactory::class) {
+//            subclass(CatchSkill.Companion::class)
+//            subclass(SureHandsSkill.Companion::class)
+//        }
     }
 
     private val jsonFormat = Json {

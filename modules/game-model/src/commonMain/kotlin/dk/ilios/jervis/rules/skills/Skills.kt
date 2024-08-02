@@ -1,18 +1,26 @@
 package dk.ilios.jervis.rules.skills
 
+import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.BlockDieRoll
 import dk.ilios.jervis.procedures.D6DieRoll
 import dk.ilios.jervis.procedures.DieRoll
+import dk.ilios.jervis.procedures.UseStandardSkillReroll
 import dk.ilios.jervis.procedures.UseTeamReroll
+import dk.ilios.jervis.rules.bb2020.Agility
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 public object DiceRoll {
     val BLOCK = DiceRollType.BlockRoll
     val CATCH = DiceRollType.CatchRoll
-    val PICKUP = DiceRollType.ProRoll
+    val PICKUP = DiceRollType.PickUpRoll
 }
 
 sealed interface DiceRollType {
@@ -43,6 +51,7 @@ data object PickUpRoll: DiceRollType
 //data class CustomRoll(val id: String): DiceRollType
 
 }
+
 enum class TeamRerollDuration {
     END_OF_HALF,
     END_OF_DRIVE
@@ -53,33 +62,30 @@ sealed interface TeamReroll: RerollSource {
     val isTemporary: Boolean
     override val rerollProcedure: Procedure
         get() = UseTeamReroll
-}
 
-class RegularTeamReroll(val team: Team): TeamReroll {
-    override var rerollUsed: Boolean = false
-    override fun canReroll(type: DiceRollType, value: List<D6DieRoll>, wasSuccess: Boolean): Boolean {
+    override fun canReroll(
+        type: DiceRollType,
+        value: List<DieRoll<*, *>>,
+        wasSuccess: Boolean?
+    ): Boolean {
         // TODO Some types cannot be rerolled
         return value.all { it.rerollSource == null }
     }
+
     override fun calculateRerollOptions(
         type: DiceRollType,
-        value: List<D6DieRoll>,
-        wasSuccess: Boolean
-    ): List<DiceRerollOption<D6DieRoll>> {
+        value: List<DieRoll<*, *>>,
+        wasSuccess: Boolean?
+    ): List<DiceRerollOption> {
         return listOf(DiceRerollOption(this, value))
     }
+}
 
-    override fun canRerollBlock(value: List<BlockDieRoll>): Boolean {
-        return value.all { it.rerollSource == null }
-    }
-
-    override fun calculateBlockRerollOptions(value: List<BlockDieRoll>): List<DiceRerollOption<BlockDieRoll>> {
-        return listOf(DiceRerollOption(this, value))
-    }
-
+class RegularTeamReroll(val team: Team): TeamReroll {
     override val carryOverIntoOvertime: Boolean = true
     override val isTemporary: Boolean = false
     override val rerollDescription: String = "Team reroll"
+    override var rerollUsed: Boolean = false
 }
 
 class LeaderTeamReroll(val player: Player): TeamReroll {
@@ -87,65 +93,66 @@ class LeaderTeamReroll(val player: Player): TeamReroll {
     override val isTemporary: Boolean = true
     override val rerollDescription: String = "Team reroll (Leader)"
     override var rerollUsed: Boolean = false
-    override fun canReroll(type: DiceRollType, value: List<D6DieRoll>, wasSuccess: Boolean): Boolean {
-        return value.all { it.rerollSource == null }
-    }
-
-    override fun calculateRerollOptions(
-        type: DiceRollType,
-        value: List<D6DieRoll>,
-        wasSuccess: Boolean
-    ): List<DiceRerollOption<D6DieRoll>> {
-        return listOf(DiceRerollOption(this, value))
-    }
-
-    override fun canRerollBlock(value: List<BlockDieRoll>): Boolean {
-        return value.all { it.rerollSource == null }
-    }
-
-    override fun calculateBlockRerollOptions(value: List<BlockDieRoll>): List<DiceRerollOption<BlockDieRoll>> {
-        return listOf(DiceRerollOption(this, value))
-    }
 }
-
-//enum class TeamRerollType {
-//    REGULAR,
-//    LEADER,
-//    END_OF_DRIVE,
-//    END_OF_HALF,
-//    END_OF_GAME
-//}
 
 // Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {
     val rerollDescription: String
     var rerollUsed: Boolean
     val rerollProcedure: Procedure
-    fun canReroll(type: DiceRollType, value: List<D6DieRoll>, wasSuccess: Boolean): Boolean
-    // Maybe overkill, since the only re-rollable rolls are single dice rolls
-    fun calculateRerollOptions(type: DiceRollType, value: List<D6DieRoll>, wasSuccess: Boolean): List<DiceRerollOption<D6DieRoll>>
-    fun calculateRerollOptions(type: DiceRollType, value: D6DieRoll, wasSuccess: Boolean): List<DiceRerollOption<D6DieRoll>> = calculateRerollOptions(type, listOf(value), wasSuccess)
-    fun canRerollBlock(value: List<BlockDieRoll>): Boolean
-    fun calculateBlockRerollOptions(value: List<BlockDieRoll>): List<DiceRerollOption<BlockDieRoll>>
+    fun canReroll(type: DiceRollType, value: List<DieRoll<*, *>>, wasSuccess: Boolean? = null): Boolean
+    fun calculateRerollOptions(type: DiceRollType, value: List<DieRoll<*, *>>, wasSuccess: Boolean? = null): List<DiceRerollOption>
+    fun calculateRerollOptions(type: DiceRollType, value: DieRoll<*, *>, wasSuccess: Boolean): List<DiceRerollOption> = calculateRerollOptions(type, listOf(value), wasSuccess)
+}
+
+interface D6StandardSkillReroll: RerollSource {
+    override val rerollProcedure: Procedure
+        get() = UseStandardSkillReroll
+
+    override fun calculateRerollOptions(
+        type: DiceRollType,
+        value: List<DieRoll<*, *>>,
+        wasSuccess: Boolean?
+    ): List<DiceRerollOption> {
+        // For standard skills
+        if (value.size != 1) error("Unsupported number of dice: ${value.joinToString()}")
+        return listOf(DiceRerollOption(this, value))
+    }
 }
 
 // `rerollSource` is not set yet
 @Serializable
-data class DiceRerollOption<T: DieRoll>(val source: RerollSource, val dice: List<T>)
+data class DiceRerollOption(
+    val source: RerollSource,
+    val dice: List<DieRoll<*, *>>
+)
 
-interface Skill: RerollSource {
-    enum class UsageType {
-        ALWAYS,
-        ONCE_PR_TURN,
-        ONCE_PR_DRIVE,
-        ONCE_PR_HALF,
-        ONCE_PR_GAME,
-        SPECIAL //
+@Serializable
+sealed interface Skill {
+
+    companion object {
+        const val NO_LIMIT = -1
     }
-    val id: Long
+
+    enum class ResetPolicy {
+        NEVER,
+        END_OF_TURN,
+        END_OF_DRIVE,
+        END_OF_HALF,
+        SPECIAL
+    }
+
+    val id: String
     val name: String
-    val usage: UsageType
+    val limit: Int
+    var used: Int
+    val resetAt: ResetPolicy
     val category: SkillCategory
+}
+
+@Serializable
+sealed interface SkillFactory {
+    fun createSkill(): Skill
 }
 
 interface SkillCategory {
@@ -225,7 +232,8 @@ class BB2016Skills {
 //    - Throw Team-mate
 }
 
-sealed interface BB2020Skill: Skill
+@Serializable
+sealed interface BB2020Skill : Skill
 
 
 enum class BB2020SkillsList {

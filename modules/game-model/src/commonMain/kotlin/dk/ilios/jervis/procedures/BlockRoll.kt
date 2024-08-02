@@ -24,6 +24,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.DiceRollType
+import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -88,9 +89,11 @@ object BlockRoll: Procedure() {
             // Pro: Can reroll any single die
             // Team reroll: Can reroll all of them
             val availableSkills: List<SelectRerollOption> = attackingPlayer.skills
-                .filter { it.canRerollBlock(context.roll) }
-                .flatMap { skill: Skill -> skill.calculateBlockRerollOptions(context.roll) }
-                .map { rerollOption: DiceRerollOption<BlockDieRoll> -> SelectRerollOption(rerollOption) }
+                .filter { skill: Skill -> skill is RerollSource }
+                .map { it as RerollSource }
+                .filter { it.canReroll(DiceRollType.BlockRoll, context.roll) }
+                .flatMap { it.calculateRerollOptions(DiceRollType.BlockRoll, context.roll) }
+                .map { rerollOption: DiceRerollOption -> SelectRerollOption(rerollOption) }
 
             val team = attackingPlayer.team
             val hasTeamRerolls = team.availableRerollCount > 0
@@ -102,7 +105,7 @@ object BlockRoll: Procedure() {
                 listOf(ContinueWhenReady)
             } else {
                 val teamRerolls = if (hasTeamRerolls && allowedToUseTeamReroll) {
-                    listOf(SelectRerollOption(DiceRerollOption<BlockDieRoll>(team.availableRerolls.last(), context.roll)))
+                    listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), context.roll)))
                 } else {
                     emptyList()
                 }

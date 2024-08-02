@@ -195,6 +195,16 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                         text = "${player.model.starPlayerPoints} ${player.model.level.name}",
                         textAlign = TextAlign.Center
                     )
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        player.model.skills.forEach {
+                            Text(
+                                modifier = Modifier.padding(4.dp).fillMaxWidth(),
+                                text = it.name,
+                            )
+                        }
+                    }
                 }
             }
         }

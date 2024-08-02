@@ -25,7 +25,7 @@ import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.DiceRoll
 import dk.ilios.jervis.rules.skills.DiceRollType
-import dk.ilios.jervis.rules.skills.Skill
+import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
@@ -75,8 +75,10 @@ object CatchRoll: Procedure() {
             val successOnFirstRoll = context.success
             val catchingPlayer = context.catchingPlayer
             val availableSkills: List<SelectRerollOption> = catchingPlayer.skills
+                .filter { it is RerollSource }
+                .map { it as RerollSource }
                 .filter { it.canReroll(DiceRoll.CATCH, listOf(context.roll), successOnFirstRoll) }
-                .flatMap { it: Skill -> it.calculateRerollOptions(DiceRoll.CATCH, context.roll, successOnFirstRoll) }
+                .flatMap { it: RerollSource -> it.calculateRerollOptions(DiceRoll.CATCH, context.roll, successOnFirstRoll) }
                 .map { SelectRerollOption(it) }
 
             val team = catchingPlayer.team
@@ -90,7 +92,7 @@ object CatchRoll: Procedure() {
                 listOf(ContinueWhenReady)
             } else {
                 val teamReroll = if (hasTeamRerolls && allowedToUseTeamReroll) {
-                    listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf<DieRoll>(context.roll))))
+                    listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf(context.roll))))
                 } else {
                     emptyList()
                 }

@@ -1,7 +1,6 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.rules.roster.Position
-import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.skills.Skill
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -80,7 +79,8 @@ value class PlayerId(val value: String)
 
 @Serializable
 class Player(
-    val id: PlayerId
+    val id: PlayerId,
+    val position: Position
 ): Observable<Player>() {
 
     @Transient
@@ -100,7 +100,6 @@ class Player(
     var hasTackleZones: Boolean = true
     var name: String = ""
     var number: PlayerNo = PlayerNo(0)
-    var position: Position = HumanTeam.positions.first()
 
     var baseMove: Int = 0
     var moveLeft: Int = 0
@@ -108,7 +107,9 @@ class Player(
     var baseAgility: Int = 0
     var basePassing: Int? = 0
     var baseArmorValue: Int = 0
-    val skills = mutableListOf<Skill>()
+    val extraSkills = mutableListOf<Skill>()
+    val positionSkills: List<Skill>
+    val skills: List<Skill>
     val move: Int get() = baseMove
     val strength: Int get() = baseStrenght
     val agility: Int get() = baseAgility
@@ -122,6 +123,11 @@ class Player(
         } else {
             null
         }
+
+    init {
+        positionSkills = position.skills.map { it.createSkill() }
+        skills = positionSkills + extraSkills
+    }
 
     fun hasBall(): Boolean = (ball != null)
 

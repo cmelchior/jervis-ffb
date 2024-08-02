@@ -5,6 +5,8 @@ import dk.ilios.jervis.rules.bb2020.General
 import dk.ilios.jervis.rules.bb2020.Passing
 import dk.ilios.jervis.rules.bb2020.Strength
 import dk.ilios.jervis.rules.roster.RosterId
+import dk.ilios.jervis.rules.skills.CatchSkill
+import dk.ilios.jervis.rules.skills.SureHandsSkill
 import kotlinx.serialization.Serializable
 
 // Page 116 in the rulebook
@@ -28,7 +30,7 @@ data object HumanTeam: BB2020Roster {
         "Thrower",
         80_000,
         6,3,3,2,9,
-        emptyList(),
+        listOf(SureHandsSkill),
         listOf(General, Passing),
         listOf(Agility, Strength)
     )
@@ -39,7 +41,7 @@ data object HumanTeam: BB2020Roster {
         "Catcher",
         65_000,
         8,2,3,5,8,
-        emptyList(),
+        listOf(CatchSkill), // Still misses Dodge
         listOf(Agility, General),
         listOf(Strength, Passing)
     )

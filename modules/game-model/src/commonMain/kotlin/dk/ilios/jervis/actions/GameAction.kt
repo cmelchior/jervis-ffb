@@ -3,7 +3,6 @@ package dk.ilios.jervis.actions
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
-import dk.ilios.jervis.procedures.DieRoll
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -63,7 +62,7 @@ data class SelectRandomPlayers(val count: Int, val players: List<Player>): Actio
 
 //data class SelectSkillRerollSource(val skill: Skill): ActionDescriptor
 //data class SelectTeamRerollSource(val reroll: TeamReroll): ActionDescriptor
-data class SelectRerollOption(val option: DiceRerollOption<out DieRoll>): ActionDescriptor
+data class SelectRerollOption(val option: DiceRerollOption): ActionDescriptor
 data object SelectNoReroll: ActionDescriptor
 
 // Available actions
@@ -149,7 +148,7 @@ class D4Result(override val result: Int): DieResult() {
 }
 
 @Serializable
-class D6Result(override val result: Int = Random.nextInt(1, 7)): DieResult() {
+class D6Result(override val result: Int): DieResult() {
     constructor(): this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 6
@@ -239,6 +238,6 @@ data class FieldSquareSelected(val coordinate: FieldCoordinate): GameAction {
 @Serializable
 data class RandomPlayersSelected(val players: List<Player>): GameAction
 @Serializable
-data class RerollOptionSelected(val option: DiceRerollOption<out DieRoll>): GameAction
+data class RerollOptionSelected(val option: DiceRerollOption): GameAction
 @Serializable
 data object NoRerollSelected: GameAction
