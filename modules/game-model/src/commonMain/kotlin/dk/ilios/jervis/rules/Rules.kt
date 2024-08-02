@@ -197,6 +197,17 @@ interface Rules {
         }
     }
 
+    fun canUseTeamReroll(game: Game, player: Player): Boolean {
+        if (!game.canUseTeamRerolls) return false
+        if (game.activeTeam != player.team) return false
+        return when(player.team.usedTeamRerollThisTurn) {
+            true -> allowMultipleTeamRerollsPrTurn
+            false -> true
+        }
+    }
+
+
+
     // Characteristic limits
     val moveRange: IntRange
         get() = 1 .. 9

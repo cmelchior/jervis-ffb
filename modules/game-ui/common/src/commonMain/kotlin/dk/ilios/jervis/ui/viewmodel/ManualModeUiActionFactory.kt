@@ -219,6 +219,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 DiceRollUserInputDialog.createKickOffEventDialog(controller.rules)
             }
 
+            CatchRoll.ReRollDie,
             is CatchRoll.RollDie -> {
                 SingleChoiceInputDialog.createCatchBallDialog(controller.state.catchRollContext!!.catchingPlayer, D6Result.allOptions())
             }
@@ -227,8 +228,16 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 SingleChoiceInputDialog.createBounceBallDialog(controller.rules, D8Result.allOptions())
             }
 
+            is PickupRoll.ReRollDie,
             is PickupRoll.RollDie -> {
                 SingleChoiceInputDialog.createPickupBallDialog(controller.state.pickupRollContext!!.player, D6Result.allOptions())
+            }
+
+            is PickupRoll.ChooseReRollSource -> {
+                SingleChoiceInputDialog.createPickupRerollDialog(
+                    controller.state.pickupRollResultContext!!,
+                    mapUnknownActions(controller.getAvailableActions())
+                )
             }
 
             else -> {

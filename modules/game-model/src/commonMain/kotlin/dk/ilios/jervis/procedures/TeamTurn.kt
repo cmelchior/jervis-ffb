@@ -18,6 +18,7 @@ import dk.ilios.jervis.commands.ResetAvailableTeamActions
 import dk.ilios.jervis.commands.SetActiveAction
 import dk.ilios.jervis.commands.SetActivePlayer
 import dk.ilios.jervis.commands.SetAvailableActions
+import dk.ilios.jervis.commands.SetCanUseTeamRerolls
 import dk.ilios.jervis.commands.SetPlayerAvailability
 import dk.ilios.jervis.commands.SetTurnNo
 import dk.ilios.jervis.commands.SetTurnOver
@@ -50,6 +51,7 @@ object TeamTurn : Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val turn = state.activeTeam.turnData.currentTurn + 1u
         return compositeCommandOf(
+            SetCanUseTeamRerolls(true),
             SetTurnNo(state.activeTeam, turn),
             getResetTurnActionCommands(state, rules),
             *getResetAvailablePlayers(state, rules),
@@ -60,6 +62,7 @@ object TeamTurn : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         return compositeCommandOf(
             SetTurnOver(false),
+            SetCanUseTeamRerolls(false),
             ReportEndingTurn(state.activeTeam, state.activeTeam.turnData.currentTurn)
         )
     }

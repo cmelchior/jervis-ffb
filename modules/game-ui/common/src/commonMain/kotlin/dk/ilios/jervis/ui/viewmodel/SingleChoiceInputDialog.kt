@@ -22,6 +22,7 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.procedures.PickupRollResultContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Direction
 import javax.swing.Icon
@@ -58,7 +59,7 @@ data class SingleChoiceInputDialog(
                 is CoinTossResult -> action.result.name
                 is RandomPlayersSelected -> "Random players: $action"
                 NoRerollSelected -> "No reroll"
-                is RerollOptionSelected -> action.option.toString()
+                is RerollOptionSelected -> action.option.source.rerollDescription
             }
         }
 
@@ -111,6 +112,15 @@ data class SingleChoiceInputDialog(
             message = "Roll D6 for ${player.name}",
             actions = actions
         )
+
+        fun createPickupRerollDialog(context: PickupRollResultContext, actions: List<GameAction>): SingleChoiceInputDialog {
+            val message = "<Insert result of rolling D6>"
+            return create(
+                title = "Choose Reroll",
+                message = message,
+                actions = actions
+            )
+        }
 
         fun createBounceBallDialog(rules: Rules, actions: List<D8Result>): SingleChoiceInputDialog = createWithDescription(
             title = "Bounce Ball",

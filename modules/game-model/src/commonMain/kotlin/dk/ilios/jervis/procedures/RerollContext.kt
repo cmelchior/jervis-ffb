@@ -37,6 +37,7 @@ data class D6DieRoll(
         get() = rerolledResult ?: originalRoll
 }
 
+// Wrap the choice of the reroll type used, it can be skills, team reroll
 data class RerollContext(val roll: DiceRollType, val source: RerollSource)
 
 // Wraps the result of whether a specific reroll source can be used to reroll a specific roll type (all dice or parts of them)

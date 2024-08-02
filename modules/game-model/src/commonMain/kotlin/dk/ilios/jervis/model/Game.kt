@@ -40,6 +40,8 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var activePlayer: Player? = null
     var kickingPlayer: Player? = null
 
+    // Active/Inactive does indicate "active turn"
+    var canUseTeamRerolls = false
     var activeTeam: Team = this.homeTeam
     var inactiveTeam: Team = this.awayTeam
     var kickingTeam: Team = this.homeTeam

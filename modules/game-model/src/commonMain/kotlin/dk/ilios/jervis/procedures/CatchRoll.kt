@@ -83,10 +83,7 @@ object CatchRoll: Procedure() {
 
             val team = catchingPlayer.team
             val hasTeamRerolls = team.availableRerollCount > 0
-            val allowedToUseTeamReroll = when(team.usedTeamRerollThisTurn) {
-                true -> rules.allowMultipleTeamRerollsPrTurn
-                false -> true
-            }
+            val allowedToUseTeamReroll = rules.canUseTeamReroll(state, catchingPlayer)
 
             return if (availableSkills.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
                 listOf(ContinueWhenReady)
@@ -155,5 +152,4 @@ object CatchRoll: Procedure() {
         target: Int,
         rollContext: CatchRollContext
     ) = it.result != 1 && (target <= it.result + rollContext.diceModifier())
-
 }
