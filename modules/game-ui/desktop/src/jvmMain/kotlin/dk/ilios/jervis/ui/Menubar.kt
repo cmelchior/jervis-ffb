@@ -5,6 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
 import dk.ilios.jervis.ui.viewmodel.MenuViewModel
@@ -27,6 +29,12 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
                     vm.saveGameState(filePath)
                 }
             })
+            Item(
+                text = "Undo Action",
+                shortcut = KeyShortcut(Key.Z, meta = true)
+            ) {
+                vm.undoAction()
+            }
         }
 //        Menu("Help", mnemonic = 'H') {
 //            Item("About", onClick = { action = "About" })

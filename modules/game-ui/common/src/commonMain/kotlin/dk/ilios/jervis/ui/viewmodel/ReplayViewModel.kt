@@ -1,8 +1,14 @@
 package dk.ilios.jervis.ui.viewmodel
 
-import dk.ilios.jervis.controller.GameController
+import dk.ilios.jervis.actions.Undo
+import dk.ilios.jervis.ui.GameScreenModel
 
-class ReplayViewModel(val controller: GameController) {
+class ReplayViewModel(
+    private val uiActionFactory: UiActionFactory,
+    private val gameModel: GameScreenModel
+) {
+
+    val controller = gameModel.controller
 
     fun rewind() {
         while(controller.back()) { }

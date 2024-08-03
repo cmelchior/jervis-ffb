@@ -30,6 +30,7 @@ import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.EndTurnWhenReady
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
@@ -77,10 +78,10 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                     initialActionsIndex++
                     action
                 } else {
-                    val action: GameAction = runBlocking(Dispatchers.Default) {
-                        model.actionRequestChannel.send(Pair(controller, availableActions))
-                        model.actionSelectedChannel.receive()
-                    }
+                    val action = runBlocking(Dispatchers.Default) {
+                            model.actionRequestChannel.send(Pair(controller, availableActions))
+                            model.actionSelectedChannel.receive()
+                        }
                     action
                 }
             }

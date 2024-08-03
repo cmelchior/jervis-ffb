@@ -4,6 +4,7 @@ import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.EnterProcedure
 import dk.ilios.jervis.fsm.ActionNode
@@ -16,6 +17,7 @@ import dk.ilios.jervis.fsm.ProcedureState
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.reports.LogEntry
+import dk.ilios.jervis.reports.ReportHandleAction
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.safeTryEmit
@@ -30,7 +32,7 @@ class GameController(
     rules: Rules,
     state: Game,
 ) {
-    private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 0, extraBufferCapacity = 10_000)
+    private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 0, extraBufferCapacity = 20_000)
     val logsEvents: Flow<ListEvent> = _logsEvents
     val logs: MutableList<LogEntry> = mutableListOf()
     val rules: Rules = rules
@@ -56,18 +58,21 @@ class GameController(
             }
 
             is ActionNode -> {
+                // TODO This logic breaks when reverting state. Figure out a solution
                 val actions = currentNode.getAvailableActions(state, rules)
                 val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}")
                 commands.add(reportAvailableActions)
                 reportAvailableActions.execute(state, this)
                 val selectedAction = actionProvider(this@GameController, actions)
-                val reportSelectedAction = SimpleLogEntry("Selected action: $selectedAction")
-                commands.add(reportSelectedAction)
-                reportSelectedAction.execute(state, this)
-                 val command = currentNode.applyAction(selectedAction, state, rules)
-                commands.add(command)
-                command.execute(state, this)
-                state.notifyUpdate()
+                if (selectedAction != Undo) {
+                    val reportSelectedAction = ReportHandleAction(selectedAction)
+                    commands.add(reportSelectedAction)
+                    reportSelectedAction.execute(state, this)
+                    val command = currentNode.applyAction(selectedAction, state, rules)
+                    commands.add(command)
+                    command.execute(state, this)
+                    state.notifyUpdate()
+                }
             }
 
             is ParentNode -> {
@@ -101,7 +106,7 @@ class GameController(
 
     fun processAction(userAction: GameAction) {
         actionHistory.add(userAction)
-        val reportSelectedAction = SimpleLogEntry("Selected action: $userAction")
+        val reportSelectedAction = ReportHandleAction(userAction)
         commands.add(reportSelectedAction)
         reportSelectedAction.execute(state, this)
         val currentNode: ActionNode = stack.currentNode() as ActionNode
@@ -183,7 +188,8 @@ class GameController(
 
     fun removeLog(entry: LogEntry) {
         if (logs.lastOrNull() == entry) {
-            _logsEvents.safeTryEmit(RemoveEntry(logs.removeLast()))
+            val logEntry = logs.removeLast()
+            _logsEvents.safeTryEmit(RemoveEntry(logEntry))
         } else {
             throw IllegalStateException("Log could not be removed: ${entry.message}")
         }
@@ -223,6 +229,28 @@ class GameController(
         this.replayIndex = -1
     }
 
+    // Revert last action
+    fun revert() {
+        if (replayMode) throw IllegalStateException("Controller is in replay mode. `revert` is only available in manual mode.")
+        if (commands.isEmpty()) return
+        while (commands.last() !is ReportHandleAction && actionHistory.last() != (commands.last() as? ReportHandleAction)?.action) {
+            val i = commands.size - 1
+            val undoCommand = commands[i]
+            undoCommand.undo(state, this)
+            commands.removeLast()
+        }
+//        val reportAction = (commands.last() as ReportHandleAction)
+//        if (actionHistory.last() == reportAction.action) {
+//            error("Action mismatch: ${actionHistory.last()} != ${reportAction.action}")
+//        }
+        commands.removeLast().undo(state, this)
+        actionHistory.removeLast()
+        state.notifyUpdate()
+        // Should we also send out
+
+    }
+
+    // Go backwards in the command history
     fun back(): Boolean {
         checkReplayMode()
         if (replayIndex == 0) {

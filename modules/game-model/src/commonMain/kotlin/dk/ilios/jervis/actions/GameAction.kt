@@ -93,6 +93,9 @@ sealed class DieResult: Number(), GameAction {
 sealed interface GameAction
 
 @Serializable
+data object Undo: GameAction
+
+@Serializable
 data object Continue: GameAction
 @Serializable
 data object Confirm: GameAction
@@ -117,7 +120,7 @@ data class CoinTossResult(val result: Coin): GameAction {
     }
 }
 @Serializable
-class D2Result(override val result: Int): DieResult() {
+data class D2Result(override val result: Int): DieResult() {
     constructor(): this(Random.nextInt(1, 3)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 2
@@ -126,7 +129,7 @@ class D2Result(override val result: Int): DieResult() {
     }
 }
 @Serializable
-class D3Result(override val result: Int): DieResult() {
+data class D3Result(override val result: Int): DieResult() {
     constructor(): this(Random.nextInt(1, 4)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 3
@@ -137,7 +140,7 @@ class D3Result(override val result: Int): DieResult() {
 }
 
 @Serializable
-class D4Result(override val result: Int): DieResult() {
+data class D4Result(override val result: Int): DieResult() {
     constructor(): this(Random.nextInt(1, 5)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 4
@@ -148,7 +151,7 @@ class D4Result(override val result: Int): DieResult() {
 }
 
 @Serializable
-class D6Result(override val result: Int): DieResult() {
+data class D6Result(override val result: Int): DieResult() {
     constructor(): this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 6
@@ -159,7 +162,7 @@ class D6Result(override val result: Int): DieResult() {
 }
 
 @Serializable
-class D8Result(override val result: Int): DieResult() {
+data class D8Result(override val result: Int): DieResult() {
     constructor(): this(Random.nextInt(1, 9)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 8
@@ -170,7 +173,7 @@ class D8Result(override val result: Int): DieResult() {
 }
 
 @Serializable
-class D12Result(override val result: Int): DieResult() {
+data class D12Result(override val result: Int): DieResult() {
     constructor(): this(Random.nextInt(1, 13)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 12
@@ -181,7 +184,7 @@ class D12Result(override val result: Int): DieResult() {
 }
 
 @Serializable
-class D16Result(override val result: Int): DieResult() {
+data class D16Result(override val result: Int): DieResult() {
     constructor(): this(Random.nextInt(1, 17)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 16
@@ -192,7 +195,7 @@ class D16Result(override val result: Int): DieResult() {
 }
 
 @Serializable
-class D20Result(override val result: Int): DieResult() {
+data class D20Result(override val result: Int): DieResult() {
     constructor(): this(Random.nextInt(1, 21)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 20
@@ -203,7 +206,7 @@ class D20Result(override val result: Int): DieResult() {
 }
 
 @Serializable
-class DBlockResult(override val result: Int): DieResult() {
+data class DBlockResult(override val result: Int): DieResult() {
     constructor(): this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
     override val min: Short = 1
     override val max: Short = 6
@@ -215,7 +218,7 @@ class DBlockResult(override val result: Int): DieResult() {
 }
 
 @Serializable
-class DiceResults(val rolls: List<DieResult>): GameAction, List<DieResult> by rolls {
+data class DiceResults(val rolls: List<DieResult>): GameAction, List<DieResult> by rolls {
     constructor(vararg roll: DieResult): this(listOf(*roll))
 }
 @Serializable

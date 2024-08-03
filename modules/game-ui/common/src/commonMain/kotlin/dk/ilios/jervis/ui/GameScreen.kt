@@ -29,7 +29,7 @@ import okio.Path.Companion.toOkioPath
 
 class GameScreenModel(
     val mode: GameMode,
-    menuViewModel: MenuViewModel,
+    val menuViewModel: MenuViewModel,
     controller: GameController? = null
 ): ScreenModel {
     val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
@@ -78,12 +78,13 @@ class GameScreen(val screenModel: GameScreenModel, private val actions: List<Gam
             Random -> RandomModeUiActionFactory(screenModel)
             is Replay -> ReplayModeUiActionFactory(screenModel)
         }
+        screenModel.menuViewModel.uiActionFactory = uiActionFactory
         Screen(
             FieldViewModel(screenModel.controller, uiActionFactory, screenModel.controller.state.field, screenModel.hoverPlayerFlow),
             SidebarViewModel(uiActionFactory, screenModel.controller.state.homeTeam, screenModel.hoverPlayerFlow),
             SidebarViewModel(uiActionFactory, screenModel.controller.state.awayTeam, screenModel.hoverPlayerFlow),
             GameStatusViewModel(screenModel.controller),
-            ReplayViewModel(screenModel.controller),
+            ReplayViewModel(uiActionFactory, screenModel),
             ActionSelectorViewModel(uiActionFactory),
             LogViewModel(screenModel.controller),
             DialogsViewModel(uiActionFactory)

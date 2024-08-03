@@ -30,6 +30,7 @@ class ProcedureState(val procedure: Procedure) {
     override fun toString(): String {
         return "${name()}[${nodes.lastOrNull()?.name()}]"
     }
+
     fun removeLast() {
         nodes.removeLast()
     }

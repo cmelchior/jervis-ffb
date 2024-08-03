@@ -14,6 +14,7 @@ import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
@@ -60,6 +61,7 @@ data class SingleChoiceInputDialog(
                 is RandomPlayersSelected -> "Random players: $action"
                 NoRerollSelected -> "No reroll"
                 is RerollOptionSelected -> action.option.source.rerollDescription
+                Undo -> TODO()
             }
         }
 
