@@ -7,10 +7,12 @@ import dk.ilios.jervis.rules.skills.RegularTeamReroll
 import dk.ilios.jervis.rules.skills.TeamReroll
 
 class SetAvailableTeamRerolls(private val team: Team) : Command {
-
     private var originalRerolls = mutableListOf<TeamReroll>()
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         originalRerolls.addAll(team.rerolls)
         team.rerolls.clear()
         repeat(team.rerollsCountOnRoster) {
@@ -18,7 +20,10 @@ class SetAvailableTeamRerolls(private val team: Team) : Command {
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         team.rerolls.clear()
         team.rerolls.addAll(originalRerolls)
     }

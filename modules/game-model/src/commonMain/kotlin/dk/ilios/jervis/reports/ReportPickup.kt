@@ -6,9 +6,14 @@ import dk.ilios.jervis.model.Player
 
 class ReportPickup(player: Player, target: Int, modifiers: List<DiceModifier>, result: D6Result, success: Boolean) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
-    override val message: String = if (success) {
-        "${player.name} picked up the ball [${result.result} + ${modifiers.fold(0) { acc, mod -> acc + mod.modifier }} >= $target]."
-    } else {
-        "${player.name} failed to pickup the ball [${result.result} + ${modifiers.fold(0) { acc, mod -> acc + mod.modifier }} < $target]."
-    }
+    override val message: String =
+        if (success) {
+            "${player.name} picked up the ball [${result.result} + ${modifiers.fold(
+                0,
+            ) { acc, mod -> acc + mod.modifier }} >= $target]."
+        } else {
+            "${player.name} failed to pickup the ball [${result.result} + ${modifiers.fold(
+                0,
+            ) { acc, mod -> acc + mod.modifier }} < $target]."
+        }
 }

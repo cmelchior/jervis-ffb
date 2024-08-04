@@ -10,33 +10,46 @@ import kotlin.reflect.KMutableProperty1
  */
 class SetTemporaryState<T>(private val property: KMutableProperty1<Game, T>, private val value: T) : Command {
     var originalValue: T? = null
-    override fun execute(state: Game, controller: GameController) {
+
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         originalValue = property.get(state)
         property.set(state, value)
     }
-    override fun undo(state: Game, controller: GameController) {
+
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         try {
             property.set(state, originalValue!!)
         } catch (ex: Exception) {
             println(ex)
         }
     }
-
 }
 
 class SetRollContext<T>(private val property: KMutableProperty1<Game, T?>, private val value: T) : Command {
     var originalValue: T? = null
-    override fun execute(state: Game, controller: GameController) {
+
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         originalValue = property.get(state)
         property.set(state, value)
     }
-    override fun undo(state: Game, controller: GameController) {
+
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         try {
             property.set(state, originalValue)
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             println(ex)
         }
     }
-
 }
-

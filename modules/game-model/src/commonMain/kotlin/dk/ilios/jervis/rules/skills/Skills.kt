@@ -1,21 +1,12 @@
 package dk.ilios.jervis.rules.skills
 
-import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.procedures.BlockDieRoll
-import dk.ilios.jervis.procedures.D6DieRoll
 import dk.ilios.jervis.procedures.DieRoll
 import dk.ilios.jervis.procedures.UseStandardSkillReroll
 import dk.ilios.jervis.procedures.UseTeamReroll
-import dk.ilios.jervis.rules.bb2020.Agility
-import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 public object DiceRoll {
     val BLOCK = DiceRollType.BlockRoll
@@ -24,40 +15,44 @@ public object DiceRoll {
 }
 
 sealed interface DiceRollType {
-    data object ArmourRoll: DiceRollType
-    data object BlockRoll: DiceRollType
-//data object BloodLustRoll: DiceRollType
-//data object BoneHeadRoll: DiceRollType
-    data object CasultyRoll: DiceRollType
+    data object ArmourRoll : DiceRollType
+
+    data object BlockRoll : DiceRollType
+
+// data object BloodLustRoll: DiceRollType
+// data object BoneHeadRoll: DiceRollType
+    data object CasultyRoll : DiceRollType
+
     data object CatchRoll : DiceRollType
 
-    //data object DodgeRoll: DiceRollType
-//data object FoulRoll: DiceRollType
-//data object HypnoticGazeRoll: DiceRollType
-//data object InjuryRoll: DiceRollType
-//data object InterceptRoll: DiceRollType
-//data object KickOffTableRoll: DiceRollType
-//data object LonerRoll: DiceRollType
-//data object PassRoll: DiceRollType
-data object PickUpRoll: DiceRollType
-//data object ReallyStupidRoll: DiceRollType
-//data object RegenerationRoll: DiceRollType
-    data object ProRoll : DiceRollType
-//data object RushRoll: DiceRollType
-//data object TakeRootRoll: DiceRollType
-//data object ThrowTeamMateRoll: DiceRollType
-    data object WeatherRoll: DiceRollType
-//data object WildAnimalRoll: DiceRollType
-//data class CustomRoll(val id: String): DiceRollType
+    // data object DodgeRoll: DiceRollType
+// data object FoulRoll: DiceRollType
+// data object HypnoticGazeRoll: DiceRollType
+// data object InjuryRoll: DiceRollType
+// data object InterceptRoll: DiceRollType
+// data object KickOffTableRoll: DiceRollType
+// data object LonerRoll: DiceRollType
+// data object PassRoll: DiceRollType
+    data object PickUpRoll : DiceRollType
 
+// data object ReallyStupidRoll: DiceRollType
+// data object RegenerationRoll: DiceRollType
+    data object ProRoll : DiceRollType
+
+// data object RushRoll: DiceRollType
+// data object TakeRootRoll: DiceRollType
+// data object ThrowTeamMateRoll: DiceRollType
+    data object WeatherRoll : DiceRollType
+// data object WildAnimalRoll: DiceRollType
+// data class CustomRoll(val id: String): DiceRollType
 }
 
 enum class TeamRerollDuration {
     END_OF_HALF,
-    END_OF_DRIVE
+    END_OF_DRIVE,
 }
 
-sealed interface TeamReroll: RerollSource {
+sealed interface TeamReroll : RerollSource {
     val carryOverIntoOvertime: Boolean
     val isTemporary: Boolean
     override val rerollProcedure: Procedure
@@ -66,7 +61,7 @@ sealed interface TeamReroll: RerollSource {
     override fun canReroll(
         type: DiceRollType,
         value: List<DieRoll<*, *>>,
-        wasSuccess: Boolean?
+        wasSuccess: Boolean?,
     ): Boolean {
         // TODO Some types cannot be rerolled
         return value.all { it.rerollSource == null }
@@ -75,20 +70,20 @@ sealed interface TeamReroll: RerollSource {
     override fun calculateRerollOptions(
         type: DiceRollType,
         value: List<DieRoll<*, *>>,
-        wasSuccess: Boolean?
+        wasSuccess: Boolean?,
     ): List<DiceRerollOption> {
         return listOf(DiceRerollOption(this, value))
     }
 }
 
-class RegularTeamReroll(val team: Team): TeamReroll {
+class RegularTeamReroll(val team: Team) : TeamReroll {
     override val carryOverIntoOvertime: Boolean = true
     override val isTemporary: Boolean = false
     override val rerollDescription: String = "Team reroll"
     override var rerollUsed: Boolean = false
 }
 
-class LeaderTeamReroll(val player: Player): TeamReroll {
+class LeaderTeamReroll(val player: Player) : TeamReroll {
     override val carryOverIntoOvertime: Boolean = true
     override val isTemporary: Boolean = true
     override val rerollDescription: String = "Team reroll (Leader)"
@@ -100,19 +95,39 @@ interface RerollSource {
     val rerollDescription: String
     var rerollUsed: Boolean
     val rerollProcedure: Procedure
-    fun canReroll(type: DiceRollType, value: List<DieRoll<*, *>>, wasSuccess: Boolean? = null): Boolean
-    fun calculateRerollOptions(type: DiceRollType, value: List<DieRoll<*, *>>, wasSuccess: Boolean? = null): List<DiceRerollOption>
-    fun calculateRerollOptions(type: DiceRollType, value: DieRoll<*, *>, wasSuccess: Boolean): List<DiceRerollOption> = calculateRerollOptions(type, listOf(value), wasSuccess)
+
+    fun canReroll(
+        type: DiceRollType,
+        value: List<DieRoll<*, *>>,
+        wasSuccess: Boolean? = null,
+    ): Boolean
+
+    fun calculateRerollOptions(
+        type: DiceRollType,
+        value: List<DieRoll<*, *>>,
+        wasSuccess: Boolean? = null,
+    ): List<DiceRerollOption>
+
+    fun calculateRerollOptions(
+        type: DiceRollType,
+        value: DieRoll<*, *>,
+        wasSuccess: Boolean,
+    ): List<DiceRerollOption> =
+        calculateRerollOptions(
+            type,
+            listOf(value),
+            wasSuccess,
+        )
 }
 
-interface D6StandardSkillReroll: RerollSource {
+interface D6StandardSkillReroll : RerollSource {
     override val rerollProcedure: Procedure
         get() = UseStandardSkillReroll
 
     override fun calculateRerollOptions(
         type: DiceRollType,
         value: List<DieRoll<*, *>>,
-        wasSuccess: Boolean?
+        wasSuccess: Boolean?,
     ): List<DiceRerollOption> {
         // For standard skills
         if (value.size != 1) error("Unsupported number of dice: ${value.joinToString()}")
@@ -124,12 +139,11 @@ interface D6StandardSkillReroll: RerollSource {
 @Serializable
 data class DiceRerollOption(
     val source: RerollSource,
-    val dice: List<DieRoll<*, *>>
+    val dice: List<DieRoll<*, *>>,
 )
 
 @Serializable
 sealed interface Skill {
-
     companion object {
         const val NO_LIMIT = -1
     }
@@ -139,7 +153,7 @@ sealed interface Skill {
         END_OF_TURN,
         END_OF_DRIVE,
         END_OF_HALF,
-        SPECIAL
+        SPECIAL,
     }
 
     val id: String
@@ -161,7 +175,7 @@ interface SkillCategory {
 }
 
 class BB2016Skills {
-//Agility
+// Agility
 //    - Catch
 //    - Diving Catch
 //    - Diving Tackle
@@ -173,7 +187,7 @@ class BB2016Skills {
 //    - Sprint
 //    - Sure Feet
 //
-//General
+// General
 //    - Block
 //    - Dauntless
 //    - Dirty Player
@@ -189,7 +203,7 @@ class BB2016Skills {
 //    - Tackle
 //    - Wrestle
 //
-//Mutations
+// Mutations
 //    - Big Hand
 //    - Claw/Claws
 //    - Disturbing Presence
@@ -201,7 +215,7 @@ class BB2016Skills {
 //    - Two Heads
 //    - Very Long Legs
 //
-//Passing
+// Passing
 //    - Accurate
 //    - Dump-off
 //    - Hail Mary Pass
@@ -210,7 +224,7 @@ class BB2016Skills {
 //    - Pass
 //    - Safe Pass
 //
-//Strength
+// Strength
 //    - Break Tackle
 //    - Grab
 //    - Guard
@@ -221,7 +235,7 @@ class BB2016Skills {
 //    - Strong Arm
 //    - Thick Skull
 //
-//Extraordinary
+// Extraordinary
 //    - Always Hungry
 //    - Bone Head
 //    - Loner
@@ -235,10 +249,9 @@ class BB2016Skills {
 @Serializable
 sealed interface BB2020Skill : Skill
 
-
 enum class BB2020SkillsList {
 //
-//Agility
+// Agility
 //    - Catch
 //    - Diving Catch
 //    - Diving Tackle
@@ -252,7 +265,7 @@ enum class BB2020SkillsList {
 //    - Sprint
 //    - Sure Feet
 //
-//General
+// General
 //    - Block
 //    - Dauntless
 //    - Dirty Player (+1)
@@ -266,7 +279,7 @@ enum class BB2020SkillsList {
 //    - Tackle
 //    - Wrestle
 //
-//Passing
+// Passing
 //    - Accurate
 //    - Cannoneer
 //    - Cloud Burster
@@ -280,7 +293,7 @@ enum class BB2020SkillsList {
 //    - Running Pass
 //    - Safe Pass
 //
-//Strength
+// Strength
 //    - Arm Bar
 //    - Brawler
 //    - Break Tackle
@@ -294,7 +307,7 @@ enum class BB2020SkillsList {
 //    - Strong Arm
 //    - Thick Skull
 //
-//Traits
+// Traits
 //    - Animal Savagery*
 //    - Animosity*
 //    - Always Hungry*

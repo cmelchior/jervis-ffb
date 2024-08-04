@@ -5,10 +5,12 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 
 class SetFanFactor(private val team: Team, private val fanFactor: Int) : Command {
-
     private var originalValue: Int = 0
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         originalValue = team.fanFactor
         team.apply {
             fanFactor = this@SetFanFactor.fanFactor
@@ -16,7 +18,10 @@ class SetFanFactor(private val team: Team, private val fanFactor: Int) : Command
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         team.apply {
             fanFactor = originalValue
             notifyUpdate()

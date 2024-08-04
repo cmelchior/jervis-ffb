@@ -20,9 +20,10 @@ import kotlinx.coroutines.launch
  * For other game modes, this class can just return the appropriate action immediately without involving the user.
  */
 abstract class UiActionFactory(protected val model: GameScreenModel) {
-    val errorHandler = CoroutineExceptionHandler { _, exception ->
-        exception.printStackTrace()
-    }
+    val errorHandler =
+        CoroutineExceptionHandler { _, exception ->
+            exception.printStackTrace()
+        }
     val scope = CoroutineScope(CoroutineName("ActionSelectorScope") + Dispatchers.Default + errorHandler)
     var blockEvents = false
 
@@ -32,9 +33,10 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
     // FieldActions:
     // - Select Player, Select ball, Select location
     // ----
-    protected val  _fieldActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
+    @Suppress("unused")
+    private val _fieldActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
     val fieldActions: Flow<UserInput> = _fieldActions.takeWhile { !blockEvents }
-    protected val _unknownActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
+    private val _unknownActions: MutableSharedFlow<UserInput> = MutableSharedFlow(replay = 1)
     val unknownActions: Flow<UserInput> = _unknownActions.takeWhile { !blockEvents }
     val dialogActions: MutableSharedFlow<UserInputDialog?> = MutableSharedFlow(replay = 1)
     // ----

@@ -8,5 +8,5 @@ data class RangeRuler(
     val throwerId: PlayerId,
     val targetCoordinate: FieldCoordinate,
     val minimumRoll: Int,
-    val throwTeamMate: Boolean
+    val throwTeamMate: Boolean,
 )

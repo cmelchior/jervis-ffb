@@ -24,17 +24,25 @@ import okio.Path
 import java.io.File
 
 sealed interface GameMode
-data object Random: GameMode
-data object Manual: GameMode
-data class Replay(val file: File): GameMode
+
+data object Random : GameMode
+
+data object Manual : GameMode
+
+data class Replay(val file: File) : GameMode
 
 class IntroScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
-
-    fun start(navigator: Navigator, mode: GameMode) {
+    fun start(
+        navigator: Navigator,
+        mode: GameMode,
+    ) {
         navigator.push(GameScreen(GameScreenModel(mode, menuViewModel), emptyList()))
     }
 
-    fun loadGame(navigator: Navigator, file: Path) {
+    fun loadGame(
+        navigator: Navigator,
+        file: Path,
+    ) {
         val (controller, actions) = JervisSerialization.loadFromFile(file)
         navigator.push(GameScreen(GameScreenModel(Manual, menuViewModel, controller), actions))
     }
@@ -54,14 +62,14 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Button(onClick = {
                 screenModel.start(navigator, Manual)
             }) {
                 Text(
                     text = "Start game with manual actions",
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -70,23 +78,23 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
             }) {
                 Text(
                     text = "Start game with random actions",
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                FilePicker(
+                filePicker(
                     "Load Jervis game file",
                     null,
                     "Jervis game file (*.jrvs)",
-                    "jrvs"
+                    "jrvs",
                 ) { filePath ->
                     screenModel.loadGame(navigator, filePath)
                 }
             }) {
                 Text(
                     text = "Load game",
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 )
             }
 
@@ -97,7 +105,7 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
                 }) {
                     Text(
                         text = "Start replay: ${file.name}",
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))

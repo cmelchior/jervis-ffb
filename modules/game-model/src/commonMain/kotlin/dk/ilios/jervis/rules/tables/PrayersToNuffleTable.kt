@@ -23,24 +23,26 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  * Class representing the Prayers To Nuffle Table on page 39 in the rulebook.
  */
 object PrayersToNuffleTable {
-    private val table = mapOf(
-        1 to TableResult("Treacherous Trapdor", TreacherousTrapdoor),
-        2 to TableResult("Friends with the Ref", FriendsWithTheRef),
-        3 to TableResult("Stiletto", Stiletto),
-        4 to TableResult("Iron Man", IronMan),
-        5 to TableResult("Knuckle Dusters", KnuckleDusters),
-        6 to TableResult("Bad Habits", BadHabits),
-        7 to TableResult("Greasy Cleats", GreasyCleats),
-        8 to TableResult("Blessed Statue of Nuffle", BlessedStatueOfNuffle),
-        9 to TableResult("Moles under the Pitch", MolesUnderThePitch),
-        10 to TableResult("Perfect Passing", PerfectPassing),
-        11 to TableResult("Fan Interaction", FanInteraction),
-        12 to TableResult("Necessary Violence", NecessaryViolence),
-        13 to TableResult("Fouling Frenzy", FoulingFrenzy),
-        14 to TableResult("Throw a Rock", ThrowARock),
-        15 to TableResult("Under Scrutiny", UnderScrutiny),
-        16 to TableResult("Intensive Training", IntensiveTraining),
-    )
+    private val table =
+        mapOf(
+            1 to TableResult("Treacherous Trapdor", TreacherousTrapdoor),
+            2 to TableResult("Friends with the Ref", FriendsWithTheRef),
+            3 to TableResult("Stiletto", Stiletto),
+            4 to TableResult("Iron Man", IronMan),
+            5 to TableResult("Knuckle Dusters", KnuckleDusters),
+            6 to TableResult("Bad Habits", BadHabits),
+            7 to TableResult("Greasy Cleats", GreasyCleats),
+            8 to TableResult("Blessed Statue of Nuffle", BlessedStatueOfNuffle),
+            9 to TableResult("Moles under the Pitch", MolesUnderThePitch),
+            10 to TableResult("Perfect Passing", PerfectPassing),
+            11 to TableResult("Fan Interaction", FanInteraction),
+            12 to TableResult("Necessary Violence", NecessaryViolence),
+            13 to TableResult("Fouling Frenzy", FoulingFrenzy),
+            14 to TableResult("Throw a Rock", ThrowARock),
+            15 to TableResult("Under Scrutiny", UnderScrutiny),
+            16 to TableResult("Intensive Training", IntensiveTraining),
+        )
+
     /**
      * Roll on the Prayers of Nuffle table and return the result.
      */

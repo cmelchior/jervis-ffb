@@ -7,5 +7,5 @@ enum class PlayerLevel {
     EMERGING_STAR,
     STAR,
     SUPER_STAR,
-    LEGEND
+    LEGEND,
 }

@@ -39,46 +39,58 @@ import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 
-
 /**
  * Procedure for controlling the active teams turn.
  *
  * See page 42 in the rulebook
  */
 object TeamTurn : Procedure() {
-
     override val initialNode: Node = SelectPlayerOrEndTurn
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? {
         val turn = state.activeTeam.turnData.currentTurn + 1u
         return compositeCommandOf(
             SetCanUseTeamRerolls(true),
             SetTurnNo(state.activeTeam, turn),
             getResetTurnActionCommands(state, rules),
             *getResetAvailablePlayers(state, rules),
-            ReportStartingTurn(state.activeTeam, turn)
+            ReportStartingTurn(state.activeTeam, turn),
         )
     }
 
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? {
         return compositeCommandOf(
             SetTurnOver(false),
             SetCanUseTeamRerolls(false),
-            ReportEndingTurn(state.activeTeam, state.activeTeam.turnData.currentTurn)
+            ReportEndingTurn(state.activeTeam, state.activeTeam.turnData.currentTurn),
         )
     }
 
-    object SelectPlayerOrEndTurn: ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            return listOf(EndTurnWhenReady) + getAvailablePlayers(state,rules).map { SelectPlayer(it) }
+    object SelectPlayerOrEndTurn : ActionNode() {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> {
+            return listOf(EndTurnWhenReady) + getAvailablePlayers(state, rules).map { SelectPlayer(it) }
         }
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when(action) {
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
+            return when (action) {
                 is PlayerSelected -> {
                     compositeCommandOf(
                         SetActivePlayer(action.player),
                         SetPlayerAvailability(action.player, Availability.IS_ACTIVE),
-                        GotoNode(DeselectPlayerOrSelectAction)
+                        GotoNode(DeselectPlayerOrSelectAction),
                     )
                 }
                 EndTurn -> GotoNode(ResolveEndOfTurn)
@@ -87,12 +99,18 @@ object TeamTurn : Procedure() {
         }
     }
 
-    object DeselectPlayerOrSelectAction: ActionNode() {
-        private fun getAvailableSpecialActions(state: Game, rules: Rules): Set<PlayerAction> {
+    object DeselectPlayerOrSelectAction : ActionNode() {
+        private fun getAvailableSpecialActions(
+            state: Game,
+            rules: Rules,
+        ): Set<PlayerAction> {
             return emptySet() // TODO Hypnotic Gaze, Ball & Chain, others?
         }
 
-        private fun getAvailableTeamActions(state: Game, rules: Rules): Set<PlayerAction> {
+        private fun getAvailableTeamActions(
+            state: Game,
+            rules: Rules,
+        ): Set<PlayerAction> {
             val actions = mutableSetOf<PlayerAction>()
             state.activeTeam.turnData.let {
                 if (it.moveActions > 0) actions.add(rules.teamActions.move.action)
@@ -105,45 +123,63 @@ object TeamTurn : Procedure() {
             return actions
         }
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> {
             val teamActions: Set<PlayerAction> = getAvailableTeamActions(state, rules)
             val specialPlayerActions: Set<PlayerAction> = getAvailableSpecialActions(state, rules)
-            val allActions: List<SelectAction> = (teamActions + specialPlayerActions).map {
-                SelectAction(it)
-            }
-            val availableActions: List<SelectAction> = (allActions.firstOrNull { it.action.compulsory }?.let { listOf(it) } ?: allActions)
+            val allActions: List<SelectAction> =
+                (teamActions + specialPlayerActions).map {
+                    SelectAction(it)
+                }
+            val availableActions: List<SelectAction> = (
+                allActions.firstOrNull {
+                    it.action.compulsory
+                }?.let { listOf(it) } ?: allActions
+            )
             val deselectPlayer: List<ActionDescriptor> = listOf(DeselectPlayer(state.activePlayer!!))
             return deselectPlayer + availableActions
         }
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when(action) {
-                PlayerDeselected -> compositeCommandOf(
-                    SetPlayerAvailability(state.activePlayer!!, Availability.AVAILABLE),
-                    SetActivePlayer(null),
-                    GotoNode(SelectPlayerOrEndTurn)
-                )
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
+            return when (action) {
+                PlayerDeselected ->
+                    compositeCommandOf(
+                        SetPlayerAvailability(state.activePlayer!!, Availability.AVAILABLE),
+                        SetActivePlayer(null),
+                        GotoNode(SelectPlayerOrEndTurn),
+                    )
                 is PlayerActionSelected -> {
                     val type: PlayerActionType = action.action.type
-                    val modifyAvailableActions: Command = when(type) {
-                        PlayerActionType.MOVE,
-                        PlayerActionType.PASS,
-                        PlayerActionType.HAND_OFF,
-                        PlayerActionType.BLOCK,
-                        PlayerActionType.BLITZ,
-                        PlayerActionType.FOUL -> {
-                            val currentValue: Int = state.activeTeam.turnData.availableActions[type]!!
-                            // Mark the action as used. Regardless what happens from here, the action
-                            // has been considered "selected" and thus count as used.
-                            SetAvailableActions(state.activeTeam, type, currentValue - 1)
+                    val modifyAvailableActions: Command =
+                        when (type) {
+                            PlayerActionType.MOVE,
+                            PlayerActionType.PASS,
+                            PlayerActionType.HAND_OFF,
+                            PlayerActionType.BLOCK,
+                            PlayerActionType.BLITZ,
+                            PlayerActionType.FOUL,
+                            -> {
+                                val currentValue: Int = state.activeTeam.turnData.availableActions[type]!!
+                                // Mark the action as used. Regardless what happens from here, the action
+                                // has been considered "selected" and thus count as used.
+                                SetAvailableActions(state.activeTeam, type, currentValue - 1)
+                            }
+                            PlayerActionType.SPECIAL ->
+                                INVALID_ACTION(
+                                    action,
+                                ) // TODO Figure out what needs to happen here
                         }
-                        PlayerActionType.SPECIAL -> INVALID_ACTION(action) // TODO Figure out what needs to happen here
-                    }
                     compositeCommandOf(
                         modifyAvailableActions,
                         SetActiveAction(action.action),
                         ReportActionSelected(state.activePlayer!!, action.action),
-                        GotoNode(ActivatePlayer)
+                        GotoNode(ActivatePlayer),
                     )
                 }
                 else -> INVALID_ACTION(action)
@@ -153,18 +189,28 @@ object TeamTurn : Procedure() {
 
     // Activating a player is an implicit step when choosing a player action (see page 42 in the rulebook)
     // However, some skills will modify the behavior of the player, when this happens, so we inj
-    object ActivatePlayer: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+    object ActivatePlayer : ComputationNode() {
+        override fun apply(
+            state: Game,
+            rules: Rules,
+        ): Command {
             // TODO Some rules to consider here: Bone Head
             return compositeCommandOf(
-                GotoNode(ResolveSelectedAction)
+                GotoNode(ResolveSelectedAction),
             )
         }
     }
 
-    object ResolveSelectedAction: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = state.activePlayerAction!!.procedure
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    object ResolveSelectedAction : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ): Procedure = state.activePlayerAction!!.procedure
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return compositeCommandOf(
                 SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
                 SetActivePlayer(null),
@@ -173,20 +219,26 @@ object TeamTurn : Procedure() {
                     GotoNode(ResolveEndOfTurn)
                 } else {
                     GotoNode(SelectPlayerOrEndTurn)
-                }
+                },
             )
         }
     }
 
-    object ResolveEndOfTurn: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+    object ResolveEndOfTurn : ComputationNode() {
+        override fun apply(
+            state: Game,
+            rules: Rules,
+        ): Command {
             // TODO Implement end-of-turn things
             //  - Players stunned at the beginning of the turn are now prone
             return ExitProcedure()
         }
     }
 
-    private fun getResetTurnActionCommands(state: Game, rules: Rules): ResetAvailableTeamActions {
+    private fun getResetTurnActionCommands(
+        state: Game,
+        rules: Rules,
+    ): ResetAvailableTeamActions {
         val moveActions = rules.teamActions.move.availablePrTurn
         val passActions = rules.teamActions.pass.availablePrTurn
         val handOffActions = rules.teamActions.handOff.availablePrTurn
@@ -200,11 +252,14 @@ object TeamTurn : Procedure() {
             handOffActions,
             blockActions,
             blitzActions,
-            foulActions
+            foulActions,
         )
     }
 
-    private fun getAvailablePlayers(state: Game, rules: Rules): List<Player> {
+    private fun getAvailablePlayers(
+        state: Game,
+        rules: Rules,
+    ): List<Player> {
         return state.activeTeam
             .filter {
                 it.available == Availability.AVAILABLE
@@ -212,7 +267,10 @@ object TeamTurn : Procedure() {
             .filter { it.state == PlayerState.STANDING || it.state == PlayerState.PRONE } // Only Standing/Prone players
     }
 
-    private fun getResetAvailablePlayers(state: Game, rules: Rules): Array<SetPlayerAvailability> {
+    private fun getResetAvailablePlayers(
+        state: Game,
+        rules: Rules,
+    ): Array<SetPlayerAvailability> {
         // TODO Is there anyone who should not be made available? I.e. Stunned players will be turned KO
         return state.activeTeam.map {
             if (it.location.isOnField(rules) && (it.state == PlayerState.STANDING || it.state == PlayerState.PRONE)) {

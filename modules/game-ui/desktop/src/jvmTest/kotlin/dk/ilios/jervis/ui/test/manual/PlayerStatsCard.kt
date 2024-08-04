@@ -18,9 +18,7 @@ import dk.ilios.jervis.ui.viewmodel.FieldViewModel
 import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
 import org.junit.Test
 
-
 class PlayerStatsCard {
-
     @Test
     fun run() {
         val left = TestDummy.leftSidebar
@@ -44,11 +42,17 @@ class PlayerStatsCard {
 }
 
 @Composable
-private fun PlayerStatsContent(leftDugout: SidebarViewModel, rightDugout: SidebarViewModel, field: FieldViewModel) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .aspectRatio((152.42f+782f+152.42f)/452f),
-        verticalAlignment = Alignment.Top
+private fun PlayerStatsContent(
+    leftDugout: SidebarViewModel,
+    rightDugout: SidebarViewModel,
+    field: FieldViewModel,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .aspectRatio((152.42f + 782f + 152.42f) / 452f),
+        verticalAlignment = Alignment.Top,
     ) {
         Sidebar(leftDugout, Modifier.weight(152.42f))
         Field(field, Modifier.weight(782f))

@@ -22,7 +22,6 @@ data class Team(
     @SerialName("playerArray")
     val players: Array<Player>,
     val specialRules: Set<SpecialRule>,
-    val roster: Roster
+    val roster: Roster,
 //    val fInducementSet: InducementSet? = null
-) {
-}
+)

@@ -16,7 +16,6 @@ import kotlinx.serialization.Transient
 import kotlin.properties.Delegates
 
 class Game(homeTeam: Team, awayTeam: Team, field: Field) {
-
     init {
         homeTeam.setGameReference(this)
         awayTeam.setGameReference(this)
@@ -61,18 +60,18 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var pitchInvasionAwayTeamPlayersAffected: Int = 0
 
     // How many different types of rolls are there that might be modified by skills etc
-        // Go-For-It (Rushing)
-        // Dodge
-        // Stand Up
-        // Pick Up Ball
-        // Catch Ball
-        // Hand-Off
-        // Pass
-        //
-        // Block
-        // Armor Roll
-        // Injury Roll
-        //
+    // Go-For-It (Rushing)
+    // Dodge
+    // Stand Up
+    // Pick Up Ball
+    // Catch Ball
+    // Hand-Off
+    // Pass
+    //
+    // Block
+    // Armor Roll
+    // Injury Roll
+    //
 
     var blockContext: BlockContext? = null
 
@@ -91,7 +90,7 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
         get() = this.field[ball.location]
 
     fun getPlayerById(id: PlayerId): Player? {
-        return homeTeam.firstOrNull { it.id == id } ?: awayTeam.firstOrNull { it.id == id}
+        return homeTeam.firstOrNull { it.id == id } ?: awayTeam.firstOrNull { it.id == id }
     }
 
     fun swapKickingTeam() {

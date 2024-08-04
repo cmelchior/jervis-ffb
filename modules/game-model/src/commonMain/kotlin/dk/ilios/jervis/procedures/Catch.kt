@@ -18,8 +18,7 @@ import dk.ilios.jervis.reports.ReportCatch
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
-
-enum class CatchModifier(override val modifier: Int, override val description: String): DiceModifier {
+enum class CatchModifier(override val modifier: Int, override val description: String) : DiceModifier {
     CONVERT_DEFLECTION(-1, "Deflection"),
     BOUNCING(-1, "Bouncing ball"),
     THROW_IN(-1, "Throw-in"),
@@ -27,16 +26,16 @@ enum class CatchModifier(override val modifier: Int, override val description: S
     DEVIATED(-1, "Deviated"),
     MARKED(-1, "Marked"),
     DISTURBING_PRESENCE(-1, "Disturbing Presence"),
-    POURING_RAIN(-1, "Pouring Rain")
+    POURING_RAIN(-1, "Pouring Rain"),
 }
 
 data class CatchRollContext(
     val catchingPlayer: Player,
     val diceRollTarget: Int,
-    val modifiers: List<DiceModifier>
+    val modifiers: List<DiceModifier>,
 ) {
     // The sum of modifiers
-    fun diceModifier(): Int = modifiers.fold(0) { acc: Int, el: DiceModifier ->  acc + el.modifier }
+    fun diceModifier(): Int = modifiers.fold(0) { acc: Int, el: DiceModifier -> acc + el.modifier }
 }
 
 data class CatchRollResultContext(
@@ -44,7 +43,7 @@ data class CatchRollResultContext(
     val target: Int,
     val modifiers: List<DiceModifier>,
     val roll: D6DieRoll,
-    val success: Boolean
+    val success: Boolean,
 ) {
     val rerolled: Boolean = roll.rerollSource != null && roll.rerolledResult != null
 }
@@ -54,9 +53,13 @@ data class CatchRollResultContext(
  *
  * This can be used as a placeholder during development or testing.
  */
-object Catch: Procedure() {
+object Catch : Procedure() {
     override val initialNode: Node = RollToCatch
-    override fun isValid(state: Game, rules: Rules) {
+
+    override fun isValid(
+        state: Game,
+        rules: Rules,
+    ) {
         super.isValid(state, rules)
         // Check that this is only called on a standing player with tacklezones
         val ballLocation = state.ball.location
@@ -67,7 +70,11 @@ object Catch: Procedure() {
             INVALID_GAME_STATE("Player is not eligible for catching the ball at: $ballLocation")
         }
     }
-    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command {
         // Determine target and modifiers for the Catch roll
         val catchingPlayer = state.field[state.ball.location].player!!
         val diceRollTarget = catchingPlayer.agility
@@ -82,37 +89,55 @@ object Catch: Procedure() {
         rules.addMarkedModifiers(state, catchingPlayer.team, state.ballSquare, modifiers)
         val rollContext = CatchRollContext(catchingPlayer, diceRollTarget, modifiers)
         return compositeCommandOf(
-            SetRollContext(Game::catchRollContext, rollContext)
+            SetRollContext(Game::catchRollContext, rollContext),
         )
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object RollToCatch: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = CatchRoll
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    object RollToCatch : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ): Procedure = CatchRoll
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             val result = state.catchRollResultContext!!
             return if (result.success) {
                 compositeCommandOf(
                     SetBallState.carried(result.catchingPlayer),
                     ReportCatch(result.catchingPlayer, result.target, result.modifiers, result.roll.result, true),
-                    ExitProcedure()
+                    ExitProcedure(),
                 )
             } else {
                 compositeCommandOf(
                     SetBallState.bouncing(),
                     ReportCatch(result.catchingPlayer, result.target, result.modifiers, result.roll.result, false),
-                    GotoNode(CatchFailed)
+                    GotoNode(CatchFailed),
                 )
             }
         }
     }
 
-    object CatchFailed: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    object CatchFailed : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ): Procedure = Bounce
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return compositeCommandOf(
                 state.activePlayer?.let { SetTurnOver(true) },
-                ExitProcedure() // TODO Not 100% sure what to do here?
+                ExitProcedure(), // TODO Not 100% sure what to do here?
             )
         }
     }

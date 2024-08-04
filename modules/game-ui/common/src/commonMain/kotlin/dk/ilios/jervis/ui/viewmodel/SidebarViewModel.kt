@@ -21,7 +21,8 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
 enum class SidebarView {
-    RESERVES, INJURIES
+    RESERVES,
+    INJURIES,
 }
 
 class SidebarViewModel(
@@ -30,7 +31,7 @@ class SidebarViewModel(
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
 ) {
     // Image is 145f/430f, but we need to stretch to make it fit the field image.
-    val aspectRatio: Float = 152.42f/452f
+    val aspectRatio: Float = 152.42f / 452f
 
     private val _view = MutableStateFlow(SidebarView.RESERVES)
     private val _reserveCount = MutableStateFlow<Int?>(null)
@@ -44,22 +45,25 @@ class SidebarViewModel(
     // Player being hovered over.
     // All of these will be shown on the away team location, except when hovering over
     // the away team dugout, which should be shown in the home team
-    fun hoverPlayer(): Flow<UiPlayerCard?> = hoverPlayerChannel.distinctUntilChanged { old, new ->
-        old?.id == new?.id
-    }.filter { player ->
-        if (player == null) return@filter true
-        when (team.isHomeTeam()) {
-            true -> player.isOnAwayTeam() && player.location is DogOut
-            false -> !(player.isOnAwayTeam() && player.location is DogOut)
+    fun hoverPlayer(): Flow<UiPlayerCard?> =
+        hoverPlayerChannel.distinctUntilChanged { old, new ->
+            old?.id == new?.id
+        }.filter { player ->
+            if (player == null) return@filter true
+            when (team.isHomeTeam()) {
+                true -> player.isOnAwayTeam() && player.location is DogOut
+                false -> !(player.isOnAwayTeam() && player.location is DogOut)
+            }
         }
-    }
-    .distinctUntilChanged()
-    .map { player ->
-        player?.let { UiPlayerCard(it) }
-    }
+            .distinctUntilChanged()
+            .map { player ->
+                player?.let { UiPlayerCard(it) }
+            }
 
     fun view(): StateFlow<SidebarView> = _view
+
     fun reserveCount(): StateFlow<Int?> = _reserveCount
+
     fun reserves(): Flow<List<UiPlayer>> {
         return team.dogoutFlow.map { players: List<Player> ->
             players
@@ -69,17 +73,23 @@ class SidebarViewModel(
             val userInput = e2 as? SelectPlayerInput
             val selectablePlayers = userInput?.actions?.associateBy { (it as PlayerSelected).player } ?: emptyMap()
             e1.map {
-                val selectAction = selectablePlayers[it]?.let {
-                    { uiActionFactory.userSelectedAction(it) }
-                }
+                val selectAction =
+                    selectablePlayers[it]?.let {
+                        { uiActionFactory.userSelectedAction(it) }
+                    }
                 UiPlayer(it, selectAction, onHover = { hoverOver(it) })
             }
         }
     }
+
     fun knockedOut(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+
     fun badlyHurt(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+
     fun seriousInjuries(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+
     fun dead(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+
     fun injuriesCount(): StateFlow<Int?> = _injuriesCount
 
     fun hoverOver(player: Player) {
@@ -89,7 +99,6 @@ class SidebarViewModel(
     init {
         _reserveCount.value = 12
         _injuriesCount.value = 0
-
     }
 
     fun toggleReserves() {

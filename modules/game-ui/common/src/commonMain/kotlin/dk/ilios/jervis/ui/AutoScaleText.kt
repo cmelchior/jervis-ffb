@@ -1,19 +1,21 @@
 package dk.ilios.jervis.ui
 
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 
 // Credit: https://stackoverflow.com/questions/63971569/androidautosizetexttype-in-jetpack-compose
 @Composable
 fun AutoSizeText(
     text: String,
     textStyle: TextStyle,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var scaledTextStyle: TextStyle by remember { mutableStateOf(textStyle) }
     var readyToDraw: Boolean by remember { mutableStateOf(false) }
@@ -34,6 +36,6 @@ fun AutoSizeText(
             } else {
                 readyToDraw = true
             }
-        }
+        },
     )
 }

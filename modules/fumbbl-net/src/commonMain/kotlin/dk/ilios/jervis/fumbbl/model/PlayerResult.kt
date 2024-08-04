@@ -1,6 +1,5 @@
 package dk.ilios.jervis.fumbbl.model
 
-import dk.ilios.jervis.fumbbl.model.change.TeamResultDedicatedFansModifier
 import kotlinx.serialization.Serializable
 
 @Serializable

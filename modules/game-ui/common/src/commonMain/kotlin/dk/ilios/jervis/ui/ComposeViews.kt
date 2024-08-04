@@ -53,13 +53,13 @@ import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
-import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
+import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
 import dk.ilios.jervis.ui.viewmodel.CompositeUserInput
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
@@ -80,18 +80,19 @@ import java.io.InputStream
 import kotlin.random.Random
 
 // Theme
-val debugBorder = BorderStroke(2.dp,Color.Red)
+val debugBorder = BorderStroke(2.dp, Color.Red)
 
 data class FumbblButtonColors(
     private val backgroundColor: Color = Color.Gray,
     private val contentColor: Color = Color.White,
     private val disabledBackgroundColor: Color = Color.DarkGray,
-    private val disabledContentColor: Color = Color.White
+    private val disabledContentColor: Color = Color.White,
 ) : ButtonColors {
     @Composable
     override fun backgroundColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) backgroundColor else disabledBackgroundColor)
     }
+
     @Composable
     override fun contentColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) contentColor else disabledContentColor)
@@ -101,21 +102,23 @@ data class FumbblButtonColors(
 @Composable
 fun SectionDivider(modifier: Modifier) {
     Box(
-        modifier = modifier
-            .height(10.dp)
-            .shadow(1.dp)
-            .padding(4.dp)
-            .background(color = Color.White)
+        modifier =
+            modifier
+                .height(10.dp)
+                .shadow(1.dp)
+                .padding(4.dp)
+                .background(color = Color.White),
     )
 }
 
 @Composable
 fun SectionHeader(title: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(152.42f/(452f/15)),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .aspectRatio(152.42f / (452f / 15)),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         SectionDivider(modifier = Modifier.weight(1f))
         Text(
@@ -123,7 +126,6 @@ fun SectionHeader(title: String) {
             color = Color.White,
             maxLines = 1,
             modifier = Modifier.wrapContentSize().shadow(2.dp),
-
         )
         SectionDivider(modifier = Modifier.weight(1f))
     }
@@ -131,24 +133,24 @@ fun SectionHeader(title: String) {
 
 fun loadImageBitmapFromResources(path: String): ImageBitmap {
     // Use the current classloader to get the resource as a stream
-    val inputStream: InputStream = Thread.currentThread().contextClassLoader.getResourceAsStream(path)
-        ?: throw IllegalArgumentException("Resource not found: $path")
+    val inputStream: InputStream =
+        Thread.currentThread().contextClassLoader.getResourceAsStream(path)
+            ?: throw IllegalArgumentException("Resource not found: $path")
 
     // Decode the image data
     val skiaImage = Image.makeFromEncoded(inputStream.readBytes())
     return skiaImage.toComposeImageBitmap()
 }
 
-
 @Composable
 fun SpriteFromSheet() {
     val spriteSheet: ImageBitmap = loadImageBitmapFromResources("icons/cached/players/iconsets/human_lineman.png")
     val skiaImage: BufferedImage = spriteSheet.toAwtImage()
-    val x = (skiaImage.width/28)
-    val y = (skiaImage.height/28)
-    val imageNo = Random.nextInt(x*y)
-    val spriteY: Int = (imageNo/x)*28
-    val spriteX: Int = (imageNo % x)*28
+    val x = (skiaImage.width / 28)
+    val y = (skiaImage.height / 28)
+    val imageNo = Random.nextInt(x * y)
+    val spriteY: Int = (imageNo / x) * 28
+    val spriteX: Int = (imageNo % x) * 28
     println("$x, $y, $imageNo, $spriteX, $spriteY")
     val spriteWidth: Int = 28
     val spriteHeight: Int = 28
@@ -158,11 +160,9 @@ fun SpriteFromSheet() {
         contentDescription = null,
         alignment = Alignment.Center,
         contentScale = ContentScale.Fit,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     )
 }
-
-
 
 @Composable
 fun Screen(
@@ -173,32 +173,40 @@ fun Screen(
     replayController: ReplayViewModel,
     actionSelector: ActionSelectorViewModel,
     logs: LogViewModel,
-    dialogsViewModel: DialogsViewModel
+    dialogsViewModel: DialogsViewModel,
 ) {
     Dialogs(dialogsViewModel)
     Box {
         Column {
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio((152.42f+782f+152.42f)/452f),
-                verticalAlignment = Alignment.Top
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio((152.42f + 782f + 152.42f) / 452f),
+                verticalAlignment = Alignment.Top,
             ) {
                 Sidebar(leftDugout, Modifier.weight(152.42f))
                 Field(field, Modifier.weight(782f))
                 Sidebar(rightDugout, Modifier.weight(152.42f))
             }
-            Row(modifier = Modifier
-                .fillMaxWidth()
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth(),
             ) {
                 GameStatus(gameStatusController, modifier = Modifier.height(48.dp))
             }
-            Row(modifier = Modifier
-                .fillMaxWidth()
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth(),
             ) {
                 ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
             }
-            Row(modifier = Modifier
-                .fillMaxWidth()
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth(),
             ) {
                 LogViewer(logs, modifier = Modifier.width(200.dp))
                 ActionSelector(actionSelector, modifier = Modifier.width(200.dp))
@@ -208,14 +216,19 @@ fun Screen(
 }
 
 @Composable
-fun GameStatus(vm: GameStatusViewModel, modifier: Modifier) {
+fun GameStatus(
+    vm: GameStatusViewModel,
+    modifier: Modifier,
+) {
     val progress by vm.progress().collectAsState(GameProgress(0, 0, 0, ""))
     val half = if (progress.half == 0) "-" else progress.half.toString()
     val drive = if (progress.half == 0) "-" else progress.half.toString()
     val turn = if (progress.half == 0) "-" else progress.half.toString()
-    Box(modifier = modifier
-        .fillMaxSize()
-        .background(color = Color.White)
+    Box(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(color = Color.White),
     ) {
         Row {
             Text("Half: ${ if (progress.half == 0) "-" else progress.half }")
@@ -227,10 +240,16 @@ fun GameStatus(vm: GameStatusViewModel, modifier: Modifier) {
 }
 
 @Composable
-fun ReplayController(vm: ReplayViewModel, actionSelector: ActionSelectorViewModel, modifier: Modifier) {
-    Box(modifier = modifier
-        .fillMaxSize()
-        .background(color = Color.Red)
+fun ReplayController(
+    vm: ReplayViewModel,
+    actionSelector: ActionSelectorViewModel,
+    modifier: Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(color = Color.Red),
     ) {
         Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = { vm.enableReplay() }) {
@@ -273,23 +292,27 @@ fun Dialogs(vm: DialogsViewModel) {
 }
 
 @Composable
-fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
+fun ActionSelector(
+    vm: ActionSelectorViewModel,
+    modifier: Modifier,
+) {
     val inputs: UserInput? by vm.availableActions.collectAsState(null)
     Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .fillMaxSize()
-            .background(color = Color.Blue),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        modifier =
+            modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize()
+                .background(color = Color.Blue),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-
-        val userInputs: List<UserInput> = remember(inputs) {
-            when(inputs) {
-                is CompositeUserInput -> (inputs as CompositeUserInput).inputs
-                null -> emptyList()
-                else -> listOf(inputs!!)
+        val userInputs: List<UserInput> =
+            remember(inputs) {
+                when (inputs) {
+                    is CompositeUserInput -> (inputs as CompositeUserInput).inputs
+                    null -> emptyList()
+                    else -> listOf(inputs!!)
+                }
             }
-        }
 
         userInputs.forEach { input ->
             val actions = input.actions
@@ -302,29 +325,30 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
                         Button(
                             modifier = Modifier.padding(0.dp),
                             contentPadding = PaddingValues(2.dp),
-                            onClick = { vm.actionSelected(action) }
+                            onClick = { vm.actionSelected(action) },
                         ) {
-                            val text = when(action) {
-                                Confirm -> "Confirm"
-                                Continue -> "Continue"
-                                is DieResult -> action.toString()
-                                DogoutSelected -> "DogoutSelected"
-                                EndSetup -> "EndSetup"
-                                EndTurn -> "EndTurn"
-                                is FieldSquareSelected -> action.toString()
-                                is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
-                                is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
-                                is PlayerActionSelected -> "Action: ${action.action.name}"
-                                PlayerDeselected -> "Deselect active player"
-                                EndAction -> "End Action"
-                                Cancel -> "Cancel"
-                                is CoinSideSelected -> "Selected: ${action.side}"
-                                is CoinTossResult -> "Coin flip: ${action.result}"
-                                is RandomPlayersSelected -> "Random players: $action"
-                                NoRerollSelected -> "No reroll"
-                                is RerollOptionSelected -> action.option.toString()
-                                Undo -> TODO()
-                            }
+                            val text =
+                                when (action) {
+                                    Confirm -> "Confirm"
+                                    Continue -> "Continue"
+                                    is DieResult -> action.toString()
+                                    DogoutSelected -> "DogoutSelected"
+                                    EndSetup -> "EndSetup"
+                                    EndTurn -> "EndTurn"
+                                    is FieldSquareSelected -> action.toString()
+                                    is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
+                                    is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
+                                    is PlayerActionSelected -> "Action: ${action.action.name}"
+                                    PlayerDeselected -> "Deselect active player"
+                                    EndAction -> "End Action"
+                                    Cancel -> "Cancel"
+                                    is CoinSideSelected -> "Selected: ${action.side}"
+                                    is CoinTossResult -> "Coin flip: ${action.result}"
+                                    is RandomPlayersSelected -> "Random players: $action"
+                                    NoRerollSelected -> "No reroll"
+                                    is RerollOptionSelected -> action.option.toString()
+                                    Undo -> TODO()
+                                }
                             Text(text, fontSize = 10.sp)
                         }
                     }
@@ -336,15 +360,17 @@ fun ActionSelector(vm: ActionSelectorViewModel, modifier: Modifier) {
 }
 
 @Composable
-fun LogViewer(vm: LogViewModel, modifier: Modifier) {
+fun LogViewer(
+    vm: LogViewModel,
+    modifier: Modifier,
+) {
     val listData by vm.logs.collectAsState(initial = emptyList())
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         items(items = listData, key = { item -> item.hashCode() }) {
             Text(text = it.message)
         }
     }
 }
-

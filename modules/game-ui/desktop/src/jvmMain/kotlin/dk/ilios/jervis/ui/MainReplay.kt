@@ -1,19 +1,22 @@
 package dk.ilios.jervis.ui
 
-import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.rules.BB2020Rules
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
 
-fun main() = application {
-    val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
-    val actionSelectedChannel = Channel<GameAction>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
-    val rules = BB2020Rules
+fun main() =
+    application {
+        val actionRequestChannel =
+            Channel<Pair<GameController, List<ActionDescriptor>>>(
+                capacity = 2,
+                onBufferOverflow = BufferOverflow.SUSPEND,
+            )
+        val actionSelectedChannel = Channel<GameAction>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
+        val rules = BB2020Rules
 //    val fumbbl = FumbblReplay(actionRequestChannel, actionSelectedChannel)
 //    runBlocking {
 //        fumbbl.loadCommands()
@@ -23,4 +26,4 @@ fun main() = application {
 //    Window(onCloseRequest = ::exitApplication) {
 //        App(controller, actionRequestChannel, actionSelectedChannel)
 //    }
-}
+    }

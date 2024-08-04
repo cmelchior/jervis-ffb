@@ -1,10 +1,10 @@
 package dk.ilios.jervis.fumbbl.model
 
-import kotlinx.serialization.Serializable
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer
+import kotlinx.serialization.Serializable
 
-class ModelChangeDataTypeSerializer: FumbblEnumSerializer<ModelChangeDataType>(ModelChangeDataType::class)
+class ModelChangeDataTypeSerializer : FumbblEnumSerializer<ModelChangeDataType>(ModelChangeDataType::class)
 
 @Serializable(with = ModelChangeDataTypeSerializer::class)
 enum class ModelChangeDataType(override val id: String) : FumbblEnum {
@@ -41,10 +41,10 @@ enum class ModelChangeDataType(override val id: String) : FumbblEnum {
     TRACK_NUMBER("trackNumber"),
     TRAP_DOOR("trapDoor"),
     TURN_MODE("turnMode"),
-    WEATHER("weather");
+    WEATHER("weather"),
 }
 
-class ModelChangeIdSerializer: FumbblEnumSerializer<ModelChangeId>(ModelChangeId::class)
+class ModelChangeIdSerializer : FumbblEnumSerializer<ModelChangeId>(ModelChangeId::class)
 
 /**
  * All of these IDs are processed in the `ModelChangeProcessor.java` class
@@ -106,7 +106,10 @@ enum class ModelChangeId(override val id: String, val datatype: ModelChangeDataT
     FIELD_MODEL_SET_PLAYER_COORDINATE("fieldModelSetPlayerCoordinate", ModelChangeDataType.FIELD_COORDINATE),
     FIELD_MODEL_SET_PLAYER_STATE("fieldModelSetPlayerState", ModelChangeDataType.PLAYER_STATE),
     FIELD_MODEL_SET_RANGE_RULER("fieldModelSetRangeRuler", ModelChangeDataType.RANGE_RULER),
-    FIELD_MODEL_SET_TARGET_SELECTION_STATE("fieldModelSetTargetSelectionState", ModelChangeDataType.TARGET_SELECTION_STATE),
+    FIELD_MODEL_SET_TARGET_SELECTION_STATE(
+        "fieldModelSetTargetSelectionState",
+        ModelChangeDataType.TARGET_SELECTION_STATE,
+    ),
     FIELD_MODEL_SET_WEATHER("fieldModelSetWeather", ModelChangeDataType.WEATHER),
     GAME_SET_ADMIN_MODE("gameSetAdminMode", ModelChangeDataType.BOOLEAN),
     GAME_SET_CONCEDED_LEGALLY("gameSetConcededLegally", ModelChangeDataType.BOOLEAN),
@@ -146,9 +149,15 @@ enum class ModelChangeId(override val id: String, val datatype: ModelChangeDataT
     PLAYER_MARK_SKILL_UNUSED("playerMarkSkillUnused", ModelChangeDataType.SKILL),
     PLAYER_RESULT_SET_BLOCKS("playerResultSetBlocks", ModelChangeDataType.INTEGER),
     PLAYER_RESULT_SET_CASUALTIES("playerResultSetCasualties", ModelChangeDataType.INTEGER),
-    PLAYER_RESULT_SET_CASUALTIES_WITH_ADDITIONAL_SPP("playerResultSetCasualtiesWithAdditionalSpp", ModelChangeDataType.INTEGER),
+    PLAYER_RESULT_SET_CASUALTIES_WITH_ADDITIONAL_SPP(
+        "playerResultSetCasualtiesWithAdditionalSpp",
+        ModelChangeDataType.INTEGER,
+    ),
     PLAYER_RESULT_SET_COMPLETIONS("playerResultSetCompletions", ModelChangeDataType.INTEGER),
-    PLAYER_RESULT_SET_COMPLETIONS_WITH_ADDITIONAL_SPP("playerResultSetCompletionsWithAdditionalSpp", ModelChangeDataType.INTEGER),
+    PLAYER_RESULT_SET_COMPLETIONS_WITH_ADDITIONAL_SPP(
+        "playerResultSetCompletionsWithAdditionalSpp",
+        ModelChangeDataType.INTEGER,
+    ),
     PLAYER_RESULT_SET_CURRENT_SPPS("playerResultSetCurrentSpps", ModelChangeDataType.INTEGER),
     PLAYER_RESULT_SET_DEFECTING("playerResultSetDefecting", ModelChangeDataType.BOOLEAN),
     PLAYER_RESULT_SET_FOULS("playerResultSetFouls", ModelChangeDataType.INTEGER),
@@ -194,12 +203,18 @@ enum class ModelChangeId(override val id: String, val datatype: ModelChangeDataT
     TURN_DATA_SET_PLAGUE_DOCTORS("turnDataSetPlagueDoctors", ModelChangeDataType.INTEGER),
     TURN_DATA_SET_KTM_USED("turnDataSetKtmUsed", ModelChangeDataType.BOOLEAN),
     TURN_DATA_SET_RE_ROLLS("turnDataSetReRolls", ModelChangeDataType.INTEGER),
-    TURN_DATA_SET_RE_ROLLS_BRILLIANT_COACHING_ONE_DRIVE("turnDataSetReRollsBrilliantCoachingOneDrive", ModelChangeDataType.INTEGER),
-    TURN_DATA_SET_RE_ROLLS_PUMP_UP_THE_CROWD_ONE_DRIVE("turnDataSetReRollsPumpUpTheCrowdOneDrive", ModelChangeDataType.INTEGER),
+    TURN_DATA_SET_RE_ROLLS_BRILLIANT_COACHING_ONE_DRIVE(
+        "turnDataSetReRollsBrilliantCoachingOneDrive",
+        ModelChangeDataType.INTEGER,
+    ),
+    TURN_DATA_SET_RE_ROLLS_PUMP_UP_THE_CROWD_ONE_DRIVE(
+        "turnDataSetReRollsPumpUpTheCrowdOneDrive",
+        ModelChangeDataType.INTEGER,
+    ),
     TURN_DATA_SET_RE_ROLLS_SINGLE_USE("turnDataSetReRollsSingleUse", ModelChangeDataType.INTEGER),
     TURN_DATA_SET_RE_ROLL_USED("turnDataSetReRollUsed", ModelChangeDataType.BOOLEAN),
     TURN_DATA_SET_TURN_NR("turnDataSetTurnNr", ModelChangeDataType.INTEGER),
     TURN_DATA_SET_TURN_STARTED("turnDataSetTurnStarted", ModelChangeDataType.BOOLEAN),
     TURN_DATA_SET_WANDERING_APOTHECARIES("turnDataSetWanderingApothecaries", ModelChangeDataType.INTEGER),
-    TURN_DATA_SET_COACH_BANNED("turnDataSetCoachBanned", ModelChangeDataType.BOOLEAN);
+    TURN_DATA_SET_COACH_BANNED("turnDataSetCoachBanned", ModelChangeDataType.BOOLEAN),
 }

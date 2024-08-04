@@ -8,7 +8,6 @@ import dk.ilios.jervis.actions.D4Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 
-
 // Easy conversion to dice rolls
 inline val Int.d2: D2Result get() = D2Result(this)
 inline val Int.d3: D3Result get() = D3Result(this)

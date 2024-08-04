@@ -9,7 +9,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class BlockKind {
-    BLOCK, STAB, VOMIT, CHAINSAW
+    BLOCK,
+    STAB,
+    VOMIT,
+    CHAINSAW,
 }
 
 @Serializable
@@ -19,27 +22,27 @@ data class TrapDoor(val coordinate: FieldCoordinate)
 data class DiceDecoration(
     val coordinate: FieldCoordinate,
     val nrOfDice: Int,
-    val blockKind: BlockKind? = null
+    val blockKind: BlockKind? = null,
 )
 
 @Serializable
 data class PlayerMarker(
     val playerId: String,
     val homeText: String?,
-    val awayText: String?
+    val awayText: String?,
 )
 
 @Serializable
 data class FieldMarker(
     val coordinate: List<Int>,
     val homeText: String?,
-    val awayText: String?
+    val awayText: String?,
 )
 
 @Serializable
 data class BloodSpot(
     val injury: Int,
-    val coordinate: List<Int>
+    val coordinate: List<Int>,
 )
 
 @Serializable
@@ -48,7 +51,7 @@ data class PlayerData(
     val playerCoordinate: List<Int>,
     val playerState: Int,
     val cards: List<String>,
-    val cardEffects: List<String>
+    val cardEffects: List<String>,
 )
 
 @Serializable
@@ -69,7 +72,7 @@ data class FieldModel(
     val fieldMarkerArray: MutableList<FieldMarker>,
     val playerMarkerArray: MutableList<PlayerMarker>,
     val playerDataArray: MutableList<PlayerData>,
-    val trapDoors: MutableList<TrapDoor>
+    val trapDoors: MutableList<TrapDoor>,
 ) {
     private val coordinateByPlayerId = mutableMapOf<String, FieldCoordinate>()
     private val playerIdByCoordinate = mutableMapOf<FieldCoordinate, MutableList<String>>()
@@ -78,7 +81,10 @@ data class FieldModel(
 
     private val stateByPlayerId = mutableMapOf<String, PlayerState>()
 
-    fun setPlayerCoordinate(playerId: String, coordinate: FieldCoordinate) {
+    fun setPlayerCoordinate(
+        playerId: String,
+        coordinate: FieldCoordinate,
+    ) {
         coordinateByPlayerId[playerId] = coordinate
     }
 
@@ -86,7 +92,10 @@ data class FieldModel(
         return coordinateByPlayerId[playerId]
     }
 
-    fun setPlayerState(playerId: String, state: PlayerState) {
+    fun setPlayerState(
+        playerId: String,
+        state: PlayerState,
+    ) {
         stateByPlayerId[playerId] = state
     }
 
@@ -94,13 +103,15 @@ data class FieldModel(
         return stateByPlayerId[playerId]
     }
 
-    fun removeSkillEnhancements(player: Player, skill: String?) {
+    fun removeSkillEnhancements(
+        player: Player,
+        skill: String?,
+    ) {
         player.removeEnhancement(skill)
     }
 
     fun addMoveSquare(move: MoveSquare) {
         moveSquareArray.add(move)
-
     }
 
     fun removeMoveSquare(move: MoveSquare) {
@@ -154,11 +165,17 @@ data class FieldModel(
         fieldMarkerArray.remove(marker)
     }
 
-    fun addPrayerEnhancements(playerId: String, prayer: String) {
+    fun addPrayerEnhancements(
+        playerId: String,
+        prayer: String,
+    ) {
         // TODO
     }
 
-    fun removePrayerEnhancement(playerId: String, prayer: String) {
+    fun removePrayerEnhancement(
+        playerId: String,
+        prayer: String,
+    ) {
         // TODO
     }
 
@@ -170,7 +187,10 @@ data class FieldModel(
         trapDoors.remove(trapDoor)
     }
 
-    fun addCard(playerId: String, card: String) {
+    fun addCard(
+        playerId: String,
+        card: String,
+    ) {
         // TODO They also do other stuff. See Java implementation
         if (!cardsByPlayerId.containsKey(playerId)) {
             cardsByPlayerId[playerId] = mutableSetOf()
@@ -178,12 +198,18 @@ data class FieldModel(
         cardsByPlayerId[playerId]!!.add(card)
     }
 
-    fun removeCard(playerId: String, card: String) {
+    fun removeCard(
+        playerId: String,
+        card: String,
+    ) {
         // TODO They also do other stuff. See Java implementation
         cardsByPlayerId[playerId]?.remove(card)
     }
 
-    fun addCardEffect(playerId: String, cardEffect: String) {
+    fun addCardEffect(
+        playerId: String,
+        cardEffect: String,
+    ) {
         // TODO They also do other stuff. See Java implementation
         if (!cardEffectByPlayerId.containsKey(playerId)) {
             cardEffectByPlayerId[playerId] = mutableSetOf()
@@ -191,10 +217,11 @@ data class FieldModel(
         cardEffectByPlayerId[playerId]!!.add(cardEffect)
     }
 
-    fun removeCardEffect(playerId: String, cardEffect: String) {
+    fun removeCardEffect(
+        playerId: String,
+        cardEffect: String,
+    ) {
         // TODO They also do other stuff. See Java implementation
         cardEffectByPlayerId[playerId]?.remove(cardEffect)
     }
-
-
 }

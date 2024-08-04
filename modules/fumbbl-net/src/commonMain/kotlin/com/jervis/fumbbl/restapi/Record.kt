@@ -11,5 +11,5 @@ data class Record(
     val seasons: Int,
     val spent_spp: Int,
     val spp: Int,
-    val touchdowns: Int
+    val touchdowns: Int,
 )

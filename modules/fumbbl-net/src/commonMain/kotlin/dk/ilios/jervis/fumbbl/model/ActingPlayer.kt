@@ -24,7 +24,7 @@ data class ActingPlayer(
     var fumblerooskiePending: Boolean,
     val usedSkills: MutableList<String>,
     val skillsGrantedBy: Map<String, String?>,
-    var playerStateOld: PlayerState?
+    var playerStateOld: PlayerState?,
 ) {
     fun markSkillUsed(skill: String) {
         usedSkills.add(skill)

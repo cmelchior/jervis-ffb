@@ -6,9 +6,14 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommand
 
 interface FumbblAdapter {
     suspend fun start()
+
     suspend fun send(command: ClientCommand)
+
     suspend fun receive(): ServerCommand
+
     suspend fun getGame(): Game
+
     fun close()
+
     val isClosed: Boolean
 }

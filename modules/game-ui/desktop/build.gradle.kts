@@ -42,8 +42,7 @@ kotlin {
     }
 }
 
-
-//kotlin {
+// kotlin {
 //    jvm {
 //        jvmToolchain(17)
 //        withJava()
@@ -57,7 +56,7 @@ kotlin {
 //        }
 //        val jvmMain by getting {
 //            dependencies {
-////                implementation(compose.desktop.currentOs)
+// //                implementation(compose.desktop.currentOs)
 //                implementation(compose.desktop.macos_arm64)
 //                api(compose.preview)
 //                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
@@ -69,7 +68,7 @@ kotlin {
 //            }
 //        }
 //    }
-//}
+// }
 
 compose.desktop {
     application {

@@ -17,19 +17,26 @@ import dk.ilios.jervis.rules.Rules
  * Sometimes using a reroll does not actually allow you to reroll the
  * result.
  *
- */
-
-
-/**
  * Define the rules for using a Pro reroll.
  */
-object UseProReroll: Procedure() {
+object UseProReroll : Procedure() {
     override val initialNode: Node = UseReroll
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object UseReroll: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    object UseReroll : ComputationNode() {
+        override fun apply(
+            state: Game,
+            rules: Rules,
+        ): Command {
             TODO("Not yet implemented")
         }
     }
@@ -38,31 +45,53 @@ object UseProReroll: Procedure() {
 /**
  * Define the rules for using a Loner reroll.
  */
-object UseLonerReroll: Procedure() {
+object UseLonerReroll : Procedure() {
     override val initialNode: Node = UseReroll
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object UseReroll: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    object UseReroll : ComputationNode() {
+        override fun apply(
+            state: Game,
+            rules: Rules,
+        ): Command {
             TODO("Not yet implemented")
         }
     }
 }
 
-object UseTeamReroll: Procedure() {
+object UseTeamReroll : Procedure() {
     override val initialNode: Node = UseReroll
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object UseReroll: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    object UseReroll : ComputationNode() {
+        override fun apply(
+            state: Game,
+            rules: Rules,
+        ): Command {
             val context = state.useRerollContext!!
             val result = RerollResultContext(context.roll, context.source, true)
             return compositeCommandOf(
                 SetRollContext(Game::useRerollResult, result),
                 SetTeamRerollUsed(context.source),
-                ExitProcedure()
+                ExitProcedure(),
             )
         }
     }
@@ -71,19 +100,30 @@ object UseTeamReroll: Procedure() {
 /**
  * Define the rules for using a normal skill reroll.
  */
-object UseStandardSkillReroll: Procedure() {
+object UseStandardSkillReroll : Procedure() {
     override val initialNode: Node = UseReroll
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object UseReroll: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    object UseReroll : ComputationNode() {
+        override fun apply(
+            state: Game,
+            rules: Rules,
+        ): Command {
             val context = state.useRerollContext!!
             val result = RerollResultContext(context.roll, context.source, rerollAllowed = true)
             return compositeCommandOf(
                 SetRollContext(Game::useRerollResult, result),
                 SetSkillRerollUsed(context.source),
-                ExitProcedure()
+                ExitProcedure(),
             )
         }
     }

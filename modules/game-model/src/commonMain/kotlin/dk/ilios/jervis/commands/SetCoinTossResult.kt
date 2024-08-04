@@ -6,12 +6,19 @@ import dk.ilios.jervis.model.Game
 
 class SetCoinTossResult(private val coin: Coin) : Command {
     private var originalCoin: Coin? = null
-    override fun execute(state: Game, controller: GameController) {
+
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         this.originalCoin = state.coinSideSelected
         state.coinResult = coin
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         state.coinResult = originalCoin
     }
 }

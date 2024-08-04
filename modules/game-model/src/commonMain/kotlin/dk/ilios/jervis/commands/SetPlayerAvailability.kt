@@ -7,7 +7,11 @@ import dk.ilios.jervis.model.Player
 
 class SetPlayerAvailability(private val player: Player, val availability: Availability) : Command {
     private lateinit var originalAvailability: Availability
-    override fun execute(state: Game, controller: GameController) {
+
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         this.originalAvailability = player.available
         player.apply {
             available = availability
@@ -15,7 +19,10 @@ class SetPlayerAvailability(private val player: Player, val availability: Availa
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         player.apply {
             available = originalAvailability
             notifyUpdate()

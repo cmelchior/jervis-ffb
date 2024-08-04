@@ -1,13 +1,13 @@
 package dk.ilios.jervis.fumbbl.model
 
-import kotlinx.serialization.Serializable
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer
+import kotlinx.serialization.Serializable
 
-class TurnModeSerializer: FumbblEnumSerializer<TurnMode>(TurnMode::class)
+class TurnModeSerializer : FumbblEnumSerializer<TurnMode>(TurnMode::class)
 
 @Serializable(with = TurnModeSerializer::class)
-enum class TurnMode(override val id: String, val isCheckForActivePlayers: Boolean = false): FumbblEnum {
+enum class TurnMode(override val id: String, val isCheckForActivePlayers: Boolean = false) : FumbblEnum {
     BETWEEN_TURNS("betweenTurns", true),
     BOMB_AWAY_BLITZ("bombAwayBlitz"),
     BOMB_HOME("bombHome"),
@@ -37,7 +37,8 @@ enum class TurnMode(override val id: String, val isCheckForActivePlayers: Boolea
     SETUP("setup"),
     SOLID_DEFENCE("solidDefence"),
     START_GAME("startGame"),
-    WIZARD("wizard");
+    WIZARD("wizard"),
+    ;
 
     fun checkNegatraits(): Boolean {
         return this != KICKOFF_RETURN && this != PASS_BLOCK && !isBombTurn

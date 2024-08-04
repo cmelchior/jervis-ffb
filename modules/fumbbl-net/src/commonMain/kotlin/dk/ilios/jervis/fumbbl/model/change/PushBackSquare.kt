@@ -10,5 +10,5 @@ data class PushBackSquare(
     val direction: Direction,
     val selected: Boolean,
     val locked: Boolean,
-    val homeChoice: Boolean
+    val homeChoice: Boolean,
 )

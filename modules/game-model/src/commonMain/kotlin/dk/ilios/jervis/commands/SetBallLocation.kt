@@ -9,7 +9,11 @@ import dk.ilios.jervis.utils.assert
 
 class SetBallLocation(val location: FieldCoordinate) : Command {
     private lateinit var originalLocation: FieldCoordinate
-    override fun execute(state: Game, controller: GameController) {
+
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         assert(state.ball.state != BallState.CARRIED)
         val rules: Rules = controller.rules
         this.originalLocation = state.ball.location
@@ -28,7 +32,10 @@ class SetBallLocation(val location: FieldCoordinate) : Command {
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         val rules = controller.rules
         if (location.isOnField(rules)) {
             state.field[location].apply {
@@ -38,8 +45,8 @@ class SetBallLocation(val location: FieldCoordinate) : Command {
         }
         if (originalLocation.isOnField(rules)) {
             state.field[originalLocation].apply {
-              ball = state.ball
-              notifyUpdate()
+                ball = state.ball
+                notifyUpdate()
             }
         }
         state.ball.location = originalLocation

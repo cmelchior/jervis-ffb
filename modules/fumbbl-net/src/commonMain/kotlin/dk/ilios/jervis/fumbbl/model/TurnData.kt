@@ -24,5 +24,5 @@ data class TurnData(
     var wanderingApothecaries: Int,
     var rerollPumpUpTheCrowdOneDrive: Int,
     var singleUseReRolls: Int = 0,
-    var plagueDoctors: Int
+    var plagueDoctors: Int,
 )

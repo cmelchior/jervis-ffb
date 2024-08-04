@@ -3,16 +3,19 @@ package dk.ilios.jervis.commands
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ProcedureState
-import dk.ilios.jervis.reports.LogEntry
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.reports.LogEntry
 
-class ExitProcedure: Command {
+class ExitProcedure : Command {
     private lateinit var currentNode: Node
     private var entry2: LogEntry? = null
     private lateinit var entry1: LogEntry
     private lateinit var currentProcedure: ProcedureState
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         currentNode = controller.currentProcedure()!!.currentNode()
         controller.currentProcedure()!!.gotoExit()
 //
@@ -29,7 +32,10 @@ class ExitProcedure: Command {
 //        entry2?.let { controller.addLog(it) }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
 //        entry2?.let { controller.removeLog(it) }
 //        controller.removeLog(entry1)
         controller.currentProcedure()!!.removeLast()

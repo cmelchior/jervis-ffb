@@ -32,5 +32,5 @@ data class Team(
     val status: String,
     val teamValue: Int,
     val treasury: Int,
-    val tvLimit: Int
+    val tvLimit: Int,
 )

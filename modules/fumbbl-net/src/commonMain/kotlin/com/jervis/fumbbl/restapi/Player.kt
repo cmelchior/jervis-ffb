@@ -31,7 +31,7 @@ data class Player(
 //    val skillCosts: List<Any>,
     val skillStatus: SkillStatus,
     val skills: List<String>,
-    val status: Int
+    val status: Int,
 )
 
 object PositionDeserializer : KSerializer<Position> {
@@ -44,7 +44,10 @@ object PositionDeserializer : KSerializer<Position> {
         return json.decodeFromString(Position.serializer(), contentData)
     }
 
-    override fun serialize(encoder: Encoder, value: Position) {
+    override fun serialize(
+        encoder: Encoder,
+        value: Position,
+    ) {
         TODO("Not supported")
     }
 
@@ -57,4 +60,3 @@ object PositionDeserializer : KSerializer<Position> {
         }
     }
 }
-

@@ -4,10 +4,10 @@ import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer
 import kotlinx.serialization.Serializable
 
-class NetCommandIdSerializer: FumbblEnumSerializer<NetCommandId>(NetCommandId::class)
+class NetCommandIdSerializer : FumbblEnumSerializer<NetCommandId>(NetCommandId::class)
 
 @Serializable(with = NetCommandIdSerializer::class)
-enum class NetCommandId(override val id: String): FumbblEnum {
+enum class NetCommandId(override val id: String) : FumbblEnum {
     CLIENT_ACTING_PLAYER("clientActingPlayer"),
     CLIENT_APOTHECARY_CHOICE("clientApothecaryChoice"),
     CLIENT_ARGUE_THE_CALL("clientArgueTheCall"),
@@ -114,7 +114,8 @@ enum class NetCommandId(override val id: String): FumbblEnum {
     SERVER_UPDATE_LOCAL_PLAYER_MARKERS("serverUpdateLocalPlayerMarkers"),
     SERVER_USER_SETTINGS("serverUserSettings"),
     SERVER_VERSION("serverVersion"),
-    SERVER_ZAP_PLAYER("serverZapPlayer");
+    SERVER_ZAP_PLAYER("serverZapPlayer"),
+    ;
 
     fun fromCommandId(id: String) {
         values().firstOrNull { this.id == id } ?: throw IllegalArgumentException("Unrecognized command: $id")

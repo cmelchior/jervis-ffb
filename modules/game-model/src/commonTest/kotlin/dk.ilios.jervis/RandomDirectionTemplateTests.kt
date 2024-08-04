@@ -9,7 +9,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class RandomDirectionTemplateTests {
-
     private val template = RandomDirectionTemplate
 
     @Test

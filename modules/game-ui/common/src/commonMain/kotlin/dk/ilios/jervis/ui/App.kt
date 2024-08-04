@@ -8,12 +8,12 @@ import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 fun App(menuViewModel: MenuViewModel) {
     Navigator(IntroScreen(menuViewModel))
 }
-//fun App(
+// fun App(
 //    controller: GameController,
 //    actionRequestChannel: Channel<Pair<GameController, List<ActionDescriptor>>>,
 //    actionSelectedChannel: Channel<GameAction>,
 //    fumbbl: FumbblReplayAdapter? = null
-//) {
+// ) {
 //    Screen(
 //        FieldViewModel(controller.state.field),
 //        SidebarViewModel(controller.state.homeTeam),
@@ -23,4 +23,4 @@ fun App(menuViewModel: MenuViewModel) {
 //        ActionSelectorViewModel(controller, actionRequestChannel, actionSelectedChannel, fumbbl),
 //        LogViewModel(controller),
 //    )
-//}
+// }

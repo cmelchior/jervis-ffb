@@ -29,7 +29,6 @@ import dk.ilios.jervis.rules.roster.bb2020.SylvanianSpotlight
 import dk.ilios.jervis.rules.roster.bb2020.UnderworldChallenge
 import dk.ilios.jervis.rules.roster.bb2020.WorldsEdgeSuperLeague
 import dk.ilios.jervis.teamBuilder
-import kotlinx.serialization.SerialName
 
 typealias FumbblGame = dk.ilios.jervis.fumbbl.model.Game
 typealias FumbblTeam = dk.ilios.jervis.fumbbl.model.Team
@@ -68,36 +67,44 @@ private fun extractTeam(team: FumbblTeam): dk.ilios.jervis.model.Team {
         this.teamValue = team.teamValue
         this.dedicatedFans = team.dedicatedFans
         team.specialRules.forEach {
-            val specialRule = when(it) {
-                SpecialRule.BADLANDS_BRAWL -> BadlandsBrawl
-                SpecialRule.BRIBERY_AND_CORRUPTION -> BriberyAndCorruption
-                SpecialRule.ELVEN_KINGDOMS_LEAGUE -> ElvenKingdomLeague
-                SpecialRule.FAVOURED_OF_KHORNE -> FavouredOfKhorne
-                SpecialRule.FAVOURED_OF_NURGLE -> FavouredOfNurgle
-                SpecialRule.FAVOURED_OF_SLAANESH -> FavouredOfSlaanesh
-                SpecialRule.FAVOURED_OF_TZEENTCH -> FavouredOfTzeentch
-                SpecialRule.FAVOURED_OF_UNDIVIDED -> FavouredOfChaosUndivided
-                SpecialRule.HALFLING_THIMBLE_CUP -> HalflingThimbleCup
-                SpecialRule.LOW_COST_LINEMEN -> LowCostLinemen
-                SpecialRule.LUSTRIAN_SUPERLEAGUE -> LustrianSuperLeague
-                SpecialRule.MASTERS_OF_UNDEATH -> MastersOfUndeath
-                SpecialRule.OLD_WORLD_CLASSIC -> OldWorldClassic
-                SpecialRule.SYLVANIAN_SPOTLIGHT -> SylvanianSpotlight
-                SpecialRule.UNDERWORLD_CHALLENGE -> UnderworldChallenge
-                SpecialRule.WORLDS_EDGE_SUPERLEAGUE -> WorldsEdgeSuperLeague
-            }
+            val specialRule =
+                when (it) {
+                    SpecialRule.BADLANDS_BRAWL -> BadlandsBrawl
+                    SpecialRule.BRIBERY_AND_CORRUPTION -> BriberyAndCorruption
+                    SpecialRule.ELVEN_KINGDOMS_LEAGUE -> ElvenKingdomLeague
+                    SpecialRule.FAVOURED_OF_KHORNE -> FavouredOfKhorne
+                    SpecialRule.FAVOURED_OF_NURGLE -> FavouredOfNurgle
+                    SpecialRule.FAVOURED_OF_SLAANESH -> FavouredOfSlaanesh
+                    SpecialRule.FAVOURED_OF_TZEENTCH -> FavouredOfTzeentch
+                    SpecialRule.FAVOURED_OF_UNDIVIDED -> FavouredOfChaosUndivided
+                    SpecialRule.HALFLING_THIMBLE_CUP -> HalflingThimbleCup
+                    SpecialRule.LOW_COST_LINEMEN -> LowCostLinemen
+                    SpecialRule.LUSTRIAN_SUPERLEAGUE -> LustrianSuperLeague
+                    SpecialRule.MASTERS_OF_UNDEATH -> MastersOfUndeath
+                    SpecialRule.OLD_WORLD_CLASSIC -> OldWorldClassic
+                    SpecialRule.SYLVANIAN_SPOTLIGHT -> SylvanianSpotlight
+                    SpecialRule.UNDERWORLD_CHALLENGE -> UnderworldChallenge
+                    SpecialRule.WORLDS_EDGE_SUPERLEAGUE -> WorldsEdgeSuperLeague
+                }
             this.specialRules.add(specialRule)
         }
         team.players.forEach { fumbblPlayer: FumbblPlayer ->
-            val fumbblPosition = team.roster.positions.firstOrNull { it.positionId == fumbblPlayer.positionId}
+            val fumbblPosition = team.roster.positions.firstOrNull { it.positionId == fumbblPlayer.positionId }
             if (fumbblPosition == null) {
                 throw IllegalStateException("Could not find matching position: ${fumbblPlayer.positionId}")
             }
             val position = roster.positions.firstOrNull { it.positionSingular == fumbblPosition.positionName }
             if (position == null) {
-                throw IllegalStateException("Could not find position '${fumbblPosition.positionName}' in '${team.roster.rosterName}'")
+                throw IllegalStateException(
+                    "Could not find position '${fumbblPosition.positionName}' in '${team.roster.rosterName}'",
+                )
             }
-            addPlayer(PlayerId(fumbblPlayer.playerId), fumbblPlayer.playerName, PlayerNo(fumbblPlayer.playerNr), position)
+            addPlayer(
+                PlayerId(fumbblPlayer.playerId),
+                fumbblPlayer.playerName,
+                PlayerNo(fumbblPlayer.playerNr),
+                position,
+            )
         }
     }
 }
@@ -105,7 +112,7 @@ private fun extractTeam(team: FumbblTeam): dk.ilios.jervis.model.Team {
 private fun extractRoster(roster: FumbblRoster): Roster {
     // TODO Add logic for building custom rosters, for now
     //  just refer to the original rules
-    return when(roster.rosterName) {
+    return when (roster.rosterName) {
         "Chaos Dwarf" -> ChaosDwarfTeam
         "Human" -> HumanTeam
         "Khorne" -> KhorneTeam

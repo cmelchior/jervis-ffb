@@ -1,8 +1,16 @@
 package dk.ilios.jervis.fumbblcli.gamedownloader
 
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.*
-import okhttp3.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
 import okio.ByteString
 import okio.ByteString.Companion.encodeUtf8
 import java.io.File
@@ -22,7 +30,10 @@ class DownloadGameClient {
     private val response: MutableList<String> = mutableListOf()
     val json = Json { /*prettyPrint = true */ }
 
-    fun run(gameId: String, outputDir: File) {
+    fun run(
+        gameId: String,
+        outputDir: File,
+    ) {
         val gameId = gameId.toLong() //
         outputDir.let {
             if (!it.exists()) {
@@ -30,9 +41,10 @@ class DownloadGameClient {
             }
         }
         start()
-        val message = """
+        val message =
+            """
             {"netCommandId":"clientReplay","gameId":$gameId,"replayToCommandNr":0,"coach":null}
-        """.trimIndent()
+            """.trimIndent()
         val result = sendAndReceiveMessage(message)
         if (result.isSuccess()) {
             val output = File(outputDir, "game-$gameId.json")
@@ -47,41 +59,62 @@ class DownloadGameClient {
         val client = OkHttpClient()
         val request = Request.Builder().url("ws://fumbbl.com:22223/command").build()
 
-        webSocket = client.newWebSocket(request, object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                println("WebSocket connection successful")
-            }
+        webSocket =
+            client.newWebSocket(
+                request,
+                object : WebSocketListener() {
+                    override fun onOpen(
+                        webSocket: WebSocket,
+                        response: Response,
+                    ) {
+                        println("WebSocket connection successful")
+                    }
 
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                println("Received text message: $text")
-            }
+                    override fun onMessage(
+                        webSocket: WebSocket,
+                        text: String,
+                    ) {
+                        println("Received text message: $text")
+                    }
 
-            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-                    val compressedResponse: String = bytes.utf8()
-                    val jsonResponse: String? = LZString.decompressFromUTF16(compressedResponse)
-                    if (jsonResponse != null) {
-                        val responseObj: JsonElement = json.parseToJsonElement(jsonResponse)
-                        val done: Boolean = responseObj.jsonObject["lastCommand"]?.jsonPrimitive?.booleanOrNull == true
-                        val prettyJson: String = json.encodeToString(responseObj)
-                        response.add(prettyJson)
-                        if (done) {
+                    override fun onMessage(
+                        webSocket: WebSocket,
+                        bytes: ByteString,
+                    ) {
+                        val compressedResponse: String = bytes.utf8()
+                        val jsonResponse: String? = LZString.decompressFromUTF16(compressedResponse)
+                        if (jsonResponse != null) {
+                            val responseObj: JsonElement = json.parseToJsonElement(jsonResponse)
+                            val done: Boolean = responseObj.jsonObject["lastCommand"]?.jsonPrimitive?.booleanOrNull == true
+                            val prettyJson: String = json.encodeToString(responseObj)
+                            response.add(prettyJson)
+                            if (done) {
+                                responseLatch.countDown()
+                            }
+                        } else {
+                            error = "Received `null` from the server"
                             responseLatch.countDown()
                         }
-                    } else {
-                        error = "Received `null` from the server"
+                    }
+
+                    override fun onFailure(
+                        webSocket: WebSocket,
+                        t: Throwable,
+                        response: Response?,
+                    ) {
+                        error = "WebSocket connection failure: $response, ${t.message}"
                         responseLatch.countDown()
                     }
-            }
 
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                error = "WebSocket connection failure: $response, ${t.message}"
-                responseLatch.countDown()
-            }
-
-            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                println("WebSocket connection closing")
-            }
-        })
+                    override fun onClosing(
+                        webSocket: WebSocket,
+                        code: Int,
+                        reason: String,
+                    ) {
+                        println("WebSocket connection closing")
+                    }
+                },
+            )
     }
 
     fun sendAndReceiveMessage(message: String): ServerResponse {
@@ -92,7 +125,7 @@ class DownloadGameClient {
             responseLatch.await()
         } catch (e: InterruptedException) {
             error = "Interrupted while waiting for response"
-        } catch(e: Throwable) {
+        } catch (e: Throwable) {
             error = e.stackTraceToString()
         } finally {
             close()

@@ -6,7 +6,6 @@ import dk.ilios.jervis.serialize.JervisSerialization
 import okio.Path
 
 class MenuViewModel {
-
     lateinit var controller: GameController
     lateinit var uiActionFactory: UiActionFactory
 

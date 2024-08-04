@@ -1,13 +1,13 @@
 package dk.ilios.jervis.fumbbl.model
 
-import kotlinx.serialization.Serializable
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer
+import kotlinx.serialization.Serializable
 
-class ReportIdSerializer: FumbblEnumSerializer<ReportId>(ReportId::class)
+class ReportIdSerializer : FumbblEnumSerializer<ReportId>(ReportId::class)
 
 @Serializable(with = ReportIdSerializer::class)
-enum class ReportId(override val id: String): FumbblEnum {
+enum class ReportId(override val id: String) : FumbblEnum {
     ALL_YOU_CAN_EAT("allYouCanEat"),
     ALWAYS_HUNGRY_ROLL("alwaysHungryRoll"),
     ANIMAL_SAVAGERY("animalSavagery"),
@@ -33,7 +33,8 @@ enum class ReportId(override val id: String): FumbblEnum {
     CARDS_BOUGHT("cardsBought"),
     CARD_DEACTIVATED("cardDeactivated"),
     CARD_EFFECT_ROLL("cardEffectRoll"),
-    CATCH_ROLL("catchRoll"),CLOUD_BURSTER("cloudBurster"),
+    CATCH_ROLL("catchRoll"),
+    CLOUD_BURSTER("cloudBurster"),
     CHAINSAW_ROLL("chainsawRoll"),
     COIN_THROW("coinThrow"),
     CONFUSION_ROLL("confusionRoll"),
@@ -149,5 +150,5 @@ enum class ReportId(override val id: String): FumbblEnum {
     WEEPING_DAGGER_ROLL("weepingDaggerRoll"),
     WINNINGS("winnings"),
     WINNINGS_ROLL("winningsRoll"),
-    WIZARD_USE("wizardUse");
+    WIZARD_USE("wizardUse"),
 }

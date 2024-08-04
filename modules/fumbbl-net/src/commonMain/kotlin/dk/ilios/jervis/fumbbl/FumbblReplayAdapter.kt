@@ -70,19 +70,28 @@ import okio.Path.Companion.toPath
 sealed interface JervisActionHolder {
     val expectedNode: Node
 }
+
 data class JervisAction(
     val action: GameAction,
-    override val expectedNode: Node
-): JervisActionHolder
+    override val expectedNode: Node,
+) : JervisActionHolder
+
 data class CalculatedJervisAction(
     val actionFunc: (state: Game, rules: Rules) -> GameAction,
-    override val expectedNode: Node
-): JervisActionHolder
+    override val expectedNode: Node,
+) : JervisActionHolder
 
-fun MutableList<JervisActionHolder>.add(action: GameAction, expectedNode: Node) {
+fun MutableList<JervisActionHolder>.add(
+    action: GameAction,
+    expectedNode: Node,
+) {
     this.add(JervisAction(action, expectedNode))
 }
-fun MutableList<JervisActionHolder>.add(action: (state: Game, rules: Rules) -> GameAction, expectedNode: Node) {
+
+fun MutableList<JervisActionHolder>.add(
+    action: (state: Game, rules: Rules) -> GameAction,
+    expectedNode: Node,
+) {
     this.add(CalculatedJervisAction(action, expectedNode))
 }
 
@@ -113,25 +122,27 @@ class FumbblReplayAdapter(private var replayFile: Path) {
         adapter = FumbblFileReplayAdapter(file)
         val commands: MutableList<ServerCommandReplay> = mutableListOf()
         runBlocking {
-           adapter.start()
+            adapter.start()
             game = adapter.getGame()
             jervisGame = Game.fromFumbblState(game)
             var isDone = false
-            while(!isDone) {
+            while (!isDone) {
                 val cmd = adapter.receive()
-                isDone = when(cmd) {
-                    is ServerCommandReplay -> cmd.lastCommand
-                    else -> false
-                }
+                isDone =
+                    when (cmd) {
+                        is ServerCommandReplay -> cmd.lastCommand
+                        else -> false
+                    }
                 commands.add(cmd)
             }
         }
         adapter.close()
 
         // Normalize replay to a list of model changes
-        modelChangeCommands = commands.flatMap {
-            it.commandArray
-        }
+        modelChangeCommands =
+            commands.flatMap {
+                it.commandArray
+            }
         processCommands(modelChangeCommands)
     }
 
@@ -142,7 +153,7 @@ class FumbblReplayAdapter(private var replayFile: Path) {
     private fun processCommands(commands: List<ServerCommandModelSync>) {
         val jervisCommands: MutableList<JervisActionHolder> = mutableListOf()
         val i = IndexWrapper()
-        while(i.value < commands.size) {
+        while (i.value < commands.size) {
             val cmd: ServerCommandModelSync = commands[i.value]
             handleCommand(cmd, i, commands, jervisCommands)
             cmd.modelChangeList.forEach {
@@ -159,9 +170,8 @@ class FumbblReplayAdapter(private var replayFile: Path) {
         cmd: ServerCommandModelSync,
         i: IndexWrapper,
         commands: List<ServerCommandModelSync>,
-        jervisCommands: MutableList<JervisActionHolder>
+        jervisCommands: MutableList<JervisActionHolder>,
     ) {
-
         if (cmd.reportList.size == 1 && cmd.reportList.first() is PlayerActionReport) {
             // Abort a previous started action if possible (only move right now?).
             // Jervis doesn't support undoing actions right now, so just remove the first action from the action list.
@@ -169,12 +179,15 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                 jervisCommands.removeLast() // Select Move Action
                 jervisCommands.removeLast() // Select Player
             }
-            when((cmd.reportList.first() as PlayerActionReport).playerAction) {
+            when ((cmd.reportList.first() as PlayerActionReport).playerAction) {
                 PlayerAction.MOVE -> {
                     val movingPlayerId = cmd.modelChangeList.filterIsInstance<ActingPlayerSetPlayerId>().first().value!!
                     val movingPlayer = jervisGame.getPlayerById(PlayerId(movingPlayerId.id))!!
                     jervisCommands.add(PlayerSelected(movingPlayer), TeamTurn.SelectPlayerOrEndTurn)
-                    jervisCommands.add({ state, rules -> PlayerActionSelected(rules.teamActions.move.action) }, TeamTurn.DeselectPlayerOrSelectAction)
+                    jervisCommands.add(
+                        { state, rules -> PlayerActionSelected(rules.teamActions.move.action) },
+                        TeamTurn.DeselectPlayerOrSelectAction,
+                    )
                     return
                 }
                 else -> { /* Fall through */ }
@@ -185,11 +198,11 @@ class FumbblReplayAdapter(private var replayFile: Path) {
         // This is often not enough, so each entry might contain addtional that either
         // checks reports or other model changes in the same ModelSync batch in order
         // to figure out exactly what is happening.
-        when(cmd.modelChangeList.firstOrNull()?.id) {
+        when (cmd.modelChangeList.firstOrNull()?.id) {
             ModelChangeId.ACTING_PLAYER_MARK_SKILL_USED -> reportNotHandled(cmd)
             ModelChangeId.ACTING_PLAYER_MARK_SKILL_UNUSED -> reportNotHandled(cmd)
             ModelChangeId.ACTING_PLAYER_SET_CURRENT_MOVE -> {
-                when(game.actingPlayer.playerAction) {
+                when (game.actingPlayer.playerAction) {
                     PlayerAction.MOVE -> {
                         val moves: List<FieldModelSetPlayerCoordinate> = cmd.modelChangeList.filterIsInstance<FieldModelSetPlayerCoordinate>()
                         moves.forEach {
@@ -260,17 +273,17 @@ class FumbblReplayAdapter(private var replayFile: Path) {
             ModelChangeId.FIELD_MODEL_SET_BALL_COORDINATE -> {
                 // End setup and scatter ball
                 if (cmd.reportList.size == 1 && cmd.reportList.first() is KickoffScatterReport) {
-
                     // FUMBBL does not seem to pick a kicking player (probably because it doesn't really
                     // matter), but instead just asks you if you want to use Kick if an eligible player
                     // is present. To mirror this behavior, attempt to find a valid player with Kick
                     // and if not found, just pick a random one
 //                        jervisCommands.add(EndSetup, SetupTeam.SelectPlayerOrEndSetup)
-                    jervisCommands.add({state: Game, rules: Rules ->
+                    jervisCommands.add({ state: Game, rules: Rules ->
                         // TODO This might return 0 players if all are on the LoS
-                        val eligiblePlayers = state.kickingTeam.filter {
-                            it.location.isInCenterField(rules) && !it.location.isOnLineOfScrimmage(rules)
-                        }
+                        val eligiblePlayers =
+                            state.kickingTeam.filter {
+                                it.location.isInCenterField(rules) && !it.location.isOnLineOfScrimmage(rules)
+                            }
                         // TODO: Find a player with Kick (not implemented yet)
                         PlayerSelected(eligiblePlayers.random())
                     }, TheKickOff.NominateKickingPlayer)
@@ -280,22 +293,25 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                     // FUMBBL use a different Random Direction Template than the official rules. Theirs start
                     // with 1 = North and the go clockwise.
                     val endLocation: FumbblCoordinate = report.ballCoordinateEnd
-                    val startingPoint: FumbblCoordinate = endLocation.move(
-                        report.scatterDirection.reverse(),
-                        report.rollScatterDistance
-                    )
+                    val startingPoint: FumbblCoordinate =
+                        endLocation.move(
+                            report.scatterDirection.reverse(),
+                            report.rollScatterDistance,
+                        )
 
                     // TODO Kick not supported yet
                     jervisCommands.add(FieldSquareSelected(startingPoint.x, startingPoint.y), TheKickOff.PlaceTheKick)
                     jervisCommands.add(
                         DiceResults(
-                            RandomDirectionTemplate.getRollForDirection(report.scatterDirection.transformToJervisDirection()),
-                            D6Result(report.rollScatterDistance)
+                            RandomDirectionTemplate.getRollForDirection(
+                                report.scatterDirection.transformToJervisDirection(),
+                            ),
+                            D6Result(report.rollScatterDistance),
                         ),
-                        TheKickOff.TheKickDeviates
+                        TheKickOff.TheKickDeviates,
                     )
                 } else if (
-                // Ball bounce
+                    // Ball bounce
                     cmd.reportList.size == 1 &&
                     cmd.reportList.first() is ScatterBallReport &&
                     cmd.sound == "bounce"
@@ -315,10 +331,10 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                 // Moving a player for setting up a drive
                 // This is also being called when starting the half. Not sure why FUMBBL does this
                 // but we just need to discard these events
-                if (cmd.modelChangeList.size == 2
-                    && cmd.reportList.isEmpty()
-                    && cmd.modelChangeList[1].id == ModelChangeId.FIELD_MODEL_SET_PLAYER_COORDINATE
-                    && game.turnMode == TurnMode.SETUP
+                if (cmd.modelChangeList.size == 2 &&
+                    cmd.reportList.isEmpty() &&
+                    cmd.modelChangeList[1].id == ModelChangeId.FIELD_MODEL_SET_PLAYER_COORDINATE &&
+                    game.turnMode == TurnMode.SETUP
                 ) {
                     val playerId = (cmd.modelChangeList.first() as FieldModelSetPlayerState).key!!
                     var coordinates = (cmd.modelChangeList[1] as FieldModelSetPlayerCoordinate).value!!
@@ -333,11 +349,12 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                     jervisCommands.add(homeRoll, PitchInvasion.RollForHomeTeam)
                     jervisCommands.add(awayRoll, PitchInvasion.RollForAwayTeam)
                     // Split stuns into teams to figure out the result
-                    val (homeStuns, awayStuns) = report.playerIds.map {
-                        jervisGame.getPlayerById(PlayerId(it.id))!!
-                    }.partition { player ->
-                        player.team.isHomeTeam()
-                    }
+                    val (homeStuns, awayStuns) =
+                        report.playerIds.map {
+                            jervisGame.getPlayerById(PlayerId(it.id))!!
+                        }.partition { player ->
+                            player.team.isHomeTeam()
+                        }
                     if (homeStuns.isNotEmpty()) {
                         jervisCommands.add(D3Result(homeStuns.size), PitchInvasion.RollForHomeTeamStuns)
                         jervisCommands.add(RandomPlayersSelected(homeStuns), PitchInvasion.ResolveHomeTeamStuns)
@@ -353,7 +370,7 @@ class FumbblReplayAdapter(private var replayFile: Path) {
 //                                if (jervisCommands.last().expectedNode == TeamTurn.DeselectPlayerOrSelectAction) {
 //                                    jer
 //                                } else {
-                                    jervisCommands.add(EndAction, MoveAction.SelectSquareOrEndAction)
+                                jervisCommands.add(EndAction, MoveAction.SelectSquareOrEndAction)
 //                                }
                             }
                             else -> reportNotHandled(cmd)
@@ -378,13 +395,19 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                     // Handle Coin throw for starting player
                     val throwHeads = report.coinThrowHeads
                     val choseHeads = report.coinChoiceHeads
-                    jervisCommands.add(CoinSideSelected(if (choseHeads) Coin.HEAD else Coin.TAIL), DetermineKickingTeam.SelectCoinSide)
-                    jervisCommands.add(CoinTossResult(if (throwHeads) Coin.HEAD else Coin.TAIL), DetermineKickingTeam.CoinToss)
+                    jervisCommands.add(
+                        CoinSideSelected(if (choseHeads) Coin.HEAD else Coin.TAIL),
+                        DetermineKickingTeam.SelectCoinSide,
+                    )
+                    jervisCommands.add(
+                        CoinTossResult(if (throwHeads) Coin.HEAD else Coin.TAIL),
+                        DetermineKickingTeam.CoinToss,
+                    )
 //                        jervisCommands.add(CoinSideSelected(if (choseHeads) Coin.HEAD else Coin.TAIL), DetermineKickingTeam.C)
                 } else if (report is ReceiveChoiceReport) {
                     // Handle selecting to receive or kick
                     val kicking = !report.receiveChoice
-                    jervisCommands.add(if (kicking) Cancel else Confirm , DetermineKickingTeam.ChooseKickingTeam)
+                    jervisCommands.add(if (kicking) Cancel else Confirm, DetermineKickingTeam.ChooseKickingTeam)
                 } else {
                     reportNotHandled(cmd)
                 }
@@ -505,8 +528,10 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                 when (report) {
                     is KickoffResultReport -> {
                         val roll = report.kickoffRoll
-                        jervisCommands.add(DiceResults(roll.first().d6, roll.last().d6), TheKickOffEvent.RollForKickOffEvent)
-
+                        jervisCommands.add(
+                            DiceResults(roll.first().d6, roll.last().d6),
+                            TheKickOffEvent.RollForKickOffEvent,
+                        )
                     }
                     is WeatherReport -> {
                         val weatherRoll = report.weatherRoll.map { D6Result(it) }
@@ -522,7 +547,6 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                             jervisCommands.add(DiceResults(diceRoll), CatchRoll.RollDie)
                             jervisCommands.add(Continue, CatchRoll.ChooseReRollSource)
                         }
-
                     }
                     else -> reportNotHandled(cmd)
                 }
@@ -534,9 +558,14 @@ class FumbblReplayAdapter(private var replayFile: Path) {
         println("Not handling: $cmd")
     }
 
-    private fun verifyReportSize(expectedSize: Int, command: ServerCommandModelSync) {
+    private fun verifyReportSize(
+        expectedSize: Int,
+        command: ServerCommandModelSync,
+    ) {
         if (command.reportList.reports.size != expectedSize) {
-            throw IllegalStateException("Expected reports of size $expectedSize, was ${command.reportList.reports.size}")
+            throw IllegalStateException(
+                "Expected reports of size $expectedSize, was ${command.reportList.reports.size}",
+            )
         }
     }
 

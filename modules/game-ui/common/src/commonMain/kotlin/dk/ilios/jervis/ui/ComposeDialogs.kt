@@ -30,7 +30,10 @@ import dk.ilios.jervis.ui.viewmodel.SingleChoiceInputDialog
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun UserActionDialog(dialog: SingleChoiceInputDialog, vm: DialogsViewModel) {
+fun UserActionDialog(
+    dialog: SingleChoiceInputDialog,
+    vm: DialogsViewModel,
+) {
     AlertDialog(
         onDismissRequest = {},
         title = { Text(text = dialog.title) },
@@ -38,22 +41,26 @@ fun UserActionDialog(dialog: SingleChoiceInputDialog, vm: DialogsViewModel) {
         confirmButton = {
             dialog.actionDescriptions.forEach { (action, description) ->
                 Button(
-                    onClick = { vm.buttonActionSelected(action) }
+                    onClick = { vm.buttonActionSelected(action) },
                 ) {
                     Text(text = description)
                 }
             }
         },
-        properties = DialogProperties(
-            usePlatformDefaultWidth = true,
-            scrimColor = Color.Black.copy(alpha = 0.6f)
-        )
+        properties =
+            DialogProperties(
+                usePlatformDefaultWidth = true,
+                scrimColor = Color.Black.copy(alpha = 0.6f),
+            ),
     )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun MultipleSelectUserActionDialog(dialog: DiceRollUserInputDialog, vm: DialogsViewModel) {
+fun MultipleSelectUserActionDialog(
+    dialog: DiceRollUserInputDialog,
+    vm: DialogsViewModel,
+) {
     var showDialog by remember(dialog) { mutableStateOf(true) }
     if (showDialog) {
         val selectedRolls = remember(dialog) { mutableStateListOf<DieResult?>(*arrayOfNulls(dialog.dice.size)) }
@@ -71,17 +78,18 @@ fun MultipleSelectUserActionDialog(dialog: DiceRollUserInputDialog, vm: DialogsV
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             el.second.forEach { it: DieResult ->
                                 val isSelected = remember(dialog) { derivedStateOf { selectedRolls[i] == it } }
-                                val buttonColors = ButtonDefaults.buttonColors(
-                                    backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background
-                                )
+                                val buttonColors =
+                                    ButtonDefaults.buttonColors(
+                                        backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background,
+                                    )
                                 Button(
                                     modifier = Modifier.weight(1f),
                                     onClick = { selectedRolls[i] = it },
-                                    colors = buttonColors
+                                    colors = buttonColors,
                                 ) {
                                     Text(
                                         text = it.result.toString(),
-                                        color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground
+                                        color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground,
                                     )
                                 }
                             }
@@ -94,18 +102,18 @@ fun MultipleSelectUserActionDialog(dialog: DiceRollUserInputDialog, vm: DialogsV
                     onClick = {
                         showDialog = false
                         vm.buttonActionSelected(result)
-
                     },
-                    enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null)
+                    enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
                 ) {
                     val suffix by derivedStateOf { if (resultText != null) " - $resultText" else "" }
                     Text("Confirm$suffix")
                 }
             },
-            properties = DialogProperties(
-                usePlatformDefaultWidth = true,
-                scrimColor = Color.Black.copy(alpha = 0.6f)
-            )
+            properties =
+                DialogProperties(
+                    usePlatformDefaultWidth = true,
+                    scrimColor = Color.Black.copy(alpha = 0.6f),
+                ),
         )
     }
 }
@@ -121,7 +129,7 @@ private fun showDiceDialog(
     selectedRolls: SnapshotStateList<DieResult?>,
     vm: DialogsViewModel,
     result: DiceResults,
-    resultText: String?
+    resultText: String?,
 ) {
     var showDialog by remember { mutableStateOf(true) }
     if (showDialog) {
@@ -137,17 +145,18 @@ private fun showDiceDialog(
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             el.second.forEach { it: DieResult ->
                                 val isSelected = remember { derivedStateOf { selectedRolls[i] == it } }
-                                val buttonColors = ButtonDefaults.buttonColors(
-                                    backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background
-                                )
+                                val buttonColors =
+                                    ButtonDefaults.buttonColors(
+                                        backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background,
+                                    )
                                 Button(
                                     modifier = Modifier.weight(1f),
                                     onClick = { selectedRolls[i] = it },
-                                    colors = buttonColors
+                                    colors = buttonColors,
                                 ) {
                                     Text(
                                         text = it.result.toString(),
-                                        color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground
+                                        color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground,
                                     )
                                 }
                             }
@@ -160,18 +169,18 @@ private fun showDiceDialog(
                     onClick = {
                         showDialog = false
                         vm.buttonActionSelected(result)
-
                     },
-                    enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null)
+                    enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
                 ) {
                     val suffix by derivedStateOf { if (resultText != null) " - $resultText" else "" }
                     Text("Confirm$suffix")
                 }
             },
-            properties = DialogProperties(
-                usePlatformDefaultWidth = true,
-                scrimColor = Color.Black.copy(alpha = 0.6f)
-            )
+            properties =
+                DialogProperties(
+                    usePlatformDefaultWidth = true,
+                    scrimColor = Color.Black.copy(alpha = 0.6f),
+                ),
         )
     }
 }

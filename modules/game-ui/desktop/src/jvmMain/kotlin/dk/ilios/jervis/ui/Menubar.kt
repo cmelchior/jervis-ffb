@@ -20,18 +20,18 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
     MenuBar {
         Menu("Developer Tools", mnemonic = 'D') {
             Item("Save Game", onClick = {
-                FilePicker(
+                filePicker(
                     "Save File",
                     "game.jrvs",
                     "Jervis files",
-                    "jrvs"
+                    "jrvs",
                 ) { filePath: Path ->
                     vm.saveGameState(filePath)
                 }
             })
             Item(
                 text = "Undo Action",
-                shortcut = KeyShortcut(Key.Z, meta = true)
+                shortcut = KeyShortcut(Key.Z, meta = true),
             ) {
                 vm.undoAction()
             }
@@ -64,4 +64,3 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
 //        }
     }
 }
-

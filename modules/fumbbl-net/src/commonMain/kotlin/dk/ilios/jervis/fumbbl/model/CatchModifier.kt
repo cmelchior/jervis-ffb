@@ -4,10 +4,10 @@ import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer
 import kotlinx.serialization.Serializable
 
-class CatchModifierSerializer: FumbblEnumSerializer<CatchModifier>(CatchModifier::class)
+class CatchModifierSerializer : FumbblEnumSerializer<CatchModifier>(CatchModifier::class)
 
 @Serializable(with = CatchModifierSerializer::class)
-enum class CatchModifier(override val id: String, val modifier: Int): FumbblEnum {
+enum class CatchModifier(override val id: String, val modifier: Int) : FumbblEnum {
     INACCURATE("Inaccurate Pass, Deviated Ball or Scatter", -1),
     DEFLECTED_PASS("Deflected Pass", -1),
     BLAST_IT("Blast It!", -1),
@@ -30,5 +30,5 @@ enum class CatchModifier(override val id: String, val modifier: Int): FumbblEnum
     DISTURBING_PRESENCE_9("9 Disturbing Presences", -9),
     DISTURBING_PRESENCE_10("10 Disturbing Presences", -10),
     DISTURBING_PRESENCE_11("111 Disturbing Presences", -11),
-    POURING_RAIN("Pouring Rain", -1);
+    POURING_RAIN("Pouring Rain", -1),
 }

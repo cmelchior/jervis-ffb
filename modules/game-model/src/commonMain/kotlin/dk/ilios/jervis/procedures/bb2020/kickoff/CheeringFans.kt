@@ -1,10 +1,10 @@
 package dk.ilios.jervis.procedures.bb2020.kickoff
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.Dice
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.DeleteTemporaryDieRoll
@@ -26,48 +26,73 @@ import dk.ilios.jervis.rules.Rules
  * Procedure for handling the Kick-Off Event: "Cheering Fans" as described on page 41
  * of the rulebook.
  */
-object CheeringFans: Procedure() {
-
+object CheeringFans : Procedure() {
     override val initialNode: Node = KickingTeamRollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? {
         return compositeCommandOf(
             DeleteTemporaryDieRoll(state.kickingTeam),
-            DeleteTemporaryDieRoll(state.receivingTeam)
+            DeleteTemporaryDieRoll(state.receivingTeam),
         )
     }
 
-    object KickingTeamRollDie: ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+    object KickingTeamRollDie : ActionNode() {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
             return checkType<D6Result>(action) {
                 compositeCommandOf(
                     SaveTemporaryDieRoll(state.kickingTeam, it),
-                    GotoNode(ReceivingTeamRollDie)
+                    GotoNode(ReceivingTeamRollDie),
                 )
             }
         }
     }
 
-    object ReceivingTeamRollDie: ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+    object ReceivingTeamRollDie : ActionNode() {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
             return checkType<D6Result>(action) {
                 compositeCommandOf(
                     SaveTemporaryDieRoll(state.receivingTeam, it),
-                    GotoNode(ResolveCheeringFans)
+                    GotoNode(ResolveCheeringFans),
                 )
             }
         }
     }
 
-    object ResolveCheeringFans: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+    object ResolveCheeringFans : ComputationNode() {
+        override fun apply(
+            state: Game,
+            rules: Rules,
+        ): Command {
             val kickingTeamDie = state.kickingTeam.temporaryData.dieRoll.last()
             val receivingTeamDie = state.receivingTeam.temporaryData.dieRoll.last()
             val kickingResult = kickingTeamDie.result + state.kickingTeam.cheerLeaders
@@ -82,9 +107,8 @@ object CheeringFans: Procedure() {
                             receivingTeamDie,
                             state.receivingTeam.cheerLeaders,
                         ),
-                        ExitProcedure()
+                        ExitProcedure(),
                     )
-
                 }
                 kickingResult > receivingResult -> {
                     compositeCommandOf(
@@ -95,7 +119,7 @@ object CheeringFans: Procedure() {
                             receivingTeamDie,
                             state.receivingTeam.cheerLeaders,
                         ),
-                        GotoNode(WinnerRollsOnPrayersOfNuffle(state.kickingTeam))
+                        GotoNode(WinnerRollsOnPrayersOfNuffle(state.kickingTeam)),
                     )
                 }
                 else -> {
@@ -107,24 +131,32 @@ object CheeringFans: Procedure() {
                             receivingTeamDie,
                             state.receivingTeam.cheerLeaders,
                         ),
-                        GotoNode(WinnerRollsOnPrayersOfNuffle(state.receivingTeam))
+                        GotoNode(WinnerRollsOnPrayersOfNuffle(state.receivingTeam)),
                     )
                 }
             }
         }
     }
 
-
-    class WinnerRollsOnPrayersOfNuffle(private val team: Team): ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+    class WinnerRollsOnPrayersOfNuffle(private val team: Team) : ParentNode() {
+        override fun onEnterNode(
+            state: Game,
+            rules: Rules,
+        ): Command? {
 //            if (state.activeTeam != team) {
-////                return SetActiveTeam(team)
+// //                return SetActiveTeam(team)
 //            }
             return null
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RollOnPrayersOfNuffleTable
-        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
+
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ): Procedure = RollOnPrayersOfNuffleTable
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command = ExitProcedure()
     }
-
-
 }

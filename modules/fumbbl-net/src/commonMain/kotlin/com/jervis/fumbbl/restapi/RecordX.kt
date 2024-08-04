@@ -7,5 +7,5 @@ data class RecordX(
     val losses: Int,
     val td: Td,
     val ties: Int,
-    val wins: Int
+    val wins: Int,
 )

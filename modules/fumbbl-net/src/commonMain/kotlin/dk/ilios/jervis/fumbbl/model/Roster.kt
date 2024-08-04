@@ -19,5 +19,5 @@ data class Roster(
     val nameGenerator: String?,
     val maxBigGuys: Int,
     @SerialName("positionArray")
-    val positions: Array<RosterPlayer>
+    val positions: Array<RosterPlayer>,
 )

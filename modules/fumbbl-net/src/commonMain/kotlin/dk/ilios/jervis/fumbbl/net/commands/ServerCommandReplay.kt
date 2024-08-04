@@ -13,13 +13,13 @@ data class ServerCommandReplay(
     override val commandNr: Int,
     val totalNrOfCommands: Int,
     val commandArray: List<ServerCommandModelSync>,
-    val lastCommand: Boolean
-): ServerCommand
+    val lastCommand: Boolean,
+) : ServerCommand
 
-//"netCommandId": "serverAddPlayer",
-//"commandNr": 6,
-//"teamId": "662452",
-//"player": {
+// "netCommandId": "serverAddPlayer",
+// "commandNr": 6,
+// "teamId": "662452",
+// "player": {
 //    "playerKind": "rosterPlayer",
 //    "playerId": "662452S1",
 //    "playerNr": 14,
@@ -49,29 +49,29 @@ data class ServerCommandReplay(
 //    "skillValuesMap": {},
 //    "skillDisplayValuesMap": {},
 //    "usedSkills": []
-//},
-//"playerState": 9,
-//"sendToBoxReason": null,
-//"sendToBoxTurn": 0,
-//"sendToBoxHalf": 0
-//},
+// },
+// "playerState": 9,
+// "sendToBoxReason": null,
+// "sendToBoxTurn": 0,
+// "sendToBoxHalf": 0
+// },
 
 @Serializable
 @SerialName("serverAddPlayer")
 data class ServerCommandAddPlayer(
     override val netCommandId: String,
-    override val commandNr: Int
-): ServerCommand
+    override val commandNr: Int,
+) : ServerCommand
 
-//@Serializable
-//@JsonClassDiscriminator("netCommandId")
-//sealed interface ReplayCommand {
+// @Serializable
+// @JsonClassDiscriminator("netCommandId")
+// sealed interface ReplayCommand {
 //    val netCommandId: NetCommandId
-//}
+// }
 
-//@Serializable
-//@SerialName("serverModelSync")
-//data class ReplayModelChange(
+// @Serializable
+// @SerialName("serverModelSync")
+// data class ReplayModelChange(
 //    val netCommandId: NetCommandId,
 //    val commandNr: Int,
 //    val modelChangeList: ModelChangeList,
@@ -79,53 +79,79 @@ data class ServerCommandAddPlayer(
 //    // val sound: Any?,  // If this could be some specific type, please replace `Any?` with that type
 //    val gameTime: Int,
 //    val turnTime: Int
-//)
+// )
 //
-//@Serializable
-//@SerialName("serverAddPlayer")
-//data class ReplayAddPlayer(
+// @Serializable
+// @SerialName("serverAddPlayer")
+// data class ReplayAddPlayer(
 //    val netCommandId: NetCommandId,
 //    val commandNr: Int,
 //    // Unclear why this is here
-////    val modelChangeList: ModelChangeList,
-////    val reportList: ReportList,
-////    // val sound: Any?,  // If this could be some specific type, please replace `Any?` with that type
-////    val gameTime: Int,
-////    val turnTime: Int
-//)
+// //    val modelChangeList: ModelChangeList,
+// //    val reportList: ReportList,
+// //    // val sound: Any?,  // If this could be some specific type, please replace `Any?` with that type
+// //    val gameTime: Int,
+// //    val turnTime: Int
+// )
 
 @Serializable
 data class ModelChangeList(
     val modelChangeArray: List<ModelChange>,
-): List<ModelChange> {
+) : List<ModelChange> {
     override val size: Int = modelChangeArray.size
+
     override fun get(index: Int): ModelChange = modelChangeArray[index]
+
     override fun isEmpty(): Boolean = modelChangeArray.isEmpty()
+
     override fun iterator(): Iterator<ModelChange> = modelChangeArray.iterator()
+
     override fun listIterator(): ListIterator<ModelChange> = modelChangeArray.listIterator()
+
     override fun listIterator(index: Int): ListIterator<ModelChange> = modelChangeArray.listIterator(index)
-    override fun subList(fromIndex: Int, toIndex: Int): List<ModelChange> = modelChangeArray.subList(fromIndex, toIndex)
-    override fun lastIndexOf(element: ModelChange): Int  = modelChangeArray.lastIndexOf(element)
+
+    override fun subList(
+        fromIndex: Int,
+        toIndex: Int,
+    ): List<ModelChange> = modelChangeArray.subList(fromIndex, toIndex)
+
+    override fun lastIndexOf(element: ModelChange): Int = modelChangeArray.lastIndexOf(element)
+
     override fun indexOf(element: ModelChange): Int = modelChangeArray.indexOf(element)
+
     override fun containsAll(elements: Collection<ModelChange>): Boolean = modelChangeArray.containsAll(elements)
+
     override fun contains(element: ModelChange): Boolean = modelChangeArray.contains(element)
+
     fun contains(changeId: ModelChangeId): Boolean = modelChangeArray.firstOrNull { it.id == changeId } != null
 }
 
 @Serializable
 data class ReportList(
-    val reports: List<Report>
-): List<Report> {
+    val reports: List<Report>,
+) : List<Report> {
     override val size: Int = reports.size
+
     override fun get(index: Int): Report = reports[index]
+
     override fun isEmpty(): Boolean = reports.isEmpty()
+
     override fun iterator(): Iterator<Report> = reports.iterator()
+
     override fun listIterator(): ListIterator<Report> = reports.listIterator()
+
     override fun listIterator(index: Int): ListIterator<Report> = reports.listIterator(index)
-    override fun subList(fromIndex: Int, toIndex: Int): List<Report> = reports.subList(fromIndex, toIndex)
-    override fun lastIndexOf(element: Report): Int  = reports.lastIndexOf(element)
+
+    override fun subList(
+        fromIndex: Int,
+        toIndex: Int,
+    ): List<Report> = reports.subList(fromIndex, toIndex)
+
+    override fun lastIndexOf(element: Report): Int = reports.lastIndexOf(element)
+
     override fun indexOf(element: Report): Int = reports.indexOf(element)
+
     override fun containsAll(elements: Collection<Report>): Boolean = reports.containsAll(elements)
+
     override fun contains(element: Report): Boolean = reports.contains(element)
 }
-

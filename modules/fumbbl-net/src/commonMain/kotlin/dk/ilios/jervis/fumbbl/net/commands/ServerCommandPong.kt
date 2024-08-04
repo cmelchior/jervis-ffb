@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 data class ServerCommandPong(
     override val netCommandId: String,
     val timestamp: Long,
-): NetCommand
+) : NetCommand

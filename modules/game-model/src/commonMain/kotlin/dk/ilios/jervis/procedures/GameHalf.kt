@@ -13,15 +13,18 @@ import dk.ilios.jervis.commands.SetTurnNo
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.reports.ReportStartingDrive
 import dk.ilios.jervis.reports.ReportStartingHalf
-import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 
-object GameHalf: Procedure() {
+object GameHalf : Procedure() {
     override val initialNode: Node = Drive
 
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? {
         val currentHalf = state.halfNo + 1u
         // At start of game use the kicking team from the pre-game sequence, otherwise alternate teams based
         // on who kicked off at last half.
@@ -38,25 +41,35 @@ object GameHalf: Procedure() {
             SetAvailableTeamRerolls(state.awayTeam),
             SetTurnNo(state.homeTeam, 0u),
             SetTurnNo(state.awayTeam, 0u),
-            ReportStartingHalf(currentHalf)
+            ReportStartingHalf(currentHalf),
         )
     }
 
-    object Drive: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = GameDrive
-        override fun onEnterNode(state: Game, rules: Rules): Command {
+    object Drive : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ) = GameDrive
+
+        override fun onEnterNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             val drive: Int = state.driveNo + 1
             return compositeCommandOf(
                 SetDrive(drive),
-                ReportStartingDrive(drive)
+                ReportStartingDrive(drive),
             )
         }
 
-        override fun onExitNode(state: Game, rules: Rules): Command {
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             // Both teams ran out of time
             if (state.homeTeam.turnData.currentTurn == rules.turnsPrHalf && state.awayTeam.turnData.currentTurn == rules.turnsPrHalf) {
                 return compositeCommandOf(
-                    ExitProcedure()
+                    ExitProcedure(),
                 )
             } else {
                 return GotoNode(Drive)
@@ -64,5 +77,8 @@ object GameHalf: Procedure() {
         }
     }
 
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
 }

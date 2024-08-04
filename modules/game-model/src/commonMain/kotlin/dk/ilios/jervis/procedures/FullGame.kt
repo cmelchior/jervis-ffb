@@ -9,21 +9,43 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 
-object FullGame: Procedure() {
+object FullGame : Procedure() {
     override val initialNode: Node = PreGameSequence
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object PreGameSequence: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = PreGame
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    object PreGameSequence : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ) = PreGame
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return GotoNode(RunGame)
         }
     }
 
-    object RunGame: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = GameHalf
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    object RunGame : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ) = GameHalf
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return if (state.halfNo < rules.halfsPrGame) {
                 GotoNode(RunGame)
             } else {
@@ -32,8 +54,15 @@ object FullGame: Procedure() {
         }
     }
 
-    object PostGameSequence: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
-        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
+    object PostGameSequence : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ) = DummyProcedure
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command = ExitProcedure()
     }
 }

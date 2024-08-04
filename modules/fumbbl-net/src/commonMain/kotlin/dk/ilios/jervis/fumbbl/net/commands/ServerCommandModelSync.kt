@@ -12,5 +12,5 @@ data class ServerCommandModelSync(
     val reportList: ReportList,
     val sound: String? = null,
     val gameTime: Long,
-    val turnTime: Long
-): ServerCommand
+    val turnTime: Long,
+) : ServerCommand

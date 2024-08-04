@@ -10,12 +10,12 @@ data class InducementSet(
     val cardsAvailable: MutableList<String>,
     val cardsActive: MutableList<String>,
     val cardsDeactivated: MutableList<String>,
-    val prayers: MutableList<String>
+    val prayers: MutableList<String>,
 )
 
 @Serializable
 data class Inducement(
     val inducementType: String,
     val value: Int,
-    val uses: Int
+    val uses: Int,
 )

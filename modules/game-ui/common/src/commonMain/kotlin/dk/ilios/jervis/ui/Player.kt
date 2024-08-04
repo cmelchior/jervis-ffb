@@ -19,7 +19,11 @@ import dk.ilios.jervis.ui.model.UiPlayer
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun Player(modifier: Modifier, player: UiPlayer, parentHandleClick: Boolean) {
+fun Player(
+    modifier: Modifier,
+    player: UiPlayer,
+    parentHandleClick: Boolean,
+) {
     val playerImage = remember(player) { IconFactory.getImage(player).toComposeImageBitmap() }
     val ballImage = remember { IconFactory.getHeldBallOverlay().toComposeImageBitmap() }
 
@@ -34,9 +38,10 @@ fun Player(modifier: Modifier, player: UiPlayer, parentHandleClick: Boolean) {
         playerModifier = playerModifier.clickable { player.selectAction!!() }
     }
     if (player.onHover != null) {
-        playerModifier = playerModifier.onPointerEvent(eventType = PointerEventType.Enter) {
-            player.onHover.invoke()
-        }
+        playerModifier =
+            playerModifier.onPointerEvent(eventType = PointerEventType.Enter) {
+                player.onHover.invoke()
+            }
     }
 
     Box(modifier = playerModifier) {
@@ -46,7 +51,7 @@ fun Player(modifier: Modifier, player: UiPlayer, parentHandleClick: Boolean) {
             contentDescription = null,
             alignment = Alignment.Center,
             contentScale = ContentScale.Fit,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
         if (player.hasBall()) {
             Image(
@@ -54,7 +59,7 @@ fun Player(modifier: Modifier, player: UiPlayer, parentHandleClick: Boolean) {
                 contentDescription = null,
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }

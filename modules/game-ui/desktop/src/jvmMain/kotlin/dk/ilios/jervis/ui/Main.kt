@@ -12,21 +12,23 @@ import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toPath
 
-fun main() = application {
-    val fumbbl = FumbblReplayAdapter("../../../replays/game-1624379.json".toPath())
-    runBlocking {
-        fumbbl.loadCommands()
-    }
-    val menuViewModel = MenuViewModel()
+fun main() =
+    application {
+        val fumbbl = FumbblReplayAdapter("../../../replays/game-1624379.json".toPath())
+        runBlocking {
+            fumbbl.loadCommands()
+        }
+        val menuViewModel = MenuViewModel()
 
-    val windowState = rememberWindowState(
-        size = DpSize(pixelsToDp(145f+782f+145f), pixelsToDp(800f))
-    )
-    Window(onCloseRequest = ::exitApplication, state = windowState) {
-        WindowMenuBar(menuViewModel)
-        App(menuViewModel)
+        val windowState =
+            rememberWindowState(
+                size = DpSize(pixelsToDp(145f + 782f + 145f), pixelsToDp(800f)),
+            )
+        Window(onCloseRequest = ::exitApplication, state = windowState) {
+            WindowMenuBar(menuViewModel)
+            App(menuViewModel)
+        }
     }
-}
 
 @Composable
 fun pixelsToDp(pixels: Float): Dp {

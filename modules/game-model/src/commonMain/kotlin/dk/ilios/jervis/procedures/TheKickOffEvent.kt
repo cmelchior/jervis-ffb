@@ -1,10 +1,10 @@
 package dk.ilios.jervis.procedures
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.Dice
+import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectPlayer
@@ -20,7 +20,6 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.reports.ReportKickOffEventRoll
 import dk.ilios.jervis.reports.ReportTouchback
@@ -32,13 +31,24 @@ import dk.ilios.jervis.rules.tables.TableResult
  *
  * See page 41 in the rulebook.
  */
-object TheKickOffEvent: Procedure() {
+object TheKickOffEvent : Procedure() {
     override val initialNode: Node = RollForKickOffEvent
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object RollForKickOffEvent: ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    object RollForKickOffEvent : ActionNode() {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6, Dice.D6))
         }
 
@@ -58,52 +68,70 @@ object TheKickOffEvent: Procedure() {
         // Another node: If it is just rules that are unclear, and the touchback is awarded as soon as
         // the ball leaves the kicking teams half, then this also impacts things like Blitz,
         // where you
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
             return checkDiceRoll<D6Result, D6Result>(action) { firstD6, secondD6 ->
                 val result: TableResult = rules.kickOffEventTable.roll(firstD6, secondD6)
                 compositeCommandOf(
                     ReportKickOffEventRoll(firstD6, secondD6, result),
-                    GotoNode(ResolveKickOffTableEvent(result.procedure))
+                    GotoNode(ResolveKickOffTableEvent(result.procedure)),
                 )
             }
         }
     }
 
     class ResolveKickOffTableEvent(private val eventProcedure: Procedure) : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = eventProcedure
-        override fun onExitNode(state: Game, rules: Rules): Command {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ): Procedure = eventProcedure
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return GotoNode(WhatGoesUpMustComeDown)
         }
     }
 
-    object WhatGoesUpMustComeDown: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+    object WhatGoesUpMustComeDown : ComputationNode() {
+        override fun apply(
+            state: Game,
+            rules: Rules,
+        ): Command {
             // If out-of-bounds, award touch back
             // If on an empty square, bounce
             // if landing on a player, they must/can(?) attempt to catch it
             // TODO Ball lands again, and can either be caught, will bounce or result in a
             //  touchback
             val ballLocation: FieldCoordinate = state.ball.location
-            val outOfBounds = ballLocation.isOutOfBounds(rules)
-                    || (state.kickingTeam.isHomeTeam() && ballLocation.isOnHomeSide(rules))
-                    || (state.kickingTeam.isAwayTeam() && ballLocation.isOnAwaySide(rules))
+            val outOfBounds =
+                ballLocation.isOutOfBounds(rules) ||
+                    (state.kickingTeam.isHomeTeam() && ballLocation.isOnHomeSide(rules)) ||
+                    (state.kickingTeam.isAwayTeam() && ballLocation.isOnAwaySide(rules))
             return if (outOfBounds) {
                 GotoNode(TouchBack)
             } else {
                 compositeCommandOf(
                     SetBallState.deviating(),
-                    GotoNode(ResolveBallLanding(ballLocation))
+                    GotoNode(ResolveBallLanding(ballLocation)),
                 )
             }
         }
     }
 
     // Move this logic to its own procedure. It will be needed when blocking, throwing and otherwise.
-    class ResolveBallLanding(private val location: FieldCoordinate): ParentNode() {
+    class ResolveBallLanding(private val location: FieldCoordinate) : ParentNode() {
         var isFieldEmpty: Boolean = true
         var canCatch: Boolean = false
 
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(
+            state: Game,
+            rules: Rules,
+        ): Command? {
             state.abortIfBallOutOfBounds = true // TODO Wrong way to do this
             isFieldEmpty = state.field[location].player != null
             canCatch = state.field[location].player?.let { rules.canCatch(state, it) } ?: false
@@ -115,11 +143,18 @@ object TheKickOffEvent: Procedure() {
                 null
             }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ): Procedure {
             return if (canCatch) Catch else Bounce
         }
 
-        override fun onExitNode(state: Game, rules: Rules): Command {
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             state.abortIfBallOutOfBounds = false
             return if (state.ball.state == BallState.OUT_OF_BOUNDS) {
                 GotoNode(TouchBack)
@@ -129,8 +164,11 @@ object TheKickOffEvent: Procedure() {
         }
     }
 
-    object TouchBack: ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+    object TouchBack : ActionNode() {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> {
             return state.receivingTeam.filter {
                 it.hasTackleZones && it.state == PlayerState.STANDING && it.location.isOnField(rules)
             }.map {
@@ -138,12 +176,16 @@ object TheKickOffEvent: Procedure() {
             }
         }
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
             return checkType<PlayerSelected>(action) {
                 return compositeCommandOf(
                     SetBallState.carried(it.player),
                     ReportTouchback(it.player),
-                    ExitProcedure()
+                    ExitProcedure(),
                 )
             }
         }

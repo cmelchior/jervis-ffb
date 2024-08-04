@@ -36,21 +36,27 @@ import dk.ilios.jervis.ui.viewmodel.FieldDetails
 import dk.ilios.jervis.ui.viewmodel.FieldViewModel
 
 @Composable
-fun Field(vm: FieldViewModel, modifier: Modifier) {
+fun Field(
+    vm: FieldViewModel,
+    modifier: Modifier,
+) {
     val field: FieldDetails by vm.field().collectAsState()
     val flow = remember { vm.observeField() }
     val fieldData: Map<FieldCoordinate, UiFieldSquare> by flow.collectAsState(emptyMap())
 
-    Box(modifier = modifier
-        .fillMaxSize()
-        .aspectRatio(vm.aspectRatio)
+    Box(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .aspectRatio(vm.aspectRatio),
     ) {
         Image(
             painter = painterResource(field.resource),
             contentDescription = field.description,
-            modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.TopStart)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .align(Alignment.TopStart),
         )
         FieldUnderlay(vm)
         FieldData(vm, fieldData)
@@ -59,14 +65,21 @@ fun Field(vm: FieldViewModel, modifier: Modifier) {
 }
 
 @Composable
-fun FieldSquares(vm: FieldViewModel, content: @Composable (modifier: Modifier, x: Int, y: Int) -> Unit) {
-    Column(modifier = Modifier
-        .fillMaxSize()
+fun FieldSquares(
+    vm: FieldViewModel,
+    content: @Composable (modifier: Modifier, x: Int, y: Int) -> Unit,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize(),
     ) {
         repeat(vm.height) { height: Int ->
-            Row(modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .weight(1f),
             ) {
                 repeat(vm.width) { width ->
                     val boxModifier = Modifier.fillMaxSize().weight(1f)
@@ -77,7 +90,6 @@ fun FieldSquares(vm: FieldViewModel, content: @Composable (modifier: Modifier, x
     }
 }
 
-
 @Composable
 fun FieldOverlay(vm: FieldViewModel) {
     val flow = remember { vm.observeOverlays() }
@@ -86,16 +98,17 @@ fun FieldOverlay(vm: FieldViewModel) {
         val number = pathInfo?.pathSteps?.get(FieldCoordinate(x, y))
         val isTarget = pathInfo?.target == FieldCoordinate(x, y)
         val selectPathAction: (() -> Unit)? = pathInfo?.action
-        val clickableModifier = if (isTarget) {
-            modifier.clickable {
-                selectPathAction!!()
+        val clickableModifier =
+            if (isTarget) {
+                modifier.clickable {
+                    selectPathAction!!()
+                }
+            } else {
+                modifier
             }
-        } else {
-            modifier
-        }
         Box(
             modifier = clickableModifier,
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             if (number != null && (pathInfo?.path?.size ?: 0) > 1) {
                 Text(text = number.toString(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
@@ -105,7 +118,10 @@ fun FieldOverlay(vm: FieldViewModel) {
 }
 
 @Composable
-fun FieldData(vm: FieldViewModel, fieldData: Map<FieldCoordinate, UiFieldSquare>) {
+fun FieldData(
+    vm: FieldViewModel,
+    fieldData: Map<FieldCoordinate, UiFieldSquare>,
+) {
     // Players/Ball
     FieldSquares(vm) { modifier, x, y ->
         val squareData = fieldData[FieldCoordinate(x, y)]
@@ -118,16 +134,14 @@ fun FieldUnderlay(vm: FieldViewModel) {
     val highlightedSquare: FieldCoordinate? by vm.highlights().collectAsState()
     FieldSquares(vm) { modifier: Modifier, x, y ->
         val hover = (highlightedSquare?.x == x && highlightedSquare?.y == y)
-        val bgColor = when {
-            hover -> Color.Cyan.copy(alpha = 0.25f)
-            else -> Color.Transparent
-        }
+        val bgColor =
+            when {
+                hover -> Color.Cyan.copy(alpha = 0.25f)
+                else -> Color.Transparent
+            }
         Box(modifier = modifier.background(bgColor))
     }
 }
-
-
-
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -146,30 +160,33 @@ private fun FieldSquare(
 //    ))
     var showPopup by remember(square) { mutableStateOf(square.showContextMenu) }
 
-    val bgColor = when {
-        hover -> Color.Cyan.copy(alpha = 0.25f)
-        square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
-        else -> Color.Transparent
-    }
-
-    var boxWrapperModifier = boxModifier
-        .fillMaxSize()
-        .background(color = bgColor)
-        .onPointerEvent(PointerEventType.Enter) {
-            vm.hoverOver(FieldCoordinate(width, height))
+    val bgColor =
+        when {
+            hover -> Color.Cyan.copy(alpha = 0.25f)
+            square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
+            else -> Color.Transparent
         }
 
-    boxWrapperModifier = boxWrapperModifier.clickable {
-        showPopup = !showPopup
-        square.onSelected?.let {
-            it()
+    var boxWrapperModifier =
+        boxModifier
+            .fillMaxSize()
+            .background(color = bgColor)
+            .onPointerEvent(PointerEventType.Enter) {
+                vm.hoverOver(FieldCoordinate(width, height))
+            }
+
+    boxWrapperModifier =
+        boxWrapperModifier.clickable {
+            showPopup = !showPopup
+            square.onSelected?.let {
+                it()
+            }
         }
-    }
     Box(modifier = boxWrapperModifier) {
         if (showPopup) {
             ContextPopupMenu(
                 hidePopup = { showPopup = false },
-                commands = square.contextMenuOptions
+                commands = square.contextMenuOptions,
             )
         }
         square.player?.let {
@@ -181,7 +198,7 @@ private fun FieldSquare(
                 alignment = Alignment.Center,
                 contentScale = ContentScale.FillBounds,
                 bitmap = IconFactory.getBall().toComposeImageBitmap(),
-                contentDescription = ""
+                contentDescription = "",
             )
         }
     }

@@ -11,19 +11,19 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.ui.GameScreenModel
 import dk.ilios.jervis.utils.createRandomAction
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
-class RandomModeUiActionFactory(model: GameScreenModel): UiActionFactory(model) {
+class RandomModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model) {
     override suspend fun start(scope: CoroutineScope) {
         val controller = model.controller
         val start = Instant.now()
         controller.startManualMode()
         while (!controller.stack.isEmpty()) {
             val actions = controller.getAvailableActions()
-            if (!useManualAutomatedActions(controller) ) {
+            if (!useManualAutomatedActions(controller)) {
                 val selectedAction = createRandomAction(controller.state, actions)
                 delay(20)
                 controller.processAction(selectedAction)
@@ -49,9 +49,7 @@ class RandomModeUiActionFactory(model: GameScreenModel): UiActionFactory(model) 
         }
     }
 
-    private fun handleManualHomeKickingSetup(
-        controller: GameController
-    ) {
+    private fun handleManualHomeKickingSetup(controller: GameController) {
         val game: Game = controller.state
         val team = game.activeTeam
 
@@ -68,9 +66,7 @@ class RandomModeUiActionFactory(model: GameScreenModel): UiActionFactory(model) 
         setupPlayer(team, PlayerNo(11), FieldCoordinate(8, 13), controller)
     }
 
-    private fun handleManualAwayKickingSetup(
-        controller: GameController
-    ) {
+    private fun handleManualAwayKickingSetup(controller: GameController) {
         val game: Game = controller.state
         val team = game.activeTeam
 
@@ -91,13 +87,16 @@ class RandomModeUiActionFactory(model: GameScreenModel): UiActionFactory(model) 
         team: Team,
         playerNo: PlayerNo,
         fieldCoordinate: FieldCoordinate,
-        controller: GameController
+        controller: GameController,
     ) {
         controller.processAction(PlayerSelected(team[playerNo]!!))
         controller.processAction(FieldSquareSelected(fieldCoordinate))
     }
 
-    private fun printStats(controller: GameController, start: Instant) {
+    private fun printStats(
+        controller: GameController,
+        start: Instant,
+    ) {
         val end = Instant.now()
         val duration = ChronoUnit.MILLIS.between(start, end)
         val commands = controller.commands.size

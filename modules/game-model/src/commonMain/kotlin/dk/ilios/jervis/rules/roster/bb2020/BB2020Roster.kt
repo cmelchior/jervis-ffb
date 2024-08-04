@@ -10,7 +10,7 @@ import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.skills.SkillFactory
 import kotlinx.serialization.Serializable
 
-interface BB2020Roster: Roster {
+interface BB2020Roster : Roster {
     val tier: Int
     val specialRules: List<SpecialRules>
     override val positions: List<BB2020Position>
@@ -31,8 +31,13 @@ data class BB2020Position(
     override val skills: List<SkillFactory>,
     val primary: List<BB2020SkillCategory>,
     val secondary: List<BB2020SkillCategory>,
-): Position {
-    override fun createPlayer(team: Team, id: PlayerId, name: String, number: PlayerNo): Player {
+) : Position {
+    override fun createPlayer(
+        team: Team,
+        id: PlayerId,
+        name: String,
+        number: PlayerNo,
+    ): Player {
         return Player(id, this).apply {
             this.team = team
             this.name = name

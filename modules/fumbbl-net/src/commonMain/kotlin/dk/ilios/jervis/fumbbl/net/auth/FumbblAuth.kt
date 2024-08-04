@@ -8,6 +8,7 @@ import io.ktor.http.isSuccess
 import io.ktor.http.parameters
 
 expect fun getHttpClient(): HttpClient
+
 data class TeamData(val id: Int, val name: String)
 
 /**
@@ -19,14 +20,14 @@ data class TeamData(val id: Int, val name: String)
  *
  */
 class FumbblAuth {
-
     private val client: HttpClient = getHttpClient()
     private var authSessionId: String? = null
 
     private suspend fun getAnonymousSessionId(): String {
-        val response: HttpResponse = client.request("https://fumbbl.com/p/login") {
-            method = HttpMethod.Get
-        }
+        val response: HttpResponse =
+            client.request("https://fumbbl.com/p/login") {
+                method = HttpMethod.Get
+            }
         if (!response.status.isSuccess()) {
             throw IllegalStateException("Could not access FUMBBL: ${response.status}")
         }
@@ -42,21 +43,25 @@ class FumbblAuth {
         } ?: throw IllegalStateException("Could not find session id in headers: ${response.headers}")
     }
 
-    suspend fun login(username: String, password: String) {
+    suspend fun login(
+        username: String,
+        password: String,
+    ) {
         val anonymousSessionid = getAnonymousSessionId()
         println("Anonymous session id: $anonymousSessionid")
-        val response = client.request("https://fumbbl.com/user.php") {
-            method = HttpMethod.Post
-            parameters {
-                append("rememberme", "true")
-                append("module", "NS-User")
-                append("op", "login")
-                append("url", "%2Fuser.php")
-                append("user", username)
-                append("pass", password)
-                append("hash", anonymousSessionid)
+        val response =
+            client.request("https://fumbbl.com/user.php") {
+                method = HttpMethod.Post
+                parameters {
+                    append("rememberme", "true")
+                    append("module", "NS-User")
+                    append("op", "login")
+                    append("url", "%2Fuser.php")
+                    append("user", username)
+                    append("pass", password)
+                    append("hash", anonymousSessionid)
+                }
             }
-        }
         if (!response.status.isSuccess()) {
             throw IllegalStateException("Login failed:: ${response.status}")
         }

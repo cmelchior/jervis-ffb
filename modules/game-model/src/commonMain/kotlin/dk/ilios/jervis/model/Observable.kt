@@ -23,7 +23,6 @@ import kotlin.reflect.KProperty
 //      - Code is contained inside model classes, no-one using the classes need to know it.
 //      - Serialization is impossible without hacks due to https://github.com/Kotlin/kotlinx.serialization/issues/1578
 abstract class Observable<T> {
-
     private val _state = MutableSharedFlow<T>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     protected val observeState: SharedFlow<T> = _state
 
@@ -31,9 +30,16 @@ abstract class Observable<T> {
         notifyUpdate() // Make sure there is one state in the flow
     }
 
-    protected fun <P> observable(initialValue: P, onChange: ((oldValue: P, newValue: P) -> Unit)? = null): ReadWriteProperty<Any?, P> {
-        return object: ObservableProperty<P>(initialValue) {
-            override fun afterChange(property: KProperty<*>, oldValue: P, newValue: P) {
+    protected fun <P> observable(
+        initialValue: P,
+        onChange: ((oldValue: P, newValue: P) -> Unit)? = null,
+    ): ReadWriteProperty<Any?, P> {
+        return object : ObservableProperty<P>(initialValue) {
+            override fun afterChange(
+                property: KProperty<*>,
+                oldValue: P,
+                newValue: P,
+            ) {
                 _state.safeTryEmit(this@Observable as T)
                 onChange?.let {
                     onChange(oldValue, newValue)
@@ -47,8 +53,4 @@ abstract class Observable<T> {
     }
 }
 
-object JervisObservables {
-
-
-
-}
+object JervisObservables

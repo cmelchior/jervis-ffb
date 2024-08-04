@@ -14,20 +14,32 @@ import kotlin.math.sqrt
 @Serializable
 sealed interface Location {
     val coordinate: FieldCoordinate
+
     fun isOnLineOfScrimmage(rules: Rules): Boolean
+
     fun isInWideZone(rules: Rules): Boolean
+
     fun isInEndZone(rules: Rules): Boolean
+
     fun isInCenterField(rules: Rules): Boolean
+
     fun isOnHomeSide(rules: Rules): Boolean
+
     fun isOnAwaySide(rules: Rules): Boolean
+
     fun isOnField(rules: Rules): Boolean
+
     fun isOutOfBounds(rules: Rules): Boolean
-    fun isAdjacent(rules: Rules, location: Location): Boolean
+
+    fun isAdjacent(
+        rules: Rules,
+        location: Location,
+    ): Boolean
 }
+
 // (0, 0) is (top, left)
 @Serializable
-data class FieldCoordinate(val x: Int, val y: Int): Location {
-
+data class FieldCoordinate(val x: Int, val y: Int) : Location {
     companion object {
         val UNKNOWN = FieldCoordinate(Int.MAX_VALUE, Int.MAX_VALUE)
     }
@@ -37,37 +49,50 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
     override fun isOnLineOfScrimmage(rules: Rules): Boolean {
         return x == rules.lineOfScrimmageHome || x == rules.lineOfScrimmageAway
     }
+
     override fun isInWideZone(rules: Rules): Boolean {
-        return (0u until rules.wideZone).contains(y.toUInt())
-                || (rules.fieldHeight - rules.wideZone until rules.fieldHeight).contains(y.toUInt())
+        return (0u until rules.wideZone).contains(y.toUInt()) ||
+            (rules.fieldHeight - rules.wideZone until rules.fieldHeight).contains(y.toUInt())
     }
+
     override fun isInEndZone(rules: Rules): Boolean {
         return x == 0 || x.toUInt() == rules.fieldWidth - 1u
     }
+
     override fun isInCenterField(rules: Rules): Boolean {
         val xRange = (rules.endZone until rules.fieldWidth - rules.endZone)
         val yRange = (rules.wideZone until rules.fieldHeight - rules.wideZone)
         return xRange.contains(x.toUInt()) && yRange.contains(y.toUInt())
     }
+
     override fun isOnHomeSide(rules: Rules): Boolean {
         return x.toUInt() < rules.fieldWidth / 2u
     }
+
     override fun isOnAwaySide(rules: Rules): Boolean {
         return x.toUInt() >= rules.fieldWidth / 2u
     }
+
     override fun isOnField(rules: Rules): Boolean {
         return (x >= 0 && x < rules.fieldWidth.toInt() && y >= 0 && y < rules.fieldHeight.toInt())
     }
+
     override fun isOutOfBounds(rules: Rules): Boolean {
         return x < 0 || x >= rules.fieldWidth.toInt() || y < 0 || y >= rules.fieldHeight.toInt()
     }
 
-    override fun isAdjacent(rules: Rules, location: Location): Boolean {
+    override fun isAdjacent(
+        rules: Rules,
+        location: Location,
+    ): Boolean {
         return distanceTo(location.coordinate) == 1u
     }
 
-    fun move(direction: Direction, steps: Int): FieldCoordinate {
-        return FieldCoordinate(x + (direction.xModifier*steps), y + (direction.yModifier*steps))
+    fun move(
+        direction: Direction,
+        steps: Int,
+    ): FieldCoordinate {
+        return FieldCoordinate(x + (direction.xModifier * steps), y + (direction.yModifier * steps))
     }
 
     fun toLogString(): String {
@@ -77,10 +102,13 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
     /**
      * Return all on-field coordinates around a specific on-field location.
      */
-    fun getSurroundingCoordinates(rules: Rules, distance: UInt = 1u): List<FieldCoordinate> {
+    fun getSurroundingCoordinates(
+        rules: Rules,
+        distance: UInt = 1u,
+    ): List<FieldCoordinate> {
         val result = mutableListOf<FieldCoordinate>()
-        (x-distance.toInt() .. x+distance.toInt()).forEach { x: Int ->
-            (y-distance.toInt() .. y+distance.toInt()).forEach { y: Int ->
+        (x - distance.toInt()..x + distance.toInt()).forEach { x: Int ->
+            (y - distance.toInt()..y + distance.toInt()).forEach { y: Int ->
                 val newCoordinate = FieldCoordinate(x, y)
                 if (newCoordinate != this && newCoordinate.isOnField(rules)) {
                     result.add(newCoordinate)
@@ -121,68 +149,77 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
     /**
      * Return all coordinates that are considered "away" from this coordinate from the point of view of the provided
      * [location].
-     * 
+     *
      * See page 45 in the rulebook.
      */
     fun getCoordinatesAwayFromLocation(
         rules: Rules,
         location: FieldCoordinate,
-        includeOutOfBounds: Boolean = false
+        includeOutOfBounds: Boolean = false,
     ): List<FieldCoordinate> {
         // Calculate direction
         val direction = Direction(this.x - location.x, this.y - location.y)
 
-        val allCoordinates: List<FieldCoordinate> = when {
-            // Top
-            direction.xModifier == 0 && direction.yModifier == -1 -> listOf(
-                FieldCoordinate(this.x - 1, this.y - 1),
-                FieldCoordinate(this.x, this.y - 1),
-                FieldCoordinate(this.x + 1, this.y - 1),
-            )
-            // Bottom
-            direction.xModifier == 0 && direction.yModifier == 1 -> listOf(
-                FieldCoordinate(this.x - 1, this.y + 1),
-                FieldCoordinate(this.x, this.y + 1),
-                FieldCoordinate(this.x + 1, this.y + 1),
-            )
-            // Left
-            direction.xModifier == -1 && direction.yModifier == 0 -> listOf(
-                FieldCoordinate(this.x - 1, this.y - 1),
-                FieldCoordinate(this.x - 1, this.y + 0),
-                FieldCoordinate(this.x - 1, this.y + 1),
-            )
-            // Right
-            direction.xModifier == 1 && direction.yModifier == 0 -> listOf(
-                FieldCoordinate(this.x + 1, this.y - 1),
-                FieldCoordinate(this.x + 1, this.y + 0),
-                FieldCoordinate(this.x + 1, this.y + 1),
-            )
-            // Top-left
-            direction.xModifier == -1 && direction.yModifier == -1 -> listOf(
-                FieldCoordinate(this.x - 1, this.y),
-                FieldCoordinate(this.x - 1, this.y - 1),
-                FieldCoordinate(this.x, this.y - 1),
-            )
-            // Top-right
-            direction.xModifier == 1 && direction.yModifier == -1 -> listOf(
-                FieldCoordinate(this.x, this.y - 1),
-                FieldCoordinate(this.x + 1, this.y - 1),
-                FieldCoordinate(this.x + 1, this.y),
-            )
-            // Bottom-left
-            direction.xModifier == -1 && direction.yModifier == 1 -> listOf(
-                FieldCoordinate(this.x - 1, this.y),
-                FieldCoordinate(this.x - 1, this.y + 1),
-                FieldCoordinate(this.x, this.y + 1),
-            )
-            // Bottom-Right
-            direction.xModifier == 1 && direction.yModifier == 1 -> listOf(
-                FieldCoordinate(this.x + 1, this.y),
-                FieldCoordinate(this.x + 1, this.y + 1),
-                FieldCoordinate(this.x, this.y + 1),
-            )
-            else -> throw IllegalArgumentException("Unsupported direction: $direction")
-        }
+        val allCoordinates: List<FieldCoordinate> =
+            when {
+                // Top
+                direction.xModifier == 0 && direction.yModifier == -1 ->
+                    listOf(
+                        FieldCoordinate(this.x - 1, this.y - 1),
+                        FieldCoordinate(this.x, this.y - 1),
+                        FieldCoordinate(this.x + 1, this.y - 1),
+                    )
+                // Bottom
+                direction.xModifier == 0 && direction.yModifier == 1 ->
+                    listOf(
+                        FieldCoordinate(this.x - 1, this.y + 1),
+                        FieldCoordinate(this.x, this.y + 1),
+                        FieldCoordinate(this.x + 1, this.y + 1),
+                    )
+                // Left
+                direction.xModifier == -1 && direction.yModifier == 0 ->
+                    listOf(
+                        FieldCoordinate(this.x - 1, this.y - 1),
+                        FieldCoordinate(this.x - 1, this.y + 0),
+                        FieldCoordinate(this.x - 1, this.y + 1),
+                    )
+                // Right
+                direction.xModifier == 1 && direction.yModifier == 0 ->
+                    listOf(
+                        FieldCoordinate(this.x + 1, this.y - 1),
+                        FieldCoordinate(this.x + 1, this.y + 0),
+                        FieldCoordinate(this.x + 1, this.y + 1),
+                    )
+                // Top-left
+                direction.xModifier == -1 && direction.yModifier == -1 ->
+                    listOf(
+                        FieldCoordinate(this.x - 1, this.y),
+                        FieldCoordinate(this.x - 1, this.y - 1),
+                        FieldCoordinate(this.x, this.y - 1),
+                    )
+                // Top-right
+                direction.xModifier == 1 && direction.yModifier == -1 ->
+                    listOf(
+                        FieldCoordinate(this.x, this.y - 1),
+                        FieldCoordinate(this.x + 1, this.y - 1),
+                        FieldCoordinate(this.x + 1, this.y),
+                    )
+                // Bottom-left
+                direction.xModifier == -1 && direction.yModifier == 1 ->
+                    listOf(
+                        FieldCoordinate(this.x - 1, this.y),
+                        FieldCoordinate(this.x - 1, this.y + 1),
+                        FieldCoordinate(this.x, this.y + 1),
+                    )
+                // Bottom-Right
+                direction.xModifier == 1 && direction.yModifier == 1 ->
+                    listOf(
+                        FieldCoordinate(this.x + 1, this.y),
+                        FieldCoordinate(this.x + 1, this.y + 1),
+                        FieldCoordinate(this.x, this.y + 1),
+                    )
+                else -> throw IllegalArgumentException("Unsupported direction: $direction")
+            }
         return if (!includeOutOfBounds) {
             allCoordinates.filter {
                 it.isOnField(rules)
@@ -193,17 +230,27 @@ data class FieldCoordinate(val x: Int, val y: Int): Location {
     }
 }
 
-data object DogOut: Location {
+data object DogOut : Location {
     override val coordinate: FieldCoordinate = FieldCoordinate.UNKNOWN
+
     override fun isOnLineOfScrimmage(rules: Rules): Boolean = false
+
     override fun isInWideZone(rules: Rules): Boolean = false
+
     override fun isInEndZone(rules: Rules): Boolean = false
+
     override fun isInCenterField(rules: Rules): Boolean = false
+
     override fun isOnHomeSide(rules: Rules): Boolean = false
+
     override fun isOnAwaySide(rules: Rules): Boolean = false
+
     override fun isOnField(rules: Rules): Boolean = false
+
     override fun isOutOfBounds(rules: Rules): Boolean = false
-    override fun isAdjacent(rules: Rules, location: Location): Boolean = false
+
+    override fun isAdjacent(
+        rules: Rules,
+        location: Location,
+    ): Boolean = false
 }
-
-

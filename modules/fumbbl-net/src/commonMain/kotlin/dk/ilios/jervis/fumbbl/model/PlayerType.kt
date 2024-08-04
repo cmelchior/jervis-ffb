@@ -1,13 +1,13 @@
 package dk.ilios.jervis.fumbbl.model
 
-import kotlinx.serialization.Serializable
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer
+import kotlinx.serialization.Serializable
 
-class PlayerTypeSerializer: FumbblEnumSerializer<PlayerType>(PlayerType::class)
+class PlayerTypeSerializer : FumbblEnumSerializer<PlayerType>(PlayerType::class)
 
 @Serializable(with = PlayerTypeSerializer::class)
-enum class PlayerType(override val id: String): FumbblEnum {
+enum class PlayerType(override val id: String) : FumbblEnum {
     BIG_GUY("Big Guy"),
     INFAMOUS_STAFF("Infamous Staff"),
     IRREGULAR("Irregular"),
@@ -16,5 +16,5 @@ enum class PlayerType(override val id: String): FumbblEnum {
     RAISED_FROM_DEAD("RaisedFromDead"),
     REGULAR("Regular"),
     RIOTOUS_ROOKIE("RiotousRookie"),
-    STAR("Star");
+    STAR("Star"),
 }

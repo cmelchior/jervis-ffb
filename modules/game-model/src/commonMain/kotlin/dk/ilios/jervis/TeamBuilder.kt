@@ -37,7 +37,12 @@ class TeamBuilder(val roster: Roster) {
             field = value
         }
 
-    fun addPlayer(id: PlayerId, name: String, number: PlayerNo, type: Position) {
+    fun addPlayer(
+        id: PlayerId,
+        name: String,
+        number: PlayerNo,
+        type: Position,
+    ) {
         if (players.containsKey(number)) {
             throw IllegalArgumentException("Player with number $number already exits: ${players[number]}")
         }
@@ -58,14 +63,15 @@ class TeamBuilder(val roster: Roster) {
             var cheerLeaders: Int = 0
             var assistentCoaches: Int = 0
 
-
-
             notifyDogoutChange()
         }
     }
 }
 
-fun teamBuilder(roster: Roster, action: TeamBuilder.() -> Unit): Team {
+fun teamBuilder(
+    roster: Roster,
+    action: TeamBuilder.() -> Unit,
+): Team {
     val builder = TeamBuilder(roster)
     action(builder)
     return builder.build()

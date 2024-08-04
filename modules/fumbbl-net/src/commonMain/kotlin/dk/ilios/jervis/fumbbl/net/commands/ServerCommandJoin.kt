@@ -12,5 +12,5 @@ data class ServerCommandJoin(
     val coach: String,
     val clientMode: ClientMode,
     val spectators: Int,
-    val playerNames: List<String>
-): ServerCommand
+    val playerNames: List<String>,
+) : ServerCommand

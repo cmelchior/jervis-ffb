@@ -46,27 +46,30 @@ import kotlinx.coroutines.flow.Flow
 import org.pushingpixels.artemis.drawTextOnPath
 
 @Composable
-fun Sidebar(vm: SidebarViewModel, modifier: Modifier) {
+fun Sidebar(
+    vm: SidebarViewModel,
+    modifier: Modifier,
+) {
     Box(modifier = modifier.aspectRatio(vm.aspectRatio).fillMaxSize()) {
         Image(
             alignment = Alignment.TopStart,
             painter = painterResource("icons/sidebar/background_box.png"),
             contentDescription = "Box",
-            modifier = modifier.fillMaxSize()
+            modifier = modifier.fillMaxSize(),
         )
 
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-
                 val view by vm.view().collectAsState()
-                when(view) {
+                when (view) {
                     SidebarView.RESERVES -> Reserves(vm.reserves())
-                    SidebarView.INJURIES -> Injuries(
-                        vm.knockedOut(),
-                        vm.badlyHurt(),
-                        vm.seriousInjuries(),
-                        vm.dead()
-                    )
+                    SidebarView.INJURIES ->
+                        Injuries(
+                            vm.knockedOut(),
+                            vm.badlyHurt(),
+                            vm.seriousInjuries(),
+                            vm.dead(),
+                        )
                 }
             }
 
@@ -82,7 +85,7 @@ fun Sidebar(vm: SidebarViewModel, modifier: Modifier) {
                 Button(
                     onClick = { vm.toggleInjuries() },
                     colors = FumbblButtonColors(),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     val injuriesCount by vm.injuriesCount().collectAsState()
                     Text(text = "$injuriesCount Out", maxLines = 1)
@@ -104,24 +107,24 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                 painter = painterResource("icons/sidebar/overlay_player_detail_blue2.png"),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
 
             // Side bar content
             Column(modifier = Modifier.fillMaxWidth()) {
                 // Blue Square with player information
                 Column(
-                    modifier = Modifier
-                        .aspectRatio(145f / 213f) // Size of blue square
-                        .fillMaxSize()
+                    modifier =
+                        Modifier
+                            .aspectRatio(145f / 213f) // Size of blue square
+                            .fillMaxSize(),
                 ) {
-
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .weight(1f)
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .weight(1f),
                     ) {
-
                         // Player name
                         Text(
                             modifier = Modifier.padding(4.dp).fillMaxWidth(),
@@ -131,14 +134,15 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                             maxLines = 1,
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
 
                         // Image, type / number
                         Row(
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp)
-                                .fillMaxSize(),
+                            modifier =
+                                Modifier
+                                    .padding(start = 8.dp, end = 8.dp)
+                                    .fillMaxSize(),
                         ) {
                             Image(
                                 modifier = Modifier.aspectRatio(95f / 147f).fillMaxSize(),
@@ -148,7 +152,6 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                             )
 
                             androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
-
                                 // A path with three quad Bezier segments
                                 val path = androidx.compose.ui.graphics.Path()
                                 path.moveTo(this.size.width, this.size.height - 5)
@@ -162,10 +165,11 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                                     path = path,
                                     offset = Offset(0.dp.toPx(), 0.0f),
                                     textAlign = TextAlign.Start,
-                                    paint = Paint().also {
-                                        it.color = Color.White
-                                        it.style = PaintingStyle.Fill
-                                    }
+                                    paint =
+                                        Paint().also {
+                                            it.color = Color.White
+                                            it.style = PaintingStyle.Fill
+                                        },
                                 )
                             }
                         }
@@ -173,13 +177,14 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
 
                     // Stat boxes
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(3.dp),
                     ) {
                         val model = player.model
-                        val modifier = Modifier.weight(1f).aspectRatio(52f/58f)
+                        val modifier = Modifier.weight(1f).aspectRatio(52f / 58f)
                         StatBox(modifier, "MV", model.move.toString())
                         StatBox(modifier, "ST", model.strength.toString())
                         StatBox(modifier, "AG", "${model.agility}+")
@@ -188,15 +193,15 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                     }
                 }
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
                         modifier = Modifier.padding(4.dp).fillMaxWidth(),
                         text = "${player.model.starPlayerPoints} ${player.model.level.name}",
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                     Column(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         player.model.skills.forEach {
                             Text(
@@ -208,24 +213,26 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                 }
             }
         }
-
-
-
     }
 }
 
 @Composable
-fun StatBox(modifier: Modifier, title: String, value: String) {
+fun StatBox(
+    modifier: Modifier,
+    title: String,
+    value: String,
+) {
     Box(
         modifier = modifier.background(color = Color.White).border(1.dp, Color.Black),
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize()
-                    .background(color = Color.Black),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                        .background(color = Color.Black),
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = title,
@@ -237,7 +244,7 @@ fun StatBox(modifier: Modifier, title: String, value: String) {
             }
             Box(
                 modifier = Modifier.weight(1f).fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = value,
@@ -250,7 +257,6 @@ fun StatBox(modifier: Modifier, title: String, value: String) {
         }
     }
 }
-
 
 @Composable
 fun Reserves(reserves: Flow<List<UiPlayer>>) {
@@ -279,7 +285,7 @@ fun Injuries(
     knockedOut: SnapshotStateList<UiPlayer>,
     badlyHurt: SnapshotStateList<UiPlayer>,
     seriousInjuries: SnapshotStateList<UiPlayer>,
-    dead: SnapshotStateList<UiPlayer>
+    dead: SnapshotStateList<UiPlayer>,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionHeader("Knocked Out")
@@ -290,7 +296,7 @@ fun Injuries(
     }
 }
 //
-//fun Modifier.rotateVertically(clockwise: Boolean = true): Modifier {
+// fun Modifier.rotateVertically(clockwise: Boolean = true): Modifier {
 //    val rotate = rotate(if (clockwise) 90f else -90f)
 //
 //    val adjustBounds = layout { measurable, constraints ->
@@ -303,9 +309,9 @@ fun Injuries(
 //        }
 //    }
 //    return rotate then adjustBounds
-//}
+// }
 //
-//fun Modifier.vertical() = layout { measurable, constraints ->
+// fun Modifier.vertical() = layout { measurable, constraints ->
 //    val placeable = measurable.measure(constraints)
 //    layout(placeable.height, placeable.width) {
 //        placeable.place(
@@ -313,41 +319,58 @@ fun Injuries(
 //            y = -(placeable.height / 2 - placeable.width / 2)
 //        )
 //    }
-//}
+// }
 
-fun Modifier.rotateVertically(rotation: VerticalRotation) = then(
-    object : LayoutModifier {
-        override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
-            val placeable = measurable.measure(constraints)
-            return layout(constraints.maxHeight, placeable.width) {
-                placeable.place(
-                    x = -(placeable.width / 2 - placeable.height / 2),
-                    y = -(placeable.height / 2 - placeable.width / 2)
-                )
+fun Modifier.rotateVertically(rotation: VerticalRotation) =
+    then(
+        object : LayoutModifier {
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints,
+            ): MeasureResult {
+                val placeable = measurable.measure(constraints)
+                return layout(constraints.maxHeight, placeable.width) {
+                    placeable.place(
+                        x = -(placeable.width / 2 - placeable.height / 2),
+                        y = -(placeable.height / 2 - placeable.width / 2),
+                    )
+                }
             }
-        }
 
-        override fun IntrinsicMeasureScope.minIntrinsicHeight(measurable: IntrinsicMeasurable, width: Int): Int {
-            return measurable.maxIntrinsicWidth(width)
-        }
+            override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                measurable: IntrinsicMeasurable,
+                width: Int,
+            ): Int {
+                return measurable.maxIntrinsicWidth(width)
+            }
 
-        override fun IntrinsicMeasureScope.maxIntrinsicHeight(measurable: IntrinsicMeasurable, width: Int): Int {
-            return measurable.maxIntrinsicWidth(width)
-        }
+            override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+                measurable: IntrinsicMeasurable,
+                width: Int,
+            ): Int {
+                return measurable.maxIntrinsicWidth(width)
+            }
 
-        override fun IntrinsicMeasureScope.minIntrinsicWidth(measurable: IntrinsicMeasurable, height: Int): Int {
-            return measurable.minIntrinsicHeight(height)
-        }
+            override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                measurable: IntrinsicMeasurable,
+                height: Int,
+            ): Int {
+                return measurable.minIntrinsicHeight(height)
+            }
 
-        override fun IntrinsicMeasureScope.maxIntrinsicWidth(measurable: IntrinsicMeasurable, height: Int): Int {
-            return measurable.maxIntrinsicHeight(height)
-        }
-
-    })
-    .then(rotate(rotation.value))
+            override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+                measurable: IntrinsicMeasurable,
+                height: Int,
+            ): Int {
+                return measurable.maxIntrinsicHeight(height)
+            }
+        },
+    )
+        .then(rotate(rotation.value))
 
 enum class VerticalRotation(val value: Float) {
-    CLOCKWISE(90f), COUNTER_CLOCKWISE(270f)
+    CLOCKWISE(90f),
+    COUNTER_CLOCKWISE(270f),
 }
 
 fun String.takeDot(limit: Int): String {

@@ -8,7 +8,11 @@ import dk.ilios.jervis.model.Player
 
 class SetPlayerLocation(private val player: Player, val location: Location) : Command {
     private lateinit var originalLocation: Location
-    override fun execute(state: Game, controller: GameController) {
+
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         this.originalLocation = player.location
 
         // Remove from old location
@@ -40,7 +44,10 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         if (location is FieldCoordinate) {
             state.field[location].apply {
                 player = null

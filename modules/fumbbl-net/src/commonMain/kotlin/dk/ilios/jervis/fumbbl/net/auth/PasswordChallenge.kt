@@ -9,7 +9,6 @@ import java.security.NoSuchAlgorithmException
  * com.fumbbl.ffb.PasswordChallenge
  */
 object PasswordChallenge {
-
     /**
      * Create the client response to the servers password challenge when joining a game.
      *
@@ -24,12 +23,18 @@ object PasswordChallenge {
      * If an auth token is provided at startup, this step is skipped and the auth token is used directly
      * in the "clientJoin" command.
      */
-    fun createChallengeResponse(password: String, challenge: String): String {
+    fun createChallengeResponse(
+        password: String,
+        challenge: String,
+    ): String {
         return createResponse(challenge, md5Encode(password.toByteArray()))
     }
 
     @Throws(IOException::class, NoSuchAlgorithmException::class)
-    private fun createResponse(challenge: String, md5EncodedPassword: ByteArray): String {
+    private fun createResponse(
+        challenge: String,
+        md5EncodedPassword: ByteArray,
+    ): String {
         if (challenge.isNotEmpty()) {
             val challenge = fromHexString(challenge)
             val opad = xor(md5EncodedPassword, 92.toByte())
@@ -44,8 +49,11 @@ object PasswordChallenge {
         val data = ByteArray(len / 2)
         var i = 0
         while (i < len) {
-            data[i / 2] = ((hexString[i].digitToIntOrNull(16) ?: -1 shl 4) + hexString[i + 1].digitToIntOrNull(16)!!
-                ?: -1).toByte()
+            data[i / 2] =
+                (
+                    (hexString[i].digitToIntOrNull(16) ?: -1 shl 4) + hexString[i + 1].digitToIntOrNull(16)!!
+                        ?: -1
+                ).toByte()
             i += 2
         }
         return data
@@ -59,7 +67,10 @@ object PasswordChallenge {
         return hexString.toString()
     }
 
-    private fun concat(bytes1: ByteArray?, bytes2: ByteArray?): ByteArray {
+    private fun concat(
+        bytes1: ByteArray?,
+        bytes2: ByteArray?,
+    ): ByteArray {
         val size1 = if ((bytes1 != null)) bytes1.size else 0
         val size2 = if ((bytes2 != null)) bytes2.size else 0
         val result = ByteArray(size1 + size2)
@@ -76,7 +87,10 @@ object PasswordChallenge {
         return result
     }
 
-    private fun xor(bytes: ByteArray, mask: Byte): ByteArray {
+    private fun xor(
+        bytes: ByteArray,
+        mask: Byte,
+    ): ByteArray {
         val result: ByteArray?
         if (bytes.isNotEmpty()) {
             result = ByteArray(bytes.size)

@@ -4,4 +4,3 @@ interface DiceModifier {
     val modifier: Int
     val description: String
 }
-

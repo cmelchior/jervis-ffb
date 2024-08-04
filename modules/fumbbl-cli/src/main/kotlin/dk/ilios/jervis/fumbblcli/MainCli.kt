@@ -18,9 +18,10 @@ class PrepareDebugClient : CliktCommand(help = "Downloads and inject debug code 
 
     override fun run() {
         echo("Preparing debug client...")
-        val output: File = output?.let {
-            File(it)
-        } ?: getDefaultOutputLocation()
+        val output: File =
+            output?.let {
+                File(it)
+            } ?: getDefaultOutputLocation()
         val runner = CreateDebugClientRunner(getJarFileLocation())
         runner.run(output)
     }
@@ -35,7 +36,7 @@ class PrepareDebugClient : CliktCommand(help = "Downloads and inject debug code 
             this::class.java.getProtectionDomain()
                 .codeSource
                 .location
-                .toURI()
+                .toURI(),
         )
     }
 
@@ -46,33 +47,37 @@ class PrepareDebugClient : CliktCommand(help = "Downloads and inject debug code 
 }
 
 class DownloadGame : CliktCommand(
-    help = "Download all the websocket data associated with a given game on FUMBBL. " +
-            "DO NOT use this to download bulk games as it stresses the game server,"
+    help =
+        "Download all the websocket data associated with a given game on FUMBBL. " +
+            "DO NOT use this to download bulk games as it stresses the game server,",
 ) {
     private val gameId by option(help = "ID of the game to download").required()
     private val output: String? by option(help = "Optional path where game files should be saved").convert { it }
 
     override fun run() {
         echo("Downloading game: $gameId")
-        val output: File = output?.let {
-            File(it)
-        } ?: getDefaultOutputLocation()
+        val output: File =
+            output?.let {
+                File(it)
+            } ?: getDefaultOutputLocation()
         val runner = DownloadGameClient()
         runner.run(gameId, output)
     }
 
     private fun getDefaultOutputLocation(): File {
         // Assume this is <root>/tools
-        val jarFileLocation = File(
-            this::class.java.getProtectionDomain()
-                .codeSource
-                .location
-                .toURI()
-        )
+        val jarFileLocation =
+            File(
+                this::class.java.getProtectionDomain()
+                    .codeSource
+                    .location
+                    .toURI(),
+            )
         return File("${jarFileLocation.parentFile.absolutePath}/../replays-fumbbl")
     }
 }
 
-fun main(args: Array<String>) = FumbblCLI()
-    .subcommands(PrepareDebugClient(), DownloadGame())
-    .main(args)
+fun main(args: Array<String>) =
+    FumbblCLI()
+        .subcommands(PrepareDebugClient(), DownloadGame())
+        .main(args)

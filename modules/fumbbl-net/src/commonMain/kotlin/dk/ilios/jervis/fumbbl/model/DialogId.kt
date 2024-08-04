@@ -4,10 +4,10 @@ import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer
 import kotlinx.serialization.Serializable
 
-class DialogIdSerializer: FumbblEnumSerializer<DialogId>(DialogId::class)
+class DialogIdSerializer : FumbblEnumSerializer<DialogId>(DialogId::class)
 
 @Serializable(with = DialogIdSerializer::class)
-enum class DialogId(override val id: String): FumbblEnum {
+enum class DialogId(override val id: String) : FumbblEnum {
     ABOUT("about"),
     APOTHECARY_CHOICE("apothecaryChoice"),
     ARGUE_THE_CALL("argueTheCall"),

@@ -8,5 +8,5 @@ data class Stats(
     val AV: Int,
     val MA: Int,
     val PA: Int,
-    val ST: Int
+    val ST: Int,
 )

@@ -12,49 +12,99 @@ import dk.ilios.jervis.rules.Rules
 /**
  * Page 37 in the rulebook.
  */
-object PreGame: Procedure() {
+object PreGame : Procedure() {
     override val initialNode: Node = TheFans
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object TheFans: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = RollForStartingFanFactor
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    object TheFans : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ) = RollForStartingFanFactor
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return GotoNode(TheWeather)
         }
     }
 
-    object TheWeather: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = RollForTheWeather
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    object TheWeather : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ) = RollForTheWeather
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return GotoNode(TakeOnJourneyMen)
         }
     }
 
-    object TakeOnJourneyMen: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    object TakeOnJourneyMen : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ) = DummyProcedure
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return GotoNode(Inducements)
         }
     }
 
-    object Inducements: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    object Inducements : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ) = DummyProcedure
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return GotoNode(ThePrayersToNuffleTable)
         }
     }
 
-    object ThePrayersToNuffleTable: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    object ThePrayersToNuffleTable : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ) = DummyProcedure
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return GotoNode(DetermineKickingTeam)
         }
     }
 
-    object DetermineKickingTeam: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = dk.ilios.jervis.procedures.DetermineKickingTeam
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    object DetermineKickingTeam : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ) = dk.ilios.jervis.procedures.DetermineKickingTeam
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return ExitProcedure()
         }
     }

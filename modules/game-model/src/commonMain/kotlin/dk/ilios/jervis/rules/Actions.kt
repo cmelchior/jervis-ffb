@@ -7,27 +7,29 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.Transient
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlin.reflect.KClass
 
 object PlayerActionSerializer : KSerializer<PlayerAction> {
-    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("PlayerAction") {
-        val stringDescriptor = String.serializer().descriptor
-        val boolDescriptor = Boolean.serializer().descriptor
-        element("name", stringDescriptor)
-        element("type", boolDescriptor)
-        element("procedure", stringDescriptor)
-        element("compulsory", boolDescriptor)
-        element("isSpecial", boolDescriptor)
-    }
+    override val descriptor: SerialDescriptor =
+        buildClassSerialDescriptor("PlayerAction") {
+            val stringDescriptor = String.serializer().descriptor
+            val boolDescriptor = Boolean.serializer().descriptor
+            element("name", stringDescriptor)
+            element("type", boolDescriptor)
+            element("procedure", stringDescriptor)
+            element("compulsory", boolDescriptor)
+            element("isSpecial", boolDescriptor)
+        }
 
-    override fun serialize(encoder: Encoder, value: PlayerAction) {
+    override fun serialize(
+        encoder: Encoder,
+        value: PlayerAction,
+    ) {
         val compositeEncoder = encoder.beginStructure(descriptor)
         compositeEncoder.encodeStringElement(descriptor, 0, value.name)
         compositeEncoder.encodeSerializableElement(descriptor, 1, PlayerActionType.serializer(), value.type)
@@ -66,7 +68,6 @@ object PlayerActionSerializer : KSerializer<PlayerAction> {
     }
 }
 
-
 /**
  * Wrapper representing a players action
  */
@@ -90,11 +91,12 @@ enum class PlayerActionType {
     BLOCK,
     BLITZ,
     FOUL,
-    SPECIAL
+    SPECIAL,
 }
 
 abstract class TeamActions {
     abstract operator fun get(type: PlayerActionType): TeamActionDescriptor
+
     abstract val move: TeamActionDescriptor
     abstract val pass: TeamActionDescriptor
     abstract val handOff: TeamActionDescriptor
@@ -103,30 +105,29 @@ abstract class TeamActions {
     abstract val foul: TeamActionDescriptor
 }
 
-
 data class TeamActionDescriptor(
     val availablePrTurn: Int,
-    val action: PlayerAction
+    val action: PlayerAction,
 )
 
-class BB2020TeamActions: TeamActions() {
-
+class BB2020TeamActions : TeamActions() {
     private val actions: Map<PlayerActionType, TeamActionDescriptor>
 
     init {
-        actions = mapOf(
-            PlayerActionType.MOVE to TeamActionDescriptor(Int.MAX_VALUE, PlayerAction("Move", PlayerActionType.MOVE, MoveAction) ),
+        actions =
+            mapOf(
+                PlayerActionType.MOVE to TeamActionDescriptor(Int.MAX_VALUE, PlayerAction("Move", PlayerActionType.MOVE, MoveAction)),
 //            PlayerActionType.PASS to TeamActionDescriptor(1, PlayerAction("Pass", PlayerActionType.PASS, DummyProcedure) ),
 //            PlayerActionType.HAND_OFF to TeamActionDescriptor(1,  PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, DummyProcedure) ),
 //            PlayerActionType.BLOCK to TeamActionDescriptor(Int.MAX_VALUE, PlayerAction("Block", PlayerActionType.BLOCK, DummyProcedure)),
 //            PlayerActionType.BLITZ to TeamActionDescriptor(1,  PlayerAction("Blitz", PlayerActionType.BLITZ, DummyProcedure) ),
 //            PlayerActionType.FOUL to TeamActionDescriptor(1, PlayerAction("Foul", PlayerActionType.FOUL, DummyProcedure) ),
-            PlayerActionType.PASS to TeamActionDescriptor(0, PlayerAction("Pass", PlayerActionType.PASS, DummyProcedure) ),
-            PlayerActionType.HAND_OFF to TeamActionDescriptor(0,  PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, DummyProcedure) ),
-            PlayerActionType.BLOCK to TeamActionDescriptor(0, PlayerAction("Block", PlayerActionType.BLOCK, DummyProcedure)),
-            PlayerActionType.BLITZ to TeamActionDescriptor(0,  PlayerAction("Blitz", PlayerActionType.BLITZ, DummyProcedure) ),
-            PlayerActionType.FOUL to TeamActionDescriptor(0, PlayerAction("Foul", PlayerActionType.FOUL, DummyProcedure) ),
-        )
+                PlayerActionType.PASS to TeamActionDescriptor(0, PlayerAction("Pass", PlayerActionType.PASS, DummyProcedure)),
+                PlayerActionType.HAND_OFF to TeamActionDescriptor(0, PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, DummyProcedure)),
+                PlayerActionType.BLOCK to TeamActionDescriptor(0, PlayerAction("Block", PlayerActionType.BLOCK, DummyProcedure)),
+                PlayerActionType.BLITZ to TeamActionDescriptor(0, PlayerAction("Blitz", PlayerActionType.BLITZ, DummyProcedure)),
+                PlayerActionType.FOUL to TeamActionDescriptor(0, PlayerAction("Foul", PlayerActionType.FOUL, DummyProcedure)),
+            )
     }
 
     override fun get(type: PlayerActionType): TeamActionDescriptor {

@@ -11,24 +11,25 @@ import kotlinx.coroutines.flow.map
 class LogViewModel(val controller: GameController) {
     val logStateMachine = false
     val logsCache = mutableListOf<LogEntry>()
-    val logs: Flow<List<LogEntry>> = controller.logsEvents.map {
-        println(it)
-        when (it) {
-            is AddEntry -> {
-                if (it.log.category != LogCategory.STATE_MACHINE || logStateMachine) {
-                    logsCache.add(it.log)
+    val logs: Flow<List<LogEntry>> =
+        controller.logsEvents.map {
+            println(it)
+            when (it) {
+                is AddEntry -> {
+                    if (it.log.category != LogCategory.STATE_MACHINE || logStateMachine) {
+                        logsCache.add(it.log)
+                    }
                 }
-            }
-            is RemoveEntry -> {
-                if (it.log.category != LogCategory.STATE_MACHINE || logStateMachine) {
-                    if (logsCache.isNotEmpty()) {
-                        logsCache.removeLast()
+                is RemoveEntry -> {
+                    if (it.log.category != LogCategory.STATE_MACHINE || logStateMachine) {
+                        if (logsCache.isNotEmpty()) {
+                            logsCache.removeLast()
+                        }
                     }
                 }
             }
+            logsCache.map { it }
         }
-        logsCache.map { it }
-    }
 
     init {
         logsCache.addAll(controller.logs)

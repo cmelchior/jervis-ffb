@@ -13,8 +13,11 @@ internal class Data {
     }
 }
 
+// @Suppress("standard:property-naming")
+@Suppress("property-naming")
 internal object LZString {
     var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+
     fun compress(uncompressed: String?): String {
         if (uncompressed == null) {
             return ""
@@ -404,13 +407,14 @@ internal object LZString {
                 enlargeIn = Math.pow(2.0, numBits.toDouble())
                 numBits++
             }
-            entry = if (d < dictionary.size && dictionary[d] != null) {
-                dictionary[d]
-            } else if (d == dictSize) {
-                w + w!![0]
-            } else {
-                return null
-            }
+            entry =
+                if (d < dictionary.size && dictionary[d] != null) {
+                    dictionary[d]
+                } else if (d == dictSize) {
+                    w + w!![0]
+                } else {
+                    return null
+                }
             result.append(entry)
             dictionary.add(dictSize++, w + entry!![0])
             enlargeIn--

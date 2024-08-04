@@ -27,7 +27,6 @@ import dk.ilios.jervis.utils.createStartingTestSetup
 import org.junit.Test
 
 class BresenhamTests {
-
     @Test
     fun run() {
         application {
@@ -44,7 +43,7 @@ class BresenhamTests {
                         path.value,
                         { start: FieldCoordinate, end: FieldCoordinate ->
                             path.value = rules.pathFinder.getStraightLine(state, start, end)
-                        }
+                        },
                     )
                 }
             }
@@ -54,24 +53,31 @@ class BresenhamTests {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun BresenhamGrid(rows: Int, cols: Int, path: List<FieldCoordinate>, update: (start: FieldCoordinate, end: FieldCoordinate) -> Unit) {
+fun BresenhamGrid(
+    rows: Int,
+    cols: Int,
+    path: List<FieldCoordinate>,
+    update: (start: FieldCoordinate, end: FieldCoordinate) -> Unit,
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         repeat(rows) { y ->
             Row {
                 repeat(cols) { x ->
                     val onPath = path.contains(FieldCoordinate(x, y))
-                    val bgColor: Color = when {
-                        onPath -> Color.Blue
-                        else -> Color.White
-                    }
+                    val bgColor: Color =
+                        when {
+                            onPath -> Color.Blue
+                            else -> Color.White
+                        }
                     Box(
-                        modifier = Modifier
-                            .onPointerEvent(PointerEventType.Enter) {
-                                update(FieldCoordinate(12, 7), FieldCoordinate(x, y))
-                            }
-                            .size(30.dp)
-                            .padding(1.dp)
-                            .background(bgColor),
+                        modifier =
+                            Modifier
+                                .onPointerEvent(PointerEventType.Enter) {
+                                    update(FieldCoordinate(12, 7), FieldCoordinate(x, y))
+                                }
+                                .size(30.dp)
+                                .padding(1.dp)
+                                .background(bgColor),
                         contentAlignment = Alignment.Center,
                     ) {
                     }

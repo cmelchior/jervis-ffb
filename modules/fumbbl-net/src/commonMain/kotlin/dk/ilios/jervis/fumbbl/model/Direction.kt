@@ -4,10 +4,10 @@ import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer
 import kotlinx.serialization.Serializable
 
-class DirectionSerializer: FumbblEnumSerializer<Direction>(Direction::class)
+class DirectionSerializer : FumbblEnumSerializer<Direction>(Direction::class)
 
 @Serializable(with = DirectionSerializer::class)
-enum class Direction(override val id: String): FumbblEnum {
+enum class Direction(override val id: String) : FumbblEnum {
     NORTH("North"),
     NORTHEAST("Northeast"),
     EAST("East"),
@@ -15,13 +15,14 @@ enum class Direction(override val id: String): FumbblEnum {
     SOUTH("South"),
     SOUTHWEST("Southwest"),
     WEST("West"),
-    NORTHWEST("Northwest");
+    NORTHWEST("Northwest"),
+    ;
 
     /**
      * Transform a Direction in FUMBBL to a Direection in Jervis.
      */
     fun transformToJervisDirection(): dk.ilios.jervis.rules.tables.Direction {
-        return when(this) {
+        return when (this) {
             NORTH -> dk.ilios.jervis.rules.tables.Direction(0, -1)
             NORTHEAST -> dk.ilios.jervis.rules.tables.Direction(1, -1)
             EAST -> dk.ilios.jervis.rules.tables.Direction(1, 0)
@@ -34,7 +35,7 @@ enum class Direction(override val id: String): FumbblEnum {
     }
 
     fun reverse(): Direction {
-        return when(this) {
+        return when (this) {
             NORTH -> SOUTH
             NORTHEAST -> SOUTHWEST
             EAST -> WEST

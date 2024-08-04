@@ -1,4 +1,5 @@
 @file:UseContextualSerialization(LocalDateTime::class)
+
 package dk.ilios.jervis.fumbbl.model.change
 
 import dk.ilios.jervis.fumbbl.model.BloodSpot
@@ -28,8 +29,8 @@ data class ActingPlayerMarkSkillUsed(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerMarkSkillUnused")
@@ -39,8 +40,8 @@ data class ActingPlayerMarkSkillUnused(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetCurrentMove")
@@ -50,8 +51,8 @@ data class ActingPlayerSetCurrentMove(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetDodging")
@@ -61,8 +62,8 @@ data class ActingPlayerSetDodging(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetGoingForIt")
@@ -72,8 +73,8 @@ data class ActingPlayerSetGoingForIt(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetHasBlocked")
@@ -83,8 +84,8 @@ data class ActingPlayerSetHasBlocked(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetHasFed")
@@ -94,8 +95,8 @@ data class ActingPlayerSetHasFed(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetHasFouled")
@@ -105,8 +106,8 @@ data class ActingPlayerSetHasFouled(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetHasJumped")
@@ -116,8 +117,8 @@ data class ActingPlayerSetHasJumped(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetHasMoved")
@@ -127,8 +128,8 @@ data class ActingPlayerSetHasMoved(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetHasPassed")
@@ -138,8 +139,8 @@ data class ActingPlayerSetHasPassed(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetLeaping")
@@ -149,8 +150,8 @@ data class ActingPlayerSetLeaping(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetOldPlayerState")
@@ -160,8 +161,8 @@ data class ActingPlayerSetOldPlayerState(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: PlayerState
-): ModelChange
+    override val value: PlayerState,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetPlayerAction")
@@ -171,8 +172,8 @@ data class ActingPlayerSetPlayerAction(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: PlayerAction
-): ModelChange
+    override val value: PlayerAction,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetPlayerId")
@@ -182,8 +183,8 @@ data class ActingPlayerSetPlayerId(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: PlayerId?
-): ModelChange
+    override val value: PlayerId?,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetStandingUp")
@@ -193,8 +194,8 @@ data class ActingPlayerSetStandingUp(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetStrength")
@@ -204,8 +205,8 @@ data class ActingPlayerSetStrength(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetSufferingAnimosity")
@@ -215,8 +216,8 @@ data class ActingPlayerSetSufferingAnimosity(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("actingPlayerSetSufferingBloodLust")
@@ -226,8 +227,8 @@ data class ActingPlayerSetSufferingBloodLust(
     @SerialName("modelChangeKey")
     override val key: Nothing?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddBloodSpot")
@@ -237,8 +238,8 @@ data class FieldModelAddBloodSpot(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: BloodSpot
-): ModelChange
+    override val value: BloodSpot,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddCard")
@@ -248,8 +249,8 @@ data class FieldModelAddCard(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddCardEffect")
@@ -259,8 +260,8 @@ data class FieldModelAddCardEffect(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddDiceDecoration")
@@ -270,8 +271,8 @@ data class FieldModelAddDiceDecoration(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: DiceDecoration
-): ModelChange
+    override val value: DiceDecoration,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddIntensiveTraining")
@@ -281,8 +282,8 @@ data class FieldModelAddIntensiveTraining(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddFieldMarker")
@@ -292,8 +293,8 @@ data class FieldModelAddFieldMarker(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddMoveSquare")
@@ -303,8 +304,8 @@ data class FieldModelAddMoveSquare(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: MoveSquare
-): ModelChange
+    override val value: MoveSquare,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddPlayerMarker")
@@ -314,8 +315,8 @@ data class FieldModelAddPlayerMarker(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: PlayerMarker
-): ModelChange
+    override val value: PlayerMarker,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddPrayer")
@@ -325,8 +326,8 @@ data class FieldModelAddPrayer(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddSkillEnhancements")
@@ -336,8 +337,8 @@ data class FieldModelAddSkillEnhancements(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddPushbackSquare")
@@ -347,8 +348,8 @@ data class FieldModelAddPushbackSquare(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: PushBackSquare
-): ModelChange
+    override val value: PushBackSquare,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddTrackNumber")
@@ -358,8 +359,8 @@ data class FieldModelAddTrackNumber(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: TrackNumber
-): ModelChange
+    override val value: TrackNumber,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddTrapDoor")
@@ -369,8 +370,8 @@ data class FieldModelAddTrapDoor(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: TrapDoor
-): ModelChange
+    override val value: TrapDoor,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelAddWisdom")
@@ -380,8 +381,8 @@ data class FieldModelAddWisdom(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelKeepDeactivatedCard")
@@ -391,8 +392,8 @@ data class FieldModelKeepDeactivatedCard(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemoveCard")
@@ -402,8 +403,8 @@ data class FieldModelRemoveCard(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemoveCardEffect")
@@ -413,8 +414,8 @@ data class FieldModelRemoveCardEffect(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemoveDiceDecoration")
@@ -424,8 +425,8 @@ data class FieldModelRemoveDiceDecoration(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: DiceDecoration
-): ModelChange
+    override val value: DiceDecoration,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemoveFieldMarker")
@@ -435,8 +436,8 @@ data class FieldModelRemoveFieldMarker(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: FieldMarker
-): ModelChange
+    override val value: FieldMarker,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemoveMoveSquare")
@@ -446,8 +447,8 @@ data class FieldModelRemoveMoveSquare(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: MoveSquare
-): ModelChange
+    override val value: MoveSquare,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemovePlayer")
@@ -457,8 +458,8 @@ data class FieldModelRemovePlayer(
     @SerialName("modelChangeKey")
     override val key: PlayerId,
     @SerialName("modelChangeValue")
-    override val value: FieldCoordinate?
-): ModelChange
+    override val value: FieldCoordinate?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemovePlayerMarker")
@@ -468,8 +469,8 @@ data class FieldModelRemovePlayerMarker(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: PlayerMarker
-): ModelChange
+    override val value: PlayerMarker,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemovePrayer")
@@ -479,8 +480,8 @@ data class FieldModelRemovePrayer(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemoveSkillEnhancements")
@@ -490,8 +491,8 @@ data class FieldModelRemoveSkillEnhancements(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemovePushbackSquare")
@@ -501,8 +502,8 @@ data class FieldModelRemovePushbackSquare(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: PushBackSquare
-): ModelChange
+    override val value: PushBackSquare,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemoveTrackNumber")
@@ -512,8 +513,8 @@ data class FieldModelRemoveTrackNumber(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: TrackNumber
-): ModelChange
+    override val value: TrackNumber,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelRemoveTrapDoor")
@@ -523,8 +524,8 @@ data class FieldModelRemoveTrapDoor(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: TrapDoor
-): ModelChange
+    override val value: TrapDoor,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetBallCoordinate")
@@ -534,8 +535,8 @@ data class FieldModelSetBallCoordinate(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: FieldCoordinate?
-): ModelChange
+    override val value: FieldCoordinate?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetBallInPlay")
@@ -545,8 +546,8 @@ data class FieldModelSetBallInPlay(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetBallMoving")
@@ -556,8 +557,8 @@ data class FieldModelSetBallMoving(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetBlitzState")
@@ -567,8 +568,8 @@ data class FieldModelSetBlitzState(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: TargetSelectionState?
-): ModelChange
+    override val value: TargetSelectionState?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetBombCoordinate")
@@ -578,8 +579,8 @@ data class FieldModelSetBombCoordinate(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: FieldCoordinate?
-): ModelChange
+    override val value: FieldCoordinate?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetBombMoving")
@@ -589,8 +590,8 @@ data class FieldModelSetBombMoving(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetPlayerCoordinate")
@@ -600,8 +601,8 @@ data class FieldModelSetPlayerCoordinate(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: FieldCoordinate?
-): ModelChange
+    override val value: FieldCoordinate?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetPlayerState")
@@ -611,8 +612,8 @@ data class FieldModelSetPlayerState(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: PlayerState
-): ModelChange
+    override val value: PlayerState,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetRangeRuler")
@@ -622,8 +623,8 @@ data class FieldModelSetRangeRuler(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: RangeRuler?
-): ModelChange
+    override val value: RangeRuler?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetTargetSelectionState")
@@ -633,8 +634,8 @@ data class FieldModelSetTargetSelectionState(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: TargetSelectionState?
-): ModelChange
+    override val value: TargetSelectionState?,
+) : ModelChange
 
 @Serializable
 @SerialName("fieldModelSetWeather")
@@ -644,8 +645,8 @@ data class FieldModelSetWeather(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetAdminMode")
@@ -655,8 +656,8 @@ data class GameSetAdminMode(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetConcededLegally")
@@ -666,8 +667,8 @@ data class GameSetConcededLegally(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetConcessionPossible")
@@ -677,8 +678,8 @@ data class GameSetConcessionPossible(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetDefenderAction")
@@ -688,8 +689,8 @@ data class GameSetDefenderAction(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: PlayerAction?
-): ModelChange
+    override val value: PlayerAction?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetDefenderId")
@@ -699,8 +700,8 @@ data class GameSetDefenderId(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetDialogParameter")
@@ -710,8 +711,8 @@ data class GameSetDialogParameter(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: DialogOptions?
-): ModelChange
+    override val value: DialogOptions?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetFinished")
@@ -721,8 +722,8 @@ data class GameSetFinished(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: LocalDateTime?
-): ModelChange
+    override val value: LocalDateTime?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetHalf")
@@ -732,8 +733,8 @@ data class GameSetHalf(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetHomeFirstOffense")
@@ -743,8 +744,8 @@ data class GameSetHomeFirstOffense(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetHomePlaying")
@@ -754,8 +755,8 @@ data class GameSetHomePlaying(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetId")
@@ -765,8 +766,8 @@ data class GameSetId(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Long
-): ModelChange
+    override val value: Long,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetLastDefenderId")
@@ -776,8 +777,8 @@ data class GameSetLastDefenderId(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetLastTurnMode")
@@ -787,8 +788,8 @@ data class GameSetLastTurnMode(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: TurnMode?
-): ModelChange
+    override val value: TurnMode?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetPassCoordinate")
@@ -798,8 +799,8 @@ data class GameSetPassCoordinate(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: FieldCoordinate?
-): ModelChange
+    override val value: FieldCoordinate?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetScheduled")
@@ -809,8 +810,8 @@ data class GameSetScheduled(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: LocalDateTime?
-): ModelChange
+    override val value: LocalDateTime?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetSetupOffense")
@@ -820,8 +821,8 @@ data class GameSetSetupOffense(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetStarted")
@@ -831,8 +832,8 @@ data class GameSetStarted(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: LocalDateTime?
-): ModelChange
+    override val value: LocalDateTime?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetTesting")
@@ -842,8 +843,8 @@ data class GameSetTesting(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetThrowerId")
@@ -853,8 +854,8 @@ data class GameSetThrowerId(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetThrowerAction")
@@ -864,8 +865,8 @@ data class GameSetThrowerAction(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: PlayerAction?
-): ModelChange
+    override val value: PlayerAction?,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetTimeoutEnforced")
@@ -875,8 +876,8 @@ data class GameSetTimeoutEnforced(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetTimeoutPossible")
@@ -886,8 +887,8 @@ data class GameSetTimeoutPossible(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetTurnMode")
@@ -897,8 +898,8 @@ data class GameSetTurnMode(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: TurnMode
-): ModelChange
+    override val value: TurnMode,
+) : ModelChange
 
 @Serializable
 @SerialName("gameSetWaitingForOpponent")
@@ -908,8 +909,8 @@ data class GameSetWaitingForOpponent(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("gameOptionsAddOption")
@@ -919,8 +920,8 @@ data class GameOptionsAddOption(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("inducementSetActivateCard")
@@ -930,8 +931,8 @@ data class InducementSetActivateCard(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("inducementSetAddAvailableCard")
@@ -941,8 +942,8 @@ data class InducementSetAddAvailableCard(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("inducementSetAddInducement")
@@ -952,8 +953,8 @@ data class InducementSetAddInducement(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Inducement
-): ModelChange
+    override val value: Inducement,
+) : ModelChange
 
 @Serializable
 @SerialName("inducementSetCardChoices")
@@ -963,8 +964,8 @@ data class InducementSetCardChoices(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("inducementSetDeactivateCard")
@@ -974,8 +975,8 @@ data class InducementSetDeactivateCard(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("inducementSetAddPrayer")
@@ -985,8 +986,8 @@ data class InducementSetAddPrayer(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("inducementSetRemoveAvailableCard")
@@ -996,8 +997,8 @@ data class InducementSetRemoveAvailableCard(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("inducementSetRemoveInducement")
@@ -1007,8 +1008,8 @@ data class InducementSetRemoveInducement(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Inducement
-): ModelChange
+    override val value: Inducement,
+) : ModelChange
 
 @Serializable
 @SerialName("inducementSetRemovePrayer")
@@ -1018,8 +1019,8 @@ data class InducementSetRemovePrayer(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("playerMarkSkillUsed")
@@ -1029,8 +1030,8 @@ data class PlayerMarkSkillUsed(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("playerMarkSkillUnused")
@@ -1040,8 +1041,8 @@ data class PlayerMarkSkillUnused(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetBlocks")
@@ -1051,8 +1052,8 @@ data class PlayerResultSetBlocks(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetCasualties")
@@ -1062,8 +1063,8 @@ data class PlayerResultSetCasualties(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetCasualtiesWithAdditionalSpp")
@@ -1073,8 +1074,8 @@ data class PlayerResultSetCasualtiesWithAdditionalSpp(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetCompletions")
@@ -1084,8 +1085,8 @@ data class PlayerResultSetCompletions(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetCompletionsWithAdditionalSpp")
@@ -1095,8 +1096,8 @@ data class PlayerResultSetCompletionsWithAdditionalSpp(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetCurrentSpps")
@@ -1106,8 +1107,8 @@ data class PlayerResultSetCurrentSpps(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetDefecting")
@@ -1117,8 +1118,8 @@ data class PlayerResultSetDefecting(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetFouls")
@@ -1128,8 +1129,8 @@ data class PlayerResultSetFouls(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetHasUsedSecretWeapon")
@@ -1139,8 +1140,8 @@ data class PlayerResultSetHasUsedSecretWeapon(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetInterceptions")
@@ -1150,8 +1151,8 @@ data class PlayerResultSetInterceptions(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetDeflections")
@@ -1161,8 +1162,8 @@ data class PlayerResultSetDeflections(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetPassing")
@@ -1172,8 +1173,8 @@ data class PlayerResultSetPassing(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetPlayerAwards")
@@ -1183,8 +1184,8 @@ data class PlayerResultSetPlayerAwards(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetRushing")
@@ -1194,8 +1195,8 @@ data class PlayerResultSetRushing(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetSendToBoxByPlayerId")
@@ -1205,8 +1206,8 @@ data class PlayerResultSetSendToBoxByPlayerId(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetSendToBoxHalf")
@@ -1216,8 +1217,8 @@ data class PlayerResultSetSendToBoxHalf(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetSendToBoxReason")
@@ -1227,8 +1228,8 @@ data class PlayerResultSetSendToBoxReason(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetSendToBoxTurn")
@@ -1238,8 +1239,8 @@ data class PlayerResultSetSendToBoxTurn(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetSeriousInjury")
@@ -1249,8 +1250,8 @@ data class PlayerResultSetSeriousInjury(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetSeriousInjuryDecay")
@@ -1260,8 +1261,8 @@ data class PlayerResultSetSeriousInjuryDecay(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: String?
-): ModelChange
+    override val value: String?,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetTouchdowns")
@@ -1271,8 +1272,8 @@ data class PlayerResultSetTouchdowns(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("playerResultSetTurnsPlayed")
@@ -1282,8 +1283,8 @@ data class PlayerResultSetTurnsPlayed(
     @SerialName("modelChangeKey")
     override val key: String,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetConceded")
@@ -1293,8 +1294,8 @@ data class TeamResultSetConceded(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultDedicatedFansModifier")
@@ -1304,8 +1305,8 @@ data class TeamResultDedicatedFansModifier(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetFame")
@@ -1315,8 +1316,8 @@ data class TeamResultSetFame(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetFanFactor")
@@ -1326,8 +1327,8 @@ data class TeamResultSetFanFactor(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetBadlyHurtSuffered")
@@ -1337,8 +1338,8 @@ data class TeamResultSetBadlyHurtSuffered(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetFanFactorModifier")
@@ -1348,8 +1349,8 @@ data class TeamResultSetFanFactorModifier(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetPenaltyScore")
@@ -1359,8 +1360,8 @@ data class TeamResultSetPenaltyScore(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetPettyCashTransferred")
@@ -1370,8 +1371,8 @@ data class TeamResultSetPettyCashTransferred(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetPettyCashUsed")
@@ -1381,8 +1382,8 @@ data class TeamResultSetPettyCashUsed(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetRaisedDead")
@@ -1392,8 +1393,8 @@ data class TeamResultSetRaisedDead(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetRipSuffered")
@@ -1403,8 +1404,8 @@ data class TeamResultSetRipSuffered(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetScore")
@@ -1414,8 +1415,8 @@ data class TeamResultSetScore(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetSeriousInjurySuffered")
@@ -1425,8 +1426,8 @@ data class TeamResultSetSeriousInjurySuffered(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetSpectators")
@@ -1436,8 +1437,8 @@ data class TeamResultSetSpectators(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetSpirallingExpenses")
@@ -1447,8 +1448,8 @@ data class TeamResultSetSpirallingExpenses(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetTeamValue")
@@ -1458,8 +1459,8 @@ data class TeamResultSetTeamValue(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("teamResultSetWinnings")
@@ -1469,8 +1470,8 @@ data class TeamResultSetWinnings(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetApothecaries")
@@ -1480,8 +1481,8 @@ data class TurnDataSetApothecaries(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetBlitzUsed")
@@ -1491,8 +1492,8 @@ data class TurnDataSetBlitzUsed(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetBombUsed")
@@ -1502,8 +1503,8 @@ data class TurnDataSetBombUsed(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetFirstTurnAfterKickoff")
@@ -1513,8 +1514,8 @@ data class TurnDataSetFirstTurnAfterKickoff(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetFoulUsed")
@@ -1524,8 +1525,8 @@ data class TurnDataSetFoulUsed(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetHandOverUsed")
@@ -1535,8 +1536,8 @@ data class TurnDataSetHandOverUsed(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetLeaderState")
@@ -1546,8 +1547,8 @@ data class TurnDataSetLeaderState(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: String
-): ModelChange
+    override val value: String,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetPassUsed")
@@ -1557,8 +1558,8 @@ data class TurnDataSetPassUsed(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetPlagueDoctors")
@@ -1568,8 +1569,8 @@ data class TurnDataSetPlagueDoctors(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetKtmUsed")
@@ -1579,8 +1580,8 @@ data class TurnDataSetKtmUsed(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetReRolls")
@@ -1590,8 +1591,8 @@ data class TurnDataSetReRolls(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetReRollsBrilliantCoachingOneDrive")
@@ -1601,8 +1602,8 @@ data class TurnDataSetReRollsBrilliantCoachingOneDrive(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetReRollsPumpUpTheCrowdOneDrive")
@@ -1612,8 +1613,8 @@ data class TurnDataSetReRollsPumpUpTheCrowdOneDrive(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetReRollsSingleUse")
@@ -1623,8 +1624,8 @@ data class TurnDataSetReRollsSingleUse(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetReRollUsed")
@@ -1634,8 +1635,8 @@ data class TurnDataSetReRollUsed(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetTurnNr")
@@ -1645,8 +1646,8 @@ data class TurnDataSetTurnNr(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetTurnStarted")
@@ -1656,8 +1657,8 @@ data class TurnDataSetTurnStarted(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
+    override val value: Boolean,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetWanderingApothecaries")
@@ -1667,8 +1668,8 @@ data class TurnDataSetWanderingApothecaries(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Int
-): ModelChange
+    override val value: Int,
+) : ModelChange
 
 @Serializable
 @SerialName("turnDataSetCoachBanned")
@@ -1678,6 +1679,5 @@ data class TurnDataSetCoachBanned(
     @SerialName("modelChangeKey")
     override val key: String?,
     @SerialName("modelChangeValue")
-    override val value: Boolean
-): ModelChange
-
+    override val value: Boolean,
+) : ModelChange

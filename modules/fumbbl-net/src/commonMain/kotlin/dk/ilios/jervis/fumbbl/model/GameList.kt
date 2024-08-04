@@ -1,6 +1,7 @@
 @file:UseContextualSerialization(
-    LocalDateTime::class
+    LocalDateTime::class,
 )
+
 package dk.ilios.jervis.fumbbl.model
 
 import kotlinx.serialization.Serializable
@@ -21,5 +22,5 @@ data class GameData(
 
 @Serializable
 data class GameList(
-    val gameListEntries: List<GameData>
+    val gameListEntries: List<GameData>,
 )

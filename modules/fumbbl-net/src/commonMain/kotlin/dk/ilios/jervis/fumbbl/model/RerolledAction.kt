@@ -4,10 +4,10 @@ import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer
 import kotlinx.serialization.Serializable
 
-class ReRolledActionSerializer: FumbblEnumSerializer<ReRolledAction>(ReRolledAction::class)
+class ReRolledActionSerializer : FumbblEnumSerializer<ReRolledAction>(ReRolledAction::class)
 
 @Serializable(with = ReRolledActionSerializer::class)
-enum class ReRolledAction(override val id: String): FumbblEnum {
+enum class ReRolledAction(override val id: String) : FumbblEnum {
     GO_FOR_IT("Go For It"),
     RUSH("Rush"),
     DODGE("Dodge"),
@@ -52,5 +52,5 @@ enum class ReRolledAction(override val id: String): FumbblEnum {
     LOOK_INTO_MY_EYES("Look Into My Eyes"),
     BALEFUL_HEX("Baleful Hex"),
     SINGLE_DIE("Single Die"),
-    ALL_YOU_CAN_EAT("All You Can Eat")
+    ALL_YOU_CAN_EAT("All You Can Eat"),
 }

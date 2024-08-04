@@ -5,7 +5,8 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.PlayerActionType
 
-class ResetAvailableTeamActions(private val team: Team,
+class ResetAvailableTeamActions(
+    private val team: Team,
     private val moveActions: Int,
     private val passActions: Int,
     private val handOffActions: Int,
@@ -13,7 +14,6 @@ class ResetAvailableTeamActions(private val team: Team,
     private val blitzActions: Int,
     private val foulActions: Int,
 ) : Command {
-
     var originalMoveActions = 0
     var originalPassActions = 0
     var originalHandOffActions = 0
@@ -21,7 +21,10 @@ class ResetAvailableTeamActions(private val team: Team,
     var originalBlitzActions = 0
     var originalFoulActions = 0
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         originalMoveActions = team.turnData.availableActions[PlayerActionType.MOVE]!!
         originalPassActions = team.turnData.availableActions[PlayerActionType.PASS]!!
         originalHandOffActions = team.turnData.availableActions[PlayerActionType.HAND_OFF]!!
@@ -39,7 +42,10 @@ class ResetAvailableTeamActions(private val team: Team,
         team.notifyUpdate()
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         team.turnData.let {
             it.moveActions = originalMoveActions
             it.passActions = originalPassActions

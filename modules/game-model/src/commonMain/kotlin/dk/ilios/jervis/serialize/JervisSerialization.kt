@@ -52,75 +52,79 @@ import okio.use
  * Class encapsulating the the logic for serializing and deserializing a Jervis game file.
  */
 object JervisSerialization {
+    private val jervisModule =
+        SerializersModule {
 
-    private val jervisModule = SerializersModule {
-
-
-        polymorphic(Rules::class) {
-            subclass(BB2020Rules::class)
-        }
-        polymorphic(Roster::class) {
-            subclass(ChaosDwarfTeam::class)
-            subclass(HumanTeam::class)
-            subclass(KhorneTeam::class)
-        }
-        polymorphic(BB2020Roster::class) {
-            subclass(ChaosDwarfTeam::class)
-            subclass(HumanTeam::class)
-            subclass(KhorneTeam::class)
-        }
-        polymorphic(Position::class) {
-            subclass(BB2020Position::class)
-        }
-        polymorphic(GameAction::class) {
-            subclass(Cancel::class)
-            subclass(CoinSideSelected::class)
-            subclass(CoinTossResult::class)
-            subclass(Confirm::class)
-            subclass(Continue::class)
-            subclass(DiceResults::class)
-            subclass(DogoutSelected::class)
-            subclass(EndAction::class)
-            subclass(EndTurn::class)
-            subclass(EndSetup::class)
-            subclass(FieldSquareSelected::class)
-            subclass(NoRerollSelected::class)
-            subclass(PlayerActionSelected::class)
-            subclass(PlayerDeselected::class)
-            subclass(PlayerSelected::class)
-            subclass(RandomPlayersSelected::class)
-            subclass(RerollOptionSelected::class)
+            polymorphic(Rules::class) {
+                subclass(BB2020Rules::class)
+            }
+            polymorphic(Roster::class) {
+                subclass(ChaosDwarfTeam::class)
+                subclass(HumanTeam::class)
+                subclass(KhorneTeam::class)
+            }
+            polymorphic(BB2020Roster::class) {
+                subclass(ChaosDwarfTeam::class)
+                subclass(HumanTeam::class)
+                subclass(KhorneTeam::class)
+            }
+            polymorphic(Position::class) {
+                subclass(BB2020Position::class)
+            }
+            polymorphic(GameAction::class) {
+                subclass(Cancel::class)
+                subclass(CoinSideSelected::class)
+                subclass(CoinTossResult::class)
+                subclass(Confirm::class)
+                subclass(Continue::class)
+                subclass(DiceResults::class)
+                subclass(DogoutSelected::class)
+                subclass(EndAction::class)
+                subclass(EndTurn::class)
+                subclass(EndSetup::class)
+                subclass(FieldSquareSelected::class)
+                subclass(NoRerollSelected::class)
+                subclass(PlayerActionSelected::class)
+                subclass(PlayerDeselected::class)
+                subclass(PlayerSelected::class)
+                subclass(RandomPlayersSelected::class)
+                subclass(RerollOptionSelected::class)
 
 //            polymorphic(DieResult::class) {
-            subclass(D2Result::class)
-            subclass(D3Result::class)
-            subclass(D4Result::class)
-            subclass(D6Result::class)
-            subclass(D8Result::class)
-            subclass(D12Result::class)
-            subclass(D16Result::class)
-            subclass(D20Result::class)
-            subclass(DBlockResult::class)
+                subclass(D2Result::class)
+                subclass(D3Result::class)
+                subclass(D4Result::class)
+                subclass(D6Result::class)
+                subclass(D8Result::class)
+                subclass(D12Result::class)
+                subclass(D16Result::class)
+                subclass(D20Result::class)
+                subclass(DBlockResult::class)
 //            }
-        }
+            }
 
 //        polymorphic(SkillFactory::class) {
 //            subclass(CatchSkill.Companion::class)
 //            subclass(SureHandsSkill.Companion::class)
 //        }
-    }
+        }
 
-    private val jsonFormat = Json {
-        serializersModule = jervisModule
-        prettyPrint = true
-    }
+    private val jsonFormat =
+        Json {
+            serializersModule = jervisModule
+            prettyPrint = true
+        }
 
-    fun saveToFile(game: GameController, file: Path) {
-        val fileData = JervisFile(
-            JervisMetaData(),
-            JervisConfiguration(game.rules),
-            JervisGameData(game.state.homeTeam, game.state.awayTeam, game.actionHistory)
-        )
+    fun saveToFile(
+        game: GameController,
+        file: Path,
+    ) {
+        val fileData =
+            JervisFile(
+                JervisMetaData(),
+                JervisConfiguration(game.rules),
+                JervisGameData(game.state.homeTeam, game.state.awayTeam, game.actionHistory),
+            )
         val fileContent = jsonFormat.encodeToString(fileData)
         platformFileSystem.sink(file).use { fileSink ->
             fileSink.buffer().use {
@@ -130,10 +134,10 @@ object JervisSerialization {
     }
 
     fun loadFromFile(file: Path): Pair<GameController, List<GameAction>> {
-        val fileContent = platformFileSystem.source(file).use { fileSource ->
-            fileSource.buffer().readUtf8()
-
-        }
+        val fileContent =
+            platformFileSystem.source(file).use { fileSource ->
+                fileSource.buffer().readUtf8()
+            }
         val gameData = jsonFormat.decodeFromString<JervisFile>(fileContent)
         val rules = gameData.configuration.rules
         val homeTeam = gameData.game.homeTeam
@@ -148,9 +152,12 @@ object JervisSerialization {
     }
 
     // Remap object references like to Player in GameActions so they all point to the same instance
-    private fun remapActionRefs(actions: List<GameAction>, state: Game): List<GameAction> {
+    private fun remapActionRefs(
+        actions: List<GameAction>,
+        state: Game,
+    ): List<GameAction> {
         return actions.map { action ->
-            when(action) {
+            when (action) {
                 is PlayerSelected -> {
                     val isHomeTeam = state.homeTeam.firstOrNull { it.id == action.player.id } != null
                     val playerNo = action.player.number
@@ -162,7 +169,4 @@ object JervisSerialization {
             }
         }
     }
-
 }
-
-

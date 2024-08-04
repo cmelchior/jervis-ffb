@@ -27,7 +27,6 @@ import dk.ilios.jervis.utils.createDefaultGameState
 import dk.ilios.jervis.utils.createStartingTestSetup
 import org.junit.Test
 
-
 class DjikstraTests {
     @Test
     fun run() {
@@ -58,33 +57,40 @@ fun DjiekstraContent() {
         { end: FieldCoordinate ->
             val newPath = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), end, 4, false)
             path.value = result.getClosestPathTo(end) // newPath.path
-        }
-
+        },
     )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun DjiekstraBoxGrid(rows: Int, cols: Int, distances: Map<FieldCoordinate, Int>, path: List<FieldCoordinate>, update: (end: FieldCoordinate) -> Unit) {
+fun DjiekstraBoxGrid(
+    rows: Int,
+    cols: Int,
+    distances: Map<FieldCoordinate, Int>,
+    path: List<FieldCoordinate>,
+    update: (end: FieldCoordinate) -> Unit,
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         repeat(rows) { y ->
             Row {
                 repeat(cols) { x ->
                     val squareValue: Int? = distances[FieldCoordinate(x, y)]
                     val onPath = path.contains(FieldCoordinate(x, y))
-                    val (text: String, bgColor: Color) = when {
-                        onPath -> (squareValue?.toString() ?: "") to Color.Blue
-                        else -> (squareValue?.toString() ?: "") to Color.White
-                    }
+                    val (text: String, bgColor: Color) =
+                        when {
+                            onPath -> (squareValue?.toString() ?: "") to Color.Blue
+                            else -> (squareValue?.toString() ?: "") to Color.White
+                        }
                     Box(
-                        modifier = Modifier
-                            .onPointerEvent(PointerEventType.Enter) {
-                                update(FieldCoordinate(x, y))
-                            }
-                            .size(30.dp)
-                            .padding(1.dp)
-                            .background(bgColor),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .onPointerEvent(PointerEventType.Enter) {
+                                    update(FieldCoordinate(x, y))
+                                }
+                                .size(30.dp)
+                                .padding(1.dp)
+                                .background(bgColor),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(text = text)
                     }

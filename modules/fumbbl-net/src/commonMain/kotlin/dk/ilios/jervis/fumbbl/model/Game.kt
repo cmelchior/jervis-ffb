@@ -1,9 +1,9 @@
 @file:UseContextualSerialization(
-    LocalDateTime::class
+    LocalDateTime::class,
 )
+
 package dk.ilios.jervis.fumbbl.model
 
-import dk.ilios.jervis.fumbbl.model.change.GameSetConcessionPossible
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
 import java.time.LocalDateTime
@@ -45,7 +45,7 @@ data class Game(
     var dialogParameter: DialogOptions?,
     var concededLegally: Boolean,
     var adminMode: Boolean = false,
-    var rangeRuler: RangeRuler? = null
+    var rangeRuler: RangeRuler? = null,
 ) {
     fun getPlayerById(playerId: String): Player? {
         return teamHome.players.firstOrNull { player ->
@@ -54,6 +54,7 @@ data class Game(
     }
 
     public enum class TeamState {
-        SKELETON, FULL
+        SKELETON,
+        FULL,
     }
 }

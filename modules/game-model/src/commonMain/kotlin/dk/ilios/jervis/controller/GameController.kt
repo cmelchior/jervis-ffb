@@ -25,8 +25,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 sealed interface ListEvent
-data class AddEntry(val log: LogEntry): ListEvent
-data class RemoveEntry(val log: LogEntry): ListEvent
+
+data class AddEntry(val log: LogEntry) : ListEvent
+
+data class RemoveEntry(val log: LogEntry) : ListEvent
 
 class GameController(
     rules: Rules,
@@ -47,7 +49,7 @@ class GameController(
 
     private fun processNode(
         currentNode: Node,
-        actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction
+        actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction,
     ) {
         when (currentNode) {
             is ComputationNode -> {
@@ -76,11 +78,12 @@ class GameController(
             }
 
             is ParentNode -> {
-                val commands = when (stack.firstOrNull()!!.currentParentNodeState()) {
-                    ParentNode.State.ENTERING -> currentNode.enterNode(state, rules)
-                    ParentNode.State.RUNNING -> currentNode.runNode(state, rules)
-                    ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
-                }
+                val commands =
+                    when (stack.firstOrNull()!!.currentParentNodeState()) {
+                        ParentNode.State.ENTERING -> currentNode.enterNode(state, rules)
+                        ParentNode.State.RUNNING -> currentNode.runNode(state, rules)
+                        ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
+                    }
                 this.commands.add(commands)
                 commands.execute(state, this)
             }
@@ -98,7 +101,7 @@ class GameController(
         }
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val actions = currentNode.getAvailableActions(state, rules)
-        val reportAvailableActions = SimpleLogEntry( "Available actions: ${actions.joinToString()}")
+        val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}")
         commands.add(reportAvailableActions)
         reportAvailableActions.execute(state, this)
         return actions
@@ -123,7 +126,7 @@ class GameController(
 
     private fun rollForwardToNextActionNode() {
         if (!stack.isEmpty() && (stack.currentNode() is ComputationNode || stack.currentNode() is ParentNode)) {
-            when(val currentNode: Node = stack.currentNode()) {
+            when (val currentNode: Node = stack.currentNode()) {
                 is ComputationNode -> {
                     // Reduce noise from Continue events
                     val command = currentNode.applyAction(Continue, state, rules)
@@ -132,11 +135,12 @@ class GameController(
                 }
                 is ActionNode -> throw IllegalStateException("Should not happen")
                 is ParentNode -> {
-                    val commands = when(stack.firstOrNull()!!.currentParentNodeState()) {
-                        ParentNode.State.ENTERING -> currentNode.enterNode(state, rules)
-                        ParentNode.State.RUNNING -> currentNode.runNode(state, rules)
-                        ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
-                    }
+                    val commands =
+                        when (stack.firstOrNull()!!.currentParentNodeState()) {
+                            ParentNode.State.ENTERING -> currentNode.enterNode(state, rules)
+                            ParentNode.State.RUNNING -> currentNode.runNode(state, rules)
+                            ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
+                        }
                     this.commands.add(commands)
                     commands.execute(state, this)
                 }
@@ -159,7 +163,6 @@ class GameController(
         setInitialProcedure(FullGame)
     }
 
-
     fun startCallbackMode(actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction) {
         val backupActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
             actionProvider(controller, availableActions).also { selectedAction ->
@@ -173,10 +176,11 @@ class GameController(
     }
 
     private fun setInitialProcedure(procedure: Procedure) {
-        val command = compositeCommandOf(
-            SimpleLogEntry("Set initial procedure: ${procedure.name()}[${procedure.initialNode.name()}]"),
-            EnterProcedure(procedure)
-        )
+        val command =
+            compositeCommandOf(
+                SimpleLogEntry("Set initial procedure: ${procedure.name()}[${procedure.initialNode.name()}]"),
+                EnterProcedure(procedure),
+            )
         commands.add(command)
         command.execute(state, this)
     }
@@ -224,14 +228,18 @@ class GameController(
 
     fun disableReplayMode() {
         checkReplayMode()
-        while(forward()) { }
+        while (forward()) { }
         this.replayMode = false
         this.replayIndex = -1
     }
 
     // Revert last action
     fun revert() {
-        if (replayMode) throw IllegalStateException("Controller is in replay mode. `revert` is only available in manual mode.")
+        if (replayMode) {
+            throw IllegalStateException(
+                "Controller is in replay mode. `revert` is only available in manual mode.",
+            )
+        }
         if (actionHistory.isEmpty()) return
         while (commands.last() !is ReportHandleAction && actionHistory.last() != (commands.last() as? ReportHandleAction)?.action) {
             val i = commands.size - 1

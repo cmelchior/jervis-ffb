@@ -30,7 +30,6 @@ import kotlin.io.path.name
  * Create
  */
 class CreateDebugClientRunner(private val cliJarFile: File) {
-
     fun run(jarFolder: File) {
         val baseUrl = "https://fumbbl.com"
         val jnlpFileName = "ffblive.jnlp"
@@ -51,7 +50,11 @@ class CreateDebugClientRunner(private val cliJarFile: File) {
     /**
      * Go through the JNLP file and download all resources it mentions, so we can run the code locally.
      */
-    suspend fun processJNLPFile(client: HttpClient, root: File, file: File) {
+    suspend fun processJNLPFile(
+        client: HttpClient,
+        root: File,
+        file: File,
+    ) {
         val content: String = file.readText()
         val findBaseUrl = Regex("codebase=\"(.*?)\"")
         val baseUrl: String = findBaseUrl.find(content)!!.groups[1]!!.value
@@ -60,18 +63,23 @@ class CreateDebugClientRunner(private val cliJarFile: File) {
         matches.forEach {
             val resourceFile = it.groups[1]!!.value
             logInfo("Downloading resource: $resourceFile")
-            client.downloadFile(File(root, resourceFile),"$baseUrl/$resourceFile")
+            client.downloadFile(File(root, resourceFile), "$baseUrl/$resourceFile")
         }
         val findMainClass = Regex("main-class=\"(.*?)\"")
         val mainClass: String = findMainClass.find(content)!!.groups[1]!!.value
         logInfo("Usage: java -cp FantasyFootballClient.jar:* $mainClass -replay -gameId <gameId>")
-        logInfo("Debug usage: java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:8000 -cp FantasyFootballClient.jar:* $mainClass -replay -gameId <gameId>")
+        logInfo(
+            "Debug usage: java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:8000 -cp FantasyFootballClient.jar:* $mainClass -replay -gameId <gameId>",
+        )
     }
 
     /**
      * Helper function for easily downloading a file using HTTP GET.
      */
-    suspend fun HttpClient.downloadFile(targetFile: File, url: String) {
+    suspend fun HttpClient.downloadFile(
+        targetFile: File,
+        url: String,
+    ) {
         if (targetFile.exists()) {
             targetFile.delete()
         }
@@ -93,6 +101,7 @@ class CreateDebugClientRunner(private val cliJarFile: File) {
         val cp = ClassPool.getDefault()
         cp.insertClassPath(fumbblClientJar.absolutePath)
         val cc = cp["com.fumbbl.ffb.client.net.CommandEndpoint"]
+
         /**
          * This is the method template we want to modify:
          *
@@ -117,13 +126,17 @@ class CreateDebugClientRunner(private val cliJarFile: File) {
          *    }
          */
         val sendMethod = cc.getDeclaredMethod("send")
-        sendMethod.instrument(object : ExprEditor() {
-            override fun edit(m: MethodCall) {
-                if (m.methodName.equals("toJsonValue")) {
-                    m.replace("\$_ = \$proceed($$); dk.ilios.jervis.fumbbl.FumbblDebugger.handleClientMessage(\$_);")
+        sendMethod.instrument(
+            object : ExprEditor() {
+                override fun edit(m: MethodCall) {
+                    if (m.methodName.equals("toJsonValue")) {
+                        m.replace(
+                            "\$_ = \$proceed($$); dk.ilios.jervis.fumbbl.FumbblDebugger.handleClientMessage(\$_);",
+                        )
+                    }
                 }
-            }
-        })
+            },
+        )
 
         /**
          * This is the method template we want to modify:
@@ -139,17 +152,24 @@ class CreateDebugClientRunner(private val cliJarFile: File) {
          *    }
          */
         val onMessageMethod = cc.getDeclaredMethod("onMessage")
-        onMessageMethod.instrument(object : ExprEditor() {
-            override fun edit(m: MethodCall) {
-                if (m.methodName.equals("readFrom")) {
-                    m.replace("\$_ = \$proceed($$); dk.ilios.jervis.fumbbl.FumbblDebugger.handleServerMessage(\$_);")
+        onMessageMethod.instrument(
+            object : ExprEditor() {
+                override fun edit(m: MethodCall) {
+                    if (m.methodName.equals("readFrom")) {
+                        m.replace(
+                            "\$_ = \$proceed($$); dk.ilios.jervis.fumbbl.FumbblDebugger.handleServerMessage(\$_);",
+                        )
+                    }
                 }
-            }
-        })
+            },
+        )
 
         val jarParentDir = fumbblClientJar.parentFile.absolutePath
         cc.writeFile(jarParentDir + okio.Path.DIRECTORY_SEPARATOR)
-        val outputFile = File(jarParentDir + "/com/fumbbl/ffb/client/net/CommandEndpoint.class".replace("/", okio.Path.DIRECTORY_SEPARATOR))
+        val outputFile =
+            File(
+                jarParentDir + "/com/fumbbl/ffb/client/net/CommandEndpoint.class".replace("/", okio.Path.DIRECTORY_SEPARATOR),
+            )
         return mapOf("com/fumbbl/ffb/client/net/CommandEndpoint.class" to outputFile)
     }
 
@@ -162,7 +182,10 @@ class CreateDebugClientRunner(private val cliJarFile: File) {
         copyCLIJarFile(cliJarFile.toPath(), fumbblClientJar.parentFile.toPath())
     }
 
-    private fun copyCLIJarFile(cliJarFile: Path, targetDirectory: Path) {
+    private fun copyCLIJarFile(
+        cliJarFile: Path,
+        targetDirectory: Path,
+    ) {
         val targetFile = targetDirectory.resolve(cliJarFile.name)
         logInfo("Copy CLI Jar file to $targetFile")
         Files.copy(cliJarFile, targetFile, StandardCopyOption.REPLACE_EXISTING)
@@ -171,20 +194,24 @@ class CreateDebugClientRunner(private val cliJarFile: File) {
     /**
      * Replace the modified classes in the FUMBBL Client jar file.
      */
-    fun rewriteJarFile(fumbblClientJar: File, modifiedFiles: Map<String, File>) {
+    fun rewriteJarFile(
+        fumbblClientJar: File,
+        modifiedFiles: Map<String, File>,
+    ) {
         val pathToFumbblClientJar = fumbblClientJar.absolutePath
         val tempJarPath = Files.createTempFile("tempJar", ".jar")
 
         // Get the paths of all entries in the original JAR file, excluding the entry to be replaced
         var entriesToKeep: List<String?> = ArrayList()
         JarFile(pathToFumbblClientJar).use { jar ->
-            entriesToKeep = jar.stream()
-                .map(JarEntry::getName)
-                // Don't copy modified files
-                .filter { name -> !modifiedFiles.keys.contains(name) }
-                // Remove signatures as they are now broken and will prevent loading the JAR
-                .filter { name -> !name.endsWith(".SF") && !name.endsWith(".RSA") }
-                .collect(Collectors.toList())
+            entriesToKeep =
+                jar.stream()
+                    .map(JarEntry::getName)
+                    // Don't copy modified files
+                    .filter { name -> !modifiedFiles.keys.contains(name) }
+                    // Remove signatures as they are now broken and will prevent loading the JAR
+                    .filter { name -> !name.endsWith(".SF") && !name.endsWith(".RSA") }
+                    .collect(Collectors.toList())
         }
 
         // Create the new JAR file

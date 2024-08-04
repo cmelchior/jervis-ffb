@@ -11,5 +11,5 @@ data class Redrafting(
     val redraftCap: Int,
     val redraftRamp: Int,
     val seasonGames: Int,
-    val tooltip: String
+    val tooltip: String,
 )

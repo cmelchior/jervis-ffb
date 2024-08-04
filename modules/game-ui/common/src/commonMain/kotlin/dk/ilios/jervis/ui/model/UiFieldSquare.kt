@@ -18,11 +18,11 @@ data class UiFieldSquare(
     val onSelected: (() -> Unit)? = null,
     val contextMenuOptions: List<ContextMenuOption> = emptyList(),
     val showContextMenu: Boolean = false,
-): UiModel<FieldSquare>
+) : UiModel<FieldSquare>
 
+class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?, val onHover: (() -> Unit)? = null) : UiModel<Player> {
+    fun hasBall(): Boolean = model.hasBall()
 
-class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?, val onHover: (() -> Unit)? = null): UiModel<Player> {
-    fun hasBall(): Boolean  = model.hasBall()
     val state: PlayerState = model.state
     val isOnHomeTeam = model.isOnHomeTeam()
     val position = model.position
@@ -32,5 +32,5 @@ class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?, val 
 }
 
 class UiPlayerCard(
-    override val model: Player
-): UiModel<Player> {}
+    override val model: Player,
+) : UiModel<Player>

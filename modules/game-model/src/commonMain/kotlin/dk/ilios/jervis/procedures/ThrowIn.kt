@@ -18,19 +18,30 @@ import dk.ilios.jervis.rules.Rules
  *
  * TODO Currently implementation just finds the first empty field
  */
-object ThrowIn: Procedure() {
+object ThrowIn : Procedure() {
     override val initialNode: Node = SelectDirection
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
 
     // TODO For now just select an empty field
-    object SelectDirection: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+    object SelectDirection : ComputationNode() {
+        override fun apply(
+            state: Game,
+            rules: Rules,
+        ): Command {
             val square = state.field.filter { it.isEmpty() }.random()
             return compositeCommandOf(
                 SetBallLocation(square.coordinates),
                 SetBallState.onGround(),
-                ExitProcedure()
+                ExitProcedure(),
             )
         }
     }

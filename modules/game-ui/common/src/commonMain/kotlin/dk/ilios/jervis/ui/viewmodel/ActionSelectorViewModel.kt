@@ -14,42 +14,47 @@ sealed interface UserInput {
     val actions: List<GameAction>
 }
 
-class CompositeUserInput(val inputs: List<UserInput>): UserInput {
+class CompositeUserInput(val inputs: List<UserInput>) : UserInput {
     override val actions: List<GameAction>
         get() = TODO("Not supported")
 }
 
-data object WaitingForUserInput: UserInput {
+data object WaitingForUserInput : UserInput {
     override val actions: List<GameAction> = emptyList()
 }
 
-data object IgnoreUserInput: UserInput {
+data object IgnoreUserInput : UserInput {
     override val actions: List<GameAction>
         get() = TODO()
 }
 
-data object ResumeUserInput: UserInput {
+data object ResumeUserInput : UserInput {
     override val actions: List<GameAction>
         get() = TODO()
 }
 
-class SelectPlayerActionInput(val activePlayerLocation: FieldCoordinate, override val actions: List<PlayerActionSelected>): UserInput
-class EndActionInput(val activePlayerLocation: FieldCoordinate, override val actions:List<EndAction>): UserInput {}
-class SelectPlayerInput(override val actions: List<GameAction>): UserInput
-class DeselectPlayerInput(override val actions: List<GameAction>): UserInput
-class SelectFieldLocationInput(override val actions: List<FieldSquareSelected>): UserInput {
+class SelectPlayerActionInput(val activePlayerLocation: FieldCoordinate, override val actions: List<PlayerActionSelected>) : UserInput
+
+class EndActionInput(val activePlayerLocation: FieldCoordinate, override val actions: List<EndAction>) : UserInput
+
+class SelectPlayerInput(override val actions: List<GameAction>) : UserInput
+
+class DeselectPlayerInput(override val actions: List<GameAction>) : UserInput
+
+class SelectFieldLocationInput(override val actions: List<FieldSquareSelected>) : UserInput {
     // Map action to each field
     val fieldAction: Map<FieldCoordinate, FieldSquareSelected> = actions.associateBy { FieldCoordinate(it.x, it.y) }
 }
+
 class SelectMoveActionFieldLocationInput(
     override val actions: List<FieldSquareSelected>,
-    distances: PathFinder.AllPathsResult
-): UserInput {
+    distances: PathFinder.AllPathsResult,
+) : UserInput {
     // Map action to each field
     val fieldAction: Map<FieldCoordinate, FieldSquareSelected> = actions.associateBy { FieldCoordinate(it.x, it.y) }
 }
 
-//class SelectKickingPlayer(val team: Team, override val actions: List<GameAction>) : UserInput
+// class SelectKickingPlayer(val team: Team, override val actions: List<GameAction>) : UserInput
 
 /**
  * View model for the unknown action selector part of the UI. Eventually this should be removed.
@@ -74,9 +79,9 @@ class ActionSelectorViewModel(
 //            }
 //            actionSelectedChannel.send(EndSetup)
 //            return true
-////        } else if (controller.stack.firstOrNull()?.procedure == TheKickOffEvent && controller.stack.firstOrNull()?.currentNode() == TheKickOffEvent.ResolveKickOffEvent) {
-////            actionSelectedChannel.send(DiceResults(listOf(D6Result(2), D6Result(4))))
-////            return true
+// //        } else if (controller.stack.firstOrNull()?.procedure == TheKickOffEvent && controller.stack.firstOrNull()?.currentNode() == TheKickOffEvent.ResolveKickOffEvent) {
+// //            actionSelectedChannel.send(DiceResults(listOf(D6Result(2), D6Result(4))))
+// //            return true
 //        } else {
 //            return false
 //        }

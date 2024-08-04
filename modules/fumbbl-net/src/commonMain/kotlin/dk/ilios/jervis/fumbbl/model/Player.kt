@@ -4,7 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Player(
-    val playerKind: String, // This can either be `zappedPlayer` or `rosterPlayer`
+    // This can either be `zappedPlayer` or `rosterPlayer`
+    val playerKind: String,
     val playerId: String,
     val playerNr: Int,
     val positionId: String,
@@ -29,17 +30,23 @@ data class Player(
     val skillValuesMap: Map<String, String?>,
     val skillDisplayValuesMap: Map<String, String?>,
     val playerStatus: String? = null,
-    val usedSkills: List<String>
+    val usedSkills: List<String>,
 ) {
     fun removeEnhancement(skill: String?) {
         // TODO Unclear exactly what to do here. Fumbbl has pretty advanced tracking of modifiers/skills
     }
 
-    fun markUnused(skill: String, game: Game) {
+    fun markUnused(
+        skill: String,
+        game: Game,
+    ) {
         // TODO
     }
 
-    fun markUsed(skill: String, game: Game) {
+    fun markUsed(
+        skill: String,
+        game: Game,
+    ) {
         // TODO
     }
 }

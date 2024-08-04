@@ -18,14 +18,16 @@ import io.ktor.http.isSuccess
 import kotlinx.serialization.json.Json
 
 object FumbblTeamLoader {
-
     val json = Json { ignoreUnknownKeys = true }
 
     /**
      * Load a FUMBBL Team and convert it to a Jervis, so it can be used
      * inside Jervis games.
      */
-    suspend fun loadTeam(teamId: Int, rules: Rules): Team {
+    suspend fun loadTeam(
+        teamId: Int,
+        rules: Rules,
+    ): Team {
         return getHttpClient().use { client ->
             val result = client.get("https://fumbbl.com/api/team/get/$teamId")
             if (result.status.isSuccess()) {
@@ -54,12 +56,15 @@ object FumbblTeamLoader {
                 val name = player.name
                 val number = PlayerNo(player.number)
                 val position = getBB2020Position(jervisRoster, player.position.name)
-                addPlayer( id, name, number, position)
+                addPlayer(id, name, number, position)
             }
         }
     }
 
-    private fun getBB2020Position(jervisRoster: BB2020Roster, name: String): BB2020Position {
+    private fun getBB2020Position(
+        jervisRoster: BB2020Roster,
+        name: String,
+    ): BB2020Position {
         // This might not be true for all FUMBBL names. Some will probably crash. A problem for the future
         return jervisRoster.positions.firstOrNull {
             it.positionSingular == name
@@ -73,4 +78,3 @@ object FumbblTeamLoader {
         }
     }
 }
-

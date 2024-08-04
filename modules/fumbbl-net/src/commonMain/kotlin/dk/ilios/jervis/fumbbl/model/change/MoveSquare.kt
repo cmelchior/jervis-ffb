@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class MoveSquare(
     val coordinate: FieldCoordinate,
     val minimumRollDodge: Int,
-    val minimumRollGfi: Int
+    val minimumRollGfi: Int,
 )

@@ -29,57 +29,90 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  * Procedure for handling the Kick-Off Event: "Pitch Invasion" as described on page 41
  * of the rulebook.
  */
-object PitchInvasion: Procedure() {
+object PitchInvasion : Procedure() {
     override val initialNode: Node = RollForHomeTeam
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? {
         return SetActiveTeam(state.kickingTeam)
     }
 
     object RollForHomeTeam : ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
             return checkDiceRoll<D6Result>(action) {
                 compositeCommandOf(
                     SetTemporaryState(Game::pitchInvasionHomeRoll, it),
                     ReportPitchInvasionRoll(state.homeTeam, it, state.homeTeam.fanFactor),
-                    GotoNode(RollForAwayTeam)
+                    GotoNode(RollForAwayTeam),
                 )
             }
         }
     }
 
     object RollForAwayTeam : ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
             return checkDiceRoll<D6Result>(action) {
                 val homeResult = state.pitchInvasionHomeRoll!!.result + state.homeTeam.fanFactor
                 val awayResult = it.result + state.awayTeam.fanFactor
-                val nextNodes = when {
-                    homeResult > awayResult -> {
-                        arrayOf(SetActiveTeam(state.awayTeam), GotoNode(RollForAwayTeamStuns))
+                val nextNodes =
+                    when {
+                        homeResult > awayResult -> {
+                            arrayOf(SetActiveTeam(state.awayTeam), GotoNode(RollForAwayTeamStuns))
+                        }
+                        else -> {
+                            arrayOf(SetActiveTeam(state.homeTeam), GotoNode(RollForHomeTeamStuns))
+                        }
                     }
-                    else -> {
-                        arrayOf(SetActiveTeam(state.homeTeam), GotoNode(RollForHomeTeamStuns))
-                    }
-                }
                 compositeCommandOf(
                     SetTemporaryState(Game::pitchInvasionHomeResult, homeResult),
                     SetTemporaryState(Game::pitchInvasionAwayResult, awayResult),
                     ReportPitchInvasionRoll(state.awayTeam, it, state.awayTeam.fanFactor),
-                    *nextNodes
+                    *nextNodes,
                 )
             }
         }
     }
 
     object RollForHomeTeamStuns : ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D3))
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> = listOf(RollDice(Dice.D3))
+
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
             return checkType<D3Result>(action) {
                 compositeCommandOf(
                     SetTemporaryState(Game::pitchInvasionHomeTeamPlayersAffected, it.result),
-                    GotoNode(ResolveHomeTeamStuns)
+                    GotoNode(ResolveHomeTeamStuns),
                 )
             }
         }
@@ -87,67 +120,95 @@ object PitchInvasion: Procedure() {
 
     // Home team always go first, so is responsible for also triggering away team stuns if needed
     object ResolveHomeTeamStuns : ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val onFieldPlayers = state.homeTeam.filter {
-                it.location.isOnField(rules)
-            }
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> {
+            val onFieldPlayers =
+                state.homeTeam.filter {
+                    it.location.isOnField(rules)
+                }
             return listOf(SelectRandomPlayers(state.pitchInvasionHomeTeamPlayersAffected, onFieldPlayers))
         }
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
             return checkType<RandomPlayersSelected>(action) {
-                val playerStuns = it.players.flatMap { player ->
-                    listOf(
-                        SetPlayerState(player, PlayerState.STUNNED),
-                        ReportPlayerInjury(player, PlayerState.STUNNED)
-                    )
-                }.toTypedArray()
-                val nextNode = when {
-                    (state.pitchInvasionHomeResult == state.pitchInvasionAwayResult) -> GotoNode(RollForAwayTeamStuns)
-                    (state.pitchInvasionHomeResult < state.pitchInvasionAwayResult) -> ExitProcedure()
-                    else -> INVALID_GAME_STATE()
-                }
+                val playerStuns =
+                    it.players.flatMap { player ->
+                        listOf(
+                            SetPlayerState(player, PlayerState.STUNNED),
+                            ReportPlayerInjury(player, PlayerState.STUNNED),
+                        )
+                    }.toTypedArray()
+                val nextNode =
+                    when {
+                        (state.pitchInvasionHomeResult == state.pitchInvasionAwayResult) ->
+                            GotoNode(
+                                RollForAwayTeamStuns,
+                            )
+                        (state.pitchInvasionHomeResult < state.pitchInvasionAwayResult) -> ExitProcedure()
+                        else -> INVALID_GAME_STATE()
+                    }
                 return compositeCommandOf(
                     *playerStuns,
-                    nextNode
+                    nextNode,
                 )
             }
         }
     }
 
     object RollForAwayTeamStuns : ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> =
-            listOf(RollDice(Dice.D3))
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> = listOf(RollDice(Dice.D3))
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
             return checkType<D3Result>(action) {
                 compositeCommandOf(
                     SetTemporaryState(Game::pitchInvasionHomeTeamPlayersAffected, it.result),
-                    GotoNode(ResolveAwayTeamStuns)
+                    GotoNode(ResolveAwayTeamStuns),
                 )
             }
         }
     }
 
     object ResolveAwayTeamStuns : ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val onFieldPlayers = state.awayTeam.filter {
-                it.location.isOnField(rules)
-            }
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> {
+            val onFieldPlayers =
+                state.awayTeam.filter {
+                    it.location.isOnField(rules)
+                }
             return listOf(SelectRandomPlayers(state.pitchInvasionAwayTeamPlayersAffected, onFieldPlayers))
         }
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
             return checkType<RandomPlayersSelected>(action) {
-                val playerStuns = it.players.flatMap { player ->
-                    listOf(
-                        SetPlayerState(player, PlayerState.STUNNED),
-                        ReportPlayerInjury(player, PlayerState.STUNNED)
-                    )
-                }.toTypedArray()
+                val playerStuns =
+                    it.players.flatMap { player ->
+                        listOf(
+                            SetPlayerState(player, PlayerState.STUNNED),
+                            ReportPlayerInjury(player, PlayerState.STUNNED),
+                        )
+                    }.toTypedArray()
                 return compositeCommandOf(
                     *playerStuns,
-                    ExitProcedure()
+                    ExitProcedure(),
                 )
             }
         }

@@ -16,14 +16,18 @@ interface FumbblEnum {
 }
 
 open class FumbblEnumSerializer<E>(
-    private val kClass: KClass<E>
+    private val kClass: KClass<E>,
 ) : KSerializer<E> where E : Enum<E>, E : FumbblEnum {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
-        "dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer",
-        PrimitiveKind.STRING
-    )
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor(
+            "dk.ilios.jervis.fumbbl.net.serialization.FumbblEnumSerializer",
+            PrimitiveKind.STRING,
+        )
 
-    override fun serialize(encoder: Encoder, value: E) {
+    override fun serialize(
+        encoder: Encoder,
+        value: E,
+    ) {
         encoder.encodeString(value.id)
     }
 

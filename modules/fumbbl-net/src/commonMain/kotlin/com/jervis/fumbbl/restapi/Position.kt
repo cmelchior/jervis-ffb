@@ -28,5 +28,5 @@ data class Position(
     val thrall: String,
     val title: String,
     val type: String,
-    val undead: String
+    val undead: String,
 )

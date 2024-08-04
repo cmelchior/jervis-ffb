@@ -30,11 +30,14 @@ import okio.Path.Companion.toOkioPath
 class GameScreenModel(
     val mode: GameMode,
     val menuViewModel: MenuViewModel,
-    controller: GameController? = null
-): ScreenModel {
-    val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
-    val actionSelectedChannel = Channel<GameAction>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
-    val hoverPlayerFlow = MutableSharedFlow<Player?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    controller: GameController? = null,
+) : ScreenModel {
+    val actionRequestChannel =
+        Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
+    val actionSelectedChannel =
+        Channel<GameAction>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
+    val hoverPlayerFlow =
+        MutableSharedFlow<Player?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     val controller: GameController
     val fumbbl: FumbblReplayAdapter?
@@ -57,12 +60,13 @@ class GameScreenModel(
                 }
 
                 is Replay -> {
-                    fumbbl = FumbblReplayAdapter(mode.file.toOkioPath()).also { adapter ->
-                        runBlocking {
-                            adapter.loadCommands()
+                    fumbbl =
+                        FumbblReplayAdapter(mode.file.toOkioPath()).also { adapter ->
+                            runBlocking {
+                                adapter.loadCommands()
+                            }
+                            this.controller = GameController(rules, adapter.getGame())
                         }
-                        this.controller = GameController(rules, adapter.getGame())
-                    }
                 }
             }
         }
@@ -70,24 +74,30 @@ class GameScreenModel(
     }
 }
 
-class GameScreen(val screenModel: GameScreenModel, private val actions: List<GameAction>): Screen {
+class GameScreen(val screenModel: GameScreenModel, private val actions: List<GameAction>) : Screen {
     @Composable
     override fun Content() {
-        val uiActionFactory = when(screenModel.mode) {
-            Manual -> ManualModeUiActionFactory(screenModel, actions)
-            Random -> RandomModeUiActionFactory(screenModel)
-            is Replay -> ReplayModeUiActionFactory(screenModel)
-        }
+        val uiActionFactory =
+            when (screenModel.mode) {
+                Manual -> ManualModeUiActionFactory(screenModel, actions)
+                Random -> RandomModeUiActionFactory(screenModel)
+                is Replay -> ReplayModeUiActionFactory(screenModel)
+            }
         screenModel.menuViewModel.uiActionFactory = uiActionFactory
         Screen(
-            FieldViewModel(screenModel.controller, uiActionFactory, screenModel.controller.state.field, screenModel.hoverPlayerFlow),
+            FieldViewModel(
+                screenModel.controller,
+                uiActionFactory,
+                screenModel.controller.state.field,
+                screenModel.hoverPlayerFlow,
+            ),
             SidebarViewModel(uiActionFactory, screenModel.controller.state.homeTeam, screenModel.hoverPlayerFlow),
             SidebarViewModel(uiActionFactory, screenModel.controller.state.awayTeam, screenModel.hoverPlayerFlow),
             GameStatusViewModel(screenModel.controller),
             ReplayViewModel(uiActionFactory, screenModel),
             ActionSelectorViewModel(uiActionFactory),
             LogViewModel(screenModel.controller),
-            DialogsViewModel(uiActionFactory)
+            DialogsViewModel(uiActionFactory),
         )
     }
 }

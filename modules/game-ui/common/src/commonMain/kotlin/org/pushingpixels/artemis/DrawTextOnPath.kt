@@ -63,7 +63,7 @@ fun DrawScope.drawTextOnPath(
     offset: Offset,
     textAlign: TextAlign = TextAlign.Center,
     paint: Paint,
-    shadow: Shadow? = null
+    shadow: Shadow? = null,
 ) {
     this.drawIntoCanvas {
         val nativeCanvas = it.nativeCanvas
@@ -84,11 +84,12 @@ fun DrawScope.drawTextOnPath(
         val textPixelLength = glyphPositions[glyphs.size - 1].x + glyphWidths[glyphs.size - 1]
         // Where do we start to draw the first glyph along the path based on the requested
         // text alignment
-        val textStartOffset = when (textAlign) {
-            TextAlign.Left, TextAlign.Start -> glyphPositions[0].x
-            TextAlign.Right, TextAlign.End -> pathPixelLength - textPixelLength + glyphPositions[0].x
-            else -> (pathPixelLength - textPixelLength) / 2.0f + glyphPositions[0].x
-        }
+        val textStartOffset =
+            when (textAlign) {
+                TextAlign.Left, TextAlign.Start -> glyphPositions[0].x
+                TextAlign.Right, TextAlign.End -> pathPixelLength - textPixelLength + glyphPositions[0].x
+                else -> (pathPixelLength - textPixelLength) / 2.0f + glyphPositions[0].x
+            }
 
         val visibleGlyphs = arrayListOf<Short>()
         val visibleGlyphTransforms = arrayListOf<RSXform>()
@@ -128,8 +129,8 @@ fun DrawScope.drawTextOnPath(
                         scos = glyphMidPointTangent.x,
                         ssin = glyphMidPointTangent.y,
                         tx = translationX,
-                        ty = translationY
-                    )
+                        ty = translationY,
+                    ),
                 )
                 visibleGlyphs.add(glyphs[index])
             }
@@ -140,7 +141,7 @@ fun DrawScope.drawTextOnPath(
         textBlobBuilder.appendRunRSXform(
             font = skiaFont,
             glyphs = visibleGlyphs.toShortArray(),
-            xform = visibleGlyphTransforms.toArray(emptyArray())
+            xform = visibleGlyphTransforms.toArray(emptyArray()),
         )
         val textBlob = textBlobBuilder.build()!!
 
@@ -149,22 +150,25 @@ fun DrawScope.drawTextOnPath(
                 blob = textBlob,
                 x = shadow.offset.x,
                 y = shadow.offset.y,
-                paint = org.jetbrains.skia.Paint().also { skiaPaint ->
-                    skiaPaint.color4f = Color4f(
-                        r = shadow.color.red,
-                        g = shadow.color.green,
-                        b = shadow.color.blue,
-                        a = shadow.color.alpha
-                    )
-                    skiaPaint.maskFilter =
-                        MaskFilter.makeBlur(FilterBlurMode.OUTER, shadow.blurRadius)
-                }
+                paint =
+                    org.jetbrains.skia.Paint().also { skiaPaint ->
+                        skiaPaint.color4f =
+                            Color4f(
+                                r = shadow.color.red,
+                                g = shadow.color.green,
+                                b = shadow.color.blue,
+                                a = shadow.color.alpha,
+                            )
+                        skiaPaint.maskFilter =
+                            MaskFilter.makeBlur(FilterBlurMode.OUTER, shadow.blurRadius)
+                    },
             )
         }
         nativeCanvas.drawTextBlob(
             blob = textBlob,
-            x = 0.0f, y = 0.0f,
-            paint = paint.asFrameworkPaint()
+            x = 0.0f,
+            y = 0.0f,
+            paint = paint.asFrameworkPaint(),
         )
     }
 }

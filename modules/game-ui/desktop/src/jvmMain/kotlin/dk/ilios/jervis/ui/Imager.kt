@@ -28,15 +28,25 @@ import java.io.File
  * Easy entry point for taking snapshots. Used by Kotlin Notebooks.
  */
 object Imager {
-
-    fun appScreenshot(state: Game, width: Int, height: Int): BufferedImage {
+    fun appScreenshot(
+        state: Game,
+        width: Int,
+        height: Int,
+    ): BufferedImage {
         return renderScreenshot(width, height) {
-            val actionProvider: (Game, List<ActionDescriptor>) -> Any = { state: Game, availableActions: List<ActionDescriptor> ->
+            val actionProvider: (
+                Game,
+                List<ActionDescriptor>,
+            ) -> Any = { state: Game, availableActions: List<ActionDescriptor> ->
                 if (availableActions.first() == ContinueWhenReady) {
                     Continue
                 }
             }
-            val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
+            val actionRequestChannel =
+                Channel<Pair<GameController, List<ActionDescriptor>>>(
+                    capacity = 1,
+                    onBufferOverflow = BufferOverflow.SUSPEND,
+                )
             val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
 //            val controller = GameController(BB2020Rules, state, actionProvider as ((GameController, List<ActionDescriptor>) -> GameAction))
             val controller = GameController(BB2020Rules, state)
@@ -47,18 +57,25 @@ object Imager {
     /**
      * Take a screenshot of a specific screen.
      */
-    fun dummyAppScreenshot(width: Int, height: Int): BufferedImage {
+    fun dummyAppScreenshot(
+        width: Int,
+        height: Int,
+    ): BufferedImage {
         return renderScreenshot(width, height) {
             val rules = BB2020Rules
             val state = createDefaultGameState(rules)
-            val actionRequestChannel = Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)
+            val actionRequestChannel =
+                Channel<Pair<GameController, List<ActionDescriptor>>>(
+                    capacity = 1,
+                    onBufferOverflow = BufferOverflow.SUSPEND,
+                )
             val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
             val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
                 createRandomAction(state, availableActions)
             }
 //            val controller = GameController(rules, state, actionProvider)
             val controller = GameController(rules, state)
-            App(MenuViewModel())//controller, actionRequestChannel, actionSelectedChannel)
+            App(MenuViewModel()) // controller, actionRequestChannel, actionSelectedChannel)
         }
     }
 
@@ -68,7 +85,11 @@ object Imager {
      * method for each use case.
      */
     @OptIn(ExperimentalTestApi::class)
-    private fun renderScreenshot(width: Int, height: Int, renderView: @Composable () -> Unit): BufferedImage {
+    private fun renderScreenshot(
+        width: Int,
+        height: Int,
+        renderView: @Composable () -> Unit,
+    ): BufferedImage {
         lateinit var image: BufferedImage
         runDesktopComposeUiTest(width, height) {
             setContent {
@@ -83,7 +104,10 @@ object Imager {
     /**
      * Optionally save the screenshot to a file
      */
-    fun saveScreenshot(image: BufferedImage, name: String): File {
+    fun saveScreenshot(
+        image: BufferedImage,
+        name: String,
+    ): File {
         val file = File.createTempFile(name, ".png")
         val img: Data? = image.toImage().encodeToData(EncodedImageFormat.PNG)
         file.outputStream().use { stream ->

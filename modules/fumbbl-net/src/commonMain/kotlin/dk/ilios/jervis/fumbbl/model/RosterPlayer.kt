@@ -33,6 +33,6 @@ data class RosterPlayer(
     val skillCategoriesDouble: List<String>,
     val skillArray: List<String> = listOf(),
     val skillValues: List<String?> = listOf(),
-    val skillDisplayValues: List<String?> = listOf()
+    val skillDisplayValues: List<String?> = listOf(),
     // val keywords: List<Any>
 )

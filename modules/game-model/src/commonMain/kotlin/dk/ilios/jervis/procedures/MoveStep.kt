@@ -18,12 +18,24 @@ import dk.ilios.jervis.rules.Rules
  *
  * Jumping are handled in [JumpStep]
  */
-object MoveStep: Procedure() {
+object MoveStep : Procedure() {
     override val initialNode: Node = CheckTargetSquare
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    object CheckTargetSquare: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    object CheckTargetSquare : ComputationNode() {
+        override fun apply(
+            state: Game,
+            rules: Rules,
+        ): Command {
             val moveTo = state.moveStepTarget!!.second
             val movingPlayer = state.activePlayer!!
             val pickupBall = state.field[moveTo].ball != null
@@ -34,15 +46,22 @@ object MoveStep: Procedure() {
                     GotoNode(PickUpBall)
                 } else {
                     ExitProcedure()
-                }
+                },
             )
         }
     }
 
     // If a player moved into the ball as part of the action, they must pick it up.
-    object PickUpBall: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    object PickUpBall : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ): Procedure = Pickup
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return ExitProcedure()
         }
     }

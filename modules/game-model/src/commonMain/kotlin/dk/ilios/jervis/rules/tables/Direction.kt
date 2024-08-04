@@ -12,4 +12,3 @@ data class Direction(val xModifier: Int, val yModifier: Int) {
      */
     fun reverse(): Direction = Direction(xModifier * -1, yModifier * -1)
 }
-

@@ -23,5 +23,5 @@ data class TeamResult(
     var treasuryUsedOnInducements: Int,
     var fanFactor: Int,
     var dedicatedFans: Int,
-    var penaltyScore: Int
+    var penaltyScore: Int,
 )

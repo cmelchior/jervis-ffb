@@ -7,24 +7,32 @@ class ProcedureState(val procedure: Procedure) {
     // if the currentNode is a ParentNode
     private val nodes: MutableList<Node> = mutableListOf()
     private val parentNodeStates: MutableList<ParentNode.State> = mutableListOf()
-    constructor(procedure: Procedure, initialNode: Node): this(procedure) {
+    constructor(procedure: Procedure, initialNode: Node) : this(procedure) {
         nodes.add(initialNode)
     }
-    private constructor(procedure: Procedure, history: List<Node>, parentNodeStatesHistory: List<ParentNode.State>): this(procedure) {
+    private constructor(
+        procedure: Procedure,
+        history: List<Node>,
+        parentNodeStatesHistory: List<ParentNode.State>,
+    ) : this(procedure) {
         nodes.addAll(history)
         parentNodeStates.addAll(parentNodeStatesHistory)
     }
-    fun currentParentNodeState(): ParentNode.State  {
-        return parentNodeStates.last()
 
+    fun currentParentNodeState(): ParentNode.State {
+        return parentNodeStates.last()
     }
+
     fun currentNode(): Node = nodes.last()
+
     fun addNode(node: Node) {
         nodes.add(node)
     }
+
     fun copy(): ProcedureState {
         return ProcedureState(procedure, nodes.map { it }, parentNodeStates)
     }
+
     fun name(): String = procedure.name()
 
     override fun toString(): String {

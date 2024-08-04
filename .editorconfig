@@ -1,0 +1,16 @@
+root = true
+# See https://pinterest.github.io/ktlint/0.49.1/rules/code-styles/
+[*.{kt,kts}]
+ktlint_code_style = ktlint_official
+ktlint_function_naming_ignore_when_annotated_with = Composable
+# # possible values: number (e.g. 2), "unset" (makes ktlint ignore indentation completely)
+indent_size=4
+# # true (recommended) / false
+insert_final_newline=true
+# # possible values: number (e.g. 120) (package name, imports & comments are ignored), "off"
+# # it's automatically set to 100 on `ktlint --android ...` (per Android Kotlin Style Guide)
+max_line_length=200
+
+ktlint_standard_property-naming=disabled
+ktlint_standard_discouraged-comment-location=disabled
+ktlint_standard_if-else-wrapping=disabled # Comment location cannot be disabled if this is :(

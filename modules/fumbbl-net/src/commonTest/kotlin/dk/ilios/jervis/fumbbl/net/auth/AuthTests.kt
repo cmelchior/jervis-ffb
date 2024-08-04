@@ -5,9 +5,10 @@ import kotlin.test.Test
 
 class AuthTests {
     @Test
-    fun testLogin() = runBlocking {
-        val auth = FumbblAuth()
-        auth.login("<insertUser>", "<insertPass>")
-        auth.close()
-    }
+    fun testLogin() =
+        runBlocking {
+            val auth = FumbblAuth()
+            auth.login("<insertUser>", "<insertPass>")
+            auth.close()
+        }
 }

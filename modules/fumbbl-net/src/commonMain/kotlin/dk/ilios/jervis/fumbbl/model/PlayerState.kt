@@ -13,7 +13,10 @@ object PlayerStateSerializer : KSerializer<PlayerState> {
     private val decoderSerializer: KSerializer<Int> = Int.serializer()
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("PlayerState", PrimitiveKind.INT)
 
-    override fun serialize(encoder: Encoder, value: PlayerState) {
+    override fun serialize(
+        encoder: Encoder,
+        value: PlayerState,
+    ) {
         encoder.encodeInt(value.id)
     }
 
@@ -25,7 +28,6 @@ object PlayerStateSerializer : KSerializer<PlayerState> {
 
 @Serializable(with = PlayerStateSerializer::class)
 class PlayerState(val id: Int) {
-
     val base: Int
         get() = id and 0xFF
 
@@ -151,7 +153,10 @@ class PlayerState(val id: Int) {
         return (PRONE == base || STUNNED == base)
     }
 
-    private fun changeBit(pMask: Int, pBit: Boolean): PlayerState {
+    private fun changeBit(
+        pMask: Int,
+        pBit: Boolean,
+    ): PlayerState {
         if (pBit) {
             return PlayerState(id or pMask)
         }
@@ -233,6 +238,7 @@ class PlayerState(val id: Int) {
         return (this.id == other.id)
     }
 
+    @Suppress("standard:property-naming")
     companion object {
         const val UNKNOWN: Int = 0
         const val STANDING: Int = 1
@@ -266,27 +272,28 @@ class PlayerState(val id: Int) {
         private const val _BIT_SELECTED_BLITZ_TARGET = 16384
         private const val _BIT_SELECTED_BLOCK_TARGET = 32768
         private const val _BIT_SELECTED_GAZE_TARGET = 65536
-        private val _BASE_MASK = intArrayOf(
-            0,
-            1048320,
-            1048320,
-            1048320,
-            1048320,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1048320,
-            1048320,
-            0,
-            1048320,
-            1048320,
-            1048320,
-            1048320,
-            1048320,
-            1048320
-        )
+        private val _BASE_MASK =
+            intArrayOf(
+                0,
+                1048320,
+                1048320,
+                1048320,
+                1048320,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1048320,
+                1048320,
+                0,
+                1048320,
+                1048320,
+                1048320,
+                1048320,
+                1048320,
+                1048320,
+            )
     }
 }

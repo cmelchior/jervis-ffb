@@ -31,50 +31,44 @@ import dk.ilios.jervis.rules.tables.TableResult
 import dk.ilios.jervis.rules.tables.WeatherTable
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
-interface BloodBowl {
+interface BloodBowl
 
-}
+interface DungeonBowl
 
-interface DungeonBowl {
-
-}
-
-interface BloodBowl7 {
-
-}
-
-
+interface BloodBowl7
 
 /**
  * Class representing the Kick-Off Event Table on page 41 in the rulebook.
  */
 object KickOffEventTable {
-
-    private val table = mapOf(
-        2 to TableResult("Get the Ref", GetTheRef),
-        3 to TableResult("Time Out", TimeOut),
-        4 to TableResult("Solid Defense", SolidDefense),
-        5 to TableResult("High Kick", HighKick),
-        6 to TableResult("Cheering Fans", CheeringFans),
-        7 to TableResult("Brilliant Coaching", BrilliantCoaching),
-        8 to TableResult("Changing Weather", ChangingWeather),
-        9 to TableResult("Quick Snap", QuickSnap),
-        10 to TableResult("Blitz", Blitz),
-        11 to TableResult("Officious Ref", OfficiousRef),
-        12 to TableResult("Pitch Invasion", PitchInvasion),
-    )
+    private val table =
+        mapOf(
+            2 to TableResult("Get the Ref", GetTheRef),
+            3 to TableResult("Time Out", TimeOut),
+            4 to TableResult("Solid Defense", SolidDefense),
+            5 to TableResult("High Kick", HighKick),
+            6 to TableResult("Cheering Fans", CheeringFans),
+            7 to TableResult("Brilliant Coaching", BrilliantCoaching),
+            8 to TableResult("Changing Weather", ChangingWeather),
+            9 to TableResult("Quick Snap", QuickSnap),
+            10 to TableResult("Blitz", Blitz),
+            11 to TableResult("Officious Ref", OfficiousRef),
+            12 to TableResult("Pitch Invasion", PitchInvasion),
+        )
 
     /**
      * Roll on the Kick-Off table and return the result.
      */
-    fun roll(die1: D6Result, die2: D6Result): TableResult {
+    fun roll(
+        die1: D6Result,
+        die2: D6Result,
+    ): TableResult {
         val result = die1.result + die2.result
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Kick-Off Event Table.")
     }
 }
 
 interface Rules {
-
     fun isValidSetup(state: Game): Boolean {
         val team = state.activeTeam
         val isHomeTeam = team.isHomeTeam()
@@ -95,9 +89,10 @@ interface Rules {
         // Check LoS requirements
         val field = state.field
         val losIndex: Int = if (isHomeTeam) lineOfScrimmageHome else lineOfScrimmageAway
-        val playersOnLos = (0u + wideZone until fieldHeight - wideZone).filter { y: UInt ->
-            !field[losIndex, y.toInt()].isEmpty()
-        }.size
+        val playersOnLos =
+            (0u + wideZone until fieldHeight - wideZone).filter { y: UInt ->
+                !field[losIndex, y.toInt()].isEmpty()
+            }.size
 
         // If available, 3 players must be on the widezone LoS
         if (onField.size.toUInt() >= playersRequiredOnLineOfScrimmage && playersOnLos < playersRequiredOnLineOfScrimmage.toInt()) {
@@ -112,7 +107,7 @@ interface Rules {
         // Max 2 players in top wide zone. They must not be on the widezone LoS.
         var count = 0
         if (isHomeTeam) {
-            (0 .. lineOfScrimmageHome).forEach { x ->
+            (0..lineOfScrimmageHome).forEach { x ->
                 (0 until wideZone.toInt()).forEach { y ->
                     if (field[x, y].isNotEmpty()) {
                         // They must not be on the LoS
@@ -147,7 +142,11 @@ interface Rules {
 
     // Roll on the random direction template
     fun direction(d8: D8Result): Direction = randomDirectionTemplate.roll(d8)
-    fun cornerThrowIn(corner: CornerThrowInPosition, d3: D3Result): Direction {
+
+    fun cornerThrowIn(
+        corner: CornerThrowInPosition,
+        d3: D3Result,
+    ): Direction {
         return randomDirectionTemplate.roll(corner, d3)
     }
 
@@ -158,7 +157,10 @@ interface Rules {
     /**
      * Returns whether a not a player is eligible for catching a ball that landed in his field.
      */
-    fun canCatch(state: Game, player: Player): Boolean {
+    fun canCatch(
+        state: Game,
+        player: Player,
+    ): Boolean {
         return player.hasTackleZones && player.state == PlayerState.STANDING && player.location.isOnField(this)
     }
 
@@ -173,7 +175,10 @@ interface Rules {
      * Return `true` if the [assisting] player can assist another player against
      * [target], `false` if not.
      */
-    fun canOfferAssistAgainst(assisting: Player, target: Player): Boolean {
+    fun canOfferAssistAgainst(
+        assisting: Player,
+        target: Player,
+    ): Boolean {
         if (assisting.team == target.team) return false
         if (!assisting.location.isAdjacent(this, target.location)) return false
         if (!canMark(assisting)) return false
@@ -186,7 +191,12 @@ interface Rules {
     }
 
     // Only call this method for the active team
-    fun addMarkedModifiers(game: Game, activeTeam: Team, square: FieldSquare, modifiers: MutableList<DiceModifier>) {
+    fun addMarkedModifiers(
+        game: Game,
+        activeTeam: Team,
+        square: FieldSquare,
+        modifiers: MutableList<DiceModifier>,
+    ) {
         square.coordinates.getSurroundingCoordinates(this).forEach {
             val markingPlayer: Player? = game.field[it].player
             if (markingPlayer != null) {
@@ -197,26 +207,27 @@ interface Rules {
         }
     }
 
-    fun canUseTeamReroll(game: Game, player: Player): Boolean {
+    fun canUseTeamReroll(
+        game: Game,
+        player: Player,
+    ): Boolean {
         if (!game.canUseTeamRerolls) return false
         if (game.activeTeam != player.team) return false
-        return when(player.team.usedTeamRerollThisTurn) {
+        return when (player.team.usedTeamRerollThisTurn) {
             true -> allowMultipleTeamRerollsPrTurn
             false -> true
         }
     }
 
-
-
     // Characteristic limits
     val moveRange: IntRange
-        get() = 1 .. 9
+        get() = 1..9
 
     val strengthRange: IntRange
-        get() = 1 .. 8
+        get() = 1..8
 
     val agilityRange: IntProgression
-        get() = 6 downTo  1
+        get() = 6 downTo 1
 
     val passingRange: IntProgression
         get() = 6 downTo 1

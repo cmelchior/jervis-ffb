@@ -6,15 +6,13 @@ package dk.ilios.jervis.rules.pathfinder
  * Credit: https://github.com/badoo/Reaktive/blob/6c1f29e1c385a0e7fc3ca648d21d0ae284105b44/reaktive/src/commonMain/kotlin/com/badoo/reaktive/utils/queue/PriorityQueue.kt
  */
 class PriorityQueue<T>(
-    private val comparator: Comparator<in T>
+    private val comparator: Comparator<in T>,
 ) : Iterable<T> {
-
     private var array: Array<T?>? = null
     private var _size: Int = 0
     val isEmpty: Boolean get() = _size == 0
 
-    fun peek(): T? =
-        array?.takeUnless { isEmpty }?.get(0)
+    fun peek(): T? = array?.takeUnless { isEmpty }?.get(0)
 
     fun offer(item: T) {
         var arr: Array<T?>? = array
@@ -80,7 +78,11 @@ class PriorityQueue<T>(
         @Suppress("UNCHECKED_CAST")
         private fun <T> newArray(): Array<T?> = arrayOfNulls<Any?>(INITIAL_CAPACITY) as Array<T?>
 
-        private fun <T> Array<T>.heapifyDown(index: Int, actualSize: Int, comparator: Comparator<in T>) {
+        private fun <T> Array<T>.heapifyDown(
+            index: Int,
+            actualSize: Int,
+            comparator: Comparator<in T>,
+        ) {
             val leftChildIndex = index * 2 + 1
             if (leftChildIndex >= actualSize) {
                 return
@@ -103,7 +105,10 @@ class PriorityQueue<T>(
             }
         }
 
-        private fun <T> Array<T>.heapifyUp(index: Int, comparator: Comparator<in T>) {
+        private fun <T> Array<T>.heapifyUp(
+            index: Int,
+            comparator: Comparator<in T>,
+        ) {
             val parentIndex = if (index % 2 == 0) index / 2 - 1 else index / 2
             if (parentIndex < 0) {
                 return
@@ -115,7 +120,10 @@ class PriorityQueue<T>(
             }
         }
 
-        private fun <T> Array<T>.swap(first: Int, second: Int) {
+        private fun <T> Array<T>.swap(
+            first: Int,
+            second: Int,
+        ) {
             val temp = get(first)
             set(first, get(second))
             set(second, temp)

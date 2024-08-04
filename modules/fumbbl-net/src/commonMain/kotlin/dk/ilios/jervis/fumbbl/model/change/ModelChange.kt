@@ -1,10 +1,10 @@
 @file:UseContextualSerialization(
-    LocalDateTime::class
+    LocalDateTime::class,
 )
+
 package dk.ilios.jervis.fumbbl.model.change
 
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
 import kotlinx.serialization.json.JsonClassDiscriminator

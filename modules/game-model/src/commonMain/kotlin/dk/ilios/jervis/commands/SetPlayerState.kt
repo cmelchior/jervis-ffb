@@ -7,7 +7,11 @@ import dk.ilios.jervis.model.PlayerState
 
 class SetPlayerState(private val player: Player, val state: PlayerState) : Command {
     private lateinit var originalState: PlayerState
-    override fun execute(state: Game, controller: GameController) {
+
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         this.originalState = player.state
         player.apply {
             this.state = this@SetPlayerState.state
@@ -15,7 +19,10 @@ class SetPlayerState(private val player: Player, val state: PlayerState) : Comma
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         player.apply {
             this.state = originalState
             notifyUpdate()

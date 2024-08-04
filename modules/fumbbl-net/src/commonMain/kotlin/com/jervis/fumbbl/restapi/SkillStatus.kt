@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class SkillStatus(
     val maxLimit: Int,
     val status: String,
-    val tier: Int
+    val tier: Int,
 )

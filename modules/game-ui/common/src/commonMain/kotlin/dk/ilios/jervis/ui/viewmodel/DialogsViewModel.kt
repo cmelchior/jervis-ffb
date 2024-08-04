@@ -10,5 +10,6 @@ class DialogsViewModel(val uiActionFactory: UiActionFactory) {
     fun buttonActionSelected(action: GameAction) {
         uiActionFactory.userSelectedAction(action)
     }
+
     val availableActions: Flow<UserInputDialog?> = uiActionFactory.dialogActions
 }

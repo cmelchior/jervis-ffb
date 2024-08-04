@@ -22,7 +22,6 @@ value class TeamId(val id: String = "")
 class TeamHalfData(private val game: Game) {
     var totalRerolls: Int = 0
     var usedRerolls: Int = 0
-
 }
 
 class TeamDriveData(private val game: Game) {
@@ -35,30 +34,43 @@ class TeamTurnData(private val game: Game) {
     }
     var moveActions: Int
         get() = availableActions[PlayerActionType.MOVE]!!
-        set(value) { availableActions[PlayerActionType.MOVE] = value }
+        set(value) {
+            availableActions[PlayerActionType.MOVE] = value
+        }
     var passActions: Int
         get() = availableActions[PlayerActionType.PASS]!!
-        set(value) { availableActions[PlayerActionType.PASS] = value }
+        set(value) {
+            availableActions[PlayerActionType.PASS] = value
+        }
     var handOffActions: Int
         get() = availableActions[PlayerActionType.HAND_OFF]!!
-        set(value) { availableActions[PlayerActionType.HAND_OFF] = value }
+        set(value) {
+            availableActions[PlayerActionType.HAND_OFF] = value
+        }
     var blockActions: Int
         get() = availableActions[PlayerActionType.BLOCK]!!
-        set(value) { availableActions[PlayerActionType.BLOCK] = value }
+        set(value) {
+            availableActions[PlayerActionType.BLOCK] = value
+        }
     var blitzActions: Int
         get() = availableActions[PlayerActionType.BLITZ]!!
-        set(value) { availableActions[PlayerActionType.BLITZ] = value }
+        set(value) {
+            availableActions[PlayerActionType.BLITZ] = value
+        }
     var foulActions: Int
         get() = availableActions[PlayerActionType.FOUL]!!
-        set(value) { availableActions[PlayerActionType.FOUL] = value }
-    val availableActions = mutableMapOf(
-        PlayerActionType.MOVE to 0,
-        PlayerActionType.PASS to 0,
-        PlayerActionType.HAND_OFF to 0,
-        PlayerActionType.BLOCK to 0,
-        PlayerActionType.BLITZ to 0,
-        PlayerActionType.FOUL to 0,
-    )
+        set(value) {
+            availableActions[PlayerActionType.FOUL] = value
+        }
+    val availableActions =
+        mutableMapOf(
+            PlayerActionType.MOVE to 0,
+            PlayerActionType.PASS to 0,
+            PlayerActionType.HAND_OFF to 0,
+            PlayerActionType.BLOCK to 0,
+            PlayerActionType.BLITZ to 0,
+            PlayerActionType.FOUL to 0,
+        )
 }
 
 class TeamTemporaryData(private val game: Game) {
@@ -67,8 +79,7 @@ class TeamTemporaryData(private val game: Game) {
 }
 
 @Serializable
-class Team(val name: String, val roster: Roster, val coach: Coach): Collection<Player>, Observable<Team>() {
-
+class Team(val name: String, val roster: Roster, val coach: Coach) : Collection<Player>, Observable<Team>() {
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
     // Fixed Team data, identifying the team
@@ -76,14 +87,18 @@ class Team(val name: String, val roster: Roster, val coach: Coach): Collection<P
 
     // Variable team data that might change during the game
     var rerollsCountOnRoster: Int = 0
+
     @Transient
     var rerolls: MutableList<TeamReroll> = mutableListOf()
+
     @Transient
     val availableRerolls: List<TeamReroll>
         get() = rerolls.filter { !it.rerollUsed }
+
     @Transient
     val availableRerollCount: Int
         get() = availableRerolls.size
+
     @Transient
     var usedTeamRerollThisTurn: Boolean = false
 
@@ -99,12 +114,16 @@ class Team(val name: String, val roster: Roster, val coach: Coach): Collection<P
     // Special team state that needs to be tracked for the given period
     @Transient
     lateinit var game: Game
+
     @Transient
     lateinit var halfData: TeamHalfData
+
     @Transient
     lateinit var driveData: TeamDriveData
+
     @Transient
     lateinit var turnData: TeamTurnData
+
     @Transient
     lateinit var temporaryData: TeamTemporaryData
 
@@ -127,27 +146,36 @@ class Team(val name: String, val roster: Roster, val coach: Coach): Collection<P
     }
 
     fun isHomeTeam(): Boolean = (game.homeTeam == this)
+
     fun isAwayTeam(): Boolean = (game.awayTeam == this)
 
     fun add(player: Player) {
         player.team = this
         noToPlayer[player.number] = player
     }
+
     operator fun get(playerNo: PlayerNo): Player? = noToPlayer[playerNo]
+
     override val size: Int
         get() = noToPlayer.size
+
     override fun isEmpty(): Boolean = noToPlayer.isEmpty()
+
     override fun iterator(): Iterator<Player> = noToPlayer.values.iterator()
+
     override fun containsAll(elements: Collection<Player>): Boolean = noToPlayer.values.containsAll(elements)
+
     override fun contains(element: Player): Boolean = noToPlayer.containsValue(element)
 
     fun notifyDogoutChange() {
         val playersInDogout = noToPlayer.values.filter { it.location == DogOut }
         _dogoutState.safeTryEmit(playersInDogout)
     }
+
     @Transient
-    private val _dogoutState = MutableSharedFlow<List<Player>>(replay = 1, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
+    private val _dogoutState =
+        MutableSharedFlow<List<Player>>(replay = 1, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
+
     @Transient
     val dogoutFlow: SharedFlow<List<Player>> = _dogoutState
-
 }

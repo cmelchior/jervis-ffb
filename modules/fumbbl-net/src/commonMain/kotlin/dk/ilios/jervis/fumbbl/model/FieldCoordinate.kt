@@ -15,7 +15,10 @@ object FieldCoordinateSerializer : KSerializer<FieldCoordinate> {
     private val decoderSerializser: KSerializer<List<Int>> = ListSerializer(Int.serializer())
     override val descriptor: SerialDescriptor = SerialDescriptor("FieldCoordinate", decoderSerializser.descriptor)
 
-    override fun serialize(encoder: Encoder, value: FieldCoordinate) {
+    override fun serialize(
+        encoder: Encoder,
+        value: FieldCoordinate,
+    ) {
         TODO("Not yet implemented")
     }
 
@@ -29,7 +32,7 @@ object FieldCoordinateSerializer : KSerializer<FieldCoordinate> {
 @Serializable(with = FieldCoordinateSerializer::class)
 data class FieldCoordinate(
     var x: Int,
-    var y: Int
+    var y: Int,
 ) {
     val isBoxCoordinate: Boolean
         get() {
@@ -39,7 +42,10 @@ data class FieldCoordinate(
             return false
         }
 
-    fun add(deltaX: Int, deltaY: Int): FieldCoordinate {
+    fun add(
+        deltaX: Int,
+        deltaY: Int,
+    ): FieldCoordinate {
         return FieldCoordinate(x + deltaX, y + deltaY)
     }
 
@@ -74,9 +80,11 @@ data class FieldCoordinate(
         }
         return FieldCoordinate(25 - x, y)
     }
+
     override fun toString(): String {
         return "(" + x + "," + y + ")"
     }
+
     operator fun compareTo(pAnotherFc: FieldCoordinate?): Int {
         if (pAnotherFc == null) {
             return -1
@@ -86,10 +94,15 @@ data class FieldCoordinate(
         }
         return if (pAnotherFc.x > x) {
             -1
-        } else y - pAnotherFc.y
+        } else {
+            y - pAnotherFc.y
+        }
     }
 
-    fun move(d: Direction, distance: Int): FieldCoordinate {
+    fun move(
+        d: Direction,
+        distance: Int,
+    ): FieldCoordinate {
         val result = FieldCoordinate(x, y)
         var dy = 0
         var dx = 0
@@ -144,29 +157,41 @@ data class FieldCoordinate(
             return pFieldCoordinate?.transform()
         }
 
-        fun equals(pCoordinate1: FieldCoordinate?, pCoordinate2: FieldCoordinate?): Boolean {
+        fun equals(
+            pCoordinate1: FieldCoordinate?,
+            pCoordinate2: FieldCoordinate?,
+        ): Boolean {
             return if (pCoordinate1 != null) pCoordinate1 == pCoordinate2 else pCoordinate2 == null
         }
 
-        fun getDirection(from: FieldCoordinate, to: FieldCoordinate): dk.ilios.jervis.fumbbl.model.Direction? {
+        fun getDirection(
+            from: FieldCoordinate,
+            to: FieldCoordinate,
+        ): dk.ilios.jervis.fumbbl.model.Direction? {
             val dx = to.x - from.x
             val dy = to.y - from.y
             if (dx < 0) {
                 if (dy < 0) return dk.ilios.jervis.fumbbl.model.Direction.NORTHWEST
                 return if (dy > 0) {
                     dk.ilios.jervis.fumbbl.model.Direction.SOUTHWEST
-                } else dk.ilios.jervis.fumbbl.model.Direction.WEST
+                } else {
+                    dk.ilios.jervis.fumbbl.model.Direction.WEST
+                }
             }
             if (dx > 0) {
                 if (dy < 0) return dk.ilios.jervis.fumbbl.model.Direction.NORTHEAST
                 return if (dy > 0) {
                     dk.ilios.jervis.fumbbl.model.Direction.SOUTHEAST
-                } else dk.ilios.jervis.fumbbl.model.Direction.EAST
+                } else {
+                    dk.ilios.jervis.fumbbl.model.Direction.EAST
+                }
             }
             return dk.ilios.jervis.fumbbl.model.Direction.NORTH
             return if (dy > 0) {
                 dk.ilios.jervis.fumbbl.model.Direction.SOUTH
-            } else null
+            } else {
+                null
+            }
         }
     }
 }

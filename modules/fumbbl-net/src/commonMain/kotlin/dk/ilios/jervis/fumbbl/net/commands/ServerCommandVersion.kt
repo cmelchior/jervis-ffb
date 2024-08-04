@@ -12,6 +12,5 @@ data class ServerCommandVersion(
     val clientVersion: String,
     val clientPropertyNames: List<String>,
     val clientPropertyValues: List<String>,
-    val testing: Boolean
-): ServerCommand
-
+    val testing: Boolean,
+) : ServerCommand

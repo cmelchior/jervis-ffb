@@ -8,5 +8,5 @@ data class RedraftingLimits(
     val fans: Int,
     val newTreasury: Int,
     val rerolls: Int,
-    val treasury: Int
+    val treasury: Int,
 )

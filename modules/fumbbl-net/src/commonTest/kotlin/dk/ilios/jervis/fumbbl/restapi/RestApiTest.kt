@@ -13,23 +13,24 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class RestApiTest {
+    @Test
+    fun smokeTest() =
+        runBlocking {
+            val json =
+                Json {
+                    ignoreUnknownKeys = true
+                }
+            getHttpClient().use { client: HttpClient ->
+                val jsonText = client.get("https://fumbbl.com/api/team/get/1158751").bodyAsText()
+                val team = json.decodeFromString<Team>(jsonText)
+            }
+        }
 
     @Test
-    fun smokeTest() = runBlocking {
-        val json = Json {
-            ignoreUnknownKeys = true
+    fun teamLoader() =
+        runBlocking<Unit> {
+            // Human team
+            val team = FumbblTeamLoader.loadTeam(1187712, BB2020Rules)
+            assertEquals(team.name, "Just Human Nothing More")
         }
-        getHttpClient().use { client: HttpClient ->
-            val jsonText = client.get("https://fumbbl.com/api/team/get/1158751").bodyAsText()
-            val team = json.decodeFromString<Team>(jsonText)
-        }
-    }
-
-    @Test
-    fun teamLoader() = runBlocking<Unit> {
-        // Human team
-        val team = FumbblTeamLoader.loadTeam(1187712, BB2020Rules)
-        assertEquals(team.name, "Just Human Nothing More")
-    }
-
 }

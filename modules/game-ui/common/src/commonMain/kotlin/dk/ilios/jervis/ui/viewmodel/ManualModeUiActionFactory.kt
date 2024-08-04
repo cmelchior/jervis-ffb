@@ -30,7 +30,6 @@ import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.EndTurnWhenReady
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
-import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
@@ -67,7 +66,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
-class ManualModeUiActionFactory(model: GameScreenModel, private val actions: List<GameAction>) : UiActionFactory(model) {
+class ManualModeUiActionFactory(model: GameScreenModel, private val actions: List<GameAction>) : UiActionFactory(
+    model,
+) {
     override suspend fun start(scope: CoroutineScope) {
         scope.launch(errorHandler) {
             var initialActionsIndex = 0
@@ -78,7 +79,8 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                     initialActionsIndex++
                     action
                 } else {
-                    val action = runBlocking(Dispatchers.Default) {
+                    val action =
+                        runBlocking(Dispatchers.Default) {
                             model.actionRequestChannel.send(Pair(controller, availableActions))
                             model.actionSelectedChannel.receive()
                         }
@@ -92,7 +94,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
 
     private fun startUserActionSelector(scope: CoroutineScope) {
         scope.launch(errorHandler) {
-            actions@while(true) {
+            actions@while (true) {
                 val (controller, actions) = model.actionRequestChannel.receive()
                 var selectedAction = calculateAutomaticResponse(controller, actions)
                 if (selectedAction == null) {
@@ -114,7 +116,10 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
      * Some examples:
      * - During an action and the only choice is EndAction
      */
-    private fun calculateAutomaticResponse(controller: GameController, actions: List<ActionDescriptor>): GameAction? {
+    private fun calculateAutomaticResponse(
+        controller: GameController,
+        actions: List<ActionDescriptor>,
+    ): GameAction? {
         if (actions.size == 1 && actions.first() is EndActionWhenReady) {
             return EndAction
         }
@@ -122,38 +127,50 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         return null
     }
 
-    private suspend fun detectAndSendUserInput(controller: GameController, actions: List<ActionDescriptor>) {
-        val userInputs: List<UserInput> = actions.groupBy { it::class }.map { action ->
-            when {
-                action.key == SelectPlayer::class -> {
-                    SelectPlayerInput(action.value.map { PlayerSelected((it as SelectPlayer).player) })
+    private suspend fun detectAndSendUserInput(
+        controller: GameController,
+        actions: List<ActionDescriptor>,
+    ) {
+        val userInputs: List<UserInput> =
+            actions.groupBy { it::class }.map { action ->
+                when {
+                    action.key == SelectPlayer::class -> {
+                        SelectPlayerInput(action.value.map { PlayerSelected((it as SelectPlayer).player) })
+                    }
+                    action.key == SelectFieldLocation::class && controller.currentProcedure()?.currentNode() == MoveAction.SelectSquareOrEndAction -> {
+                        val pathFinder = controller.rules.pathFinder
+                        val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
+                        SelectMoveActionFieldLocationInput(
+                            action.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) },
+                            pathFinder.calculateAllPaths(
+                                controller.state,
+                                startLocation,
+                                controller.state.activePlayer!!.moveLeft,
+                            ),
+                        )
+                    }
+                    action.key == SelectFieldLocation::class -> {
+                        SelectFieldLocationInput(
+                            action.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) },
+                        )
+                    }
+                    action.key == DeselectPlayer::class -> {
+                        DeselectPlayerInput(listOf(PlayerDeselected))
+                    }
+                    action.key == SelectAction::class -> {
+                        val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
+                        SelectPlayerActionInput(
+                            playerLocation,
+                            action.value.map { PlayerActionSelected((it as SelectAction).action) },
+                        )
+                    }
+                    action.key == EndActionWhenReady::class -> {
+                        val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
+                        EndActionInput(playerLocation, listOf(EndAction))
+                    }
+                    else -> UnknownInput(mapUnknownActions(action.value)) // TODO This breaks if using multiple times
                 }
-                action.key == SelectFieldLocation::class && controller.currentProcedure()?.currentNode() == MoveAction.SelectSquareOrEndAction -> {
-                    val pathFinder = controller.rules.pathFinder
-                    val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
-                    SelectMoveActionFieldLocationInput(
-                        action.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) },
-                        pathFinder.calculateAllPaths(controller.state, startLocation, controller.state.activePlayer!!.moveLeft)
-
-                    )
-                }
-                action.key == SelectFieldLocation::class -> {
-                    SelectFieldLocationInput(action.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) })
-                }
-                action.key == DeselectPlayer::class -> {
-                    DeselectPlayerInput(listOf(PlayerDeselected))
-                }
-                action.key == SelectAction::class -> {
-                    val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
-                    SelectPlayerActionInput(playerLocation, action.value.map { PlayerActionSelected((it as SelectAction).action) })
-                }
-                action.key == EndActionWhenReady::class -> {
-                    val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
-                    EndActionInput(playerLocation, listOf(EndAction))
-                }
-                else -> UnknownInput(mapUnknownActions(action.value)) // TODO This breaks if using multiple times
             }
-        }
 
         sendToRelevantUserInputChannel(userInputs)
     }
@@ -162,89 +179,99 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
      * Detects if a visible dialog is needed and return it. `null` if some other actions are needed.
      */
     private fun detectDialogPopup(controller: GameController): UserInput? {
-        val userInput = when (controller.stack.currentNode()) {
-            is RollForStartingFanFactor.SetFanFactorForHomeTeam -> {
-                SingleChoiceInputDialog.createFanFactorDialog(controller.state.homeTeam, D3Result.allOptions())
-            }
-
-            is RollForStartingFanFactor.SetFanFactorForAwayTeam -> {
-                SingleChoiceInputDialog.createFanFactorDialog(controller.state.awayTeam, D3Result.allOptions())
-            }
-
-            is RollForTheWeather.RollWeatherDice -> {
-                val diceRolls = mutableListOf<DiceResults>()
-                D8Result.allOptions().forEach { d8 ->
-                    D6Result.allOptions().forEach { d6 ->
-                        diceRolls.add(DiceResults(d8, d6))
-                    }
+        val userInput =
+            when (controller.stack.currentNode()) {
+                is RollForStartingFanFactor.SetFanFactorForHomeTeam -> {
+                    SingleChoiceInputDialog.createFanFactorDialog(controller.state.homeTeam, D3Result.allOptions())
                 }
-                DiceRollUserInputDialog.createWeatherRollDialog(controller.rules)
-            }
 
-            is DetermineKickingTeam.SelectCoinSide -> {
-                SingleChoiceInputDialog.createSelectKickoffCoinTossResultDialog(
-                    controller.state.activeTeam,
-                    CoinSideSelected.allOptions()
-                )
-            }
-
-            is DetermineKickingTeam.CoinToss -> {
-                SingleChoiceInputDialog.createTossDialog(CoinTossResult.allOptions())
-            }
-
-            is DetermineKickingTeam.ChooseKickingTeam -> {
-                val choices = listOf(
-                    Confirm to "Kickoff",
-                    Cancel to "Receive"
-                )
-                SingleChoiceInputDialog.createChooseToKickoffDialog(controller.state.activeTeam, choices)
-            }
-
-            is SetupTeam.InformOfInvalidSetup -> {
-                SingleChoiceInputDialog.createInvalidSetupDialog(controller.state.activeTeam)
-            }
-
-            is TheKickOff.TheKickDeviates -> {
-                val diceRolls = mutableListOf<DiceResults>()
-                D8Result.allOptions().forEach { d8 ->
-                    D6Result.allOptions().forEach { d6 ->
-                        diceRolls.add(DiceResults(d8, d6))
-                    }
+                is RollForStartingFanFactor.SetFanFactorForAwayTeam -> {
+                    SingleChoiceInputDialog.createFanFactorDialog(controller.state.awayTeam, D3Result.allOptions())
                 }
-                DiceRollUserInputDialog.createKickOffDeviatesDialog(
-                    controller.rules,
-                )
-            }
 
-            is TheKickOffEvent.RollForKickOffEvent -> {
-                DiceRollUserInputDialog.createKickOffEventDialog(controller.rules)
-            }
+                is RollForTheWeather.RollWeatherDice -> {
+                    val diceRolls = mutableListOf<DiceResults>()
+                    D8Result.allOptions().forEach { d8 ->
+                        D6Result.allOptions().forEach { d6 ->
+                            diceRolls.add(DiceResults(d8, d6))
+                        }
+                    }
+                    DiceRollUserInputDialog.createWeatherRollDialog(controller.rules)
+                }
 
-            CatchRoll.ReRollDie,
-            is CatchRoll.RollDie -> {
-                SingleChoiceInputDialog.createCatchBallDialog(controller.state.catchRollContext!!.catchingPlayer, D6Result.allOptions())
-            }
+                is DetermineKickingTeam.SelectCoinSide -> {
+                    SingleChoiceInputDialog.createSelectKickoffCoinTossResultDialog(
+                        controller.state.activeTeam,
+                        CoinSideSelected.allOptions(),
+                    )
+                }
 
-            is Bounce.RollDirection -> {
-                SingleChoiceInputDialog.createBounceBallDialog(controller.rules, D8Result.allOptions())
-            }
+                is DetermineKickingTeam.CoinToss -> {
+                    SingleChoiceInputDialog.createTossDialog(CoinTossResult.allOptions())
+                }
 
-            is PickupRoll.ReRollDie,
-            is PickupRoll.RollDie -> {
-                SingleChoiceInputDialog.createPickupBallDialog(controller.state.pickupRollContext!!.player, D6Result.allOptions())
-            }
+                is DetermineKickingTeam.ChooseKickingTeam -> {
+                    val choices =
+                        listOf(
+                            Confirm to "Kickoff",
+                            Cancel to "Receive",
+                        )
+                    SingleChoiceInputDialog.createChooseToKickoffDialog(controller.state.activeTeam, choices)
+                }
 
-            is PickupRoll.ChooseReRollSource -> {
-                SingleChoiceInputDialog.createPickupRerollDialog(
-                    controller.state.pickupRollResultContext!!,
-                    mapUnknownActions(controller.getAvailableActions())
-                )
-            }
+                is SetupTeam.InformOfInvalidSetup -> {
+                    SingleChoiceInputDialog.createInvalidSetupDialog(controller.state.activeTeam)
+                }
 
-            else -> {
-                null
+                is TheKickOff.TheKickDeviates -> {
+                    val diceRolls = mutableListOf<DiceResults>()
+                    D8Result.allOptions().forEach { d8 ->
+                        D6Result.allOptions().forEach { d6 ->
+                            diceRolls.add(DiceResults(d8, d6))
+                        }
+                    }
+                    DiceRollUserInputDialog.createKickOffDeviatesDialog(
+                        controller.rules,
+                    )
+                }
+
+                is TheKickOffEvent.RollForKickOffEvent -> {
+                    DiceRollUserInputDialog.createKickOffEventDialog(controller.rules)
+                }
+
+                CatchRoll.ReRollDie,
+                is CatchRoll.RollDie,
+                -> {
+                    SingleChoiceInputDialog.createCatchBallDialog(
+                        controller.state.catchRollContext!!.catchingPlayer,
+                        D6Result.allOptions(),
+                    )
+                }
+
+                is Bounce.RollDirection -> {
+                    SingleChoiceInputDialog.createBounceBallDialog(controller.rules, D8Result.allOptions())
+                }
+
+                is PickupRoll.ReRollDie,
+                is PickupRoll.RollDie,
+                -> {
+                    SingleChoiceInputDialog.createPickupBallDialog(
+                        controller.state.pickupRollContext!!.player,
+                        D6Result.allOptions(),
+                    )
+                }
+
+                is PickupRoll.ChooseReRollSource -> {
+                    SingleChoiceInputDialog.createPickupRerollDialog(
+                        controller.state.pickupRollResultContext!!,
+                        mapUnknownActions(controller.getAvailableActions()),
+                    )
+                }
+
+                else -> {
+                    null
+                }
             }
-        }
         return userInput
     }
 
@@ -254,14 +281,13 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
     // we can replay the channel correctly. If multiple input is sent it should
     // be wrapped in a CompositeUserInput.
     private suspend fun sendToRelevantUserInputChannel(uiEvents: List<UserInput>) {
-
         // Group events into channels
         val fieldInputs = mutableListOf<UserInput>()
         val dialogInputs = mutableListOf<UserInput>()
         val unknownInputs = mutableListOf<UserInput>()
 
         uiEvents.forEach {
-            when(it) {
+            when (it) {
                 is CompositeUserInput -> error("Should not occur here")
                 is DeselectPlayerInput -> fieldInputs.add(it)
                 is EndActionInput -> fieldInputs.add(it)
@@ -287,12 +313,21 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         }
 
         if (dialogInputs.isNotEmpty()) {
-            val dialogInput = if (dialogInputs.size == 1) dialogInputs.first() else error("Only 1 dialog allow: ${dialogInputs.size}")
+            val dialogInput =
+                if (dialogInputs.size == 1) {
+                    dialogInputs.first()
+                } else {
+                    error(
+                        "Only 1 dialog allow: ${dialogInputs.size}",
+                    )
+                }
             dialogActions.emit(dialogInput as UserInputDialog?)
         }
 
         if (unknownInputs.isNotEmpty()) {
-            _unknownActions.emit(if (unknownInputs.size == 1) unknownInputs.first() else CompositeUserInput(unknownInputs))
+            _unknownActions.emit(
+                if (unknownInputs.size == 1) unknownInputs.first() else CompositeUserInput(unknownInputs),
+            )
         }
     }
 
@@ -306,19 +341,20 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 ContinueWhenReady -> Continue
                 EndTurnWhenReady -> EndTurn
                 is RollDice -> {
-                    val rolls = action.dice.map {
-                        when(it) {
-                            Dice.D2 -> D2Result()
-                            Dice.D3 -> D3Result()
-                            Dice.D4 -> D4Result()
-                            Dice.D6 -> D6Result()
-                            Dice.D8 -> D8Result()
-                            Dice.D12 -> D12Result()
-                            Dice.D16 -> D16Result()
-                            Dice.D20 -> D20Result()
-                            Dice.BLOCK -> DBlockResult()
+                    val rolls =
+                        action.dice.map {
+                            when (it) {
+                                Dice.D2 -> D2Result()
+                                Dice.D3 -> D3Result()
+                                Dice.D4 -> D4Result()
+                                Dice.D6 -> D6Result()
+                                Dice.D8 -> D8Result()
+                                Dice.D12 -> D12Result()
+                                Dice.D16 -> D16Result()
+                                Dice.D20 -> D20Result()
+                                Dice.BLOCK -> DBlockResult()
+                            }
                         }
-                    }
                     if (rolls.size == 1) {
                         rolls.first()
                     } else {
@@ -335,14 +371,14 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 EndActionWhenReady -> EndAction
                 CancelWhenReady -> Cancel
                 SelectCoinSide -> {
-                    when(Random.nextInt(2)) {
+                    when (Random.nextInt(2)) {
                         0 -> CoinSideSelected(Coin.HEAD)
                         1 -> CoinSideSelected(Coin.TAIL)
                         else -> throw IllegalStateException("Unsupported value")
                     }
                 }
                 TossCoin -> {
-                    when(Random.nextInt(2)) {
+                    when (Random.nextInt(2)) {
                         0 -> CoinTossResult(Coin.HEAD)
                         1 -> CoinTossResult(Coin.TAIL)
                         else -> throw IllegalStateException("Unsupported value")
@@ -359,4 +395,3 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         }
     }
 }
-

@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class ReplayModeUiActionFactory(model: GameScreenModel): UiActionFactory(model) {
+class ReplayModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model) {
     override suspend fun start(scope: CoroutineScope) {
         var index = 0
         val replayCommands = model.fumbbl?.getCommands()
@@ -19,18 +19,27 @@ class ReplayModeUiActionFactory(model: GameScreenModel): UiActionFactory(model) 
                 if (replayCommands != null && index <= replayCommands.size) {
                     val commandFromReplay = replayCommands[index]
                     if (commandFromReplay.expectedNode != controller.stack.currentNode()) {
-                        throw IllegalStateException("""
-                    Current node: ${controller.stack.currentNode()::class.qualifiedName}
-                    Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
-                    Action: ${
-                            when(commandFromReplay) {
-                                is CalculatedJervisAction -> commandFromReplay.actionFunc(controller.state, controller.rules)
-                                is JervisAction -> commandFromReplay.action
-                            }}
-                """.trimIndent())
+                        throw IllegalStateException(
+                            """
+                            Current node: ${controller.stack.currentNode()::class.qualifiedName}
+                            Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
+                            Action: ${
+                                when (commandFromReplay) {
+                                    is CalculatedJervisAction ->
+                                        commandFromReplay.actionFunc(
+                                            controller.state,
+                                            controller.rules,
+                                        )
+                                    is JervisAction -> commandFromReplay.action
+                                }}
+                            """.trimIndent(),
+                        )
                     }
-                    when(commandFromReplay) {
-                        is CalculatedJervisAction -> controller.processAction(commandFromReplay.actionFunc(controller.state, controller.rules))
+                    when (commandFromReplay) {
+                        is CalculatedJervisAction ->
+                            controller.processAction(
+                                commandFromReplay.actionFunc(controller.state, controller.rules),
+                            )
                         is JervisAction -> controller.processAction(commandFromReplay.action)
                     }
                     index += 1

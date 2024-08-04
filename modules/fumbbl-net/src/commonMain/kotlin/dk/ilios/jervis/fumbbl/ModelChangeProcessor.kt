@@ -147,10 +147,13 @@ import dk.ilios.jervis.fumbbl.model.change.TurnDataSetWanderingApothecaries
 import dk.ilios.jervis.fumbbl.model.change.isHomeData
 
 object ModelChangeProcessor {
-    fun apply(game: Game, change: ModelChange): Boolean {
+    fun apply(
+        game: Game,
+        change: ModelChange,
+    ): Boolean {
 //        val dialogParameter: IDialogParameter
 //        val skillFactory: SkillFactory = pGame.getFactory(FactoryType.Factory.SKILL) as SkillFactory
-        when(change) {
+        when (change) {
             is ActingPlayerMarkSkillUnused -> game.actingPlayer.markSkillUnused(change.value)
             is ActingPlayerMarkSkillUsed -> game.actingPlayer.markSkillUsed(change.value)
             is ActingPlayerSetCurrentMove -> game.actingPlayer.currentMove = change.value
@@ -194,7 +197,11 @@ object ModelChangeProcessor {
             is FieldModelRemovePlayerMarker -> game.fieldModel.removePlayerMarker(change.value)
             is FieldModelRemovePrayer -> game.fieldModel.removePrayerEnhancement(change.key, change.value)
             is FieldModelRemovePushbackSquare -> game.fieldModel.removePushbackSquare(change.value)
-            is FieldModelRemoveSkillEnhancements -> game.fieldModel.removeSkillEnhancements(game.getPlayerById(change.key)!!, change.value)
+            is FieldModelRemoveSkillEnhancements ->
+                game.fieldModel.removeSkillEnhancements(
+                    game.getPlayerById(change.key)!!,
+                    change.value,
+                )
             is FieldModelRemoveTrackNumber -> game.fieldModel.removeTrackNumber(change.value)
             is FieldModelRemoveTrapDoor -> game.fieldModel.removeTrapDoor(change.value)
             is FieldModelSetBallCoordinate -> game.fieldModel.ballCoordinate = change.value
@@ -1137,24 +1144,35 @@ object ModelChangeProcessor {
 //        )
 //    }
 
-
     private fun isHomeData(pChange: ModelChange): Boolean {
         return "home" == pChange.key
     }
 
-    private fun getTeamResult(game: Game, homeData: Boolean): TeamResult {
+    private fun getTeamResult(
+        game: Game,
+        homeData: Boolean,
+    ): TeamResult {
         return if (homeData) game.gameResult.teamResultHome else game.gameResult.teamResultAway
     }
 
-    private fun getTurnData(game: Game, homeData: Boolean): TurnData {
+    private fun getTurnData(
+        game: Game,
+        homeData: Boolean,
+    ): TurnData {
         return if (homeData) game.turnDataHome else game.turnDataAway
     }
 
-    private fun getInducementSet(pGame: Game, pHomeData: Boolean): InducementSet {
+    private fun getInducementSet(
+        pGame: Game,
+        pHomeData: Boolean,
+    ): InducementSet {
         return if (pHomeData) pGame.turnDataHome.inducementSet else pGame.turnDataAway.inducementSet
     }
 
-    private fun getPlayerResult(game: Game, playerId: String): PlayerResult {
+    private fun getPlayerResult(
+        game: Game,
+        playerId: String,
+    ): PlayerResult {
         return game.gameResult.getPlayerResult(game.getPlayerById(playerId)!!)
     }
 }

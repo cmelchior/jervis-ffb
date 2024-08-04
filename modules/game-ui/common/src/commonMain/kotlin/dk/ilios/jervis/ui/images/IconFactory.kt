@@ -13,28 +13,27 @@ import java.io.InputStream
 import javax.imageio.ImageIO
 
 const val iconRootPath = "icons/cached/players/iconsets"
-val playerIconSpriteSheets = mutableMapOf(
-    HumanTeam.LINEMAN to "$iconRootPath/human_lineman.png",
-    HumanTeam.THROWER to "$iconRootPath/human_thrower.png",
-    HumanTeam.CATCHER to "$iconRootPath/human_catcher.png",
-    HumanTeam.BLITZER to "$iconRootPath/human_blitzer.png",
-    HumanTeam.OGRE to "$iconRootPath/human_ogre.png",
-    HumanTeam.HALFLING_HOPEFUL to "$iconRootPath/human_haflinghopeful.png",
-
-    ChaosDwarfTeam.HOBGOBLIN_LINEMEN to "$iconRootPath/chaosdwarf_hobgoblinlineman.png",
-    ChaosDwarfTeam.CHAOS_DWARF_BLOCKERS to "$iconRootPath/chaosdwarf_chaosdwarfblocker.png",
-    ChaosDwarfTeam.BULL_CENTAUR_BLITZERS to "$iconRootPath/chaosdwarf_bullcentaurblitzer.png",
-    ChaosDwarfTeam.ENSLAVED_MINOTAUR to "$iconRootPath/chaosdwarf_enslavedminotaur.png",
-
-    KhorneTeam.BLOODBORN_MARAUDER_LINEMEN to "$iconRootPath/khorne_bloodbornmarauderlineman.png",
-    KhorneTeam.KHORNGORS to "$iconRootPath/khorne_khorngor.png",
-    KhorneTeam.BLOODSEEKERS to "$iconRootPath/khorne_bloodseeker.png",
-    KhorneTeam.BLOODSPAWN to "$iconRootPath/khorne_bloodspawn.png"
-)
+val playerIconSpriteSheets =
+    mutableMapOf(
+        HumanTeam.LINEMAN to "$iconRootPath/human_lineman.png",
+        HumanTeam.THROWER to "$iconRootPath/human_thrower.png",
+        HumanTeam.CATCHER to "$iconRootPath/human_catcher.png",
+        HumanTeam.BLITZER to "$iconRootPath/human_blitzer.png",
+        HumanTeam.OGRE to "$iconRootPath/human_ogre.png",
+        HumanTeam.HALFLING_HOPEFUL to "$iconRootPath/human_haflinghopeful.png",
+        ChaosDwarfTeam.HOBGOBLIN_LINEMEN to "$iconRootPath/chaosdwarf_hobgoblinlineman.png",
+        ChaosDwarfTeam.CHAOS_DWARF_BLOCKERS to "$iconRootPath/chaosdwarf_chaosdwarfblocker.png",
+        ChaosDwarfTeam.BULL_CENTAUR_BLITZERS to "$iconRootPath/chaosdwarf_bullcentaurblitzer.png",
+        ChaosDwarfTeam.ENSLAVED_MINOTAUR to "$iconRootPath/chaosdwarf_enslavedminotaur.png",
+        KhorneTeam.BLOODBORN_MARAUDER_LINEMEN to "$iconRootPath/khorne_bloodbornmarauderlineman.png",
+        KhorneTeam.KHORNGORS to "$iconRootPath/khorne_khorngor.png",
+        KhorneTeam.BLOODSEEKERS to "$iconRootPath/khorne_bloodseeker.png",
+        KhorneTeam.BLOODSPAWN to "$iconRootPath/khorne_bloodspawn.png",
+    )
 
 data class PositionImage(
     val default: BufferedImage,
-    val active: BufferedImage
+    val active: BufferedImage,
 )
 
 class PositionImageFactory(spriteSheet: BufferedImage) {
@@ -55,16 +54,16 @@ class PositionImageFactory(spriteSheet: BufferedImage) {
     private fun extractSprites(image: BufferedImage): List<Pair<PositionImage, PositionImage>> {
         val spriteWidth = image.width / 4 // There are always 4 sprites pr line.
         val spriteHeight = spriteWidth
-        val lines = image.height/spriteHeight
+        val lines = image.height / spriteHeight
         return (0 until lines).map { line ->
             val homeDefaultX = 0
             val homeActiveX = spriteWidth
-            val awayDefaultX = spriteWidth*2
-            val awayActiveX = spriteWidth*3
-            val homeDefault = image.getSubimage(homeDefaultX, line*spriteHeight, spriteWidth, spriteHeight)
-            val homeActive = image.getSubimage(homeActiveX, line*spriteHeight, spriteWidth, spriteHeight)
-            val awayDefault = image.getSubimage(awayDefaultX, line*spriteHeight, spriteWidth, spriteHeight)
-            val awayActive = image.getSubimage(awayActiveX, line*spriteHeight, spriteWidth, spriteHeight)
+            val awayDefaultX = spriteWidth * 2
+            val awayActiveX = spriteWidth * 3
+            val homeDefault = image.getSubimage(homeDefaultX, line * spriteHeight, spriteWidth, spriteHeight)
+            val homeActive = image.getSubimage(homeActiveX, line * spriteHeight, spriteWidth, spriteHeight)
+            val awayDefault = image.getSubimage(awayDefaultX, line * spriteHeight, spriteWidth, spriteHeight)
+            val awayActive = image.getSubimage(awayActiveX, line * spriteHeight, spriteWidth, spriteHeight)
             val homePlayer = PositionImage(homeDefault, homeActive)
             val awayPlayer = PositionImage(awayDefault, awayActive)
             Pair(homePlayer, awayPlayer)
@@ -81,9 +80,7 @@ class PositionImageFactory(spriteSheet: BufferedImage) {
     }
 }
 
-
 object IconFactory {
-
     private val iconHeight = 40
     private val iconWidth = 40
     private var classLoader: ClassLoader
@@ -96,7 +93,10 @@ object IconFactory {
         classLoader = Thread.currentThread().contextClassLoader
     }
 
-    private fun loadImageFromResources(path: String, cache: Boolean = false): BufferedImage {
+    private fun loadImageFromResources(
+        path: String,
+        cache: Boolean = false,
+    ): BufferedImage {
         if (cache && cachedImages.containsKey(path)) {
             return cachedImages[path]!!
         } else {

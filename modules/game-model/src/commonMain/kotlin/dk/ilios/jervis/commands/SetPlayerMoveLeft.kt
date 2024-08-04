@@ -10,16 +10,22 @@ import dk.ilios.jervis.model.Player
  */
 class SetPlayerMoveLeft(private val player: Player, val remainingMove: Int) : Command {
     private var originalMove: Int = 0
-    override fun execute(state: Game, controller: GameController) {
+
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         this.originalMove = player.moveLeft
         player.apply {
             moveLeft = remainingMove
             notifyUpdate()
         }
-
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         player.apply {
             moveLeft = originalMove
             notifyUpdate()

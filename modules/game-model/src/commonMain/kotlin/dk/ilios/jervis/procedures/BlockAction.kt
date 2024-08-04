@@ -25,47 +25,69 @@ import dk.ilios.jervis.utils.INVALID_ACTION
  *
  * See page 56 in the rulebook.
  */
-object BlockAction: Procedure() {
+object BlockAction : Procedure() {
     override val initialNode: Node = SelectDefenderOrEndAction
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
+
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command? = null
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command {
         return ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
     }
 
-    object SelectDefenderOrEndAction: ActionNode() {
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+    object SelectDefenderOrEndAction : ActionNode() {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> {
             val end: List<ActionDescriptor> = listOf(EndActionWhenReady)
 
-            val eligibleEmptySquares: List<ActionDescriptor> = if (state.activePlayer!!.moveLeft > 0) {
-                state.activePlayer!!.location.coordinate.getSurroundingCoordinates(rules)
-                    .filter { state.field[it].isEmpty() }
-                    .map { SelectFieldLocation(it) }
-            } else emptyList()
+            val eligibleEmptySquares: List<ActionDescriptor> =
+                if (state.activePlayer!!.moveLeft > 0) {
+                    state.activePlayer!!.location.coordinate.getSurroundingCoordinates(rules)
+                        .filter { state.field[it].isEmpty() }
+                        .map { SelectFieldLocation(it) }
+                } else {
+                    emptyList()
+                }
 
-            val eligibleJumpSquares: List<ActionDescriptor> = if (state.activePlayer!!.moveLeft > 0) {
-                val activePlayerLocation = state.activePlayer!!.location.coordinate
-                activePlayerLocation.getSurroundingCoordinates(rules)
-                    .filter { !state.field[it].isEmpty() }
-                    .flatMap {
-                        it.getCoordinatesAwayFromLocation(rules, activePlayerLocation)
-                    }
-                    .toSet()
-                    .map { SelectFieldLocation(it) }
-            } else emptyList()
+            val eligibleJumpSquares: List<ActionDescriptor> =
+                if (state.activePlayer!!.moveLeft > 0) {
+                    val activePlayerLocation = state.activePlayer!!.location.coordinate
+                    activePlayerLocation.getSurroundingCoordinates(rules)
+                        .filter { !state.field[it].isEmpty() }
+                        .flatMap {
+                            it.getCoordinatesAwayFromLocation(rules, activePlayerLocation)
+                        }
+                        .toSet()
+                        .map { SelectFieldLocation(it) }
+                } else {
+                    emptyList()
+                }
             return end + eligibleEmptySquares + eligibleJumpSquares
         }
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when(action) {
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
+            return when (action) {
                 EndAction -> ExitProcedure()
                 is PlayerSelected -> {
-                    val context = BlockContext(
-                        attacker = state.activePlayer!!,
-                        defender = action.player
-                    )
+                    val context =
+                        BlockContext(
+                            attacker = state.activePlayer!!,
+                            defender = action.player,
+                        )
                     compositeCommandOf(
                         SetRollContext(Game::blockContext, context),
-                        GotoNode(ResolveBlock)
+                        GotoNode(ResolveBlock),
                     )
                 }
                 else -> INVALID_ACTION(action)
@@ -73,9 +95,16 @@ object BlockAction: Procedure() {
         }
     }
 
-    object ResolveBlock: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BlockStep
-        override fun onExitNode(state: Game, rules: Rules): Command {
+    object ResolveBlock : ParentNode() {
+        override fun getChildProcedure(
+            state: Game,
+            rules: Rules,
+        ): Procedure = BlockStep
+
+        override fun onExitNode(
+            state: Game,
+            rules: Rules,
+        ): Command {
             return ExitProcedure()
         }
     }

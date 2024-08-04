@@ -10,9 +10,8 @@ import dk.ilios.jervis.model.Player
 class SetBallState private constructor(
     private val ballState: BallState,
     private val carriedBy: Player? = null,
-    private val exitLocation: FieldCoordinate? = null
+    private val exitLocation: FieldCoordinate? = null,
 ) : Command {
-
     private lateinit var originalState: BallState
     private var originalCarriedBy: Player? = null
     private var originalExit: FieldCoordinate? = null
@@ -20,18 +19,30 @@ class SetBallState private constructor(
 
     companion object {
         fun inAir(): Command = SetBallState(ballState = BallState.IN_AIR)
+
         fun carried(player: Player): Command = SetBallState(ballState = BallState.CARRIED, carriedBy = player)
+
         fun onGround(): Command = SetBallState(ballState = BallState.ON_GROUND)
+
         fun deviating(): Command = SetBallState(ballState = BallState.DEVIATING)
+
         fun bouncing(): Command = SetBallState(ballState = BallState.BOUNCING)
-        fun outOfBounds(exit: FieldCoordinate): Command = SetBallState(ballState = BallState.OUT_OF_BOUNDS, exitLocation = exit)
+
+        fun outOfBounds(exit: FieldCoordinate): Command =
+            SetBallState(
+                ballState = BallState.OUT_OF_BOUNDS,
+                exitLocation = exit,
+            )
     }
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         val ball: Ball = state.ball
         ball.let {
             this.originalState = it.state
-            this.originalCarriedBy= it.carriedBy
+            this.originalCarriedBy = it.carriedBy
             this.originalExit = it.outOfBoundsAt
             this.originalLocation = it.location
         }
@@ -46,7 +57,10 @@ class SetBallState private constructor(
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
         state.ball.state = originalState
         state.ball.carriedBy = originalCarriedBy
         state.ball.outOfBoundsAt = originalExit

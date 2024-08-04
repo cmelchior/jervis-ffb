@@ -25,7 +25,6 @@ import dk.ilios.jervis.utils.createStartingTestSetup
 import org.junit.Test
 
 class AStarTests {
-
     @Test
     fun run() {
         application {
@@ -37,7 +36,6 @@ class AStarTests {
             }
         }
     }
-
 }
 
 @Composable
@@ -46,7 +44,7 @@ fun AStarContent() {
     val state = createDefaultGameState(rules)
     createStartingTestSetup(state)
 
-    val result = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), FieldCoordinate(0, 14), 4,true)
+    val result = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), FieldCoordinate(0, 14), 4, true)
     when (result) {
         is PathFinder.Failure -> {
             (result.debugInformation as BB2020PathFinder.DebugInformation).let {
@@ -55,7 +53,7 @@ fun AStarContent() {
                     rules.fieldWidth.toInt(),
                     it.fieldView,
                     it.gScore,
-                    result.path
+                    result.path,
                 )
             }
         }
@@ -67,7 +65,7 @@ fun AStarContent() {
                     rules.fieldWidth.toInt(),
                     it.fieldView,
                     it.gScore,
-                    result.path
+                    result.path,
                 )
             }
         }
@@ -75,26 +73,34 @@ fun AStarContent() {
 }
 
 @Composable
-fun BoxGrid(rows: Int, cols: Int, field: Array<Array<Int>>, gScore: Map<FieldCoordinate, Double>, path: List<FieldCoordinate>) {
+fun BoxGrid(
+    rows: Int,
+    cols: Int,
+    field: Array<Array<Int>>,
+    gScore: Map<FieldCoordinate, Double>,
+    path: List<FieldCoordinate>,
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         repeat(rows) { y ->
             Row {
                 repeat(cols) { x ->
                     val onPath = path.contains(FieldCoordinate(x, y))
                     val squareValue = field[x][y]
-                    val (text: String, bgColor: Color) = when {
-                        onPath -> gScore[FieldCoordinate(x, y)].formatToString(1) to Color.Blue
-                        squareValue == Int.MAX_VALUE -> "" to Color.Black
-                        squareValue > 0 -> "(${squareValue})" to Color.LightGray
-                        squareValue == 0 -> gScore[FieldCoordinate(x, y)].formatToString(1) to Color.White
-                        else -> "" to Color.Red
-                    }
+                    val (text: String, bgColor: Color) =
+                        when {
+                            onPath -> gScore[FieldCoordinate(x, y)].formatToString(1) to Color.Blue
+                            squareValue == Int.MAX_VALUE -> "" to Color.Black
+                            squareValue > 0 -> "($squareValue)" to Color.LightGray
+                            squareValue == 0 -> gScore[FieldCoordinate(x, y)].formatToString(1) to Color.White
+                            else -> "" to Color.Red
+                        }
                     Box(
-                        modifier = Modifier
-                            .size(30.dp)
-                            .padding(1.dp)
-                            .background(bgColor),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .size(30.dp)
+                                .padding(1.dp)
+                                .background(bgColor),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(text = text)
                     }

@@ -20,5 +20,10 @@ interface Position {
 
     val skills: List<SkillFactory>
 
-    fun createPlayer(team: Team, id: PlayerId, name: String, number: PlayerNo): Player
+    fun createPlayer(
+        team: Team,
+        id: PlayerId,
+        name: String,
+        number: PlayerNo,
+    ): Player
 }

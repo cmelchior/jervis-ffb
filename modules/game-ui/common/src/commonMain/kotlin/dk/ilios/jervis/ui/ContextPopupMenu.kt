@@ -29,16 +29,14 @@ fun ContextPopupMenu(
     hidePopup: () -> Unit,
     commands: List<ContextMenuOption>,
 ) {
-
     // Calculate the offset of the popup, so it is displayed best on the screen
     // Prefer right of content, and then left. If there is no space, place on top.
     fun calculateOffset(
         anchorBounds: IntRect, // Bounds for the content we want to place popup around
         windowSize: IntSize, // Size of the window
         layoutDirection: LayoutDirection,
-        popupContentSize: IntSize
+        popupContentSize: IntSize,
     ): IntOffset {
-
         val screenLeft = 0
         val screenRight = windowSize.width
         val contentWidth = popupContentSize.width
@@ -56,7 +54,7 @@ fun ContextPopupMenu(
         // else do-best-effort starting from the right
         return IntOffset(
             anchorBounds.right.coerceIn(0, (screenRight - contentWidth)),
-            anchorBounds.top.coerceIn(0, windowSize.height - popupContentSize.height)
+            anchorBounds.top.coerceIn(0, windowSize.height - popupContentSize.height),
         )
     }
     if (commands.isEmpty()) {
@@ -65,33 +63,35 @@ fun ContextPopupMenu(
     }
     Box(modifier = Modifier.fillMaxSize().clickable { /* Intercept events outside popup */ }) {
         Popup(
-            popupPositionProvider = object : PopupPositionProvider {
-                override fun calculatePosition(
-                    anchorBounds: IntRect,
-                    windowSize: IntSize,
-                    layoutDirection: LayoutDirection,
-                    popupContentSize: IntSize
-                ): IntOffset {
-                    return calculateOffset(anchorBounds, windowSize, layoutDirection, popupContentSize)
-                }
-            },
+            popupPositionProvider =
+                object : PopupPositionProvider {
+                    override fun calculatePosition(
+                        anchorBounds: IntRect,
+                        windowSize: IntSize,
+                        layoutDirection: LayoutDirection,
+                        popupContentSize: IntSize,
+                    ): IntOffset {
+                        return calculateOffset(anchorBounds, windowSize, layoutDirection, popupContentSize)
+                    }
+                },
             properties = PopupProperties(),
-            onDismissRequest = { hidePopup() }
+            onDismissRequest = { hidePopup() },
         ) {
             Column(modifier = Modifier.width(IntrinsicSize.Max).background(MaterialTheme.colors.background)) {
                 commands.forEach { (title, cmd) ->
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colors.background)
-                            .clickable {
-                                hidePopup()
-                                cmd()
-                            }
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colors.background)
+                                .clickable {
+                                    hidePopup()
+                                    cmd()
+                                },
                     ) {
                         Text(
                             modifier = Modifier.padding(4.dp),
-                            text = title
+                            text = title,
                         )
                     }
                 }

@@ -9,17 +9,16 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
-fun main() = application {
-    val windowState = rememberWindowState()
-    Window(onCloseRequest = ::exitApplication, state = windowState) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Content()
+fun main() =
+    application {
+        val windowState = rememberWindowState()
+        Window(onCloseRequest = ::exitApplication, state = windowState) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Content()
+            }
         }
     }
-}
 
 @Composable
 fun Content() {
-
 }
-

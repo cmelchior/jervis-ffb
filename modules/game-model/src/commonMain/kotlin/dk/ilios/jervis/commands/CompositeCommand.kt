@@ -6,19 +6,27 @@ import dk.ilios.jervis.model.Game
 class CompositeCommand private constructor(private val commands: List<Command>) : Command {
     class Builder {
         private val commands = mutableListOf<Command>()
+
         fun add(command: Command) = commands.add(command)
+
         fun build(): CompositeCommand {
             return CompositeCommand(commands)
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
-        for (i in commands.size-1 downTo 0) {
+    override fun undo(
+        state: Game,
+        controller: GameController,
+    ) {
+        for (i in commands.size - 1 downTo 0) {
             commands[i].undo(state, controller)
         }
     }
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(
+        state: Game,
+        controller: GameController,
+    ) {
         commands.forEach { it.execute(state, controller) }
     }
 

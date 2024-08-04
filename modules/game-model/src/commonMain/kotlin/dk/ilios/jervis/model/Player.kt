@@ -18,8 +18,7 @@ enum class PlayerState {
     // Field states
     STANDING,
     PRONE,
-    STUNNED
-
+    STUNNED,
 
 //    MOVING,
 //    UNKNOWN,
@@ -37,20 +36,19 @@ enum class PlayerState {
 //    SETUP_PREVENTED
 }
 
-
 @Serializable
 @JvmInline
-value class PlayerNo(val number: Int): Comparable<PlayerNo> {
+value class PlayerNo(val number: Int) : Comparable<PlayerNo> {
     override fun compareTo(other: PlayerNo): Int {
         return when {
             (number == other.number) -> 0
             (number < other.number) -> -1
-            else ->  1
+            else -> 1
         }
     }
+
     override fun toString(): String = number.toString()
 }
-
 
 fun Player.isOnHomeTeam(): Boolean {
     return this.team.game.homeTeam == this.team
@@ -60,29 +58,22 @@ fun Player.isOnAwayTeam(): Boolean {
     return this.team.game.awayTeam == this.team
 }
 
-
 enum class Availability {
     AVAILABLE, // Are available to be activated in this turn
     IS_ACTIVE, // Are currently active
     HAS_ACTIVATED, // Has already activated this turn
-    UNAVAILABLE // Unavailable for this turn
+    UNAVAILABLE, // Unavailable for this turn
 }
-
 
 @JvmInline
 @Serializable
 value class PlayerId(val value: String)
 
-
-
-
-
 @Serializable
 class Player(
     val id: PlayerId,
-    val position: Position
-): Observable<Player>() {
-
+    val position: Position,
+) : Observable<Player>() {
     @Transient
     lateinit var team: Team
     var location: Location = DogOut
@@ -118,11 +109,12 @@ class Player(
     var starPlayerPoints: Int = 0
     var level: PlayerLevel = PlayerLevel.ROOKIE
     val ball: Ball?
-        get() = if (team.game.ball.carriedBy == this) {
-            team.game.ball
-        } else {
-            null
-        }
+        get() =
+            if (team.game.ball.carriedBy == this) {
+                team.game.ball
+            } else {
+                null
+            }
 
     init {
         positionSkills = position.skills.map { it.createSkill() }

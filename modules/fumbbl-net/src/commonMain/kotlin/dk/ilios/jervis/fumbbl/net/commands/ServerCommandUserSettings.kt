@@ -10,4 +10,4 @@ data class ServerCommandUserSettings(
     override val commandNr: Int,
     val userSettingNames: List<String>,
     val userSettingValues: List<String?>,
-): ServerCommand
+) : ServerCommand

@@ -1,6 +1,8 @@
 package dk.ilios.jervis.fumbbl
 
 import dk.ilios.jervis.fumbbl.net.auth.getHttpClient
+import dk.ilios.jervis.fumbbl.net.commands.ClientCommand
+import dk.ilios.jervis.fumbbl.net.commands.ServerCommand
 import io.ktor.client.plugins.websocket.receiveDeserialized
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.plugins.websocket.webSocket
@@ -11,8 +13,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import dk.ilios.jervis.fumbbl.net.commands.ServerCommand
-import dk.ilios.jervis.fumbbl.net.commands.ClientCommand
 
 /**
  * Class for controlling the websocket connection to FUMBBL.
@@ -20,7 +20,6 @@ import dk.ilios.jervis.fumbbl.net.commands.ClientCommand
  * to know which messages to send and receive.
  */
 class FumbblWebsocketConnection() {
-
     private val scope = CoroutineScope(CoroutineName("FumbblWebsocket"))
 
     // Messages sent from the server. Users of this class
@@ -38,7 +37,7 @@ class FumbblWebsocketConnection() {
             client.webSocket(
                 host = "fumbbl.com",
                 port = 22223,
-                path = "/command"
+                path = "/command",
             ) {
                 launch {
                     while (this.isActive) {
@@ -48,7 +47,7 @@ class FumbblWebsocketConnection() {
                     }
                 }
                 launch {
-                    while(this.isActive) {
+                    while (this.isActive) {
                         val incomingMessage: ServerCommand = receiveDeserialized<ServerCommand>()
                         println("Received: $incomingMessage")
                         this@FumbblWebsocketConnection.incoming.send(incomingMessage)
@@ -72,5 +71,4 @@ class FumbblWebsocketConnection() {
         outgoing.close()
         scope.cancel()
     }
-
 }

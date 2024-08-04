@@ -7,21 +7,30 @@ import dk.ilios.jervis.model.Game
  * Interface encapsulating ways to calculate paths between squares on the field.
  */
 interface PathFinder {
-
     sealed interface SinglePathResult {
         val path: List<FieldCoordinate>
     }
-    class Success(override val path: List<FieldCoordinate>, val debugInformation: Any?): SinglePathResult
-    class Failure(override val path: List<FieldCoordinate>, val debugInformation: Any?): SinglePathResult
+
+    class Success(override val path: List<FieldCoordinate>, val debugInformation: Any?) : SinglePathResult
+
+    class Failure(override val path: List<FieldCoordinate>, val debugInformation: Any?) : SinglePathResult
 
     interface AllPathsResult {
         // Return a map of all known distances
         val distances: Map<FieldCoordinate, Int>
+
         // Returns the path from the start to the goal square. If no path exists, the path
         // that is closets is returned instead.
-        fun getClosestPathTo(goal: FieldCoordinate, maxMove: Int = Int.MAX_VALUE): List<FieldCoordinate>
+        fun getClosestPathTo(
+            goal: FieldCoordinate,
+            maxMove: Int = Int.MAX_VALUE,
+        ): List<FieldCoordinate>
+
         // Returns the path from start to goal or `null` or no path exists.
-        fun getPathTo(goal: FieldCoordinate, maxMove: Int = Int.MAX_VALUE): List<FieldCoordinate>?
+        fun getPathTo(
+            goal: FieldCoordinate,
+            maxMove: Int = Int.MAX_VALUE,
+        ): List<FieldCoordinate>?
     }
 
     /**
@@ -33,7 +42,7 @@ interface PathFinder {
         start: FieldCoordinate,
         goal: FieldCoordinate,
         maxMove: Int,
-        includeDebugInfo: Boolean = false
+        includeDebugInfo: Boolean = false,
     ): SinglePathResult
 
     /**
@@ -50,5 +59,9 @@ interface PathFinder {
     /**
      * Returns the direct path in squares between two squares on the field, start and end inclusive.
      */
-    fun getStraightLine(state: Game, start: FieldCoordinate, end: FieldCoordinate): List<FieldCoordinate>
+    fun getStraightLine(
+        state: Game,
+        start: FieldCoordinate,
+        end: FieldCoordinate,
+    ): List<FieldCoordinate>
 }

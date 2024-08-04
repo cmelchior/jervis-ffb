@@ -1,10 +1,10 @@
 package dk.ilios.jervis.fumbbl.model
 
-import kotlinx.serialization.Serializable
 import dk.ilios.jervis.fumbbl.net.serialization.FumbblEnum
+import kotlinx.serialization.Serializable
 
 @Serializable
-enum class SpecialRule(override val id: String): FumbblEnum {
+enum class SpecialRule(override val id: String) : FumbblEnum {
     BADLANDS_BRAWL("Badlands Brawl"),
     BRIBERY_AND_CORRUPTION("Bribery and Corruption"),
     ELVEN_KINGDOMS_LEAGUE("Elven Kingdoms League"),
@@ -20,5 +20,5 @@ enum class SpecialRule(override val id: String): FumbblEnum {
     OLD_WORLD_CLASSIC("Old World Classic"),
     SYLVANIAN_SPOTLIGHT("Sylvanian Spotlight"),
     UNDERWORLD_CHALLENGE("Underworld Challenge"),
-    WORLDS_EDGE_SUPERLEAGUE("Worlds Edge Superleague");
+    WORLDS_EDGE_SUPERLEAGUE("Worlds Edge Superleague"),
 }

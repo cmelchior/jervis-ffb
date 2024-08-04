@@ -8,9 +8,13 @@ data class TargetSelectionState(
     val targetSelectionStatus: Status = Status.SELECTED,
     val targetSelectionStatusIsCommitted: Boolean,
     val playerStateOld: Int?,
-    val usedSkills: List<String>
+    val usedSkills: List<String>,
 ) {
     enum class Status {
-        STARTED, CANCELED, SELECTED, SKIPPED, FAILED
+        STARTED,
+        CANCELED,
+        SELECTED,
+        SKIPPED,
+        FAILED,
     }
 }
