@@ -82,7 +82,8 @@ class FieldViewModel(
                             fieldCoordinate to (index + 1)
                         }.toMap()
                         val action = {
-                            val selectedSquares = path.map { FieldSquareSelected(it) }
+                            // Only allow a path up to hitting a ball
+                            val selectedSquares = path.takeWhile { state[it].ball == null }.map { FieldSquareSelected(it) }
                             if (selectedSquares.size == 1) {
                                 uiActionFactory.userSelectedAction(selectedSquares.first())
                             } else {

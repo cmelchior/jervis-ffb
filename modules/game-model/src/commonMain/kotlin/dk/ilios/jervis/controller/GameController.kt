@@ -232,22 +232,16 @@ class GameController(
     // Revert last action
     fun revert() {
         if (replayMode) throw IllegalStateException("Controller is in replay mode. `revert` is only available in manual mode.")
-        if (commands.isEmpty()) return
+        if (actionHistory.isEmpty()) return
         while (commands.last() !is ReportHandleAction && actionHistory.last() != (commands.last() as? ReportHandleAction)?.action) {
             val i = commands.size - 1
             val undoCommand = commands[i]
             undoCommand.undo(state, this)
             commands.removeLast()
         }
-//        val reportAction = (commands.last() as ReportHandleAction)
-//        if (actionHistory.last() == reportAction.action) {
-//            error("Action mismatch: ${actionHistory.last()} != ${reportAction.action}")
-//        }
         commands.removeLast().undo(state, this)
         actionHistory.removeLast()
         state.notifyUpdate()
-        // Should we also send out
-
     }
 
     // Go backwards in the command history
