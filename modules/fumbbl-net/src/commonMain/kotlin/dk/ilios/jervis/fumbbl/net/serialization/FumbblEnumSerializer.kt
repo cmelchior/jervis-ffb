@@ -35,6 +35,6 @@ open class FumbblEnumSerializer<E>(
         decoder.decodeString().let { value ->
             kClass.java.enumConstants.firstOrNull {
                 it.id == value
-            } ?: throw IllegalStateException("Cannot find enum with label $value")
+            } ?: throw IllegalStateException("Cannot find enum with label $value in ${kClass.simpleName}")
         }
 }

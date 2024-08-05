@@ -11,6 +11,7 @@ enum class CatchModifier(override val id: String, val modifier: Int) : FumbblEnu
     INACCURATE("Inaccurate Pass, Deviated Ball or Scatter", -1),
     DEFLECTED_PASS("Deflected Pass", -1),
     BLAST_IT("Blast It!", -1),
+    NERVES_OF_STEEL("Nerves of Steel", 0),
     TACKLEZONES_1("1 Tacklezone", -1),
     TACKLEZONES_2("2 Tacklezones", -2),
     TACKLEZONES_3("3 Tacklezones", -3),

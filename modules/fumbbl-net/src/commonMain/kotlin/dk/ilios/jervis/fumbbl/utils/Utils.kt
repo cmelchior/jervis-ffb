@@ -13,6 +13,7 @@ import dk.ilios.jervis.rules.roster.bb2020.BadlandsBrawl
 import dk.ilios.jervis.rules.roster.bb2020.BriberyAndCorruption
 import dk.ilios.jervis.rules.roster.bb2020.ChaosDwarfTeam
 import dk.ilios.jervis.rules.roster.bb2020.ElvenKingdomLeague
+import dk.ilios.jervis.rules.roster.bb2020.ElvenUnionTeam
 import dk.ilios.jervis.rules.roster.bb2020.FavouredOfChaosUndivided
 import dk.ilios.jervis.rules.roster.bb2020.FavouredOfKhorne
 import dk.ilios.jervis.rules.roster.bb2020.FavouredOfNurgle
@@ -116,6 +117,7 @@ private fun extractRoster(roster: FumbblRoster): Roster {
         "Chaos Dwarf" -> ChaosDwarfTeam
         "Human" -> HumanTeam
         "Khorne" -> KhorneTeam
+        "Elven Union" -> ElvenUnionTeam
         else -> TODO("Missing team: ${roster.rosterName}")
     }
 }

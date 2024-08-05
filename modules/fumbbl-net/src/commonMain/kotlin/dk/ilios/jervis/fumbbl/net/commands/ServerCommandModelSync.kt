@@ -8,9 +8,9 @@ import kotlinx.serialization.Serializable
 data class ServerCommandModelSync(
     override val netCommandId: String,
     override val commandNr: Int,
-    val modelChangeList: ModelChangeList,
-    val reportList: ReportList,
+    val modelChangeList: ModelChangeList = ModelChangeList(emptyList()),
+    val reportList: ReportList = ReportList(emptyList()),
     val sound: String? = null,
-    val gameTime: Long,
-    val turnTime: Long,
+    val gameTime: Long = 0,
+    val turnTime: Long = 0,
 ) : ServerCommand

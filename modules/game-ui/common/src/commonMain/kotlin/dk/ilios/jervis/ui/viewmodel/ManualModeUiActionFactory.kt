@@ -72,7 +72,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
     override suspend fun start(scope: CoroutineScope) {
         scope.launch(errorHandler) {
             var initialActionsIndex = 0
-            _fieldActions.emit(WaitingForUserInput)
+            emitToField(WaitingForUserInput)
             val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
                 if (initialActionsIndex < actions.size) {
                     val action = actions[initialActionsIndex]
@@ -309,7 +309,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
 
         if (fieldInputs.isNotEmpty()) {
             val action: UserInput = if (fieldInputs.size == 1) fieldInputs.first() else CompositeUserInput(fieldInputs)
-            _fieldActions.emit(action)
+            emitToField(action)
         }
 
         if (dialogInputs.isNotEmpty()) {
@@ -325,7 +325,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         }
 
         if (unknownInputs.isNotEmpty()) {
-            _unknownActions.emit(
+            emitToUnknown(
                 if (unknownInputs.size == 1) unknownInputs.first() else CompositeUserInput(unknownInputs),
             )
         }

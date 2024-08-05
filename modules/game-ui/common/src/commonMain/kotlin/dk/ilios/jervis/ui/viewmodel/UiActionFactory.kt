@@ -47,6 +47,14 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
     // TODO
     abstract suspend fun start(scope: CoroutineScope)
 
+    protected suspend fun emitToField(input: UserInput) {
+        _fieldActions.emit(input)
+    }
+
+    protected suspend fun emitToUnknown(input: UserInput) {
+        _unknownActions.emit(input)
+    }
+
     // The user selected an action
     fun userSelectedAction(action: GameAction) {
         scope.launch(errorHandler) {

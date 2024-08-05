@@ -14,6 +14,7 @@ class ReplayModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
         val replayCommands = model.fumbbl?.getCommands()
         scope.launch(Dispatchers.Default) {
             val controller = model.controller
+            emitToField(WaitingForUserInput) // Init flows
             controller.startManualMode()
             while (!controller.stack.isEmpty()) {
                 if (replayCommands != null && index <= replayCommands.size) {
@@ -42,6 +43,7 @@ class ReplayModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
                             )
                         is JervisAction -> controller.processAction(commandFromReplay.action)
                     }
+                    controller.state.notifyUpdate()
                     index += 1
                     delay(20)
                     continue

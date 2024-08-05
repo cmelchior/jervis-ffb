@@ -5,6 +5,7 @@ import dk.ilios.jervis.model.isOnHomeTeam
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.ChaosDwarfTeam
+import dk.ilios.jervis.rules.roster.bb2020.ElvenUnionTeam
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.roster.bb2020.KhorneTeam
 import dk.ilios.jervis.ui.model.UiPlayer
@@ -29,6 +30,10 @@ val playerIconSpriteSheets =
         KhorneTeam.KHORNGORS to "$iconRootPath/khorne_khorngor.png",
         KhorneTeam.BLOODSEEKERS to "$iconRootPath/khorne_bloodseeker.png",
         KhorneTeam.BLOODSPAWN to "$iconRootPath/khorne_bloodspawn.png",
+        ElvenUnionTeam.LINEMAN to "$iconRootPath/elvenunion_lineman.png",
+        ElvenUnionTeam.CATCHER to "$iconRootPath/elvenunion_catcher.png",
+        ElvenUnionTeam.THROWER to "$iconRootPath/elvenunion_thrower.png",
+        ElvenUnionTeam.BLITZER to "$iconRootPath/elvenunion_blitzer.png",
     )
 
 data class PositionImage(
