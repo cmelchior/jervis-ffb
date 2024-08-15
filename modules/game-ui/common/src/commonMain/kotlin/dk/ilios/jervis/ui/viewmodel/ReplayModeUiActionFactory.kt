@@ -1,7 +1,7 @@
 package dk.ilios.jervis.ui.viewmodel
 
-import dk.ilios.jervis.fumbbl.CalculatedJervisAction
-import dk.ilios.jervis.fumbbl.JervisAction
+import dk.ilios.jervis.fumbbl.adapter.CalculatedJervisAction
+import dk.ilios.jervis.fumbbl.adapter.JervisAction
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

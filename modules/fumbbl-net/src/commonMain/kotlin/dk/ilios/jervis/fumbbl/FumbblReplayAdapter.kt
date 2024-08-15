@@ -9,6 +9,7 @@ import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
@@ -20,7 +21,8 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
-import dk.ilios.jervis.fsm.Node
+import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
+import dk.ilios.jervis.fumbbl.adapter.add
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
 import dk.ilios.jervis.fumbbl.model.PlayerAction
 import dk.ilios.jervis.fumbbl.model.ReportId
@@ -66,34 +68,6 @@ import dk.ilios.jervis.rules.tables.RandomDirectionTemplate
 import kotlinx.coroutines.runBlocking
 import okio.Path
 import okio.Path.Companion.toPath
-
-sealed interface JervisActionHolder {
-    val expectedNode: Node
-}
-
-data class JervisAction(
-    val action: GameAction,
-    override val expectedNode: Node,
-) : JervisActionHolder
-
-data class CalculatedJervisAction(
-    val actionFunc: (state: Game, rules: Rules) -> GameAction,
-    override val expectedNode: Node,
-) : JervisActionHolder
-
-fun MutableList<JervisActionHolder>.add(
-    action: GameAction,
-    expectedNode: Node,
-) {
-    this.add(JervisAction(action, expectedNode))
-}
-
-fun MutableList<JervisActionHolder>.add(
-    action: (state: Game, rules: Rules) -> GameAction,
-    expectedNode: Node,
-) {
-    this.add(CalculatedJervisAction(action, expectedNode))
-}
 
 // TODO This approach is ultimately broken. It isn't possible to extract actions
 //  from incomplete data. It looks like FUMBBL is sometimes sending the same
@@ -340,7 +314,11 @@ class FumbblReplayAdapter(private var replayFile: Path) {
                     var coordinates = (cmd.modelChangeList[1] as FieldModelSetPlayerCoordinate).value!!
                     val selectedPlayer = jervisGame.getPlayerById(PlayerId(playerId))!!
                     jervisCommands.add(PlayerSelected(selectedPlayer), SetupTeam.SelectPlayerOrEndSetup)
-                    jervisCommands.add(FieldSquareSelected(coordinates.x, coordinates.y), SetupTeam.PlacePlayer)
+                    if (coordinates.x < 0 || coordinates.y > 25) {
+                        jervisCommands.add(DogoutSelected, SetupTeam.PlacePlayer)
+                    } else {
+                        jervisCommands.add(FieldSquareSelected(coordinates.x, coordinates.y), SetupTeam.PlacePlayer)
+                    }
                 } else if (cmd.reportList.size == 1 && cmd.reportList.first() is KickoffPitchInvasionReport) {
                     // Resolve a Pitch Invasion
                     val report = cmd.reportList.first() as KickoffPitchInvasionReport

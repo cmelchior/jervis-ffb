@@ -1,7 +1,7 @@
 package dk.ilios.jervis.fumbbl.net.auth
 
 import dk.ilios.jervis.fumbbl.FumbblFileReplayAdapter
-import dk.ilios.jervis.fumbbl.FumbblReplayAdapter
+import dk.ilios.jervis.fumbbl.adapter.FumbblReplayAdapter
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandReplay
 import dk.ilios.jervis.fumbbl.platformFileSystem
 import dk.ilios.jervis.fumbbl.utils.fromFumbblState
@@ -12,6 +12,7 @@ import okio.Path.Companion.toPath
 import org.junit.jupiter.api.Test
 
 class ReplayFileTests {
+
     @Test
     fun readReplayFile() =
         runBlocking {

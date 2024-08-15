@@ -815,7 +815,7 @@ data class GameSetScheduled(
 
 @Serializable
 @SerialName("gameSetSetupOffense")
-data class GameSetSetupOffense(
+data class  GameSetSetupOffense(
     @SerialName("modelChangeId")
     override val id: ModelChangeId = ModelChangeId.GAME_SET_SETUP_OFFENSE,
     @SerialName("modelChangeKey")
