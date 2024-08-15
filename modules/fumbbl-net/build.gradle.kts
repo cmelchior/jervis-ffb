@@ -33,6 +33,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-websockets:$ktor")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+                implementation("org.reflections:reflections:0.10.2")
             }
         }
         val commonTest by getting {

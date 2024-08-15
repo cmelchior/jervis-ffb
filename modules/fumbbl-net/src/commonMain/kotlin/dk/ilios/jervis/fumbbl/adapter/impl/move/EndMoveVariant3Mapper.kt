@@ -1,38 +1,42 @@
-package dk.ilios.jervis.fumbbl.adapter.impl.setup
+package dk.ilios.jervis.fumbbl.adapter.impl.move
 
-import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
-import dk.ilios.jervis.fumbbl.model.reports.WeatherReport
+import dk.ilios.jervis.fumbbl.model.PlayerAction
+import dk.ilios.jervis.fumbbl.model.change.ActingPlayerSetPlayerId
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.RollForTheWeather
+import dk.ilios.jervis.procedures.MoveAction
 
-object WeatherRollMapper: CommandActionMapper {
+/**
+ * Active player ended its move action (variant 3)
+ */
+object EndMoveVariant3Mapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
         processedCommands: MutableSet<ServerCommandModelSync>
     ): Boolean {
+        val setActivePlayer = command.modelChangeList.filterIsInstance<ActingPlayerSetPlayerId>().firstOrNull()
+        // Active player is removed = Action ended
         return (
-            command .firstChangeId() == null &&
-            command.firstReport() is WeatherReport
+            setActivePlayer != null &&
+            setActivePlayer.value == null &&
+            game.actingPlayer.playerAction == PlayerAction.MOVE
         )
     }
 
     override fun mapServerCommand(
-        fumbblGame: FumbblGame,
+        fumbblGame: dk.ilios.jervis.fumbbl.model.Game,
         jervisGame: Game,
         command: ServerCommandModelSync,
         processedCommands: MutableSet<ServerCommandModelSync>,
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {
-        val report = command.reportList.reports.first() as WeatherReport
-        val weatherRoll = report.weatherRoll.map { D6Result(it) }
-        newActions.add(DiceResults(weatherRoll), RollForTheWeather.RollWeatherDice)
+        newActions.add(EndAction, MoveAction.SelectSquareOrEndAction)
     }
 }

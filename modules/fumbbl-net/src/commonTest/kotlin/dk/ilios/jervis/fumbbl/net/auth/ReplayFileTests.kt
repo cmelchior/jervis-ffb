@@ -37,7 +37,7 @@ class ReplayFileTests {
     fun convertReplayFileToJervisCommands() =
         runBlocking {
             val rules = BB2020Rules
-            val fumbbl = FumbblReplayAdapter("../../replays/game-1624379.json".toPath())
+            val fumbbl = FumbblReplayAdapter("../../replays/game-1624379.json".toPath(), true)
             runBlocking {
                 fumbbl.loadCommands()
             }

@@ -90,6 +90,7 @@ object MoveAction : Procedure() {
                             rules,
                         ).contains(SelectFieldLocation(action.coordinate))
                     ) {
+                        val availableActions = getAvailableActions(state, rules)
                         INVALID_ACTION(action)
                     }
                     compositeCommandOf(

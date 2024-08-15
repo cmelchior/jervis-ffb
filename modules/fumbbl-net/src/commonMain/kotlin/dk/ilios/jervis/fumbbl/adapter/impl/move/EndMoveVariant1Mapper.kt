@@ -19,6 +19,8 @@ object EndMoveVariant1Mapper: CommandActionMapper {
         command: ServerCommandModelSync,
         processedCommands: MutableSet<ServerCommandModelSync>
     ): Boolean {
+        // This is not right. Figure out a way to better handle how the Client undo actions
+        return false //
         return command.firstChangeId() == ModelChangeId.ACTING_PLAYER_SET_HAS_MOVED
     }
 

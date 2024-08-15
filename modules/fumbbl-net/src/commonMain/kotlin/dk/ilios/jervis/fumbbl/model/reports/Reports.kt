@@ -566,6 +566,11 @@ data class PickMeUpReport(
 @SerialName("pickUpRoll")
 data class PickUpRollReport(
     override val reportId: ReportId = ReportId.PICK_UP_ROLL,
+    val playerId: String,
+    val successful: Boolean,
+    val roll: Int,
+    val minimumRoll: Int,
+    val reRolled: Boolean,
 ) : Report
 
 @Serializable

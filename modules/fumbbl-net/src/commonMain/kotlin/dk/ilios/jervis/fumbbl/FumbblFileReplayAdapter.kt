@@ -84,10 +84,8 @@ class FumbblFileReplayAdapter(private val file: Path) : FumbblAdapter {
 
     override suspend fun start() {
         scope.launch {
-            val fileContent =
-                platformFileSystem.read(file) {
-                    readUtf8()
-                }.trim()
+            val fileContent = platformFileSystem.read(file) { readUtf8() }.trim()
+            // Some of the replay files are not JSON arrays, but just an JSON object pr. line.
             val isJson = (fileContent.startsWith("[") && fileContent.endsWith("]"))
             val gameCommands: List<ServerCommand>
             if (isJson) {

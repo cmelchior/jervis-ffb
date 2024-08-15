@@ -27,7 +27,9 @@ object AbortActionMapper: CommandActionMapper {
         command: ServerCommandModelSync,
         processedCommands: MutableSet<ServerCommandModelSync>
     ): Boolean {
-        return command.reportList.size == 1 && command.reportList.first() is PlayerActionReport
+        return false //
+        // this check fails on Index 44 in 1624379
+        // return command.reportList.size == 1 && command.reportList.first() is PlayerActionReport
     }
 
     override fun mapServerCommand(

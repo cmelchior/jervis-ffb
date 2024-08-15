@@ -104,11 +104,11 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
      */
     fun getSurroundingCoordinates(
         rules: Rules,
-        distance: UInt = 1u,
+        distance: Int = 1,
     ): List<FieldCoordinate> {
         val result = mutableListOf<FieldCoordinate>()
-        (x - distance.toInt()..x + distance.toInt()).forEach { x: Int ->
-            (y - distance.toInt()..y + distance.toInt()).forEach { y: Int ->
+        (x - distance..x + distance).forEach { x: Int ->
+            (y - distance..y + distance).forEach { y: Int ->
                 val newCoordinate = FieldCoordinate(x, y)
                 if (newCoordinate != this && newCoordinate.isOnField(rules)) {
                     result.add(newCoordinate)

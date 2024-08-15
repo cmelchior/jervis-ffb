@@ -94,7 +94,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
                 pathState = reconstructPath(cameFrom, currentLocation, maxMove)
                 break
             }
-            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1u)
+            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1)
             for (neighbor in neighbors) {
                 // Skip all fields that contain tackle zones or players (except the goal
                 val neighborValue = fieldView[neighbor.x][neighbor.y]
@@ -165,7 +165,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
 
         while (!openSet.isEmpty) {
             val currentLocation: FieldCoordinate = openSet.poll()!!.point
-            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1u)
+            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1)
             for (neighbor in neighbors) {
                 val neighborValue: Int = distances.getValue(neighbor)
                 if (fieldView[neighbor.x][neighbor.y] > 0) continue // Skip all intermediate steps going through tackle zones.

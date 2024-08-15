@@ -6,7 +6,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.controller.GameController
-import dk.ilios.jervis.fumbbl.FumbblReplayAdapter
+import dk.ilios.jervis.fumbbl.adapter.FumbblReplayAdapter
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
@@ -61,7 +61,7 @@ class GameScreenModel(
 
                 is Replay -> {
                     fumbbl =
-                        FumbblReplayAdapter(mode.file.toOkioPath()).also { adapter ->
+                        FumbblReplayAdapter(mode.file.toOkioPath(), false).also { adapter ->
                             runBlocking {
                                 adapter.loadCommands()
                             }

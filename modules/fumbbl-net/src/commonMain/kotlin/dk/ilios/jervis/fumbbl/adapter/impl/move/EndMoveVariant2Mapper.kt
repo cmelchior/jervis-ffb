@@ -31,8 +31,8 @@ object EndMoveVariant2Mapper: CommandActionMapper {
     ): Boolean {
         return (
             command.firstChangeId() == ModelChangeId.FIELD_MODEL_SET_PLAYER_STATE &&
-                command.modelChangeList.size >= 3 && command.modelChangeList[2] is ActingPlayerSetPlayerId
-            )
+            command.modelChangeList.size >= 3 && command.modelChangeList[2] is ActingPlayerSetPlayerId
+        )
     }
 
     override fun mapServerCommand(

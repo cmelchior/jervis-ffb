@@ -28,7 +28,8 @@ object BounceBallMapper: CommandActionMapper {
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {
-        val direction = (command.reportList.first() as ScatterBallReport).directionArray.first().transformToJervisDirection()
+        val report = command.firstReport() as ScatterBallReport
+        val direction = report.directionArray.first().transformToJervisDirection()
         val roll = RandomDirectionTemplate.getRollForDirection(direction)
         newActions.add(DiceResults(roll), Bounce.RollDirection)
     }

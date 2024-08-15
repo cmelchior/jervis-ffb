@@ -1,6 +1,7 @@
 package dk.ilios.jervis.fumbbl.net.commands
 
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
+import dk.ilios.jervis.fumbbl.model.reports.Report
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -18,5 +19,9 @@ data class ServerCommandModelSync(
 
     fun firstChangeId(): ModelChangeId? {
         return modelChangeList.firstOrNull()?.id
+    }
+
+    fun firstReport(): Report? {
+        return reportList.reports.firstOrNull()
     }
 }

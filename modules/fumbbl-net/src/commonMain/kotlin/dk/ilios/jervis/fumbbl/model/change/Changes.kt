@@ -296,6 +296,7 @@ data class FieldModelAddFieldMarker(
     override val value: String?,
 ) : ModelChange
 
+// This looks to only indicate a possible target square
 @Serializable
 @SerialName("fieldModelAddMoveSquare")
 data class FieldModelAddMoveSquare(

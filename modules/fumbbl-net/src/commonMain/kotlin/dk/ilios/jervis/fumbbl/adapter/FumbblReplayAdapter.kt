@@ -25,10 +25,10 @@ import okio.Path.Companion.toPath
 // This will give us a full state to query. It might be more helpful if others want to convert a FUMBBL state into
 // something else as well...but will probably be more work. Hmm, maybe it is just porting the ModelChangeProcessor
 // which is just a lot of trivial code.
-class FumbblReplayAdapter(private var replayFile: Path) {
+class FumbblReplayAdapter(private var replayFile: Path, private val checkCommandsWhenLoading: Boolean = false) {
 
     private lateinit var gameCommands: List<JervisActionHolder>
-    private lateinit var game: FumbblGame
+    private lateinit var fumbblGame: FumbblGame
     private lateinit var jervisGame: Game
 
     suspend fun loadCommands() {
@@ -42,8 +42,8 @@ class FumbblReplayAdapter(private var replayFile: Path) {
         val commands: MutableList<ServerCommandReplay> = mutableListOf()
         runBlocking {
             adapter.start()
-            game = adapter.getGame()
-            jervisGame = Game.fromFumbblState(game)
+            fumbblGame = adapter.getGame()
+            jervisGame = Game.fromFumbblState(fumbblGame)
             var isDone = false
             while (!isDone) {
                 val cmd = adapter.receive()
@@ -64,7 +64,7 @@ class FumbblReplayAdapter(private var replayFile: Path) {
     }
 
     private fun processCommands(commands: List<ServerCommandModelSync>) {
-        val chain = MapperChain(jervisGame, game)
+        val chain = MapperChain(jervisGame, fumbblGame, checkCommandsWhenLoading)
         gameCommands = chain.process(commands)
     }
 
