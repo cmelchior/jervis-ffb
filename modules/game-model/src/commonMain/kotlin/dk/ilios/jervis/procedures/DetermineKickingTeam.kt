@@ -9,7 +9,6 @@ import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.GameAction
-import dk.ilios.jervis.actions.SelectCoinSide
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
@@ -21,6 +20,7 @@ import dk.ilios.jervis.commands.SetKickingTeam
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.reports.ReportKickingTeamResult
 import dk.ilios.jervis.rules.Rules
@@ -85,14 +85,14 @@ object DetermineKickingTeam : Procedure() {
             rules: Rules,
         ): Command {
             return checkType<CoinTossResult>(action) {
-                val result = it.result
-                if (result == state.coinSideSelected) {
-                    return compositeCommandOf(
+                val result: Coin = it.result
+                return if (result == state.coinSideSelected) {
+                    compositeCommandOf(
                         SetCoinTossResult(result),
                         GotoNode(ChooseKickingTeam),
                     )
                 } else {
-                    return compositeCommandOf(
+                    compositeCommandOf(
                         SetCoinTossResult(result),
                         SetActiveTeam(state.awayTeam),
                         GotoNode(ChooseKickingTeam),
@@ -108,8 +108,8 @@ object DetermineKickingTeam : Procedure() {
             rules: Rules,
         ): List<ActionDescriptor> =
             listOf(
-                ConfirmWhenReady,
-                CancelWhenReady,
+                ConfirmWhenReady, /* Chooser becomes kicker */
+                CancelWhenReady, /* Chooser becomes receiver */
             )
 
         override fun applyAction(
@@ -122,7 +122,7 @@ object DetermineKickingTeam : Procedure() {
                     compositeCommandOf(
                         SetKickingTeam(state.awayTeam),
                         ReportKickingTeamResult(state.coinResult!!, state.awayTeam),
-                        SetActiveTeam(state.homeTeam),
+                        SetActiveTeam(state.awayTeam),
                         ExitProcedure(),
                     )
                 }

@@ -4,7 +4,6 @@ import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
-import dk.ilios.jervis.fumbbl.model.ModelChangeId
 import dk.ilios.jervis.fumbbl.model.reports.FanFactorReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
@@ -17,7 +16,11 @@ object RollFanFactorMapper: CommandActionMapper {
         command: ServerCommandModelSync,
         processedCommands: MutableSet<ServerCommandModelSync>
     ): Boolean {
-        return command.firstChangeId() == ModelChangeId.GAME_SET_STARTED
+        return (
+            command.reportList.size == 2 &&
+            command.reportList.reports[0] is FanFactorReport &&
+            command.reportList.reports[1] is FanFactorReport
+        )
     }
 
     override fun mapServerCommand(

@@ -53,6 +53,7 @@ class DownloadGame : CliktCommand(
 ) {
     private val gameId by option(help = "ID of the game to download").required()
     private val output: String? by option(help = "Optional path where game files should be saved").convert { it }
+    private val pretty: Boolean? by option(help = "Pretty print JSON output (warning, this will make the file quite a bit larger)").convert { it.toBoolean() }
 
     override fun run() {
         echo("Downloading game: $gameId")
@@ -60,7 +61,7 @@ class DownloadGame : CliktCommand(
             output?.let {
                 File(it)
             } ?: getDefaultOutputLocation()
-        val runner = DownloadGameClient()
+        val runner = DownloadGameClient(pretty == true)
         runner.run(gameId, output)
     }
 

@@ -42,4 +42,14 @@ class ReplayFileTests {
                 fumbbl.loadCommands()
             }
         }
+
+    @Test
+    fun convertReplayFileToJervisCommands2() =
+        runBlocking {
+            val rules = BB2020Rules
+            val fumbbl = FumbblReplayAdapter("../../replays/game-1744037.json".toPath(), true)
+            runBlocking {
+                fumbbl.loadCommands()
+            }
+        }
 }

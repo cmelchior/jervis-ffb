@@ -1,6 +1,5 @@
 package dk.ilios.jervis.fumbbl.utils
 
-import dk.ilios.jervis.fumbbl.model.Player
 import dk.ilios.jervis.fumbbl.model.SpecialRule
 import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.CoachId
@@ -26,6 +25,7 @@ import dk.ilios.jervis.rules.roster.bb2020.LowCostLinemen
 import dk.ilios.jervis.rules.roster.bb2020.LustrianSuperLeague
 import dk.ilios.jervis.rules.roster.bb2020.MastersOfUndeath
 import dk.ilios.jervis.rules.roster.bb2020.OldWorldClassic
+import dk.ilios.jervis.rules.roster.bb2020.SkavenTeam
 import dk.ilios.jervis.rules.roster.bb2020.SylvanianSpotlight
 import dk.ilios.jervis.rules.roster.bb2020.UnderworldChallenge
 import dk.ilios.jervis.rules.roster.bb2020.WorldsEdgeSuperLeague
@@ -118,6 +118,7 @@ private fun extractRoster(roster: FumbblRoster): Roster {
         "Human" -> HumanTeam
         "Khorne" -> KhorneTeam
         "Elven Union" -> ElvenUnionTeam
+        "Skaven" -> SkavenTeam
         else -> TODO("Missing team: ${roster.rosterName}")
     }
 }

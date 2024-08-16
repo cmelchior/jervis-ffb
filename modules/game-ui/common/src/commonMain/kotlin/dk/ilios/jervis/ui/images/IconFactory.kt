@@ -8,6 +8,7 @@ import dk.ilios.jervis.rules.roster.bb2020.ChaosDwarfTeam
 import dk.ilios.jervis.rules.roster.bb2020.ElvenUnionTeam
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.roster.bb2020.KhorneTeam
+import dk.ilios.jervis.rules.roster.bb2020.SkavenTeam
 import dk.ilios.jervis.ui.model.UiPlayer
 import java.awt.image.BufferedImage
 import java.io.InputStream
@@ -20,8 +21,8 @@ val playerIconSpriteSheets =
         HumanTeam.THROWER to "$iconRootPath/human_thrower.png",
         HumanTeam.CATCHER to "$iconRootPath/human_catcher.png",
         HumanTeam.BLITZER to "$iconRootPath/human_blitzer.png",
+        HumanTeam.HALFLING_HOPEFUL to "$iconRootPath/human_halflinghopeful.png",
         HumanTeam.OGRE to "$iconRootPath/human_ogre.png",
-        HumanTeam.HALFLING_HOPEFUL to "$iconRootPath/human_haflinghopeful.png",
         ChaosDwarfTeam.HOBGOBLIN_LINEMEN to "$iconRootPath/chaosdwarf_hobgoblinlineman.png",
         ChaosDwarfTeam.CHAOS_DWARF_BLOCKERS to "$iconRootPath/chaosdwarf_chaosdwarfblocker.png",
         ChaosDwarfTeam.BULL_CENTAUR_BLITZERS to "$iconRootPath/chaosdwarf_bullcentaurblitzer.png",
@@ -34,6 +35,11 @@ val playerIconSpriteSheets =
         ElvenUnionTeam.CATCHER to "$iconRootPath/elvenunion_catcher.png",
         ElvenUnionTeam.THROWER to "$iconRootPath/elvenunion_thrower.png",
         ElvenUnionTeam.BLITZER to "$iconRootPath/elvenunion_blitzer.png",
+        SkavenTeam.LINEMAN to "$iconRootPath/skaven_lineman.png",
+        SkavenTeam.THROWER to "$iconRootPath/skaven_thrower.png",
+        SkavenTeam.GUTTER_RUNNER to "$iconRootPath/skaven_gutterrunner.png",
+        SkavenTeam.BLITZER to "$iconRootPath/skaven_blitzer.png",
+        SkavenTeam.RAT_OGRE to "$iconRootPath/skaven_ratogre.png",
     )
 
 data class PositionImage(

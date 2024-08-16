@@ -35,6 +35,6 @@ object SelectToKickoffOrReceiveMapper: CommandActionMapper {
         // Handle selecting to receive or kick
         val report = command.reportList.firstOrNull() as ReceiveChoiceReport
         val kicking = !report.receiveChoice
-        newActions.add(if (kicking) Cancel else Confirm, DetermineKickingTeam.ChooseKickingTeam)
+        newActions.add(if (kicking) Confirm else Cancel, DetermineKickingTeam.ChooseKickingTeam)
     }
 }

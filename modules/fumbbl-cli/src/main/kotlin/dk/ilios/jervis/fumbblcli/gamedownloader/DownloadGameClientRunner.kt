@@ -23,12 +23,12 @@ data class ServerResponse(val response: JsonResponse, val error: String? = null)
     fun isSuccess(): Boolean = (error == null)
 }
 
-class DownloadGameClient {
+class DownloadGameClient(private val prettyPrint: Boolean) {
     private lateinit var webSocket: WebSocket
     private var responseLatch: CountDownLatch = CountDownLatch(1)
     private var error: String? = null
     private val response: MutableList<String> = mutableListOf()
-    val json = Json { /*prettyPrint = true */ }
+    val json = Json { prettyPrint = this@DownloadGameClient.prettyPrint }
 
     fun run(
         gameId: String,
