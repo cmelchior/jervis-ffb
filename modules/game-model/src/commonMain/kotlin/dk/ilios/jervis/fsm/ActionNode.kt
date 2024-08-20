@@ -107,6 +107,8 @@ abstract class ActionNode : Node {
             }
             @Suppress("UNCHECKED_CAST")
             return function(action.rolls as List<D1>)
+        } else if (action is D1) {
+            return function(listOf(action))
         } else {
             throw IllegalArgumentException(
                 "Action (${action::class}) is not of the expected type: ${DiceResults::class}",

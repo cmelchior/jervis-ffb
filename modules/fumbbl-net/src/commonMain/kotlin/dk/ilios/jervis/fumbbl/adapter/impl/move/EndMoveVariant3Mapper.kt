@@ -9,7 +9,7 @@ import dk.ilios.jervis.fumbbl.model.change.ActingPlayerSetPlayerId
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.MoveAction
+import dk.ilios.jervis.procedures.actions.move.MoveAction
 
 /**
  * Active player ended its move action (variant 3)

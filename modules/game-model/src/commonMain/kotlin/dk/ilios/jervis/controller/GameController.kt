@@ -3,6 +3,7 @@ package dk.ilios.jervis.controller
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Continue
+import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.commands.Command
@@ -62,10 +63,19 @@ class GameController(
             is ActionNode -> {
                 // TODO This logic breaks when reverting state. Figure out a solution
                 val actions = currentNode.getAvailableActions(state, rules)
-                val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}")
-                commands.add(reportAvailableActions)
-                reportAvailableActions.execute(state, this)
-                val selectedAction = actionProvider(this@GameController, actions)
+
+                // If an action node just accept a single Continue event, it means that it is
+                // taking a shortcut through some nodes. In that case, just apply it immediately
+                // without notifying the user.
+                val selectedAction = if (actions.size == 1 && actions.first() == ContinueWhenReady) {
+                    Continue
+                } else {
+                    val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}")
+                    commands.add(reportAvailableActions)
+                    reportAvailableActions.execute(state, this)
+                    actionProvider(this@GameController, actions)
+                }
+
                 if (selectedAction != Undo) {
                     val reportSelectedAction = ReportHandleAction(selectedAction)
                     commands.add(reportSelectedAction)
@@ -74,6 +84,9 @@ class GameController(
                     commands.add(command)
                     command.execute(state, this)
                     state.notifyUpdate()
+                } else {
+                    // TODO Is this the correct thing to do here?
+                    undoLastAction()
                 }
             }
 
@@ -234,7 +247,7 @@ class GameController(
     }
 
     // Revert last action
-    fun revert() {
+    fun undoLastAction() {
         if (replayMode) {
             throw IllegalStateException(
                 "Controller is in replay mode. `revert` is only available in manual mode.",

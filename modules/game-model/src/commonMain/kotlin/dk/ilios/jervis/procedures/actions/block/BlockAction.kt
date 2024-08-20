@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures
+package dk.ilios.jervis.procedures.actions.block
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
@@ -6,7 +6,7 @@ import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
-import dk.ilios.jervis.actions.SelectFieldLocation
+import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
@@ -47,29 +47,14 @@ object BlockAction : Procedure() {
         ): List<ActionDescriptor> {
             val end: List<ActionDescriptor> = listOf(EndActionWhenReady)
 
-            val eligibleEmptySquares: List<ActionDescriptor> =
-                if (state.activePlayer!!.moveLeft > 0) {
-                    state.activePlayer!!.location.coordinate.getSurroundingCoordinates(rules)
-                        .filter { state.field[it].isEmpty() }
-                        .map { SelectFieldLocation(it) }
-                } else {
-                    emptyList()
-                }
+            val attacker = state.activePlayer!!
+            val eligibleDefenders: List<ActionDescriptor> =
+                attacker.location.coordinate.getSurroundingCoordinates(rules)
+                    .filter { state.field[it].isNotEmpty() }
+                    .filter { state.field[it].player!!.team != attacker.team }
+                    .map { SelectPlayer(state.field[it].player!!) }
 
-            val eligibleJumpSquares: List<ActionDescriptor> =
-                if (state.activePlayer!!.moveLeft > 0) {
-                    val activePlayerLocation = state.activePlayer!!.location.coordinate
-                    activePlayerLocation.getSurroundingCoordinates(rules)
-                        .filter { !state.field[it].isEmpty() }
-                        .flatMap {
-                            it.getCoordinatesAwayFromLocation(rules, activePlayerLocation)
-                        }
-                        .toSet()
-                        .map { SelectFieldLocation(it) }
-                } else {
-                    emptyList()
-                }
-            return end + eligibleEmptySquares + eligibleJumpSquares
+            return end + eligibleDefenders
         }
 
         override fun applyAction(
@@ -86,7 +71,7 @@ object BlockAction : Procedure() {
                             defender = action.player,
                         )
                     compositeCommandOf(
-                        SetRollContext(Game::blockContext, context),
+                        SetRollContext(Game::blockRollContext, context),
                         GotoNode(ResolveBlock),
                     )
                 }
@@ -105,6 +90,7 @@ object BlockAction : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
+            // Regardless of the outcome of the block, the action is over
             return ExitProcedure()
         }
     }

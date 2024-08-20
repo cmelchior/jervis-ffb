@@ -13,7 +13,7 @@ enum class PlayerState {
     KNOCKED_OUT,
     BADLY_HURT,
     SERIOUS_INJURY,
-    RIP,
+    DEAD,
 
     // Field states
     STANDING,
@@ -106,6 +106,7 @@ class Player(
     val agility: Int get() = baseAgility
     val passing: Int? get() = basePassing
     val armorValue: Int get() = baseArmorValue
+    var nigglingInjuries: Int = 0
     var starPlayerPoints: Int = 0
     var level: PlayerLevel = PlayerLevel.ROOKIE
     val ball: Ball?

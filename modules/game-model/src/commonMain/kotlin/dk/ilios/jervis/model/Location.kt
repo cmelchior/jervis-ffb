@@ -42,6 +42,7 @@ sealed interface Location {
 data class FieldCoordinate(val x: Int, val y: Int) : Location {
     companion object {
         val UNKNOWN = FieldCoordinate(Int.MAX_VALUE, Int.MAX_VALUE)
+        val OUT_OF_BOUNDS = FieldCoordinate(Int.MIN_VALUE, Int.MIN_VALUE)
     }
 
     override val coordinate: FieldCoordinate = this
@@ -101,16 +102,22 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
 
     /**
      * Return all on-field coordinates around a specific on-field location.
+     * TODO Figure out if coordinates out of bounds should be returned as that or as their real coordinate
+     * value (to make it easier to make calculations)
      */
     fun getSurroundingCoordinates(
         rules: Rules,
         distance: Int = 1,
+        includeOutOfBounds: Boolean = false,
     ): List<FieldCoordinate> {
         val result = mutableListOf<FieldCoordinate>()
         (x - distance..x + distance).forEach { x: Int ->
             (y - distance..y + distance).forEach { y: Int ->
                 val newCoordinate = FieldCoordinate(x, y)
-                if (newCoordinate != this && newCoordinate.isOnField(rules)) {
+                if (newCoordinate.isOnField(rules)) {
+                    result.add(newCoordinate)
+                }
+                if (includeOutOfBounds && newCoordinate.isOutOfBounds(rules)) {
                     result.add(newCoordinate)
                 }
             }

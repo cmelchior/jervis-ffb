@@ -1,21 +1,19 @@
-package dk.ilios.jervis.procedures
+package dk.ilios.jervis.procedures.actions.block
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.ActionDescriptor
-import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.BlockDice
+import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetPlayerLocation
-import dk.ilios.jervis.commands.SetPlayerMoveLeft
 import dk.ilios.jervis.commands.SetRollContext
-import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.procedures.BlockDieRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
@@ -26,15 +24,25 @@ data class BlockContext(
     val attacker: Player,
     val defender: Player,
     val isBlitzing: Boolean = false,
+    val isUsingJuggernaught: Boolean = false,
     val isUsingMultiBlock: Boolean = false,
     val offensiveAssists: Int = 0,
     val defensiveAssists: Int = 0,
     val roll: List<BlockDieRoll> = emptyList(),
 )
 
+data class BlockRollResultContext(
+    val attacker: Player,
+    val defender: Player,
+    val isBlitzing: Boolean = false,
+    val isUsingMultiBlock: Boolean = false,
+    val roll: List<BlockDieRoll> = emptyList(),
+    val result: DBlockResult,
+)
+
 /**
  * Procedure for handling a block once attacker and defender have been identified. This includes
- * rolling dice and resolving their result.
+ * rolling dice and resolving the result.
  *
  * This procedure is called as part of a [BlockAction] or `BlitzAction`.
  */
@@ -45,7 +53,7 @@ object BlockStep : Procedure() {
         state: Game,
         rules: Rules,
     ): Command? {
-        if (state.blockContext == null) {
+        if (state.blockRollContext == null) {
             INVALID_GAME_STATE("No block context was found")
         }
         return null
@@ -54,7 +62,12 @@ object BlockStep : Procedure() {
     override fun onExitProcedure(
         state: Game,
         rules: Rules,
-    ): Command? = null
+    ): Command? {
+        return compositeCommandOf(
+            SetRollContext(Game::blockRollContext, null),
+            SetRollContext(Game::blockRollResultContext, null),
+        )
+    }
 
     // Horns are applied before applying any other skills/traits and before counting assists
     // See page 78 in the rulebook.
@@ -81,15 +94,15 @@ object BlockStep : Procedure() {
         }
     }
 
-    // Offensive/Defensive assists. Technically, you are allowed to choose whether to assist or not,
-    // but I cannot come up with a single (even bad) reason for why you would ever choose to not assist,
-    // so we just automatically include all assists on both sides
+    // Offensive/Defensive assists. Technically, you are allowed to choose whether to assist.
+    // However, I cannot come up with a single (even bad) reason for why you would ever choose
+    // to not assist, so we just automatically include all assists on both sides
     object DetermineAssists : ComputationNode() {
         override fun apply(
             state: Game,
             rules: Rules,
         ): Command {
-            val context = state.blockContext!!
+            val context = state.blockRollContext!!
             val offensiveAssists =
                 context.defender.location.coordinate.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
@@ -102,7 +115,7 @@ object BlockStep : Procedure() {
 
             return compositeCommandOf(
                 SetRollContext(
-                    Game::blockContext,
+                    Game::blockRollContext,
                     context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists),
                 ),
                 GotoNode(RollBlockDice),
@@ -120,54 +133,28 @@ object BlockStep : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            return GotoNode(SelectBlockResult)
+            return GotoNode(ResolveBlockDie)
         }
     }
 
-//     object SelectBlockResult
-    // resolvePlayerDown
-    // resolveBothDown
-    // resolvePushBack
-    // resolveStumble
-    // ResolvePOW
-    object SelectBlockResult : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
-            TODO("Not yet implemented")
+    object ResolveBlockDie : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            // Select sub procedure based on the result of the die.
+            return when(state.blockRollResultContext!!.result.blockResult) {
+                BlockDice.PLAYER_DOWN -> PlayerDown
+                BlockDice.BOTH_DOWN -> BothDown
+                BlockDice.PUSH_BACK -> PushBack
+                BlockDice.STUMBLE -> Stumble
+                BlockDice.POW -> Pow
+            }
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
-            TODO("Not yet implemented")
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // Once the block die is resolved, the block step is over
+            // Block Actions will also quit immediately, while Blitz actions
+            // might allow further movement
+            return ExitProcedure()
         }
-    }
 
-    object ResolveBlockResult : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
-            TODO("Not yet implemented")
-        }
-    }
-
-    object CheckTargetSquare : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
-            val moveTo = state.moveStepTarget!!.second
-            val movingPlayer = state.activePlayer!!
-            return compositeCommandOf(
-                SetPlayerMoveLeft(movingPlayer, movingPlayer.moveLeft - 1),
-                SetPlayerLocation(movingPlayer, moveTo),
-                ExitProcedure(),
-            )
-        }
     }
 }

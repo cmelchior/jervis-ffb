@@ -9,42 +9,42 @@ import dk.ilios.jervis.procedures.UseTeamReroll
 import kotlinx.serialization.Serializable
 
 public object DiceRoll {
+    val AMOUR = DiceRollType.ArmourRoll
     val BLOCK = DiceRollType.BlockRoll
+    val CASULTY = DiceRollType.CasultyRoll
     val CATCH = DiceRollType.CatchRoll
+    val INJURY = DiceRollType.InjuryRoll
     val PICKUP = DiceRollType.PickUpRoll
+    val PRO = DiceRollType.ProRoll
+    val WEATHER = DiceRollType.WeatherRoll
 }
 
+// Enumerate all different roll types
 sealed interface DiceRollType {
     data object ArmourRoll : DiceRollType
-
     data object BlockRoll : DiceRollType
-
-// data object BloodLustRoll: DiceRollType
-// data object BoneHeadRoll: DiceRollType
+    // data object BloodLustRoll: DiceRollType
+    // data object BoneHeadRoll: DiceRollType
     data object CasultyRoll : DiceRollType
-
     data object CatchRoll : DiceRollType
-
     // data object DodgeRoll: DiceRollType
-// data object FoulRoll: DiceRollType
-// data object HypnoticGazeRoll: DiceRollType
-// data object InjuryRoll: DiceRollType
-// data object InterceptRoll: DiceRollType
-// data object KickOffTableRoll: DiceRollType
-// data object LonerRoll: DiceRollType
-// data object PassRoll: DiceRollType
+    // data object FoulRoll: DiceRollType
+    // data object HypnoticGazeRoll: DiceRollType
+    data object InjuryRoll: DiceRollType
+    // data object InterceptRoll: DiceRollType
+    // data object KickOffTableRoll: DiceRollType
+    // data object LonerRoll: DiceRollType
+    // data object PassRoll: DiceRollType
     data object PickUpRoll : DiceRollType
-
-// data object ReallyStupidRoll: DiceRollType
-// data object RegenerationRoll: DiceRollType
+    // data object ReallyStupidRoll: DiceRollType
+    // data object RegenerationRoll: DiceRollType
     data object ProRoll : DiceRollType
-
-// data object RushRoll: DiceRollType
-// data object TakeRootRoll: DiceRollType
-// data object ThrowTeamMateRoll: DiceRollType
+    // data object RushRoll: DiceRollType
+    // data object TakeRootRoll: DiceRollType
+    // data object ThrowTeamMateRoll: DiceRollType
     data object WeatherRoll : DiceRollType
-// data object WildAnimalRoll: DiceRollType
-// data class CustomRoll(val id: String): DiceRollType
+    // data object WildAnimalRoll: DiceRollType
+    // data class CustomRoll(val id: String): DiceRollType
 }
 
 enum class TeamRerollDuration {

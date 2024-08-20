@@ -7,19 +7,26 @@ import dk.ilios.jervis.model.Location
 import dk.ilios.jervis.model.Player
 
 class SetPlayerLocation(private val player: Player, val location: Location) : Command {
-    private lateinit var originalLocation: Location
+    private lateinit var originalPlayerLocation: Location
+    private var originalPlayerOnField: Player? = null
 
     override fun execute(
         state: Game,
         controller: GameController,
     ) {
-        this.originalLocation = player.location
+        this.originalPlayerLocation = player.location
+        this.originalPlayerOnField = state.field[player.location as FieldCoordinate].player
 
         // Remove from old location
-        val oldLocation = originalLocation
+        val oldLocation = originalPlayerLocation
         if (oldLocation is FieldCoordinate) {
             state.field[oldLocation].apply {
-                player = null
+                // In some cases, players are in an intermediate state, where
+                // field.location doesn't match player.location In that case,
+                // do not remove the player from the field
+                if (player == this@SetPlayerLocation.player) {
+                    player = null
+                }
             }
         }
 
@@ -53,11 +60,11 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
                 player = null
             }
         }
-        player.location = originalLocation
-        val originalLoc = originalLocation
+        player.location = originalPlayerLocation
+        val originalLoc = originalPlayerLocation
         if (originalLoc is FieldCoordinate) {
             state.field[originalLoc].apply {
-                player = this@SetPlayerLocation.player
+                player = originalPlayerOnField
             }
         }
         // Only run notifications after all changes are applied

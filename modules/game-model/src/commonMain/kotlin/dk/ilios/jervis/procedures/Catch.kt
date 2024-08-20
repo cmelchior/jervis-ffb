@@ -96,7 +96,13 @@ object Catch : Procedure() {
     override fun onExitProcedure(
         state: Game,
         rules: Rules,
-    ): Command? = null
+    ): Command? {
+        return compositeCommandOf(
+            SetRollContext(Game::catchRollContext, null),
+            SetRollContext(Game::catchRollResultContext, null)
+        )
+    }
+
 
     object RollToCatch : ParentNode() {
         override fun getChildProcedure(

@@ -1,8 +1,9 @@
 package dk.ilios.jervis.rules
 
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.DummyProcedure
-import dk.ilios.jervis.procedures.MoveAction
+import dk.ilios.jervis.procedures.actions.move.MoveAction
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -110,23 +111,40 @@ data class TeamActionDescriptor(
     val action: PlayerAction,
 )
 
+/**
+ * Define the standard set of actions that are available in the rules.
+ * TODO What if these are modified by skills, events, cards or otherwise?
+ */
 class BB2020TeamActions : TeamActions() {
     private val actions: Map<PlayerActionType, TeamActionDescriptor>
 
     init {
         actions =
             mapOf(
-                PlayerActionType.MOVE to TeamActionDescriptor(Int.MAX_VALUE, PlayerAction("Move", PlayerActionType.MOVE, MoveAction)),
-//            PlayerActionType.PASS to TeamActionDescriptor(1, PlayerAction("Pass", PlayerActionType.PASS, DummyProcedure) ),
-//            PlayerActionType.HAND_OFF to TeamActionDescriptor(1,  PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, DummyProcedure) ),
-//            PlayerActionType.BLOCK to TeamActionDescriptor(Int.MAX_VALUE, PlayerAction("Block", PlayerActionType.BLOCK, DummyProcedure)),
-//            PlayerActionType.BLITZ to TeamActionDescriptor(1,  PlayerAction("Blitz", PlayerActionType.BLITZ, DummyProcedure) ),
-//            PlayerActionType.FOUL to TeamActionDescriptor(1, PlayerAction("Foul", PlayerActionType.FOUL, DummyProcedure) ),
-                PlayerActionType.PASS to TeamActionDescriptor(0, PlayerAction("Pass", PlayerActionType.PASS, DummyProcedure)),
-                PlayerActionType.HAND_OFF to TeamActionDescriptor(0, PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, DummyProcedure)),
-                PlayerActionType.BLOCK to TeamActionDescriptor(0, PlayerAction("Block", PlayerActionType.BLOCK, DummyProcedure)),
-                PlayerActionType.BLITZ to TeamActionDescriptor(0, PlayerAction("Blitz", PlayerActionType.BLITZ, DummyProcedure)),
-                PlayerActionType.FOUL to TeamActionDescriptor(0, PlayerAction("Foul", PlayerActionType.FOUL, DummyProcedure)),
+                PlayerActionType.MOVE to TeamActionDescriptor(
+                    availablePrTurn = Int.MAX_VALUE,
+                    action = PlayerAction("Move", PlayerActionType.MOVE, MoveAction)
+                ),
+                PlayerActionType.PASS to TeamActionDescriptor(
+                    availablePrTurn = 1,
+                    action = PlayerAction("Pass", PlayerActionType.PASS, DummyProcedure)
+                ),
+                PlayerActionType.HAND_OFF to TeamActionDescriptor(
+                    availablePrTurn = 1,
+                    action = PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, DummyProcedure)
+                ),
+                PlayerActionType.BLOCK to TeamActionDescriptor(
+                    availablePrTurn = Int.MAX_VALUE,
+                    action = PlayerAction("Block", PlayerActionType.BLOCK, BlockAction)
+                ),
+                PlayerActionType.BLITZ to TeamActionDescriptor(
+                    availablePrTurn = 1,
+                    action = PlayerAction("Blitz", PlayerActionType.BLITZ, DummyProcedure)
+                ),
+                PlayerActionType.FOUL to TeamActionDescriptor(
+                    availablePrTurn = 1,
+                    action = PlayerAction("Foul", PlayerActionType.FOUL, DummyProcedure)
+                ),
             )
     }
 

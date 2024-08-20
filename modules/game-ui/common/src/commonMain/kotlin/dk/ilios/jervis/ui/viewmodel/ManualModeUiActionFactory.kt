@@ -39,6 +39,7 @@ import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectCoinSide
+import dk.ilios.jervis.actions.SelectDiceResult
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectNoReroll
@@ -52,13 +53,13 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.CatchRoll
 import dk.ilios.jervis.procedures.DetermineKickingTeam
-import dk.ilios.jervis.procedures.MoveAction
 import dk.ilios.jervis.procedures.PickupRoll
 import dk.ilios.jervis.procedures.RollForStartingFanFactor
 import dk.ilios.jervis.procedures.RollForTheWeather
 import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.procedures.TheKickOff
 import dk.ilios.jervis.procedures.TheKickOffEvent
+import dk.ilios.jervis.procedures.actions.move.MoveAction
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -120,8 +121,15 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         controller: GameController,
         actions: List<ActionDescriptor>,
     ): GameAction? {
+
+        // If a team has no further actions, just end their turn immediately
         if (actions.size == 1 && actions.first() is EndActionWhenReady) {
             return EndAction
+        }
+
+        if (actions.size == 1 && actions.first() is SelectFieldLocation) {
+            val loc = actions.first() as SelectFieldLocation
+            return FieldSquareSelected(loc.coordinate)
         }
 
         return null
@@ -391,6 +399,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
 
                 SelectNoReroll -> NoRerollSelected
                 is SelectRerollOption -> RerollOptionSelected(action.option)
+                is SelectDiceResult -> action.choices.random()
             }
         }
     }

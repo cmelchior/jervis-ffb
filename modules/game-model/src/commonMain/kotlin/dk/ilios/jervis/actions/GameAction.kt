@@ -1,5 +1,10 @@
 package dk.ilios.jervis.actions
 
+import dk.ilios.jervis.actions.BlockDice.BOTH_DOWN
+import dk.ilios.jervis.actions.BlockDice.PLAYER_DOWN
+import dk.ilios.jervis.actions.BlockDice.POW
+import dk.ilios.jervis.actions.BlockDice.PUSH_BACK
+import dk.ilios.jervis.actions.BlockDice.STUMBLE
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
@@ -66,13 +71,18 @@ data object SelectCoinSide : ActionDescriptor
 
 data object TossCoin : ActionDescriptor
 
+// Roll a number of dice and return their result
 data class RollDice(val dice: List<Dice>) : ActionDescriptor {
     constructor(vararg dice: Dice) : this(dice.toList())
 }
 
 data class SelectFieldLocation(val x: Int, val y: Int) : ActionDescriptor {
+    val coordinate: FieldCoordinate = FieldCoordinate(x, y)
     constructor(coordinate: FieldCoordinate) : this(coordinate.x, coordinate.y)
 }
+
+// Give a number of dice results, the user needs to select 1 or more of them
+data class SelectDiceResult(val choices: List<DieResult>, val count: Int = 1): ActionDescriptor
 
 data object SelectDogout : ActionDescriptor
 
@@ -281,6 +291,7 @@ data class D20Result(override val result: Int) : DieResult() {
     }
 }
 
+// This class is a bit annoying, it is treated as a special D6, where the result can be found in `blockResult`
 @Serializable
 data class DBlockResult(override val result: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why

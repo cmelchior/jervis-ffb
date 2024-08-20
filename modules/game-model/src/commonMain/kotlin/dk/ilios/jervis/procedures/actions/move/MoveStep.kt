@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures
+package dk.ilios.jervis.procedures.actions.move
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
@@ -11,6 +11,7 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.procedures.Pickup
 import dk.ilios.jervis.rules.Rules
 
 /**

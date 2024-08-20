@@ -12,8 +12,13 @@ import kotlinx.serialization.Serializable
 abstract class Procedure {
     open fun name(): String = this::class.simpleName!!
 
+    // Will be called after `enterNode`
     abstract val initialNode: Node
+    // First thing called when entering this node.
+    // It is called when this procedure has been added on the stack
     val enterNode: Node = EnterProcedureNode(this)
+    // Last thing called when leaving this procedure.
+    // It is called before this procedure is removed.
     val exitNode: Node = ExitProcedureNode(this)
 
     open fun isValid(

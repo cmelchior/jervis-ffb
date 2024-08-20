@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures
+package dk.ilios.jervis.procedures.actions.move
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor

@@ -85,7 +85,12 @@ object Pickup : Procedure() {
     override fun onExitProcedure(
         state: Game,
         rules: Rules,
-    ): Command? = null
+    ): Command? {
+        return compositeCommandOf(
+            SetRollContext(Game::pickupRollContext, null),
+            SetRollContext(Game::pickupRollResultContext, null)
+        )
+    }
 
     object RollToPickup : ParentNode() {
         override fun getChildProcedure(

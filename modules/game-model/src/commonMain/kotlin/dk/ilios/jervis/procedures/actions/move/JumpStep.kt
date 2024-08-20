@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures
+package dk.ilios.jervis.procedures.actions.move
 
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.fsm.ComputationNode

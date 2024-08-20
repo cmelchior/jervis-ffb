@@ -1,13 +1,16 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.procedures.BlockContext
 import dk.ilios.jervis.procedures.CatchRollContext
 import dk.ilios.jervis.procedures.CatchRollResultContext
 import dk.ilios.jervis.procedures.PickupRollContext
 import dk.ilios.jervis.procedures.PickupRollResultContext
 import dk.ilios.jervis.procedures.RerollContext
 import dk.ilios.jervis.procedures.RerollResultContext
+import dk.ilios.jervis.procedures.actions.block.BlockContext
+import dk.ilios.jervis.procedures.actions.block.BlockRollResultContext
+import dk.ilios.jervis.procedures.actions.block.PushContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
@@ -73,12 +76,14 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     // Injury Roll
     //
 
-    var blockContext: BlockContext? = null
-
+    var blockRollContext: BlockContext? = null
+    var blockRollResultContext: BlockRollResultContext? = null
     var catchRollContext: CatchRollContext? = null
     var catchRollResultContext: CatchRollResultContext? = null
     var pickupRollContext: PickupRollContext? = null
     var pickupRollResultContext: PickupRollResultContext? = null
+    var riskingInjuryRollsContext: RiskingInjuryRollContext? = null
+    var pushContext: PushContext? = null
 
     var useRerollContext: RerollContext? = null
     var useRerollResult: RerollResultContext? = null

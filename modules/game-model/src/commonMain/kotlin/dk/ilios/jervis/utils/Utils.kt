@@ -21,6 +21,7 @@ import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndActionWhenReady
@@ -39,6 +40,7 @@ import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectCoinSide
+import dk.ilios.jervis.actions.SelectDiceResult
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectNoReroll
@@ -120,6 +122,7 @@ fun createRandomAction(
 
         SelectNoReroll -> NoRerollSelected
         is SelectRerollOption -> RerollOptionSelected(action.option)
+        is SelectDiceResult -> action.choices.random()
     }
 }
 
@@ -131,6 +134,8 @@ inline fun assert(condition: Boolean) {
     }
 }
 
+fun List<DieResult>.sum(): Int = fold(0) { acc, el -> acc + el.result }
+
 class InvalidAction(message: String) : RuntimeException(message)
 
 class InvalidGameState(message: String) : IllegalStateException(message)
@@ -139,8 +144,10 @@ inline fun INVALID_GAME_STATE(message: String = "Unexpected game state"): Nothin
     throw InvalidGameState(message)
 }
 
-inline fun INVALID_ACTION(action: GameAction): Nothing {
-    throw InvalidAction("Invalid action selected: $action")
+inline fun INVALID_ACTION(action: GameAction, customMessage: String? = null): Nothing {
+    throw InvalidAction(customMessage?.let {
+        customMessage
+    } ?: "Invalid action selected: $action")
 }
 
 fun createDefaultGameState(rules: BB2020Rules): Game {

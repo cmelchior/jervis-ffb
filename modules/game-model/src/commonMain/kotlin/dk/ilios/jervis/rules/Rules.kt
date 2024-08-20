@@ -4,6 +4,8 @@ import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.model.DiceModifier
+import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.FieldCoordinate.Companion.OUT_OF_BOUNDS
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
@@ -217,6 +219,48 @@ interface Rules {
             true -> allowMultipleTeamRerollsPrTurn
             false -> true
         }
+    }
+
+    /**
+     * Return all locations you can choose from when pushing a player.
+     * This only returns the normal push options and doesn't take into
+     * account skills or if the squares are occupied.
+     * If that matters or not is up to the call of this method.
+     */
+    fun getPushOptions(pusher: Player, pushee: Player): Set<FieldCoordinate> {
+        val start: FieldCoordinate = pusher.location as? FieldCoordinate ?: throw IllegalStateException("Pusher must be on field.")
+        val direction: FieldCoordinate = pushee.location as? FieldCoordinate ?: throw IllegalStateException("Pushee must be on field.")
+        if (!start.isAdjacent(this, direction)) {
+            throw IllegalArgumentException("Pusher and Pushee must be adjacent to each other")
+        }
+
+        val all =  (pushee.location as FieldCoordinate).getSurroundingCoordinates(this, includeOutOfBounds = true).toSet()
+        val map = all.map { Pair(it, it.realDistanceTo(start)) }
+        val result = map
+            .sortedByDescending { it.second }
+            .subList(0, 3)
+            .map {
+                val coords = it.first
+                if (coords.isOutOfBounds(this)) {
+                    OUT_OF_BOUNDS
+                } else {
+                    coords
+                }
+            }
+            .toSet()
+        return result
+
+
+
+//        return (pushee.location as FieldCoordinate).getSurroundingCoordinates(this, includeOutOfBounds = true)
+//            .toSet() // Remove multiple instances of OUT_OF_BOUNDS
+//            .map {
+//                Pair(it, it.realDistanceTo(start))
+//            }
+//            .sortedBy { it.second }
+//            .subList(0, 3)
+//            .map { it.first }
+//            .toSet()
     }
 
     // Characteristic limits

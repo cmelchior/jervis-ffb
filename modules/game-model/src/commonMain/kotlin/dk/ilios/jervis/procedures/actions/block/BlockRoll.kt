@@ -1,8 +1,7 @@
-package dk.ilios.jervis.procedures
+package dk.ilios.jervis.procedures.actions.block
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
-import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.Dice
@@ -10,6 +9,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
+import dk.ilios.jervis.actions.SelectDiceResult
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
@@ -21,6 +21,8 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.procedures.BlockDieRoll
+import dk.ilios.jervis.procedures.RerollContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.DiceRollType
@@ -39,7 +41,7 @@ object BlockRoll : Procedure() {
         state: Game,
         rules: Rules,
     ) {
-        if (state.blockContext == null) {
+        if (state.blockRollContext == null) {
             INVALID_GAME_STATE("No catch roll context found")
         }
     }
@@ -58,7 +60,7 @@ object BlockRoll : Procedure() {
 
     // Helper method to share logic between roll and reroll
     private fun calculateNoOfBlockDice(state: Game): Int {
-        val context = state.blockContext!!
+        val context = state.blockRollContext!!
         val attackStrength = context.attacker.strength + context.offensiveAssists
         val defenderStrength = context.defender.strength + context.defensiveAssists
         return when {
@@ -89,7 +91,7 @@ object BlockRoll : Procedure() {
                         BlockDieRoll(originalRoll = diceRoll)
                     }
                 return compositeCommandOf(
-                    SetRollContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
+                    SetRollContext(Game::blockRollContext, state.blockRollContext!!.copy(roll = roll)),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -101,7 +103,7 @@ object BlockRoll : Procedure() {
             state: Game,
             rules: Rules,
         ): List<ActionDescriptor> {
-            val context = state.blockContext!!
+            val context = state.blockRollContext!!
             val attackingPlayer = context.attacker
 
             // Re-rolling block dice can be pretty complex,
@@ -142,8 +144,8 @@ object BlockRoll : Procedure() {
             rules: Rules,
         ): Command {
             return when (action) {
-                Continue -> ExitProcedure()
-                NoRerollSelected -> ExitProcedure()
+                // TODO What is the difference between Continue and NoRerollSelected
+                NoRerollSelected -> GotoNode(SelectBlockResult)
                 is RerollOptionSelected -> {
                     val rerollContext = RerollContext(DiceRollType.CatchRoll, action.option.source)
                     compositeCommandOf(
@@ -195,10 +197,54 @@ object BlockRoll : Procedure() {
                         BlockDieRoll(originalRoll = blockRoll)
                     }
                 return compositeCommandOf(
-                    SetRollContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
+                    SetRollContext(Game::blockRollContext, state.blockRollContext!!.copy(roll = roll)),
                     GotoNode(ChooseReRollSource),
                 )
             }
+        }
+    }
+
+    //     object SelectBlockResult
+    // resolvePlayerDown
+    // resolveBothDown
+    // resolvePushBack
+    // resolveStumble
+    // ResolvePOW
+    object SelectBlockResult : ActionNode() {
+        override fun getAvailableActions(
+            state: Game,
+            rules: Rules,
+        ): List<ActionDescriptor> {
+            return listOf(
+                SelectDiceResult(state.blockRollContext!!.roll.map { it.result }, 1)
+            )
+        }
+
+
+
+
+        override fun applyAction(
+            action: GameAction,
+            state: Game,
+            rules: Rules,
+        ): Command {
+            if (action !is DBlockResult) {
+                INVALID_ACTION(action)
+            }
+            val roll = state.blockRollContext!!
+            val result = BlockRollResultContext(
+                roll.attacker,
+                roll.defender,
+                roll.isBlitzing,
+                roll.isUsingMultiBlock,
+                roll.roll,
+                action,
+            )
+
+            return compositeCommandOf(
+                SetRollContext<BlockRollResultContext>(Game::blockRollResultContext, result),
+                ExitProcedure()
+            )
         }
     }
 }

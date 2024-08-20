@@ -14,7 +14,7 @@ class MenuViewModel {
     }
 
     fun undoAction() {
-        controller.revert()
+        controller.undoLastAction()
         uiActionFactory.userSelectedAction(Undo)
     }
 }

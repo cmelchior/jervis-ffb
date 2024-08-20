@@ -8,6 +8,10 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 
+/**
+ * Helper node, for making it easier to create "transition" nodes, that just
+ * run computations but doesn't require user input.
+ */
 abstract class ComputationNode : ActionNode() {
     abstract fun apply(
         state: Game,
