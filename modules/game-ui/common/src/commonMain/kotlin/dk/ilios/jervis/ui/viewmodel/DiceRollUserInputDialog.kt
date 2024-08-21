@@ -2,6 +2,7 @@ package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
+import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
@@ -20,7 +21,7 @@ data class DiceRollUserInputDialog(
     val title: String,
     val message: String,
     val dice: List<Pair<Dice, List<DieResult>>>,
-    val result: (DiceResults) -> String,
+    val result: (DiceResults) -> String?,
 ) : UserInputDialog {
     override val actions: List<GameAction> = emptyList()
 
@@ -91,6 +92,15 @@ data class DiceRollUserInputDialog(
                         ).name
                     "$description(${rolls.sumOf { it.result }})"
                 },
+            )
+        }
+
+        fun createBlockRollDialog(diceCount: Int, isBlitz: Boolean): UserInputDialog {
+            return DiceRollUserInputDialog(
+                title = "${ if (isBlitz) "Blitz" else "Block"} roll",
+                message = "Roll ${diceCount}D6",
+                dice = (1..diceCount).map { Pair(Dice.BLOCK, DBlockResult.allOptions()) },
+                result = { rolls: DiceResults -> null },
             )
         }
     }

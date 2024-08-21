@@ -59,6 +59,8 @@ import dk.ilios.jervis.procedures.RollForTheWeather
 import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.procedures.TheKickOff
 import dk.ilios.jervis.procedures.TheKickOffEvent
+import dk.ilios.jervis.procedures.actions.block.BlockRoll
+import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.actions.move.MoveAction
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
@@ -97,17 +99,15 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         scope.launch(errorHandler) {
             actions@while (true) {
                 val (controller, actions) = model.actionRequestChannel.receive()
-                var selectedAction = calculateAutomaticResponse(controller, actions)
-                if (selectedAction == null) {
-                    val userInput = detectDialogPopup(controller)
-                    if (userInput == null) {
-                        detectAndSendUserInput(controller, actions)
-                    } else {
-                        sendToRelevantUserInputChannel(listOf(userInput))
-                    }
-                    selectedAction = userSelectedAction.receive()
+                var selectedUserAction = calculateAutomaticResponse(controller, actions)
+                if (selectedUserAction == null) {
+                    createDialogPopupIfNeeded(controller, actions)?.let { dialogInput ->
+                        sendToRelevantUserInputChannel(listOf(dialogInput))
+                    } ?: detectAndSendNonDialogUserInput(controller, actions)
+                    // After input has been sent to the UI, wait for a response
+                    selectedUserAction = userSelectedAction.receive()
                 }
-                model.actionSelectedChannel.send(selectedAction)
+                model.actionSelectedChannel.send(selectedUserAction)
             }
         }
     }
@@ -122,20 +122,28 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         actions: List<ActionDescriptor>,
     ): GameAction? {
 
+        val currentNode = controller.currentProcedure()?.currentNode()
+
         // If a team has no further actions, just end their turn immediately
         if (actions.size == 1 && actions.first() is EndActionWhenReady) {
             return EndAction
         }
 
-        if (actions.size == 1 && actions.first() is SelectFieldLocation) {
+        // When selecting a pushback, but only one choice is available.
+        if (actions.size == 1 && actions.first() is SelectFieldLocation && currentNode is PushStep.SelectPushDirection) {
             val loc = actions.first() as SelectFieldLocation
             return FieldSquareSelected(loc.coordinate)
+        }
+
+        // When selecting block results after reroll and only 1 dice is available.
+        if (currentNode == BlockRoll.SelectBlockResult && actions.size == 1) {
+            return (actions.first() as SelectDiceResult).choices.first() as DBlockResult
         }
 
         return null
     }
 
-    private suspend fun detectAndSendUserInput(
+    private suspend fun detectAndSendNonDialogUserInput(
         controller: GameController,
         actions: List<ActionDescriptor>,
     ) {
@@ -184,9 +192,10 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
     }
 
     /**
-     * Detects if a visible dialog is needed and return it. `null` if some other actions are needed.
+     * Detects if a visible dialog is necessary and return it. `null` if this needs to be handled
+     * by some other part of the UI.
      */
-    private fun detectDialogPopup(controller: GameController): UserInput? {
+    private fun createDialogPopupIfNeeded(controller: GameController, actions: List<ActionDescriptor>): UserInput? {
         val userInput =
             when (controller.stack.currentNode()) {
                 is RollForStartingFanFactor.SetFanFactorForHomeTeam -> {
@@ -272,6 +281,24 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 is PickupRoll.ChooseReRollSource -> {
                     SingleChoiceInputDialog.createPickupRerollDialog(
                         controller.state.pickupRollResultContext!!,
+                        mapUnknownActions(controller.getAvailableActions()),
+                    )
+                }
+
+                is BlockRoll.ReRollDie,
+                is BlockRoll.RollDice -> {
+                    val diceCount = (actions.first() as RollDice).dice.size
+                    DiceRollUserInputDialog.createBlockRollDialog(diceCount, controller.state.blockRollContext!!.isBlitzing)
+                }
+
+                is PushStep.DecideToFollowUp -> {
+                    SingleChoiceInputDialog.createFollowUpDialog(
+                        controller.state.pushContext!!.pusher
+                    )
+                }
+
+                is BlockRoll.ChooseResultOrReRollSource -> {
+                    SingleChoiceInputDialog.createChooseBlockResultOrReroll(
                         mapUnknownActions(controller.getAvailableActions()),
                     )
                 }

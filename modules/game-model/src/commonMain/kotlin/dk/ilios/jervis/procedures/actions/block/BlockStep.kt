@@ -113,6 +113,7 @@ object BlockStep : Procedure() {
                     .mapNotNull { state.field[it].player }
                     .count { player -> rules.canOfferAssistAgainst(player, context.attacker) }
 
+
             return compositeCommandOf(
                 SetRollContext(
                     Game::blockRollContext,

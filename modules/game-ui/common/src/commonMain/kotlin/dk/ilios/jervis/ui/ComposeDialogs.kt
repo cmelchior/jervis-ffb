@@ -1,7 +1,10 @@
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -16,14 +19,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
+import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
 import dk.ilios.jervis.ui.viewmodel.DiceRollUserInputDialog
 import dk.ilios.jervis.ui.viewmodel.SingleChoiceInputDialog
@@ -82,15 +90,35 @@ fun MultipleSelectUserActionDialog(
                                     ButtonDefaults.buttonColors(
                                         backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background,
                                     )
-                                Button(
-                                    modifier = Modifier.weight(1f),
-                                    onClick = { selectedRolls[i] = it },
-                                    colors = buttonColors,
-                                ) {
-                                    Text(
-                                        text = it.result.toString(),
-                                        color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground,
-                                    )
+
+                                when(it) {
+                                    is DBlockResult -> {
+                                        val text = it.blockResult.name
+                                        Button(
+                                            modifier = Modifier.weight(1f).aspectRatio(1.0f),
+                                            onClick = { selectedRolls[i] = it },
+                                            colors = buttonColors,
+                                        ) {
+                                            Image(
+                                                modifier = Modifier.fillMaxSize(),
+                                                bitmap = IconFactory.getDiceIcon(it.blockResult).toComposeImageBitmap(),
+                                                contentDescription = text,
+                                                alignment = Alignment.Center,
+                                                contentScale = ContentScale.Fit
+                                            )
+                                        }
+                                    }
+                                    else -> {
+                                        Button(
+                                            modifier = Modifier.weight(1f),
+                                            onClick = { selectedRolls[i] = it },
+                                            colors = buttonColors,
+                                        ) {
+                                            Text(
+                                                text = it.result.toString(),
+                                                color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground,
+                                            )
+                                        }                                    }
                                 }
                             }
                         }

@@ -92,13 +92,13 @@ object BlockRoll : Procedure() {
                     }
                 return compositeCommandOf(
                     SetRollContext(Game::blockRollContext, state.blockRollContext!!.copy(roll = roll)),
-                    GotoNode(ChooseReRollSource),
+                    GotoNode(ChooseResultOrReRollSource),
                 )
             }
         }
     }
 
-    object ChooseReRollSource : ActionNode() {
+    object ChooseResultOrReRollSource : ActionNode() {
         override fun getAvailableActions(
             state: Game,
             rules: Rules,
@@ -147,7 +147,7 @@ object BlockRoll : Procedure() {
                 // TODO What is the difference between Continue and NoRerollSelected
                 NoRerollSelected -> GotoNode(SelectBlockResult)
                 is RerollOptionSelected -> {
-                    val rerollContext = RerollContext(DiceRollType.CatchRoll, action.option.source)
+                    val rerollContext = RerollContext(DiceRollType.BlockRoll, action.option.source)
                     compositeCommandOf(
                         SetRollContext(Game::useRerollContext, rerollContext),
                         GotoNode(UseRerollSource),
@@ -198,7 +198,7 @@ object BlockRoll : Procedure() {
                     }
                 return compositeCommandOf(
                     SetRollContext(Game::blockRollContext, state.blockRollContext!!.copy(roll = roll)),
-                    GotoNode(ChooseReRollSource),
+                    GotoNode(ChooseResultOrReRollSource),
                 )
             }
         }
@@ -219,9 +219,6 @@ object BlockRoll : Procedure() {
                 SelectDiceResult(state.blockRollContext!!.roll.map { it.result }, 1)
             )
         }
-
-
-
 
         override fun applyAction(
             action: GameAction,

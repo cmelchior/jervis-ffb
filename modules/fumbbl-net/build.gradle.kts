@@ -12,7 +12,6 @@ repositories {
 }
 
 kotlin {
-
     jvm {
         jvmToolchain((project.properties["java.version"] as String).toInt())
         testRuns["test"].executionTask.configure {

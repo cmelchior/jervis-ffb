@@ -1,9 +1,10 @@
-import org.jetbrains.compose.compose
+@file:OptIn(ExperimentalWasmDsl::class)
+
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose)
-//    id("com.android.library")
 }
 
 group = "dk.ilios.bloodbowl.ui"
@@ -13,6 +14,30 @@ kotlin {
     jvm("desktop") {
         jvmToolchain((project.properties["java.version"] as String).toInt())
     }
+//    wasmJs {
+//        binaries.executable()
+//        browser {
+//            commonWebpackConfig {
+//                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+//                    // Uncomment and configure this if you want to open a browser different from the system default
+//                    // open = mapOf(
+//                    //     "app" to mapOf(
+//                    //         "name" to "google chrome"
+//                    //     )
+//                    // )
+//
+//                    static = (static ?: mutableListOf()).apply {
+//                        // Serve sources to debug inside browser
+//                        add(project.rootDir.path)
+//                    }
+//                }
+//            }
+//
+//            // Uncomment the next line to apply Binaryen and get optimized wasm binaries
+//            // applyBinaryen()
+//        }
+//    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {

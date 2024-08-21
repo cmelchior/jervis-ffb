@@ -1,5 +1,6 @@
 package dk.ilios.jervis.ui.images
 
+import dk.ilios.jervis.actions.BlockDice
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.isOnHomeTeam
 import dk.ilios.jervis.rules.roster.Position
@@ -13,6 +14,7 @@ import dk.ilios.jervis.ui.model.UiPlayer
 import java.awt.image.BufferedImage
 import java.io.InputStream
 import javax.imageio.ImageIO
+
 
 const val iconRootPath = "icons/cached/players/iconsets"
 val playerIconSpriteSheets =
@@ -132,6 +134,20 @@ object IconFactory {
                 cachedPositionVariants[position] = it
             }
         }
+    }
+
+    fun getDiceIcon(die: BlockDice): BufferedImage {
+        val root = "icons/sidebar/dice"
+        val path = when(die) {
+            BlockDice.PLAYER_DOWN -> "new_skool_black_1.png"
+            BlockDice.BOTH_DOWN -> "new_skool_black_2.png"
+            BlockDice.PUSH_BACK -> "new_skool_black_3_4.png"
+            BlockDice.STUMBLE -> "new_skool_black_5.png"
+            BlockDice.POW -> "new_skool_black_6.png"
+        }
+
+        // Find platform path seperator somewhere
+        return loadImageFromResources("$root/$path", cache = true)
     }
 
     fun getImage(player: UiPlayer): BufferedImage {

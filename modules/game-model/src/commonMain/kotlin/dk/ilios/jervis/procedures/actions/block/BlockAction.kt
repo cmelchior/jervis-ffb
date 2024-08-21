@@ -69,6 +69,7 @@ object BlockAction : Procedure() {
                         BlockContext(
                             attacker = state.activePlayer!!,
                             defender = action.player,
+                            isBlitzing = false
                         )
                     compositeCommandOf(
                         SetRollContext(Game::blockRollContext, context),

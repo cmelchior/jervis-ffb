@@ -157,6 +157,16 @@ data class SingleChoiceInputDialog(
             )
         }
 
+        fun createChooseBlockResultOrReroll(
+            actions: List<GameAction>): SingleChoiceInputDialog {
+            val message = "Choose result of block"
+            return create(
+                title = "Choose Reroll or Result",
+                message = message,
+                actions = actions,
+            )
+        }
+
         fun createBounceBallDialog(
             rules: Rules,
             actions: List<D8Result>,
@@ -181,6 +191,15 @@ data class SingleChoiceInputDialog(
                         Pair(roll, description)
                     },
             )
+
+        fun createFollowUpDialog(player: Player): SingleChoiceInputDialog {
+            return createWithDescription(
+                title = "Follow-up",
+                message = "Does ${player.name} want to follow up?",
+                actions = listOf(Confirm to "Confirm", Continue to "Cancel"),
+            )
+        }
+
     }
 }
 
