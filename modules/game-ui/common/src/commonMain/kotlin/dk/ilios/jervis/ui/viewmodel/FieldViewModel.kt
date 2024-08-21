@@ -83,13 +83,23 @@ class FieldViewModel(
                                 fieldCoordinate to (index + 1)
                             }.toMap()
                         val action = {
-                            // Only allow a path up to hitting a ball
-                            val selectedSquares =
+
+                            // If a path consist of only 1 step, always execute it, since
+                            // we assume the user wants to execute it.
+                            // If it consists of multiple steps, only move up to the point
+                            // where a dice roll is required (i.e. pickup, rush, dodge)
+                            val selectedSquares = if (path.size == 1) {
+                                path.map {
+                                    FieldSquareSelected(it)
+                                }
+                            } else {
                                 path.takeWhile { state[it].ball == null }.map {
                                     FieldSquareSelected(
                                         it,
                                     )
                                 }
+                            }
+
                             if (selectedSquares.size == 1) {
                                 uiActionFactory.userSelectedAction(selectedSquares.first())
                             } else {
