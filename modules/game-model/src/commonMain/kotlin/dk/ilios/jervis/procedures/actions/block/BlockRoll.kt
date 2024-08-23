@@ -5,6 +5,7 @@ import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.Dice
+import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
@@ -225,9 +226,16 @@ object BlockRoll : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            if (action !is DBlockResult) {
+            if (action !is DBlockResult && !(action is DiceResults && action.rolls.size == 1)) {
                 INVALID_ACTION(action)
             }
+
+            val selectedDie = when(action) {
+                is DBlockResult -> action
+                is DiceResults -> action.rolls.first() as DBlockResult
+                else -> INVALID_ACTION(action)
+            }
+
             val roll = state.blockRollContext!!
             val result = BlockRollResultContext(
                 roll.attacker,
@@ -235,7 +243,7 @@ object BlockRoll : Procedure() {
                 roll.isBlitzing,
                 roll.isUsingMultiBlock,
                 roll.roll,
-                action,
+                selectedDie,
             )
 
             return compositeCommandOf(

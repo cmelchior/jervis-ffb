@@ -1,9 +1,10 @@
 package com.jervis.fumbbl.restapi
 
 import dk.ilios.jervis.fumbbl.net.auth.getHttpClient
+import dk.ilios.jervis.utils.runBlocking
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
-import kotlinx.coroutines.runBlocking
+import io.ktor.utils.io.core.use
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

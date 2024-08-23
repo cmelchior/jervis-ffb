@@ -7,8 +7,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.isSuccess
 import io.ktor.http.parameters
 
-expect fun getHttpClient(): HttpClient
-
 data class TeamData(val id: Int, val name: String)
 
 /**

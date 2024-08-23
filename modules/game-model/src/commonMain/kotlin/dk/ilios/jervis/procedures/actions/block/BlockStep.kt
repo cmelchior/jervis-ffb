@@ -113,7 +113,6 @@ object BlockStep : Procedure() {
                     .mapNotNull { state.field[it].player }
                     .count { player -> rules.canOfferAssistAgainst(player, context.attacker) }
 
-
             return compositeCommandOf(
                 SetRollContext(
                     Game::blockRollContext,
@@ -125,15 +124,8 @@ object BlockStep : Procedure() {
     }
 
     object RollBlockDice : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = BlockRoll
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BlockRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(ResolveBlockDie)
         }
     }

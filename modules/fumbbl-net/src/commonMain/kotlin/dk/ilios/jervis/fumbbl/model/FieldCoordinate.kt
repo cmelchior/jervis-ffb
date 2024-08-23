@@ -52,7 +52,7 @@ data class FieldCoordinate(
     fun distanceInSteps(otherCoordinate: FieldCoordinate?): Int {
         var result = -1
         if (otherCoordinate != null) {
-            result = max(Math.abs(x - otherCoordinate.x), abs(y - otherCoordinate.y))
+            result = max(abs(x - otherCoordinate.x), abs(y - otherCoordinate.y))
         }
         return result
     }

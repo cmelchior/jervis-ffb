@@ -15,7 +15,9 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
         controller: GameController,
     ) {
         this.originalPlayerLocation = player.location
-        this.originalPlayerOnField = state.field[player.location as FieldCoordinate].player
+        if (originalPlayerLocation is FieldCoordinate) {
+            this.originalPlayerOnField = state.field[player.location as FieldCoordinate].player
+        }
 
         // Remove from old location
         val oldLocation = originalPlayerLocation

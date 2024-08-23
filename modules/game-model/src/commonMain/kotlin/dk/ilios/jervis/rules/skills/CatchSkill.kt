@@ -25,7 +25,7 @@ class CatchSkill : BB2020Skill, D6StandardSkillReroll {
     }
 
     @Serializable
-    companion object : SkillFactory {
+    data object Factory : SkillFactory {
         override fun createSkill(): CatchSkill = CatchSkill()
     }
 }

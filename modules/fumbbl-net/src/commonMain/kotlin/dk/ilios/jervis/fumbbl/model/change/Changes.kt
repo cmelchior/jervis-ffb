@@ -16,10 +16,10 @@ import dk.ilios.jervis.fumbbl.model.RangeRuler
 import dk.ilios.jervis.fumbbl.model.TrackNumber
 import dk.ilios.jervis.fumbbl.model.TrapDoor
 import dk.ilios.jervis.fumbbl.model.TurnMode
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
-import java.time.LocalDateTime
 
 @Serializable
 @SerialName("actingPlayerMarkSkillUsed")

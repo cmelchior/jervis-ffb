@@ -1,8 +1,7 @@
 package dk.ilios.jervis.fumbbl.net.auth
 
-import java.io.IOException
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
+import io.ktor.utils.io.core.toByteArray
+import okio.Buffer
 
 /**
  * Copied and modified from the FUMBBL Java Client:
@@ -30,7 +29,6 @@ object PasswordChallenge {
         return createResponse(challenge, md5Encode(password.toByteArray()))
     }
 
-    @Throws(IOException::class, NoSuchAlgorithmException::class)
     private fun createResponse(
         challenge: String,
         md5EncodedPassword: ByteArray,
@@ -103,9 +101,8 @@ object PasswordChallenge {
         return result
     }
 
-    @Throws(NoSuchAlgorithmException::class)
-    private fun md5Encode(bytes: ByteArray?): ByteArray {
-        val md5Digest = MessageDigest.getInstance("MD5")
-        return md5Digest.digest(bytes)
+    private fun md5Encode(bytes: ByteArray): ByteArray {
+        val buffer = Buffer()
+        return buffer.write(bytes).md5().toByteArray()
     }
 }

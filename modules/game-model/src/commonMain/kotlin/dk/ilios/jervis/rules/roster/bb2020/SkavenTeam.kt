@@ -6,7 +6,7 @@ import dk.ilios.jervis.rules.bb2020.Mutations
 import dk.ilios.jervis.rules.bb2020.Passing
 import dk.ilios.jervis.rules.bb2020.Strength
 import dk.ilios.jervis.rules.roster.RosterId
-import dk.ilios.jervis.rules.skills.SureHandsSkill
+import dk.ilios.jervis.rules.skills.SureHands
 import kotlinx.serialization.Serializable
 
 // Page 116 in the rulebook
@@ -32,7 +32,7 @@ data object SkavenTeam : BB2020Roster {
             "Thrower",
             85_000,
             7, 3, 3, 2, 8,
-            listOf(/* Pass, */ SureHandsSkill),
+            listOf(/* Pass, */ SureHands.Factory),
             listOf(General, Passing),
             listOf(Agility, Mutations, Strength),
         )

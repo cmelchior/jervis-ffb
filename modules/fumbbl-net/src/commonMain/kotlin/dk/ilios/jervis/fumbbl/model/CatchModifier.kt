@@ -6,6 +6,13 @@ import kotlinx.serialization.Serializable
 
 class CatchModifierSerializer : FumbblEnumSerializer<CatchModifier>(CatchModifier::class)
 
+val foo = mapOf(
+    "Inaccurate Pass, Deviated Ball or Scatter" to CatchModifier.INACCURATE,
+)
+
+
+
+
 @Serializable(with = CatchModifierSerializer::class)
 enum class CatchModifier(override val id: String, val modifier: Int) : FumbblEnum {
     INACCURATE("Inaccurate Pass, Deviated Ball or Scatter", -1),

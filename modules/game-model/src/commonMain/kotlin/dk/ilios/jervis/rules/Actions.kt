@@ -1,8 +1,8 @@
 package dk.ilios.jervis.rules
 
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.DummyProcedure
+import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.move.MoveAction
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.KSerializer

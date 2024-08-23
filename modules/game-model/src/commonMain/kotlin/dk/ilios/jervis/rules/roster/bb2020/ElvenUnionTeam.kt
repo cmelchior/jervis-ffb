@@ -42,7 +42,7 @@ data object ElvenUnionTeam : BB2020Roster {
             "Catcher",
             100_000,
             8, 3, 3, 4, 8,
-            listOf(CatchSkill, /* Nerves Of Steel */),
+            listOf(CatchSkill.Factory, /* Nerves Of Steel */),
             listOf(Agility, General),
             listOf(Strength),
         )

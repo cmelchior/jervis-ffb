@@ -4,9 +4,9 @@
 
 package dk.ilios.jervis.fumbbl.model
 
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
-import java.time.LocalDateTime
 
 @Serializable
 data class Game(

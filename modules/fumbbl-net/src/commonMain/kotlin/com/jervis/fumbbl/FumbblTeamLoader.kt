@@ -15,6 +15,7 @@ import dk.ilios.jervis.teamBuilder
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
+import io.ktor.utils.io.core.use
 import kotlinx.serialization.json.Json
 
 object FumbblTeamLoader {

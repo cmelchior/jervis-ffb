@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.serialization)
@@ -11,30 +13,27 @@ repositories {
 }
 
 kotlin {
+    jvmToolchain((project.properties["java.version"] as String).toInt())
     jvm {
-        jvmToolchain((project.properties["java.version"] as String).toInt())
         withJava()
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
     }
-    val hostOs = System.getProperty("os.name")
-    val isMingwX64 = hostOs.startsWith("Windows")
-    val nativeTarget =
-        when {
-            hostOs == "Mac OS X" -> macosX64("native")
-            hostOs == "Linux" -> linuxX64("native")
-            isMingwX64 -> mingwX64("native")
-            else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
-        }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "game-model"
+        browser()
+    }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":modules:utils"))
+                implementation(kotlin("reflect"))
                 implementation(libs.coroutines)
                 implementation(libs.jsonserialization)
                 implementation(libs.okio)
-                implementation(kotlin("reflect"))
             }
         }
         val commonTest by getting {
@@ -44,7 +43,5 @@ kotlin {
         }
         val jvmMain by getting
         val jvmTest by getting
-        val nativeMain by getting
-        val nativeTest by getting
     }
 }

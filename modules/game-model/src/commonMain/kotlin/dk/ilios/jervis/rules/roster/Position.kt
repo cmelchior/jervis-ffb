@@ -6,6 +6,7 @@ import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.skills.SkillFactory
 
+
 interface Position {
     val roster: Roster
     val quantity: Int

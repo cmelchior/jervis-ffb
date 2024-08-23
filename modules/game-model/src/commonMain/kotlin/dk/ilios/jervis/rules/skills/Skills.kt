@@ -164,6 +164,9 @@ sealed interface Skill {
     val category: SkillCategory
 }
 
+// TODO Find a better way to serialize these,
+//  so it also works well when naming the skill in the Position list
+//  Ideally this `listOf(SureHands)`, not `listOf(SureHands.Factory)`
 @Serializable
 sealed interface SkillFactory {
     fun createSkill(): Skill

@@ -6,8 +6,8 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandReplay
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.fumbbl.utils.fromFumbblState
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.serialize.platformFileSystem
-import kotlinx.coroutines.runBlocking
+import dk.ilios.jervis.utils.platformFileSystem
+import dk.ilios.jervis.utils.runBlocking
 import okio.Path
 import okio.Path.Companion.toPath
 

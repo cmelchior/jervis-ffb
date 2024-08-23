@@ -1,15 +1,15 @@
 package dk.ilios.jervis.fumbbl.adapter
 
+//import org.reflections.Reflections
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fumbbl.ModelChangeProcessor
-import dk.ilios.jervis.fumbbl.adapter.impl.AbortActionMapper
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.BB2020Rules
-import org.reflections.Reflections
 import kotlin.reflect.KClass
-import kotlin.reflect.full.isSubclassOf
+
+//import kotlin.reflect.full.isSubclassOf
 
 /**
  * Map all server commands into the equivalent [JervisAction] by using all configured
@@ -18,26 +18,28 @@ import kotlin.reflect.full.isSubclassOf
 class MapperChain(private val jervisGame: Game, private val fumbblGame: FumbblGame, private val checkCommands: Boolean = false) {
 
     private val jervisGameController = GameController(BB2020Rules, jervisGame)
-    private val mappers: List<CommandActionMapper>
+    private val mappers: List<CommandActionMapper> = emptyList()
 
     fun getMappersInPackage(): List<KClass<*>> {
-        val reflections = Reflections("dk.ilios.jervis.fumbbl.adapter.impl")
-        return reflections.getSubTypesOf(CommandActionMapper::class.java).map { it.kotlin }.toList()
+        TODO()
+//        val reflections = Reflections("dk.ilios.jervis.fumbbl.adapter.impl")
+//        return reflections.getSubTypesOf(CommandActionMapper::class.java).map { it.kotlin }.toList()
     }
 
     init {
-        val classes = getMappersInPackage()
-        val loadedMappers = classes
-            .filter { it.qualifiedName?.contains("AbortActionMapper") == false }
-            .filter { it.isSubclassOf(CommandActionMapper::class) }
-            .map {
-                try {
-                    it.objectInstance as CommandActionMapper
-                } catch (ex: Exception) {
-                    throw IllegalStateException("Failed to instantiate mapper ${it.qualifiedName}", ex)
-                }
-            }
-        mappers = listOf(AbortActionMapper) + loadedMappers
+        TODO()
+//        val classes = getMappersInPackage()
+//        val loadedMappers = classes
+//            .filter { it.qualifiedName?.contains("AbortActionMapper") == false }
+//            .filter { it.isSubclassOf(CommandActionMapper::class) }
+//            .map {
+//                try {
+//                    it.objectInstance as CommandActionMapper
+//                } catch (ex: Exception) {
+//                    throw IllegalStateException("Failed to instantiate mapper ${it.qualifiedName}", ex)
+//                }
+//            }
+//        mappers = listOf(AbortActionMapper) + loadedMappers
     }
 
     fun process(commands: List<ServerCommandModelSync>): List<JervisActionHolder> {

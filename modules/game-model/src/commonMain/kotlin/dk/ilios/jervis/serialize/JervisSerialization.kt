@@ -39,6 +39,7 @@ import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
 import dk.ilios.jervis.rules.roster.bb2020.ChaosDwarfTeam
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.roster.bb2020.KhorneTeam
+import dk.ilios.jervis.utils.platformFileSystem
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -54,7 +55,6 @@ import okio.use
 object JervisSerialization {
     private val jervisModule =
         SerializersModule {
-
             polymorphic(Rules::class) {
                 subclass(BB2020Rules::class)
             }
@@ -89,8 +89,7 @@ object JervisSerialization {
                 subclass(PlayerSelected::class)
                 subclass(RandomPlayersSelected::class)
                 subclass(RerollOptionSelected::class)
-
-//            polymorphic(DieResult::class) {
+                // polymorphic(DieResult::class) {
                 subclass(D2Result::class)
                 subclass(D3Result::class)
                 subclass(D4Result::class)
@@ -100,13 +99,7 @@ object JervisSerialization {
                 subclass(D16Result::class)
                 subclass(D20Result::class)
                 subclass(DBlockResult::class)
-//            }
             }
-
-//        polymorphic(SkillFactory::class) {
-//            subclass(CatchSkill.Companion::class)
-//            subclass(SureHandsSkill.Companion::class)
-//        }
         }
 
     private val jsonFormat =

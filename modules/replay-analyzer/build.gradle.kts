@@ -16,9 +16,8 @@ application {
 }
 
 kotlin {
-
+    jvmToolchain((project.properties["java.version"] as String).toInt())
     jvm {
-        jvmToolchain((project.properties["java.version"] as String).toInt())
         withJava()
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
@@ -28,6 +27,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":modules:utils"))
                 implementation(libs.coroutines)
                 implementation(project(":modules:fumbbl-net"))
                 implementation(project(":modules:game-model"))

@@ -5,6 +5,7 @@ import dk.ilios.jervis.fumbbl.net.commands.ClientCommand
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommand
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandGameState
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandReplay
+import dk.ilios.jervis.utils.platformFileSystem
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +13,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -23,11 +25,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.modules.SerializersModule
-import okio.FileSystem
 import okio.Path
-import java.time.LocalDateTime
-
-expect val platformFileSystem: FileSystem
 
 /**
  * Class for loading a FUMBBL replay file and convert it into a stream of

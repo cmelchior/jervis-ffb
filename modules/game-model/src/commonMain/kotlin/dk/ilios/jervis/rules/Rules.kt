@@ -187,7 +187,9 @@ interface Rules {
         // TODO If player has Guard, player can always assist
         return assisting.location.coordinate.getSurroundingCoordinates(this).firstOrNull {
             assisting.team.game.field[it].player?.let { adjacentPlayer ->
-                adjacentPlayer.team != assisting.team && canMark(adjacentPlayer)
+                adjacentPlayer != target &&
+                    adjacentPlayer.team != assisting.team &&
+                    canMark(adjacentPlayer)
             } ?: false
         } == null
     }

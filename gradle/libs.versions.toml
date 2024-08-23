@@ -1,0 +1,35 @@
+[versions]
+kotlin = "2.0.10"
+ktor = "3.0.0-beta-2"
+compose = "1.6.11"
+coroutines = "1.9.0-RC.2"
+minimalJson = "0.9.5"
+javaAssist = "3.29.2-GA"
+serialization = "1.7.1"
+voyager = "1.1.0-beta02"
+datetimex = "0.6.1"
+okio = "3.7.0"
+
+[libraries]
+coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+jsonserialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetimex" }
+
+voyager-navigator = { group = "cafe.adriel.voyager", name = "voyager-navigator", version.ref = "voyager" }
+voyager-screenmodel = { group = "cafe.adriel.voyager", name = "voyager-screenmodel", version.ref = "voyager" }
+voyager-bottom-sheet-navigator = { group = "cafe.adriel.voyager", name = "voyager-bottom-sheet-navigator", version.ref = "voyager" }
+voyager-tab-navigator = { group = "cafe.adriel.voyager", name = "voyager-tab-navigator", version.ref = "voyager" }
+voyager-transitions = { group = "cafe.adriel.voyager", name = "voyager-transitions", version.ref = "voyager" }
+
+[plugins]
+jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+[bundles]
+voyager = [ "voyager-navigator", "voyager-screenmodel", "voyager-bottom-sheet-navigator", "voyager-tab-navigator", "voyager-transitions" ]
+

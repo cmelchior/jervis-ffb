@@ -5,10 +5,11 @@
 package dk.ilios.jervis.fumbbl.model.change
 
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
 import kotlinx.serialization.json.JsonClassDiscriminator
-import java.time.LocalDateTime
+import kotlin.jvm.JvmInline
 
 fun ModelChange.isHomeData(): Boolean {
     return key == "home"
