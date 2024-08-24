@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
@@ -41,7 +42,6 @@ fun Field(
     val field: FieldDetails by vm.field().collectAsState()
     val flow = remember { vm.observeField() }
     val fieldData: Map<FieldCoordinate, UiFieldSquare> by flow.collectAsState(emptyMap())
-
     Box(
         modifier =
             modifier
@@ -49,7 +49,7 @@ fun Field(
                 .aspectRatio(vm.aspectRatio),
     ) {
         Image(
-            painter = painterResource(field.resource),
+            painter = BitmapPainter(IconFactory.getField(field)),
             contentDescription = field.description,
             modifier =
                 Modifier

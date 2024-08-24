@@ -22,6 +22,8 @@ import dk.ilios.jervis.serialize.JervisSerialization
 import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 import dk.ilios.jervis.utils.isRegularFile
 import dk.ilios.jervis.utils.platformFileSystem
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okio.Path
 import okio.Path.Companion.toPath
 
@@ -38,23 +40,35 @@ class IntroScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
         navigator: Navigator,
         mode: GameMode,
     ) {
-        navigator.push(GameScreen(GameScreenModel(mode, menuViewModel), emptyList()))
+        GlobalScope.launch {
+            val screenModel = GameScreenModel(mode, menuViewModel)
+            screenModel.initialize()
+            navigator.push(GameScreen(screenModel, emptyList()))
+        }
     }
 
     fun loadGame(
         navigator: Navigator,
         file: Path,
     ) {
-        val (controller, actions) = JervisSerialization.loadFromFile(file)
-        navigator.push(GameScreen(GameScreenModel(Manual, menuViewModel, controller), actions))
+        GlobalScope.launch {
+            val (controller, actions) = JervisSerialization.loadFromFile(file)
+            val screenModel = GameScreenModel(Manual, menuViewModel, controller)
+            screenModel.initialize()
+            navigator.push(GameScreen(screenModel, actions))
+        }
     }
 
     val availableReplayFiles: List<Path>
         get() {
             val dir = "/Users/christian.melchior/Private/jervis-bloodbowl-agent/replays-fumbbl".toPath()
-            return platformFileSystem.list(dir)
-                .filter { it.isRegularFile }
-                .filter { it.name.endsWith(".json") }
+            return if (platformFileSystem.exists(dir)) {
+                emptyList()
+            } else {
+                platformFileSystem.list(dir)
+                    .filter { it.isRegularFile }
+                    .filter { it.name.endsWith(".json") }
+            }
         }
 }
 

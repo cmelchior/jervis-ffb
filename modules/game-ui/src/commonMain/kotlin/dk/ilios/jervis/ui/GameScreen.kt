@@ -9,6 +9,7 @@ import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fumbbl.adapter.FumbblReplayAdapter
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
 import dk.ilios.jervis.ui.viewmodel.FieldViewModel
@@ -21,7 +22,6 @@ import dk.ilios.jervis.ui.viewmodel.ReplayModeUiActionFactory
 import dk.ilios.jervis.ui.viewmodel.ReplayViewModel
 import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
 import dk.ilios.jervis.utils.createDefaultGameState
-import dk.ilios.jervis.utils.runBlocking
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 class GameScreenModel(
     val mode: GameMode,
     val menuViewModel: MenuViewModel,
-    controller: GameController? = null,
+    private val injectedController: GameController? = null,
 ) : ScreenModel {
     val actionRequestChannel =
         Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
@@ -38,13 +38,13 @@ class GameScreenModel(
     val hoverPlayerFlow =
         MutableSharedFlow<Player?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
-    val controller: GameController
-    val fumbbl: FumbblReplayAdapter?
+    lateinit var controller: GameController
+    var fumbbl: FumbblReplayAdapter? = null
     val rules: BB2020Rules = BB2020Rules
 
-    init {
-        if (controller != null) {
-            this.controller = controller
+    suspend fun initialize() {
+        if (injectedController != null) {
+            this.controller = injectedController
             fumbbl = null
         } else {
             when (mode) {
@@ -59,17 +59,14 @@ class GameScreenModel(
                 }
 
                 is Replay -> {
-                    fumbbl =
-                        FumbblReplayAdapter(mode.file, false).also { adapter ->
-                            runBlocking {
-                                adapter.loadCommands()
-                            }
-                            this.controller = GameController(rules, adapter.getGame())
-                        }
+                    fumbbl = FumbblReplayAdapter(mode.file, false)
+                    fumbbl!!.loadCommands()
+                    this.controller = GameController(rules, fumbbl!!.getGame())
                 }
             }
         }
         menuViewModel.controller = this.controller
+        IconFactory.initialize(controller.state.homeTeam, controller.state.awayTeam)
     }
 }
 

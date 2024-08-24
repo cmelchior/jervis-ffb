@@ -7,7 +7,6 @@ import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.fumbbl.utils.fromFumbblState
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.utils.platformFileSystem
-import dk.ilios.jervis.utils.runBlocking
 import okio.Path
 import okio.Path.Companion.toPath
 
@@ -37,23 +36,22 @@ class FumbblReplayAdapter(private var replayFile: Path, private val checkCommand
         processCommands(modelChangeCommands)
     }
 
-    private fun loadCommandsFromFile(file: Path): List<ServerCommandModelSync> {
+    private suspend fun loadCommandsFromFile(file: Path): List<ServerCommandModelSync> {
         val adapter = FumbblFileReplayAdapter(file)
         val commands: MutableList<ServerCommandReplay> = mutableListOf()
-        runBlocking {
-            adapter.start()
-            fumbblGame = adapter.getGame()
-            jervisGame = Game.fromFumbblState(fumbblGame)
-            var isDone = false
-            while (!isDone) {
-                val cmd = adapter.receive()
-                isDone =
-                    when (cmd) {
-                        is ServerCommandReplay -> cmd.lastCommand
-                        else -> false
-                    }
-                commands.add(cmd)
-            }
+
+        adapter.start()
+        fumbblGame = adapter.getGame()
+        jervisGame = Game.fromFumbblState(fumbblGame)
+        var isDone = false
+        while (!isDone) {
+            val cmd = adapter.receive()
+            isDone =
+                when (cmd) {
+                    is ServerCommandReplay -> cmd.lastCommand
+                    else -> false
+                }
+            commands.add(cmd)
         }
         adapter.close()
 

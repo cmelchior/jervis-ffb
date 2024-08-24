@@ -4,6 +4,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import dk.ilios.bloodbowl.ui.game_ui.generated.resources.Res
 import dk.ilios.jervis.actions.BlockDice
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.isOnHomeTeam
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.Roster
@@ -15,6 +17,7 @@ import dk.ilios.jervis.rules.roster.bb2020.SkavenTeam
 import dk.ilios.jervis.ui.getSubImage
 import dk.ilios.jervis.ui.loadImage
 import dk.ilios.jervis.ui.model.UiPlayer
+import dk.ilios.jervis.ui.viewmodel.FieldDetails
 
 
 const val iconRootPath = "icons/cached/players/iconsets"
@@ -104,7 +107,54 @@ object IconFactory {
     private val cachedPlayers: MutableMap<Player, PositionImage> = mutableMapOf()
     private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
 
-    private fun loadImageFromResources(
+    private val BALL = "icons/game/sball_30x30.png"
+    private val HELD_BALL_OVERLAY = "icons/decorations/holdball.png"
+    private val PLAYER_DETAIL_OVERLAY = "icons/sidebar/overlay_player_detail_blue2.png"
+    private val SIDEBAR_BACKGROUND = "icons/sidebar/background_box.png"
+
+    // Load all image resources used.
+    // It looks like we cannot lazy load them due to how Compose Resources work on WasmJS
+    // `Res.readBytes` is suspendable and runBlocking doesn't work on wasmJs, which makes
+    // loading images in the middle of a Composable function quite a nightmare.
+    // Instead we pre-load all resources up front. This will probably result in slightly
+    // higher memory usage, but it will probably not be problematic.
+    suspend fun initialize(homeTeam: Team, awayTeam: Team): Boolean {
+        saveImageIntoCache(BALL)
+        saveImageIntoCache(HELD_BALL_OVERLAY)
+        saveImageIntoCache(PLAYER_DETAIL_OVERLAY)
+        saveImageIntoCache("i/332804.png")
+        saveImageIntoCache(SIDEBAR_BACKGROUND)
+        FieldDetails.entries.forEach {
+            saveImageIntoCache(it.resource)
+        }
+        BlockDice.entries.forEach { die ->
+            val root = "icons/sidebar/dice"
+            val path = when(die) {
+                BlockDice.PLAYER_DOWN -> "new_skool_black_1.png"
+                BlockDice.BOTH_DOWN -> "new_skool_black_2.png"
+                BlockDice.PUSH_BACK -> "new_skool_black_3_4.png"
+                BlockDice.STUMBLE -> "new_skool_black_5.png"
+                BlockDice.POW -> "new_skool_black_6.png"
+            }
+            saveImageIntoCache("$root/$path")
+        }
+        saveTeamPlayerImagesToCache(homeTeam)
+        saveTeamPlayerImagesToCache(awayTeam)
+
+        // Just load all player imsage
+        return true
+    }
+
+    private suspend fun saveImageIntoCache(path: String) {
+        val image = Res.loadImage(path)
+        cachedImages[path] = image
+    }
+
+    private fun loadImageFromCache(path: String): ImageBitmap {
+        return cachedImages[path] ?: error("Could not find: $path")
+    }
+
+    private suspend fun loadImageFromResources(
         path: String,
         cache: Boolean = false,
     ): ImageBitmap {
@@ -121,7 +171,7 @@ object IconFactory {
         }
     }
 
-    private fun getPositionSpriteSheet(position: Position): PositionImageFactory {
+    private suspend fun getPositionSpriteSheet(position: Position): PositionImageFactory {
         if (cachedPositionVariants.contains(position)) {
             return cachedPositionVariants[position]!!
         } else {
@@ -142,9 +192,15 @@ object IconFactory {
             BlockDice.STUMBLE -> "new_skool_black_5.png"
             BlockDice.POW -> "new_skool_black_6.png"
         }
+        return loadImageFromCache("$root/$path")
+    }
 
-        // Find platform path seperator somewhere
-        return loadImageFromResources("$root/$path", cache = true)
+    suspend fun saveTeamPlayerImagesToCache(team: Team) {
+        team.forEach { player ->
+            val variants = getPositionSpriteSheet(player.position)
+            val playerImage: PositionImage = variants.getVariant(player)
+            cachedPlayers[player] = playerImage
+        }
     }
 
     fun getImage(player: UiPlayer): ImageBitmap {
@@ -160,22 +216,31 @@ object IconFactory {
                 cachedPlayers[player.model]!!.default
             }
         } else {
-            val variants = getPositionSpriteSheet(player.position)
-            val playerImage = variants.getVariant(player.model)
-            cachedPlayers[player.model] = playerImage
-            return if (isActive) {
-                playerImage.active
-            } else {
-                playerImage.default
-            }
+            error("Could not find: $player")
         }
     }
 
     fun getHeldBallOverlay(): ImageBitmap {
-        return loadImageFromResources("icons/decorations/holdball.png", cache = true)
+        return loadImageFromCache(HELD_BALL_OVERLAY)
     }
 
     fun getBall(): ImageBitmap {
-        return loadImageFromResources("icons/game/sball_30x30.png")
+        return loadImageFromCache(BALL)
+    }
+
+    fun getPlayerDetailOverlay(): ImageBitmap {
+        return loadImageFromCache(PLAYER_DETAIL_OVERLAY)
+    }
+
+    fun getPlayerImage(player: PlayerId): ImageBitmap {
+        return loadImageFromCache("i/332804.png")
+    }
+
+    fun getSidebarBackground(): ImageBitmap {
+        return loadImageFromCache(SIDEBAR_BACKGROUND)
+    }
+
+    fun getField(field: FieldDetails): ImageBitmap {
+        return loadImageFromCache(field.resource)
     }
 }

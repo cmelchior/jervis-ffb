@@ -9,5 +9,5 @@ actual fun filePicker(
     extensionFilterFileType: String,
     onFileSelected: (Path) -> Unit,
 ) {
-    TODO() // How to do a file picker in Wasm web?
+    // Do nothing
 }

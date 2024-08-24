@@ -8,9 +8,15 @@ import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    ComposeViewport(document.body!!) {
-        val menuViewModel = MenuViewModel()
-        // WindowMenuBar(menuViewModel)
-        App(menuViewModel)
+    try {
+        ComposeViewport(document.body!!) {
+            val menuViewModel = MenuViewModel()
+            // WindowMenuBar(menuViewModel)
+            App(menuViewModel)
+        }
+    } catch(ex: Throwable) {
+        // Work-around for exceptions not being very nice in WebAssembly.
+        ex.printStackTrace()
+        throw ex
     }
 }

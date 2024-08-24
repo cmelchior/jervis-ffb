@@ -64,9 +64,7 @@ import dk.ilios.jervis.procedures.actions.block.BlockRoll
 import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.actions.move.MoveAction
 import dk.ilios.jervis.ui.GameScreenModel
-import dk.ilios.jervis.utils.runBlocking
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -77,17 +75,14 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         scope.launch(errorHandler) {
             var initialActionsIndex = 0
             emitToField(WaitingForUserInput)
-            val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+            val actionProvider: suspend (GameController, List<ActionDescriptor>) -> GameAction = { controller: GameController, availableActions: List<ActionDescriptor> ->
                 if (initialActionsIndex < actions.size) {
                     val action = actions[initialActionsIndex]
                     initialActionsIndex++
                     action
                 } else {
-                    val action =
-                        runBlocking(Dispatchers.Default) {
-                            model.actionRequestChannel.send(Pair(controller, availableActions))
-                            model.actionSelectedChannel.receive()
-                        }
+                    model.actionRequestChannel.send(Pair(controller, availableActions))
+                    val action = model.actionSelectedChannel.receive()
                     action
                 }
             }

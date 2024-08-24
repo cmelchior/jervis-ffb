@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
@@ -37,12 +38,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.model.UiPlayer
 import dk.ilios.jervis.ui.model.UiPlayerCard
 import dk.ilios.jervis.ui.viewmodel.SidebarView
 import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
 import kotlinx.coroutines.flow.Flow
-import org.jetbrains.compose.resources.painterResource
 import org.pushingpixels.artemis.drawTextOnPath
 
 @Composable
@@ -53,7 +54,7 @@ fun Sidebar(
     Box(modifier = modifier.aspectRatio(vm.aspectRatio).fillMaxSize()) {
         Image(
             alignment = Alignment.TopStart,
-            painter = painterResource("icons/sidebar/background_box.png"),
+            painter = BitmapPainter(IconFactory.getSidebarBackground()),
             contentDescription = "Box",
             modifier = modifier.fillMaxSize(),
         )
@@ -104,7 +105,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
     playerData?.let { player ->
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
             Image(
-                painter = painterResource("icons/sidebar/overlay_player_detail_blue2.png"),
+                painter = BitmapPainter(IconFactory.getPlayerDetailOverlay()),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize(),
@@ -146,7 +147,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                         ) {
                             Image(
                                 modifier = Modifier.aspectRatio(95f / 147f).fillMaxSize(),
-                                painter = painterResource("i/332804.png"),
+                                painter = BitmapPainter(IconFactory.getPlayerImage(player.model.id)),
                                 contentDescription = "",
                                 contentScale = ContentScale.Fit,
                             )

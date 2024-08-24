@@ -18,6 +18,7 @@ kotlin {
             dependencies {
                 implementation(libs.coroutines)
                 implementation(libs.okio)
+                implementation(libs.okio.fake)
             }
         }
     }

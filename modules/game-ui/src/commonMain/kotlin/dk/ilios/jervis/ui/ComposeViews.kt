@@ -33,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dk.ilios.jervis.actions.Cancel
@@ -121,41 +120,6 @@ fun SectionHeader(title: String) {
         )
         SectionDivider(modifier = Modifier.weight(1f))
     }
-}
-
-fun loadImageBitmapFromResources(path: String): ImageBitmap {
-    TODO()
-//    // Use the current classloader to get the resource as a stream
-//    val inputStream: InputStream =
-//        Thread.currentThread().contextClassLoader.getResourceAsStream(path)
-//            ?: throw IllegalArgumentException("Resource not found: $path")
-//
-//    // Decode the image data
-//    val skiaImage = Image.makeFromEncoded(inputStream.readBytes())
-//    return skiaImage.toComposeImageBitmap()
-}
-
-@Composable
-fun SpriteFromSheet() {
-    TODO()
-//    val spriteSheet: ImageBitmap = loadImageBitmapFromResources("icons/cached/players/iconsets/human_lineman.png")
-//    val skiaImage: BufferedImage = spriteSheet.toAwtImage()
-//    val x = (skiaImage.width / 28)
-//    val y = (skiaImage.height / 28)
-//    val imageNo = Random.nextInt(x * y)
-//    val spriteY: Int = (imageNo / x) * 28
-//    val spriteX: Int = (imageNo % x) * 28
-//    println("$x, $y, $imageNo, $spriteX, $spriteY")
-//    val spriteWidth: Int = 28
-//    val spriteHeight: Int = 28
-//    val playerImage = skiaImage.getSubimage(spriteX, spriteY, 28, 28).toComposeImageBitmap()
-//    Image(
-//        bitmap = playerImage,
-//        contentDescription = null,
-//        alignment = Alignment.Center,
-//        contentScale = ContentScale.Fit,
-//        modifier = Modifier.fillMaxSize(),
-//    )
 }
 
 @Composable

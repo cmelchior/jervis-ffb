@@ -126,7 +126,7 @@ object JervisSerialization {
         }
     }
 
-    fun loadFromFile(file: Path): Pair<GameController, List<GameAction>> {
+    suspend fun loadFromFile(file: Path): Pair<GameController, List<GameAction>> {
         val fileContent =
             platformFileSystem.source(file).use { fileSource ->
                 fileSource.buffer().readUtf8()

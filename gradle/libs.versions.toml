@@ -14,6 +14,7 @@ okio = "3.7.0"
 coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 jsonserialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
+okio-fake = { group = "com.squareup.okio", name = "okio-fakefilesystem", version.ref = "okio" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetimex" }
 
 voyager-navigator = { group = "cafe.adriel.voyager", name = "voyager-navigator", version.ref = "voyager" }

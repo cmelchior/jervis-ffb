@@ -48,9 +48,9 @@ class GameController(
     private var replayIndex: Int = -1
     private val isStopped = false
 
-    private fun processNode(
+    private suspend fun processNode(
         currentNode: Node,
-        actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction,
+        actionProvider: suspend (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction,
     ) {
         when (currentNode) {
             is ComputationNode -> {
@@ -176,8 +176,8 @@ class GameController(
         setInitialProcedure(FullGame)
     }
 
-    fun startCallbackMode(actionProvider: (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction) {
-        val backupActionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+    suspend fun startCallbackMode(actionProvider: suspend (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction) {
+        val backupActionProvider: suspend (GameController, List<ActionDescriptor>) -> GameAction = { controller: GameController, availableActions: List<ActionDescriptor> ->
             actionProvider(controller, availableActions).also { selectedAction ->
                 actionHistory.add(selectedAction)
             }
