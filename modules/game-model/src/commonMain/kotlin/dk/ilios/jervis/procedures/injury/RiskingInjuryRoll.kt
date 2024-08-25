@@ -101,8 +101,11 @@ object RiskingInjuryRoll: Procedure() {
             return if (context.armourBroken) {
                 GotoNode(RollForInjury)
             } else {
-                // If armour is not broken, nothing further can happen
-                ExitProcedure()
+                // If armour is not broken, player is just placed prone.
+                compositeCommandOf(
+                    SetPlayerState(context.player, PlayerState.PRONE),
+                    ExitProcedure()
+                )
             }
         }
     }

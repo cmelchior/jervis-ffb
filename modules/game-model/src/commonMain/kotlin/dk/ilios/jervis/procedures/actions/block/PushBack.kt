@@ -37,6 +37,7 @@ fun createPushContext(state: Game): PushContext {
 
 /**
  * Resolve a pushback when select on a block die.
+ * See page 57 in the rulebook.
  */
 object PushBack: Procedure() {
     override val initialNode: Node = ResolvePush

@@ -15,6 +15,9 @@ enum class PlayerState {
     SERIOUS_INJURY,
     DEAD,
 
+    // Intermediate states
+    KNOCKED_DOWN,
+
     // Field states
     STANDING,
     PRONE,

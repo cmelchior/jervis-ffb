@@ -42,7 +42,7 @@ object Pow: Procedure() {
             return if (context.defender.location.isOnField(rules)) {
                 val injuryContext = RiskingInjuryRollContext(context.defender)
                 compositeCommandOf(
-                    SetPlayerState(context.defender, PlayerState.PRONE),
+                    SetPlayerState(context.defender, PlayerState.KNOCKED_DOWN),
                     SetContext(Game::riskingInjuryRollsContext, injuryContext),
                     GotoNode(ResolvePlayerDown)
                 )
