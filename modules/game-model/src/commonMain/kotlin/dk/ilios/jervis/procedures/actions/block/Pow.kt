@@ -21,15 +21,14 @@ object Pow: Procedure() {
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val newContext = createPushContext(state)
-        return compositeCommandOf(
-            SetContext(Game::pushContext, newContext),
-            ReportPowResult(newContext.pusher, newContext.pushee)
-        )
+        return SetContext(Game::pushContext, newContext)
     }
 
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        val context = state.pushContext!!
         return compositeCommandOf(
             SetContext(Game::pushContext, null),
+            ReportPowResult(context.pusher, context.pushee)
         )
     }
 

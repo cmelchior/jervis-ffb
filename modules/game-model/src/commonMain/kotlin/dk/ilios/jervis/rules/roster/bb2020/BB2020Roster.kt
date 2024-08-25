@@ -47,7 +47,7 @@ data class BB2020Position(
             baseAgility = position.agility
             basePassing = this@BB2020Position.passing
             baseArmorValue = position.armorValue
-            // TODO Skills etc
+            positionSkills = position.skills.map { it.createSkill() }
         }
     }
 

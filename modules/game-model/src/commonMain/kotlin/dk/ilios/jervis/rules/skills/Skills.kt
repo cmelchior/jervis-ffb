@@ -162,6 +162,10 @@ sealed interface Skill {
     var used: Int
     val resetAt: ResetPolicy
     val category: SkillCategory
+
+    fun isAvailable(): Boolean {
+        return used < limit
+    }
 }
 
 // TODO Find a better way to serialize these,

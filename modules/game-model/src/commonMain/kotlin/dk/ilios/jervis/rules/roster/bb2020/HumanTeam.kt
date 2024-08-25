@@ -5,6 +5,7 @@ import dk.ilios.jervis.rules.bb2020.General
 import dk.ilios.jervis.rules.bb2020.Passing
 import dk.ilios.jervis.rules.bb2020.Strength
 import dk.ilios.jervis.rules.roster.RosterId
+import dk.ilios.jervis.rules.skills.Block
 import dk.ilios.jervis.rules.skills.CatchSkill
 import dk.ilios.jervis.rules.skills.SureHands
 import kotlinx.serialization.Serializable
@@ -56,7 +57,7 @@ data object HumanTeam : BB2020Roster {
             "Blitzer",
             85_000,
             7, 3, 3, 4, 9,
-            emptyList(),
+            listOf(Block.Factory),
             listOf(General, Strength),
             listOf(Agility, Passing),
         )

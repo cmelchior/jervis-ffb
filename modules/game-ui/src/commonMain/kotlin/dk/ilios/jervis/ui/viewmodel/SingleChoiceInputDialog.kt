@@ -26,6 +26,7 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.PickupRollResultContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.rules.tables.Direction
 
 sealed interface UserInputDialog : UserInput
@@ -204,6 +205,14 @@ data class SingleChoiceInputDialog(
             return createWithDescription(
                 title = "Use Apothecary",
                 message = "Do you want to use an apothecary to heal ${context.player.name} from a ${context.injuryResult}?",
+                actions = listOf(Confirm to "Confirm", Cancel to "Cancel"),
+            )
+        }
+
+        fun createUseSkillDialog(player: Player, skill: Skill): UserInput? {
+            return createWithDescription(
+                title = "Use ${skill.name}",
+                message = "Does ${player.name} want to use ${skill.name}?",
                 actions = listOf(Confirm to "Confirm", Cancel to "Cancel"),
             )
         }

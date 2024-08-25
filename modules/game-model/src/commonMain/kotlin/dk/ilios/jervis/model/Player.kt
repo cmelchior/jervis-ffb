@@ -102,7 +102,7 @@ class Player(
     var basePassing: Int? = 0
     var baseArmorValue: Int = 0
     val extraSkills = mutableListOf<Skill>()
-    val positionSkills: List<Skill>
+    var positionSkills: List<Skill>
     val skills: List<Skill>
     val move: Int get() = baseMove
     val strength: Int get() = baseStrenght
@@ -133,5 +133,13 @@ class Player(
 
     override fun toString(): String {
         return "Player(id='${id.value}', name='$name', number=$number, position=$position)"
+    }
+
+    inline fun <reified T: Skill> getSkill(): T {
+        return skills.filterIsInstance<T>().first()
+    }
+
+    inline fun <reified T: Skill> getSkillOrNull(): T? {
+        return skills.filterIsInstance<T>().firstOrNull()
     }
 }

@@ -9,6 +9,7 @@ import dk.ilios.jervis.procedures.RerollContext
 import dk.ilios.jervis.procedures.RerollResultContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.procedures.actions.block.BlockRollResultContext
+import dk.ilios.jervis.procedures.actions.block.BothDownContext
 import dk.ilios.jervis.procedures.actions.block.PushContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.rules.PlayerAction
@@ -84,6 +85,7 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var pickupRollResultContext: PickupRollResultContext? = null
     var riskingInjuryRollsContext: RiskingInjuryRollContext? = null
     var pushContext: PushContext? = null
+    var bothDownContext: BothDownContext? = null
 
     var useRerollContext: RerollContext? = null
     var useRerollResult: RerollResultContext? = null
