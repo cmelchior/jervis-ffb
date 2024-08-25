@@ -25,10 +25,14 @@ import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
 import dk.ilios.jervis.procedures.bb2020.kickoff.TimeOut
 import dk.ilios.jervis.rules.pathfinder.BB2020PathFinder
 import dk.ilios.jervis.rules.pathfinder.PathFinder
+import dk.ilios.jervis.rules.tables.CasualtyTable
 import dk.ilios.jervis.rules.tables.CornerThrowInPosition
 import dk.ilios.jervis.rules.tables.Direction
+import dk.ilios.jervis.rules.tables.InjuryTable
+import dk.ilios.jervis.rules.tables.LastingInjuryTable
 import dk.ilios.jervis.rules.tables.PrayersToNuffleTable
 import dk.ilios.jervis.rules.tables.RandomDirectionTemplate
+import dk.ilios.jervis.rules.tables.StuntyInjuryTable
 import dk.ilios.jervis.rules.tables.TableResult
 import dk.ilios.jervis.rules.tables.WeatherTable
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -335,6 +339,18 @@ interface Rules {
 
     val weatherTable
         get() = WeatherTable
+
+    val injuryTable
+        get() = InjuryTable
+
+    val stuntyInjuryTable
+        get() = StuntyInjuryTable
+
+    val casualtyTable
+        get() = CasualtyTable
+
+    val lastingInjuryTable
+        get() = LastingInjuryTable
 
     val teamActions: TeamActions
         get() = BB2020TeamActions()

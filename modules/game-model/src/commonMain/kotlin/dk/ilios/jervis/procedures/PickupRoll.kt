@@ -15,7 +15,7 @@ import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetRollContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -79,7 +79,7 @@ object PickupRoll : Procedure() {
                         success = isPickupSuccess(it, target, rollContext),
                     )
                 return compositeCommandOf(
-                    SetRollContext(Game::pickupRollResultContext, resultContext),
+                    SetContext(Game::pickupRollResultContext, resultContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -138,7 +138,7 @@ object PickupRoll : Procedure() {
                 is RerollOptionSelected -> {
                     val rerollContext = RerollContext(DiceRollType.CatchRoll, action.option.source)
                     compositeCommandOf(
-                        SetRollContext(Game::useRerollContext, rerollContext),
+                        SetContext(Game::useRerollContext, rerollContext),
                         GotoNode(UseRerollSource),
                     )
                 }
@@ -194,7 +194,7 @@ object PickupRoll : Procedure() {
                         success = isPickupSuccess(it, target, rollContext),
                     )
                 compositeCommandOf(
-                    SetRollContext(Game::pickupRollResultContext, rerollContext),
+                    SetContext(Game::pickupRollResultContext, rerollContext),
                     ExitProcedure(),
                 )
             }

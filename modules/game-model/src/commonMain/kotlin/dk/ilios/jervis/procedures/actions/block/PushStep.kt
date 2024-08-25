@@ -15,8 +15,8 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetActiveTeam
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerLocation
-import dk.ilios.jervis.commands.SetRollContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -173,7 +173,7 @@ object PushStep: Procedure() {
                 val context = state.pushContext!!
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usingJuggernaut = useSkill))
                 return compositeCommandOf(
-                    SetRollContext<PushContext>(Game::pushContext, newContext),
+                    SetContext<PushContext>(Game::pushContext, newContext),
                     SetActiveTeam(context.pushee.team),
                     GotoNode(DecideToUseStandFirm)
                 )
@@ -205,7 +205,7 @@ object PushStep: Procedure() {
                 val context = state.pushContext!!
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedStandFirm = useSkill))
                 return compositeCommandOf(
-                    SetRollContext<PushContext>(Game::pushContext, newContext),
+                    SetContext<PushContext>(Game::pushContext, newContext),
                     SetActiveTeam(context.pusher.team),
                     GotoNode(DecideToUseGrab)
                 )
@@ -238,7 +238,7 @@ object PushStep: Procedure() {
                 val context = state.pushContext!!
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedGrab = useSkill))
                 return compositeCommandOf(
-                    SetRollContext<PushContext>(Game::pushContext, newContext),
+                    SetContext<PushContext>(Game::pushContext, newContext),
                     SetActiveTeam(context.pushee.team),
                     GotoNode(DecideToUseSidestep)
                 )
@@ -271,7 +271,7 @@ object PushStep: Procedure() {
                 val context = state.pushContext!!
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedSideStep = useSkill))
                 return compositeCommandOf(
-                    SetRollContext<PushContext>(Game::pushContext, newContext),
+                    SetContext<PushContext>(Game::pushContext, newContext),
                     GotoNode(DecideToUseFend)
                 )
             } else {
@@ -302,7 +302,7 @@ object PushStep: Procedure() {
                 val context = state.pushContext!!
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedFend = useSkill))
                 return compositeCommandOf(
-                    SetRollContext<PushContext>(Game::pushContext, newContext),
+                    SetContext<PushContext>(Game::pushContext, newContext),
                     SetActiveTeam(context.pusher.team),
                     GotoNode(SelectPushDirection)
                 )
@@ -353,7 +353,7 @@ object PushStep: Procedure() {
                     // Player was moved into an empty square, which means we can start resolving
                     // the entire chain.
                     compositeCommandOf(
-                        SetRollContext<PushContext>(Game::pushContext, updatedContext),
+                        SetContext<PushContext>(Game::pushContext, updatedContext),
                         GotoNode(ResolvePush)
                     )
                 } else {
@@ -367,7 +367,7 @@ object PushStep: Procedure() {
                     )
                     val newContext = updatedContext.copyAddPushChain(newPush)
                     compositeCommandOf(
-                        SetRollContext<PushContext>(Game::pushContext, newContext),
+                        SetContext<PushContext>(Game::pushContext, newContext),
                         GotoNode(DecideToUseJuggernaut)
                     )
                 }

@@ -1,38 +1,51 @@
 package dk.ilios.jervis.procedures.actions.block
 
+import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.actions.block.PushStep.SelectPushDirection
+import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
+import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
+import dk.ilios.jervis.reports.ReportPowResult
 import dk.ilios.jervis.rules.Rules
 
 object Pow: Procedure() {
-    override val initialNode: Node = SelectPushDirection
+    override val initialNode: Node = ResolvePush
 
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        TODO("Not yet implemented")
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+        val newContext = createPushContext(state)
+        return compositeCommandOf(
+            SetContext(Game::pushContext, newContext),
+            ReportPowResult(newContext.pusher, newContext.pushee)
+        )
     }
 
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        TODO("Report result of ")
+        return compositeCommandOf(
+            SetContext(Game::pushContext, null),
+        )
     }
 
     // Push the player, including chain pushes
     object ResolvePush: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            // Set PushContext
-            return PushStep
-        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStep
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.blockRollResultContext!!
             return if (context.defender.location.isOnField(rules)) {
-                GotoNode(ResolvePlayerDown)
+                val injuryContext = RiskingInjuryRollContext(context.defender)
+                compositeCommandOf(
+                    SetPlayerState(context.defender, PlayerState.PRONE),
+                    SetContext(Game::riskingInjuryRollsContext, injuryContext),
+                    GotoNode(ResolvePlayerDown)
+                )
             } else {
                 ExitProcedure()
             }

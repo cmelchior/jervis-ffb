@@ -24,6 +24,7 @@ import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.PickupRollResultContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Direction
 
@@ -195,7 +196,15 @@ data class SingleChoiceInputDialog(
             return createWithDescription(
                 title = "Follow-up",
                 message = "Does ${player.name} want to follow up?",
-                actions = listOf(Confirm to "Confirm", Continue to "Cancel"),
+                actions = listOf(Confirm to "Confirm", Cancel to "Cancel"),
+            )
+        }
+
+        fun createUseApothecaryDialog(context: RiskingInjuryRollContext): SingleChoiceInputDialog {
+            return createWithDescription(
+                title = "Use Apothecary",
+                message = "Do you want to use an apothecary to heal ${context.player.name} from a ${context.injuryResult}?",
+                actions = listOf(Confirm to "Confirm", Cancel to "Cancel"),
             )
         }
 

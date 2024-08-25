@@ -6,7 +6,7 @@ import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetRollContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -64,8 +64,8 @@ object BlockStep : Procedure() {
         rules: Rules,
     ): Command? {
         return compositeCommandOf(
-            SetRollContext(Game::blockRollContext, null),
-            SetRollContext(Game::blockRollResultContext, null),
+            SetContext(Game::blockRollContext, null),
+            SetContext(Game::blockRollResultContext, null),
         )
     }
 
@@ -114,7 +114,7 @@ object BlockStep : Procedure() {
                     .count { player -> rules.canOfferAssistAgainst(player, context.attacker) }
 
             return compositeCommandOf(
-                SetRollContext(
+                SetContext(
                     Game::blockRollContext,
                     context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists),
                 ),

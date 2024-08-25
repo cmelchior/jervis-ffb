@@ -5,7 +5,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallState
-import dk.ilios.jervis.commands.SetRollContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -78,7 +78,7 @@ object Pickup : Procedure() {
         rules.addMarkedModifiers(state, pickupPlayer.team, state.ballSquare, modifiers)
         val rollContext = PickupRollContext(pickupPlayer, diceRollTarget, modifiers)
         return compositeCommandOf(
-            SetRollContext(Game::pickupRollContext, rollContext),
+            SetContext(Game::pickupRollContext, rollContext),
         )
     }
 
@@ -87,8 +87,8 @@ object Pickup : Procedure() {
         rules: Rules,
     ): Command? {
         return compositeCommandOf(
-            SetRollContext(Game::pickupRollContext, null),
-            SetRollContext(Game::pickupRollResultContext, null)
+            SetContext(Game::pickupRollContext, null),
+            SetContext(Game::pickupRollResultContext, null)
         )
     }
 

@@ -16,7 +16,7 @@ import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetRollContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -92,7 +92,7 @@ object BlockRoll : Procedure() {
                         BlockDieRoll(originalRoll = diceRoll)
                     }
                 return compositeCommandOf(
-                    SetRollContext(Game::blockRollContext, state.blockRollContext!!.copy(roll = roll)),
+                    SetContext(Game::blockRollContext, state.blockRollContext!!.copy(roll = roll)),
                     GotoNode(ChooseResultOrReRollSource),
                 )
             }
@@ -150,7 +150,7 @@ object BlockRoll : Procedure() {
                 is RerollOptionSelected -> {
                     val rerollContext = RerollContext(DiceRollType.BlockRoll, action.option.source)
                     compositeCommandOf(
-                        SetRollContext(Game::useRerollContext, rerollContext),
+                        SetContext(Game::useRerollContext, rerollContext),
                         GotoNode(UseRerollSource),
                     )
                 }
@@ -198,19 +198,13 @@ object BlockRoll : Procedure() {
                         BlockDieRoll(originalRoll = blockRoll)
                     }
                 return compositeCommandOf(
-                    SetRollContext(Game::blockRollContext, state.blockRollContext!!.copy(roll = roll)),
+                    SetContext(Game::blockRollContext, state.blockRollContext!!.copy(roll = roll)),
                     GotoNode(ChooseResultOrReRollSource),
                 )
             }
         }
     }
 
-    //     object SelectBlockResult
-    // resolvePlayerDown
-    // resolveBothDown
-    // resolvePushBack
-    // resolveStumble
-    // ResolvePOW
     object SelectBlockResult : ActionNode() {
         override fun getAvailableActions(
             state: Game,
@@ -247,7 +241,7 @@ object BlockRoll : Procedure() {
             )
 
             return compositeCommandOf(
-                SetRollContext<BlockRollResultContext>(Game::blockRollResultContext, result),
+                SetContext(Game::blockRollResultContext, result),
                 ExitProcedure()
             )
         }

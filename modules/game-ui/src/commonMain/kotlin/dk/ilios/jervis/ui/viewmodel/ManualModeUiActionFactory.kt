@@ -63,6 +63,11 @@ import dk.ilios.jervis.procedures.TheKickOffEvent
 import dk.ilios.jervis.procedures.actions.block.BlockRoll
 import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.actions.move.MoveAction
+import dk.ilios.jervis.procedures.injury.ArmourRoll
+import dk.ilios.jervis.procedures.injury.CasualtyRoll
+import dk.ilios.jervis.procedures.injury.InjuryRoll
+import dk.ilios.jervis.procedures.injury.LastingInjuryRoll
+import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -207,9 +212,9 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
 
                 is RollForTheWeather.RollWeatherDice -> {
                     val diceRolls = mutableListOf<DiceResults>()
-                    D8Result.allOptions().forEach { d8 ->
+                    D8Result.allOptions().forEach { d6 ->
                         D6Result.allOptions().forEach { d6 ->
-                            diceRolls.add(DiceResults(d8, d6))
+                            diceRolls.add(DiceResults(d6, d6))
                         }
                     }
                     DiceRollUserInputDialog.createWeatherRollDialog(controller.rules)
@@ -306,6 +311,27 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                     DiceRollUserInputDialog.createSelectBlockDie(
                         actions.first() as SelectDiceResult
                     )
+                }
+
+                is ArmourRoll.RollDice -> {
+                    DiceRollUserInputDialog.createArmourRollDialog()
+                }
+
+                is InjuryRoll.RollDice -> {
+                    DiceRollUserInputDialog.createInjuryRollDialog(controller.rules)
+                }
+
+                is CasualtyRoll.RollDie -> {
+                    DiceRollUserInputDialog.createCasualtyRollDialog(controller.rules)
+                }
+
+                is LastingInjuryRoll.RollDice -> {
+                    DiceRollUserInputDialog.createLastingInjuryRollDialog(controller.rules)
+                }
+
+                is RiskingInjuryRoll.ChooseToUseApothecary -> {
+                    val context = controller.state.riskingInjuryRollsContext!!
+                    SingleChoiceInputDialog.createUseApothecaryDialog(context)
                 }
 
                 else -> {

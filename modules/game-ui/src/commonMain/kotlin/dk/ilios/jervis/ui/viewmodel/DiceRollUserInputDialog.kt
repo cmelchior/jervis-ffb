@@ -1,5 +1,6 @@
 package dk.ilios.jervis.ui.viewmodel
 
+import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DBlockResult
@@ -112,5 +113,64 @@ data class DiceRollUserInputDialog(
                 result = { rolls: DiceResults -> null },
             )
         }
+
+        fun createArmourRollDialog(): UserInput {
+            return DiceRollUserInputDialog(
+                title = "Armour roll",
+                message = "Roll 2D6 to break armour",
+                dice =
+                    listOf(
+                        Pair(Dice.D6, D6Result.allOptions()),
+                        Pair(Dice.D6, D6Result.allOptions()),
+                    ),
+                result = { rolls: DiceResults ->
+                    rolls.sum().toString()
+                },
+            )
+        }
+
+        fun createInjuryRollDialog(rules: Rules): UserInput {
+            return DiceRollUserInputDialog(
+                title = "Injury roll",
+                message = "Roll 2D6 for an injury",
+                dice =
+                    listOf(
+                        Pair(Dice.D6, D6Result.allOptions()),
+                        Pair(Dice.D6, D6Result.allOptions()),
+                    ),
+                result = { rolls: DiceResults ->
+                    val result = rules.injuryTable.roll(rolls.first() as D6Result, rolls.last() as D6Result)
+                    "(${rolls.sum()}) ${result.title}"
+                },
+            )
+        }
+
+        fun createCasualtyRollDialog(rules: Rules): UserInput {
+            return DiceRollUserInputDialog(
+                title = "Casualty roll",
+                message = "Roll D16 for a casualty",
+                dice =
+                    listOf(
+                        Pair(Dice.D16, D16Result.allOptions()),
+                    ),
+                result = { rolls: DiceResults ->
+                    val result = rules.casualtyTable.roll(rolls.first() as D16Result)
+                    "(${rolls.sum()}) ${result.title}"
+                },
+            )
+        }
+
+        fun createLastingInjuryRollDialog(rules: Rules): UserInput {
+            return DiceRollUserInputDialog(
+                title = "Lasting Injury roll",
+                message = "Roll D6 for a Lasting Injury",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { rolls: DiceResults ->
+                    val result = rules.lastingInjuryTable.roll(rolls.first() as D6Result)
+                    "(${rolls.sum()}) ${result.title}"
+                },
+            )
+        }
+
     }
 }

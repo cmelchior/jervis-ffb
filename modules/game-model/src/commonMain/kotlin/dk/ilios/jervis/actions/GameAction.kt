@@ -1,10 +1,5 @@
 package dk.ilios.jervis.actions
 
-import dk.ilios.jervis.actions.BlockDice.BOTH_DOWN
-import dk.ilios.jervis.actions.BlockDice.PLAYER_DOWN
-import dk.ilios.jervis.actions.BlockDice.POW
-import dk.ilios.jervis.actions.BlockDice.PUSH_BACK
-import dk.ilios.jervis.actions.BlockDice.STUMBLE
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
@@ -311,6 +306,9 @@ data class DBlockResult(override val result: Int) : DieResult() {
 @Serializable
 data class DiceResults(val rolls: List<DieResult>) : GameAction, List<DieResult> by rolls {
     constructor(vararg roll: DieResult) : this(listOf(*roll))
+    fun sum(): Int {
+        return rolls.sumOf { it.result }
+    }
 }
 
 @Serializable

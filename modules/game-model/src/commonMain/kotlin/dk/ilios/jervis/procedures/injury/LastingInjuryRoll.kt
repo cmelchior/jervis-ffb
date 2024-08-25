@@ -11,23 +11,17 @@ import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DiceModifier
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.assert
 
 /**
- * Implement the injury roll as described on page 60 in the rulebook.
+ * Implement the lasting injury roll as described on page 61 in the rulebook.
  *
  * The result is stored in [Game.injuryRollResultContext] and it is up
  * to the caller to determine what to do with the result.
- *
- * TODO Note, Mighty Blow specifically say "When an opposition player is knocked
- *  down" (page 80) and "Pushed into the Crows" (page 58) says "A player that
- *  is pushed into the crowd is immediately removed from play". So this would
- *  mean that any effect that requires a "Knocked Down" player doesn't apply.
  */
-object InjuryRoll: Procedure() {
+object LastingInjuryRoll: Procedure() {
     override val initialNode: Node = RollDice
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
@@ -48,19 +42,14 @@ object InjuryRoll: Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            return checkDiceRoll<D6Result, D6Result>(action) { die1, die2 ->
+            return checkDiceRoll<D6Result>(action) { d6 ->
                 val context = state.riskingInjuryRollsContext!!
 
-                // Determine result of injury roll
-                // TODO This logic needs to be expanded to support things like Mighty Blow and others.
-                val roll = listOf(die1, die2)
-                val modifiers = emptyList<DiceModifier>()
-                val result = rules.injuryTable.roll(die1, die2, modifiers.sumOf { it.modifier })
-
+                val result = rules.lastingInjuryTable.roll(d6)
                 val updatedContext = context.copy(
-                    injuryRoll = roll,
-                    injuryResult = result,
-                    injuryModifiers = modifiers,
+                    lastingInjuryRoll = d6,
+                    lastingInjuryResult = result,
+                    lastingInjuryModifiers = emptyList(),
                 )
 
                 compositeCommandOf(

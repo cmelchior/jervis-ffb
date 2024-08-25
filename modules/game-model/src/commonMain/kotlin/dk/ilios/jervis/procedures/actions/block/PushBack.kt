@@ -3,14 +3,37 @@ package dk.ilios.jervis.procedures.actions.block
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetRollContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.reports.ReportFollowup
+import dk.ilios.jervis.reports.ReportPushResult
 import dk.ilios.jervis.rules.Rules
+
+
+// Helper method for creating a push context before moving a player back
+// This is used by all results that push back.
+fun createPushContext(state: Game): PushContext {
+    val blockContext = state.blockRollResultContext!!
+    // Setup the context needed to resolve the full push include
+    val newContext = PushContext(
+        blockContext.attacker,
+        blockContext.defender,
+        listOf(
+            PushContext.PushData(
+                pusher = blockContext.attacker,
+                pushee = blockContext.defender,
+                from = blockContext.defender.location as FieldCoordinate,
+                isBlitzing = blockContext.isBlitzing,
+                isChainPush = false,
+                usingJuggernaut = false
+            )
+        )
+    )
+    return newContext
+}
 
 /**
  * Resolve a pushback when select on a block die.
@@ -19,30 +42,15 @@ object PushBack: Procedure() {
     override val initialNode: Node = ResolvePush
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        val blockContext = state.blockRollResultContext!!
-        // Setup the context needed to resolve the full push include
-        val newContext = PushContext(
-            blockContext.attacker,
-            blockContext.defender,
-            listOf(
-                PushContext.PushData(
-                    pusher = blockContext.attacker,
-                    pushee = blockContext.defender,
-                    from = blockContext.defender.location as FieldCoordinate,
-                    isBlitzing = blockContext.isBlitzing,
-                    isChainPush = false,
-                    usingJuggernaut = false
-                )
-            )
-        )
-        return SetRollContext(Game::pushContext, newContext)
+        val newContext = createPushContext(state)
+        return SetContext(Game::pushContext, newContext)
     }
 
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val context = state.pushContext!!
         return compositeCommandOf(
-            SetRollContext(Game::pushContext, null),
-            ReportFollowup(context.pusher, context.pushChain.first().from)
+            SetContext(Game::pushContext, null),
+            ReportPushResult(context.pusher, context.pushChain.first().from)
         )
     }
 

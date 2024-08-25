@@ -3,7 +3,7 @@ package dk.ilios.jervis.procedures
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetRollContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetSkillRerollUsed
 import dk.ilios.jervis.commands.SetTeamRerollUsed
 import dk.ilios.jervis.fsm.ComputationNode
@@ -89,7 +89,7 @@ object UseTeamReroll : Procedure() {
             val context = state.useRerollContext!!
             val result = RerollResultContext(context.roll, context.source, true)
             return compositeCommandOf(
-                SetRollContext(Game::useRerollResult, result),
+                SetContext(Game::useRerollResult, result),
                 SetTeamRerollUsed(context.source),
                 ExitProcedure(),
             )
@@ -121,7 +121,7 @@ object UseStandardSkillReroll : Procedure() {
             val context = state.useRerollContext!!
             val result = RerollResultContext(context.roll, context.source, rerollAllowed = true)
             return compositeCommandOf(
-                SetRollContext(Game::useRerollResult, result),
+                SetContext(Game::useRerollResult, result),
                 SetSkillRerollUsed(context.source),
                 ExitProcedure(),
             )
