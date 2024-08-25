@@ -63,6 +63,7 @@ import dk.ilios.jervis.procedures.TheKickOffEvent
 import dk.ilios.jervis.procedures.actions.block.BlockRoll
 import dk.ilios.jervis.procedures.actions.block.BothDown
 import dk.ilios.jervis.procedures.actions.block.PushStep
+import dk.ilios.jervis.procedures.actions.block.Stumble
 import dk.ilios.jervis.procedures.actions.move.MoveAction
 import dk.ilios.jervis.procedures.injury.ArmourRoll
 import dk.ilios.jervis.procedures.injury.CasualtyRoll
@@ -70,6 +71,8 @@ import dk.ilios.jervis.procedures.injury.InjuryRoll
 import dk.ilios.jervis.procedures.injury.LastingInjuryRoll
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
 import dk.ilios.jervis.rules.skills.Block
+import dk.ilios.jervis.rules.skills.Dodge
+import dk.ilios.jervis.rules.skills.Tackle
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -348,6 +351,16 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 is BothDown.DefenderChooseToUseBlock -> {
                     val context = controller.state.bothDownContext!!
                     SingleChoiceInputDialog.createUseSkillDialog(context.defender, context.defender.getSkill<Block>())
+                }
+
+                is Stumble.ChooseToUseDodge -> {
+                    val defender = controller.state.stumbleContext!!.defender
+                    SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Dodge>())
+                }
+
+                is Stumble.ChooseToUseTackle -> {
+                    val defender = controller.state.stumbleContext!!.attacker
+                    SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Tackle>())
                 }
 
                 else -> {

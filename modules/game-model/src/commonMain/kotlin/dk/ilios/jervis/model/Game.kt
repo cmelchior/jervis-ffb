@@ -11,6 +11,7 @@ import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.procedures.actions.block.BlockRollResultContext
 import dk.ilios.jervis.procedures.actions.block.BothDownContext
 import dk.ilios.jervis.procedures.actions.block.PushContext
+import dk.ilios.jervis.procedures.actions.block.StumbleContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.utils.safeTryEmit
@@ -86,6 +87,7 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var riskingInjuryRollsContext: RiskingInjuryRollContext? = null
     var pushContext: PushContext? = null
     var bothDownContext: BothDownContext? = null
+    var stumbleContext: StumbleContext? = null
 
     var useRerollContext: RerollContext? = null
     var useRerollResult: RerollResultContext? = null
