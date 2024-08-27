@@ -7,11 +7,13 @@ import dk.ilios.jervis.procedures.PickupRollContext
 import dk.ilios.jervis.procedures.PickupRollResultContext
 import dk.ilios.jervis.procedures.RerollContext
 import dk.ilios.jervis.procedures.RerollResultContext
+import dk.ilios.jervis.procedures.actions.blitz.BlitzContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
-import dk.ilios.jervis.procedures.actions.block.BlockRollResultContext
+import dk.ilios.jervis.procedures.actions.block.BlockResultContext
 import dk.ilios.jervis.procedures.actions.block.BothDownContext
 import dk.ilios.jervis.procedures.actions.block.PushContext
 import dk.ilios.jervis.procedures.actions.block.StumbleContext
+import dk.ilios.jervis.procedures.actions.move.MoveContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.utils.safeTryEmit
@@ -78,8 +80,9 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     // Injury Roll
     //
 
-    var blockRollContext: BlockContext? = null
-    var blockRollResultContext: BlockRollResultContext? = null
+    var moveContext: MoveContext? = null
+    var blockContext: BlockContext? = null
+    var blockRollResultContext: BlockResultContext? = null
     var catchRollContext: CatchRollContext? = null
     var catchRollResultContext: CatchRollResultContext? = null
     var pickupRollContext: PickupRollContext? = null
@@ -88,6 +91,7 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var pushContext: PushContext? = null
     var bothDownContext: BothDownContext? = null
     var stumbleContext: StumbleContext? = null
+    var blitzContext: BlitzContext? = null
 
     var useRerollContext: RerollContext? = null
     var useRerollResult: RerollResultContext? = null

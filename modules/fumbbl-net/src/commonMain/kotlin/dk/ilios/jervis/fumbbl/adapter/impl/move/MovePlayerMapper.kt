@@ -36,7 +36,7 @@ object MovePlayerMapper: CommandActionMapper {
         val moves: List<FieldModelSetPlayerCoordinate> = command.modelChangeList.filterIsInstance<FieldModelSetPlayerCoordinate>()
         moves.forEach {
             val coord = FieldCoordinate(it.value!!.x, it.value.y)
-            newActions.add(FieldSquareSelected(coord), MoveAction.SelectSquareOrEndAction)
+            newActions.add(FieldSquareSelected(coord), MoveAction.SelectMoveType)
         }
     }
 }

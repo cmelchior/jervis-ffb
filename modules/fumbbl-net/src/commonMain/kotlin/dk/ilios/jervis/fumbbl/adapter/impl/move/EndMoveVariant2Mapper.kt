@@ -49,7 +49,7 @@ object EndMoveVariant2Mapper: CommandActionMapper {
 //                                if (jervisCommands.last().expectedNode == TeamTurn.DeselectPlayerOrSelectAction) {
 //                                    jer
 //                                } else {
-                    newActions.add(EndAction, MoveAction.SelectSquareOrEndAction)
+                    newActions.add(EndAction, MoveAction.SelectMoveType)
 //                                }
                 }
 

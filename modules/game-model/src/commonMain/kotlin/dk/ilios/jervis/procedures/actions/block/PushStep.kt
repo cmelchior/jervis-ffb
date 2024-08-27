@@ -325,9 +325,9 @@ object PushStep: Procedure() {
             // but it might not be in case of a circular chain.
             val emptyFields = isSquaresEmptyForPushing(pushContext, pushOptions, state)
             return if (emptyFields.isNotEmpty()) {
-                emptyFields.map { SelectFieldLocation(it) }
+                emptyFields.map { SelectFieldLocation.push(it) }
             } else {
-                pushOptions.map { SelectFieldLocation(it) }
+                pushOptions.map { SelectFieldLocation.push(it) }
             }
         }
 
@@ -336,7 +336,7 @@ object PushStep: Procedure() {
             // and redo the entire chain.
             return checkType<FieldSquareSelected>(action) { action ->
                 val availableActions = getAvailableActions(state, rules)
-                if (!availableActions.contains(SelectFieldLocation(action.coordinate))) {
+                if (!availableActions.contains(SelectFieldLocation.push(action.coordinate))) {
                     INVALID_ACTION(action, "Target $action is not valid: $availableActions")
                 }
 
@@ -387,7 +387,7 @@ object PushStep: Procedure() {
             }.isEmpty()
             return pushOptions.filter {
                 it == FieldCoordinate.OUT_OF_BOUNDS ||
-                    state.field[it].isEmpty() ||
+                    state.field[it].isUnoccupied() ||
                     it == firstPushedFromLocation && isFirstPushLocationAvailable
             }
         }

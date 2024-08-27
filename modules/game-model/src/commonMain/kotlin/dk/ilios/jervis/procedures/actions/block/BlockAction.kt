@@ -50,7 +50,7 @@ object BlockAction : Procedure() {
             val attacker = state.activePlayer!!
             val eligibleDefenders: List<ActionDescriptor> =
                 attacker.location.coordinate.getSurroundingCoordinates(rules)
-                    .filter { state.field[it].isNotEmpty() }
+                    .filter { state.field[it].isOccupied() }
                     .filter { state.field[it].player!!.team != attacker.team }
                     .map { SelectPlayer(state.field[it].player!!) }
 
@@ -72,7 +72,7 @@ object BlockAction : Procedure() {
                             isBlitzing = false
                         )
                     compositeCommandOf(
-                        SetContext(Game::blockRollContext, context),
+                        SetContext(Game::blockContext, context),
                         GotoNode(ResolveBlock),
                     )
                 }

@@ -44,7 +44,7 @@ object AbortActionMapper: CommandActionMapper {
         // Abort a previous started action if possible (only move right now?).
         // Jervis doesn't support undoing actions right now, so just remove the first action from the action list.
         if (jervisCommands.last().expectedNode == TeamTurn.DeselectPlayerOrSelectAction) {
-            newActions.add(Undo, MoveAction.SelectSquareOrEndAction) // Select Move Action
+            newActions.add(Undo, MoveAction.SelectMoveType) // Select Move Action
             newActions.add(Undo, TeamTurn.DeselectPlayerOrSelectAction) // Select Player
         }
 

@@ -37,7 +37,7 @@ object ThrowIn : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            val square = state.field.filter { it.isEmpty() }.random()
+            val square = state.field.filter { it.isUnoccupied() }.random()
             return compositeCommandOf(
                 SetBallLocation(square.coordinates),
                 SetBallState.onGround(),

@@ -8,4 +8,4 @@ interpreted.
 
 2. When resolving Both Dow during a Block. Who is resolved first: Attacker or Defender?
 
-3. When selecting skill usage. Who goes first? E.g. choosing Dodge/Tackle for Stumble
+3. When selecting skill usage. Who goes first? E.g. choosing Dodge/Tackle f or Stumble

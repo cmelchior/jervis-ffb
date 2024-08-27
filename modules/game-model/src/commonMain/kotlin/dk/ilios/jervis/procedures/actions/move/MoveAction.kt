@@ -2,78 +2,64 @@ package dk.ilios.jervis.procedures.actions.move
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndActionWhenReady
-import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
-import dk.ilios.jervis.actions.SelectFieldLocation
+import dk.ilios.jervis.actions.MoveType
+import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetMoveStepTarget
-import dk.ilios.jervis.commands.SetPlayerMoveLeft
+import dk.ilios.jervis.commands.SetAvailableActions
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.reports.ReportActionEnded
+import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
+
+data class MoveContext(
+    val player: Player,
+    val moveType: MoveType,
+    val targetCoordinate: FieldCoordinate? = null
+)
 
 /**
  * Procedure controlling a Move action as described on page XX in the rulebook.
  */
 object MoveAction : Procedure() {
-    override val initialNode: Node = SelectSquareOrEndAction
+    override val initialNode: Node = SelectMoveType
 
     override fun onEnterProcedure(
         state: Game,
         rules: Rules,
-    ): Command? {
-        return SetPlayerMoveLeft(state.activePlayer!!, state.activePlayer!!.move)
-    }
+    ): Command? = null
 
     override fun onExitProcedure(
         state: Game,
         rules: Rules,
     ): Command {
-        return ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
+        val activeTeam = state.activeTeam
+        return compositeCommandOf(
+            SetAvailableActions(activeTeam, PlayerActionType.MOVE, activeTeam.turnData.moveActions - 1 ),
+            ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
+        )
     }
 
-    object SelectSquareOrEndAction : ActionNode() {
+    object SelectMoveType : ActionNode() {
         override fun getAvailableActions(
             state: Game,
             rules: Rules,
         ): List<ActionDescriptor> {
-            val end: List<ActionDescriptor> = listOf(EndActionWhenReady)
-
-            val activePlayer = state.activePlayer!!
-            val eligibleEmptySquares: List<ActionDescriptor> =
-                if (activePlayer.moveLeft > 0) {
-                    activePlayer.location.coordinate.getSurroundingCoordinates(rules)
-                        .filter { state.field[it].isEmpty() }
-                        .map { SelectFieldLocation(it) }
-                } else {
-                    emptyList()
-                }
-
-            // Figure out how to find square more than 1 away. This could be skill dependant.
-            // Are there more skills that allow you to move, like teleport.
-            val eligibleJumpSquares: List<ActionDescriptor> = emptyList()
-//            val eligibleJumpSquares: List<ActionDescriptor> = if (activePlayer.moveLeft > 0) {
-//                val activePlayerLocation = activePlayer.location.coordinate
-//                activePlayerLocation.getSurroundingCoordinates(rules)
-//                    .filter { !state.field[it].isEmpty() }
-//                    .flatMap {
-//                        it.getCoordinatesAwayFromLocation(rules, activePlayerLocation)
-//                    }
-//                    .toSet()
-//                    .map { SelectFieldLocation(it) }
-//            } else emptyList()
-
-            return end + eligibleEmptySquares + eligibleJumpSquares
+            val moveOptions = calculateMoveTypesAvailable(state.activePlayer!!, rules)
+            return moveOptions + listOf(EndActionWhenReady)
         }
 
         override fun applyAction(
@@ -82,47 +68,27 @@ object MoveAction : Procedure() {
             rules: Rules,
         ): Command {
             return when (action) {
-                EndAction -> ExitProcedure()
-                // TODO How to tell the difference between Move and Leap here?
-                is FieldSquareSelected -> {
-                    if (!getAvailableActions(
-                            state,
-                            rules,
-                        ).contains(SelectFieldLocation(action.coordinate))
-                    ) {
-                        val availableActions = getAvailableActions(state, rules)
-                        INVALID_ACTION(action)
-                    }
+                is EndAction -> ExitProcedure()
+                is MoveTypeSelected -> {
                     compositeCommandOf(
-                        SetMoveStepTarget(
-                            state.activePlayer!!.location.coordinate,
-                            FieldCoordinate(action.x, action.y),
+                        SetContext(
+                            Game::moveContext,
+                            MoveContext(state.activePlayer!!, action.moveType),
                         ),
-                        GotoNode(MoveToSquare),
+                        GotoNode(ResolveMoveType)
                     )
                 }
+                is Cancel -> ExitProcedure() // End action
                 else -> INVALID_ACTION(action)
             }
         }
     }
 
-    object JumpToSquare : ParentNode() {
+    object ResolveMoveType : ParentNode() {
         override fun getChildProcedure(
             state: Game,
             rules: Rules,
-        ): Procedure = JumpStep
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command = GotoNode(SelectSquareOrEndAction)
-    }
-
-    object MoveToSquare : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = MoveStep
+        ): Procedure = MoveTypeSelectorStep
 
         override fun onExitNode(
             state: Game,
@@ -131,7 +97,7 @@ object MoveAction : Procedure() {
             return if (state.isTurnOver) {
                 ExitProcedure()
             } else {
-                GotoNode(SelectSquareOrEndAction)
+                GotoNode(SelectMoveType)
             }
         }
     }

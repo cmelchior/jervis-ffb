@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
+import dk.ilios.jervis.actions.CompositeGameAction
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.DiceResults
@@ -48,10 +49,12 @@ import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.PlayerSubActionSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.Undo
@@ -305,7 +308,10 @@ fun ActionSelector(
                                     is RandomPlayersSelected -> "Random players: $action"
                                     NoRerollSelected -> "No reroll"
                                     is RerollOptionSelected -> action.option.toString()
+                                    is MoveTypeSelected -> action.moveType.toString()
                                     Undo -> TODO()
+                                    is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
+                                    is PlayerSubActionSelected -> action.action.toString()
                                 }
                             Text(text, fontSize = 10.sp)
                         }

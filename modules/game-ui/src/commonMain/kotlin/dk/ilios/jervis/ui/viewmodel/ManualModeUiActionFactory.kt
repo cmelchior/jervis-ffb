@@ -5,6 +5,7 @@ import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CancelWhenReady
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
+import dk.ilios.jervis.actions.CompositeGameAction
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.Continue
@@ -31,10 +32,13 @@ import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.EndTurnWhenReady
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.MoveType
+import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.PlayerSubActionSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
@@ -43,6 +47,7 @@ import dk.ilios.jervis.actions.SelectCoinSide
 import dk.ilios.jervis.actions.SelectDiceResult
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
+import dk.ilios.jervis.actions.SelectMoveType
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.actions.SelectRandomPlayers
@@ -64,7 +69,7 @@ import dk.ilios.jervis.procedures.actions.block.BlockRoll
 import dk.ilios.jervis.procedures.actions.block.BothDown
 import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.actions.block.Stumble
-import dk.ilios.jervis.procedures.actions.move.MoveAction
+import dk.ilios.jervis.procedures.actions.move.calculateOptionsForMoveType
 import dk.ilios.jervis.procedures.injury.ArmourRoll
 import dk.ilios.jervis.procedures.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.injury.InjuryRoll
@@ -77,6 +82,7 @@ import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+import kotlin.reflect.KClass
 
 class ManualModeUiActionFactory(model: GameScreenModel, private val actions: List<GameAction>) : UiActionFactory(
     model,
@@ -157,26 +163,99 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         actions: List<ActionDescriptor>,
     ) {
         val userInputs: List<UserInput> =
-            actions.groupBy { it::class }.map { action ->
+            actions.groupBy { it::class }.map { action: Map.Entry<KClass<out ActionDescriptor>, List<ActionDescriptor>> ->
                 when {
                     action.key == SelectPlayer::class -> {
                         SelectPlayerInput(action.value.map { PlayerSelected((it as SelectPlayer).player) })
                     }
-                    action.key == SelectFieldLocation::class && controller.currentProcedure()?.currentNode() == MoveAction.SelectSquareOrEndAction -> {
-                        val pathFinder = controller.rules.pathFinder
-                        val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
-                        SelectMoveActionFieldLocationInput(
-                            action.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) },
-                            pathFinder.calculateAllPaths(
-                                controller.state,
-                                startLocation,
-                                controller.state.activePlayer!!.moveLeft,
-                            ),
-                        )
+                    action.key == SelectMoveType::class -> {
+                        val values = action.value as List<SelectMoveType>
+                        val player = controller.state.activePlayer!!
+
+                        // For move selectings, some types of moves we want to display on the field
+                        // others should be a specific action that must be selected.
+                        // On-field moves are actually shortcutting the Rules engine, so we need
+                        val inputs: UserInput = CompositeUserInput(values.map { actionDescriptor ->
+                            when (actionDescriptor.type) {
+                                MoveType.JUMP -> {
+                                    SelectPlayerSubActionInput(
+                                        activePlayerLocation = player.location.coordinate,
+                                        actions = listOf(PlayerSubActionSelected("Jump", MoveTypeSelected(MoveType.JUMP)))
+                                    )
+                                }
+                                MoveType.LEAP -> {
+                                    SelectPlayerSubActionInput(
+                                        activePlayerLocation = player.location.coordinate,
+                                        actions = listOf(PlayerSubActionSelected("Leap", MoveTypeSelected(MoveType.LEAP)))
+                                    )
+                                }
+                                MoveType.RUSH -> {
+                                    // Rush moves should be converted to jus choosing the square on the field
+                                    val pathFinder = controller.rules.pathFinder
+                                    val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
+                                    val allPaths = pathFinder.calculateAllPaths(
+                                        controller.state,
+                                        startLocation,
+                                        player.rushesLeft,
+                                    )
+                                    SelectMoveActionFieldLocationInput(
+                                        wrapperAction = calculateOptionsForMoveType(controller.state, controller.rules, player, MoveType.RUSH).map {
+                                            FieldSquareAction(
+                                                coordinate = (it as SelectFieldLocation).coordinate,
+                                                action = CompositeGameAction(
+                                                    list = listOf(
+                                                        MoveTypeSelected(MoveType.RUSH),
+                                                        FieldSquareSelected(it.coordinate)
+                                                    )
+                                                )
+                                            )
+                                        },
+                                        distances = allPaths
+                                    )                                }
+                                MoveType.STANDARD -> {
+                                    // Normal moves are converted to just choosing the square on the field
+                                    val pathFinder = controller.rules.pathFinder
+                                    val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
+                                    val allPaths = pathFinder.calculateAllPaths(
+                                        controller.state,
+                                        startLocation,
+                                        player.movesLeft,
+                                    )
+                                    SelectMoveActionFieldLocationInput(
+                                        wrapperAction = calculateOptionsForMoveType(controller.state, controller.rules, player, MoveType.STANDARD).map {
+                                            FieldSquareAction(
+                                                coordinate = (it as SelectFieldLocation).coordinate,
+                                                action = CompositeGameAction(
+                                                    list = listOf(
+                                                        MoveTypeSelected(MoveType.STANDARD),
+                                                        FieldSquareSelected(it.coordinate)
+                                                    )
+                                                )
+                                            )
+                                        },
+                                        distances = allPaths
+                                    )
+                                }
+                                MoveType.STAND_UP -> {
+                                    SelectPlayerSubActionInput(
+                                        activePlayerLocation = player.location.coordinate,
+                                        actions = listOf(PlayerSubActionSelected("Stand Up", MoveTypeSelected(MoveType.STAND_UP)))
+                                    )
+                                }
+                                else -> TODO()
+                            }
+                        })
+                        inputs
                     }
                     action.key == SelectFieldLocation::class -> {
                         SelectFieldLocationInput(
-                            action.value.map { FieldSquareSelected((it as SelectFieldLocation).x, it.y) },
+                            action.value.map {
+                                val coords = (it as SelectFieldLocation).coordinate
+                                FieldSquareAction(
+                                    coordinate = coords,
+                                    action = FieldSquareSelected(coords)
+                                )
+                            }
                         )
                     }
                     action.key == DeselectPlayer::class -> {
@@ -297,7 +376,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 is BlockRoll.ReRollDie,
                 is BlockRoll.RollDice -> {
                     val diceCount = (actions.first() as RollDice).dice.size
-                    DiceRollUserInputDialog.createBlockRollDialog(diceCount, controller.state.blockRollContext!!.isBlitzing)
+                    DiceRollUserInputDialog.createBlockRollDialog(diceCount, controller.state.blockContext!!.isBlitzing)
                 }
 
                 is PushStep.DecideToFollowUp -> {
@@ -381,24 +460,35 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         val dialogInputs = mutableListOf<UserInput>()
         val unknownInputs = mutableListOf<UserInput>()
 
-        uiEvents.forEach {
-            when (it) {
-                is CompositeUserInput -> error("Should not occur here")
-                is DeselectPlayerInput -> fieldInputs.add(it)
-                is EndActionInput -> fieldInputs.add(it)
-                is SelectFieldLocationInput -> fieldInputs.add(it)
-                is SelectPlayerActionInput -> fieldInputs.add(it)
-                is SelectPlayerInput -> fieldInputs.add(it)
-                is UnknownInput -> unknownInputs.add(it)
-                is DiceRollUserInputDialog -> dialogInputs.add(it)
-                is SingleChoiceInputDialog -> dialogInputs.add(it)
-                is SelectMoveActionFieldLocationInput -> fieldInputs.add(it)
-                is IgnoreUserInput -> fieldInputs.add(it)
-                is ResumeUserInput -> fieldInputs.add(it)
-                is WaitingForUserInput -> {
-                    fieldInputs.add(it)
-                    unknownInputs.add(it)
+        // TODO Rethink how events are grouped and propagated all over. This is getting too complex :/
+        fun sendEvent(event: UserInput) {
+            when (event) {
+                is CompositeUserInput -> {
+                    error("Should not occur here: $event")
                 }
+                is DeselectPlayerInput -> fieldInputs.add(event)
+                is EndActionInput -> fieldInputs.add(event)
+                is SelectFieldLocationInput -> fieldInputs.add(event)
+                is SelectPlayerActionInput -> fieldInputs.add(event)
+                is SelectPlayerSubActionInput -> fieldInputs.add(event)
+                is SelectPlayerInput -> fieldInputs.add(event)
+                is UnknownInput -> unknownInputs.add(event)
+                is DiceRollUserInputDialog -> dialogInputs.add(event)
+                is SingleChoiceInputDialog -> dialogInputs.add(event)
+                is SelectMoveActionFieldLocationInput -> fieldInputs.add(event)
+                is IgnoreUserInput -> fieldInputs.add(event)
+                is ResumeUserInput -> fieldInputs.add(event)
+                is WaitingForUserInput -> {
+                    fieldInputs.add(event)
+                    unknownInputs.add(event)
+                }
+            }
+        }
+
+        uiEvents.forEach { event: UserInput ->
+            when(event){
+                is CompositeUserInput -> event.inputs.forEach { sendEvent(it) }
+                else -> sendEvent(event)
             }
         }
 
@@ -487,6 +577,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 SelectNoReroll -> NoRerollSelected
                 is SelectRerollOption -> RerollOptionSelected(action.option)
                 is SelectDiceResult -> action.choices.random()
+                is SelectMoveType -> MoveTypeSelected(action.type)
             }
         }
     }

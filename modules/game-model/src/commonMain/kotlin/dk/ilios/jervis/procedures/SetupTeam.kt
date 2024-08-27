@@ -95,13 +95,13 @@ object SetupTeam : Procedure() {
                             it.x >= rules.fieldWidth.toInt() / 2
                         }
                     }
-                    .filter { it.isEmpty() }
-                    .map { SelectFieldLocation(it.x, it.y) }
+                    .filter { it.isUnoccupied() }
+                    .map { SelectFieldLocation.setup(it.coordinate) }
 
             val playerLocation = state.activePlayer!!.location
             var playerSquare: List<SelectFieldLocation> = emptyList()
             if (playerLocation is FieldCoordinate) {
-                playerSquare = listOf(SelectFieldLocation(playerLocation.x, playerLocation.y))
+                playerSquare = listOf(SelectFieldLocation.setup(playerLocation))
             }
             return freeFields + SelectDogout + playerSquare
         }

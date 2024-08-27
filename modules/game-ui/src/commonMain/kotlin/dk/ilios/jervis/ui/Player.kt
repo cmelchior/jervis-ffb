@@ -34,7 +34,9 @@ fun Player(
 
     var playerModifier = modifier.aspectRatio(1f) // .background(color = backgroundColor)
     if (player.isSelectable && !parentHandleClick) {
-        playerModifier = playerModifier.clickable { player.selectAction!!() }
+        playerModifier = playerModifier.clickable {
+            player.selectAction!!()
+        }
     }
     if (player.onHover != null) {
         playerModifier =

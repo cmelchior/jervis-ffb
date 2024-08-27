@@ -160,7 +160,7 @@ object GameDrive : Procedure() {
             // TODO Other stuff?
             val movePlayers: List<SetPlayerLocation> =
                 state.field
-                    .filter { !it.isEmpty() }
+                    .filter { !it.isUnoccupied() }
                     .map {
                         SetPlayerLocation(it.player!!, DogOut)
                     }

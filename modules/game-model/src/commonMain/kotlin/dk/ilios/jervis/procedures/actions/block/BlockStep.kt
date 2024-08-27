@@ -31,7 +31,7 @@ data class BlockContext(
     val roll: List<BlockDieRoll> = emptyList(),
 )
 
-data class BlockRollResultContext(
+data class BlockResultContext(
     val attacker: Player,
     val defender: Player,
     val isBlitzing: Boolean = false,
@@ -53,7 +53,7 @@ object BlockStep : Procedure() {
         state: Game,
         rules: Rules,
     ): Command? {
-        if (state.blockRollContext == null) {
+        if (state.blockContext == null) {
             INVALID_GAME_STATE("No block context was found")
         }
         return null
@@ -64,7 +64,7 @@ object BlockStep : Procedure() {
         rules: Rules,
     ): Command? {
         return compositeCommandOf(
-            SetContext(Game::blockRollContext, null),
+            SetContext(Game::blockContext, null),
             SetContext(Game::blockRollResultContext, null),
         )
     }
@@ -102,7 +102,7 @@ object BlockStep : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            val context = state.blockRollContext!!
+            val context = state.blockContext!!
             val offensiveAssists =
                 context.defender.location.coordinate.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
@@ -115,7 +115,7 @@ object BlockStep : Procedure() {
 
             return compositeCommandOf(
                 SetContext(
-                    Game::blockRollContext,
+                    Game::blockContext,
                     context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists),
                 ),
                 GotoNode(RollBlockDice),

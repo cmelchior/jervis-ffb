@@ -14,9 +14,11 @@ class FieldSquare(val coordinates: FieldCoordinate) : Observable<FieldSquare>(),
     var player: Player? = null // observable(null)
     var ball: Ball? = null // by observable(null)
 
-    fun isEmpty(): Boolean = (player == null)
+    // Is field unoccupied as per the definition on page 44 in the rulebook.
+    fun isUnoccupied(): Boolean = (player == null)
 
-    fun isNotEmpty(): Boolean = !isEmpty()
+    // Is field occupied as per the definition on page 44 in the rulebook.
+    fun isOccupied(): Boolean = !isUnoccupied()
 
     fun isOnTeamHalf(
         team: Team,

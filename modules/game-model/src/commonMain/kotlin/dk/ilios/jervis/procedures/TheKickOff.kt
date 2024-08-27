@@ -120,7 +120,7 @@ object TheKickOff : Procedure() {
             // Place the ball anywhere on the opposing teams side
             return state.field
                 .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
-                .map { SelectFieldLocation(it.x, it.y) }
+                .map { SelectFieldLocation.kick(it.coordinates) }
         }
 
         override fun applyAction(
@@ -249,7 +249,7 @@ object TheFUMBBLKickOff : Procedure() {
             // Place the ball anywhere on the opposing teams side
             return state.field
                 .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
-                .map { SelectFieldLocation(it.x, it.y) }
+                .map { SelectFieldLocation.kick(it.coordinates) }
         }
 
         override fun applyAction(

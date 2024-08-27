@@ -37,6 +37,6 @@ object EndMoveVariant3Mapper: CommandActionMapper {
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {
-        newActions.add(EndAction, MoveAction.SelectSquareOrEndAction)
+        newActions.add(EndAction, MoveAction.SelectMoveType)
     }
 }

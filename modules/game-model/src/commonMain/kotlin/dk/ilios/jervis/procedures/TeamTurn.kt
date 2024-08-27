@@ -20,6 +20,7 @@ import dk.ilios.jervis.commands.SetActivePlayer
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetCanUseTeamRerolls
 import dk.ilios.jervis.commands.SetPlayerAvailability
+import dk.ilios.jervis.commands.SetPlayerStats
 import dk.ilios.jervis.commands.SetTurnNo
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
@@ -56,6 +57,7 @@ object TeamTurn : Procedure() {
             SetCanUseTeamRerolls(true),
             SetTurnNo(state.activeTeam, turn),
             getResetTurnActionCommands(state, rules),
+            *resetPlayerStats(state, rules),
             *getResetAvailablePlayers(state, rules),
             ReportStartingTurn(state.activeTeam, turn),
         )
@@ -265,6 +267,19 @@ object TeamTurn : Procedure() {
                 it.available == Availability.AVAILABLE
             } // Players that hasn't already been activated
             .filter { it.state == PlayerState.STANDING || it.state == PlayerState.PRONE } // Only Standing/Prone players
+    }
+
+    // Reset player stats back to start, this e.g. include moves/rushes used/temporary skills
+    private fun resetPlayerStats(state: Game, rules: Rules): Array<Command> {
+        return state.activeTeam
+            .filter { it.location.isOnField(rules) }
+            .map {
+                SetPlayerStats(
+                    it,
+                    it.baseMove,
+                    rules.rushesPrActivation // Check for Sprint
+                )
+            }.toTypedArray()
     }
 
     private fun getResetAvailablePlayers(

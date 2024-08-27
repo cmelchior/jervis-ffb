@@ -5,129 +5,14 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.skills.DiceRerollOption
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
-enum class Dice {
-    D2,
-    D3,
-    D4,
-    D6,
-    D8,
-    D12,
-    D16,
-    D20,
-    BLOCK,
-}
-
-/**
- * Representation of a Block die.
- * See page 57 in the rulebook.
- */
-enum class BlockDice {
-    PLAYER_DOWN,
-    BOTH_DOWN,
-    PUSH_BACK,
-    STUMBLE,
-    POW,
-    ;
-
-    companion object {
-        fun fromD6(roll: D6Result): BlockDice {
-            return when (roll.result) {
-                1 -> PLAYER_DOWN
-                2 -> BOTH_DOWN
-                3, 4 -> PUSH_BACK
-                5 -> STUMBLE
-                6 -> POW
-                else -> INVALID_GAME_STATE("Illegal roll: $roll")
-            }
-        }
-    }
-}
-
-// Action descriptors
-sealed interface ActionDescriptor
-
-data object ContinueWhenReady : ActionDescriptor // "internal event" for continuing the game state
-
-data object ConfirmWhenReady : ActionDescriptor // An generic action that requires explicit confirmation by a player
-
-data object CancelWhenReady : ActionDescriptor // An generic action that requires explicit confirmation by a player
-
-data object EndSetupWhenReady : ActionDescriptor // Mark the setup phase as ended for a team
-
-data object EndTurnWhenReady : ActionDescriptor // Mark the turn as ended for a team
-
-data object EndActionWhenReady : ActionDescriptor
-
-data object SelectCoinSide : ActionDescriptor
-
-data object TossCoin : ActionDescriptor
-
-// Roll a number of dice and return their result
-data class RollDice(val dice: List<Dice>) : ActionDescriptor {
-    constructor(vararg dice: Dice) : this(dice.toList())
-}
-
-data class SelectFieldLocation(val x: Int, val y: Int) : ActionDescriptor {
-    val coordinate: FieldCoordinate = FieldCoordinate(x, y)
-    constructor(coordinate: FieldCoordinate) : this(coordinate.x, coordinate.y)
-}
-
-// Give a number of dice results, the user needs to select 1 or more of them
-data class SelectDiceResult(val choices: List<DieResult>, val count: Int = 1): ActionDescriptor
-
-data object SelectDogout : ActionDescriptor
-
-data class SelectPlayer(val player: Player) : ActionDescriptor
-
-data class DeselectPlayer(val player: Player) : ActionDescriptor
-
-data class SelectAction(val action: PlayerAction) : ActionDescriptor
-
-data class SelectRandomPlayers(val count: Int, val players: List<Player>) : ActionDescriptor // This is not a single action
-
-// data class SelectSkillRerollSource(val skill: Skill): ActionDescriptor
-// data class SelectTeamRerollSource(val reroll: TeamReroll): ActionDescriptor
-data class SelectRerollOption(val option: DiceRerollOption) : ActionDescriptor
-
-data object SelectNoReroll : ActionDescriptor
-
-// Available actions
-@Serializable
-sealed class DieResult : Number(), GameAction {
-    abstract val result: Int
-    abstract val min: Short
-    abstract val max: Short
-
-    init {
-        if (result < min || result > max) {
-            throw IllegalArgumentException("Result outside range: $min <= $result <= $max")
-        }
-    }
-
-    override fun toByte(): Byte = result.toByte()
-
-    override fun toDouble(): Double = result.toDouble()
-
-    override fun toFloat(): Float = result.toFloat()
-
-    override fun toInt(): Int = result.toInt()
-
-    override fun toLong(): Long = result.toLong()
-
-    override fun toShort(): Short = result.toShort()
-
-    override fun toString(): String {
-        return "${this::class.simpleName}[$result]"
-    }
-
-    fun toLogString(): String = "[$result]"
-}
 
 sealed interface GameAction
+
+@Serializable
+data class CompositeGameAction(val list: List<GameAction>): GameAction
 
 @Serializable
 data object Undo : GameAction
@@ -320,6 +205,10 @@ data object PlayerDeselected : GameAction
 @Serializable
 data class PlayerActionSelected(val action: PlayerAction) : GameAction
 
+// TODO Merge with PlayerActionSelected
+@Serializable
+data class PlayerSubActionSelected(val name: String, val action: GameAction) : GameAction
+
 @Serializable
 data object DogoutSelected : GameAction
 
@@ -343,3 +232,6 @@ data class RerollOptionSelected(val option: DiceRerollOption) : GameAction
 
 @Serializable
 data object NoRerollSelected : GameAction
+
+@Serializable
+data class MoveTypeSelected(val moveType: MoveType) : GameAction

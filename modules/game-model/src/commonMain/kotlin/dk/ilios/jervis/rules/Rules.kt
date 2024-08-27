@@ -97,7 +97,7 @@ interface Rules {
         val losIndex: Int = if (isHomeTeam) lineOfScrimmageHome else lineOfScrimmageAway
         val playersOnLos =
             (0u + wideZone until fieldHeight - wideZone).filter { y: UInt ->
-                !field[losIndex, y.toInt()].isEmpty()
+                !field[losIndex, y.toInt()].isUnoccupied()
             }.size
 
         // If available, 3 players must be on the widezone LoS
@@ -115,7 +115,7 @@ interface Rules {
         if (isHomeTeam) {
             (0..lineOfScrimmageHome).forEach { x ->
                 (0 until wideZone.toInt()).forEach { y ->
-                    if (field[x, y].isNotEmpty()) {
+                    if (field[x, y].isOccupied()) {
                         // They must not be on the LoS
                         if (x == lineOfScrimmageHome) {
                             return false
@@ -127,7 +127,7 @@ interface Rules {
         } else {
             (fieldWidth - 1u downTo lineOfScrimmageAway.toUInt()).forEach { x ->
                 (0u until wideZone).forEach { y ->
-                    if (field[x.toInt(), y.toInt()].isNotEmpty()) {
+                    if (field[x.toInt(), y.toInt()].isOccupied()) {
                         // They must not be on the LoS
                         if (x == lineOfScrimmageAway.toUInt()) {
                             return false
@@ -284,6 +284,9 @@ interface Rules {
 
     val armorValueRange: IntProgression
         get() = 11 downTo 1
+
+    val rushesPrActivation: Int
+        get() = 2
 
     // Game length setup
 

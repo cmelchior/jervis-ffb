@@ -1,6 +1,8 @@
 package dk.ilios.jervis.ui.viewmodel
 
+import dk.ilios.jervis.actions.CompositeGameAction
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -57,15 +59,19 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
 
     // The user selected an action
     fun userSelectedAction(action: GameAction) {
-        scope.launch(errorHandler) {
-            // Reset UI so it doesn't allow more input
-            _unknownActions.emit(WaitingForUserInput)
-            _fieldActions.emit(WaitingForUserInput)
-            // By emitting `null`, recomposing will no longer show dialogs.
-            // Hide the dialog before sending the event to prevent race conditions
-            // with showing multiple dialogs (which can cause type case errors for the dice rolls)
-            dialogActions.emit(null)
-            userSelectedAction.send(action)
+        if (action is CompositeGameAction) {
+            userSelectedMultipleActions(action.list)
+        } else {
+            scope.launch(errorHandler) {
+                // Reset UI so it doesn't allow more input
+                _unknownActions.emit(WaitingForUserInput)
+                _fieldActions.emit(WaitingForUserInput)
+                // By emitting `null`, recomposing will no longer show dialogs.
+                // Hide the dialog before sending the event to prevent race conditions
+                // with showing multiple dialogs (which can cause type case errors for the dice rolls)
+                dialogActions.emit(null)
+                userSelectedAction.send(action)
+            }
         }
     }
 
@@ -92,7 +98,11 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
                     _fieldActions.emit(ResumeUserInput) // This doesn't work because these events don't reach all fields
                 }
                 userSelectedAction.send(el)
-                delay(200)
+                // Do not pause for flow-control events, only events that would appear "visible"
+                // to the player
+                if (el !is MoveTypeSelected) {
+                    delay(200)
+                }
             }
         }
     }

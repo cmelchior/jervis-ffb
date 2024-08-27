@@ -1,5 +1,6 @@
 package dk.ilios.jervis.model
 
+import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.skills.Skill
 import kotlinx.serialization.Serializable
@@ -96,7 +97,8 @@ class Player(
     var number: PlayerNo = PlayerNo(0)
 
     var baseMove: Int = 0
-    var moveLeft: Int = 0
+    var movesLeft: Int = 0
+    var rushesLeft: Int = 0
     var baseStrenght: Int = 0
     var baseAgility: Int = 0
     var basePassing: Int? = 0
@@ -141,5 +143,12 @@ class Player(
 
     inline fun <reified T: Skill> getSkillOrNull(): T? {
         return skills.filterIsInstance<T>().firstOrNull()
+    }
+
+    /**
+     * Returns `true` if the player is still standing on the field
+     */
+    fun isStanding(rules: Rules): Boolean {
+        return state == PlayerState.STANDING && location.isOnField(rules)
     }
 }

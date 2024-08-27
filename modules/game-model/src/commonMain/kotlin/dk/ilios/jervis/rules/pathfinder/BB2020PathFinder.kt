@@ -243,7 +243,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
                 Array(15) { 0 }
             }
         field.forEach { square ->
-            if (square.isNotEmpty()) {
+            if (square.isOccupied()) {
                 // Location contains a player. Mark this field and all adjacent fields as blocked
                 // if the player is an opponent.
                 fieldView[square.x][square.y] = Int.MAX_VALUE

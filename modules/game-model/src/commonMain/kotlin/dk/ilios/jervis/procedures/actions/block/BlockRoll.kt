@@ -42,7 +42,7 @@ object BlockRoll : Procedure() {
         state: Game,
         rules: Rules,
     ) {
-        if (state.blockRollContext == null) {
+        if (state.blockContext == null) {
             INVALID_GAME_STATE("No catch roll context found")
         }
     }
@@ -61,7 +61,7 @@ object BlockRoll : Procedure() {
 
     // Helper method to share logic between roll and reroll
     private fun calculateNoOfBlockDice(state: Game): Int {
-        val context = state.blockRollContext!!
+        val context = state.blockContext!!
         val attackStrength = context.attacker.strength + context.offensiveAssists
         val defenderStrength = context.defender.strength + context.defensiveAssists
         return when {
@@ -92,7 +92,7 @@ object BlockRoll : Procedure() {
                         BlockDieRoll(originalRoll = diceRoll)
                     }
                 return compositeCommandOf(
-                    SetContext(Game::blockRollContext, state.blockRollContext!!.copy(roll = roll)),
+                    SetContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
                     GotoNode(ChooseResultOrReRollSource),
                 )
             }
@@ -104,7 +104,7 @@ object BlockRoll : Procedure() {
             state: Game,
             rules: Rules,
         ): List<ActionDescriptor> {
-            val context = state.blockRollContext!!
+            val context = state.blockContext!!
             val attackingPlayer = context.attacker
 
             // Re-rolling block dice can be pretty complex,
@@ -198,7 +198,7 @@ object BlockRoll : Procedure() {
                         BlockDieRoll(originalRoll = blockRoll)
                     }
                 return compositeCommandOf(
-                    SetContext(Game::blockRollContext, state.blockRollContext!!.copy(roll = roll)),
+                    SetContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
                     GotoNode(ChooseResultOrReRollSource),
                 )
             }
@@ -211,7 +211,7 @@ object BlockRoll : Procedure() {
             rules: Rules,
         ): List<ActionDescriptor> {
             return listOf(
-                SelectDiceResult(state.blockRollContext!!.roll.map { it.result }, 1)
+                SelectDiceResult(state.blockContext!!.roll.map { it.result }, 1)
             )
         }
 
@@ -230,8 +230,8 @@ object BlockRoll : Procedure() {
                 else -> INVALID_ACTION(action)
             }
 
-            val roll = state.blockRollContext!!
-            val result = BlockRollResultContext(
+            val roll = state.blockContext!!
+            val result = BlockResultContext(
                 roll.attacker,
                 roll.defender,
                 roll.isBlitzing,

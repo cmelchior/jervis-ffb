@@ -1,7 +1,8 @@
 package dk.ilios.jervis.rules
 
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.procedures.DummyProcedure
+import dk.ilios.jervis.procedures.ErrorProcedure
+import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
 import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.move.MoveAction
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -127,11 +128,11 @@ class BB2020TeamActions : TeamActions() {
                 ),
                 PlayerActionType.PASS to TeamActionDescriptor(
                     availablePrTurn = 1,
-                    action = PlayerAction("Pass", PlayerActionType.PASS, DummyProcedure)
+                    action = PlayerAction("Pass", PlayerActionType.PASS, ErrorProcedure)
                 ),
                 PlayerActionType.HAND_OFF to TeamActionDescriptor(
                     availablePrTurn = 1,
-                    action = PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, DummyProcedure)
+                    action = PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, ErrorProcedure)
                 ),
                 PlayerActionType.BLOCK to TeamActionDescriptor(
                     availablePrTurn = Int.MAX_VALUE,
@@ -139,11 +140,11 @@ class BB2020TeamActions : TeamActions() {
                 ),
                 PlayerActionType.BLITZ to TeamActionDescriptor(
                     availablePrTurn = 1,
-                    action = PlayerAction("Blitz", PlayerActionType.BLITZ, DummyProcedure)
+                    action = PlayerAction("Blitz", PlayerActionType.BLITZ, BlitzAction)
                 ),
                 PlayerActionType.FOUL to TeamActionDescriptor(
                     availablePrTurn = 1,
-                    action = PlayerAction("Foul", PlayerActionType.FOUL, DummyProcedure)
+                    action = PlayerAction("Foul", PlayerActionType.FOUL, ErrorProcedure)
                 ),
             )
     }

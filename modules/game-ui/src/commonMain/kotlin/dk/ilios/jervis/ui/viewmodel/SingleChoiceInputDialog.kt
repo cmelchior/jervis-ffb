@@ -3,6 +3,7 @@ package dk.ilios.jervis.ui.viewmodel
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
+import dk.ilios.jervis.actions.CompositeGameAction
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.D8Result
@@ -14,10 +15,12 @@ import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.PlayerSubActionSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.Undo
@@ -64,6 +67,9 @@ data class SingleChoiceInputDialog(
                 NoRerollSelected -> "No reroll"
                 is RerollOptionSelected -> action.option.source.rerollDescription
                 Undo -> TODO()
+                is MoveTypeSelected -> action.moveType.toString()
+                is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
+                is PlayerSubActionSelected -> action.name
             }
         }
 

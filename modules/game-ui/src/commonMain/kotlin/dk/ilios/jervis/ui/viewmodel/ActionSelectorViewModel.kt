@@ -1,9 +1,9 @@
 package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.actions.EndAction
-import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerActionSelected
+import dk.ilios.jervis.actions.PlayerSubActionSelected
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.rules.pathfinder.PathFinder
 import kotlinx.coroutines.flow.Flow
@@ -35,23 +35,32 @@ data object ResumeUserInput : UserInput {
 
 class SelectPlayerActionInput(val activePlayerLocation: FieldCoordinate, override val actions: List<PlayerActionSelected>) : UserInput
 
+class SelectPlayerSubActionInput(val activePlayerLocation: FieldCoordinate, override val actions: List<PlayerSubActionSelected>) : UserInput {}
+
 class EndActionInput(val activePlayerLocation: FieldCoordinate, override val actions: List<EndAction>) : UserInput
 
 class SelectPlayerInput(override val actions: List<GameAction>) : UserInput
 
 class DeselectPlayerInput(override val actions: List<GameAction>) : UserInput
 
-class SelectFieldLocationInput(override val actions: List<FieldSquareSelected>) : UserInput {
+data class FieldSquareAction(val coordinate: FieldCoordinate, val action: GameAction)
+
+class SelectFieldLocationInput(val wrapperAction: List<FieldSquareAction>) : UserInput {
+    override val actions = wrapperAction.map { it.action }
     // Map action to each field
-    val fieldAction: Map<FieldCoordinate, FieldSquareSelected> = actions.associateBy { FieldCoordinate(it.x, it.y) }
+    val fieldAction: Map<FieldCoordinate, FieldSquareAction> = wrapperAction.associateBy { it.coordinate }
 }
 
+// Class wrapping all user input when selecting moves
+// If MoveType.STANDARD is one of the options, we will also calculate all reachable squares that can
+// be reached without rolling any dice.
 class SelectMoveActionFieldLocationInput(
-    override val actions: List<FieldSquareSelected>,
-    distances: PathFinder.AllPathsResult,
+    val wrapperAction: List<FieldSquareAction>,
+    distances: PathFinder.AllPathsResult?,
 ) : UserInput {
+    override val actions = wrapperAction.map { it.action }
     // Map action to each field
-    val fieldAction: Map<FieldCoordinate, FieldSquareSelected> = actions.associateBy { FieldCoordinate(it.x, it.y) }
+    val fieldAction: Map<FieldCoordinate, FieldSquareAction> = wrapperAction.associateBy { it.coordinate }
 }
 
 // class SelectKickingPlayer(val team: Team, override val actions: List<GameAction>) : UserInput

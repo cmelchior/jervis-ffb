@@ -34,6 +34,7 @@ import dk.ilios.jervis.ui.model.UiFieldSquare
 import dk.ilios.jervis.ui.viewmodel.FieldDetails
 import dk.ilios.jervis.ui.viewmodel.FieldViewModel
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Field(
     vm: FieldViewModel,
@@ -46,7 +47,10 @@ fun Field(
         modifier =
             modifier
                 .fillMaxSize()
-                .aspectRatio(vm.aspectRatio),
+                .aspectRatio(vm.aspectRatio)
+                .onPointerEvent(PointerEventType.Exit) {
+                    vm.exitHover()
+                }
     ) {
         Image(
             painter = BitmapPainter(IconFactory.getField(field)),
@@ -88,24 +92,32 @@ fun FieldSquares(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FieldOverlay(vm: FieldViewModel) {
     val flow = remember { vm.observeOverlays() }
     val pathInfo by flow.collectAsState(initial = null)
-    FieldSquares(vm) { modifier: Modifier, x, y ->
+    FieldSquares(vm) { modifier: Modifier, x, y: Int ->
         val number = pathInfo?.pathSteps?.get(FieldCoordinate(x, y))
         val isTarget = pathInfo?.target == FieldCoordinate(x, y)
         val selectPathAction: (() -> Unit)? = pathInfo?.action
-        val clickableModifier =
+        var updatedModifier = modifier
+        updatedModifier =
             if (isTarget) {
-                modifier.clickable {
-                    selectPathAction!!()
-                }
+                updatedModifier
+                    .onPointerEvent(PointerEventType.Enter) {
+                        // The overlay needs to report onHover events when enabled
+                        // because it is shadowing for the FieldData
+                        vm.hoverOver(FieldCoordinate(x, y))
+                    }
+                    .clickable {
+                        selectPathAction!!()
+                    }
             } else {
-                modifier
+                updatedModifier
             }
         Box(
-            modifier = clickableModifier,
+            modifier = updatedModifier,
             contentAlignment = Alignment.Center,
         ) {
             if (number != null && (pathInfo?.path?.size ?: 0) > 1) {
@@ -122,8 +134,14 @@ fun FieldData(
 ) {
     // Players/Ball
     FieldSquares(vm) { modifier, x, y ->
-        val squareData = fieldData[FieldCoordinate(x, y)]
-        FieldSquare(modifier, null, x, y, vm, squareData ?: UiFieldSquare(FieldSquare(-1, -1)))
+        val squareData: UiFieldSquare? = fieldData[FieldCoordinate(x, y)]
+        FieldSquare(
+            modifier,
+            x,
+            y,
+            vm,
+            squareData ?: UiFieldSquare(FieldSquare(-1, -1))
+        )
     }
 }
 
@@ -145,41 +163,38 @@ fun FieldUnderlay(vm: FieldViewModel) {
 @Composable
 private fun FieldSquare(
     boxModifier: Modifier,
-    highlightedSquare: FieldCoordinate?,
     width: Int,
     height: Int,
     vm: FieldViewModel,
     square: UiFieldSquare,
 ) {
-    val hover: Boolean = FieldCoordinate(width, height) == highlightedSquare
-//    val squareFlow = remember(width, height) { vm.observeSquare(width, height) }
-//    val square: UiFieldSquare by squareFlow.collectAsState(initial = UiFieldSquare(
-//        FieldSquare(-1, -1),
-//    ))
-    var showPopup by remember(square) { mutableStateOf(square.showContextMenu) }
+    var showPopup by remember { mutableStateOf(square.showContextMenu) }
 
-    val bgColor =
-        when {
-            hover -> Color.Cyan.copy(alpha = 0.25f)
-            square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
-            else -> Color.Transparent
-        }
+    val bgColor = when {
+        square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
+        else -> Color.Transparent
+    }
 
-    var boxWrapperModifier =
-        boxModifier
+    val boxWrapperModifier = remember(square) {
+        val modifier = boxModifier
             .fillMaxSize()
             .background(color = bgColor)
             .onPointerEvent(PointerEventType.Enter) {
                 vm.hoverOver(FieldCoordinate(width, height))
             }
 
-    boxWrapperModifier =
-        boxWrapperModifier.clickable {
-            showPopup = !showPopup
-            square.onSelected?.let {
-                it()
+        if (square.onSelected != null || square.contextMenuOptions.isNotEmpty()) {
+            modifier.clickable {
+                showPopup = !showPopup
+                square.onSelected?.let {
+                    it()
+                }
             }
+        } else {
+            modifier
         }
+    }
+
     Box(modifier = boxWrapperModifier) {
         if (showPopup) {
             ContextPopupMenu(
