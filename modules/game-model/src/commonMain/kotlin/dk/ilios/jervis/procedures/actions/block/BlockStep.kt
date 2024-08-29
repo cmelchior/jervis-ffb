@@ -13,6 +13,7 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.ProcedureContext
 import dk.ilios.jervis.procedures.BlockDieRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -29,7 +30,7 @@ data class BlockContext(
     val offensiveAssists: Int = 0,
     val defensiveAssists: Int = 0,
     val roll: List<BlockDieRoll> = emptyList(),
-)
+): ProcedureContext
 
 data class BlockResultContext(
     val attacker: Player,
@@ -38,13 +39,13 @@ data class BlockResultContext(
     val isUsingMultiBlock: Boolean = false,
     val roll: List<BlockDieRoll> = emptyList(),
     val result: DBlockResult,
-)
+): ProcedureContext
 
 /**
  * Procedure for handling a block once attacker and defender have been identified. This includes
  * rolling dice and resolving the result.
  *
- * This procedure is called as part of a [BlockAction] or `BlitzAction`.
+ * This procedure is called as part of a [BlockAction] or [BlitzAction].
  */
 object BlockStep : Procedure() {
     override val initialNode: Node = DetermineAssists

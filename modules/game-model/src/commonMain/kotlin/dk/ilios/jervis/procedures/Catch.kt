@@ -6,7 +6,6 @@ import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
-import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -14,6 +13,7 @@ import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.DiceModifier
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.ProcedureContext
 import dk.ilios.jervis.reports.ReportCatch
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -33,7 +33,7 @@ data class CatchRollContext(
     val catchingPlayer: Player,
     val diceRollTarget: Int,
     val modifiers: List<DiceModifier>,
-) {
+) : ProcedureContext {
     // The sum of modifiers
     fun diceModifier(): Int = modifiers.fold(0) { acc: Int, el: DiceModifier -> acc + el.modifier }
 }
@@ -44,7 +44,7 @@ data class CatchRollResultContext(
     val modifiers: List<DiceModifier>,
     val roll: D6DieRoll,
     val success: Boolean,
-) {
+) : ProcedureContext {
     val rerolled: Boolean = roll.rerollSource != null && roll.rerolledResult != null
 }
 
@@ -142,7 +142,6 @@ object Catch : Procedure() {
             rules: Rules,
         ): Command {
             return compositeCommandOf(
-                state.activePlayer?.let { SetTurnOver(true) },
                 ExitProcedure(), // TODO Not 100% sure what to do here?
             )
         }

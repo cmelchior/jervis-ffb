@@ -28,6 +28,7 @@ import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.ProcedureContext
 import dk.ilios.jervis.reports.ReportInjuryResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Skill
@@ -40,6 +41,7 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
 enum class RiskingInjuryMode {
     KNOCKED_DOWN,
     PUSHED_INTO_CROWD,
+    FOUL
 }
 
 // What do we need to track?
@@ -48,7 +50,7 @@ data class RiskingInjuryRollContext(
     val mode: RiskingInjuryMode = RiskingInjuryMode.KNOCKED_DOWN, // Do we need this?
     val armourRoll: List<D6Result> = listOf(),
     val armourResult: Int = -1,
-    val armourModifiers: List<Skill> = listOf(),
+    val armourModifiers: List<DiceModifier> = listOf(),
     val armourBroken: Boolean = false,
     val injuryRoll: List<D6Result> = emptyList(),
     val injuryModifiers: List<DiceModifier> = listOf(),
@@ -60,10 +62,13 @@ data class RiskingInjuryRollContext(
     val lastingInjuryModifiers: List<DiceModifier> = listOf(),
     val lastingInjuryResult: LastingInjuryResult? = null,
     val useApothecary: Boolean = false,
-)
+): ProcedureContext
 
 /**
  * Implement Armour and Injury Rolls as described on page 60-62 in the rulebook.
+ *
+ * [Game.riskingInjuryRollsContext] is not cleared when exiting this procedure.
+ * The caller must do this.
  */
 object RiskingInjuryRoll: Procedure() {
     override val initialNode: Node = DetermineStartingRoll
@@ -130,6 +135,7 @@ object RiskingInjuryRoll: Procedure() {
                     } else {
                         compositeCommandOf(
                             SetPlayerState(context.player, PlayerState.STUNNED),
+                            ExitProcedure(),
                         )
                     }
                 }

@@ -28,8 +28,13 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.controller.GameController
+import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
+import dk.ilios.jervis.procedures.actions.block.BlockAction
+import dk.ilios.jervis.procedures.actions.foul.FoulAction
+import dk.ilios.jervis.procedures.actions.move.MoveAction
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Position
@@ -55,6 +60,12 @@ import okio.use
 object JervisSerialization {
     private val jervisModule =
         SerializersModule {
+            polymorphic(Procedure::class) {
+                subclass(MoveAction::class)
+                subclass(BlitzAction::class)
+                subclass(BlockAction::class)
+                subclass(FoulAction::class)
+            }
             polymorphic(Rules::class) {
                 subclass(BB2020Rules::class)
             }

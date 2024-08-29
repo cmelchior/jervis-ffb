@@ -254,12 +254,19 @@ class FieldViewModel(
                         }
                     }
                     val uiPlayer = square.player?.let { UiPlayer(it, squareAction) }
+
+                    // TODO It looks like the ball state might not be updated automatically, which
+                    //  can result in the ball changing state, but not position at the same time.
+                    //  Probably need to combine SetBallState and SetBallLocation
+                    val isBallOnGround: Boolean = square.ball?.let {
+                        (it.state != BallState.CARRIED && it.state != BallState.OUT_OF_BOUNDS) &&
+                            it.location.x == x &&
+                            it.location.y == y
+                     } ?: false
                     val uiSquare =
                         UiFieldSquare(
                             square,
-                            square.ball?.state?.let {
-                                it != BallState.CARRIED && it != BallState.OUT_OF_BOUNDS
-                            } ?: false,
+                            isBallOnGround,
                             square.player?.hasBall() == true,
                             uiPlayer,
                             squareAction, // Only allow a Square Action if no player is on the field

@@ -109,14 +109,13 @@ object TheKickOffEvent : Procedure() {
             //  touchback
             val ballLocation: FieldCoordinate = state.ball.location
             val outOfBounds =
-                ballLocation.isOutOfBounds(rules) ||
+                state.ball.state == BallState.OUT_OF_BOUNDS ||
                     (state.kickingTeam.isHomeTeam() && ballLocation.isOnHomeSide(rules)) ||
                     (state.kickingTeam.isAwayTeam() && ballLocation.isOnAwaySide(rules))
             return if (outOfBounds) {
                 GotoNode(TouchBack)
             } else {
                 compositeCommandOf(
-                    SetBallState.deviating(),
                     GotoNode(ResolveBallLanding(ballLocation)),
                 )
             }

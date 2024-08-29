@@ -59,9 +59,11 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.CatchRoll
 import dk.ilios.jervis.procedures.DetermineKickingTeam
+import dk.ilios.jervis.procedures.DeviateRoll
 import dk.ilios.jervis.procedures.PickupRoll
 import dk.ilios.jervis.procedures.RollForStartingFanFactor
 import dk.ilios.jervis.procedures.RollForTheWeather
+import dk.ilios.jervis.procedures.Scatter
 import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.procedures.TheKickOff
 import dk.ilios.jervis.procedures.TheKickOffEvent
@@ -69,7 +71,10 @@ import dk.ilios.jervis.procedures.actions.block.BlockRoll
 import dk.ilios.jervis.procedures.actions.block.BothDown
 import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.actions.block.Stumble
+import dk.ilios.jervis.procedures.actions.foul.ArgueTheCallRoll
+import dk.ilios.jervis.procedures.actions.foul.FoulStep
 import dk.ilios.jervis.procedures.actions.move.calculateOptionsForMoveType
+import dk.ilios.jervis.procedures.actions.pass.AccuracyRoll
 import dk.ilios.jervis.procedures.injury.ArmourRoll
 import dk.ilios.jervis.procedures.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.injury.InjuryRoll
@@ -284,168 +289,197 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
      * by some other part of the UI.
      */
     private fun createDialogPopupIfNeeded(controller: GameController, actions: List<ActionDescriptor>): UserInput? {
+        val rules = controller.rules
         val userInput =
-            when (controller.stack.currentNode()) {
-                is RollForStartingFanFactor.SetFanFactorForHomeTeam -> {
-                    SingleChoiceInputDialog.createFanFactorDialog(controller.state.homeTeam, D3Result.allOptions())
-                }
+        when (controller.stack.currentNode()) {
 
-                is RollForStartingFanFactor.SetFanFactorForAwayTeam -> {
-                    SingleChoiceInputDialog.createFanFactorDialog(controller.state.awayTeam, D3Result.allOptions())
-                }
-
-                is RollForTheWeather.RollWeatherDice -> {
-                    val diceRolls = mutableListOf<DiceResults>()
-                    D8Result.allOptions().forEach { d6 ->
-                        D6Result.allOptions().forEach { d6 ->
-                            diceRolls.add(DiceResults(d6, d6))
-                        }
-                    }
-                    DiceRollUserInputDialog.createWeatherRollDialog(controller.rules)
-                }
-
-                is DetermineKickingTeam.SelectCoinSide -> {
-                    SingleChoiceInputDialog.createSelectKickoffCoinTossResultDialog(
-                        controller.state.activeTeam,
-                        CoinSideSelected.allOptions(),
-                    )
-                }
-
-                is DetermineKickingTeam.CoinToss -> {
-                    SingleChoiceInputDialog.createTossDialog(CoinTossResult.allOptions())
-                }
-
-                is DetermineKickingTeam.ChooseKickingTeam -> {
-                    val choices =
-                        listOf(
-                            Confirm to "Kickoff",
-                            Cancel to "Receive",
-                        )
-                    SingleChoiceInputDialog.createChooseToKickoffDialog(controller.state.activeTeam, choices)
-                }
-
-                is SetupTeam.InformOfInvalidSetup -> {
-                    SingleChoiceInputDialog.createInvalidSetupDialog(controller.state.activeTeam)
-                }
-
-                is TheKickOff.TheKickDeviates -> {
-                    val diceRolls = mutableListOf<DiceResults>()
-                    D8Result.allOptions().forEach { d8 ->
-                        D6Result.allOptions().forEach { d6 ->
-                            diceRolls.add(DiceResults(d8, d6))
-                        }
-                    }
-                    DiceRollUserInputDialog.createKickOffDeviatesDialog(
-                        controller.rules,
-                    )
-                }
-
-                is TheKickOffEvent.RollForKickOffEvent -> {
-                    DiceRollUserInputDialog.createKickOffEventDialog(controller.rules)
-                }
-
-                CatchRoll.ReRollDie,
-                is CatchRoll.RollDie,
-                -> {
-                    SingleChoiceInputDialog.createCatchBallDialog(
-                        controller.state.catchRollContext!!.catchingPlayer,
-                        D6Result.allOptions(),
-                    )
-                }
-
-                is Bounce.RollDirection -> {
-                    SingleChoiceInputDialog.createBounceBallDialog(controller.rules, D8Result.allOptions())
-                }
-
-                is PickupRoll.ReRollDie,
-                is PickupRoll.RollDie,
-                -> {
-                    SingleChoiceInputDialog.createPickupBallDialog(
-                        controller.state.pickupRollContext!!.player,
-                        D6Result.allOptions(),
-                    )
-                }
-
-                is PickupRoll.ChooseReRollSource -> {
-                    SingleChoiceInputDialog.createPickupRerollDialog(
-                        controller.state.pickupRollResultContext!!,
-                        mapUnknownActions(controller.getAvailableActions()),
-                    )
-                }
-
-                is BlockRoll.ReRollDie,
-                is BlockRoll.RollDice -> {
-                    val diceCount = (actions.first() as RollDice).dice.size
-                    DiceRollUserInputDialog.createBlockRollDialog(diceCount, controller.state.blockContext!!.isBlitzing)
-                }
-
-                is PushStep.DecideToFollowUp -> {
-                    SingleChoiceInputDialog.createFollowUpDialog(
-                        controller.state.pushContext!!.pusher
-                    )
-                }
-
-                is BlockRoll.ChooseResultOrReRollSource -> {
-                    SingleChoiceInputDialog.createChooseBlockResultOrReroll(
-                        mapUnknownActions(controller.getAvailableActions()),
-                    )
-                }
-
-                is BlockRoll.SelectBlockResult -> {
-                    DiceRollUserInputDialog.createSelectBlockDie(
-                        actions.first() as SelectDiceResult
-                    )
-                }
-
-                is ArmourRoll.RollDice -> {
-                    val player = controller.state.riskingInjuryRollsContext!!.player
-                    DiceRollUserInputDialog.createArmourRollDialog(player)
-                }
-
-                is InjuryRoll.RollDice -> {
-                    val player = controller.state.riskingInjuryRollsContext!!.player
-                    DiceRollUserInputDialog.createInjuryRollDialog(controller.rules, player)
-                }
-
-                is CasualtyRoll.RollDie -> {
-                    val player = controller.state.riskingInjuryRollsContext!!.player
-                    DiceRollUserInputDialog.createCasualtyRollDialog(controller.rules, player)
-                }
-
-                is LastingInjuryRoll.RollDice -> {
-                    val player = controller.state.riskingInjuryRollsContext!!.player
-                    DiceRollUserInputDialog.createLastingInjuryRollDialog(controller.rules, player)
-                }
-
-                is RiskingInjuryRoll.ChooseToUseApothecary -> {
-                    val context = controller.state.riskingInjuryRollsContext!!
-                    SingleChoiceInputDialog.createUseApothecaryDialog(context)
-                }
-
-                is BothDown.AttackerChooseToUseBlock -> {
-                    val context = controller.state.bothDownContext!!
-                    SingleChoiceInputDialog.createUseSkillDialog(context.attacker, context.attacker.getSkill<Block>())
-                }
-
-                is BothDown.DefenderChooseToUseBlock -> {
-                    val context = controller.state.bothDownContext!!
-                    SingleChoiceInputDialog.createUseSkillDialog(context.defender, context.defender.getSkill<Block>())
-                }
-
-                is Stumble.ChooseToUseDodge -> {
-                    val defender = controller.state.stumbleContext!!.defender
-                    SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Dodge>())
-                }
-
-                is Stumble.ChooseToUseTackle -> {
-                    val defender = controller.state.stumbleContext!!.attacker
-                    SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Tackle>())
-                }
-
-                else -> {
-                    null
-                }
+            is AccuracyRoll.RollDice -> {
+                DiceRollUserInputDialog.createAccuracyRollDialog(controller.state.passContext!!, rules)
             }
+
+            is ArgueTheCallRoll.RollDice -> {
+                DiceRollUserInputDialog.createArgueTheCallRollDialog(controller.state.foulContext!!, rules)
+            }
+
+            is ArmourRoll.RollDice -> {
+                val player = controller.state.riskingInjuryRollsContext!!.player
+                DiceRollUserInputDialog.createArmourRollDialog(player)
+            }
+
+            is BlockRoll.ChooseResultOrReRollSource -> {
+                SingleChoiceInputDialog.createChooseBlockResultOrReroll(
+                    mapUnknownActions(controller.getAvailableActions()),
+                )
+            }
+
+            is BlockRoll.ReRollDie,
+            is BlockRoll.RollDice -> {
+                val diceCount = (actions.first() as RollDice).dice.size
+                DiceRollUserInputDialog.createBlockRollDialog(diceCount, controller.state.blockContext!!.isBlitzing)
+            }
+
+            is BlockRoll.SelectBlockResult -> {
+                DiceRollUserInputDialog.createSelectBlockDie(
+                    actions.first() as SelectDiceResult
+                )
+            }
+
+            is BothDown.AttackerChooseToUseBlock -> {
+                val context = controller.state.bothDownContext!!
+                SingleChoiceInputDialog.createUseSkillDialog(context.attacker, context.attacker.getSkill<Block>())
+            }
+
+            is BothDown.DefenderChooseToUseBlock -> {
+                val context = controller.state.bothDownContext!!
+                SingleChoiceInputDialog.createUseSkillDialog(context.defender, context.defender.getSkill<Block>())
+            }
+
+            is Bounce.RollDirection -> {
+                SingleChoiceInputDialog.createBounceBallDialog(rules, D8Result.allOptions())
+            }
+
+            is CasualtyRoll.RollDie -> {
+                val player = controller.state.riskingInjuryRollsContext!!.player
+                DiceRollUserInputDialog.createCasualtyRollDialog(rules, player)
+            }
+
+            is CatchRoll.ChooseReRollSource -> {
+                SingleChoiceInputDialog.createCatchRerollDialog(
+                    mapUnknownActions(controller.getAvailableActions()),
+                )
+            }
+
+            CatchRoll.ReRollDie,
+            is CatchRoll.RollDie,
+                -> {
+                SingleChoiceInputDialog.createCatchBallDialog(
+                    controller.state.catchRollContext!!.catchingPlayer,
+                    D6Result.allOptions(),
+                )
+            }
+
+            is DetermineKickingTeam.ChooseKickingTeam -> {
+                val choices =
+                    listOf(
+                        Confirm to "Kickoff",
+                        Cancel to "Receive",
+                    )
+                SingleChoiceInputDialog.createChooseToKickoffDialog(controller.state.activeTeam, choices)
+            }
+
+            is DetermineKickingTeam.CoinToss -> {
+                SingleChoiceInputDialog.createTossDialog(CoinTossResult.allOptions())
+            }
+
+            is DetermineKickingTeam.SelectCoinSide -> {
+                SingleChoiceInputDialog.createSelectKickoffCoinTossResultDialog(
+                    controller.state.activeTeam,
+                    CoinSideSelected.allOptions(),
+                )
+            }
+
+            is DeviateRoll.RollDice -> {
+                val diceRolls = mutableListOf<DiceResults>()
+                D8Result.allOptions().forEach { d8 ->
+                    D6Result.allOptions().forEach { d6 ->
+                        diceRolls.add(DiceResults(d8, d6))
+                    }
+                }
+                DiceRollUserInputDialog.createDeviateDialog(rules, false)
+            }
+
+            is FoulStep.DecideToArgueTheCall -> {
+                SingleChoiceInputDialog.createArgueTheCallDialog(controller.state.foulContext!!)
+            }
+
+            is InjuryRoll.RollDice -> {
+                val player = controller.state.riskingInjuryRollsContext!!.player
+                DiceRollUserInputDialog.createInjuryRollDialog(rules, player)
+            }
+
+            is LastingInjuryRoll.RollDice -> {
+                val player = controller.state.riskingInjuryRollsContext!!.player
+                DiceRollUserInputDialog.createLastingInjuryRollDialog(rules, player)
+            }
+
+            is PickupRoll.ChooseReRollSource -> {
+                SingleChoiceInputDialog.createPickupRerollDialog(
+                    mapUnknownActions(controller.getAvailableActions()),
+                )
+            }
+            is PickupRoll.ReRollDie,
+            is PickupRoll.RollDie,
+                -> {
+                SingleChoiceInputDialog.createPickupBallDialog(
+                    controller.state.pickupRollContext!!.player,
+                    D6Result.allOptions(),
+                )
+            }
+            is PushStep.DecideToFollowUp -> {
+                SingleChoiceInputDialog.createFollowUpDialog(
+                    controller.state.pushContext!!.pusher
+                )
+            }
+
+            is RiskingInjuryRoll.ChooseToUseApothecary -> {
+                val context = controller.state.riskingInjuryRollsContext!!
+                SingleChoiceInputDialog.createUseApothecaryDialog(context)
+            }
+
+            is RollForStartingFanFactor.SetFanFactorForAwayTeam -> {
+                SingleChoiceInputDialog.createFanFactorDialog(controller.state.awayTeam, D3Result.allOptions())
+            }
+            is RollForStartingFanFactor.SetFanFactorForHomeTeam -> {
+                SingleChoiceInputDialog.createFanFactorDialog(controller.state.homeTeam, D3Result.allOptions())
+            }
+            is RollForTheWeather.RollWeatherDice -> {
+                val diceRolls = mutableListOf<DiceResults>()
+                D6Result.allOptions().forEach { d6 ->
+                    D6Result.allOptions().forEach { d6 ->
+                        diceRolls.add(DiceResults(d6, d6))
+                    }
+                }
+                DiceRollUserInputDialog.createWeatherRollDialog(rules)
+            }
+
+            is Scatter.RollDice -> {
+                DiceRollUserInputDialog.createScatterRollDialog(rules)
+            }
+
+            is SetupTeam.InformOfInvalidSetup -> {
+                SingleChoiceInputDialog.createInvalidSetupDialog(controller.state.activeTeam)
+            }
+
+            is Stumble.ChooseToUseDodge -> {
+                val defender = controller.state.stumbleContext!!.defender
+                SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Dodge>())
+            }
+
+            is Stumble.ChooseToUseTackle -> {
+                val defender = controller.state.stumbleContext!!.attacker
+                SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Tackle>())
+            }
+
+            is TheKickOff.TheKickDeviates -> {
+                val diceRolls = mutableListOf<DiceResults>()
+                D8Result.allOptions().forEach { d8 ->
+                    D6Result.allOptions().forEach { d6 ->
+                        diceRolls.add(DiceResults(d8, d6))
+                    }
+                }
+                DiceRollUserInputDialog.createDeviateDialog(
+                    rules,
+                )
+            }
+
+            is TheKickOffEvent.RollForKickOffEvent -> {
+                DiceRollUserInputDialog.createKickOffEventDialog(rules)
+            }
+
+            else -> {
+                null
+            }
+        }
         return userInput
     }
 

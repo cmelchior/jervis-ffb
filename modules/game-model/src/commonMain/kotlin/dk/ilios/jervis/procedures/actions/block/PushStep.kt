@@ -24,6 +24,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.ProcedureContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -34,7 +35,7 @@ data class PushContext(
     // Chain of pushes, for a single push, this contains one element
     // Should only be modified from within `PushStep`.
     val pushChain: List<PushData>
-) {
+) : ProcedureContext {
 
     data class PushData(
         val pusher: Player,

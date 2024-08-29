@@ -13,6 +13,7 @@ import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
@@ -22,14 +23,17 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.ProcedureContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.procedures.actions.block.BlockStep
 import dk.ilios.jervis.procedures.actions.move.MoveContext
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.reports.ReportActionEnded
+import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
+import kotlinx.serialization.Serializable
 
 
 data class BlitzContext(
@@ -37,13 +41,14 @@ data class BlitzContext(
     val defender: Player? = null,
     val hasMoved: Boolean = false,
     val hasBlocked: Boolean = false,
-)
+) : ProcedureContext
 
 /**
  * Procedure for controlling a player's Blitz action.
  *
  * See page 43 in the rulebook.
  */
+@Serializable
 object BlitzAction : Procedure() {
     override val initialNode: Node = SelectTargetOrCancel
 
@@ -56,9 +61,17 @@ object BlitzAction : Procedure() {
         state: Game,
         rules: Rules,
     ): Command {
+        val context = state.blitzContext!!
+        val player = state.activePlayer!!
         return compositeCommandOf(
             SetContext(Game::blitzContext, null),
-            ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
+            if (context.hasBlocked || context.hasMoved) {
+                val team = state.activeTeam
+                SetAvailableActions(team, PlayerActionType.FOUL, team.turnData.blitzActions - 1)
+            } else {
+                null
+            },
+            ReportActionEnded(player, state.activePlayerAction!!)
         )
     }
 
@@ -94,7 +107,7 @@ object BlitzAction : Procedure() {
 
     object MoveOrBlockOrEndAction : ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.blitzContext!!
+            val context = blitzContext(state)
             val options = mutableListOf<ActionDescriptor>()
 
             // Find possible move types
@@ -206,5 +219,10 @@ object BlitzAction : Procedure() {
                 else -> INVALID_ACTION(action)
             }
         }
+    }
+
+    private fun blitzContext(state: Game): BlitzContext {
+        val context = state.blitzContext!!
+        return context
     }
 }

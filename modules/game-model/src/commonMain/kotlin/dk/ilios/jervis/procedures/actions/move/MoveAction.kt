@@ -20,20 +20,23 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.ProcedureContext
 import dk.ilios.jervis.reports.ReportActionEnded
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
+import kotlinx.serialization.Serializable
 
 data class MoveContext(
     val player: Player,
     val moveType: MoveType,
     val targetCoordinate: FieldCoordinate? = null
-)
+): ProcedureContext
 
 /**
  * Procedure controlling a Move action as described on page XX in the rulebook.
  */
+@Serializable
 object MoveAction : Procedure() {
     override val initialNode: Node = SelectMoveType
 

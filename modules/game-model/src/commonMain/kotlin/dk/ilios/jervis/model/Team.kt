@@ -102,6 +102,7 @@ class Team(val name: String, val roster: Roster, val coach: Coach) : Collection<
     @Transient
     var usedTeamRerollThisTurn: Boolean = false
 
+    var coachBanned: Boolean = false
     var apothecaries: Int = 0
     var cheerLeaders: Int = 0
     var assistentCoaches: Int = 0

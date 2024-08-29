@@ -19,12 +19,14 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.reports.ReportActionEnded
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
+import kotlinx.serialization.Serializable
 
 /**
  * Procedure for controlling a player's Block action.
  *
  * See page 56 in the rulebook.
  */
+@Serializable
 object BlockAction : Procedure() {
     override val initialNode: Node = SelectDefenderOrEndAction
 

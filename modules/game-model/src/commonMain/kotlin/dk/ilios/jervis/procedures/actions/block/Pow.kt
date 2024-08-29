@@ -59,7 +59,10 @@ object Pow: Procedure() {
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
+            return compositeCommandOf(
+                SetContext(Game::riskingInjuryRollsContext, null),
+                ExitProcedure()
+            )
         }
     }
 

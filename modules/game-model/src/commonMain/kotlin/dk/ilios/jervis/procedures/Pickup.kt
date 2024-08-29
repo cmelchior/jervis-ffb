@@ -14,6 +14,7 @@ import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.DiceModifier
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.ProcedureContext
 import dk.ilios.jervis.reports.ReportPickup
 import dk.ilios.jervis.rules.Rules
 
@@ -26,7 +27,7 @@ data class PickupRollContext(
     val player: Player,
     val diceRollTarget: Int,
     val modifiers: List<DiceModifier>,
-) {
+) : ProcedureContext {
     // The sum of modifiers
     fun diceModifier(): Int = modifiers.fold(0) { acc: Int, el: DiceModifier -> acc + el.modifier }
 }
@@ -37,7 +38,7 @@ data class PickupRollResultContext(
     val modifiers: List<DiceModifier>,
     val roll: D6DieRoll,
     val success: Boolean,
-) {
+) : ProcedureContext {
     val rerolled: Boolean = roll.rerollSource != null && roll.rerolledResult != null
 }
 

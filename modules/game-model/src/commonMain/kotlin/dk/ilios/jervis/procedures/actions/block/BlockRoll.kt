@@ -197,7 +197,7 @@ object BlockRoll : Procedure() {
                     rolls.map { blockRoll: DBlockResult ->
                         BlockDieRoll(originalRoll = blockRoll)
                     }
-                return compositeCommandOf(
+                compositeCommandOf(
                     SetContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
                     GotoNode(ChooseResultOrReRollSource),
                 )

@@ -2,7 +2,9 @@ package dk.ilios.jervis.procedures.actions.move
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CancelWhenReady
+import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
@@ -16,6 +18,7 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.utils.INVALID_ACTION
 
 /**
  * Handle a player rushing a single square.
@@ -37,16 +40,19 @@ object RushStep: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            // TODO Check rolling for dodge
-            // TODO Roll for Rush
-            return checkType<FieldSquareSelected>(action) {
-                val moveContext = state.moveContext!!
-                val movingPlayer = moveContext.player
-                compositeCommandOf(
-                    SetPlayerRushesLeft(movingPlayer, movingPlayer.rushesLeft - 1),
-                    SetPlayerLocation(movingPlayer, it.coordinate),
-                    ExitProcedure()
-                )
+            return when(action) {
+                is FieldSquareSelected -> {
+                    val moveContext = state.moveContext!!
+                    val movingPlayer = moveContext.player
+                    compositeCommandOf(
+                        SetPlayerRushesLeft(movingPlayer, movingPlayer.rushesLeft - 1),
+                        SetPlayerLocation(movingPlayer, action.coordinate),
+                        ExitProcedure()
+                    )
+                }
+                is Cancel -> ExitProcedure()
+                is EndAction -> ExitProcedure() // How to signal end-of-action?
+                else -> INVALID_ACTION(action)
             }
         }
 

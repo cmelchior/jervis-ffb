@@ -1,6 +1,7 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.tables.CornerThrowInPosition
 import dk.ilios.jervis.rules.tables.Direction
 import kotlinx.serialization.Serializable
 import kotlin.math.abs
@@ -31,6 +32,8 @@ sealed interface Location {
 
     fun isOutOfBounds(rules: Rules): Boolean
 
+    fun getCornerLocation(rules: Rules): CornerThrowInPosition?
+
     fun isAdjacent(
         rules: Rules,
         location: Location,
@@ -52,26 +55,26 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
     }
 
     override fun isInWideZone(rules: Rules): Boolean {
-        return (0u until rules.wideZone).contains(y.toUInt()) ||
-            (rules.fieldHeight - rules.wideZone until rules.fieldHeight).contains(y.toUInt())
+        return (0 until rules.wideZone).contains(y) ||
+            (rules.fieldHeight - rules.wideZone until rules.fieldHeight).contains(y)
     }
 
     override fun isInEndZone(rules: Rules): Boolean {
-        return x == 0 || x.toUInt() == rules.fieldWidth - 1u
+        return x == 0 || x == rules.fieldWidth - 1
     }
 
     override fun isInCenterField(rules: Rules): Boolean {
         val xRange = (rules.endZone until rules.fieldWidth - rules.endZone)
         val yRange = (rules.wideZone until rules.fieldHeight - rules.wideZone)
-        return xRange.contains(x.toUInt()) && yRange.contains(y.toUInt())
+        return xRange.contains(x) && yRange.contains(y)
     }
 
     override fun isOnHomeSide(rules: Rules): Boolean {
-        return x.toUInt() < rules.fieldWidth / 2u
+        return x < rules.fieldWidth / 2
     }
 
     override fun isOnAwaySide(rules: Rules): Boolean {
-        return x.toUInt() >= rules.fieldWidth / 2u
+        return x >= rules.fieldWidth / 2
     }
 
     override fun isOnField(rules: Rules): Boolean {
@@ -80,6 +83,16 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
 
     override fun isOutOfBounds(rules: Rules): Boolean {
         return x < 0 || x >= rules.fieldWidth.toInt() || y < 0 || y >= rules.fieldHeight.toInt()
+    }
+
+    override fun getCornerLocation(rules: Rules): CornerThrowInPosition? {
+        return when {
+            x == 0 && y == 0 -> CornerThrowInPosition.TOP_LEFT
+            x == 0 && y == rules.fieldHeight - 1 -> CornerThrowInPosition.BOTTOM_LEFT
+            x == rules.fieldWidth -1 && y == 0 -> CornerThrowInPosition.TOP_RIGHT
+            x == rules.fieldWidth - 1 && y == rules.fieldHeight -1 -> CornerThrowInPosition.BOTTOM_RIGHT
+            else -> null
+        }
     }
 
     override fun isAdjacent(
@@ -255,6 +268,8 @@ data object DogOut : Location {
     override fun isOnField(rules: Rules): Boolean = false
 
     override fun isOutOfBounds(rules: Rules): Boolean = false
+
+    override fun getCornerLocation(rules: Rules): CornerThrowInPosition? = null
 
     override fun isAdjacent(
         rules: Rules,

@@ -10,6 +10,8 @@ import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.SelectDiceResult
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.procedures.actions.foul.FoulContext
+import dk.ilios.jervis.procedures.actions.pass.PassContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Direction
 
@@ -48,9 +50,9 @@ data class DiceRollUserInputDialog(
             )
         }
 
-        fun createKickOffDeviatesDialog(rules: Rules): UserInputDialog {
+        fun createDeviateDialog(rules: Rules, isKickOff: Boolean = true): UserInputDialog {
             return DiceRollUserInputDialog(
-                title = "The KickOff",
+                title = if (isKickOff) "The KickOff"  else "Deviate the ball",
                 message = "Roll Roll 1D8 + 1D6 to deviate the ball.",
                 dice =
                     listOf(
@@ -170,6 +172,54 @@ data class DiceRollUserInputDialog(
                     val result = rules.lastingInjuryTable.roll(rolls.first() as D6Result)
                     "(${rolls.sum()}) ${result.title}"
                 },
+            )
+        }
+
+        fun createArgueTheCallRollDialog(context: FoulContext, rules: Rules): UserInput? {
+            return DiceRollUserInputDialog(
+                title = "Argue The Call Roll",
+                message = "Roll D6 to Argue The Call on behalf of ${context.fouler.name}",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { rolls: DiceResults ->
+                    val result = rules.argueTheCallTable.roll(rolls.first() as D6Result)
+                    "(${rolls.sum()}) ${result.title}"
+                },
+            )
+        }
+
+        fun createAccuracyRollDialog(passContext: PassContext, rules: Rules): UserInput? {
+            return DiceRollUserInputDialog(
+                title = "Test for Accuracy",
+                message = "${passContext.thrower.name} rolls a D6 to test for accuracy when making a pass",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { _: DiceResults -> null }
+            )
+        }
+
+        fun createScatterRollDialog(rules: Rules): UserInput? {
+            return DiceRollUserInputDialog(
+                title = "Scatter Roll",
+                message = "Roll 3D8 to scatter the ball",
+                dice = listOf(Pair(Dice.D8, D8Result.allOptions()), Pair(Dice.D8, D8Result.allOptions()), Pair(Dice.D8, D8Result.allOptions())),
+                result = { dice: DiceResults ->
+                    dice.joinToString(prefix = "[", postfix = "]") { result: DieResult ->
+                        if (result is D8Result) {
+                            when (val direction = rules.direction(result)) {
+                                Direction(-1, -1) -> "Up-Left"
+                                Direction(0, -1) -> "Up"
+                                Direction(1, -1) -> "Up-Right"
+                                Direction(-1, 0) -> "Left"
+                                Direction(1, 0) -> "Right"
+                                Direction(-1, 1) -> "Down-Left"
+                                Direction(0, 1) -> "Down"
+                                Direction(1, 1) -> "Down-Right"
+                                else -> TODO("Not supported: $direction")
+                            }.toString()
+                        } else {
+                            "null"
+                        }
+                    }
+                }
             )
         }
 

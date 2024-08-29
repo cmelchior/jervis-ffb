@@ -7,10 +7,10 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
-class Field(val width: UInt, val height: UInt) : Iterable<FieldSquare> {
+class Field(val width: Int, val height: Int) : Iterable<FieldSquare> {
     private val field: Array<Array<FieldSquare>> =
-        Array(width.toInt()) { x: Int ->
-            Array(height.toInt()) { y: Int ->
+        Array(width) { x: Int ->
+            Array(height) { y: Int ->
                 FieldSquare(x, y)
             }
         }

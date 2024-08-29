@@ -18,21 +18,27 @@ class SetBallState private constructor(
     private var originalLocation: FieldCoordinate? = null
 
     companion object {
-        fun inAir(): Command = SetBallState(ballState = BallState.IN_AIR)
+        fun accurateThrow(): Command = SetBallState(ballState = BallState.ACCURATE_THROW, carriedBy = null, exitLocation = null)
 
-        fun carried(player: Player): Command = SetBallState(ballState = BallState.CARRIED, carriedBy = player)
+        fun inAir(): Command = SetBallState(ballState = BallState.IN_AIR, carriedBy = null, exitLocation = null)
 
-        fun onGround(): Command = SetBallState(ballState = BallState.ON_GROUND)
+        fun carried(player: Player): Command = SetBallState(ballState = BallState.CARRIED, carriedBy = player, exitLocation = null)
 
-        fun deviating(): Command = SetBallState(ballState = BallState.DEVIATING)
+        fun onGround(): Command = SetBallState(ballState = BallState.ON_GROUND, carriedBy = null, exitLocation = null)
 
-        fun bouncing(): Command = SetBallState(ballState = BallState.BOUNCING)
+        fun deviating(): Command = SetBallState(ballState = BallState.DEVIATING, carriedBy = null, exitLocation = null)
+
+        fun bouncing(): Command = SetBallState(ballState = BallState.BOUNCING, carriedBy = null, exitLocation = null)
+
+        fun scattered(): Command = SetBallState(ballState = BallState.SCATTERED, carriedBy = null, exitLocation = null)
 
         fun outOfBounds(exit: FieldCoordinate): Command =
             SetBallState(
                 ballState = BallState.OUT_OF_BOUNDS,
                 exitLocation = exit,
             )
+
+        fun thrownIn(): Command = SetBallState(BallState.THROW_IN, carriedBy = null, exitLocation = null)
     }
 
     override fun execute(

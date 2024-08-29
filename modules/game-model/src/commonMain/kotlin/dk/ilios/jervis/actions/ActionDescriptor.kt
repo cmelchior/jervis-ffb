@@ -55,7 +55,8 @@ data class SelectFieldLocation private constructor(val x: Int, val y: Int, val t
         RUSH,
         JUMP,
         LEAP,
-        KICK
+        KICK,
+        THROW_TARGET
     }
     val coordinate: FieldCoordinate = FieldCoordinate(x, y)
     private constructor(coordinate: FieldCoordinate, type: Type) : this(coordinate.x, coordinate.y, type)
@@ -69,6 +70,7 @@ data class SelectFieldLocation private constructor(val x: Int, val y: Int, val t
         fun jump(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.JUMP)
         fun leap(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.LEAP)
         fun kick(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.KICK)
+        fun throwTarget(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.THROW_TARGET)
     }
 }
 

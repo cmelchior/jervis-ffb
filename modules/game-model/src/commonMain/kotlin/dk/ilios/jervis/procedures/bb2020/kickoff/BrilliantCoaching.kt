@@ -30,6 +30,7 @@ object BrilliantCoaching : Procedure() {
 
     object GiveBribe : ComputationNode() {
         // TODO Figure out how to do this
+        // If Main Coach is banned, you get -1 to this roll. Page 63
         override fun apply(
             state: Game,
             rules: Rules,

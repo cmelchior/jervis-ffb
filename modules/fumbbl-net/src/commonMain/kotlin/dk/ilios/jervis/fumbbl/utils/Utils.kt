@@ -125,5 +125,5 @@ private fun extractRoster(roster: FumbblRoster): Roster {
 
 private fun extractField(field: FumbblField): Field {
     // TODO Extract more information when we know what to fetch
-    return Field(width = 26u, height = 15u)
+    return Field(width = 26, height = 15)
 }

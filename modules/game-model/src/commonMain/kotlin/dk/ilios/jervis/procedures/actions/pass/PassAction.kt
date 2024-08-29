@@ -1,0 +1,158 @@
+package dk.ilios.jervis.procedures.actions.pass
+
+import compositeCommandOf
+import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.Confirm
+import dk.ilios.jervis.actions.ConfirmWhenReady
+import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.actions.EndAction
+import dk.ilios.jervis.actions.EndActionWhenReady
+import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.MoveTypeSelected
+import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.ExitProcedure
+import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.SetAvailableActions
+import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.fsm.ActionNode
+import dk.ilios.jervis.fsm.Node
+import dk.ilios.jervis.fsm.ParentNode
+import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.DiceModifier
+import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.procedures.actions.move.MoveContext
+import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
+import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
+import dk.ilios.jervis.reports.ReportActionEnded
+import dk.ilios.jervis.reports.ReportPassResult
+import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.tables.Range
+import dk.ilios.jervis.utils.INVALID_ACTION
+import kotlinx.serialization.Serializable
+
+enum class PassingType {
+    ACCURATE,
+    INACCURATE,
+    WILDLY_INACCURATE,
+    FUMBLED
+}
+
+data class PassContext(
+    val thrower: Player,
+    val hasMoved: Boolean = false,
+    val target: FieldCoordinate? = null,
+    val range: Range? = null,
+    val passingRoll: D6Result? = null,
+    val passingModifiers: List<DiceModifier> = emptyList(),
+    val passingResult: PassingType? = null,
+    val runInterference: Player? = null,
+    val passingInterference: PassingInteferenceContext? = null,
+) : ProcedureContext
+
+/**
+ * Procedure for controlling a player's Pass action.
+ *
+ * See page 48 in the rulebook.
+ */
+@Serializable
+object PassAction : Procedure() {
+    override val initialNode: Node = MoveOrPassOrEndAction
+
+    override fun onEnterProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command = SetContext(Game::passContext, PassContext(thrower = state.activePlayer!!))
+
+    override fun onExitProcedure(
+        state: Game,
+        rules: Rules,
+    ): Command {
+        val context = state.passContext!!
+        return compositeCommandOf(
+            if (context.target != null) ReportPassResult(context) else null,
+            SetContext(Game::passContext, null),
+            if (context.hasMoved) {
+                val team = state.activeTeam
+                SetAvailableActions(team, PlayerActionType.PASS, team.turnData.passActions - 1)
+            } else {
+                null
+            },
+            ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
+        )
+    }
+
+    object MoveOrPassOrEndAction : ActionNode() {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            val context = state.passContext!!
+            val options = mutableListOf<ActionDescriptor>()
+
+            // Find possible move types
+            options.addAll(calculateMoveTypesAvailable(state.activePlayer!!, rules))
+
+            // If holding the ball, the player can start the "Pass" section of the Pass action
+            if (context.thrower.hasBall()) {
+                options.add(ConfirmWhenReady) // TODO Do something more specific here?
+            }
+
+            // End the pass action before trying to throw the ball
+            options.add(EndActionWhenReady)
+
+            return options
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.passContext!!
+            return when (action) {
+                Confirm -> {
+                    GotoNode(ResolveThrow)
+                }
+                EndAction -> ExitProcedure()
+                is MoveTypeSelected -> {
+                    val moveContext = MoveContext(context.thrower, action.moveType)
+                    compositeCommandOf(
+                        SetContext(Game::passContext, context.copy(hasMoved = true)),
+                        SetContext(Game::moveContext, moveContext),
+                        GotoNode(ResolveMove)
+                    )
+                }
+                else -> INVALID_ACTION(action)
+            }
+        }
+    }
+
+    object ResolveMove : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = MoveTypeSelectorStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // If player is not standing on the field after the move, it is a turn over,
+            // otherwise they are free to continue their pass action.
+            val context = state.passContext!!
+            return if (!context.thrower.isStanding(rules)) {
+                compositeCommandOf(
+                    SetTurnOver(true),
+                    ExitProcedure()
+                )
+            } else {
+                GotoNode(MoveOrPassOrEndAction)
+            }
+        }
+    }
+
+    object ResolveThrow : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.passContext!!
+            return if (context.target == null) {
+                // No target was selected, so no pass was attempted, continue the pass.
+                GotoNode(MoveOrPassOrEndAction)
+            } else {
+                ExitProcedure()
+
+            }
+        }
+    }
+}

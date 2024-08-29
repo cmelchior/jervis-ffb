@@ -24,7 +24,7 @@ class SetBallLocation(val location: FieldCoordinate) : Command {
                 notifyUpdate()
             }
         }
-        if (location.isOnField(rules) && !location.isOutOfBounds(rules)) {
+        if (location.isOnField(rules)) {
             state.field[location].apply {
                 ball = state.ball
                 notifyUpdate()

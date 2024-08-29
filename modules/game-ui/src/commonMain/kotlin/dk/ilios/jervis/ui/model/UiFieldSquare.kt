@@ -25,6 +25,8 @@ class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?, val 
 
     val state: PlayerState = model.state
     val isOnHomeTeam = model.isOnHomeTeam()
+    val isProne = (model.state == PlayerState.PRONE)
+    val isStunned = (model.state == PlayerState.STUNNED)
     val position = model.position
     val isActive = (model.available == Availability.IS_ACTIVE)
     val isSelectable = (selectAction != null)

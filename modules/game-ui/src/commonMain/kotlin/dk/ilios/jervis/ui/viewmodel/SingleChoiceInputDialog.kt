@@ -26,7 +26,7 @@ import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.procedures.PickupRollResultContext
+import dk.ilios.jervis.procedures.actions.foul.FoulContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Skill
@@ -152,8 +152,18 @@ data class SingleChoiceInputDialog(
                 actions = actions,
             )
 
+        fun createCatchRerollDialog(
+            actions: List<GameAction>,
+        ): SingleChoiceInputDialog {
+            val message = "Reroll catching the ball?"
+            return create(
+                title = "Choose Reroll",
+                message = message,
+                actions = actions,
+            )
+        }
+
         fun createPickupRerollDialog(
-            context: PickupRollResultContext,
             actions: List<GameAction>,
         ): SingleChoiceInputDialog {
             val message = "<Insert result of rolling D6>"
@@ -220,6 +230,14 @@ data class SingleChoiceInputDialog(
                 title = "Use ${skill.name}",
                 message = "Does ${player.name} want to use ${skill.name}?",
                 actions = listOf(Confirm to "Confirm", Cancel to "Cancel"),
+            )
+        }
+
+        fun createArgueTheCallDialog(context: FoulContext): UserInput {
+            return createWithDescription(
+                title = "Argue the call",
+                message = "${context.fouler.name} was caught by the ref. Argue the call?",
+                actions = listOf(Confirm to "Argue", Cancel to "Stay silent"),
             )
         }
 

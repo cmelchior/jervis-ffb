@@ -29,7 +29,7 @@ enum class PlayerState {
 //    MISSING,
 //    FALLING,
 //    BLOCKED,
-//    BANNED,
+    BANNED,
 //    EXHAUSTED,
 //    BEING_DRAGGED,
 //    PICKED_UP,

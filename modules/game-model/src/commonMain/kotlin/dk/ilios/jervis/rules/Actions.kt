@@ -1,10 +1,12 @@
 package dk.ilios.jervis.rules
 
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.procedures.ErrorProcedure
 import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
 import dk.ilios.jervis.procedures.actions.block.BlockAction
+import dk.ilios.jervis.procedures.actions.foul.FoulAction
+import dk.ilios.jervis.procedures.actions.handoff.HandOffAction
 import dk.ilios.jervis.procedures.actions.move.MoveAction
+import dk.ilios.jervis.procedures.actions.pass.PassAction
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -128,11 +130,11 @@ class BB2020TeamActions : TeamActions() {
                 ),
                 PlayerActionType.PASS to TeamActionDescriptor(
                     availablePrTurn = 1,
-                    action = PlayerAction("Pass", PlayerActionType.PASS, ErrorProcedure)
+                    action = PlayerAction("Pass", PlayerActionType.PASS, PassAction)
                 ),
                 PlayerActionType.HAND_OFF to TeamActionDescriptor(
                     availablePrTurn = 1,
-                    action = PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, ErrorProcedure)
+                    action = PlayerAction("Hand-Off", PlayerActionType.HAND_OFF, HandOffAction)
                 ),
                 PlayerActionType.BLOCK to TeamActionDescriptor(
                     availablePrTurn = Int.MAX_VALUE,
@@ -144,7 +146,7 @@ class BB2020TeamActions : TeamActions() {
                 ),
                 PlayerActionType.FOUL to TeamActionDescriptor(
                     availablePrTurn = 1,
-                    action = PlayerAction("Foul", PlayerActionType.FOUL, ErrorProcedure)
+                    action = PlayerAction("Foul", PlayerActionType.FOUL, FoulAction)
                 ),
             )
     }

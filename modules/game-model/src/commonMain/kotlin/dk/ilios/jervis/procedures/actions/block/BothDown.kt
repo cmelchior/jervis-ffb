@@ -22,6 +22,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.ProcedureContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.reports.ReportBothDownResult
@@ -37,7 +38,7 @@ data class BothDownContext(
     val defenderUsesBlock: Boolean = false,
     val attackerUsesWrestle: Boolean = false,
     val defenderUsesWrestle: Boolean = false,
-)
+) : ProcedureContext
 
 /**
  * Resolve a "Both Down" selected as a block result.
@@ -229,7 +230,10 @@ object BothDown: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
+            return compositeCommandOf(
+                SetContext(Game::riskingInjuryRollsContext, null),
+                ExitProcedure()
+            )
         }
     }
 }

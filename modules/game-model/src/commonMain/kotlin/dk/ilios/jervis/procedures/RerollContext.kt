@@ -3,6 +3,7 @@ package dk.ilios.jervis.procedures
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.DieResult
+import dk.ilios.jervis.model.ProcedureContext
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.skills.RerollSource
 
@@ -38,7 +39,13 @@ data class D6DieRoll(
 }
 
 // Wrap the choice of the reroll type used, it can be skills, team reroll
-data class RerollContext(val roll: DiceRollType, val source: RerollSource)
+data class RerollContext(
+    val roll: DiceRollType,
+    val source: RerollSource
+) : ProcedureContext
 
 // Wraps the result of whether a specific reroll source can be used to reroll a specific roll type (all dice or parts of them)
-data class RerollResultContext(val roll: DiceRollType, val source: RerollSource, val rerollAllowed: Boolean)
+data class RerollResultContext(
+    val roll: DiceRollType,
+    val source: RerollSource, val rerollAllowed: Boolean
+): ProcedureContext

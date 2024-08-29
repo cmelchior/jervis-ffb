@@ -1,6 +1,7 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.tables.CornerThrowInPosition
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.serialization.Serializable
 
@@ -44,6 +45,8 @@ class FieldSquare(val coordinates: FieldCoordinate) : Observable<FieldSquare>(),
     override fun isOnField(rules: Rules): Boolean = coordinates.isOnField(rules)
 
     override fun isOutOfBounds(rules: Rules): Boolean = false
+
+    override fun getCornerLocation(rules: Rules): CornerThrowInPosition? = coordinates.getCornerLocation(rules)
 
     override fun isAdjacent(
         rules: Rules,

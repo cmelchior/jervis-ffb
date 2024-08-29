@@ -16,9 +16,11 @@ import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetKickingPlayer
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
+import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
@@ -138,28 +140,20 @@ object TheKickOff : Procedure() {
         }
     }
 
-    object TheKickDeviates : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
-            return listOf(RollDice(Dice.D8, Dice.D6))
+    object TheKickDeviates : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            return SetContext(Game::deviateRollContext, DeviateRollContext(from = state.ball.location))
         }
-
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
-            return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
-                val direction = rules.direction(d8)
-                val newLocation = state.ball.location.move(direction, d6.result)
-                compositeCommandOf(
-                    SetBallLocation(newLocation),
-                    ReportKickResult(state.kickingTeam, d8, d6, newLocation, rules),
-                    ExitProcedure(),
-                )
-            }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.deviateRollContext!!
+            val newLocation = context.outOfBoundsAt ?: context.landsAt!!
+            return compositeCommandOf(
+                if (context.outOfBoundsAt != null) SetBallState.outOfBounds(context.outOfBoundsAt) else SetBallState.deviating(),
+                SetBallLocation(newLocation),
+                ReportKickResult(state.kickingTeam, context.deviateRoll.first() as D8Result, context.deviateRoll.last() as D6Result, newLocation, rules),
+                ExitProcedure(),
+            )
         }
     }
 }

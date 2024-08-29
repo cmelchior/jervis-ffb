@@ -21,6 +21,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.ProcedureContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.reports.ReportPowResult
@@ -35,7 +36,7 @@ data class StumbleContext(
     val defender: Player,
     val attackerUsesTackle: Boolean = false,
     val defenderUsesDodge: Boolean = false,
-) {
+) : ProcedureContext {
     fun isDefenderDown(): Boolean {
         return !defenderUsesDodge || attackerUsesTackle
     }
@@ -152,8 +153,10 @@ object Stumble: Procedure() {
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
+            return compositeCommandOf(
+                SetContext(Game::riskingInjuryRollsContext, null),
+                ExitProcedure()
+            )
         }
     }
-
 }

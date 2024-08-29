@@ -12,9 +12,9 @@ import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.DiceModifier
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.utils.assert
 import dk.ilios.jervis.utils.sum
 
@@ -66,7 +66,7 @@ object ArmourRoll: Procedure() {
                 // TODO This logic needs to be expanded to support things like Mighty Blow, Claw, Chainsaw and others.
                 val roll = listOf(die1, die2)
                 val result = roll.sum()
-                val modifiers = emptyList<Skill>() // Any skills that modify the result
+                val modifiers = emptyList<DiceModifier>() // Any skills that modify the result
                 val broken = (context.player.armorValue <= result)
 
                 val updatedContext = state.riskingInjuryRollsContext!!.copy(

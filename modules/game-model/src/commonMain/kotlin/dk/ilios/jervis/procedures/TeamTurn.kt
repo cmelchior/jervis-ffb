@@ -17,7 +17,6 @@ import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.ResetAvailableTeamActions
 import dk.ilios.jervis.commands.SetActiveAction
 import dk.ilios.jervis.commands.SetActivePlayer
-import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetCanUseTeamRerolls
 import dk.ilios.jervis.commands.SetPlayerAvailability
 import dk.ilios.jervis.commands.SetPlayerStats
@@ -36,7 +35,6 @@ import dk.ilios.jervis.reports.ReportActionSelected
 import dk.ilios.jervis.reports.ReportEndingTurn
 import dk.ilios.jervis.reports.ReportStartingTurn
 import dk.ilios.jervis.rules.PlayerAction
-import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 
@@ -157,28 +155,32 @@ object TeamTurn : Procedure() {
                         GotoNode(SelectPlayerOrEndTurn),
                     )
                 is PlayerActionSelected -> {
-                    val type: PlayerActionType = action.action.type
-                    val modifyAvailableActions: Command =
-                        when (type) {
-                            PlayerActionType.MOVE,
-                            PlayerActionType.PASS,
-                            PlayerActionType.HAND_OFF,
-                            PlayerActionType.BLOCK,
-                            PlayerActionType.BLITZ,
-                            PlayerActionType.FOUL,
-                            -> {
-                                val currentValue: Int = state.activeTeam.turnData.availableActions[type]!!
-                                // Mark the action as used. Regardless what happens from here, the action
-                                // has been considered "selected" and thus count as used.
-                                SetAvailableActions(state.activeTeam, type, currentValue - 1)
-                            }
-                            PlayerActionType.SPECIAL ->
-                                INVALID_ACTION(
-                                    action,
-                                ) // TODO Figure out what needs to happen here
-                        }
+//                    val type: PlayerActionType = action.action.type
+                    // TODO We should probably not modify it here/
+                    // While it is probably technically correct, we allow
+                    // players to cancel most actions until they start
+                    // moving or rolling dice.
+//                    val modifyAvailableActions: Command =
+//                        when (type) {
+//                            PlayerActionType.MOVE,
+//                            PlayerActionType.PASS,
+//                            PlayerActionType.HAND_OFF,
+//                            PlayerActionType.BLOCK,
+//                            PlayerActionType.BLITZ,
+//                            PlayerActionType.FOUL,
+//                            -> {
+//                                val currentValue: Int = state.activeTeam.turnData.availableActions[type]!!
+//                                // Mark the action as used. Regardless what happens from here, the action
+//                                // has been considered "selected" and thus count as used.
+//                                SetAvailableActions(state.activeTeam, type, currentValue - 1)
+//                            }
+//                            PlayerActionType.SPECIAL ->
+//                                INVALID_ACTION(
+//                                    action,
+//                                ) // TODO Figure out what needs to happen here
+//                        }
                     compositeCommandOf(
-                        modifyAvailableActions,
+//                        modifyAvailableActions,
                         SetActiveAction(action.action),
                         ReportActionSelected(state.activePlayer!!, action.action),
                         GotoNode(ActivatePlayer),

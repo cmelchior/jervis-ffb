@@ -25,15 +25,18 @@ import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
 import dk.ilios.jervis.procedures.bb2020.kickoff.TimeOut
 import dk.ilios.jervis.rules.pathfinder.BB2020PathFinder
 import dk.ilios.jervis.rules.pathfinder.PathFinder
+import dk.ilios.jervis.rules.tables.ArgueTheCallTable
 import dk.ilios.jervis.rules.tables.CasualtyTable
-import dk.ilios.jervis.rules.tables.CornerThrowInPosition
 import dk.ilios.jervis.rules.tables.Direction
 import dk.ilios.jervis.rules.tables.InjuryTable
 import dk.ilios.jervis.rules.tables.LastingInjuryTable
 import dk.ilios.jervis.rules.tables.PrayersToNuffleTable
 import dk.ilios.jervis.rules.tables.RandomDirectionTemplate
+import dk.ilios.jervis.rules.tables.RangeRuler
 import dk.ilios.jervis.rules.tables.StuntyInjuryTable
 import dk.ilios.jervis.rules.tables.TableResult
+import dk.ilios.jervis.rules.tables.ThrowInPosition
+import dk.ilios.jervis.rules.tables.ThrowInTemplate
 import dk.ilios.jervis.rules.tables.WeatherTable
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
@@ -96,7 +99,7 @@ interface Rules {
         val field = state.field
         val losIndex: Int = if (isHomeTeam) lineOfScrimmageHome else lineOfScrimmageAway
         val playersOnLos =
-            (0u + wideZone until fieldHeight - wideZone).filter { y: UInt ->
+            (0 + wideZone until fieldHeight - wideZone).filter { y: Int ->
                 !field[losIndex, y.toInt()].isUnoccupied()
             }.size
 
@@ -125,11 +128,11 @@ interface Rules {
                 }
             }
         } else {
-            (fieldWidth - 1u downTo lineOfScrimmageAway.toUInt()).forEach { x ->
-                (0u until wideZone).forEach { y ->
+            (fieldWidth - 1 downTo lineOfScrimmageAway).forEach { x ->
+                (0 until wideZone).forEach { y ->
                     if (field[x.toInt(), y.toInt()].isOccupied()) {
                         // They must not be on the LoS
-                        if (x == lineOfScrimmageAway.toUInt()) {
+                        if (x == lineOfScrimmageAway) {
                             return false
                         }
                         count++
@@ -149,15 +152,27 @@ interface Rules {
     // Roll on the random direction template
     fun direction(d8: D8Result): Direction = randomDirectionTemplate.roll(d8)
 
-    fun cornerThrowIn(
-        corner: CornerThrowInPosition,
-        d3: D3Result,
-    ): Direction {
-        return randomDirectionTemplate.roll(corner, d3)
-    }
-
-    fun isKickingOff(state: Game): Boolean {
-        TODO("Not yet implemented")
+    /**
+     * Returns the result of rolling a direction using the Throw-in
+     * template (or Random Direction template in case of corners)
+     */
+    fun throwIn(from: FieldCoordinate, d3: D3Result): Direction {
+        val corner = from.getCornerLocation(this)
+        return if (corner != null) {
+            randomDirectionTemplate.roll(corner, d3)
+        } else {
+            if (from.x == 0) {
+                ThrowInTemplate.roll(ThrowInPosition.LEFT, d3)
+            } else if (from.x == fieldWidth - 1) {
+                ThrowInTemplate.roll(ThrowInPosition.RIGHT, d3)
+            } else if (from.y == 0) {
+                ThrowInTemplate.roll(ThrowInPosition.TOP, d3)
+            } else if (from.y == fieldHeight - 1) {
+                ThrowInTemplate.roll(ThrowInPosition.BOTTOM, d3)
+            } else {
+                throw IllegalArgumentException("Cannot determine position of: $from")
+            }
+        }
     }
 
     /**
@@ -204,12 +219,13 @@ interface Rules {
         activeTeam: Team,
         square: FieldSquare,
         modifiers: MutableList<DiceModifier>,
+        markedModifier: DiceModifier = CatchModifier.MARKED
     ) {
         square.coordinates.getSurroundingCoordinates(this).forEach {
             val markingPlayer: Player? = game.field[it].player
             if (markingPlayer != null) {
                 if (markingPlayer.team != activeTeam && canMark(markingPlayer)) {
-                    modifiers.add(CatchModifier.MARKED)
+                    modifiers.add(markedModifier)
                 }
             }
         }
@@ -269,6 +285,13 @@ interface Rules {
 //            .toSet()
     }
 
+    /**
+     * Returns `true` if the team has a hold of the ball.
+     */
+    fun teamHasBall(team: Team): Boolean {
+        return team.firstOrNull { it.hasBall() } != null
+    }
+
     // Characteristic limits
     val moveRange: IntRange
         get() = 1..9
@@ -299,20 +322,20 @@ interface Rules {
     // Field description
 
     // Total width of the field
-    val fieldWidth: UInt
-        get() = 26u
+    val fieldWidth: Int
+        get() = 26
 
     // Total height of the field
-    val fieldHeight: UInt
-        get() = 15u
+    val fieldHeight: Int
+        get() = 15
 
     // Height of the Wide Zone at the top and bottom of the field
-    val wideZone: UInt
-        get() = 4u
+    val wideZone: Int
+        get() = 4
 
     // Width of the End Zone at each end of the field
-    val endZone: UInt
-        get() = 1u
+    val endZone: Int
+        get() = 1
 
     // X-coordinates for the line of scrimmage for the home team
     val lineOfScrimmageHome: Int
@@ -354,6 +377,12 @@ interface Rules {
 
     val lastingInjuryTable
         get() = LastingInjuryTable
+
+    val argueTheCallTable
+        get() = ArgueTheCallTable
+
+    val rangeRuler
+        get() = RangeRuler
 
     val teamActions: TeamActions
         get() = BB2020TeamActions()

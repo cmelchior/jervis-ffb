@@ -35,10 +35,7 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  * choose the appropriate action depending on the outcome.
  */
 object CatchRoll : Procedure() {
-    override fun isValid(
-        state: Game,
-        rules: Rules,
-    ) {
+    override fun isValid(state: Game, rules: Rules) {
         if (state.catchRollContext == null) {
             INVALID_GAME_STATE("No catch roll context found")
         }
@@ -46,27 +43,14 @@ object CatchRoll : Procedure() {
 
     override val initialNode: Node = RollDie
 
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
 
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollDie : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) {
                 val rollContext = state.catchRollContext!!
                 val target = rollContext.catchingPlayer.agility
