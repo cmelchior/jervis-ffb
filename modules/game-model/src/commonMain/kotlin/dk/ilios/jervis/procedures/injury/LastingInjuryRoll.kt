@@ -12,7 +12,9 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.assert
 
 /**
@@ -53,6 +55,7 @@ object LastingInjuryRoll: Procedure() {
                 )
 
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.LASTING_INJURY, d6),
                     SetOldContext(Game::riskingInjuryRollsContext, updatedContext),
                     ExitProcedure()
                 )

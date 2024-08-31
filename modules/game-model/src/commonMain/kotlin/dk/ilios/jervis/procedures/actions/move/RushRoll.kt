@@ -21,10 +21,11 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.UseRerollContext
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.procedures.D6DieRoll
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -67,6 +68,7 @@ import dk.ilios.jervis.utils.sum
                 val context = state.rushRollContext!!
                 val success = isRushSuccess(d6, context.rollModifiers)
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.RUSH, d6),
                     SetOldContext(Game::rushRollContext, context.copy(
                         roll = D6DieRoll(d6),
                         isSuccess = success,
@@ -166,6 +168,7 @@ import dk.ilios.jervis.utils.sum
                     isSuccess = isRushSuccess(d6, rushContext.rollModifiers),
                 )
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.RUSH, d6),
                     SetOldContext(Game::rushRollContext, rerollResult),
                     ExitProcedure(),
                 )

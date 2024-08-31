@@ -17,7 +17,9 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 data class DeviateRollContext(
@@ -79,6 +81,7 @@ object DeviateRoll : Procedure() {
                 }
 
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.DEVIATE, listOf(d8, d6), showDiceType = true),
                     SetOldContext(
                         Game::deviateRollContext, context.copy(
                             deviateRoll = listOf(d8, d6),

@@ -5,6 +5,13 @@ import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Game
 import kotlin.random.Random
 
+/**
+ *
+ * Implementation Note:
+ * Compose 1.7.0 should add support for using HTML in strings so it can
+ * be shown using Spannables in compose. This would allow us to theme it.
+ * https://issuetracker.google.com/issues/139320238
+ */
 abstract class LogEntry : Command {
     private val id: Long = Random.nextLong()
     abstract val category: LogCategory

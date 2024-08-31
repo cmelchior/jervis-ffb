@@ -13,7 +13,9 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.utils.assert
 
@@ -58,6 +60,7 @@ object CasualtyRoll: Procedure() {
                 )
 
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.CASUALTY, d16),
                     SetOldContext(Game::riskingInjuryRollsContext, updatedContext),
                     ExitProcedure()
                 )

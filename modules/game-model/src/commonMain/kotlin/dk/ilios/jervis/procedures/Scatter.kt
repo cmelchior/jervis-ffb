@@ -15,7 +15,9 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import dk.ilios.jervis.utils.assert
 
@@ -75,6 +77,7 @@ object Scatter : Procedure() {
                     }
                 }
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.SCATTER, dice),
                     SetOldContext(
                         Game::scatterRollContext, state.scatterRollContext!!.copy(
                             scatterRoll = dice,

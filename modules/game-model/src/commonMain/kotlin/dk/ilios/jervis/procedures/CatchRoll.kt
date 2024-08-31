@@ -22,6 +22,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.CatchRollContext
 import dk.ilios.jervis.model.context.UseRerollContext
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -57,6 +58,7 @@ object CatchRoll : Procedure() {
                     isSuccess = isCatchSuccess(d6, rollContext.target, rollContext)
                 )
                 return compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.CATCH, d6),
                     SetOldContext(Game::catchRollContext, resultContext),
                     GotoNode(ChooseReRollSource),
                 )

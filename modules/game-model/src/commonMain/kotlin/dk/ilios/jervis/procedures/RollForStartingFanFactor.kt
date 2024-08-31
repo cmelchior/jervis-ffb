@@ -15,8 +15,10 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportFanFactor
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 object RollForStartingFanFactor : Procedure() {
@@ -56,6 +58,7 @@ object RollForStartingFanFactor : Procedure() {
             return checkDiceRoll<D3Result>(action) {
                 val total = it.value + dedicatedFans
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.DEDICATED_FANS, it),
                     SetFanFactor(state.homeTeam, total),
                     ReportFanFactor(state.homeTeam, it.value, dedicatedFans),
                     GotoNode(SetFanFactorForAwayTeam),
@@ -81,6 +84,7 @@ object RollForStartingFanFactor : Procedure() {
             return checkDiceRoll<D3Result>(action) {
                 val total = it.value + dedicatedFans
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.DEDICATED_FANS, it),
                     SetFanFactor(state.awayTeam, total),
                     ReportFanFactor(state.awayTeam, it.value, dedicatedFans),
                     ExitProcedure(),

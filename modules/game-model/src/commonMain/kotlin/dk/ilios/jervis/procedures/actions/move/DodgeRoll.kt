@@ -43,6 +43,7 @@ import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.modifiers.DodgeRollModifier
 import dk.ilios.jervis.model.modifiers.MarkedModifier
 import dk.ilios.jervis.procedures.D6DieRoll
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportDodgeResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.BreakTackle
@@ -113,6 +114,7 @@ import dk.ilios.jervis.utils.sum
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<DodgeRollContext>()
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.DODGE, d6),
                     SetContext(context.copy(roll = D6DieRoll(d6))),
                     GotoNode(CalculateMandatoryModifiers)
                 )
@@ -401,6 +403,7 @@ import dk.ilios.jervis.utils.sum
                     )
                 )
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.DODGE, d6),
                     SetContext(rerolledDodgeRoll),
                     ExitProcedure(),
                 )

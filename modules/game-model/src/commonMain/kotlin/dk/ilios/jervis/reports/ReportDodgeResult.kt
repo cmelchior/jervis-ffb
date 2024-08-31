@@ -1,7 +1,6 @@
 package dk.ilios.jervis.reports
 
 import dk.ilios.jervis.model.context.DodgeRollContext
-import dk.ilios.jervis.utils.sum
 
 class ReportDodgeResult(private val context: DodgeRollContext) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
@@ -9,11 +8,9 @@ class ReportDodgeResult(private val context: DodgeRollContext) : LogEntry() {
         get() {
             return buildString {
                 when(context.isSuccess) {
-                    true -> appendLine("${context.player.name} successfully dodged on a D6 roll of ${context.roll!!.result.value}. ")
-                    false -> appendLine("${context.player.name} failed to dodge on a D6 roll of ${context.roll!!.result.value}.")
+                    true -> appendLine("${context.player.name} successfully dodged.")
+                    false -> appendLine("${context.player.name} crashed to the ground.")
                 }
-                appendLine("Target: ${context.player.agility}+")
-                append("Modifiers: ${context.rollModifiers.sum()}")
             }
         }
 }

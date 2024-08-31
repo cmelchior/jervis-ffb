@@ -24,6 +24,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.procedures.BlockDieRoll
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.DiceRollType
@@ -92,6 +93,7 @@ object BlockRoll : Procedure() {
                         BlockDieRoll(originalRoll = diceRoll)
                     }
                 return compositeCommandOf(
+                    ReportDiceRoll(roll),
                     SetOldContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
                     GotoNode(ChooseResultOrReRollSource),
                 )

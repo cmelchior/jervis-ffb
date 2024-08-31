@@ -21,7 +21,9 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.reports.ReportBounce
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.tables.Direction
 
 /**
@@ -89,6 +91,7 @@ object Bounce : Procedure() {
                     }
 
                 return compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.BOUNCE, d8),
                     SetBallLocation(newLocation),
                     ReportBounce(newLocation, if (outOfBounds) state.ball.location else null),
                     nextNode,

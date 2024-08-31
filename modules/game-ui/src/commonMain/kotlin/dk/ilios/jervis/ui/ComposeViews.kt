@@ -18,12 +18,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -329,9 +331,18 @@ fun LogViewer(
     modifier: Modifier,
 ) {
     val listData by vm.logs.collectAsState(initial = emptyList())
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(listData) {
+        if (listData.isNotEmpty()) {
+            listState.scrollToItem(listData.size - 1)
+        }
+    }
+
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
+        state = listState
     ) {
         items(items = listData, key = { item -> item.hashCode() }) {
             Text(text = it.message)
