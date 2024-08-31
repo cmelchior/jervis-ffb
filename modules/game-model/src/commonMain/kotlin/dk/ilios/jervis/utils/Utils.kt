@@ -56,7 +56,6 @@ import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.CoachId
 import dk.ilios.jervis.model.Coin
-import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
@@ -65,10 +64,12 @@ import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.procedures.D6DieRoll
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
+import dk.ilios.jervis.rules.roster.bb2020.LizardmenTeam
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.skills.RerollSource
@@ -78,6 +79,27 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.jvm.JvmName
 import kotlin.random.Random
+
+val HUMAN_AWAY_TEAM: Team =
+    teamBuilder(HumanTeam) {
+        coach = Coach(CoachId("away-coach"), "AwayCoach")
+        name = "AwayTeam"
+        addPlayer(PlayerId("A1"), "Lineman-1-A", PlayerNo(1), HumanTeam.LINEMAN)
+        addPlayer(PlayerId("A2"), "Lineman-2-A", PlayerNo(2), HumanTeam.LINEMAN)
+        addPlayer(PlayerId("A3"), "Lineman-3-A", PlayerNo(3), HumanTeam.LINEMAN)
+        addPlayer(PlayerId("A4"), "Lineman-4-A", PlayerNo(4), HumanTeam.LINEMAN)
+        addPlayer(PlayerId("A5"), "Thrower-1-A", PlayerNo(5), HumanTeam.THROWER)
+        addPlayer(PlayerId("A6"), "Catcher-1-A", PlayerNo(6), HumanTeam.CATCHER)
+        addPlayer(PlayerId("A7"), "Catcher-2-A", PlayerNo(7), HumanTeam.CATCHER)
+        addPlayer(PlayerId("A8"), "Blitzer-1-A", PlayerNo(8), HumanTeam.BLITZER)
+        addPlayer(PlayerId("A9"), "Blitzer-2-A", PlayerNo(9), HumanTeam.BLITZER)
+        addPlayer(PlayerId("A10"), "Blitzer-3-A", PlayerNo(10), HumanTeam.BLITZER)
+        addPlayer(PlayerId("A11"), "Blitzer-4-A", PlayerNo(11), HumanTeam.BLITZER)
+        reRolls = 4
+        apothecaries = 1
+    }
+
+
 
 fun createRandomAction(
     state: Game,
@@ -164,6 +186,9 @@ inline fun INVALID_ACTION(action: GameAction, customMessage: String? = null): No
     } ?: "Invalid action selected: $action")
 }
 
+
+
+
 fun createDefaultGameState(rules: BB2020Rules): Game {
     val team1: Team =
         teamBuilder(HumanTeam) {
@@ -184,20 +209,20 @@ fun createDefaultGameState(rules: BB2020Rules): Game {
             apothecaries = 1
         }
     val team2: Team =
-        teamBuilder(HumanTeam) {
+        teamBuilder(LizardmenTeam) {
             coach = Coach(CoachId("away-coach"), "AwayCoach")
             name = "AwayTeam"
-            addPlayer(PlayerId("A1"), "Lineman-1-A", PlayerNo(1), HumanTeam.LINEMAN)
-            addPlayer(PlayerId("A2"), "Lineman-2-A", PlayerNo(2), HumanTeam.LINEMAN)
-            addPlayer(PlayerId("A3"), "Lineman-3-A", PlayerNo(3), HumanTeam.LINEMAN)
-            addPlayer(PlayerId("A4"), "Lineman-4-A", PlayerNo(4), HumanTeam.LINEMAN)
-            addPlayer(PlayerId("A5"), "Thrower-1-A", PlayerNo(5), HumanTeam.THROWER)
-            addPlayer(PlayerId("A6"), "Catcher-1-A", PlayerNo(6), HumanTeam.CATCHER)
-            addPlayer(PlayerId("A7"), "Catcher-2-A", PlayerNo(7), HumanTeam.CATCHER)
-            addPlayer(PlayerId("A8"), "Blitzer-1-A", PlayerNo(8), HumanTeam.BLITZER)
-            addPlayer(PlayerId("A9"), "Blitzer-2-A", PlayerNo(9), HumanTeam.BLITZER)
-            addPlayer(PlayerId("A10"), "Blitzer-3-A", PlayerNo(10), HumanTeam.BLITZER)
-            addPlayer(PlayerId("A11"), "Blitzer-4-A", PlayerNo(11), HumanTeam.BLITZER)
+            addPlayer(PlayerId("A1"), "Lineman-1-A", PlayerNo(1), LizardmenTeam.KROXIGOR)
+            addPlayer(PlayerId("A2"), "Lineman-2-A", PlayerNo(2), LizardmenTeam.SAURUS_BLOCKERS)
+            addPlayer(PlayerId("A3"), "Lineman-3-A", PlayerNo(3), LizardmenTeam.SAURUS_BLOCKERS)
+            addPlayer(PlayerId("A4"), "Lineman-4-A", PlayerNo(4), LizardmenTeam.SAURUS_BLOCKERS)
+            addPlayer(PlayerId("A5"), "Thrower-1-A", PlayerNo(5), LizardmenTeam.SAURUS_BLOCKERS)
+            addPlayer(PlayerId("A6"), "Catcher-1-A", PlayerNo(6), LizardmenTeam.SAURUS_BLOCKERS)
+            addPlayer(PlayerId("A7"), "Catcher-2-A", PlayerNo(7), LizardmenTeam.SAURUS_BLOCKERS)
+            addPlayer(PlayerId("A8"), "Blitzer-1-A", PlayerNo(8), LizardmenTeam.CHAMELEON_SKINKS)
+            addPlayer(PlayerId("A9"), "Blitzer-2-A", PlayerNo(9), LizardmenTeam.SKINK_RUNNER_LINEMEN)
+            addPlayer(PlayerId("A10"), "Blitzer-3-A", PlayerNo(10), LizardmenTeam.SKINK_RUNNER_LINEMEN)
+            addPlayer(PlayerId("A11"), "Blitzer-4-A", PlayerNo(11), LizardmenTeam.SKINK_RUNNER_LINEMEN)
             reRolls = 4
             apothecaries = 1
         }

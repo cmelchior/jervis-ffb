@@ -3,6 +3,7 @@ package dk.ilios.jervis.model
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.skills.Skill
+import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlin.jvm.JvmInline
@@ -138,7 +139,7 @@ class Player(
     }
 
     inline fun <reified T: Skill> getSkill(): T {
-        return skills.filterIsInstance<T>().first()
+        return skills.filterIsInstance<T>().firstOrNull() ?: INVALID_GAME_STATE("Player does not have the skill ${T::class.simpleName}")
     }
 
     inline fun <reified T: Skill> getSkillOrNull(): T? {

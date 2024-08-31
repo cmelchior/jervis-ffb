@@ -5,9 +5,9 @@ import dk.ilios.jervis.rules.bb2020.Agility
 import kotlinx.serialization.Serializable
 
 @Serializable
-class CatchSkill : BB2020Skill, D6StandardSkillReroll {
-    override val id: String = "catch-skill"
-    override val name: String = "Catch"
+class SureFeet : BB2020Skill, D6StandardSkillReroll {
+    override val id: String = "sure-feet-skill"
+    override val name: String = "Sure Feet"
     override val compulsory: Boolean = false
     override val resetAt: ResetPolicy = ResetPolicy.NEVER
     override val category: SkillCategory = Agility
@@ -16,9 +16,8 @@ class CatchSkill : BB2020Skill, D6StandardSkillReroll {
     override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = false
 
-    // Catch is always available
-    override val rerollResetAt: ResetPolicy = ResetPolicy.NEVER
-    override val rerollDescription: String = "Catch Reroll"
+    override val rerollResetAt: ResetPolicy = ResetPolicy.END_OF_TURN
+    override val rerollDescription: String = "Sure Feet Reroll"
     override var rerollUsed: Boolean = false
 
     override fun canReroll(
@@ -26,11 +25,11 @@ class CatchSkill : BB2020Skill, D6StandardSkillReroll {
         value: List<DieRoll<*, *>>,
         wasSuccess: Boolean?,
     ): Boolean {
-        return type == DiceRollType.CATCH
+        return type == DiceRollType.PICKUP
     }
 
     @Serializable
-    data object Factory : SkillFactory {
-        override fun createSkill(): CatchSkill = CatchSkill()
+    data object Factory: SkillFactory {
+        override fun createSkill() = SureFeet()
     }
 }

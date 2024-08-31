@@ -13,6 +13,7 @@ import dk.ilios.jervis.rules.roster.bb2020.ChaosDwarfTeam
 import dk.ilios.jervis.rules.roster.bb2020.ElvenUnionTeam
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.roster.bb2020.KhorneTeam
+import dk.ilios.jervis.rules.roster.bb2020.LizardmenTeam
 import dk.ilios.jervis.rules.roster.bb2020.SkavenTeam
 import dk.ilios.jervis.ui.getSubImage
 import dk.ilios.jervis.ui.loadImage
@@ -46,6 +47,10 @@ val playerIconSpriteSheets =
         SkavenTeam.GUTTER_RUNNER to "$iconRootPath/skaven_gutterrunner.png",
         SkavenTeam.BLITZER to "$iconRootPath/skaven_blitzer.png",
         SkavenTeam.RAT_OGRE to "$iconRootPath/skaven_ratogre.png",
+        LizardmenTeam.SKINK_RUNNER_LINEMEN to "$iconRootPath/lizardmen_skinkrunnerlineman.png",
+        LizardmenTeam.CHAMELEON_SKINKS to "$iconRootPath/lizardmen_chameleonskink.png",
+        LizardmenTeam.SAURUS_BLOCKERS to "$iconRootPath/lizardmen_saurusblocker.png",
+        LizardmenTeam.KROXIGOR to "$iconRootPath/lizardmen_kroxigor.png",
     )
 
 data class PositionImage(

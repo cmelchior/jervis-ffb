@@ -37,7 +37,7 @@ import dk.ilios.jervis.reports.ReportEndingTurn
 import dk.ilios.jervis.reports.ReportStartingTurn
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.Skill
+import dk.ilios.jervis.rules.skills.ResetPolicy
 import dk.ilios.jervis.utils.INVALID_ACTION
 
 /**
@@ -293,7 +293,7 @@ object TeamTurn : Procedure() {
     private fun resetSkillsUsed(state: Game, rules: Rules): Array<Command> {
         return state.activeTeam
             .map {
-                val skillsThatReset = it.skills.filter { it.used  && it.resetAt == Skill.ResetPolicy.END_OF_TURN}
+                val skillsThatReset = it.skills.filter { it.used  && it.resetAt == ResetPolicy.END_OF_TURN}
                 Pair(it, skillsThatReset)
             }
             .flatMap {

@@ -82,7 +82,7 @@ import dk.ilios.jervis.utils.sum
  * Designer's Commentary:
  * It is possible to wait using Diving Tackle until the reroll has been made
  *
- * Implementation Note:
+ * Developer's Commentary:
  * Given the Designer's Commentary, technically all optional skills not selected before the
  * first roll should go through another selection process, but I cannot find any reason why
  * you would want that. It makes sense for "Diving Tackle", since it brings a penalty, but
@@ -244,7 +244,7 @@ import dk.ilios.jervis.utils.sum
                     val player = action.player
                     compositeCommandOf(
                         SetContext(context.copyAndAddModifier(DodgeRollModifier.PREHENSILE_TAIL)),
-                        SetSkillUsed(player, player.getSkill<BreakTackle>(), true),
+                        SetSkillUsed(player, player.getSkill<PrehensileTail>(), true),
                         GotoNode(ChooseToUseDivingTackle)
                     )
                 }

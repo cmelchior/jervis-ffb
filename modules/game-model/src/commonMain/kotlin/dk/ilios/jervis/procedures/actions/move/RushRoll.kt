@@ -42,8 +42,22 @@ import dk.ilios.jervis.utils.sum
  * the player will be knocked down in the starting square, rather than
  * in the ending square.
  *
- * It more than one rush is required, it is up to the caller of this procedure
+ * Developer's Commentary:
+ * If more than one rush is required, it is up to the caller of this procedure
  * to do so. And also handle each roll result.
+ *
+ * Skills are optional to use, so technically you would choose to use Sprint
+ * as part of doing a Rush, but since Rushing is also, we opt for the easier
+ * implementation and check for Sprint when starting an action and add either
+ * 2 or 3 allowed rushes there.
+ *
+ * Also, an observation about Rushing. It is worded this way in the rules:
+ *
+ * "Whenever a player performs an action that includes movement.."
+ *
+ * This means that if, by any means, a player is able to do two actions.
+ * They would be able to move 2*Rush distance. Sprint has a similar wording
+ * that would allow it to be used in both actions as well.
  */
  object RushRoll: Procedure() {
     override val initialNode: Node = RollDie

@@ -13,7 +13,7 @@ class BreakTackle : BB2020Skill{
     override val id: String = "break-tackle-skill"
     override val name: String = "Break Tackle"
     override val compulsory: Boolean = false
-    override val resetAt: Skill.ResetPolicy = Skill.ResetPolicy.END_OF_TURN
+    override val resetAt: ResetPolicy = ResetPolicy.END_OF_TURN
     override val category: SkillCategory = Strength
     override var used: Boolean = false
     override val value: Int? = null

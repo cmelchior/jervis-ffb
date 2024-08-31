@@ -13,7 +13,7 @@ class PrehensileTail : BB2020Skill{
     override val id: String = "prehensile-tail-skill"
     override val name: String = "Prehensile Tail"
     override val compulsory: Boolean = false
-    override val resetAt: Skill.ResetPolicy = Skill.ResetPolicy.NEVER
+    override val resetAt: ResetPolicy = ResetPolicy.NEVER
     override val category: SkillCategory = Traits
     override var used: Boolean = false
     override val value: Int? = null

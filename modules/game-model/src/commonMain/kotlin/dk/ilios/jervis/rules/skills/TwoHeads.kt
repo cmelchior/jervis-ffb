@@ -13,7 +13,7 @@ class TwoHeads : BB2020Skill{
     override val id: String = "two-heads-skill"
     override val name: String = "Two Heads"
     override val compulsory: Boolean = false
-    override val resetAt: Skill.ResetPolicy = Skill.ResetPolicy.NEVER
+    override val resetAt: ResetPolicy = ResetPolicy.NEVER
     override val category: SkillCategory = Mutations
     override var used: Boolean = false
     override val value: Int? = null

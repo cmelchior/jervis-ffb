@@ -20,15 +20,16 @@ object Pow: Procedure() {
     override val initialNode: Node = ResolvePush
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val newContext = createPushContext(state)
-        return SetOldContext(Game::pushContext, newContext)
+        val pushContext = createPushContext(state)
+        return compositeCommandOf(
+            ReportPowResult(pushContext.pusher, pushContext.pushee),
+            SetOldContext(Game::pushContext, pushContext)
+        )
     }
 
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        val context = state.pushContext!!
         return compositeCommandOf(
-            SetOldContext(Game::pushContext, null),
-            ReportPowResult(context.pusher, context.pushee)
+            SetOldContext(Game::pushContext, null)
         )
     }
 
@@ -59,6 +60,7 @@ object Pow: Procedure() {
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.pushContext!!
             return compositeCommandOf(
                 SetOldContext(Game::riskingInjuryRollsContext, null),
                 ExitProcedure()

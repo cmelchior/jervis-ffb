@@ -73,6 +73,7 @@ sealed interface TeamReroll : RerollSource {
 class RegularTeamReroll(val team: Team) : TeamReroll {
     override val carryOverIntoOvertime: Boolean = true
     override val isTemporary: Boolean = false
+    override val rerollResetAt: ResetPolicy = ResetPolicy.END_OF_HALF
     override val rerollDescription: String = "Team reroll"
     override var rerollUsed: Boolean = false
 }
@@ -80,12 +81,14 @@ class RegularTeamReroll(val team: Team) : TeamReroll {
 class LeaderTeamReroll(val player: Player) : TeamReroll {
     override val carryOverIntoOvertime: Boolean = true
     override val isTemporary: Boolean = true
+    override val rerollResetAt: ResetPolicy = ResetPolicy.END_OF_HALF
     override val rerollDescription: String = "Team reroll (Leader)"
     override var rerollUsed: Boolean = false
 }
 
 // Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {
+    val rerollResetAt: ResetPolicy
     val rerollDescription: String
     var rerollUsed: Boolean
     val rerollProcedure: Procedure
@@ -136,17 +139,17 @@ data class DiceRerollOption(
     val dice: List<DieRoll<*, *>>,
 )
 
+// When does the "used" state reset?
+enum class ResetPolicy {
+    NEVER,
+    END_OF_TURN,
+    END_OF_DRIVE,
+    END_OF_HALF,
+    SPECIAL,
+}
+
 @Serializable
 sealed interface Skill {
-    // When does the "used" state reset?
-    enum class ResetPolicy {
-        NEVER,
-        END_OF_TURN,
-        END_OF_DRIVE,
-        END_OF_HALF,
-        SPECIAL,
-    }
-
     // Unique identifier for this skill
     val id: String
     // Human readable name of this skill
@@ -154,6 +157,8 @@ sealed interface Skill {
     // Whether or not this skill is compulsory to use
     val compulsory: Boolean
     // Whether this skill count as being "used". The meaning of this is interpreted in the context it is used.
+    // Note, this specifically does not apply to a "reroll" part of a skill.
+    // See
     var used: Boolean
     // Represents any value in brackes, like Might Blow(1+) or Loner(4+). It is up to the context to correctly interpret this value
     val value: Int?

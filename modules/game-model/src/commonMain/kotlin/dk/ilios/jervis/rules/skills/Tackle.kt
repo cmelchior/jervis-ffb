@@ -8,7 +8,7 @@ class Tackle : BB2020Skill {
     override val id: String = "tackle-skill"
     override val name: String = "Tackle"
     override val compulsory: Boolean = false
-    override val resetAt: Skill.ResetPolicy = Skill.ResetPolicy.NEVER
+    override val resetAt: ResetPolicy = ResetPolicy.NEVER
     override val category: SkillCategory = General
     override var used: Boolean = false
     override val value: Int? = null

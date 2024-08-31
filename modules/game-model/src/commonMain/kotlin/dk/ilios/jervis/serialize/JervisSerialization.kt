@@ -42,8 +42,11 @@ import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Position
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
 import dk.ilios.jervis.rules.roster.bb2020.ChaosDwarfTeam
+import dk.ilios.jervis.rules.roster.bb2020.ElvenUnionTeam
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.roster.bb2020.KhorneTeam
+import dk.ilios.jervis.rules.roster.bb2020.LizardmenTeam
+import dk.ilios.jervis.rules.roster.bb2020.SkavenTeam
 import dk.ilios.jervis.utils.platformFileSystem
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -71,13 +74,19 @@ object JervisSerialization {
             }
             polymorphic(Roster::class) {
                 subclass(ChaosDwarfTeam::class)
+                subclass(ElvenUnionTeam::class)
                 subclass(HumanTeam::class)
                 subclass(KhorneTeam::class)
+                subclass(LizardmenTeam::class)
+                subclass(SkavenTeam::class)
             }
             polymorphic(BB2020Roster::class) {
                 subclass(ChaosDwarfTeam::class)
+                subclass(ElvenUnionTeam::class)
                 subclass(HumanTeam::class)
                 subclass(KhorneTeam::class)
+                subclass(LizardmenTeam::class)
+                subclass(SkavenTeam::class)
             }
             polymorphic(Position::class) {
                 subclass(BB2020Position::class)

@@ -13,7 +13,7 @@ class Titchy : BB2020Skill{
     override val id: String = "titchy-skill"
     override val name: String = "Titchy"
     override val compulsory: Boolean = true
-    override val resetAt: Skill.ResetPolicy = Skill.ResetPolicy.NEVER
+    override val resetAt: ResetPolicy = ResetPolicy.NEVER
     override val category: SkillCategory = Traits
     override var used: Boolean = false
     override val value: Int? = null

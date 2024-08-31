@@ -7,6 +7,7 @@ import dk.ilios.jervis.rules.bb2020.Strength
 import dk.ilios.jervis.rules.roster.RosterId
 import dk.ilios.jervis.rules.skills.Block
 import dk.ilios.jervis.rules.skills.CatchSkill
+import dk.ilios.jervis.rules.skills.Dodge
 import dk.ilios.jervis.rules.skills.SureHands
 import kotlinx.serialization.Serializable
 
@@ -45,7 +46,7 @@ data object HumanTeam : BB2020Roster {
             "Catcher",
             65_000,
             8, 2, 3, 5, 8,
-            listOf(CatchSkill.Factory), // Still misses Dodge
+            listOf(CatchSkill.Factory, Dodge.Factory),
             listOf(Agility, General),
             listOf(Strength, Passing),
         )
