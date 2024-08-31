@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -190,7 +191,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                         StatBox(modifier, "MV", model.move.toString())
                         StatBox(modifier, "ST", model.strength.toString())
                         StatBox(modifier, "AG", "${model.agility}+")
-                        StatBox(modifier, "PA", "${model.passing}+")
+                        StatBox(modifier, "PA", if (model.passing == null) "-" else "${model.passing}+")
                         StatBox(modifier, "AV", "${model.armorValue}+")
                     }
                 }
@@ -250,8 +251,9 @@ fun StatBox(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
+                    modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
                     text = value,
-                    fontSize = 8.sp,
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.Normal,
                     color = Color.Black,
                     textAlign = TextAlign.Center,

@@ -23,16 +23,18 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.procedures.actions.block.BlockStep
-import dk.ilios.jervis.procedures.actions.move.MoveContext
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
+import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
 import dk.ilios.jervis.reports.ReportActionEnded
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
+import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 
 
@@ -55,7 +57,13 @@ object BlitzAction : Procedure() {
     override fun onEnterProcedure(
         state: Game,
         rules: Rules,
-    ): Command = SetOldContext(Game::blitzContext, BlitzContext(state.activePlayer!!))
+    ): Command {
+        val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
+        return compositeCommandOf(
+            getSetPlayerRushesCommand(rules, player),
+            SetOldContext(Game::blitzContext, BlitzContext(player))
+        )
+    }
 
     override fun onExitProcedure(
         state: Game,

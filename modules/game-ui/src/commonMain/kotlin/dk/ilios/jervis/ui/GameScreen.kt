@@ -21,6 +21,7 @@ import dk.ilios.jervis.ui.viewmodel.RandomModeUiActionFactory
 import dk.ilios.jervis.ui.viewmodel.ReplayModeUiActionFactory
 import dk.ilios.jervis.ui.viewmodel.ReplayViewModel
 import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
+import dk.ilios.jervis.utils.LIZARDMEN_AWAY_TEAM
 import dk.ilios.jervis.utils.createDefaultGameState
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -50,7 +51,7 @@ class GameScreenModel(
             when (mode) {
                 Manual -> {
                     fumbbl = null
-                    this.controller = GameController(rules, createDefaultGameState(rules))
+                    this.controller = GameController(rules, createDefaultGameState(rules, awayTeam = LIZARDMEN_AWAY_TEAM))
                 }
 
                 Random -> {

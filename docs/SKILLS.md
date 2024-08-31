@@ -76,7 +76,7 @@ Skills should only be marked as completed here if they are implemented and have 
 
 - [ ] Arm Bar
 - [ ] Brawler
-- [ ] Break Tackle
+- [x] Break Tackle
 - [ ] Grab
 - [ ] Guard
 - [ ] Juggernaut

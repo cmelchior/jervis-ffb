@@ -16,7 +16,6 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetOldContext
-import dk.ilios.jervis.commands.SetPlayerRushesLeft
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -36,6 +35,10 @@ import dk.ilios.jervis.utils.sum
 /**
  * Handle a player rushing a single square.
  * See page 44 in the rulebook.
+ *
+ * This procedure is only responsible for the actual dice roll. The result
+ * must be handled by the procedure calling this one. This also includes
+ * modifying the number of rushes left.
  *
  * Designer's Commentary:
  * If two rushes are necessary for a Jump/Leap and the first roll is a failure,
@@ -67,10 +70,7 @@ import dk.ilios.jervis.utils.sum
         }
         return null
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        val context = state.rushRollContext!!
-        return SetPlayerRushesLeft(context.player, context.player.rushesLeft - 1)
-    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollDie: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {

@@ -137,6 +137,13 @@ class GameController(
         rollForwardToNextActionNode()
     }
 
+    fun startTestMode(start: Procedure) {
+        setupInitialStartingState(start)
+        rollForwardToNextActionNode()
+
+    }
+
+    // TODO What does this do exactly
     private fun rollForwardToNextActionNode() {
         if (!stack.isEmpty() && (stack.currentNode() is ComputationNode || stack.currentNode() is ParentNode)) {
             when (val currentNode: Node = stack.currentNode()) {
@@ -165,7 +172,7 @@ class GameController(
         }
     }
 
-    private fun setupInitialStartingState() {
+    private fun setupInitialStartingState(startingProcedure: Procedure = FullGame) {
         if (replayMode) {
             throw IllegalStateException("Replay mode is enabled")
         }
@@ -173,7 +180,7 @@ class GameController(
             throw IllegalStateException("Game was already started")
         }
         isStarted = true
-        setInitialProcedure(FullGame)
+        setInitialProcedure(startingProcedure)
     }
 
     suspend fun startCallbackMode(actionProvider: suspend (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction) {
@@ -291,5 +298,27 @@ class GameController(
         commands[replayIndex].execute(state, this)
         replayIndex += 1
         return true
+    }
+
+    // Test method
+    fun rollForward(vararg actions: GameAction) {
+        actions.forEach {
+            processAction(it)
+            rollForwardToNextActionNode()
+            gotoNextUserAction()
+        }
+        gotoNextUserAction()
+    }
+
+    // Roll forward to next action that requires user input.
+    // This means automatically providing "Continue" events if that
+    // is the only option.
+    private fun gotoNextUserAction() {
+        var newActions = getAvailableActions()
+        while (newActions.size == 1 && newActions.first() == ContinueWhenReady) {
+            processAction(Continue)
+            rollForwardToNextActionNode()
+            newActions = getAvailableActions()
+        }
     }
 }

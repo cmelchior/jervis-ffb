@@ -258,7 +258,6 @@ interface Rules {
         }
     }
 
-
     fun canUseTeamReroll(
         game: Game,
         player: Player,
@@ -336,7 +335,7 @@ interface Rules {
     val armorValueRange: IntProgression
         get() = 11 downTo 1
 
-    val rushesPrActivation: Int
+    val rushesPrAction: Int
         get() = 2
 
     // Game length setup

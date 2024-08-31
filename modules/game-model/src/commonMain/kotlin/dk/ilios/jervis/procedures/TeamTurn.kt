@@ -284,7 +284,6 @@ object TeamTurn : Procedure() {
                 SetPlayerStats(
                     it,
                     it.baseMove,
-                    rules.rushesPrActivation // Check for Sprint
                 )
             }.toTypedArray()
     }

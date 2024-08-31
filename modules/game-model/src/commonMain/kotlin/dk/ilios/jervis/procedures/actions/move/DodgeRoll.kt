@@ -45,6 +45,7 @@ import dk.ilios.jervis.model.modifiers.MarkedModifier
 import dk.ilios.jervis.procedures.D6DieRoll
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportDodgeResult
+import dk.ilios.jervis.reports.ReportSkillUsed
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.BreakTackle
 import dk.ilios.jervis.rules.skills.DiceRollType
@@ -169,6 +170,7 @@ import dk.ilios.jervis.utils.sum
             return compositeCommandOf(
                 when (action) {
                     Confirm -> {
+                        ReportSkillUsed(context.player, context.player.getSkill<TwoHeads>())
                         SetContext(context.copyAndAddModifier(DodgeRollModifier.TWO_HEADS))
                     }
                     Cancel,
@@ -200,6 +202,7 @@ import dk.ilios.jervis.utils.sum
                     Confirm -> {
                         val modifier = BreakTackleModifier(player.strength)
                         compositeCommandOf(
+                            ReportSkillUsed(context.player, context.player.getSkill<BreakTackle>()),
                             SetContext(context.copyAndAddModifier(modifier)),
                             SetSkillUsed(player = player, skill = player.getSkill<BreakTackle>(), used = true),
                             GotoNode(ChooseToUsePrehensileTail)
@@ -241,10 +244,9 @@ import dk.ilios.jervis.utils.sum
             val context = state.getContext<DodgeRollContext>()
             return when (action) {
                 is PlayerSelected -> {
-                    val player = action.player
                     compositeCommandOf(
+                        ReportSkillUsed(action.player, action.player.getSkill<PrehensileTail>()),
                         SetContext(context.copyAndAddModifier(DodgeRollModifier.PREHENSILE_TAIL)),
-                        SetSkillUsed(player, player.getSkill<PrehensileTail>(), true),
                         GotoNode(ChooseToUseDivingTackle)
                     )
                 }
@@ -286,9 +288,10 @@ import dk.ilios.jervis.utils.sum
             return when (action) {
                 is PlayerSelected -> {
                     val player = action.player
+                    val skill = player.getSkill<DivingTackle>()
                     compositeCommandOf(
+                        ReportSkillUsed(player, skill),
                         SetContext(context.copyAndAddModifier(DodgeRollModifier.DIVING_TACKLE)),
-                        SetSkillUsed(player, player.getSkill<DivingTackle>(), true),
                         GotoNode(CalculateSuccess)
                     )
                 }
@@ -298,7 +301,8 @@ import dk.ilios.jervis.utils.sum
                 }
                 else -> INVALID_ACTION(action)
             }
-        }    }
+        }
+    }
 
     /**
      * After selecting all modifiers. Calculate if the roll was successful or not.
@@ -405,7 +409,7 @@ import dk.ilios.jervis.utils.sum
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGE, d6),
                     SetContext(rerolledDodgeRoll),
-                    ExitProcedure(),
+                    GotoNode(CalculateSuccess),
                 )
             }
         }

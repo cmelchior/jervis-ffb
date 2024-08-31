@@ -3,6 +3,7 @@ package dk.ilios.jervis.model
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.model.context.CatchRollContext
 import dk.ilios.jervis.model.context.ContextHolder
+import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.RushRollContext
 import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.procedures.DeviateRollContext
@@ -18,7 +19,6 @@ import dk.ilios.jervis.procedures.actions.block.PushContext
 import dk.ilios.jervis.procedures.actions.block.StumbleContext
 import dk.ilios.jervis.procedures.actions.foul.FoulContext
 import dk.ilios.jervis.procedures.actions.handoff.HandOffContext
-import dk.ilios.jervis.procedures.actions.move.MoveContext
 import dk.ilios.jervis.procedures.actions.pass.PassContext
 import dk.ilios.jervis.procedures.actions.pass.PassingInteferenceContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
@@ -53,8 +53,9 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var activePlayer: Player? = null
     var kickingPlayer: Player? = null
 
-    // Active/Inactive does indicate "active turn"
+    // In some cases team rerolls are not allowed, like during setups
     var canUseTeamRerolls = false
+    // Active/Inactive does indicate "active turn"
     var activeTeam: Team = this.homeTeam
     var inactiveTeam: Team = this.awayTeam
     var kickingTeam: Team = this.homeTeam

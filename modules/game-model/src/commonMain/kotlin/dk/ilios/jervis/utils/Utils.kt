@@ -50,6 +50,7 @@ import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.TossCoin
+import dk.ilios.jervis.commands.SetAvailableTeamRerolls
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.controller.GameController
@@ -95,6 +96,25 @@ val HUMAN_AWAY_TEAM: Team =
         addPlayer(PlayerId("A9"), "Blitzer-2-A", PlayerNo(9), HumanTeam.BLITZER)
         addPlayer(PlayerId("A10"), "Blitzer-3-A", PlayerNo(10), HumanTeam.BLITZER)
         addPlayer(PlayerId("A11"), "Blitzer-4-A", PlayerNo(11), HumanTeam.BLITZER)
+        reRolls = 4
+        apothecaries = 1
+    }
+
+val LIZARDMEN_AWAY_TEAM: Team =
+    teamBuilder(LizardmenTeam) {
+        coach = Coach(CoachId("away-coach"), "AwayCoach")
+        name = "AwayTeam"
+        addPlayer(PlayerId("A1"), "Lineman-1-A", PlayerNo(1), LizardmenTeam.KROXIGOR)
+        addPlayer(PlayerId("A2"), "Lineman-2-A", PlayerNo(2), LizardmenTeam.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A3"), "Lineman-3-A", PlayerNo(3), LizardmenTeam.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A4"), "Lineman-4-A", PlayerNo(4), LizardmenTeam.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A5"), "Thrower-1-A", PlayerNo(5), LizardmenTeam.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A6"), "Catcher-1-A", PlayerNo(6), LizardmenTeam.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A7"), "Catcher-2-A", PlayerNo(7), LizardmenTeam.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A8"), "Blitzer-1-A", PlayerNo(8), LizardmenTeam.CHAMELEON_SKINKS)
+        addPlayer(PlayerId("A9"), "Blitzer-2-A", PlayerNo(9), LizardmenTeam.SKINK_RUNNER_LINEMEN)
+        addPlayer(PlayerId("A10"), "Blitzer-3-A", PlayerNo(10), LizardmenTeam.SKINK_RUNNER_LINEMEN)
+        addPlayer(PlayerId("A11"), "Blitzer-4-A", PlayerNo(11), LizardmenTeam.SKINK_RUNNER_LINEMEN)
         reRolls = 4
         apothecaries = 1
     }
@@ -187,9 +207,60 @@ inline fun INVALID_ACTION(action: GameAction, customMessage: String? = null): No
 }
 
 
+/**
+ * Default setup of two test teams.
+ *
+ * They will be set up in a mirror way.
+ *
+ * - 1-5 Are setup in the midle of the LoS
+ * - 6-7 are setup next to each other on the right line 1 step away from LoS
+ * - 8-9 are setup next to each on the left line 1 step away from LoS
+ * - 10-11 are setup in the backfield
+ */
+fun setupTeamsOnField(controller: GameController) {
+    val homeCommands = with(controller.state.homeTeam) {
+        listOf(
+            SetPlayerLocation(get(PlayerNo(1))!!, FieldCoordinate(12, 5)),
+            SetPlayerLocation(get(PlayerNo(2))!!, FieldCoordinate(12, 6)),
+            SetPlayerLocation(get(PlayerNo(3))!!, FieldCoordinate(12, 7)),
+            SetPlayerLocation(get(PlayerNo(4))!!, FieldCoordinate(12, 8)),
+            SetPlayerLocation(get(PlayerNo(5))!!, FieldCoordinate(12, 9)),
+            SetPlayerLocation(get(PlayerNo(6))!!, FieldCoordinate(11, 1)),
+            SetPlayerLocation(get(PlayerNo(7))!!, FieldCoordinate(11, 2)),
+            SetPlayerLocation(get(PlayerNo(8))!!, FieldCoordinate(11, 12)),
+            SetPlayerLocation(get(PlayerNo(9))!!, FieldCoordinate(11, 13)),
+            SetPlayerLocation(get(PlayerNo(10))!!, FieldCoordinate(9, 7)),
+            SetPlayerLocation(get(PlayerNo(11))!!, FieldCoordinate(3, 7))
+        )
+    }
+    val awayCommands = with(controller.state.awayTeam) {
+        listOf(
+            SetPlayerLocation(get(PlayerNo(1))!!, FieldCoordinate(13, 5)),
+            SetPlayerLocation(get(PlayerNo(2))!!, FieldCoordinate(13, 6)),
+            SetPlayerLocation(get(PlayerNo(3))!!, FieldCoordinate(13, 7)),
+            SetPlayerLocation(get(PlayerNo(4))!!, FieldCoordinate(13, 8)),
+            SetPlayerLocation(get(PlayerNo(5))!!, FieldCoordinate(13, 9)),
+            SetPlayerLocation(get(PlayerNo(6))!!, FieldCoordinate(14, 1)),
+            SetPlayerLocation(get(PlayerNo(7))!!, FieldCoordinate(14, 2)),
+            SetPlayerLocation(get(PlayerNo(8))!!, FieldCoordinate(14, 12)),
+            SetPlayerLocation(get(PlayerNo(9))!!, FieldCoordinate(14, 13)),
+            SetPlayerLocation(get(PlayerNo(10))!!, FieldCoordinate(16, 7)),
+            SetPlayerLocation(get(PlayerNo(11))!!, FieldCoordinate(22, 7))
+        )
+    }
 
+    (homeCommands + awayCommands).forEach { command ->
+        command.execute(controller.state, controller)
+    }
 
-fun createDefaultGameState(rules: BB2020Rules): Game {
+    // Also enable Team rerolls
+    controller.state.activeTeam = controller.state.homeTeam
+    controller.state.canUseTeamRerolls = true
+    SetAvailableTeamRerolls(controller.state.homeTeam).execute(controller.state, controller)
+    SetAvailableTeamRerolls(controller.state.awayTeam).execute(controller.state, controller)
+}
+
+fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = HUMAN_AWAY_TEAM): Game {
     val team1: Team =
         teamBuilder(HumanTeam) {
             coach = Coach(CoachId("home-coach"), "HomeCoach")
@@ -208,26 +279,8 @@ fun createDefaultGameState(rules: BB2020Rules): Game {
             reRolls = 4
             apothecaries = 1
         }
-    val team2: Team =
-        teamBuilder(LizardmenTeam) {
-            coach = Coach(CoachId("away-coach"), "AwayCoach")
-            name = "AwayTeam"
-            addPlayer(PlayerId("A1"), "Lineman-1-A", PlayerNo(1), LizardmenTeam.KROXIGOR)
-            addPlayer(PlayerId("A2"), "Lineman-2-A", PlayerNo(2), LizardmenTeam.SAURUS_BLOCKERS)
-            addPlayer(PlayerId("A3"), "Lineman-3-A", PlayerNo(3), LizardmenTeam.SAURUS_BLOCKERS)
-            addPlayer(PlayerId("A4"), "Lineman-4-A", PlayerNo(4), LizardmenTeam.SAURUS_BLOCKERS)
-            addPlayer(PlayerId("A5"), "Thrower-1-A", PlayerNo(5), LizardmenTeam.SAURUS_BLOCKERS)
-            addPlayer(PlayerId("A6"), "Catcher-1-A", PlayerNo(6), LizardmenTeam.SAURUS_BLOCKERS)
-            addPlayer(PlayerId("A7"), "Catcher-2-A", PlayerNo(7), LizardmenTeam.SAURUS_BLOCKERS)
-            addPlayer(PlayerId("A8"), "Blitzer-1-A", PlayerNo(8), LizardmenTeam.CHAMELEON_SKINKS)
-            addPlayer(PlayerId("A9"), "Blitzer-2-A", PlayerNo(9), LizardmenTeam.SKINK_RUNNER_LINEMEN)
-            addPlayer(PlayerId("A10"), "Blitzer-3-A", PlayerNo(10), LizardmenTeam.SKINK_RUNNER_LINEMEN)
-            addPlayer(PlayerId("A11"), "Blitzer-4-A", PlayerNo(11), LizardmenTeam.SKINK_RUNNER_LINEMEN)
-            reRolls = 4
-            apothecaries = 1
-        }
     val field = Field.createForRuleset(rules)
-    return Game(team1, team2, field)
+    return Game(team1, awayTeam, field)
 }
 
 /**

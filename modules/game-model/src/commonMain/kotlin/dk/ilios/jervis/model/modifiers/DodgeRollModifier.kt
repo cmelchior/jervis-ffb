@@ -12,7 +12,7 @@ enum class DodgeRollModifier(override val modifier: Int, override val descriptio
     DIVING_TACKLE(-2, "Diving Tackle")
 }
 
-class BreakTackleModifier(val playerStrength: Int): DiceModifier {
+data class BreakTackleModifier(val playerStrength: Int): DiceModifier {
     override val modifier: Int = if (playerStrength > 4) 2 else 1
     override val description: String = "Break Tackle"
 }

@@ -96,15 +96,15 @@ object PickupRoll : Procedure() {
             val successOnFirstRoll = context.success
             val pickupPlayer = context.player
             val availableSkills: List<SelectRerollOption> =
-                pickupPlayer.skills
+                pickupPlayer.skills.asSequence()
                     .filter { it is RerollSource }
                     .map { it as RerollSource }
                     .filter { skill -> skill.canReroll(DiceRollType.PICKUP, listOf(context.roll), successOnFirstRoll) }
-                    .flatMap {
-                            it: RerollSource ->
+                    .flatMap { it: RerollSource ->
                         it.calculateRerollOptions(DiceRollType.PICKUP, context.roll, successOnFirstRoll)
                     }
                     .map { SelectRerollOption(it) }
+                    .toList()
 
             val team = pickupPlayer.team
             val hasTeamRerolls = team.availableRerollCount > 0

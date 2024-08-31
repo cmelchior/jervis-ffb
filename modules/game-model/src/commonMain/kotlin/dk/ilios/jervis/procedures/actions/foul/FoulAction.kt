@@ -24,10 +24,11 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
-import dk.ilios.jervis.procedures.actions.move.MoveContext
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
+import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.reports.ReportActionEnded
 import dk.ilios.jervis.reports.ReportFoulResult
@@ -35,6 +36,7 @@ import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.ArgueTheCallResult
 import dk.ilios.jervis.utils.INVALID_ACTION
+import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 
 
@@ -64,7 +66,13 @@ object FoulAction : Procedure() {
     override fun onEnterProcedure(
         state: Game,
         rules: Rules,
-    ): Command = SetOldContext(Game::foulContext, FoulContext(state.activePlayer!!))
+    ): Command {
+        val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
+        return compositeCommandOf(
+            getSetPlayerRushesCommand(rules, player),
+            SetOldContext(Game::foulContext, FoulContext(player))
+        )
+    }
 
     override fun onExitProcedure(
         state: Game,

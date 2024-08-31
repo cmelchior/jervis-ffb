@@ -39,7 +39,7 @@ class Field(val width: Int, val height: Int) : Iterable<FieldSquare> {
         return player
     }
 
-    private inline fun assertEmptySquare(
+    private fun assertEmptySquare(
         x: Int,
         y: Int,
     ) {

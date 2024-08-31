@@ -105,8 +105,10 @@ class Player(
     var basePassing: Int? = 0
     var baseArmorValue: Int = 0
     val extraSkills = mutableListOf<Skill>()
-    var positionSkills: List<Skill>
+    var positionSkills = position.skills.map { it.createSkill() }.toMutableList()
+    @Transient
     val skills: List<Skill>
+        get() = extraSkills + positionSkills // TODO This probably result in _a lot_ of copying. Find a way to optimize this
     val move: Int get() = baseMove
     val strength: Int get() = baseStrenght
     val agility: Int get() = baseAgility
@@ -123,9 +125,8 @@ class Player(
                 null
             }
 
-    init {
-        positionSkills = position.skills.map { it.createSkill() }
-        skills = positionSkills + extraSkills
+    fun addSkill(skill: Skill) {
+        extraSkills.add(skill)
     }
 
     fun hasBall(): Boolean = (ball != null)

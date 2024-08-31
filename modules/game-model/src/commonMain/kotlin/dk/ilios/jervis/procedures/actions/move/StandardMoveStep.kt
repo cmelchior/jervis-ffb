@@ -121,15 +121,15 @@ object StandardMoveStep: Procedure() {
                 .firstOrNull { rules.canMark(state.field[it].player!!) } != null
 
             return if (isMarked) {
-                GotoNode(ResolveDodgeRoll)
+                GotoNode(ResolveDodge)
             } else {
                 GotoNode(ResolveMove) // Shadowing here
             }
         }
     }
 
-    object ResolveDodgeRoll: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+    object ResolveDodge: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             val moveContext = state.moveContext!!
             return SetContext(context = DodgeRollContext(
                 moveContext.player,

@@ -5,8 +5,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 
 /**
- * Set how many normal move squares the player has left. This does not include
- * Rush or actions that provide more move (I think).
+ * Set how many rushes a player can perform during the current action.
  */
 class SetPlayerRushesLeft(private val player: Player, val remainingRushes: Int) : Command {
     private var originalRushes: Int = 0
