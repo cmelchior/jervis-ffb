@@ -15,7 +15,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetActiveTeam
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
@@ -24,7 +24,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -174,7 +174,7 @@ object PushStep: Procedure() {
                 val context = state.pushContext!!
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usingJuggernaut = useSkill))
                 return compositeCommandOf(
-                    SetContext<PushContext>(Game::pushContext, newContext),
+                    SetOldContext<PushContext>(Game::pushContext, newContext),
                     SetActiveTeam(context.pushee.team),
                     GotoNode(DecideToUseStandFirm)
                 )
@@ -206,7 +206,7 @@ object PushStep: Procedure() {
                 val context = state.pushContext!!
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedStandFirm = useSkill))
                 return compositeCommandOf(
-                    SetContext<PushContext>(Game::pushContext, newContext),
+                    SetOldContext<PushContext>(Game::pushContext, newContext),
                     SetActiveTeam(context.pusher.team),
                     GotoNode(DecideToUseGrab)
                 )
@@ -239,7 +239,7 @@ object PushStep: Procedure() {
                 val context = state.pushContext!!
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedGrab = useSkill))
                 return compositeCommandOf(
-                    SetContext<PushContext>(Game::pushContext, newContext),
+                    SetOldContext<PushContext>(Game::pushContext, newContext),
                     SetActiveTeam(context.pushee.team),
                     GotoNode(DecideToUseSidestep)
                 )
@@ -272,7 +272,7 @@ object PushStep: Procedure() {
                 val context = state.pushContext!!
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedSideStep = useSkill))
                 return compositeCommandOf(
-                    SetContext<PushContext>(Game::pushContext, newContext),
+                    SetOldContext<PushContext>(Game::pushContext, newContext),
                     GotoNode(DecideToUseFend)
                 )
             } else {
@@ -303,7 +303,7 @@ object PushStep: Procedure() {
                 val context = state.pushContext!!
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedFend = useSkill))
                 return compositeCommandOf(
-                    SetContext<PushContext>(Game::pushContext, newContext),
+                    SetOldContext<PushContext>(Game::pushContext, newContext),
                     SetActiveTeam(context.pusher.team),
                     GotoNode(SelectPushDirection)
                 )
@@ -354,7 +354,7 @@ object PushStep: Procedure() {
                     // Player was moved into an empty square, which means we can start resolving
                     // the entire chain.
                     compositeCommandOf(
-                        SetContext<PushContext>(Game::pushContext, updatedContext),
+                        SetOldContext<PushContext>(Game::pushContext, updatedContext),
                         GotoNode(ResolvePush)
                     )
                 } else {
@@ -368,7 +368,7 @@ object PushStep: Procedure() {
                     )
                     val newContext = updatedContext.copyAddPushChain(newPush)
                     compositeCommandOf(
-                        SetContext<PushContext>(Game::pushContext, newContext),
+                        SetOldContext<PushContext>(Game::pushContext, newContext),
                         GotoNode(DecideToUseJuggernaut)
                     )
                 }

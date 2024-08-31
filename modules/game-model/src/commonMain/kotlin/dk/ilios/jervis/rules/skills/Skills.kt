@@ -8,43 +8,32 @@ import dk.ilios.jervis.procedures.UseStandardSkillReroll
 import dk.ilios.jervis.procedures.UseTeamReroll
 import kotlinx.serialization.Serializable
 
-public object DiceRoll {
-    val AMOUR = DiceRollType.ArmourRoll
-    val BLOCK = DiceRollType.BlockRoll
-    val CASULTY = DiceRollType.CasultyRoll
-    val CATCH = DiceRollType.CatchRoll
-    val INJURY = DiceRollType.InjuryRoll
-    val PICKUP = DiceRollType.PickUpRoll
-    val PRO = DiceRollType.ProRoll
-    val WEATHER = DiceRollType.WeatherRoll
-}
-
-// Enumerate all different roll types
-sealed interface DiceRollType {
-    data object ArmourRoll : DiceRollType
-    data object BlockRoll : DiceRollType
-    // data object BloodLustRoll: DiceRollType
-    // data object BoneHeadRoll: DiceRollType
-    data object CasultyRoll : DiceRollType
-    data object CatchRoll : DiceRollType
-    // data object DodgeRoll: DiceRollType
-    // data object FoulRoll: DiceRollType
-    // data object HypnoticGazeRoll: DiceRollType
-    data object InjuryRoll: DiceRollType
-    // data object InterceptRoll: DiceRollType
-    // data object KickOffTableRoll: DiceRollType
-    // data object LonerRoll: DiceRollType
-    // data object PassRoll: DiceRollType
-    data object PickUpRoll : DiceRollType
-    // data object ReallyStupidRoll: DiceRollType
-    // data object RegenerationRoll: DiceRollType
-    data object ProRoll : DiceRollType
-    // data object RushRoll: DiceRollType
-    // data object TakeRootRoll: DiceRollType
-    // data object ThrowTeamMateRoll: DiceRollType
-    data object WeatherRoll : DiceRollType
-    // data object WildAnimalRoll: DiceRollType
-    // data class CustomRoll(val id: String): DiceRollType
+enum class DiceRollType {
+    ACCURACY, // For passing
+    ARMOUR,
+    BLOCK,
+    BLOODLUST,
+    BONE_HEAD,
+    CASUALTY,
+    CATCH,
+    DEFLECTION,
+    DODGE,
+    FOUl,
+    HYPNOTIC_GAZE,
+    INJURY,
+    INTERCEPT,
+    KICK_OFF_TABLE,
+    LONER,
+    PASS,
+    PICKUP,
+    REALLY_STUPID,
+    REGENERATION,
+    PRO,
+    RUSH,
+    TAKE_ROOT,
+    THROW_TEAM_MATE,
+    WEATHER,
+    WILD_ANIMAL
 }
 
 enum class TeamRerollDuration {
@@ -144,10 +133,7 @@ data class DiceRerollOption(
 
 @Serializable
 sealed interface Skill {
-    companion object {
-        const val NO_LIMIT = -1
-    }
-
+    // When does the "used" state reset?
     enum class ResetPolicy {
         NEVER,
         END_OF_TURN,
@@ -156,16 +142,24 @@ sealed interface Skill {
         SPECIAL,
     }
 
+    // Unique identifier for this skill
     val id: String
+    // Human readable name of this skill
     val name: String
-    val limit: Int
-    var used: Int
+    // Whether or not this skill is compulsory to use
+    val compulsory: Boolean
+    // Whether this skill count as being "used". The meaning of this is interpreted in the context it is used.
+    var used: Boolean
+    // Represents any value in brackes, like Might Blow(1+) or Loner(4+). It is up to the context to correctly interpret this value
+    val value: Int?
+    // When the `used` state reset back to `false`?
     val resetAt: ResetPolicy
+    // Which category does this skill belong to?
     val category: SkillCategory
-
-    fun isAvailable(): Boolean {
-        return used < limit
-    }
+    // Whether this skill works when the player has lost its tackle zones
+    val workWithoutTackleZones: Boolean
+    // Whether this skill works when the player is prone or stunned
+    val workWhenProne: Boolean
 }
 
 // TODO Find a better way to serialize these,
@@ -179,78 +173,6 @@ sealed interface SkillFactory {
 interface SkillCategory {
     val id: Long
     val name: String
-}
-
-class BB2016Skills {
-// Agility
-//    - Catch
-//    - Diving Catch
-//    - Diving Tackle
-//    - Dodge
-//    - Jump Up
-//    - Leap
-//    - Side Step
-//    - Sneaky Git
-//    - Sprint
-//    - Sure Feet
-//
-// General
-//    - Block
-//    - Dauntless
-//    - Dirty Player
-//    - Fend
-//    - Frenzy
-//    - Kick
-//    - Kick-off Return
-//    - Pass Block
-//    - Pro
-//    - Shadowing
-//    - Strip Ball
-//    - Sure Hands
-//    - Tackle
-//    - Wrestle
-//
-// Mutations
-//    - Big Hand
-//    - Claw/Claws
-//    - Disturbing Presence
-//    - Extra Arms
-//    - Foul Appearance
-//    - Horns
-//    - Prehensile Tail
-//    - Tentacles
-//    - Two Heads
-//    - Very Long Legs
-//
-// Passing
-//    - Accurate
-//    - Dump-off
-//    - Hail Mary Pass
-//    - Leader
-//    - Nerves of Steel
-//    - Pass
-//    - Safe Pass
-//
-// Strength
-//    - Break Tackle
-//    - Grab
-//    - Guard
-//    - Juggernaut
-//    - Might Blow
-//    - Multiple Block
-//    - Stand Firm
-//    - Strong Arm
-//    - Thick Skull
-//
-// Extraordinary
-//    - Always Hungry
-//    - Bone Head
-//    - Loner
-//    - Really Stupid
-//    - Regeneration
-//    - Right Stuff
-//    - Stunty
-//    - Throw Team-mate
 }
 
 @Serializable

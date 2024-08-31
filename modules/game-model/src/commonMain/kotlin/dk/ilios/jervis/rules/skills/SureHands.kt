@@ -8,10 +8,13 @@ import kotlinx.serialization.Serializable
 class SureHands : BB2020Skill, D6StandardSkillReroll {
     override val id: String = "surehands-skill"
     override val name: String = "Sure Hands"
+    override val compulsory: Boolean = false
     override val resetAt: Skill.ResetPolicy = Skill.ResetPolicy.NEVER
-    override val limit: Int = Int.MAX_VALUE
     override val category: SkillCategory = Agility
-    override var used: Int = 0
+    override var used: Boolean = false
+    override val value: Int? = null
+    override val workWithoutTackleZones: Boolean = false
+    override val workWhenProne: Boolean = false
 
     override val rerollDescription: String = "Sure Hands Reroll"
     override var rerollUsed: Boolean = false // Catch is always available
@@ -21,7 +24,7 @@ class SureHands : BB2020Skill, D6StandardSkillReroll {
         value: List<DieRoll<*, *>>,
         wasSuccess: Boolean?,
     ): Boolean {
-        return type == DiceRollType.PickUpRoll
+        return type == DiceRollType.PICKUP
     }
 
     @Serializable

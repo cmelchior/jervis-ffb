@@ -8,7 +8,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
@@ -58,7 +58,7 @@ object CasualtyRoll: Procedure() {
                 )
 
                 compositeCommandOf(
-                    SetContext(Game::riskingInjuryRollsContext, updatedContext),
+                    SetOldContext(Game::riskingInjuryRollsContext, updatedContext),
                     ExitProcedure()
                 )
             }

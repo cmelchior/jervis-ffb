@@ -23,7 +23,7 @@ object ArgueTheCallTable {
     fun roll(
         d6: D6Result,
     ): ArgueTheCallResult {
-        val result = d6.result
+        val result = d6.value
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Argue the Call Table.")
     }
 }

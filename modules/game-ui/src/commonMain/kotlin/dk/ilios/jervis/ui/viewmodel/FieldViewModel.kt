@@ -58,6 +58,8 @@ class FieldViewModel(
 
     fun observeOverlays(): Flow<PathInfo?> {
         var ignoreUserInput = false
+
+        // Calculate any path info data we want to display
         return combine(_highlights, uiActionFactory.fieldActions) { square, userInput: UserInput ->
             when (userInput) {
                 is IgnoreUserInput -> ignoreUserInput = true
@@ -65,10 +67,11 @@ class FieldViewModel(
                 else -> { // Do nothing
                 }
             }
+
             if (!ignoreUserInput && userInput is CompositeUserInput) {
                 userInput.inputs.firstOrNull { it is SelectMoveActionFieldLocationInput }?.let {
                     val activePlayer: Player? = game.activePlayer
-                    if (activePlayer != null && square != null && activePlayer.location.coordinate != square) {
+                    if (activePlayer != null && square != null && activePlayer.location.coordinate != square && activePlayer.movesLeft > 0) {
                         val path: List<FieldCoordinate> =
                             rules.pathFinder.calculateShortestPath(
                                 game,
@@ -76,10 +79,10 @@ class FieldViewModel(
                                 square,
                                 activePlayer.movesLeft,
                             ).path
-                        val pathSteps =
-                            path.mapIndexed { index, fieldCoordinate ->
-                                fieldCoordinate to (index + 1)
-                            }.toMap()
+                        val pathSteps = path
+                            .mapIndexed { index, fieldCoordinate -> fieldCoordinate to (index + 1) }
+                            .toMap()
+
                         val action = {
 
                             // If a path consists of only 1 step, always execute it, since
@@ -150,6 +153,7 @@ class FieldViewModel(
                 (0 until rules.fieldHeight.toInt()).forEach { y ->
                     val square = game.field[x, y]
                     var squareAction: (() -> Unit)? = null
+                    var requiresRoll = false
                     val contextAction: MutableList<ContextMenuOption> = mutableListOf()
                     var showContextMenu = false
                     if (!ignoreUserInput) {
@@ -226,14 +230,10 @@ class FieldViewModel(
                                 is SelectMoveActionFieldLocationInput -> {
                                     // Allow square to be selected if an action is available for this square.
                                     squareAction =
-                                        input.fieldAction[
-                                            FieldCoordinate(
-                                                x,
-                                                y,
-                                            ),
-                                        ]?.let { action: FieldSquareAction ->
+                                        input.fieldAction[FieldCoordinate(x,y)]?.let { action: FieldSquareAction ->
                                             { uiActionFactory.userSelectedAction(action.action) }
                                         }
+                                    requiresRoll = input.fieldAction[FieldCoordinate(x, y)]?.requiresRoll ?: false
                                 }
 
                                 is EndActionInput -> {
@@ -249,7 +249,9 @@ class FieldViewModel(
                                     }
                                 }
 
-                                else -> null // No action possible for this field
+                                else -> {
+                                    // No action possible for this field
+                                }
                             }
                         }
                     }
@@ -263,6 +265,7 @@ class FieldViewModel(
                             it.location.x == x &&
                             it.location.y == y
                      } ?: false
+
                     val uiSquare =
                         UiFieldSquare(
                             square,
@@ -270,6 +273,7 @@ class FieldViewModel(
                             square.player?.hasBall() == true,
                             uiPlayer,
                             squareAction, // Only allow a Square Action if no player is on the field
+                            requiresRoll,
                             contextAction,
                             showContextMenu,
                         )

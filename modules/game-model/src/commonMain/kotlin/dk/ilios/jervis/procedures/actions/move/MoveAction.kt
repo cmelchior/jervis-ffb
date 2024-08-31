@@ -12,7 +12,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -20,7 +20,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.reports.ReportActionEnded
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
@@ -30,7 +30,8 @@ import kotlinx.serialization.Serializable
 data class MoveContext(
     val player: Player,
     val moveType: MoveType,
-    val targetCoordinate: FieldCoordinate? = null
+    val target: FieldCoordinate? = null,
+    val startingSquare: FieldCoordinate = player.location.coordinate,
 ): ProcedureContext
 
 /**
@@ -74,7 +75,7 @@ object MoveAction : Procedure() {
                 is EndAction -> ExitProcedure()
                 is MoveTypeSelected -> {
                     compositeCommandOf(
-                        SetContext(
+                        SetOldContext(
                             Game::moveContext,
                             MoveContext(state.activePlayer!!, action.moveType),
                         ),

@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
@@ -207,7 +208,8 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                         player.model.skills.forEach {
                             Text(
                                 modifier = Modifier.padding(4.dp).fillMaxWidth(),
-                                text = it.name,
+                                text = it.name + if (it.compulsory) "*" else "",
+                                textDecoration = if (it.used) TextDecoration.LineThrough else TextDecoration.None,
                             )
                         }
                     }

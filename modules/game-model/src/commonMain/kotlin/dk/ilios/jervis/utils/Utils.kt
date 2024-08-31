@@ -56,6 +56,7 @@ import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.CoachId
 import dk.ilios.jervis.model.Coin
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
@@ -64,11 +65,18 @@ import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.procedures.D6DieRoll
 import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
+import dk.ilios.jervis.rules.skills.DiceRerollOption
+import dk.ilios.jervis.rules.skills.DiceRollType
+import dk.ilios.jervis.rules.skills.RerollSource
+import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.teamBuilder
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.jvm.JvmName
 import kotlin.random.Random
 
 fun createRandomAction(
@@ -137,7 +145,10 @@ inline fun assert(condition: Boolean) {
     }
 }
 
-fun List<DieResult>.sum(): Int = fold(0) { acc, el -> acc + el.result }
+@JvmName("sumOfDieResults")
+fun List<DieResult>.sum(): Int = fold(0) { acc, el -> acc + el.value }
+
+fun List<DiceModifier>.sum(): Int = this.sumOf { it.modifier }
 
 class InvalidAction(message: String) : RuntimeException(message)
 
@@ -252,3 +263,52 @@ fun <T : Any?> MutableSharedFlow<T>.safeTryEmit(value: T) {
         throw IllegalStateException("Failed to emit value: $value")
     }
 }
+
+fun List<Skill>.getRerollActionDescriptors(type: DiceRollType, roll: D6DieRoll, successOnFirstRoll: Boolean): List<SelectRerollOption> {
+    return this.asSequence().filter { it is RerollSource }
+        .map { it as RerollSource }
+        .filter { it.canReroll(type, listOf(roll), successOnFirstRoll) }
+        .flatMap { it: RerollSource -> it.calculateRerollOptions(type, roll, successOnFirstRoll) }
+        .map { SelectRerollOption(it) }.toList()
+}
+
+/**
+ * Calculate all available re-rolls options for a given roll type.
+ * If no re-rolls are available, an empty list is returned.
+ *
+ * This method doesn't work for BLOCK rolls.
+ */
+fun calculateAvailableRerollsFor(
+    rules: Rules, // Ruleset used
+    player: Player, // Player rolling the dice
+    type: DiceRollType, // Which type of dice roll
+    roll: D6DieRoll, // The result of the first dice
+    firstRollWasSuccess: Boolean // Whether the first roll was a success.
+): List<SelectRerollOption> {
+    if (type == DiceRollType.BLOCK) throw IllegalArgumentException("Use XX instead")
+
+    // Check any skills available to the player
+    val skillRerolls: List<SelectRerollOption> = player.skills.getRerollActionDescriptors(
+        type,
+        roll,
+        firstRollWasSuccess
+    )
+
+    // Check if there is any team re-rolls available
+    val team = player.team
+    val hasTeamRerolls = team.availableRerollCount > 0
+    val allowedToUseTeamReroll = rules.canUseTeamReroll(player.team.game, player)
+
+    // Calculate the full list of re-roll options
+    return if (skillRerolls.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
+        emptyList()
+    } else {
+        val teamReroll = if (hasTeamRerolls && allowedToUseTeamReroll) {
+                listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf(roll))))
+            } else {
+                emptyList()
+            }
+        skillRerolls + teamReroll
+    }
+}
+

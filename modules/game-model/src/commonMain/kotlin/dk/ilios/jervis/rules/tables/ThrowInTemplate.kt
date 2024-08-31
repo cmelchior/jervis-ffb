@@ -34,7 +34,7 @@ object ThrowInTemplate {
         position: ThrowInPosition,
         d3: D3Result,
     ): Direction {
-        return rotateVector(results[d3.result]!!, position.rotateDegrees)
+        return rotateVector(results[d3.value]!!, position.rotateDegrees)
     }
 
     private fun rotateVector(

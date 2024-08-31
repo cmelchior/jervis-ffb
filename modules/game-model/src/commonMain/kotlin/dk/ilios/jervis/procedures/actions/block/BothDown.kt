@@ -12,7 +12,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
@@ -22,7 +22,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.reports.ReportBothDownResult
@@ -51,7 +51,7 @@ object BothDown: Procedure() {
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val blockContext = state.blockRollResultContext ?: INVALID_GAME_STATE("Missing block context.")
-        return SetContext(Game::bothDownContext, BothDownContext(
+        return SetOldContext(Game::bothDownContext, BothDownContext(
             blockContext.attacker,
             blockContext.defender,
         ))
@@ -60,7 +60,7 @@ object BothDown: Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         return compositeCommandOf(
             ReportBothDownResult(state.bothDownContext!!),
-            SetContext(Game::bothDownContext, null),
+            SetOldContext(Game::bothDownContext, null),
         )
     }
 
@@ -84,7 +84,7 @@ object BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(Game::bothDownContext, context.copy(attackerUsesWrestle = useWrestle)),
+                SetOldContext(Game::bothDownContext, context.copy(attackerUsesWrestle = useWrestle)),
                 GotoNode(DefenderChooseToUseWrestle)
             )
         }
@@ -110,7 +110,7 @@ object BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(Game::bothDownContext, context.copy(defenderUsesWrestle = useWrestle)),
+                SetOldContext(Game::bothDownContext, context.copy(defenderUsesWrestle = useWrestle)),
                 GotoNode(AttackerChooseToUseBlock)
             )
         }
@@ -119,7 +119,7 @@ object BothDown: Procedure() {
     object AttackerChooseToUseBlock: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.bothDownContext!!
-            val hasBlock = context.attacker.getSkillOrNull<Block>()?.isAvailable() ?: false
+            val hasBlock = (context.attacker.getSkillOrNull<Block>() != null)
             return when (hasBlock) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -135,7 +135,7 @@ object BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(Game::bothDownContext, context.copy(attackUsesBlock = useBlock)),
+                SetOldContext(Game::bothDownContext, context.copy(attackUsesBlock = useBlock)),
                 GotoNode(DefenderChooseToUseBlock)
             )
         }
@@ -144,7 +144,7 @@ object BothDown: Procedure() {
     object DefenderChooseToUseBlock: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.bothDownContext!!
-            val hasBlock = context.defender.getSkillOrNull<Block>()?.isAvailable() ?: false
+            val hasBlock = context.defender.getSkillOrNull<Block>() != null
             return when (hasBlock) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -160,7 +160,7 @@ object BothDown: Procedure() {
                 else -> INVALID_ACTION(action)
             }
             return compositeCommandOf(
-                SetContext(Game::bothDownContext, context.copy(defenderUsesBlock = useBlock)),
+                SetOldContext(Game::bothDownContext, context.copy(defenderUsesBlock = useBlock)),
                 GotoNode(ResolveBothDown)
             )
         }
@@ -198,7 +198,7 @@ object BothDown: Procedure() {
     object RollDefenderInjury: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val bothDownContext = state.bothDownContext!!
-            return SetContext(
+            return SetOldContext(
                 Game::riskingInjuryRollsContext,
                 RiskingInjuryRollContext(bothDownContext.defender)
             )
@@ -223,7 +223,7 @@ object BothDown: Procedure() {
     object RollAttackerInjury: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val bothDownContext = state.bothDownContext!!
-            return SetContext(
+            return SetOldContext(
                 Game::riskingInjuryRollsContext,
                 RiskingInjuryRollContext(bothDownContext.attacker)
             )
@@ -231,7 +231,7 @@ object BothDown: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetContext(Game::riskingInjuryRollsContext, null),
+                SetOldContext(Game::riskingInjuryRollsContext, null),
                 ExitProcedure()
             )
         }

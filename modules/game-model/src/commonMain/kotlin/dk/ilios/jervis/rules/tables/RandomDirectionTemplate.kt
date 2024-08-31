@@ -44,7 +44,7 @@ object RandomDirectionTemplate {
      * a D8 to determine the direction the object is moving in.
      */
     fun roll(roll: D8Result): Direction {
-        return results[roll.result] ?: throw IllegalArgumentException("Only values between [1, 8] is allowed: ${roll.result}")
+        return results[roll.value] ?: throw IllegalArgumentException("Only values between [1, 8] is allowed: ${roll.value}")
     }
 
     /**
@@ -68,7 +68,7 @@ object RandomDirectionTemplate {
         corner: CornerThrowInPosition,
         d3: D3Result,
     ): Direction {
-        return rotateVector(results[d3.result]!!, corner.rotateDegrees)
+        return rotateVector(results[d3.value]!!, corner.rotateDegrees)
     }
 
     private fun rotateVector(

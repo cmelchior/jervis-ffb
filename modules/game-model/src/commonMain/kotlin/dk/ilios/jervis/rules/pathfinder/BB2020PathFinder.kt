@@ -279,6 +279,16 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
             path.add(currentPoint)
         }
         path.removeLast()
-        return path.reversed().subList(0, maxMove.coerceAtMost(path.size))
+
+        return if (path.isEmpty()) {
+            path
+        } else {
+            try {
+                path.reversed().subList(0, maxMove.coerceAtMost(path.size))
+            } catch(ex: Throwable) {
+                println(ex)
+                TODO()
+            }
+        }
     }
 }

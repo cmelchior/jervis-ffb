@@ -23,12 +23,12 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DiceModifier
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.reports.ReportInjuryResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Skill

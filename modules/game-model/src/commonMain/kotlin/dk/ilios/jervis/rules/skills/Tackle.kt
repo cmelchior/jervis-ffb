@@ -7,10 +7,13 @@ import kotlinx.serialization.Serializable
 class Tackle : BB2020Skill {
     override val id: String = "tackle-skill"
     override val name: String = "Tackle"
+    override val compulsory: Boolean = false
     override val resetAt: Skill.ResetPolicy = Skill.ResetPolicy.NEVER
-    override val limit: Int = Int.MAX_VALUE
     override val category: SkillCategory = General
-    override var used: Int = 0
+    override var used: Boolean = false
+    override val value: Int? = null
+    override val workWithoutTackleZones: Boolean = false
+    override val workWhenProne: Boolean = false
 
     @Serializable
     data object Factory: SkillFactory {

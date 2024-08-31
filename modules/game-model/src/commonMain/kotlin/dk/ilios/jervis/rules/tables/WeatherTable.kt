@@ -53,7 +53,7 @@ object WeatherTable {
         firstD6: D6Result,
         secondD6: D6Result,
     ): Weather {
-        val result = firstD6.result + secondD6.result
+        val result = firstD6.value + secondD6.value
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Weather Table.")
     }
 }

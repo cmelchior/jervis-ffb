@@ -7,11 +7,11 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DiceModifier
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.assert
@@ -64,7 +64,7 @@ object InjuryRoll: Procedure() {
                 )
 
                 compositeCommandOf(
-                    SetContext(Game::riskingInjuryRollsContext, updatedContext),
+                    SetOldContext(Game::riskingInjuryRollsContext, updatedContext),
                     ExitProcedure()
                 )
             }

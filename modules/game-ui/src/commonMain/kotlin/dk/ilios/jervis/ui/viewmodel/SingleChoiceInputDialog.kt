@@ -50,7 +50,7 @@ data class SingleChoiceInputDialog(
             return when (action) {
                 Confirm -> "Confirm"
                 Continue -> "Continue"
-                is DieResult -> action.result.toString()
+                is DieResult -> action.value.toString()
                 DogoutSelected -> "DogoutSelected"
                 EndSetup -> "EndSetup"
                 EndTurn -> "EndTurn"
@@ -238,6 +238,24 @@ data class SingleChoiceInputDialog(
                 title = "Argue the call",
                 message = "${context.fouler.name} was caught by the ref. Argue the call?",
                 actions = listOf(Confirm to "Argue", Cancel to "Stay silent"),
+            )
+        }
+
+        fun createRushRerollDialog(actions: List<GameAction>): SingleChoiceInputDialog {
+            val message = "Reroll Rush?"
+            return create(
+                title = "Choose Reroll",
+                message = message,
+                actions = actions,
+            )
+        }
+
+        fun createDodgeRerollDialog(actions: List<GameAction>): SingleChoiceInputDialog {
+            val message = "Reroll Dodge?"
+            return create(
+                title = "Choose Reroll",
+                message = message,
+                actions = actions,
             )
         }
 

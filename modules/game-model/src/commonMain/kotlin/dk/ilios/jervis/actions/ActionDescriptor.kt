@@ -37,14 +37,19 @@ data class RollDice(val dice: List<Dice>) : ActionDescriptor {
 enum class MoveType {
     JUMP,
     LEAP,
-    RUSH,
+    // RUSH,
     STANDARD,
     STAND_UP,
 }
 
 data class SelectMoveType(val type: MoveType): ActionDescriptor
 
-data class SelectFieldLocation private constructor(val x: Int, val y: Int, val type: Type) : ActionDescriptor {
+data class SelectFieldLocation private constructor(
+    val x: Int,
+    val y: Int,
+    val type: Type,
+    val requiresRush: Boolean = false,
+) : ActionDescriptor {
     // What is causing this field location to be selectable
     // This is in order so the UI can filter or show options in different ways.
     enum class Type {
@@ -59,13 +64,13 @@ data class SelectFieldLocation private constructor(val x: Int, val y: Int, val t
         THROW_TARGET
     }
     val coordinate: FieldCoordinate = FieldCoordinate(x, y)
-    private constructor(coordinate: FieldCoordinate, type: Type) : this(coordinate.x, coordinate.y, type)
+    private constructor(coordinate: FieldCoordinate, type: Type, needRush: Boolean = false) : this(coordinate.x, coordinate.y, type, needRush)
 
     companion object {
         fun setup(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.SETUP)
         fun push(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.PUSH)
         fun standUp(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.STAND_UP)
-        fun move(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.MOVE)
+        fun move(coordinate: FieldCoordinate, needRush: Boolean) = SelectFieldLocation(coordinate, Type.MOVE, needRush)
         fun rush(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.RUSH)
         fun jump(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.JUMP)
         fun leap(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.LEAP)
@@ -96,31 +101,31 @@ data object SelectNoReroll : ActionDescriptor
 // Available actions
 @Serializable
 sealed class DieResult : Number(), GameAction {
-    abstract val result: Int
+    abstract val value: Int
     abstract val min: Short
     abstract val max: Short
 
     init {
-        if (result < min || result > max) {
-            throw IllegalArgumentException("Result outside range: $min <= $result <= $max")
+        if (value < min || value > max) {
+            throw IllegalArgumentException("Result outside range: $min <= $value <= $max")
         }
     }
 
-    override fun toByte(): Byte = result.toByte()
+    override fun toByte(): Byte = value.toByte()
 
-    override fun toDouble(): Double = result.toDouble()
+    override fun toDouble(): Double = value.toDouble()
 
-    override fun toFloat(): Float = result.toFloat()
+    override fun toFloat(): Float = value.toFloat()
 
-    override fun toInt(): Int = result.toInt()
+    override fun toInt(): Int = value.toInt()
 
-    override fun toLong(): Long = result.toLong()
+    override fun toLong(): Long = value.toLong()
 
-    override fun toShort(): Short = result.toShort()
+    override fun toShort(): Short = value.toShort()
 
     override fun toString(): String {
-        return "${this::class.simpleName}[$result]"
+        return "${this::class.simpleName}[$value]"
     }
 
-    fun toLogString(): String = "[$result]"
+    fun toLogString(): String = "[$value]"
 }

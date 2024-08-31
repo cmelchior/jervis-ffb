@@ -1,4 +1,4 @@
-package dk.ilios.jervis
+package dk.ilios.jervis.tables
 
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D8Result

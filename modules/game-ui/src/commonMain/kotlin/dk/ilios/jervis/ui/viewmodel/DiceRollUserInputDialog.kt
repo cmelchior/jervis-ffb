@@ -9,6 +9,7 @@ import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.SelectDiceResult
+import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.procedures.actions.foul.FoulContext
 import dk.ilios.jervis.procedures.actions.pass.PassContext
@@ -45,7 +46,7 @@ data class DiceRollUserInputDialog(
                             rolls.rolls.first() as D6Result,
                             rolls.rolls.last() as D6Result,
                         ).title
-                    "$description (${rolls.sumOf { it.result }})"
+                    "$description (${rolls.sumOf { it.value }})"
                 },
             )
         }
@@ -74,7 +75,7 @@ data class DiceRollUserInputDialog(
                             Direction(1, 1) -> "Down-Right"
                             else -> TODO("Not supported: $direction")
                         }
-                    "$description(${d6.result})"
+                    "$description(${d6.value})"
                 },
             )
         }
@@ -94,7 +95,7 @@ data class DiceRollUserInputDialog(
                             rolls.first() as D6Result,
                             rolls.last() as D6Result,
                         ).name
-                    "$description(${rolls.sumOf { it.result }})"
+                    "$description(${rolls.sumOf { it.value }})"
                 },
             )
         }
@@ -223,5 +224,22 @@ data class DiceRollUserInputDialog(
             )
         }
 
+        fun createDodgeRollDialog(player: Player, target: FieldCoordinate): UserInput? {
+            return DiceRollUserInputDialog(
+                title = "Dodge Roll",
+                message = "${player.name} rolls D6 to dodge to ${target.toLogString()}.",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { rolls: DiceResults -> null }
+            )
+        }
+
+        fun createRushRollDialog(player: Player, target: FieldCoordinate): UserInput? {
+            return DiceRollUserInputDialog(
+                title = "Rush Roll",
+                message = "${player.name} rolls D6 to rush to ${target.toLogString()}",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { rolls: DiceResults -> null }
+            )
+        }
     }
 }

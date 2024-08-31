@@ -17,7 +17,7 @@ class ReportKickResult(
     override val message: String
 
     init {
-        var msg = "Rolled [d8=${d8.result}, d6=${d6.result}]."
+        var msg = "Rolled [d8=${d8.value}, d6=${d6.value}]."
         msg =
             if (ballLocation.isOutOfBounds(rules)) {
                 "$msg Ball went out of bounds."

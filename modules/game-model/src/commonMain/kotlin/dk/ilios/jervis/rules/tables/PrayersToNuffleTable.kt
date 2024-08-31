@@ -47,6 +47,6 @@ object PrayersToNuffleTable {
      * Roll on the Prayers of Nuffle table and return the result.
      */
     fun roll(d16: D16Result): TableResult {
-        return table[d16.result] ?: INVALID_GAME_STATE("${d16.result} was not found in the Kick-Off Event Table.")
+        return table[d16.value] ?: INVALID_GAME_STATE("${d16.value} was not found in the Kick-Off Event Table.")
     }
 }

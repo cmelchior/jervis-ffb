@@ -43,7 +43,7 @@ class SelectPlayerInput(override val actions: List<GameAction>) : UserInput
 
 class DeselectPlayerInput(override val actions: List<GameAction>) : UserInput
 
-data class FieldSquareAction(val coordinate: FieldCoordinate, val action: GameAction)
+data class FieldSquareAction(val coordinate: FieldCoordinate, val action: GameAction, val requiresRoll: Boolean)
 
 class SelectFieldLocationInput(val wrapperAction: List<FieldSquareAction>) : UserInput {
     override val actions = wrapperAction.map { it.action }

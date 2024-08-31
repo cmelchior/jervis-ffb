@@ -16,7 +16,7 @@ enum class BlockDice {
 
     companion object {
         fun fromD6(roll: D6Result): BlockDice {
-            return when (roll.result) {
+            return when (roll.value) {
                 1 -> PLAYER_DOWN
                 2 -> BOTH_DOWN
                 3, 4 -> PUSH_BACK

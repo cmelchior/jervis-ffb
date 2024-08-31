@@ -3,7 +3,6 @@ package dk.ilios.jervis.rules
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.model.DiceModifier
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.FieldCoordinate.Companion.OUT_OF_BOUNDS
 import dk.ilios.jervis.model.FieldSquare
@@ -11,7 +10,8 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.procedures.CatchModifier
+import dk.ilios.jervis.model.modifiers.CatchModifier
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.procedures.bb2020.kickoff.Blitz
 import dk.ilios.jervis.procedures.bb2020.kickoff.BrilliantCoaching
 import dk.ilios.jervis.procedures.bb2020.kickoff.ChangingWeather
@@ -72,7 +72,7 @@ object KickOffEventTable {
         die1: D6Result,
         die2: D6Result,
     ): TableResult {
-        val result = die1.result + die2.result
+        val result = die1.value + die2.value
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Kick-Off Event Table.")
     }
 }
@@ -189,7 +189,7 @@ interface Rules {
      * Return `true` if this player is able to mark other players.
      */
     fun canMark(player: Player): Boolean {
-        return player.hasTackleZones
+        return player.hasTackleZones && player.state == PlayerState.STANDING
     }
 
     /**
@@ -230,6 +230,34 @@ interface Rules {
             }
         }
     }
+
+    /**
+     * Calculates how many opponent players are marking a given field square.
+     * See page 26 in the rulebook.
+     *
+     * A player is marking a square if:
+     * - The player has its tackle zones.
+     * - The square is in the player's tackle zone.
+     * - The player is standing.
+     */
+    fun calculateMarks(
+        game: Game,
+        team: Team,
+        square: FieldCoordinate,
+    ): Int {
+        if (!square.isOnField(this)) throw IllegalArgumentException("${square.toLogString()} is not on the field")
+        return square.getSurroundingCoordinates(this).fold(initial = 0) { acc, coordinate ->
+            val markingPlayer: Player? = game.field[coordinate].player
+            val otherTeam = markingPlayer?.team
+            val canMark = markingPlayer?.let { canMark(it) } ?: false
+            if (markingPlayer != null && otherTeam != team && canMark) {
+                acc + 1
+            } else {
+                acc
+            }
+        }
+    }
+
 
     fun canUseTeamReroll(
         game: Game,

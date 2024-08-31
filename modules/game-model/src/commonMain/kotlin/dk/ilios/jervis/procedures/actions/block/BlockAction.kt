@@ -10,7 +10,7 @@ import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -74,7 +74,7 @@ object BlockAction : Procedure() {
                             isBlitzing = false
                         )
                     compositeCommandOf(
-                        SetContext(Game::blockContext, context),
+                        SetOldContext(Game::blockContext, context),
                         GotoNode(ResolveBlock),
                     )
                 }

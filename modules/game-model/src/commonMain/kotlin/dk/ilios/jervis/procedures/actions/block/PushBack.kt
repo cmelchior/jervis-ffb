@@ -3,7 +3,7 @@ package dk.ilios.jervis.procedures.actions.block
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -44,13 +44,13 @@ object PushBack: Procedure() {
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val newContext = createPushContext(state)
-        return SetContext(Game::pushContext, newContext)
+        return SetOldContext(Game::pushContext, newContext)
     }
 
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val context = state.pushContext!!
         return compositeCommandOf(
-            SetContext(Game::pushContext, null),
+            SetOldContext(Game::pushContext, null),
             ReportPushResult(context.pusher, context.pushChain.first().from)
         )
     }

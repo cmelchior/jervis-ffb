@@ -1,6 +1,6 @@
 package dk.ilios.jervis.rules.tables
 
-import dk.ilios.jervis.model.StatModifier
+import dk.ilios.jervis.model.modifiers.StatModifier
 
 enum class LastingInjuryResult(val title: String, val modifier: StatModifier) {
     HEAD_INJURY("Head Injury", StatModifier.AV(1)),

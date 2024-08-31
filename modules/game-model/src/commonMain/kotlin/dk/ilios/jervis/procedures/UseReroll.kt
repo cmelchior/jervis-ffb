@@ -3,13 +3,14 @@ package dk.ilios.jervis.procedures
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetSkillRerollUsed
 import dk.ilios.jervis.commands.SetTeamRerollUsed
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.rules.Rules
 
 /**
@@ -86,10 +87,10 @@ object UseTeamReroll : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            val context = state.useRerollContext!!
-            val result = RerollResultContext(context.roll, context.source, true)
+            val context = state.rerollContext!!
+            val result = UseRerollContext(context.roll, context.source, true)
             return compositeCommandOf(
-                SetContext(Game::useRerollResult, result),
+                SetOldContext(Game::rerollContext, result),
                 SetTeamRerollUsed(context.source),
                 ExitProcedure(),
             )
@@ -99,6 +100,7 @@ object UseTeamReroll : Procedure() {
 
 /**
  * Define the rules for using a normal skill reroll.
+ *
  */
 object UseStandardSkillReroll : Procedure() {
     override val initialNode: Node = UseReroll
@@ -118,10 +120,10 @@ object UseStandardSkillReroll : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            val context = state.useRerollContext!!
-            val result = RerollResultContext(context.roll, context.source, rerollAllowed = true)
+            val context = state.rerollContext!!
+            val result = UseRerollContext(context.roll, context.source, rerollAllowed = true)
             return compositeCommandOf(
-                SetContext(Game::useRerollResult, result),
+                SetOldContext(Game::rerollContext, result),
                 SetSkillRerollUsed(context.source),
                 ExitProcedure(),
             )

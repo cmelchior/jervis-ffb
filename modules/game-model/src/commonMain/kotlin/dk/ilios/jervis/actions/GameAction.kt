@@ -54,7 +54,7 @@ data class CoinTossResult(val result: Coin) : GameAction {
 }
 
 @Serializable
-data class D2Result(override val result: Int) : DieResult() {
+data class D2Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 3)) // Fix issues with serialization not serializing `result`. Figure out why
 
     override val min: Short = 1
@@ -68,7 +68,7 @@ data class D2Result(override val result: Int) : DieResult() {
 }
 
 @Serializable
-data class D3Result(override val result: Int) : DieResult() {
+data class D3Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 4)) // Fix issues with serialization not serializing `result`. Figure out why
 
     override val min: Short = 1
@@ -82,7 +82,7 @@ data class D3Result(override val result: Int) : DieResult() {
 }
 
 @Serializable
-data class D4Result(override val result: Int) : DieResult() {
+data class D4Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 5)) // Fix issues with serialization not serializing `result`. Figure out why
 
     override val min: Short = 1
@@ -96,7 +96,7 @@ data class D4Result(override val result: Int) : DieResult() {
 }
 
 @Serializable
-data class D6Result(override val result: Int) : DieResult() {
+data class D6Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
 
     override val min: Short = 1
@@ -110,7 +110,7 @@ data class D6Result(override val result: Int) : DieResult() {
 }
 
 @Serializable
-data class D8Result(override val result: Int) : DieResult() {
+data class D8Result(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 9)) // Fix issues with serialization not serializing `result`. Figure out why
 
     override val min: Short = 1
@@ -124,7 +124,7 @@ data class D8Result(override val result: Int) : DieResult() {
 }
 
 @Serializable
-data class D12Result(override val result: Int) : DieResult() {
+data class D12Result(override val value: Int) : DieResult() {
     constructor() : this(
         Random.nextInt(1, 13),
     ) // Fix issues with serialization not serializing `result`. Figure out why
@@ -140,7 +140,7 @@ data class D12Result(override val result: Int) : DieResult() {
 }
 
 @Serializable
-data class D16Result(override val result: Int) : DieResult() {
+data class D16Result(override val value: Int) : DieResult() {
     constructor() : this(
         Random.nextInt(1, 17),
     ) // Fix issues with serialization not serializing `result`. Figure out why
@@ -156,7 +156,7 @@ data class D16Result(override val result: Int) : DieResult() {
 }
 
 @Serializable
-data class D20Result(override val result: Int) : DieResult() {
+data class D20Result(override val value: Int) : DieResult() {
     constructor() : this(
         Random.nextInt(1, 21),
     ) // Fix issues with serialization not serializing `result`. Figure out why
@@ -173,13 +173,13 @@ data class D20Result(override val result: Int) : DieResult() {
 
 // This class is a bit annoying, it is treated as a special D6, where the result can be found in `blockResult`
 @Serializable
-data class DBlockResult(override val result: Int) : DieResult() {
+data class DBlockResult(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
 
     override val min: Short = 1
     override val max: Short = 6
 
-    val blockResult: BlockDice = BlockDice.fromD6(D6Result(result))
+    val blockResult: BlockDice = BlockDice.fromD6(D6Result(value))
 
     companion object {
         fun allOptions(): List<DBlockResult> {
@@ -192,7 +192,7 @@ data class DBlockResult(override val result: Int) : DieResult() {
 data class DiceResults(val rolls: List<DieResult>) : GameAction, List<DieResult> by rolls {
     constructor(vararg roll: DieResult) : this(listOf(*roll))
     fun sum(): Int {
-        return rolls.sumOf { it.result }
+        return rolls.sumOf { it.value }
     }
 }
 

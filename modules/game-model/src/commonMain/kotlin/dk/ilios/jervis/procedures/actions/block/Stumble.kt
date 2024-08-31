@@ -12,7 +12,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
@@ -21,7 +21,8 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.reports.ReportPowResult
@@ -55,13 +56,13 @@ object Stumble: Procedure() {
             blockContext.attacker,
             blockContext.defender,
         )
-        return SetContext(Game::stumbleContext, stumbleContext)
+        return SetOldContext(Game::stumbleContext, stumbleContext)
     }
 
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val context = state.pushContext!!
         return compositeCommandOf(
-            SetContext(Game::pushContext, null),
+            SetOldContext(Game::pushContext, null),
             ReportPowResult(context.pusher, context.pushee)
         )
     }
@@ -69,7 +70,7 @@ object Stumble: Procedure() {
     object ChooseToUseTackle: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val stumbleContext = state.stumbleContext!!
-            return if (stumbleContext.attacker.getSkillOrNull<Tackle>()?.isAvailable() == true) {
+            return if (stumbleContext.attacker.hasSkill<Tackle>()) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
                 listOf(ContinueWhenReady)
@@ -84,7 +85,7 @@ object Stumble: Procedure() {
             }
             val updatedContext = state.stumbleContext!!.copy(attackerUsesTackle = useTackle)
             return compositeCommandOf(
-                SetContext(Game::stumbleContext, updatedContext),
+                SetOldContext(Game::stumbleContext, updatedContext),
                 if (useTackle) GotoNode(ResolvePush) else GotoNode(ChooseToUseDodge)
             )
         }
@@ -93,7 +94,7 @@ object Stumble: Procedure() {
     object ChooseToUseDodge: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val stumbleContext = state.stumbleContext!!
-            return if (stumbleContext.defender.getSkillOrNull<Dodge>()?.isAvailable() == true) {
+            return if (stumbleContext.defender.hasSkill<Dodge>()) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
                 listOf(ContinueWhenReady)
@@ -109,7 +110,7 @@ object Stumble: Procedure() {
             }
             val updatedContext = state.stumbleContext!!.copy(defenderUsesDodge = useDodge)
             return compositeCommandOf(
-                SetContext(Game::stumbleContext, updatedContext),
+                SetOldContext(Game::stumbleContext, updatedContext),
                 GotoNode(ResolvePush)
             )
         }
@@ -121,7 +122,7 @@ object Stumble: Procedure() {
     object ResolvePush: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val pushContext = createPushContext(state)
-            return SetContext(Game::pushContext, pushContext)
+            return SetOldContext(Game::pushContext, pushContext)
         }
 
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStep
@@ -144,7 +145,7 @@ object Stumble: Procedure() {
             val injuryContext = RiskingInjuryRollContext(defender)
             return compositeCommandOf(
                 SetPlayerState(defender, PlayerState.KNOCKED_DOWN),
-                SetContext(Game::riskingInjuryRollsContext, injuryContext)
+                SetOldContext(Game::riskingInjuryRollsContext, injuryContext)
             )
         }
 
@@ -154,7 +155,7 @@ object Stumble: Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetContext(Game::riskingInjuryRollsContext, null),
+                SetOldContext(Game::riskingInjuryRollsContext, null),
                 ExitProcedure()
             )
         }

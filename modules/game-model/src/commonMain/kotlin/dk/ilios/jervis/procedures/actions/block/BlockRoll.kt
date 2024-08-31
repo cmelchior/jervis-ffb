@@ -16,14 +16,14 @@ import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.procedures.BlockDieRoll
-import dk.ilios.jervis.procedures.RerollContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.DiceRollType
@@ -92,7 +92,7 @@ object BlockRoll : Procedure() {
                         BlockDieRoll(originalRoll = diceRoll)
                     }
                 return compositeCommandOf(
-                    SetContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
+                    SetOldContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
                     GotoNode(ChooseResultOrReRollSource),
                 )
             }
@@ -115,8 +115,8 @@ object BlockRoll : Procedure() {
                 attackingPlayer.skills
                     .filter { skill: Skill -> skill is RerollSource }
                     .map { it as RerollSource }
-                    .filter { it.canReroll(DiceRollType.BlockRoll, context.roll) }
-                    .flatMap { it.calculateRerollOptions(DiceRollType.BlockRoll, context.roll) }
+                    .filter { it.canReroll(DiceRollType.BLOCK, context.roll) }
+                    .flatMap { it.calculateRerollOptions(DiceRollType.BLOCK, context.roll) }
                     .map { rerollOption: DiceRerollOption -> SelectRerollOption(rerollOption) }
 
             val team = attackingPlayer.team
@@ -148,9 +148,9 @@ object BlockRoll : Procedure() {
                 // TODO What is the difference between Continue and NoRerollSelected
                 NoRerollSelected -> GotoNode(SelectBlockResult)
                 is RerollOptionSelected -> {
-                    val rerollContext = RerollContext(DiceRollType.BlockRoll, action.option.source)
+                    val rerollContext = UseRerollContext(DiceRollType.BLOCK, action.option.source)
                     compositeCommandOf(
-                        SetContext(Game::useRerollContext, rerollContext),
+                        SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),
                     )
                 }
@@ -163,14 +163,14 @@ object BlockRoll : Procedure() {
         override fun getChildProcedure(
             state: Game,
             rules: Rules,
-        ): Procedure = state.useRerollContext!!.source.rerollProcedure
+        ): Procedure = state.rerollContext!!.source.rerollProcedure
 
         override fun onExitNode(
             state: Game,
             rules: Rules,
         ): Command {
             // useRerollResult must be set by the procedure running determing if a reroll is allowed
-            return if (state.useRerollResult!!.rerollAllowed) {
+            return if (state.rerollContext!!.rerollAllowed) {
                 GotoNode(ReRollDie)
             } else {
                 ExitProcedure()
@@ -198,7 +198,7 @@ object BlockRoll : Procedure() {
                         BlockDieRoll(originalRoll = blockRoll)
                     }
                 compositeCommandOf(
-                    SetContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
+                    SetOldContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
                     GotoNode(ChooseResultOrReRollSource),
                 )
             }
@@ -241,7 +241,7 @@ object BlockRoll : Procedure() {
             )
 
             return compositeCommandOf(
-                SetContext(Game::blockRollResultContext, result),
+                SetOldContext(Game::blockRollResultContext, result),
                 ExitProcedure()
             )
         }

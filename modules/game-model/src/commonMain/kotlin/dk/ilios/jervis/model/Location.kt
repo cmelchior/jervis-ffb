@@ -110,7 +110,7 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
     }
 
     fun toLogString(): String {
-        return "[$x, $y]"
+        return "[${x+1}, ${y+1}]"
     }
 
     /**
@@ -127,7 +127,7 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
         (x - distance..x + distance).forEach { x: Int ->
             (y - distance..y + distance).forEach { y: Int ->
                 val newCoordinate = FieldCoordinate(x, y)
-                if (newCoordinate.isOnField(rules)) {
+                if (newCoordinate.isOnField(rules) && this != newCoordinate) {
                     result.add(newCoordinate)
                 }
                 if (includeOutOfBounds && newCoordinate.isOutOfBounds(rules)) {

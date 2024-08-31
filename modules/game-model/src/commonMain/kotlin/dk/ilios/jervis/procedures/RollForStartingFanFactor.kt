@@ -54,10 +54,10 @@ object RollForStartingFanFactor : Procedure() {
         ): Command {
             val dedicatedFans = state.homeTeam.dedicatedFans
             return checkDiceRoll<D3Result>(action) {
-                val total = it.result + dedicatedFans
+                val total = it.value + dedicatedFans
                 compositeCommandOf(
                     SetFanFactor(state.homeTeam, total),
-                    ReportFanFactor(state.homeTeam, it.result, dedicatedFans),
+                    ReportFanFactor(state.homeTeam, it.value, dedicatedFans),
                     GotoNode(SetFanFactorForAwayTeam),
                 )
             }
@@ -79,10 +79,10 @@ object RollForStartingFanFactor : Procedure() {
         ): Command {
             val dedicatedFans = state.awayTeam.dedicatedFans
             return checkDiceRoll<D3Result>(action) {
-                val total = it.result + dedicatedFans
+                val total = it.value + dedicatedFans
                 compositeCommandOf(
                     SetFanFactor(state.awayTeam, total),
-                    ReportFanFactor(state.awayTeam, it.result, dedicatedFans),
+                    ReportFanFactor(state.awayTeam, it.value, dedicatedFans),
                     ExitProcedure(),
                 )
             }

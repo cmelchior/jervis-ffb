@@ -4,7 +4,7 @@ import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -21,13 +21,13 @@ object Pow: Procedure() {
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val newContext = createPushContext(state)
-        return SetContext(Game::pushContext, newContext)
+        return SetOldContext(Game::pushContext, newContext)
     }
 
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val context = state.pushContext!!
         return compositeCommandOf(
-            SetContext(Game::pushContext, null),
+            SetOldContext(Game::pushContext, null),
             ReportPowResult(context.pusher, context.pushee)
         )
     }
@@ -42,7 +42,7 @@ object Pow: Procedure() {
                 val injuryContext = RiskingInjuryRollContext(context.defender)
                 compositeCommandOf(
                     SetPlayerState(context.defender, PlayerState.KNOCKED_DOWN),
-                    SetContext(Game::riskingInjuryRollsContext, injuryContext),
+                    SetOldContext(Game::riskingInjuryRollsContext, injuryContext),
                     GotoNode(ResolvePlayerDown)
                 )
             } else {
@@ -60,7 +60,7 @@ object Pow: Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetContext(Game::riskingInjuryRollsContext, null),
+                SetOldContext(Game::riskingInjuryRollsContext, null),
                 ExitProcedure()
             )
         }

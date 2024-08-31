@@ -61,7 +61,7 @@ class CreateDebugClientRunner(private val cliJarFile: File) {
         val findJars = Regex("<jar href=\"(.*?)\"/>", RegexOption.MULTILINE)
         val matches: Sequence<MatchResult> = findJars.findAll(content)
         matches.forEach {
-            val resourceFile = it.groups[1]!!.value
+            val resourceFile = it.groups[1]!!.value.trim().removeSuffix("&#10;")
             logInfo("Downloading resource: $resourceFile")
             client.downloadFile(File(root, resourceFile), "$baseUrl/$resourceFile")
         }
@@ -99,6 +99,9 @@ class CreateDebugClientRunner(private val cliJarFile: File) {
      */
     fun createClassesWithDebugCode(fumbblClientJar: File): Map<String, File> {
         val cp = ClassPool.getDefault()
+        if (!fumbblClientJar.exists()) {
+            throw IllegalStateException("Fumbbl client jar is not found: $fumbblClientJar.a")
+        }
         cp.insertClassPath(fumbblClientJar.absolutePath)
         val cc = cp["com.fumbbl.ffb.client.net.CommandEndpoint"]
 

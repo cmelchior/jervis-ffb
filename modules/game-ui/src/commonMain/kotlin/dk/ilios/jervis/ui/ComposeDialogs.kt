@@ -114,7 +114,7 @@ fun MultipleSelectUserActionDialog(
                                             colors = buttonColors,
                                         ) {
                                             Text(
-                                                text = it.result.toString(),
+                                                text = it.value.toString(),
                                                 color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground,
                                             )
                                         }                                    }
@@ -182,7 +182,7 @@ private fun showDiceDialog(
                                     colors = buttonColors,
                                 ) {
                                     Text(
-                                        text = it.result.toString(),
+                                        text = it.value.toString(),
                                         color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground,
                                     )
                                 }

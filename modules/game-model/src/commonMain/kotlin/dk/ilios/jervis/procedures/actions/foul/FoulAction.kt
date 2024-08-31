@@ -15,7 +15,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
@@ -24,7 +24,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.procedures.actions.move.MoveContext
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
@@ -64,7 +64,7 @@ object FoulAction : Procedure() {
     override fun onEnterProcedure(
         state: Game,
         rules: Rules,
-    ): Command = SetContext(Game::foulContext, FoulContext(state.activePlayer!!))
+    ): Command = SetOldContext(Game::foulContext, FoulContext(state.activePlayer!!))
 
     override fun onExitProcedure(
         state: Game,
@@ -73,7 +73,7 @@ object FoulAction : Procedure() {
         val context = state.foulContext!!
         return compositeCommandOf(
             if (context.victim != null) ReportFoulResult(context) else null,
-            SetContext(Game::foulContext, null),
+            SetOldContext(Game::foulContext, null),
             if (context.hasFouled || context.hasMoved) {
                 val team = state.activeTeam
                 SetAvailableActions(team, PlayerActionType.FOUL, team.turnData.foulActions - 1)
@@ -104,7 +104,7 @@ object FoulAction : Procedure() {
                 is PlayerSelected -> {
                     val context = state.foulContext!!
                     compositeCommandOf(
-                        SetContext(Game::foulContext, context.copy(victim = action.player)),
+                        SetOldContext(Game::foulContext, context.copy(victim = action.player)),
                         GotoNode(MoveOrFoulOrEndAction)
                     )
                 }
@@ -142,15 +142,15 @@ object FoulAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.fouler, action.moveType)
                     compositeCommandOf(
-                        SetContext(Game::foulContext, context.copy(hasMoved = true)),
-                        SetContext(Game::moveContext, moveContext),
+                        SetOldContext(Game::foulContext, context.copy(hasMoved = true)),
+                        SetOldContext(Game::moveContext, moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
                 is PlayerSelected -> {
                     val foulContext = state.foulContext!!
                     compositeCommandOf(
-                        SetContext(Game::foulContext, foulContext.copy(victim = action.player)),
+                        SetOldContext(Game::foulContext, foulContext.copy(victim = action.player)),
                         GotoNode(ResolveFoul)
                     )
                 }

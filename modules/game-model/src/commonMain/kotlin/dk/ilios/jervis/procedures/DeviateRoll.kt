@@ -10,7 +10,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
@@ -64,7 +64,7 @@ object DeviateRoll : Procedure() {
             return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
                 val context = state.deviateRollContext!!
                 val direction = rules.direction(d8)
-                val distance = d6.result
+                val distance = d6.value
 
                 // Move the ball one at a time and check for out of bounds at every move
                 var currentLocation = context.from
@@ -79,7 +79,7 @@ object DeviateRoll : Procedure() {
                 }
 
                 compositeCommandOf(
-                    SetContext(
+                    SetOldContext(
                         Game::deviateRollContext, context.copy(
                             deviateRoll = listOf(d8, d6),
                             landsAt = if (outOfBoundsAt == null) currentLocation else null,

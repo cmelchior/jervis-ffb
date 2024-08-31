@@ -7,10 +7,13 @@ import kotlinx.serialization.Serializable
 class Dodge : BB2020Skill {
     override val id: String = "dodge-skill"
     override val name: String = "Dodge"
+    override val compulsory: Boolean = false
     override val resetAt: Skill.ResetPolicy = Skill.ResetPolicy.END_OF_TURN
-    override val limit: Int = 1
     override val category: SkillCategory = General
-    override var used: Int = 0
+    override var used: Boolean = false
+    override val value: Int? = null
+    override val workWithoutTackleZones: Boolean = false
+    override val workWhenProne: Boolean = false
 
     @Serializable
     data object Factory: SkillFactory {

@@ -5,16 +5,16 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallState
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
-import dk.ilios.jervis.model.DiceModifier
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.reports.ReportPickup
 import dk.ilios.jervis.rules.Rules
 
@@ -79,7 +79,7 @@ object Pickup : Procedure() {
         rules.addMarkedModifiers(state, pickupPlayer.team, state.ballSquare, modifiers)
         val rollContext = PickupRollContext(pickupPlayer, diceRollTarget, modifiers)
         return compositeCommandOf(
-            SetContext(Game::pickupRollContext, rollContext),
+            SetOldContext(Game::pickupRollContext, rollContext),
         )
     }
 
@@ -88,8 +88,8 @@ object Pickup : Procedure() {
         rules: Rules,
     ): Command? {
         return compositeCommandOf(
-            SetContext(Game::pickupRollContext, null),
-            SetContext(Game::pickupRollResultContext, null)
+            SetOldContext(Game::pickupRollContext, null),
+            SetOldContext(Game::pickupRollResultContext, null)
         )
     }
 

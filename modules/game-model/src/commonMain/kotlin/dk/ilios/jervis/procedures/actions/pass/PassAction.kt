@@ -13,17 +13,17 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DiceModifier
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.procedures.actions.move.MoveContext
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
@@ -66,7 +66,7 @@ object PassAction : Procedure() {
     override fun onEnterProcedure(
         state: Game,
         rules: Rules,
-    ): Command = SetContext(Game::passContext, PassContext(thrower = state.activePlayer!!))
+    ): Command = SetOldContext(Game::passContext, PassContext(thrower = state.activePlayer!!))
 
     override fun onExitProcedure(
         state: Game,
@@ -75,7 +75,7 @@ object PassAction : Procedure() {
         val context = state.passContext!!
         return compositeCommandOf(
             if (context.target != null) ReportPassResult(context) else null,
-            SetContext(Game::passContext, null),
+            SetOldContext(Game::passContext, null),
             if (context.hasMoved) {
                 val team = state.activeTeam
                 SetAvailableActions(team, PlayerActionType.PASS, team.turnData.passActions - 1)
@@ -115,8 +115,8 @@ object PassAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
-                        SetContext(Game::passContext, context.copy(hasMoved = true)),
-                        SetContext(Game::moveContext, moveContext),
+                        SetOldContext(Game::passContext, context.copy(hasMoved = true)),
+                        SetOldContext(Game::moveContext, moveContext),
                         GotoNode(ResolveMove)
                     )
                 }

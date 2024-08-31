@@ -3,7 +3,7 @@ package dk.ilios.jervis.procedures.actions.block
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.Node
@@ -28,7 +28,7 @@ object PlayerDown: Procedure() {
         val injuryContext = RiskingInjuryRollContext(context.attacker)
         return compositeCommandOf(
             SetPlayerState(context.attacker, PlayerState.KNOCKED_DOWN),
-            SetContext(Game::riskingInjuryRollsContext, injuryContext),
+            SetOldContext(Game::riskingInjuryRollsContext, injuryContext),
         )
     }
 

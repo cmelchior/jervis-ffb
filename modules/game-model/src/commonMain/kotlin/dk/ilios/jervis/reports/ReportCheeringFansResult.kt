@@ -19,7 +19,7 @@ class ReportCheeringFansResult(
     override val message: String
 
     init {
-        var msg = "Cheering Fans roll-off: [${dieKickingTeam.result} + $cheerLeadersKickingTeam] vs. [${dieReceivingTeam.result} + $cheerLeadersReceivingTeam].\n"
+        var msg = "Cheering Fans roll-off: [${dieKickingTeam.value} + $cheerLeadersKickingTeam] vs. [${dieReceivingTeam.value} + $cheerLeadersReceivingTeam].\n"
         when (result) {
             State.KICKER_WINS -> msg += "Kicking team wins and gets to roll on the Prayers Of Nuffle table."
             State.RECEIVER_WINS -> msg += "Receiving team wins and gets to roll on the Prayers Of Nuffle table."

@@ -177,5 +177,3 @@ and https://bbtactics.com/blood-bowl-star-players-list/ (pr. 30/8/2024)
 - [ ] Whirling Dervish, Fungus the Loon
 - [ ] Wisdom of the White Dwarf, Grombrindal, the White Dwarf
 - [ ] Yoink!, Scrappa Sorehead
-
-

@@ -8,10 +8,13 @@ import kotlinx.serialization.Serializable
 class Wrestle : BB2020Skill, D6StandardSkillReroll {
     override val id: String = "wrestle-skill"
     override val name: String = "Wrestle"
+    override val compulsory: Boolean = false
     override val resetAt: Skill.ResetPolicy = Skill.ResetPolicy.NEVER
-    override val limit: Int = Int.MAX_VALUE
     override val category: SkillCategory = General
-    override var used: Int = 0
+    override var used: Boolean = false
+    override val value: Int? = null
+    override val workWithoutTackleZones: Boolean = false
+    override val workWhenProne: Boolean = false
 
     override val rerollDescription: String = "Block Reroll"
     override var rerollUsed: Boolean = false // Wrestle is always available
@@ -21,7 +24,7 @@ class Wrestle : BB2020Skill, D6StandardSkillReroll {
         value: List<DieRoll<*, *>>,
         wasSuccess: Boolean?,
     ): Boolean {
-        return type == DiceRollType.BlockRoll
+        return type == DiceRollType.BLOCK
     }
 
     @Serializable

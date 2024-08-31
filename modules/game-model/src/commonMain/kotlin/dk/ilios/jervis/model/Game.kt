@@ -1,13 +1,13 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.procedures.CatchRollContext
-import dk.ilios.jervis.procedures.CatchRollResultContext
+import dk.ilios.jervis.model.context.CatchRollContext
+import dk.ilios.jervis.model.context.ContextHolder
+import dk.ilios.jervis.model.context.RushRollContext
+import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.procedures.DeviateRollContext
 import dk.ilios.jervis.procedures.PickupRollContext
 import dk.ilios.jervis.procedures.PickupRollResultContext
-import dk.ilios.jervis.procedures.RerollContext
-import dk.ilios.jervis.procedures.RerollResultContext
 import dk.ilios.jervis.procedures.ScatterRollContext
 import dk.ilios.jervis.procedures.ThrowInContext
 import dk.ilios.jervis.procedures.actions.blitz.BlitzContext
@@ -73,25 +73,13 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var pitchInvasionHomeTeamPlayersAffected: Int = 0
     var pitchInvasionAwayTeamPlayersAffected: Int = 0
 
-    // How many different types of rolls are there that might be modified by skills etc
-    // Go-For-It (Rushing)
-    // Dodge
-    // Stand Up
-    // Pick Up Ball
-    // Catch Ball
-    // Hand-Off
-    // Pass
-    //
-    // Block
-    // Armor Roll
-    // Injury Roll
-    //
-
+    // Context objects are state holders used by procedures
+    // when they need to track state between nodes
+    val contexts: ContextHolder = ContextHolder()
     var moveContext: MoveContext? = null
     var blockContext: BlockContext? = null
     var blockRollResultContext: BlockResultContext? = null
     var catchRollContext: CatchRollContext? = null
-    var catchRollResultContext: CatchRollResultContext? = null
     var pickupRollContext: PickupRollContext? = null
     var pickupRollResultContext: PickupRollResultContext? = null
     var riskingInjuryRollsContext: RiskingInjuryRollContext? = null
@@ -106,9 +94,9 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var deviateRollContext: DeviateRollContext? = null
     var passingInteferenceContext: PassingInteferenceContext? = null
     var throwInContext: ThrowInContext? = null
+    var rushRollContext: RushRollContext? = null
 
-    var useRerollContext: RerollContext? = null
-    var useRerollResult: RerollResultContext? = null
+    var rerollContext: UseRerollContext? = null
 
     val field: Field = field
     val ball: Ball = Ball()

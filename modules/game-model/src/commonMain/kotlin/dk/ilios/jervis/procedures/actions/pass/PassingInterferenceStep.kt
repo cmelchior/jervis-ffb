@@ -6,7 +6,7 @@ import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DiceModifier
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player

@@ -15,7 +15,7 @@ repositories {
 dependencies {
     implementation(project(":modules:utils"))
     implementation(project(":modules:fumbbl-net"))
-    compileOnly("com.eclipsesource.minimal-json:minimal-json:${libs.versions.minimalJson.get()}")
+    implementation("com.eclipsesource.minimal-json:minimal-json:${libs.versions.minimalJson.get()}")
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
     implementation("org.javassist:javassist:${libs.versions.javaAssist.get()}")
     implementation("io.ktor:ktor-client-okhttp:${libs.versions.ktor.get()}")

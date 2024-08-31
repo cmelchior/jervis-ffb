@@ -73,6 +73,8 @@ import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.actions.block.Stumble
 import dk.ilios.jervis.procedures.actions.foul.ArgueTheCallRoll
 import dk.ilios.jervis.procedures.actions.foul.FoulStep
+import dk.ilios.jervis.procedures.actions.move.DodgeRoll
+import dk.ilios.jervis.procedures.actions.move.RushRoll
 import dk.ilios.jervis.procedures.actions.move.calculateOptionsForMoveType
 import dk.ilios.jervis.procedures.actions.pass.AccuracyRoll
 import dk.ilios.jervis.procedures.injury.ArmourRoll
@@ -194,29 +196,29 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                                         actions = listOf(PlayerSubActionSelected("Leap", MoveTypeSelected(MoveType.LEAP)))
                                     )
                                 }
-                                MoveType.RUSH -> {
-                                    // Rush moves should be converted to jus choosing the square on the field
-                                    val pathFinder = controller.rules.pathFinder
-                                    val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
-                                    val allPaths = pathFinder.calculateAllPaths(
-                                        controller.state,
-                                        startLocation,
-                                        player.rushesLeft,
-                                    )
-                                    SelectMoveActionFieldLocationInput(
-                                        wrapperAction = calculateOptionsForMoveType(controller.state, controller.rules, player, MoveType.RUSH).map {
-                                            FieldSquareAction(
-                                                coordinate = (it as SelectFieldLocation).coordinate,
-                                                action = CompositeGameAction(
-                                                    list = listOf(
-                                                        MoveTypeSelected(MoveType.RUSH),
-                                                        FieldSquareSelected(it.coordinate)
-                                                    )
-                                                )
-                                            )
-                                        },
-                                        distances = allPaths
-                                    )                                }
+//                                MoveType.RUSH -> {
+//                                    // Rush moves should be converted to jus choosing the square on the field
+//                                    val pathFinder = controller.rules.pathFinder
+//                                    val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
+//                                    val allPaths = pathFinder.calculateAllPaths(
+//                                        controller.state,
+//                                        startLocation,
+//                                        player.rushesLeft,
+//                                    )
+//                                    SelectMoveActionFieldLocationInput(
+//                                        wrapperAction = calculateOptionsForMoveType(controller.state, controller.rules, player, MoveType.RUSH).map {
+//                                            FieldSquareAction(
+//                                                coordinate = (it as SelectFieldLocation).coordinate,
+//                                                action = CompositeGameAction(
+//                                                    list = listOf(
+//                                                        MoveTypeSelected(MoveType.RUSH),
+//                                                        FieldSquareSelected(it.coordinate)
+//                                                    )
+//                                                )
+//                                            )
+//                                        },
+//                                        distances = allPaths
+//                                    )                                }
                                 MoveType.STANDARD -> {
                                     // Normal moves are converted to just choosing the square on the field
                                     val pathFinder = controller.rules.pathFinder
@@ -227,7 +229,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                                         player.movesLeft,
                                     )
                                     SelectMoveActionFieldLocationInput(
-                                        wrapperAction = calculateOptionsForMoveType(controller.state, controller.rules, player, MoveType.STANDARD).map {
+                                        wrapperAction = calculateOptionsForMoveType(controller.state, controller.rules, player, MoveType.STANDARD).map { it: ActionDescriptor ->
                                             FieldSquareAction(
                                                 coordinate = (it as SelectFieldLocation).coordinate,
                                                 action = CompositeGameAction(
@@ -235,7 +237,8 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                                                         MoveTypeSelected(MoveType.STANDARD),
                                                         FieldSquareSelected(it.coordinate)
                                                     )
-                                                )
+                                                ),
+                                                requiresRoll = it.requiresRush
                                             )
                                         },
                                         distances = allPaths
@@ -258,7 +261,8 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                                 val coords = (it as SelectFieldLocation).coordinate
                                 FieldSquareAction(
                                     coordinate = coords,
-                                    action = FieldSquareSelected(coords)
+                                    action = FieldSquareSelected(coords),
+                                    requiresRoll = it.requiresRush
                                 )
                             }
                         )
@@ -388,6 +392,18 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 DiceRollUserInputDialog.createDeviateDialog(rules, false)
             }
 
+            is DodgeRoll.ReRollDie,
+            is DodgeRoll.RollDie -> {
+                val context = controller.state.moveContext!!
+                DiceRollUserInputDialog.createDodgeRollDialog(context.player, context.target!!)
+            }
+
+            is DodgeRoll.ChooseReRollSource -> {
+                SingleChoiceInputDialog.createDodgeRerollDialog(
+                    mapUnknownActions(controller.getAvailableActions()),
+                )
+            }
+
             is FoulStep.DecideToArgueTheCall -> {
                 SingleChoiceInputDialog.createArgueTheCallDialog(controller.state.foulContext!!)
             }
@@ -440,6 +456,18 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                     }
                 }
                 DiceRollUserInputDialog.createWeatherRollDialog(rules)
+            }
+
+            is RushRoll.ReRollDie,
+            is RushRoll.RollDie -> {
+                val context = controller.state.rushRollContext!!
+                DiceRollUserInputDialog.createRushRollDialog(context.player, context.target)
+            }
+
+            is RushRoll.ChooseReRollSource -> {
+                SingleChoiceInputDialog.createRushRerollDialog(
+                    mapUnknownActions(controller.getAvailableActions()),
+                )
             }
 
             is Scatter.RollDice -> {

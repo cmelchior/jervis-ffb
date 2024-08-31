@@ -16,7 +16,7 @@ import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetKickingPlayer
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
@@ -142,7 +142,7 @@ object TheKickOff : Procedure() {
 
     object TheKickDeviates : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
-            return SetContext(Game::deviateRollContext, DeviateRollContext(from = state.ball.location))
+            return SetOldContext(Game::deviateRollContext, DeviateRollContext(from = state.ball.location))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -276,7 +276,7 @@ object TheFUMBBLKickOff : Procedure() {
         ): Command {
             return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
                 val direction = rules.direction(d8)
-                val newLocation = state.ball.location.move(direction, d6.result)
+                val newLocation = state.ball.location.move(direction, d6.value)
                 compositeCommandOf(
                     SetBallLocation(newLocation),
                     ReportKickResult(state.kickingTeam, d8, d6, newLocation, rules),

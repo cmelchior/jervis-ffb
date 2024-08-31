@@ -14,7 +14,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
@@ -23,7 +23,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.procedures.actions.block.BlockStep
 import dk.ilios.jervis.procedures.actions.move.MoveContext
@@ -55,7 +55,7 @@ object BlitzAction : Procedure() {
     override fun onEnterProcedure(
         state: Game,
         rules: Rules,
-    ): Command = SetContext(Game::blitzContext, BlitzContext(state.activePlayer!!))
+    ): Command = SetOldContext(Game::blitzContext, BlitzContext(state.activePlayer!!))
 
     override fun onExitProcedure(
         state: Game,
@@ -64,7 +64,7 @@ object BlitzAction : Procedure() {
         val context = state.blitzContext!!
         val player = state.activePlayer!!
         return compositeCommandOf(
-            SetContext(Game::blitzContext, null),
+            SetOldContext(Game::blitzContext, null),
             if (context.hasBlocked || context.hasMoved) {
                 val team = state.activeTeam
                 SetAvailableActions(team, PlayerActionType.FOUL, team.turnData.blitzActions - 1)
@@ -95,7 +95,7 @@ object BlitzAction : Procedure() {
                 is PlayerSelected -> {
                     val context = state.blitzContext!!
                     compositeCommandOf(
-                        SetContext(Game::blitzContext, context.copy(defender = action.player)),
+                        SetOldContext(Game::blitzContext, context.copy(defender = action.player)),
                         GotoNode(MoveOrBlockOrEndAction)
                     )
                 }
@@ -133,8 +133,8 @@ object BlitzAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.attacker, action.moveType)
                     compositeCommandOf(
-                        SetContext(Game::blitzContext, context.copy(hasMoved = true)),
-                        SetContext(Game::moveContext, moveContext),
+                        SetOldContext(Game::blitzContext, context.copy(hasMoved = true)),
+                        SetOldContext(Game::moveContext, moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
@@ -146,8 +146,8 @@ object BlitzAction : Procedure() {
                         isBlitzing = true
                     )
                     compositeCommandOf(
-                        SetContext(Game::blitzContext, context.copy(hasBlocked = true)),
-                        SetContext(Game::blockContext, blockContext),
+                        SetOldContext(Game::blitzContext, context.copy(hasBlocked = true)),
+                        SetOldContext(Game::blockContext, blockContext),
                         GotoNode(ResolveBlock)
                     )
                 }
@@ -210,8 +210,8 @@ object BlitzAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.attacker, action.moveType)
                     compositeCommandOf(
-                        SetContext(Game::blitzContext, context.copy(hasMoved = true)),
-                        SetContext(Game::moveContext, moveContext),
+                        SetOldContext(Game::blitzContext, context.copy(hasMoved = true)),
+                        SetOldContext(Game::moveContext, moveContext),
                         GotoNode(ResolveMove)
                     )
                 }

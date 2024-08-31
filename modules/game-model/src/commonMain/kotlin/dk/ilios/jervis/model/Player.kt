@@ -152,3 +152,23 @@ class Player(
         return state == PlayerState.STANDING && location.isOnField(rules)
     }
 }
+
+inline fun <reified T:Skill> Player.hasSkill(): Boolean {
+    return this.skills.filterIsInstance<T>().isNotEmpty()
+}
+
+// This method assumes the player is on the field
+inline fun <reified T:Skill> Player.isSkillAvailable(): Boolean {
+    return skills.filterIsInstance<T>().firstOrNull()?.let { skill ->
+        if (!hasTackleZones && !skill.workWithoutTackleZones) {
+            return@let false
+        }
+        if ((state == PlayerState.PRONE || state == PlayerState.STUNNED) && !skill.workWhenProne) {
+            return@let false
+        }
+        if (state != PlayerState.STANDING && state != PlayerState.PRONE && state == PlayerState.STUNNED) {
+            return@let false
+        }
+        return !skill.used
+    } ?: false
+}

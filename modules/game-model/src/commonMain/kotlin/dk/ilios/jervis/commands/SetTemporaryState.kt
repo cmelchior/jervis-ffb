@@ -31,7 +31,7 @@ class SetTemporaryState<T>(private val property: KMutableProperty1<Game, T>, pri
     }
 }
 
-class SetContext<T>(private val property: KMutableProperty1<Game, T?>, private val value: T) : Command {
+class SetOldContext<T>(private val property: KMutableProperty1<Game, T?>, private val value: T) : Command {
     var originalValue: T? = null
 
     override fun execute(

@@ -28,23 +28,12 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
     return when (type) {
         MoveType.JUMP -> TODO()
         MoveType.LEAP -> TODO()
-        MoveType.RUSH -> {
-            val eligibleEmptySquares: List<ActionDescriptor> =
-                if (player.rushesLeft > 0) {
-                    player.location.coordinate.getSurroundingCoordinates(rules)
-                        .filter { state.field[it].isUnoccupied() }
-                        .map { SelectFieldLocation.rush(it) }
-                } else {
-                    emptyList()
-                }
-            eligibleEmptySquares
-        }
         MoveType.STANDARD -> {
             val eligibleEmptySquares: List<ActionDescriptor> =
-                if (player.movesLeft > 0) {
+                if (player.movesLeft + player.rushesLeft > 0) {
                     player.location.coordinate.getSurroundingCoordinates(rules)
                         .filter { state.field[it].isUnoccupied() }
-                        .map { SelectFieldLocation.move(it) }
+                        .map { SelectFieldLocation.move(it, player.movesLeft <= 0) }
                 } else {
                     emptyList()
                 }
@@ -65,21 +54,15 @@ fun calculateMoveTypesAvailable(player: Player, rules: Rules): List<ActionDescri
 
     val options = mutableListOf<MoveType>()
 
-    // Normal move
-    if (player.movesLeft > 0 && player.isStanding(rules)) {
+    // Normal move (with a potential rush)
+    if (player.movesLeft + player.rushesLeft >= 1 && player.isStanding(rules)) {
         options.add(MoveType.STANDARD)
     }
 
-    // Rushing
-    if (player.movesLeft == 0 && player.rushesLeft > 0 && player.isStanding(rules)) {
-        options.add(MoveType.RUSH)
-    }
-
-    // Jump/Leap - Can only be attempted if at least 2 moves left
+    // Jump/Leap (with potential rushes)
     if (player.movesLeft + player.rushesLeft >= 2 && player.isStanding(rules)) {
-        // TODO Add support for JUMP and LEAP
-//        options.add(MoveType.JUMP)
-//        options.add(MoveType.LEAP)
+        options.add(MoveType.JUMP)
+        options.add(MoveType.LEAP)
     }
 
     // Standup
@@ -147,7 +130,6 @@ object MoveTypeSelectorStep : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return when(val moveType = state.moveContext!!.moveType) {
                 MoveType.STANDARD -> StandardMoveStep
-                MoveType.RUSH -> RushStep
                 MoveType.JUMP,
                 MoveType.LEAP,
                 MoveType.STAND_UP -> TODO("Not supported yet: $moveType")

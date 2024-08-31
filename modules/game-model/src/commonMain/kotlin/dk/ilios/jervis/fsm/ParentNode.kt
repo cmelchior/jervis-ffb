@@ -13,7 +13,7 @@ import dk.ilios.jervis.rules.Rules
  * `Player Actions`.
  *
  * Calling a child procedure is its own state-machine with [EnterParentNode] and [ExitParentNode] states which makes it possible to
- * that makes it possible to control state and flow after entering and exiting the child procedure.
+ * control state and flow after entering and exiting the child procedure.
  */
 abstract class ParentNode : Node {
     enum class State {
@@ -39,6 +39,8 @@ abstract class ParentNode : Node {
         rules: Rules,
     ): Command
 
+    // This method should only be called by `GameController`
+    // It is not supposed to be called by procedure subclasses.
     fun enterNode(
         state: Game,
         rules: Rules,
@@ -49,6 +51,8 @@ abstract class ParentNode : Node {
         )
     }
 
+    // This method should only be called by `GameController`
+    // It is not supposed to be called by procedure subclasses.
     fun runNode(
         state: Game,
         rules: Rules,
@@ -62,6 +66,8 @@ abstract class ParentNode : Node {
         )
     }
 
+    // This method should only be called by `GameController`
+    // It is not supposed to be called by procedure subclasses.
     fun exitNode(
         state: Game,
         rules: Rules,

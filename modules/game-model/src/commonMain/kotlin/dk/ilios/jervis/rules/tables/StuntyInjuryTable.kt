@@ -29,7 +29,7 @@ object StuntyInjuryTable {
         firstD6: D6Result,
         secondD6: D6Result,
     ): InjuryResult {
-        val result = firstD6.result + secondD6.result
+        val result = firstD6.value + secondD6.value
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Stunty Injury Table.")
     }
 }

@@ -170,9 +170,12 @@ private fun FieldSquare(
 ) {
     var showPopup by remember { mutableStateOf(square.showContextMenu) }
 
-    val bgColor = when {
-        square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
-        else -> Color.Transparent
+    val bgColor by remember(square) {
+        mutableStateOf(when {
+            square.onSelected != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
+            square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
+            else -> Color.Transparent
+        })
     }
 
     val boxWrapperModifier = remember(square) {

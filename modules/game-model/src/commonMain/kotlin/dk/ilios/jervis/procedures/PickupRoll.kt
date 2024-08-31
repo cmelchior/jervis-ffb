@@ -15,15 +15,15 @@ import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
-import dk.ilios.jervis.rules.skills.DiceRoll
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -79,7 +79,7 @@ object PickupRoll : Procedure() {
                         success = isPickupSuccess(it, target, rollContext),
                     )
                 return compositeCommandOf(
-                    SetContext(Game::pickupRollResultContext, resultContext),
+                    SetOldContext(Game::pickupRollResultContext, resultContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -99,10 +99,10 @@ object PickupRoll : Procedure() {
                 pickupPlayer.skills
                     .filter { it is RerollSource }
                     .map { it as RerollSource }
-                    .filter { skill -> skill.canReroll(DiceRoll.PICKUP, listOf(context.roll), successOnFirstRoll) }
+                    .filter { skill -> skill.canReroll(DiceRollType.PICKUP, listOf(context.roll), successOnFirstRoll) }
                     .flatMap {
                             it: RerollSource ->
-                        it.calculateRerollOptions(DiceRoll.PICKUP, context.roll, successOnFirstRoll)
+                        it.calculateRerollOptions(DiceRollType.PICKUP, context.roll, successOnFirstRoll)
                     }
                     .map { SelectRerollOption(it) }
 
@@ -136,9 +136,9 @@ object PickupRoll : Procedure() {
                 Continue -> ExitProcedure()
                 NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = RerollContext(DiceRollType.CatchRoll, action.option.source)
+                    val rerollContext = UseRerollContext(DiceRollType.CATCH, action.option.source)
                     compositeCommandOf(
-                        SetContext(Game::useRerollContext, rerollContext),
+                        SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),
                     )
                 }
@@ -151,14 +151,13 @@ object PickupRoll : Procedure() {
         override fun getChildProcedure(
             state: Game,
             rules: Rules,
-        ): Procedure = state.useRerollContext!!.source.rerollProcedure
+        ): Procedure = state.rerollContext!!.source.rerollProcedure
 
         override fun onExitNode(
             state: Game,
             rules: Rules,
         ): Command {
-            // useRerollResult must be set by the procedure running determing if a reroll is allowed
-            return if (state.useRerollResult!!.rerollAllowed) {
+            return if (state.rerollContext!!.rerollAllowed) {
                 GotoNode(ReRollDie)
             } else {
                 ExitProcedure()
@@ -188,13 +187,13 @@ object PickupRoll : Procedure() {
                         modifiers = rollContext.modifiers,
                         roll =
                             rollResultContext.roll.copy(
-                                rerollSource = state.useRerollContext!!.source,
+                                rerollSource = state.rerollContext!!.source,
                                 rerolledResult = it,
                             ),
                         success = isPickupSuccess(it, target, rollContext),
                     )
                 compositeCommandOf(
-                    SetContext(Game::pickupRollResultContext, rerollContext),
+                    SetOldContext(Game::pickupRollResultContext, rerollContext),
                     ExitProcedure(),
                 )
             }
@@ -205,5 +204,5 @@ object PickupRoll : Procedure() {
         it: D6Result,
         target: Int,
         rollContext: PickupRollContext,
-    ) = it.result != 1 && (target <= it.result + rollContext.diceModifier())
+    ) = it.value != 1 && (target <= it.value + rollContext.diceModifier())
 }

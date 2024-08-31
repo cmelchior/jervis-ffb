@@ -30,7 +30,7 @@ object InjuryTable {
         secondD6: D6Result,
         modifier: Int = 0,
     ): InjuryResult {
-        val result = (firstD6.result + secondD6.result + modifier).coerceIn(2, 12)
+        val result = (firstD6.value + secondD6.value + modifier).coerceIn(2, 12)
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Injury Table.")
     }
 }

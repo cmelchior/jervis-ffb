@@ -20,6 +20,7 @@ import dk.ilios.jervis.commands.SetActivePlayer
 import dk.ilios.jervis.commands.SetCanUseTeamRerolls
 import dk.ilios.jervis.commands.SetPlayerAvailability
 import dk.ilios.jervis.commands.SetPlayerStats
+import dk.ilios.jervis.commands.SetSkillUsed
 import dk.ilios.jervis.commands.SetTurnNo
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
@@ -36,6 +37,7 @@ import dk.ilios.jervis.reports.ReportEndingTurn
 import dk.ilios.jervis.reports.ReportStartingTurn
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.utils.INVALID_ACTION
 
 /**
@@ -57,6 +59,7 @@ object TeamTurn : Procedure() {
             getResetTurnActionCommands(state, rules),
             *resetPlayerStats(state, rules),
             *getResetAvailablePlayers(state, rules),
+            *resetSkillsUsed(state, rules),
             ReportStartingTurn(state.activeTeam, turn),
         )
     }
@@ -235,7 +238,9 @@ object TeamTurn : Procedure() {
         ): Command {
             // TODO Implement end-of-turn things
             //  - Players stunned at the beginning of the turn are now prone
-            return ExitProcedure()
+            return compositeCommandOf(
+                ExitProcedure()
+            )
         }
     }
 
@@ -281,6 +286,18 @@ object TeamTurn : Procedure() {
                     it.baseMove,
                     rules.rushesPrActivation // Check for Sprint
                 )
+            }.toTypedArray()
+    }
+
+    // Reset player stats back to start, this e.g. include moves/rushes used/temporary skills
+    private fun resetSkillsUsed(state: Game, rules: Rules): Array<Command> {
+        return state.activeTeam
+            .map {
+                val skillsThatReset = it.skills.filter { it.used  && it.resetAt == Skill.ResetPolicy.END_OF_TURN}
+                Pair(it, skillsThatReset)
+            }
+            .flatMap {
+                it.second.map { skill -> SetSkillUsed(it.first, skill, false) }
             }.toTypedArray()
     }
 

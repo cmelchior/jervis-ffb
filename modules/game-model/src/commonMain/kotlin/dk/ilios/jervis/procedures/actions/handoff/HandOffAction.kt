@@ -14,7 +14,7 @@ import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
@@ -23,7 +23,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.procedures.Catch
 import dk.ilios.jervis.procedures.actions.move.MoveContext
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
@@ -52,7 +52,7 @@ object HandOffAction : Procedure() {
     override fun onEnterProcedure(
         state: Game,
         rules: Rules,
-    ): Command = SetContext(Game::handOffContext, HandOffContext(state.activePlayer!!))
+    ): Command = SetOldContext(Game::handOffContext, HandOffContext(state.activePlayer!!))
 
     override fun onExitProcedure(
         state: Game,
@@ -60,7 +60,7 @@ object HandOffAction : Procedure() {
     ): Command {
         val context = state.handOffContext!!
         return compositeCommandOf(
-            SetContext(Game::handOffContext, null),
+            SetOldContext(Game::handOffContext, null),
             if (context.hasMoved) {
                 val team = state.activeTeam
                 SetAvailableActions(team, PlayerActionType.HAND_OFF, team.turnData.handOffActions - 1)
@@ -101,15 +101,15 @@ object HandOffAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
-                        SetContext(Game::handOffContext, context.copy(hasMoved = true)),
-                        SetContext(Game::moveContext, moveContext),
+                        SetOldContext(Game::handOffContext, context.copy(hasMoved = true)),
+                        SetOldContext(Game::moveContext, moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
                 is PlayerSelected -> {
                     val context = state.handOffContext!!
                     compositeCommandOf(
-                        SetContext(Game::handOffContext, context.copy(catcher = action.player)),
+                        SetOldContext(Game::handOffContext, context.copy(catcher = action.player)),
                         SetBallState.accurateThrow(),
                         SetBallLocation(action.player.location.coordinate),
                         GotoNode(ResolveCatch)

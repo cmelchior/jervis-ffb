@@ -11,7 +11,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetCoachBanned
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.SetTurnOver
@@ -21,10 +21,10 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DefensiveAssistsModifier
+import dk.ilios.jervis.model.modifiers.DefensiveAssistsModifier
 import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.OffensiveAssistModifier
+import dk.ilios.jervis.model.modifiers.OffensiveAssistModifier
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
@@ -65,7 +65,7 @@ object FoulStep: Procedure() {
                     .count { player -> rules.canOfferAssistAgainst(player, context.fouler) }
 
             return compositeCommandOf(
-                SetContext(Game::foulContext, context.copy(foulAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
+                SetOldContext(Game::foulContext, context.copy(foulAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
                 GotoNode(RollForFoul)
             )
         }
@@ -82,7 +82,7 @@ object FoulStep: Procedure() {
                     DefensiveAssistsModifier(foulContext.defensiveAssists)
                 )
             )
-            return SetContext(Game::riskingInjuryRollsContext, injuryContext)
+            return SetOldContext(Game::riskingInjuryRollsContext, injuryContext)
         }
 
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
@@ -94,8 +94,8 @@ object FoulStep: Procedure() {
                 (injuryContext.armourRoll[0] == 1.d6 && injuryContext.armourRoll[1] == 1.d6) ||
                 (injuryContext.injuryRoll[0] == 1.d6 && injuryContext.injuryRoll[1] == 1.d6)
             return compositeCommandOf(
-                SetContext(Game::riskingInjuryRollsContext, null),
-                SetContext(Game::foulContext, foulContext.copy(
+                SetOldContext(Game::riskingInjuryRollsContext, null),
+                SetOldContext(Game::foulContext, foulContext.copy(
                     injuryRoll = injuryContext,
                     spottedByTheRef = spottedByRef)),
                 if (spottedByRef) {
@@ -122,13 +122,13 @@ object FoulStep: Procedure() {
             return when (action) {
                 Cancel -> {
                     compositeCommandOf(
-                        SetContext(Game::foulContext, foulContext.copy(argueTheCall = false)),
+                        SetOldContext(Game::foulContext, foulContext.copy(argueTheCall = false)),
                         ExitProcedure()
                     )
                 }
                 Confirm -> {
                     compositeCommandOf(
-                        SetContext(Game::foulContext, foulContext.copy(argueTheCall = true)),
+                        SetOldContext(Game::foulContext, foulContext.copy(argueTheCall = true)),
                         GotoNode(RollForArgueThCall)
                     )
                 }

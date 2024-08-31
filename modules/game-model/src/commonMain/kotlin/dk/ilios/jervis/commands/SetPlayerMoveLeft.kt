@@ -11,6 +11,10 @@ import dk.ilios.jervis.model.Player
 class SetPlayerMoveLeft(private val player: Player, val remainingMove: Int) : Command {
     private var originalMove: Int = 0
 
+    init {
+        if (remainingMove < 0) throw IllegalArgumentException("Remaining move cannot be negative")
+    }
+
     override fun execute(
         state: Game,
         controller: GameController,

@@ -5,48 +5,18 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallState
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
-import dk.ilios.jervis.model.DiceModifier
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.Player
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.CatchRollContext
+import dk.ilios.jervis.model.modifiers.CatchModifier
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.reports.ReportCatch
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
-
-enum class CatchModifier(override val modifier: Int, override val description: String) : DiceModifier {
-    CONVERT_DEFLECTION(-1, "Deflection"),
-    BOUNCING(-1, "Bouncing ball"),
-    THROW_IN(-1, "Throw-in"),
-    SCATTERED(-1, "Scattered"),
-    DEVIATED(-1, "Deviated"),
-    MARKED(-1, "Marked"),
-    DISTURBING_PRESENCE(-1, "Disturbing Presence"),
-    POURING_RAIN(-1, "Pouring Rain"),
-}
-
-data class CatchRollContext(
-    val catchingPlayer: Player,
-    val diceRollTarget: Int,
-    val modifiers: List<DiceModifier>,
-) : ProcedureContext {
-    // The sum of modifiers
-    fun diceModifier(): Int = modifiers.fold(0) { acc: Int, el: DiceModifier -> acc + el.modifier }
-}
-
-data class CatchRollResultContext(
-    val catchingPlayer: Player,
-    val target: Int,
-    val modifiers: List<DiceModifier>,
-    val roll: D6DieRoll,
-    val success: Boolean,
-) : ProcedureContext {
-    val rerolled: Boolean = roll.rerollSource != null && roll.rerolledResult != null
-}
 
 /**
  * Resolve a player attempting to catch the ball.
@@ -89,7 +59,7 @@ object Catch : Procedure() {
         rules.addMarkedModifiers(state, catchingPlayer.team, state.ballSquare, modifiers)
         val rollContext = CatchRollContext(catchingPlayer, diceRollTarget, modifiers)
         return compositeCommandOf(
-            SetContext(Game::catchRollContext, rollContext),
+            SetOldContext(Game::catchRollContext, rollContext),
         )
     }
 
@@ -98,8 +68,7 @@ object Catch : Procedure() {
         rules: Rules,
     ): Command? {
         return compositeCommandOf(
-            SetContext(Game::catchRollContext, null),
-            SetContext(Game::catchRollResultContext, null)
+            SetOldContext(Game::catchRollContext, null),
         )
     }
 
@@ -114,17 +83,18 @@ object Catch : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            val result = state.catchRollResultContext!!
-            return if (result.success) {
+            val context = state.catchRollContext!!
+            val roll = context.roll!!
+            return if (context.isSuccess) {
                 compositeCommandOf(
-                    SetBallState.carried(result.catchingPlayer),
-                    ReportCatch(result.catchingPlayer, result.target, result.modifiers, result.roll.result, true),
+                    SetBallState.carried(context.catchingPlayer),
+                    ReportCatch(context.catchingPlayer, context.target, context.modifiers, roll.result, true),
                     ExitProcedure(),
                 )
             } else {
                 compositeCommandOf(
                     SetBallState.bouncing(),
-                    ReportCatch(result.catchingPlayer, result.target, result.modifiers, result.roll.result, false),
+                    ReportCatch(context.catchingPlayer, context.target, context.modifiers, roll.result, false),
                     GotoNode(CatchFailed),
                 )
             }

@@ -5,5 +5,5 @@ import dk.ilios.jervis.model.Team
 
 class ReportPitchInvasionRoll(team: Team, roll: D6Result, fanFactor: Int) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
-    override val message: String = "${team.name} rolled [${roll.result}] + fanFactor = ${roll.result + fanFactor}."
+    override val message: String = "${team.name} rolled [${roll.value}] + fanFactor = ${roll.value + fanFactor}."
 }

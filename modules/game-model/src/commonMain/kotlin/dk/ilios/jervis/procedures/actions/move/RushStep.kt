@@ -35,7 +35,7 @@ object RushStep: Procedure() {
     object SelectTargetSquareOrCancelStep: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val player = state.moveContext!!.player
-            val eligibleSquares = calculateOptionsForMoveType(state, rules, player, MoveType.RUSH)
+            val eligibleSquares = calculateOptionsForMoveType(state, rules, player, MoveType.STANDARD)
             return eligibleSquares + listOf(CancelWhenReady, EndActionWhenReady)
         }
 

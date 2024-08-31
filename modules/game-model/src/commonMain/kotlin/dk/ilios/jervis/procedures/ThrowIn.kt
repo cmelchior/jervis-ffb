@@ -12,14 +12,14 @@ import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.ProcedureContext
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Direction
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -66,7 +66,7 @@ object ThrowIn : Procedure() {
                 val context = state.throwInContext!!
                 val direction = rules.throwIn(context.outOfBoundsAt, d3)
                 return compositeCommandOf(
-                    SetContext(Game::throwInContext, context.copy(
+                    SetOldContext(Game::throwInContext, context.copy(
                         directionRoll =  d3,
                         direction = direction,
                     )),
@@ -104,7 +104,7 @@ object ThrowIn : Procedure() {
 
                 return if (outOfBoundsAt != null) {
                     compositeCommandOf(
-                        SetContext(Game::throwInContext, context.copy(
+                        SetOldContext(Game::throwInContext, context.copy(
                             distance = dice,
                         )),
                         SetBallState.outOfBounds(outOfBoundsAt),
@@ -113,7 +113,7 @@ object ThrowIn : Procedure() {
                     )
                 } else {
                     compositeCommandOf(
-                        SetContext(Game::throwInContext, context.copy(
+                        SetOldContext(Game::throwInContext, context.copy(
                             distance = dice,
                         )),
                         SetBallState.thrownIn(),
@@ -129,7 +129,7 @@ object ThrowIn : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             // Replace the current throw in context
             // TODO Does this ruin reporting logging?
-            return SetContext(Game::throwInContext, ThrowInContext(
+            return SetOldContext(Game::throwInContext, ThrowInContext(
                 state.ball.outOfBoundsAt!!
             )
             )

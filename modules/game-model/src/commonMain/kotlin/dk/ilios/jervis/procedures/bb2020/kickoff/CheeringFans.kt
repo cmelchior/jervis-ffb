@@ -95,8 +95,8 @@ object CheeringFans : Procedure() {
         ): Command {
             val kickingTeamDie = state.kickingTeam.temporaryData.dieRoll.last()
             val receivingTeamDie = state.receivingTeam.temporaryData.dieRoll.last()
-            val kickingResult = kickingTeamDie.result + state.kickingTeam.cheerLeaders
-            val receivingResult = receivingTeamDie.result + state.receivingTeam.cheerLeaders
+            val kickingResult = kickingTeamDie.value + state.kickingTeam.cheerLeaders
+            val receivingResult = receivingTeamDie.value + state.receivingTeam.cheerLeaders
             return when {
                 kickingResult == receivingResult -> {
                     compositeCommandOf(

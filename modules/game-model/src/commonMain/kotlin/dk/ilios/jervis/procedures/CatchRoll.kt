@@ -11,23 +11,22 @@ import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectNoReroll
-import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.CatchRollContext
+import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.DiceRerollOption
-import dk.ilios.jervis.rules.skills.DiceRoll
 import dk.ilios.jervis.rules.skills.DiceRollType
-import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
+import dk.ilios.jervis.utils.calculateAvailableRerollsFor
 
 /**
  * Procedure for handling a Catch Roll. It is only responsible for handling the actual dice roll.
@@ -51,19 +50,14 @@ object CatchRoll : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) {
+            return checkDiceRoll<D6Result>(action) { d6 ->
                 val rollContext = state.catchRollContext!!
-                val target = rollContext.catchingPlayer.agility
-                val resultContext =
-                    CatchRollResultContext(
-                        catchingPlayer = rollContext.catchingPlayer,
-                        target = target,
-                        modifiers = rollContext.modifiers,
-                        roll = D6DieRoll(originalRoll = it),
-                        success = isCatchSuccess(it, target, rollContext),
-                    )
+                val resultContext = rollContext.copy(
+                    roll = D6DieRoll(d6),
+                    isSuccess = isCatchSuccess(d6, rollContext.target, rollContext)
+                )
                 return compositeCommandOf(
-                    SetContext(Game::catchRollResultContext, resultContext),
+                    SetOldContext(Game::catchRollContext, resultContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -76,34 +70,18 @@ object CatchRoll : Procedure() {
             state: Game,
             rules: Rules,
         ): List<ActionDescriptor> {
-            val context = state.catchRollResultContext!!
-            val successOnFirstRoll = context.success
-            val catchingPlayer = context.catchingPlayer
-            val availableSkills: List<SelectRerollOption> =
-                catchingPlayer.skills
-                    .filter { it is RerollSource }
-                    .map { it as RerollSource }
-                    .filter { it.canReroll(DiceRoll.CATCH, listOf(context.roll), successOnFirstRoll) }
-                    .flatMap {
-                            it: RerollSource ->
-                        it.calculateRerollOptions(DiceRoll.CATCH, context.roll, successOnFirstRoll)
-                    }
-                    .map { SelectRerollOption(it) }
-
-            val team = catchingPlayer.team
-            val hasTeamRerolls = team.availableRerollCount > 0
-            val allowedToUseTeamReroll = rules.canUseTeamReroll(state, catchingPlayer)
-
-            return if (availableSkills.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
+            val context = state.catchRollContext!!
+            val availableRerolls = calculateAvailableRerollsFor(
+                rules,
+                context.catchingPlayer,
+                DiceRollType.CATCH,
+                context.roll!!,
+                context.isSuccess
+            )
+            return if (availableRerolls.isEmpty()) {
                 listOf(ContinueWhenReady)
             } else {
-                val teamReroll =
-                    if (hasTeamRerolls && allowedToUseTeamReroll) {
-                        listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf(context.roll))))
-                    } else {
-                        emptyList()
-                    }
-                listOf(SelectNoReroll) + availableSkills + teamReroll
+                listOf(SelectNoReroll) + availableRerolls
             }
         }
 
@@ -116,9 +94,9 @@ object CatchRoll : Procedure() {
                 Continue -> ExitProcedure()
                 NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = RerollContext(DiceRollType.CatchRoll, action.option.source)
+                    val rerollContext = UseRerollContext(DiceRollType.CATCH, action.option.source)
                     compositeCommandOf(
-                        SetContext(Game::useRerollContext, rerollContext),
+                        SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),
                     )
                 }
@@ -131,14 +109,14 @@ object CatchRoll : Procedure() {
         override fun getChildProcedure(
             state: Game,
             rules: Rules,
-        ): Procedure = state.useRerollContext!!.source.rerollProcedure
+        ): Procedure = state.rerollContext!!.source.rerollProcedure
 
         override fun onExitNode(
             state: Game,
             rules: Rules,
         ): Command {
-            // useRerollResult must be set by the procedure running determing if a reroll is allowed
-            return if (state.useRerollResult!!.rerollAllowed) {
+            val context = state.rerollContext!!
+            return if (context.rerollAllowed) {
                 GotoNode(ReRollDie)
             } else {
                 ExitProcedure()
@@ -157,24 +135,19 @@ object CatchRoll : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            return checkDiceRoll<D6Result>(action) {
-                val rollResultContext = state.catchRollResultContext!!
+            return checkDiceRoll<D6Result>(action) { d6 ->
+                val rollResultContext = state.catchRollContext!!
                 val rollContext = state.catchRollContext!!
                 val target = rollContext.catchingPlayer.agility + rollContext.diceModifier()
-                val rerollResult =
-                    CatchRollResultContext(
-                        catchingPlayer = rollContext.catchingPlayer,
-                        target = target,
-                        modifiers = rollContext.modifiers,
-                        roll =
-                            rollResultContext.roll.copy(
-                                rerollSource = state.useRerollContext!!.source,
-                                rerolledResult = it,
-                            ),
-                        success = isCatchSuccess(it, target, rollContext),
-                    )
+                val rerollResult = rollResultContext.copy(
+                    roll = rollResultContext.roll!!.copy(
+                        rerollSource = state.rerollContext!!.source,
+                        rerolledResult = d6,
+                    ),
+                    isSuccess = isCatchSuccess(d6, target, rollContext)
+                )
                 compositeCommandOf(
-                    SetContext(Game::catchRollResultContext, rerollResult),
+                    SetOldContext(Game::catchRollContext, rerollResult),
                     ExitProcedure(),
                 )
             }
@@ -185,5 +158,5 @@ object CatchRoll : Procedure() {
         it: D6Result,
         target: Int,
         rollContext: CatchRollContext,
-    ) = it.result != 1 && (target <= it.result + rollContext.diceModifier())
+    ) = it.value != 1 && (target <= it.value + rollContext.diceModifier())
 }

@@ -33,7 +33,7 @@ object CasualtyTable {
     fun roll(
         d16: D16Result,
     ): CasualtyResult {
-        val result = d16.result
+        val result = d16.value
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Casulty Table.")
     }
 }

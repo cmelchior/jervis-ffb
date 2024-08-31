@@ -77,8 +77,8 @@ object PitchInvasion : Procedure() {
             rules: Rules,
         ): Command {
             return checkDiceRoll<D6Result>(action) {
-                val homeResult = state.pitchInvasionHomeRoll!!.result + state.homeTeam.fanFactor
-                val awayResult = it.result + state.awayTeam.fanFactor
+                val homeResult = state.pitchInvasionHomeRoll!!.value + state.homeTeam.fanFactor
+                val awayResult = it.value + state.awayTeam.fanFactor
                 val nextNodes =
                     when {
                         homeResult > awayResult -> {
@@ -111,7 +111,7 @@ object PitchInvasion : Procedure() {
         ): Command {
             return checkType<D3Result>(action) {
                 compositeCommandOf(
-                    SetTemporaryState(Game::pitchInvasionHomeTeamPlayersAffected, it.result),
+                    SetTemporaryState(Game::pitchInvasionHomeTeamPlayersAffected, it.value),
                     GotoNode(ResolveHomeTeamStuns),
                 )
             }
@@ -174,7 +174,7 @@ object PitchInvasion : Procedure() {
         ): Command {
             return checkType<D3Result>(action) {
                 compositeCommandOf(
-                    SetTemporaryState(Game::pitchInvasionHomeTeamPlayersAffected, it.result),
+                    SetTemporaryState(Game::pitchInvasionHomeTeamPlayersAffected, it.value),
                     GotoNode(ResolveAwayTeamStuns),
                 )
             }

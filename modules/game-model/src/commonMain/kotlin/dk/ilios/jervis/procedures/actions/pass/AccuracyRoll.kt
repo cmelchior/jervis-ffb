@@ -8,11 +8,11 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DiceModifier
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Range
@@ -81,19 +81,19 @@ object AccuracyRoll: Procedure() {
                 val modifierTotal = modifiers.sumOf { it.modifier }
                 val result = when {
                     context.thrower.passing == null -> PassingType.FUMBLED
-                    d6.result == 6 -> PassingType.ACCURATE
-                    d6.result == 1 -> PassingType.FUMBLED
+                    d6.value == 6 -> PassingType.ACCURATE
+                    d6.value == 1 -> PassingType.FUMBLED
                     // Designers commentary: Rolling 1 after modifiers with PA 1+ is an accurate pass.
                     // Designers commentary: Rolling 1 or less after modifiers is Wildly Inaccurate, not
                     // just a result of 1.
-                    d6.result + modifierTotal <= 1 && passingStat != 1 -> PassingType.WILDLY_INACCURATE
-                    d6.result + modifierTotal >= passingStat -> PassingType.ACCURATE
-                    d6.result + modifierTotal < passingStat -> PassingType.INACCURATE
-                    else -> INVALID_GAME_STATE("Unsupported result: ${d6.result}, target: $passingStat, modifierTotal: $modifierTotal")
+                    d6.value + modifierTotal <= 1 && passingStat != 1 -> PassingType.WILDLY_INACCURATE
+                    d6.value + modifierTotal >= passingStat -> PassingType.ACCURATE
+                    d6.value + modifierTotal < passingStat -> PassingType.INACCURATE
+                    else -> INVALID_GAME_STATE("Unsupported result: ${d6.value}, target: $passingStat, modifierTotal: $modifierTotal")
                 }
 
                 return compositeCommandOf(
-                    SetContext(Game::passContext, context.copy(
+                    SetOldContext(Game::passContext, context.copy(
                         passingRoll =  d6,
                         passingModifiers = modifiers,
                         passingResult = result
