@@ -21,46 +21,37 @@ import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
-object RollForStartingFanFactor : Procedure() {
+/**
+ * This procedure controls rolling for "The Fans" as described on page
+ * 37 in the rulebook.
+ */
+object FanFactorRolls : Procedure() {
     override val initialNode: Node = SetFanFactorForHomeTeam
 
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         if (!state.activeTeam.isHomeTeam()) {
             INVALID_GAME_STATE("Expected active team to be the home team.")
         }
         return null
     }
 
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         return SetActiveTeam(state.homeTeam)
     }
 
     object SetFanFactorForHomeTeam : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
-            val dedicatedFans = state.homeTeam.dedicatedFans
-            return checkDiceRoll<D3Result>(action) {
-                val total = it.value + dedicatedFans
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return checkDiceRoll<D3Result>(action) { d3 ->
+                val dedicatedFans = state.homeTeam.dedicatedFans
+                val total = d3.value + dedicatedFans
                 compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.DEDICATED_FANS, it),
+                    ReportDiceRoll(DiceRollType.FAN_FACTOR, d3),
                     SetFanFactor(state.homeTeam, total),
-                    ReportFanFactor(state.homeTeam, it.value, dedicatedFans),
+                    ReportFanFactor(state.homeTeam, d3.value, dedicatedFans),
                     GotoNode(SetFanFactorForAwayTeam),
                 )
             }
@@ -84,7 +75,7 @@ object RollForStartingFanFactor : Procedure() {
             return checkDiceRoll<D3Result>(action) {
                 val total = it.value + dedicatedFans
                 compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.DEDICATED_FANS, it),
+                    ReportDiceRoll(DiceRollType.FAN_FACTOR, it),
                     SetFanFactor(state.awayTeam, total),
                     ReportFanFactor(state.awayTeam, it.value, dedicatedFans),
                     ExitProcedure(),

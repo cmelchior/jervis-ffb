@@ -51,7 +51,7 @@ object KickOffAndScatterMapper: CommandActionMapper {
                     it.location.isInCenterField(rules) && !it.location.isOnLineOfScrimmage(rules)
                 }
             // TODO: Find a player with Kick (not implemented yet)
-            PlayerSelected(eligiblePlayers.random())
+            PlayerSelected(eligiblePlayers.random().id)
         }, TheKickOff.NominateKickingPlayer)
 
         val report = command.reportList.first() as KickoffScatterReport

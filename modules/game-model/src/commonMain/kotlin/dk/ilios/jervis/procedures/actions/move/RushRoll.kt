@@ -15,20 +15,25 @@ import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.RushRollContext
 import dk.ilios.jervis.model.context.UseRerollContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.DiceModifier
+import dk.ilios.jervis.model.modifiers.RushModifier
 import dk.ilios.jervis.procedures.D6DieRoll
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
+import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.utils.INVALID_ACTION
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import dk.ilios.jervis.utils.calculateAvailableRerollsFor
 import dk.ilios.jervis.utils.sum
 
@@ -65,10 +70,12 @@ import dk.ilios.jervis.utils.sum
  object RushRoll: Procedure() {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        if (state.rushRollContext == null) {
-            INVALID_GAME_STATE("Missing rush context")
+        state.assertContext<RushRollContext>()
+        return if (state.weather == Weather.BLIZZARD) {
+            SetContext(state.getContext<RushRollContext>().copyAndAddModifier(RushModifier.BLIZZARD))
+        } else {
+            null
         }
-        return null
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
@@ -79,11 +86,11 @@ import dk.ilios.jervis.utils.sum
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
-                val context = state.rushRollContext!!
-                val success = isRushSuccess(d6, context.rollModifiers)
+                val context = state.getContext<RushRollContext>()
+                val success = isRushSuccess(d6, context.modifiers)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.RUSH, d6),
-                    SetOldContext(Game::rushRollContext, context.copy(
+                    SetContext(context.copy(
                         roll = D6DieRoll(d6),
                         isSuccess = success,
                     )),
@@ -102,7 +109,7 @@ import dk.ilios.jervis.utils.sum
             state: Game,
             rules: Rules,
         ): List<ActionDescriptor> {
-            val context = state.rushRollContext!!
+            val context = state.getContext<RushRollContext>()
             val rushingPlayer = context.player
             val availableReRolls: List<SelectRerollOption> = calculateAvailableRerollsFor(
                 rules,
@@ -172,18 +179,18 @@ import dk.ilios.jervis.utils.sum
             rules: Rules,
         ): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
-                val rushContext = state.rushRollContext!!
+                val rushContext = state.getContext<RushRollContext>()
                 val rerollContext = state.rerollContext!!
                 val rerollResult = rushContext.copy(
                     roll = rushContext.roll!!.copy(
                         rerollSource = rerollContext.source,
                         rerolledResult = d6,
                     ),
-                    isSuccess = isRushSuccess(d6, rushContext.rollModifiers),
+                    isSuccess = isRushSuccess(d6, rushContext.modifiers),
                 )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.RUSH, d6),
-                    SetOldContext(Game::rushRollContext, rerollResult),
+                    SetContext(rerollResult),
                     ExitProcedure(),
                 )
             }

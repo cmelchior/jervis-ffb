@@ -16,6 +16,8 @@ enum class PlayerState {
     BADLY_HURT,
     SERIOUS_INJURY,
     DEAD,
+    FAINTED, // From Sweltering Heat
+    BANNED,
 
     // Intermediate states
     KNOCKED_DOWN,
@@ -30,7 +32,6 @@ enum class PlayerState {
 //    MISSING,
 //    FALLING,
 //    BLOCKED,
-    BANNED,
 //    EXHAUSTED,
 //    BEING_DRAGGED,
 //    PICKED_UP,

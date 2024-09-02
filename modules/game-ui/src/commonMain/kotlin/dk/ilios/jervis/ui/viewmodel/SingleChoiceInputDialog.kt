@@ -55,7 +55,7 @@ data class SingleChoiceInputDialog(
                 EndSetup -> "EndSetup"
                 EndTurn -> "EndTurn"
                 is FieldSquareSelected -> action.toString()
-                is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
+                is PlayerSelected -> "Player[${action.playerId}]"
                 is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
                 is PlayerActionSelected -> "Action: ${action.action.name}"
                 PlayerDeselected -> "Deselect active player"

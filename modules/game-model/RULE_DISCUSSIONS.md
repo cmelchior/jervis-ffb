@@ -14,11 +14,11 @@ interpreted.
    Is it "Active then InActive", "InActive then Active", "Active Coach Decides" or "InActive Coache Decides"
 
 
-
-
-
 # Differences compared to the rules as written
 
-5. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 
+1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 
    this choice always come after the roll. There is no valid reason for asking it before, and asking
    both before and after would create a lot of noise.
+
+2. (Page 37) Rolling for the weather should be done by each coach rolling once dice. This doesn't
+   matter in this case, so both dice are just rolled as a single step.

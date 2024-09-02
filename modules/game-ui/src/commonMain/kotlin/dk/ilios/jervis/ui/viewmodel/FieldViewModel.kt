@@ -40,8 +40,8 @@ class FieldViewModel(
     val rules = controller.rules
     val game = controller.state
     val aspectRatio: Float = 782f / 452f
-    val width = rules.fieldWidth.toInt()
-    val height = rules.fieldHeight.toInt()
+    val width = rules.fieldWidth
+    val height = rules.fieldHeight
 
     private val field = MutableStateFlow(FieldDetails.NICE)
     private val highlights = SnapshotStateList<FieldCoordinate>()
@@ -192,7 +192,7 @@ class FieldViewModel(
                                     // If the player in this square is among the selectable players, enable the option
                                     squareAction =
                                         square.player?.let {
-                                            input.actions.firstOrNull { (it as PlayerSelected).player == square.player }
+                                            input.actions.firstOrNull { (it as PlayerSelected).getPlayer(game) == square.player }
                                                 ?.let { playerAction: GameAction ->
                                                     { uiActionFactory.userSelectedAction(playerAction) }
                                                 }

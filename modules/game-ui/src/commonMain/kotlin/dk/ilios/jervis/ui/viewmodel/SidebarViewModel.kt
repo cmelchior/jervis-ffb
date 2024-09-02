@@ -71,7 +71,7 @@ class SidebarViewModel(
                 .sortedBy { it.number }
         }.combine(uiActionFactory.fieldActions) { e1: List<Player>, e2: UserInput ->
             val userInput = e2 as? SelectPlayerInput
-            val selectablePlayers = userInput?.actions?.associateBy { (it as PlayerSelected).player } ?: emptyMap()
+            val selectablePlayers = userInput?.actions?.associateBy { (it as PlayerSelected).getPlayer(team.game) } ?: emptyMap()
             e1.map {
                 val selectAction =
                     selectablePlayers[it]?.let {

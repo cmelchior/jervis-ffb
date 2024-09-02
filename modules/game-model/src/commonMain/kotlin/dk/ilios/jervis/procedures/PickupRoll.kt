@@ -15,71 +15,53 @@ import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.PickupRollContext
 import dk.ilios.jervis.model.context.UseRerollContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.utils.INVALID_ACTION
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
+import dk.ilios.jervis.utils.sum
 
 /**
- * Procedure for handling a Pickup Roll. It is only responsible for handling the actual dice roll.
- * The result is stored in [Game.pickupRollContext]] and it is up to the caller of the procedure to
+ * Procedure for handling a Pickup Roll as described on page 46 in the rulebook.
+ * It is only responsible for handling the actual dice roll. The result is stored
+ * in [PickupRollContext]] and it is up to the caller of the procedure to
  * choose the appropriate action depending on the outcome.
  */
 object PickupRoll : Procedure() {
-    override fun isValid(
-        state: Game,
-        rules: Rules,
-    ) {
-        if (state.pickupRollContext == null) {
-            INVALID_GAME_STATE("No pickup roll context found")
-        }
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<PickupRollContext>()
     }
 
     override val initialNode: Node = RollDie
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollDie : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
-
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            return listOf(RollDice(Dice.D6))
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) {
-                val rollContext = state.pickupRollContext!!
-                val target = rollContext.player.agility
-                val resultContext =
-                    PickupRollResultContext(
-                        player = rollContext.player,
-                        target = target,
-                        modifiers = rollContext.modifiers,
-                        roll = D6DieRoll(originalRoll = it),
-                        success = isPickupSuccess(it, target, rollContext),
-                    )
+                val context = state.getContext<PickupRollContext>()
+                val updatedContext = context.copy(
+                    roll = D6DieRoll(originalRoll = it),
+                    isSuccess = isPickupSuccess(it, context.player.agility, context.modifiers),
+                )
                 return compositeCommandOf(
-                    SetOldContext(Game::pickupRollResultContext, resultContext),
+                    SetContext(updatedContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -92,16 +74,16 @@ object PickupRoll : Procedure() {
             state: Game,
             rules: Rules,
         ): List<ActionDescriptor> {
-            val context = state.pickupRollResultContext!!
-            val successOnFirstRoll = context.success
+            val context = state.getContext<PickupRollContext>()
+            val successOnFirstRoll = context.isSuccess
             val pickupPlayer = context.player
             val availableSkills: List<SelectRerollOption> =
                 pickupPlayer.skills.asSequence()
                     .filter { it is RerollSource }
                     .map { it as RerollSource }
-                    .filter { skill -> skill.canReroll(DiceRollType.PICKUP, listOf(context.roll), successOnFirstRoll) }
+                    .filter { skill -> skill.canReroll(DiceRollType.PICKUP, listOf(context.roll!!), successOnFirstRoll) }
                     .flatMap { it: RerollSource ->
-                        it.calculateRerollOptions(DiceRollType.PICKUP, context.roll, successOnFirstRoll)
+                        it.calculateRerollOptions(DiceRollType.PICKUP, context.roll!!, successOnFirstRoll)
                     }
                     .map { SelectRerollOption(it) }
                     .toList()
@@ -119,7 +101,7 @@ object PickupRoll : Procedure() {
             } else {
                 val teamReroll =
                     if (hasTeamRerolls && allowedToUseTeamReroll) {
-                        listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf(context.roll))))
+                        listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf(context.roll!!))))
                     } else {
                         emptyList()
                     }
@@ -176,24 +158,17 @@ object PickupRoll : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            return checkDiceRoll<D6Result>(action) {
-                val rollResultContext = state.pickupRollResultContext!!
-                val rollContext = state.pickupRollContext!!
-                val target = rollContext.player.agility + rollContext.diceModifier()
-                val rerollContext =
-                    PickupRollResultContext(
-                        player = rollContext.player,
-                        target = target,
-                        modifiers = rollContext.modifiers,
-                        roll =
-                            rollResultContext.roll.copy(
-                                rerollSource = state.rerollContext!!.source,
-                                rerolledResult = it,
-                            ),
-                        success = isPickupSuccess(it, target, rollContext),
-                    )
+            return checkDiceRoll<D6Result>(action) { d6 ->
+                val context = state.getContext<PickupRollContext>()
+                val updatedContext = context.copy(
+                    roll = context.roll!!.copy(
+                        rerollSource = state.rerollContext!!.source,
+                        rerolledResult = d6,
+                    ),
+                    isSuccess = isPickupSuccess(d6, context.player.agility, context.modifiers)
+                )
                 compositeCommandOf(
-                    SetOldContext(Game::pickupRollResultContext, rerollContext),
+                    SetContext(updatedContext),
                     ExitProcedure(),
                 )
             }
@@ -201,8 +176,15 @@ object PickupRoll : Procedure() {
     }
 
     private fun isPickupSuccess(
-        it: D6Result,
+        roll: D6Result,
         target: Int,
-        rollContext: PickupRollContext,
-    ) = it.value != 1 && (target <= it.value + rollContext.diceModifier())
+        modifiers: List<DiceModifier>,
+    ): Boolean {
+        return when(roll.value) {
+            1 -> false
+            in 2..5 -> roll.value != 1 && (target <= roll.value + modifiers.sum())
+            6 -> true
+            else -> error("Invalid value: ${roll.value}")
+        }
+    }
 }

@@ -14,6 +14,7 @@ import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
@@ -110,16 +111,16 @@ object HandOffAction : Procedure() {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
                         SetOldContext(Game::handOffContext, context.copy(hasMoved = true)),
-                        SetOldContext(Game::moveContext, moveContext),
+                        SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
                 is PlayerSelected -> {
                     val context = state.handOffContext!!
                     compositeCommandOf(
-                        SetOldContext(Game::handOffContext, context.copy(catcher = action.player)),
+                        SetOldContext(Game::handOffContext, context.copy(catcher = action.getPlayer(state))),
                         SetBallState.accurateThrow(),
-                        SetBallLocation(action.player.location.coordinate),
+                        SetBallLocation(action.getPlayer(state).location.coordinate),
                         GotoNode(ResolveCatch)
                     )
                 }

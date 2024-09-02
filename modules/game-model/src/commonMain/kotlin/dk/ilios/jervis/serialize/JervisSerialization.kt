@@ -171,13 +171,13 @@ object JervisSerialization {
     ): List<GameAction> {
         return actions.map { action ->
             when (action) {
-                is PlayerSelected -> {
-                    val isHomeTeam = state.homeTeam.firstOrNull { it.id == action.player.id } != null
-                    val playerNo = action.player.number
-                    val team = if (isHomeTeam) state.homeTeam else state.awayTeam
-                    val player = team[playerNo]!!
-                    PlayerSelected(player)
-                }
+//                is PlayerSelected -> {
+//                    val isHomeTeam = state.homeTeam.firstOrNull { it.id == action.player.id } != null
+//                    val playerNo = action.player.number
+//                    val team = if (isHomeTeam) state.homeTeam else state.awayTeam
+//                    val player = team[playerNo]!!
+//                    PlayerSelected(player)
+//                }
                 else -> action
             }
         }

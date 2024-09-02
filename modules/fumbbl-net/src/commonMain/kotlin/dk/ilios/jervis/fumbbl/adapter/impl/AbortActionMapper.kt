@@ -13,8 +13,8 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerId
-import dk.ilios.jervis.procedures.actions.move.MoveAction
 import dk.ilios.jervis.procedures.TeamTurn
+import dk.ilios.jervis.procedures.actions.move.MoveAction
 
 /**
  * A user's action was aborted.
@@ -52,9 +52,9 @@ object AbortActionMapper: CommandActionMapper {
             PlayerAction.MOVE -> {
                 val movingPlayerId = command.modelChangeList.filterIsInstance<ActingPlayerSetPlayerId>().first().value!!
                 val movingPlayer = jervisGame.getPlayerById(PlayerId(movingPlayerId.id))!!
-                newActions.add(PlayerSelected(movingPlayer), TeamTurn.SelectPlayerOrEndTurn)
+                newActions.add(PlayerSelected(movingPlayer.id), TeamTurn.SelectPlayerOrEndTurn)
                 newActions.add(
-                    { state, rules -> PlayerActionSelected(rules.teamActions.move.action) },
+                    { state, rules -> PlayerActionSelected(rules.teamActions.move.action.type) },
                     TeamTurn.DeselectPlayerOrSelectAction,
                 )
             }

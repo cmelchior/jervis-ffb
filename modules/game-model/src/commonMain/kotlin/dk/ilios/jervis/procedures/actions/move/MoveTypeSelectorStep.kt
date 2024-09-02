@@ -14,14 +14,16 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.context.MoveContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.Pickup
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 /**
  * Returns all the reachable squares. player can go to using a specific type of move.
  *
- * Will throw if the player is not able to do the request move type, ie. is prone,
+ * Will throw if the player is not able to do the request move type, i.e., is prone,
  * does not have the skill etc.
  */
 fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type: MoveType): List<ActionDescriptor> {
@@ -109,26 +111,17 @@ fun calculateMoveTypesAvailable(player: Player, rules: Rules): List<ActionDescri
  * Standing up are handled in [StandingUp]
  */
 object MoveTypeSelectorStep : Procedure() {
-    override val initialNode: Node = ResolveMove
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<MoveContext>()
 
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? {
-        if (state.moveContext == null) {
-            INVALID_GAME_STATE("Move context is null")
-        }
-        return null
     }
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override val initialNode: Node = ResolveMove
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object ResolveMove : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return when(val moveType = state.moveContext!!.moveType) {
+            return when(val moveType = state.getContext<MoveContext>().moveType) {
                 MoveType.STANDARD -> StandardMoveStep
                 MoveType.JUMP,
                 MoveType.LEAP,
@@ -137,7 +130,7 @@ object MoveTypeSelectorStep : Procedure() {
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val player = state.moveContext!!.player
+            val player = state.getContext<MoveContext>().player
             val pickupBall = player.isStanding(rules) && state.field[player.location as FieldCoordinate].ball != null
             return if (pickupBall) {
                 GotoNode(PickUpBall)

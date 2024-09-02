@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
@@ -299,7 +300,7 @@ fun ActionSelector(
                                     EndSetup -> "EndSetup"
                                     EndTurn -> "EndTurn"
                                     is FieldSquareSelected -> action.toString()
-                                    is PlayerSelected -> "Player[${action.player.name}, ${action.player.number.number}]"
+                                    is PlayerSelected -> "Player[${action.playerId}]"
                                     is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
                                     is PlayerActionSelected -> "Action: ${action.action.name}"
                                     PlayerDeselected -> "Deselect active player"
@@ -345,7 +346,10 @@ fun LogViewer(
         state = listState
     ) {
         items(items = listData, key = { item -> item.hashCode() }) {
-            Text(text = it.message)
+            Text(
+                text = it.message,
+                lineHeight = if (it.message.lines().size > 1) 1.5.em else 1.0.em,
+            )
         }
     }
 }

@@ -16,8 +16,8 @@ import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetKickingPlayer
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -106,8 +106,8 @@ object TheKickOff : Procedure() {
         ): Command {
             return checkType<PlayerSelected>(action) {
                 compositeCommandOf(
-                    SetKickingPlayer(it.player),
-                    ReportKickingPlayer(it.player),
+                    SetKickingPlayer(it.getPlayer(state)),
+                    ReportKickingPlayer(it.getPlayer(state)),
                     GotoNode(PlaceTheKick),
                 )
             }
@@ -141,7 +141,7 @@ object TheKickOff : Procedure() {
     }
 
     object TheKickDeviates : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             return SetOldContext(Game::deviateRollContext, DeviateRollContext(from = state.ball.location))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll

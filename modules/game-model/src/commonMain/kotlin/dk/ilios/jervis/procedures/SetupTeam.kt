@@ -31,22 +31,11 @@ import dk.ilios.jervis.utils.INVALID_ACTION
 
 object SetupTeam : Procedure() {
     override val initialNode: Node = SelectPlayerOrEndSetup
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object SelectPlayerOrEndSetup : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val availablePlayers =
                 state.activeTeam.filter {
                     val inReserve = (it.location == DogOut && it.state == PlayerState.STANDING)
@@ -58,15 +47,11 @@ object SetupTeam : Procedure() {
             return availablePlayers + EndSetupWhenReady
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 is PlayerSelected -> {
                     compositeCommandOf(
-                        SetActivePlayer(action.player),
+                        SetActivePlayer(action.getPlayer(state)),
                         GotoNode(PlacePlayer),
                     )
                 }
@@ -77,10 +62,7 @@ object SetupTeam : Procedure() {
     }
 
     object PlacePlayer : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
             val isHomeTeam = state.activeTeam.isHomeTeam()
@@ -106,11 +88,7 @@ object SetupTeam : Procedure() {
             return freeFields + SelectDogout + playerSquare
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 DogoutSelected ->
                     compositeCommandOf(
@@ -137,10 +115,7 @@ object SetupTeam : Procedure() {
     }
 
     object EndSetupAndValidate : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             return if (rules.isValidSetup(state)) {
                 ExitProcedure()
             } else {
@@ -150,10 +125,7 @@ object SetupTeam : Procedure() {
     }
 
     object InformOfInvalidSetup : ConfirmationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             return GotoNode(SelectPlayerOrEndSetup)
         }
     }

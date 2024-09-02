@@ -11,7 +11,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
-import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -70,10 +70,7 @@ object MoveAction : Procedure() {
                 is EndAction -> ExitProcedure()
                 is MoveTypeSelected -> {
                     compositeCommandOf(
-                        SetOldContext(
-                            Game::moveContext,
-                            MoveContext(state.activePlayer!!, action.moveType),
-                        ),
+                        SetContext(MoveContext(state.activePlayer!!, action.moveType)),
                         GotoNode(ResolveMoveType)
                     )
                 }

@@ -52,7 +52,7 @@ fun Game.setContext(context: ProcedureContext) {
  * if none exists.
  */
 inline fun <reified T: ProcedureContext> Game.getContext(): T {
-    return this.contexts.getContext(T::class)!!
+    return this.contexts.getContext(T::class) ?: error("Missing context ${T::class.simpleName}")
 }
 
 /**

@@ -98,6 +98,7 @@ val HUMAN_AWAY_TEAM: Team =
         addPlayer(PlayerId("A11"), "Blitzer-4-A", PlayerNo(11), HumanTeam.BLITZER)
         reRolls = 4
         apothecaries = 1
+        dedicatedFans = 2
     }
 
 val LIZARDMEN_AWAY_TEAM: Team =
@@ -151,7 +152,7 @@ fun createRandomAction(
         is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
         is SelectPlayer -> PlayerSelected(action.player)
         is DeselectPlayer -> PlayerDeselected
-        is SelectAction -> PlayerActionSelected(action.action)
+        is SelectAction -> PlayerActionSelected(action.action.type)
         EndActionWhenReady -> EndAction
         CancelWhenReady -> Cancel
         SelectCoinSide -> {
@@ -278,6 +279,7 @@ fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = HUMAN_AWAY_TEAM)
             addPlayer(PlayerId("H11"), "Blitzer-4-H", PlayerNo(11), HumanTeam.BLITZER)
             reRolls = 4
             apothecaries = 1
+            dedicatedFans = 1
         }
     val field = Field.createForRuleset(rules)
     return Game(team1, awayTeam, field)

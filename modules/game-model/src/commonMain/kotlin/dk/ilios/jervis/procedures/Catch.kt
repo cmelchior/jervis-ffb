@@ -4,18 +4,22 @@ import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetBallState
-import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.CatchRollContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.CatchModifier
 import dk.ilios.jervis.model.modifiers.DiceModifier
+import dk.ilios.jervis.model.modifiers.MarkedModifier
 import dk.ilios.jervis.reports.ReportCatch
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 /**
@@ -56,10 +60,17 @@ object Catch : Procedure() {
         if (state.ball.state == BallState.SCATTERED) modifiers.add(CatchModifier.SCATTERED)
         // TODO Check for disturbing presence.
         // Check for field being marked
-        rules.addMarkedModifiers(state, catchingPlayer.team, state.ballSquare, modifiers)
+        val marks = rules.calculateMarks(state, catchingPlayer.team, state.ballSquare.coordinates)
+        modifiers.add(MarkedModifier(marks * -1))
+
+        // Check the weather
+        if (state.weather == Weather.POURING_RAIN) {
+            modifiers.add(CatchModifier.POURING_RAIN)
+        }
+
         val rollContext = CatchRollContext(catchingPlayer, diceRollTarget, modifiers)
         return compositeCommandOf(
-            SetOldContext(Game::catchRollContext, rollContext),
+            SetContext(rollContext),
         )
     }
 
@@ -68,10 +79,9 @@ object Catch : Procedure() {
         rules: Rules,
     ): Command? {
         return compositeCommandOf(
-            SetOldContext(Game::catchRollContext, null),
+            RemoveContext<CatchRollContext>(),
         )
     }
-
 
     object RollToCatch : ParentNode() {
         override fun getChildProcedure(
@@ -83,7 +93,7 @@ object Catch : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            val context = state.catchRollContext!!
+            val context = state.getContext<CatchRollContext>()
             val roll = context.roll!!
             return if (context.isSuccess) {
                 compositeCommandOf(

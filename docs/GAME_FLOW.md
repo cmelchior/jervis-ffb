@@ -1,6 +1,30 @@
 # Game Flow Implementation
 
-This document list all game mechanics that have been fully implemented with tests.
+This document lists all game mechanics that have been fully implemented with tests.
+
+## Pregame
+- [ ] The fans
+- [ ] The Weather
+- [ ] Take on Journeymen
+- [ ] Inducements
+- [ ] Prayers to Nuffle Tabl
+- [ ] Determine kicking team
+
+## Start of Drive
+
+- [ ] Setup
+- [ ] The Kick-off
+- [ ] The Kick-off Event
+  - [ ] Kick-off Event Table
+- [ ] What goes up, must come down
+- [ ] Touchbacks
+
+## Game
+
+- [ ] Moving the turn marker
+- [ ] Halfs and overtime
+
+// ...
 
 - [ ] Team Rerolls
 - [ ] Rushing
@@ -21,4 +45,3 @@ This document list all game mechanics that have been fully implemented with test
 - [ ] Moving turn marker
 - [ ] Going into overtime
 - [ ]
-

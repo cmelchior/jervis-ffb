@@ -56,17 +56,22 @@ import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.context.CatchRollContext
+import dk.ilios.jervis.model.context.MoveContext
+import dk.ilios.jervis.model.context.PickupRollContext
+import dk.ilios.jervis.model.context.RushRollContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.CatchRoll
 import dk.ilios.jervis.procedures.DetermineKickingTeam
 import dk.ilios.jervis.procedures.DeviateRoll
+import dk.ilios.jervis.procedures.FanFactorRolls
 import dk.ilios.jervis.procedures.PickupRoll
-import dk.ilios.jervis.procedures.RollForStartingFanFactor
-import dk.ilios.jervis.procedures.RollForTheWeather
 import dk.ilios.jervis.procedures.Scatter
 import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.procedures.TheKickOff
 import dk.ilios.jervis.procedures.TheKickOffEvent
+import dk.ilios.jervis.procedures.WeatherRoll
 import dk.ilios.jervis.procedures.actions.block.BlockRoll
 import dk.ilios.jervis.procedures.actions.block.BothDown
 import dk.ilios.jervis.procedures.actions.block.PushStep
@@ -77,6 +82,7 @@ import dk.ilios.jervis.procedures.actions.move.DodgeRoll
 import dk.ilios.jervis.procedures.actions.move.RushRoll
 import dk.ilios.jervis.procedures.actions.move.calculateOptionsForMoveType
 import dk.ilios.jervis.procedures.actions.pass.AccuracyRoll
+import dk.ilios.jervis.procedures.actions.pass.PassContext
 import dk.ilios.jervis.procedures.injury.ArmourRoll
 import dk.ilios.jervis.procedures.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.injury.InjuryRoll
@@ -274,7 +280,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                         val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
                         SelectPlayerActionInput(
                             playerLocation,
-                            action.value.map { PlayerActionSelected((it as SelectAction).action) },
+                            action.value.map { PlayerActionSelected((it as SelectAction).action.type) },
                         )
                     }
                     action.key == EndActionWhenReady::class -> {
@@ -298,7 +304,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         when (controller.stack.currentNode()) {
 
             is AccuracyRoll.RollDice -> {
-                DiceRollUserInputDialog.createAccuracyRollDialog(controller.state.passContext!!, rules)
+                DiceRollUserInputDialog.createAccuracyRollDialog(controller.state.getContext<PassContext>(), rules)
             }
 
             is ArgueTheCallRoll.RollDice -> {
@@ -357,7 +363,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             is CatchRoll.RollDie,
                 -> {
                 SingleChoiceInputDialog.createCatchBallDialog(
-                    controller.state.catchRollContext!!.catchingPlayer,
+                    controller.state.getContext<CatchRollContext>().catchingPlayer,
                     D6Result.allOptions(),
                 )
             }
@@ -394,7 +400,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
 
             is DodgeRoll.ReRollDie,
             is DodgeRoll.RollDie -> {
-                val context = controller.state.moveContext!!
+                val context = controller.state.getContext<MoveContext>()
                 DiceRollUserInputDialog.createDodgeRollDialog(context.player, context.target!!)
             }
 
@@ -427,7 +433,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             is PickupRoll.RollDie,
                 -> {
                 SingleChoiceInputDialog.createPickupBallDialog(
-                    controller.state.pickupRollContext!!.player,
+                    controller.state.getContext<PickupRollContext>().player,
                     D6Result.allOptions(),
                 )
             }
@@ -442,17 +448,17 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 SingleChoiceInputDialog.createUseApothecaryDialog(context)
             }
 
-            is RollForStartingFanFactor.SetFanFactorForAwayTeam -> {
+            is FanFactorRolls.SetFanFactorForAwayTeam -> {
                 SingleChoiceInputDialog.createFanFactorDialog(controller.state.awayTeam, D3Result.allOptions())
             }
-            is RollForStartingFanFactor.SetFanFactorForHomeTeam -> {
+            is FanFactorRolls.SetFanFactorForHomeTeam -> {
                 SingleChoiceInputDialog.createFanFactorDialog(controller.state.homeTeam, D3Result.allOptions())
             }
-            is RollForTheWeather.RollWeatherDice -> {
+            is WeatherRoll.RollWeatherDice -> {
                 val diceRolls = mutableListOf<DiceResults>()
-                D6Result.allOptions().forEach { d6 ->
-                    D6Result.allOptions().forEach { d6 ->
-                        diceRolls.add(DiceResults(d6, d6))
+                D6Result.allOptions().forEach { firstD6 ->
+                    D6Result.allOptions().forEach { secondD6 ->
+                        diceRolls.add(DiceResults(firstD6, secondD6))
                     }
                 }
                 DiceRollUserInputDialog.createWeatherRollDialog(rules)
@@ -460,7 +466,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
 
             is RushRoll.ReRollDie,
             is RushRoll.RollDie -> {
-                val context = controller.state.rushRollContext!!
+                val context = controller.state.getContext<RushRollContext>()
                 DiceRollUserInputDialog.createRushRollDialog(context.player, context.target)
             }
 
@@ -614,7 +620,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
                 is SelectPlayer -> PlayerSelected(action.player)
                 is DeselectPlayer -> PlayerDeselected
-                is SelectAction -> PlayerActionSelected(action.action)
+                is SelectAction -> PlayerActionSelected(action.action.type)
                 EndActionWhenReady -> EndAction
                 CancelWhenReady -> Cancel
                 SelectCoinSide -> {

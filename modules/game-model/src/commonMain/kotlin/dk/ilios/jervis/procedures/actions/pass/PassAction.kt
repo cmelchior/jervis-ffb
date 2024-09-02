@@ -12,8 +12,9 @@ import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetAvailableActions
-import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
@@ -24,6 +25,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
@@ -63,27 +65,25 @@ data class PassContext(
  */
 @Serializable
 object PassAction : Procedure() {
+    override fun isValid(state: Game, rules: Rules) {
+        state.activePlayer ?: INVALID_GAME_STATE("No active player")
+    }
     override val initialNode: Node = MoveOrPassOrEndAction
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command {
-        val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+        val player = state.activePlayer!!
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetOldContext(Game::passContext, PassContext(thrower = player))
+            SetContext(PassContext(thrower = player))
         )
     }
-
     override fun onExitProcedure(
         state: Game,
         rules: Rules,
     ): Command {
-        val context = state.passContext!!
+        val context = state.getContext<PassContext>()
         return compositeCommandOf(
             if (context.target != null) ReportPassResult(context) else null,
-            SetOldContext(Game::passContext, null),
+            RemoveContext<PassContext>(),
             if (context.hasMoved) {
                 val team = state.activeTeam
                 SetAvailableActions(team, PlayerActionType.PASS, team.turnData.passActions - 1)
@@ -96,7 +96,7 @@ object PassAction : Procedure() {
 
     object MoveOrPassOrEndAction : ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.passContext!!
+            val context = state.getContext<PassContext>()
             val options = mutableListOf<ActionDescriptor>()
 
             // Find possible move types
@@ -114,7 +114,7 @@ object PassAction : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.passContext!!
+            val context = state.getContext<PassContext>()
             return when (action) {
                 Confirm -> {
                     GotoNode(ResolveThrow)
@@ -123,8 +123,8 @@ object PassAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
-                        SetOldContext(Game::passContext, context.copy(hasMoved = true)),
-                        SetOldContext(Game::moveContext, moveContext),
+                        SetContext(context.copy(hasMoved = true)),
+                        SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
@@ -138,7 +138,7 @@ object PassAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their pass action.
-            val context = state.passContext!!
+            val context = state.getContext<PassContext>()
             return if (!context.thrower.isStanding(rules)) {
                 compositeCommandOf(
                     SetTurnOver(true),
@@ -153,7 +153,7 @@ object PassAction : Procedure() {
     object ResolveThrow : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.passContext!!
+            val context = state.getContext<PassContext>()
             return if (context.target == null) {
                 // No target was selected, so no pass was attempted, continue the pass.
                 GotoNode(MoveOrPassOrEndAction)

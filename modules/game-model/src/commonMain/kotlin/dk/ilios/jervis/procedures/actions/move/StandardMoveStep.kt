@@ -25,6 +25,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.DodgeRollContext
+import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.RushRollContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
@@ -57,16 +58,16 @@ object StandardMoveStep: Procedure() {
 
     object SelectTargetSquareOrEndAction: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val player = state.moveContext!!.player
+            val player = state.getContext<MoveContext>().player
             val eligibleSquares = calculateOptionsForMoveType(state, rules, player, MoveType.STANDARD)
             return eligibleSquares + listOf(EndActionWhenReady)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<FieldSquareSelected>(action) {
-                val context = state.moveContext!!
+                val context = state.getContext<MoveContext>()
                 compositeCommandOf(
-                    SetOldContext(Game::moveContext, context.copy(target = it.coordinate)),
+                    SetContext(context.copy(target = it.coordinate)),
                     GotoNode(CheckIfRushingIsNeeded),
                 )
             }
@@ -75,7 +76,7 @@ object StandardMoveStep: Procedure() {
 
     object CheckIfRushingIsNeeded : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.moveContext!!
+            val context = state.getContext<MoveContext>()
             return if (context.player.movesLeft == 0) {
                 GotoNode(ResolveRush)
             } else {
@@ -86,18 +87,18 @@ object StandardMoveStep: Procedure() {
 
     object ResolveRush: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
-            val moveContext = state.moveContext!!
-            return SetOldContext(Game::rushRollContext, RushRollContext(moveContext.player, moveContext.target!!))
+            val moveContext = state.getContext<MoveContext>()
+            return SetContext(RushRollContext(moveContext.player, moveContext.target!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val rushContext = state.rushRollContext!!
+            val rushContext = state.getContext<RushRollContext>()
             val player = rushContext.player
             return if (rushContext.isSuccess) {
                 compositeCommandOf(
                     SetPlayerMoveLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
-                    SetOldContext(Game::rushRollContext, null),
+                    RemoveContext<RushRollContext>(),
                     GotoNode(CheckIfDodgeIsNeeded)
                 )
             } else {
@@ -105,7 +106,7 @@ object StandardMoveStep: Procedure() {
                 return compositeCommandOf(
                     SetPlayerLocation(player, rushContext.target),
                     SetPlayerState(player, PlayerState.KNOCKED_DOWN),
-                    SetOldContext(Game::rushRollContext, null),
+                    RemoveContext<RushRollContext>(),
                     GotoNode(ResolvePlayerKnockedDown)
                 )
             }
@@ -114,7 +115,7 @@ object StandardMoveStep: Procedure() {
 
     object CheckIfDodgeIsNeeded : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.moveContext!!
+            val context = state.getContext<MoveContext>()
             val isMarked = context.player.location.coordinate.getSurroundingCoordinates(rules, 1)
                 .filter { state.field[it].player != null }
                 .filter { state.field[it].player!!.team != context.player.team }
@@ -130,7 +131,7 @@ object StandardMoveStep: Procedure() {
 
     object ResolveDodge: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val moveContext = state.moveContext!!
+            val moveContext = state.getContext<MoveContext>()
             return SetContext(context = DodgeRollContext(
                 moveContext.player,
                 moveContext.startingSquare,
@@ -160,7 +161,7 @@ object StandardMoveStep: Procedure() {
         }
     }
 
-    object CheckIfShadowingIsAvailable: ActionNode() {
+    object øCheckIfShadowingIsAvailable: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             TODO("Not yet implemented")
         }
@@ -176,7 +177,7 @@ object StandardMoveStep: Procedure() {
      */
     object ResolvePlayerKnockedDown: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.moveContext!!
+            val context = state.getContext<MoveContext>()
             return SetOldContext(Game::riskingInjuryRollsContext, RiskingInjuryRollContext(
                 context.player,
                 RiskingInjuryMode.KNOCKED_DOWN
@@ -197,7 +198,7 @@ object StandardMoveStep: Procedure() {
      */
     object ResolveMove: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.moveContext!!
+            val context = state.getContext<MoveContext>()
             val movingPlayer = context.player
             return compositeCommandOf(
                 SetPlayerLocation(movingPlayer, context.target!!),

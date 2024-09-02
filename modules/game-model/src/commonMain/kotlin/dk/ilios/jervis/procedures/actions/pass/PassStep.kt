@@ -12,6 +12,7 @@ import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
@@ -21,6 +22,8 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.Catch
 import dk.ilios.jervis.procedures.DeviateRoll
@@ -31,6 +34,7 @@ import dk.ilios.jervis.procedures.ThrowIn
 import dk.ilios.jervis.procedures.ThrowInContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Range
+import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
@@ -41,21 +45,28 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  * See page 48 in the rulebook.
  */
 object PassStep: Procedure() {
-    override val initialNode: Node = DeclareTargetSquare
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        if (state.passContext == null) {
-            INVALID_GAME_STATE("Missing pass context")
-        }
-        return null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<PassContext>()
     }
-
+    override val initialNode: Node = DeclareTargetSquare
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object DeclareTargetSquare: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.passContext!!
+            val context = state.getContext<PassContext>()
             val targetSquares = context.thrower.location.coordinate.getSurroundingCoordinates(rules, rules.rangeRuler.maxDistance)
-                .filter { rules.rangeRuler.measure(context.thrower.location.coordinate, it) != Range.OUT_OF_RANGE }
+                .filter {
+                    val range = rules.rangeRuler.measure(context.thrower.location.coordinate, it)
+                    when (range) {
+                        Range.PASSING_PLAYER -> false
+                        Range.QUICK_PASS -> true
+                        Range.SHORT_PASS -> true
+                        Range.LONG_PASS -> state.weather != Weather.BLIZZARD
+                        Range.LONG_BOMB -> state.weather != Weather.BLIZZARD
+                        Range.OUT_OF_RANGE -> false
+                    }
+                }
                 .map { SelectFieldLocation.throwTarget(it) }
             return targetSquares + listOf(CancelWhenReady)
         }
@@ -67,16 +78,15 @@ object PassStep: Procedure() {
                     ExitProcedure()
                 }
                 is FieldSquareSelected -> {
-                    val context = state.passContext!!
+                    val context = state.getContext<PassContext>()
                     // We should only accept valid ranges, it is considered an error to pass in
                     // invalid ranges here
-                    val distance = rules.rangeRuler.measure(
-                        context.thrower.location.coordinate, action.coordinate
-                    ). also {
-                        if (it == Range.OUT_OF_RANGE) INVALID_GAME_STATE("Invalid target: ${action.coordinate}")
+                    if (!getAvailableActions(state, rules).contains(SelectFieldLocation.throwTarget(action.coordinate))) {
+                        INVALID_ACTION(action)
                     }
+                    val distance = rules.rangeRuler.measure(context.thrower.location.coordinate, action.coordinate)
                     compositeCommandOf(
-                        SetOldContext(Game::passContext, context.copy(target = action.coordinate, range = distance)),
+                        SetContext(context.copy(target = action.coordinate, range = distance)),
                         SetBallState.accurateThrow(), // Until proven otherwise. Should we invent a new type?
                         SetBallLocation(action.coordinate),
                         GotoNode(TestForAccuracy)
@@ -90,7 +100,7 @@ object PassStep: Procedure() {
     object TestForAccuracy: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = AccuracyRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.passContext!!
+            val context = state.getContext<PassContext>()
             return when (context.passingResult) {
                 PassingType.ACCURATE -> GotoNode(ResolveAccuratePass)
                 PassingType.INACCURATE -> GotoNode(ResolveInaccuratePass)
@@ -105,7 +115,7 @@ object PassStep: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             // Ball was successfully thrown to the target square.
             // Move the ball and check for interference
-            val context = state.passContext!!
+            val context = state.getContext<PassContext>()
             return compositeCommandOf(
                 SetBallState.accurateThrow(),
                 SetBallLocation(context.target!!),
@@ -120,7 +130,7 @@ object PassStep: Procedure() {
     object ResolveInaccuratePass: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             // Ball was inaccurate. It goes to the target square and then scatters.
-            val context = state.passContext!!
+            val context = state.getContext<PassContext>()
             return compositeCommandOf(
                 SetBallState.scattered(),
                 SetBallLocation(context.target!!),
@@ -155,7 +165,7 @@ object PassStep: Procedure() {
      */
     object ResolveWildlyInaccuratePass: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val passContext = state.passContext!!
+            val passContext = state.getContext<PassContext>()
             return compositeCommandOf(
                 SetBallState.deviating(),
                 SetBallLocation(passContext.thrower.location.coordinate),
@@ -194,7 +204,7 @@ object PassStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetBallState.bouncing(),
-                SetBallLocation(state.passContext!!.thrower.location.coordinate)
+                SetBallLocation(state.getContext<PassContext>().thrower.location.coordinate)
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
@@ -215,7 +225,7 @@ object PassStep: Procedure() {
      */
     object AttemptPassingInterferenceBeforeGoingOutOfBounds: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val passContext = state.passContext!!
+            val passContext = state.getContext<PassContext>()
             return SetOldContext(Game::passingInteferenceContext, PassingInteferenceContext(
                 thrower = passContext.thrower,
                 target = state.ball.outOfBoundsAt!!,
@@ -230,13 +240,13 @@ object PassStep: Procedure() {
             return if (context.didDeflect || context.didIntercept) {
                 // TODO Unclear exactly which information we need to retain from passing interference, and how
                 compositeCommandOf(
-                    SetOldContext(Game::passContext, state.passContext!!.copy(passingInterference = context)),
+                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
                     SetOldContext(Game::passingInteferenceContext, null),
                     ExitProcedure()
                 )
             } else {
                 compositeCommandOf(
-                    SetOldContext(Game::passContext, state.passContext!!.copy(passingInterference = context)),
+                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
                     SetOldContext(Game::passingInteferenceContext, null),
                     GotoNode(ResolveGoingOutOfBounds)
                 )
@@ -249,7 +259,7 @@ object PassStep: Procedure() {
      */
     object AttemptPassingInterference: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val passContext = state.passContext!!
+            val passContext = state.getContext<PassContext>()
             return SetOldContext(Game::passingInteferenceContext, PassingInteferenceContext(
                 thrower = passContext.thrower,
                 target = state.ball.location,
@@ -264,13 +274,13 @@ object PassStep: Procedure() {
             return if (context.didDeflect || context.didIntercept) {
                 // TODO Unclear exactly which information we need to retain from passing interference, and how
                 compositeCommandOf(
-                    SetOldContext(Game::passContext, state.passContext!!.copy(passingInterference = context)),
+                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
                     SetOldContext(Game::passingInteferenceContext, null),
                     ExitProcedure()
                 )
             } else {
                 compositeCommandOf(
-                    SetOldContext(Game::passContext, state.passContext!!.copy(passingInterference = context)),
+                    SetContext(state.getContext<PassContext>().copy(passingInterference = context)),
                     SetOldContext(Game::passingInteferenceContext, null),
                     GotoNode(ResolveBounceOrCatch)
                 )
@@ -290,7 +300,7 @@ object PassStep: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If the ball didn't end up getting caught by the throwers team, it is a turnover.
             // Otherwise, the throwers team can continue their turn.
-            val passContext = state.passContext!!
+            val passContext = state.getContext<PassContext>()
             return compositeCommandOf(
                 SetOldContext(Game::throwInContext, null),
                 if (!rules.teamHasBall(passContext.thrower.team)) SetTurnOver(true) else null,
@@ -321,7 +331,7 @@ object PassStep: Procedure() {
 
         // TODO How to check for Star Player Points
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.passContext!!
+            val context = state.getContext<PassContext>()
             return compositeCommandOf(
                 if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(true) else null,
                 ExitProcedure()

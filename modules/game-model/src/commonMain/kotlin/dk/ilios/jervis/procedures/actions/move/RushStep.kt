@@ -17,6 +17,8 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.MoveContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 
@@ -34,7 +36,7 @@ object RushStep: Procedure() {
 
     object SelectTargetSquareOrCancelStep: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val player = state.moveContext!!.player
+            val player = state.getContext<MoveContext>().player
             val eligibleSquares = calculateOptionsForMoveType(state, rules, player, MoveType.STANDARD)
             return eligibleSquares + listOf(CancelWhenReady, EndActionWhenReady)
         }
@@ -42,7 +44,7 @@ object RushStep: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when(action) {
                 is FieldSquareSelected -> {
-                    val moveContext = state.moveContext!!
+                    val moveContext = state.getContext<MoveContext>()
                     val movingPlayer = moveContext.player
                     compositeCommandOf(
                         SetPlayerRushesLeft(movingPlayer, movingPlayer.rushesLeft - 1),

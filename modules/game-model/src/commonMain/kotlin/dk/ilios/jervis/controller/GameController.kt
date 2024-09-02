@@ -301,11 +301,13 @@ class GameController(
     }
 
     // Test method
-    fun rollForward(vararg actions: GameAction) {
+    fun rollForward(vararg actions: GameAction?) {
         actions.forEach {
-            processAction(it)
-            rollForwardToNextActionNode()
-            gotoNextUserAction()
+            if (it != null) {
+                processAction(it)
+                rollForwardToNextActionNode()
+                gotoNextUserAction()
+            }
         }
         gotoNextUserAction()
     }

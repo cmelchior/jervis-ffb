@@ -36,9 +36,9 @@ object StartMoveMapper: CommandActionMapper {
     ) {
         val report = command.firstReport() as PlayerActionReport
         val movingPlayer = jervisGame.getPlayerById(PlayerId(report.actingPlayerId.id))!!
-        newActions.add(PlayerSelected(movingPlayer), TeamTurn.SelectPlayerOrEndTurn)
+        newActions.add(PlayerSelected(movingPlayer.id), TeamTurn.SelectPlayerOrEndTurn)
         newActions.add(
-            { state, rules -> PlayerActionSelected(rules.teamActions.move.action) },
+            { state, rules -> PlayerActionSelected(rules.teamActions.move.action.type) },
             TeamTurn.DeselectPlayerOrSelectAction
         )
     }

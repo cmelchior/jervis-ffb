@@ -70,7 +70,7 @@ object BlockAction : Procedure() {
                     val context =
                         BlockContext(
                             attacker = state.activePlayer!!,
-                            defender = action.player,
+                            defender = action.getPlayer(state),
                             isBlitzing = false
                         )
                     compositeCommandOf(

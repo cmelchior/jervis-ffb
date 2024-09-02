@@ -2,8 +2,10 @@ package dk.ilios.jervis.actions
 
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
-import dk.ilios.jervis.rules.PlayerAction
+import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
@@ -197,13 +199,18 @@ data class DiceResults(val rolls: List<DieResult>) : GameAction, List<DieResult>
 }
 
 @Serializable
-data class PlayerSelected(val player: Player) : GameAction
+data class PlayerSelected(val playerId: PlayerId) : GameAction {
+    constructor(player: Player): this(player.id)
+    fun getPlayer(state: Game): Player {
+        return state.getPlayerById(playerId) ?: error("No player with id $playerId")
+    }
+}
 
 @Serializable
 data object PlayerDeselected : GameAction
 
 @Serializable
-data class PlayerActionSelected(val action: PlayerAction) : GameAction
+data class PlayerActionSelected(val action: PlayerActionType) : GameAction
 
 // TODO Merge with PlayerActionSelected
 @Serializable

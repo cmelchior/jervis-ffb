@@ -182,8 +182,8 @@ object TheKickOffEvent : Procedure() {
         ): Command {
             return checkType<PlayerSelected>(action) {
                 return compositeCommandOf(
-                    SetBallState.carried(it.player),
-                    ReportTouchback(it.player),
+                    SetBallState.carried(it.getPlayer(state)),
+                    ReportTouchback(it.getPlayer(state)),
                     ExitProcedure(),
                 )
             }

@@ -8,23 +8,19 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.modifiers.AccuracyModifier
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Range
+import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
-import dk.ilios.jervis.utils.assert
-
-enum class AccuracyModifier(override val modifier: Int, override val description: String) : DiceModifier {
-    MARKED(-1, "Marked"),
-    SHORT_PASS(-1, "Short Pass"),
-    LONG_PASS(-2, "Long Pass"),
-    LONG_BOMB(-3, "Long Bomb")
-}
 
 /**
  * Implement the Accuracy Roll as described on page 49 in the rulebook.
@@ -33,13 +29,11 @@ enum class AccuracyModifier(override val modifier: Int, override val description
  * to the caller to determine what to do with the result.
  */
 object AccuracyRoll: Procedure() {
-    override val initialNode: Node = RollDice
-
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        assert(state.passContext != null)
-        return null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<PassContext>()
     }
-
+    override val initialNode: Node = RollDice
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     // TODO Add support for rerolls
@@ -51,8 +45,7 @@ object AccuracyRoll: Procedure() {
             rules: Rules,
         ): Command {
             return checkType<D6Result>(action) { d6 ->
-                val context = state.passContext!!
-
+                val context = state.getContext<PassContext>()
                 val modifiers = mutableListOf<DiceModifier>()
 
                 // Range modifier
@@ -72,6 +65,11 @@ object AccuracyRoll: Procedure() {
                     modifiers,
                     AccuracyModifier.MARKED
                 )
+
+                // Weather
+                if (state.weather == Weather.VERY_SUNNY) {
+                    modifiers.add(AccuracyModifier.VERY_SUNNY)
+                }
 
                 // Are there other accuracy modifiers? (Like disturbing presence)
                 // TODO
@@ -93,7 +91,7 @@ object AccuracyRoll: Procedure() {
                 }
 
                 return compositeCommandOf(
-                    SetOldContext(Game::passContext, context.copy(
+                    SetContext(context.copy(
                         passingRoll =  d6,
                         passingModifiers = modifiers,
                         passingResult = result

@@ -91,8 +91,8 @@ object TeamTurn : Procedure() {
             return when (action) {
                 is PlayerSelected -> {
                     compositeCommandOf(
-                        SetActivePlayer(action.player),
-                        SetPlayerAvailability(action.player, Availability.IS_ACTIVE),
+                        SetActivePlayer(action.getPlayer(state)),
+                        SetPlayerAvailability(action.getPlayer(state), Availability.IS_ACTIVE),
                         GotoNode(DeselectPlayerOrSelectAction),
                     )
                 }
@@ -182,10 +182,11 @@ object TeamTurn : Procedure() {
 //                                    action,
 //                                ) // TODO Figure out what needs to happen here
 //                        }
+                    val selectedAction = rules.teamActions[action.action].action
                     compositeCommandOf(
 //                        modifyAvailableActions,
-                        SetActiveAction(action.action),
-                        ReportActionSelected(state.activePlayer!!, action.action),
+                        SetActiveAction(selectedAction),
+                        ReportActionSelected(state.activePlayer!!, selectedAction),
                         GotoNode(ActivatePlayer),
                     )
                 }

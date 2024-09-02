@@ -2,6 +2,7 @@ package dk.ilios.jervis.actions
 
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import kotlinx.serialization.Serializable
@@ -84,7 +85,9 @@ data class SelectDiceResult(val choices: List<DieResult>, val count: Int = 1): A
 
 data object SelectDogout : ActionDescriptor
 
-data class SelectPlayer(val player: Player) : ActionDescriptor
+data class SelectPlayer(val player: PlayerId) : ActionDescriptor {
+    constructor(player: Player): this(player.id)
+}
 
 data class DeselectPlayer(val player: Player) : ActionDescriptor
 

@@ -21,82 +21,45 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 object GameDrive : Procedure() {
     override val initialNode: Node = SetupKickingTeam
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object SetupKickingTeam : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ) = SetupTeam
+        override fun getChildProcedure(state: Game, rules: Rules) = SetupTeam
 
-        override fun onEnterNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetActiveTeam(state.kickingTeam),
                 ReportSetupKickingTeam(state.kickingTeam),
             )
         }
 
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(SetupReceivingTeam)
         }
     }
 
     object SetupReceivingTeam : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ) = SetupTeam
+        override fun getChildProcedure(state: Game, rules: Rules) = SetupTeam
 
-        override fun onEnterNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetActiveTeam(state.receivingTeam),
                 ReportSetupReceivingTeam(state.receivingTeam),
             )
         }
 
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(KickOff)
         }
     }
 
     object KickOff : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ) = TheKickOff
-
-        override fun onEnterNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getChildProcedure(state: Game, rules: Rules) = TheKickOff
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             return ReportStartingKickOff(state.kickingTeam)
         }
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 GotoNode(KickOffEvent),
             )
@@ -104,15 +67,8 @@ object GameDrive : Procedure() {
     }
 
     object KickOffEvent : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ) = TheKickOffEvent
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getChildProcedure(state: Game, rules: Rules) = TheKickOffEvent
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetActiveTeam(state.receivingTeam),
                 GotoNode(Turn),
@@ -121,29 +77,22 @@ object GameDrive : Procedure() {
     }
 
     object Turn : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ) = TeamTurn
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getChildProcedure(state: Game, rules: Rules) = TeamTurn
+        override fun onExitNode(state: Game, rules: Rules): Command {
             val switchTeamCommands =
                 compositeCommandOf(
                     SetActiveTeam(state.inactiveTeam),
                     SetKickingTeam(state.receivingTeam),
                 )
             val goalScored = state.goalScored
-            if (goalScored) {
+            return if (goalScored) {
                 // TODO this is probably wrong if the inactive team scored. I.e. at the end of the half
-                return switchTeamCommands + ExitProcedure()
+                switchTeamCommands + ExitProcedure()
             } else if (state.homeTeam.turnData.currentTurn == rules.turnsPrHalf && state.awayTeam.turnData.currentTurn == rules.turnsPrHalf) {
-                return GotoNode(EndDrive)
+                GotoNode(EndDrive)
                 // The other team can continue the drive
             } else if (state.inactiveTeam.turnData.currentTurn < rules.turnsPrHalf) {
-                return switchTeamCommands + GotoNode(Turn)
+                switchTeamCommands + GotoNode(Turn)
             } else {
                 INVALID_GAME_STATE()
             }
@@ -151,10 +100,7 @@ object GameDrive : Procedure() {
     }
 
     object EndDrive : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             // Move all players on the field back to reserves
             // TODO Roll for secret weapons
             // TODO Other stuff?

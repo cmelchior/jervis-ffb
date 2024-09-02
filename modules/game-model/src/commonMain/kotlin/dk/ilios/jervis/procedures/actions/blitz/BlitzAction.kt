@@ -14,6 +14,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
@@ -103,7 +104,7 @@ object BlitzAction : Procedure() {
                 is PlayerSelected -> {
                     val context = state.blitzContext!!
                     compositeCommandOf(
-                        SetOldContext(Game::blitzContext, context.copy(defender = action.player)),
+                        SetOldContext(Game::blitzContext, context.copy(defender = action.getPlayer(state))),
                         GotoNode(MoveOrBlockOrEndAction)
                     )
                 }
@@ -142,7 +143,7 @@ object BlitzAction : Procedure() {
                     val moveContext = MoveContext(context.attacker, action.moveType)
                     compositeCommandOf(
                         SetOldContext(Game::blitzContext, context.copy(hasMoved = true)),
-                        SetOldContext(Game::moveContext, moveContext),
+                        SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
@@ -150,7 +151,7 @@ object BlitzAction : Procedure() {
                 is PlayerSelected -> {
                     val blockContext = BlockContext(
                         attacker = context.attacker,
-                        defender = action.player,
+                        defender = action.getPlayer(state),
                         isBlitzing = true
                     )
                     compositeCommandOf(
@@ -219,7 +220,7 @@ object BlitzAction : Procedure() {
                     val moveContext = MoveContext(context.attacker, action.moveType)
                     compositeCommandOf(
                         SetOldContext(Game::blitzContext, context.copy(hasMoved = true)),
-                        SetOldContext(Game::moveContext, moveContext),
+                        SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }

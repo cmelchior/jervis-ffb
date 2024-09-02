@@ -17,7 +17,7 @@ enum class DiceRollType {
     BOUNCE,
     CASUALTY,
     CATCH,
-    DEDICATED_FANS,
+    FAN_FACTOR,
     DEFLECTION,
     DODGE,
     DEVIATE,
@@ -35,10 +35,11 @@ enum class DiceRollType {
     PRO,
     RUSH,
     SCATTER,
+    SWELTERING_HEAT,
     TAKE_ROOT,
     THROW_TEAM_MATE,
     WEATHER,
-    WILD_ANIMAL
+    WILD_ANIMAL,
 }
 
 enum class TeamRerollDuration {

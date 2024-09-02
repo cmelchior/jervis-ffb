@@ -15,6 +15,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
@@ -112,7 +113,7 @@ object FoulAction : Procedure() {
                 is PlayerSelected -> {
                     val context = state.foulContext!!
                     compositeCommandOf(
-                        SetOldContext(Game::foulContext, context.copy(victim = action.player)),
+                        SetOldContext(Game::foulContext, context.copy(victim = action.getPlayer(state))),
                         GotoNode(MoveOrFoulOrEndAction)
                     )
                 }
@@ -151,14 +152,14 @@ object FoulAction : Procedure() {
                     val moveContext = MoveContext(context.fouler, action.moveType)
                     compositeCommandOf(
                         SetOldContext(Game::foulContext, context.copy(hasMoved = true)),
-                        SetOldContext(Game::moveContext, moveContext),
+                        SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
                 is PlayerSelected -> {
                     val foulContext = state.foulContext!!
                     compositeCommandOf(
-                        SetOldContext(Game::foulContext, foulContext.copy(victim = action.player)),
+                        SetOldContext(Game::foulContext, foulContext.copy(victim = action.getPlayer(state))),
                         GotoNode(ResolveFoul)
                     )
                 }

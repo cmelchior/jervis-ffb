@@ -9,7 +9,7 @@ import dk.ilios.jervis.fumbbl.model.reports.WeatherReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.RollForTheWeather
+import dk.ilios.jervis.procedures.WeatherRoll
 
 object WeatherRollMapper: CommandActionMapper {
     override fun isApplicable(
@@ -33,6 +33,6 @@ object WeatherRollMapper: CommandActionMapper {
     ) {
         val report = command.reportList.reports.first() as WeatherReport
         val weatherRoll = report.weatherRoll.map { D6Result(it) }
-        newActions.add(DiceResults(weatherRoll), RollForTheWeather.RollWeatherDice)
+        newActions.add(DiceResults(weatherRoll), WeatherRoll.RollWeatherDice)
     }
 }

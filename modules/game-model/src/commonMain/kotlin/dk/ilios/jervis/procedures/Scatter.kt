@@ -15,6 +15,8 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.actions.pass.PassContext
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
@@ -65,7 +67,7 @@ object Scatter : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRollList<D8Result>(action) { dice: List<D8Result> ->
                 assert(dice.size == 3)
-                val context = state.passContext!!
+                val context = state.getContext<PassContext>()
                 var scatteredLocation = context.target!!
                 var outOfBoundsAt: FieldCoordinate? = null
                 for (diceResult in dice) {

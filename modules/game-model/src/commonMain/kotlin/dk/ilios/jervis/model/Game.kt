@@ -1,14 +1,10 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.model.context.CatchRollContext
 import dk.ilios.jervis.model.context.ContextHolder
 import dk.ilios.jervis.model.context.MoveContext
-import dk.ilios.jervis.model.context.RushRollContext
 import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.procedures.DeviateRollContext
-import dk.ilios.jervis.procedures.PickupRollContext
-import dk.ilios.jervis.procedures.PickupRollResultContext
 import dk.ilios.jervis.procedures.ScatterRollContext
 import dk.ilios.jervis.procedures.ThrowInContext
 import dk.ilios.jervis.procedures.actions.blitz.BlitzContext
@@ -19,10 +15,10 @@ import dk.ilios.jervis.procedures.actions.block.PushContext
 import dk.ilios.jervis.procedures.actions.block.StumbleContext
 import dk.ilios.jervis.procedures.actions.foul.FoulContext
 import dk.ilios.jervis.procedures.actions.handoff.HandOffContext
-import dk.ilios.jervis.procedures.actions.pass.PassContext
 import dk.ilios.jervis.procedures.actions.pass.PassingInteferenceContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.rules.PlayerAction
+import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,6 +32,8 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     }
 
     companion object
+
+    var weather: Weather = Weather.PERFECT_CONDITIONS
 
     var isTurnOver = false
     var goalScored: Boolean = false
@@ -77,12 +75,8 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     // Context objects are state holders used by procedures
     // when they need to track state between nodes
     val contexts: ContextHolder = ContextHolder()
-    var moveContext: MoveContext? = null
     var blockContext: BlockContext? = null
     var blockRollResultContext: BlockResultContext? = null
-    var catchRollContext: CatchRollContext? = null
-    var pickupRollContext: PickupRollContext? = null
-    var pickupRollResultContext: PickupRollResultContext? = null
     var riskingInjuryRollsContext: RiskingInjuryRollContext? = null
     var pushContext: PushContext? = null
     var bothDownContext: BothDownContext? = null
@@ -90,13 +84,10 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var blitzContext: BlitzContext? = null
     var foulContext: FoulContext? = null
     var handOffContext: HandOffContext? = null
-    var passContext: PassContext? = null
     var scatterRollContext: ScatterRollContext? = null
     var deviateRollContext: DeviateRollContext? = null
     var passingInteferenceContext: PassingInteferenceContext? = null
     var throwInContext: ThrowInContext? = null
-    var rushRollContext: RushRollContext? = null
-
     var rerollContext: UseRerollContext? = null
 
     val field: Field = field

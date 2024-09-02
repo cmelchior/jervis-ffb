@@ -14,6 +14,7 @@ import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
@@ -22,29 +23,26 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.CatchRollContext
 import dk.ilios.jervis.model.context.UseRerollContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.INVALID_ACTION
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import dk.ilios.jervis.utils.calculateAvailableRerollsFor
 
 /**
- * Procedure for handling a Catch Roll. It is only responsible for handling the actual dice roll.
- * The result is stored in [Game.catchRollResultContext] and it is up to the caller of the procedure to
- * choose the appropriate action depending on the outcome.
+ * Procedure for handling a Catch Roll as described on page 51 in the rulebook.
+ * It is only responsible for handling the actual dice roll. The result is stored
+ * in [CatchRollContext] and it is up to the caller of the procedure to choose
+ * the appropriate action depending on the outcome.
  */
 object CatchRoll : Procedure() {
     override fun isValid(state: Game, rules: Rules) {
-        if (state.catchRollContext == null) {
-            INVALID_GAME_STATE("No catch roll context found")
-        }
+        state.assertContext<CatchRollContext>()
     }
-
     override val initialNode: Node = RollDie
-
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollDie : ActionNode() {
@@ -52,14 +50,14 @@ object CatchRoll : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
-                val rollContext = state.catchRollContext!!
+                val rollContext = state.getContext<CatchRollContext>()
                 val resultContext = rollContext.copy(
                     roll = D6DieRoll(d6),
                     isSuccess = isCatchSuccess(d6, rollContext.target, rollContext)
                 )
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CATCH, d6),
-                    SetOldContext(Game::catchRollContext, resultContext),
+                    SetContext(resultContext),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -72,7 +70,7 @@ object CatchRoll : Procedure() {
             state: Game,
             rules: Rules,
         ): List<ActionDescriptor> {
-            val context = state.catchRollContext!!
+            val context = state.getContext<CatchRollContext>()
             val availableRerolls = calculateAvailableRerollsFor(
                 rules,
                 context.catchingPlayer,
@@ -138,8 +136,8 @@ object CatchRoll : Procedure() {
             rules: Rules,
         ): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
-                val rollResultContext = state.catchRollContext!!
-                val rollContext = state.catchRollContext!!
+                val rollResultContext = state.getContext<CatchRollContext>()
+                val rollContext = state.getContext<CatchRollContext>()
                 val target = rollContext.catchingPlayer.agility + rollContext.diceModifier()
                 val rerollResult = rollResultContext.copy(
                     roll = rollResultContext.roll!!.copy(
@@ -149,7 +147,7 @@ object CatchRoll : Procedure() {
                     isSuccess = isCatchSuccess(d6, target, rollContext)
                 )
                 compositeCommandOf(
-                    SetOldContext(Game::catchRollContext, rerollResult),
+                    SetContext(rerollResult),
                     ExitProcedure(),
                 )
             }

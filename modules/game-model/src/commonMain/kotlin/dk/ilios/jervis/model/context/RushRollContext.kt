@@ -1,8 +1,8 @@
 package dk.ilios.jervis.model.context
 
-import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.procedures.D6DieRoll
 
 /**
@@ -15,6 +15,12 @@ data class RushRollContext(
     val player: Player,
     val target: FieldCoordinate,
     val roll: D6DieRoll? = null,
-    val rollModifiers: List<DiceModifier> = emptyList(),
+    val modifiers: List<DiceModifier> = emptyList(),
     val isSuccess: Boolean = false
-): ProcedureContext
+): ProcedureContext {
+    fun copyAndAddModifier(modifier: DiceModifier): RushRollContext {
+        return this.copy(
+            modifiers = this.modifiers + modifier,
+        )
+    }
+}

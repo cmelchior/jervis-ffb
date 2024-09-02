@@ -319,6 +319,8 @@ interface Rules {
         return team.firstOrNull { it.hasBall() } != null
     }
 
+    val name: String
+
     // Characteristic limits
     val moveRange: IntRange
         get() = 1..9

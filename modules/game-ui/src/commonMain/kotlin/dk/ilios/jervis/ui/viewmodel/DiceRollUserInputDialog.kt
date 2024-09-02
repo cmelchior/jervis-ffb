@@ -45,7 +45,7 @@ data class DiceRollUserInputDialog(
                         rules.weatherTable.roll(
                             rolls.rolls.first() as D6Result,
                             rolls.rolls.last() as D6Result,
-                        ).title
+                        ).name
                     "$description (${rolls.sumOf { it.value }})"
                 },
             )

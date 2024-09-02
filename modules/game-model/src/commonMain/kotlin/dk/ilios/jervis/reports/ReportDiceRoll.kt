@@ -12,7 +12,7 @@ class ReportDiceRoll(
     constructor(type: DiceRollType, die: DieResult): this(type, listOf(die))
     constructor(roll: List<BlockDieRoll>) : this(DiceRollType.BLOCK, roll.map { it.result })
 
-    override val category: LogCategory = LogCategory.GAME_PROGRESS
+    override val category: LogCategory = LogCategory.DICE_ROLL
     override val message: String
         get() {
             val dice = dice.joinToString(" ") { it ->

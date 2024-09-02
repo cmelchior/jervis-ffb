@@ -8,7 +8,7 @@ import dk.ilios.jervis.fumbbl.model.reports.FanFactorReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.RollForStartingFanFactor
+import dk.ilios.jervis.procedures.FanFactorRolls
 
 object RollFanFactorMapper: CommandActionMapper {
     override fun isApplicable(
@@ -35,8 +35,8 @@ object RollFanFactorMapper: CommandActionMapper {
         verifyReportSize(2, command)
         val homeTeamRoll = (command.reportList.reports[0] as FanFactorReport).dedicatedFansRoll
         val awayTeamRoll = (command.reportList.reports[1] as FanFactorReport).dedicatedFansRoll
-        newActions.add(homeTeamRoll.d3, RollForStartingFanFactor.SetFanFactorForHomeTeam)
-        newActions.add(awayTeamRoll.d3, RollForStartingFanFactor.SetFanFactorForAwayTeam)
+        newActions.add(homeTeamRoll.d3, FanFactorRolls.SetFanFactorForHomeTeam)
+        newActions.add(awayTeamRoll.d3, FanFactorRolls.SetFanFactorForAwayTeam)
     }
 
     private fun verifyReportSize(

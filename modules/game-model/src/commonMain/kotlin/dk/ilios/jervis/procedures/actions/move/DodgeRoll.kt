@@ -244,8 +244,9 @@ import dk.ilios.jervis.utils.sum
             val context = state.getContext<DodgeRollContext>()
             return when (action) {
                 is PlayerSelected -> {
+                    val player = action.getPlayer(state)
                     compositeCommandOf(
-                        ReportSkillUsed(action.player, action.player.getSkill<PrehensileTail>()),
+                        ReportSkillUsed(player, player.getSkill<PrehensileTail>()),
                         SetContext(context.copyAndAddModifier(DodgeRollModifier.PREHENSILE_TAIL)),
                         GotoNode(ChooseToUseDivingTackle)
                     )
@@ -287,7 +288,7 @@ import dk.ilios.jervis.utils.sum
             val context = state.getContext<DodgeRollContext>()
             return when (action) {
                 is PlayerSelected -> {
-                    val player = action.player
+                    val player = action.getPlayer(state)
                     val skill = player.getSkill<DivingTackle>()
                     compositeCommandOf(
                         ReportSkillUsed(player, skill),
