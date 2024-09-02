@@ -88,6 +88,7 @@ import dk.ilios.jervis.procedures.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.injury.InjuryRoll
 import dk.ilios.jervis.procedures.injury.LastingInjuryRoll
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
+import dk.ilios.jervis.procedures.weather.SwelteringHeat
 import dk.ilios.jervis.rules.skills.Block
 import dk.ilios.jervis.rules.skills.Dodge
 import dk.ilios.jervis.rules.skills.Tackle
@@ -492,6 +493,11 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             is Stumble.ChooseToUseTackle -> {
                 val defender = controller.state.stumbleContext!!.attacker
                 SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Tackle>())
+            }
+
+            is SwelteringHeat.RollForAwayTeam,
+            is SwelteringHeat.RollForHomeTeam -> {
+                DiceRollUserInputDialog.createSwelteringHeatRollDialog()
             }
 
             is TheKickOff.TheKickDeviates -> {

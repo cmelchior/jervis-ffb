@@ -4,8 +4,8 @@ import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 
-class SetTurnNo(private val currentTeam: Team, private val nextTurn: UInt) : Command {
-    private var originalTurn: UInt = 0u
+class SetTurnNo(private val currentTeam: Team, private val nextTurn: Int) : Command {
+    private var originalTurn: Int = 0
 
     override fun execute(
         state: Game,

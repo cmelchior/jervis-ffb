@@ -13,6 +13,8 @@ interpreted.
 4. In which order is skill usage declared when both teams have to choose? E.g. Break Tackle and Diving Tackle?
    Is it "Active then InActive", "InActive then Active", "Active Coach Decides" or "InActive Coache Decides"
 
+5. It is a bit unclear if Sweltering Heat or Deal with Secret Weapons happens first, but Sweltering heat 
+   does mention "once a drive ends", which matches the "The Drive Ends" step of the End of Drive sequence.
 
 # Differences compared to the rules as written
 

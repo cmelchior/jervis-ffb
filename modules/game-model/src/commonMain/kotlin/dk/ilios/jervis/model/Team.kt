@@ -29,7 +29,7 @@ class TeamDriveData(private val game: Game) {
 }
 
 class TeamTurnData(private val game: Game) {
-    var currentTurn by Delegates.observable(0u) { prop, old, new ->
+    var currentTurn by Delegates.observable(0) { prop, old, new ->
         game.gameFlow.safeTryEmit(game)
     }
     var moveActions: Int

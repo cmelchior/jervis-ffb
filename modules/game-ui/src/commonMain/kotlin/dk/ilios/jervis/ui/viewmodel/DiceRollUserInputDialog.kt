@@ -1,6 +1,7 @@
 package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.actions.D16Result
+import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DBlockResult
@@ -233,11 +234,20 @@ data class DiceRollUserInputDialog(
             )
         }
 
-        fun createRushRollDialog(player: Player, target: FieldCoordinate): UserInput? {
+        fun createRushRollDialog(player: Player, target: FieldCoordinate): UserInput {
             return DiceRollUserInputDialog(
                 title = "Rush Roll",
                 message = "${player.name} rolls D6 to rush to ${target.toLogString()}",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { rolls: DiceResults -> null }
+            )
+        }
+
+        fun createSwelteringHeatRollDialog(): UserInput {
+            return DiceRollUserInputDialog(
+                title = "Sweltering Heat Roll",
+                message = "Roll D3 to find number of affected players.",
+                dice = listOf(Pair(Dice.D3, D3Result.allOptions())),
                 result = { rolls: DiceResults -> null }
             )
         }

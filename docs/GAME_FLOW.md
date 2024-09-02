@@ -3,11 +3,16 @@
 This document lists all game mechanics that have been fully implemented with tests.
 
 ## Pregame
-- [ ] The fans
-- [ ] The Weather
+- [x] The Fans
+- [x] The Weather
+  - [x] Sweltering Heat
+  - [x] Very Sunny
+  - [x] Perfect Conditions
+  - [x] Pouring Rain
+  - [x] Blizzard
 - [ ] Take on Journeymen
 - [ ] Inducements
-- [ ] Prayers to Nuffle Tabl
+- [ ] Prayers to Nuffle Table
 - [ ] Determine kicking team
 
 ## Start of Drive

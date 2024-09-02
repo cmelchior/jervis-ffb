@@ -342,11 +342,11 @@ interface Rules {
 
     // Game length setup
 
-    val halfsPrGame: UInt
-        get() = 2u
+    val halfsPrGame: Int
+        get() = 2
 
-    val turnsPrHalf: UInt
-        get() = 8u
+    val turnsPrHalf: Int
+        get() = 8
 
     // Field description
 

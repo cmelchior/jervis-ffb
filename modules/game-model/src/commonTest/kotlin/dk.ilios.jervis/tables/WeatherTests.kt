@@ -3,6 +3,7 @@ package dk.ilios.jervis.tables
 import dk.ilios.jervis.GameFlowTests
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
@@ -14,6 +15,7 @@ import dk.ilios.jervis.defaultFanFactor
 import dk.ilios.jervis.defaultKickOffHomeTeam
 import dk.ilios.jervis.defaultPregame
 import dk.ilios.jervis.defaultSetup
+import dk.ilios.jervis.endTurns
 import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.ext.d8
@@ -60,8 +62,12 @@ class WeatherTests: GameFlowTests() {
     fun swelteringHeat() {
         controller.startTestMode(FullGame)
         controller.rollForward(
-            *defaultFanFactor(),
-            DiceResults(1.d6, 1.d6), // Weather roll
+            *defaultPregame(
+                weatherRoll = DiceResults(1.d6, 1.d6), // Weather roll
+            ),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(),
+            *endTurns(16),
             2.d3, // Home Heat roll
             RandomPlayersSelected(listOf(
                 homeTeam[PlayerNo(1)]!!,
@@ -71,6 +77,7 @@ class WeatherTests: GameFlowTests() {
             RandomPlayersSelected(listOf(awayTeam[PlayerNo(1)]!!)),
         )
         assertEquals(Weather.SWELTERING_HEAT, state.weather)
+        assertEquals(2, state.halfNo) // We are at the start of 2nd drive.
         listOf(
             homeTeam[PlayerNo(1)]!!,
             homeTeam[PlayerNo(2)]!!,
@@ -79,8 +86,8 @@ class WeatherTests: GameFlowTests() {
             assertEquals(PlayerState.FAINTED, player.state, "Player $player")
             assertEquals(DogOut, player.location, "Player $player")
         }
-        assertEquals(9, homeTeam.filter { it.location.isOnField(rules)}.size)
-        assertEquals(10, awayTeam.filter { it.location.isOnField(rules)}.size)
+        assertEquals(2, homeTeam.filter { it.state == PlayerState.FAINTED }.size)
+        assertEquals(1, awayTeam.filter { it.state == PlayerState.FAINTED }.size)
     }
 
     @Test

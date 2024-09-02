@@ -7,7 +7,6 @@ import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetActiveTeam
 import dk.ilios.jervis.commands.SetKickingTeam
 import dk.ilios.jervis.commands.SetPlayerLocation
-import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -89,7 +88,7 @@ object GameDrive : Procedure() {
                 // TODO this is probably wrong if the inactive team scored. I.e. at the end of the half
                 switchTeamCommands + ExitProcedure()
             } else if (state.homeTeam.turnData.currentTurn == rules.turnsPrHalf && state.awayTeam.turnData.currentTurn == rules.turnsPrHalf) {
-                GotoNode(EndDrive)
+                GotoNode(ResolveEndOfDrive)
                 // The other team can continue the drive
             } else if (state.inactiveTeam.turnData.currentTurn < rules.turnsPrHalf) {
                 switchTeamCommands + GotoNode(Turn)
@@ -99,11 +98,11 @@ object GameDrive : Procedure() {
         }
     }
 
-    object EndDrive : ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            // Move all players on the field back to reserves
-            // TODO Roll for secret weapons
-            // TODO Other stuff?
+    object ResolveEndOfDrive : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = EndOfDriveSequence
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // The End of Drive Sequence doesn't mention moving players off the pitch, so we
+            // do it here after the sequence has completed.
             val movePlayers: List<SetPlayerLocation> =
                 state.field
                     .filter { !it.isUnoccupied() }

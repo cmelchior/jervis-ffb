@@ -8,14 +8,11 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetWeather
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
-import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.weather.SwelteringHeat
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportWeatherResult
 import dk.ilios.jervis.rules.Rules
@@ -61,16 +58,9 @@ object WeatherRoll : Procedure() {
                     SetWeather(weather),
                     ReportDiceRoll(DiceRollType.WEATHER, listOf(firstD6, secondD6)),
                     ReportWeatherResult(weather),
-                    if (weather == Weather.SWELTERING_HEAT) GotoNode(ResolveSwelteringHeat) else ExitProcedure(),
+                    ExitProcedure(),
                 )
             }
-        }
-    }
-
-    object ResolveSwelteringHeat : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = SwelteringHeat
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
         }
     }
 }

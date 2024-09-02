@@ -52,7 +52,7 @@ object TeamTurn : Procedure() {
         state: Game,
         rules: Rules,
     ): Command? {
-        val turn = state.activeTeam.turnData.currentTurn + 1u
+        val turn = state.activeTeam.turnData.currentTurn + 1
         return compositeCommandOf(
             SetCanUseTeamRerolls(true),
             SetTurnNo(state.activeTeam, turn),

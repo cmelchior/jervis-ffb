@@ -6,6 +6,7 @@ import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.EndSetup
+import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.MoveType
@@ -163,5 +164,7 @@ fun moveTo(x: Int, y: Int) = arrayOf(
     MoveTypeSelected(MoveType.STANDARD),
     FieldSquareSelected(FieldCoordinate(x, y)),
 )
+
+fun endTurns(count: Int) = Array(count) { EndTurn }
 
 

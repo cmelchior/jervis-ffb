@@ -2,7 +2,6 @@ package dk.ilios.jervis.model
 
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.model.context.ContextHolder
-import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.procedures.DeviateRollContext
 import dk.ilios.jervis.procedures.ScatterRollContext
@@ -38,7 +37,7 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var isTurnOver = false
     var goalScored: Boolean = false
     var abortIfBallOutOfBounds: Boolean = false
-    var halfNo by Delegates.observable(0u) { prop, old, new ->
+    var halfNo by Delegates.observable(0) { prop, old, new ->
         gameFlow.safeTryEmit(this)
     }
     var driveNo by Delegates.observable(0) { prop, old, new ->
