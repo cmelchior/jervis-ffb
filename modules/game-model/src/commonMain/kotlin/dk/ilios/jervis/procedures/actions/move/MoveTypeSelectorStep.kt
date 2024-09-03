@@ -88,7 +88,7 @@ fun calculateMoveTypesAvailable(player: Player, rules: Rules): List<ActionDescri
  *  Turnovers are handled in procedures calling this one.
  *
  *  --------------
- *  Design Notes:
+ *  Developer's Notes:
  *
  *  To make it easier to handle each type, it is required to select
  *  the type before choosing the target.

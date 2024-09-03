@@ -12,12 +12,12 @@ import dk.ilios.jervis.procedures.actions.block.BlockResultContext
 import dk.ilios.jervis.procedures.actions.block.BothDownContext
 import dk.ilios.jervis.procedures.actions.block.PushContext
 import dk.ilios.jervis.procedures.actions.block.StumbleContext
-import dk.ilios.jervis.procedures.actions.foul.FoulContext
 import dk.ilios.jervis.procedures.actions.handoff.HandOffContext
 import dk.ilios.jervis.procedures.actions.pass.PassingInteferenceContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.tables.Weather
+import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -81,7 +81,6 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var bothDownContext: BothDownContext? = null
     var stumbleContext: StumbleContext? = null
     var blitzContext: BlitzContext? = null
-    var foulContext: FoulContext? = null
     var handOffContext: HandOffContext? = null
     var scatterRollContext: ScatterRollContext? = null
     var deviateRollContext: DeviateRollContext? = null
@@ -99,8 +98,8 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
             } ?: this.field[ball.location]
 
         }
-    fun getPlayerById(id: PlayerId): Player? {
-        return homeTeam.firstOrNull { it.id == id } ?: awayTeam.firstOrNull { it.id == id }
+    fun getPlayerById(id: PlayerId): Player {
+        return homeTeam.firstOrNull { it.id == id } ?: awayTeam.firstOrNull { it.id == id } ?: INVALID_GAME_STATE("Player with ${id} not found")
     }
 
     fun swapKickingTeam() {

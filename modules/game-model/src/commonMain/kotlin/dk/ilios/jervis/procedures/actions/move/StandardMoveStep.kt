@@ -12,7 +12,6 @@ import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
-import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerMoveLeft
 import dk.ilios.jervis.commands.SetPlayerRushesLeft
 import dk.ilios.jervis.commands.SetPlayerState
@@ -68,8 +67,30 @@ object StandardMoveStep: Procedure() {
                 val context = state.getContext<MoveContext>()
                 compositeCommandOf(
                     SetContext(context.copy(target = it.coordinate)),
-                    GotoNode(CheckIfRushingIsNeeded),
+                    GotoNode(MovePlayer),
                 )
+            }
+        }
+    }
+
+    // When moving a player, they are placed into the target square
+    // before rolling any dice.
+    object MovePlayer: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val moveContext = state.getContext<MoveContext>()
+            return SetContext(
+                MovePlayerIntoSquareContext(
+                    player = moveContext.player,
+                    target = moveContext.target!!,
+                )
+            )
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = MovePlayerIntoSquare
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return if (state.isTurnOver) {
+                ExitProcedure() // Something went wrong when moving the player
+            } else {
+                GotoNode(CheckIfRushingIsNeeded)
             }
         }
     }
@@ -96,7 +117,6 @@ object StandardMoveStep: Procedure() {
             val player = rushContext.player
             return if (rushContext.isSuccess) {
                 compositeCommandOf(
-                    SetPlayerMoveLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
                     RemoveContext<RushRollContext>(),
                     GotoNode(CheckIfDodgeIsNeeded)
@@ -104,7 +124,6 @@ object StandardMoveStep: Procedure() {
             } else {
                 // Rush failed, player is Knocked Down in target square
                 return compositeCommandOf(
-                    SetPlayerLocation(player, rushContext.target),
                     SetPlayerState(player, PlayerState.KNOCKED_DOWN),
                     RemoveContext<RushRollContext>(),
                     GotoNode(ResolvePlayerKnockedDown)
@@ -144,15 +163,11 @@ object StandardMoveStep: Procedure() {
             val player = dodgeContext.player
             if (dodgeContext.isSuccess) {
                 return compositeCommandOf(
-                    // They might be here already due to rushing also moving the player
-                    SetPlayerLocation(player, dodgeContext.targetSquare),
                     RemoveContext<DodgeRollContext>(),
                     GotoNode(ResolveMove/*CheckIfShadowingIsAvailable*/)
                 )
             } else {
                 return compositeCommandOf(
-                    // They might be here already due to rushing also moving the player
-                    SetPlayerLocation(player, dodgeContext.targetSquare),
                     SetPlayerState(player, PlayerState.KNOCKED_DOWN),
                     RemoveContext<DodgeRollContext>(),
                     GotoNode(ResolvePlayerKnockedDown)
@@ -201,7 +216,8 @@ object StandardMoveStep: Procedure() {
             val context = state.getContext<MoveContext>()
             val movingPlayer = context.player
             return compositeCommandOf(
-                SetPlayerLocation(movingPlayer, context.target!!),
+                // Player was already moved before rolling any dice, so here we just
+                // adjust stats.
                 SetPlayerMoveLeft(movingPlayer, movingPlayer.movesLeft - 1),
                 ExitProcedure()
             )

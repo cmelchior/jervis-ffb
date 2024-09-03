@@ -11,6 +11,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
 import dk.ilios.jervis.commands.SetCoachBanned
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
@@ -21,11 +22,13 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.modifiers.DefensiveAssistsModifier
 import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.modifiers.OffensiveAssistModifier
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.modifiers.DefensiveAssistsModifier
+import dk.ilios.jervis.model.modifiers.OffensiveAssistModifier
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
@@ -39,21 +42,18 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  * Procedure for handling the Foul part of a [FoulAction].
  */
 object FoulStep: Procedure() {
-    override val initialNode: Node = CalculateAssists
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        if (state.foulContext == null) {
-            INVALID_GAME_STATE("Missing foul context")
-        }
-        return null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<FoulContext>()
     }
-
+    override val initialNode: Node = CalculateAssists
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object CalculateAssists: ComputationNode() {
         // TODO For now, assume that both sides want all assists to count
         //  Could there be a case where the defender wants the foul to succeed?
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.foulContext!!
+            val context = state.getContext<FoulContext>()
             val offensiveAssists =
                 context.victim!!.location.coordinate.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
@@ -65,7 +65,7 @@ object FoulStep: Procedure() {
                     .count { player -> rules.canOfferAssistAgainst(player, context.fouler) }
 
             return compositeCommandOf(
-                SetOldContext(Game::foulContext, context.copy(foulAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
+                SetContext(context.copy(foulAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
                 GotoNode(RollForFoul)
             )
         }
@@ -73,7 +73,7 @@ object FoulStep: Procedure() {
 
     object RollForFoul: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val foulContext = state.foulContext!!
+            val foulContext = state.getContext<FoulContext>()
             val injuryContext = RiskingInjuryRollContext(
                 player = foulContext.victim!!,
                 mode = RiskingInjuryMode.FOUL,
@@ -88,14 +88,14 @@ object FoulStep: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val foulContext = state.foulContext!!
+            val foulContext =state.getContext<FoulContext>()
             val injuryContext = state.riskingInjuryRollsContext!!
             val spottedByRef: Boolean =
                 (injuryContext.armourRoll[0] == 1.d6 && injuryContext.armourRoll[1] == 1.d6) ||
                 (injuryContext.injuryRoll[0] == 1.d6 && injuryContext.injuryRoll[1] == 1.d6)
             return compositeCommandOf(
                 SetOldContext(Game::riskingInjuryRollsContext, null),
-                SetOldContext(Game::foulContext, foulContext.copy(
+                SetContext(foulContext.copy(
                     injuryRoll = injuryContext,
                     spottedByTheRef = spottedByRef)),
                 if (spottedByRef) {
@@ -118,17 +118,17 @@ object FoulStep: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val foulContext = state.foulContext!!
+            val foulContext = state.getContext<FoulContext>()
             return when (action) {
                 Cancel -> {
                     compositeCommandOf(
-                        SetOldContext(Game::foulContext, foulContext.copy(argueTheCall = false)),
+                        SetContext(foulContext.copy(argueTheCall = false)),
                         ExitProcedure()
                     )
                 }
                 Confirm -> {
                     compositeCommandOf(
-                        SetOldContext(Game::foulContext, foulContext.copy(argueTheCall = true)),
+                        SetContext(foulContext.copy(argueTheCall = true)),
                         GotoNode(RollForArgueThCall)
                     )
                 }
@@ -140,8 +140,8 @@ object FoulStep: Procedure() {
     object RollForArgueThCall: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ArgueTheCallRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.foulContext!!
-            val resultCommands = when (context.argueTheCallResult) {
+            val context = state.getContext<FoulContext>()
+            val resultCommand = when (context.argueTheCallResult) {
                 ArgueTheCallResult.YOURE_OUTTA_HERE -> {
                     compositeCommandOf(
                         SetCoachBanned(context.fouler.team, true),
@@ -156,12 +156,12 @@ object FoulStep: Procedure() {
                     )
                 }
                 ArgueTheCallResult.WELL_IF_YOU_PUT_IT_LIKE_THAT -> {
-                    compositeCommandOf()
+                    null // Nothing happens to the player
                 }
                 null -> INVALID_GAME_STATE("Missing argue the call result")
             }
             return compositeCommandOf(
-                resultCommands,
+                resultCommand,
                 SetTurnOver(true),
                 ExitProcedure()
             )

@@ -14,6 +14,7 @@ class FieldSquare(val coordinates: FieldCoordinate) : Observable<FieldSquare>(),
     val y = coordinates.y
     var player: Player? = null // observable(null)
     var ball: Ball? = null // by observable(null)
+    var hasTrapdoor: Boolean = false
 
     // Is field unoccupied as per the definition on page 44 in the rulebook.
     fun isUnoccupied(): Boolean = (player == null)

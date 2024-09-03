@@ -9,18 +9,12 @@ class EnterProcedure(private val procedure: Procedure) : Command {
     private val enterProcedureEntry =
         SimpleLogEntry(message = "Load procedure: ${procedure.name()}[${procedure.initialNode.name()}]")
 
-    override fun execute(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun execute(state: Game, controller: GameController) {
         controller.addLog(enterProcedureEntry)
         controller.addProcedure(procedure)
     }
 
-    override fun undo(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun undo(state: Game, controller: GameController) {
         controller.removeProcedure()
         controller.removeLog(enterProcedureEntry)
     }

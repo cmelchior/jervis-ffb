@@ -7,6 +7,7 @@ import dk.ilios.jervis.model.CoachId
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Position
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
@@ -44,7 +45,7 @@ object FumbblTeamLoader {
     private fun convertToBB2020JervisTeam(team: com.jervis.fumbbl.restapi.Team): Team {
         if (team.ruleset != 4) throw IllegalStateException("Unsupported ruleset ${team.ruleset}") // 4 is BB2020
         val jervisRoster: BB2020Roster = getBB2020Roster(team.roster)
-        return teamBuilder(jervisRoster) {
+        return teamBuilder(BB2020Rules, jervisRoster) {
             name = team.name
             coach = Coach(CoachId(team.coach.id.toString()), team.coach.name)
             reRolls = team.rerolls

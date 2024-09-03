@@ -18,7 +18,7 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.procedures.RollOnPrayersOfNuffleTable
+import dk.ilios.jervis.procedures.PrayersToNuffleRoll
 import dk.ilios.jervis.reports.ReportCheeringFansResult
 import dk.ilios.jervis.rules.Rules
 
@@ -149,14 +149,7 @@ object CheeringFans : Procedure() {
             return null
         }
 
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = RollOnPrayersOfNuffleTable
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command = ExitProcedure()
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PrayersToNuffleRoll
+        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
     }
 }

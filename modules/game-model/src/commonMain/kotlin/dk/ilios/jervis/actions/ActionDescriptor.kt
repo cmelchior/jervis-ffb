@@ -5,6 +5,7 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.skills.DiceRerollOption
+import dk.ilios.jervis.rules.skills.SkillFactory
 import kotlinx.serialization.Serializable
 
 // Action descriptors
@@ -23,6 +24,8 @@ data object EndTurnWhenReady : ActionDescriptor // Mark the turn as ended for a 
 data object EndActionWhenReady : ActionDescriptor
 
 data object SelectCoinSide : ActionDescriptor
+
+data class SelectSkill(val skill: SkillFactory) : ActionDescriptor
 
 data object TossCoin : ActionDescriptor
 
@@ -93,7 +96,7 @@ data class DeselectPlayer(val player: Player) : ActionDescriptor
 
 data class SelectAction(val action: PlayerAction) : ActionDescriptor
 
-data class SelectRandomPlayers(val count: Int, val players: List<Player>) : ActionDescriptor // This is not a single action
+data class SelectRandomPlayers(val count: Int, val players: List<PlayerId>) : ActionDescriptor // This is not a single action
 
 // data class SelectSkillRerollSource(val skill: Skill): ActionDescriptor
 // data class SelectTeamRerollSource(val reroll: TeamReroll): ActionDescriptor

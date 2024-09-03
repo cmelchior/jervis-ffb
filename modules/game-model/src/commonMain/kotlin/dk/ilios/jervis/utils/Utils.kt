@@ -49,6 +49,8 @@ import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.actions.SelectRerollOption
+import dk.ilios.jervis.actions.SelectSkill
+import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.commands.SetAvailableTeamRerolls
 import dk.ilios.jervis.commands.SetPlayerLocation
@@ -66,6 +68,7 @@ import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.modifiers.DiceModifier
+import dk.ilios.jervis.model.modifiers.StatModifier
 import dk.ilios.jervis.procedures.D6DieRoll
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.Rules
@@ -81,8 +84,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.jvm.JvmName
 import kotlin.random.Random
 
-val HUMAN_AWAY_TEAM: Team =
-    teamBuilder(HumanTeam) {
+fun humanTeamAway(): Team {
+    return teamBuilder(BB2020Rules, HumanTeam) {
         coach = Coach(CoachId("away-coach"), "AwayCoach")
         name = "AwayTeam"
         addPlayer(PlayerId("A1"), "Lineman-1-A", PlayerNo(1), HumanTeam.LINEMAN)
@@ -99,10 +102,12 @@ val HUMAN_AWAY_TEAM: Team =
         reRolls = 4
         apothecaries = 1
         dedicatedFans = 2
+        teamValue = 1_000_000
     }
+}
 
-val LIZARDMEN_AWAY_TEAM: Team =
-    teamBuilder(LizardmenTeam) {
+fun lizardMenAwayTeam(): Team {
+    return teamBuilder(BB2020Rules, LizardmenTeam) {
         coach = Coach(CoachId("away-coach"), "AwayCoach")
         name = "AwayTeam"
         addPlayer(PlayerId("A1"), "Lineman-1-A", PlayerNo(1), LizardmenTeam.KROXIGOR)
@@ -118,9 +123,9 @@ val LIZARDMEN_AWAY_TEAM: Team =
         addPlayer(PlayerId("A11"), "Blitzer-4-A", PlayerNo(11), LizardmenTeam.SKINK_RUNNER_LINEMEN)
         reRolls = 4
         apothecaries = 1
+        teamValue = 1_050_000
     }
-
-
+}
 
 fun createRandomAction(
     state: Game,
@@ -177,6 +182,7 @@ fun createRandomAction(
         is SelectRerollOption -> RerollOptionSelected(action.option)
         is SelectDiceResult -> action.choices.random()
         is SelectMoveType -> MoveTypeSelected(action.type)
+        is SelectSkill -> SkillSelected(action.skill)
     }
 }
 
@@ -192,6 +198,9 @@ inline fun assert(condition: Boolean) {
 fun List<DieResult>.sum(): Int = fold(0) { acc, el -> acc + el.value }
 
 fun List<DiceModifier>.sum(): Int = this.sumOf { it.modifier }
+
+@JvmName("sumOfStatModifiers")
+fun List<StatModifier>.sum(): Int = this.sumOf { it.modifier }
 
 class InvalidAction(message: String) : RuntimeException(message)
 
@@ -261,9 +270,9 @@ fun setupTeamsOnField(controller: GameController) {
     SetAvailableTeamRerolls(controller.state.awayTeam).execute(controller.state, controller)
 }
 
-fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = HUMAN_AWAY_TEAM): Game {
+fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = humanTeamAway()): Game {
     val team1: Team =
-        teamBuilder(HumanTeam) {
+        teamBuilder(rules, HumanTeam) {
             coach = Coach(CoachId("home-coach"), "HomeCoach")
             name = "HomeTeam"
             addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), HumanTeam.LINEMAN)
@@ -280,6 +289,7 @@ fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = HUMAN_AWAY_TEAM)
             reRolls = 4
             apothecaries = 1
             dedicatedFans = 1
+            teamValue = 1_000_000
         }
     val field = Field.createForRuleset(rules)
     return Game(team1, awayTeam, field)

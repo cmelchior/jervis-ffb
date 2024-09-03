@@ -1,6 +1,6 @@
 package dk.ilios.jervis.skills
 
-import dk.ilios.jervis.GameFlowTests
+import dk.ilios.jervis.JervisGameTest
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.commands.SetContext
@@ -21,7 +21,7 @@ import kotlin.test.assertTrue
 /**
  * Class testing usage of the [BreakTackle] skill
  */
-class BreakTackleTests: GameFlowTests() {
+class BreakTackleTests: JervisGameTest() {
 
     @BeforeTest
     override fun setUp() {

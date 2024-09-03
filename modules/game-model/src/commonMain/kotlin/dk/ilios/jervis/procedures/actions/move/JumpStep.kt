@@ -13,21 +13,11 @@ import dk.ilios.jervis.rules.Rules
 object JumpStep : Procedure() {
     override val initialNode: Node = CheckTargetSquare
 
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object CheckTargetSquare : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             TODO("Not yet implemented")
         }
     }

@@ -22,22 +22,11 @@ import dk.ilios.jervis.rules.Rules
  */
 object UseProReroll : Procedure() {
     override val initialNode: Node = UseReroll
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object UseReroll : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             TODO("Not yet implemented")
         }
     }
@@ -100,7 +89,6 @@ object UseTeamReroll : Procedure() {
 
 /**
  * Define the rules for using a normal skill reroll.
- *
  */
 object UseStandardSkillReroll : Procedure() {
     override val initialNode: Node = UseReroll

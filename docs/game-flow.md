@@ -12,8 +12,23 @@ This document lists all game mechanics that have been fully implemented with tes
   - [x] Blizzard
 - [ ] Take on Journeymen
 - [ ] Inducements
-- [ ] Prayers to Nuffle Table
-- [ ] Determine kicking team
+- [x] Roll on Prayers to Nuffle Table
+  - [ ] Treacherous Trapdoor
+  - [x] Friends with the Ref
+  - [x] Stiletto
+  - [x] Iron Man
+  - [x] Knuckle Dusters
+  - [x] Bad Habits
+  - [ ] Greasy Cleats
+  - [ ] Blessed Statue of Nuffle
+  - [ ] Moles under the Pitch
+  - [ ] Perfect Passing
+  - [ ] Fan Interaction
+  - [ ] Necessary Violence
+  - [ ] Fouling Frenzy
+  - [ ] Throw a Rock
+  - [ ] Under Scrutiny
+  - [ ] Intensive Training
 
 ## Start of Drive
 
@@ -22,6 +37,8 @@ This document lists all game mechanics that have been fully implemented with tes
 - [ ] The Kick-off Event
   - [ ] Kick-off Event Table
 - [ ] What goes up, must come down
+- [ ] Catch
+- [ ] Bounce
 - [ ] Touchbacks
 
 ## Game
@@ -49,4 +66,8 @@ This document lists all game mechanics that have been fully implemented with tes
 - [ ] Kickoff event
 - [ ] Moving turn marker
 - [ ] Going into overtime
-- [ ]
+- [ ] Track Star Player Points and adjustments to it. Figure out how
+- [ ] Touchdown
+- [ ] Stalling
+- [ ] Trapdoors
+- [ ] Maximum Stats

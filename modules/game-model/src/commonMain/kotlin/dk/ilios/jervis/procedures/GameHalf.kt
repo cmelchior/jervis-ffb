@@ -17,6 +17,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.reports.ReportStartingDrive
 import dk.ilios.jervis.reports.ReportStartingHalf
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.ResetPolicy
 
 object GameHalf : Procedure() {
     override val initialNode: Node = Drive
@@ -40,7 +41,13 @@ object GameHalf : Procedure() {
             ReportStartingHalf(currentHalf),
         )
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        // Remove modifiers that only last this half
+        val resetCommands = getResetTemporaryModifiersCommands(state, rules, ResetPolicy.END_OF_HALF)
+        return compositeCommandOf(
+            *resetCommands
+        )
+    }
 
     object Drive : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules) = GameDrive

@@ -7,6 +7,7 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.skills.DiceRerollOption
+import dk.ilios.jervis.rules.skills.SkillFactory
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
@@ -216,6 +217,8 @@ data class PlayerActionSelected(val action: PlayerActionType) : GameAction
 @Serializable
 data class PlayerSubActionSelected(val name: String, val action: GameAction) : GameAction
 
+
+
 @Serializable
 data object DogoutSelected : GameAction
 
@@ -232,7 +235,13 @@ data class FieldSquareSelected(val coordinate: FieldCoordinate) : GameAction {
 }
 
 @Serializable
-data class RandomPlayersSelected(val players: List<Player>) : GameAction
+data class RandomPlayersSelected(val players: List<PlayerId>) : GameAction {
+    fun getPlayers(state: Game): List<Player> {
+        return players.map {
+            state.getPlayerById(it) ?: error("No player with id $it")
+        }
+    }
+}
 
 @Serializable
 data class RerollOptionSelected(val option: DiceRerollOption) : GameAction
@@ -242,3 +251,6 @@ data object NoRerollSelected : GameAction
 
 @Serializable
 data class MoveTypeSelected(val moveType: MoveType) : GameAction
+
+@Serializable
+data class SkillSelected(val skill: SkillFactory): GameAction

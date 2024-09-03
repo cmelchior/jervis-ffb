@@ -5,6 +5,7 @@ import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
 import dk.ilios.jervis.rules.skills.TeamReroll
+import dk.ilios.jervis.rules.tables.PrayerToNuffle
 import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -110,7 +111,8 @@ class Team(val name: String, val roster: Roster, val coach: Coach) : Collection<
     var teamValue: Int = 0
     var treasury: Int = 0
     var dedicatedFans: Int = 0
-    val specialRules: MutableList<SpecialRules> = mutableListOf()
+    val specialRules = mutableListOf<SpecialRules>()
+    val activePrayersOfNuffle = mutableSetOf<PrayerToNuffle>()
 
     // Special team state that needs to be tracked for the given period
     @Transient
@@ -127,6 +129,9 @@ class Team(val name: String, val roster: Roster, val coach: Coach) : Collection<
 
     @Transient
     lateinit var temporaryData: TeamTemporaryData
+
+
+
 
     // Must be called before using this class.
     // Used to break circular reference between Team and Game instances
@@ -167,6 +172,10 @@ class Team(val name: String, val roster: Roster, val coach: Coach) : Collection<
     override fun containsAll(elements: Collection<Player>): Boolean = noToPlayer.values.containsAll(elements)
 
     override fun contains(element: Player): Boolean = noToPlayer.containsValue(element)
+
+    fun hasPrayer(prayer: PrayerToNuffle): Boolean {
+        return activePrayersOfNuffle.contains(prayer)
+    }
 
     fun notifyDogoutChange() {
         val playersInDogout = noToPlayer.values.filter { it.location == DogOut }

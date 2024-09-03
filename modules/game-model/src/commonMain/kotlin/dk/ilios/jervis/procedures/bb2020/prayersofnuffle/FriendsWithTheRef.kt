@@ -3,10 +3,14 @@ package dk.ilios.jervis.procedures.bb2020.prayersofnuffle
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
 import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
@@ -17,25 +21,18 @@ import dk.ilios.jervis.rules.Rules
  */
 object FriendsWithTheRef : Procedure() {
     override val initialNode: Node = ApplyEvent
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<PrayersToNuffleRollContext>()
+    }
 
     object ApplyEvent : ComputationNode() {
-        // TODO Figure out how to do this
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<PrayersToNuffleRollContext>()
             return compositeCommandOf(
-                SimpleLogEntry("Do Friends with the Ref!", category = LogCategory.GAME_PROGRESS),
+                SetContext(context.copy(resultApplied = true)),
+                SimpleLogEntry("${state.activeTeam} received Friends with the Ref", category = LogCategory.GAME_PROGRESS),
                 ExitProcedure(),
             )
         }

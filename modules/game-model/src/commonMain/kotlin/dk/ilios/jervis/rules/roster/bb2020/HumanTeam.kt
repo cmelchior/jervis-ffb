@@ -1,9 +1,9 @@
 package dk.ilios.jervis.rules.roster.bb2020
 
-import dk.ilios.jervis.rules.bb2020.Agility
-import dk.ilios.jervis.rules.bb2020.General
-import dk.ilios.jervis.rules.bb2020.Passing
-import dk.ilios.jervis.rules.bb2020.Strength
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.AGILITY
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.GENERAL
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.PASSING
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.STRENGTH
 import dk.ilios.jervis.rules.roster.RosterId
 import dk.ilios.jervis.rules.skills.Block
 import dk.ilios.jervis.rules.skills.CatchSkill
@@ -11,7 +11,11 @@ import dk.ilios.jervis.rules.skills.Dodge
 import dk.ilios.jervis.rules.skills.SureHands
 import kotlinx.serialization.Serializable
 
-// Page 116 in the rulebook
+/**
+ * Human Teams
+ *
+ * See page 116 in the rulebook.
+ */
 @Serializable
 data object HumanTeam : BB2020Roster {
     val LINEMAN =
@@ -23,8 +27,8 @@ data object HumanTeam : BB2020Roster {
             50_000,
             6, 3, 3, 4, 9,
             emptyList(),
-            listOf(General),
-            listOf(Agility, Strength),
+            listOf(GENERAL),
+            listOf(AGILITY, STRENGTH),
         )
     val THROWER =
         BB2020Position(
@@ -34,9 +38,9 @@ data object HumanTeam : BB2020Roster {
             "Thrower",
             80_000,
             6, 3, 3, 2, 9,
-            listOf(SureHands.Factory),
-            listOf(General, Passing),
-            listOf(Agility, Strength),
+            listOf(/* Pass */ SureHands.Factory),
+            listOf(GENERAL, PASSING),
+            listOf(AGILITY, STRENGTH),
         )
     val CATCHER =
         BB2020Position(
@@ -47,8 +51,8 @@ data object HumanTeam : BB2020Roster {
             65_000,
             8, 2, 3, 5, 8,
             listOf(CatchSkill.Factory, Dodge.Factory),
-            listOf(Agility, General),
-            listOf(Strength, Passing),
+            listOf(AGILITY, GENERAL),
+            listOf(STRENGTH, PASSING),
         )
     val BLITZER =
         BB2020Position(
@@ -59,8 +63,8 @@ data object HumanTeam : BB2020Roster {
             85_000,
             7, 3, 3, 4, 9,
             listOf(Block.Factory),
-            listOf(General, Strength),
-            listOf(Agility, Passing),
+            listOf(GENERAL, STRENGTH),
+            listOf(AGILITY, PASSING),
         )
     val HALFLING_HOPEFUL =
         BB2020Position(
@@ -71,8 +75,8 @@ data object HumanTeam : BB2020Roster {
             30_000,
             5, 2, 3, 4, 7,
             emptyList(),
-            listOf(Agility),
-            listOf(General, Strength),
+            listOf(AGILITY),
+            listOf(GENERAL, STRENGTH),
         )
     val OGRE =
         BB2020Position(
@@ -83,12 +87,12 @@ data object HumanTeam : BB2020Roster {
             140_000,
             5, 5, 4, 5, 10,
             emptyList(),
-            listOf(Strength),
-            listOf(Agility, General),
+            listOf(STRENGTH),
+            listOf(AGILITY, GENERAL),
         )
     override val id: RosterId = RosterId("jervis-human")
     override val tier: Int = 1
-    override val specialRules: List<SpecialRules> = listOf(OldWorldClassic)
+    override val specialRules: List<SpecialRules> = listOf(RegionalSpecialRules.OLD_WORLD_CLASSIC)
     override val name: String = "Human Team"
     override val numberOfRerolls: Int = 8
     override val rerollCost: Int = 50_000

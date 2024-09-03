@@ -1,10 +1,10 @@
 package dk.ilios.jervis.rules.roster.bb2020
 
-import dk.ilios.jervis.rules.bb2020.Agility
-import dk.ilios.jervis.rules.bb2020.General
-import dk.ilios.jervis.rules.bb2020.Mutations
-import dk.ilios.jervis.rules.bb2020.Passing
-import dk.ilios.jervis.rules.bb2020.Strength
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.AGILITY
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.GENERAL
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.MUTATIONS
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.PASSING
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.STRENGTH
 import dk.ilios.jervis.rules.roster.RosterId
 import kotlinx.serialization.Serializable
 
@@ -20,8 +20,8 @@ data object KhorneTeam : BB2020Roster {
             50_000,
             6, 3, 3, 4, 8,
             emptyList(), // Frenzy
-            listOf(General, Mutations),
-            listOf(Agility, Strength),
+            listOf(GENERAL, MUTATIONS),
+            listOf(AGILITY, STRENGTH),
         )
     val KHORNGORS =
         BB2020Position(
@@ -32,8 +32,8 @@ data object KhorneTeam : BB2020Roster {
             70_000,
             6, 3, 4, 4, 9,
             emptyList(), // Horns, Juggernaut
-            listOf(General, Mutations, Strength),
-            listOf(Agility, Passing),
+            listOf(GENERAL, MUTATIONS, STRENGTH),
+            listOf(AGILITY, PASSING),
         )
     val BLOODSEEKERS =
         BB2020Position(
@@ -44,8 +44,8 @@ data object KhorneTeam : BB2020Roster {
             110_000,
             5, 4, 4, 6, 10,
             emptyList(), // Frenzy
-            listOf(General, Mutations, Strength),
-            listOf(Agility),
+            listOf(GENERAL, MUTATIONS, STRENGTH),
+            listOf(AGILITY),
         )
     val BLOODSPAWN =
         BB2020Position(
@@ -56,12 +56,12 @@ data object KhorneTeam : BB2020Roster {
             160_000,
             5, 5, 4, null, 9,
             emptyList(), // Claws, Frenzy, Loner(4+), Might Blow (+1), Unchanelled Fury
-            listOf(Mutations, Strength),
-            listOf(Agility, General),
+            listOf(MUTATIONS, STRENGTH),
+            listOf(AGILITY, GENERAL),
         )
     override val id: RosterId = RosterId("jervis-khorne")
     override val tier: Int = 2
-    override val specialRules: List<SpecialRules> = listOf(FavouredOfKhorne)
+    override val specialRules: List<SpecialRules> = listOf(TeamSpecialRules.FAVOURED_OF_KHORNE)
     override val name: String = "Chaos Dwarf"
     override val numberOfRerolls: Int = 8
     override val rerollCost: Int = 60_000

@@ -14,9 +14,9 @@ import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
@@ -27,6 +27,7 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
@@ -71,7 +72,7 @@ object FoulAction : Procedure() {
         val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetOldContext(Game::foulContext, FoulContext(player))
+            SetContext(FoulContext(player))
         )
     }
 
@@ -79,10 +80,10 @@ object FoulAction : Procedure() {
         state: Game,
         rules: Rules,
     ): Command {
-        val context = state.foulContext!!
+        val context = state.getContext<FoulContext>()
         return compositeCommandOf(
             if (context.victim != null) ReportFoulResult(context) else null,
-            SetOldContext(Game::foulContext, null),
+            RemoveContext<FoulContext>(),
             if (context.hasFouled || context.hasMoved) {
                 val team = state.activeTeam
                 SetAvailableActions(team, PlayerActionType.FOUL, team.turnData.foulActions - 1)
@@ -98,7 +99,7 @@ object FoulAction : Procedure() {
             state: Game,
             rules: Rules,
         ): List<ActionDescriptor> {
-            val fouler = state.foulContext!!.fouler
+            val fouler = state.getContext<FoulContext>().fouler
             val availableTargetPlayers = fouler.team.otherTeam().filter {
                 it.location.isOnField(rules) && (it.state == PlayerState.PRONE || it.state == PlayerState.STUNNED)
             }.map {
@@ -111,9 +112,9 @@ object FoulAction : Procedure() {
             return when (action) {
                 PlayerDeselected -> ExitProcedure()
                 is PlayerSelected -> {
-                    val context = state.foulContext!!
+                    val context = state.getContext<FoulContext>()
                     compositeCommandOf(
-                        SetOldContext(Game::foulContext, context.copy(victim = action.getPlayer(state))),
+                        SetContext(context.copy(victim = action.getPlayer(state))),
                         GotoNode(MoveOrFoulOrEndAction)
                     )
                 }
@@ -125,7 +126,7 @@ object FoulAction : Procedure() {
 
     object MoveOrFoulOrEndAction : ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.foulContext!!
+            val context = state.getContext<FoulContext>()
             val options = mutableListOf<ActionDescriptor>()
 
             // Find possible move types
@@ -145,21 +146,21 @@ object FoulAction : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.foulContext!!
+            val context = state.getContext<FoulContext>()
             return when (action) {
                 EndAction -> ExitProcedure()
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.fouler, action.moveType)
                     compositeCommandOf(
-                        SetOldContext(Game::foulContext, context.copy(hasMoved = true)),
+                        SetContext(context.copy(hasMoved = true)),
                         SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
                 is PlayerSelected -> {
-                    val foulContext = state.foulContext!!
+                    val foulContext = state.getContext<FoulContext>()
                     compositeCommandOf(
-                        SetOldContext(Game::foulContext, foulContext.copy(victim = action.getPlayer(state))),
+                        SetContext(foulContext.copy(victim = action.getPlayer(state))),
                         GotoNode(ResolveFoul)
                     )
                 }
@@ -174,7 +175,7 @@ object FoulAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their blitz
-            val context = state.foulContext!!
+            val context = state.getContext<FoulContext>()
             return if (!context.fouler.isStanding(rules)) {
                 compositeCommandOf(
                     SetTurnOver(true),

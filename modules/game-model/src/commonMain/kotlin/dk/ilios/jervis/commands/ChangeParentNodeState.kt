@@ -11,17 +11,11 @@ import dk.ilios.jervis.model.Game
  * This command alters the state of the Procedure r
  */
 class ChangeParentNodeState(private val nextState: ParentNode.State) : Command {
-    override fun execute(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun execute(state: Game, controller: GameController) {
         controller.stack.firstOrNull()!!.addParentNodeState(nextState)
     }
 
-    override fun undo(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun undo(state: Game, controller: GameController) {
         controller.stack.firstOrNull()!!.removeParentNodeState(nextState)
     }
 }

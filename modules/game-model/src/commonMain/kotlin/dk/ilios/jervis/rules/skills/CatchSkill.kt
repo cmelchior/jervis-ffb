@@ -1,16 +1,19 @@
 package dk.ilios.jervis.rules.skills
 
 import dk.ilios.jervis.procedures.DieRoll
-import dk.ilios.jervis.rules.bb2020.Agility
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class CatchSkill : BB2020Skill, D6StandardSkillReroll {
+class CatchSkill(
+    override val isTemporary: Boolean = false,
+    override val expiresAt: ResetPolicy = ResetPolicy.NEVER
+) : BB2020Skill, D6StandardSkillReroll {
     override val id: String = "catch-skill"
     override val name: String = "Catch"
     override val compulsory: Boolean = false
     override val resetAt: ResetPolicy = ResetPolicy.NEVER
-    override val category: SkillCategory = Agility
+    override val category: SkillCategory = BB2020SkillCategory.AGILITY
     override var used: Boolean = false
     override val value: Int? = null
     override val workWithoutTackleZones: Boolean = false
@@ -30,7 +33,8 @@ class CatchSkill : BB2020Skill, D6StandardSkillReroll {
     }
 
     @Serializable
-    data object Factory : SkillFactory {
-        override fun createSkill(): CatchSkill = CatchSkill()
+    data object Factory: SkillFactory {
+        override val value: Int? = null
+        override fun createSkill(isTemporary: Boolean, expiresAt: ResetPolicy): Skill = CatchSkill(isTemporary, expiresAt)
     }
 }

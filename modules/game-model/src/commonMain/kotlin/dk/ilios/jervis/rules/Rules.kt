@@ -1,7 +1,6 @@
 package dk.ilios.jervis.rules
 
 import dk.ilios.jervis.actions.D3Result
-import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.FieldCoordinate.Companion.OUT_OF_BOUNDS
@@ -12,70 +11,21 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.modifiers.CatchModifier
 import dk.ilios.jervis.model.modifiers.DiceModifier
-import dk.ilios.jervis.procedures.bb2020.kickoff.Blitz
-import dk.ilios.jervis.procedures.bb2020.kickoff.BrilliantCoaching
-import dk.ilios.jervis.procedures.bb2020.kickoff.ChangingWeather
-import dk.ilios.jervis.procedures.bb2020.kickoff.CheeringFans
-import dk.ilios.jervis.procedures.bb2020.kickoff.GetTheRef
-import dk.ilios.jervis.procedures.bb2020.kickoff.HighKick
-import dk.ilios.jervis.procedures.bb2020.kickoff.OfficiousRef
-import dk.ilios.jervis.procedures.bb2020.kickoff.PitchInvasion
-import dk.ilios.jervis.procedures.bb2020.kickoff.QuickSnap
-import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
-import dk.ilios.jervis.procedures.bb2020.kickoff.TimeOut
 import dk.ilios.jervis.rules.pathfinder.BB2020PathFinder
 import dk.ilios.jervis.rules.pathfinder.PathFinder
 import dk.ilios.jervis.rules.tables.ArgueTheCallTable
 import dk.ilios.jervis.rules.tables.CasualtyTable
 import dk.ilios.jervis.rules.tables.Direction
 import dk.ilios.jervis.rules.tables.InjuryTable
+import dk.ilios.jervis.rules.tables.KickOffEventTable
 import dk.ilios.jervis.rules.tables.LastingInjuryTable
 import dk.ilios.jervis.rules.tables.PrayersToNuffleTable
 import dk.ilios.jervis.rules.tables.RandomDirectionTemplate
 import dk.ilios.jervis.rules.tables.RangeRuler
 import dk.ilios.jervis.rules.tables.StuntyInjuryTable
-import dk.ilios.jervis.rules.tables.TableResult
 import dk.ilios.jervis.rules.tables.ThrowInPosition
 import dk.ilios.jervis.rules.tables.ThrowInTemplate
 import dk.ilios.jervis.rules.tables.WeatherTable
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
-
-interface BloodBowl
-
-interface DungeonBowl
-
-interface BloodBowl7
-
-/**
- * Class representing the Kick-Off Event Table on page 41 in the rulebook.
- */
-object KickOffEventTable {
-    private val table =
-        mapOf(
-            2 to TableResult("Get the Ref", GetTheRef),
-            3 to TableResult("Time Out", TimeOut),
-            4 to TableResult("Solid Defense", SolidDefense),
-            5 to TableResult("High Kick", HighKick),
-            6 to TableResult("Cheering Fans", CheeringFans),
-            7 to TableResult("Brilliant Coaching", BrilliantCoaching),
-            8 to TableResult("Changing Weather", ChangingWeather),
-            9 to TableResult("Quick Snap", QuickSnap),
-            10 to TableResult("Blitz", Blitz),
-            11 to TableResult("Officious Ref", OfficiousRef),
-            12 to TableResult("Pitch Invasion", PitchInvasion),
-        )
-
-    /**
-     * Roll on the Kick-Off table and return the result.
-     */
-    fun roll(
-        die1: D6Result,
-        die2: D6Result,
-    ): TableResult {
-        val result = die1.value + die2.value
-        return table[result] ?: INVALID_GAME_STATE("$result was not found in the Kick-Off Event Table.")
-    }
-}
 
 interface Rules {
     fun isValidSetup(state: Game): Boolean {
@@ -322,20 +272,21 @@ interface Rules {
     val name: String
 
     // Characteristic limits
+    // See page 28 in the rulebook
     val moveRange: IntRange
         get() = 1..9
 
     val strengthRange: IntRange
         get() = 1..8
 
-    val agilityRange: IntProgression
-        get() = 6 downTo 1
+    val agilityRange: IntRange
+        get() = 1 .. 6
 
-    val passingRange: IntProgression
-        get() = 6 downTo 1
+    val passingRange: IntRange
+        get() = 1.. 6
 
-    val armorValueRange: IntProgression
-        get() = 11 downTo 1
+    val armorValueRange: IntRange
+        get() = 3 .. 11
 
     val rushesPrAction: Int
         get() = 2

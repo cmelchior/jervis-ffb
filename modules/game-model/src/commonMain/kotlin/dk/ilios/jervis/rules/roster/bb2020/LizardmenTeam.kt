@@ -1,9 +1,9 @@
 package dk.ilios.jervis.rules.roster.bb2020
 
-import dk.ilios.jervis.rules.bb2020.Agility
-import dk.ilios.jervis.rules.bb2020.General
-import dk.ilios.jervis.rules.bb2020.Passing
-import dk.ilios.jervis.rules.bb2020.Strength
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.AGILITY
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.GENERAL
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.PASSING
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.STRENGTH
 import dk.ilios.jervis.rules.roster.RosterId
 import dk.ilios.jervis.rules.skills.Dodge
 import dk.ilios.jervis.rules.skills.PrehensileTail
@@ -26,8 +26,8 @@ data object LizardmenTeam : BB2020Roster {
             60_000,
             8, 2, 3, 4, 8,
             listOf(Dodge.Factory, Stunty.Factory),
-            listOf(Agility),
-            listOf(General, Passing, Strength),
+            listOf(AGILITY),
+            listOf(GENERAL, PASSING, STRENGTH),
         )
     val CHAMELEON_SKINKS =
         BB2020Position(
@@ -38,8 +38,8 @@ data object LizardmenTeam : BB2020Roster {
             70_000,
             7, 2, 3, 3, 8,
             listOf(Dodge.Factory, /* On the Ball, Shadowing */ Stunty.Factory),
-            listOf(Agility),
-            listOf(General, Passing, Strength),
+            listOf(AGILITY),
+            listOf(GENERAL, PASSING, STRENGTH),
         )
     val SAURUS_BLOCKERS =
         BB2020Position(
@@ -50,8 +50,8 @@ data object LizardmenTeam : BB2020Roster {
             85_000,
             6, 4, 5, 6, 10,
             emptyList(),
-            listOf(General, Strength),
-            listOf(Agility),
+            listOf(GENERAL, STRENGTH),
+            listOf(AGILITY),
         )
     val KROXIGOR =
         BB2020Position(
@@ -62,13 +62,13 @@ data object LizardmenTeam : BB2020Roster {
             140_000,
             6, 5, 5, null, 10,
             listOf(/* Bone Head, Loner (4+), Might Blow (1+), Thick Skull */ PrehensileTail.Factory),
-            listOf(Strength),
-            listOf(Agility, General),
+            listOf(STRENGTH),
+            listOf(AGILITY, GENERAL),
         )
 
     override val id: RosterId = RosterId("jervis-lizardmen")
     override val tier: Int = 1
-    override val specialRules: List<SpecialRules> = listOf(LustrianSuperLeague)
+    override val specialRules: List<SpecialRules> = listOf(RegionalSpecialRules.LUSTRIAN_SUPERLEAGUE)
     override val name: String = "Lizardmen Team"
     override val numberOfRerolls: Int = 8
     override val rerollCost: Int = 70_000

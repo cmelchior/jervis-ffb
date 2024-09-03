@@ -25,6 +25,7 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.procedures.actions.block.PushStep.ResolvePush
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -69,7 +70,7 @@ data class PushContext(
  * it is resolved here.
  *
  * Pushing players is a complicated process, involving a lot of skills. The logic is
- * implemented the following way, with Player A = pusher and Player B = pushee.
+ * implemented in the following way, with Player A = pusher and Player B = pushee.
  *
  * 1. Player A starts blitz or block and must decide to use Juggernaut or not (before the push start).
  *    a. Cannot be used on chain pushes.
@@ -115,25 +116,39 @@ data class PushContext(
  *   in case of a circular chain. (But the players are not actively moved until the
  *   entire chain is resolved).
  *
- * - If Player A is moved away from Player B's starting square, they are no longer
- *   allowed to follow up. The reason is due to the following sentence in the rules:
- *   "Sometimes, a player must follow-up due to an in-game effect, a special rule,
- *   or a Skill or Trait, whether they want to or not.", in this case, the in-game
- *   effect is Push/Chain-push.
+ * - If Player A is moved away so it is no longer adjacent to Player B's starting square,
+ *   they are no longer allowed to follow up. The reason is due to the following
+ *   sentence in the rules: "Sometimes, a player must follow-up due to an in-game effect,
+ *   a special rule, or a Skill or Trait, whether they want to or not.", in this case,
+ *   the in-game effect is Push/Chain-push.
  *
  * - Due to the possibility of circular chain pushes, we risk having two players
  *   in the same location no matter if the chain is resolved from the start or
  *   from the end. To make it more natural, we thus resolve from the beginning,
  *   which also means that being pushed into the crowd is resolved at the end.
  *
- *   This means a push is modeled this way:
- *   ```
+ * This also affects Treacherous Trapdoor, if a chain-push results in a player
+ * being pushed into another square with a player, what happens?
+ *
+ *   a. The player can fall into the trapdoor before chain pushing the other player out.
+ *      If it falls through, the chain just stops there. The original player stays on the
+ *      trapdoor.
+ *   b. The check for trapdoor isn't done until after the full chain is resolved.
+ *      Potentially leaving a "hole" in the chain.
+ *
+ * You could probably argue for both interpretations, so in this case, we use option A,
+ * as it is easier to implement in [ResolvePush]. However, due to how the logic is setup,
+ * you select all steps of the chain without checking for trapdoors, and the trapdoor check
+ * is then done when fully resolving the chain.
+ *
+ * This means a push is modeled this way:
+ * ```
  *   for_each_step_in_chain {
  *      playerA.location = pushed_into_location
  *      field.get(pushed_into_location) = playerA
  *      // At this point in time playerA.location == playerB.location (which is fine)
  *   }
- *  ```
+ * ```
  */
 object PushStep: Procedure() {
 
@@ -322,8 +337,8 @@ object PushStep: Procedure() {
             val pushOptions = rules.getPushOptions(lastPushInChain.pusher, lastPushInChain.pushee)
 
             // Calculate all push options taking into account a chain push in progress.
-            // In chain pushes, only the square of Player B might be empty,
-            // but it might not be in case of a circular chain.
+            // In chain pushes, only the square of Player B could be empty, but it might
+            // not be in case of a circular chain.
             val emptyFields = isSquaresEmptyForPushing(pushContext, pushOptions, state)
             return if (emptyFields.isNotEmpty()) {
                 emptyFields.map { SelectFieldLocation.push(it) }
@@ -354,7 +369,7 @@ object PushStep: Procedure() {
                     // Player was moved into an empty square, which means we can start resolving
                     // the entire chain.
                     compositeCommandOf(
-                        SetOldContext<PushContext>(Game::pushContext, updatedContext),
+                        SetOldContext(Game::pushContext, updatedContext),
                         GotoNode(ResolvePush)
                     )
                 } else {
@@ -368,7 +383,7 @@ object PushStep: Procedure() {
                     )
                     val newContext = updatedContext.copyAddPushChain(newPush)
                     compositeCommandOf(
-                        SetOldContext<PushContext>(Game::pushContext, newContext),
+                        SetOldContext(Game::pushContext, newContext),
                         GotoNode(DecideToUseJuggernaut)
                     )
                 }
@@ -401,8 +416,8 @@ object PushStep: Procedure() {
                 val to = push.to!!
                 if (to == FieldCoordinate.OUT_OF_BOUNDS) {
                     // We do not know where the player is going until after the injury roll,
-                    // but they are neither on the field or in the dogout. The pusher must
-                    // decide whether to follow up before any injury roll.
+                    // but they are not on the field. The pusher must decide whether to
+                    // follow up before any injury roll.
                     SetPlayerLocation(push.pushee, FieldCoordinate.UNKNOWN)
                 } else {
                     SetPlayerLocation(push.pushee, to)

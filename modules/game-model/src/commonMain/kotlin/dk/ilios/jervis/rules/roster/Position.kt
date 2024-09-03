@@ -4,6 +4,7 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.SkillFactory
 
 
@@ -22,6 +23,7 @@ interface Position {
     val skills: List<SkillFactory>
 
     fun createPlayer(
+        rules: Rules,
         team: Team,
         id: PlayerId,
         name: String,

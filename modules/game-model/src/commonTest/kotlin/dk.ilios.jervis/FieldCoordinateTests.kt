@@ -7,14 +7,12 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 
 fun getDefaultTestSetup(rules: Rules): Game {
-    val rules = BB2020Rules
     val team1: Team =
-        teamBuilder(HumanTeam) {
+        teamBuilder(rules, HumanTeam) {
             coach = Coach(CoachId("home-coach"), "HomeCoach")
             name = "HomeTeam"
             addPlayer(PlayerId("H1"), "Lineman-1", PlayerNo(1), HumanTeam.LINEMAN)

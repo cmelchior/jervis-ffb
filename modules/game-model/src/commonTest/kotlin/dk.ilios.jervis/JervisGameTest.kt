@@ -33,25 +33,31 @@ import dk.ilios.jervis.utils.createDefaultGameState
 import dk.ilios.jervis.utils.setupTeamsOnField
 import kotlin.test.BeforeTest
 
-abstract class GameFlowTests {
+/**
+ * Abstract class for tests that involving testing the flow of
+ * events during a real game.
+ *
+ * This class makes it easier to setup and manipulate the
+ */
+abstract class JervisGameTest {
 
     val rules = BB2020Rules
-    lateinit var state: Game
-    lateinit var controller: GameController
-    lateinit var homeTeam: Team
-    lateinit var awayTeam: Team
+    protected lateinit var state: Game
+    protected lateinit var controller: GameController
+    protected lateinit var homeTeam: Team
+    protected lateinit var awayTeam: Team
 
     @BeforeTest
     open fun setUp() {
         state = createDefaultGameState(rules).apply {
             // Should be on LoS
             homeTeam[PlayerNo(1)]!!.apply {
-                addSkill(BreakTackle.Factory.createSkill())
+                addSkill(BreakTackle())
                 baseStrenght = 4
             }
             // Should be on LoS
             homeTeam[PlayerNo(2)]!!.apply {
-                addSkill(BreakTackle.Factory.createSkill())
+                addSkill(BreakTackle())
                 baseStrenght = 5
             }
         }
@@ -80,6 +86,12 @@ fun defaultFanFactor() = arrayOf(
 
 fun defaultWeather() = DiceResults(3.d6, 4.d6)
 
+fun defaultJourneyMen() = emptyArray<GameAction>()
+
+fun defaultInducements() = emptyArray<GameAction>()
+
+fun defaultPrayersToNuffle() = emptyArray<GameAction>()
+
 fun defaultDetermineKickingTeam() = arrayOf(
     CoinSideSelected(Coin.HEAD), // Home: Select side
     CoinTossResult(Coin.HEAD), // Flip coin
@@ -89,9 +101,9 @@ fun defaultDetermineKickingTeam() = arrayOf(
 fun defaultPregame(
     fanFactor: Array<out GameAction> = defaultFanFactor(),
     weatherRoll: DiceResults = defaultWeather(),
-    journeyMen: Array<out GameAction> = emptyArray(),
-    inducements: Array<out GameAction> = emptyArray(),
-    prayersToNuffle: Array<out GameAction> = emptyArray(),
+    journeyMen: Array<out GameAction> = defaultJourneyMen(),
+    inducements: Array<out GameAction> = defaultInducements(),
+    prayersToNuffle: Array<out GameAction> = defaultPrayersToNuffle(),
     determineKickingTeam: Array<out GameAction> = defaultDetermineKickingTeam(),
 ) = arrayOf(
     *fanFactor,

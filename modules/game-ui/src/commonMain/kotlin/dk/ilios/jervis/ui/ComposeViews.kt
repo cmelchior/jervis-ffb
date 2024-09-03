@@ -60,6 +60,7 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.PlayerSubActionSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
+import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
 import dk.ilios.jervis.ui.viewmodel.CompositeUserInput
@@ -315,6 +316,7 @@ fun ActionSelector(
                                     Undo -> TODO()
                                     is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
                                     is PlayerSubActionSelected -> action.action.toString()
+                                    is SkillSelected -> action.skill.toString()
                                 }
                             Text(text, fontSize = 10.sp)
                         }

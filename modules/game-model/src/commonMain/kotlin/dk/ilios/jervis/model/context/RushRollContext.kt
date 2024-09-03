@@ -18,9 +18,9 @@ data class RushRollContext(
     val modifiers: List<DiceModifier> = emptyList(),
     val isSuccess: Boolean = false
 ): ProcedureContext {
-    fun copyAndAddModifier(modifier: DiceModifier): RushRollContext {
+    fun copyAndAddModifier(vararg modifiers: DiceModifier): RushRollContext {
         return this.copy(
-            modifiers = this.modifiers + modifier,
+            modifiers = this.modifiers + modifiers,
         )
     }
 }

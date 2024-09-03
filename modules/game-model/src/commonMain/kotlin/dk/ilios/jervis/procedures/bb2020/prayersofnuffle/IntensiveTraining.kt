@@ -1,43 +1,93 @@
 package dk.ilios.jervis.procedures.bb2020.prayersofnuffle
 
 import compositeCommandOf
+import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.SelectPlayer
+import dk.ilios.jervis.actions.SelectSkill
+import dk.ilios.jervis.actions.SkillSelected
+import dk.ilios.jervis.commands.AddPlayerSkill
+import dk.ilios.jervis.commands.AddPrayersToNuffle
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.fsm.ComputationNode
+import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.hasSkill
+import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
 import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.roster.bb2020.BB2020Position
+import dk.ilios.jervis.rules.skills.Loner
+import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.tables.PrayerToNuffle
+import dk.ilios.jervis.utils.INVALID_ACTION
+
+data class IntensiveTrainingContext(
+    val player: Player,
+): ProcedureContext
 
 /**
  * Procedure for handling the Prayer of Nuffle "Intensive Training" as described on page 39
  * of the rulebook.
  */
 object IntensiveTraining : Procedure() {
-    override val initialNode: Node = ApplyEvent
+    override val initialNode: Node = SelectPlayer
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<PrayersToNuffleRollContext>()
+    }
 
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    object SelectPlayer : ActionNode() {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            return state.activeTeam
+                .filter { it.state == PlayerState.STANDING }
+                .filter { !it.hasSkill<Loner>() }
+                .map { SelectPlayer(it) }
+        }
 
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return checkType<PlayerSelected>(action) {
+                return compositeCommandOf(
+                    SetContext(IntensiveTrainingContext(it.getPlayer(state))),
+                    GotoNode(SelectSkill)
+                )
+            }
+        }
+    }
 
-    object ApplyEvent : ComputationNode() {
-        // TODO Figure out how to do this
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
-            return compositeCommandOf(
-                SimpleLogEntry("Do Intensive Training!", category = LogCategory.GAME_PROGRESS),
-                ExitProcedure(),
-            )
+    object SelectSkill : ActionNode() {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            val context = state.getContext<IntensiveTrainingContext>()
+            return (context.player.position as BB2020Position).primary.flatMap { it.skills }.map {
+                SelectSkill(it)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return checkType<SkillSelected>(action) {
+                if (!getAvailableActions(state, rules).contains(SelectSkill(it.skill))) {
+                    INVALID_ACTION(action, "Skill isn't a primary skill")
+                }
+                val context = state.getContext<IntensiveTrainingContext>()
+                val skill = it.skill.createSkill(isTemporary = true, expiresAt = ResetPolicy.END_OF_GAME)
+                return compositeCommandOf(
+                    AddPlayerSkill(context.player, skill),
+                    SimpleLogEntry("${context.player.name} receives ${skill.name} due to Intensive Training", category = LogCategory.GAME_PROGRESS),
+                    ExitProcedure()
+                )
+            }
         }
     }
 }

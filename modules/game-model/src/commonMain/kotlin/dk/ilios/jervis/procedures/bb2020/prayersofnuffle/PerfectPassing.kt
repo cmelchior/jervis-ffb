@@ -7,6 +7,8 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
 import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
@@ -17,16 +19,11 @@ import dk.ilios.jervis.rules.Rules
  */
 object PerfectPassing : Procedure() {
     override val initialNode: Node = ApplyEvent
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<PrayersToNuffleRollContext>()
+    }
 
     object ApplyEvent : ComputationNode() {
         // TODO Figure out how to do this
@@ -35,7 +32,7 @@ object PerfectPassing : Procedure() {
             rules: Rules,
         ): Command {
             return compositeCommandOf(
-                SimpleLogEntry("Do Perfect Passing!", category = LogCategory.GAME_PROGRESS),
+                SimpleLogEntry("${state.activeTeam} receives Perfect Passing", category = LogCategory.GAME_PROGRESS),
                 ExitProcedure(),
             )
         }

@@ -50,11 +50,11 @@ object PitchInvasionMapper: CommandActionMapper {
             }
         if (homeStuns.isNotEmpty()) {
             newActions.add(D3Result(homeStuns.size), PitchInvasion.RollForHomeTeamStuns)
-            newActions.add(RandomPlayersSelected(homeStuns), PitchInvasion.ResolveHomeTeamStuns)
+            newActions.add(RandomPlayersSelected(homeStuns.map { it.id }), PitchInvasion.ResolveHomeTeamStuns)
         }
         if (awayStuns.isNotEmpty()) {
             newActions.add(D3Result(awayStuns.size), PitchInvasion.RollForAwayTeamStuns)
-            newActions.add(RandomPlayersSelected(awayStuns), PitchInvasion.RollForHomeTeamStuns)
+            newActions.add(RandomPlayersSelected(awayStuns.map { it.id }), PitchInvasion.RollForHomeTeamStuns)
         }
     }
 }

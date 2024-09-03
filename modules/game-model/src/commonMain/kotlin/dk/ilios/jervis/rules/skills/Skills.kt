@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 enum class DiceRollType {
     ACCURACY, // For passing
     ARMOUR,
+    BAD_HABITS,
     BLOCK,
     BLOODLUST,
     BONE_HEAD,
@@ -30,6 +31,7 @@ enum class DiceRollType {
     LONER,
     PASS,
     PICKUP,
+    PRAYERS_TO_NUFFLE,
     REALLY_STUPID,
     REGENERATION,
     PRO,
@@ -37,7 +39,9 @@ enum class DiceRollType {
     SCATTER,
     SWELTERING_HEAT,
     TAKE_ROOT,
+    THROW_A_ROCK,
     THROW_TEAM_MATE,
+    TREACHEROUS_TRAPDOOR,
     WEATHER,
     WILD_ANIMAL,
 }
@@ -141,11 +145,14 @@ data class DiceRerollOption(
 )
 
 // When does the "used" state reset?
+// TODO Rename to Duration?
 enum class ResetPolicy {
     NEVER,
+    END_OF_ACTIVATION,
     END_OF_TURN,
     END_OF_DRIVE,
     END_OF_HALF,
+    END_OF_GAME,
     SPECIAL,
 }
 
@@ -171,19 +178,23 @@ sealed interface Skill {
     val workWithoutTackleZones: Boolean
     // Whether this skill works when the player is prone or stunned
     val workWhenProne: Boolean
+    // Whether or not this skill is temporary
+    val isTemporary: Boolean
+    val expiresAt: ResetPolicy
 }
 
-// TODO Find a better way to serialize these,
-//  so it also works well when naming the skill in the Position list
+// TODO Not really liking this API. Is there a good way to serialize them?
+//  Also it doesn't look nice when naming the skill in the Position list
 //  Ideally this `listOf(SureHands)`, not `listOf(SureHands.Factory)`
 @Serializable
 sealed interface SkillFactory {
-    fun createSkill(): Skill
+    val value: Int?
+    fun createSkill(isTemporary: Boolean = false, expiresAt: ResetPolicy = ResetPolicy.NEVER): Skill
 }
 
 interface SkillCategory {
     val id: Long
-    val name: String
+    val description: String
 }
 
 @Serializable

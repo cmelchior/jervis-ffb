@@ -6,6 +6,7 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandReplay
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.fumbbl.utils.fromFumbblState
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.utils.platformFileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -41,8 +42,9 @@ class FumbblReplayAdapter(private var replayFile: Path, private val checkCommand
         val commands: MutableList<ServerCommandReplay> = mutableListOf()
 
         adapter.start()
+        val rules = BB2020Rules // How do we figure out which ruleset this game is uing?
         fumbblGame = adapter.getGame()
-        jervisGame = Game.fromFumbblState(fumbblGame)
+        jervisGame = Game.fromFumbblState(rules, fumbblGame)
         var isDone = false
         while (!isDone) {
             val cmd = adapter.receive()

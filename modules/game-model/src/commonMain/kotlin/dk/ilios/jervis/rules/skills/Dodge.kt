@@ -1,16 +1,19 @@
 package dk.ilios.jervis.rules.skills
 
 import dk.ilios.jervis.procedures.DieRoll
-import dk.ilios.jervis.rules.bb2020.General
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Dodge : BB2020Skill, D6StandardSkillReroll {
+class Dodge(
+    override val isTemporary: Boolean = false,
+    override val expiresAt: ResetPolicy = ResetPolicy.NEVER
+) : BB2020Skill, D6StandardSkillReroll {
     override val id: String = "dodge-skill"
     override val name: String = "Dodge"
     override val compulsory: Boolean = false
     override val resetAt: ResetPolicy = ResetPolicy.NEVER
-    override val category: SkillCategory = General
+    override val category: SkillCategory = BB2020SkillCategory.AGILITY
     override var used: Boolean = false
     override val value: Int? = null
     override val workWithoutTackleZones: Boolean = false
@@ -26,6 +29,7 @@ class Dodge : BB2020Skill, D6StandardSkillReroll {
 
     @Serializable
     data object Factory: SkillFactory {
-        override fun createSkill() = Dodge()
+        override val value: Int? = null
+        override fun createSkill(isTemporary: Boolean, expiresAt: ResetPolicy): Skill = Dodge(isTemporary, expiresAt)
     }
 }

@@ -52,6 +52,8 @@ import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.actions.SelectRerollOption
+import dk.ilios.jervis.actions.SelectSkill
+import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Coin
@@ -67,6 +69,8 @@ import dk.ilios.jervis.procedures.DetermineKickingTeam
 import dk.ilios.jervis.procedures.DeviateRoll
 import dk.ilios.jervis.procedures.FanFactorRolls
 import dk.ilios.jervis.procedures.PickupRoll
+import dk.ilios.jervis.procedures.PrayersToNuffleRoll
+import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
 import dk.ilios.jervis.procedures.Scatter
 import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.procedures.TheKickOff
@@ -77,12 +81,14 @@ import dk.ilios.jervis.procedures.actions.block.BothDown
 import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.actions.block.Stumble
 import dk.ilios.jervis.procedures.actions.foul.ArgueTheCallRoll
+import dk.ilios.jervis.procedures.actions.foul.FoulContext
 import dk.ilios.jervis.procedures.actions.foul.FoulStep
 import dk.ilios.jervis.procedures.actions.move.DodgeRoll
 import dk.ilios.jervis.procedures.actions.move.RushRoll
 import dk.ilios.jervis.procedures.actions.move.calculateOptionsForMoveType
 import dk.ilios.jervis.procedures.actions.pass.AccuracyRoll
 import dk.ilios.jervis.procedures.actions.pass.PassContext
+import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.BadHabits
 import dk.ilios.jervis.procedures.injury.ArmourRoll
 import dk.ilios.jervis.procedures.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.injury.InjuryRoll
@@ -309,12 +315,16 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             }
 
             is ArgueTheCallRoll.RollDice -> {
-                DiceRollUserInputDialog.createArgueTheCallRollDialog(controller.state.foulContext!!, rules)
+                DiceRollUserInputDialog.createArgueTheCallRollDialog(controller.state.getContext<FoulContext>(), rules)
             }
 
             is ArmourRoll.RollDice -> {
                 val player = controller.state.riskingInjuryRollsContext!!.player
                 DiceRollUserInputDialog.createArmourRollDialog(player)
+            }
+
+            BadHabits.RollDie -> {
+                DiceRollUserInputDialog.createBadHabitsRoll()
             }
 
             is BlockRoll.ChooseResultOrReRollSource -> {
@@ -412,7 +422,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             }
 
             is FoulStep.DecideToArgueTheCall -> {
-                SingleChoiceInputDialog.createArgueTheCallDialog(controller.state.foulContext!!)
+                SingleChoiceInputDialog.createArgueTheCallDialog(controller.state.getContext<FoulContext>())
             }
 
             is InjuryRoll.RollDice -> {
@@ -438,6 +448,12 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                     D6Result.allOptions(),
                 )
             }
+
+            PrayersToNuffleRoll.RollDie -> {
+                val context = controller.state.getContext<PrayersToNuffleRollContext>()
+                DiceRollUserInputDialog.createPrayersToNuffleRollDialog(controller.rules, context.rollsRemaining)
+            }
+
             is PushStep.DecideToFollowUp -> {
                 SingleChoiceInputDialog.createFollowUpDialog(
                     controller.state.pushContext!!.pusher
@@ -652,6 +668,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                 is SelectRerollOption -> RerollOptionSelected(action.option)
                 is SelectDiceResult -> action.choices.random()
                 is SelectMoveType -> MoveTypeSelected(action.type)
+                is SelectSkill -> SkillSelected(action.skill)
             }
         }
     }

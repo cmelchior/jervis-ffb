@@ -10,5 +10,5 @@ class ReportPrayersOfNuffleRoll(
     result: TableResult,
 ) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
-    override val message: String = "${team.name} rolled ${dieRoll.toLogString()} on the Prayers of Nuffle Table: ${result.name}"
+    override val message: String = "${team.name} rolled ${dieRoll.toLogString()} on the Prayers of Nuffle Table: ${result.description}"
 }

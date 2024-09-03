@@ -95,7 +95,7 @@ data class DiceRollUserInputDialog(
                         rules.kickOffEventTable.roll(
                             rolls.first() as D6Result,
                             rolls.last() as D6Result,
-                        ).name
+                        ).description
                     "$description(${rolls.sumOf { it.value }})"
                 },
             )
@@ -172,7 +172,7 @@ data class DiceRollUserInputDialog(
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
                 result = { rolls: DiceResults ->
                     val result = rules.lastingInjuryTable.roll(rolls.first() as D6Result)
-                    "(${rolls.sum()}) ${result.title}"
+                    "(${rolls.sum()}) ${result.description}"
                 },
             )
         }
@@ -249,6 +249,26 @@ data class DiceRollUserInputDialog(
                 message = "Roll D3 to find number of affected players.",
                 dice = listOf(Pair(Dice.D3, D3Result.allOptions())),
                 result = { rolls: DiceResults -> null }
+            )
+        }
+
+        fun createPrayersToNuffleRollDialog(rules: Rules, rollsRemaining: Int): UserInput {
+            return DiceRollUserInputDialog(
+                title = "Prayer to Nuffle Roll ($rollsRemaining rolls)",
+                message = "Roll D16 to choose a prayer",
+                dice = listOf(Pair(Dice.D16, D16Result.allOptions())),
+                result = { rolls: DiceResults ->
+                    rules.prayersToNuffleTable.roll(rolls.first() as D16Result).description
+                }
+            )
+        }
+
+        fun createBadHabitsRoll(): UserInput {
+            return DiceRollUserInputDialog(
+                title = "Bad Habits Roll",
+                message = "Roll D3 to find number of affected players",
+                dice = listOf(Pair(Dice.D3, D3Result.allOptions())),
+                result = { _: DiceResults -> null }
             )
         }
     }

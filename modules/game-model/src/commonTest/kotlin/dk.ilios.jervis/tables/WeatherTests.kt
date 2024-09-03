@@ -1,9 +1,8 @@
 package dk.ilios.jervis.tables
 
-import dk.ilios.jervis.GameFlowTests
+import dk.ilios.jervis.JervisGameTest
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.DiceResults
-import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
@@ -46,7 +45,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.fail
 
-class WeatherTests: GameFlowTests() {
+class WeatherTests: JervisGameTest() {
 
     @Test
     fun weatherRollChangesWeather() {
@@ -70,11 +69,11 @@ class WeatherTests: GameFlowTests() {
             *endTurns(16),
             2.d3, // Home Heat roll
             RandomPlayersSelected(listOf(
-                homeTeam[PlayerNo(1)]!!,
-                homeTeam[PlayerNo(2)]!!,
+                homeTeam[PlayerNo(1)]!!.id,
+                homeTeam[PlayerNo(2)]!!.id,
             )),
             1.d3, // Away Heat roll
-            RandomPlayersSelected(listOf(awayTeam[PlayerNo(1)]!!)),
+            RandomPlayersSelected(listOf(awayTeam[PlayerNo(1)]!!.id)),
         )
         assertEquals(Weather.SWELTERING_HEAT, state.weather)
         assertEquals(2, state.halfNo) // We are at the start of 2nd drive.

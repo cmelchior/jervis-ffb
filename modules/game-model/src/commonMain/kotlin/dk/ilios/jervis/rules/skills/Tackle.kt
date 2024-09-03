@@ -1,15 +1,18 @@
 package dk.ilios.jervis.rules.skills
 
-import dk.ilios.jervis.rules.bb2020.General
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Tackle : BB2020Skill {
+class Tackle(
+    override val isTemporary: Boolean = false,
+    override val expiresAt: ResetPolicy = ResetPolicy.NEVER
+) : BB2020Skill {
     override val id: String = "tackle-skill"
     override val name: String = "Tackle"
     override val compulsory: Boolean = false
     override val resetAt: ResetPolicy = ResetPolicy.NEVER
-    override val category: SkillCategory = General
+    override val category: SkillCategory = BB2020SkillCategory.GENERAL
     override var used: Boolean = false
     override val value: Int? = null
     override val workWithoutTackleZones: Boolean = false
@@ -17,6 +20,7 @@ class Tackle : BB2020Skill {
 
     @Serializable
     data object Factory: SkillFactory {
-        override fun createSkill() = Tackle()
+        override val value: Int? = null
+        override fun createSkill(isTemporary: Boolean, expiresAt: ResetPolicy): Skill = Tackle(isTemporary, expiresAt)
     }
 }

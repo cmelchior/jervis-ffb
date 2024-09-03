@@ -1,6 +1,6 @@
 package dk.ilios.jervis.rules.skills
 
-import dk.ilios.jervis.rules.bb2020.Traits
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
 import kotlinx.serialization.Serializable
 
 /**
@@ -9,12 +9,15 @@ import kotlinx.serialization.Serializable
  * See page 86 in the rulebook.
  */
 @Serializable
-class Stunty : BB2020Skill{
+class Stunty(
+    override val isTemporary: Boolean = false,
+    override val expiresAt: ResetPolicy = ResetPolicy.NEVER
+) : BB2020Skill{
     override val id: String = "stunty-skill"
     override val name: String = "Stunty"
     override val compulsory: Boolean = true
     override val resetAt: ResetPolicy = ResetPolicy.NEVER
-    override val category: SkillCategory = Traits
+    override val category: SkillCategory = BB2020SkillCategory.TRAITS
     override var used: Boolean = false
     override val value: Int? = null
     override val workWithoutTackleZones: Boolean = false
@@ -22,6 +25,7 @@ class Stunty : BB2020Skill{
 
     @Serializable
     data object Factory: SkillFactory {
-        override fun createSkill() = Stunty()
+        override val value: Int? = null
+        override fun createSkill(isTemporary: Boolean, expiresAt: ResetPolicy): Skill = Stunty(isTemporary, expiresAt)
     }
 }

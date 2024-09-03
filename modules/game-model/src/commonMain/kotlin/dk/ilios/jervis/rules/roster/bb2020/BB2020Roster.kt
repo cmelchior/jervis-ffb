@@ -4,6 +4,7 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.Roster
@@ -33,12 +34,21 @@ data class BB2020Position(
     val secondary: List<BB2020SkillCategory>,
 ) : Position {
     override fun createPlayer(
+        rules: Rules,
         team: Team,
         id: PlayerId,
         name: String,
         number: PlayerNo,
     ): Player {
-        return Player(id, this).apply {
+        return Player(
+            id,
+            this,
+            rules.moveRange,
+            rules.strengthRange,
+            rules.agilityRange,
+            rules.passingRange,
+            rules.armorValueRange
+        ).apply {
             this.team = team
             this.name = name
             this.number = number

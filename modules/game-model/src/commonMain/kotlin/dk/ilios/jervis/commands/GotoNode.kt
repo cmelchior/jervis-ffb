@@ -10,10 +10,7 @@ import dk.ilios.jervis.reports.SimpleLogEntry
 class GotoNode(private val nextNode: Node) : Command {
     private lateinit var logEntry1: LogEntry
 
-    override fun execute(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun execute(state: Game, controller: GameController) {
         logEntry1 = SimpleLogEntry("Transition to: ${controller.currentProcedure()!!.name()}[${nextNode.name()}]")
         controller.addLog(logEntry1)
         controller.addNode(nextNode)
@@ -22,10 +19,7 @@ class GotoNode(private val nextNode: Node) : Command {
         }
     }
 
-    override fun undo(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun undo(state: Game, controller: GameController) {
         if (controller.currentProcedure()!!.currentNode() is ParentNode) {
             controller.currentProcedure()!!.removeParentNodeState(ParentNode.State.ENTERING)
         }

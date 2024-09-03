@@ -1,15 +1,18 @@
 package dk.ilios.jervis.rules.skills
 
-import dk.ilios.jervis.rules.bb2020.General
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Block : BB2020Skill {
+class Block(
+    override val isTemporary: Boolean = false,
+    override val expiresAt: ResetPolicy = ResetPolicy.NEVER
+) : BB2020Skill {
     override val id: String = "block-skill"
     override val name: String = "Block"
     override val compulsory: Boolean = false
     override val resetAt: ResetPolicy = ResetPolicy.NEVER
-    override val category: SkillCategory = General
+    override val category: SkillCategory = BB2020SkillCategory.GENERAL
     override var used: Boolean = false // This skill is always available
     override val value: Int? = null // Skill has no value
     override val workWithoutTackleZones: Boolean = false
@@ -17,6 +20,7 @@ class Block : BB2020Skill {
 
     @Serializable
     data object Factory: SkillFactory {
-        override fun createSkill() = Block()
+        override val value: Int? = null
+        override fun createSkill(isTemporary: Boolean, expiresAt: ResetPolicy): Skill = Block(isTemporary, expiresAt)
     }
 }

@@ -78,15 +78,19 @@ object GameDrive : Procedure() {
     object Turn : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules) = TeamTurn
         override fun onExitNode(state: Game, rules: Rules): Command {
+            // TODO This logic is completely messed up. A Drive also ends at the end of the half
             val switchTeamCommands =
                 compositeCommandOf(
                     SetActiveTeam(state.inactiveTeam),
                     SetKickingTeam(state.receivingTeam),
                 )
-            val goalScored = state.goalScored
+            val goalScored = state.goalScored || state.isTurnOver
             return if (goalScored) {
                 // TODO this is probably wrong if the inactive team scored. I.e. at the end of the half
-                switchTeamCommands + ExitProcedure()
+                compositeCommandOf(
+                    switchTeamCommands,
+                    ExitProcedure()
+                )
             } else if (state.homeTeam.turnData.currentTurn == rules.turnsPrHalf && state.awayTeam.turnData.currentTurn == rules.turnsPrHalf) {
                 GotoNode(ResolveEndOfDrive)
                 // The other team can continue the drive

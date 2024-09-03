@@ -1,12 +1,12 @@
 package dk.ilios.jervis.pregame
 
-import dk.ilios.jervis.GameFlowTests
+import dk.ilios.jervis.JervisGameTest
 import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.procedures.FanFactorRolls
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class FanFactorRollTests: GameFlowTests() {
+class FanFactorRollTests: JervisGameTest() {
 
     @Test
     fun rollingForFanFactor() {

@@ -23,6 +23,7 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.PlayerSubActionSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
+import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
@@ -70,6 +71,7 @@ data class SingleChoiceInputDialog(
                 is MoveTypeSelected -> action.moveType.toString()
                 is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
                 is PlayerSubActionSelected -> action.name
+                is SkillSelected -> action.skill.toString()
             }
         }
 

@@ -128,7 +128,7 @@ object PitchInvasion : Procedure() {
                 state.homeTeam.filter {
                     it.location.isOnField(rules)
                 }
-            return listOf(SelectRandomPlayers(state.pitchInvasionHomeTeamPlayersAffected, onFieldPlayers))
+            return listOf(SelectRandomPlayers(state.pitchInvasionHomeTeamPlayersAffected, onFieldPlayers.map { it.id }))
         }
 
         override fun applyAction(
@@ -138,7 +138,7 @@ object PitchInvasion : Procedure() {
         ): Command {
             return checkType<RandomPlayersSelected>(action) {
                 val playerStuns =
-                    it.players.flatMap { player ->
+                    it.getPlayers(state).flatMap { player ->
                         listOf(
                             SetPlayerState(player, PlayerState.STUNNED),
                             ReportPlayerInjury(player, PlayerState.STUNNED),
@@ -190,7 +190,7 @@ object PitchInvasion : Procedure() {
                 state.awayTeam.filter {
                     it.location.isOnField(rules)
                 }
-            return listOf(SelectRandomPlayers(state.pitchInvasionAwayTeamPlayersAffected, onFieldPlayers))
+            return listOf(SelectRandomPlayers(state.pitchInvasionAwayTeamPlayersAffected, onFieldPlayers.map { it.id }))
         }
 
         override fun applyAction(
@@ -200,7 +200,7 @@ object PitchInvasion : Procedure() {
         ): Command {
             return checkType<RandomPlayersSelected>(action) {
                 val playerStuns =
-                    it.players.flatMap { player ->
+                    it.getPlayers(state).flatMap { player ->
                         listOf(
                             SetPlayerState(player, PlayerState.STUNNED),
                             ReportPlayerInjury(player, PlayerState.STUNNED),

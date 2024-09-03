@@ -1,10 +1,10 @@
 package dk.ilios.jervis.rules.roster.bb2020
 
-import dk.ilios.jervis.rules.bb2020.Agility
-import dk.ilios.jervis.rules.bb2020.General
-import dk.ilios.jervis.rules.bb2020.Mutations
-import dk.ilios.jervis.rules.bb2020.Passing
-import dk.ilios.jervis.rules.bb2020.Strength
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.AGILITY
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.GENERAL
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.MUTATIONS
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.PASSING
+import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.STRENGTH
 import dk.ilios.jervis.rules.roster.RosterId
 import kotlinx.serialization.Serializable
 
@@ -20,8 +20,8 @@ data object ChaosDwarfTeam : BB2020Roster {
             40_000,
             6, 3, 3, 4, 8,
             emptyList(),
-            listOf(General),
-            listOf(Agility, Strength),
+            listOf(GENERAL),
+            listOf(AGILITY, STRENGTH),
         )
     val CHAOS_DWARF_BLOCKERS =
         BB2020Position(
@@ -32,8 +32,8 @@ data object ChaosDwarfTeam : BB2020Roster {
             70_000,
             4, 3, 4, 6, 10,
             emptyList(), // Block, Tackle, Thick Skull
-            listOf(General, Strength),
-            listOf(Agility, Mutations),
+            listOf(GENERAL, STRENGTH),
+            listOf(AGILITY, MUTATIONS),
         )
     val BULL_CENTAUR_BLITZERS =
         BB2020Position(
@@ -44,8 +44,8 @@ data object ChaosDwarfTeam : BB2020Roster {
             130_000,
             6, 4, 4, 6, 10,
             emptyList(), // Sprint, Sure Feet, Thick Skull
-            listOf(General, Strength),
-            listOf(Agility),
+            listOf(GENERAL, STRENGTH),
+            listOf(AGILITY),
         )
     val ENSLAVED_MINOTAUR =
         BB2020Position(
@@ -56,8 +56,8 @@ data object ChaosDwarfTeam : BB2020Roster {
             150_000,
             5, 5, 4, 0, 9,
             emptyList(),
-            listOf(Agility, General),
-            listOf(Strength, Passing),
+            listOf(AGILITY, GENERAL),
+            listOf(STRENGTH, PASSING),
         )
     override val id: RosterId = RosterId("jervis-chaos-dwarf")
     override val tier: Int = 1
@@ -65,13 +65,13 @@ data object ChaosDwarfTeam : BB2020Roster {
     // Only select one of Favoured of
     override val specialRules: List<SpecialRules> =
         listOf(
-            BadlandsBrawl,
-            WorldsEdgeSuperLeague,
-            FavouredOfChaosUndivided,
-            FavouredOfKhorne,
-            FavouredOfNurgle,
-            FavouredOfTzeentch,
-            FavouredOfSlaanesh,
+            RegionalSpecialRules.BADLANDS_BRAWL,
+            RegionalSpecialRules.WORLDS_EDGE_SUPERLEAGUE,
+            TeamSpecialRules.FAVOURED_OF_CHAOS_UNDIVIDED,
+            TeamSpecialRules.FAVOURED_OF_KHORNE,
+            TeamSpecialRules.FAVOURED_OF_NURGLE,
+            TeamSpecialRules.FAVOURED_OF_TZEENTCH,
+            TeamSpecialRules.FAVOURED_OF_SLAANESH,
         )
     override val name: String = "Chaos Dwarf"
     override val numberOfRerolls: Int = 8

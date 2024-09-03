@@ -1,12 +1,52 @@
 package dk.ilios.jervis.model
 
+import dk.ilios.jervis.model.modifiers.StatModifier
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
+import dk.ilios.jervis.utils.sum
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.listSerialDescriptor
+import kotlinx.serialization.encoding.CompositeDecoder
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.encoding.decodeStructure
+import kotlinx.serialization.encoding.encodeStructure
 import kotlin.jvm.JvmInline
+
+object IntRangeSerializer: KSerializer<IntRange> {
+    @OptIn(ExperimentalSerializationApi::class)
+    override val descriptor: SerialDescriptor = listSerialDescriptor<Int>()
+    override fun deserialize(decoder: Decoder): IntRange {
+        return decoder.decodeStructure(descriptor) {
+            var start = 0
+            var endInclusive = 0
+            loop@while (true) {
+                when (val index = decodeElementIndex(descriptor)) {
+                    CompositeDecoder.DECODE_DONE -> break@loop
+                    0 -> start = decodeIntElement(descriptor, index)
+                    1 -> endInclusive = decodeIntElement(descriptor, index)
+                    else -> throw IllegalStateException("Unexpected index: $index")
+                }
+            }
+            start..endInclusive
+        }
+    }
+
+    override fun serialize(encoder: Encoder, value: IntRange) {
+        encoder.encodeStructure(descriptor) {
+            encodeIntElement(descriptor, 0, value.first)
+            encodeIntElement(descriptor, 1, value.last)
+        }
+    }
+}
+
+
 
 // TODO Should we split this into DogoutState and FieldState?
 enum class PlayerState {
@@ -79,6 +119,18 @@ value class PlayerId(val value: String)
 class Player(
     val id: PlayerId,
     val position: Position,
+    // Inject Ranges to avoid needing a Rules reference when accessing characteristics
+    // Slightly annoying, but I am not sure if there is a better way?
+    @Serializable(with = IntRangeSerializer::class)
+    private val moveRange: IntRange,
+    @Serializable(with = IntRangeSerializer::class)
+    val strengthRange: IntRange,
+    @Serializable(with = IntRangeSerializer::class)
+    val agilityRange: IntRange,
+    @Serializable(with = IntRangeSerializer::class)
+    val passingRange: IntRange,
+    @Serializable(with = IntRangeSerializer::class)
+    val armourRange: IntRange,
 ) : Observable<Player>() {
     @Transient
     lateinit var team: Team
@@ -95,26 +147,44 @@ class Player(
     var available: Availability = Availability.AVAILABLE
     var stunnedThisTurn: Boolean? = null
     var hasTackleZones: Boolean = true
+    var isStalling: Boolean = false
     var name: String = ""
     var number: PlayerNo = PlayerNo(0)
-
     var baseMove: Int = 0
+    val moveModifiers = mutableListOf<StatModifier>()
     var movesLeft: Int = 0
     var rushesLeft: Int = 0
     var baseStrenght: Int = 0
+    val strengthModifiers = mutableListOf<StatModifier>()
     var baseAgility: Int = 0
+    val agilityModifiers = mutableListOf<StatModifier>()
     var basePassing: Int? = 0
+    val passingModifiers = mutableListOf<StatModifier>()
     var baseArmorValue: Int = 0
+    val armourModifiers = mutableListOf<StatModifier>()
     val extraSkills = mutableListOf<Skill>()
     var positionSkills = position.skills.map { it.createSkill() }.toMutableList()
-    @Transient
     val skills: List<Skill>
         get() = extraSkills + positionSkills // TODO This probably result in _a lot_ of copying. Find a way to optimize this
-    val move: Int get() = baseMove
-    val strength: Int get() = baseStrenght
-    val agility: Int get() = baseAgility
-    val passing: Int? get() = basePassing
-    val armorValue: Int get() = baseArmorValue
+    val move: Int
+        get() = (baseMove + moveModifiers.sum()).coerceIn(moveRange)
+    val strength: Int
+        get() = (baseStrenght + strengthModifiers.sum()).coerceIn(strengthRange)
+    val agility: Int
+        get() = (baseAgility + agilityModifiers.sum()).coerceIn(agilityRange)
+    val passing: Int?
+        get() {
+            // How to handle modifiers to `null`. I believe the start is then treated as 7+, but find reference
+            return if (basePassing == null && passingModifiers.isNotEmpty()) {
+                (7 + passingModifiers.sum()).coerceIn(passingRange)
+            } else if (basePassing != null && passingModifiers.isNotEmpty()) {
+                (basePassing!! + passingModifiers.sum()).coerceIn(passingRange)
+            } else {
+                basePassing
+            }
+        }
+    val armorValue: Int
+        get() = (baseArmorValue + armourModifiers.sum()).coerceIn(armourRange)
     var nigglingInjuries: Int = 0
     var starPlayerPoints: Int = 0
     var level: PlayerLevel = PlayerLevel.ROOKIE
@@ -129,6 +199,13 @@ class Player(
     fun addSkill(skill: Skill) {
         extraSkills.add(skill)
     }
+
+    fun removeSkill(skill: Skill) {
+        if (!extraSkills.remove(skill)) {
+            INVALID_GAME_STATE("Could not remove skill: ${skill.name}")
+        }
+    }
+
 
     fun hasBall(): Boolean = (ball != null)
 
@@ -153,6 +230,36 @@ class Player(
      */
     fun isStanding(rules: Rules): Boolean {
         return state == PlayerState.STANDING && location.isOnField(rules)
+    }
+
+    fun addStatModifier(modifier: StatModifier) {
+        when(modifier.type) {
+            StatModifier.Type.AV -> armourModifiers.add(modifier)
+            StatModifier.Type.MA -> moveModifiers.add(modifier)
+            StatModifier.Type.PA -> passingModifiers.add(modifier)
+            StatModifier.Type.AG -> agilityModifiers.add(modifier)
+            StatModifier.Type.ST -> strengthModifiers.add(modifier)
+        }
+    }
+
+    fun removeStatModifier(modifier: StatModifier) {
+        // TODO We should start search from the end of array
+        // It doesn't matter much, but will ensure that the list
+        // stays more consistent across Do/Undo
+        val success = when(modifier.type) {
+            StatModifier.Type.AV -> armourModifiers.remove(modifier)
+            StatModifier.Type.MA -> moveModifiers.remove(modifier)
+            StatModifier.Type.PA -> passingModifiers.remove(modifier)
+            StatModifier.Type.AG -> agilityModifiers.remove(modifier)
+            StatModifier.Type.ST -> strengthModifiers.remove(modifier)
+        }
+        if (!success) {
+            INVALID_GAME_STATE("Could not remove $modifier from $name")
+        }
+    }
+
+    fun getStatModifiers(): List<StatModifier> {
+        return armourModifiers + moveModifiers + passingModifiers + agilityModifiers + strengthModifiers
     }
 }
 

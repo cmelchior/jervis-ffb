@@ -10,6 +10,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.weather.SwelteringHeat
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.ResetPolicy
 import dk.ilios.jervis.rules.tables.Weather
 
 /**
@@ -39,12 +40,12 @@ object EndOfDriveSequence: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             // Remove special rules or effects that lasted for the duration of the drive
             // Unclear where in this process Sweltering Heat is applied.
-            // For now, it doesn't really matter so just run it afterwards
-            return if (state.weather == Weather.SWELTERING_HEAT) {
-                GotoNode(ResolveSwelteringHeat)
-            } else {
-                ExitProcedure()
-            }
+            // For now, it doesn't really matter, so just run it afterwards
+            val resetCommands = getResetTemporaryModifiersCommands(state, rules, ResetPolicy.END_OF_DRIVE)
+            return compositeCommandOf(
+                *resetCommands,
+                if (state.weather == Weather.SWELTERING_HEAT) GotoNode(ResolveSwelteringHeat) else ExitProcedure()
+            )
         }
     }
 

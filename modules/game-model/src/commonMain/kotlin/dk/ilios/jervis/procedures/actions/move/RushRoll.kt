@@ -32,6 +32,7 @@ import dk.ilios.jervis.procedures.D6DieRoll
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
+import dk.ilios.jervis.rules.tables.PrayerToNuffle
 import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.calculateAvailableRerollsFor
@@ -71,8 +72,24 @@ import dk.ilios.jervis.utils.sum
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         state.assertContext<RushRollContext>()
-        return if (state.weather == Weather.BLIZZARD) {
-            SetContext(state.getContext<RushRollContext>().copyAndAddModifier(RushModifier.BLIZZARD))
+
+        // Check for Rush modifiers
+        val modifiers = mutableListOf<DiceModifier>()
+
+        // Blizzard (Weather)
+        if (state.weather == Weather.BLIZZARD) {
+            modifiers.add(RushModifier.BLIZZARD)
+        }
+        // Moles under the Pitch (Prayers to Nuffle)
+        if (state.homeTeam.activePrayersOfNuffle.contains(PrayerToNuffle.MOLES_UNDER_THE_PITCH)) {
+            modifiers.add(RushModifier.MOLES_UNDER_THE_PITCH)
+        }
+        if (state.awayTeam.activePrayersOfNuffle.contains(PrayerToNuffle.MOLES_UNDER_THE_PITCH)) {
+            modifiers.add(RushModifier.MOLES_UNDER_THE_PITCH)
+        }
+
+        return if (modifiers.isNotEmpty()) {
+            SetContext(state.getContext<RushRollContext>().copyAndAddModifier(*modifiers.toTypedArray()))
         } else {
             null
         }
@@ -105,10 +122,7 @@ import dk.ilios.jervis.utils.sum
      * or other sources.
      */
     object ChooseReRollSource : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<RushRollContext>()
             val rushingPlayer = context.player
             val availableReRolls: List<SelectRerollOption> = calculateAvailableRerollsFor(
@@ -125,11 +139,7 @@ import dk.ilios.jervis.utils.sum
             }
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Continue -> ExitProcedure()
                 NoRerollSelected -> ExitProcedure()
@@ -149,15 +159,11 @@ import dk.ilios.jervis.utils.sum
      * Use the selected reroll source.
      */
     object UseRerollSource : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = state.rerollContext!!.source.rerollProcedure
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return state.rerollContext!!.source.rerollProcedure
+        }
 
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.rerollContext!!
             return if (context.rerollAllowed) {
                 GotoNode(ReRollDie)
@@ -168,16 +174,9 @@ import dk.ilios.jervis.utils.sum
     }
 
     object ReRollDie : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val rushContext = state.getContext<RushRollContext>()
                 val rerollContext = state.rerollContext!!

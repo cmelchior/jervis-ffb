@@ -69,14 +69,14 @@ object SwelteringHeat : Procedure() {
 
     object RollForPlayersOnHomeTeam : ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val onFieldPlayers = state.homeTeam.filter { it.location.isOnField(rules) }
+            val onFieldPlayers = state.homeTeam.filter { it.location.isOnField(rules) }.map { it.id }
             val affectedPlayers = state.getContext<SwelteringHeatContext>().homeRoll!!.value
             return listOf(SelectRandomPlayers(affectedPlayers, onFieldPlayers))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<RandomPlayersSelected>(action) {
-                val playersRemoved = it.players.flatMap { player ->
+                val playersRemoved = it.getPlayers(state).flatMap { player ->
                     listOf(
                         SetPlayerState(player, PlayerState.FAINTED),
                         SetPlayerLocation(player, DogOut),
@@ -110,14 +110,14 @@ object SwelteringHeat : Procedure() {
 
     object RollForPlayersOnAwayTeam : ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val onFieldPlayers = state.awayTeam.filter { it.location.isOnField(rules) }
+            val onFieldPlayers = state.awayTeam.filter { it.location.isOnField(rules) }.map { it.id }
             val affectedPlayers = state.getContext<SwelteringHeatContext>().awayRoll!!.value
             return listOf(SelectRandomPlayers(affectedPlayers, onFieldPlayers))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<RandomPlayersSelected>(action) {
-                val playersRemoved = it.players.flatMap { player ->
+                val playersRemoved = it.getPlayers(state).flatMap { player ->
                     listOf(
                         SetPlayerState(player, PlayerState.FAINTED),
                         SetPlayerLocation(player, DogOut),
