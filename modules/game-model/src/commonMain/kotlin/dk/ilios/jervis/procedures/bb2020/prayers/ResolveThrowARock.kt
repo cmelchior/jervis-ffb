@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures.bb2020.prayersofnuffle
+package dk.ilios.jervis.procedures.bb2020.prayers
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
@@ -41,7 +41,7 @@ data class ThrowARockContext(
 ): ProcedureContext
 
 /**
- * Procedure for handling the Prayer of Nuffle "Throw a Rock" at the end of a drive where it was active.
+ * Procedure for handling the Prayer to Nuffle "Throw a Rock" at the end of a drive where it was active.
  *
  * Developer's Comments:
  * Does Throw a Rock also work in the dogout? For now we assume the answer is no.

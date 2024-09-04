@@ -4,7 +4,7 @@ import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.tables.TableResult
 
-class ReportPrayersOfNuffleRoll(
+class ReportPrayersToNuffleRoll(
     team: Team,
     dieRoll: D16Result,
     result: TableResult,

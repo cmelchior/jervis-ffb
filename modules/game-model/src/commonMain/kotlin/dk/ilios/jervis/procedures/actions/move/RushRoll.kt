@@ -81,11 +81,11 @@ import dk.ilios.jervis.utils.sum
             modifiers.add(RushModifier.BLIZZARD)
         }
         // Moles under the Pitch (Prayers to Nuffle)
-        if (state.homeTeam.activePrayersOfNuffle.contains(PrayerToNuffle.MOLES_UNDER_THE_PITCH)) {
-            modifiers.add(RushModifier.MOLES_UNDER_THE_PITCH)
+        if (state.homeTeam.activePrayersToNuffle.contains(PrayerToNuffle.MOLES_UNDER_THE_PITCH)) {
+            modifiers.add(RushModifier.MOLES_UNDER_THE_PITCH_HOME)
         }
-        if (state.awayTeam.activePrayersOfNuffle.contains(PrayerToNuffle.MOLES_UNDER_THE_PITCH)) {
-            modifiers.add(RushModifier.MOLES_UNDER_THE_PITCH)
+        if (state.awayTeam.activePrayersToNuffle.contains(PrayerToNuffle.MOLES_UNDER_THE_PITCH)) {
+            modifiers.add(RushModifier.MOLES_UNDER_THE_PITCH_AWAY)
         }
 
         return if (modifiers.isNotEmpty()) {

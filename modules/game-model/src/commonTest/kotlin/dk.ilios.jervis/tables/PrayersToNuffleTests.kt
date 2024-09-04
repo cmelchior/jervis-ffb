@@ -30,11 +30,13 @@ import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.MightyBlow
+import dk.ilios.jervis.rules.skills.Pro
 import dk.ilios.jervis.rules.skills.ResetPolicy
 import dk.ilios.jervis.rules.skills.Stab
 import dk.ilios.jervis.rules.tables.PrayerStatModifier
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
 import dk.ilios.jervis.utils.createDefaultGameState
+import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -47,6 +49,16 @@ import kotlin.test.fail
  */
 class PrayersToNuffleTests: JervisGameTest() {
 
+    @BeforeTest
+    override fun setUp() {
+        super.setUp()
+        // Trigger one roll on the Prayers to Nuffle table as a default
+        // Some tests might overwrite this
+        homeTeam.teamValue = 1_050_000
+        awayTeam.teamValue = 1_000_000
+    }
+
+
     @Test
     fun numberOfPrayers() {
         val tests: List<Triple<Int, Int, Int>> = listOf(
@@ -56,8 +68,8 @@ class PrayersToNuffleTests: JervisGameTest() {
         )
         tests.forEach { (homeTv, awayTv, rolls) ->
             val state = createDefaultGameState(rules)
-            homeTeam.teamValue = homeTv
-            awayTeam.teamValue = awayTv
+            state.homeTeam.teamValue = homeTv
+            state.awayTeam.teamValue = awayTv
             val controller = GameController(rules, state)
             controller.startTestMode(FullGame)
             controller.rollForward(
@@ -71,7 +83,7 @@ class PrayersToNuffleTests: JervisGameTest() {
                 1 -> {
                     val context = state.getContext<PrayersToNuffleRollContext>()
                     assertEquals(1, context.rollsRemaining)
-                    assertEquals(homeTeam, context.team)
+                    assertEquals(state.homeTeam, context.team)
                 }
                 else -> fail("Unsupported value: rolls")
             }
@@ -93,10 +105,10 @@ class PrayersToNuffleTests: JervisGameTest() {
                 )
             ),
         )
-        assertEquals(2, awayTeam.activePrayersOfNuffle.size)
+        assertEquals(2, awayTeam.activePrayersToNuffle.size)
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR))
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.FRIENDS_WITH_THE_REF))
-        assertEquals(0, homeTeam.activePrayersOfNuffle.size)
+        assertEquals(0, homeTeam.activePrayersToNuffle.size)
     }
 
     @Test
@@ -107,8 +119,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun friendsWithTheRef() {
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
@@ -146,8 +156,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun stiletto() {
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
@@ -178,8 +186,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun stiletto_notAvailableToSomePlayers() {
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
         awayTeam.forEachIndexed { i, it ->
             when (i) {
                 0 -> it.state = PlayerState.KNOCKED_OUT
@@ -203,8 +209,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun ironMan_notAvailableToSomePlayers() {
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
         awayTeam.forEachIndexed { i, it ->
             when (i) {
                 // Should it not be available to players that already have AV11?
@@ -229,8 +233,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun ironMan_onAV11() {
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
         val player = state.getPlayerById("A1".playerId)
         player.baseArmorValue = 11
         controller.startTestMode(FullGame)
@@ -249,8 +251,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun knuckleDusters() {
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
@@ -281,8 +281,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun knuckleDusters_notAvailableToSomePlayers() {
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
         awayTeam.forEachIndexed { i, it ->
             when (i) {
                 // Should it not be available to players that already have AV11?
@@ -308,8 +306,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun badHabits() {
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
@@ -336,9 +332,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun badHabits_notAvailableToSomePlayers() {
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
-
         // Give everyone except 1 loner, so when you roll 3 on the prayer
         // Only 1 can be selected
         homeTeam.forEachIndexed { i, it ->
@@ -363,8 +356,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun badHabits_notAvailableToAnyPlayers() {
-        homeTeam.teamValue = 1_050_000
-        awayTeam.teamValue = 1_000_000
         homeTeam.forEachIndexed { i, it ->
             when (i) {
                 0 -> it.state = PlayerState.KNOCKED_OUT
@@ -388,27 +379,108 @@ class PrayersToNuffleTests: JervisGameTest() {
     }
 
     @Test
-    @Ignore
     fun greasyCleats() {
-        TODO()
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(
+                prayersToNuffle = arrayOf(
+                    7.d16, // Roll Greasy Cleats.
+                    PlayerSelected("H1".playerId), // Select H1 as target
+                )
+            ),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam()
+        )
+
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
+        assertTrue(homeTeam[1.playerNo]!!.moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
+
+        // Prayer and effects will be removed after the drive
+        controller.rollForward(
+            *endTurns(16) // Will also end the half
+        )
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
+        assertFalse(homeTeam[1.playerNo]!!.moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
     }
 
     @Test
-    @Ignore
+    fun greasyCleats_noPlayersAvailable() {
+        homeTeam.forEachIndexed { i, it ->
+            it.state = PlayerState.KNOCKED_OUT
+        }
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(
+                prayersToNuffle = arrayOf(
+                    7.d16, // Roll Greasy Cleats. Will be ignored
+                )
+            ),
+            *defaultSetup(),
+        )
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
+        assertEquals(0, homeTeam.count { it.getStatModifiers().contains(PrayerStatModifier.GREASY_CLEATS) })
+    }
+
+    @Test
     fun blessedStatueOfNuffle() {
-        TODO()
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(
+                prayersToNuffle = arrayOf(
+                    8.d16, // Roll Blessed Statue.
+                    PlayerSelected("A1".playerId), // Select A1 as target
+                )
+            ),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam()
+        )
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffle.BLESSED_STATUE_OF_NUFFLE))
+        assertTrue(awayTeam[1.playerNo]!!.hasSkill<Pro>())
     }
 
     @Test
-    @Ignore
+    fun blessedStatueOfNuffle_noValidPlayers() {
+        awayTeam.forEachIndexed { i, player ->
+            when (i) {
+                0 -> player.state = PlayerState.KNOCKED_OUT
+                1 -> player.addSkill(Pro(isTemporary = false))
+                else -> player.addSkill(Loner(2))
+            }
+        }
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(
+                prayersToNuffle = arrayOf(
+                    8.d16, // Roll BlessedStatue. Will be ignored
+                )
+            ),
+            *defaultSetup(),
+        )
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffle.BLESSED_STATUE_OF_NUFFLE))
+        assertEquals(0, awayTeam.count { it.hasSkill<Pro>() && it.getSkill<Pro>().isTemporary })
+    }
+
+    @Test
     fun molesUnderThePitch() {
-        TODO()
-    }
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(
+                prayersToNuffle = arrayOf(
+                    9.d16, // Roll Moles Under the Pitch.
+                )
+            ),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam()
+        )
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
+        assertFalse(homeTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
 
-    @Test
-    @Ignore
-    fun twoMolesUnderThePitch() {
-        TODO()
+        // Prayer and effects will be removed after the half
+        controller.rollForward(
+            *endTurns(16)
+        )
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
+        assertFalse(homeTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
     }
 
     @Test

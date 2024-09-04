@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures.bb2020.prayersofnuffle
+package dk.ilios.jervis.procedures.bb2020.prayers
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
@@ -8,7 +8,6 @@ import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.actions.SelectSkill
 import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.commands.AddPlayerSkill
-import dk.ilios.jervis.commands.AddPrayersToNuffle
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
@@ -30,15 +29,13 @@ import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Position
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.ResetPolicy
-import dk.ilios.jervis.rules.tables.PrayerToNuffle
-import dk.ilios.jervis.utils.INVALID_ACTION
 
 data class IntensiveTrainingContext(
     val player: Player,
 ): ProcedureContext
 
 /**
- * Procedure for handling the Prayer of Nuffle "Intensive Training" as described on page 39
+ * Procedure for handling the Prayer to Nuffle "Intensive Training" as described on page 39
  * of the rulebook.
  */
 object IntensiveTraining : Procedure() {
@@ -76,10 +73,7 @@ object IntensiveTraining : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<SkillSelected>(action) {
-                if (!getAvailableActions(state, rules).contains(SelectSkill(it.skill))) {
-                    INVALID_ACTION(action, "Skill isn't a primary skill")
-                }
+            return checkTypeAndValue<SkillSelected>(state, rules, action, this) {
                 val context = state.getContext<IntensiveTrainingContext>()
                 val skill = it.skill.createSkill(isTemporary = true, expiresAt = ResetPolicy.END_OF_GAME)
                 return compositeCommandOf(

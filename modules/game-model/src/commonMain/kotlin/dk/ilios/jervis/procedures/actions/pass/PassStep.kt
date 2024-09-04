@@ -35,9 +35,7 @@ import dk.ilios.jervis.procedures.ThrowInContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Range
 import dk.ilios.jervis.rules.tables.Weather
-import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
-
 
 /**
  * Procedure for handling the passing part of a [PassAction].
@@ -73,26 +71,19 @@ object PassStep: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is Cancel -> {
-                    // Abort the throw
-                    ExitProcedure()
-                }
-                is FieldSquareSelected -> {
-                    val context = state.getContext<PassContext>()
-                    // We should only accept valid ranges, it is considered an error to pass in
-                    // invalid ranges here
-                    if (!getAvailableActions(state, rules).contains(SelectFieldLocation.throwTarget(action.coordinate))) {
-                        INVALID_ACTION(action)
+                is Cancel -> ExitProcedure() // Abort the throw
+                else -> {
+                    checkTypeAndValue<FieldSquareSelected>(state, rules, action, this) {
+                        val context = state.getContext<PassContext>()
+                        val distance = rules.rangeRuler.measure(context.thrower.location.coordinate, it.coordinate)
+                        compositeCommandOf(
+                            SetContext(context.copy(target = it.coordinate, range = distance)),
+                            SetBallState.accurateThrow(), // Until proven otherwise. Should we invent a new type?
+                            SetBallLocation(it.coordinate),
+                            GotoNode(TestForAccuracy)
+                        )
                     }
-                    val distance = rules.rangeRuler.measure(context.thrower.location.coordinate, action.coordinate)
-                    compositeCommandOf(
-                        SetContext(context.copy(target = action.coordinate, range = distance)),
-                        SetBallState.accurateThrow(), // Until proven otherwise. Should we invent a new type?
-                        SetBallLocation(action.coordinate),
-                        GotoNode(TestForAccuracy)
-                    )
                 }
-                else -> INVALID_ACTION(action)
             }
         }
     }

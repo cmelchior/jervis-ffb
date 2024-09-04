@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures.bb2020.prayersofnuffle
+package dk.ilios.jervis.procedures.bb2020.prayers
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
@@ -14,10 +14,10 @@ import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 
 /**
- * Procedure for handling the Prayer of Nuffle "Perfect Passing" as described on page 39
+ * Procedure for handling the Prayer to Nuffle "Fouling Frenzy" as described on page 39
  * of the rulebook.
  */
-object PerfectPassing : Procedure() {
+object FoulingFrenzy : Procedure() {
     override val initialNode: Node = ApplyEvent
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -32,7 +32,7 @@ object PerfectPassing : Procedure() {
             rules: Rules,
         ): Command {
             return compositeCommandOf(
-                SimpleLogEntry("${state.activeTeam} receives Perfect Passing", category = LogCategory.GAME_PROGRESS),
+                SimpleLogEntry("Do Fouling Frenzy", category = LogCategory.GAME_PROGRESS),
                 ExitProcedure(),
             )
         }

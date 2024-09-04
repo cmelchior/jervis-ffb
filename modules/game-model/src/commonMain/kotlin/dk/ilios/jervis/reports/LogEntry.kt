@@ -6,10 +6,9 @@ import dk.ilios.jervis.model.Game
 import kotlin.random.Random
 
 /**
- *
- * Implementation Note:
+ * Developer's Commentary:
  * Compose 1.7.0 should add support for using HTML in strings so it can
- * be shown using Spannables in compose. This would allow us to theme it.
+ * be shown using Spannables in Compose. This would allow us to theme it.
  * https://issuetracker.google.com/issues/139320238
  */
 abstract class LogEntry : Command {
@@ -17,17 +16,11 @@ abstract class LogEntry : Command {
     abstract val category: LogCategory
     abstract val message: String
 
-    override fun execute(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun execute(state: Game, controller: GameController) {
         controller.addLog(this)
     }
 
-    override fun undo(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun undo(state: Game, controller: GameController) {
         controller.removeLog(this)
     }
 

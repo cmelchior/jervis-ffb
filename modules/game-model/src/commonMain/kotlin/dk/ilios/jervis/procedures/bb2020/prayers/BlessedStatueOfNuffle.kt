@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures.bb2020.prayersofnuffle
+package dk.ilios.jervis.procedures.bb2020.prayers
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
@@ -24,28 +24,27 @@ import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Loner
+import dk.ilios.jervis.rules.skills.Pro
 import dk.ilios.jervis.rules.skills.ResetPolicy
-import dk.ilios.jervis.rules.skills.Stab
-import dk.ilios.jervis.utils.INVALID_ACTION
 
 /**
- * Procedure for handling the Prayer of Nuffle "Stiletto" as described on page 39
+ * Procedure for handling the Prayer to Nuffle "Blessed Statue of Nuffle" as described on page 39
  * of the rulebook.
  */
-object Stiletto : Procedure() {
-    override val initialNode: Node = ChoosePlayer
+object BlessedStatueOfNuffle : Procedure() {
+    override val initialNode: Node = SelectPlayer
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<PrayersToNuffleRollContext>()
     }
 
-    object ChoosePlayer : ActionNode() {
+    object SelectPlayer: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val availablePlayers = context.team
                 .filter { it.state == PlayerState.STANDING }
-                .filter { !it.hasSkill<Loner>() && !it.hasSkill<Stab>() }
+                .filter { !it.hasSkill<Loner>() && !it.hasSkill<Pro>() }
                 .map { SelectPlayer(it) }
 
             return availablePlayers.ifEmpty {
@@ -56,27 +55,23 @@ object Stiletto : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 is Continue -> {
-                   compositeCommandOf(
-                       SimpleLogEntry("No players are able to receive Stiletto", category = LogCategory.GAME_PROGRESS),
-                       ExitProcedure(),
-                   )
+                    compositeCommandOf(
+                        SimpleLogEntry("No players are able to receive Blessed Statue of Nuffle", category = LogCategory.GAME_PROGRESS),
+                        ExitProcedure(),
+                    )
                 }
                 else -> {
-                    checkType<PlayerSelected>(action) {
-                        if (!getAvailableActions(state, rules).contains(SelectPlayer(it.playerId))) {
-                            INVALID_ACTION(action, "Invalid player selected: ${it.playerId}")
-                        }
+                    return checkTypeAndValue<PlayerSelected>(state, rules, action, this) {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
-                        return compositeCommandOf(
-                            AddPlayerSkill(player, Stab(isTemporary = true, expiresAt = ResetPolicy.END_OF_DRIVE)),
+                        compositeCommandOf(
+                            AddPlayerSkill(player, Pro(isTemporary = true, expiresAt = ResetPolicy.END_OF_GAME)),
                             SetContext(context.copy(resultApplied = true)),
-                            SimpleLogEntry("${player.name} received Stiletto", category = LogCategory.GAME_PROGRESS),
+                            SimpleLogEntry("${player.name} received Blessed Statue of Nuffle (Pro)", category = LogCategory.GAME_PROGRESS),
                             ExitProcedure(),
                         )
                     }
                 }
-            }
-        }
+            }        }
     }
 }

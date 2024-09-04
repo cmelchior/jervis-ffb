@@ -19,9 +19,9 @@ This document lists all game mechanics that have been fully implemented with tes
   - [x] Iron Man
   - [x] Knuckle Dusters
   - [x] Bad Habits
-  - [ ] Greasy Cleats
-  - [ ] Blessed Statue of Nuffle
-  - [ ] Moles under the Pitch
+  - [x] Greasy Cleats
+  - [x] Blessed Statue of Nuffle
+  - [x] Moles under the Pitch
   - [ ] Perfect Passing
   - [ ] Fan Interaction
   - [ ] Necessary Violence

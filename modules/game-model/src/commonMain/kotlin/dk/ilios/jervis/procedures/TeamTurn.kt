@@ -32,7 +32,7 @@ import dk.ilios.jervis.model.Availability
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.ResolveThrowARock
+import dk.ilios.jervis.procedures.bb2020.prayers.ResolveThrowARock
 import dk.ilios.jervis.reports.ReportActionSelected
 import dk.ilios.jervis.reports.ReportEndingTurn
 import dk.ilios.jervis.reports.ReportStartingTurn
@@ -211,7 +211,7 @@ object TeamTurn : Procedure() {
             // but currently the only thing that reset/expire is skills that uses rerolls. None of these
             // should interfer with Throw A Rock. So the order here doesn't matter
             val resetCommands = getResetTemporaryModifiersCommands(state, rules, ResetPolicy.END_OF_TURN)
-            val nextNodeCommand = if(state.activeTeam.otherTeam().activePrayersOfNuffle.contains(PrayerToNuffle.THROW_A_ROCK)) {
+            val nextNodeCommand = if(state.activeTeam.otherTeam().activePrayersToNuffle.contains(PrayerToNuffle.THROW_A_ROCK)) {
                 GotoNode(CheckForThrowARock)
             } else {
                 ExitProcedure()

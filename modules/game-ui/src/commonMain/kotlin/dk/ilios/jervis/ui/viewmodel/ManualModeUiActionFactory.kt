@@ -88,7 +88,7 @@ import dk.ilios.jervis.procedures.actions.move.RushRoll
 import dk.ilios.jervis.procedures.actions.move.calculateOptionsForMoveType
 import dk.ilios.jervis.procedures.actions.pass.AccuracyRoll
 import dk.ilios.jervis.procedures.actions.pass.PassContext
-import dk.ilios.jervis.procedures.bb2020.prayersofnuffle.BadHabits
+import dk.ilios.jervis.procedures.bb2020.prayers.BadHabits
 import dk.ilios.jervis.procedures.injury.ArmourRoll
 import dk.ilios.jervis.procedures.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.injury.InjuryRoll

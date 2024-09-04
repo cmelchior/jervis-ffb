@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures.bb2020.prayersofnuffle
+package dk.ilios.jervis.procedures.bb2020.prayers
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
@@ -14,7 +14,7 @@ import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 
 /**
- * Procedure for handling the Prayer of Nuffle "Necessary Violence" as described on page 39
+ * Procedure for handling the Prayer to Nuffle "Necessary Violence" as described on page 39
  * of the rulebook.
  */
 object NecessaryViolence : Procedure() {

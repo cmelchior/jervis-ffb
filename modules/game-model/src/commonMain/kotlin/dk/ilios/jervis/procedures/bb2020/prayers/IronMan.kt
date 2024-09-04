@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures.bb2020.prayersofnuffle
+package dk.ilios.jervis.procedures.bb2020.prayers
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
@@ -7,10 +7,10 @@ import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
-import dk.ilios.jervis.commands.AddPlayerSkill
-import dk.ilios.jervis.commands.AddPrayersToNuffle
+import dk.ilios.jervis.commands.AddPlayerStatModifier
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
@@ -24,16 +24,14 @@ import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Loner
-import dk.ilios.jervis.rules.skills.MightyBlow
-import dk.ilios.jervis.rules.skills.ResetPolicy
-import dk.ilios.jervis.rules.tables.PrayerToNuffle
-import dk.ilios.jervis.utils.INVALID_ACTION
+import dk.ilios.jervis.rules.tables.PrayerStatModifier
 
 /**
- * Procedure for handling the Prayer of Nuffle "Knuckle Dusters" as described on page 39
+ * Procedure for handling the Prayer to Nuffle "Iron Man" as described on page 39
  * of the rulebook.
  */
-object KnuckleDusters : Procedure() {
+object IronMan : Procedure() {
+
     override val initialNode: Node = ChoosePlayer
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -46,9 +44,8 @@ object KnuckleDusters : Procedure() {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val availablePlayers = context.team
                 .filter { it.state == PlayerState.STANDING }
-                .filter { !it.hasSkill<Loner>() && !it.hasSkill<MightyBlow>() }
+                .filter { !it.hasSkill<Loner>() }
                 .map { SelectPlayer(it) }
-
             return availablePlayers.ifEmpty {
                 listOf(ContinueWhenReady)
             }
@@ -63,15 +60,13 @@ object KnuckleDusters : Procedure() {
                     )
                 }
                 else -> {
-                    return checkType<PlayerSelected>(action) {
-                        if (!getAvailableActions(state, rules).contains(SelectPlayer(it.playerId))) {
-                            INVALID_ACTION(action, "Invalid player selected: ${it.playerId}")
-                        }
+                    checkTypeAndValue<PlayerSelected>(state, rules, action, this) {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
-                        compositeCommandOf(
-                            AddPlayerSkill(player, MightyBlow(value = 1, isTemporary = true, expiresAt = ResetPolicy.END_OF_DRIVE)),
-                            SimpleLogEntry("${player.name} received Knuckle Dusters", category = LogCategory.GAME_PROGRESS),
+                        return compositeCommandOf(
+                            AddPlayerStatModifier(player, PrayerStatModifier.IRON_MAN),
+                            SetContext(context.copy(resultApplied = true)),
+                            SimpleLogEntry("${player.name} received Iron Man (+1 AV)", category = LogCategory.GAME_PROGRESS),
                             ExitProcedure(),
                         )
                     }

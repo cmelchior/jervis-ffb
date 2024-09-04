@@ -54,7 +54,7 @@ object ArgueTheCallRoll: Procedure() {
                 // While weirdly worded "Friends with the Ref", just means that roll 5
                 // can be changed to "Well, When You Put It Like That..."
                 val nextNodeCommand = if (
-                    context.fouler.team.activePrayersOfNuffle.contains(PrayerToNuffle.FRIENDS_WITH_THE_REF) &&
+                    context.fouler.team.activePrayersToNuffle.contains(PrayerToNuffle.FRIENDS_WITH_THE_REF) &&
                     d6.value == 5
                 ) {
                     GotoNode(ResolveFriendsWithTheReferences)

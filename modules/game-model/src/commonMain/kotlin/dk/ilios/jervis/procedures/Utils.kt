@@ -47,7 +47,7 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Rese
 
     // Find all active Prayers of Nuffle that expires at the given duration
     val removablePrayers = teams.flatMap { team ->
-        team.activePrayersOfNuffle
+        team.activePrayersToNuffle
             .filter { it.duration == duration }
             .map { RemovePrayersToNuffle(team, it) }
     }

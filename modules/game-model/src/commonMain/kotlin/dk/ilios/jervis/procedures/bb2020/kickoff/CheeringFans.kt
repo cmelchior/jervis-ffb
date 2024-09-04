@@ -119,7 +119,7 @@ object CheeringFans : Procedure() {
                             receivingTeamDie,
                             state.receivingTeam.cheerLeaders,
                         ),
-                        GotoNode(WinnerRollsOnPrayersOfNuffle(state.kickingTeam)),
+                        GotoNode(WinnerRollsOnPrayersToNuffle(state.kickingTeam)),
                     )
                 }
                 else -> {
@@ -131,14 +131,14 @@ object CheeringFans : Procedure() {
                             receivingTeamDie,
                             state.receivingTeam.cheerLeaders,
                         ),
-                        GotoNode(WinnerRollsOnPrayersOfNuffle(state.receivingTeam)),
+                        GotoNode(WinnerRollsOnPrayersToNuffle(state.receivingTeam)),
                     )
                 }
             }
         }
     }
 
-    class WinnerRollsOnPrayersOfNuffle(private val team: Team) : ParentNode() {
+    class WinnerRollsOnPrayersToNuffle(private val team: Team) : ParentNode() {
         override fun onEnterNode(
             state: Game,
             rules: Rules,

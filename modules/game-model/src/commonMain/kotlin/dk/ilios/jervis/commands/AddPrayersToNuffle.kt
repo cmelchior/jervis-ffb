@@ -7,12 +7,12 @@ import dk.ilios.jervis.rules.tables.PrayerToNuffle
 
 class AddPrayersToNuffle(private val team: Team, val prayer: PrayerToNuffle) : Command {
     override fun execute(state: Game, controller: GameController) {
-        team.activePrayersOfNuffle.add(prayer)
+        team.activePrayersToNuffle.add(prayer)
         team.notifyUpdate()
     }
 
     override fun undo(state: Game, controller: GameController) {
-        team.activePrayersOfNuffle.remove(prayer)
+        team.activePrayersToNuffle.remove(prayer)
         team.notifyUpdate()
     }
 }

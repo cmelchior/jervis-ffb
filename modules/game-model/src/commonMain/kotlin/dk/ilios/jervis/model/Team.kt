@@ -112,7 +112,7 @@ class Team(val name: String, val roster: Roster, val coach: Coach) : Collection<
     var treasury: Int = 0
     var dedicatedFans: Int = 0
     val specialRules = mutableListOf<SpecialRules>()
-    val activePrayersOfNuffle = mutableSetOf<PrayerToNuffle>()
+    val activePrayersToNuffle = mutableSetOf<PrayerToNuffle>()
 
     // Special team state that needs to be tracked for the given period
     @Transient
@@ -174,7 +174,7 @@ class Team(val name: String, val roster: Roster, val coach: Coach) : Collection<
     override fun contains(element: Player): Boolean = noToPlayer.containsValue(element)
 
     fun hasPrayer(prayer: PrayerToNuffle): Boolean {
-        return activePrayersOfNuffle.contains(prayer)
+        return activePrayersToNuffle.contains(prayer)
     }
 
     fun notifyDogoutChange() {

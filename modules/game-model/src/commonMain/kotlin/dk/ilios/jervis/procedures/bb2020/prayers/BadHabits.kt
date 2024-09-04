@@ -1,4 +1,4 @@
-package dk.ilios.jervis.procedures.bb2020.prayersofnuffle
+package dk.ilios.jervis.procedures.bb2020.prayers
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
@@ -40,7 +40,7 @@ import dk.ilios.jervis.utils.INVALID_ACTION
 import kotlin.math.min
 
 /**
- * Procedure for handling the Prayer of Nuffle "Bad Habits" as described on page 39
+ * Procedure for handling the Prayer to Nuffle "Bad Habits" as described on page 39
  * of the rulebook.
  */
 object BadHabits : Procedure() {
