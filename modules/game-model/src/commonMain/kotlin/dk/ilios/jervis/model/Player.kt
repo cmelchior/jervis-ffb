@@ -60,6 +60,7 @@ enum class PlayerState {
     BANNED,
 
     // Intermediate states
+    FALLED_OVER,
     KNOCKED_DOWN,
 
     // Field states

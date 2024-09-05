@@ -7,24 +7,26 @@ and what the central concepts are.
 
 This project was started with the following design goals in mind.
 
-1. It should be a faithful representation of the board game rules and should represent the rules
-   "as written".
+1. The implementation should be a faithful representation of the rules "as written". This includes things 
+   like always choosing to use a skill or not, or rerolling successful rolls. 
 
-2. The rule implementation should be flexible and extendable. Blood Bowl is a game of exceptions,
-   and it should be possible to capture all these extensions in the code.
+2. The rules engine should not care what generates an action, it could be the player through the UI,
+   or some automated process.
 
-3. The code should be A.I. friendly. This idea came from following along in the Bot Bowl competition, but 
-   since the rules there are stuck on Blood Bowl 2016. This idea evolved into creating an Blood Bowl
-   AI that could play on FUMBBL. Which is the current platform with the best implementation of the rules.
+3. The rule implementation should be flexible and extendable. Blood Bowl is a game of exceptions,
+   and it should be possible to capture all these exceptions in the code.
 
-4. The rules should be decoupled from the UI, so it is easier to hook any kind of UI up to the rules. 
+4. The code should be A.I. friendly. I.e., it should be easy for an AI training process or model to 
+   interact with the rules and the state of the game. 
 
+5. The rules should be decoupled from the UI. It should be possible to hook many different kinds of UIs
+   up to the same rules engine.
 
 ## What are the future goals?
 
 1. Be able to replay all FUMBBL Games inside the Jervis Client.
 
-2. Be a alternative for the current FUMBBL Client.
+2. Be a alternative to the current FUMBBL Client.
 
 3. Be an AI client you can hook up to any FUMBBL game.
 

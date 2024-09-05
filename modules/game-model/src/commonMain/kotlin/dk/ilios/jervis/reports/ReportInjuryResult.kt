@@ -1,10 +1,10 @@
 package dk.ilios.jervis.reports
 
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.rules.tables.CasualtyResult
 import dk.ilios.jervis.rules.tables.InjuryResult
 
-class ReportInjuryResult(val context: RiskingInjuryRollContext) : LogEntry() {
+class ReportInjuryResult(val context: RiskingInjuryContext) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String
         get() {

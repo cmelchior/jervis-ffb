@@ -12,6 +12,8 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.RemoveContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.fsm.ActionNode
@@ -23,8 +25,8 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.hasSkill
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
+import dk.ilios.jervis.procedures.injury.KnockedDown
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.reports.ReportPowResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Dodge
@@ -142,20 +144,20 @@ object Stumble: Procedure() {
     object ResolvePlayerDown: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val defender = state.stumbleContext!!.defender
-            val injuryContext = RiskingInjuryRollContext(defender)
+            val injuryContext = RiskingInjuryContext(defender)
             return compositeCommandOf(
                 SetPlayerState(defender, PlayerState.KNOCKED_DOWN),
-                SetOldContext(Game::riskingInjuryRollsContext, injuryContext)
+                SetContext(injuryContext)
             )
         }
 
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return RiskingInjuryRoll
+            return KnockedDown
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetOldContext(Game::riskingInjuryRollsContext, null),
+                RemoveContext<RiskingInjuryContext>(),
                 ExitProcedure()
             )
         }

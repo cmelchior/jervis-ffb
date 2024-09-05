@@ -7,16 +7,17 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
-import dk.ilios.jervis.utils.assert
 
 /**
  * Implement the injury roll as described on page 60 in the rulebook.
@@ -31,13 +32,11 @@ import dk.ilios.jervis.utils.assert
  */
 object InjuryRoll: Procedure() {
     override val initialNode: Node = RollDice
-
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        assert(state.riskingInjuryRollsContext != null)
-        return null
-    }
-
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<RiskingInjuryContext>()
+    }
 
     object RollDice : ActionNode() {
         override fun getAvailableActions(
@@ -51,7 +50,7 @@ object InjuryRoll: Procedure() {
             rules: Rules,
         ): Command {
             return checkDiceRoll<D6Result, D6Result>(action) { die1, die2 ->
-                val context = state.riskingInjuryRollsContext!!
+                val context = state.getContext<RiskingInjuryContext>()
 
                 // Determine result of injury roll
                 // TODO This logic needs to be expanded to support things like Mighty Blow and others.
@@ -67,7 +66,7 @@ object InjuryRoll: Procedure() {
 
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.INJURY, roll),
-                    SetOldContext(Game::riskingInjuryRollsContext, updatedContext),
+                    SetContext(updatedContext),
                     ExitProcedure()
                 )
             }

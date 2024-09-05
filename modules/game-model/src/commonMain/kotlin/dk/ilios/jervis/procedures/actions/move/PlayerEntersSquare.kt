@@ -30,9 +30,11 @@ import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
 import kotlinx.serialization.Serializable
 
@@ -65,23 +67,29 @@ object MovePlayerIntoSquare : Procedure() {
             val isTreacherous = state.homeTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR) ||
                 state.awayTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR)
             return if (hasTrapdoor && isTreacherous) {
-                listOf(ContinueWhenReady)
-            } else {
                 listOf(RollDice(Dice.D6))
+            } else {
+                listOf(ContinueWhenReady)
             }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<MovePlayerIntoSquareContext>()
             return when (action) {
-                is Continue -> ExitProcedure()
+                is Continue -> {
+                    compositeCommandOf(
+                        SetPlayerLocation(context.player, context.target),
+                        ExitProcedure()
+                    )
+                }
                 else -> {
                     checkDiceRoll<D6Result>(action) { d6 ->
-                        if (d6.value == 1) {
-                            GotoNode(ResolveFallingThroughTrapdoor)
-                        } else {
-                            SetPlayerLocation(context.player, context.target)
-                        }
+                        compositeCommandOf(
+                            SetPlayerLocation(context.player, context.target),
+                            ReportDiceRoll(DiceRollType.TREACHEROUS_TRAPDOOR, d6),
+                            if (d6.value != 1) SimpleLogEntry("${context.player.name} narrowly avoided the trapdoor") else null,
+                            if (d6.value == 1) GotoNode(ResolveFallingThroughTrapdoor) else ExitProcedure()
+                        )
                     }
                 }
             }
@@ -94,7 +102,7 @@ object MovePlayerIntoSquare : Procedure() {
             return compositeCommandOf(
                 SetPlayerLocation(context.player, DogOut),
                 SetPlayerState(context.player, PlayerState.KNOCKED_DOWN),
-                SetContext(RiskingInjuryRollContext(
+                SetContext(RiskingInjuryContext(
                     player = context.player,
                     mode = RiskingInjuryMode.PUSHED_INTO_CROWD
                 )),

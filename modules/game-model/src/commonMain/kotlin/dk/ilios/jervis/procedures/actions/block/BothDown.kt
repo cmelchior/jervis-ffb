@@ -12,6 +12,8 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.RemoveContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.fsm.ActionNode
@@ -23,8 +25,8 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.ProcedureContext
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
+import dk.ilios.jervis.procedures.injury.KnockedDown
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.reports.ReportBothDownResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Block
@@ -43,8 +45,6 @@ data class BothDownContext(
 /**
  * Resolve a "Both Down" selected as a block result.
  * See page 57 in the rulebook.
- *
- * TODO Is there a more clean way to represent the flow here
  */
 object BothDown: Procedure() {
     override val initialNode: Node = AttackerChooseToUseWrestle
@@ -198,12 +198,9 @@ object BothDown: Procedure() {
     object RollDefenderInjury: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val bothDownContext = state.bothDownContext!!
-            return SetOldContext(
-                Game::riskingInjuryRollsContext,
-                RiskingInjuryRollContext(bothDownContext.defender)
-            )
+            return SetContext(RiskingInjuryContext(bothDownContext.defender))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(ResolveAttackerInjury)
         }
@@ -223,15 +220,12 @@ object BothDown: Procedure() {
     object RollAttackerInjury: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val bothDownContext = state.bothDownContext!!
-            return SetOldContext(
-                Game::riskingInjuryRollsContext,
-                RiskingInjuryRollContext(bothDownContext.attacker)
-            )
+            return SetContext(RiskingInjuryContext(bothDownContext.attacker))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetOldContext(Game::riskingInjuryRollsContext, null),
+                RemoveContext<RiskingInjuryContext>(),
                 ExitProcedure()
             )
         }

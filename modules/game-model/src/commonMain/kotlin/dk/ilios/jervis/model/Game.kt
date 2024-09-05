@@ -14,7 +14,6 @@ import dk.ilios.jervis.procedures.actions.block.PushContext
 import dk.ilios.jervis.procedures.actions.block.StumbleContext
 import dk.ilios.jervis.procedures.actions.handoff.HandOffContext
 import dk.ilios.jervis.procedures.actions.pass.PassingInteferenceContext
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -76,7 +75,6 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     val contexts: ContextHolder = ContextHolder()
     var blockContext: BlockContext? = null
     var blockRollResultContext: BlockResultContext? = null
-    var riskingInjuryRollsContext: RiskingInjuryRollContext? = null
     var pushContext: PushContext? = null
     var bothDownContext: BothDownContext? = null
     var stumbleContext: StumbleContext? = null

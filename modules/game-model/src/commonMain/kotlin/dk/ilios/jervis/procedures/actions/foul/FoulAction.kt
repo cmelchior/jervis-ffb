@@ -31,7 +31,7 @@ import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.reports.ReportActionEnded
 import dk.ilios.jervis.reports.ReportFoulResult
 import dk.ilios.jervis.rules.PlayerActionType
@@ -47,7 +47,7 @@ data class FoulContext(
     val victim: Player? = null,
     val foulAssists: Int = 0,
     val defensiveAssists: Int = 0,
-    val injuryRoll: RiskingInjuryRollContext? = null,
+    val injuryRoll: RiskingInjuryContext? = null,
     val hasMoved: Boolean = false,
     val hasFouled: Boolean = false,
     val spottedByTheRef: Boolean = false,

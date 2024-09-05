@@ -8,16 +8,17 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
-import dk.ilios.jervis.utils.assert
 import dk.ilios.jervis.utils.sum
 
 /**
@@ -42,13 +43,11 @@ import dk.ilios.jervis.utils.sum
  */
 object ArmourRoll: Procedure() {
     override val initialNode: Node = RollDice
-
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        assert(state.riskingInjuryRollsContext != null)
-        return null
-    }
-
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<RiskingInjuryContext>()
+    }
 
     object RollDice : ActionNode() {
         override fun getAvailableActions(
@@ -62,7 +61,7 @@ object ArmourRoll: Procedure() {
             rules: Rules,
         ): Command {
             return checkDiceRoll<D6Result, D6Result>(action) { die1, die2 ->
-                val context = state.riskingInjuryRollsContext!!
+                val context = state.getContext<RiskingInjuryContext>()
 
                 // Determine result of armour roll
                 // TODO This logic needs to be expanded to support things like Mighty Blow, Claw, Chainsaw and others.
@@ -71,7 +70,7 @@ object ArmourRoll: Procedure() {
                 val modifiers = emptyList<DiceModifier>() // Any skills that modify the result
                 val broken = (context.player.armorValue <= result)
 
-                val updatedContext = state.riskingInjuryRollsContext!!.copy(
+                val updatedContext = state.getContext<RiskingInjuryContext>().copy(
                     armourRoll = roll,
                     armourResult = result,
                     armourModifiers = modifiers,
@@ -80,7 +79,7 @@ object ArmourRoll: Procedure() {
 
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ARMOUR, roll),
-                    SetOldContext(Game::riskingInjuryRollsContext, updatedContext),
+                    SetContext(updatedContext),
                     ExitProcedure()
                 )
             }

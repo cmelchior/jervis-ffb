@@ -27,7 +27,7 @@ import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.SimpleLogEntry
@@ -125,7 +125,7 @@ object ResolveThrowARock : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val throwContext = state.getContext<ThrowARockContext>()
             return SetContext(
-                RiskingInjuryRollContext(
+                RiskingInjuryContext(
                     player = throwContext.currentPlayer!!,
                     mode = RiskingInjuryMode.HIT_BY_ROCK
                 )
@@ -134,7 +134,7 @@ object ResolveThrowARock : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                RemoveContext<RiskingInjuryRollContext>(),
+                RemoveContext<RiskingInjuryContext>(),
                 GotoNode(SelectPlayer)
             )
         }

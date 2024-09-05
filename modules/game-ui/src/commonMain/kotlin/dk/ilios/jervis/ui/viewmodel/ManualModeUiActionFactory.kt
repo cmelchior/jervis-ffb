@@ -96,6 +96,7 @@ import dk.ilios.jervis.procedures.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.injury.InjuryRoll
 import dk.ilios.jervis.procedures.injury.LastingInjuryRoll
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.procedures.weather.SwelteringHeat
 import dk.ilios.jervis.rules.skills.Block
 import dk.ilios.jervis.rules.skills.Dodge
@@ -321,7 +322,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             }
 
             is ArmourRoll.RollDice -> {
-                val player = controller.state.riskingInjuryRollsContext!!.player
+                val player = controller.state.getContext<RiskingInjuryContext>().player
                 DiceRollUserInputDialog.createArmourRollDialog(player)
             }
 
@@ -362,7 +363,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             }
 
             is CasualtyRoll.RollDie -> {
-                val player = controller.state.riskingInjuryRollsContext!!.player
+                val player = controller.state.getContext<RiskingInjuryContext>().player
                 DiceRollUserInputDialog.createCasualtyRollDialog(rules, player)
             }
 
@@ -428,12 +429,12 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             }
 
             is InjuryRoll.RollDice -> {
-                val player = controller.state.riskingInjuryRollsContext!!.player
+                val player = controller.state.getContext<RiskingInjuryContext>().player
                 DiceRollUserInputDialog.createInjuryRollDialog(rules, player)
             }
 
             is LastingInjuryRoll.RollDice -> {
-                val player = controller.state.riskingInjuryRollsContext!!.player
+                val player = controller.state.getContext<RiskingInjuryContext>().player
                 DiceRollUserInputDialog.createLastingInjuryRollDialog(rules, player)
             }
 
@@ -463,7 +464,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             }
 
             is RiskingInjuryRoll.ChooseToUseApothecary -> {
-                val context = controller.state.riskingInjuryRollsContext!!
+                val context = controller.state.getContext<RiskingInjuryContext>()
                 SingleChoiceInputDialog.createUseApothecaryDialog(context)
             }
 

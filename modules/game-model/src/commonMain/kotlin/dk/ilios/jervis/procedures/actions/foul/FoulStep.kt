@@ -10,9 +10,9 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetCoachBanned
 import dk.ilios.jervis.commands.SetContext
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.SetTurnOver
@@ -31,7 +31,7 @@ import dk.ilios.jervis.model.modifiers.DefensiveAssistsModifier
 import dk.ilios.jervis.model.modifiers.OffensiveAssistModifier
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRollContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.ArgueTheCallResult
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -74,7 +74,7 @@ object FoulStep: Procedure() {
     object RollForFoul: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val foulContext = state.getContext<FoulContext>()
-            val injuryContext = RiskingInjuryRollContext(
+            val injuryContext = RiskingInjuryContext(
                 player = foulContext.victim!!,
                 mode = RiskingInjuryMode.FOUL,
                 armourModifiers = listOf(
@@ -82,19 +82,19 @@ object FoulStep: Procedure() {
                     DefensiveAssistsModifier(foulContext.defensiveAssists)
                 )
             )
-            return SetOldContext(Game::riskingInjuryRollsContext, injuryContext)
+            return SetContext(injuryContext)
         }
 
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val foulContext =state.getContext<FoulContext>()
-            val injuryContext = state.riskingInjuryRollsContext!!
+            val injuryContext = state.getContext<RiskingInjuryContext>()
             val spottedByRef: Boolean =
                 (injuryContext.armourRoll[0] == 1.d6 && injuryContext.armourRoll[1] == 1.d6) ||
                 (injuryContext.injuryRoll[0] == 1.d6 && injuryContext.injuryRoll[1] == 1.d6)
             return compositeCommandOf(
-                SetOldContext(Game::riskingInjuryRollsContext, null),
+                RemoveContext<RiskingInjuryContext>(),
                 SetContext(foulContext.copy(
                     injuryRoll = injuryContext,
                     spottedByTheRef = spottedByRef)),

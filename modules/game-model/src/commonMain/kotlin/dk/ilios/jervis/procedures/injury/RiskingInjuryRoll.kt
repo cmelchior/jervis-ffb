@@ -28,6 +28,8 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.inducements.ApothecaryType
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.reports.ReportInjuryResult
@@ -40,6 +42,7 @@ import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 enum class RiskingInjuryMode {
+    FALLING_OVER,
     KNOCKED_DOWN,
     PUSHED_INTO_CROWD,
     FOUL,
@@ -47,7 +50,7 @@ enum class RiskingInjuryMode {
 }
 
 // What do we need to track?
-data class RiskingInjuryRollContext(
+data class RiskingInjuryContext(
     val player: Player,
     val mode: RiskingInjuryMode = RiskingInjuryMode.KNOCKED_DOWN, // Do we need this?
     val armourRoll: List<D6Result> = listOf(),
@@ -69,7 +72,7 @@ data class RiskingInjuryRollContext(
 /**
  * Implement Armour and Injury Rolls as described on page 60-62 in the rulebook.
  *
- * [Game.riskingInjuryRollsContext] is not cleared when exiting this procedure.
+ * [RiskingInjuryContext] is not cleared when exiting this procedure.
  * The caller must do this.
  *
  * Also, specifically, this procedure does not control turn overs. It is up to the
@@ -77,21 +80,17 @@ data class RiskingInjuryRollContext(
  */
 object RiskingInjuryRoll: Procedure() {
     override val initialNode: Node = DetermineStartingRoll
-
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        if (state.riskingInjuryRollsContext == null) {
-            INVALID_GAME_STATE("Missing injury context")
-        }
-        return null
-    }
-
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        return ReportInjuryResult(state.riskingInjuryRollsContext!!)
+        return ReportInjuryResult(state.getContext<RiskingInjuryContext>())
+    }
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<RiskingInjuryContext>()
     }
 
     object DetermineStartingRoll: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            return state.riskingInjuryRollsContext!!.let { context ->
+            return state.getContext<RiskingInjuryContext>().let { context ->
                 if (context.mode == RiskingInjuryMode.PUSHED_INTO_CROWD) {
                     GotoNode(RollForInjury)
                 } else {
@@ -107,7 +106,7 @@ object RiskingInjuryRoll: Procedure() {
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.riskingInjuryRollsContext!!
+            val context = state.getContext<RiskingInjuryContext>()
             return if (context.armourBroken) {
                 GotoNode(RollForInjury)
             } else {
@@ -126,7 +125,7 @@ object RiskingInjuryRoll: Procedure() {
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.riskingInjuryRollsContext!!
+            val context = state.getContext<RiskingInjuryContext>()
             return when (context.injuryResult) {
                 InjuryResult.STUNNED -> {
                     // If pushed into the crowed, stunned will move you to Reserves
@@ -169,7 +168,7 @@ object RiskingInjuryRoll: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = CasualtyRoll
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.riskingInjuryRollsContext!!
+            val context = state.getContext<RiskingInjuryContext>()
 
             val playerChangeCommands = when (context.casualtyResult) {
                 CasualtyResult.BADLY_HURT -> {
@@ -213,7 +212,7 @@ object RiskingInjuryRoll: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = LastingInjuryRoll
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.riskingInjuryRollsContext!!
+            val context = state.getContext<RiskingInjuryContext>()
             return compositeCommandOf(
                 // TODO Missing stat modifier
                 SetPlayerState(context.player, PlayerState.SERIOUS_INJURY),
@@ -224,7 +223,7 @@ object RiskingInjuryRoll: Procedure() {
 
     object ChooseToUseApothecary: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.riskingInjuryRollsContext!!
+            val context = state.getContext<RiskingInjuryContext>()
             val hasApothecary = context.player.team.teamApothecaries.count { it.type == ApothecaryType.STANDARD && !it.used } > 0
             return when (hasApothecary) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
@@ -233,7 +232,7 @@ object RiskingInjuryRoll: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.riskingInjuryRollsContext!!
+            val context = state.getContext<RiskingInjuryContext>()
             val player = context.player
             val team = player.team
             val moveToDogOut = context.armourBroken && context.injuryResult != InjuryResult.STUNNED
