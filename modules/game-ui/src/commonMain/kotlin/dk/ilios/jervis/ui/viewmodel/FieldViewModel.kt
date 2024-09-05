@@ -13,6 +13,7 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.ui.ContextMenuOption
 import dk.ilios.jervis.ui.model.UiFieldSquare
 import dk.ilios.jervis.ui.model.UiPlayer
@@ -74,17 +75,18 @@ class FieldViewModel(
                     if (
                         activePlayer != null &&
                         square != null &&
-                        activePlayer.location.coordinate != square
-                        && activePlayer.movesLeft > 0
-
+                        activePlayer.location.coordinate != square &&
+                        activePlayer.movesLeft > 0 &&
+                        rules.calculateMarks(game, activePlayer.team, activePlayer.location.coordinate) <= 0
                     ) {
                         val path: List<FieldCoordinate> =
                             rules.pathFinder.calculateShortestPath(
                                 game,
                                 activePlayer.location.coordinate,
                                 square,
-                                activePlayer.movesLeft,
+                                activePlayer.movesLeft ,
                             ).path
+
                         val pathSteps = path
                             .mapIndexed { index, fieldCoordinate -> fieldCoordinate to (index + 1) }
                             .toMap()
@@ -211,8 +213,17 @@ class FieldViewModel(
                                     if (square.x == input.activePlayerLocation.x && square.y == input.activePlayerLocation.y) {
                                         contextAction.addAll(
                                             input.actions.map {
+                                                val name = when(it.action) {
+                                                    PlayerActionType.MOVE -> "Move"
+                                                    PlayerActionType.PASS -> "Pass"
+                                                    PlayerActionType.HAND_OFF -> "Hand-off"
+                                                    PlayerActionType.BLOCK -> "Block"
+                                                    PlayerActionType.BLITZ -> "Blitz"
+                                                    PlayerActionType.FOUL -> "Foul"
+                                                    PlayerActionType.SPECIAL -> "Special"
+                                                }
                                                 ContextMenuOption(
-                                                    it.action.name,
+                                                    name,
                                                     { this@FieldViewModel.uiActionFactory.userSelectedAction(it) },
                                                 )
                                             },

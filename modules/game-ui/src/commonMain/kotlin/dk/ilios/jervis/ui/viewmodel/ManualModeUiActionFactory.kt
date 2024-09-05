@@ -239,10 +239,11 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                                     // Normal moves are converted to just choosing the square on the field
                                     val pathFinder = controller.rules.pathFinder
                                     val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
+                                    val requiresDodge = controller.rules.calculateMarks(controller.state, player.team, startLocation) > 0
                                     val allPaths = pathFinder.calculateAllPaths(
                                         controller.state,
                                         startLocation,
-                                        player.movesLeft,
+                                        if (requiresDodge) 1 else player.movesLeft,
                                     )
                                     SelectMoveActionFieldLocationInput(
                                         wrapperAction = calculateOptionsForMoveType(controller.state, controller.rules, player, MoveType.STANDARD).map { it: ActionDescriptor ->
