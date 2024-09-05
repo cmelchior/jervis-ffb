@@ -10,6 +10,7 @@ import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
@@ -125,7 +126,7 @@ object PassStep: Procedure() {
             return compositeCommandOf(
                 SetBallState.scattered(),
                 SetBallLocation(context.target!!),
-                SetOldContext(Game::scatterRollContext, ScatterRollContext(from = context.target ))
+                SetContext(ScatterRollContext(from = context.target ))
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter
@@ -137,14 +138,14 @@ object PassStep: Procedure() {
                 compositeCommandOf(
                     SetBallState.outOfBounds(context.outOfBoundsAt),
                     SetBallLocation(FieldCoordinate.OUT_OF_BOUNDS),
-                    SetOldContext(Game::scatterRollContext, null),
+                    RemoveContext<ScatterRollContext>(),
                     GotoNode(AttemptPassingInterferenceBeforeGoingOutOfBounds)
                 )
             } else {
                 compositeCommandOf(
                     SetBallState.scattered(),
                     SetBallLocation(context.landsAt!!),
-                    SetOldContext(Game::scatterRollContext, null),
+                    RemoveContext<ScatterRollContext>(),
                     GotoNode(AttemptPassingInterference)
                 )
             }

@@ -34,35 +34,21 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  */
 object DetermineKickingTeam : Procedure() {
     override val initialNode: Node = SelectCoinSide
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? {
-        if (!state.activeTeam.isHomeTeam()) {
-            INVALID_GAME_STATE("Home team should be active at this stage.")
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
+        if (state.activeTeam != state.receivingTeam) {
+            // TODO That doesn't always seem to be true
+            INVALID_GAME_STATE("Receiving team should be active at this stage: ${state.receivingTeam.name} vs. ${state.activeTeam.name}")
         }
-        return null
     }
 
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
     object SelectCoinSide : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(dk.ilios.jervis.actions.SelectCoinSide)
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<CoinSideSelected>(action) {
                 val result = it.side
                 compositeCommandOf(
@@ -74,16 +60,9 @@ object DetermineKickingTeam : Procedure() {
     }
 
     object CoinToss : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> = listOf(TossCoin)
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(TossCoin)
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<CoinTossResult>(action) {
                 val result: Coin = it.result
                 return if (result == state.coinSideSelected) {
@@ -103,20 +82,13 @@ object DetermineKickingTeam : Procedure() {
     }
 
     object ChooseKickingTeam : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> =
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> =
             listOf(
                 ConfirmWhenReady, /* Chooser becomes kicker */
                 CancelWhenReady, /* Chooser becomes receiver */
             )
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Cancel -> {
                     compositeCommandOf(

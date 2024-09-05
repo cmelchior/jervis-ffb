@@ -4,6 +4,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.Rules
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class JervisFile(
@@ -28,7 +29,7 @@ data class JervisConfiguration(
  */
 @Serializable
 data class JervisGameData(
-    val homeTeam: Team,
-    val awayTeam: Team,
+    val homeTeam: JsonElement,
+    val awayTeam: JsonElement,
     val actions: List<GameAction>,
 )

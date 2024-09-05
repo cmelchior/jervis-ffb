@@ -34,7 +34,8 @@ import dk.ilios.jervis.rules.tables.TableResult
 
 data class KickOffEventContext(
     val roll: DiceResults,
-    val result: TableResult
+    val result: TableResult,
+    val scatterBallBeforeLanding: Boolean = false // If Changing Weather rolled Perfect Conditions
 ): ProcedureContext
 
 /**
@@ -69,13 +70,44 @@ object TheKickOffEvent : Procedure() {
             return state.getContext<KickOffEventContext>().result.procedure
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<KickOffEventContext>()
+            return if (context.scatterBallBeforeLanding) {
+                compositeCommandOf(
+                    SetBallState.scattered(),
+                    RemoveContext<KickOffEventContext>(),
+                    GotoNode(ScatterBallBeforeLanding)
+                )
+            } else {
+                compositeCommandOf(
+                    RemoveContext<KickOffEventContext>(),
+                    GotoNode(WhatGoesUpMustComeDown)
+                )
+            }
+        }
+    }
+
+    /**
+     * The ball scatters further while high in the air, before coming down.
+     * Should only happen if Changing Weather (on the Kick-off Event Table) rolled Perfect
+     * Conditions.
+     */
+    object ScatterBallBeforeLanding : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            return SetContext(ScatterRollContext(from = state.ball.location.coordinate))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                RemoveContext<KickOffEventContext>(),
+                RemoveContext<ScatterRollContext>(),
                 GotoNode(WhatGoesUpMustComeDown)
             )
         }
     }
 
+    /**
+     * Resolve the "What goes up, must come down" step.
+     * See page 41 in the rulebook.
+     */
     object WhatGoesUpMustComeDown : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             // If out-of-bounds, award touch back

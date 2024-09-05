@@ -21,9 +21,11 @@ import dk.ilios.jervis.reports.LogEntry
 import dk.ilios.jervis.reports.ReportHandleAction
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.serialize.JervisSerialization
 import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.serialization.json.JsonElement
 
 sealed interface ListEvent
 
@@ -35,6 +37,10 @@ class GameController(
     rules: Rules,
     state: Game,
 ) {
+    // Copy of the state Home and Away teams, taken just before starting the game
+    var initialHomeTeamState: JsonElement? = null
+    var initialAwayTeamState: JsonElement? = null
+
     private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 0, extraBufferCapacity = 20_000)
     val logsEvents: Flow<ListEvent> = _logsEvents
     val logs: MutableList<LogEntry> = mutableListOf()
@@ -179,6 +185,12 @@ class GameController(
         if (isStarted) {
             throw IllegalStateException("Game was already started")
         }
+
+        // Save a snapshot of the initial state for Home and Awway teams
+        initialHomeTeamState = JervisSerialization.createTeamSnapshot(state.homeTeam)
+        initialAwayTeamState = JervisSerialization.createTeamSnapshot(state.awayTeam)
+
+        // Set up the initial starting procedure
         isStarted = true
         setInitialProcedure(startingProcedure)
     }
