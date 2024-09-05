@@ -201,7 +201,14 @@ private fun FieldSquare(
     Box(modifier = boxWrapperModifier) {
         if (showPopup) {
             ContextPopupMenu(
-                hidePopup = { showPopup = false },
+                hidePopup = { dimissed ->
+                    showPopup = false
+                    if (dimissed)  {
+                        square.onMenuHidden?.let {
+                            it()
+                        }
+                    }
+                },
                 commands = square.contextMenuOptions,
             )
         }

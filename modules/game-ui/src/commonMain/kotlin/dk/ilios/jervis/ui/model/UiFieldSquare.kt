@@ -16,6 +16,7 @@ data class UiFieldSquare(
     val isBallCarried: Boolean = false,
     val player: UiPlayer? = null,
     val onSelected: (() -> Unit)? = null,
+    val onMenuHidden: (() -> Unit?)? = null,
     val requiresRoll: Boolean = false,
     val contextMenuOptions: List<ContextMenuOption> = emptyList(),
     val showContextMenu: Boolean = false,

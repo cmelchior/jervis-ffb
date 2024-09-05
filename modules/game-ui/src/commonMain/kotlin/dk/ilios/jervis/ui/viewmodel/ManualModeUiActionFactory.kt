@@ -95,8 +95,8 @@ import dk.ilios.jervis.procedures.injury.ArmourRoll
 import dk.ilios.jervis.procedures.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.injury.InjuryRoll
 import dk.ilios.jervis.procedures.injury.LastingInjuryRoll
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
 import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
 import dk.ilios.jervis.procedures.weather.SwelteringHeat
 import dk.ilios.jervis.rules.skills.Block
 import dk.ilios.jervis.rules.skills.Dodge
@@ -254,7 +254,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                                                         FieldSquareSelected(it.coordinate)
                                                     )
                                                 ),
-                                                requiresRoll = it.requiresRush
+                                                requiresRoll = it.requiresRush || it.requiresDodge
                                             )
                                         },
                                         distances = allPaths

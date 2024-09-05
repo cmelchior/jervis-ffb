@@ -192,7 +192,7 @@ interface Rules {
      */
     fun calculateMarks(
         game: Game,
-        team: Team,
+        movingTeam: Team,
         square: FieldCoordinate,
     ): Int {
         if (!square.isOnField(this)) throw IllegalArgumentException("${square.toLogString()} is not on the field")
@@ -200,7 +200,7 @@ interface Rules {
             val markingPlayer: Player? = game.field[coordinate].player
             val otherTeam = markingPlayer?.team
             val canMark = markingPlayer?.let { canMark(it) } ?: false
-            if (markingPlayer != null && otherTeam != team && canMark) {
+            if (markingPlayer != null && otherTeam != movingTeam && canMark) {
                 acc + 1
             } else {
                 acc

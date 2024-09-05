@@ -55,6 +55,7 @@ data class SelectFieldLocation private constructor(
     val y: Int,
     val type: Type,
     val requiresRush: Boolean = false,
+    val requiresDodge: Boolean = false,
 ) : ActionDescriptor {
     // What is causing this field location to be selectable
     // This is in order so the UI can filter or show options in different ways.
@@ -70,13 +71,13 @@ data class SelectFieldLocation private constructor(
         THROW_TARGET
     }
     val coordinate: FieldCoordinate = FieldCoordinate(x, y)
-    private constructor(coordinate: FieldCoordinate, type: Type, needRush: Boolean = false) : this(coordinate.x, coordinate.y, type, needRush)
+    private constructor(coordinate: FieldCoordinate, type: Type, needRush: Boolean = false, needDodge: Boolean = false) : this(coordinate.x, coordinate.y, type, needRush, needDodge)
 
     companion object {
         fun setup(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.SETUP)
         fun push(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.PUSH)
         fun standUp(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.STAND_UP)
-        fun move(coordinate: FieldCoordinate, needRush: Boolean) = SelectFieldLocation(coordinate, Type.MOVE, needRush)
+        fun move(coordinate: FieldCoordinate, needRush: Boolean, needDodge: Boolean) = SelectFieldLocation(coordinate, Type.MOVE, needRush, needDodge)
         fun rush(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.RUSH)
         fun jump(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.JUMP)
         fun leap(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.LEAP)

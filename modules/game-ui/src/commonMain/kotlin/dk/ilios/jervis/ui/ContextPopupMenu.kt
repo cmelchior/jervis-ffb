@@ -26,7 +26,8 @@ data class ContextMenuOption(val title: String, val command: () -> Unit)
 
 @Composable
 fun ContextPopupMenu(
-    hidePopup: () -> Unit,
+    // Boolean = true, if popup is manually dismissed
+    hidePopup: (Boolean) -> Unit,
     commands: List<ContextMenuOption>,
 ) {
     // Calculate the offset of the popup, so it is displayed best on the screen
@@ -58,7 +59,7 @@ fun ContextPopupMenu(
         )
     }
     if (commands.isEmpty()) {
-        hidePopup()
+        hidePopup(false)
         return
     }
     Box(modifier = Modifier.fillMaxSize().clickable { /* Intercept events outside popup */ }) {
@@ -75,7 +76,7 @@ fun ContextPopupMenu(
                     }
                 },
             properties = PopupProperties(),
-            onDismissRequest = { hidePopup() },
+            onDismissRequest = { hidePopup(true) },
         ) {
             Column(modifier = Modifier.width(IntrinsicSize.Max).background(MaterialTheme.colors.background)) {
                 commands.forEach { (title, cmd) ->
@@ -85,7 +86,7 @@ fun ContextPopupMenu(
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colors.background)
                                 .clickable {
-                                    hidePopup()
+                                    hidePopup(false)
                                     cmd()
                                 },
                     ) {

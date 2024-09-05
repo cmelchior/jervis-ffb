@@ -31,11 +31,12 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
         MoveType.JUMP -> TODO()
         MoveType.LEAP -> TODO()
         MoveType.STANDARD -> {
+            val requiresDodge = rules.calculateMarks(state, player.team, player.location.coordinate) > 0
             val eligibleEmptySquares: List<ActionDescriptor> =
                 if (player.movesLeft + player.rushesLeft > 0) {
                     player.location.coordinate.getSurroundingCoordinates(rules)
                         .filter { state.field[it].isUnoccupied() }
-                        .map { SelectFieldLocation.move(it, player.movesLeft <= 0) }
+                        .map { SelectFieldLocation.move(it, player.movesLeft <= 0, requiresDodge) }
                 } else {
                     emptyList()
                 }

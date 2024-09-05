@@ -71,7 +71,13 @@ class FieldViewModel(
             if (!ignoreUserInput && userInput is CompositeUserInput) {
                 userInput.inputs.firstOrNull { it is SelectMoveActionFieldLocationInput }?.let {
                     val activePlayer: Player? = game.activePlayer
-                    if (activePlayer != null && square != null && activePlayer.location.coordinate != square && activePlayer.movesLeft > 0) {
+                    if (
+                        activePlayer != null &&
+                        square != null &&
+                        activePlayer.location.coordinate != square
+                        && activePlayer.movesLeft > 0
+
+                    ) {
                         val path: List<FieldCoordinate> =
                             rules.pathFinder.calculateShortestPath(
                                 game,
@@ -153,6 +159,7 @@ class FieldViewModel(
                 (0 until rules.fieldHeight.toInt()).forEach { y ->
                     val square = game.field[x, y]
                     var squareAction: (() -> Unit)? = null
+                    var onMenuHiddenAction: (() -> Unit)? = null
                     var requiresRoll = false
                     val contextAction: MutableList<ContextMenuOption> = mutableListOf()
                     var showContextMenu = false
@@ -172,6 +179,7 @@ class FieldViewModel(
                                     // Since `deselect` only applies to the active player, check if the player in the square is active.
                                     if (square.player?.isActive == true) {
                                         squareAction = { uiActionFactory.userSelectedAction(input.actions.first()) }
+                                        onMenuHiddenAction = squareAction
                                     }
                                 }
 
@@ -273,6 +281,7 @@ class FieldViewModel(
                             square.player?.hasBall() == true,
                             uiPlayer,
                             squareAction, // Only allow a Square Action if no player is on the field
+                            onMenuHiddenAction,
                             requiresRoll,
                             contextAction,
                             showContextMenu,
