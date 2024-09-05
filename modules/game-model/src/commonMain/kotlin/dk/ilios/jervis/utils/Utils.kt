@@ -180,7 +180,7 @@ fun createRandomAction(
         is SelectRandomPlayers ->
             RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
 
-        SelectNoReroll -> NoRerollSelected
+        is SelectNoReroll -> NoRerollSelected
         is SelectRerollOption -> RerollOptionSelected(action.option)
         is SelectDiceResult -> action.choices.random()
         is SelectMoveType -> MoveTypeSelected(action.type)

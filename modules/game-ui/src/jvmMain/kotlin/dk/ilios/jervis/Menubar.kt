@@ -10,6 +10,7 @@ import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
 import dk.ilios.jervis.ui.filePicker
+import dk.ilios.jervis.ui.viewmodel.Feature
 import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 import okio.Path
 
@@ -17,7 +18,7 @@ import okio.Path
 fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
     var action by remember { mutableStateOf("Last action: None") }
     var isOpen by remember { mutableStateOf(true) }
-    var isSubmenuShowing by remember { mutableStateOf(false) }
+    var rerollSuccessfulActions by remember { mutableStateOf(vm.isFeatureEnabled(Feature.REROLL_SUCCESSFUL_ACTIONS)) }
     MenuBar {
         Menu("Developer Tools", mnemonic = 'D') {
             Item("Save Game", onClick = {
@@ -37,6 +38,18 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
                 vm.undoAction()
             }
         }
+
+        Menu ("Automated Actions", mnemonic = 'A') {
+            CheckboxItem(
+                "Reroll successful actions",
+                checked = rerollSuccessfulActions,
+                onCheckedChange = { enabled ->
+                    rerollSuccessfulActions = enabled
+                    vm.toggleFeature(Feature.REROLL_SUCCESSFUL_ACTIONS, enabled)
+                }
+            )
+        }
+
 //        Menu("Help", mnemonic = 'H') {
 //            Item("About", onClick = { action = "About" })
 //            Item("Help", onClick = { action = "Help" })

@@ -137,7 +137,7 @@ object BlockRoll : Procedure() {
                     } else {
                         emptyList()
                     }
-                listOf(SelectNoReroll) + availableSkills + teamRerolls
+                listOf(SelectNoReroll(null)) + availableSkills + teamRerolls
             }
         }
 

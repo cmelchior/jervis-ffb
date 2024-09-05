@@ -157,6 +157,12 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         actions: List<ActionDescriptor>,
     ): GameAction? {
 
+        if (!model.menuViewModel.isFeatureEnabled(Feature.REROLL_SUCCESSFUL_ACTIONS)) {
+            if (actions.filterIsInstance<SelectNoReroll>().count { it.rollSuccessful == true} > 0) {
+                return NoRerollSelected
+            }
+        }
+
         val currentNode = controller.currentProcedure()?.currentNode()
 
         // If a team has no further actions, just end their turn immediately
@@ -668,7 +674,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
                     RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
                 }
 
-                SelectNoReroll -> NoRerollSelected
+                is SelectNoReroll -> NoRerollSelected
                 is SelectRerollOption -> RerollOptionSelected(action.option)
                 is SelectDiceResult -> action.choices.random()
                 is SelectMoveType -> MoveTypeSelected(action.type)

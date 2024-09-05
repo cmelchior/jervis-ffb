@@ -341,7 +341,7 @@ import dk.ilios.jervis.utils.sum
             return if (availableReRolls.isEmpty()) {
                 listOf(ContinueWhenReady)
             } else {
-                listOf(SelectNoReroll) + availableReRolls
+                listOf(SelectNoReroll(context.isSuccess)) + availableReRolls
             }
         }
 

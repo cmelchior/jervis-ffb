@@ -105,7 +105,9 @@ data class SelectRandomPlayers(val count: Int, val players: List<PlayerId>) : Ac
 // data class SelectTeamRerollSource(val reroll: TeamReroll): ActionDescriptor
 data class SelectRerollOption(val option: DiceRerollOption) : ActionDescriptor
 
-data object SelectNoReroll : ActionDescriptor
+// Successful might be hard to interpret in some cases, in which this is `null`
+// Otherwise it contains
+data class SelectNoReroll(val rollSuccessful: Boolean? = null) : ActionDescriptor
 
 // Available actions
 @Serializable

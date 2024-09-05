@@ -81,7 +81,7 @@ object CatchRoll : Procedure() {
             return if (availableRerolls.isEmpty()) {
                 listOf(ContinueWhenReady)
             } else {
-                listOf(SelectNoReroll) + availableRerolls
+                listOf(SelectNoReroll(context.isSuccess)) + availableRerolls
             }
         }
 

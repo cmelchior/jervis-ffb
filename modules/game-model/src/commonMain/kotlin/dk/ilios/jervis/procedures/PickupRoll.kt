@@ -105,7 +105,7 @@ object PickupRoll : Procedure() {
                     } else {
                         emptyList()
                     }
-                listOf(SelectNoReroll) + availableSkills + teamReroll
+                listOf(SelectNoReroll(context.isSuccess)) + availableSkills + teamReroll
             }
         }
 
