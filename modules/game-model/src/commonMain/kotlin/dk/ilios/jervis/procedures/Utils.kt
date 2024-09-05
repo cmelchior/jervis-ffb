@@ -5,11 +5,18 @@ import dk.ilios.jervis.commands.RemovePlayerSkill
 import dk.ilios.jervis.commands.RemovePlayerStatModifier
 import dk.ilios.jervis.commands.RemovePrayersToNuffle
 import dk.ilios.jervis.commands.SetPlayerRushesLeft
+import dk.ilios.jervis.commands.SetSpecialPlayCardActive
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.hasSkill
+import dk.ilios.jervis.model.inducements.InfamousCoachAbility
+import dk.ilios.jervis.model.inducements.InfamousCoachingStaff
+import dk.ilios.jervis.model.inducements.SpecialPlayCard
+import dk.ilios.jervis.model.inducements.Spell
+import dk.ilios.jervis.model.inducements.Timing
+import dk.ilios.jervis.model.inducements.wizards.Wizard
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.skills.Sprint
 
 /**
@@ -24,7 +31,7 @@ fun getSetPlayerRushesCommand(rules: Rules, player: Player): Command {
  * Returns all commands that reset temporary table results, stat and skill modifiers for the
  * current active team.
  */
-fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: ResetPolicy): Array<Command> {
+fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Duration): Array<Command> {
     val teams = listOf(state.homeTeam, state.awayTeam)
 
     // Find all temporary player stat characteristics modifiers
@@ -52,6 +59,14 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Rese
             .map { RemovePrayersToNuffle(team, it) }
     }
 
+    // All active special play cards that has ended their duration are marked
+    // as played
+    val specialPlayCards: List<SetSpecialPlayCardActive> = teams.flatMap { team ->
+        team.specialPlayCards
+            .filter { it.isActive && duration == duration }
+            .map { SetSpecialPlayCardActive(it, false) }
+    }
+
     return (
         removableStatModifiers +
         removableSkills +
@@ -59,5 +74,24 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Rese
     ).toTypedArray()
 }
 
+/**
+ * Returns all available spells across all wizards
+ */
+fun List<Wizard>.getAvailableSpells(trigger: Timing): List<Spell> {
+    return this.flatMap { it.getAvailableSpells(trigger) }
+}
+
+fun List<SpecialPlayCard>.getAvailableCards(trigger: Timing, state: Game, rules: Rules): List<SpecialPlayCard> {
+    return this
+        .filter { it.triggers.contains(trigger) && !it.used }
+        .filter { it.isApplicable(state, rules) }
+}
+
+fun List<InfamousCoachingStaff>.getAvailableAbilities(trigger: Timing, state: Game, rules: Rules): List<InfamousCoachAbility> {
+    return this
+        .flatMap { it.specialAbilities }
+        .filter { it.triggers.contains(trigger) && !it.used }
+        .filter { it.isApplicable(state, rules) }
+}
 
 

@@ -11,7 +11,30 @@ This document lists all game mechanics that have been fully implemented with tes
   - [x] Pouring Rain
   - [x] Blizzard
 - [ ] Take on Journeymen
-- [ ] Inducements
+- [ ] Inducements (Select and Buy)
+  - [ ] Temp Agency Cheerleaders
+  - [ ] Part-time Assistant Coaches
+  - [ ] Weather Mage
+  - [ ] Bloodweiser Kegs
+  - [ ] Special Plays (soooo many cards)
+  - [ ] Extra Team Training
+  - [ ] Bribes
+  - [ ] Wandering Apothecaries
+  - [ ] Mortuary Assistant
+  - [ ] Plague Doctor
+  - [ ] Riteous Rockies
+  - [ ] Halfing Master Chef
+  - [ ] Unlimited Mercenary Players
+  - [ ] Star Players
+  - [ ] (In)famous Coaching Staff
+    - [ ] Josef Bugman 
+    - [ ] How many others(???)
+  - [ ] Wizard
+    - [ ] Hireling Sports-Wizard
+    - [ ] How many others(???)
+  - [ ] Biased Referee 
+    - [ ] Biased Referee
+    - [ ] How many others(???)
 - [x] Roll on Prayers to Nuffle Table
   - [ ] Treacherous Trapdoor
   - [x] Friends with the Ref
@@ -33,12 +56,20 @@ This document lists all game mechanics that have been fully implemented with tes
 ## Start of Drive
 
 - [ ] Setup
-- [ ] The Kick-off
-- [ ] The Kick-off Event
-  - [ ] Kick-off Event Table
+- [ ] Kick-off (Kicking player and target)
+- [x] The Kick-off Event
+  - [x] Get the Ref
+  - [x] Time-out
+  - [ ] Solid Defense
+  - [ ] High Kick
+  - [ ] Cheering Fans
+  - [ ] Brilliant Coaching
+  - [ ] Changing Weather
+  - [ ] Quick Snap
+  - [ ] Blitz
+  - [ ] Officious Ref
+  - [ ] Pitch Invasion
 - [ ] What goes up, must come down
-- [ ] Catch
-- [ ] Bounce
 - [ ] Touchbacks
 
 ## Game
@@ -54,6 +85,8 @@ This document lists all game mechanics that have been fully implemented with tes
 - [ ] Deviating Ball
 - [ ] Scatter Ball
 - [ ] Bouncing Ball
+- [ ] Catch
+- [ ] Bounce
 - [ ] Throw-in
 - [ ] Weather
 - [ ] Fan Factor
@@ -71,3 +104,5 @@ This document lists all game mechanics that have been fully implemented with tes
 - [ ] Stalling
 - [ ] Trapdoors
 - [ ] Maximum Stats
+- [ ] Knocked Down
+- [ ] Fall Over

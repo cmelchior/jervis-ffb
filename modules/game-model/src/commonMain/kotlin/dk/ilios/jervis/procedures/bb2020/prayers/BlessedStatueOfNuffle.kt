@@ -25,7 +25,7 @@ import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.Pro
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 
 /**
  * Procedure for handling the Prayer to Nuffle "Blessed Statue of Nuffle" as described on page 39
@@ -65,7 +65,7 @@ object BlessedStatueOfNuffle : Procedure() {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
                         compositeCommandOf(
-                            AddPlayerSkill(player, Pro(isTemporary = true, expiresAt = ResetPolicy.END_OF_GAME)),
+                            AddPlayerSkill(player, Pro(isTemporary = true, expiresAt = Duration.END_OF_GAME)),
                             SetContext(context.copy(resultApplied = true)),
                             SimpleLogEntry("${player.name} received Blessed Statue of Nuffle (Pro)", category = LogCategory.GAME_PROGRESS),
                             ExitProcedure(),

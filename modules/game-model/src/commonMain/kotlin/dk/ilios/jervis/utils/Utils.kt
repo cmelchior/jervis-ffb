@@ -31,6 +31,7 @@ import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.EndTurnWhenReady
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.InducementSelected
 import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
@@ -44,6 +45,7 @@ import dk.ilios.jervis.actions.SelectCoinSide
 import dk.ilios.jervis.actions.SelectDiceResult
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
+import dk.ilios.jervis.actions.SelectInducement
 import dk.ilios.jervis.actions.SelectMoveType
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectPlayer
@@ -183,6 +185,7 @@ fun createRandomAction(
         is SelectDiceResult -> action.choices.random()
         is SelectMoveType -> MoveTypeSelected(action.type)
         is SelectSkill -> SkillSelected(action.skill)
+        is SelectInducement -> InducementSelected(action.id)
     }
 }
 

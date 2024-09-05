@@ -24,7 +24,7 @@ import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.MightyBlow
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 
 /**
  * Procedure for handling the Prayer to Nuffle "Knuckle Dusters" as described on page 39
@@ -64,7 +64,7 @@ object KnuckleDusters : Procedure() {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
                         compositeCommandOf(
-                            AddPlayerSkill(player, MightyBlow(value = 1, isTemporary = true, expiresAt = ResetPolicy.END_OF_DRIVE)),
+                            AddPlayerSkill(player, MightyBlow(value = 1, isTemporary = true, expiresAt = Duration.END_OF_DRIVE)),
                             SimpleLogEntry("${player.name} received Knuckle Dusters", category = LogCategory.GAME_PROGRESS),
                             ExitProcedure(),
                         )

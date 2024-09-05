@@ -31,7 +31,7 @@ import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.MightyBlow
 import dk.ilios.jervis.rules.skills.Pro
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.skills.Stab
 import dk.ilios.jervis.rules.tables.PrayerStatModifier
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
@@ -173,7 +173,7 @@ class PrayersToNuffleTests: JervisGameTest() {
         assertTrue(player.hasSkill<Stab>())
         val stabSkill = player.getSkill<Stab>()
         assertTrue(stabSkill.isTemporary)
-        assertEquals(ResetPolicy.END_OF_DRIVE, stabSkill.expiresAt)
+        assertEquals(Duration.END_OF_DRIVE, stabSkill.expiresAt)
 
         // Goes away after the drive
         controller.rollForward(
@@ -268,7 +268,7 @@ class PrayersToNuffleTests: JervisGameTest() {
         assertTrue(player.hasSkill<MightyBlow>())
         val mightyBlowSkill = player.getSkill<MightyBlow>()
         assertTrue(mightyBlowSkill.isTemporary)
-        assertEquals(ResetPolicy.END_OF_DRIVE, mightyBlowSkill.expiresAt)
+        assertEquals(Duration.END_OF_DRIVE, mightyBlowSkill.expiresAt)
         assertEquals(1, mightyBlowSkill.value)
 
         // Will be removed after the drive

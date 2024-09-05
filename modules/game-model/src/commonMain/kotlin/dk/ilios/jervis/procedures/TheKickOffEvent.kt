@@ -4,6 +4,7 @@ import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.Dice
+import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RollDice
@@ -11,7 +12,9 @@ import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetBallState
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -21,10 +24,18 @@ import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.reports.ReportKickOffEventRoll
+import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportTouchback
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.tables.TableResult
+
+data class KickOffEventContext(
+    val roll: DiceResults,
+    val result: TableResult
+): ProcedureContext
 
 /**
  * Run the Kick-Off Event as well as the results of the ball coming back to the field.
@@ -33,75 +44,40 @@ import dk.ilios.jervis.rules.tables.TableResult
  */
 object TheKickOffEvent : Procedure() {
     override val initialNode: Node = RollForKickOffEvent
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollForKickOffEvent : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6, Dice.D6))
         }
 
-        // For High Kick:
-        // Following the strict ordering of the rules, the Kick-Off Event is resolved
-        // before "What Goes Up, Must Come Down". This means that the touchback rule cannot
-        // yet be applied when High Kick is resolved. Also, no-where is it stated that
-        // the high kick player cannot enter the opponents field. So in theory it would be
-        // allowed to move a player into the opponents field, resolve the ball coming down,
-        // which would result in a touchback. And then automatically give it to the player
-        // who was moved onto the opponents field.
-        //
-        // However, this seems against the spirits of the rules and are probably an oversight,
-        // So disallowing it for now unless someone can surface an official reference that
-        // contradicts this.
-        //
-        // Another node: If it is just rules that are unclear, and the touchback is awarded as soon as
-        // the ball leaves the kicking teams half, then this also impacts things like Blitz,
-        // where you
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result, D6Result>(action) { firstD6, secondD6 ->
                 val result: TableResult = rules.kickOffEventTable.roll(firstD6, secondD6)
                 compositeCommandOf(
-                    ReportKickOffEventRoll(firstD6, secondD6, result),
-                    GotoNode(ResolveKickOffTableEvent(result.procedure)),
+                    ReportDiceRoll(DiceRollType.KICK_OFF_TABLE, listOf(firstD6, secondD6)),
+                    SetContext(KickOffEventContext(roll = DiceResults(firstD6, secondD6), result = result)),
+                    GotoNode(ResolveKickOffTableEvent),
                 )
             }
         }
     }
 
-    class ResolveKickOffTableEvent(private val eventProcedure: Procedure) : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = eventProcedure
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
-            return GotoNode(WhatGoesUpMustComeDown)
+    object ResolveKickOffTableEvent : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return state.getContext<KickOffEventContext>().result.procedure
+        }
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                RemoveContext<KickOffEventContext>(),
+                GotoNode(WhatGoesUpMustComeDown)
+            )
         }
     }
 
     object WhatGoesUpMustComeDown : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             // If out-of-bounds, award touch back
             // If on an empty square, bounce
             // if landing on a player, they must/can(?) attempt to catch it
@@ -127,10 +103,7 @@ object TheKickOffEvent : Procedure() {
         var isFieldEmpty: Boolean = true
         var canCatch: Boolean = false
 
-        override fun onEnterNode(
-            state: Game,
-            rules: Rules,
-        ): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
             state.abortIfBallOutOfBounds = true // TODO Wrong way to do this
             isFieldEmpty = state.field[location].player != null
             canCatch = state.field[location].player?.let { rules.canCatch(state, it) } ?: false
@@ -143,17 +116,11 @@ object TheKickOffEvent : Procedure() {
             }
         }
 
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return if (canCatch) Catch else Bounce
         }
 
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun onExitNode(state: Game, rules: Rules): Command {
             state.abortIfBallOutOfBounds = false
             return if (state.ball.state == BallState.OUT_OF_BOUNDS) {
                 GotoNode(TouchBack)
@@ -164,10 +131,7 @@ object TheKickOffEvent : Procedure() {
     }
 
     object TouchBack : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return state.receivingTeam.filter {
                 it.hasTackleZones && it.state == PlayerState.STANDING && it.location.isOnField(rules)
             }.map {
@@ -175,11 +139,7 @@ object TheKickOffEvent : Procedure() {
             }
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<PlayerSelected>(action) {
                 return compositeCommandOf(
                     SetBallState.carried(it.getPlayer(state)),

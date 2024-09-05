@@ -2,7 +2,7 @@ package dk.ilios.jervis.rules.tables
 
 import dk.ilios.jervis.model.modifiers.StatModifier
 import dk.ilios.jervis.model.modifiers.StatModifier.Type
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 
 /**
  * Enumerate the possible stat modifications that can happen after
@@ -15,7 +15,7 @@ enum class LastingInjuryResult(
     override val description: String,
     override val modifier: Int,
     override val type: Type,
-    override val expiresAt: ResetPolicy = ResetPolicy.NEVER
+    override val expiresAt: Duration = Duration.PERMANENT
 ): StatModifier {
     HEAD_INJURY("Head Injury", -1, Type.AV),
     SMASHED_KNEE("Smashed Knee", -1, Type.MA),

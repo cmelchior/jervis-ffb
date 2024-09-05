@@ -4,15 +4,13 @@ import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.RemovePlayerStatModifier
-import dk.ilios.jervis.commands.RemovePrayersToNuffle
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.reports.ReportStartingGame
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 
 object FullGame : Procedure() {
     override val initialNode: Node = PreGameSequence
@@ -32,7 +30,7 @@ object FullGame : Procedure() {
             return if (state.halfNo < rules.halfsPrGame) {
                 GotoNode(RunGame)
             } else {
-                val resetCommands = getResetTemporaryModifiersCommands(state, rules, ResetPolicy.END_OF_GAME)
+                val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_GAME)
                 return compositeCommandOf(
                     *resetCommands,
                     GotoNode(PostGameSequence)

@@ -1,6 +1,6 @@
 package dk.ilios.jervis.model.modifiers
 
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 
 /**
  * Interface describing a change to a player's base line stat.
@@ -15,7 +15,7 @@ interface StatModifier {
     val description: String
     val modifier: Int
     val type: Type
-    val expiresAt: ResetPolicy
+    val expiresAt: Duration
 }
 
 //@Serializable

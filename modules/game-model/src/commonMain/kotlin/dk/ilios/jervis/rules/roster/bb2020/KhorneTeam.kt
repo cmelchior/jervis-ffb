@@ -61,7 +61,7 @@ data object KhorneTeam : BB2020Roster {
         )
     override val id: RosterId = RosterId("jervis-khorne")
     override val tier: Int = 2
-    override val specialRules: List<SpecialRules> = listOf(TeamSpecialRules.FAVOURED_OF_KHORNE)
+    override val specialRules: List<SpecialRules> = listOf(TeamSpecialRule.FAVOURED_OF_KHORNE)
     override val name: String = "Chaos Dwarf"
     override val numberOfRerolls: Int = 8
     override val rerollCost: Int = 60_000

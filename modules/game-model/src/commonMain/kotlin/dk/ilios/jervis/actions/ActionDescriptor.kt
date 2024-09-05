@@ -27,6 +27,8 @@ data object SelectCoinSide : ActionDescriptor
 
 data class SelectSkill(val skill: SkillFactory) : ActionDescriptor
 
+data class SelectInducement(val id: String): ActionDescriptor
+
 data object TossCoin : ActionDescriptor
 
 // Roll a number of dice and return their result

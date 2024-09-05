@@ -24,7 +24,7 @@ import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Loner
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.skills.Stab
 
 /**
@@ -65,7 +65,7 @@ object Stiletto : Procedure() {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
                         return compositeCommandOf(
-                            AddPlayerSkill(player, Stab(isTemporary = true, expiresAt = ResetPolicy.END_OF_DRIVE)),
+                            AddPlayerSkill(player, Stab(isTemporary = true, expiresAt = Duration.END_OF_DRIVE)),
                             SetContext(context.copy(resultApplied = true)),
                             SimpleLogEntry("${player.name} received Stiletto", category = LogCategory.GAME_PROGRESS),
                             ExitProcedure(),

@@ -14,10 +14,10 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.SetApothecary
 import dk.ilios.jervis.commands.SetNigglingInjuries
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.commands.UseApothecary
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -28,6 +28,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.inducements.ApothecaryType
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.reports.ReportInjuryResult
 import dk.ilios.jervis.rules.Rules
@@ -224,7 +225,7 @@ object RiskingInjuryRoll: Procedure() {
     object ChooseToUseApothecary: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.riskingInjuryRollsContext!!
-            val hasApothecary = context.player.team.apothecaries > 0
+            val hasApothecary = context.player.team.teamApothecaries.count { it.type == ApothecaryType.STANDARD && !it.used } > 0
             return when (hasApothecary) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -239,9 +240,9 @@ object RiskingInjuryRoll: Procedure() {
 
             return when (action) {
                 Confirm -> {
-                    // Figure out how to handle apothecary here
+                    // TODO Figure out how to handle apothecary here
                     compositeCommandOf(
-                        SetApothecary(team, team.apothecaries -1),
+                        UseApothecary(team, team.teamApothecaries.first { it.type == ApothecaryType.STANDARD && !it.used }),
                         SetPlayerState(player, PlayerState.STUNNED), // Override whatever injury they had
                         ExitProcedure()
                     )

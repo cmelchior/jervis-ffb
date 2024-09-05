@@ -15,6 +15,7 @@ import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.InducementSelected
 import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
@@ -72,6 +73,7 @@ data class SingleChoiceInputDialog(
                 is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
                 is PlayerSubActionSelected -> action.name
                 is SkillSelected -> action.skill.toString()
+                is InducementSelected -> action.name
             }
         }
 

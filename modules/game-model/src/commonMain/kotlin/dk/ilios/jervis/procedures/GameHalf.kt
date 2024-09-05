@@ -9,7 +9,7 @@ import dk.ilios.jervis.commands.SetAvailableTeamRerolls
 import dk.ilios.jervis.commands.SetDrive
 import dk.ilios.jervis.commands.SetHalf
 import dk.ilios.jervis.commands.SetKickingTeamAtHalfTime
-import dk.ilios.jervis.commands.SetTurnNo
+import dk.ilios.jervis.commands.SetTurnMarker
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -17,7 +17,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.reports.ReportStartingDrive
 import dk.ilios.jervis.reports.ReportStartingHalf
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 
 object GameHalf : Procedure() {
     override val initialNode: Node = Drive
@@ -36,14 +36,14 @@ object GameHalf : Procedure() {
             SetActiveTeam(kickingTeam.otherTeam()),
             SetAvailableTeamRerolls(state.homeTeam),
             SetAvailableTeamRerolls(state.awayTeam),
-            SetTurnNo(state.homeTeam, 0),
-            SetTurnNo(state.awayTeam, 0),
+            SetTurnMarker(state.homeTeam, 0),
+            SetTurnMarker(state.awayTeam, 0),
             ReportStartingHalf(currentHalf),
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         // Remove modifiers that only last this half
-        val resetCommands = getResetTemporaryModifiersCommands(state, rules, ResetPolicy.END_OF_HALF)
+        val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_HALF)
         return compositeCommandOf(
             *resetCommands
         )
@@ -61,7 +61,7 @@ object GameHalf : Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Both teams ran out of time
-            return if (state.homeTeam.turnData.currentTurn == rules.turnsPrHalf && state.awayTeam.turnData.currentTurn == rules.turnsPrHalf) {
+            return if (state.homeTeam.turnData.turnMarker == rules.turnsPrHalf && state.awayTeam.turnData.turnMarker == rules.turnsPrHalf) {
                 ExitProcedure()
             } else {
                 GotoNode(Drive)

@@ -11,12 +11,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 class Stunty(
     override val isTemporary: Boolean = false,
-    override val expiresAt: ResetPolicy = ResetPolicy.NEVER
+    override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill{
     override val id: String = "stunty-skill"
     override val name: String = "Stunty"
     override val compulsory: Boolean = true
-    override val resetAt: ResetPolicy = ResetPolicy.NEVER
+    override val resetAt: Duration = Duration.PERMANENT
     override val category: SkillCategory = BB2020SkillCategory.TRAITS
     override var used: Boolean = false
     override val value: Int? = null
@@ -26,6 +26,6 @@ class Stunty(
     @Serializable
     data object Factory: SkillFactory {
         override val value: Int? = null
-        override fun createSkill(isTemporary: Boolean, expiresAt: ResetPolicy): Skill = Stunty(isTemporary, expiresAt)
+        override fun createSkill(isTemporary: Boolean, expiresAt: Duration): Skill = Stunty(isTemporary, expiresAt)
     }
 }

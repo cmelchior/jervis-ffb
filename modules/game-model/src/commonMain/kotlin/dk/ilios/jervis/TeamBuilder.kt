@@ -6,12 +6,12 @@ import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Position
-import dk.ilios.jervis.rules.roster.Roster
+import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
 import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
 
 private data class PlayerData(val id: PlayerId, val name: String, val number: PlayerNo, val type: Position)
 
-class TeamBuilder(val rules: Rules, val roster: Roster) {
+class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     private val players: MutableMap<PlayerNo, PlayerData> = mutableMapOf()
     var coach: Coach? = null
     var name: String = ""
@@ -66,11 +66,11 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
                     data.number
                 ))
             }
-            rerollsCountOnRoster = this@TeamBuilder.reRolls
-            cheerLeaders = this@TeamBuilder.cheerLeaders
-            assistentCoaches = this@TeamBuilder.assistentCoaches
-            dedicatedFans = this@TeamBuilder.dedicatedFans
-            teamValue = this@TeamBuilder.teamValue
+            this.rerollsCountOnRoster = this@TeamBuilder.reRolls
+            this.teamCheerleaders = this@TeamBuilder.cheerLeaders
+            this.teamAssistentCoaches = this@TeamBuilder.assistentCoaches
+            this.dedicatedFans = this@TeamBuilder.dedicatedFans
+            this.teamValue = this@TeamBuilder.teamValue
             notifyDogoutChange()
         }
     }
@@ -78,7 +78,7 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
 
 fun teamBuilder(
     rules: Rules,
-    roster: Roster,
+    roster: BB2020Roster,
     action: TeamBuilder.() -> Unit,
 ): Team {
     val builder = TeamBuilder(rules, roster)

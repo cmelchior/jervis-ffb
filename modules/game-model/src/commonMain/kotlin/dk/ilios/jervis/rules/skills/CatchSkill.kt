@@ -7,12 +7,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 class CatchSkill(
     override val isTemporary: Boolean = false,
-    override val expiresAt: ResetPolicy = ResetPolicy.NEVER
+    override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill, D6StandardSkillReroll {
     override val id: String = "catch-skill"
     override val name: String = "Catch"
     override val compulsory: Boolean = false
-    override val resetAt: ResetPolicy = ResetPolicy.NEVER
+    override val resetAt: Duration = Duration.PERMANENT
     override val category: SkillCategory = BB2020SkillCategory.AGILITY
     override var used: Boolean = false
     override val value: Int? = null
@@ -20,7 +20,7 @@ class CatchSkill(
     override val workWhenProne: Boolean = false
 
     // Catch is always available
-    override val rerollResetAt: ResetPolicy = ResetPolicy.NEVER
+    override val rerollResetAt: Duration = Duration.PERMANENT
     override val rerollDescription: String = "Catch Reroll"
     override var rerollUsed: Boolean = false
 
@@ -35,6 +35,6 @@ class CatchSkill(
     @Serializable
     data object Factory: SkillFactory {
         override val value: Int? = null
-        override fun createSkill(isTemporary: Boolean, expiresAt: ResetPolicy): Skill = CatchSkill(isTemporary, expiresAt)
+        override fun createSkill(isTemporary: Boolean, expiresAt: Duration): Skill = CatchSkill(isTemporary, expiresAt)
     }
 }

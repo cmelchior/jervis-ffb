@@ -74,7 +74,7 @@ data object SkavenTeam : BB2020Roster {
         )
     override val id: RosterId = RosterId("jervis-skaven")
     override val tier: Int = 1
-    override val specialRules: List<SpecialRules> = listOf(RegionalSpecialRules.UNDERWORLD_CHALLENGE)
+    override val specialRules: List<SpecialRules> = listOf(RegionalSpecialRule.UNDERWORLD_CHALLENGE)
     override val name: String = "Skaven Team"
     override val numberOfRerolls: Int = 8
     override val rerollCost: Int = 50_000

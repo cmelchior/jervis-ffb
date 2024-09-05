@@ -53,7 +53,8 @@ enum class TeamRerollDuration {
 
 sealed interface TeamReroll : RerollSource {
     val carryOverIntoOvertime: Boolean
-    val isTemporary: Boolean
+    // When is this reroll removed from the Team, regardless of it being used or not
+    val duration: Duration
     override val rerollProcedure: Procedure
         get() = UseTeamReroll
 
@@ -77,23 +78,31 @@ sealed interface TeamReroll : RerollSource {
 
 class RegularTeamReroll(val team: Team) : TeamReroll {
     override val carryOverIntoOvertime: Boolean = true
-    override val isTemporary: Boolean = false
-    override val rerollResetAt: ResetPolicy = ResetPolicy.END_OF_HALF
+    override val duration = Duration.PERMANENT
+    override val rerollResetAt: Duration = Duration.END_OF_HALF
     override val rerollDescription: String = "Team reroll"
     override var rerollUsed: Boolean = false
 }
 
 class LeaderTeamReroll(val player: Player) : TeamReroll {
     override val carryOverIntoOvertime: Boolean = true
-    override val isTemporary: Boolean = true
-    override val rerollResetAt: ResetPolicy = ResetPolicy.END_OF_HALF
+    override val duration = Duration.SPECIAL
+    override val rerollResetAt: Duration = Duration.END_OF_HALF
     override val rerollDescription: String = "Team reroll (Leader)"
+    override var rerollUsed: Boolean = false
+}
+
+class BrilliantCoachingReroll(val team: Team) : TeamReroll {
+    override val carryOverIntoOvertime: Boolean = false
+    override val duration = Duration.END_OF_DRIVE
+    override val rerollResetAt: Duration = Duration.END_OF_HALF
+    override val rerollDescription: String = "Team Reroll (Brilliant Coaching)"
     override var rerollUsed: Boolean = false
 }
 
 // Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {
-    val rerollResetAt: ResetPolicy
+    val rerollResetAt: Duration
     val rerollDescription: String
     var rerollUsed: Boolean
     val rerollProcedure: Procedure
@@ -146,14 +155,15 @@ data class DiceRerollOption(
 
 // When does the "used" state reset?
 // TODO Rename to Duration?
-enum class ResetPolicy {
-    NEVER,
-    END_OF_ACTIVATION,
-    END_OF_TURN,
-    END_OF_DRIVE,
-    END_OF_HALF,
-    END_OF_GAME,
-    SPECIAL,
+enum class Duration {
+    IMMEDIATE, // The effect expires immediately.
+    END_OF_ACTIVATION, // The effect expires at the end of the current players activation
+    END_OF_TURN, // The effect expires at the end of the current teams turn.
+    END_OF_DRIVE, // The effect expires at the end of the current drive
+    END_OF_HALF, // The effect expires at the end of the current half
+    END_OF_GAME, // The effect lasts for the entire game, but doesn't carry over to the next game
+    SPECIAL, // The duration of this effect is too hard to put into a bucket and must be handled manually.
+    PERMANENT, // The effect is a permanent change to the team.
 }
 
 @Serializable
@@ -171,7 +181,7 @@ sealed interface Skill {
     // Represents any value in brackes, like Might Blow(1+) or Loner(4+). It is up to the context to correctly interpret this value
     val value: Int?
     // When the `used` state reset back to `false`?
-    val resetAt: ResetPolicy
+    val resetAt: Duration
     // Which category does this skill belong to?
     val category: SkillCategory
     // Whether this skill works when the player has lost its tackle zones
@@ -180,7 +190,7 @@ sealed interface Skill {
     val workWhenProne: Boolean
     // Whether or not this skill is temporary
     val isTemporary: Boolean
-    val expiresAt: ResetPolicy
+    val expiresAt: Duration
 }
 
 // TODO Not really liking this API. Is there a good way to serialize them?
@@ -189,7 +199,7 @@ sealed interface Skill {
 @Serializable
 sealed interface SkillFactory {
     val value: Int?
-    fun createSkill(isTemporary: Boolean = false, expiresAt: ResetPolicy = ResetPolicy.NEVER): Skill
+    fun createSkill(isTemporary: Boolean = false, expiresAt: Duration = Duration.PERMANENT): Skill
 }
 
 interface SkillCategory {

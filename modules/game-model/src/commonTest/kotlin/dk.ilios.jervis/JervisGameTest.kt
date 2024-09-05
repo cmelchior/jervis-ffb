@@ -156,14 +156,19 @@ fun defaultSetup(): Array<GameAction> {
     )
 }
 
+fun defaultKickOffEvent(): Array<GameAction> = arrayOf(
+    DiceResults(3.d6, 4.d6), // Roll on kick-off table, does nothing for now
+)
+
 fun defaultKickOffHomeTeam(
     deviate: DiceResults = DiceResults(4.d8, 1.d6), // Land on [18,7]
+    kickoffEvent: Array<GameAction> = defaultKickOffEvent(),
     bounce: D8Result? = 4.d8 // Bounce to [17,7]
 ) = arrayOf(
     PlayerSelected(PlayerId("H8")), // Select Kicker
     FieldSquareSelected(19, 7), // Center of Away Half,
     deviate,
-    DiceResults(3.d6, 4.d6), // Roll on kick-off table, does nothing for now
+    *kickoffEvent,
     bounce
 )
 

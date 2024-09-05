@@ -68,7 +68,7 @@ data object LizardmenTeam : BB2020Roster {
 
     override val id: RosterId = RosterId("jervis-lizardmen")
     override val tier: Int = 1
-    override val specialRules: List<SpecialRules> = listOf(RegionalSpecialRules.LUSTRIAN_SUPERLEAGUE)
+    override val specialRules: List<SpecialRules> = listOf(RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE)
     override val name: String = "Lizardmen Team"
     override val numberOfRerolls: Int = 8
     override val rerollCost: Int = 70_000

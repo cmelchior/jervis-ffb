@@ -52,6 +52,7 @@ import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.InducementSelected
 import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
@@ -185,21 +186,33 @@ fun GameStatus(
     vm: GameStatusViewModel,
     modifier: Modifier,
 ) {
-    val progress by vm.progress().collectAsState(GameProgress(0, 0, 0, ""))
+    val progress by vm.progress().collectAsState(GameProgress(0, 0, "", 0, "", 0))
     val half = if (progress.half == 0) "-" else progress.half.toString()
     val drive = if (progress.half == 0) "-" else progress.half.toString()
     val turn = if (progress.half == 0) "-" else progress.half.toString()
     Box(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .background(color = Color.White),
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = Color.White),
     ) {
+        val textModifier = Modifier.padding(4.dp).padding(end = 8.dp)
         Row {
-            Text("Half: ${ if (progress.half == 0) "-" else progress.half }")
-            Text("Drive: ${ if (progress.drive == 0) "-" else progress.drive }")
-            Text("Turn: ${ if (progress.turn == 0) "-" else progress.turn }")
-            Text("Active team :${progress.name}")
+            Text(
+                modifier = textModifier,
+                text = "Half: ${ if (progress.half == 0) "-" else progress.half }"
+            )
+            Text(
+                modifier = textModifier,
+                text = "Drive: ${ if (progress.drive == 0) "-" else progress.drive }"
+            )
+            Text(
+                modifier = textModifier,
+                text = "Active team: ${progress.activeTeam} - Turn ${progress.activeTeamTurn}",
+            )
+            Text(
+                modifier = textModifier,
+                text = "Inactive team: ${progress.inactiveTeam} - Turn ${progress.inactiveTeamTurn}",
+            )
         }
     }
 }
@@ -317,6 +330,7 @@ fun ActionSelector(
                                     is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
                                     is PlayerSubActionSelected -> action.action.toString()
                                     is SkillSelected -> action.skill.toString()
+                                    is InducementSelected -> action.name
                                 }
                             Text(text, fontSize = 10.sp)
                         }

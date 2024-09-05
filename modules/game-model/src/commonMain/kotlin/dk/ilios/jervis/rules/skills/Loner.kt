@@ -7,12 +7,12 @@ import kotlinx.serialization.Serializable
 class Loner(
     override val value: Int,
     override val isTemporary: Boolean = false,
-    override val expiresAt: ResetPolicy = ResetPolicy.NEVER
+    override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill {
     override val id: String = "loner-skill"
     override val name: String = "Loner ($value+)"
     override val compulsory: Boolean = false
-    override val resetAt: ResetPolicy = ResetPolicy.NEVER
+    override val resetAt: Duration = Duration.PERMANENT
     override val category: SkillCategory = BB2020SkillCategory.TRAITS
     override var used: Boolean = false // This skill is always available
     override val workWithoutTackleZones: Boolean = false
@@ -20,6 +20,6 @@ class Loner(
 
     @Serializable
     class Factory(override val value: Int): SkillFactory {
-        override fun createSkill(isTemporary: Boolean, expiresAt: ResetPolicy): Skill = Loner(value, isTemporary, expiresAt)
+        override fun createSkill(isTemporary: Boolean, expiresAt: Duration): Skill = Loner(value, isTemporary, expiresAt)
     }
 }

@@ -254,3 +254,6 @@ data class MoveTypeSelected(val moveType: MoveType) : GameAction
 
 @Serializable
 data class SkillSelected(val skill: SkillFactory): GameAction
+
+@Serializable
+data class InducementSelected(val name: String): GameAction

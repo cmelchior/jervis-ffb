@@ -73,6 +73,16 @@ interpreted.
 14. Can a player that already have AV 11 receive Iron Man from Prayers of Nuffle? It wil not work
     for sure, but can they still get it? And what happens if they cannot?
 
+15. For High Kick: Following the strict ordering of the rules, the Kick-Off Event is resolved 
+    before "What Goes Up, Must Come Down". This means that the touchback rule cannot
+    yet be applied when High Kick is resolved. Also, no-where is it stated that
+    the high kick player cannot enter the opponents field. So if the ball goes out of bounds
+    on the other side. In theory it would be allowed to move a player into the opponents field, 
+    resolve the touchback (ie. the ball doesn't land) and give it to the player that moved into the 
+    other side.
+
+16. If you have two Special Play Cards with End of Opponent Turn and End of Turn, who plays first?
+
 # Differences compared to the rules as written
 
 1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 
@@ -87,3 +97,15 @@ interpreted.
    applied, e.g., because the entire team has Loner. For now, Jervis just treat the roll as 
    wasted. Mostly because it is easier to implement and the the chance of this happening 
    is virtually zero.
+
+4. (Page 42) Order of events in End-of-Turn isn't well-defined. E.g. it is unclear if Special Play 
+    Cards like Assassination Attempt trigger before or after Throw a Rock and when temporary skills
+    or abilities are removed.
+
+    For now we choose the (somewhat arbitrary) order:
+    - Prayers Of Nuffle (Throw a Rock)
+    - Special Play Cards
+    - Temporary Skills/Characteristics are removed
+    - Stunned Players are now prone
+
+

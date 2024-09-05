@@ -11,7 +11,6 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.commands.AddPlayerSkill
-import dk.ilios.jervis.commands.AddPrayersToNuffle
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.commands.GotoNode
@@ -34,8 +33,7 @@ import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.skills.Loner
-import dk.ilios.jervis.rules.skills.ResetPolicy
-import dk.ilios.jervis.rules.tables.PrayerToNuffle
+import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.utils.INVALID_ACTION
 import kotlin.math.min
 
@@ -105,7 +103,7 @@ object BadHabits : Procedure() {
                         val addLonerCommands = it.getPlayers(state).flatMap { player ->
                             listOf(
                                 SimpleLogEntry("${player.name} received Loner (2+)"),
-                                AddPlayerSkill(player, Loner(2, isTemporary = true, expiresAt = ResetPolicy.END_OF_DRIVE))
+                                AddPlayerSkill(player, Loner(2, isTemporary = true, expiresAt = Duration.END_OF_DRIVE))
                             )
                         }.toTypedArray()
 

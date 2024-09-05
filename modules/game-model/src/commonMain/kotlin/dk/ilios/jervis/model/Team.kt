@@ -1,8 +1,13 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.actions.DieResult
+import dk.ilios.jervis.model.inducements.Apothecary
+import dk.ilios.jervis.model.inducements.Bribe
+import dk.ilios.jervis.model.inducements.InfamousCoachingStaff
+import dk.ilios.jervis.model.inducements.SpecialPlayCard
+import dk.ilios.jervis.model.inducements.wizards.Wizard
 import dk.ilios.jervis.rules.PlayerActionType
-import dk.ilios.jervis.rules.roster.Roster
+import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
 import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
 import dk.ilios.jervis.rules.skills.TeamReroll
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
@@ -30,7 +35,7 @@ class TeamDriveData(private val game: Game) {
 }
 
 class TeamTurnData(private val game: Game) {
-    var currentTurn by Delegates.observable(0) { prop, old, new ->
+    var turnMarker by Delegates.observable(0) { prop, old, new ->
         game.gameFlow.safeTryEmit(game)
     }
     var moveActions: Int
@@ -80,39 +85,60 @@ class TeamTemporaryData(private val game: Game) {
 }
 
 @Serializable
-class Team(val name: String, val roster: Roster, val coach: Coach) : Collection<Player>, Observable<Team>() {
+class Team(val name: String, val roster: BB2020Roster, val coach: Coach) : Collection<Player>, Observable<Team>() {
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
     // Fixed Team data, identifying the team
     val id = TeamId("team-${Random.nextLong()}")
 
-    // Variable team data that might change during the game
-    var rerollsCountOnRoster: Int = 0
-
-    @Transient
-    var rerolls: MutableList<TeamReroll> = mutableListOf()
-
-    @Transient
-    val availableRerolls: List<TeamReroll>
-        get() = rerolls.filter { !it.rerollUsed }
-
-    @Transient
-    val availableRerollCount: Int
-        get() = availableRerolls.size
-
-    @Transient
-    var usedTeamRerollThisTurn: Boolean = false
-
+    // Team staff
     var coachBanned: Boolean = false
-    var apothecaries: Int = 0
-    var cheerLeaders: Int = 0
-    var assistentCoaches: Int = 0
-    var fanFactor: Int = 0
-    var teamValue: Int = 0
+    val apothecaries: Int // Limit
+        get() = teamApothecaries.count { it.used } + tempApothecaries.count { it.used }
+    val teamApothecaries = mutableListOf<Apothecary>()
+    val tempApothecaries = mutableListOf<Apothecary>()
+    fun getApothecaries(): List<Apothecary> = teamApothecaries + tempApothecaries
+
+    // Track cheerleaders
+    val cheerLeaders: Int
+        get() = teamCheerleaders + tempCheerleaders
+    var teamCheerleaders: Int = 0 // 0-12
+    var tempCheerleaders: Int = 0 // 0-4
+
+    // Track assistant coaches
+    val assistantCoaches: Int
+        get() = teamAssistentCoaches + tempAssistantCoaches
+    var teamAssistentCoaches: Int = 0
+    val tempAssistantCoaches: Int = 0
+
+    // Treasury
     var treasury: Int = 0
+    var pettyCash: Int = 0
+
+    // Fans
+    var fanFactor: Int = 0
     var dedicatedFans: Int = 0
+
+    var teamValue: Int = 0
     val specialRules = mutableListOf<SpecialRules>()
     val activePrayersToNuffle = mutableSetOf<PrayerToNuffle>()
+
+    // Reroll tracking
+    var rerollsCountOnRoster: Int = 0
+    @Transient
+    var rerolls: MutableList<TeamReroll> = mutableListOf()
+    val availableRerolls: List<TeamReroll>
+        get() = rerolls.filter { !it.rerollUsed }
+    val availableRerollCount: Int
+        get() = availableRerolls.size
+    var usedTeamRerollThisTurn: Boolean = false
+
+    // Inducements
+    var bloodweiserKegs: Int = 0
+    val bribes = mutableListOf<Bribe>()
+    val wizards = mutableListOf<Wizard>()
+    val specialPlayCards = mutableListOf<SpecialPlayCard>()
+    val infamousCoachingStaff = mutableListOf<InfamousCoachingStaff>()
 
     // Special team state that needs to be tracked for the given period
     @Transient
@@ -129,8 +155,6 @@ class Team(val name: String, val roster: Roster, val coach: Coach) : Collection<
 
     @Transient
     lateinit var temporaryData: TeamTemporaryData
-
-
 
 
     // Must be called before using this class.

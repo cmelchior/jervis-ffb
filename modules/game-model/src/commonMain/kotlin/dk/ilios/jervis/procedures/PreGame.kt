@@ -61,7 +61,7 @@ object PreGame : Procedure() {
     }
 
     object Inducements : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = DummyProcedure
+        override fun getChildProcedure(state: Game, rules: Rules) = BuyInducements
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(CheckForPrayersToNuffle)
         }

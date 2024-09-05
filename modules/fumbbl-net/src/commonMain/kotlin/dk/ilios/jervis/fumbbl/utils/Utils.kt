@@ -8,14 +8,14 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.roster.Roster
+import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
 import dk.ilios.jervis.rules.roster.bb2020.ChaosDwarfTeam
 import dk.ilios.jervis.rules.roster.bb2020.ElvenUnionTeam
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.roster.bb2020.KhorneTeam
-import dk.ilios.jervis.rules.roster.bb2020.RegionalSpecialRules
+import dk.ilios.jervis.rules.roster.bb2020.RegionalSpecialRule
 import dk.ilios.jervis.rules.roster.bb2020.SkavenTeam
-import dk.ilios.jervis.rules.roster.bb2020.TeamSpecialRules
+import dk.ilios.jervis.rules.roster.bb2020.TeamSpecialRule
 import dk.ilios.jervis.teamBuilder
 
 typealias FumbblGame = dk.ilios.jervis.fumbbl.model.Game
@@ -57,22 +57,22 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): dk.ilios.jervis.model.T
         team.specialRules.forEach {
             val specialRule =
                 when (it) {
-                    SpecialRule.BADLANDS_BRAWL -> RegionalSpecialRules.BADLANDS_BRAWL
-                    SpecialRule.BRIBERY_AND_CORRUPTION -> TeamSpecialRules.BRIBERY_AND_CORRUPTION
-                    SpecialRule.ELVEN_KINGDOMS_LEAGUE -> RegionalSpecialRules.ELVEN_KINGDOM_LEAGUE
-                    SpecialRule.FAVOURED_OF_KHORNE -> TeamSpecialRules.FAVOURED_OF_KHORNE
-                    SpecialRule.FAVOURED_OF_NURGLE -> TeamSpecialRules.FAVOURED_OF_NURGLE
-                    SpecialRule.FAVOURED_OF_SLAANESH -> TeamSpecialRules.FAVOURED_OF_SLAANESH
-                    SpecialRule.FAVOURED_OF_TZEENTCH -> TeamSpecialRules.FAVOURED_OF_TZEENTCH
-                    SpecialRule.FAVOURED_OF_UNDIVIDED -> TeamSpecialRules.FAVOURED_OF_CHAOS_UNDIVIDED
-                    SpecialRule.HALFLING_THIMBLE_CUP -> RegionalSpecialRules.HAFLING_THIMBLE_CUP
-                    SpecialRule.LOW_COST_LINEMEN -> TeamSpecialRules.LOW_COST_LINEMEN
-                    SpecialRule.LUSTRIAN_SUPERLEAGUE -> RegionalSpecialRules.LUSTRIAN_SUPERLEAGUE
-                    SpecialRule.MASTERS_OF_UNDEATH -> TeamSpecialRules.MASTERS_OF_UNDEATH
-                    SpecialRule.OLD_WORLD_CLASSIC -> RegionalSpecialRules.OLD_WORLD_CLASSIC
-                    SpecialRule.SYLVANIAN_SPOTLIGHT -> RegionalSpecialRules.SYLVIAN_SPOTLIGHT
-                    SpecialRule.UNDERWORLD_CHALLENGE -> RegionalSpecialRules.UNDERWORLD_CHALLENGE
-                    SpecialRule.WORLDS_EDGE_SUPERLEAGUE -> RegionalSpecialRules.WORLDS_EDGE_SUPERLEAGUE
+                    SpecialRule.BADLANDS_BRAWL -> RegionalSpecialRule.BADLANDS_BRAWL
+                    SpecialRule.BRIBERY_AND_CORRUPTION -> TeamSpecialRule.BRIBERY_AND_CORRUPTION
+                    SpecialRule.ELVEN_KINGDOMS_LEAGUE -> RegionalSpecialRule.ELVEN_KINGDOM_LEAGUE
+                    SpecialRule.FAVOURED_OF_KHORNE -> TeamSpecialRule.FAVOURED_OF_KHORNE
+                    SpecialRule.FAVOURED_OF_NURGLE -> TeamSpecialRule.FAVOURED_OF_NURGLE
+                    SpecialRule.FAVOURED_OF_SLAANESH -> TeamSpecialRule.FAVOURED_OF_SLAANESH
+                    SpecialRule.FAVOURED_OF_TZEENTCH -> TeamSpecialRule.FAVOURED_OF_TZEENTCH
+                    SpecialRule.FAVOURED_OF_UNDIVIDED -> TeamSpecialRule.FAVOURED_OF_CHAOS_UNDIVIDED
+                    SpecialRule.HALFLING_THIMBLE_CUP -> RegionalSpecialRule.HAFLING_THIMBLE_CUP
+                    SpecialRule.LOW_COST_LINEMEN -> TeamSpecialRule.LOW_COST_LINEMEN
+                    SpecialRule.LUSTRIAN_SUPERLEAGUE -> RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE
+                    SpecialRule.MASTERS_OF_UNDEATH -> TeamSpecialRule.MASTERS_OF_UNDEATH
+                    SpecialRule.OLD_WORLD_CLASSIC -> RegionalSpecialRule.OLD_WORLD_CLASSIC
+                    SpecialRule.SYLVANIAN_SPOTLIGHT -> RegionalSpecialRule.SYLVIAN_SPOTLIGHT
+                    SpecialRule.UNDERWORLD_CHALLENGE -> RegionalSpecialRule.UNDERWORLD_CHALLENGE
+                    SpecialRule.WORLDS_EDGE_SUPERLEAGUE -> RegionalSpecialRule.WORLDS_EDGE_SUPERLEAGUE
                 }
             this.specialRules.add(specialRule)
         }
@@ -97,7 +97,7 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): dk.ilios.jervis.model.T
     }
 }
 
-private fun extractRoster(roster: FumbblRoster): Roster {
+private fun extractRoster(roster: FumbblRoster): BB2020Roster {
     // TODO Add logic for building custom rosters, for now
     //  just refer to the original rules
     return when (roster.rosterName) {

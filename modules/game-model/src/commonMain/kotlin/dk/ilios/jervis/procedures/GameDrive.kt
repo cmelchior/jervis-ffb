@@ -91,10 +91,10 @@ object GameDrive : Procedure() {
                     switchTeamCommands,
                     ExitProcedure()
                 )
-            } else if (state.homeTeam.turnData.currentTurn == rules.turnsPrHalf && state.awayTeam.turnData.currentTurn == rules.turnsPrHalf) {
+            } else if (state.homeTeam.turnData.turnMarker == rules.turnsPrHalf && state.awayTeam.turnData.turnMarker == rules.turnsPrHalf) {
                 GotoNode(ResolveEndOfDrive)
                 // The other team can continue the drive
-            } else if (state.inactiveTeam.turnData.currentTurn < rules.turnsPrHalf) {
+            } else if (state.inactiveTeam.turnData.turnMarker < rules.turnsPrHalf) {
                 switchTeamCommands + GotoNode(Turn)
             } else {
                 INVALID_GAME_STATE()

@@ -7,12 +7,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 class SureHands(
     override val isTemporary: Boolean = false,
-    override val expiresAt: ResetPolicy = ResetPolicy.NEVER
+    override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill, D6StandardSkillReroll {
     override val id: String = "surehands-skill"
     override val name: String = "Sure Hands"
     override val compulsory: Boolean = false
-    override val resetAt: ResetPolicy = ResetPolicy.NEVER
+    override val resetAt: Duration = Duration.PERMANENT
     override val category: SkillCategory = BB2020SkillCategory.GENERAL
     override var used: Boolean = false
     override val value: Int? = null
@@ -20,7 +20,7 @@ class SureHands(
     override val workWhenProne: Boolean = false
 
     // Sure Hands is always available
-    override val rerollResetAt: ResetPolicy = ResetPolicy.NEVER
+    override val rerollResetAt: Duration = Duration.PERMANENT
     override val rerollDescription: String = "Sure Hands Reroll"
     override var rerollUsed: Boolean = false
 
@@ -35,6 +35,6 @@ class SureHands(
     @Serializable
     data object Factory: SkillFactory {
         override val value: Int? = null
-        override fun createSkill(isTemporary: Boolean, expiresAt: ResetPolicy): Skill = SureHands(isTemporary, expiresAt)
+        override fun createSkill(isTemporary: Boolean, expiresAt: Duration): Skill = SureHands(isTemporary, expiresAt)
     }
 }

@@ -65,13 +65,13 @@ data object ChaosDwarfTeam : BB2020Roster {
     // Only select one of Favoured of
     override val specialRules: List<SpecialRules> =
         listOf(
-            RegionalSpecialRules.BADLANDS_BRAWL,
-            RegionalSpecialRules.WORLDS_EDGE_SUPERLEAGUE,
-            TeamSpecialRules.FAVOURED_OF_CHAOS_UNDIVIDED,
-            TeamSpecialRules.FAVOURED_OF_KHORNE,
-            TeamSpecialRules.FAVOURED_OF_NURGLE,
-            TeamSpecialRules.FAVOURED_OF_TZEENTCH,
-            TeamSpecialRules.FAVOURED_OF_SLAANESH,
+            RegionalSpecialRule.BADLANDS_BRAWL,
+            RegionalSpecialRule.WORLDS_EDGE_SUPERLEAGUE,
+            TeamSpecialRule.FAVOURED_OF_CHAOS_UNDIVIDED,
+            TeamSpecialRule.FAVOURED_OF_KHORNE,
+            TeamSpecialRule.FAVOURED_OF_NURGLE,
+            TeamSpecialRule.FAVOURED_OF_TZEENTCH,
+            TeamSpecialRule.FAVOURED_OF_SLAANESH,
         )
     override val name: String = "Chaos Dwarf"
     override val numberOfRerolls: Int = 8

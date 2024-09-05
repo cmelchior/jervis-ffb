@@ -18,10 +18,11 @@ import dk.ilios.jervis.commands.ResetAvailableTeamActions
 import dk.ilios.jervis.commands.SetActiveAction
 import dk.ilios.jervis.commands.SetActivePlayer
 import dk.ilios.jervis.commands.SetCanUseTeamRerolls
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerAvailability
 import dk.ilios.jervis.commands.SetPlayerStats
 import dk.ilios.jervis.commands.SetSkillUsed
-import dk.ilios.jervis.commands.SetTurnNo
+import dk.ilios.jervis.commands.SetTurnMarker
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
@@ -32,13 +33,16 @@ import dk.ilios.jervis.model.Availability
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.inducements.Timing
 import dk.ilios.jervis.procedures.bb2020.prayers.ResolveThrowARock
+import dk.ilios.jervis.procedures.inducements.ActivateInducementContext
+import dk.ilios.jervis.procedures.inducements.ActivateInducements
 import dk.ilios.jervis.reports.ReportActionSelected
 import dk.ilios.jervis.reports.ReportEndingTurn
 import dk.ilios.jervis.reports.ReportStartingTurn
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
 import dk.ilios.jervis.utils.INVALID_ACTION
 
@@ -51,14 +55,14 @@ object TeamTurn : Procedure() {
     override val initialNode: Node = SelectPlayerOrEndTurn
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val turn = state.activeTeam.turnData.currentTurn + 1
+        val turn = state.activeTeam.turnData.turnMarker + 1
         // TODO Check for stalling players at this point.
         // If any player is starting the turn with the ball, check if they are stalling
         // We also need to check for this whenever a player receives the ball during their
         // turn
         return compositeCommandOf(
             SetCanUseTeamRerolls(true),
-            SetTurnNo(state.activeTeam, turn),
+            SetTurnMarker(state.activeTeam, turn),
             getResetTurnActionCommands(state, rules),
             *resetPlayerStats(state, rules),
             *getResetAvailablePlayers(state, rules),
@@ -71,8 +75,19 @@ object TeamTurn : Procedure() {
         return compositeCommandOf(
             SetTurnOver(false),
             SetCanUseTeamRerolls(false),
-            ReportEndingTurn(state.activeTeam, state.activeTeam.turnData.currentTurn),
+            ReportEndingTurn(state.activeTeam, state.activeTeam.turnData.turnMarker),
         )
+    }
+
+    object UseSpecialEffects: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            return SetContext(ActivateInducementContext(state.activeTeam, Timing.END_OF_TURN))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducements
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // TODO Do we need to check for anything here? Could we have a turn-over already?
+            return GotoNode(SelectPlayerOrEndTurn)
+        }
     }
 
     object SelectPlayerOrEndTurn : ActionNode() {
@@ -207,10 +222,17 @@ object TeamTurn : Procedure() {
             // TODO Implement end-of-turn things
             //  - Players stunned at the beginning of the turn are now prone
 
-            // It isn't well-defined what happens in which order things happen at the end of the turn
-            // but currently the only thing that reset/expire is skills that uses rerolls. None of these
-            // should interfer with Throw A Rock. So the order here doesn't matter
-            val resetCommands = getResetTemporaryModifiersCommands(state, rules, ResetPolicy.END_OF_TURN)
+            // It isn't well-defined in which order things happen at the end of the turn.
+            // E.g. it is unclear if Special Play Cards like Assassination Attempt trigger before or
+            // after Throw a Rock and when temporary skills or abilities are moved.
+            //
+            // For now we choose the (somewhat arbitrary) order:
+            //
+            // - Prayers Of Nuffle (Throw a Rock)
+            // - Special Play Cards
+            // - Temporary Skills/Characteristics are removed
+            // - Stunned Players are now prone
+            val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_TURN)
             val nextNodeCommand = if(state.activeTeam.otherTeam().activePrayersToNuffle.contains(PrayerToNuffle.THROW_A_ROCK)) {
                 GotoNode(CheckForThrowARock)
             } else {
@@ -273,7 +295,7 @@ object TeamTurn : Procedure() {
     private fun resetSkillsUsed(state: Game, rules: Rules): Array<Command> {
         return state.activeTeam
             .map {
-                val skillsThatReset = it.skills.filter { it.used  && it.resetAt == ResetPolicy.END_OF_TURN}
+                val skillsThatReset = it.skills.filter { it.used  && it.resetAt == Duration.END_OF_TURN}
                 Pair(it, skillsThatReset)
             }
             .flatMap {

@@ -28,7 +28,7 @@ import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Position
 import dk.ilios.jervis.rules.skills.Loner
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 
 data class IntensiveTrainingContext(
     val player: Player,
@@ -75,7 +75,7 @@ object IntensiveTraining : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkTypeAndValue<SkillSelected>(state, rules, action, this) {
                 val context = state.getContext<IntensiveTrainingContext>()
-                val skill = it.skill.createSkill(isTemporary = true, expiresAt = ResetPolicy.END_OF_GAME)
+                val skill = it.skill.createSkill(isTemporary = true, expiresAt = Duration.END_OF_GAME)
                 return compositeCommandOf(
                     AddPlayerSkill(context.player, skill),
                     SimpleLogEntry("${context.player.name} receives ${skill.name} due to Intensive Training", category = LogCategory.GAME_PROGRESS),

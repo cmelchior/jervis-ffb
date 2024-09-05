@@ -1,14 +1,15 @@
 package dk.ilios.jervis.procedures.bb2020.kickoff
 
 import compositeCommandOf
+import dk.ilios.jervis.commands.AddBribe
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.reports.LogCategory
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.model.inducements.Bribe
+import dk.ilios.jervis.reports.ReportGetTheRef
 import dk.ilios.jervis.rules.Rules
 
 /**
@@ -16,26 +17,18 @@ import dk.ilios.jervis.rules.Rules
  * of the rulebook.
  */
 object GetTheRef : Procedure() {
-    override val initialNode: Node = GiveBribe
+    override val initialNode: Node = GiveBribes
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    object GiveBribe : ComputationNode() {
-        // TODO Figure out how to add inducements
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+    object GiveBribes : ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            // Each team gets a free bribe, this allows them to go above the limit
+            // of 3 when buying them as inducements
             return compositeCommandOf(
-                SimpleLogEntry("Do Get the Ref!", category = LogCategory.GAME_PROGRESS),
+                AddBribe(state.homeTeam, Bribe()),
+                AddBribe(state.awayTeam, Bribe()),
+                ReportGetTheRef(state),
                 ExitProcedure(),
             )
         }

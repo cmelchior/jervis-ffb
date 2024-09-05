@@ -92,7 +92,7 @@ data object HumanTeam : BB2020Roster {
         )
     override val id: RosterId = RosterId("jervis-human")
     override val tier: Int = 1
-    override val specialRules: List<SpecialRules> = listOf(RegionalSpecialRules.OLD_WORLD_CLASSIC)
+    override val specialRules: List<SpecialRules> = listOf(RegionalSpecialRule.OLD_WORLD_CLASSIC)
     override val name: String = "Human Team"
     override val numberOfRerolls: Int = 8
     override val rerollCost: Int = 50_000

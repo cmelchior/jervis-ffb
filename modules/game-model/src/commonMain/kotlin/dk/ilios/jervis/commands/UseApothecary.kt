@@ -3,16 +3,17 @@ package dk.ilios.jervis.commands
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.inducements.Apothecary
 
-class SetApothecary(private val team: Team, private val apothecaries: Int) : Command {
-    private var originalApothecaries: Int = 0
+class UseApothecary(private val team: Team, private val apothecary: Apothecary) : Command {
+    private var originalUsed: Boolean = false
 
     override fun execute(
         state: Game,
         controller: GameController,
     ) {
-        originalApothecaries = team.apothecaries
-        team.apothecaries = apothecaries
+        originalUsed = apothecary.used
+        apothecary.used = true
         team.notifyUpdate()
     }
 
@@ -20,7 +21,7 @@ class SetApothecary(private val team: Team, private val apothecaries: Int) : Com
         state: Game,
         controller: GameController,
     ) {
-        team.apothecaries = originalApothecaries
+        apothecary.used = false
         team.notifyUpdate()
     }
 }

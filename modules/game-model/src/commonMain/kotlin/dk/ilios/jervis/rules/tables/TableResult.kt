@@ -1,7 +1,7 @@
 package dk.ilios.jervis.rules.tables
 
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.rules.skills.ResetPolicy
+import dk.ilios.jervis.rules.skills.Duration
 
 /**
  * Wrapper around a table result, e.g. rolling on the Kick-Off Table or
@@ -14,5 +14,5 @@ import dk.ilios.jervis.rules.skills.ResetPolicy
 interface TableResult {
     val description: String
     val procedure: Procedure
-    val duration: ResetPolicy
+    val duration: Duration
 }

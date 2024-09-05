@@ -21,11 +21,19 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.ArgueTheCallResult
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
+
+enum class ArgueTheCallRollModifier(
+    override val modifier: Int,
+    override val description: String
+) : DiceModifier {
+    I_DID_NOT_SEE_A_THING(1, "I didn't see a thing"), // Biased Referee Inducement
+}
 
 /**
  * Implement the Argue The Call roll as described on page 63 in the rulebook.
