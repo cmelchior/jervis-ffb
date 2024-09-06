@@ -38,16 +38,8 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  */
 object TheKickOff : Procedure() {
     override val initialNode: Node = NominateKickingPlayer
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object NominateKickingPlayer : ActionNode() {
         data class PlayersAvailableForKicking(
@@ -57,10 +49,7 @@ object TheKickOff : Procedure() {
             val playersAvailable: MutableList<Player> = mutableListOf(),
         )
 
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Nominate a player on the center field that should kick the ball
             // If all players are on the line of scrimmage or in the wide zone, a player on the
             // line of scrimmage must be selected.
@@ -99,11 +88,7 @@ object TheKickOff : Procedure() {
             return eligiblePlayers
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<PlayerSelected>(action) {
                 compositeCommandOf(
                     SetKickingPlayer(it.getPlayer(state)),
@@ -115,10 +100,7 @@ object TheKickOff : Procedure() {
     }
 
     object PlaceTheKick : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Place the ball anywhere on the opposing teams side
             return state.field
                 .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
@@ -168,16 +150,8 @@ object TheKickOff : Procedure() {
  */
 object TheFUMBBLKickOff : Procedure() {
     override val initialNode: Node = PlaceTheKick
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
 //    object NominateKickingPlayer: ActionNode() {
 //        data class PlayersAvailableForKicking(
@@ -236,21 +210,14 @@ object TheFUMBBLKickOff : Procedure() {
 //    }
 
     object PlaceTheKick : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Place the ball anywhere on the opposing teams side
             return state.field
                 .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
                 .map { SelectFieldLocation.kick(it.coordinates) }
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<FieldSquareSelected>(action) {
                 compositeCommandOf(
                     SetBallState.inAir(),
@@ -262,18 +229,11 @@ object TheFUMBBLKickOff : Procedure() {
     }
 
     object TheKickDeviates : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D8, Dice.D6))
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
                 val direction = rules.direction(d8)
                 val newLocation = state.ball.location.move(direction, d6.value)

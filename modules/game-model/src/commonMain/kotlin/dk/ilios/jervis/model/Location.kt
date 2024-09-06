@@ -248,6 +248,13 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
             allCoordinates
         }
     }
+
+    // Swap the coordinates around the Y axis
+    // TODO Figure out exactly where/how it is best to do this
+    fun swapX(rules: Rules): FieldCoordinate {
+        rules.fieldWidth
+        return FieldCoordinate(rules.fieldWidth - x - 1, y)
+    }
 }
 
 data object DogOut : Location {

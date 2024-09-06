@@ -23,8 +23,7 @@ data class UiFieldSquare(
 ) : UiModel<FieldSquare>
 
 class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?, val onHover: (() -> Unit)? = null) : UiModel<Player> {
-    fun hasBall(): Boolean = model.hasBall()
-
+    val carriesBall: Boolean = model.hasBall()
     val state: PlayerState = model.state
     val isOnHomeTeam = model.isOnHomeTeam()
     val isProne = (model.state == PlayerState.PRONE)

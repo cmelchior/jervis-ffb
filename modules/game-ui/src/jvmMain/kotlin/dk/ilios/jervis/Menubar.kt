@@ -18,7 +18,7 @@ import okio.Path
 fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
     var action by remember { mutableStateOf("Last action: None") }
     var isOpen by remember { mutableStateOf(true) }
-    var rerollSuccessfulActions by remember { mutableStateOf(vm.isFeatureEnabled(Feature.REROLL_SUCCESSFUL_ACTIONS)) }
+    var rerollSuccessfulActions by remember { mutableStateOf(vm.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) }
     MenuBar {
         Menu("Developer Tools", mnemonic = 'D') {
             Item("Save Game", onClick = {
@@ -40,14 +40,22 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
         }
 
         Menu ("Automated Actions", mnemonic = 'A') {
-            CheckboxItem(
-                "Reroll successful actions",
-                checked = rerollSuccessfulActions,
-                onCheckedChange = { enabled ->
-                    rerollSuccessfulActions = enabled
-                    vm.toggleFeature(Feature.REROLL_SUCCESSFUL_ACTIONS, enabled)
+            Item(
+                text = "3-4-4",
+                onClick = {
+                    vm.loadSetup("3-4-4")
                 }
             )
+        }
+
+        Menu ("Setups", mnemonic = 'S') {
+            Menu("Kicking") {
+                Item("3-4-4", onClick = { vm.loadSetup("3-4-4") })
+            }
+
+            Menu("Receiving") {
+                Item("5-5-1", onClick = { vm.loadSetup("5-5-1") })
+            }
         }
 
 //        Menu("Help", mnemonic = 'H') {

@@ -157,7 +157,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         actions: List<ActionDescriptor>,
     ): GameAction? {
 
-        if (!model.menuViewModel.isFeatureEnabled(Feature.REROLL_SUCCESSFUL_ACTIONS)) {
+        if (model.menuViewModel.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) {
             if (actions.filterIsInstance<SelectNoReroll>().count { it.rollSuccessful == true} > 0) {
                 return NoRerollSelected
             }

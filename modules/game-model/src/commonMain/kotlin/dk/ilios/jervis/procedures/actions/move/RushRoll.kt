@@ -56,9 +56,9 @@ import dk.ilios.jervis.utils.sum
  * to do so. And also handle each roll result.
  *
  * Skills are optional to use, so technically you would choose to use Sprint
- * as part of doing a Rush, but since Rushing is also, we opt for the easier
- * implementation and check for Sprint when starting an action and add either
- * 2 or 3 allowed rushes there.
+ * as part of doing a Rush, but since Rushing is also optional, we opt for the
+ * easier implementation and check for Sprint when starting an action and add
+ * either 2 or 3 allowed rushes there.
  *
  * Also, an observation about Rushing. It is worded this way in the rules:
  *
@@ -67,12 +67,12 @@ import dk.ilios.jervis.utils.sum
  * This means that if, by any means, a player is able to do two actions.
  * They would be able to move 2*Rush distance. Sprint has a similar wording
  * that would allow it to be used in both actions as well.
+ *
+ * @see [StandardMoveStep.ResolveRush]
  */
  object RushRoll: Procedure() {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        state.assertContext<RushRollContext>()
-
         // Check for Rush modifiers
         val modifiers = mutableListOf<DiceModifier>()
 
@@ -95,12 +95,14 @@ import dk.ilios.jervis.utils.sum
         }
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<RushRollContext>()
+    }
 
     object RollDie: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<RushRollContext>()
@@ -175,7 +177,6 @@ import dk.ilios.jervis.utils.sum
 
     object ReRollDie : ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val rushContext = state.getContext<RushRollContext>()
@@ -194,7 +195,6 @@ import dk.ilios.jervis.utils.sum
                 )
             }
         }
-
     }
 
     private fun isRushSuccess(d6: D6Result, modifiers: List<DiceModifier>): Boolean {

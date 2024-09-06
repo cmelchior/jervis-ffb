@@ -41,10 +41,7 @@ class SetBallState private constructor(
         fun thrownIn(): Command = SetBallState(BallState.THROW_IN, carriedBy = null, exitLocation = null)
     }
 
-    override fun execute(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun execute(state: Game, controller: GameController) {
         val ball: Ball = state.ball
         ball.let {
             this.originalState = it.state
@@ -60,13 +57,11 @@ class SetBallState private constructor(
             }
             it.outOfBoundsAt = exitLocation
             it.notifyUpdate()
+            originalCarriedBy?.notifyUpdate()
         }
     }
 
-    override fun undo(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun undo(state: Game, controller: GameController) {
         state.ball.state = originalState
         state.ball.carriedBy = originalCarriedBy
         state.ball.outOfBoundsAt = originalExit
@@ -74,5 +69,6 @@ class SetBallState private constructor(
             state.ball.location = originalLocation!!
         }
         state.ball.notifyUpdate()
+        state.ball.carriedBy?.notifyUpdate()
     }
 }

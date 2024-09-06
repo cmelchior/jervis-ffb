@@ -75,7 +75,7 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
         }
     }
 
-    fun userSelectedMultipleActions(actions: List<GameAction>) {
+    fun userSelectedMultipleActions(actions: List<GameAction>, delayEvent: Boolean = true) {
         when (actions.size) {
             0 -> return
             1 -> {
@@ -100,7 +100,7 @@ abstract class UiActionFactory(protected val model: GameScreenModel) {
                 userSelectedAction.send(el)
                 // Do not pause for flow-control events, only events that would appear "visible"
                 // to the player
-                if (el !is MoveTypeSelected) {
+                if (el !is MoveTypeSelected && delayEvent) {
                     delay(200)
                 }
             }

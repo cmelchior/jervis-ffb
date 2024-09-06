@@ -26,8 +26,8 @@ import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.RushRollContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.injury.FallingOver
-import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.rules.Rules
 
 /**
@@ -164,13 +164,13 @@ object StandardMoveStep: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val dodgeContext = state.getContext<DodgeRollContext>()
             val player = dodgeContext.player
-            if (dodgeContext.isSuccess) {
-                return compositeCommandOf(
+            return if (dodgeContext.isSuccess) {
+                compositeCommandOf(
                     RemoveContext<DodgeRollContext>(),
                     GotoNode(ResolveMove/*CheckIfShadowingIsAvailable*/)
                 )
             } else {
-                return compositeCommandOf(
+                compositeCommandOf(
                     SetPlayerState(player, PlayerState.KNOCKED_DOWN),
                     RemoveContext<DodgeRollContext>(),
                     GotoNode(ResolvePlayerFallingOver)
@@ -179,7 +179,7 @@ object StandardMoveStep: Procedure() {
         }
     }
 
-    object øCheckIfShadowingIsAvailable: ActionNode() {
+    object CheckIfShadowingIsAvailable: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             TODO("Not yet implemented")
         }
@@ -190,16 +190,13 @@ object StandardMoveStep: Procedure() {
     }
 
     /**
-     * The player failed its move and was knocked down. This creates a turnover
-     * and requires an injury roll. Regardless of why the player was knocked down.
+     * The player failed its move and fell over. This creates a turnover
+     * and requires an injury roll. Regardless of why the player fell down.
      */
     object ResolvePlayerFallingOver: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            return SetContext(RiskingInjuryContext(
-                context.player,
-                RiskingInjuryMode.FALLING_OVER
-            ))
+            return SetContext(RiskingInjuryContext(context.player, RiskingInjuryMode.FALLING_OVER))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver
         override fun onExitNode(state: Game, rules: Rules): Command {

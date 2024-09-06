@@ -125,7 +125,7 @@ fun lizardMenAwayTeam(): Team {
         addPlayer(PlayerId("A11"), "Blitzer-4-A", PlayerNo(11), LizardmenTeam.SKINK_RUNNER_LINEMEN)
         reRolls = 4
         apothecaries = 1
-        teamValue = 1_050_000
+        teamValue = 1_000_000
     }
 }
 

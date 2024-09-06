@@ -184,7 +184,7 @@ class Team(val name: String, val roster: BB2020Roster, val coach: Coach) : Colle
         noToPlayer[player.number] = player
     }
 
-    operator fun get(playerNo: PlayerNo): Player? = noToPlayer[playerNo]
+    operator fun get(playerNo: PlayerNo): Player = noToPlayer[playerNo] ?: throw IllegalArgumentException("Player $playerNo not found")
 
     override val size: Int
         get() = noToPlayer.size

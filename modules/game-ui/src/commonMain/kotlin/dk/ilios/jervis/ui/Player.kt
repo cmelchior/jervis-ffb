@@ -57,7 +57,7 @@ fun Player(
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize(),
         )
-        if (player.hasBall()) {
+        if (player.carriesBall) {
             Image(
                 bitmap = ballImage,
                 contentDescription = null,

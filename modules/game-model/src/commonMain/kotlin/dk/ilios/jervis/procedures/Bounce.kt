@@ -33,35 +33,18 @@ import dk.ilios.jervis.rules.tables.Direction
  */
 object Bounce : Procedure() {
     override val initialNode: Node = RollDirection
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? {
-        if (state.ball.state != BallState.BOUNCING) {
-            throw IllegalStateException("Ball is not bouncing, but ${state.ball.state}")
-        }
-        return null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
+        if (state.ball.state != BallState.BOUNCING) throw IllegalStateException("Ball is not bouncing, but ${state.ball.state}")
     }
 
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
     object RollDirection : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D8))
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D8Result>(action) { d8 ->
                 val direction: Direction = rules.direction(d8)
                 val newLocation: FieldCoordinate = state.ball.location.move(direction, 1)
@@ -101,10 +84,7 @@ object Bounce : Procedure() {
     }
 
     object ResolveLandingOnTheGround : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetBallState.onGround(),
                 ExitProcedure(),
@@ -113,38 +93,17 @@ object Bounce : Procedure() {
     }
 
     object ResolveThrowIn : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = ThrowIn
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command = ExitProcedure()
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowIn
+        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
     }
 
     object ResolveBounce : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = Bounce
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command = ExitProcedure()
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
+        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
     }
 
     object ResolveCatch : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = Catch
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command = ExitProcedure()
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch
+        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
     }
 }

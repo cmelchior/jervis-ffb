@@ -23,7 +23,17 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  */
 object FallingOver: Procedure() {
     override val initialNode: Node = RollForInjury
-    override fun onEnterProcedure(state: Game, rules: Rules): Command?  = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+        val context = state.getContext<RiskingInjuryContext>()
+        return if (context.player.hasBall()) {
+            compositeCommandOf(
+                SetBallState.bouncing(),
+                SetBallLocation(context.player.location.coordinate),
+            )
+        } else {
+            null
+        }
+    }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return SetTurnOver(true)
     }
@@ -36,17 +46,6 @@ object FallingOver: Procedure() {
     }
 
     object RollForInjury: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
-            val context = state.getContext<RiskingInjuryContext>()
-            return if (context.player.hasBall()) {
-                compositeCommandOf(
-                    SetBallState.bouncing(),
-                    SetBallLocation(context.player.location.coordinate)
-                )
-            } else {
-                null
-            }
-        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             return if (state.ball.state == BallState.BOUNCING) {

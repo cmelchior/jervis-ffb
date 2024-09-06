@@ -107,6 +107,9 @@ data class SelectRerollOption(val option: DiceRerollOption) : ActionDescriptor
 
 // Successful might be hard to interpret in some cases, in which this is `null`
 // Otherwise it contains
+// TODO Do we want to send things that are effectively just "state"?
+//  Could this open up a door for a lot of things.
+//  On the other side, it might just be useful information
 data class SelectNoReroll(val rollSuccessful: Boolean? = null) : ActionDescriptor
 
 // Available actions
