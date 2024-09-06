@@ -15,6 +15,8 @@ import dk.ilios.jervis.procedures.actions.block.StumbleContext
 import dk.ilios.jervis.procedures.actions.handoff.HandOffContext
 import dk.ilios.jervis.procedures.actions.pass.PassingInteferenceContext
 import dk.ilios.jervis.rules.PlayerAction
+import dk.ilios.jervis.rules.skills.RerollSource
+import dk.ilios.jervis.rules.skills.RerollSourceId
 import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import dk.ilios.jervis.utils.safeTryEmit
@@ -23,18 +25,31 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.Transient
 import kotlin.properties.Delegates
 
-class Game(homeTeam: Team, awayTeam: Team, field: Field) {
+/**
+ * Entry point for tracking the state of a game of Blood Bowl.
+ * It should only contain the static state and not enforce any rules.
+ *
+ * All rules should either be enforced by a [dk.ilios.jervis.fsm.Procedure]
+ * or by calling methods in [dk.ilios.jervis.rules.Rules]
+ */
+class Game(
+    val homeTeam: Team,
+    val awayTeam: Team,
+    val field: Field
+) {
     init {
+        // Setup circular references, making it easier to navigate
+        // the object graph.
         homeTeam.setGameReference(this)
         awayTeam.setGameReference(this)
     }
 
     companion object
 
+    // Weather conditions for the field
     var weather: Weather = Weather.PERFECT_CONDITIONS
 
-    var isTurnOver = false
-    var goalScored: Boolean = false
+    // Game progress
     var abortIfBallOutOfBounds: Boolean = false
     var halfNo by Delegates.observable(0) { prop, old, new ->
         gameFlow.safeTryEmit(this)
@@ -43,17 +58,53 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
         gameFlow.safeTryEmit(this)
     }
 
-    val homeTeam: Team = homeTeam
-    val awayTeam: Team = awayTeam
-
+    // Global state properties
+    // We should only have properties here that are relevant to more than
+    // one procedure, otherwise it should be moved into a [ProcedureContext]
+    var isTurnOver = false
+    var goalScored: Boolean = false
     var activePlayer: Player? = null
-    var kickingPlayer: Player? = null
+    var kickingPlayer: Player? = null // TODO Move into a context?
+    class DicePool {
 
-    // In some cases team rerolls are not allowed, like during setups
-    var canUseTeamRerolls = false
-    // Active/Inactive does indicate "active turn"
+    }
+
+//    val pool = buildDicePool(type) {
+//        add(1.d6)
+//        add(2.d6)
+//    }
+//
+//    pool.canReroll(state)
+//    pool.createRerol
+//    val diceRolls: MutableList<DicePool> = mutableListOf()
+
+    // Kick-off events are not considered any teams turn, which means
+    // a number of rules are not applicable there.
+    // Especially the concept of "Active Team", which would be neither.
+    // But due to how many times we want to access the active team, we
+    // are instead making a special note of whether it being kick-off
+    // or not. If you ask for the active or inactive team during that
+    // period, an exception is thrown.
+    var isDuringKickOff: Boolean = false
+    var canUseTeamRerolls: Boolean = false
+
+    // Active/Inactive indicates a teams "active turn".
+    // See page 42 in the rulebook.
     var activeTeam: Team = this.homeTeam
+        get() {
+            if (isDuringKickOff) INVALID_GAME_STATE("Active team does not exists during Kick-off.")
+            return field
+        }
+
+
     var inactiveTeam: Team = this.awayTeam
+        get() {
+            if (isDuringKickOff) INVALID_GAME_STATE("Inactive team does not exists during Kick-off.")
+            return field
+        }
+
+    // Kicking/Receiving team is decided during the pre-game sequence.
+    // See page 38 in the rulebook.
     var kickingTeam: Team = this.homeTeam
     var receivingTeam: Team = this.awayTeam
     var kickingTeamInLastHalf: Team = kickingTeam
@@ -86,7 +137,6 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
     var throwInContext: ThrowInContext? = null
     var rerollContext: UseRerollContext? = null
 
-    val field: Field = field
     val ball: Ball = Ball()
 
     val ballSquare: FieldSquare
@@ -96,20 +146,22 @@ class Game(homeTeam: Team, awayTeam: Team, field: Field) {
             } ?: this.field[ball.location]
 
         }
+
+    /**
+     * Returns the player matching the given [PlayerId].
+     * If no player matches, an [dk.ilios.jervis.utils.InvalidGameStateException] is thrown
+     */
     fun getPlayerById(id: PlayerId): Player {
-        return homeTeam.firstOrNull { it.id == id } ?: awayTeam.firstOrNull { it.id == id } ?: INVALID_GAME_STATE("Player with ${id} not found")
+        return homeTeam.firstOrNull { it.id == id } ?: awayTeam.firstOrNull { it.id == id } ?: INVALID_GAME_STATE("Player with $id not found")
     }
 
-    fun swapKickingTeam() {
-        val currentKickingTeam = kickingTeam
-        kickingTeam = receivingTeam
-        receivingTeam = currentKickingTeam
-    }
-
-    fun swapActiveTeam() {
-        val currentTeam = activeTeam
-        activeTeam = inactiveTeam
-        inactiveTeam = currentTeam
+    fun getRerollSourceById(id: RerollSourceId): RerollSource {
+        // Optimize this
+        return homeTeam.rerolls.firstOrNull { it.id == id }
+            ?: homeTeam.flatMap { it.skills.filterIsInstance<RerollSource>() }.firstOrNull { skill-> skill.id == id }
+            ?: awayTeam.rerolls.firstOrNull { it.id == id }
+            ?: awayTeam.flatMap { it.skills.filterIsInstance<RerollSource>() }.firstOrNull { skill-> skill.id == id }
+            ?: INVALID_GAME_STATE("Reroll $id could not be found")
     }
 
     fun notifyUpdate() {

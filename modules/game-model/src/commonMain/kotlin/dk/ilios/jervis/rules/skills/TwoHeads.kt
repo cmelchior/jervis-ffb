@@ -13,7 +13,7 @@ class TwoHeads(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill{
-    override val id: String = "two-heads-skill"
+    override val skillId: String = "two-heads-skill"
     override val name: String = "Two Heads"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT

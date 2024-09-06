@@ -23,7 +23,7 @@ import kotlin.random.Random
 
 @Serializable
 @JvmInline
-value class TeamId(val id: String = "")
+value class TeamId(val value: String = "")
 
 class TeamHalfData(private val game: Game) {
     var totalRerolls: Int = 0

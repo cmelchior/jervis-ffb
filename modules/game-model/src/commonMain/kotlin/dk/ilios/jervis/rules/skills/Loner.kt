@@ -9,7 +9,7 @@ class Loner(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill {
-    override val id: String = "loner-skill"
+    override val skillId: String = "loner-skill"
     override val name: String = "Loner ($value+)"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT

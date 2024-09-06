@@ -29,24 +29,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 object BlockAction : Procedure() {
     override val initialNode: Node = SelectDefenderOrEndAction
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         return ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
     }
 
     object SelectDefenderOrEndAction : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val end: List<ActionDescriptor> = listOf(EndActionWhenReady)
 
             val attacker = state.activePlayer!!
@@ -59,11 +48,7 @@ object BlockAction : Procedure() {
             return end + eligibleDefenders
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 EndAction -> ExitProcedure()
                 is PlayerSelected -> {
@@ -84,15 +69,8 @@ object BlockAction : Procedure() {
     }
 
     object ResolveBlock : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = BlockStep
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BlockStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome of the block, the action is over
             return ExitProcedure()
         }

@@ -8,6 +8,7 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
 import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.SimpleLogEntry
@@ -27,12 +28,10 @@ object FanInteraction : Procedure() {
 
     object ApplyEvent : ComputationNode() {
         // TODO Figure out how to do this
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<PrayersToNuffleRollContext>()
             return compositeCommandOf(
-                SimpleLogEntry("${state.activeTeam} receives Fan Interaction", category = LogCategory.GAME_PROGRESS),
+                SimpleLogEntry("${context.team.name} receives Fan Interaction", category = LogCategory.GAME_PROGRESS),
                 ExitProcedure(),
             )
         }

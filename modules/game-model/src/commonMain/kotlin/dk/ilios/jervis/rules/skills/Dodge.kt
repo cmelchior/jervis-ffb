@@ -9,7 +9,8 @@ class Dodge(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill, D6StandardSkillReroll {
-    override val id: String = "dodge-skill"
+    override val skillId: String = "dodge-skill"
+    override val id: RerollSourceId = RerollSourceId("dodge-reroll")
     override val name: String = "Dodge"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
@@ -23,7 +24,7 @@ class Dodge(
     override val rerollResetAt: Duration = Duration.END_OF_TURN
     override var rerollUsed: Boolean = false
 
-    override fun canReroll(type: DiceRollType, value: List<DieRoll<*, *>>, wasSuccess: Boolean?): Boolean {
+    override fun canReroll(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
         return type == DiceRollType.DODGE
     }
 

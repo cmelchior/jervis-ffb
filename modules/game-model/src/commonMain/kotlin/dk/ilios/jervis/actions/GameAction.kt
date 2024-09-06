@@ -6,13 +6,25 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
+import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.rules.skills.SkillFactory
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
 
 sealed interface GameAction
+
+/**
+ * Game Action that can delay its value until called.
+ * This is only for testing and should never be accepted by a `Procedure.
+ */
+class CalculatedAction(private val action: (Game, Rules) -> GameAction) : GameAction {
+    fun get(state: Game, rules: Rules): GameAction {
+        return action(state, rules)
+    }
+}
 
 @Serializable
 data class CompositeGameAction(val list: List<GameAction>): GameAction
@@ -244,7 +256,12 @@ data class RandomPlayersSelected(val players: List<PlayerId>) : GameAction {
 }
 
 @Serializable
-data class RerollOptionSelected(val option: DiceRerollOption) : GameAction
+data class RerollOptionSelected(val option: DiceRerollOption) : GameAction {
+    fun getRerollSource(state: Game): RerollSource {
+        return option.source
+//        return state.getRerollSourceById(option.source)
+    }
+}
 
 @Serializable
 data object NoRerollSelected : GameAction

@@ -101,7 +101,7 @@ object PickupRoll : Procedure() {
             } else {
                 val teamReroll =
                     if (hasTeamRerolls && allowedToUseTeamReroll) {
-                        listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf(context.roll!!))))
+                        listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), context.roll!!)))
                     } else {
                         emptyList()
                     }
@@ -118,7 +118,7 @@ object PickupRoll : Procedure() {
                 Continue -> ExitProcedure()
                 NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.CATCH, action.option.source)
+                    val rerollContext = UseRerollContext(DiceRollType.CATCH, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),

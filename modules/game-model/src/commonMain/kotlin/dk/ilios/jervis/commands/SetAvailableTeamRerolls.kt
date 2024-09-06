@@ -15,8 +15,8 @@ class SetAvailableTeamRerolls(private val team: Team) : Command {
     ) {
         originalRerolls.addAll(team.rerolls)
         team.rerolls.clear()
-        repeat(team.rerollsCountOnRoster) {
-            team.rerolls.add(RegularTeamReroll(team))
+        repeat(team.rerollsCountOnRoster) { i ->
+            team.rerolls.add(RegularTeamReroll(team, i))
         }
     }
 

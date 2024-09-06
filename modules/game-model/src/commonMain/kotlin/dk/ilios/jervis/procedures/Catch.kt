@@ -45,10 +45,7 @@ object Catch : Procedure() {
         }
     }
 
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
         // Determine target and modifiers for the Catch roll
         val catchingPlayer = state.field[state.ball.location].player!!
         val diceRollTarget = catchingPlayer.agility
@@ -74,25 +71,15 @@ object Catch : Procedure() {
         )
     }
 
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
             RemoveContext<CatchRollContext>(),
         )
     }
 
     object RollToCatch : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = CatchRoll
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = CatchRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<CatchRollContext>()
             val roll = context.roll!!
             return if (context.isSuccess) {
@@ -112,15 +99,8 @@ object Catch : Procedure() {
     }
 
     object CatchFailed : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = Bounce
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
+        override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 ExitProcedure(), // TODO Not 100% sure what to do here?
             )

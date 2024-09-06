@@ -85,7 +85,7 @@ object PassAction : Procedure() {
             if (context.target != null) ReportPassResult(context) else null,
             RemoveContext<PassContext>(),
             if (context.hasMoved) {
-                val team = state.activeTeam
+                val team = context.thrower.team
                 SetAvailableActions(team, PlayerActionType.PASS, team.turnData.passActions - 1)
             } else {
                 null

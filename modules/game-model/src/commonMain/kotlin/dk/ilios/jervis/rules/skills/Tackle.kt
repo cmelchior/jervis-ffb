@@ -8,7 +8,7 @@ class Tackle(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill {
-    override val id: String = "tackle-skill"
+    override val skillId: String = "tackle-skill"
     override val name: String = "Tackle"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT

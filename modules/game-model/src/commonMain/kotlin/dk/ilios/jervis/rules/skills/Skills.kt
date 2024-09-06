@@ -7,6 +7,7 @@ import dk.ilios.jervis.procedures.DieRoll
 import dk.ilios.jervis.procedures.UseStandardSkillReroll
 import dk.ilios.jervis.procedures.UseTeamReroll
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
 enum class DiceRollType {
     ACCURACY, // For passing
@@ -46,11 +47,6 @@ enum class DiceRollType {
     WILD_ANIMAL,
 }
 
-enum class TeamRerollDuration {
-    END_OF_HALF,
-    END_OF_DRIVE,
-}
-
 sealed interface TeamReroll : RerollSource {
     val carryOverIntoOvertime: Boolean
     // When is this reroll removed from the Team, regardless of it being used or not
@@ -60,7 +56,7 @@ sealed interface TeamReroll : RerollSource {
 
     override fun canReroll(
         type: DiceRollType,
-        value: List<DieRoll<*, *>>,
+        value: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): Boolean {
         // TODO Some types cannot be rerolled
@@ -69,14 +65,15 @@ sealed interface TeamReroll : RerollSource {
 
     override fun calculateRerollOptions(
         type: DiceRollType,
-        value: List<DieRoll<*, *>>,
+        value: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): List<DiceRerollOption> {
         return listOf(DiceRerollOption(this, value))
     }
 }
 
-class RegularTeamReroll(val team: Team) : TeamReroll {
+class RegularTeamReroll(val team: Team, index: Int) : TeamReroll {
+    override val id: RerollSourceId = RerollSourceId("team-reroll-$index")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.PERMANENT
     override val rerollResetAt: Duration = Duration.END_OF_HALF
@@ -85,6 +82,7 @@ class RegularTeamReroll(val team: Team) : TeamReroll {
 }
 
 class LeaderTeamReroll(val player: Player) : TeamReroll {
+    override val id: RerollSourceId = RerollSourceId("leader-${player.id.value}")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.SPECIAL
     override val rerollResetAt: Duration = Duration.END_OF_HALF
@@ -93,6 +91,7 @@ class LeaderTeamReroll(val player: Player) : TeamReroll {
 }
 
 class BrilliantCoachingReroll(val team: Team) : TeamReroll {
+    override val id: RerollSourceId = RerollSourceId("brilliant-coaching-${team.id.value}")
     override val carryOverIntoOvertime: Boolean = false
     override val duration = Duration.END_OF_DRIVE
     override val rerollResetAt: Duration = Duration.END_OF_HALF
@@ -100,30 +99,33 @@ class BrilliantCoachingReroll(val team: Team) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
+@Serializable
+@JvmInline
+value class RerollSourceId(val id: String)
+
 // Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {
+    val id: RerollSourceId // Unique identifier for this reroll. Should only be unique within a single team.
     val rerollResetAt: Duration
     val rerollDescription: String
     var rerollUsed: Boolean
     val rerollProcedure: Procedure
 
-    fun canReroll(
-        type: DiceRollType,
-        value: List<DieRoll<*, *>>,
-        wasSuccess: Boolean? = null,
-    ): Boolean
+    // Returns `true` if `calculateRerollOptions` will return a non-empty list
+    fun canReroll(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean? = null): Boolean
 
     fun calculateRerollOptions(
+        // What kind of dice roll
         type: DiceRollType,
-        value: List<DieRoll<*, *>>,
+        // All dice part of the roll
+        value: List<DieRoll<*>>,
+        // If the roll was "successful" (as some skills only allow rerolls if unsuccessful). For some roll types
+        // this concept doesn't make sense, like Block rolls or rolling for a table result.
         wasSuccess: Boolean? = null,
     ): List<DiceRerollOption>
 
-    fun calculateRerollOptions(
-        type: DiceRollType,
-        value: DieRoll<*, *>,
-        wasSuccess: Boolean,
-    ): List<DiceRerollOption> =
+    // Helper method, for just rolling a single dice. Which is by far, the most common scenario.
+    fun calculateRerollOptions(type: DiceRollType, value: DieRoll<*>, wasSuccess: Boolean, ): List<DiceRerollOption> =
         calculateRerollOptions(
             type,
             listOf(value),
@@ -137,7 +139,7 @@ interface D6StandardSkillReroll : RerollSource {
 
     override fun calculateRerollOptions(
         type: DiceRollType,
-        value: List<DieRoll<*, *>>,
+        value: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): List<DiceRerollOption> {
         // For standard skills
@@ -150,8 +152,10 @@ interface D6StandardSkillReroll : RerollSource {
 @Serializable
 data class DiceRerollOption(
     val source: RerollSource,
-    val dice: List<DieRoll<*, *>>,
-)
+    val dice: List<DieRoll<*>>,
+) {
+    constructor(source: RerollSource, dieRoll: DieRoll<*>): this(source, listOf(dieRoll))
+}
 
 // When does the "used" state reset?
 // TODO Rename to Duration?
@@ -169,7 +173,7 @@ enum class Duration {
 @Serializable
 sealed interface Skill {
     // Unique identifier for this skill
-    val id: String
+    val skillId: String
     // Human readable name of this skill
     val name: String
     // Whether or not this skill is compulsory to use
@@ -209,92 +213,3 @@ interface SkillCategory {
 
 @Serializable
 sealed interface BB2020Skill : Skill
-
-enum class BB2020SkillsList {
-//
-// Agility
-//    - Catch
-//    - Diving Catch
-//    - Diving Tackle
-//    - Dodge
-//    - Defensive
-//    - Jump Up
-//    - Leap
-//    - Safe Pair of Hands
-//    - Sidestep
-//    - Sneaky Git
-//    - Sprint
-//    - Sure Feet
-//
-// General
-//    - Block
-//    - Dauntless
-//    - Dirty Player (+1)
-//    - Fend
-//    - Frenzy*
-//    - Kick
-//    - Pro
-//    - Shadowing
-//    - Strip Ball
-//    - Sure Hands
-//    - Tackle
-//    - Wrestle
-//
-// Passing
-//    - Accurate
-//    - Cannoneer
-//    - Cloud Burster
-//    - Dump-off
-//    - Fumblerooskie
-//    - Hail Mary Pass
-//    - Leader
-//    - Nerves of Steel
-//    - On the Ball
-//    - Pass
-//    - Running Pass
-//    - Safe Pass
-//
-// Strength
-//    - Arm Bar
-//    - Brawler
-//    - Break Tackle
-//    - Grab
-//    - Guard
-//    - Juggernaut
-//    - Might Blow (+1)
-//    - Multiple Block
-//    - Pile Driver
-//    - Stand Firm
-//    - Strong Arm
-//    - Thick Skull
-//
-// Traits
-//    - Animal Savagery*
-//    - Animosity*
-//    - Always Hungry*
-//    - Ball & Chain*
-//    - Bombadier
-//    - Bone Head*
-//    - Chainsaw*
-//    - Decay*
-//    - Hypnotic Gaze
-//    - Kick Team-mate
-//    - Loner (X+)*
-//    - No Hands*
-//    - Plague Ridden
-//    - Pogo Stick
-//    - Projectile Vomit
-//    - Really Stupid*
-//    - Regeneration
-//    - Right Stuff*
-//    - Secret Weapon*
-//    - Stab
-//    - Stunty*
-//    - Swarming
-//    - Swoop
-//    - Take Root*
-//    - Titchy*
-//    - Timmm-ber!
-//    - Throw Team-mate
-//    - Unchannelled Fury*
-}

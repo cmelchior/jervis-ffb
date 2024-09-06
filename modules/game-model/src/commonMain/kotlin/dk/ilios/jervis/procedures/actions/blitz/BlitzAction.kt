@@ -75,7 +75,7 @@ object BlitzAction : Procedure() {
         return compositeCommandOf(
             SetOldContext(Game::blitzContext, null),
             if (context.hasBlocked || context.hasMoved) {
-                val team = state.activeTeam
+                val team = context.attacker.team
                 SetAvailableActions(team, PlayerActionType.FOUL, team.turnData.blitzActions - 1)
             } else {
                 null

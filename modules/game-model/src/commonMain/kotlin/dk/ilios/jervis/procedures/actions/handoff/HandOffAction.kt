@@ -71,7 +71,7 @@ object HandOffAction : Procedure() {
         return compositeCommandOf(
             SetOldContext(Game::handOffContext, null),
             if (context.hasMoved) {
-                val team = state.activeTeam
+                val team = context.thrower.team
                 SetAvailableActions(team, PlayerActionType.HAND_OFF, team.turnData.handOffActions - 1)
             } else {
                 null

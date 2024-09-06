@@ -146,7 +146,7 @@ import dk.ilios.jervis.utils.sum
                 Continue -> ExitProcedure()
                 NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.RUSH, action.option.source)
+                    val rerollContext = UseRerollContext(DiceRollType.RUSH, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),

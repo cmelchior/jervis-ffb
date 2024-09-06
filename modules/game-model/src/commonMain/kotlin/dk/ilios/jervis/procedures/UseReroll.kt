@@ -60,22 +60,11 @@ object UseLonerReroll : Procedure() {
 
 object UseTeamReroll : Procedure() {
     override val initialNode: Node = UseReroll
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object UseReroll : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             val context = state.rerollContext!!
             val result = UseRerollContext(context.roll, context.source, true)
             return compositeCommandOf(
@@ -92,22 +81,11 @@ object UseTeamReroll : Procedure() {
  */
 object UseStandardSkillReroll : Procedure() {
     override val initialNode: Node = UseReroll
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object UseReroll : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             val context = state.rerollContext!!
             val result = UseRerollContext(context.roll, context.source, rerollAllowed = true)
             return compositeCommandOf(

@@ -8,7 +8,7 @@ class Stab(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill {
-    override val id: String = "stab-skill"
+    override val skillId: String = "stab-skill"
     override val name: String = "Stab"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT

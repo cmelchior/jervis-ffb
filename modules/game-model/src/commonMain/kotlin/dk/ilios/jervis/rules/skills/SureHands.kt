@@ -9,7 +9,8 @@ class SureHands(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill, D6StandardSkillReroll {
-    override val id: String = "surehands-skill"
+    override val skillId: String = "surehands-skill"
+    override val id: RerollSourceId = RerollSourceId("sure-hands-reroll")
     override val name: String = "Sure Hands"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
@@ -26,7 +27,7 @@ class SureHands(
 
     override fun canReroll(
         type: DiceRollType,
-        value: List<DieRoll<*, *>>,
+        value: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): Boolean {
         return type == DiceRollType.PICKUP

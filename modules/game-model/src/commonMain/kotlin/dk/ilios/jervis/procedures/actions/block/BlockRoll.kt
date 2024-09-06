@@ -141,16 +141,13 @@ object BlockRoll : Procedure() {
             }
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
+        override fun applyAction(action: GameAction, state: Game, rules: Rules,
         ): Command {
             return when (action) {
                 // TODO What is the difference between Continue and NoRerollSelected
                 NoRerollSelected -> GotoNode(SelectBlockResult)
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.BLOCK, action.option.source)
+                    val rerollContext = UseRerollContext(DiceRollType.BLOCK, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),
@@ -162,16 +159,9 @@ object BlockRoll : Procedure() {
     }
 
     object UseRerollSource : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = state.rerollContext!!.source.rerollProcedure
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
-            // useRerollResult must be set by the procedure running determing if a reroll is allowed
+        override fun getChildProcedure(state: Game, rules: Rules, ): Procedure = state.rerollContext!!.source.rerollProcedure
+        override fun onExitNode( state: Game, rules: Rules): Command {
+            // useRerollResult must be set by the procedure running which determines if a reroll is allowed
             return if (state.rerollContext!!.rerollAllowed) {
                 GotoNode(ReRollDie)
             } else {

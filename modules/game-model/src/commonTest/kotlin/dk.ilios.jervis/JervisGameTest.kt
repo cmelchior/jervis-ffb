@@ -15,7 +15,6 @@ import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.SelectRerollOption
-import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
@@ -30,7 +29,6 @@ import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.skills.BreakTackle
 import dk.ilios.jervis.utils.createDefaultGameState
-import dk.ilios.jervis.utils.setupTeamsOnField
 import kotlin.test.BeforeTest
 
 /**
@@ -64,19 +62,12 @@ abstract class JervisGameTest {
         homeTeam = state.homeTeam
         awayTeam = state.awayTeam
         controller = GameController(rules, state)
-        setupTeamsOnField(controller)
     }
 
     protected fun useTeamReroll(controller: GameController) =
         RerollOptionSelected(
             controller.getAvailableActions().filterIsInstance<SelectRerollOption>().first().option
         )
-
-    protected fun execute(vararg commands: Command) {
-        commands.forEach {
-            it.execute(state, controller)
-        }
-    }
 }
 
 fun defaultFanFactor() = arrayOf(
@@ -161,12 +152,13 @@ fun defaultKickOffEvent(): Array<GameAction> = arrayOf(
 )
 
 fun defaultKickOffHomeTeam(
+    placeKick: FieldSquareSelected = FieldSquareSelected(19, 7), // Center of Away Half,
     deviate: DiceResults = DiceResults(4.d8, 1.d6), // Land on [18,7]
     kickoffEvent: Array<GameAction> = defaultKickOffEvent(),
     bounce: D8Result? = 4.d8 // Bounce to [17,7]
 ) = arrayOf(
     PlayerSelected(PlayerId("H8")), // Select Kicker
-    FieldSquareSelected(19, 7), // Center of Away Half,
+    placeKick,
     deviate,
     *kickoffEvent,
     bounce

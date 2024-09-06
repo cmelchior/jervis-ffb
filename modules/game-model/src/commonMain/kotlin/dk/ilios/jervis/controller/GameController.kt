@@ -2,6 +2,7 @@ package dk.ilios.jervis.controller
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.CalculatedAction
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.GameAction
@@ -316,7 +317,8 @@ class GameController(
     fun rollForward(vararg actions: GameAction?) {
         actions.forEach {
             if (it != null) {
-                processAction(it)
+                val action = if (it is CalculatedAction) it.get(state, rules) else it
+                processAction(action)
                 rollForwardToNextActionNode()
                 gotoNextUserAction()
             }

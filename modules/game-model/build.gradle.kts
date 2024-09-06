@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.serialization)
@@ -20,7 +18,7 @@ kotlin {
             useJUnitPlatform()
         }
     }
-    @OptIn(ExperimentalWasmDsl::class)
+
     wasmJs {
         moduleName = "game-model"
         browser()

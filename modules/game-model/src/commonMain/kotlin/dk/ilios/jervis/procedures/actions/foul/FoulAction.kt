@@ -85,7 +85,7 @@ object FoulAction : Procedure() {
             if (context.victim != null) ReportFoulResult(context) else null,
             RemoveContext<FoulContext>(),
             if (context.hasFouled || context.hasMoved) {
-                val team = state.activeTeam
+                val team = context.fouler.team
                 SetAvailableActions(team, PlayerActionType.FOUL, team.turnData.foulActions - 1)
             } else {
                 null

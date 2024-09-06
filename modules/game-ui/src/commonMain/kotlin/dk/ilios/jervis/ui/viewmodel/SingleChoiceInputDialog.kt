@@ -1,5 +1,6 @@
 package dk.ilios.jervis.ui.viewmodel
 
+import dk.ilios.jervis.actions.CalculatedAction
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
@@ -74,6 +75,7 @@ data class SingleChoiceInputDialog(
                 is PlayerSubActionSelected -> action.name
                 is SkillSelected -> action.skill.toString()
                 is InducementSelected -> action.name
+                is CalculatedAction -> TODO("Should only be used in tests")
             }
         }
 

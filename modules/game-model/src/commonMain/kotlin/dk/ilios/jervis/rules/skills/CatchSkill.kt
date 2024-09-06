@@ -9,7 +9,8 @@ class CatchSkill(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill, D6StandardSkillReroll {
-    override val id: String = "catch-skill"
+    override val id: RerollSourceId = RerollSourceId("catch-reroll")
+    override val skillId: String = "catch-skill"
     override val name: String = "Catch"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
@@ -26,7 +27,7 @@ class CatchSkill(
 
     override fun canReroll(
         type: DiceRollType,
-        value: List<DieRoll<*, *>>,
+        value: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): Boolean {
         return type == DiceRollType.CATCH

@@ -13,7 +13,7 @@ class DivingTackle(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill{
-    override val id: String = "diving-tackle-skill"
+    override val skillId: String = "diving-tackle-skill"
     override val name: String = "Diving Tackle"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT

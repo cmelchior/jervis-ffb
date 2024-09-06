@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import dk.ilios.jervis.actions.CalculatedAction
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
@@ -331,6 +332,7 @@ fun ActionSelector(
                                     is PlayerSubActionSelected -> action.action.toString()
                                     is SkillSelected -> action.skill.toString()
                                     is InducementSelected -> action.name
+                                    is CalculatedAction -> TODO("Should only be used in tests")
                                 }
                             Text(text, fontSize = 10.sp)
                         }

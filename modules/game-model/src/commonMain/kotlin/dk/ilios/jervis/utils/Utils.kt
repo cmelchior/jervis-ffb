@@ -207,10 +207,10 @@ fun List<StatModifier>.sum(): Int = this.sumOf { it.modifier }
 
 class InvalidAction(message: String) : RuntimeException(message)
 
-class InvalidGameState(message: String) : IllegalStateException(message)
+class InvalidGameStateException(message: String) : IllegalStateException(message)
 
 inline fun INVALID_GAME_STATE(message: String = "Unexpected game state"): Nothing {
-    throw InvalidGameState(message)
+    throw InvalidGameStateException(message)
 }
 
 inline fun INVALID_ACTION(action: GameAction, customMessage: String? = null): Nothing {
@@ -268,7 +268,6 @@ fun setupTeamsOnField(controller: GameController) {
 
     // Also enable Team rerolls
     controller.state.activeTeam = controller.state.homeTeam
-    controller.state.canUseTeamRerolls = true
     SetAvailableTeamRerolls(controller.state.homeTeam).execute(controller.state, controller)
     SetAvailableTeamRerolls(controller.state.awayTeam).execute(controller.state, controller)
 }

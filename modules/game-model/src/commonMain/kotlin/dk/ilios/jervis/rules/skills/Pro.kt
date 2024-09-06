@@ -11,7 +11,8 @@ class Pro(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill, RerollSource  {
-    override val id: String = "pro-skill"
+    override val skillId: String = "pro-skill"
+    override val id: RerollSourceId = RerollSourceId("pro-reroll")
     override val name: String = "Pro"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
@@ -32,11 +33,13 @@ class Pro(
     override var rerollUsed: Boolean = false
     override val rerollProcedure: Procedure = UseProReroll
 
-    override fun canReroll(type: DiceRollType, value: List<DieRoll<*, *>>, wasSuccess: Boolean?): Boolean {
+    override fun canReroll(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun calculateRerollOptions(type: DiceRollType, value: List<DieRoll<*, *>>, wasSuccess: Boolean?): List<DiceRerollOption> {
+    override fun calculateRerollOptions(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): List<DiceRerollOption> {
+
+
         TODO("Not yet implemented")
     }
 }

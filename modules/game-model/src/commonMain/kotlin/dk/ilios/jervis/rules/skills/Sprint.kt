@@ -13,7 +13,7 @@ class Sprint(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill {
-    override val id: String = "sprint-skill"
+    override val skillId: String = "sprint-skill"
     override val name: String = "Sprint"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT

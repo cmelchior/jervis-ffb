@@ -13,7 +13,7 @@ class PrehensileTail(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill{
-    override val id: String = "prehensile-tail-skill"
+    override val skillId: String = "prehensile-tail-skill"
     override val name: String = "Prehensile Tail"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT

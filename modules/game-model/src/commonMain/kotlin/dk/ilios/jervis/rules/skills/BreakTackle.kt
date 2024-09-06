@@ -13,7 +13,7 @@ class BreakTackle(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill{
-    override val id: String = "break-tackle-skill"
+    override val skillId: String = "break-tackle-skill"
     override val name: String = "Break Tackle"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.END_OF_TURN

@@ -13,7 +13,7 @@ class Titchy(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill{
-    override val id: String = "titchy-skill"
+    override val skillId: String = "titchy-skill"
     override val name: String = "Titchy"
     override val compulsory: Boolean = true
     override val resetAt: Duration = Duration.PERMANENT

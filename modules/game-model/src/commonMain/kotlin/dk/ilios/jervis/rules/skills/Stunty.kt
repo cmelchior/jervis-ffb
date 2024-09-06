@@ -13,7 +13,7 @@ class Stunty(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill{
-    override val id: String = "stunty-skill"
+    override val skillId: String = "stunty-skill"
     override val name: String = "Stunty"
     override val compulsory: Boolean = true
     override val resetAt: Duration = Duration.PERMANENT

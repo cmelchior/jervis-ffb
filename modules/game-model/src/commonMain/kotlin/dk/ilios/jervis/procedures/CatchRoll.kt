@@ -38,12 +38,10 @@ import dk.ilios.jervis.utils.calculateAvailableRerollsFor
  * the appropriate action depending on the outcome.
  */
 object CatchRoll : Procedure() {
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<CatchRollContext>()
-    }
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<CatchRollContext>()
 
     object RollDie : ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
@@ -66,10 +64,7 @@ object CatchRoll : Procedure() {
 
     // Team Reroll, Pro, Catch (only if failed), other skills
     object ChooseReRollSource : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<CatchRollContext>()
             val availableRerolls = calculateAvailableRerollsFor(
                 rules,
@@ -85,16 +80,12 @@ object CatchRoll : Procedure() {
             }
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Continue -> ExitProcedure()
                 NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.CATCH, action.option.source)
+                    val rerollContext = UseRerollContext(DiceRollType.CATCH, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),
@@ -106,15 +97,10 @@ object CatchRoll : Procedure() {
     }
 
     object UseRerollSource : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = state.rerollContext!!.source.rerollProcedure
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return state.rerollContext!!.source.rerollProcedure
+        }
+        override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.rerollContext!!
             return if (context.rerollAllowed) {
                 GotoNode(ReRollDie)
@@ -125,16 +111,8 @@ object CatchRoll : Procedure() {
     }
 
     object ReRollDie : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
-
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val rollResultContext = state.getContext<CatchRollContext>()
                 val rollContext = state.getContext<CatchRollContext>()
@@ -158,5 +136,7 @@ object CatchRoll : Procedure() {
         it: D6Result,
         target: Int,
         rollContext: CatchRollContext,
-    ) = it.value != 1 && (target <= it.value + rollContext.diceModifier())
+    ): Boolean {
+        return it.value != 1 && (target <= it.value + rollContext.diceModifier())
+    }
 }

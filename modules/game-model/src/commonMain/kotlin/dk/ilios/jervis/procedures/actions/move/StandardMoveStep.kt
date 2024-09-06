@@ -61,7 +61,7 @@ object StandardMoveStep: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<FieldSquareSelected>(action) {
+            return checkTypeAndValue<FieldSquareSelected>(state, rules, action, this) {
                 val context = state.getContext<MoveContext>()
                 compositeCommandOf(
                     SetContext(context.copy(target = it.coordinate)),
@@ -138,11 +138,7 @@ object StandardMoveStep: Procedure() {
     object CheckIfDodgeIsNeeded : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            val isMarked = context.startingSquare.coordinate.getSurroundingCoordinates(rules, 1)
-                .filter { state.field[it].player != null }
-                .filter { state.field[it].player!!.team != context.player.team }
-                .firstOrNull { rules.canMark(state.field[it].player!!) } != null
-
+            val isMarked = rules.isMarked(context.player, context.startingSquare)
             return if (isMarked) {
                 GotoNode(ResolveDodge)
             } else {

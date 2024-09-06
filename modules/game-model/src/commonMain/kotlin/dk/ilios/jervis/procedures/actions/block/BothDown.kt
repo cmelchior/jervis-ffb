@@ -224,6 +224,8 @@ object BothDown: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
+            // Attacker went down, so its turn ends immediately, commonly because it is a turnover,
+            // but if it happened during a kick-off blitz, it just ends the Blitz.
             return compositeCommandOf(
                 RemoveContext<RiskingInjuryContext>(),
                 ExitProcedure()

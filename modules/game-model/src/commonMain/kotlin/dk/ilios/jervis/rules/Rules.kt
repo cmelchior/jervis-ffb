@@ -6,6 +6,7 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.FieldCoordinate.Companion.OUT_OF_BOUNDS
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Location
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
@@ -143,6 +144,40 @@ interface Rules {
     }
 
     /**
+     * Returns `true` if the player is considered `Open` as described on
+     * page 26 in the rulebook.
+     */
+    fun isOpen(player: Player): Boolean = !isMarked(player)
+
+    /**
+     * Returns `true` if the player is considered `Marked as described on
+     * page 26 in the rulebook.
+     */
+    fun isMarked(player: Player, overrideLocation: Location): Boolean {
+        if (!overrideLocation.isOnField(this)) return false
+        val field = player.team.game.field
+        return overrideLocation.coordinate.getSurroundingCoordinates(this, 1)
+            .asSequence()
+            .filter {
+                val otherPlayer = field[it].player
+                otherPlayer != null && otherPlayer.team != player.team
+            }
+            .firstOrNull { canMark(field[it].player!!) } != null
+    }
+
+    fun isMarked(player: Player): Boolean {
+        if (!player.location.isOnField(this)) return false
+        val field = player.team.game.field
+        return player.location.coordinate.getSurroundingCoordinates(this, 1)
+            .asSequence()
+            .filter {
+                val otherPlayer = field[it].player
+                otherPlayer != null && otherPlayer.team != player.team
+            }
+            .firstOrNull { canMark(field[it].player!!) } != null
+    }
+
+    /**
      * Return `true` if the [assisting] player can assist another player against
      * [target], `false` if not.
      */
@@ -208,10 +243,7 @@ interface Rules {
         }
     }
 
-    fun canUseTeamReroll(
-        game: Game,
-        player: Player,
-    ): Boolean {
+    fun canUseTeamReroll(game: Game, player: Player): Boolean {
         if (!game.canUseTeamRerolls) return false
         if (game.activeTeam != player.team) return false
         return when (player.team.usedTeamRerollThisTurn) {
