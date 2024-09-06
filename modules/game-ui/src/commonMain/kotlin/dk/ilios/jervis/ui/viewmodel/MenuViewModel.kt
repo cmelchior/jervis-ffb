@@ -10,7 +10,8 @@ import dk.ilios.jervis.serialize.JervisSerialization
 import okio.Path
 
 enum class Feature {
-    DO_NOT_REROLL_SUCCESSFUL_ACTIONS
+    DO_NOT_REROLL_SUCCESSFUL_ACTIONS,
+    SELECT_KICKING_PLAYER
 }
 
 class MenuViewModel {
@@ -20,6 +21,7 @@ class MenuViewModel {
     // Default values .. figure out a way to persist these
     private var features: MutableMap<Feature, Boolean> = mutableMapOf(
         Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS to true,
+        Feature.SELECT_KICKING_PLAYER to true,
     )
 
     fun saveGameState(destination: Path) {

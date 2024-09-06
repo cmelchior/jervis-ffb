@@ -58,6 +58,7 @@ import dk.ilios.jervis.actions.SelectSkill
 import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.actions.TossCoin
 import dk.ilios.jervis.controller.GameController
+import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.context.CatchRollContext
@@ -161,6 +162,13 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             if (actions.filterIsInstance<SelectNoReroll>().count { it.rollSuccessful == true} > 0) {
                 return NoRerollSelected
             }
+        }
+
+        if (controller.currentProcedure()?.currentNode() == TheKickOff.NominateKickingPlayer && model.menuViewModel.isFeatureEnabled(Feature.SELECT_KICKING_PLAYER)) {
+            return (controller.currentProcedure()!!.currentNode() as ActionNode).getAvailableActions(controller.state, controller.rules)
+                .random().let {
+                    PlayerSelected((it as SelectPlayer).player)
+                }
         }
 
         val currentNode = controller.currentProcedure()?.currentNode()

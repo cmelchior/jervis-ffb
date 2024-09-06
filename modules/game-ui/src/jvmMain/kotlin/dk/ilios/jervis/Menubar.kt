@@ -19,6 +19,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
     var action by remember { mutableStateOf("Last action: None") }
     var isOpen by remember { mutableStateOf(true) }
     var rerollSuccessfulActions by remember { mutableStateOf(vm.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) }
+    var selectKickingPlayer by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_KICKING_PLAYER)) }
     MenuBar {
         Menu("Developer Tools", mnemonic = 'D') {
             Item("Save Game", onClick = {
@@ -40,10 +41,20 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
         }
 
         Menu ("Automated Actions", mnemonic = 'A') {
-            Item(
-                text = "3-4-4",
-                onClick = {
-                    vm.loadSetup("3-4-4")
+            CheckboxItem(
+                text = "Do not reroll successful actions",
+                checked = rerollSuccessfulActions,
+                onCheckedChange = {
+                    rerollSuccessfulActions = !rerollSuccessfulActions
+                    vm.toggleFeature(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS, rerollSuccessfulActions)
+                }
+            )
+            CheckboxItem(
+                text = "Select kicking player",
+                checked = selectKickingPlayer,
+                onCheckedChange = {
+                    selectKickingPlayer = !selectKickingPlayer
+                    vm.toggleFeature(Feature.SELECT_KICKING_PLAYER, selectKickingPlayer)
                 }
             )
         }
