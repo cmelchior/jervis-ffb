@@ -103,7 +103,7 @@ class Team(val name: String, val roster: BB2020Roster, val coach: Coach) : Colle
     val assistantCoaches: Int
         get() = teamAssistentCoaches + tempAssistantCoaches
     var teamAssistentCoaches: Int = 0
-    val tempAssistantCoaches: Int = 0
+    var tempAssistantCoaches: Int = 0
 
     // Treasury
     var treasury: Int = 0
@@ -118,14 +118,12 @@ class Team(val name: String, val roster: BB2020Roster, val coach: Coach) : Colle
     val activePrayersToNuffle = mutableSetOf<PrayerToNuffle>()
 
     // Reroll tracking
-    var rerollsCountOnRoster: Int = 0
-    @Transient
-    var rerolls: MutableList<TeamReroll> = mutableListOf()
+    val rerolls = mutableListOf<TeamReroll>()
+    var usedRerollThisTurn: Boolean = false
     val availableRerolls: List<TeamReroll>
         get() = rerolls.filter { !it.rerollUsed }
     val availableRerollCount: Int
         get() = availableRerolls.size
-    var usedTeamRerollThisTurn: Boolean = false
 
     // Inducements
     var bloodweiserKegs: Int = 0

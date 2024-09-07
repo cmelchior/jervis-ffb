@@ -174,6 +174,6 @@ fun moveTo(x: Int, y: Int) = arrayOf(
     FieldSquareSelected(FieldCoordinate(x, y)),
 )
 
-fun endTurns(count: Int) = Array(count) { EndTurn }
+fun skipTurns(count: Int) = Array(count) { EndTurn }
 
 

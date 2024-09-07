@@ -42,6 +42,7 @@ import dk.ilios.jervis.procedures.actions.move.DodgeRoll
 import dk.ilios.jervis.procedures.actions.move.RushRoll
 import dk.ilios.jervis.procedures.actions.pass.AccuracyRoll
 import dk.ilios.jervis.procedures.actions.pass.PassContext
+import dk.ilios.jervis.procedures.bb2020.kickoff.BrilliantCoaching
 import dk.ilios.jervis.procedures.bb2020.kickoff.CheeringFans
 import dk.ilios.jervis.procedures.bb2020.prayers.BadHabits
 import dk.ilios.jervis.procedures.injury.ArmourRoll
@@ -115,6 +116,13 @@ object DialogFactory {
 
                 is Bounce.RollDirection -> {
                     SingleChoiceInputDialog.createBounceBallDialog(rules, D8Result.allOptions())
+                }
+
+                is BrilliantCoaching.KickingTeamRollDie -> {
+                    DiceRollUserInputDialog.createBrilliantCoachingRolLDialog(controller.state.kickingTeam)
+                }
+                is BrilliantCoaching.ReceivingTeamRollDie -> {
+                    DiceRollUserInputDialog.createBrilliantCoachingRolLDialog(controller.state.kickingTeam)
                 }
 
                 is CasualtyRoll.RollDie -> {

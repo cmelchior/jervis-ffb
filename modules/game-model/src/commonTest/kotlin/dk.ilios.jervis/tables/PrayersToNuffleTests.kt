@@ -14,7 +14,7 @@ import dk.ilios.jervis.defaultKickOffHomeTeam
 import dk.ilios.jervis.defaultPregame
 import dk.ilios.jervis.defaultSetup
 import dk.ilios.jervis.defaultWeather
-import dk.ilios.jervis.endTurns
+import dk.ilios.jervis.skipTurns
 import dk.ilios.jervis.ext.d16
 import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
@@ -149,7 +149,7 @@ class PrayersToNuffleTests: JervisGameTest() {
 
         // Check the prayer is gone by the end of drive
         controller.rollForward(
-            *endTurns(15) // Will also end the half
+            *skipTurns(15) // Will also end the half
         )
         assertFalse(awayTeam.hasPrayer(PrayerToNuffle.FRIENDS_WITH_THE_REF))
     }
@@ -177,7 +177,7 @@ class PrayersToNuffleTests: JervisGameTest() {
 
         // Goes away after the drive
         controller.rollForward(
-            *endTurns(16) // Will also end the half
+            *skipTurns(16) // Will also end the half
         )
 
         assertFalse(player.hasSkill<Stab>())
@@ -273,7 +273,7 @@ class PrayersToNuffleTests: JervisGameTest() {
 
         // Will be removed after the drive
         controller.rollForward(
-            *endTurns(16) // Will also end the half
+            *skipTurns(16) // Will also end the half
         )
         assertFalse(player.hasSkill<MightyBlow>())
         assertFalse(awayTeam.hasPrayer(PrayerToNuffle.KNUCKLE_DUSTERS))
@@ -324,7 +324,7 @@ class PrayersToNuffleTests: JervisGameTest() {
 
         // Prayer and effects will be removed after the drive
         controller.rollForward(
-            *endTurns(16) // Will also end the half
+            *skipTurns(16) // Will also end the half
         )
         assertFalse(awayTeam.hasPrayer(PrayerToNuffle.BAD_HABITS))
         assertEquals(0, homeTeam.count { it.hasSkill<Loner>() && it.getSkill<Loner>().value == 2 })
@@ -397,7 +397,7 @@ class PrayersToNuffleTests: JervisGameTest() {
 
         // Prayer and effects will be removed after the drive
         controller.rollForward(
-            *endTurns(16) // Will also end the half
+            *skipTurns(16) // Will also end the half
         )
         assertFalse(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
         assertFalse(homeTeam[1.playerNo]!!.moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
@@ -477,7 +477,7 @@ class PrayersToNuffleTests: JervisGameTest() {
 
         // Prayer and effects will be removed after the half
         controller.rollForward(
-            *endTurns(16)
+            *skipTurns(16)
         )
         assertFalse(awayTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
         assertFalse(homeTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))

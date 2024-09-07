@@ -3,14 +3,17 @@ package dk.ilios.jervis.commands
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.model.inducements.Bribe
+import dk.ilios.jervis.rules.skills.TeamReroll
 
-class AddBribe(private val team: Team, private val bribe: Bribe) : Command {
+/**
+ * Add a new reroll to the team.
+ */
+class AddTeamReroll(private val team: Team, private val reroll: TeamReroll) : Command {
     override fun execute(state: Game, controller: GameController) {
-        team.bribes.add(bribe)
+            team.rerolls.add(reroll)
     }
 
     override fun undo(state: Game, controller: GameController) {
-        team.bribes.remove(bribe)
+        team.rerolls.remove(reroll)
     }
 }

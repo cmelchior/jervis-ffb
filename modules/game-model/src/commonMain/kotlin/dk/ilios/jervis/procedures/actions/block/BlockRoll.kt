@@ -124,7 +124,7 @@ object BlockRoll : Procedure() {
             val team = attackingPlayer.team
             val hasTeamRerolls = team.availableRerollCount > 0
             val allowedToUseTeamReroll =
-                when (team.usedTeamRerollThisTurn) {
+                when (team.usedRerollThisTurn) {
                     true -> rules.allowMultipleTeamRerollsPrTurn
                     false -> true
                 }

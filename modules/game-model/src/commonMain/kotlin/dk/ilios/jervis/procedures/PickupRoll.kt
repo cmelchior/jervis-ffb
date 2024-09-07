@@ -91,7 +91,7 @@ object PickupRoll : Procedure() {
             val team = pickupPlayer.team
             val hasTeamRerolls = team.availableRerollCount > 0
             val allowedToUseTeamReroll =
-                when (team.usedTeamRerollThisTurn) {
+                when (team.usedRerollThisTurn) {
                     true -> rules.allowMultipleTeamRerollsPrTurn
                     false -> true
                 }

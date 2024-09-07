@@ -4,6 +4,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemovePlayerSkill
 import dk.ilios.jervis.commands.RemovePlayerStatModifier
 import dk.ilios.jervis.commands.RemovePrayersToNuffle
+import dk.ilios.jervis.commands.RemoveTeamReroll
 import dk.ilios.jervis.commands.SetPlayerRushesLeft
 import dk.ilios.jervis.commands.SetSpecialPlayCardActive
 import dk.ilios.jervis.model.Game
@@ -52,6 +53,15 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
         }
     }
 
+    // Remove all temporary rerolls that might have expired
+    // TODO Consider overtime here
+    // TODO What about Leader?
+    val removableRerolls: List<RemoveTeamReroll> = teams.flatMap { team ->
+        team.rerolls
+            .filter { it.duration == duration }
+            .map { RemoveTeamReroll(team, it) }
+    }
+
     // Find all active Prayers of Nuffle that expires at the given duration
     val removablePrayers = teams.flatMap { team ->
         team.activePrayersToNuffle
@@ -70,6 +80,7 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
     return (
         removableStatModifiers +
         removableSkills +
+        removableRerolls +
         removablePrayers
     ).toTypedArray()
 }

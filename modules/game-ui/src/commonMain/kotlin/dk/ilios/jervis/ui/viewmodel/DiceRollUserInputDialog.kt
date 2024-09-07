@@ -28,7 +28,7 @@ import dk.ilios.jervis.rules.tables.Direction
  * Each die gets its own line (since we assume this is only being used up to D8)
  * And the confirm button will show the final result
  */
-data class DiceRollUserInputDialog(
+class DiceRollUserInputDialog(
     val icon: Any? = null, // TODO Replacement for Icon?
     val title: String,
     val message: String,
@@ -287,6 +287,16 @@ data class DiceRollUserInputDialog(
             )
         }
 
+        fun createBrilliantCoachingRolLDialog(team: Team): UserInput? {
+            return DiceRollUserInputDialog(
+                title = "Brilliant Coaching Roll",
+                message = "${team.name} rolls a D6 for Brilliant Coaching",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { _: DiceResults -> null }
+            )
+        }
+
+
         fun createUnknownDiceRoll(dicePool: RollDice): UserInput {
             val dice= dicePool.dice.map {
                 when(it) {
@@ -309,5 +319,6 @@ data class DiceRollUserInputDialog(
                 result = { _: DiceResults -> null }
             )
         }
+
     }
 }

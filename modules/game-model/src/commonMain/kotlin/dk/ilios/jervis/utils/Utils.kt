@@ -54,7 +54,7 @@ import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.SelectSkill
 import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.actions.TossCoin
-import dk.ilios.jervis.commands.SetAvailableTeamRerolls
+import dk.ilios.jervis.commands.ResetAvailableTeamRerolls
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.controller.GameController
@@ -268,8 +268,8 @@ fun setupTeamsOnField(controller: GameController) {
 
     // Also enable Team rerolls
     controller.state.activeTeam = controller.state.homeTeam
-    SetAvailableTeamRerolls(controller.state.homeTeam).execute(controller.state, controller)
-    SetAvailableTeamRerolls(controller.state.awayTeam).execute(controller.state, controller)
+    ResetAvailableTeamRerolls(controller.state.homeTeam).execute(controller.state, controller)
+    ResetAvailableTeamRerolls(controller.state.awayTeam).execute(controller.state, controller)
 }
 
 fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = humanTeamAway()): Game {

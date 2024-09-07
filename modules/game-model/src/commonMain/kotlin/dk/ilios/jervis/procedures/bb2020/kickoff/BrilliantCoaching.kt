@@ -1,11 +1,35 @@
 package dk.ilios.jervis.procedures.bb2020.kickoff
 
+import compositeCommandOf
+import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.D6Result
+import dk.ilios.jervis.actions.Dice
+import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.RollDice
+import dk.ilios.jervis.commands.AddTeamReroll
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.ExitProcedure
+import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.RemoveContext
+import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.reports.ReportBrilliantCoachingResult
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.BrilliantCoachingReroll
+import dk.ilios.jervis.rules.skills.DiceRollType
+import dk.ilios.jervis.utils.INVALID_GAME_STATE
+
+data class BrilliantCoachingContext(
+    val kickingTeamRoll: D6Result,
+    val receivingTeamRoll: D6Result? = null,
+): ProcedureContext
 
 /**
  * Procedure for handling the Kick-Off Event: "Brilliant Coaching" as described on page 41
@@ -13,98 +37,61 @@ import dk.ilios.jervis.rules.Rules
  */
 object BrilliantCoaching : Procedure() {
     override val initialNode: Node = KickingTeamRollDie
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<BrilliantCoachingContext>()
 
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    object KickingTeamRollDie: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
+    object KickingTeamRollDie : ActionNode() {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            return listOf(RollDice(Dice.D6))
         }
-
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return checkType<D6Result>(action) { d6 ->
+                compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.BRILLIANT_COACHING, d6),
+                    SetContext(BrilliantCoachingContext(d6)),
+                    GotoNode(ReceivingTeamRollDie),
+                )
+            }
+        }
     }
-//
-//    object KickingTeamRollDie : ActionNode() {
-//        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-//            return listOf(RollDice(Dice.D6))
-//        }
-//
-//        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-//            return checkType<D6Result>(action) {
-//                compositeCommandOf(
-//                    SaveTemporaryDieRoll(state.kickingTeam, it),
-//                    GotoNode(ReceivingTeamRollDie),
-//                )
-//            }
-//        }
-//    }
-//
-//    object ReceivingTeamRollDie : ActionNode() {
-//        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-//            return listOf(RollDice(Dice.D6))
-//        }
-//        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-//            return checkType<D6Result>(action) {
-//                compositeCommandOf(
-//                    SaveTemporaryDieRoll(state.receivingTeam, it),
-//                    GotoNode(ResolveCheeringFans),
-//                )
-//            }
-//        }
-//    }
-//
-//    object ResolveCheeringFans : ComputationNode() {
-//        override fun apply(state: Game, rules: Rules,
-//        ): Command {
-//            val kickingTeamDie = state.kickingTeam.temporaryData.dieRoll.last()
-//            val receivingTeamDie = state.receivingTeam.temporaryData.dieRoll.last()
-//            val kickingResult = kickingTeamDie.value + state.kickingTeam.cheerLeaders
-//            val receivingResult = receivingTeamDie.value + state.receivingTeam.cheerLeaders
-//            return when {
-//                kickingResult == receivingResult -> {
-//                    compositeCommandOf(
-//                        ReportCheeringFansResult(
-//                            ReportCheeringFansResult.State.DRAW,
-//                            kickingTeamDie,
-//                            state.kickingTeam.cheerLeaders,
-//                            receivingTeamDie,
-//                            state.receivingTeam.cheerLeaders,
-//                        ),
-//                        ExitProcedure(),
-//                    )
-//                }
-//                kickingResult > receivingResult -> {
-//                    compositeCommandOf(
-//                        ReportCheeringFansResult(
-//                            ReportCheeringFansResult.State.KICKER_WINS,
-//                            kickingTeamDie,
-//                            state.kickingTeam.cheerLeaders,
-//                            receivingTeamDie,
-//                            state.receivingTeam.cheerLeaders,
-//                        ),
-//                        GotoNode(WinnerRollsOnPrayersToNuffle(state.kickingTeam)),
-//                    )
-//                }
-//                else -> {
-//                    compositeCommandOf(
-//                        ReportCheeringFansResult(
-//                            ReportCheeringFansResult.State.RECEIVER_WINS,
-//                            kickingTeamDie,
-//                            state.kickingTeam.cheerLeaders,
-//                            receivingTeamDie,
-//                            state.receivingTeam.cheerLeaders,
-//                        ),
-//                        GotoNode(WinnerRollsOnPrayersToNuffle(state.receivingTeam)),
-//                    )
-//                }
-//            }
-//        }
-//    }
+
+    object ReceivingTeamRollDie : ActionNode() {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            return listOf(RollDice(Dice.D6))
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return checkType<D6Result>(action) { d6 ->
+                compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.BRILLIANT_COACHING, d6),
+                    SetContext(state.getContext<BrilliantCoachingContext>().copy(receivingTeamRoll = d6)),
+                    GotoNode(ResolveBrilliantCoaching),
+                )
+            }
+        }
+    }
+
+    object ResolveBrilliantCoaching : ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<BrilliantCoachingContext>()
+            val kickingResult = context.kickingTeamRoll.value + state.kickingTeam.assistantCoaches
+            val receivingResult = context.receivingTeamRoll!!.value + state.receivingTeam.assistantCoaches
+            return compositeCommandOf(
+                when {
+                    kickingResult > receivingResult -> AddTeamReroll(state.kickingTeam, BrilliantCoachingReroll(state.kickingTeam))
+                    kickingResult < receivingResult -> AddTeamReroll(state.receivingTeam, BrilliantCoachingReroll(state.receivingTeam))
+                    kickingResult == receivingResult -> null
+                    else -> INVALID_GAME_STATE("Unknown case when resolving brilliant coaching: $kickingResult, $receivingResult")
+                },
+                ReportBrilliantCoachingResult(
+                    state.kickingTeam,
+                    state.receivingTeam,
+                    context.kickingTeamRoll,
+                    state.kickingTeam.assistantCoaches,
+                    context.receivingTeamRoll,
+                    state.receivingTeam.assistantCoaches,
+                ),
+                ExitProcedure(),
+            )
+        }
+    }
 }

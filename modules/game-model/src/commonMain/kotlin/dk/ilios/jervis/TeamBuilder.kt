@@ -8,6 +8,7 @@ import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
 import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
+import dk.ilios.jervis.rules.skills.RegularTeamReroll
 
 private data class PlayerData(val id: PlayerId, val name: String, val number: PlayerNo, val type: Position)
 
@@ -66,7 +67,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
                     data.number
                 ))
             }
-            this.rerollsCountOnRoster = this@TeamBuilder.reRolls
+            this.rerolls.addAll((0 ..<this@TeamBuilder.reRolls).map { RegularTeamReroll(it) })
             this.teamCheerleaders = this@TeamBuilder.cheerLeaders
             this.teamAssistentCoaches = this@TeamBuilder.assistentCoaches
             this.dedicatedFans = this@TeamBuilder.dedicatedFans

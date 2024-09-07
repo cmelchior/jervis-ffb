@@ -17,6 +17,7 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
+import dk.ilios.jervis.skipTurns
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -86,7 +87,7 @@ class KickOffEventTests: JervisGameTest() {
     @Test
     @Ignore
     fun SolidDefense() {
-
+        TODO()
     }
 
     @Test
@@ -190,7 +191,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 5.d6), // Roll Cheering Fans, cannot be used
+                    DiceResults(1.d6, 5.d6), // Roll Cheering Fans
                     2.d6, // Home team roll
                     1.d6, // Away team roll, should be the same value
                 ),
@@ -208,7 +209,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 5.d6), // Roll Cheering Fans, cannot be used
+                    DiceResults(1.d6, 5.d6), // Roll Cheering Fans
                     3.d6, // Home team roll
                     2.d6, // Away team roll
                     2.d16 // Prayers To Nuffle: Friends with the ref
@@ -221,10 +222,67 @@ class KickOffEventTests: JervisGameTest() {
     }
 
     @Test
-    @Ignore
-    fun brilliantCoaching() {
-
+    fun brilliantCoaching_noRerollGiven() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(2.d6, 5.d6), // Roll Brilliant Coaching
+                    3.d6, // Home team roll
+                    3.d6, // Away team roll
+                ),
+                bounce = null
+            ),
+        )
+        assertEquals(4, homeTeam.availableRerolls.size)
+        assertEquals(4, awayTeam.availableRerolls.size)
     }
+
+    @Test
+    fun brilliantCoaching_awayTeamWins() {
+        homeTeam.tempAssistantCoaches = 0
+        awayTeam.tempAssistantCoaches = 1
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(2.d6, 5.d6), // Roll Brilliant Coaching
+                    3.d6, // Home team roll
+                    3.d6, // Away team roll - Wins
+                ),
+                bounce = null
+            ),
+        )
+        assertEquals(4, homeTeam.availableRerolls.size)
+        assertEquals(5, awayTeam.availableRerolls.size)
+    }
+
+    @Test
+    fun brilliantCoaching_rerollExpire() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(2.d6, 5.d6), // Roll Brilliant Coaching
+                    2.d6, // Home team roll - Wins
+                    1.d6, // Away team roll
+                ),
+            ),
+        )
+        assertEquals(5, homeTeam.availableRerolls.size)
+        assertEquals(4, awayTeam.availableRerolls.size)
+
+        controller.rollForward(*skipTurns(16)) // End the drive (and half)
+        assertEquals(4, homeTeam.availableRerolls.size)
+        assertEquals(4, awayTeam.availableRerolls.size)
+    }
+
 
     @Test
     @Ignore

@@ -14,7 +14,7 @@ import dk.ilios.jervis.defaultFanFactor
 import dk.ilios.jervis.defaultKickOffHomeTeam
 import dk.ilios.jervis.defaultPregame
 import dk.ilios.jervis.defaultSetup
-import dk.ilios.jervis.endTurns
+import dk.ilios.jervis.skipTurns
 import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.ext.d8
@@ -66,7 +66,7 @@ class WeatherTests: JervisGameTest() {
             ),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
-            *endTurns(16),
+            *skipTurns(16),
             2.d3, // Home Heat roll
             RandomPlayersSelected(listOf(
                 homeTeam[PlayerNo(1)]!!.id,

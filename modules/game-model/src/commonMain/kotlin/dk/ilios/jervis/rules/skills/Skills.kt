@@ -49,6 +49,7 @@ enum class DiceRollType {
     WILD_ANIMAL,
 }
 
+@Serializable
 sealed interface TeamReroll : RerollSource {
     val carryOverIntoOvertime: Boolean
     // When is this reroll removed from the Team, regardless of it being used or not
@@ -74,7 +75,8 @@ sealed interface TeamReroll : RerollSource {
     }
 }
 
-class RegularTeamReroll(val team: Team, index: Int) : TeamReroll {
+@Serializable
+class RegularTeamReroll(val index: Int) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("team-reroll-$index")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.PERMANENT
@@ -83,6 +85,7 @@ class RegularTeamReroll(val team: Team, index: Int) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
+@Serializable
 class LeaderTeamReroll(val player: Player) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("leader-${player.id.value}")
     override val carryOverIntoOvertime: Boolean = true
@@ -92,6 +95,7 @@ class LeaderTeamReroll(val player: Player) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
+@Serializable
 class BrilliantCoachingReroll(val team: Team) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("brilliant-coaching-${team.id.value}")
     override val carryOverIntoOvertime: Boolean = false

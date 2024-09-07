@@ -246,7 +246,7 @@ interface Rules {
     fun canUseTeamReroll(game: Game, player: Player): Boolean {
         if (!game.canUseTeamRerolls) return false
         if (game.activeTeam != player.team) return false
-        return when (player.team.usedTeamRerollThisTurn) {
+        return when (player.team.usedRerollThisTurn) {
             true -> allowMultipleTeamRerollsPrTurn
             false -> true
         }
