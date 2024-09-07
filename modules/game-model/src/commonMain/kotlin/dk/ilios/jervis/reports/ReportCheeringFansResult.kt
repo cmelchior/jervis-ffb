@@ -1,30 +1,25 @@
 package dk.ilios.jervis.reports
 
 import dk.ilios.jervis.actions.DieResult
+import dk.ilios.jervis.model.Team
 
 class ReportCheeringFansResult(
-    result: State,
+    kickingTeam: Team,
+    receivingTeam: Team,
     dieKickingTeam: DieResult,
     cheerLeadersKickingTeam: Int,
     dieReceivingTeam: DieResult,
     cheerLeadersReceivingTeam: Int,
 ) : LogEntry() {
-    enum class State {
-        KICKER_WINS,
-        RECEIVER_WINS,
-        DRAW,
-    }
-
     override val category: LogCategory = LogCategory.GAME_PROGRESS
-    override val message: String
-
-    init {
-        var msg = "Cheering Fans roll-off: [${dieKickingTeam.value} + $cheerLeadersKickingTeam] vs. [${dieReceivingTeam.value} + $cheerLeadersReceivingTeam].\n"
-        when (result) {
-            State.KICKER_WINS -> msg += "Kicking team wins and gets to roll on the Prayers Of Nuffle table."
-            State.RECEIVER_WINS -> msg += "Receiving team wins and gets to roll on the Prayers Of Nuffle table."
-            State.DRAW -> "It is a stand-off. Neither team gets to roll on the Prayers of Nuffle table."
+    override val message: String = buildString {
+        val kickingResult = dieKickingTeam.value + cheerLeadersKickingTeam
+        val receivingResult = dieReceivingTeam.value + cheerLeadersReceivingTeam
+        appendLine("Cheering Fans: ${kickingTeam.name} [${dieKickingTeam.value} + $cheerLeadersKickingTeam = $kickingResult] vs. ${receivingTeam.name} [${dieReceivingTeam.value} + $cheerLeadersReceivingTeam = $receivingResult]")
+        when {
+            kickingResult > receivingResult -> append("${kickingTeam.name} wins and gets to roll on the Prayers Of Nuffle table.")
+            receivingResult > kickingResult -> append("${receivingTeam.name} wins and gets to roll on the Prayers Of Nuffle table.")
+            else -> append("It is a stand-off. Neither team gets to roll on the Prayers of Nuffle table.")
         }
-        message = msg
     }
 }

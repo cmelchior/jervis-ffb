@@ -1,14 +1,10 @@
 package dk.ilios.jervis.procedures.bb2020.kickoff
 
-import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.reports.LogCategory
-import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
 
 /**
@@ -16,7 +12,7 @@ import dk.ilios.jervis.rules.Rules
  * of the rulebook.
  */
 object BrilliantCoaching : Procedure() {
-    override val initialNode: Node = GiveBribe
+    override val initialNode: Node = KickingTeamRollDie
 
     override fun onEnterProcedure(
         state: Game,
@@ -28,17 +24,87 @@ object BrilliantCoaching : Procedure() {
         rules: Rules,
     ): Command? = null
 
-    object GiveBribe : ComputationNode() {
-        // TODO Figure out how to do this
-        // If Main Coach is banned, you get -1 to this roll. Page 63
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
-            return compositeCommandOf(
-                SimpleLogEntry("Do Brilliant Coaching!", category = LogCategory.GAME_PROGRESS),
-                ExitProcedure(),
-            )
+    object KickingTeamRollDie: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            TODO("Not yet implemented")
         }
+
     }
+//
+//    object KickingTeamRollDie : ActionNode() {
+//        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+//            return listOf(RollDice(Dice.D6))
+//        }
+//
+//        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+//            return checkType<D6Result>(action) {
+//                compositeCommandOf(
+//                    SaveTemporaryDieRoll(state.kickingTeam, it),
+//                    GotoNode(ReceivingTeamRollDie),
+//                )
+//            }
+//        }
+//    }
+//
+//    object ReceivingTeamRollDie : ActionNode() {
+//        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+//            return listOf(RollDice(Dice.D6))
+//        }
+//        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+//            return checkType<D6Result>(action) {
+//                compositeCommandOf(
+//                    SaveTemporaryDieRoll(state.receivingTeam, it),
+//                    GotoNode(ResolveCheeringFans),
+//                )
+//            }
+//        }
+//    }
+//
+//    object ResolveCheeringFans : ComputationNode() {
+//        override fun apply(state: Game, rules: Rules,
+//        ): Command {
+//            val kickingTeamDie = state.kickingTeam.temporaryData.dieRoll.last()
+//            val receivingTeamDie = state.receivingTeam.temporaryData.dieRoll.last()
+//            val kickingResult = kickingTeamDie.value + state.kickingTeam.cheerLeaders
+//            val receivingResult = receivingTeamDie.value + state.receivingTeam.cheerLeaders
+//            return when {
+//                kickingResult == receivingResult -> {
+//                    compositeCommandOf(
+//                        ReportCheeringFansResult(
+//                            ReportCheeringFansResult.State.DRAW,
+//                            kickingTeamDie,
+//                            state.kickingTeam.cheerLeaders,
+//                            receivingTeamDie,
+//                            state.receivingTeam.cheerLeaders,
+//                        ),
+//                        ExitProcedure(),
+//                    )
+//                }
+//                kickingResult > receivingResult -> {
+//                    compositeCommandOf(
+//                        ReportCheeringFansResult(
+//                            ReportCheeringFansResult.State.KICKER_WINS,
+//                            kickingTeamDie,
+//                            state.kickingTeam.cheerLeaders,
+//                            receivingTeamDie,
+//                            state.receivingTeam.cheerLeaders,
+//                        ),
+//                        GotoNode(WinnerRollsOnPrayersToNuffle(state.kickingTeam)),
+//                    )
+//                }
+//                else -> {
+//                    compositeCommandOf(
+//                        ReportCheeringFansResult(
+//                            ReportCheeringFansResult.State.RECEIVER_WINS,
+//                            kickingTeamDie,
+//                            state.kickingTeam.cheerLeaders,
+//                            receivingTeamDie,
+//                            state.receivingTeam.cheerLeaders,
+//                        ),
+//                        GotoNode(WinnerRollsOnPrayersToNuffle(state.receivingTeam)),
+//                    )
+//                }
+//            }
+//        }
+//    }
 }

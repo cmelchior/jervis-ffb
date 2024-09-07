@@ -35,7 +35,7 @@ This document lists all game mechanics that have been fully implemented with tes
   - [ ] Biased Referee 
     - [ ] Biased Referee
     - [ ] How many others(???)
-- [x] Roll on Prayers to Nuffle Table
+- [ ] Roll on Prayers to Nuffle Table
   - [ ] Treacherous Trapdoor
   - [x] Friends with the Ref
   - [x] Stiletto
@@ -61,8 +61,8 @@ This document lists all game mechanics that have been fully implemented with tes
   - [x] Get the Ref
   - [x] Time-out
   - [ ] Solid Defense
-  - [ ] High Kick
-  - [ ] Cheering Fans
+  - [x] High Kick
+  - [x] Cheering Fans
   - [ ] Brilliant Coaching
   - [ ] Changing Weather
   - [ ] Quick Snap

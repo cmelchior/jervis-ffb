@@ -28,10 +28,10 @@ import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
 import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.MightyBlow
 import dk.ilios.jervis.rules.skills.Pro
-import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.skills.Stab
 import dk.ilios.jervis.rules.tables.PrayerStatModifier
 import dk.ilios.jervis.rules.tables.PrayerToNuffle

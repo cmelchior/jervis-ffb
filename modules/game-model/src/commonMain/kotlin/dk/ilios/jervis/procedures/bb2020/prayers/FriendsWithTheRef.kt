@@ -32,7 +32,7 @@ object FriendsWithTheRef : Procedure() {
             val context = state.getContext<PrayersToNuffleRollContext>()
             return compositeCommandOf(
                 SetContext(context.copy(resultApplied = true)),
-                SimpleLogEntry("${state.activeTeam} received Friends with the Ref", category = LogCategory.GAME_PROGRESS),
+                SimpleLogEntry("${context.team.name} received Friends with the Ref", category = LogCategory.GAME_PROGRESS),
                 ExitProcedure(),
             )
         }

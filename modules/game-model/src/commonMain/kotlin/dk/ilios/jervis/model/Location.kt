@@ -78,11 +78,11 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
     }
 
     override fun isOnField(rules: Rules): Boolean {
-        return (x >= 0 && x < rules.fieldWidth.toInt() && y >= 0 && y < rules.fieldHeight.toInt())
+        return (x >= 0 && x < rules.fieldWidth && y >= 0 && y < rules.fieldHeight)
     }
 
     override fun isOutOfBounds(rules: Rules): Boolean {
-        return x < 0 || x >= rules.fieldWidth.toInt() || y < 0 || y >= rules.fieldHeight.toInt()
+        return x < 0 || x >= rules.fieldWidth || y < 0 || y >= rules.fieldHeight
     }
 
     override fun getCornerLocation(rules: Rules): CornerThrowInPosition? {

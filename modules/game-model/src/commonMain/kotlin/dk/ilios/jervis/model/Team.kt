@@ -1,6 +1,5 @@
 package dk.ilios.jervis.model
 
-import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.model.inducements.Apothecary
 import dk.ilios.jervis.model.inducements.Bribe
 import dk.ilios.jervis.model.inducements.InfamousCoachingStaff
@@ -79,11 +78,6 @@ class TeamTurnData(private val game: Game) {
         )
 }
 
-class TeamTemporaryData(private val game: Game) {
-    // This contain the result of the last dice rolled
-    val dieRoll = mutableListOf<DieResult>()
-}
-
 @Serializable
 class Team(val name: String, val roster: BB2020Roster, val coach: Coach) : Collection<Player>, Observable<Team>() {
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
@@ -153,17 +147,12 @@ class Team(val name: String, val roster: BB2020Roster, val coach: Coach) : Colle
     @Transient
     lateinit var turnData: TeamTurnData
 
-    @Transient
-    lateinit var temporaryData: TeamTemporaryData
-
-
     // Must be called before using this class.
     // Used to break circular reference between Team and Game instances
     fun setGameReference(game: Game) {
         halfData = TeamHalfData(game)
         driveData = TeamDriveData(game)
         turnData = TeamTurnData(game)
-        temporaryData = TeamTemporaryData(game)
         this.game = game
     }
 

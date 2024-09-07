@@ -19,20 +19,14 @@ inline fun <reified T: ProcedureContext> RemoveContext(): Command {
 class RemoveContext<T: ProcedureContext>(private val type: KClass<T>) : Command {
     var originalValue: ProcedureContext? = null
 
-    override fun execute(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun execute(state: Game, controller: GameController) {
         originalValue = state.contexts.getContext(type)
         state.contexts.remove(type)
     }
 
-    override fun undo(
-        state: Game,
-        controller: GameController,
-    ) {
-        if (originalValue == null) {
+    override fun undo(state: Game, controller: GameController) {
+//        if (originalValue == null) {
             state.setContext(originalValue!!)
-        }
+//        }
     }
 }

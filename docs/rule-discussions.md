@@ -83,6 +83,13 @@ interpreted.
 
 16. If you have two Special Play Cards with End of Opponent Turn and End of Turn, who plays first?
 
+17. Rerolls and Regeneration: https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=32212
+    Also Pro is mentioned in Designer's Commentary. 
+    If a player rolls Both-Down and is injured and rolls for regeneration
+       - Pro does not work, because apparently the activation ended. Does that mean the activation ends as soon as you are knocked down?
+       - Team reroll does work bcause the team turn still hasn't ended.
+
+
 # Differences compared to the rules as written
 
 1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 

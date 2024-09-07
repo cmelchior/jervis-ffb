@@ -7,12 +7,16 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.defaultKickOffHomeTeam
 import dk.ilios.jervis.defaultPregame
 import dk.ilios.jervis.defaultSetup
+import dk.ilios.jervis.ext.d16
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.ext.d8
 import dk.ilios.jervis.ext.playerId
 import dk.ilios.jervis.ext.playerNo
 import dk.ilios.jervis.model.BallState
+import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.FullGame
+import dk.ilios.jervis.rules.tables.PrayerToNuffle
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -128,24 +132,97 @@ class KickOffEventTests: JervisGameTest() {
         assertEquals(BallState.CARRIED, state.ball.state)
     }
 
+    @Test
     fun highKick_acrossLoS() {
-        TODO()
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                placeKick = FieldSquareSelected(13, 7),
+                deviate = DiceResults(4.d8, 2.d6), // Move ball to [11,7], behind opponent LoS
+                kickoffEvent = arrayOf(
+                    DiceResults(1.d6, 4.d6), // Roll High Kick
+                    PlayerSelected("A10".playerId),
+                ),
+                bounce = null
+            )
+        )
+
+        val player = state.getPlayerById("A10".playerId)
+        assertFalse(player.hasBall())
+        assertEquals(FieldCoordinate(11, 7), player.location.coordinate)
+        assertEquals(BallState.DEVIATING, state.ball.state)
     }
 
+    @Test
     fun highKick_noValidPlayers() {
-        TODO()
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                placeKick = FieldSquareSelected(13, 0),
+                deviate = DiceResults(2.d8, 1.d6), // Move ball to [11,7], behind opponent LoS
+                kickoffEvent = arrayOf(
+                    DiceResults(1.d6, 4.d6), // Roll High Kick, cannot be used
+                ),
+                bounce = null
+            ),
+        )
+        assertEquals(BallState.OUT_OF_BOUNDS, state.ball.state)
+        controller.rollForward(
+            PlayerSelected("A2".playerId) // Touchback
+        )
+        val player = state.getPlayerById("A2".playerId)
+        assertTrue(player.hasBall())
+        assertEquals(BallState.CARRIED, state.ball.state)
     }
 
 
     @Test
-    @Ignore
-    fun CheeringFans() {
+    fun cheeringFans_equalRoll() {
+        homeTeam.tempCheerleaders = 0
+        awayTeam.tempCheerleaders = 1
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(1.d6, 5.d6), // Roll Cheering Fans, cannot be used
+                    2.d6, // Home team roll
+                    1.d6, // Away team roll, should be the same value
+                ),
+                bounce = null
+            ),
+        )
+        assertEquals(Bounce.RollDirection, controller.currentProcedure()?.currentNode())
+    }
 
+    @Test
+    fun cheeringFans_homeWins() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(1.d6, 5.d6), // Roll Cheering Fans, cannot be used
+                    3.d6, // Home team roll
+                    2.d6, // Away team roll
+                    2.d16 // Prayers To Nuffle: Friends with the ref
+                ),
+                bounce = null
+            ),
+        )
+        assertTrue(homeTeam.activePrayersToNuffle.contains(PrayerToNuffle.FRIENDS_WITH_THE_REF))
+        assertFalse(awayTeam.activePrayersToNuffle.contains(PrayerToNuffle.FRIENDS_WITH_THE_REF))
     }
 
     @Test
     @Ignore
-    fun BrilliantCoaching() {
+    fun brilliantCoaching() {
 
     }
 

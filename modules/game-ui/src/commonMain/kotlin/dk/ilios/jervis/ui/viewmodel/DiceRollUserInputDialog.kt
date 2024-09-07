@@ -1,7 +1,11 @@
 package dk.ilios.jervis.ui.viewmodel
 
+import dk.ilios.jervis.actions.D12Result
 import dk.ilios.jervis.actions.D16Result
+import dk.ilios.jervis.actions.D20Result
+import dk.ilios.jervis.actions.D2Result
 import dk.ilios.jervis.actions.D3Result
+import dk.ilios.jervis.actions.D4Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DBlockResult
@@ -9,9 +13,11 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectDiceResult
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.actions.foul.FoulContext
 import dk.ilios.jervis.procedures.actions.pass.PassContext
 import dk.ilios.jervis.rules.Rules
@@ -268,6 +274,38 @@ data class DiceRollUserInputDialog(
                 title = "Bad Habits Roll",
                 message = "Roll D3 to find number of affected players",
                 dice = listOf(Pair(Dice.D3, D3Result.allOptions())),
+                result = { _: DiceResults -> null }
+            )
+        }
+
+        fun createCheeringFansRollDialog(team: Team): UserInput {
+            return DiceRollUserInputDialog(
+                title = "Cheering Fans Roll",
+                message = "${team.name} rolls a D6 for Cheering Fans",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { _: DiceResults -> null }
+            )
+        }
+
+        fun createUnknownDiceRoll(dicePool: RollDice): UserInput {
+            val dice= dicePool.dice.map {
+                when(it) {
+                    Dice.D2 -> Pair(it, D2Result.allOptions())
+                    Dice.D3 -> Pair(it, D3Result.allOptions())
+                    Dice.D4 -> Pair(it, D4Result.allOptions())
+                    Dice.D6 -> Pair(it, D6Result.allOptions())
+                    Dice.D8 -> Pair(it, D8Result.allOptions())
+                    Dice.D12 -> Pair(it, D12Result.allOptions())
+                    Dice.D16 -> Pair(it, D16Result.allOptions())
+                    Dice.D20 -> Pair(it, D20Result.allOptions())
+                    Dice.BLOCK -> Pair(it, DBlockResult.allOptions())
+                }
+            }
+
+            return DiceRollUserInputDialog(
+                title = "Unknown Dice Roll",
+                message = "Unmapped die roll (see logs for details)",
+                dice = dice,
                 result = { _: DiceResults -> null }
             )
         }

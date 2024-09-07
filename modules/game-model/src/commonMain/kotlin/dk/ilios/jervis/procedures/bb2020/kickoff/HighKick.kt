@@ -13,6 +13,7 @@ import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.SimpleLogEntry

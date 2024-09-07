@@ -25,18 +25,15 @@ import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
 
 /**
- * Run a roll on the Prayers to Nuffle table.
+ * Roll on the Prayers to Nuffle table as many times as defined in [PrayersToNuffleRollContext].
+ * If a result is already active, it will continue re-rolling until it succeeds.
  * See page 39 in the rulebook.
  */
 object PrayersToNuffleRoll : Procedure() {
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<PrayersToNuffleRollContext>()
-    }
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return RemoveContext<PrayersToNuffleRollContext>()
-    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<PrayersToNuffleRollContext>()
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<PrayersToNuffleRollContext>()
 
     object RollDie : ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {

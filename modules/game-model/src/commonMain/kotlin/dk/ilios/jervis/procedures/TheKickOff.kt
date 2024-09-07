@@ -129,7 +129,7 @@ object TheKickOff : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.deviateRollContext!!
-            val newLocation = context.outOfBoundsAt ?: context.landsAt!!
+            val newLocation = context.landsAt ?: FieldCoordinate.OUT_OF_BOUNDS
             return compositeCommandOf(
                 if (context.outOfBoundsAt != null) SetBallState.outOfBounds(context.outOfBoundsAt) else SetBallState.deviating(),
                 SetBallLocation(newLocation),
