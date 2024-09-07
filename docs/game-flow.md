@@ -60,7 +60,7 @@ This document lists all game mechanics that have been fully implemented with tes
 - [x] The Kick-off Event
   - [x] Get the Ref
   - [x] Time-out
-  - [ ] Solid Defense
+  - [x] Solid Defense
   - [x] High Kick
   - [x] Cheering Fans
   - [x] Brilliant Coaching
@@ -91,7 +91,6 @@ This document lists all game mechanics that have been fully implemented with tes
 - [ ] Weather
 - [ ] Fan Factor
 - [ ] Inducements
-- [ ] Prayers To Nuffle
 - [ ] Track Star Player Points
 - [ ] Track more advanced stats
 - [ ] Setup and broken rules
@@ -101,8 +100,8 @@ This document lists all game mechanics that have been fully implemented with tes
 - [ ] Going into overtime
 - [ ] Track Star Player Points and adjustments to it. Figure out how
 - [ ] Touchdown
-- [ ] Stalling
+- [ ] Detect Stalling
 - [ ] Trapdoors
 - [ ] Maximum Stats
 - [ ] Knocked Down
-- [ ] Fall Over
+- [ ] Falling Over

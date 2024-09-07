@@ -2,6 +2,7 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndSetupWhenReady
@@ -19,7 +20,6 @@ import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
-import dk.ilios.jervis.fsm.ConfirmationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.DogOut
@@ -65,7 +65,7 @@ object SetupTeam : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
-            val isHomeTeam = state.activeTeam.isHomeTeam()
+            val isHomeTeam = state.kickingTeam.isHomeTeam()
             val freeFields: List<SelectFieldLocation> =
                 state.field
                     .filter {
@@ -116,7 +116,7 @@ object SetupTeam : Procedure() {
 
     object EndSetupAndValidate : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            return if (rules.isValidSetup(state)) {
+            return if (rules.isValidSetup(state, state.activeTeam)) {
                 ExitProcedure()
             } else {
                 GotoNode(InformOfInvalidSetup)
@@ -124,8 +124,12 @@ object SetupTeam : Procedure() {
         }
     }
 
-    object InformOfInvalidSetup : ConfirmationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
+    object InformOfInvalidSetup : ActionNode() {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            return listOf(ConfirmWhenReady)
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return GotoNode(SelectPlayerOrEndSetup)
         }
     }

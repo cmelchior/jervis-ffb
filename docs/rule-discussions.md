@@ -46,7 +46,7 @@ interpreted.
    faint from the heat. 
 
 10. It is unclear what happens if you put a player on a trapdoor during setup. Does that count 
-    as "enter for any reason"?
+    as "enter for any reason"? For we do nothing
 
 11. The timing of Trapdoor vs. Dodge/Jump is a bit unclear. Since Dodge/Jump is rolled after the player
     is moved, I read it as the following sequence:
@@ -89,6 +89,8 @@ interpreted.
        - Pro does not work, because apparently the activation ended. Does that mean the activation ends as soon as you are knocked down?
        - Team reroll does work bcause the team turn still hasn't ended.
 
+18. A player that that falls through a Trapdoor does not cause a turnover unless they where holding the
+    ball. (at least reading from the rules)
 
 # Differences compared to the rules as written
 

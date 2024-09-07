@@ -246,6 +246,8 @@ class GameController(
 
     fun currentProcedure(): ProcedureState? = stack.firstOrNull()
 
+    fun currentNode(): Node? = currentProcedure()?.currentNode()
+
     fun addNode(nextState: Node) {
         stack.addNode(nextState)
     }

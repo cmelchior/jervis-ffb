@@ -29,8 +29,7 @@ import dk.ilios.jervis.rules.tables.ThrowInTemplate
 import dk.ilios.jervis.rules.tables.WeatherTable
 
 interface Rules {
-    fun isValidSetup(state: Game): Boolean {
-        val team = state.activeTeam
+    fun isValidSetup(state: Game, team: Team): Boolean {
         val isHomeTeam = team.isHomeTeam()
         val inReserve: List<Player> = team.filter { it.state == PlayerState.STANDING && !it.location.isOnField(this) }
         val onField: List<Player> = team.filter { it.state == PlayerState.STANDING && it.location.isOnField(this) }
@@ -81,7 +80,7 @@ interface Rules {
         } else {
             (fieldWidth - 1 downTo lineOfScrimmageAway).forEach { x ->
                 (0 until wideZone).forEach { y ->
-                    if (field[x.toInt(), y.toInt()].isOccupied()) {
+                    if (field[x, y].isOccupied()) {
                         // They must not be on the LoS
                         if (x == lineOfScrimmageAway) {
                             return false

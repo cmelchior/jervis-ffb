@@ -2,12 +2,14 @@ package dk.ilios.jervis.tables
 
 import dk.ilios.jervis.JervisGameTest
 import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.defaultKickOffHomeTeam
 import dk.ilios.jervis.defaultPregame
 import dk.ilios.jervis.defaultSetup
 import dk.ilios.jervis.ext.d16
+import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.ext.d8
 import dk.ilios.jervis.ext.playerId
@@ -16,6 +18,7 @@ import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.FullGame
+import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
 import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.skipTurns
@@ -86,10 +89,62 @@ class KickOffEventTests: JervisGameTest() {
 
 
     @Test
-    @Ignore
-    fun SolidDefense() {
-        TODO()
+    fun solidDefense() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(2.d6, 2.d6), // Roll Solid Defense
+                    1.d3, // D3 + 3 players
+                    PlayerSelected("H6".playerId),
+                    FieldSquareSelected(0, 5),
+                    PlayerSelected("H7".playerId),
+                    FieldSquareSelected(0, 6),
+                    EndSetup, // Will be valid
+                ),
+            )
+        )
+        assertEquals(FieldCoordinate(0, 5), state.getPlayerById("H6".playerId).location)
+        assertEquals(FieldCoordinate(0, 6), state.getPlayerById("H7".playerId).location)
+        assertEquals(awayTeam, state.activeTeam)
     }
+
+    @Test
+    fun solidDefense_invalid() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(2.d6, 2.d6), // Roll Solid Defense
+                    1.d3, // D3 + 3 players
+                    PlayerSelected("H6".playerId),
+                    FieldSquareSelected(0, 0),
+                    PlayerSelected("H7".playerId),
+                    FieldSquareSelected(0, 1),
+                    PlayerSelected("H8".playerId),
+                    FieldSquareSelected(0, 2),
+                    PlayerSelected("H9".playerId),
+                    FieldSquareSelected(0, 3),
+                    EndSetup, // Will be invalid
+                ),
+                bounce = null
+            )
+        )
+        assertEquals(SolidDefense.InformOfInvalidSetup, controller.currentNode())
+    }
+
+
+
+    @Test
+    fun solidDefense_lessPlayersThanRolled() {
+
+    }
+
+
 
     @Test
     fun highKick() {
