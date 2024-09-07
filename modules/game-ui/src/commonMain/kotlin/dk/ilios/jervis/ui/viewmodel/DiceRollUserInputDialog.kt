@@ -52,7 +52,7 @@ class DiceRollUserInputDialog(
                         rules.weatherTable.roll(
                             rolls.rolls.first() as D6Result,
                             rolls.rolls.last() as D6Result,
-                        ).name
+                        ).title
                     "$description (${rolls.sumOf { it.value }})"
                 },
             )
@@ -102,7 +102,7 @@ class DiceRollUserInputDialog(
                             rolls.first() as D6Result,
                             rolls.last() as D6Result,
                         ).description
-                    "$description(${rolls.sumOf { it.value }})"
+                    "$description (${rolls.sumOf { it.value }})"
                 },
             )
         }
@@ -151,7 +151,7 @@ class DiceRollUserInputDialog(
                     ),
                 result = { rolls: DiceResults ->
                     val result = rules.injuryTable.roll(rolls.first() as D6Result, rolls.last() as D6Result)
-                    "(${rolls.sum()}) ${result.title}"
+                    "${result.title} (${rolls.sum()})"
                 },
             )
         }
@@ -166,7 +166,7 @@ class DiceRollUserInputDialog(
                     ),
                 result = { rolls: DiceResults ->
                     val result = rules.casualtyTable.roll(rolls.first() as D16Result)
-                    "(${rolls.sum()}) ${result.title}"
+                    "${result.title} (${rolls.sum()})"
                 },
             )
         }
@@ -178,7 +178,7 @@ class DiceRollUserInputDialog(
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
                 result = { rolls: DiceResults ->
                     val result = rules.lastingInjuryTable.roll(rolls.first() as D6Result)
-                    "(${rolls.sum()}) ${result.description}"
+                    "${result.description} (${rolls.sum()})"
                 },
             )
         }
@@ -190,7 +190,7 @@ class DiceRollUserInputDialog(
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
                 result = { rolls: DiceResults ->
                     val result = rules.argueTheCallTable.roll(rolls.first() as D6Result)
-                    "(${rolls.sum()}) ${result.title}"
+                    "${result.title} (${rolls.sum()})"
                 },
             )
         }

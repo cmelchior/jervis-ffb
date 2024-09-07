@@ -107,11 +107,7 @@ object TheKickOff : Procedure() {
                 .map { SelectFieldLocation.kick(it.coordinates) }
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<FieldSquareSelected>(action) {
                 compositeCommandOf(
                     SetBallState.inAir(),

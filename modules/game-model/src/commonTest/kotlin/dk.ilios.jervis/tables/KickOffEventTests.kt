@@ -17,6 +17,7 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
+import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.skipTurns
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -285,10 +286,109 @@ class KickOffEventTests: JervisGameTest() {
 
 
     @Test
-    @Ignore
-    fun ChangingWeather() {
-
+    fun changingWeather() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(4.d6, 4.d6), // Roll Changing Weather
+                    DiceResults(1.d6, 1.d6), // Roll Sweltering Heat
+                ),
+            ),
+        )
+        assertEquals(Weather.SWELTERING_HEAT, state.weather)
     }
+
+    @Test
+    fun changingWeather_scatter() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(4.d6, 4.d6), // Roll Changing Weather
+                    DiceResults(3.d6, 4.d6), // Roll Perfect Conditions
+                    DiceResults(2.d8, 2.d8, 2.d8) // Scatter 3 times up
+                ),
+                bounce = 2.d8 // Final bounce up
+            ),
+        )
+        assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
+        assertEquals(BallState.ON_GROUND, state.ball.state)
+        assertEquals(FieldCoordinate(18, 3), state.ball.location)
+    }
+
+    @Test
+    fun changingWeather_scatterBackToReceiverField() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                placeKick = FieldSquareSelected(13, 7),
+                deviate = DiceResults(4.d8, 1.d6), // Deviate to [12,7] on Kickers sid
+                kickoffEvent = arrayOf(
+                    DiceResults(4.d6, 4.d6), // Roll Changing Weather
+                    DiceResults(3.d6, 4.d6), // Roll Perfect Conditions
+                    DiceResults(2.d8, 2.d8, 2.d8), // Scatter 3 times up
+                    PlayerSelected("A1".playerId), // Touchback -> give to A1
+                ),
+                bounce = null
+            ),
+        )
+        assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
+        assertEquals(BallState.CARRIED, state.ball.state)
+        assertTrue(awayTeam[1.playerNo].hasBall())
+    }
+
+    @Test
+    fun changingWeather_scatterBackToKickerField() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                placeKick = FieldSquareSelected(13, 7),
+                deviate = DiceResults(4.d8, 1.d6), // Deviate to [12,7] on Kickers side
+                kickoffEvent = arrayOf(
+                    DiceResults(4.d6, 4.d6), // Roll Changing Weather
+                    DiceResults(3.d6, 4.d6), // Roll Perfect Conditions
+                    DiceResults(5.d8, 5.d8, 2.d8), // Scatter 3 times up to the right, back to receivers side [14, 6]
+                ),
+                bounce = 2.d8 // Bounce to [14, 5]
+            ),
+        )
+        assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
+        assertEquals(BallState.ON_GROUND, state.ball.state)
+        assertEquals(FieldCoordinate(14, 5), state.ball.location)
+    }
+
+    @Test
+    fun changingWeather_perfectWeatherWhenOutOfBounds() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                placeKick = FieldSquareSelected(13, 0),
+                deviate = DiceResults(2.d8, 1.d6), // Deviate out of bounds with exit at [13, 0]
+                kickoffEvent = arrayOf(
+                    DiceResults(4.d6, 4.d6), // Roll Changing Weather
+                    DiceResults(3.d6, 4.d6), // Roll Perfect Conditions
+                    PlayerSelected("A5".playerId)
+                ),
+                bounce = null
+            ),
+        )
+        assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
+        assertEquals(BallState.CARRIED, state.ball.state)
+        assertTrue(awayTeam[5.playerNo].hasBall())
+    }
+
+
 
     @Test
     @Ignore

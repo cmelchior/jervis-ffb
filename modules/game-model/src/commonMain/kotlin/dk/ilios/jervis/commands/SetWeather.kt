@@ -14,7 +14,7 @@ class SetWeather(private val weather: Weather) : Command {
     }
 
     override fun undo(state: Game, controller: GameController) {
-        state.weather = originalWeather!!
+        state.weather = originalWeather
         state.notifyUpdate()
     }
 }

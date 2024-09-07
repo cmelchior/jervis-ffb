@@ -17,6 +17,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
@@ -27,21 +28,21 @@ data class DeviateRollContext(
     val deviateRoll: List<DieResult> = emptyList(),
     val landsAt: FieldCoordinate? = null, // Will be `null` if out of bounds
     val outOfBoundsAt: FieldCoordinate? = null, // Will contain the last field before the ball went out of bounds.
-)
+): ProcedureContext
 
 /**
  * Resolve a Deviate Roll.
- * Do not try to land the ball after the roll, this is up to the caller of this procedure.
+ *
+ * Note, this procedure does not move the ball or change its state, it only save the result inside
+ * [DeviateRollContext]. It is up to the parent procedure to handle it.
  *
  * See page 25 in the rulebook.
  */
 object DeviateRoll : Procedure() {
     override val initialNode: Node = RollDice
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
         if (state.deviateRollContext == null) {
             INVALID_GAME_STATE("Missing scatter roll context")
         }
@@ -49,13 +50,7 @@ object DeviateRoll : Procedure() {
         if (ball?.state != BallState.DEVIATING && ball?.state != BallState.IN_AIR) {
             throw IllegalStateException("Ball is not deviating, but ${ball?.state}")
         }
-        return null
     }
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
 
     object RollDice : ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {

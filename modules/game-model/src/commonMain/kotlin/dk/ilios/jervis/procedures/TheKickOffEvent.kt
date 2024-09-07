@@ -164,6 +164,7 @@ object TheKickOffEvent : Procedure() {
 
     object TouchBack : ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            // TODO Handle no valid players, so it will bounce
             return state.receivingTeam.filter {
                 it.hasTackleZones && it.state == PlayerState.STANDING && it.location.isOnField(rules)
             }.map {
