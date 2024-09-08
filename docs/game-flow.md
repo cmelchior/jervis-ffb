@@ -67,7 +67,7 @@ This document lists all game mechanics that have been fully implemented with tes
   - [x] Changing Weather
   - [x] Quick Snap
   - [ ] Blitz
-  - [ ] Officious Ref
+  - [x] Officious Ref
   - [ ] Pitch Invasion
 - [ ] What goes up, must come down
 - [ ] Touchbacks

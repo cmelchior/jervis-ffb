@@ -5,6 +5,7 @@ import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.defaultKickOffHomeTeam
 import dk.ilios.jervis.defaultPregame
 import dk.ilios.jervis.defaultSetup
@@ -15,6 +16,7 @@ import dk.ilios.jervis.ext.d8
 import dk.ilios.jervis.ext.playerId
 import dk.ilios.jervis.ext.playerNo
 import dk.ilios.jervis.model.BallState
+import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.procedures.Bounce
@@ -573,10 +575,79 @@ class KickOffEventTests: JervisGameTest() {
     }
 
     @Test
-    @Ignore
-    fun OfficiousRef() {
-
+    fun officiousRef() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(5.d6, 6.d6), // Roll Officious Ref
+                    6.d6, // Home team rolls
+                    3.d6, // Away team rolls
+                    RandomPlayersSelected(listOf("A1".playerId)),
+                    2.d6 // Roll for the Ref
+                )
+            )
+        )
+        assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
     }
+
+    @Test
+    fun officiousRef_bothTeams() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(5.d6, 6.d6), // Roll Officious Ref
+                    6.d6, // Home team rolls
+                    4.d6, // Away team rolls
+                    RandomPlayersSelected(listOf("A1".playerId)),
+                    1.d6, // Roll for the Ref
+                    RandomPlayersSelected(listOf("H1".playerId)),
+                    2.d6 // Roll for the Ref
+                )
+            )
+        )
+        val awayPlayer = state.getPlayerById("A1".playerId)
+        val homePlayer = state.getPlayerById("H1".playerId)
+        assertEquals(PlayerState.BANNED, awayPlayer.state)
+        assertEquals(DogOut, awayPlayer.location)
+        assertEquals(PlayerState.STUNNED, homePlayer.state)
+    }
+
+    @Test
+    fun officiousRef_noPlayersOnField() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup()
+        )
+
+        // Fake it, by moving all kickoff players back to Dogout after setup
+        homeTeam.forEach {
+            it.state = PlayerState.RESERVE
+            it.location = DogOut
+        }
+        controller.rollForward(
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(5.d6, 6.d6), // Roll Officious Ref
+                    6.d6, // Home team rolls
+                    4.d6, // Away team rolls
+                    RandomPlayersSelected(listOf("A1".playerId)),
+                    1.d6, // Roll for the Ref
+                    // Skip rolls for home players as none are eligible
+                )
+            )
+        )
+        val awayPlayer = state.getPlayerById("A1".playerId)
+        assertEquals(PlayerState.BANNED, awayPlayer.state)
+        assertEquals(TeamTurn.SelectPlayerOrEndTurn, controller.currentNode())
+    }
+
 
     @Test
     @Ignore

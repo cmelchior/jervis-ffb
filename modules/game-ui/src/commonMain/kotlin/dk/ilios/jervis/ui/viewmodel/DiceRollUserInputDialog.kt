@@ -296,6 +296,23 @@ class DiceRollUserInputDialog(
             )
         }
 
+        fun createOfficiousRefRollDialog(team: Team): UserInput {
+            return DiceRollUserInputDialog(
+                title = "Officious Ref Roll",
+                message = "${team.name} rolls a D6 for Officious Ref",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { _: DiceResults -> null }
+            )
+        }
+
+        fun createOfficiousRefPlayerRollDialog(player: Player): UserInput {
+            return DiceRollUserInputDialog(
+                title = "Officious Ref Player Roll",
+                message = "${player.name} rolls a D6 while arguing with the Ref",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { _: DiceResults -> null }
+            )
+        }
 
         fun createUnknownDiceRoll(dicePool: RollDice): UserInput {
             val dice= dicePool.dice.map {
@@ -319,6 +336,5 @@ class DiceRollUserInputDialog(
                 result = { _: DiceResults -> null }
             )
         }
-
     }
 }

@@ -44,6 +44,8 @@ import dk.ilios.jervis.procedures.actions.pass.AccuracyRoll
 import dk.ilios.jervis.procedures.actions.pass.PassContext
 import dk.ilios.jervis.procedures.bb2020.kickoff.BrilliantCoaching
 import dk.ilios.jervis.procedures.bb2020.kickoff.CheeringFans
+import dk.ilios.jervis.procedures.bb2020.kickoff.OfficiousRef
+import dk.ilios.jervis.procedures.bb2020.kickoff.OfficiousRefContext
 import dk.ilios.jervis.procedures.bb2020.prayers.BadHabits
 import dk.ilios.jervis.procedures.injury.ArmourRoll
 import dk.ilios.jervis.procedures.injury.CasualtyRoll
@@ -303,6 +305,17 @@ object DialogFactory {
 
                 is TheKickOffEvent.RollForKickOffEvent -> {
                     DiceRollUserInputDialog.createKickOffEventDialog(rules)
+                }
+
+                is OfficiousRef.KickingTeamRollDie -> {
+                    DiceRollUserInputDialog.createOfficiousRefRollDialog(controller.state.kickingTeam)
+                }
+                is OfficiousRef.ReceivingTeamRollDie -> {
+                    DiceRollUserInputDialog.createOfficiousRefRollDialog(controller.state.kickingTeam)
+                }
+                is OfficiousRef.RollForPlayer -> {
+                    val context = controller.state.getContext<OfficiousRefContext>()
+                    DiceRollUserInputDialog.createOfficiousRefPlayerRollDialog(context.currentPlayer!!)
                 }
 
                 else -> {
