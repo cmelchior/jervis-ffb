@@ -101,6 +101,7 @@ fun humanTeamAway(): Team {
         addPlayer(PlayerId("A9"), "Blitzer-2-A", PlayerNo(9), HumanTeam.BLITZER)
         addPlayer(PlayerId("A10"), "Blitzer-3-A", PlayerNo(10), HumanTeam.BLITZER)
         addPlayer(PlayerId("A11"), "Blitzer-4-A", PlayerNo(11), HumanTeam.BLITZER)
+        addPlayer(PlayerId("A12"), "Lineman-5-A", PlayerNo(12), HumanTeam.LINEMAN)
         reRolls = 4
         apothecaries = 1
         dedicatedFans = 2
@@ -288,6 +289,7 @@ fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = humanTeamAway())
             addPlayer(PlayerId("H9"), "Blitzer-2-H", PlayerNo(9), HumanTeam.BLITZER)
             addPlayer(PlayerId("H10"), "Blitzer-3-H", PlayerNo(10), HumanTeam.BLITZER)
             addPlayer(PlayerId("H11"), "Blitzer-4-H", PlayerNo(11), HumanTeam.BLITZER)
+            addPlayer(PlayerId("H12"), "Lineman-5-H", PlayerNo(12), HumanTeam.LINEMAN)
             reRolls = 4
             apothecaries = 1
             dedicatedFans = 1

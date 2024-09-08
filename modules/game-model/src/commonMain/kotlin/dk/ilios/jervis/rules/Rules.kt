@@ -146,7 +146,17 @@ interface Rules {
      * Returns `true` if the player is considered `Open` as described on
      * page 26 in the rulebook.
      */
-    fun isOpen(player: Player): Boolean = !isMarked(player)
+    fun isOpen(player: Player): Boolean {
+        return player.state == PlayerState.STANDING && !isMarked(player)
+    }
+
+    /**
+     * Returns `true` if the player is considered "Standing" as described
+     * on page 26 in the rulebook.
+     */
+    fun isStanding(player: Player): Boolean {
+        return player.state == PlayerState.STANDING && player.location.isOnField(this)
+    }
 
     /**
      * Returns `true` if the player is considered `Marked as described on

@@ -189,7 +189,7 @@ object BlitzAction : Procedure() {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their blitz
             val context = state.blitzContext!!
-            return if (!context.attacker.isStanding(rules)) {
+            return if (!rules.isStanding(context.attacker)) {
                 compositeCommandOf(
                     SetTurnOver(true),
                     ExitProcedure()

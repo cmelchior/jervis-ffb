@@ -16,8 +16,10 @@ import dk.ilios.jervis.ext.playerId
 import dk.ilios.jervis.ext.playerNo
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.FullGame
+import dk.ilios.jervis.procedures.TeamTurn
 import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
 import dk.ilios.jervis.rules.tables.Weather
@@ -141,10 +143,28 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun solidDefense_lessPlayersThanRolled() {
-
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(2.d6, 2.d6), // Roll Solid Defense
+                ),
+                bounce = null
+            )
+        )
+        // Only standing open players can be selected, so make
+        // everyone but 1 prone
+        (1..10).forEach {
+            homeTeam[it.playerNo].state = PlayerState.PRONE
+        }
+        controller.rollForward(
+            1.d3, // D3 + 3 players
+        )
+        // 1 player + EndSetup
+        assertEquals(2, controller.getAvailableActions().size)
     }
-
-
 
     @Test
     fun highKick() {
@@ -446,9 +466,104 @@ class KickOffEventTests: JervisGameTest() {
 
 
     @Test
-    @Ignore
-    fun QuickSnap() {
+    fun quickSnap() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(3.d6, 6.d6), // Roll Quick Snap
+                    1.d3, // D3 + 3 players
+                ),
+                bounce = null
+            )
+        )
+        // 6 players available to select + EndSetup
+        assertEquals(6 + 1, controller.getAvailableActions().size)
 
+        // Move 3 players then end the Quick Snap
+        controller.rollForward(PlayerSelected("A6".playerId))
+        assertEquals(8, controller.getAvailableActions().size) // Can move into all nearby fields
+        controller.rollForward(
+            FieldSquareSelected(14,0),
+            PlayerSelected("A7".playerId),
+            FieldSquareSelected(14,1),
+            PlayerSelected("A9".playerId),
+            FieldSquareSelected(14,14),
+            EndSetup
+        )
+        assertEquals(Bounce.RollDirection, controller.currentNode())
+    }
+
+    @Test
+    fun quickSnap_notEnoughPlayers() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(4.d6, 5.d6), // Roll Quick Snap
+                ),
+                bounce = null
+            )
+        )
+        // Only standing open players can be selected, so make
+        // everyone but 1 prone
+        (1..10).forEach {
+            awayTeam[it.playerNo].state = PlayerState.PRONE
+        }
+        controller.rollForward(
+            1.d3, // D3 + 3 players
+        )
+        // 1 player + EndSetup
+        assertEquals(2, controller.getAvailableActions().size)
+    }
+
+    @Test
+    fun quickSnap_automaticallyEndSetup() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(3.d6, 6.d6), // Roll Quick Snap
+                    1.d3, // D3 + 3 players
+                    PlayerSelected("A6".playerId),
+                    FieldSquareSelected(14,0),
+                    PlayerSelected("A7".playerId),
+                    FieldSquareSelected(14,1),
+                    PlayerSelected("A9".playerId),
+                    FieldSquareSelected(14,14),
+                    PlayerSelected("A8".playerId),
+                    FieldSquareSelected(14,13),
+                ),
+            )
+        )
+        assertEquals(TeamTurn.SelectPlayerOrEndTurn, controller.currentNode())
+    }
+
+    @Test
+    fun quickSnap_sameFieldDoesNotCountAsMoved() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(3.d6, 6.d6), // Roll Quick Snap
+                    1.d3, // D3 + 3 players
+                    PlayerSelected("A6".playerId),
+                    FieldSquareSelected(14,1), // Same location
+                    PlayerSelected("A6".playerId),
+                    FieldSquareSelected(14,1), // Same location
+                    EndSetup
+                )
+            )
+        )
+        assertEquals(TeamTurn.SelectPlayerOrEndTurn, controller.currentNode())
     }
 
     @Test

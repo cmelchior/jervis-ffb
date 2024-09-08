@@ -65,7 +65,7 @@ This document lists all game mechanics that have been fully implemented with tes
   - [x] Cheering Fans
   - [x] Brilliant Coaching
   - [x] Changing Weather
-  - [ ] Quick Snap
+  - [x] Quick Snap
   - [ ] Blitz
   - [ ] Officious Ref
   - [ ] Pitch Invasion

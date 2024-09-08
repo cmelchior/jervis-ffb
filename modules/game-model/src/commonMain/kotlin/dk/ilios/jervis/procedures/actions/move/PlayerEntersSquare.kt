@@ -28,9 +28,9 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
@@ -111,8 +111,12 @@ object MovePlayerIntoSquare : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MovePlayerIntoSquareContext>()
             return compositeCommandOf(
-                SetTurnOver(true),
+                if (context.player.hasBall()) {
+                    // TODO Should also bounce the ball
+                    SetTurnOver(true)
+                } else null,
                 ExitProcedure()
             )
         }

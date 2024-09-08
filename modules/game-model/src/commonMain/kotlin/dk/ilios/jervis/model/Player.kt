@@ -229,8 +229,9 @@ class Player(
     /**
      * Returns `true` if the player is still standing on the field
      */
+    @Deprecated("Move this Rules instead")
     fun isStanding(rules: Rules): Boolean {
-        return state == PlayerState.STANDING && location.isOnField(rules)
+        return rules.isStanding(this)
     }
 
     fun addStatModifier(modifier: StatModifier) {

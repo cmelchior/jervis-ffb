@@ -117,6 +117,7 @@ Skills should only be marked as completed here if they are implemented and have 
 - [ ] Throw Team-mate
 - [ ] Timmm-ber!
 - [ ] Unchannelled Fury*
+- [ ] Hit and Run (Spike 15)
 
 # Star Player Skills
 
