@@ -68,7 +68,7 @@ This document lists all game mechanics that have been fully implemented with tes
   - [x] Quick Snap
   - [ ] Blitz
   - [x] Officious Ref
-  - [ ] Pitch Invasion
+  - [x] Pitch Invasion
 - [ ] What goes up, must come down
 - [ ] Touchbacks
 

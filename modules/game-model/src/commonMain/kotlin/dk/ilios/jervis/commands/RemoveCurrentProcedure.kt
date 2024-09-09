@@ -3,6 +3,7 @@ package dk.ilios.jervis.commands
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fsm.ProcedureState
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.LogEntry
 import dk.ilios.jervis.reports.SimpleLogEntry
 
@@ -18,11 +19,11 @@ class RemoveCurrentProcedure : Command {
         val removed: ProcedureState = controller.removeProcedure()
         currentProcedure = removed.copy()
         val current: ProcedureState? = controller.currentProcedure()
-        entry1 = SimpleLogEntry("Procedure ${removed.name()} removed.")
+        entry1 = SimpleLogEntry("Procedure ${removed.name()} removed.", LogCategory.STATE_MACHINE)
         if (current != null) {
-            entry2 = SimpleLogEntry("Current state: ${current.name()}[${current.currentNode().name()}]")
+            entry2 = SimpleLogEntry("Current state: ${current.name()}[${current.currentNode().name()}]", LogCategory.STATE_MACHINE)
         } else {
-            entry2 = SimpleLogEntry("Current state: <Empty>")
+            entry2 = SimpleLogEntry("Current state: <Empty>", LogCategory.STATE_MACHINE)
         }
         controller.addLog(entry1)
         entry2?.let { controller.addLog(it) }

@@ -18,6 +18,7 @@ import dk.ilios.jervis.fsm.ProcedureStack
 import dk.ilios.jervis.fsm.ProcedureState
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.FullGame
+import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.LogEntry
 import dk.ilios.jervis.reports.ReportHandleAction
 import dk.ilios.jervis.reports.SimpleLogEntry
@@ -77,7 +78,7 @@ class GameController(
                 val selectedAction = if (actions.size == 1 && actions.first() == ContinueWhenReady) {
                     Continue
                 } else {
-                    val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}")
+                    val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}", LogCategory.STATE_MACHINE)
                     commands.add(reportAvailableActions)
                     reportAvailableActions.execute(state, this)
                     actionProvider(this@GameController, actions)
@@ -121,7 +122,7 @@ class GameController(
         }
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val actions = currentNode.getAvailableActions(state, rules)
-        val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}")
+        val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}", LogCategory.STATE_MACHINE)
         commands.add(reportAvailableActions)
         reportAvailableActions.execute(state, this)
         return actions
@@ -211,7 +212,7 @@ class GameController(
     private fun setInitialProcedure(procedure: Procedure) {
         val command =
             compositeCommandOf(
-                SimpleLogEntry("Set initial procedure: ${procedure.name()}[${procedure.initialNode.name()}]"),
+                SimpleLogEntry("Set initial procedure: ${procedure.name()}[${procedure.initialNode.name()}]", LogCategory.STATE_MACHINE),
                 EnterProcedure(procedure),
             )
         commands.add(command)

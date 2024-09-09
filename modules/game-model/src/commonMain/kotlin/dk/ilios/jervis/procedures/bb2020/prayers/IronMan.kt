@@ -20,8 +20,7 @@ import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
-import dk.ilios.jervis.reports.LogCategory
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.tables.PrayerStatModifier
@@ -55,7 +54,7 @@ object IronMan : Procedure() {
             return when (action) {
                 is Continue -> {
                     compositeCommandOf(
-                        SimpleLogEntry("No players are able to receive Iron Man", category = LogCategory.GAME_PROGRESS),
+                        ReportGameProgress("No players are able to receive Iron Man"),
                         ExitProcedure(),
                     )
                 }
@@ -66,7 +65,7 @@ object IronMan : Procedure() {
                         return compositeCommandOf(
                             AddPlayerStatModifier(player, PrayerStatModifier.IRON_MAN),
                             SetContext(context.copy(resultApplied = true)),
-                            SimpleLogEntry("${player.name} received Iron Man (+1 AV)", category = LogCategory.GAME_PROGRESS),
+                            ReportGameProgress("${player.name} received Iron Man (+1 AV)"),
                             ExitProcedure(),
                         )
                     }

@@ -11,8 +11,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
-import dk.ilios.jervis.reports.LogCategory
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 
 /**
@@ -32,7 +31,7 @@ object MolesUnderThePitch : Procedure() {
             val context = state.getContext<PrayersToNuffleRollContext>()
             return compositeCommandOf(
                 SetContext(context.copy (resultApplied = true)),
-                SimpleLogEntry("${context.team.name} released Moles Under the Pitch", category = LogCategory.GAME_PROGRESS),
+                ReportGameProgress("${context.team.name} released Moles Under the Pitch"),
                 ExitProcedure(),
             )
         }

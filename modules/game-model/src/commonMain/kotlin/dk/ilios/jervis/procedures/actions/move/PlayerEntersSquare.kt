@@ -32,7 +32,7 @@ import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
 import dk.ilios.jervis.reports.ReportDiceRoll
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
@@ -87,7 +87,7 @@ object MovePlayerIntoSquare : Procedure() {
                         compositeCommandOf(
                             SetPlayerLocation(context.player, context.target),
                             ReportDiceRoll(DiceRollType.TREACHEROUS_TRAPDOOR, d6),
-                            if (d6.value != 1) SimpleLogEntry("${context.player.name} narrowly avoided the trapdoor") else null,
+                            if (d6.value != 1) ReportGameProgress("${context.player.name} narrowly avoided the trapdoor") else null,
                             if (d6.value == 1) GotoNode(ResolveFallingThroughTrapdoor) else ExitProcedure()
                         )
                     }
@@ -106,7 +106,7 @@ object MovePlayerIntoSquare : Procedure() {
                     player = context.player,
                     mode = RiskingInjuryMode.PUSHED_INTO_CROWD
                 )),
-                SimpleLogEntry("${context.player.name} fell through a trapdoor at ${context.target.toLogString()}")
+                ReportGameProgress("${context.player.name} fell through a trapdoor at ${context.target.toLogString()}")
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll

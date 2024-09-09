@@ -27,13 +27,12 @@ import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
-import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.ReportDiceRoll
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
-import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.Duration
+import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.utils.INVALID_ACTION
 import kotlin.math.min
 
@@ -88,7 +87,7 @@ object BadHabits : Procedure() {
             return when(action) {
                 is Continue -> {
                     compositeCommandOf(
-                        SimpleLogEntry("No players are able to receive Bad Habits", category = LogCategory.GAME_PROGRESS),
+                        ReportGameProgress("No players are able to receive Bad Habits"),
                         ExitProcedure(),
                     )
                 }
@@ -102,7 +101,7 @@ object BadHabits : Procedure() {
 
                         val addLonerCommands = it.getPlayers(state).flatMap { player ->
                             listOf(
-                                SimpleLogEntry("${player.name} received Loner (2+)"),
+                                ReportGameProgress("${player.name} received Loner (2+)"),
                                 AddPlayerSkill(player, Loner(2, isTemporary = true, expiresAt = Duration.END_OF_DRIVE))
                             )
                         }.toTypedArray()

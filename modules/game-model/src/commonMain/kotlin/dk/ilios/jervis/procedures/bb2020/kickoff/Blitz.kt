@@ -7,8 +7,7 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.reports.LogCategory
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 
 /**
@@ -35,7 +34,7 @@ object Blitz : Procedure() {
             rules: Rules,
         ): Command {
             return compositeCommandOf(
-                SimpleLogEntry("Do Blitz!", category = LogCategory.GAME_PROGRESS),
+                ReportGameProgress("Do Blitz!"),
                 ExitProcedure(),
             )
         }

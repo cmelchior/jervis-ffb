@@ -20,12 +20,11 @@ import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
-import dk.ilios.jervis.reports.LogCategory
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.Pro
-import dk.ilios.jervis.rules.skills.Duration
 
 /**
  * Procedure for handling the Prayer to Nuffle "Blessed Statue of Nuffle" as described on page 39
@@ -56,7 +55,7 @@ object BlessedStatueOfNuffle : Procedure() {
             return when (action) {
                 is Continue -> {
                     compositeCommandOf(
-                        SimpleLogEntry("No players are able to receive Blessed Statue of Nuffle", category = LogCategory.GAME_PROGRESS),
+                        ReportGameProgress("No players are able to receive Blessed Statue of Nuffle"),
                         ExitProcedure(),
                     )
                 }
@@ -67,7 +66,7 @@ object BlessedStatueOfNuffle : Procedure() {
                         compositeCommandOf(
                             AddPlayerSkill(player, Pro(isTemporary = true, expiresAt = Duration.END_OF_GAME)),
                             SetContext(context.copy(resultApplied = true)),
-                            SimpleLogEntry("${player.name} received Blessed Statue of Nuffle (Pro)", category = LogCategory.GAME_PROGRESS),
+                            ReportGameProgress("${player.name} received Blessed Statue of Nuffle (Pro)"),
                             ExitProcedure(),
                         )
                     }

@@ -39,8 +39,8 @@ object PitchInvasionMapper: CommandActionMapper {
         val report = command.reportList.first() as KickoffPitchInvasionReport
         val homeRoll = D6Result(report.rollHome)
         val awayRoll = D6Result(report.rollAway)
-        newActions.add(homeRoll, PitchInvasion.RollForHomeTeam)
-        newActions.add(awayRoll, PitchInvasion.RollForAwayTeam)
+        newActions.add(homeRoll, PitchInvasion.RollForKickingTeamFans)
+        newActions.add(awayRoll, PitchInvasion.RollForReceivingTeamFans)
         // Split stuns into teams to figure out the result
         val (homeStuns, awayStuns) =
             report.playerIds.map {
@@ -49,12 +49,12 @@ object PitchInvasionMapper: CommandActionMapper {
                 player.team.isHomeTeam()
             }
         if (homeStuns.isNotEmpty()) {
-            newActions.add(D3Result(homeStuns.size), PitchInvasion.RollForHomeTeamStuns)
-            newActions.add(RandomPlayersSelected(homeStuns.map { it.id }), PitchInvasion.ResolveHomeTeamStuns)
+            newActions.add(D3Result(homeStuns.size), PitchInvasion.RollForKickingTeamFans)
+            newActions.add(RandomPlayersSelected(homeStuns.map { it.id }), PitchInvasion.SelectKickingTeamAffectedPlayers)
         }
         if (awayStuns.isNotEmpty()) {
-            newActions.add(D3Result(awayStuns.size), PitchInvasion.RollForAwayTeamStuns)
-            newActions.add(RandomPlayersSelected(awayStuns.map { it.id }), PitchInvasion.RollForHomeTeamStuns)
+            newActions.add(D3Result(awayStuns.size), PitchInvasion.RollForReceivingTeamFans)
+            newActions.add(RandomPlayersSelected(awayStuns.map { it.id }), PitchInvasion.SelectReceivingTeamAffectedPlayers)
         }
     }
 }

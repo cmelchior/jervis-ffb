@@ -20,11 +20,10 @@ import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
-import dk.ilios.jervis.reports.LogCategory
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.Duration
+import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.Stab
 
 /**
@@ -56,7 +55,7 @@ object Stiletto : Procedure() {
             return when (action) {
                 is Continue -> {
                    compositeCommandOf(
-                       SimpleLogEntry("No players are able to receive Stiletto", category = LogCategory.GAME_PROGRESS),
+                       ReportGameProgress("No players are able to receive Stiletto"),
                        ExitProcedure(),
                    )
                 }
@@ -67,7 +66,7 @@ object Stiletto : Procedure() {
                         return compositeCommandOf(
                             AddPlayerSkill(player, Stab(isTemporary = true, expiresAt = Duration.END_OF_DRIVE)),
                             SetContext(context.copy(resultApplied = true)),
-                            SimpleLogEntry("${player.name} received Stiletto", category = LogCategory.GAME_PROGRESS),
+                            ReportGameProgress("${player.name} received Stiletto"),
                             ExitProcedure(),
                         )
                     }

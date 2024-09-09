@@ -9,8 +9,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
-import dk.ilios.jervis.reports.LogCategory
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 
 /**
@@ -32,7 +31,7 @@ object UnderScrutiny : Procedure() {
             rules: Rules,
         ): Command {
             return compositeCommandOf(
-                SimpleLogEntry("Do Bad Habits!", category = LogCategory.GAME_PROGRESS),
+                ReportGameProgress("Do Bad Habits!"),
                 ExitProcedure(),
             )
         }

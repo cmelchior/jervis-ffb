@@ -23,12 +23,11 @@ import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
-import dk.ilios.jervis.reports.LogCategory
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Position
-import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.Duration
+import dk.ilios.jervis.rules.skills.Loner
 
 data class IntensiveTrainingContext(
     val player: Player,
@@ -78,7 +77,7 @@ object IntensiveTraining : Procedure() {
                 val skill = it.skill.createSkill(isTemporary = true, expiresAt = Duration.END_OF_GAME)
                 return compositeCommandOf(
                     AddPlayerSkill(context.player, skill),
-                    SimpleLogEntry("${context.player.name} receives ${skill.name} due to Intensive Training", category = LogCategory.GAME_PROGRESS),
+                    ReportGameProgress("${context.player.name} receives ${skill.name} due to Intensive Training"),
                     ExitProcedure()
                 )
             }

@@ -27,9 +27,8 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
-import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.ReportDiceRoll
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 
@@ -50,8 +49,12 @@ data class OfficiousRefContext(
  * Procedure for handling the Kick-Off Event: "Officious Ref" as described on page 41
  * of the rulebook.
  *
- * Designer's Commentary:
- * Each team and roll as gotten its own node, since all the permutations created a pretty big
+ * Developer's Commentary:
+ * It isn't defined in the rules, which team resolve their roll first, so we have just
+ * decided on the receiving team (it shouldn't matter either, since there is currently no
+ * way to affect the rolls)
+ *
+ * Also, each team and roll has gotten its own node, since all the permutations created a pretty big
  * mess in fewer nodes.
  */
 object OfficiousRef : Procedure() {
@@ -70,7 +73,7 @@ object OfficiousRef : Procedure() {
                 val result =  d6.value + fanFactor
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_FAN_FACTOR, d6),
-                    SimpleLogEntry("${state.kickingTeam.name} rolled [ ${d6.value} + $fanFactor = $result ]", category = LogCategory.GAME_PROGRESS),
+                    ReportGameProgress("${state.kickingTeam.name} rolled [ ${d6.value} + $fanFactor = $result ]"),
                     SetContext(OfficiousRefContext(
                         kickingTeamRoll = d6,
                         kickingTeamFanFactor = fanFactor,
@@ -93,7 +96,7 @@ object OfficiousRef : Procedure() {
                 val result =  d6.value + fanFactor
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.OFFICIOUS_REF_FAN_FACTOR, d6),
-                    SimpleLogEntry("${state.receivingTeam.name} rolled [ ${d6.value} + $fanFactor = $result ]", category = LogCategory.GAME_PROGRESS),
+                    ReportGameProgress("${state.receivingTeam.name} rolled [ ${d6.value} + $fanFactor = $result ]"),
                     SetContext(state.getContext<OfficiousRefContext>().copy(
                         receivingTeamRoll = d6,
                         receivingTeamFanFactor = fanFactor,
@@ -168,7 +171,7 @@ object OfficiousRef : Procedure() {
                 // Since all rolls have been made at this point, just exit
                 Continue -> {
                     compositeCommandOf(
-                        SimpleLogEntry("No players from ${state.kickingTeam.name} are on the field", category = LogCategory.GAME_PROGRESS),
+                        ReportGameProgress("No players from ${state.kickingTeam.name} are on the field"),
                         ExitProcedure()
                     )
                 }
@@ -178,7 +181,7 @@ object OfficiousRef : Procedure() {
                         val player = selectAction.getPlayers(state).first()
                         return compositeCommandOf(
                             SetContext(context.copy(receivingTeamPlayerSelected = player)),
-                            GotoNode(RollForKickingTeamPlayer)
+                            GotoNode(RollForReceivingTemSelectedPlayer)
                         )
                     }
                 }
@@ -186,7 +189,7 @@ object OfficiousRef : Procedure() {
         }
     }
 
-    object RollForKickingTeamPlayer: ActionNode() {
+    object RollForReceivingTemSelectedPlayer: ActionNode() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -223,11 +226,11 @@ object OfficiousRef : Procedure() {
             1 -> compositeCommandOf(
                 SetPlayerState(player, PlayerState.BANNED),
                 SetPlayerLocation(player, DogOut),
-                SimpleLogEntry("${player.name} angered the Ref and was Sent-off", category = LogCategory.GAME_PROGRESS)
+                ReportGameProgress("${player.name} angered the Ref and was Sent-off")
             )
             else -> compositeCommandOf(
                 SetPlayerState(player, PlayerState.STUNNED),
-                SimpleLogEntry("${player.name} came to blows with the Ref and was Stunned", category = LogCategory.GAME_PROGRESS),
+                ReportGameProgress("${player.name} came to blows with the Ref and was Stunned"),
             )
         }
     }

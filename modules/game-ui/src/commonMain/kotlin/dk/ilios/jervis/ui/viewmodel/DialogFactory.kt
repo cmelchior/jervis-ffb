@@ -313,9 +313,13 @@ object DialogFactory {
                 is OfficiousRef.ReceivingTeamRollDie -> {
                     DiceRollUserInputDialog.createOfficiousRefRollDialog(controller.state.kickingTeam)
                 }
-                is OfficiousRef.RollForPlayer -> {
+                is OfficiousRef.RollForReceivingTemSelectedPlayer -> {
                     val context = controller.state.getContext<OfficiousRefContext>()
-                    DiceRollUserInputDialog.createOfficiousRefPlayerRollDialog(context.currentPlayer!!)
+                    DiceRollUserInputDialog.createOfficiousRefPlayerRollDialog(context.receivingTeamPlayerSelected!!)
+                }
+                is OfficiousRef.RollForKickingTeamSelectedPlayer -> {
+                    val context = controller.state.getContext<OfficiousRefContext>()
+                    DiceRollUserInputDialog.createOfficiousRefPlayerRollDialog(context.kickingTeamPlayerSelected!!)
                 }
 
                 else -> {

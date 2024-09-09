@@ -650,9 +650,71 @@ class KickOffEventTests: JervisGameTest() {
 
 
     @Test
-    @Ignore
-    fun PitchInvasion() {
-
+    fun pitchInvasion() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(6.d6, 6.d6), // Roll Pitch Invasion
+                    6.d6, // Home team rolls
+                    3.d6, // Away team rolls
+                    2.d3, // Affected players on Receiving team
+                    RandomPlayersSelected(listOf("A1".playerId, "A2".playerId, "A3".playerId)),
+                )
+            )
+        )
+        assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
     }
 
+    @Test
+    fun pitchInvasion_bothTeams() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(6.d6, 6.d6), // Roll Pitch Invasion
+                    6.d6, // Home team rolls
+                    4.d6, // Away team rolls
+                    2.d3, // Affected players on Receiving team
+                    RandomPlayersSelected(listOf("A1".playerId, "A3".playerId)),
+                    1.d3, // Affected players on Kicking team
+                    RandomPlayersSelected(listOf("H1".playerId)),
+                )
+            )
+        )
+        assertEquals(2, awayTeam.count { it.state == PlayerState.STUNNED })
+        assertEquals(1, homeTeam.count { it.state == PlayerState.STUNNED })
+        assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
+        assertEquals(PlayerState.STUNNED, state.getPlayerById("A3".playerId).state)
+        assertEquals(PlayerState.STUNNED, state.getPlayerById("H1".playerId).state)
+    }
+
+    @Test
+    fun pitchInvasion_noPlayersOnField() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup()
+        )
+        // Fake it, by moving all kickoff players back to Dogout after setup
+        homeTeam.forEach {
+            it.state = PlayerState.RESERVE
+            it.location = DogOut
+        }
+        controller.rollForward(
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceResults(6.d6, 6.d6), // Roll Officious Ref
+                    1.d6, // Home team rolls
+                    6.d6, // Away team rolls
+                    3.d3 // 3 players affected, but none are available
+                )
+            )
+        )
+        assertEquals(TeamTurn.SelectPlayerOrEndTurn, controller.currentNode())
+    }
 }

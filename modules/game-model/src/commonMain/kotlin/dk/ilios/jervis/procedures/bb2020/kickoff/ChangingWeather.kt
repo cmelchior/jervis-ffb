@@ -17,8 +17,7 @@ import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.Scatter
 import dk.ilios.jervis.procedures.ScatterRollContext
 import dk.ilios.jervis.procedures.WeatherRoll
-import dk.ilios.jervis.reports.LogCategory
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Weather
 
@@ -29,7 +28,7 @@ import dk.ilios.jervis.rules.tables.Weather
 object ChangingWeather : Procedure() {
     override val initialNode: Node = ChangeWeather
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        return SimpleLogEntry("Rolled Changing Weather", category = LogCategory.GAME_PROGRESS)
+        return ReportGameProgress("Rolled Changing Weather")
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 

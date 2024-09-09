@@ -7,4 +7,5 @@ import dk.ilios.jervis.actions.GameAction
  */
 class ReportHandleAction(val action: GameAction) : SimpleLogEntry(
     message = "Selected action: $action",
+    category = LogCategory.STATE_MACHINE
 )

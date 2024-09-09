@@ -25,12 +25,11 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
-import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.ReportDiceRoll
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -107,13 +106,13 @@ object ResolveThrowARock : Procedure() {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROW_A_ROCK, d6),
                         SetPlayerState(context.currentPlayer!!, PlayerState.KNOCKED_DOWN),
-                        SimpleLogEntry("${state.activeTeam} hit ${context.currentPlayer!!.name} with a rock", category = LogCategory.GAME_PROGRESS),
+                        ReportGameProgress("${state.activeTeam} hit ${context.currentPlayer!!.name} with a rock"),
                         GotoNode(ResolveInjuryByRock),
                     )
                 } else {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROW_A_ROCK, d6),
-                        SimpleLogEntry("${state.activeTeam} ignores ${context.currentPlayer!!.name}", category = LogCategory.GAME_PROGRESS),
+                        ReportGameProgress("${state.activeTeam} ignores ${context.currentPlayer!!.name}"),
                         GotoNode(SelectPlayer),
                     )
                 }

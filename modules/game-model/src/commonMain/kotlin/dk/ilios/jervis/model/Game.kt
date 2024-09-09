@@ -1,6 +1,5 @@
 package dk.ilios.jervis.model
 
-import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.model.context.ContextHolder
 import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.procedures.DeviateRollContext
@@ -65,18 +64,6 @@ class Game(
     var goalScored: Boolean = false
     var activePlayer: Player? = null
     var kickingPlayer: Player? = null // TODO Move into a context?
-    class DicePool {
-
-    }
-
-//    val pool = buildDicePool(type) {
-//        add(1.d6)
-//        add(2.d6)
-//    }
-//
-//    pool.canReroll(state)
-//    pool.createRerol
-//    val diceRolls: MutableList<DicePool> = mutableListOf()
 
     // Kick-off events are not considered any teams turn, which means
     // a number of rules are not applicable there.
@@ -114,12 +101,6 @@ class Game(
     var moveStepTarget: Pair<FieldCoordinate, FieldCoordinate>? = null
     var coinSideSelected: Coin? = null
     var coinResult: Coin? = null
-    var pitchInvasionHomeRoll: D6Result? = null
-    var pitchInvasionAwayRoll: D6Result? = null
-    var pitchInvasionHomeResult: Int = 0
-    var pitchInvasionAwayResult: Int = 0
-    var pitchInvasionHomeTeamPlayersAffected: Int = 0
-    var pitchInvasionAwayTeamPlayersAffected: Int = 0
 
     // Context objects are state holders used by procedures
     // when they need to track state between nodes

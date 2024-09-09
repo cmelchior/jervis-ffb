@@ -19,7 +19,7 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
-import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.PrayerStatModifier
 
@@ -52,7 +52,7 @@ object GreasyCleats : Procedure() {
             return when(action) {
                 Continue -> {
                    compositeCommandOf(
-                       SimpleLogEntry("No players are eligible to receive Greasy Cleats"),
+                       ReportGameProgress("No players are eligible to receive Greasy Cleats"),
                        ExitProcedure()
                    )
                 }
@@ -61,7 +61,7 @@ object GreasyCleats : Procedure() {
                         compositeCommandOf(
                             AddPlayerStatModifier(it.getPlayer(state), PrayerStatModifier.GREASY_CLEATS),
                             SetContext(state.getContext<PrayersToNuffleRollContext>().copy(resultApplied = true)),
-                            SimpleLogEntry("${it.getPlayer(state).name} received Greasy Cleats (-1 MA)"),
+                            ReportGameProgress("${it.getPlayer(state).name} received Greasy Cleats (-1 MA)"),
                             ExitProcedure()
                         )
                     }
