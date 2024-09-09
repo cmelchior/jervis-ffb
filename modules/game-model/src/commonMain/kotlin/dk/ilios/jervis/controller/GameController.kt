@@ -258,7 +258,7 @@ class GameController(
     fun currentNode(): Node? = currentProcedure()?.currentNode()
 
     fun setCurrentNode(nextState: Node) {
-        stack.addNode(nextState)
+        stack.peepOrNull()!!.setCurrentNode(nextState)
     }
 
     fun enableReplayMode() {

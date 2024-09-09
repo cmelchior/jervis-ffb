@@ -34,7 +34,7 @@ class ProcedureStack {
 
     // Store the list of procedures currently on the stack.
     // The `history` is used as a Stack (First-In-Last-Out)
-    // Using an ArrayList vs. ArrayDequeue due to a better resize policy
+    // It is using an ArrayList vs. ArrayDequeue due to a better resize policy
     private val history: MutableList<ProcedureState> = mutableListOf()
 
     /**
@@ -70,13 +70,6 @@ class ProcedureStack {
      */
     fun peepOrNull(): ProcedureState? = history.lastOrNull()
 
-
-    // TODO Why is this method here?
-    fun addNode(nextNode: Node) = history.last().setCurrentNode(nextNode)
-
-    // TODO Why is this method here?
-    // fun removeNode() = history.last().removeLast()
-
     /**
      * Returns `true` if the given [Procedure] is part of the current stack.
      */
@@ -86,7 +79,7 @@ class ProcedureStack {
 
     /**
      * Returns the current active [Node].
-     * Will throw [NoSuchElementException] is [isEmpty] returns `true`.
+     * Will throw [NoSuchElementException] if [isEmpty] returns `true`.
      */
     fun currentNode(): Node = history.last().currentNode()
 }
