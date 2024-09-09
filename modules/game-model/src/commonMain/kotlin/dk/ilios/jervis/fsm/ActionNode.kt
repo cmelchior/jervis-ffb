@@ -15,17 +15,23 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 
+/**
+ * Node type that represents the need of a users "action" to progress.
+ *
+ * Actions are described using [ActionDescriptor], while the actual user action
+ * is represented using a [GameAction]
+ */
 abstract class ActionNode : Node {
-    abstract fun getAvailableActions(
-        state: Game,
-        rules: Rules,
-    ): List<ActionDescriptor>
+    /**
+     * Returns the set of valid [GameAction]s that will be accepted by this node.
+     */
+    abstract fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor>
 
-    abstract fun applyAction(
-        action: GameAction,
-        state: Game,
-        rules: Rules,
-    ): Command
+    /**
+     * Calculate all changes that will happen as a consequence of applying a specific
+     * [GameAction] to this node.
+     */
+    abstract fun applyAction(action: GameAction, state: Game, rules: Rules): Command
 
 //    inline fun <reified T : GameAction> checkType(action: GameAction): T {
 //        if (action is T) {

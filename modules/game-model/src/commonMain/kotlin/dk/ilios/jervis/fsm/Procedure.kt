@@ -2,8 +2,8 @@ package dk.ilios.jervis.fsm
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.GotoNode
-import dk.ilios.jervis.commands.RemoveCurrentProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
+import dk.ilios.jervis.commands.fsm.RemoveCurrentProcedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 import kotlinx.serialization.Serializable
@@ -34,10 +34,7 @@ abstract class Procedure {
     }
 
     private class EnterProcedureNode(private val procedure: Procedure) : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 procedure.onEnterProcedure(state, rules),
                 GotoNode(procedure.initialNode),
@@ -46,10 +43,7 @@ abstract class Procedure {
     }
 
     private class ExitProcedureNode(private val procedure: Procedure) : ComputationNode() {
-        override fun apply(
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun apply(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 procedure.onExitProcedure(state, rules),
                 RemoveCurrentProcedure(),

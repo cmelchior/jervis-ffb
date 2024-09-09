@@ -6,7 +6,7 @@ import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node

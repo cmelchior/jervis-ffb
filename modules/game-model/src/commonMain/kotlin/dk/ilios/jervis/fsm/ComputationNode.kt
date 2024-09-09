@@ -9,25 +9,17 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 
 /**
- * Helper node, for making it easier to create "transition" nodes, that just
+ * Helper node type that makes it easier to create "transition" nodes, that just
  * run computations but doesn't require user input.
  */
 abstract class ComputationNode : ActionNode() {
-    abstract fun apply(
-        state: Game,
-        rules: Rules,
-    ): Command
+    abstract fun apply(state: Game, rules: Rules): Command
 
-    override fun getAvailableActions(
-        state: Game,
-        rules: Rules,
-    ): List<ActionDescriptor> = listOf(ContinueWhenReady)
+    override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        return listOf(ContinueWhenReady)
+    }
 
-    override fun applyAction(
-        action: GameAction,
-        state: Game,
-        rules: Rules,
-    ): Command {
+    override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
         return checkType<Continue>(action) {
             apply(state, rules)
         }

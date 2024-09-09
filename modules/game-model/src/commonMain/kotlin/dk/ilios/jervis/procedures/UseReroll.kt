@@ -2,7 +2,7 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetSkillRerollUsed
 import dk.ilios.jervis.commands.SetTeamRerollUsed

@@ -8,7 +8,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node

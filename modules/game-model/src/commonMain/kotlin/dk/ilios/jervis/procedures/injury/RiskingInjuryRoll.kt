@@ -12,8 +12,8 @@ import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetNigglingInjuries
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState

@@ -33,7 +33,7 @@ class RandomModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
     }
 
     private suspend fun useManualAutomatedActions(controller: GameController): Boolean {
-        if (controller.stack.firstOrNull()?.procedure == SetupTeam && controller.stack.firstOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+        if (controller.stack.peepOrNull()?.procedure == SetupTeam && controller.stack.peepOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
             if (controller.state.activeTeam.isHomeTeam()) {
                 handleManualHomeKickingSetup(controller)
             } else {

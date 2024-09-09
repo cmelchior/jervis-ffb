@@ -2,7 +2,7 @@ package dk.ilios.jervis.procedures.actions.block
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.fsm.Node

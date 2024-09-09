@@ -5,8 +5,8 @@ import dk.ilios.jervis.actions.MoveType
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectMoveType
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure

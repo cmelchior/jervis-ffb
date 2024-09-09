@@ -12,8 +12,8 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetActiveTeam
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerLocation

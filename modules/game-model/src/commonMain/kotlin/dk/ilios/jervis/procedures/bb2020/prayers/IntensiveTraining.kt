@@ -9,8 +9,8 @@ import dk.ilios.jervis.actions.SelectSkill
 import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.commands.AddPlayerSkill
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node

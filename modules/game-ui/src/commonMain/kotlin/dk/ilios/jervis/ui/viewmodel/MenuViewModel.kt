@@ -15,7 +15,7 @@ enum class Feature {
 }
 
 class MenuViewModel {
-    lateinit var controller: GameController
+    var controller: GameController? = null
     lateinit var uiActionFactory: UiActionFactory
 
     // Default values .. figure out a way to persist these
@@ -25,25 +25,24 @@ class MenuViewModel {
     )
 
     fun saveGameState(destination: Path) {
-        JervisSerialization.saveToFile(controller, destination)
+        JervisSerialization.saveToFile(controller!!, destination)
     }
 
     fun undoAction() {
-        controller.undoLastAction()
         uiActionFactory.userSelectedAction(Undo)
     }
-
 
     fun toggleFeature(rerollSuccessfulActions: Feature, enabled: Boolean) {
         features[rerollSuccessfulActions] = enabled
     }
 
     fun isFeatureEnabled(feature: Feature): Boolean {
-        return features[feature] ?: false
+        val isUndoing = controller?.lastActionWasUndo ?: false
+        return !isUndoing && (features[feature] ?: false)
     }
 
     fun loadSetup(id: String) {
-        val state = controller.state
+        val state = controller!!.state
         val setupActions = Setups.setups[id]!!.flatMap { (playerNo, fieldCoordinate) ->
             listOf(
                 PlayerSelected(state.activeTeam[playerNo].id),

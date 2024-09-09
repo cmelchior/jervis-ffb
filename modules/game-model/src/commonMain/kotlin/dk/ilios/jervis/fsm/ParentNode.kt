@@ -1,7 +1,7 @@
 package dk.ilios.jervis.fsm
 
 import compositeCommandOf
-import dk.ilios.jervis.commands.ChangeParentNodeState
+import dk.ilios.jervis.commands.fsm.ChangeParentNodeState
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.EnterProcedure
 import dk.ilios.jervis.model.Game
@@ -16,18 +16,37 @@ import dk.ilios.jervis.rules.Rules
  * control state and flow after entering and exiting the child procedure.
  */
 abstract class ParentNode : Node {
+
+    /**
+     * The state of the [ParentNode].
+     * This is only used for internal bookkeeping.
+     */
     enum class State {
         ENTERING,
         RUNNING,
         EXITING,
     }
 
-    override fun name(): String = this::class.simpleName!!
-
+    /**
+     * Returns the [Procedure] this node should load and go into.
+     */
     abstract fun getChildProcedure(state: Game, rules: Rules): Procedure
 
+    /**
+     * Called just before loading the child procedure. It is called on the level of the
+     * [ParentNode] and not the procedure returned by [getChildProcedure].
+     *
+     * This makes it possible to define some state required by the child procedure.
+     */
     open fun onEnterNode(state: Game, rules: Rules): Command? = null
 
+    /**
+     * Called when the child procedure has fully completed. It is called on the level of
+     * the [ParentNode] and not the procedure returned by [getChildProcedure].
+     *
+     * This method is responsible for determining where the FSM should transition
+     * to next.
+     */
     abstract fun onExitNode(state: Game, rules: Rules): Command
 
     // This method should only be called by `GameController`
@@ -45,7 +64,7 @@ abstract class ParentNode : Node {
         return compositeCommandOf(
             // Manipulate the stack by moving to the EXIT state before loading the
             // child procedure. That way, when the child procedure exits, it will
-            // return in the correct state.
+            // return to the correct state.
             ChangeParentNodeState(State.EXITING),
             EnterProcedure(getChildProcedure(state, rules)),
         )

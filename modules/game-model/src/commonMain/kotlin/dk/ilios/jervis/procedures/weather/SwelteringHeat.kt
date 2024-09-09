@@ -9,8 +9,8 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
-import dk.ilios.jervis.commands.GotoNode
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetActiveTeam
 import dk.ilios.jervis.commands.SetContext

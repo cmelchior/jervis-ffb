@@ -20,6 +20,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.LogEntry
+import dk.ilios.jervis.reports.ReportAvailableActions
 import dk.ilios.jervis.reports.ReportHandleAction
 import dk.ilios.jervis.reports.SimpleLogEntry
 import dk.ilios.jervis.rules.Rules
@@ -55,6 +56,10 @@ class GameController(
     private var replayMode: Boolean = false
     private var replayIndex: Int = -1
     private val isStopped = false
+    // Track if last action is UNDO, because we want to disable all automatic actions in that case,
+    // Not sure if this is the best way to do that. I guess we could extend the GameAction interface
+    // with a `source` hint, but is that overkill?
+    var lastActionWasUndo = false
 
     private suspend fun processNode(
         currentNode: Node,
@@ -78,13 +83,14 @@ class GameController(
                 val selectedAction = if (actions.size == 1 && actions.first() == ContinueWhenReady) {
                     Continue
                 } else {
-                    val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}", LogCategory.STATE_MACHINE)
+                    val reportAvailableActions = ReportAvailableActions(actions)
                     commands.add(reportAvailableActions)
                     reportAvailableActions.execute(state, this)
                     actionProvider(this@GameController, actions)
                 }
 
                 if (selectedAction != Undo) {
+                    lastActionWasUndo = false
                     val reportSelectedAction = ReportHandleAction(selectedAction)
                     commands.add(reportSelectedAction)
                     reportSelectedAction.execute(state, this)
@@ -93,14 +99,14 @@ class GameController(
                     command.execute(state, this)
                     state.notifyUpdate()
                 } else {
-                    // TODO Is this the correct thing to do here?
+                    lastActionWasUndo = true
                     undoLastAction()
                 }
             }
 
             is ParentNode -> {
                 val commands =
-                    when (stack.firstOrNull()!!.currentParentNodeState()) {
+                    when (stack.peepOrNull()!!.getParentNodeState()) {
                         ParentNode.State.ENTERING -> currentNode.enterNode(state, rules)
                         ParentNode.State.RUNNING -> currentNode.runNode(state, rules)
                         ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
@@ -164,7 +170,7 @@ class GameController(
                 is ActionNode -> throw IllegalStateException("Should not happen")
                 is ParentNode -> {
                     val commands =
-                        when (stack.firstOrNull()!!.currentParentNodeState()) {
+                        when (stack.peepOrNull()!!.getParentNodeState()) {
                             ParentNode.State.ENTERING -> currentNode.enterNode(state, rules)
                             ParentNode.State.RUNNING -> currentNode.runNode(state, rules)
                             ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
@@ -200,7 +206,9 @@ class GameController(
     suspend fun startCallbackMode(actionProvider: suspend (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction) {
         val backupActionProvider: suspend (GameController, List<ActionDescriptor>) -> GameAction = { controller: GameController, availableActions: List<ActionDescriptor> ->
             actionProvider(controller, availableActions).also { selectedAction ->
-                actionHistory.add(selectedAction)
+                if (selectedAction != Undo) {
+                    actionHistory.add(selectedAction)
+                }
             }
         }
         setupInitialStartingState()
@@ -245,16 +253,12 @@ class GameController(
         return stack.popProcedure()
     }
 
-    fun currentProcedure(): ProcedureState? = stack.firstOrNull()
+    fun currentProcedure(): ProcedureState? = stack.peepOrNull()
 
     fun currentNode(): Node? = currentProcedure()?.currentNode()
 
-    fun addNode(nextState: Node) {
+    fun setCurrentNode(nextState: Node) {
         stack.addNode(nextState)
-    }
-
-    fun removeNode() {
-        stack.removeNode()
     }
 
     fun enableReplayMode() {
@@ -270,6 +274,7 @@ class GameController(
     }
 
     // Revert last action
+    // Will only revert back until
     fun undoLastAction() {
         if (replayMode) {
             throw IllegalStateException(
@@ -277,13 +282,28 @@ class GameController(
             )
         }
         if (actionHistory.isEmpty()) return
-        while (commands.last() !is ReportHandleAction && actionHistory.last() != (commands.last() as? ReportHandleAction)?.action) {
-            val i = commands.size - 1
-            val undoCommand = commands[i]
-            undoCommand.undo(state, this)
-            commands.removeLast()
+        // User actions are always prefixed with a `ReportHandleAction` command
+        // So the way to revert a user action is to remove commands from the command
+        // list until we see an action of that type. Once we do that, we can remove
+        // the ReportHandleAction and then finally the action.
+
+        // Remove initial logs for the current node that is waiting for input.
+        while (commands.last() is ReportHandleAction || commands.last() is ReportAvailableActions) {
+            commands.removeLast().undo(state, this)
         }
-        commands.removeLast().undo(state, this)
+
+        // Now revert all commands from the last action
+        while (commands.last() !is ReportHandleAction)  {
+            val undoCommand = commands.removeLast()
+            undoCommand.undo(state, this)
+        }
+
+        // Then remove the logs describing entering that node
+        while (commands.last() is ReportHandleAction || commands.last() is ReportAvailableActions) {
+            commands.removeLast().undo(state, this)
+        }
+
+        // Finally, remove the entry from the action history
         actionHistory.removeLast()
         state.notifyUpdate()
     }

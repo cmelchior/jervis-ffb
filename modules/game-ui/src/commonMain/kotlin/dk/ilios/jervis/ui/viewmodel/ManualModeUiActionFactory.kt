@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.reflect.KClass
 
-class ManualModeUiActionFactory(model: GameScreenModel, private val actions: List<GameAction>) : UiActionFactory(
+class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedActions: List<GameAction>) : UiActionFactory(
     model,
 ) {
     override suspend fun start(scope: CoroutineScope) {
@@ -79,8 +79,8 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
             var initialActionsIndex = 0
             emitToField(WaitingForUserInput)
             val actionProvider: suspend (GameController, List<ActionDescriptor>) -> GameAction = { controller: GameController, availableActions: List<ActionDescriptor> ->
-                if (initialActionsIndex < actions.size) {
-                    val action = actions[initialActionsIndex]
+                if (initialActionsIndex < preloadedActions.size - 1) {
+                    val action = preloadedActions[initialActionsIndex]
                     initialActionsIndex++
                     action
                 } else {
@@ -124,7 +124,6 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val actions: Lis
         controller: GameController,
         actions: List<ActionDescriptor>,
     ): GameAction? {
-
         if (model.menuViewModel.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) {
             if (actions.filterIsInstance<SelectNoReroll>().count { it.rollSuccessful == true} > 0) {
                 return NoRerollSelected

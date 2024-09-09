@@ -1,60 +1,64 @@
 package dk.ilios.jervis.fsm
 
-import dk.ilios.jervis.utils.assert
+/**
+ * Class responsible for tracking the current state of a single [Procedure].
+ */
+class ProcedureState(val procedure: Procedure, initialNode: Node) {
 
-class ProcedureState(val procedure: Procedure) {
-    // Track events related to ParentNode. It should only be allowed to modify this
-    // if the currentNode is a ParentNode
-    private val nodes: MutableList<Node> = mutableListOf()
-    private val parentNodeStates: MutableList<ParentNode.State> = mutableListOf()
-    constructor(procedure: Procedure, initialNode: Node) : this(procedure) {
-        nodes.add(initialNode)
-    }
+    // Tracks the current active node
+    private var activeNode: Node = initialNode
+
+    // Track state related to ParentNode. It should only be allowed to modify this
+    // if `currentNode` is a ParentNode
+    private var parentNodeState: ParentNode.State? = null
+
     private constructor(
         procedure: Procedure,
-        history: List<Node>,
-        parentNodeStatesHistory: List<ParentNode.State>,
-    ) : this(procedure) {
-        nodes.addAll(history)
-        parentNodeStates.addAll(parentNodeStatesHistory)
+        history: Node,
+        parentNodeState: ParentNode.State?,
+    ) : this(procedure, history) {
+        this.parentNodeState = parentNodeState
     }
 
-    fun currentParentNodeState(): ParentNode.State {
-        return parentNodeStates.last()
+    /**
+     * If the current node is a [ParentNode], this will return its [ParentNode.State].
+     * If it is any other type, an [IllegalStateException] is thrown.
+     */
+    fun getParentNodeState(): ParentNode.State {
+        if (activeNode !is ParentNode) throw IllegalStateException("Current state is not a ParentNode: $activeNode")
+        return parentNodeState!!
     }
 
-    fun currentNode(): Node = nodes.last()
+    /**
+     * Returns the current active node.
+     */
+    fun currentNode(): Node = activeNode
 
-    fun addNode(node: Node) {
-        nodes.add(node)
+    /**
+     * Sets the node that is currently active.
+     */
+    fun setCurrentNode(node: Node) {
+        activeNode = node
     }
 
+    /**
+     * Creates a deep copy of the entire state object.
+     */
     fun copy(): ProcedureState {
-        return ProcedureState(procedure, nodes.map { it }, parentNodeStates)
+        return ProcedureState(procedure, activeNode, parentNodeState)
     }
 
+    /**
+     * Returns a name describing this state object.
+     */
     fun name(): String = procedure.name()
 
     override fun toString(): String {
-        return "${name()}[${nodes.lastOrNull()?.name()}]"
+         return "${name()}[${activeNode.name()}]"
     }
 
-    fun removeLast() {
-        nodes.removeLast()
-    }
-
-    fun gotoExit() {
-        nodes.add(procedure.exitNode)
-    }
-
-    fun addParentNodeState(nextState: ParentNode.State) {
-        parentNodeStates.add(nextState)
-    }
-
-    fun removeParentNodeState(nextState: ParentNode.State) {
-        assert(parentNodeStates.isNotEmpty())
-        if (parentNodeStates.last() == nextState) {
-            parentNodeStates.removeLast()
-        }
+    fun setParentNodeState(nextState: ParentNode.State?) {
+        if (activeNode !is ParentNode) throw IllegalStateException("Current state is not a ParentNode: $activeNode")
+        parentNodeState = nextState
     }
 }

@@ -2,7 +2,7 @@ package dk.ilios.jervis.procedures.actions.pass
 
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.ExitProcedure
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
