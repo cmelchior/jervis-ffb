@@ -15,6 +15,7 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
@@ -38,6 +39,7 @@ object KnuckleDusters : Procedure() {
     }
 
     object ChoosePlayer : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val availablePlayers = context.team

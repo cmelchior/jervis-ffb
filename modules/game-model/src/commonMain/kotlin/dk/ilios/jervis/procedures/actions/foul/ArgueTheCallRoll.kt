@@ -11,14 +11,15 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
-import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.DiceModifier
@@ -42,14 +43,14 @@ enum class ArgueTheCallRollModifier(
  * determine what to do with the result.
  */
 object ArgueTheCallRoll: Procedure() {
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<FoulContext>()
-    }
     override val initialNode: Node = RollDice
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<FoulContext>()
 
     object RollDice : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -85,6 +86,8 @@ object ArgueTheCallRoll: Procedure() {
     // If the team rolled "Friends with the Ref" on Prayers of Nuffle, they have the
     // option of modifying the final result. This choice is handled here.
     object ResolveFriendsWithTheReferences : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(ConfirmWhenReady, CancelWhenReady)
         }
@@ -98,9 +101,7 @@ object ArgueTheCallRoll: Procedure() {
                         INVALID_GAME_STATE("Wrong value for Friends with the Ref: ${context.argueTheCallRoll}")
                     }
                     compositeCommandOf(
-                        SetContext(context.copy(
-                            argueTheCallResult = ArgueTheCallResult.WELL_IF_YOU_PUT_IT_LIKE_THAT
-                        )),
+                        SetContext(context.copy(argueTheCallResult = ArgueTheCallResult.WELL_IF_YOU_PUT_IT_LIKE_THAT)),
                         ExitProcedure()
                     )
                 }

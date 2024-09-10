@@ -12,12 +12,12 @@ import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -25,6 +25,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
@@ -64,22 +65,14 @@ data class FoulContext(
 @Serializable
 object FoulAction : Procedure() {
     override val initialNode: Node = SelectFoulTargetOrCancel
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
             SetContext(FoulContext(player))
         )
     }
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<FoulContext>()
         return compositeCommandOf(
             if (context.victim != null) ReportFoulResult(context) else null,
@@ -95,10 +88,8 @@ object FoulAction : Procedure() {
     }
 
     object SelectFoulTargetOrCancel : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val fouler = state.getContext<FoulContext>().fouler
             val availableTargetPlayers = fouler.team.otherTeam().filter {
                 it.location.isOnField(rules) && (it.state == PlayerState.PRONE || it.state == PlayerState.STUNNED)
@@ -125,6 +116,7 @@ object FoulAction : Procedure() {
     }
 
     object MoveOrFoulOrEndAction : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<FoulContext>()
             val options = mutableListOf<ActionDescriptor>()

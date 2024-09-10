@@ -4,9 +4,10 @@ import compositeCommandOf
 import dk.ilios.jervis.actions.BlockDice
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.RemoveContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -14,6 +15,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.BlockDieRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -66,7 +68,7 @@ object BlockStep : Procedure() {
     ): Command? {
         return compositeCommandOf(
             SetOldContext(Game::blockContext, null),
-            SetOldContext(Game::blockRollResultContext, null),
+            RemoveContext<BlockResultContext>()
         )
     }
 
@@ -134,7 +136,7 @@ object BlockStep : Procedure() {
     object ResolveBlockDie : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             // Select sub procedure based on the result of the die.
-            return when(state.blockRollResultContext!!.result.blockResult) {
+            return when(state.getContext<BlockResultContext>().result.blockResult) {
                 BlockDice.PLAYER_DOWN -> PlayerDown
                 BlockDice.BOTH_DOWN -> BothDown
                 BlockDice.PUSH_BACK -> PushBack

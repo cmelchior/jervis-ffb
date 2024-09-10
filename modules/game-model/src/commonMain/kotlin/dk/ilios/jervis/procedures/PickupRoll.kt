@@ -13,15 +13,16 @@ import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.PickupRollContext
 import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.model.context.assertContext
@@ -50,6 +51,8 @@ object PickupRoll : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PickupRollContext>().player.team
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -70,10 +73,9 @@ object PickupRoll : Procedure() {
 
     // Team Reroll, Pro, Catch (only if failed), other skills
     object ChooseReRollSource : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PickupRollContext>().player.team
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PickupRollContext>()
             val successOnFirstRoll = context.isSuccess
             val pickupPlayer = context.player
@@ -109,11 +111,7 @@ object PickupRoll : Procedure() {
             }
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Continue -> ExitProcedure()
                 NoRerollSelected -> ExitProcedure()
@@ -148,16 +146,11 @@ object PickupRoll : Procedure() {
     }
 
     object ReRollDie : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PickupRollContext>().player.team
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<PickupRollContext>()
                 val updatedContext = context.copy(
@@ -175,11 +168,7 @@ object PickupRoll : Procedure() {
         }
     }
 
-    private fun isPickupSuccess(
-        roll: D6Result,
-        target: Int,
-        modifiers: List<DiceModifier>,
-    ): Boolean {
+    private fun isPickupSuccess(roll: D6Result, target: Int, modifiers: List<DiceModifier>): Boolean {
         return when(roll.value) {
             1 -> false
             in 2..5 -> roll.value != 1 && (target <= roll.value + modifiers.sum())

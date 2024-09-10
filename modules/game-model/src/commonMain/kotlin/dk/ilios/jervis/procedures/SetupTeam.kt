@@ -13,11 +13,12 @@ import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
-import dk.ilios.jervis.commands.SetActivePlayer
+import dk.ilios.jervis.commands.RemoveContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -25,19 +26,32 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
+
+data class SetupTeamContext(
+    val team: Team,
+    var currentPlayer: Player? = null
+): ProcedureContext
 
 object SetupTeam : Procedure() {
     override val initialNode: Node = SelectPlayerOrEndSetup
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<SetupTeamContext>()
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<SetupTeamContext>()
 
     object SelectPlayerOrEndSetup : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<SetupTeamContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            val context = state.getContext<SetupTeamContext>()
             val availablePlayers =
-                state.activeTeam.filter {
+                context.team.filter {
                     val inReserve = (it.location == DogOut && it.state == PlayerState.STANDING)
                     val onField = (it.location is FieldCoordinate && it.state == PlayerState.STANDING)
                     inReserve || onField
@@ -48,24 +62,28 @@ object SetupTeam : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<SetupTeamContext>()
             return when (action) {
-                is PlayerSelected -> {
-                    compositeCommandOf(
-                        SetActivePlayer(action.getPlayer(state)),
-                        GotoNode(PlacePlayer),
-                    )
-                }
                 EndSetup -> GotoNode(EndSetupAndValidate)
-                else -> INVALID_ACTION(action)
+                else -> {
+                    checkTypeAndValue<PlayerSelected>(state, rules, action, this) { playerSelected ->
+                        compositeCommandOf(
+                            SetContext(context.copy(currentPlayer = playerSelected.getPlayer(state))),
+                            GotoNode(PlacePlayer),
+                        )
+                    }
+                }
             }
         }
     }
 
     object PlacePlayer : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam // TODO Using the "active team" is probably not the right thing
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
-            val isHomeTeam = state.kickingTeam.isHomeTeam()
+            val context = state.getContext<SetupTeamContext>()
+            val isHomeTeam = context.team.isHomeTeam()
             val freeFields: List<SelectFieldLocation> =
                 state.field
                     .filter {
@@ -80,7 +98,7 @@ object SetupTeam : Procedure() {
                     .filter { it.isUnoccupied() }
                     .map { SelectFieldLocation.setup(it.coordinate) }
 
-            val playerLocation = state.activePlayer!!.location
+            val playerLocation = context.currentPlayer!!.location
             var playerSquare: List<SelectFieldLocation> = emptyList()
             if (playerLocation is FieldCoordinate) {
                 playerSquare = listOf(SelectFieldLocation.setup(playerLocation))
@@ -89,23 +107,26 @@ object SetupTeam : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<SetupTeamContext>()
+            val player = context.currentPlayer!!
             return when (action) {
-                DogoutSelected ->
+                DogoutSelected -> {
                     compositeCommandOf(
-                        SetPlayerLocation(state.activePlayer!!, DogOut),
-                        SetPlayerState(state.activePlayer!!, PlayerState.STANDING),
-                        SetActivePlayer(null),
+                        SetPlayerLocation(player, DogOut),
+                        SetPlayerState(player, PlayerState.STANDING),
+                        SetContext(context.copy(currentPlayer = null)),
                         GotoNode(SelectPlayerOrEndSetup),
                     )
+                }
                 is FieldSquareSelected -> {
-                    when (state.activeTeam.isHomeTeam()) {
+                    when (context.team.isHomeTeam()) {
                         true -> if (action.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
                         false -> if (action.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)
                     }
                     compositeCommandOf(
-                        SetPlayerLocation(state.activePlayer!!, FieldCoordinate(action.x, action.y)),
-                        SetPlayerState(state.activePlayer!!, PlayerState.STANDING),
-                        SetActivePlayer(null),
+                        SetPlayerLocation(player, FieldCoordinate(action.x, action.y)),
+                        SetPlayerState(player, PlayerState.STANDING),
+                        SetContext(context.copy(currentPlayer = null)),
                         GotoNode(SelectPlayerOrEndSetup),
                     )
                 }
@@ -116,7 +137,8 @@ object SetupTeam : Procedure() {
 
     object EndSetupAndValidate : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            return if (rules.isValidSetup(state, state.activeTeam)) {
+            val context = state.getContext<SetupTeamContext>()
+            return if (rules.isValidSetup(state, context.team)) {
                 ExitProcedure()
             } else {
                 GotoNode(InformOfInvalidSetup)
@@ -125,10 +147,10 @@ object SetupTeam : Procedure() {
     }
 
     object InformOfInvalidSetup : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<SetupTeamContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(ConfirmWhenReady)
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return GotoNode(SelectPlayerOrEndSetup)
         }

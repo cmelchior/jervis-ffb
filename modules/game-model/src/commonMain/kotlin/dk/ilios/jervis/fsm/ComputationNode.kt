@@ -13,6 +13,8 @@ import dk.ilios.jervis.rules.Rules
  * run computations but doesn't require user input.
  */
 abstract class ComputationNode : ActionNode() {
+    override fun actionOwner(state: Game, rules: Rules) = null
+
     abstract fun apply(state: Game, rules: Rules): Command
 
     override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {

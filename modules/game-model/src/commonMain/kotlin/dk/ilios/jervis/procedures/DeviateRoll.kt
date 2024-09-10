@@ -9,14 +9,15 @@ import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
@@ -53,10 +54,10 @@ object DeviateRoll : Procedure() {
     }
 
     object RollDice : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D8, Dice.D6))
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
                 val context = state.deviateRollContext!!

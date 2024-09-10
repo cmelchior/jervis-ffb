@@ -11,12 +11,12 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
@@ -63,6 +63,7 @@ object OfficiousRef : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<OfficiousRefContext>()
 
     object KickingTeamRollDie: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -86,6 +87,7 @@ object OfficiousRef : Procedure() {
     }
 
     object ReceivingTeamRollDie: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -109,6 +111,7 @@ object OfficiousRef : Procedure() {
     }
 
     object SelectPlayerFromReceivingTeam: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<OfficiousRefContext>()
             return if (context.kickingTeamResult >= context.receivingTeamResult) {
@@ -137,6 +140,8 @@ object OfficiousRef : Procedure() {
     }
 
     object RollForKickingTeamSelectedPlayer: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -156,6 +161,7 @@ object OfficiousRef : Procedure() {
     }
 
     object SelectPlayerFromKickingTeam: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<OfficiousRefContext>()
             return if (context.kickingTeamResult <= context.receivingTeamResult) {
@@ -190,6 +196,8 @@ object OfficiousRef : Procedure() {
     }
 
     object RollForReceivingTemSelectedPlayer: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }

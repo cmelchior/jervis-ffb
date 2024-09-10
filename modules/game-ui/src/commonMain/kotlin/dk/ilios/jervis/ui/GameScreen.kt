@@ -3,8 +3,8 @@ package dk.ilios.jervis.ui
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.controller.ActionsRequest
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fumbbl.adapter.FumbblReplayAdapter
 import dk.ilios.jervis.model.Player
@@ -33,7 +33,7 @@ class GameScreenModel(
     private val injectedController: GameController? = null,
 ) : ScreenModel {
     val actionRequestChannel =
-        Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
+        Channel<Pair<GameController, ActionsRequest>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
     val actionSelectedChannel =
         Channel<GameAction>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
     val hoverPlayerFlow =

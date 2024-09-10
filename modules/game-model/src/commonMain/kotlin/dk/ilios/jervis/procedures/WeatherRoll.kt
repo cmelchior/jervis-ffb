@@ -7,12 +7,13 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.SetWeather
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportWeatherResult
 import dk.ilios.jervis.rules.Rules
@@ -29,6 +30,8 @@ object WeatherRoll : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollWeatherDice : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null // TODO Is this always true, e.g. if called from Kick-off Event
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Each coach should role a dice, but just treat this as a single dice roll here
             return listOf(RollDice(Dice.D6, Dice.D6))

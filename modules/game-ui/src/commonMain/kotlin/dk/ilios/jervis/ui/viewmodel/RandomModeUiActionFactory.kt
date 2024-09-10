@@ -22,9 +22,9 @@ class RandomModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
         val start = Clock.System.now()
         controller.startManualMode()
         while (!controller.stack.isEmpty()) {
-            val actions = controller.getAvailableActions()
+            val request = controller.getAvailableActions()
             if (!useManualAutomatedActions(controller)) {
-                val selectedAction = createRandomAction(controller.state, actions)
+                val selectedAction = createRandomAction(controller.state, request.actions)
                 delay(20)
                 controller.processAction(selectedAction)
             }

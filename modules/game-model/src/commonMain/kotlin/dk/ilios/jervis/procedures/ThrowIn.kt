@@ -8,17 +8,18 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Direction
@@ -57,6 +58,8 @@ object ThrowIn : Procedure() {
     ): Command? = null
 
     object RollDirection : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
@@ -78,10 +81,10 @@ object ThrowIn : Procedure() {
     }
 
     object RollDistance : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6, Dice.D6))
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRollList<D6Result>(action) { dice ->
                 assert(dice.size == 2)

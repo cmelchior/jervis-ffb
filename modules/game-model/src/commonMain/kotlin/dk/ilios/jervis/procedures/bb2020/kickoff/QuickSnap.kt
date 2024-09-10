@@ -13,10 +13,10 @@ import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -24,6 +24,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.actions.move.MovePlayerIntoSquare
@@ -52,6 +53,7 @@ object QuickSnap : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<QuickSnapContext>()
 
     object RollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
@@ -68,6 +70,7 @@ object QuickSnap : Procedure() {
     }
 
     object SelectPlayerOrEndSetup: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Max D3 + 3 players must be selected, once a player has moved, it cannot move again
             val context = state.getContext<QuickSnapContext>()
@@ -100,6 +103,7 @@ object QuickSnap : Procedure() {
     }
 
     object SelectSquare: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<QuickSnapContext>()
             val currentLocation = context.currentPlayer!!.location.coordinate
@@ -137,7 +141,7 @@ object QuickSnap : Procedure() {
      * should also not apply to e.g. Blitz which would be a bit weird.
      */
     object MovePlayer: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<QuickSnapContext>()
             return SetContext(MovePlayerIntoSquareContext(
                 player = context.currentPlayer!!,

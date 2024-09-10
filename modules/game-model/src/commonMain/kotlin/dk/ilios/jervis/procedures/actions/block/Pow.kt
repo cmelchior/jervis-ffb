@@ -2,17 +2,17 @@ package dk.ilios.jervis.procedures.actions.block
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.injury.KnockedDown
 import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.reports.ReportPowResult
@@ -20,19 +20,15 @@ import dk.ilios.jervis.rules.Rules
 
 object Pow: Procedure() {
     override val initialNode: Node = ResolvePush
-
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val pushContext = createPushContext(state)
         return compositeCommandOf(
             ReportPowResult(pushContext.pusher, pushContext.pushee),
-            SetOldContext(Game::pushContext, pushContext)
+            SetContext(pushContext)
         )
     }
-
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        return compositeCommandOf(
-            SetOldContext(Game::pushContext, null)
-        )
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        return RemoveContext<PushContext>()
     }
 
     // Push the player, including chain pushes
@@ -40,7 +36,7 @@ object Pow: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStep
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.blockRollResultContext!!
+            val context = state.getContext<BlockResultContext>()
             return if (context.defender.location.isOnField(rules)) {
                 val injuryContext = RiskingInjuryContext(context.defender)
                 compositeCommandOf(

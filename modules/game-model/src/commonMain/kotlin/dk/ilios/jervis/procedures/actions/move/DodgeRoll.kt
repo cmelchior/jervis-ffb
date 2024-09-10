@@ -19,11 +19,11 @@ import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetSkillUsed
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -31,6 +31,7 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.DodgeRollContext
 import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.model.context.assertContext
@@ -93,20 +94,20 @@ import dk.ilios.jervis.utils.sum
  * which case, you wouldn't want to apply them after a reroll either.
  *
  * Also, it is unclear from the rules who choose to use skills first, e.g., Break Tackle and
- * Prehensile Tail. In this case, it doesn't matter since they are both "free", but in others
+ * Prehensile Tail. In this case, it doesn't matter since they are both "free", but in other
  * cases it might.
  */
  object DodgeRoll: Procedure() {
     override val initialNode: Node = RollDie
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        state.assertContext<DodgeRollContext>()
-        return null
-    }
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         return ReportDodgeResult(state.getContext<DodgeRollContext>())
     }
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<DodgeRollContext>()
 
     object RollDie: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -156,6 +157,8 @@ import dk.ilios.jervis.utils.sum
      * Choose whether dodging player should use Two Heads (if applicable).
      */
     object ChooseToUseTwoHeads: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             return if (context.player.hasSkill<TwoHeads>()) {
@@ -186,6 +189,8 @@ import dk.ilios.jervis.utils.sum
      * Choose whether dodging player should use Break Tackle (if applicable).
      */
     object ChooseToUseBreakTackle: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             return if (context.player.isSkillAvailable<BreakTackle>()) {
@@ -220,6 +225,8 @@ import dk.ilios.jervis.utils.sum
      * If multiple players have it, only 1 can use it.
      */
     object ChooseToUsePrehensileTail: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team.otherTeam()
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
 
@@ -265,6 +272,8 @@ import dk.ilios.jervis.utils.sum
      * If multiple players has it, only 1 can use it.
      */
     object ChooseToUseDivingTackle: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team.otherTeam()
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
@@ -325,6 +334,8 @@ import dk.ilios.jervis.utils.sum
      * or other sources.
      */
     object ChooseReRollSource : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
+
         override fun getAvailableActions(
             state: Game,
             rules: Rules,
@@ -388,6 +399,8 @@ import dk.ilios.jervis.utils.sum
     }
 
     object ReRollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
+
         override fun getAvailableActions(
             state: Game,
             rules: Rules,

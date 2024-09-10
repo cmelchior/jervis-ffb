@@ -7,13 +7,13 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.MoveType
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerMoveLeft
 import dk.ilios.jervis.commands.SetPlayerRushesLeft
 import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -21,6 +21,7 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.DodgeRollContext
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.RushRollContext
@@ -54,6 +55,7 @@ object StandardMoveStep: Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object SelectTargetSquareOrEndAction: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val player = state.getContext<MoveContext>().player
             val eligibleSquares = calculateOptionsForMoveType(state, rules, player, MoveType.STANDARD)
@@ -176,6 +178,7 @@ object StandardMoveStep: Procedure() {
     }
 
     object CheckIfShadowingIsAvailable: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team.otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             TODO("Not yet implemented")
         }

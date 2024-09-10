@@ -14,17 +14,18 @@ import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerLocation
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.reports.ReportDiceRoll
@@ -51,6 +52,7 @@ object SolidDefense : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<SolidDefenseContext>()
 
     object RollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
@@ -68,6 +70,7 @@ object SolidDefense : Procedure() {
     }
 
     object SelectPlayerOrEndSetup: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Max D3 + 3 players must be selected, including those in the playersMoved list.
             // If player is not already in the playersMoved list, they must be open.
@@ -103,6 +106,7 @@ object SolidDefense : Procedure() {
     }
 
     object PlacePlayer: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<SolidDefenseContext>()
             // Allow players to be placed on the kicking teams side. At this stage, the more
@@ -154,6 +158,7 @@ object SolidDefense : Procedure() {
     }
 
     object InformOfInvalidSetup : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(ConfirmWhenReady)
         }

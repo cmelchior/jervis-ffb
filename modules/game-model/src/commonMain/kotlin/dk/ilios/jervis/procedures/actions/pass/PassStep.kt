@@ -23,6 +23,7 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.Bounce
@@ -52,6 +53,7 @@ object PassStep: Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object DeclareTargetSquare: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PassContext>().thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PassContext>()
             val targetSquares = context.thrower.location.coordinate.getSurroundingCoordinates(rules, rules.rangeRuler.maxDistance)

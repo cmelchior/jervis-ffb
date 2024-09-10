@@ -2,11 +2,12 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetActiveTeam
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetKickingTeam
 import dk.ilios.jervis.commands.SetPlayerLocation
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -24,15 +25,13 @@ object GameDrive : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object SetupKickingTeam : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = SetupTeam
-
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetActiveTeam(state.kickingTeam),
+                SetContext(SetupTeamContext(state.kickingTeam)),
                 ReportSetupKickingTeam(state.kickingTeam),
             )
         }
-
+        override fun getChildProcedure(state: Game, rules: Rules) = SetupTeam
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(SetupReceivingTeam)
         }
@@ -43,7 +42,7 @@ object GameDrive : Procedure() {
 
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetActiveTeam(state.receivingTeam),
+                SetContext(SetupTeamContext(state.receivingTeam)),
                 ReportSetupReceivingTeam(state.receivingTeam),
             )
         }
@@ -69,7 +68,6 @@ object GameDrive : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules) = TheKickOffEvent
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetActiveTeam(state.receivingTeam),
                 GotoNode(Turn),
             )
         }

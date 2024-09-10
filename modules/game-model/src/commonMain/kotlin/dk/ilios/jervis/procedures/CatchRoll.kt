@@ -12,10 +12,10 @@ import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -44,8 +44,8 @@ object CatchRoll : Procedure() {
     override fun isValid(state: Game, rules: Rules) = state.assertContext<CatchRollContext>()
 
     object RollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchRollContext>().catchingPlayer.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val rollContext = state.getContext<CatchRollContext>()
@@ -64,6 +64,7 @@ object CatchRoll : Procedure() {
 
     // Team Reroll, Pro, Catch (only if failed), other skills
     object ChooseReRollSource : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchRollContext>().catchingPlayer.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<CatchRollContext>()
             val availableRerolls = calculateAvailableRerollsFor(
@@ -111,6 +112,7 @@ object CatchRoll : Procedure() {
     }
 
     object ReRollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchRollContext>().catchingPlayer.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->

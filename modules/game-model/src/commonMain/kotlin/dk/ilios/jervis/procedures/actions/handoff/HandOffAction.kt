@@ -9,14 +9,14 @@ import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -24,6 +24,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.procedures.Catch
@@ -51,22 +52,14 @@ data class HandOffContext(
 @Serializable
 object HandOffAction : Procedure() {
     override val initialNode: Node = MoveOrHandOffOrEndAction
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
             SetOldContext(Game::handOffContext, HandOffContext(player))
         )
     }
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.handOffContext!!
         return compositeCommandOf(
             SetOldContext(Game::handOffContext, null),
@@ -81,6 +74,7 @@ object HandOffAction : Procedure() {
     }
 
     object MoveOrHandOffOrEndAction : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.handOffContext!!.thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.handOffContext!!
             val options = mutableListOf<ActionDescriptor>()

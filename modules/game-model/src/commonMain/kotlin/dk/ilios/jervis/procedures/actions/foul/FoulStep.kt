@@ -8,14 +8,14 @@ import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetCoachBanned
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
@@ -25,13 +25,14 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.DefensiveAssistsModifier
 import dk.ilios.jervis.model.modifiers.OffensiveAssistModifier
+import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.ArgueTheCallResult
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -42,12 +43,10 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  * Procedure for handling the Foul part of a [FoulAction].
  */
 object FoulStep: Procedure() {
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<FoulContext>()
-    }
     override val initialNode: Node = CalculateAssists
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<FoulContext>()
 
     object CalculateAssists: ComputationNode() {
         // TODO For now, assume that both sides want all assists to count
@@ -108,6 +107,7 @@ object FoulStep: Procedure() {
     }
 
     object DecideToArgueTheCall: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return if (state.activeTeam.coachBanned) {
                 // If the coach was already banned, they cannot argue the call again.

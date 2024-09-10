@@ -12,11 +12,11 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetActiveTeam
+import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
-import dk.ilios.jervis.commands.SetActiveTeam
-import dk.ilios.jervis.commands.SetOldContext
-import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -24,11 +24,13 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.actions.block.PushStep.ResolvePush
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 data class PushContext(
     val pusher: Player,
@@ -158,18 +160,17 @@ object PushStep: Procedure() {
     // If we end up in the middle of the chain due to this, the rest of the nodes will
     // be executed, but will just require "Continue" if they do not apply
     override val initialNode: Node = DecideToUseJuggernaut
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        if (state.pushContext == null) {
-            INVALID_GAME_STATE("Missing push context")
-        }
-        return null
-    }
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<PushContext>()
+    }
 
     // TODO Is this where we decide on Juggernaut?
     object DecideToUseJuggernaut: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.pushContext!!
+            val context = state.getContext<PushContext>()
             val hasJuggernaut = false // How to check?
             val canUseJuggernaut = !context.pushChain.last().usingJuggernaut
             return when(hasJuggernaut && canUseJuggernaut) {
@@ -186,10 +187,10 @@ object PushStep: Procedure() {
                     is Cancel -> false
                     else -> INVALID_ACTION(action)
                 }
-                val context = state.pushContext!!
+                val context = state.getContext<PushContext>()
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usingJuggernaut = useSkill))
                 return compositeCommandOf(
-                    SetOldContext<PushContext>(Game::pushContext, newContext),
+                    SetContext(newContext),
                     SetActiveTeam(context.pushee.team),
                     GotoNode(DecideToUseStandFirm)
                 )
@@ -200,8 +201,11 @@ object PushStep: Procedure() {
     }
 
     object DecideToUseStandFirm: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? {
+            return state.getContext<PushContext>().pushChain.last().pushee.team
+        }
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.pushContext!!
+            val context = state.getContext<PushContext>()
             val hasStandFirm = false // How to check?
             val canUseStandFirm = !context.pushChain.last().usingJuggernaut
             return when(hasStandFirm && canUseStandFirm) {
@@ -218,10 +222,10 @@ object PushStep: Procedure() {
                     is Cancel -> false
                     else -> INVALID_ACTION(action)
                 }
-                val context = state.pushContext!!
+                val context = state.getContext<PushContext>()
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedStandFirm = useSkill))
                 return compositeCommandOf(
-                    SetOldContext<PushContext>(Game::pushContext, newContext),
+                    SetContext(newContext),
                     SetActiveTeam(context.pusher.team),
                     GotoNode(DecideToUseGrab)
                 )
@@ -233,8 +237,9 @@ object PushStep: Procedure() {
     }
 
     object DecideToUseGrab: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pusher.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.pushContext!!
+            val context = state.getContext<PushContext>()
             val hasGrab = false // How to check?
             val canUseGrab = true // TODO Is this true?
             return when(hasGrab && canUseGrab) {
@@ -251,10 +256,10 @@ object PushStep: Procedure() {
                     is Cancel -> false
                     else -> INVALID_ACTION(action)
                 }
-                val context = state.pushContext!!
+                val context = state.getContext<PushContext>()
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedGrab = useSkill))
                 return compositeCommandOf(
-                    SetOldContext<PushContext>(Game::pushContext, newContext),
+                    SetContext(newContext),
                     SetActiveTeam(context.pushee.team),
                     GotoNode(DecideToUseSidestep)
                 )
@@ -265,8 +270,9 @@ object PushStep: Procedure() {
     }
 
     object DecideToUseSidestep: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pushee.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.pushContext!!.pushChain.last()
+            val context = state.getContext<PushContext>().pushChain.last()
             val hasSidestep = false // How to check?
             val validSideStepTargets = false // If no valid sidestep targets, exist, sidestep cannot be used
             val canUseSidestep = context.usedGrab || context.usedStandFirm
@@ -284,10 +290,10 @@ object PushStep: Procedure() {
                     is Cancel -> false
                     else -> INVALID_ACTION(action)
                 }
-                val context = state.pushContext!!
+                val context = state.getContext<PushContext>()
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedSideStep = useSkill))
                 return compositeCommandOf(
-                    SetOldContext<PushContext>(Game::pushContext, newContext),
+                    SetContext(newContext),
                     GotoNode(DecideToUseFend)
                 )
             } else {
@@ -297,8 +303,9 @@ object PushStep: Procedure() {
     }
 
     object DecideToUseFend: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pushee.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.pushContext!!.pushChain.last()
+            val context = state.getContext<PushContext>().pushChain.last()
             val hasFend = false // How to check?
             val canUseFend = false // How?
             return when(hasFend && canUseFend) {
@@ -315,10 +322,10 @@ object PushStep: Procedure() {
                     is Cancel -> false
                     else -> INVALID_ACTION(action)
                 }
-                val context = state.pushContext!!
+                val context = state.getContext<PushContext>()
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedFend = useSkill))
                 return compositeCommandOf(
-                    SetOldContext<PushContext>(Game::pushContext, newContext),
+                    SetContext(newContext),
                     SetActiveTeam(context.pusher.team),
                     GotoNode(SelectPushDirection)
                 )
@@ -330,8 +337,16 @@ object PushStep: Procedure() {
 
     // Select where to push the player
     object SelectPushDirection: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            val context = state.getContext<PushContext>()
+            return if (context.pushChain.last().usedSideStep) {
+                context.pushChain.last().pushee.team
+            } else {
+                context.pushChain.last().pusher.team
+            }
+        }
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val pushContext = state.pushContext!!
+            val pushContext = state.getContext<PushContext>()
             val lastPushInChain = pushContext.pushChain.last()
             // TODO Add support for skills, right now just go with the default 3 options
             val pushOptions = rules.getPushOptions(lastPushInChain.pusher, lastPushInChain.pushee)
@@ -357,19 +372,19 @@ object PushStep: Procedure() {
                 }
 
                 val isEmpty = isSquaresEmptyForPushing(
-                    state.pushContext!!,
+                    state.getContext<PushContext>(),
                     setOf(action.coordinate),
                     state
                 ).isNotEmpty()
 
-                val context = state.pushContext!!
+                val context = state.getContext<PushContext>()
                 val updatedContext = context.copyModifyPushChain(context.pushChain.last().copy(to = action.coordinate))
 
                 val commands = if (isEmpty) {
                     // Player was moved into an empty square, which means we can start resolving
                     // the entire chain.
                     compositeCommandOf(
-                        SetOldContext(Game::pushContext, updatedContext),
+                        SetContext(updatedContext),
                         GotoNode(ResolvePush)
                     )
                 } else {
@@ -383,7 +398,7 @@ object PushStep: Procedure() {
                     )
                     val newContext = updatedContext.copyAddPushChain(newPush)
                     compositeCommandOf(
-                        SetOldContext(Game::pushContext, newContext),
+                        SetContext(newContext),
                         GotoNode(DecideToUseJuggernaut)
                     )
                 }
@@ -411,7 +426,7 @@ object PushStep: Procedure() {
 
     object ResolvePush: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val context = state.pushContext!!
+            val context = state.getContext<PushContext>()
             val moveCommands = context.pushChain.map { push ->
                 val to = push.to!!
                 if (to == FieldCoordinate.OUT_OF_BOUNDS) {
@@ -431,16 +446,17 @@ object PushStep: Procedure() {
     }
 
     object PushedIntoTheCrowd: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             TODO("Not yet implemented")
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             TODO("Not yet implemented")
         }
     }
 
     object DecideToFollowUp: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<PushContext>().pusher.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Check if it is possible to follow up
             return listOf(
@@ -450,7 +466,7 @@ object PushStep: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.pushContext!!
+            val context = state.getContext<PushContext>()
             val actions = when(action) {
                 is Confirm -> arrayOf(
                     SetPlayerLocation(context.pusher, context.pushChain.first().from)

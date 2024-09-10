@@ -8,15 +8,16 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.AddTeamReroll
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.reports.ReportBrilliantCoachingResult
@@ -41,6 +42,7 @@ object BrilliantCoaching : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<BrilliantCoachingContext>()
 
     object KickingTeamRollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -56,6 +58,7 @@ object BrilliantCoaching : Procedure() {
     }
 
     object ReceivingTeamRollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }

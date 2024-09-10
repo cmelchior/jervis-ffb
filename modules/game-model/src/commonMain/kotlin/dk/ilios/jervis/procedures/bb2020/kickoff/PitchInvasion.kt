@@ -12,11 +12,11 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
@@ -57,6 +57,7 @@ object PitchInvasion : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<PitchInvasionContext>()
 
     object RollForKickingTeamFans : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
@@ -72,6 +73,7 @@ object PitchInvasion : Procedure() {
     }
 
     object RollForReceivingTeamFans : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
@@ -95,6 +97,7 @@ object PitchInvasion : Procedure() {
     }
 
     object RollForReceivingTeamStuns : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D3))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D3Result>(action) { d3 ->
@@ -109,11 +112,11 @@ object PitchInvasion : Procedure() {
     }
 
     object SelectReceivingTeamAffectedPlayers: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PitchInvasionContext>()
             return selectFromTeam(context.receivingPlayersAffected, state.receivingTeam, rules)
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<PitchInvasionContext>()
             val nextNode = if (context.kickingResult == context.receivingResult) GotoNode(RollForKickingTeamStuns) else ExitProcedure()
@@ -143,6 +146,7 @@ object PitchInvasion : Procedure() {
     }
 
     object RollForKickingTeamStuns : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D3))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D3Result>(action) { d3 ->
@@ -157,11 +161,11 @@ object PitchInvasion : Procedure() {
     }
 
     object SelectKickingTeamAffectedPlayers: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PitchInvasionContext>()
             return selectFromTeam(context.kickingPlayersAffected, state.kickingTeam, rules)
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 is Continue -> {

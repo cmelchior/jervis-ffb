@@ -9,15 +9,16 @@ import dk.ilios.jervis.actions.SelectSkill
 import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.commands.AddPlayerSkill
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
-import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
@@ -41,11 +42,10 @@ object IntensiveTraining : Procedure() {
     override val initialNode: Node = SelectPlayer
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<PrayersToNuffleRollContext>()
-    }
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<PrayersToNuffleRollContext>()
 
     object SelectPlayer : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return state.activeTeam
                 .filter { it.state == PlayerState.STANDING }
@@ -64,6 +64,7 @@ object IntensiveTraining : Procedure() {
     }
 
     object SelectSkill : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<IntensiveTrainingContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<IntensiveTrainingContext>()
             return (context.player.position as BB2020Position).primary.flatMap { it.skills }.map {

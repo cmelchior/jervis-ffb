@@ -41,6 +41,7 @@ object ActivateInducements : Procedure() {
     }
 
     object SelectInducement : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ActivateInducementContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<ActivateInducementContext>()
             val currentTrigger = context.timing

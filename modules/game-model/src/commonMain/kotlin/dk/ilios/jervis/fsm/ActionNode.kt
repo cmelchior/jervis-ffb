@@ -12,6 +12,7 @@ import dk.ilios.jervis.actions.SelectSkill
 import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 
@@ -22,6 +23,23 @@ import dk.ilios.jervis.utils.INVALID_ACTION
  * is represented using a [GameAction]
  */
 abstract class ActionNode : Node {
+
+    /**
+     * Returns which team are responsible for sending an action to [applyAction], `null` if
+     * it doesn't matter. In which case, it will be treated as a "System" action.
+     *
+     * Developer's Commentary:
+     * We need to have a way to tell the rest of the system who is responsible for
+     * creating the [GameAction]. It might technically be more correct to store this
+     * inside [Game] or the [ActionDescriptor], but either of these approaches
+     * would make the code quite a bit more convoluted. So for now, we are just
+     * treating it as metadata that are part of a node, similar to [Procedure.initialNode]
+     *
+     * This approach also assumes that any given node only accepts input from
+     * one player. Which (for now) seems a reasonable restriction.
+     */
+    abstract fun actionOwner(state: Game, rules: Rules): Team?
+
     /**
      * Returns the set of valid [GameAction]s that will be accepted by this node.
      */
@@ -33,17 +51,9 @@ abstract class ActionNode : Node {
      */
     abstract fun applyAction(action: GameAction, state: Game, rules: Rules): Command
 
-//    inline fun <reified T : GameAction> checkType(action: GameAction): T {
-//        if (action is T) {
-//            return action
-//        } else {
-//            throw IllegalArgumentException("Action (${action::class}) is not of the expected type: ${T::class}")
-//        }
-//    }
-
     /**
      * Check that not only verify the game action type, but also the value.
-     * This is e.g. relevant when selecting locations or players.
+     * This is, e.g., relevant when selecting locations or players.
      */
     inline fun <reified T : GameAction> checkTypeAndValue(
         state: Game,

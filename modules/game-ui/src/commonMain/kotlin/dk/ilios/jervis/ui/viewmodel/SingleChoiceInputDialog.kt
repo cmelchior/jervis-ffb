@@ -35,7 +35,9 @@ import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.rules.tables.Direction
 
-sealed interface UserInputDialog : UserInput
+sealed interface UserInputDialog : UserInput {
+    var owner: Team?
+}
 
 /**
  * Class wrapping the intent of choosing a single option between many
@@ -45,6 +47,7 @@ data class SingleChoiceInputDialog(
     val title: String,
     val message: String,
     val actionDescriptions: List<Pair<GameAction, String>>,
+    override var owner: Team? = null,
 ) : UserInputDialog {
     override val actions: List<GameAction> = actionDescriptions.map { it.first }
 
@@ -231,7 +234,7 @@ data class SingleChoiceInputDialog(
             )
         }
 
-        fun createUseSkillDialog(player: Player, skill: Skill): UserInput? {
+        fun createUseSkillDialog(player: Player, skill: Skill): UserInputDialog {
             return createWithDescription(
                 title = "Use ${skill.name}",
                 message = "Does ${player.name} want to use ${skill.name}?",
@@ -239,7 +242,7 @@ data class SingleChoiceInputDialog(
             )
         }
 
-        fun createArgueTheCallDialog(context: FoulContext): UserInput {
+        fun createArgueTheCallDialog(context: FoulContext): UserInputDialog {
             return createWithDescription(
                 title = "Argue the call",
                 message = "${context.fouler.name} was caught by the ref. Argue the call?",

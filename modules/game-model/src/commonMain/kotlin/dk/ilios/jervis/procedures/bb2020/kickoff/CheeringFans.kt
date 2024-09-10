@@ -7,10 +7,10 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -45,6 +45,7 @@ object CheeringFans : Procedure() {
     override fun isValid(state: Game, rules: Rules) = state.assertContext<CheeringFansContext>()
 
     object KickingTeamRollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -61,6 +62,7 @@ object CheeringFans : Procedure() {
     }
 
     object ReceivingTeamRollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -127,7 +129,7 @@ object CheeringFans : Procedure() {
     }
 
     object WinnerRollsOnPrayersToNuffle : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<CheeringFansContext>()
             return SetContext(PrayersToNuffleRollContext(context.winner!!, 1))
         }

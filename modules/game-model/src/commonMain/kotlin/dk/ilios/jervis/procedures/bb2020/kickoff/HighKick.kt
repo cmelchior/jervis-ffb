@@ -14,6 +14,7 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
 
@@ -39,6 +40,7 @@ object HighKick : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object SelectPlayer : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val openPlayers = state.receivingTeam
                 .filter { rules.isOpen(it) }

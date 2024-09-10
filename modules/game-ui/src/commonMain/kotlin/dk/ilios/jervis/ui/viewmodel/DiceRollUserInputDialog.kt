@@ -34,11 +34,12 @@ class DiceRollUserInputDialog(
     val message: String,
     val dice: List<Pair<Dice, List<DieResult>>>,
     val result: (DiceResults) -> String?,
+    override var owner: Team? = null
 ) : UserInputDialog {
     override val actions: List<GameAction> = emptyList()
 
     companion object {
-        fun createWeatherRollDialog(rules: Rules): UserInput {
+        fun createWeatherRollDialog(rules: Rules): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Weather roll",
                 message = "Roll 2D6 for the weather",
@@ -125,7 +126,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createArmourRollDialog(player: Player): UserInput {
+        fun createArmourRollDialog(player: Player): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Armour roll",
                 message = "Roll 2D6 to break armour for ${player.name}",
@@ -140,7 +141,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createInjuryRollDialog(rules: Rules, player: Player): UserInput {
+        fun createInjuryRollDialog(rules: Rules, player: Player): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Injury roll",
                 message = "Roll 2D6 for an injury on ${player.name}",
@@ -156,7 +157,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createCasualtyRollDialog(rules: Rules, player: Player): UserInput {
+        fun createCasualtyRollDialog(rules: Rules, player: Player): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Casualty roll",
                 message = "Roll D16 for a casualty on ${player.name}",
@@ -171,7 +172,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createLastingInjuryRollDialog(rules: Rules, player: Player): UserInput {
+        fun createLastingInjuryRollDialog(rules: Rules, player: Player): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Lasting Injury roll",
                 message = "Roll D6 for a Lasting Injury on ${player.name}",
@@ -183,7 +184,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createArgueTheCallRollDialog(context: FoulContext, rules: Rules): UserInput? {
+        fun createArgueTheCallRollDialog(context: FoulContext, rules: Rules): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Argue The Call Roll",
                 message = "Roll D6 to Argue The Call on behalf of ${context.fouler.name}",
@@ -195,7 +196,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createAccuracyRollDialog(passContext: PassContext, rules: Rules): UserInput? {
+        fun createAccuracyRollDialog(passContext: PassContext, rules: Rules): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Test for Accuracy",
                 message = "${passContext.thrower.name} rolls a D6 to test for accuracy when making a pass",
@@ -204,7 +205,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createScatterRollDialog(rules: Rules): UserInput? {
+        fun createScatterRollDialog(rules: Rules): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Scatter Roll",
                 message = "Roll 3D8 to scatter the ball",
@@ -231,7 +232,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createDodgeRollDialog(player: Player, target: FieldCoordinate): UserInput? {
+        fun createDodgeRollDialog(player: Player, target: FieldCoordinate): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Dodge Roll",
                 message = "${player.name} rolls D6 to dodge to ${target.toLogString()}.",
@@ -240,7 +241,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createRushRollDialog(player: Player, target: FieldCoordinate): UserInput {
+        fun createRushRollDialog(player: Player, target: FieldCoordinate): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Rush Roll",
                 message = "${player.name} rolls D6 to rush to ${target.toLogString()}",
@@ -249,7 +250,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createSwelteringHeatRollDialog(): UserInput {
+        fun createSwelteringHeatRollDialog(): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Sweltering Heat Roll",
                 message = "Roll D3 to find number of affected players.",
@@ -258,7 +259,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createPrayersToNuffleRollDialog(rules: Rules, rollsRemaining: Int): UserInput {
+        fun createPrayersToNuffleRollDialog(rules: Rules, rollsRemaining: Int): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Prayer to Nuffle Roll ($rollsRemaining rolls)",
                 message = "Roll D16 to choose a prayer",
@@ -269,7 +270,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createBadHabitsRoll(): UserInput {
+        fun createBadHabitsRoll(): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Bad Habits Roll",
                 message = "Roll D3 to find number of affected players",
@@ -278,7 +279,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createCheeringFansRollDialog(team: Team): UserInput {
+        fun createCheeringFansRollDialog(team: Team): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Cheering Fans Roll",
                 message = "${team.name} rolls a D6 for Cheering Fans",
@@ -287,7 +288,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createBrilliantCoachingRolLDialog(team: Team): UserInput? {
+        fun createBrilliantCoachingRolLDialog(team: Team): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Brilliant Coaching Roll",
                 message = "${team.name} rolls a D6 for Brilliant Coaching",
@@ -296,7 +297,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createOfficiousRefRollDialog(team: Team): UserInput {
+        fun createOfficiousRefRollDialog(team: Team): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Officious Ref Roll",
                 message = "${team.name} rolls a D6 for Officious Ref",
@@ -305,7 +306,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createOfficiousRefPlayerRollDialog(player: Player): UserInput {
+        fun createOfficiousRefPlayerRollDialog(player: Player): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Officious Ref Player Roll",
                 message = "${player.name} rolls a D6 while arguing with the Ref",
@@ -314,7 +315,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createUnknownDiceRoll(dicePool: RollDice): UserInput {
+        fun createUnknownDiceRoll(dicePool: RollDice): UserInputDialog {
             val dice= dicePool.dice.map {
                 when(it) {
                     Dice.D2 -> Pair(it, D2Result.allOptions())

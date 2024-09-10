@@ -9,13 +9,13 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -25,6 +25,7 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
@@ -61,6 +62,7 @@ object MovePlayerIntoSquare : Procedure() {
     }
 
     object RollForTrapdoorIfNeeded : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MovePlayerIntoSquareContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<MovePlayerIntoSquareContext>()
             val hasTrapdoor = state.field[context.target].hasTrapdoor

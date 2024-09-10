@@ -9,13 +9,14 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.AddPlayerSkill
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
@@ -39,6 +40,7 @@ object BlessedStatueOfNuffle : Procedure() {
     }
 
     object SelectPlayer: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val availablePlayers = context.team
@@ -71,6 +73,7 @@ object BlessedStatueOfNuffle : Procedure() {
                         )
                     }
                 }
-            }        }
+            }
+        }
     }
 }

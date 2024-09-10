@@ -7,14 +7,15 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetActiveTeam
 import dk.ilios.jervis.commands.SetFanFactor
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportFanFactor
 import dk.ilios.jervis.rules.Rules
@@ -40,6 +41,8 @@ object FanFactorRolls : Procedure() {
     }
 
     object SetFanFactorForHomeTeam : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.homeTeam
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
@@ -59,18 +62,13 @@ object FanFactorRolls : Procedure() {
     }
 
     object SetFanFactorForAwayTeam : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.awayTeam
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val dedicatedFans = state.awayTeam.dedicatedFans
             return checkDiceRoll<D3Result>(action) {
                 val total = it.value + dedicatedFans

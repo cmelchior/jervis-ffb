@@ -12,16 +12,17 @@ import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.commands.AddPlayerSkill
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.BadHabitsContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
@@ -51,6 +52,7 @@ object BadHabits : Procedure() {
     }
 
     object RollDie: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
@@ -71,6 +73,7 @@ object BadHabits : Procedure() {
     }
 
     object SelectPlayers: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val prayerContext = state.getContext<PrayersToNuffleRollContext>()
             val badHabitsContext = state.getContext<BadHabitsContext>()

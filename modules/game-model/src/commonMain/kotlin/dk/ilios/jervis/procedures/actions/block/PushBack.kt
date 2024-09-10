@@ -2,13 +2,15 @@ package dk.ilios.jervis.procedures.actions.block
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.RemoveContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.reports.ReportPushResult
 import dk.ilios.jervis.rules.Rules
 
@@ -16,7 +18,7 @@ import dk.ilios.jervis.rules.Rules
 // Helper method for creating a push context before moving a player back
 // This is used by all results that push back.
 fun createPushContext(state: Game): PushContext {
-    val blockContext = state.blockRollResultContext!!
+    val blockContext = state.getContext<BlockResultContext>()
     // Setup the context needed to resolve the full push include
     val newContext = PushContext(
         blockContext.attacker,
@@ -44,13 +46,13 @@ object PushBack: Procedure() {
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val newContext = createPushContext(state)
-        return SetOldContext(Game::pushContext, newContext)
+        return SetContext(newContext)
     }
 
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
-        val context = state.pushContext!!
+        val context = state.getContext<PushContext>()
         return compositeCommandOf(
-            SetOldContext(Game::pushContext, null),
+            RemoveContext<PushContext>(),
             ReportPushResult(context.pusher, context.pushChain.first().from)
         )
     }

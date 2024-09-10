@@ -12,8 +12,6 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.ResetAvailableTeamActions
 import dk.ilios.jervis.commands.SetActiveAction
 import dk.ilios.jervis.commands.SetActivePlayer
@@ -24,6 +22,8 @@ import dk.ilios.jervis.commands.SetPlayerStats
 import dk.ilios.jervis.commands.SetSkillUsed
 import dk.ilios.jervis.commands.SetTurnMarker
 import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -91,6 +91,8 @@ object TeamTurn : Procedure() {
     }
 
     object SelectPlayerOrEndTurn : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules) = state.activeTeam
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(EndTurnWhenReady) + getAvailablePlayers(state, rules).map { SelectPlayer(it) }
         }
@@ -111,6 +113,8 @@ object TeamTurn : Procedure() {
     }
 
     object DeselectPlayerOrSelectAction : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules) = state.activeTeam
+
         private fun getAvailableSpecialActions(state: Game, rules: Rules): Set<PlayerAction> {
             return emptySet() // TODO Hypnotic Gaze, Ball & Chain, others?
         }

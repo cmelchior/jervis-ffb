@@ -1,6 +1,5 @@
 package dk.ilios.jervis.ui.viewmodel
 
-import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
@@ -12,6 +11,7 @@ import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectDiceResult
+import dk.ilios.jervis.controller.ActionsRequest
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.context.CatchRollContext
 import dk.ilios.jervis.model.context.MoveContext
@@ -20,6 +20,7 @@ import dk.ilios.jervis.model.context.RushRollContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.CatchRoll
+import dk.ilios.jervis.procedures.CoinTossContext
 import dk.ilios.jervis.procedures.DetermineKickingTeam
 import dk.ilios.jervis.procedures.DeviateRoll
 import dk.ilios.jervis.procedures.FanFactorRolls
@@ -33,8 +34,11 @@ import dk.ilios.jervis.procedures.TheKickOffEvent
 import dk.ilios.jervis.procedures.WeatherRoll
 import dk.ilios.jervis.procedures.actions.block.BlockRoll
 import dk.ilios.jervis.procedures.actions.block.BothDown
+import dk.ilios.jervis.procedures.actions.block.BothDownContext
+import dk.ilios.jervis.procedures.actions.block.PushContext
 import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.actions.block.Stumble
+import dk.ilios.jervis.procedures.actions.block.StumbleContext
 import dk.ilios.jervis.procedures.actions.foul.ArgueTheCallRoll
 import dk.ilios.jervis.procedures.actions.foul.FoulContext
 import dk.ilios.jervis.procedures.actions.foul.FoulStep
@@ -62,13 +66,13 @@ import dk.ilios.jervis.rules.skills.Tackle
  * Class responsible for setting up modal dialogs specifically for dice rolls.
  * If no dialog could be created `null` is returned.
  *
- * Detects if a visible dialog is necessary and return it. `null` if this needs to be handled
+ * Detect if a visible dialog is necessary and return it. `null` if this needs to be handled
  * by some other part of the UI.
  */
 object DialogFactory {
-    fun createDialogIfPossible(controller: GameController, actions: List<ActionDescriptor>, mapUnknownActions: (List<ActionDescriptor>) -> List<GameAction>): UserInput? {
+    fun createDialogIfPossible(controller: GameController, request: ActionsRequest, mapUnknownActions: (ActionsRequest) -> List<GameAction>): UserInput? {
         val rules = controller.rules
-        val userInput =
+        val userInput: UserInputDialog? =
             when (controller.stack.currentNode()) {
 
                 is AccuracyRoll.RollDice -> {
@@ -96,23 +100,23 @@ object DialogFactory {
 
                 is BlockRoll.ReRollDie,
                 is BlockRoll.RollDice -> {
-                    val diceCount = (actions.first() as RollDice).dice.size
+                    val diceCount = (request.actions.first() as RollDice).dice.size
                     DiceRollUserInputDialog.createBlockRollDialog(diceCount, controller.state.blockContext!!.isBlitzing)
                 }
 
                 is BlockRoll.SelectBlockResult -> {
                     DiceRollUserInputDialog.createSelectBlockDie(
-                        actions.first() as SelectDiceResult
+                        request.actions.first() as SelectDiceResult
                     )
                 }
 
                 is BothDown.AttackerChooseToUseBlock -> {
-                    val context = controller.state.bothDownContext!!
+                    val context = controller.state.getContext<BothDownContext>()
                     SingleChoiceInputDialog.createUseSkillDialog(context.attacker, context.attacker.getSkill<Block>())
                 }
 
                 is BothDown.DefenderChooseToUseBlock -> {
-                    val context = controller.state.bothDownContext!!
+                    val context = controller.state.getContext<BothDownContext>()
                     SingleChoiceInputDialog.createUseSkillDialog(context.defender, context.defender.getSkill<Block>())
                 }
 
@@ -160,7 +164,8 @@ object DialogFactory {
                             Confirm to "Kickoff",
                             Cancel to "Receive",
                         )
-                    SingleChoiceInputDialog.createChooseToKickoffDialog(controller.state.activeTeam, choices)
+                    val context = controller.state.getContext<CoinTossContext>()
+                    SingleChoiceInputDialog.createChooseToKickoffDialog(context.winner!!, choices)
                 }
 
                 is DetermineKickingTeam.CoinToss -> {
@@ -169,7 +174,7 @@ object DialogFactory {
 
                 is DetermineKickingTeam.SelectCoinSide -> {
                     SingleChoiceInputDialog.createSelectKickoffCoinTossResultDialog(
-                        controller.state.activeTeam,
+                        controller.state.awayTeam,
                         CoinSideSelected.allOptions(),
                     )
                 }
@@ -231,7 +236,7 @@ object DialogFactory {
 
                 is PushStep.DecideToFollowUp -> {
                     SingleChoiceInputDialog.createFollowUpDialog(
-                        controller.state.pushContext!!.pusher
+                        controller.state.getContext<PushContext>().pusher
                     )
                 }
 
@@ -277,12 +282,12 @@ object DialogFactory {
                 }
 
                 is Stumble.ChooseToUseDodge -> {
-                    val defender = controller.state.stumbleContext!!.defender
+                    val defender = controller.state.getContext<StumbleContext>().defender
                     SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Dodge>())
                 }
 
                 is Stumble.ChooseToUseTackle -> {
-                    val defender = controller.state.stumbleContext!!.attacker
+                    val defender = controller.state.getContext<StumbleContext>().attacker
                     SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Tackle>())
                 }
 
@@ -327,10 +332,14 @@ object DialogFactory {
                 }
             }
 
-        return if (userInput == null && actions.size == 1 && actions.first() is RollDice) {
-            DiceRollUserInputDialog.createUnknownDiceRoll(actions.first() as RollDice)
+        return if (userInput == null && request.actions.size == 1 && request.actions.first() is RollDice) {
+            DiceRollUserInputDialog.createUnknownDiceRoll(request.actions.first() as RollDice).apply {
+                this.owner = request.team
+            }
         } else {
-            userInput
+            userInput.apply {
+                this?.owner = request.team
+            }
         }
     }
 }

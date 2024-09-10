@@ -10,12 +10,12 @@ import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -23,6 +23,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
@@ -65,9 +66,6 @@ data class PassContext(
  */
 @Serializable
 object PassAction : Procedure() {
-    override fun isValid(state: Game, rules: Rules) {
-        state.activePlayer ?: INVALID_GAME_STATE("No active player")
-    }
     override val initialNode: Node = MoveOrPassOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val player = state.activePlayer!!
@@ -93,8 +91,12 @@ object PassAction : Procedure() {
             ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
         )
     }
+    override fun isValid(state: Game, rules: Rules) {
+        state.activePlayer ?: INVALID_GAME_STATE("No active player")
+    }
 
     object MoveOrPassOrEndAction : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PassContext>()
             val options = mutableListOf<ActionDescriptor>()

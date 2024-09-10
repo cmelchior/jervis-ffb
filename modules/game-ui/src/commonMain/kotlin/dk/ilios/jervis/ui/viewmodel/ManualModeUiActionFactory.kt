@@ -57,6 +57,7 @@ import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.SelectSkill
 import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.actions.TossCoin
+import dk.ilios.jervis.controller.ActionsRequest
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.model.Coin
@@ -78,13 +79,13 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
         scope.launch(errorHandler) {
             var initialActionsIndex = 0
             emitToField(WaitingForUserInput)
-            val actionProvider: suspend (GameController, List<ActionDescriptor>) -> GameAction = { controller: GameController, availableActions: List<ActionDescriptor> ->
-                if (initialActionsIndex < preloadedActions.size - 1) {
+            val actionProvider: suspend (GameController, ActionsRequest) -> GameAction = { controller: GameController, request: ActionsRequest   ->
+                if (initialActionsIndex < preloadedActions.size) {
                     val action = preloadedActions[initialActionsIndex]
                     initialActionsIndex++
                     action
                 } else {
-                    model.actionRequestChannel.send(Pair(controller, availableActions))
+                    model.actionRequestChannel.send(Pair(controller, request))
                     val action = model.actionSelectedChannel.receive()
                     action
                 }
@@ -97,16 +98,16 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
     private fun startUserActionSelector(scope: CoroutineScope) {
         scope.launch(errorHandler) {
             actions@while (true) {
-                val (controller, actions) = model.actionRequestChannel.receive()
-                var selectedUserAction = calculateAutomaticResponse(controller, actions)
+                val (controller, request) = model.actionRequestChannel.receive()
+                var selectedUserAction = calculateAutomaticResponse(controller, request.actions)
                 if (selectedUserAction == null) {
                     DialogFactory.createDialogIfPossible(
                         controller,
-                        actions,
-                        { actionDescriptors-> mapUnknownActions(actions) }
+                        request,
+                        { actionDescriptors-> mapUnknownActions(request.actions) }
                     )?.let { dialogInput ->
                         sendToRelevantUserInputChannel(listOf(dialogInput))
-                    } ?: detectAndSendNonDialogUserInput(controller, actions)
+                    } ?: detectAndSendNonDialogUserInput(controller, request)
                     // After input has been sent to the UI, wait for a response
                     selectedUserAction = userSelectedAction.receive()
                 }
@@ -163,10 +164,10 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
 
     private suspend fun detectAndSendNonDialogUserInput(
         controller: GameController,
-        actions: List<ActionDescriptor>,
+        request: ActionsRequest,
     ) {
         val userInputs: List<UserInput> =
-            actions.groupBy { it::class }.map { action: Map.Entry<KClass<out ActionDescriptor>, List<ActionDescriptor>> ->
+            request.actions.groupBy { it::class }.map { action: Map.Entry<KClass<out ActionDescriptor>, List<ActionDescriptor>> ->
                 when {
                     action.key == SelectPlayer::class -> {
                         SelectPlayerInput(action.value.map { PlayerSelected((it as SelectPlayer).player) })

@@ -8,14 +8,15 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.reports.ReportActionEnded
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -35,6 +36,8 @@ object BlockAction : Procedure() {
     }
 
     object SelectDefenderOrEndAction : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val end: List<ActionDescriptor> = listOf(EndActionWhenReady)
 

@@ -7,9 +7,6 @@ import dk.ilios.jervis.procedures.ScatterRollContext
 import dk.ilios.jervis.procedures.ThrowInContext
 import dk.ilios.jervis.procedures.actions.blitz.BlitzContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
-import dk.ilios.jervis.procedures.actions.block.BlockResultContext
-import dk.ilios.jervis.procedures.actions.block.BothDownContext
-import dk.ilios.jervis.procedures.actions.block.PushContext
 import dk.ilios.jervis.procedures.actions.block.StumbleContext
 import dk.ilios.jervis.procedures.actions.handoff.HandOffContext
 import dk.ilios.jervis.procedures.actions.pass.PassingInteferenceContext
@@ -99,17 +96,11 @@ class Game(
     // Temporary states - Figure out where/how to store these
     var activePlayerAction: PlayerAction? = null
     var moveStepTarget: Pair<FieldCoordinate, FieldCoordinate>? = null
-    var coinSideSelected: Coin? = null
-    var coinResult: Coin? = null
 
     // Context objects are state holders used by procedures
     // when they need to track state between nodes
     val contexts: ContextHolder = ContextHolder()
     var blockContext: BlockContext? = null
-    var blockRollResultContext: BlockResultContext? = null
-    var pushContext: PushContext? = null
-    var bothDownContext: BothDownContext? = null
-    var stumbleContext: StumbleContext? = null
     var blitzContext: BlitzContext? = null
     var handOffContext: HandOffContext? = null
     var scatterRollContext: ScatterRollContext? = null

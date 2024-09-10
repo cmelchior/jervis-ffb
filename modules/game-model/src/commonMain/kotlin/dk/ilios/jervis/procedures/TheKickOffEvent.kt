@@ -10,11 +10,11 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -24,6 +24,7 @@ import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.reports.ReportDiceRoll
@@ -49,6 +50,8 @@ object TheKickOffEvent : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollForKickOffEvent : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6, Dice.D6))
         }
@@ -163,6 +166,8 @@ object TheKickOffEvent : Procedure() {
     }
 
     object TouchBack : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // TODO Handle no valid players, so it will bounce
             return state.receivingTeam.filter {

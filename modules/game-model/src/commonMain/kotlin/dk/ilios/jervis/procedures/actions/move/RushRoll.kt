@@ -22,6 +22,7 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.RushRollContext
 import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.model.context.assertContext
@@ -95,11 +96,10 @@ import dk.ilios.jervis.utils.sum
         }
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<RushRollContext>()
-    }
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<RushRollContext>()
 
     object RollDie: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RushRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
@@ -124,6 +124,7 @@ import dk.ilios.jervis.utils.sum
      * or other sources.
      */
     object ChooseReRollSource : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RushRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<RushRollContext>()
             val rushingPlayer = context.player
@@ -176,6 +177,7 @@ import dk.ilios.jervis.utils.sum
     }
 
     object ReRollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RushRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->

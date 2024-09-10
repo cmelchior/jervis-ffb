@@ -11,12 +11,12 @@ import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -24,8 +24,10 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.procedures.actions.block.BlockStep
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
@@ -85,6 +87,8 @@ object BlitzAction : Procedure() {
     }
 
     object SelectTargetOrCancel : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
+
         override fun getAvailableActions(
             state: Game,
             rules: Rules,
@@ -115,6 +119,8 @@ object BlitzAction : Procedure() {
     }
 
     object MoveOrBlockOrEndAction : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = blitzContext(state)
             val options = mutableListOf<ActionDescriptor>()
@@ -201,6 +207,8 @@ object BlitzAction : Procedure() {
     }
 
     object RemainingMovesOrEndAction : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val options = mutableListOf<ActionDescriptor>()
             // Find possible move types

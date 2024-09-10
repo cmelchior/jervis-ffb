@@ -17,6 +17,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.fsm.ProcedureStack
 import dk.ilios.jervis.fsm.ProcedureState
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.reports.LogCategory
 import dk.ilios.jervis.reports.LogEntry
@@ -29,6 +30,11 @@ import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.JsonElement
+
+class ActionsRequest(
+    val team: Team?,
+    val actions: List<ActionDescriptor>
+)
 
 sealed interface ListEvent
 
@@ -63,7 +69,7 @@ class GameController(
 
     private suspend fun processNode(
         currentNode: Node,
-        actionProvider: suspend (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction,
+        actionProvider: suspend (controller: GameController, availableActions: ActionsRequest) -> GameAction,
     ) {
         when (currentNode) {
             is ComputationNode -> {
@@ -75,18 +81,21 @@ class GameController(
 
             is ActionNode -> {
                 // TODO This logic breaks when reverting state. Figure out a solution
-                val actions = currentNode.getAvailableActions(state, rules)
+                val request = ActionsRequest(
+                    currentNode.actionOwner(state, rules),
+                    currentNode.getAvailableActions(state, rules)
+                )
 
                 // If an action node just accept a single Continue event, it means that it is
                 // taking a shortcut through some nodes. In that case, just apply it immediately
                 // without notifying the user.
-                val selectedAction = if (actions.size == 1 && actions.first() == ContinueWhenReady) {
+                val selectedAction = if (request.actions.size == 1 && request.actions.first() == ContinueWhenReady) {
                     Continue
                 } else {
-                    val reportAvailableActions = ReportAvailableActions(actions)
+                    val reportAvailableActions = ReportAvailableActions(request.actions)
                     commands.add(reportAvailableActions)
                     reportAvailableActions.execute(state, this)
-                    actionProvider(this@GameController, actions)
+                    actionProvider(this@GameController, request)
                 }
 
                 if (selectedAction != Undo) {
@@ -121,8 +130,8 @@ class GameController(
         }
     }
 
-    fun getAvailableActions(): List<ActionDescriptor> {
-        if (stack.isEmpty()) return emptyList()
+    fun getAvailableActions(): ActionsRequest {
+        if (stack.isEmpty()) return ActionsRequest(null, emptyList())
         if (stack.currentNode() !is ActionNode || stack.currentNode() is ComputationNode) {
             throw IllegalStateException("State machine is not waiting at an ActionNode: ${stack.currentNode()}")
         }
@@ -131,7 +140,7 @@ class GameController(
         val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}", LogCategory.STATE_MACHINE)
         commands.add(reportAvailableActions)
         reportAvailableActions.execute(state, this)
-        return actions
+        return ActionsRequest(currentNode.actionOwner(state, rules), actions)
     }
 
     fun processAction(userAction: GameAction) {
@@ -203,9 +212,9 @@ class GameController(
         setInitialProcedure(startingProcedure)
     }
 
-    suspend fun startCallbackMode(actionProvider: suspend (controller: GameController, availableActions: List<ActionDescriptor>) -> GameAction) {
-        val backupActionProvider: suspend (GameController, List<ActionDescriptor>) -> GameAction = { controller: GameController, availableActions: List<ActionDescriptor> ->
-            actionProvider(controller, availableActions).also { selectedAction ->
+    suspend fun startCallbackMode(actionProvider: suspend (controller: GameController, availableActions: ActionsRequest) -> GameAction) {
+        val backupActionProvider: suspend (GameController, ActionsRequest) -> GameAction = { controller: GameController, request: ActionsRequest ->
+            actionProvider(controller, request).also { selectedAction ->
                 if (selectedAction != Undo) {
                     actionHistory.add(selectedAction)
                 }
@@ -354,7 +363,7 @@ class GameController(
     // is the only option.
     private fun gotoNextUserAction() {
         var newActions = getAvailableActions()
-        while (newActions.size == 1 && newActions.first() == ContinueWhenReady) {
+        while (newActions.actions.size == 1 && newActions.actions.first() == ContinueWhenReady) {
             processAction(Continue)
             rollForwardToNextActionNode()
             newActions = getAvailableActions()

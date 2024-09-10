@@ -8,15 +8,16 @@ import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
 import dk.ilios.jervis.reports.ReportActionEnded
@@ -48,6 +49,8 @@ object MoveAction : Procedure() {
     }
 
     object SelectMoveType : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
+
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val moveOptions = calculateMoveTypesAvailable(state.activePlayer!!, rules)
             return moveOptions + listOf(EndActionWhenReady)

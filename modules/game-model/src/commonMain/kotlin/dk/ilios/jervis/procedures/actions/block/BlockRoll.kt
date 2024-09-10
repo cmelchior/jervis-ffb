@@ -14,16 +14,21 @@ import dk.ilios.jervis.actions.SelectDiceResult
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.UseRerollContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.BlockDieRoll
+import dk.ilios.jervis.procedures.actions.blitz.BlitzContext
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
@@ -31,7 +36,6 @@ import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.utils.INVALID_ACTION
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 /**
  * Procedure for handling a Catch Roll. It is only responsible for handling the actual dice roll.
@@ -39,54 +43,19 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  * choose the appropriate action depending on the outcome.
  */
 object BlockRoll : Procedure() {
-    override fun isValid(
-        state: Game,
-        rules: Rules,
-    ) {
-        if (state.blockContext == null) {
-            INVALID_GAME_STATE("No catch roll context found")
-        }
-    }
-
     override val initialNode: Node = RollDice
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
-
-    // Helper method to share logic between roll and reroll
-    private fun calculateNoOfBlockDice(state: Game): Int {
-        val context = state.blockContext!!
-        val attackStrength = context.attacker.strength + context.offensiveAssists
-        val defenderStrength = context.defender.strength + context.defensiveAssists
-        return when {
-            attackStrength == defenderStrength -> 1
-            attackStrength > defenderStrength * 2 -> 3
-            defenderStrength > attackStrength * 2 -> 3
-            else -> 2
-        }
-    }
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockContext>()
 
     object RollDice : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val noOfDice = calculateNoOfBlockDice(state)
             return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRollList<DBlockResult>(action) { it: List<DBlockResult> ->
                 val roll =
                     it.map { diceRoll: DBlockResult ->
@@ -102,10 +71,8 @@ object BlockRoll : Procedure() {
     }
 
     object ChooseResultOrReRollSource : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.blockContext!!
             val attackingPlayer = context.attacker
 
@@ -141,8 +108,7 @@ object BlockRoll : Procedure() {
             }
         }
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 // TODO What is the difference between Continue and NoRerollSelected
                 NoRerollSelected -> GotoNode(SelectBlockResult)
@@ -171,19 +137,13 @@ object BlockRoll : Procedure() {
     }
 
     object ReRollDie : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val noOfDice = calculateNoOfBlockDice(state)
             return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRollList<DBlockResult>(action) { rolls: List<DBlockResult> ->
                 val roll =
                     rolls.map { blockRoll: DBlockResult ->
@@ -198,20 +158,14 @@ object BlockRoll : Procedure() {
     }
 
     object SelectBlockResult : ActionNode() {
-        override fun getAvailableActions(
-            state: Game,
-            rules: Rules,
-        ): List<ActionDescriptor> {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(
                 SelectDiceResult(state.blockContext!!.roll.map { it.result }, 1)
             )
         }
 
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             if (action !is DBlockResult && !(action is DiceResults && action.rolls.size == 1)) {
                 INVALID_ACTION(action)
             }
@@ -233,9 +187,22 @@ object BlockRoll : Procedure() {
             )
 
             return compositeCommandOf(
-                SetOldContext(Game::blockRollResultContext, result),
+                SetContext(result),
                 ExitProcedure()
             )
+        }
+    }
+
+    // Helper method to share logic between roll and reroll
+    private fun calculateNoOfBlockDice(state: Game): Int {
+        val context = state.blockContext!!
+        val attackStrength = context.attacker.strength + context.offensiveAssists
+        val defenderStrength = context.defender.strength + context.defensiveAssists
+        return when {
+            attackStrength == defenderStrength -> 1
+            attackStrength > defenderStrength * 2 -> 3
+            defenderStrength > attackStrength * 2 -> 3
+            else -> 2
         }
     }
 }

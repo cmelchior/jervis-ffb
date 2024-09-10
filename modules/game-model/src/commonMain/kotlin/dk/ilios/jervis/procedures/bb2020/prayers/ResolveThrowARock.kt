@@ -11,11 +11,11 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -23,8 +23,10 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
 import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
@@ -61,6 +63,7 @@ object ResolveThrowARock : Procedure() {
     }
 
     object SelectPlayer: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<ThrowARockContext>()
             return if (context.stallingPlayers.isEmpty()) {
@@ -96,6 +99,7 @@ object ResolveThrowARock : Procedure() {
     }
 
     object RollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ThrowARockContext>().currentPlayer!!.team.otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
