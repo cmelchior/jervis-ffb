@@ -98,16 +98,6 @@ data class SingleChoiceInputDialog(
             return SingleChoiceInputDialog(null, title, message, actions)
         }
 
-        fun createFanFactorDialog(
-            team: Team,
-            actions: List<GameAction>,
-        ): SingleChoiceInputDialog =
-            create(
-                title = "Fan Factor Roll",
-                message = "Roll D3 for ${team.name}",
-                actions = actions,
-            )
-
         fun createSelectKickoffCoinTossResultDialog(
             team: Team,
             actions: List<GameAction>,

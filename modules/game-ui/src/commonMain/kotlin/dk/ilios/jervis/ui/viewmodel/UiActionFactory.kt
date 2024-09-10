@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
  *
  * For other game modes, this class can just return the appropriate action immediately without involving the user.
  */
-abstract class UiActionFactory(protected val model: GameScreenModel) {
+abstract class UiActionFactory(val model: GameScreenModel) {
     val errorHandler =
         CoroutineExceptionHandler { _, exception ->
             exception.printStackTrace()

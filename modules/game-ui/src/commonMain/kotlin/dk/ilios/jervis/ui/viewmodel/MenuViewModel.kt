@@ -10,6 +10,7 @@ import dk.ilios.jervis.serialize.JervisSerialization
 import okio.Path
 
 enum class Feature {
+    ROLL_DICE,
     DO_NOT_REROLL_SUCCESSFUL_ACTIONS,
     SELECT_KICKING_PLAYER
 }

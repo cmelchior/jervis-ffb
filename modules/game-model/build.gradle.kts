@@ -29,6 +29,8 @@ kotlin {
             dependencies {
                 implementation(project(":modules:utils"))
                 implementation(kotlin("reflect"))
+                implementation("dev.whyoleg.cryptography:cryptography-core:0.3.1")
+                implementation(libs.kotlinx.datetime)
                 implementation(libs.coroutines)
                 implementation(libs.jsonserialization)
                 implementation(libs.okio)
@@ -39,7 +41,17 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
-        val jvmMain by getting
+        val jvmMain by getting {
+            dependencies {
+                implementation("dev.whyoleg.cryptography:cryptography-provider-jdk:0.3.1")
+            }
+        }
         val jvmTest by getting
+        val wasmJsMain by getting {
+            dependencies {
+                implementation("dev.whyoleg.cryptography:cryptography-provider-webcrypto:0.3.1")
+            }
+        }
+        val wasmJsTest by getting
     }
 }

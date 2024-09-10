@@ -165,7 +165,7 @@ class KickOffEventTests: JervisGameTest() {
             1.d3, // D3 + 3 players
         )
         // 1 player + EndSetup
-        assertEquals(2, controller.getAvailableActions().size)
+        assertEquals(2, controller.getAvailableActions().actions.size)
     }
 
     @Test
@@ -482,7 +482,7 @@ class KickOffEventTests: JervisGameTest() {
             )
         )
         // 6 players available to select + EndSetup
-        assertEquals(6 + 1, controller.getAvailableActions().size)
+        assertEquals(6 + 1, controller.getAvailableActions().actions.size)
 
         // Move 3 players then end the Quick Snap
         controller.rollForward(PlayerSelected("A6".playerId))

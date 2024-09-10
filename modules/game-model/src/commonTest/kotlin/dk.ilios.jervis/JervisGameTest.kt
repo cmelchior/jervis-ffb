@@ -66,7 +66,7 @@ abstract class JervisGameTest {
 
     protected fun useTeamReroll(controller: GameController) =
         RerollOptionSelected(
-            controller.getAvailableActions().filterIsInstance<SelectRerollOption>().first().option
+            controller.getAvailableActions().actions.filterIsInstance<SelectRerollOption>().first().option
         )
 }
 

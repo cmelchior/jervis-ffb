@@ -4,7 +4,6 @@ import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.Confirm
-import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DiceResults
@@ -46,17 +45,17 @@ import dk.ilios.jervis.procedures.actions.move.DodgeRoll
 import dk.ilios.jervis.procedures.actions.move.RushRoll
 import dk.ilios.jervis.procedures.actions.pass.AccuracyRoll
 import dk.ilios.jervis.procedures.actions.pass.PassContext
-import dk.ilios.jervis.procedures.tables.kickoff.BrilliantCoaching
-import dk.ilios.jervis.procedures.tables.kickoff.CheeringFans
-import dk.ilios.jervis.procedures.tables.kickoff.OfficiousRef
-import dk.ilios.jervis.procedures.tables.kickoff.OfficiousRefContext
-import dk.ilios.jervis.procedures.tables.prayers.BadHabits
 import dk.ilios.jervis.procedures.tables.injury.ArmourRoll
 import dk.ilios.jervis.procedures.tables.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.tables.injury.InjuryRoll
 import dk.ilios.jervis.procedures.tables.injury.LastingInjuryRoll
 import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
 import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryRoll
+import dk.ilios.jervis.procedures.tables.kickoff.BrilliantCoaching
+import dk.ilios.jervis.procedures.tables.kickoff.CheeringFans
+import dk.ilios.jervis.procedures.tables.kickoff.OfficiousRef
+import dk.ilios.jervis.procedures.tables.kickoff.OfficiousRefContext
+import dk.ilios.jervis.procedures.tables.prayers.BadHabits
 import dk.ilios.jervis.procedures.tables.weather.SwelteringHeat
 import dk.ilios.jervis.rules.skills.Block
 import dk.ilios.jervis.rules.skills.Dodge
@@ -246,10 +245,10 @@ object DialogFactory {
                 }
 
                 is FanFactorRolls.SetFanFactorForAwayTeam -> {
-                    SingleChoiceInputDialog.createFanFactorDialog(controller.state.awayTeam, D3Result.allOptions())
+                    DiceRollUserInputDialog.createFanFactorDialog(controller.state.awayTeam)
                 }
                 is FanFactorRolls.SetFanFactorForHomeTeam -> {
-                    SingleChoiceInputDialog.createFanFactorDialog(controller.state.homeTeam, D3Result.allOptions())
+                    DiceRollUserInputDialog.createFanFactorDialog(controller.state.homeTeam)
                 }
                 is WeatherRoll.RollWeatherDice -> {
                     val diceRolls = mutableListOf<DiceResults>()

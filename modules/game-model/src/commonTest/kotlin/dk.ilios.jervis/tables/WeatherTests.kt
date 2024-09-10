@@ -14,7 +14,6 @@ import dk.ilios.jervis.defaultFanFactor
 import dk.ilios.jervis.defaultKickOffHomeTeam
 import dk.ilios.jervis.defaultPregame
 import dk.ilios.jervis.defaultSetup
-import dk.ilios.jervis.skipTurns
 import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.ext.d8
@@ -38,6 +37,7 @@ import dk.ilios.jervis.procedures.actions.pass.PassingType
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.tables.Range
 import dk.ilios.jervis.rules.tables.Weather
+import dk.ilios.jervis.skipTurns
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -199,7 +199,7 @@ class WeatherTests: JervisGameTest() {
         )
 
         // Check that no squares outside the valid range can be selected.
-        controller.getAvailableActions().filterIsInstance<SelectFieldLocation>().forEach {
+        controller.getAvailableActions().actions.filterIsInstance<SelectFieldLocation>().forEach {
             val range = rules.rangeRuler.measure(FieldCoordinate(17, 7), it.coordinate)
             if (range != Range.QUICK_PASS && range != Range.SHORT_PASS) {
                 fail("Invalid range: $range for ${it.coordinate}")

@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
  * Class responsible for handling and showing model dialogs.
  */
 class DialogsViewModel(val uiActionFactory: UiActionFactory) {
+    val diceGenerator = uiActionFactory.model.controller.diceGenerator
+
     fun buttonActionSelected(action: GameAction) {
         uiActionFactory.userSelectedAction(action)
     }

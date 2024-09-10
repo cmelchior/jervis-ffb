@@ -24,6 +24,7 @@ import dk.ilios.jervis.reports.LogEntry
 import dk.ilios.jervis.reports.ReportAvailableActions
 import dk.ilios.jervis.reports.ReportHandleAction
 import dk.ilios.jervis.reports.SimpleLogEntry
+import dk.ilios.jervis.rng.Fortuna
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.serialize.JervisSerialization
 import dk.ilios.jervis.utils.safeTryEmit
@@ -34,7 +35,9 @@ import kotlinx.serialization.json.JsonElement
 class ActionsRequest(
     val team: Team?,
     val actions: List<ActionDescriptor>
-)
+) {
+    val size = actions.size
+}
 
 sealed interface ListEvent
 
@@ -53,6 +56,7 @@ class GameController(
     private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 0, extraBufferCapacity = 20_000)
     val logsEvents: Flow<ListEvent> = _logsEvents
     val logs: MutableList<LogEntry> = mutableListOf()
+    val diceGenerator = Fortuna()
     val rules: Rules = rules
     val stack: ProcedureStack = ProcedureStack()
     val actionHistory: MutableList<GameAction> = mutableListOf() // List all actions provided by the user.

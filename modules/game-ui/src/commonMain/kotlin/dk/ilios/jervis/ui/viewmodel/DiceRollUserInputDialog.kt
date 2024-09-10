@@ -34,11 +34,20 @@ class DiceRollUserInputDialog(
     val message: String,
     val dice: List<Pair<Dice, List<DieResult>>>,
     val result: (DiceResults) -> String?,
-    override var owner: Team? = null
+    override var owner: Team? = null,
 ) : UserInputDialog {
     override val actions: List<GameAction> = emptyList()
 
     companion object {
+        fun createFanFactorDialog(team: Team): UserInputDialog {
+            return DiceRollUserInputDialog(
+                title = "Fan Factor Roll",
+                message = "Roll D3 for ${team.name}",
+                dice = listOf(Pair(Dice.D3, D3Result.allOptions())),
+                result = { rolls: DiceResults -> null },
+            )
+        }
+
         fun createWeatherRollDialog(rules: Rules): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Weather roll",
