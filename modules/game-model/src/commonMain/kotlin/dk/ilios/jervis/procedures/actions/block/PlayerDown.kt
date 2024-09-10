@@ -11,8 +11,8 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.getContext
-import dk.ilios.jervis.procedures.injury.KnockedDown
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.tables.injury.KnockedDown
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
 import dk.ilios.jervis.reports.ReportPlayerDownResult
 import dk.ilios.jervis.rules.Rules
 

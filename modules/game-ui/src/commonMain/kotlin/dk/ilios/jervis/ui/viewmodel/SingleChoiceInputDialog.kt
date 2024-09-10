@@ -30,7 +30,7 @@ import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.actions.foul.FoulContext
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.rules.tables.Direction

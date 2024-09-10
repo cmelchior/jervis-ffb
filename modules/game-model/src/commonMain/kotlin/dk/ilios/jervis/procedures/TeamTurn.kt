@@ -34,7 +34,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.inducements.Timing
-import dk.ilios.jervis.procedures.bb2020.prayers.ResolveThrowARock
+import dk.ilios.jervis.procedures.tables.prayers.ResolveThrowARock
 import dk.ilios.jervis.procedures.inducements.ActivateInducementContext
 import dk.ilios.jervis.procedures.inducements.ActivateInducements
 import dk.ilios.jervis.reports.ReportActionSelected

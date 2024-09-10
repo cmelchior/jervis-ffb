@@ -30,9 +30,9 @@ import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.DefensiveAssistsModifier
 import dk.ilios.jervis.model.modifiers.OffensiveAssistModifier
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
-import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryMode
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.ArgueTheCallResult
 import dk.ilios.jervis.utils.INVALID_ACTION

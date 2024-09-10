@@ -26,9 +26,9 @@ import dk.ilios.jervis.model.context.DodgeRollContext
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.RushRollContext
 import dk.ilios.jervis.model.context.getContext
-import dk.ilios.jervis.procedures.injury.FallingOver
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
-import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
+import dk.ilios.jervis.procedures.tables.injury.FallingOver
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryMode
 import dk.ilios.jervis.rules.Rules
 
 /**

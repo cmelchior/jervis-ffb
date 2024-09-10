@@ -1,6 +1,6 @@
 package dk.ilios.jervis.reports
 
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
 import dk.ilios.jervis.rules.tables.CasualtyResult
 import dk.ilios.jervis.rules.tables.InjuryResult
 

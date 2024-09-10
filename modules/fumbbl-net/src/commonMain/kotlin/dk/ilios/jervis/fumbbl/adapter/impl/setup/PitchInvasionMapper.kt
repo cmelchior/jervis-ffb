@@ -12,7 +12,7 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerId
-import dk.ilios.jervis.procedures.bb2020.kickoff.PitchInvasion
+import dk.ilios.jervis.procedures.tables.kickoff.PitchInvasion
 
 object PitchInvasionMapper: CommandActionMapper {
     override fun isApplicable(

@@ -8,7 +8,7 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.weather.SwelteringHeat
+import dk.ilios.jervis.procedures.tables.weather.SwelteringHeat
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.tables.Weather

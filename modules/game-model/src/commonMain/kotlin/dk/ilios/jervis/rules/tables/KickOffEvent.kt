@@ -1,17 +1,17 @@
 package dk.ilios.jervis.rules.tables
 
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.procedures.bb2020.kickoff.Blitz
-import dk.ilios.jervis.procedures.bb2020.kickoff.BrilliantCoaching
-import dk.ilios.jervis.procedures.bb2020.kickoff.ChangingWeather
-import dk.ilios.jervis.procedures.bb2020.kickoff.CheeringFans
-import dk.ilios.jervis.procedures.bb2020.kickoff.GetTheRef
-import dk.ilios.jervis.procedures.bb2020.kickoff.HighKick
-import dk.ilios.jervis.procedures.bb2020.kickoff.OfficiousRef
-import dk.ilios.jervis.procedures.bb2020.kickoff.PitchInvasion
-import dk.ilios.jervis.procedures.bb2020.kickoff.QuickSnap
-import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
-import dk.ilios.jervis.procedures.bb2020.kickoff.TimeOut
+import dk.ilios.jervis.procedures.tables.kickoff.Blitz
+import dk.ilios.jervis.procedures.tables.kickoff.BrilliantCoaching
+import dk.ilios.jervis.procedures.tables.kickoff.ChangingWeather
+import dk.ilios.jervis.procedures.tables.kickoff.CheeringFans
+import dk.ilios.jervis.procedures.tables.kickoff.GetTheRef
+import dk.ilios.jervis.procedures.tables.kickoff.HighKick
+import dk.ilios.jervis.procedures.tables.kickoff.OfficiousRef
+import dk.ilios.jervis.procedures.tables.kickoff.PitchInvasion
+import dk.ilios.jervis.procedures.tables.kickoff.QuickSnap
+import dk.ilios.jervis.procedures.tables.kickoff.SolidDefense
+import dk.ilios.jervis.procedures.tables.kickoff.TimeOut
 import dk.ilios.jervis.rules.skills.Duration
 
 enum class KickOffEvent(override val description: String, override val procedure: Procedure, override val duration: Duration): TableResult {

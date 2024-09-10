@@ -29,9 +29,9 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
-import dk.ilios.jervis.procedures.injury.RiskingInjuryMode
-import dk.ilios.jervis.procedures.injury.RiskingInjuryRoll
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryMode
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryRoll
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
@@ -104,10 +104,12 @@ object MovePlayerIntoSquare : Procedure() {
             return compositeCommandOf(
                 SetPlayerLocation(context.player, DogOut),
                 SetPlayerState(context.player, PlayerState.KNOCKED_DOWN),
-                SetContext(RiskingInjuryContext(
+                SetContext(
+                    RiskingInjuryContext(
                     player = context.player,
                     mode = RiskingInjuryMode.PUSHED_INTO_CROWD
-                )),
+                )
+                ),
                 ReportGameProgress("${context.player.name} fell through a trapdoor at ${context.target.toLogString()}")
             )
         }

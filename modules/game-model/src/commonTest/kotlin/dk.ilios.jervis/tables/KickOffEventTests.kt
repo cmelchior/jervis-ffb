@@ -22,7 +22,7 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.procedures.TeamTurn
-import dk.ilios.jervis.procedures.bb2020.kickoff.SolidDefense
+import dk.ilios.jervis.procedures.tables.kickoff.SolidDefense
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
 import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.skipTurns

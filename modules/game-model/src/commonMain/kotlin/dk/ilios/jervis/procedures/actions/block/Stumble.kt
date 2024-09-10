@@ -27,8 +27,8 @@ import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
-import dk.ilios.jervis.procedures.injury.KnockedDown
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.tables.injury.KnockedDown
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
 import dk.ilios.jervis.reports.ReportPowResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Dodge

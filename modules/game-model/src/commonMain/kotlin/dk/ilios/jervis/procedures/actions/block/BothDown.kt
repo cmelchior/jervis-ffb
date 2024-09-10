@@ -26,8 +26,8 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
-import dk.ilios.jervis.procedures.injury.KnockedDown
-import dk.ilios.jervis.procedures.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.tables.injury.KnockedDown
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
 import dk.ilios.jervis.reports.ReportBothDownResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Block
