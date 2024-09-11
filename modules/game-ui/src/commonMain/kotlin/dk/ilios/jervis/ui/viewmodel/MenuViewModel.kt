@@ -60,6 +60,7 @@ object Setups {
     const val SETUP_5_5_1: String = "5-5-1"
     const val SETUP_3_4_4: String = "3-4-4"
     val setups = mutableMapOf(
+
         // Offensive
         SETUP_5_5_1 to mapOf(
             2.playerNo to FieldCoordinate(12, 5),
@@ -74,6 +75,7 @@ object Setups {
             10.playerNo to FieldCoordinate(8, 7),
             11.playerNo to FieldCoordinate(3, 7),
         ),
+
         // Defensive
         SETUP_3_4_4 to mapOf(
             1.playerNo to FieldCoordinate(12, 6),

@@ -31,6 +31,7 @@ import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.DieResult
+import dk.ilios.jervis.ui.Theme
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
 import dk.ilios.jervis.ui.viewmodel.DiceRollUserInputDialog
@@ -44,8 +45,8 @@ fun UserActionDialog(
 ) {
     AlertDialog(
         modifier = Modifier.border(4.dp, when {
-            dialog.owner?.isHomeTeam() == true -> Color.Red
-            dialog.owner?.isAwayTeam() == true -> Color.Blue
+            dialog.owner?.isHomeTeam() == true -> Theme.homeTeamColor
+            dialog.owner?.isAwayTeam() == true -> Theme.awayTeamColor
             else -> Color.Green
         }, shape = RoundedCornerShape(4.dp)),
         onDismissRequest = {},
@@ -83,8 +84,8 @@ fun MultipleSelectUserActionDialog(
         val resultText = if (result.rolls.size < dialog.dice.size) null else dialog.result(result)
         AlertDialog(
             modifier = Modifier.border(4.dp, when {
-                dialog.owner?.isHomeTeam() == true -> Color.Red
-                dialog.owner?.isAwayTeam() == true -> Color.Blue
+                dialog.owner?.isHomeTeam() == true -> Theme.homeTeamColor
+                dialog.owner?.isAwayTeam() == true -> Theme.awayTeamColor
                 else -> Color.Green
             }, shape = RoundedCornerShape(4.dp)),
             onDismissRequest = {
@@ -157,70 +158,3 @@ fun MultipleSelectUserActionDialog(
         )
     }
 }
-//    showDiceDialog(dialog, selectedRolls, vm, result, resultText)
-//
-//// TODO Figure out how to do recomposition correctly here?
-//// TODO Looks like the default AlertDialog doesn't really support this very well. At least when it scales.
-////  Looks like a custom implementation is needed. Also make it draggable
-//@OptIn(ExperimentalComposeUiApi::class)
-//@Composable
-//private fun showDiceDialog(
-//    dialog: DiceRollUserInputDialog,
-//    selectedRolls: SnapshotStateList<DieResult?>,
-//    vm: DialogsViewModel,
-//    result: DiceResults,
-//    resultText: String?,
-//) {
-//    var showDialog by remember { mutableStateOf(true) }
-//    if (showDialog) {
-//        AlertDialog(
-//            onDismissRequest = {
-//                showDialog = false
-//            },
-//            title = { Text(text = dialog.title) },
-//            text = {
-//                Column(modifier = Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-//                    Text(text = dialog.message)
-//                    dialog.dice.forEachIndexed { i, el: Pair<Dice, List<DieResult>> ->
-//                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-//                            el.second.forEach { it: DieResult ->
-//                                val isSelected = remember { derivedStateOf { selectedRolls[i] == it } }
-//                                val buttonColors =
-//                                    ButtonDefaults.buttonColors(
-//                                        backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background,
-//                                    )
-//                                Button(
-//                                    modifier = Modifier.weight(1f),
-//                                    onClick = { selectedRolls[i] = it },
-//                                    colors = buttonColors,
-//                                ) {
-//                                    Text(
-//                                        text = it.value.toString(),
-//                                        color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground,
-//                                    )
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            },
-//            confirmButton = {
-//                Button(
-//                    onClick = {
-//                        showDialog = false
-//                        vm.buttonActionSelected(result)
-//                    },
-//                    enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
-//                ) {
-//                    val suffix by derivedStateOf { if (resultText != null) " - $resultText" else "" }
-//                    Text("Confirm$suffix")
-//                }
-//            },
-//            properties =
-//                DialogProperties(
-//                    usePlatformDefaultWidth = true,
-//                    scrimColor = Color.Black.copy(alpha = 0.6f),
-//                ),
-//        )
-//    }
-//}

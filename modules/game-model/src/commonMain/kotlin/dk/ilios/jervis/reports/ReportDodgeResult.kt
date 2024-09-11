@@ -8,8 +8,8 @@ class ReportDodgeResult(private val context: DodgeRollContext) : LogEntry() {
         get() {
             return buildString {
                 when(context.isSuccess) {
-                    true -> appendLine("${context.player.name} successfully dodged.")
-                    false -> appendLine("${context.player.name} crashed to the ground.")
+                    true -> append("${context.player.name} successfully dodged")
+                    false -> append("${context.player.name} crashed to the ground")
                 }
             }
         }

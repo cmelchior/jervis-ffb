@@ -33,7 +33,7 @@ enum class FieldDetails(val resource: String, val description: String) {
  * each single square on the field.
  */
 class FieldViewModel(
-    controller: GameController,
+    val controller: GameController,
     private val uiActionFactory: UiActionFactory,
     private val state: Field,
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
@@ -138,7 +138,10 @@ class FieldViewModel(
         _highlights.value = null
     }
 
-    // Observe the entire field as one
+    // Observe the entire field as one.
+    // This means we are re-rendering the entire field for every change, which feels a
+    // bit like overkill, but making it more granular is going to be painful, and it doesn't
+    // look like there is a performance problem doing it.
     fun observeField(): Flow<Map<FieldCoordinate, UiFieldSquare>> {
         var ignoreUserInput = false
         return combine(
@@ -150,157 +153,163 @@ class FieldViewModel(
             result[FieldCoordinate.UNKNOWN] = UiFieldSquare(FieldSquare(-1, -1))
 
             // Determine which action, if any, to take, if this field can be selected
-
             when (userInput) {
                 is IgnoreUserInput -> ignoreUserInput = true
                 is ResumeUserInput -> ignoreUserInput = false
                 else -> { /* do Nothing */ }
             }
-
-            (0 until rules.fieldWidth.toInt()).forEach { x ->
-                (0 until rules.fieldHeight.toInt()).forEach { y ->
-                    val square = game.field[x, y]
-                    var squareAction: (() -> Unit)? = null
-                    var onMenuHiddenAction: (() -> Unit)? = null
-                    var requiresRoll = false
-                    val contextAction: MutableList<ContextMenuOption> = mutableListOf()
-                    var showContextMenu = false
-                    if (!ignoreUserInput) {
-                        val inputs =
-                            when (userInput) {
-                                is CompositeUserInput -> {
-                                    userInput.inputs
-                                }
-                                else -> {
-                                    listOf(userInput)
-                                }
-                            }
-                        inputs.forEach { input ->
-                            when (input) {
-                                is DeselectPlayerInput -> {
-                                    // Since `deselect` only applies to the active player, check if the player in the square is active.
-                                    if (square.player?.isActive == true) {
-                                        squareAction = { uiActionFactory.userSelectedAction(input.actions.first()) }
-                                        onMenuHiddenAction = squareAction
-                                    }
-                                }
-
-                                is SelectFieldLocationInput -> {
-                                    // Allow square to be selected if an action is available for this square.
-                                    squareAction =
-                                        input.fieldAction[
-                                            FieldCoordinate(
-                                                x,
-                                                y,
-                                            ),
-                                        ]?.let { action: FieldSquareAction ->
-                                            { uiActionFactory.userSelectedAction(action.action) }
-                                        }
-                                }
-
-                                is SelectPlayerInput -> {
-                                    // If the player in this square is among the selectable players, enable the option
-                                    squareAction =
-                                        square.player?.let {
-                                            input.actions.firstOrNull { (it as PlayerSelected).getPlayer(game) == square.player }
-                                                ?.let { playerAction: GameAction ->
-                                                    { uiActionFactory.userSelectedAction(playerAction) }
-                                                }
-                                        }
-                                }
-
-                                is SelectPlayerActionInput -> {
-                                    if (square.x == input.activePlayerLocation.x && square.y == input.activePlayerLocation.y) {
-                                        contextAction.addAll(
-                                            input.actions.map {
-                                                val name = when(it.action) {
-                                                    PlayerActionType.MOVE -> "Move"
-                                                    PlayerActionType.PASS -> "Pass"
-                                                    PlayerActionType.HAND_OFF -> "Hand-off"
-                                                    PlayerActionType.BLOCK -> "Block"
-                                                    PlayerActionType.BLITZ -> "Blitz"
-                                                    PlayerActionType.FOUL -> "Foul"
-                                                    PlayerActionType.SPECIAL -> "Special"
-                                                }
-                                                ContextMenuOption(
-                                                    name,
-                                                    { this@FieldViewModel.uiActionFactory.userSelectedAction(it) },
-                                                )
-                                            },
-                                        )
-                                        showContextMenu = input.actions.isNotEmpty()
-                                    }
-                                }
-
-                                is SelectPlayerSubActionInput -> {
-                                    if (square.x == input.activePlayerLocation.x && square.y == input.activePlayerLocation.y) {
-                                        contextAction.addAll(
-                                            input.actions.map {
-                                                ContextMenuOption(
-                                                    it.name,
-                                                    { this@FieldViewModel.uiActionFactory.userSelectedAction(it) },
-                                                )
-                                            },
-                                        )
-                                        showContextMenu = showContextMenu || input.actions.isNotEmpty()
-                                    }
-                                }
-
-                                is SelectMoveActionFieldLocationInput -> {
-                                    // Allow square to be selected if an action is available for this square.
-                                    squareAction =
-                                        input.fieldAction[FieldCoordinate(x,y)]?.let { action: FieldSquareAction ->
-                                            { uiActionFactory.userSelectedAction(action.action) }
-                                        }
-                                    requiresRoll = input.fieldAction[FieldCoordinate(x, y)]?.requiresRoll ?: false
-                                }
-
-                                is EndActionInput -> {
-                                    if (square.player?.isActive == true) {
-                                        contextAction.addAll(
-                                            input.actions.map {
-                                                ContextMenuOption(
-                                                    "End action",
-                                                    { this@FieldViewModel.uiActionFactory.userSelectedAction(it) },
-                                                )
-                                            },
-                                        )
-                                    }
-                                }
-
-                                else -> {
-                                    // No action possible for this field
-                                }
-                            }
-                        }
-                    }
-                    val uiPlayer = square.player?.let { UiPlayer(it, squareAction) }
-
-                    // TODO It looks like the ball state might not be updated automatically, which
-                    //  can result in the ball changing state, but not position at the same time.
-                    //  Probably need to combine SetBallState and SetBallLocation
-                    val isBallOnGround: Boolean = square.ball?.let {
-                        (it.state != BallState.CARRIED && it.state != BallState.OUT_OF_BOUNDS) &&
-                            it.location.x == x &&
-                            it.location.y == y
-                     } ?: false
-
-                    val uiSquare =
-                        UiFieldSquare(
-                            square,
-                            isBallOnGround,
-                            square.player?.hasBall() == true,
-                            uiPlayer,
-                            squareAction, // Only allow a Square Action if no player is on the field
-                            onMenuHiddenAction,
-                            requiresRoll,
-                            contextAction,
-                            showContextMenu,
-                        )
-                    result[FieldCoordinate(x, y)] = uiSquare
+            (0 until rules.fieldWidth).forEach { x ->
+                (0 until rules.fieldHeight).forEach { y ->
+                    renderSquare(game, x, y, ignoreUserInput, userInput, result)
                 }
             }
             result
         }
+    }
+
+    private fun renderSquare(
+        game: Game,
+        x: Int,
+        y: Int,
+        ignoreUserInput: Boolean,
+        userInput: UserInput,
+        result: MutableMap<FieldCoordinate, UiFieldSquare>
+    ) {
+        val square = game.field[x, y]
+        var squareAction: (() -> Unit)? = null
+        var onMenuHiddenAction: (() -> Unit)? = null
+        var requiresRoll = false
+        val contextActions: MutableList<ContextMenuOption> = mutableListOf()
+        var showContextMenu = false
+        if (!ignoreUserInput) {
+            val inputs =
+                when (userInput) {
+                    is CompositeUserInput -> {
+                        userInput.inputs
+                    }
+
+                    else -> {
+                        listOf(userInput)
+                    }
+                }
+            inputs.forEach { input ->
+                when (input) {
+                    is DeselectPlayerInput -> {
+                        // Since `deselect` only applies to the active player, check if the player in the square is active.
+                        if (square.player?.isActive == true) {
+                            squareAction = { uiActionFactory.userSelectedAction(input.actions.first()) }
+                            onMenuHiddenAction = squareAction
+                        }
+                    }
+
+                    is SelectFieldLocationInput -> {
+                        // Allow square to be selected if an action is available for this square.
+                        squareAction =
+                            input.fieldAction[
+                                FieldCoordinate(
+                                    x,
+                                    y,
+                                ),
+                            ]?.let { action: FieldSquareAction ->
+                                { uiActionFactory.userSelectedAction(action.action) }
+                            }
+                    }
+
+                    is SelectPlayerInput -> {
+                        // If the player in this square is among the selectable players, enable the option
+                        squareAction =
+                            square.player?.let {
+                                input.actions.firstOrNull { (it as PlayerSelected).getPlayer(game) == square.player }
+                                    ?.let { playerAction: GameAction ->
+                                        { uiActionFactory.userSelectedAction(playerAction) }
+                                    }
+                            }
+                    }
+
+                    is SelectPlayerActionInput -> {
+                        if (square.x == input.activePlayerLocation.x && square.y == input.activePlayerLocation.y) {
+                            contextActions.addAll(
+                                input.actions.map {
+                                    val name = when (it.action) {
+                                        PlayerActionType.MOVE -> "Move"
+                                        PlayerActionType.PASS -> "Pass"
+                                        PlayerActionType.HAND_OFF -> "Hand-off"
+                                        PlayerActionType.BLOCK -> "Block"
+                                        PlayerActionType.BLITZ -> "Blitz"
+                                        PlayerActionType.FOUL -> "Foul"
+                                        PlayerActionType.SPECIAL -> "Special"
+                                    }
+                                    ContextMenuOption(
+                                        name,
+                                        { this@FieldViewModel.uiActionFactory.userSelectedAction(it) },
+                                    )
+                                },
+                            )
+                            showContextMenu = input.actions.isNotEmpty()
+                        }
+                    }
+
+                    is SelectPlayerSubActionInput -> {
+                        if (square.x == input.activePlayerLocation.x && square.y == input.activePlayerLocation.y) {
+                            contextActions.addAll(
+                                input.actions.map {
+                                    ContextMenuOption(
+                                        it.name,
+                                        { this@FieldViewModel.uiActionFactory.userSelectedAction(it) },
+                                    )
+                                },
+                            )
+                            showContextMenu = showContextMenu || input.actions.isNotEmpty()
+                        }
+                    }
+
+                    is SelectMoveActionFieldLocationInput -> {
+                        // Allow square to be selected if an action is available for this square.
+                        squareAction =
+                            input.fieldAction[FieldCoordinate(x, y)]?.let { action: FieldSquareAction ->
+                                { uiActionFactory.userSelectedAction(action.action) }
+                            }
+                        requiresRoll = input.fieldAction[FieldCoordinate(x, y)]?.requiresRoll ?: false
+                    }
+
+                    is EndActionInput -> {
+                        if (square.player?.isActive == true) {
+                            contextActions.addAll(
+                                input.actions.map {
+                                    ContextMenuOption(
+                                        "End action",
+                                        { this@FieldViewModel.uiActionFactory.userSelectedAction(it) },
+                                    )
+                                },
+                            )
+                        }
+                    }
+
+                    else -> {
+                        // No action possible for this field
+                    }
+                }
+            }
+        }
+        val uiPlayer = square.player?.let { UiPlayer(it, squareAction) }
+        val isBallOnGround: Boolean = square.ball?.let {
+            (it.state != BallState.CARRIED && it.state != BallState.OUT_OF_BOUNDS) &&
+                it.location.x == x &&
+                it.location.y == y
+        } ?: false
+
+        val uiSquare =
+            UiFieldSquare(
+                square,
+                isBallOnGround,
+                square.player?.hasBall() == true,
+                uiPlayer,
+                squareAction, // Only allow a Square Action if no player is on the field
+                onMenuHiddenAction,
+                requiresRoll,
+                contextActions,
+                showContextMenu,
+            )
+        result[FieldCoordinate(x, y)] = uiSquare
     }
 }

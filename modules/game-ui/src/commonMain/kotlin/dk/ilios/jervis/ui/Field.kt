@@ -168,7 +168,7 @@ private fun FieldSquare(
     vm: FieldViewModel,
     square: UiFieldSquare,
 ) {
-    var showPopup by remember { mutableStateOf(square.showContextMenu) }
+    var showPopup by remember(square) { mutableStateOf(square.showContextMenu) }
 
     val bgColor by remember(square) {
         mutableStateOf(when {
