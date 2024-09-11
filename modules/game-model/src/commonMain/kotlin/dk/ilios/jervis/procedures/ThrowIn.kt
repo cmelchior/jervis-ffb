@@ -10,7 +10,7 @@ import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
-import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
@@ -21,9 +21,10 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Direction
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import dk.ilios.jervis.utils.assert
 import dk.ilios.jervis.utils.sum
 
@@ -41,21 +42,9 @@ data class ThrowInContext(
  */
 object ThrowIn : Procedure() {
     override val initialNode: Node = RollDirection
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? {
-        if (state.throwInContext == null) {
-            INVALID_GAME_STATE("Missing throw in context")
-        }
-        return null
-    }
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? = null
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<ThrowInContext>()
 
     object RollDirection : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
@@ -66,10 +55,10 @@ object ThrowIn : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D3Result>(action) { d3 ->
-                val context = state.throwInContext!!
+                val context = state.getContext<ThrowInContext>()
                 val direction = rules.throwIn(context.outOfBoundsAt, d3)
                 return compositeCommandOf(
-                    SetOldContext(Game::throwInContext, context.copy(
+                    SetContext(context.copy(
                         directionRoll =  d3,
                         direction = direction,
                     )),
@@ -88,7 +77,7 @@ object ThrowIn : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRollList<D6Result>(action) { dice ->
                 assert(dice.size == 2)
-                val context = state.throwInContext!!
+                val context = state.getContext<ThrowInContext>()
                 val distance = dice.sum()
 
                 // Move the ball the entire distance until it either goes out of bounds again
@@ -107,18 +96,14 @@ object ThrowIn : Procedure() {
 
                 return if (outOfBoundsAt != null) {
                     compositeCommandOf(
-                        SetOldContext(Game::throwInContext, context.copy(
-                            distance = dice,
-                        )),
+                        SetContext(context.copy(distance = dice)),
                         SetBallState.outOfBounds(outOfBoundsAt),
                         SetBallLocation(FieldCoordinate.OUT_OF_BOUNDS),
                         GotoNode(ResolveOutOfBounds)
                     )
                 } else {
                     compositeCommandOf(
-                        SetOldContext(Game::throwInContext, context.copy(
-                            distance = dice,
-                        )),
+                        SetContext(context.copy(distance = dice)),
                         SetBallState.thrownIn(),
                         SetBallLocation(ballPosition),
                         GotoNode(ResolveLandOnField)
@@ -132,10 +117,7 @@ object ThrowIn : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             // Replace the current throw in context
             // TODO Does this ruin reporting logging?
-            return SetOldContext(Game::throwInContext, ThrowInContext(
-                state.ball.outOfBoundsAt!!
-            )
-            )
+            return SetContext(ThrowInContext(state.ball.outOfBoundsAt!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowIn
         override fun onExitNode(state: Game, rules: Rules): Command {

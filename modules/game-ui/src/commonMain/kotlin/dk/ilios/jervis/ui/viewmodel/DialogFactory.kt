@@ -31,6 +31,7 @@ import dk.ilios.jervis.procedures.SetupTeam
 import dk.ilios.jervis.procedures.TheKickOff
 import dk.ilios.jervis.procedures.TheKickOffEvent
 import dk.ilios.jervis.procedures.WeatherRoll
+import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.procedures.actions.block.BlockRoll
 import dk.ilios.jervis.procedures.actions.block.BothDown
 import dk.ilios.jervis.procedures.actions.block.BothDownContext
@@ -100,7 +101,7 @@ object DialogFactory {
                 is BlockRoll.ReRollDie,
                 is BlockRoll.RollDice -> {
                     val diceCount = (request.actions.first() as RollDice).dice.size
-                    DiceRollUserInputDialog.createBlockRollDialog(diceCount, controller.state.blockContext!!.isBlitzing)
+                    DiceRollUserInputDialog.createBlockRollDialog(diceCount, controller.state.getContext<BlockContext>().isBlitzing)
                 }
 
                 is BlockRoll.SelectBlockResult -> {

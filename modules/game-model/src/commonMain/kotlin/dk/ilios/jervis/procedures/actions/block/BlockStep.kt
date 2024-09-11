@@ -5,7 +5,7 @@ import dk.ilios.jervis.actions.BlockDice
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
-import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ComputationNode
@@ -15,10 +15,10 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.BlockDieRoll
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 /**
  * Wrap temporary data needed to track a Block
@@ -51,26 +51,14 @@ data class BlockResultContext(
  */
 object BlockStep : Procedure() {
     override val initialNode: Node = DetermineAssists
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? {
-        if (state.blockContext == null) {
-            INVALID_GAME_STATE("No block context was found")
-        }
-        return null
-    }
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command? {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
-            SetOldContext(Game::blockContext, null),
+            RemoveContext<BlockContext>(),
             RemoveContext<BlockResultContext>()
         )
     }
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockContext>()
 
     // Horns are applied before applying any other skills/traits and before counting assists
     // See page 78 in the rulebook.
@@ -105,7 +93,7 @@ object BlockStep : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
-            val context = state.blockContext!!
+            val context = state.getContext<BlockContext>()
             val offensiveAssists =
                 context.defender.location.coordinate.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
@@ -117,10 +105,7 @@ object BlockStep : Procedure() {
                     .count { player -> rules.canOfferAssistAgainst(player, context.attacker) }
 
             return compositeCommandOf(
-                SetOldContext(
-                    Game::blockContext,
-                    context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists),
-                ),
+                SetContext(context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists)),
                 GotoNode(RollBlockDice),
             )
         }

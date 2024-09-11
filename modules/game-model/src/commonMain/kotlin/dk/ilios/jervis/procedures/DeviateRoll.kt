@@ -9,7 +9,7 @@ import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
@@ -19,10 +19,11 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 data class DeviateRollContext(
     val from: FieldCoordinate,
@@ -44,10 +45,8 @@ object DeviateRoll : Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
-        if (state.deviateRollContext == null) {
-            INVALID_GAME_STATE("Missing scatter roll context")
-        }
-        val ball = state.field[state.deviateRollContext!!.from].ball
+        state.assertContext<DeviateRollContext>()
+        val ball = state.field[state.getContext<DeviateRollContext>().from].ball
         if (ball?.state != BallState.DEVIATING && ball?.state != BallState.IN_AIR) {
             throw IllegalStateException("Ball is not deviating, but ${ball?.state}")
         }
@@ -60,7 +59,7 @@ object DeviateRoll : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
-                val context = state.deviateRollContext!!
+                val context = state.getContext<DeviateRollContext>()
                 val direction = rules.direction(d8)
                 val distance = d6.value
 
@@ -78,13 +77,11 @@ object DeviateRoll : Procedure() {
 
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DEVIATE, listOf(d8, d6), showDiceType = true),
-                    SetOldContext(
-                        Game::deviateRollContext, context.copy(
+                    SetContext(context.copy(
                             deviateRoll = listOf(d8, d6),
                             landsAt = if (outOfBoundsAt == null) currentLocation else null,
                             outOfBoundsAt = outOfBoundsAt,
-                        )
-                    ),
+                    )),
                     ExitProcedure()
                 )
             }

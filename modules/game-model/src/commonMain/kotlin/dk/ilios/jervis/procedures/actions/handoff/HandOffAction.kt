@@ -9,11 +9,11 @@ import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -27,6 +27,7 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.Catch
 import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
@@ -53,16 +54,16 @@ data class HandOffContext(
 object HandOffAction : Procedure() {
     override val initialNode: Node = MoveOrHandOffOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
+        val player = state.activePlayer!!
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetOldContext(Game::handOffContext, HandOffContext(player))
+            SetContext(HandOffContext(player))
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val context = state.handOffContext!!
+        val context = state.getContext<HandOffContext>()
         return compositeCommandOf(
-            SetOldContext(Game::handOffContext, null),
+            RemoveContext<HandOffContext>(),
             if (context.hasMoved) {
                 val team = context.thrower.team
                 SetAvailableActions(team, PlayerActionType.HAND_OFF, team.turnData.handOffActions - 1)
@@ -72,11 +73,14 @@ object HandOffAction : Procedure() {
             ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
         )
     }
+    override fun isValid(state: Game, rules: Rules) {
+        if (state.activePlayer == null) INVALID_GAME_STATE("No active player")
+    }
 
     object MoveOrHandOffOrEndAction : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.handOffContext!!.thrower.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<HandOffContext>().thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.handOffContext!!
+            val context = state.getContext<HandOffContext>()
             val options = mutableListOf<ActionDescriptor>()
 
             // Find possible move types
@@ -98,21 +102,21 @@ object HandOffAction : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.handOffContext!!
+            val context = state.getContext<HandOffContext>()
             return when (action) {
                 EndAction -> ExitProcedure()
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
-                        SetOldContext(Game::handOffContext, context.copy(hasMoved = true)),
+                        SetContext(context.copy(hasMoved = true)),
                         SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
                 is PlayerSelected -> {
-                    val context = state.handOffContext!!
+                    val context = state.getContext<HandOffContext>()
                     compositeCommandOf(
-                        SetOldContext(Game::handOffContext, context.copy(catcher = action.getPlayer(state))),
+                        SetContext(context.copy(catcher = action.getPlayer(state))),
                         SetBallState.accurateThrow(),
                         SetBallLocation(action.getPlayer(state).location.coordinate),
                         GotoNode(ResolveCatch)
@@ -129,7 +133,7 @@ object HandOffAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their hand-off.
-            val context = state.handOffContext!!
+            val context = state.getContext<HandOffContext>()
             return if (!context.thrower.isStanding(rules)) {
                 compositeCommandOf(
                     SetTurnOver(true),
@@ -146,7 +150,7 @@ object HandOffAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If no player on the holds the ball after the hand-off is complete, it is a turnover.
             // otherwise the action just ends
-            val context = state.handOffContext!!
+            val context = state.getContext<HandOffContext>()
             return compositeCommandOf(
                 if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(true) else null,
                 ExitProcedure()

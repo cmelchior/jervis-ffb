@@ -2,13 +2,6 @@ package dk.ilios.jervis.model
 
 import dk.ilios.jervis.model.context.ContextHolder
 import dk.ilios.jervis.model.context.UseRerollContext
-import dk.ilios.jervis.procedures.DeviateRollContext
-import dk.ilios.jervis.procedures.ScatterRollContext
-import dk.ilios.jervis.procedures.ThrowInContext
-import dk.ilios.jervis.procedures.actions.blitz.BlitzContext
-import dk.ilios.jervis.procedures.actions.block.BlockContext
-import dk.ilios.jervis.procedures.actions.block.StumbleContext
-import dk.ilios.jervis.procedures.actions.handoff.HandOffContext
 import dk.ilios.jervis.procedures.actions.pass.PassingInteferenceContext
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.skills.RerollSource
@@ -100,13 +93,7 @@ class Game(
     // Context objects are state holders used by procedures
     // when they need to track state between nodes
     val contexts: ContextHolder = ContextHolder()
-    var blockContext: BlockContext? = null
-    var blitzContext: BlitzContext? = null
-    var handOffContext: HandOffContext? = null
-    var scatterRollContext: ScatterRollContext? = null
-    var deviateRollContext: DeviateRollContext? = null
     var passingInteferenceContext: PassingInteferenceContext? = null
-    var throwInContext: ThrowInContext? = null
     var rerollContext: UseRerollContext? = null
 
     val ball: Ball = Ball()

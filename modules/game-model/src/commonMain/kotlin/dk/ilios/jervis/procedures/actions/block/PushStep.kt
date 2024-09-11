@@ -166,8 +166,9 @@ object PushStep: Procedure() {
     }
 
     // TODO Is this where we decide on Juggernaut?
+    // TODO Juggernaut probably doesn't apply to chain pushes?
     object DecideToUseJuggernaut: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.last().pusher.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PushContext>()
             val hasJuggernaut = false // How to check?

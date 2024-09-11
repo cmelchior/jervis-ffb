@@ -11,9 +11,9 @@ import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -40,7 +40,6 @@ import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 
-
 data class BlitzContext(
     val attacker: Player,
     val defender: Player? = null,
@@ -56,26 +55,18 @@ data class BlitzContext(
 @Serializable
 object BlitzAction : Procedure() {
     override val initialNode: Node = SelectTargetOrCancel
-
-    override fun onEnterProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command {
-        val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
-        return compositeCommandOf(
-            getSetPlayerRushesCommand(rules, player),
-            SetOldContext(Game::blitzContext, BlitzContext(player))
-        )
-    }
-
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command {
-        val context = state.blitzContext!!
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val player = state.activePlayer!!
         return compositeCommandOf(
-            SetOldContext(Game::blitzContext, null),
+            getSetPlayerRushesCommand(rules, player),
+            SetContext(BlitzContext(player))
+        )
+    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        val context = state.getContext<BlitzContext>()
+        val player = state.activePlayer!!
+        return compositeCommandOf(
+            RemoveContext<BlitzContext>(),
             if (context.hasBlocked || context.hasMoved) {
                 val team = context.attacker.team
                 SetAvailableActions(team, PlayerActionType.FOUL, team.turnData.blitzActions - 1)
@@ -85,6 +76,9 @@ object BlitzAction : Procedure() {
             ReportActionEnded(player, state.activePlayerAction!!)
         )
     }
+    override fun isValid(state: Game, rules: Rules) {
+        state.activePlayer ?: INVALID_GAME_STATE("No active player")
+    }
 
     object SelectTargetOrCancel : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
@@ -93,7 +87,7 @@ object BlitzAction : Procedure() {
             state: Game,
             rules: Rules,
         ): List<ActionDescriptor> {
-            val attacker = state.blitzContext!!.attacker
+            val attacker = state.getContext<BlitzContext>().attacker
             val availableTargetPlayers = attacker.team.otherTeam().filter {
                 it.location.isOnField(rules) && it.state == PlayerState.STANDING
             }.map {
@@ -106,9 +100,9 @@ object BlitzAction : Procedure() {
             return when (action) {
                 PlayerDeselected -> ExitProcedure()
                 is PlayerSelected -> {
-                    val context = state.blitzContext!!
+                    val context = state.getContext<BlitzContext>()
                     compositeCommandOf(
-                        SetOldContext(Game::blitzContext, context.copy(defender = action.getPlayer(state))),
+                        SetContext(context.copy(defender = action.getPlayer(state))),
                         GotoNode(MoveOrBlockOrEndAction)
                     )
                 }
@@ -122,7 +116,7 @@ object BlitzAction : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
 
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = blitzContext(state)
+            val context = state.getContext<BlitzContext>()
             val options = mutableListOf<ActionDescriptor>()
 
             // Find possible move types
@@ -142,13 +136,13 @@ object BlitzAction : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.blitzContext!!
+            val context = state.getContext<BlitzContext>()
             return when (action) {
                 EndAction -> ExitProcedure()
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.attacker, action.moveType)
                     compositeCommandOf(
-                        SetOldContext(Game::blitzContext, context.copy(hasMoved = true)),
+                        SetContext(context.copy(hasMoved = true)),
                         SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
@@ -161,8 +155,8 @@ object BlitzAction : Procedure() {
                         isBlitzing = true
                     )
                     compositeCommandOf(
-                        SetOldContext(Game::blitzContext, context.copy(hasBlocked = true)),
-                        SetOldContext(Game::blockContext, blockContext),
+                        SetContext(context.copy(hasBlocked = true)),
+                        SetContext(blockContext),
                         GotoNode(ResolveBlock)
                     )
                 }
@@ -177,7 +171,7 @@ object BlitzAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their blitz
-            val context = state.blitzContext!!
+            val context = state.getContext<BlitzContext>()
             return if (!context.attacker.isStanding(rules)) {
                 compositeCommandOf(
                     SetTurnOver(true),
@@ -194,7 +188,7 @@ object BlitzAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their blitz
-            val context = state.blitzContext!!
+            val context = state.getContext<BlitzContext>()
             return if (!rules.isStanding(context.attacker)) {
                 compositeCommandOf(
                     SetTurnOver(true),
@@ -221,13 +215,13 @@ object BlitzAction : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.blitzContext!!
+            val context = state.getContext<BlitzContext>()
             return when (action) {
                 EndAction -> ExitProcedure()
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.attacker, action.moveType)
                     compositeCommandOf(
-                        SetOldContext(Game::blitzContext, context.copy(hasMoved = true)),
+                        SetContext(context.copy(hasMoved = true)),
                         SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
@@ -236,10 +230,5 @@ object BlitzAction : Procedure() {
                 else -> INVALID_ACTION(action)
             }
         }
-    }
-
-    private fun blitzContext(state: Game): BlitzContext {
-        val context = state.blitzContext!!
-        return context
     }
 }

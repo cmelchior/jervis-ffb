@@ -8,14 +8,14 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
@@ -135,7 +135,7 @@ object PassStep: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // The opposite team can now run interference. How this is done
             // depends on if the scattered ball is about to go out of bounds or not.
-            val context = state.scatterRollContext!!
+            val context = state.getContext<ScatterRollContext>()
             return if (context.outOfBoundsAt != null) {
                 compositeCommandOf(
                     SetBallState.outOfBounds(context.outOfBoundsAt),
@@ -163,7 +163,7 @@ object PassStep: Procedure() {
             return compositeCommandOf(
                 SetBallState.deviating(),
                 SetBallLocation(passContext.thrower.location.coordinate),
-                SetOldContext(Game::deviateRollContext, DeviateRollContext(passContext.thrower.location.coordinate))
+                SetContext(DeviateRollContext(passContext.thrower.location.coordinate))
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
@@ -171,19 +171,19 @@ object PassStep: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // The opposite team can now run interference. How this is done
             // depends on if the deviated ball is about to go out of bounds or not.
-            val context = state.deviateRollContext!!
+            val context = state.getContext<DeviateRollContext>()
             return if (context.outOfBoundsAt != null) {
                 compositeCommandOf(
                     SetBallState.outOfBounds(context.outOfBoundsAt),
                     SetBallLocation(FieldCoordinate.OUT_OF_BOUNDS),
-                    SetOldContext(Game::deviateRollContext, null),
+                    RemoveContext<DeviateRollContext>(),
                     GotoNode(AttemptPassingInterferenceBeforeGoingOutOfBounds)
                 )
             } else {
                 compositeCommandOf(
                     SetBallState.deviating(),
                     SetBallLocation(context.landsAt!!),
-                    SetOldContext(Game::deviateRollContext, null),
+                    RemoveContext<DeviateRollContext>(),
                     GotoNode(AttemptPassingInterference)
                 )
             }
@@ -288,7 +288,7 @@ object PassStep: Procedure() {
      */
     object ResolveGoingOutOfBounds: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
-            return SetOldContext(Game::throwInContext, ThrowInContext(state.ball.outOfBoundsAt!!))
+            return SetContext(ThrowInContext(state.ball.outOfBoundsAt!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowIn
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -296,7 +296,7 @@ object PassStep: Procedure() {
             // Otherwise, the throwers team can continue their turn.
             val passContext = state.getContext<PassContext>()
             return compositeCommandOf(
-                SetOldContext(Game::throwInContext, null),
+                RemoveContext<ThrowInContext>(),
                 if (!rules.teamHasBall(passContext.thrower.team)) SetTurnOver(true) else null,
                 ExitProcedure()
             )

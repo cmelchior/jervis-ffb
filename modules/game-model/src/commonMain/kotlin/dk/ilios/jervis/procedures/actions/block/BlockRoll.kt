@@ -63,7 +63,7 @@ object BlockRoll : Procedure() {
                     }
                 return compositeCommandOf(
                     ReportDiceRoll(roll),
-                    SetOldContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
+                    SetContext(state.getContext<BlockContext>().copy(roll = roll)),
                     GotoNode(ChooseResultOrReRollSource),
                 )
             }
@@ -73,7 +73,7 @@ object BlockRoll : Procedure() {
     object ChooseResultOrReRollSource : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.blockContext!!
+            val context = state.getContext<BlockContext>()
             val attackingPlayer = context.attacker
 
             // Re-rolling block dice can be pretty complex,
@@ -150,7 +150,7 @@ object BlockRoll : Procedure() {
                         BlockDieRoll(originalRoll = blockRoll)
                     }
                 compositeCommandOf(
-                    SetOldContext(Game::blockContext, state.blockContext!!.copy(roll = roll)),
+                    SetContext(state.getContext<BlockContext>().copy(roll = roll)),
                     GotoNode(ChooseResultOrReRollSource),
                 )
             }
@@ -161,7 +161,7 @@ object BlockRoll : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(
-                SelectDiceResult(state.blockContext!!.roll.map { it.result }, 1)
+                SelectDiceResult(state.getContext<BlockContext>().roll.map { it.result }, 1)
             )
         }
 
@@ -176,7 +176,7 @@ object BlockRoll : Procedure() {
                 else -> INVALID_ACTION(action)
             }
 
-            val roll = state.blockContext!!
+            val roll = state.getContext<BlockContext>()
             val result = BlockResultContext(
                 roll.attacker,
                 roll.defender,
@@ -195,7 +195,7 @@ object BlockRoll : Procedure() {
 
     // Helper method to share logic between roll and reroll
     private fun calculateNoOfBlockDice(state: Game): Int {
-        val context = state.blockContext!!
+        val context = state.getContext<BlockContext>()
         val attackStrength = context.attacker.strength + context.offensiveAssists
         val defenderStrength = context.defender.strength + context.defensiveAssists
         return when {

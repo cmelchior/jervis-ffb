@@ -14,8 +14,8 @@ import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetKickingPlayer
-import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
@@ -26,6 +26,7 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.reports.ReportKickResult
 import dk.ilios.jervis.reports.ReportKickingPlayer
 import dk.ilios.jervis.rules.Rules
@@ -125,11 +126,11 @@ object TheKickOff : Procedure() {
 
     object TheKickDeviates : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetOldContext(Game::deviateRollContext, DeviateRollContext(from = state.ball.location))
+            return SetContext(DeviateRollContext(from = state.ball.location))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.deviateRollContext!!
+            val context = state.getContext<DeviateRollContext>()
             val newLocation = context.landsAt ?: FieldCoordinate.OUT_OF_BOUNDS
             return compositeCommandOf(
                 if (context.outOfBoundsAt != null) SetBallState.outOfBounds(context.outOfBoundsAt) else SetBallState.deviating(),
