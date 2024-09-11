@@ -212,7 +212,7 @@ data class SingleChoiceInputDialog(
             return createWithDescription(
                 title = "Follow-up",
                 message = "Does ${player.name} want to follow up?",
-                actions = listOf(Confirm to "Confirm", Cancel to "Cancel"),
+                actions = listOf(Confirm to "Follow Up", Cancel to "Stay In Place"),
             )
         }
 

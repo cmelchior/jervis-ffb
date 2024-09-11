@@ -28,7 +28,6 @@ import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.BlockDieRoll
-import dk.ilios.jervis.procedures.actions.blitz.BlitzContext
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
@@ -38,9 +37,10 @@ import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.utils.INVALID_ACTION
 
 /**
- * Procedure for handling a Catch Roll. It is only responsible for handling the actual dice roll.
- * The result is stored in [Game.catchRollResultContext] and it is up to the caller of the procedure to
- * choose the appropriate action depending on the outcome.
+ * Procedure for handling a Block dice roll. It is only responsible for handling the actual dice roll.
+ * The result is stored in [BlockResultContext] and it is up to the caller of the procedure to
+ * choose the appropriate action depending on the outcome. This also includes deleting the [BlockContext]
+ * again.
  */
 object BlockRoll : Procedure() {
     override val initialNode: Node = RollDice
@@ -137,7 +137,7 @@ object BlockRoll : Procedure() {
     }
 
     object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val noOfDice = calculateNoOfBlockDice(state)
             return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
@@ -158,7 +158,7 @@ object BlockRoll : Procedure() {
     }
 
     object SelectBlockResult : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(
                 SelectDiceResult(state.getContext<BlockContext>().roll.map { it.result }, 1)

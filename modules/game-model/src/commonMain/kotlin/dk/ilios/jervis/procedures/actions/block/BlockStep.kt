@@ -21,7 +21,7 @@ import dk.ilios.jervis.procedures.BlockDieRoll
 import dk.ilios.jervis.rules.Rules
 
 /**
- * Wrap temporary data needed to track a Block
+ * Wrap temporary data needed to track a Block step
  */
 data class BlockContext(
     val attacker: Player,

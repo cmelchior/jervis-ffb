@@ -229,12 +229,11 @@ import dk.ilios.jervis.utils.sum
 
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
-
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
                 .filter { coord ->
-                    state.field[coord].player?.let { player ->
-                        player.team != context.player.team
-                    } ?: false
+                    state.field[coord].player
+                        ?.let { player -> player.team != context.player.team}
+                        ?: false
                 }
                 .mapNotNull { state.field[it].player }
                 .filter { it.isSkillAvailable<PrehensileTail>() }

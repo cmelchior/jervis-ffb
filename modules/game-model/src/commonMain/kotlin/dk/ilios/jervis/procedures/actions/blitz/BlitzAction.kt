@@ -184,6 +184,14 @@ object BlitzAction : Procedure() {
     }
 
     object ResolveBlock : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            val blitzContext = state.getContext<BlitzContext>()
+            return SetContext(BlockContext(
+                blitzContext.attacker,
+                blitzContext.defender!!,
+                isBlitzing = true
+            ))
+        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BlockStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
