@@ -245,7 +245,6 @@ class FieldViewModel(
                                     )
                                 },
                             )
-                            showContextMenu = input.actions.isNotEmpty()
                         }
                     }
 
@@ -259,7 +258,6 @@ class FieldViewModel(
                                     )
                                 },
                             )
-                            showContextMenu = showContextMenu || input.actions.isNotEmpty()
                         }
                     }
 
@@ -297,6 +295,15 @@ class FieldViewModel(
                 it.location.x == x &&
                 it.location.y == y
         } ?: false
+
+        // Choosing whether or not to showing the context menu is a bit complicated.
+        // But we employ the rule that if one of the actions are a "main" action, it means
+        // the player was just selected and we should show the context menu up front.
+        // Otherwise, it means that the player is in the middle of their action and we should
+        // not show the context menu up front. That should be up to the player
+        if (contextActions.isNotEmpty() && contextActions.count { it.title == "End action" } == 0) {
+            showContextMenu = true
+        }
 
         val uiSquare =
             UiFieldSquare(
