@@ -10,7 +10,6 @@ import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
-import dk.ilios.jervis.commands.SetActiveTeam
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
@@ -41,7 +40,6 @@ object SwelteringHeat : Procedure() {
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
-            SetActiveTeam(state.homeTeam),
             RemoveContext<SwelteringHeatContext>()
         )
     }
@@ -81,7 +79,6 @@ object SwelteringHeat : Procedure() {
                 }.toTypedArray()
                 return compositeCommandOf(
                     *playersRemoved,
-                    SetActiveTeam(state.awayTeam),
                     GotoNode(RollForAwayTeam)
                 )
             }

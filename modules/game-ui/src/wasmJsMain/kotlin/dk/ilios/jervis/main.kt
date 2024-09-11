@@ -15,7 +15,7 @@ fun main() {
             App(menuViewModel)
         }
     } catch(ex: Throwable) {
-        // Work-around for exceptions not being very nice in WebAssembly.
+        // Work-around for thrown exceptions not showing the root cause in WebAssembly.
         ex.printStackTrace()
         throw ex
     }

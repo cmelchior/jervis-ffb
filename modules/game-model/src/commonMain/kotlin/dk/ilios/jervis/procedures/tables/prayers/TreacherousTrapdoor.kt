@@ -2,8 +2,8 @@ package dk.ilios.jervis.procedures.tables.prayers
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
@@ -44,7 +44,7 @@ object TreacherousTrapdoor : Procedure() {
             val context = state.getContext<PrayersToNuffleRollContext>()
             return compositeCommandOf(
                 SetContext(context.copy(resultApplied = true)),
-                ReportGameProgress("${state.activeTeam} installed a Treacherous Trapdoor"),
+                ReportGameProgress("${context.team.name} installed a Treacherous Trapdoor"),
                 ExitProcedure(),
             )
         }

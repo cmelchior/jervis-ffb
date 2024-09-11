@@ -1,8 +1,8 @@
 package dk.ilios.jervis
 
+import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
-import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.EndSetup
@@ -84,9 +84,9 @@ fun defaultInducements() = emptyArray<GameAction>()
 fun defaultPrayersToNuffle() = emptyArray<GameAction>()
 
 fun defaultDetermineKickingTeam() = arrayOf(
-    CoinSideSelected(Coin.HEAD), // Home: Select side
-    CoinTossResult(Coin.HEAD), // Flip coin
-    Confirm // Home: Confirm to kick
+    CoinSideSelected(Coin.HEAD), // Away: Select side
+    CoinTossResult(Coin.HEAD), // Home flips coin
+    Cancel // Away choices to receive
 )
 
 fun defaultPregame(
@@ -149,6 +149,8 @@ fun defaultSetup(): Array<GameAction> {
 
 fun defaultKickOffEvent(): Array<GameAction> = arrayOf(
     DiceResults(3.d6, 4.d6), // Roll on kick-off table, does nothing for now
+    1.d6, // Brilliant coaching
+    1.d6 // Brilliant coaching
 )
 
 fun defaultKickOffHomeTeam(

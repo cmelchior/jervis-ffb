@@ -12,6 +12,7 @@ import androidx.compose.ui.window.MenuBar
 import dk.ilios.jervis.ui.filePicker
 import dk.ilios.jervis.ui.viewmodel.Feature
 import dk.ilios.jervis.ui.viewmodel.MenuViewModel
+import dk.ilios.jervis.ui.viewmodel.Setups
 import okio.Path
 
 @Composable
@@ -21,6 +22,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
     var rerollSuccessfulActions by remember { mutableStateOf(vm.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) }
     var selectKickingPlayer by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_KICKING_PLAYER)) }
     MenuBar {
+
         Menu("Developer Tools", mnemonic = 'D') {
             Item("Save Game", onClick = {
                 filePicker(
@@ -60,40 +62,12 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
         }
 
         Menu ("Setups", mnemonic = 'S') {
-            Menu("Kicking") {
-                Item("3-4-4", onClick = { vm.loadSetup("3-4-4") })
+            Menu("Defensive") {
+                Item(Setups.SETUP_3_4_4, onClick = { vm.loadSetup(Setups.SETUP_3_4_4) })
             }
-
-            Menu("Receiving") {
-                Item("5-5-1", onClick = { vm.loadSetup("5-5-1") })
+            Menu("Offensive") {
+                Item(Setups.SETUP_5_5_1, onClick = { vm.loadSetup(Setups.SETUP_5_5_1) })
             }
         }
-
-//        Menu("Help", mnemonic = 'H') {
-//            Item("About", onClick = { action = "About" })
-//            Item("Help", onClick = { action = "Help" })
-//        }
-//        Menu("File", mnemonic = 'F') {
-//            Item("Copy", onClick = { }, shortcut = KeyShortcut(Key.C, ctrl = true))
-//            Item("Paste", onClick = { }, shortcut = KeyShortcut(Key.V, ctrl = true))
-//        }
-//        Menu("Actions", mnemonic = 'A') {
-//            CheckboxItem(
-//                "Advanced settings",
-//                checked = isSubmenuShowing,
-//                onCheckedChange = {
-//                    isSubmenuShowing = !isSubmenuShowing
-//                }
-//            )
-//            if (isSubmenuShowing) {
-//                Menu("Settings") {
-//                    Item("Setting 1", onClick = { action = "Last action: Setting 1" })
-//                    Item("Setting 2", onClick = { action = "Last action: Setting 2" })
-//                }
-//            }
-//            Separator()
-//            Item("About", icon = AboutIcon, onClick = { action = "Last action: About" })
-//            Item("Exit", onClick = { isOpen = false }, shortcut = KeyShortcut(Key.Escape), mnemonic = 'E')
-//        }
     }
 }

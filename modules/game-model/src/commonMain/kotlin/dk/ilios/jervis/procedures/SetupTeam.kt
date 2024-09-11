@@ -78,7 +78,7 @@ object SetupTeam : Procedure() {
     }
 
     object PlacePlayer : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam // TODO Using the "active team" is probably not the right thing
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<SetupTeamContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`

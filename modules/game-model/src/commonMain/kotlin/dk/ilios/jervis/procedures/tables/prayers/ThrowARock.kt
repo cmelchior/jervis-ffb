@@ -8,6 +8,7 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.assertContext
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
 import dk.ilios.jervis.reports.ReportGameProgress
 import dk.ilios.jervis.rules.Rules
@@ -26,8 +27,9 @@ object ThrowARock : Procedure() {
 
     object SelectPlayer : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<PrayersToNuffleRollContext>()
             return compositeCommandOf(
-                ReportGameProgress("${state.activeTeam} will Throw a Rock if ${state.activeTeam.otherTeam().name} stalls."),
+                ReportGameProgress("${context.team.name} will Throw a Rock if ${context.team.otherTeam().name} stalls."),
                 ExitProcedure(),
             )
         }

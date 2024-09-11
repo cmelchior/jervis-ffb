@@ -7,7 +7,6 @@ import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.SetActiveTeam
 import dk.ilios.jervis.commands.SetFanFactor
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -20,7 +19,6 @@ import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportFanFactor
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
-import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 /**
  * This procedure controls rolling for "The Fans" as described on page
@@ -28,17 +26,8 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  */
 object FanFactorRolls : Procedure() {
     override val initialNode: Node = SetFanFactorForHomeTeam
-
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        if (!state.activeTeam.isHomeTeam()) {
-            INVALID_GAME_STATE("Expected active team to be the home team.")
-        }
-        return null
-    }
-
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return SetActiveTeam(state.homeTeam)
-    }
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object SetFanFactorForHomeTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.homeTeam

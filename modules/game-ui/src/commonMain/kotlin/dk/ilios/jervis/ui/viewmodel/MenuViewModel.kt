@@ -6,6 +6,8 @@ import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.ext.playerNo
 import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.SetupTeamContext
 import dk.ilios.jervis.serialize.JervisSerialization
 import okio.Path
 
@@ -43,11 +45,11 @@ class MenuViewModel {
     }
 
     fun loadSetup(id: String) {
-        val state = controller!!.state
+        val team = controller!!.state.getContext<SetupTeamContext>().team
         val setupActions = Setups.setups[id]!!.flatMap { (playerNo, fieldCoordinate) ->
             listOf(
-                PlayerSelected(state.activeTeam[playerNo].id),
-                FieldSquareSelected(fieldCoordinate)
+                PlayerSelected(team[playerNo].id),
+                if (team.isAwayTeam()) FieldSquareSelected(fieldCoordinate.swapX(controller!!.rules)) else FieldSquareSelected(fieldCoordinate)
             )
         }
         uiActionFactory.userSelectedMultipleActions(setupActions, delayEvent = false)
@@ -55,23 +57,25 @@ class MenuViewModel {
 }
 
 object Setups {
+    const val SETUP_5_5_1: String = "5-5-1"
+    const val SETUP_3_4_4: String = "3-4-4"
     val setups = mutableMapOf(
-        // Away
-        "5-5-1" to mapOf(
-            2.playerNo to FieldCoordinate(13, 5),
-            3.playerNo to FieldCoordinate(13, 6),
-            1.playerNo to FieldCoordinate(13, 7),
-            4.playerNo to FieldCoordinate(13, 8),
-            5.playerNo to FieldCoordinate(13, 9),
-            6.playerNo to FieldCoordinate(14, 3),
-            7.playerNo to FieldCoordinate(14, 11),
-            8.playerNo to FieldCoordinate(14, 1),
-            9.playerNo to FieldCoordinate(14, 13),
-            10.playerNo to FieldCoordinate(16, 7),
-            11.playerNo to FieldCoordinate(21, 7),
+        // Offensive
+        SETUP_5_5_1 to mapOf(
+            2.playerNo to FieldCoordinate(12, 5),
+            3.playerNo to FieldCoordinate(12, 6),
+            1.playerNo to FieldCoordinate(12, 7),
+            4.playerNo to FieldCoordinate(12, 8),
+            5.playerNo to FieldCoordinate(12, 9),
+            6.playerNo to FieldCoordinate(11, 3),
+            7.playerNo to FieldCoordinate(11, 11),
+            8.playerNo to FieldCoordinate(11, 1),
+            9.playerNo to FieldCoordinate(11, 13),
+            10.playerNo to FieldCoordinate(8, 7),
+            11.playerNo to FieldCoordinate(3, 7),
         ),
-        // Home
-        "3-4-4" to mapOf(
+        // Defensive
+        SETUP_3_4_4 to mapOf(
             1.playerNo to FieldCoordinate(12, 6),
             2.playerNo to FieldCoordinate(12, 7),
             3.playerNo to FieldCoordinate(12, 8),

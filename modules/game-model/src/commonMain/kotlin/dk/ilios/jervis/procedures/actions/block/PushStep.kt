@@ -12,7 +12,6 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.SetActiveTeam
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -191,7 +190,6 @@ object PushStep: Procedure() {
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usingJuggernaut = useSkill))
                 return compositeCommandOf(
                     SetContext(newContext),
-                    SetActiveTeam(context.pushee.team),
                     GotoNode(DecideToUseStandFirm)
                 )
             } else {
@@ -226,7 +224,6 @@ object PushStep: Procedure() {
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedStandFirm = useSkill))
                 return compositeCommandOf(
                     SetContext(newContext),
-                    SetActiveTeam(context.pusher.team),
                     GotoNode(DecideToUseGrab)
                 )
             } else {
@@ -260,7 +257,6 @@ object PushStep: Procedure() {
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedGrab = useSkill))
                 return compositeCommandOf(
                     SetContext(newContext),
-                    SetActiveTeam(context.pushee.team),
                     GotoNode(DecideToUseSidestep)
                 )
             } else {
@@ -326,7 +322,6 @@ object PushStep: Procedure() {
                 val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedFend = useSkill))
                 return compositeCommandOf(
                     SetContext(newContext),
-                    SetActiveTeam(context.pusher.team),
                     GotoNode(SelectPushDirection)
                 )
             } else {

@@ -79,7 +79,7 @@ abstract class ActionNode : Node {
                         .filterIsInstance<SelectPlayer>()
                         .firstOrNull { it.player == action.playerId } != null
                     if (!hasActionDescriptor) {
-                        INVALID_ACTION(action, "Player wasn't recognised as a valid action: $availableActions")
+                        INVALID_ACTION(action, "Player $action wasn't recognised as a valid action: $availableActions")
                     }
                 }
                 is SkillSelected -> {

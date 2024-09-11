@@ -36,10 +36,7 @@ data object Manual : GameMode
 data class Replay(val file: Path) : GameMode
 
 class IntroScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
-    fun start(
-        navigator: Navigator,
-        mode: GameMode,
-    ) {
+    fun start(navigator: Navigator, mode: GameMode) {
         GlobalScope.launch {
             val screenModel = GameScreenModel(mode, menuViewModel)
             screenModel.initialize()
@@ -47,10 +44,7 @@ class IntroScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
         }
     }
 
-    fun loadGame(
-        navigator: Navigator,
-        file: Path,
-    ) {
+    fun loadGame(navigator: Navigator, file: Path) {
         GlobalScope.launch {
             val (controller, actions) = JervisSerialization.loadFromFile(file)
             val screenModel = GameScreenModel(Manual, menuViewModel, controller)

@@ -18,7 +18,6 @@ import dk.ilios.jervis.utils.assert
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.experimental.xor
-import kotlin.jvm.Synchronized
 
 /**
  * https://github.com/christerk/ffb/blob/48cbbc770a0b6d9dee6a43244949a8894f10d1bf/ffb-server/src/main/java/com/fumbbl/ffb/server/util/rng/Fortuna.java
@@ -70,6 +69,9 @@ class Fortuna: DiceGenerator {
             0x89.toByte(),
             0xD6.toByte()
         )
+    }
+
+    suspend fun init() {
         val key = byteArrayOf(
             0x95.toByte(),
             0xA8.toByte(),
@@ -156,11 +158,11 @@ class Fortuna: DiceGenerator {
         return 1 + (result % max)
     }
 
-    @Synchronized
-    fun rekeyGenerator(newKey: ByteArray) {
+    // @Synchronized
+    suspend fun rekeyGenerator(newKey: ByteArray) {
         lastRekeying = Clock.System.now()
         rekeyings++
-        cipher = algorithm.keyDecoder().decodeFromBlocking(format = AES.Key.Format.RAW, input = newKey).cipher()
+        cipher = algorithm.keyDecoder().decodeFrom(format = AES.Key.Format.RAW, input = newKey).cipher()
     }
 
     private fun generateRandomData() {
@@ -172,8 +174,8 @@ class Fortuna: DiceGenerator {
         byteOffset = 0
     }
 
-    @Synchronized
-    fun addEntropy(data: Byte) {
+    // @Synchronized
+    suspend fun addEntropy(data: Byte) {
         pools[currentPool]!!.addEntropy(data)
         currentPool--
         if (currentPool < 0) {
