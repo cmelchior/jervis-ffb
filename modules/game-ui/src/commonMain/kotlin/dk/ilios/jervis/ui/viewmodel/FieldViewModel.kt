@@ -187,7 +187,6 @@ class FieldViewModel(
                     is CompositeUserInput -> {
                         userInput.inputs
                     }
-
                     else -> {
                         listOf(userInput)
                     }
@@ -212,7 +211,7 @@ class FieldViewModel(
                                 ),
                             ]?.let { action: FieldSquareAction ->
                                 { uiActionFactory.userSelectedAction(action.action) }
-                            }
+                            } ?: squareAction
                     }
 
                     is SelectPlayerInput -> {
@@ -223,7 +222,7 @@ class FieldViewModel(
                                     ?.let { playerAction: GameAction ->
                                         { uiActionFactory.userSelectedAction(playerAction) }
                                     }
-                            }
+                            } ?: squareAction
                     }
 
                     is SelectPlayerActionInput -> {
@@ -292,9 +291,9 @@ class FieldViewModel(
         val uiPlayer = square.player?.let { UiPlayer(it, squareAction) }
         val isBallOnGround: Boolean = square.ball?.let {
             (it.state != BallState.CARRIED && it.state != BallState.OUT_OF_BOUNDS) &&
-                it.location.x == x &&
-                it.location.y == y
-        } ?: false
+                    it.location.x == x &&
+                    it.location.y == y
+        } == true
 
         // Choosing whether or not to showing the context menu is a bit complicated.
         // But we employ the rule that if one of the actions are a "main" action, it means
