@@ -1,7 +1,5 @@
 package dk.ilios.jervis.ui.viewmodel
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Player
@@ -14,6 +12,7 @@ import dk.ilios.jervis.utils.safeTryEmit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -62,50 +61,67 @@ class SidebarViewModel(
 
     fun view(): StateFlow<SidebarView> = _view
 
-    fun reserveCount(): StateFlow<Int?> = _reserveCount
+    fun reserveCount(): Flow<Int> = team.dogoutFlow.map {
+        // Available players in the Dogout should only have this state
+        it.count { it.state == PlayerState.RESERVE }
+    }
 
     fun reserves(): Flow<List<UiPlayer>> {
-        return team.dogoutFlow.map { players: List<Player> ->
-            players
-                .filter { it.state == PlayerState.STANDING }
-                .sortedBy { it.number }
-        }.combine(uiActionFactory.fieldActions) { e1: List<Player>, e2: UserInput ->
-            val userInput = e2 as? SelectPlayerInput
-            val selectablePlayers = userInput?.actions?.associateBy { (it as PlayerSelected).getPlayer(team.game) } ?: emptyMap()
-            e1.map {
-                val selectAction =
-                    selectablePlayers[it]?.let {
-                        { uiActionFactory.userSelectedAction(it) }
-                    }
-                UiPlayer(it, selectAction, onHover = { hoverOver(it) })
+        return team.dogoutFlow
+            .map { players: List<Player> ->
+                players
+                    .filter { it.state == PlayerState.RESERVE }
+                    .sortedBy { it.number }
+            }.combine(uiActionFactory.fieldActions) { e1: List<Player>, e2: UserInput ->
+                val userInput = e2 as? SelectPlayerInput
+                val selectablePlayers = userInput?.actions?.associateBy { (it as PlayerSelected).getPlayer(team.game) } ?: emptyMap()
+                e1.map {
+                    val selectAction =
+                        selectablePlayers[it]?.let {
+                            { uiActionFactory.userSelectedAction(it) }
+                        }
+                    UiPlayer(it, selectAction, onHover = { hoverOver(it) })
             }
         }
     }
 
-    fun knockedOut(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+    fun knockedOut(): Flow<List<UiPlayer>> = mapTo(PlayerState.KNOCKED_OUT, team.dogoutFlow)
 
-    fun badlyHurt(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+    fun badlyHurt(): Flow<List<UiPlayer>> = mapTo(PlayerState.BADLY_HURT, team.dogoutFlow)
 
-    fun seriousInjuries(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+    fun seriousInjuries(): Flow<List<UiPlayer>> = mapTo(PlayerState.SERIOUS_INJURY, team.dogoutFlow)
 
-    fun dead(): SnapshotStateList<UiPlayer> = mutableStateListOf()
+    fun dead(): Flow<List<UiPlayer>> = mapTo(PlayerState.DEAD, team.dogoutFlow)
 
-    fun injuriesCount(): StateFlow<Int?> = _injuriesCount
+    fun banned(): Flow<List<UiPlayer>> = mapTo(PlayerState.BANNED, team.dogoutFlow)
+
+    fun special(): Flow<List<UiPlayer>> = mapTo(PlayerState.FAINTED, team.dogoutFlow)
+
+
+
+    fun injuriesCount(): Flow<Int> = team.dogoutFlow.map {
+        // Available players should be in RESERVE, all others should be treated
+        // as some kind of injury.
+        it.count { it.state != PlayerState.RESERVE}
+    }
 
     fun hoverOver(player: Player) {
         hoverPlayerChannel.safeTryEmit(player)
     }
 
-    init {
-        _reserveCount.value = 12
-        _injuriesCount.value = 0
-    }
-
-    fun toggleReserves() {
+    fun toggleToReserves() {
         _view.value = SidebarView.RESERVES
     }
 
     fun toggleInjuries() {
         _view.value = SidebarView.INJURIES
+    }
+
+    private fun mapTo(state: PlayerState, dogoutFlow: SharedFlow<List<Player>>): Flow<List<UiPlayer>> {
+        return dogoutFlow.map { players ->
+            players.filter { it.state == state }
+        }.map { players ->
+            players.map { UiPlayer(it, selectAction = null, onHover = { hoverOver(it) }) }
+        }
     }
 }

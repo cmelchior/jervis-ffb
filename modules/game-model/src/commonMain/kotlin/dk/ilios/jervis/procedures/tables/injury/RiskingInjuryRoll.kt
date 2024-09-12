@@ -134,7 +134,7 @@ object RiskingInjuryRoll: Procedure() {
                     if (context.mode == RiskingInjuryMode.PUSHED_INTO_CROWD) {
                         compositeCommandOf(
                             SetPlayerLocation(context.player, DogOut),
-                            SetPlayerState(context.player, PlayerState.STANDING),
+                            SetPlayerState(context.player, PlayerState.RESERVE),
                             ExitProcedure(),
                         )
                     } else {

@@ -8,7 +8,6 @@ import dk.ilios.jervis.ui.viewmodel.FieldViewModel
 import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
 import dk.ilios.jervis.ui.viewmodel.UiActionFactory
-import dk.ilios.jervis.ui.viewmodel.WaitingForUserInput
 import dk.ilios.jervis.utils.createDefaultGameState
 import kotlinx.coroutines.CoroutineScope
 
@@ -18,7 +17,7 @@ object TestDummy {
     val uiActionFactory =
         object : UiActionFactory(gameModel) {
             init {
-                _fieldActions.tryEmit(WaitingForUserInput)
+//                _fieldActions.tryEmit(WaitingForUserInput)
             }
 
             override suspend fun start(scope: CoroutineScope) { /* Do nothing */ }

@@ -85,16 +85,16 @@ enum class PlayerState {
 
 @Serializable
 @JvmInline
-value class PlayerNo(val number: Int) : Comparable<PlayerNo> {
+value class PlayerNo(val value: Int) : Comparable<PlayerNo> {
     override fun compareTo(other: PlayerNo): Int {
         return when {
-            (number == other.number) -> 0
-            (number < other.number) -> -1
+            (value == other.value) -> 0
+            (value < other.value) -> -1
             else -> 1
         }
     }
 
-    override fun toString(): String = number.toString()
+    override fun toString(): String = value.toString()
 }
 
 fun Player.isOnHomeTeam(): Boolean {
@@ -143,7 +143,7 @@ class Player(
                 team.notifyDogoutChange()
             }
         }
-    var state: PlayerState = PlayerState.STANDING
+    var state: PlayerState = PlayerState.RESERVE
     val isActive: Boolean get() = (team.game.activePlayer == this)
     var available: Availability = Availability.AVAILABLE
     var stunnedThisTurn: Boolean? = null

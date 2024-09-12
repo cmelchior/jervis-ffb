@@ -93,7 +93,7 @@ class PositionImageFactory(spriteSheet: ImageBitmap) {
     }
 
     fun getVariant(player: Player): PositionImage {
-        val imageIndex = player.number.number % homeTeamIcons.size
+        val imageIndex = player.number.value % homeTeamIcons.size
         return if (player.isOnHomeTeam()) {
             homeTeamIcons[imageIndex]
         } else {
@@ -116,6 +116,7 @@ object IconFactory {
     private val HELD_BALL_OVERLAY = "icons/decorations/holdball.png"
     private val PLAYER_DETAIL_OVERLAY = "icons/sidebar/overlay_player_detail_blue2.png"
     private val SIDEBAR_BACKGROUND = "icons/sidebar/background_box.png"
+    private val BUTTON_BACKGROUND = "icons/sidebar/box_button.gif"
 
     // Load all image resources used.
     // It looks like we cannot lazy load them due to how Compose Resources work on WasmJS
@@ -129,6 +130,7 @@ object IconFactory {
         saveImageIntoCache(PLAYER_DETAIL_OVERLAY)
         saveImageIntoCache("i/332804.png")
         saveImageIntoCache(SIDEBAR_BACKGROUND)
+        saveImageIntoCache(BUTTON_BACKGROUND)
         FieldDetails.entries.forEach {
             saveImageIntoCache(it.resource)
         }
@@ -247,5 +249,9 @@ object IconFactory {
 
     fun getField(field: FieldDetails): ImageBitmap {
         return loadImageFromCache(field.resource)
+    }
+
+    fun getButton(): ImageBitmap {
+        return loadImageFromCache(BUTTON_BACKGROUND)
     }
 }

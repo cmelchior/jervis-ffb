@@ -57,7 +57,7 @@ import org.jetbrains.skia.Typeface
 fun DrawScope.drawTextOnPath(
     text: String,
     textSize: Dp,
-    font: Font = Font(Typeface.makeDefault()),
+    font: Font = Font(Typeface.makeEmpty()), // TODO makeDefault was removed. What to replace it with?
     isEmboldened: Boolean = false,
     path: Path,
     offset: Offset,

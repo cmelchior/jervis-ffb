@@ -52,7 +52,7 @@ object SetupTeam : Procedure() {
             val context = state.getContext<SetupTeamContext>()
             val availablePlayers =
                 context.team.filter {
-                    val inReserve = (it.location == DogOut && it.state == PlayerState.STANDING)
+                    val inReserve = (it.location == DogOut && it.state == PlayerState.RESERVE)
                     val onField = (it.location is FieldCoordinate && it.state == PlayerState.STANDING)
                     inReserve || onField
                 }.map {
@@ -113,7 +113,7 @@ object SetupTeam : Procedure() {
                 DogoutSelected -> {
                     compositeCommandOf(
                         SetPlayerLocation(player, DogOut),
-                        SetPlayerState(player, PlayerState.STANDING),
+                        SetPlayerState(player, PlayerState.RESERVE),
                         SetContext(context.copy(currentPlayer = null)),
                         GotoNode(SelectPlayerOrEndSetup),
                     )

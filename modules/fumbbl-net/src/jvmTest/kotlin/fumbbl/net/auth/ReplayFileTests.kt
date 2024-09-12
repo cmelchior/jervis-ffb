@@ -20,7 +20,7 @@ class ReplayFileTests {
             val adapter = FumbblFileReplayAdapter(file)
             adapter.start()
             val game = adapter.getGame()
-            val jervisGame: Game = Game.fromFumbblState(game)
+            val jervisGame: Game = Game.fromFumbblState(BB2020Rules, game)
             var isDone = false
             while (!isDone) {
                 val cmd = adapter.receive()
