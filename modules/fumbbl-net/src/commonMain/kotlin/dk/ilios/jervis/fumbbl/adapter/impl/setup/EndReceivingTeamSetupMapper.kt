@@ -6,13 +6,12 @@ import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
 import dk.ilios.jervis.fumbbl.model.TurnMode
-import dk.ilios.jervis.fumbbl.model.change.GameSetTurnMode
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.SetupTeam
 
-object EndDefenseSetupMapper: CommandActionMapper {
+object EndReceivingTeamSetupMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
@@ -20,9 +19,8 @@ object EndDefenseSetupMapper: CommandActionMapper {
     ): Boolean {
         return (
             command.firstChangeId() == ModelChangeId.GAME_SET_HOME_PLAYING &&
-            game.turnMode == TurnMode.SETUP &&
-            command.modelChangeList.size == 3 &&
-            command.modelChangeList.last() is GameSetTurnMode
+            command.lastChangeId() == ModelChangeId.GAME_SET_TURN_MODE &&
+            command.modelChangeList.last().value == TurnMode.KICKOFF
         )
     }
 
@@ -34,7 +32,7 @@ object EndDefenseSetupMapper: CommandActionMapper {
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {
-        // Ending second team setup
         newActions.add(EndSetup, SetupTeam.SelectPlayerOrEndSetup)
     }
 }
+

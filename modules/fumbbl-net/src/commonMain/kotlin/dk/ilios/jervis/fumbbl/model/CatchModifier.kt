@@ -37,6 +37,9 @@ enum class CatchModifier(override val id: String, val modifier: Int) : FumbblEnu
     DISTURBING_PRESENCE_8("8 Disturbing Presences", -8),
     DISTURBING_PRESENCE_9("9 Disturbing Presences", -9),
     DISTURBING_PRESENCE_10("10 Disturbing Presences", -10),
-    DISTURBING_PRESENCE_11("111 Disturbing Presences", -11),
+    DISTURBING_PRESENCE_11("11 Disturbing Presences", -11),
     POURING_RAIN("Pouring Rain", -1),
+    HAND_OFF("Hand Off", -1),
+    ACCURATE_PASS("Accurate Pass", -1),
+    ;
 }

@@ -13,7 +13,6 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
-import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
@@ -62,16 +61,16 @@ fun calculateMoveTypesAvailable(player: Player, rules: Rules): List<ActionDescri
         options.add(MoveType.STANDARD)
     }
 
-    // Jump/Leap (with potential rushes)
-    if (player.movesLeft + player.rushesLeft >= 2 && player.isStanding(rules)) {
-        options.add(MoveType.JUMP)
-        options.add(MoveType.LEAP)
-    }
-
-    // Standup
-    if (player.location.isOnField(rules) && player.state == PlayerState.PRONE) {
-        options.add(MoveType.STAND_UP)
-    }
+//    // Jump/Leap (with potential rushes)
+//    if (player.movesLeft + player.rushesLeft >= 2 && player.isStanding(rules)) {
+//        options.add(MoveType.JUMP)
+//        options.add(MoveType.LEAP)
+//    }
+//
+//    // Standup
+//    if (player.location.isOnField(rules) && player.state == PlayerState.PRONE) {
+//        options.add(MoveType.STAND_UP)
+//    }
 
     return options.map { SelectMoveType(it) }
 }

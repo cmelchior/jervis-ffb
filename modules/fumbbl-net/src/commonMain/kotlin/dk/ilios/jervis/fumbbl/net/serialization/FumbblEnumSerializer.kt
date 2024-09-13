@@ -1,5 +1,6 @@
 package dk.ilios.jervis.fumbbl.net.serialization
 
+import dk.ilios.jervis.utils.ReflectionUtils
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -33,9 +34,8 @@ open class FumbblEnumSerializer<E>(
 
     override fun deserialize(decoder: Decoder): E =
         decoder.decodeString().let { value ->
-            TODO()
-//            kClass.java.enumConstants.firstOrNull {
-//                it.id == value
-//            } ?: throw IllegalStateException("Cannot find enum with label $value in ${kClass.simpleName}")
+            ReflectionUtils.getEnumConstants(kClass).firstOrNull {
+                it.id == value
+            } ?: throw IllegalStateException("Cannot find enum with label $value in ${kClass.simpleName}")
         }
 }

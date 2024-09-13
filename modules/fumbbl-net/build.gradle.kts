@@ -42,7 +42,6 @@ kotlin {
                 implementation("io.ktor:ktor-client-websockets:$ktor")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${libs.versions.serialization}")
-                implementation("org.reflections:reflections:0.10.2")
             }
         }
         val commonTest by getting {
@@ -53,6 +52,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-okhttp:$ktor")
+                implementation("org.reflections:reflections:0.10.2")
             }
         }
         val jvmTest by getting

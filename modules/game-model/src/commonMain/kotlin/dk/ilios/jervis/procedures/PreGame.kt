@@ -2,9 +2,9 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
-import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -60,10 +60,11 @@ object PreGame : Procedure() {
         }
     }
 
+    // For FUMBBL, we need to check `inducementPrayersAvailableForUnderdog` and possible `inducementPrayersUseLeagueTable`
     object Inducements : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules) = BuyInducements
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(CheckForPrayersToNuffle)
+            return GotoNode(DetermineKickingTeam/*CheckForPrayersToNuffle*/)
         }
     }
 

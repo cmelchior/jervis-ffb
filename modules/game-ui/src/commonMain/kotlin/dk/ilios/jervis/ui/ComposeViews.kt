@@ -108,11 +108,10 @@ fun SectionDivider(modifier: Modifier) {
     Box(
         modifier =
             modifier
-//                .shadow(2.dp, ambientColor = Color.Black, spotColor = Color.Black)
                 .padding(4.dp)
                 .height(2.dp)
-//                .padding(4.dp)
                 .background(color = Color.White)
+//                .dropShadow(color = Color.Red, offsetX = 2.dp, offsetY = 2.dp, blurRadius = 2.dp)
 
     )
 }

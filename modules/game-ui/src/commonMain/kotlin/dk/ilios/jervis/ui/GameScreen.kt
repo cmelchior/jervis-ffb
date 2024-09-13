@@ -60,7 +60,7 @@ class GameScreenModel(
                 }
 
                 is Replay -> {
-                    fumbbl = FumbblReplayAdapter(mode.file, false)
+                    fumbbl = FumbblReplayAdapter(mode.file, true)
                     fumbbl!!.loadCommands()
                     this.controller = GameController(rules, fumbbl!!.getGame())
                 }

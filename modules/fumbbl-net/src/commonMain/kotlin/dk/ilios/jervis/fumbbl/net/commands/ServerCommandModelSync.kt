@@ -21,6 +21,10 @@ data class ServerCommandModelSync(
         return modelChangeList.firstOrNull()?.id
     }
 
+    fun lastChangeId(): ModelChangeId? {
+        return modelChangeList.lastOrNull()?.id
+    }
+
     fun firstReport(): Report? {
         return reportList.reports.firstOrNull()
     }
