@@ -47,6 +47,12 @@ fun Player(
                 player.onHover.invoke()
             }
     }
+    if (player.onHoverExit != null) {
+        playerModifier =
+            playerModifier.onPointerEvent(eventType = PointerEventType.Exit) {
+                player.onHoverExit.invoke()
+            }
+    }
 
     Box(modifier = playerModifier) {
         Image(

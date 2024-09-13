@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,20 +11,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
@@ -35,18 +33,14 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.model.UiPlayer
-import dk.ilios.jervis.ui.model.UiPlayerCard
 import dk.ilios.jervis.ui.viewmodel.SidebarView
 import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
 import kotlinx.coroutines.flow.Flow
-import org.pushingpixels.artemis.drawTextOnPath
 
 @Composable
 fun Sidebar(
@@ -90,7 +84,9 @@ fun Sidebar(
                     Box(modifier = Modifier.fillMaxWidth()) {
                         val view by vm.view().collectAsState()
                         when (view) {
-                            SidebarView.RESERVES -> Reserves(vm.reserves())
+                            SidebarView.RESERVES -> Reserves(vm.reserves()) {
+                                vm.hoverExit()
+                            }
                             SidebarView.INJURIES ->
                                 Injuries(
                                     vm.knockedOut(),
@@ -125,125 +121,6 @@ fun Sidebar(
             // Rest of content
             Box {
 
-            }
-        }
-    }
-}
-
-@Composable
-fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
-    val playerData by flow.collectAsState(null)
-    playerData?.let { player ->
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
-            Image(
-                painter = BitmapPainter(IconFactory.getPlayerDetailOverlay()),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize(),
-            )
-
-            // Side bar content
-            Column(modifier = Modifier.fillMaxWidth()) {
-                // Blue Square with player information
-                Column(
-                    modifier =
-                        Modifier
-                            .aspectRatio(145f / 213f) // Size of blue square
-                            .fillMaxSize(),
-                ) {
-                    Column(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .weight(1f),
-                    ) {
-                        // Player name
-                        Text(
-                            modifier = Modifier.padding(4.dp).fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            text = player.model.name ?: "",
-                            color = Color.White,
-                            maxLines = 1,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-
-                        // Image, type / number
-                        Row(
-                            modifier =
-                                Modifier
-                                    .padding(start = 8.dp, end = 8.dp)
-                                    .fillMaxSize(),
-                        ) {
-                            Image(
-                                modifier = Modifier.aspectRatio(95f / 147f).fillMaxSize(),
-                                painter = BitmapPainter(IconFactory.getPlayerImage(player.model.id)),
-                                contentDescription = "",
-                                contentScale = ContentScale.Fit,
-                            )
-
-                            androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
-                                // A path with three quad Bezier segments
-                                val path = androidx.compose.ui.graphics.Path()
-                                path.moveTo(this.size.width, this.size.height - 5)
-                                path.lineTo(size.width, 5f)
-
-                                val name = player.model.position.positionSingular.takeDot(10)
-                                drawTextOnPath(
-                                    text = "$name #${player.model.number.value}",
-                                    textSize = 14.sp.toDp(),
-                                    isEmboldened = true,
-                                    path = path,
-                                    offset = Offset(0.dp.toPx(), 0.0f),
-                                    textAlign = TextAlign.Start,
-                                    paint =
-                                        Paint().also {
-                                            it.color = Color.White
-                                            it.style = PaintingStyle.Fill
-                                        },
-                                )
-                            }
-                        }
-                    }
-
-                    // Stat boxes
-                    Row(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(3.dp),
-                    ) {
-                        val model = player.model
-                        val modifier = Modifier.weight(1f).aspectRatio(52f / 58f)
-                        StatBox(modifier, "MV", model.move.toString())
-                        StatBox(modifier, "ST", model.strength.toString())
-                        StatBox(modifier, "AG", "${model.agility}+")
-                        StatBox(modifier, "PA", if (model.passing == null) "-" else "${model.passing}+")
-                        StatBox(modifier, "AV", "${model.armorValue}+")
-                    }
-                }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        modifier = Modifier.padding(4.dp).fillMaxWidth(),
-                        text = "${player.model.starPlayerPoints} ${player.model.level.name}",
-                        textAlign = TextAlign.Center,
-                    )
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        player.model.skills.forEach {
-                            Text(
-                                modifier = Modifier.padding(4.dp).fillMaxWidth(),
-                                text = it.name + if (it.compulsory) "*" else "",
-                                textDecoration = if (it.used) TextDecoration.LineThrough else TextDecoration.None,
-                            )
-                        }
-                    }
-                }
             }
         }
     }
@@ -310,11 +187,11 @@ fun StatBox(
 }
 
 @Composable
-fun Reserves(reserves: Flow<List<UiPlayer>>) {
+fun Reserves(reserves: Flow<List<UiPlayer>>, onExit: () -> Unit) {
     val list: List<UiPlayer> by reserves.collectAsState(emptyList())
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionHeader("Reserves")
-        PlayerSection(list, compactView = false)
+        PlayerSection(list, compactView = false, onExit = onExit)
     }
 }
 
@@ -352,18 +229,46 @@ fun Injuries(
 /**
  * A list of players under
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true) {
-    for (index in list.indices step 5) {
-        Row {
-            val modifier = Modifier.weight(1f).aspectRatio(1f)
-            repeat(5) { x ->
-                if (index + x < list.size) {
-                    Player(modifier, list[index + x], false)
-                } else {
-                    // Use empty box. Unsure if we can remove this
-                    // if we want a partial row to scale correctly.
-                    Box(modifier = modifier)
+fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true, onExit: () -> Unit = {}) {
+    if (!compactView) {
+        val max = if (list.isNotEmpty()) list.maxBy { it.model.number.value }.model.number.value else 0
+        if (max > 0) {
+            val sortedList: ArrayList<UiPlayer?> = ArrayList<UiPlayer?>(max)
+                .also { list ->
+                    repeat(max) {
+                        list.add(null)
+                    }
+                }
+            list.forEach { sortedList[it.model.number.value - 1] = it }
+            for (index in sortedList.indices step 5) {
+                Row(modifier = Modifier.onPointerEvent(PointerEventType.Exit) { onExit() }) {
+                    val modifier = Modifier.weight(1f).aspectRatio(1f)
+                    repeat(5) { x ->
+                        if (sortedList.size > (index + x) && sortedList[index + x] != null) {
+                            Player(modifier, sortedList[index + x]!!, false)
+                        } else {
+                            // Use empty box. Unsure if we can remove this
+                            // if we want a partial row to scale correctly.
+                            Box(modifier = modifier)
+                        }
+                    }
+                }
+            }
+        } else {
+            for (index in list.indices step 5) {
+                Row {
+                    val modifier = Modifier.weight(1f).aspectRatio(1f)
+                    repeat(5) { x ->
+                        if (list.size > (index + x)) {
+                            Player(modifier, list[index + x], false)
+                        } else {
+                            // Use empty box. Unsure if we can remove this
+                            // if we want a partial row to scale correctly.
+                            Box(modifier = modifier)
+                        }
+                    }
                 }
             }
         }

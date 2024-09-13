@@ -36,28 +36,24 @@ class SidebarViewModel(
     private val _reserveCount = MutableStateFlow<Int?>(null)
     private val _injuriesCount = MutableStateFlow<Int?>(null)
 
-    init {
-        // How to handle both user input and
-        //
-    }
-
     // Player being hovered over.
     // All of these will be shown on the away team location, except when hovering over
     // the away team dugout, which should be shown in the home team
     fun hoverPlayer(): Flow<UiPlayerCard?> =
         hoverPlayerChannel.distinctUntilChanged { old, new ->
             old?.id == new?.id
-        }.filter { player ->
+        }
+        .filter { player ->
             if (player == null) return@filter true
             when (team.isHomeTeam()) {
                 true -> player.isOnAwayTeam() && player.location is DogOut
                 false -> !(player.isOnAwayTeam() && player.location is DogOut)
             }
         }
-            .distinctUntilChanged()
-            .map { player ->
-                player?.let { UiPlayerCard(it) }
-            }
+        .distinctUntilChanged { old, new -> old?.id == new?.id }
+        .map { player ->
+            player?.let { UiPlayerCard(it) }
+        }
 
     fun view(): StateFlow<SidebarView> = _view
 
@@ -80,7 +76,7 @@ class SidebarViewModel(
                         selectablePlayers[it]?.let {
                             { uiActionFactory.userSelectedAction(it) }
                         }
-                    UiPlayer(it, selectAction, onHover = { hoverOver(it) })
+                    UiPlayer(it, selectAction, onHover = { hoverOver(it) }, onHoverExit = { hoverExit() })
             }
         }
     }
@@ -109,6 +105,10 @@ class SidebarViewModel(
         hoverPlayerChannel.safeTryEmit(player)
     }
 
+    fun hoverExit() {
+        hoverPlayerChannel.safeTryEmit(null)
+    }
+
     fun toggleToReserves() {
         _view.value = SidebarView.RESERVES
     }
@@ -121,7 +121,7 @@ class SidebarViewModel(
         return dogoutFlow.map { players ->
             players.filter { it.state == state }
         }.map { players ->
-            players.map { UiPlayer(it, selectAction = null, onHover = { hoverOver(it) }) }
+            players.map { UiPlayer(it, selectAction = null, onHover = { hoverOver(it) }, onHoverExit = { hoverExit() }) }
         }
     }
 }

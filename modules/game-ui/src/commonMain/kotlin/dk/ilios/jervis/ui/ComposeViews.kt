@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -104,15 +106,18 @@ data class FumbblButtonColors(
     }
 }
 
+// TODO Figure out how to do drop shadows
 @Composable
 fun SectionDivider(modifier: Modifier) {
     Box(
         modifier =
             modifier
-                .height(10.dp)
-                .shadow(1.dp)
+//                .shadow(2.dp, ambientColor = Color.Black, spotColor = Color.Black)
                 .padding(4.dp)
-                .background(color = Color.White),
+                .height(2.dp)
+//                .padding(4.dp)
+                .background(color = Color.White)
+
     )
 }
 
@@ -156,10 +161,11 @@ fun Screen(
         Column(modifier = Modifier.weight(782f).align(Alignment.Top)) {
             Field(field, Modifier.aspectRatio(field.aspectRatio))
             GameStatus(gameStatusController, modifier = Modifier.aspectRatio(782f/32f).fillMaxSize())
-            ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                LogViewer(logs, modifier = Modifier.width(200.dp))
-                ActionSelector(actionSelector, modifier = Modifier.width(200.dp))
+            // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
+            Row(modifier = Modifier.fillMaxSize()) {
+                LogViewer(logs, modifier = Modifier.weight(1f).fillMaxSize())
+                Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))
+                ActionSelector(actionSelector, modifier = Modifier.weight(1f).fillMaxSize())
             }
         }
         Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
@@ -296,69 +302,70 @@ fun ActionSelector(
     modifier: Modifier,
 ) {
     val inputs: UserInput? by vm.availableActions.collectAsState(null)
-    Column(
-        modifier =
-            modifier
-                .verticalScroll(rememberScrollState())
-                .fillMaxSize()
-                .background(color = Color.Blue),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        val userInputs: List<UserInput> =
-            remember(inputs) {
-                when (inputs) {
-                    is CompositeUserInput -> (inputs as CompositeUserInput).inputs
-                    null -> emptyList()
-                    else -> listOf(inputs!!)
-                }
-            }
-
-        userInputs.forEach { input ->
-            val actions = input.actions
-            when (input) {
-                is WaitingForUserInput -> {
-                    // Do nothing
-                }
-                is UnknownInput -> {
-                    actions.forEach { action: GameAction ->
-                        Button(
-                            modifier = Modifier.padding(0.dp),
-                            contentPadding = PaddingValues(2.dp),
-                            onClick = { vm.actionSelected(action) },
-                        ) {
-                            val text =
-                                when (action) {
-                                    Confirm -> "Confirm"
-                                    Continue -> "Continue"
-                                    is DieResult -> action.toString()
-                                    DogoutSelected -> "DogoutSelected"
-                                    EndSetup -> "EndSetup"
-                                    EndTurn -> "EndTurn"
-                                    is FieldSquareSelected -> action.toString()
-                                    is PlayerSelected -> "Player[${action.playerId}]"
-                                    is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
-                                    is PlayerActionSelected -> "Action: ${action.action.name}"
-                                    PlayerDeselected -> "Deselect active player"
-                                    EndAction -> "End Action"
-                                    Cancel -> "Cancel"
-                                    is CoinSideSelected -> "Selected: ${action.side}"
-                                    is CoinTossResult -> "Coin flip: ${action.result}"
-                                    is RandomPlayersSelected -> "Random players: $action"
-                                    NoRerollSelected -> "No reroll"
-                                    is RerollOptionSelected -> action.option.toString()
-                                    is MoveTypeSelected -> action.moveType.toString()
-                                    Undo -> TODO()
-                                    is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
-                                    is PlayerSubActionSelected -> action.action.toString()
-                                    is SkillSelected -> action.skill.toString()
-                                    is InducementSelected -> action.name
-                                    is CalculatedAction -> TODO("Should only be used in tests")
-                                }
-                            Text(text, fontSize = 10.sp)
-                        }
+    Box(modifier = modifier.padding(8.dp)) {
+        Column(
+            modifier =
+                modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            val userInputs: List<UserInput> =
+                remember(inputs) {
+                    when (inputs) {
+                        is CompositeUserInput -> (inputs as CompositeUserInput).inputs
+                        null -> emptyList()
+                        else -> listOf(inputs!!)
                     }
                 }
-                else -> TODO("Unsupported type: $actions")
+
+            userInputs.forEach { input ->
+                val actions = input.actions
+                when (input) {
+                    is WaitingForUserInput -> {
+                        // Do nothing
+                    }
+                    is UnknownInput -> {
+                        actions.forEach { action: GameAction ->
+                            Button(
+                                modifier = Modifier.padding(0.dp),
+                                contentPadding = PaddingValues(2.dp),
+                                onClick = { vm.actionSelected(action) },
+                            ) {
+                                val text =
+                                    when (action) {
+                                        Confirm -> "Confirm"
+                                        Continue -> "Continue"
+                                        is DieResult -> action.toString()
+                                        DogoutSelected -> "DogoutSelected"
+                                        EndSetup -> "EndSetup"
+                                        EndTurn -> "EndTurn"
+                                        is FieldSquareSelected -> action.toString()
+                                        is PlayerSelected -> "Player[${action.playerId}]"
+                                        is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
+                                        is PlayerActionSelected -> "Action: ${action.action.name}"
+                                        PlayerDeselected -> "Deselect active player"
+                                        EndAction -> "End Action"
+                                        Cancel -> "Cancel"
+                                        is CoinSideSelected -> "Selected: ${action.side}"
+                                        is CoinTossResult -> "Coin flip: ${action.result}"
+                                        is RandomPlayersSelected -> "Random players: $action"
+                                        NoRerollSelected -> "No reroll"
+                                        is RerollOptionSelected -> action.option.toString()
+                                        is MoveTypeSelected -> action.moveType.toString()
+                                        Undo -> TODO()
+                                        is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
+                                        is PlayerSubActionSelected -> action.action.toString()
+                                        is SkillSelected -> action.skill.toString()
+                                        is InducementSelected -> action.name
+                                        is CalculatedAction -> TODO("Should only be used in tests")
+                                    }
+                                Text(text, fontSize = 10.sp)
+                            }
+                        }
+                    }
+                    else -> TODO("Unsupported type: $actions")
+                }
             }
         }
     }

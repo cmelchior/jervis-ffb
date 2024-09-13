@@ -22,7 +22,12 @@ data class UiFieldSquare(
     val showContextMenu: Boolean = false,
 ) : UiModel<FieldSquare>
 
-class UiPlayer(override val model: Player, val selectAction: (() -> Unit)?, val onHover: (() -> Unit)? = null) : UiModel<Player> {
+class UiPlayer(
+    override val model: Player,
+    val selectAction: (() -> Unit)?,
+    val onHover: (() -> Unit)? = null,
+    val onHoverExit: (() -> Unit)? = null
+) : UiModel<Player> {
     val carriesBall: Boolean = model.hasBall()
     val state: PlayerState = model.state
     val isOnHomeTeam = model.isOnHomeTeam()
