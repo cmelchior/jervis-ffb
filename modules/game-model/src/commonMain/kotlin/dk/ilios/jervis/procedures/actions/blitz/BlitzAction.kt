@@ -117,13 +117,15 @@ object BlitzAction : Procedure() {
 
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<BlitzContext>()
+            val blitzer = context.attacker
             val options = mutableListOf<ActionDescriptor>()
 
             // Find possible move types
-            options.addAll(calculateMoveTypesAvailable(state.activePlayer!!, rules))
+            options.addAll(calculateMoveTypesAvailable(blitzer, rules))
 
             // Check if adjacent to target of the Blitz
-            if (context.attacker.location.isAdjacent(rules, context.defender!!.location)) {
+            val hasMovesLeft = blitzer.movesLeft + blitzer.rushesLeft > 0
+            if (context.attacker.location.isAdjacent(rules, context.defender!!.location) && hasMovesLeft) {
                 options.add(SelectPlayer(context.defender))
             }
 
