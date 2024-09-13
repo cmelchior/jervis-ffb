@@ -7,10 +7,12 @@ import kotlinx.coroutines.flow.map
 data class GameProgress(
     val half: Int,
     val drive: Int,
-    val activeTeam: String,
-    val activeTeamTurn: Int,
-    val inactiveTeam: String,
-    val inactiveTeamTurn: Int,
+    val homeTeam: String,
+    val homeTeamTurn: Int,
+    val awayTeam: String,
+    val awayTeamTurn: Int,
+    val homeTeamScore: Int = 0,
+    val awayTeamScore: Int = 0,
 )
 
 class GameStatusViewModel(val controller: GameController) {
@@ -19,10 +21,12 @@ class GameStatusViewModel(val controller: GameController) {
             GameProgress(
                 game.halfNo,
                 game.driveNo,
-                game.activeTeam.name,
-                game.activeTeam.turnData.turnMarker,
-                game.inactiveTeam.name,
-                game.inactiveTeam.turnData.turnMarker,
+                game.homeTeam.name,
+                game.homeTeam.turnData.turnMarker,
+                game.awayTeam.name,
+                game.awayTeam.turnData.turnMarker,
+                game.homeGoals,
+                game.awayGoals,
             )
         }
     }

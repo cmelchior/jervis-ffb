@@ -26,11 +26,11 @@ enum class SidebarView {
 
 class SidebarViewModel(
     private val uiActionFactory: UiActionFactory,
-    private val team: Team,
+    val team: Team,
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
 ) {
     // Image is 145f/430f, but we need to stretch to make it fit the field image.
-    val aspectRatio: Float = 152.42f / 452f
+    val aspectRatio: Float = 145f/430f // 152.42f / 452f
 
     private val _view = MutableStateFlow(SidebarView.RESERVES)
     private val _reserveCount = MutableStateFlow<Int?>(null)

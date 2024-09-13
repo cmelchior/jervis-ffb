@@ -3,12 +3,14 @@ package dk.ilios.jervis.ui
 import MultipleSelectUserActionDialog
 import UserActionDialog
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,6 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -64,6 +68,7 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.actions.Undo
+import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
 import dk.ilios.jervis.ui.viewmodel.CompositeUserInput
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
@@ -143,41 +148,22 @@ fun Screen(
     dialogsViewModel: DialogsViewModel,
 ) {
     Dialogs(dialogsViewModel)
-    Box {
-        Column {
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .aspectRatio((152.42f + 782f + 152.42f) / 452f),
-                verticalAlignment = Alignment.Top,
-            ) {
-                Sidebar(leftDugout, Modifier.weight(152.42f))
-                Field(field, Modifier.weight(782f))
-                Sidebar(rightDugout, Modifier.weight(152.42f))
-            }
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth(),
-            ) {
-                GameStatus(gameStatusController, modifier = Modifier.height(48.dp))
-            }
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth(),
-            ) {
-                ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
-            }
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth(),
-            ) {
+    val aspectRation = (145f+145f+782f)/690f
+    Row(modifier = Modifier.aspectRatio(aspectRation).fillMaxSize()) {
+        Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
+            Sidebar(leftDugout, Modifier)
+        }
+        Column(modifier = Modifier.weight(782f).align(Alignment.Top)) {
+            Field(field, Modifier.aspectRatio(field.aspectRatio))
+            GameStatus(gameStatusController, modifier = Modifier.aspectRatio(782f/32f).fillMaxSize())
+            ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
                 LogViewer(logs, modifier = Modifier.width(200.dp))
                 ActionSelector(actionSelector, modifier = Modifier.width(200.dp))
             }
+        }
+        Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
+            Sidebar(rightDugout, Modifier)
         }
     }
 }
@@ -188,33 +174,67 @@ fun GameStatus(
     modifier: Modifier,
 ) {
     val progress by vm.progress().collectAsState(GameProgress(0, 0, "", 0, "", 0))
-    val half = if (progress.half == 0) "-" else progress.half.toString()
-    val drive = if (progress.half == 0) "-" else progress.half.toString()
-    val turn = if (progress.half == 0) "-" else progress.half.toString()
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = Color.White),
-    ) {
-        val textModifier = Modifier.padding(4.dp).padding(end = 8.dp)
-        Row {
+    Box(modifier = modifier) {
+        Image(
+            bitmap = IconFactory.getScorebar(),
+            contentDescription = null,
+            alignment = Alignment.Center,
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize(),
+        )
+        val textModifier = Modifier.padding(4.dp)
+
+        // Turn counter
+        Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 modifier = textModifier,
-                text = "Half: ${ if (progress.half == 0) "-" else progress.half }"
+                text = "Turn",
+                fontSize = 14.sp,
+                color = Color.White,
             )
             Text(
                 modifier = textModifier,
-                text = "Drive: ${ if (progress.drive == 0) "-" else progress.drive }"
+                text = "${progress.homeTeamTurn} / ${progress.awayTeamTurn}",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
             )
+
+            val half = when (progress.half) {
+                1 -> "1st half"
+                2 -> "2nd half"
+                3 -> "Overtime"
+                else -> null
+            }
+            if (half != null) {
+                Text(
+                    modifier = textModifier,
+                    text = "of $half",
+                    fontSize = 14.sp,
+                    color = Color.White,
+                )
+            }
+        }
+
+        // Score counter
+        // TODO Need to scale the distance between them
+        Row(modifier = Modifier.align(Alignment.Center), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                modifier = textModifier,
-                text = "Active team: ${progress.activeTeam} - Turn ${progress.activeTeamTurn}",
+                text = "${progress.homeTeamScore}",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 28.sp,
             )
+            Spacer(Modifier.width(78.dp))
             Text(
-                modifier = textModifier,
-                text = "Inactive team: ${progress.inactiveTeam} - Turn ${progress.inactiveTeamTurn}",
+                text = "${progress.awayTeamScore}",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 28.sp,
             )
         }
+
+
     }
 }
 
@@ -359,6 +379,7 @@ fun LogViewer(
     }
 
     LazyColumn(
+        modifier = modifier,
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         state = listState

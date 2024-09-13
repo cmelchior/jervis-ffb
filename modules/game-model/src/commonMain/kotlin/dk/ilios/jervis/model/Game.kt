@@ -52,6 +52,8 @@ class Game(
     // one procedure, otherwise it should be moved into a [ProcedureContext]
     var isTurnOver = false
     var goalScored: Boolean = false
+    var homeGoals: Int = 0
+    var awayGoals: Int = 0
     var activePlayer: Player? = null
     var kickingPlayer: Player? = null // TODO Move into a context?
 

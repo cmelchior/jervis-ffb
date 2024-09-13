@@ -53,41 +53,80 @@ fun Sidebar(
     vm: SidebarViewModel,
     modifier: Modifier,
 ) {
-    Box(modifier = modifier.aspectRatio(vm.aspectRatio).fillMaxSize()) {
-        Image(
-            alignment = Alignment.TopStart,
-            painter = BitmapPainter(IconFactory.getSidebarBackground()),
-            contentDescription = "Box",
-            modifier = modifier.fillMaxSize(),
-        )
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        // Background images
+        Column(modifier = Modifier.fillMaxSize().align(Alignment.TopCenter)) {
+            Image(
+                bitmap = IconFactory.getSidebarBannerTop(vm.team.isHomeTeam()),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.aspectRatio(145f/430f).fillMaxWidth(),
+            )
+            Image(
+                bitmap = IconFactory.getSidebarBannerMiddle(vm.team.isHomeTeam()),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.aspectRatio(145f/92f).fillMaxWidth(),
+            )
+            Image(
+                bitmap = IconFactory.getSidebarBannerBottom(vm.team.isHomeTeam()),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.fillMaxSize(), // aspectRatio(145f/168f) Avoid setting aspect ration as rounding gets it slightly wrong
+            )
+        }
 
+        // Side bar content
         Column(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                val view by vm.view().collectAsState()
-                when (view) {
-                    SidebarView.RESERVES -> Reserves(vm.reserves())
-                    SidebarView.INJURIES ->
-                        Injuries(
-                            vm.knockedOut(),
-                            vm.badlyHurt(),
-                            vm.seriousInjuries(),
-                            vm.dead(),
-                            vm.banned(),
-                            vm.special()
-                        )
+            // Dogout + player statss
+            Box(modifier = modifier.aspectRatio(vm.aspectRatio).fillMaxSize()) {
+                Image(
+                    alignment = Alignment.TopStart,
+                    painter = BitmapPainter(IconFactory.getSidebarBackground()),
+                    contentDescription = "Box",
+                    modifier = modifier.fillMaxSize(),
+                )
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        val view by vm.view().collectAsState()
+                        when (view) {
+                            SidebarView.RESERVES -> Reserves(vm.reserves())
+                            SidebarView.INJURIES ->
+                                Injuries(
+                                    vm.knockedOut(),
+                                    vm.badlyHurt(),
+                                    vm.seriousInjuries(),
+                                    vm.dead(),
+                                    vm.banned(),
+                                    vm.special()
+                                )
+                        }
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
                 }
+
+                // Make sure player stats are shown on top of reserves
+                PlayerStatsCard(vm.hoverPlayer())
             }
-            Spacer(modifier = Modifier.weight(1f))
+
+            // Dogout buttons
             Row {
                 val injuriesCount by vm.injuriesCount().collectAsState(0)
                 SidebarButton(modifier = Modifier.weight(1f), text = "$injuriesCount Out", onClick = { vm.toggleInjuries() })
                 val reserveCount by vm.reserveCount().collectAsState(0)
                 SidebarButton(modifier = Modifier.weight(1f), text = "$reserveCount Rsv", onClick = { vm.toggleToReserves() })
             }
-        }
 
-        // Make sure player stats are shown on top of reserves
-        PlayerStatsCard(vm.hoverPlayer())
+            // End Turn
+            Box {
+
+            }
+
+            // Rest of content
+            Box {
+
+            }
+        }
     }
 }
 

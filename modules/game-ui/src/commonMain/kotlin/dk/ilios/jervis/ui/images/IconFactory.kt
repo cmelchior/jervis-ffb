@@ -118,6 +118,16 @@ object IconFactory {
     private val SIDEBAR_BACKGROUND = "icons/sidebar/background_box.png"
     private val BUTTON_BACKGROUND = "icons/sidebar/box_button.gif"
 
+    private val SIDEBAR_HOME_BANNER_TOP = "icons/sidebar/background_player_detail_red.png"
+    private val SIDEBAR_HOME_BANNER_MIDDLE = "icons/sidebar/background_turn_dice_status_red.png"
+    private val SIDEBAR_HOME_BANNER_BOTTOM = "icons/sidebar/background_resource_red.png"
+
+    private val SIDEBAR_AWAY_BANNER_TOP = "icons/sidebar/background_player_detail_blue.png"
+    private val SIDEBAR_AWAY_BANNER_MIDDLE = "icons/sidebar/background_turn_dice_status_blue.png"
+    private val SIDEBAR_AWAY_BANNER_BOTTOM = "icons/sidebar/background_resource_blue.png"
+
+    private val SCOREBAR = "icons/scorebar/background_scorebar.png"
+
     // Load all image resources used.
     // It looks like we cannot lazy load them due to how Compose Resources work on WasmJS
     // `Res.readBytes` is suspendable and runBlocking doesn't work on wasmJs, which makes
@@ -131,6 +141,14 @@ object IconFactory {
         saveImageIntoCache("i/332804.png")
         saveImageIntoCache(SIDEBAR_BACKGROUND)
         saveImageIntoCache(BUTTON_BACKGROUND)
+        saveImageIntoCache(SIDEBAR_HOME_BANNER_TOP)
+        saveImageIntoCache(SIDEBAR_HOME_BANNER_MIDDLE)
+        saveImageIntoCache(SIDEBAR_HOME_BANNER_BOTTOM)
+        saveImageIntoCache(SIDEBAR_AWAY_BANNER_TOP)
+        saveImageIntoCache(SIDEBAR_AWAY_BANNER_MIDDLE)
+        saveImageIntoCache(SIDEBAR_AWAY_BANNER_BOTTOM)
+        saveImageIntoCache(SCOREBAR)
+
         FieldDetails.entries.forEach {
             saveImageIntoCache(it.resource)
         }
@@ -253,5 +271,21 @@ object IconFactory {
 
     fun getButton(): ImageBitmap {
         return loadImageFromCache(BUTTON_BACKGROUND)
+    }
+
+    fun getSidebarBannerTop(isHomeTeam: Boolean): ImageBitmap {
+        return loadImageFromCache(if (isHomeTeam) SIDEBAR_HOME_BANNER_TOP else SIDEBAR_AWAY_BANNER_TOP)
+    }
+
+    fun getSidebarBannerMiddle(isHomeTeam: Boolean): ImageBitmap {
+        return loadImageFromCache(if (isHomeTeam) SIDEBAR_HOME_BANNER_MIDDLE else SIDEBAR_AWAY_BANNER_MIDDLE)
+    }
+
+    fun getSidebarBannerBottom(isHomeTeam: Boolean): ImageBitmap {
+        return loadImageFromCache(if (isHomeTeam) SIDEBAR_HOME_BANNER_BOTTOM else SIDEBAR_AWAY_BANNER_BOTTOM)
+    }
+
+    fun getScorebar(): ImageBitmap {
+        return loadImageFromCache(SCOREBAR)
     }
 }
