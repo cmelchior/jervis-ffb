@@ -3,14 +3,12 @@ package dk.ilios.jervis.ui
 import MultipleSelectUserActionDialog
 import UserActionDialog
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.Divider
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,10 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -70,13 +68,11 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.actions.Undo
-import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
 import dk.ilios.jervis.ui.viewmodel.CompositeUserInput
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
 import dk.ilios.jervis.ui.viewmodel.DiceRollUserInputDialog
 import dk.ilios.jervis.ui.viewmodel.FieldViewModel
-import dk.ilios.jervis.ui.viewmodel.GameProgress
 import dk.ilios.jervis.ui.viewmodel.GameStatusViewModel
 import dk.ilios.jervis.ui.viewmodel.LogViewModel
 import dk.ilios.jervis.ui.viewmodel.ReplayViewModel
@@ -135,7 +131,14 @@ fun SectionHeader(title: String) {
             text = title,
             color = Color.White,
             maxLines = 1,
-            modifier = Modifier.wrapContentSize().shadow(2.dp),
+            modifier = Modifier.wrapContentSize(),
+            style = LocalTextStyle.current.copy(
+                shadow = Shadow(
+                    color = Color.Black,
+                    offset = Offset(2f, 2f),
+                    blurRadius = 2f
+                )
+            )
         )
         SectionDivider(modifier = Modifier.weight(1f))
     }
@@ -174,75 +177,7 @@ fun Screen(
     }
 }
 
-@Composable
-fun GameStatus(
-    vm: GameStatusViewModel,
-    modifier: Modifier,
-) {
-    val progress by vm.progress().collectAsState(GameProgress(0, 0, "", 0, "", 0))
-    Box(modifier = modifier) {
-        Image(
-            bitmap = IconFactory.getScorebar(),
-            contentDescription = null,
-            alignment = Alignment.Center,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxSize(),
-        )
-        val textModifier = Modifier.padding(4.dp)
 
-        // Turn counter
-        Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                modifier = textModifier,
-                text = "Turn",
-                fontSize = 14.sp,
-                color = Color.White,
-            )
-            Text(
-                modifier = textModifier,
-                text = "${progress.homeTeamTurn} / ${progress.awayTeamTurn}",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-            )
-
-            val half = when (progress.half) {
-                1 -> "1st half"
-                2 -> "2nd half"
-                3 -> "Overtime"
-                else -> null
-            }
-            if (half != null) {
-                Text(
-                    modifier = textModifier,
-                    text = "of $half",
-                    fontSize = 14.sp,
-                    color = Color.White,
-                )
-            }
-        }
-
-        // Score counter
-        // TODO Need to scale the distance between them
-        Row(modifier = Modifier.align(Alignment.Center), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "${progress.homeTeamScore}",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 28.sp,
-            )
-            Spacer(Modifier.width(78.dp))
-            Text(
-                text = "${progress.awayTeamScore}",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 28.sp,
-            )
-        }
-
-
-    }
-}
 
 @Composable
 fun ReplayController(
