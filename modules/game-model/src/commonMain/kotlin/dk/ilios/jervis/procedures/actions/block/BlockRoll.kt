@@ -2,6 +2,7 @@ package dk.ilios.jervis.procedures.actions.block
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.Dice
@@ -111,6 +112,7 @@ object BlockRoll : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 // TODO What is the difference between Continue and NoRerollSelected
+                Continue,
                 NoRerollSelected -> GotoNode(SelectBlockResult)
                 is RerollOptionSelected -> {
                     val rerollContext = UseRerollContext(DiceRollType.BLOCK, action.getRerollSource(state))

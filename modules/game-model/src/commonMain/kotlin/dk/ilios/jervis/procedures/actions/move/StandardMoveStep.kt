@@ -2,6 +2,7 @@ package dk.ilios.jervis.procedures.actions.move
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
@@ -63,12 +64,15 @@ object StandardMoveStep: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<FieldSquareSelected>(state, rules, action, this) {
-                val context = state.getContext<MoveContext>()
-                compositeCommandOf(
-                    SetContext(context.copy(target = it.coordinate)),
-                    GotoNode(MovePlayer),
-                )
+            return when(action) {
+                EndAction -> ExitProcedure()
+                else -> checkTypeAndValue<FieldSquareSelected>(state, rules, action, this) {
+                    val context = state.getContext<MoveContext>()
+                    compositeCommandOf(
+                        SetContext(context.copy(target = it.coordinate)),
+                        GotoNode(MovePlayer),
+                    )
+                }
             }
         }
     }

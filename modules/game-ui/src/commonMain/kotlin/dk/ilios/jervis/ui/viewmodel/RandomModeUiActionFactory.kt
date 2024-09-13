@@ -8,7 +8,9 @@ import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.SetupTeam
+import dk.ilios.jervis.procedures.SetupTeamContext
 import dk.ilios.jervis.ui.GameScreenModel
 import dk.ilios.jervis.utils.createRandomAction
 import kotlinx.coroutines.CoroutineScope
@@ -21,11 +23,12 @@ class RandomModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
         val controller = model.controller
         val start = Clock.System.now()
         controller.startManualMode()
+        emitToField(WaitingForUserInput)
         while (!controller.stack.isEmpty()) {
             val request = controller.getAvailableActions()
             if (!useManualAutomatedActions(controller)) {
                 val selectedAction = createRandomAction(controller.state, request.actions)
-                delay(20)
+                delay(100)
                 controller.processAction(selectedAction)
             }
         }
@@ -34,7 +37,8 @@ class RandomModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
 
     private suspend fun useManualAutomatedActions(controller: GameController): Boolean {
         if (controller.stack.peepOrNull()?.procedure == SetupTeam && controller.stack.peepOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
-            if (controller.state.activeTeam.isHomeTeam()) {
+            val context = controller.state.getContext<SetupTeamContext>()
+            if (context.team.isHomeTeam()) {
                 handleManualHomeKickingSetup(controller)
             } else {
                 handleManualAwayKickingSetup(controller)
@@ -51,7 +55,7 @@ class RandomModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
 
     private fun handleManualHomeKickingSetup(controller: GameController) {
         val game: Game = controller.state
-        val team = game.activeTeam
+        val team = game.homeTeam
 
         setupPlayer(team, PlayerNo(1), FieldCoordinate(12, 6), controller)
         setupPlayer(team, PlayerNo(2), FieldCoordinate(12, 7), controller)
@@ -68,7 +72,7 @@ class RandomModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
 
     private fun handleManualAwayKickingSetup(controller: GameController) {
         val game: Game = controller.state
-        val team = game.activeTeam
+        val team = game.awayTeam
 
         setupPlayer(team, PlayerNo(1), FieldCoordinate(13, 6), controller)
         setupPlayer(team, PlayerNo(2), FieldCoordinate(13, 7), controller)
@@ -89,7 +93,7 @@ class RandomModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
         fieldCoordinate: FieldCoordinate,
         controller: GameController,
     ) {
-        controller.processAction(PlayerSelected(team[playerNo]!!))
+        controller.processAction(PlayerSelected(team[playerNo]))
         controller.processAction(FieldSquareSelected(fieldCoordinate))
     }
 
