@@ -55,13 +55,13 @@ object MovePlayerIntoSquare : Procedure() {
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<MovePlayerIntoSquareContext>()
     }
-    override val initialNode: Node = RollForTrapdoorIfNeeded
+    override val initialNode: Node = MoveIntoSquareAndRollForTrapdoorIfNeeded
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return RemoveContext<MovePlayerIntoSquareContext>()
     }
 
-    object RollForTrapdoorIfNeeded : ActionNode() {
+    object MoveIntoSquareAndRollForTrapdoorIfNeeded : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MovePlayerIntoSquareContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<MovePlayerIntoSquareContext>()

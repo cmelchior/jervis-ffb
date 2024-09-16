@@ -168,30 +168,28 @@ object BlockRoll : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            if (action !is DBlockResult && !(action is DiceResults && action.rolls.size == 1)) {
-                INVALID_ACTION(action)
+            return checkDiceRoll<DBlockResult>(action) {
+                val selectedDie = when(action) {
+                    is DBlockResult -> action
+                    is DiceResults -> action.rolls.first() as DBlockResult
+                    else -> INVALID_ACTION(action)
+                }
+
+                val roll = state.getContext<BlockContext>()
+                val result = BlockResultContext(
+                    roll.attacker,
+                    roll.defender,
+                    roll.isBlitzing,
+                    roll.isUsingMultiBlock,
+                    roll.roll,
+                    selectedDie,
+                )
+
+                compositeCommandOf(
+                    SetContext(result),
+                    ExitProcedure()
+                )
             }
-
-            val selectedDie = when(action) {
-                is DBlockResult -> action
-                is DiceResults -> action.rolls.first() as DBlockResult
-                else -> INVALID_ACTION(action)
-            }
-
-            val roll = state.getContext<BlockContext>()
-            val result = BlockResultContext(
-                roll.attacker,
-                roll.defender,
-                roll.isBlitzing,
-                roll.isUsingMultiBlock,
-                roll.roll,
-                selectedDie,
-            )
-
-            return compositeCommandOf(
-                SetContext(result),
-                ExitProcedure()
-            )
         }
     }
 

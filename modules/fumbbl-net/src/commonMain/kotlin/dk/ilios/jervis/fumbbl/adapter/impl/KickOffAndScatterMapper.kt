@@ -8,11 +8,13 @@ import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
 import dk.ilios.jervis.fumbbl.model.ModelChangeId
+import dk.ilios.jervis.fumbbl.model.TurnMode
 import dk.ilios.jervis.fumbbl.model.reports.KickoffScatterReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblCoordinate
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.procedures.DeviateRoll
 import dk.ilios.jervis.procedures.TheKickOff
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.RandomDirectionTemplate
@@ -27,8 +29,11 @@ object KickOffAndScatterMapper: CommandActionMapper {
         command: ServerCommandModelSync,
         processedCommands: MutableSet<ServerCommandModelSync>
     ): Boolean {
-        return command.firstChangeId() == ModelChangeId.FIELD_MODEL_SET_BALL_COORDINATE
-            && command.reportList.size == 1 && command.reportList.first() is KickoffScatterReport
+        return (
+            game.turnMode == TurnMode.KICKOFF &&
+            command.firstChangeId() == ModelChangeId.FIELD_MODEL_SET_BALL_COORDINATE &&
+            command.reportList.size == 1 && command.firstReport() is KickoffScatterReport
+        )
     }
 
     override fun mapServerCommand(
@@ -74,7 +79,7 @@ object KickOffAndScatterMapper: CommandActionMapper {
                 ),
                 D6Result(report.rollScatterDistance),
             ),
-            TheKickOff.TheKickDeviates,
+            DeviateRoll.RollDice,
         )
     }
 }

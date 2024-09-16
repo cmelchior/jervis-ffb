@@ -1,4 +1,4 @@
-package dk.ilios.jervis.fumbbl.adapter.impl.move
+package dk.ilios.jervis.fumbbl.adapter.impl.blitz
 
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.MoveType
@@ -12,17 +12,17 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.actions.move.MoveAction
+import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
 import dk.ilios.jervis.procedures.actions.move.StandardMoveStep
 
-object MovePlayerMapper: CommandActionMapper {
+object BlitzMoveMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
         processedCommands: MutableSet<ServerCommandModelSync>
     ): Boolean {
         return (
-            game.actingPlayer.playerAction == PlayerAction.MOVE
+            game.actingPlayer.playerAction == PlayerAction.BLITZ_MOVE
             && command.sound == "step"
         )
     }
@@ -38,7 +38,7 @@ object MovePlayerMapper: CommandActionMapper {
         val moves: List<FieldModelSetPlayerCoordinate> = command.modelChangeList.filterIsInstance<FieldModelSetPlayerCoordinate>()
         moves.forEach {
             val coord = FieldCoordinate(it.value!!.x, it.value.y)
-            newActions.add(MoveTypeSelected(MoveType.STANDARD), MoveAction.SelectMoveType)
+            newActions.add(MoveTypeSelected(MoveType.STANDARD), BlitzAction.MoveOrBlockOrEndAction)
             newActions.add(FieldSquareSelected(coord), StandardMoveStep.SelectTargetSquareOrEndAction)
         }
     }

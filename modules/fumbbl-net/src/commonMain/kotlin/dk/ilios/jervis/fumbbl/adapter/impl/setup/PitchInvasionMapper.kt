@@ -36,25 +36,38 @@ object PitchInvasionMapper: CommandActionMapper {
         newActions: MutableList<JervisActionHolder>
     ) {
         // Resolve a Pitch Invasion
+        val isHomeKicking = jervisGame.kickingTeam == jervisGame.homeTeam
         val report = command.reportList.first() as KickoffPitchInvasionReport
         val homeRoll = D6Result(report.rollHome)
         val awayRoll = D6Result(report.rollAway)
-        newActions.add(homeRoll, PitchInvasion.RollForKickingTeamFans)
-        newActions.add(awayRoll, PitchInvasion.RollForReceivingTeamFans)
+        newActions.add(if (isHomeKicking) homeRoll else awayRoll, PitchInvasion.RollForKickingTeamFans)
+        newActions.add(if (isHomeKicking) awayRoll else homeRoll, PitchInvasion.RollForReceivingTeamFans)
         // Split stuns into teams to figure out the result
         val (homeStuns, awayStuns) =
             report.playerIds.map {
-                jervisGame.getPlayerById(PlayerId(it.id))!!
+                jervisGame.getPlayerById(PlayerId(it.id))
             }.partition { player ->
                 player.team.isHomeTeam()
             }
-        if (homeStuns.isNotEmpty()) {
-            newActions.add(D3Result(homeStuns.size), PitchInvasion.RollForKickingTeamFans)
-            newActions.add(RandomPlayersSelected(homeStuns.map { it.id }), PitchInvasion.SelectKickingTeamAffectedPlayers)
-        }
-        if (awayStuns.isNotEmpty()) {
-            newActions.add(D3Result(awayStuns.size), PitchInvasion.RollForReceivingTeamFans)
-            newActions.add(RandomPlayersSelected(awayStuns.map { it.id }), PitchInvasion.SelectReceivingTeamAffectedPlayers)
+
+        if (isHomeKicking) {
+            if (awayStuns.isNotEmpty()) {
+                newActions.add(D3Result(awayStuns.size), PitchInvasion.RollForReceivingTeamStuns)
+                newActions.add(RandomPlayersSelected(awayStuns.map { it.id }), PitchInvasion.SelectReceivingTeamAffectedPlayers)
+            }
+            if (homeStuns.isNotEmpty()) {
+                newActions.add(D3Result(homeStuns.size), PitchInvasion.RollForKickingTeamStuns)
+                newActions.add(RandomPlayersSelected(homeStuns.map { it.id }), PitchInvasion.SelectKickingTeamAffectedPlayers)
+            }
+        } else {
+            if (homeStuns.isNotEmpty()) {
+                newActions.add(D3Result(homeStuns.size), PitchInvasion.RollForReceivingTeamStuns)
+                newActions.add(RandomPlayersSelected(homeStuns.map { it.id }), PitchInvasion.SelectReceivingTeamAffectedPlayers)
+            }
+            if (awayStuns.isNotEmpty()) {
+                newActions.add(D3Result(awayStuns.size), PitchInvasion.RollForKickingTeamStuns)
+                newActions.add(RandomPlayersSelected(awayStuns.map { it.id }), PitchInvasion.SelectKickingTeamAffectedPlayers)
+            }
         }
     }
 }

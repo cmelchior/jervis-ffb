@@ -101,9 +101,10 @@ class FumbblFileReplayAdapter(private val file: Path) : FumbblAdapter {
                         }
                     }
             }
-            for (i in 0 until gameCommands.size) {
+            
+            for (element: ServerCommand in gameCommands) {
                 if (isActive) {
-                    val cmd = gameCommands[i]
+                    val cmd = element
                     if (cmd is ServerCommandGameState) {
                         gameState.send(cmd.game)
                     } else {

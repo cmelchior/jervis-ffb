@@ -174,7 +174,15 @@ class GameController(
 
     // TODO What does this do exactly
     private fun rollForwardToNextActionNode() {
-        if (!stack.isEmpty() && (stack.currentNode() is ComputationNode || stack.currentNode() is ParentNode)) {
+        if (
+            !stack.isEmpty() &&
+            (
+                stack.currentNode() is ComputationNode ||
+                stack.currentNode() is ParentNode ||
+                // Skip action nodes that only accept "Continue" events
+                stack.currentNode() is ActionNode && getAvailableActions().let { it.actions.size == 1 && it.actions.first() == ContinueWhenReady }
+            )
+        ) {
             when (val currentNode: Node = stack.currentNode()) {
                 is ComputationNode -> {
                     // Reduce noise from Continue events
@@ -182,7 +190,11 @@ class GameController(
                     commands.add(command)
                     command.execute(state, this)
                 }
-                is ActionNode -> throw IllegalStateException("Should not happen")
+                is ActionNode -> {
+                    val command = currentNode.applyAction(Continue, state, rules)
+                    commands.add(command)
+                    command.execute(state, this)
+                }
                 is ParentNode -> {
                     val commands =
                         when (stack.peepOrNull()!!.getParentNodeState()) {

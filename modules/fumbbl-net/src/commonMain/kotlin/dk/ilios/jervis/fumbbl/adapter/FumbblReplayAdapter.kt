@@ -48,12 +48,8 @@ class FumbblReplayAdapter(private var replayFile: Path, private val checkCommand
         var isDone = false
         while (!isDone) {
             val cmd = adapter.receive()
-            isDone =
-                when (cmd) {
-                    is ServerCommandReplay -> cmd.lastCommand
-                    else -> false
-                }
             commands.add(cmd)
+            isDone = cmd.lastCommand
         }
         adapter.close()
 

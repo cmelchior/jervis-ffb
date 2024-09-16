@@ -15,6 +15,7 @@ import kotlin.reflect.full.isSubclassOf
  * Map all server commands into the equivalent [JervisAction] by using all configured
  * [CommandActionMapper]s.
  */
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: FumbblGame, checkCommands: Boolean) {
     private val jervisGame: Game
     private val fumbblGame: FumbblGame
@@ -58,7 +59,6 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
             val mapper = mappers.firstOrNull { it: CommandActionMapper ->
                 it.isApplicable(fumbblGame, serverCommand, processedCommands)
             }
-
             if (mapper != null) {
                 val newActions = mutableListOf<JervisActionHolder>()
                 mapper.mapServerCommand(fumbblGame, jervisGame, serverCommand, processedCommands, actions, newActions)
@@ -68,6 +68,7 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
                             val serverCommandIndex = i
                             val errorMessage = """
                                 Processing index $serverCommandIndex failed.
+                                Using mapper: ${mapper.javaClass.simpleName}
                                 Current node: ${jervisGameController.stack.currentNode()::class.qualifiedName}
                                 Expected node: ${action.expectedNode::class.qualifiedName}
                             """.trimIndent()

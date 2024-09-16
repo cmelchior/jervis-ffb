@@ -1,5 +1,6 @@
 package dk.ilios.jervis.fumbbl.model.reports
 
+import dk.ilios.jervis.fumbbl.model.BlockResult
 import dk.ilios.jervis.fumbbl.model.CatchModifier
 import dk.ilios.jervis.fumbbl.model.Direction
 import dk.ilios.jervis.fumbbl.model.FieldCoordinate
@@ -86,12 +87,21 @@ data class BlitzRollReport(
 @SerialName("block")
 data class BlockReport(
     override val reportId: ReportId = ReportId.BLOCK,
+    val defenderId: PlayerId,
 ) : Report
 
 @Serializable
 @SerialName("blockChoice")
 data class BlockChoiceReport(
     override val reportId: ReportId = ReportId.BLOCK_CHOICE,
+    val nrOfDice: Int,
+    val blockRoll: List<Int>,
+    val diceIndex: Int,
+    val blockResult: BlockResult,
+    val defenderId: PlayerId,
+    val suppressExtraEffectHandling: Boolean,
+    val showNameInReport: Boolean,
+    val blockRollId: Int,
 ) : Report
 
 @Serializable
@@ -104,6 +114,9 @@ data class BlockReRollReport(
 @SerialName("blockRoll")
 data class BlockRollReport(
     override val reportId: ReportId = ReportId.BLOCK_ROLL,
+    val choosingTeamId: dk.ilios.jervis.fumbbl.model.change.TeamId,
+    val blockRoll: List<Int>,
+    val defenderId: PlayerId? = null, // Is this always `null`?
 ) : Report
 
 @Serializable
@@ -740,6 +753,8 @@ data class SecretWeaponBanReport(
 @SerialName("selectBlitzTarget")
 data class SelectBlitzTargetReport(
     override val reportId: ReportId = ReportId.SELECT_BLITZ_TARGET,
+    val attackerId: PlayerId,
+    val defenderId: PlayerId,
 ) : Report
 
 @Serializable
