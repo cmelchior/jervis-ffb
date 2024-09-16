@@ -31,9 +31,9 @@ import dk.ilios.jervis.rules.tables.WeatherTable
 interface Rules {
     fun isValidSetup(state: Game, team: Team): Boolean {
         val isHomeTeam = team.isHomeTeam()
-        val inReserve: List<Player> = team.filter { it.state == PlayerState.STANDING && !it.location.isOnField(this) }
+        val inReserve: List<Player> = team.filter { it.state == PlayerState.RESERVE && !it.location.isOnField(this) }
         val onField: List<Player> = team.filter { it.state == PlayerState.STANDING && it.location.isOnField(this) }
-        val totalAvailablePlayers: UInt = inReserve.size.toUInt() + onField.size.toUInt()
+        val totalAvailablePlayers: Int = inReserve.size + onField.size
 
         // If below 11 players, all players must be fielded
         if (totalAvailablePlayers < maxPlayersOnField && inReserve.isNotEmpty()) {
@@ -41,7 +41,8 @@ interface Rules {
         }
 
         // Otherwise 11 players must be on the field
-        if (onField.size.toUInt() != maxPlayersOnField) {
+        // TODO Swarming might change this
+        if (totalAvailablePlayers >= maxPlayersOnField && onField.size != maxPlayersOnField) {
             return false
         }
 
@@ -49,31 +50,27 @@ interface Rules {
         val field = state.field
         val losIndex: Int = if (isHomeTeam) lineOfScrimmageHome else lineOfScrimmageAway
         val playersOnLos =
-            (0 + wideZone until fieldHeight - wideZone).filter { y: Int ->
-                !field[losIndex, y.toInt()].isUnoccupied()
+            (wideZone .. fieldHeight - wideZone).filter { y: Int ->
+                field[losIndex, y].isOccupied()
             }.size
 
-        // If available, 3 players must be on the widezone LoS
-        if (onField.size.toUInt() >= playersRequiredOnLineOfScrimmage && playersOnLos < playersRequiredOnLineOfScrimmage.toInt()) {
+        // If available, 3 players must be on the Centre Field LoS
+        if (onField.size >= playersRequiredOnLineOfScrimmage && playersOnLos < playersRequiredOnLineOfScrimmage.toInt()) {
             return false
         }
 
-        // If less than 3 players, all must be on the widezone LoS
-        if (onField.size.toUInt() < playersRequiredOnLineOfScrimmage && onField.size != playersOnLos) {
+        // If less than 3 players, all must be on the Centre Field LoS
+        if (onField.size < playersRequiredOnLineOfScrimmage && onField.size != playersOnLos) {
             return false
         }
 
-        // Max 2 players in top wide zone. They must not be on the widezone LoS.
-        var count = 0
+        // Max two players on the Top Wide Zone.
+        var topWideZoneCount = 0
         if (isHomeTeam) {
             (0..lineOfScrimmageHome).forEach { x ->
-                (0 until wideZone.toInt()).forEach { y ->
+                (0 until wideZone).forEach { y ->
                     if (field[x, y].isOccupied()) {
-                        // They must not be on the LoS
-                        if (x == lineOfScrimmageHome) {
-                            return false
-                        }
-                        count++
+                        topWideZoneCount++
                     }
                 }
             }
@@ -81,21 +78,38 @@ interface Rules {
             (fieldWidth - 1 downTo lineOfScrimmageAway).forEach { x ->
                 (0 until wideZone).forEach { y ->
                     if (field[x, y].isOccupied()) {
-                        // They must not be on the LoS
-                        if (x == lineOfScrimmageAway) {
-                            return false
-                        }
-                        count++
+                        topWideZoneCount++
                     }
                 }
             }
         }
-        if (count > maxPlayersInWideZone.toInt()) {
+        if (topWideZoneCount > maxPlayersInWideZone) {
             return false
         }
 
-        // TODO Max 2 players in bottom wide zone
-        // TODO They must not be on the LoS
+        // Max two players on the Bottom Wide Zone
+        var bottomWideZoneCount = 0
+        if (isHomeTeam) {
+            (0..lineOfScrimmageHome).forEach { x ->
+                (fieldHeight - wideZone  until fieldHeight).forEach { y ->
+                    if (field[x, y].isOccupied()) {
+                        bottomWideZoneCount++
+                    }
+                }
+            }
+        } else {
+            (fieldWidth - 1 downTo lineOfScrimmageAway).forEach { x ->
+                (fieldHeight - wideZone  until fieldHeight).forEach { y ->
+                    if (field[x, y].isOccupied()) {
+                        bottomWideZoneCount++
+                    }
+                }
+            }
+        }
+        if (bottomWideZoneCount > maxPlayersInWideZone) {
+            return false
+        }
+
         return true
     }
 
@@ -366,14 +380,14 @@ interface Rules {
     val lineOfScrimmageAway: Int
         get() = 13
 
-    val playersRequiredOnLineOfScrimmage: UInt
-        get() = 3u
+    val playersRequiredOnLineOfScrimmage: Int
+        get() = 3
 
-    val maxPlayersInWideZone: UInt
-        get() = 2u
+    val maxPlayersInWideZone: Int
+        get() = 2
 
-    val maxPlayersOnField: UInt
-        get() = 11u
+    val maxPlayersOnField: Int
+        get() = 11
 
     val randomDirectionTemplate
         get() = RandomDirectionTemplate
