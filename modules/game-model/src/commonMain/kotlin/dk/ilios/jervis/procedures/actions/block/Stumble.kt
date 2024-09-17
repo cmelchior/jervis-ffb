@@ -29,7 +29,7 @@ import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.procedures.tables.injury.KnockedDown
 import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
-import dk.ilios.jervis.reports.ReportPowResult
+import dk.ilios.jervis.reports.ReportStumbleResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Dodge
 import dk.ilios.jervis.rules.skills.Tackle
@@ -63,9 +63,10 @@ object Stumble: Procedure() {
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<PushContext>()
+        val stumbleContext = state.getContext<StumbleContext>()
         return compositeCommandOf(
             RemoveContext<PushContext>(),
-            ReportPowResult(context.firstPusher, context.firstPushee)
+            ReportStumbleResult(context.firstPusher, context.firstPushee, stumbleContext.isDefenderDown())
         )
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockResultContext>()

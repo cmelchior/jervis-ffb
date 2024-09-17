@@ -787,6 +787,10 @@ data class SelectGazeTargetReport(
 @SerialName("skillUse")
 data class SkillUseReport(
     override val reportId: ReportId = ReportId.SKILL_USE,
+    val playerId: PlayerId,
+    val skill: String,
+    val used: Boolean,
+    val skillUse: String,
 ) : Report
 
 @Serializable

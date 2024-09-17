@@ -45,7 +45,6 @@ object FollowUpMapper: CommandActionMapper {
         // If the dialog was shown 2 commands ago, it means that command - 1 was moving the player because
         // they accepted to follow up.
         val previousPreviousCommand = processedCommands[processedCommands.size - 2].modelChangeList.firstOrNull()
-
         if (
             (previousPreviousCommand is GameSetDialogParameter) &&
             previousPreviousCommand.value?.dialogId == DialogId.FOLLOWUP_CHOICE
