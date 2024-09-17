@@ -27,7 +27,7 @@ import dk.ilios.jervis.utils.INVALID_ACTION
  * Handle a player rushing a single square.
  * See page XX in the rulebook.
  *
- * This sub procedure is purely used by [MoveTypeSelectorStep], which is also
+ * This sub procedure is purely used by [ResolveMoveTypeStep], which is also
  * responsible for controlling the lifecycle of [MoveContext].
  */
 object RushStep: Procedure() {

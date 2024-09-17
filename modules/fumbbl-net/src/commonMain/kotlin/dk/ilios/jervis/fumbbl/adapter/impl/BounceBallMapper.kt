@@ -15,7 +15,7 @@ object BounceBallMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>
+        processedCommands: MutableList<ServerCommandModelSync>
     ): Boolean {
         return command.reportList.firstOrNull() is ScatterBallReport && command.sound == "bounce"
     }
@@ -24,7 +24,7 @@ object BounceBallMapper: CommandActionMapper {
         fumbblGame: dk.ilios.jervis.fumbbl.model.Game,
         jervisGame: Game,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>,
+        processedCommands: MutableList<ServerCommandModelSync>,
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {

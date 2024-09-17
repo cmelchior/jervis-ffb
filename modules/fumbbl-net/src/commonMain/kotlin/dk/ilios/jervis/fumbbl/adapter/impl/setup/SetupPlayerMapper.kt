@@ -23,7 +23,7 @@ object SetupPlayerMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>
+        processedCommands: MutableList<ServerCommandModelSync>
     ): Boolean {
         return (
             command.firstChangeId() == ModelChangeId.FIELD_MODEL_SET_PLAYER_STATE &&
@@ -38,7 +38,7 @@ object SetupPlayerMapper: CommandActionMapper {
         fumbblGame: dk.ilios.jervis.fumbbl.model.Game,
         jervisGame: Game,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>,
+        processedCommands: MutableList<ServerCommandModelSync>,
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {

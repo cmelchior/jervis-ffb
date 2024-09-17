@@ -13,6 +13,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
@@ -67,10 +68,10 @@ fun calculateMoveTypesAvailable(player: Player, rules: Rules): List<ActionDescri
 //        options.add(MoveType.LEAP)
 //    }
 //
-//    // Standup
-//    if (player.location.isOnField(rules) && player.state == PlayerState.PRONE) {
-//        options.add(MoveType.STAND_UP)
-//    }
+    // Standup
+    if (player.location.isOnField(rules) && player.state == PlayerState.PRONE) {
+        options.add(MoveType.STAND_UP)
+    }
 
     return options.map { SelectMoveType(it) }
 }
@@ -108,9 +109,9 @@ fun calculateMoveTypesAvailable(player: Player, rules: Rules): List<ActionDescri
  * UI without touching this layer.
  *
  * Jumping are handled in [JumpStep]
- * Standing up are handled in [StandingUp]
+ * Standing up are handled in [StandUpStep]
  */
-object MoveTypeSelectorStep : Procedure() {
+object ResolveMoveTypeStep : Procedure() {
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<MoveContext>()
 
@@ -123,9 +124,9 @@ object MoveTypeSelectorStep : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return when(val moveType = state.getContext<MoveContext>().moveType) {
                 MoveType.STANDARD -> StandardMoveStep
+                MoveType.STAND_UP -> StandUpStep
                 MoveType.JUMP,
-                MoveType.LEAP,
-                MoveType.STAND_UP -> TODO("Not supported yet: $moveType")
+                MoveType.LEAP -> TODO("Not supported: $moveType")
             }
         }
 

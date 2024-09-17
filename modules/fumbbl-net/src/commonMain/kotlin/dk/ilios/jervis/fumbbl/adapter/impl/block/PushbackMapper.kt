@@ -19,7 +19,7 @@ object PushbackMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>
+        processedCommands: MutableList<ServerCommandModelSync>
     ): Boolean {
         // TODO Unclear why some pushbacks create a report while others do not
         val isUsingSideStep =  processedCommands.lastOrNull()?.firstReport()?.let {
@@ -39,7 +39,7 @@ object PushbackMapper: CommandActionMapper {
         fumbblGame: dk.ilios.jervis.fumbbl.model.Game,
         jervisGame: Game,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>,
+        processedCommands: MutableList<ServerCommandModelSync>,
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {

@@ -25,7 +25,7 @@ object AbortActionMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>
+        processedCommands: MutableList<ServerCommandModelSync>
     ): Boolean {
         return false //
         // this check fails on Index 44 in 1624379
@@ -36,7 +36,7 @@ object AbortActionMapper: CommandActionMapper {
         fumbblGame: dk.ilios.jervis.fumbbl.model.Game,
         jervisGame: Game,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>,
+        processedCommands: MutableList<ServerCommandModelSync>,
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {

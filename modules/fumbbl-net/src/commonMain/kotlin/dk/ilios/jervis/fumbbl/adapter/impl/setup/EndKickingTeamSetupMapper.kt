@@ -15,7 +15,7 @@ object EndKickingTeamSetupMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>
+        processedCommands: MutableList<ServerCommandModelSync>
     ): Boolean {
         return (
             command.firstChangeId() == ModelChangeId.GAME_SET_HOME_PLAYING &&
@@ -30,7 +30,7 @@ object EndKickingTeamSetupMapper: CommandActionMapper {
         fumbblGame: FumbblGame,
         jervisGame: Game,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>,
+        processedCommands: MutableList<ServerCommandModelSync>,
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {

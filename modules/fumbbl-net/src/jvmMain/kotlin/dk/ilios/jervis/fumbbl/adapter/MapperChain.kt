@@ -49,7 +49,7 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
     actual fun process(commands: List<ServerCommandModelSync>): List<JervisActionHolder> {
         jervisGameController.startManualMode()
         val actions = mutableListOf<JervisActionHolder>()
-        val processedCommands = linkedSetOf<ServerCommandModelSync>()
+        val processedCommands = mutableListOf<ServerCommandModelSync>()
         var i = 0
         while (i < commands.size) {
             val serverCommand: ServerCommandModelSync = commands[i]

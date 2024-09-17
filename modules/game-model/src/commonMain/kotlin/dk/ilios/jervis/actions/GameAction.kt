@@ -229,8 +229,6 @@ data class PlayerActionSelected(val action: PlayerActionType) : GameAction
 @Serializable
 data class PlayerSubActionSelected(val name: String, val action: GameAction) : GameAction
 
-
-
 @Serializable
 data object DogoutSelected : GameAction
 

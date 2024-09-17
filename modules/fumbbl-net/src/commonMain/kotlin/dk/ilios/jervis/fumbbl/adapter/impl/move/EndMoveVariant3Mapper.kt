@@ -18,7 +18,7 @@ object EndMoveVariant3Mapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>
+        processedCommands: MutableList<ServerCommandModelSync>
     ): Boolean {
         val setActivePlayer = command.modelChangeList.filterIsInstance<ActingPlayerSetPlayerId>().firstOrNull()
         // Active player is removed = Action ended
@@ -33,7 +33,7 @@ object EndMoveVariant3Mapper: CommandActionMapper {
         fumbblGame: dk.ilios.jervis.fumbbl.model.Game,
         jervisGame: Game,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>,
+        processedCommands: MutableList<ServerCommandModelSync>,
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {

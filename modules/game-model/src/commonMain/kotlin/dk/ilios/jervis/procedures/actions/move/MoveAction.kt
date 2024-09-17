@@ -72,7 +72,7 @@ object MoveAction : Procedure() {
     }
 
     object ResolveMoveType : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = MoveTypeSelectorStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             return if (state.isTurnOver) {
                 ExitProcedure()

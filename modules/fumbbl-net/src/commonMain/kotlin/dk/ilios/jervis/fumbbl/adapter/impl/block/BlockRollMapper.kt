@@ -2,7 +2,6 @@ package dk.ilios.jervis.fumbbl.adapter.impl.block
 
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.DiceResults
-import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
@@ -20,7 +19,7 @@ object BlockRollMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>
+        processedCommands: MutableList<ServerCommandModelSync>
     ): Boolean {
         return (
             game.actingPlayer.playerAction == PlayerAction.BLOCK &&
@@ -34,7 +33,7 @@ object BlockRollMapper: CommandActionMapper {
         fumbblGame: dk.ilios.jervis.fumbbl.model.Game,
         jervisGame: Game,
         command: ServerCommandModelSync,
-        processedCommands: MutableSet<ServerCommandModelSync>,
+        processedCommands: MutableList<ServerCommandModelSync>,
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {

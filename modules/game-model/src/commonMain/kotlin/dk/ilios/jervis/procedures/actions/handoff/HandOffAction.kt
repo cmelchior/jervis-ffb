@@ -29,7 +29,7 @@ import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.Catch
-import dk.ilios.jervis.procedures.actions.move.MoveTypeSelectorStep
+import dk.ilios.jervis.procedures.actions.move.ResolveMoveTypeStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
 import dk.ilios.jervis.reports.ReportActionEnded
@@ -129,7 +129,7 @@ object HandOffAction : Procedure() {
     }
 
     object ResolveMove : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = MoveTypeSelectorStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their hand-off.

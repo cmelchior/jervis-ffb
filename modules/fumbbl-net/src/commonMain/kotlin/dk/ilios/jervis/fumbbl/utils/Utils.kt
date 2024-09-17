@@ -16,6 +16,10 @@ import dk.ilios.jervis.rules.roster.bb2020.KhorneTeam
 import dk.ilios.jervis.rules.roster.bb2020.RegionalSpecialRule
 import dk.ilios.jervis.rules.roster.bb2020.SkavenTeam
 import dk.ilios.jervis.rules.roster.bb2020.TeamSpecialRule
+import dk.ilios.jervis.rules.skills.Block
+import dk.ilios.jervis.rules.skills.Dodge
+import dk.ilios.jervis.rules.skills.Tackle
+import dk.ilios.jervis.rules.skills.Wrestle
 import dk.ilios.jervis.teamBuilder
 
 typealias FumbblGame = dk.ilios.jervis.fumbbl.model.Game
@@ -87,11 +91,26 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): dk.ilios.jervis.model.T
                     "Could not find position '${fumbblPosition.positionName}' in '${team.roster.rosterName}'",
                 )
             }
+            val skills = fumbblPlayer.skillValuesMap.map {
+                when (it.key) {
+                    "Block" -> Block()
+                    "Dodge" -> Dodge()
+                    "Tackle" -> Tackle()
+                    "Wrestle" -> Wrestle()
+                    "Extra Arms",
+                    "Brawler",
+                    "Sneaky Git",
+                    "Leader" -> null // TODO
+                    else -> TODO("Unsupported skill: $it")
+                }
+            }.filterNotNull()
+
             addPlayer(
                 PlayerId(fumbblPlayer.playerId),
                 fumbblPlayer.playerName,
                 PlayerNo(fumbblPlayer.playerNr),
                 position,
+                skills
             )
         }
     }

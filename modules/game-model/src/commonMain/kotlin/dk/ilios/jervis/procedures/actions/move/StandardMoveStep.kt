@@ -35,7 +35,7 @@ import dk.ilios.jervis.rules.Rules
 /**
  * Handle a player moving a single step using a normal move.
  *
- * This sub procedure is purely used by [MoveTypeSelectorStep], which is also
+ * This sub procedure is purely used by [ResolveMoveTypeStep], which is also
  * responsible for controlling the lifecycle of [MoveContext].
  *
  * The order of checks is:

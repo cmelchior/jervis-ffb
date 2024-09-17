@@ -253,7 +253,7 @@ class FieldViewModel(
                                 input.actions.map {
                                     ContextMenuOption(
                                         it.name,
-                                        { this@FieldViewModel.uiActionFactory.userSelectedAction(it) },
+                                        { this@FieldViewModel.uiActionFactory.userSelectedAction(it.action) },
                                     )
                                 },
                             )
