@@ -26,12 +26,12 @@ import dk.ilios.jervis.rules.skills.DiceRollType
  * to the caller to determine what to do with the result.
  */
 object LastingInjuryRoll: Procedure() {
-    override val initialNode: Node = RollDice
+    override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) = state.assertContext<RiskingInjuryContext>()
 
-    object RollDice : ActionNode() {
+    object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team.otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(dk.ilios.jervis.actions.RollDice(Dice.D6, Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

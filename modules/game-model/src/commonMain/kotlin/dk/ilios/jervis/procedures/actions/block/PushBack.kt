@@ -53,7 +53,7 @@ object PushBack: Procedure() {
         val context = state.getContext<PushContext>()
         return compositeCommandOf(
             RemoveContext<PushContext>(),
-            ReportPushResult(context.pusher, context.pushChain.first().from)
+            ReportPushResult(context.firstPusher, context.pushChain.first().from)
         )
     }
 

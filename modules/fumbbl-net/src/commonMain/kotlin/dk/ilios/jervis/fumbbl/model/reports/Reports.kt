@@ -5,6 +5,7 @@ import dk.ilios.jervis.fumbbl.model.CatchModifier
 import dk.ilios.jervis.fumbbl.model.Direction
 import dk.ilios.jervis.fumbbl.model.FieldCoordinate
 import dk.ilios.jervis.fumbbl.model.PlayerAction
+import dk.ilios.jervis.fumbbl.model.PushbackMode
 import dk.ilios.jervis.fumbbl.model.ReportId
 import dk.ilios.jervis.fumbbl.model.change.PlayerId
 import kotlinx.serialization.SerialName
@@ -365,6 +366,23 @@ data class InducementsBoughtReport(
 @SerialName("injury")
 data class InjuryReport(
     override val reportId: ReportId = ReportId.INJURY,
+    val defenderId: PlayerId,
+    val injuryType: String,
+    val armorBroken: Boolean,
+    val armorRoll: List<Int>?,
+    val injuryRoll: List<Int>?,
+    val casualtyRoll: List<Int>?,
+    val seriousInjury: String?, // Type?
+    val casualtyRollDecay: String?,  // Type?
+    val seriousInjuryDecay: String?, // Type?
+    val seriousInjuryOld: String?, // Type?
+    val injury: Int,
+    val injuryDecay: String?, // Type?
+    val attackerId: PlayerId?,
+    val armorModifiers: List<String>,
+    val injuryModifiers: List<String>,
+    val casualtyModifiers: List<String>,
+    val skipInjuryParts: String,
 ) : Report
 
 @Serializable
@@ -664,6 +682,8 @@ data class PumpUpTheCrowdReRollLostReport(
 @SerialName("pushback")
 data class PushbackReport(
     override val reportId: ReportId = ReportId.PUSHBACK,
+    val defenderId: PlayerId,
+    val pushbackMode: PushbackMode
 ) : Report
 
 @Serializable

@@ -96,6 +96,7 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
             } else {
                 reportNotHandled(serverCommand)
             }
+            processedCommands.add(serverCommand)
 
             // Then update the FUMBBL State model
             serverCommand.modelChangeList.forEach {

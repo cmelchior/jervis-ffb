@@ -10,10 +10,7 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
     private lateinit var originalPlayerLocation: Location
     private var originalPlayerOnField: Player? = null
 
-    override fun execute(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun execute(state: Game, controller: GameController) {
         this.originalPlayerLocation = player.location
         if (originalPlayerLocation is FieldCoordinate) {
             this.originalPlayerOnField = state.field[player.location as FieldCoordinate].player
@@ -53,10 +50,7 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
         }
     }
 
-    override fun undo(
-        state: Game,
-        controller: GameController,
-    ) {
+    override fun undo(state: Game, controller: GameController) {
         if (location is FieldCoordinate) {
             state.field[location].apply {
                 player = null

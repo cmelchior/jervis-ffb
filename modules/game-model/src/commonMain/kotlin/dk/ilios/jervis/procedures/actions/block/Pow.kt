@@ -23,7 +23,7 @@ object Pow: Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val pushContext = createPushContext(state)
         return compositeCommandOf(
-            ReportPowResult(pushContext.pusher, pushContext.pushee),
+            ReportPowResult(pushContext.firstPusher, pushContext.firstPushee),
             SetContext(pushContext)
         )
     }

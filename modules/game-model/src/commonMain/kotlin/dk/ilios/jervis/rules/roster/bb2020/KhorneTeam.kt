@@ -6,6 +6,7 @@ import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.MUTATIONS
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.PASSING
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.STRENGTH
 import dk.ilios.jervis.rules.roster.RosterId
+import dk.ilios.jervis.rules.skills.Frenzy
 import kotlinx.serialization.Serializable
 
 // See Spike! Journal Issue 13
@@ -19,7 +20,7 @@ data object KhorneTeam : BB2020Roster {
             "Bloodborn Marauder Lineman",
             50_000,
             6, 3, 3, 4, 8,
-            emptyList(), // Frenzy
+            listOf(Frenzy.Factory),
             listOf(GENERAL, MUTATIONS),
             listOf(AGILITY, STRENGTH),
         )
@@ -43,7 +44,7 @@ data object KhorneTeam : BB2020Roster {
             "Bloodseeker",
             110_000,
             5, 4, 4, 6, 10,
-            emptyList(), // Frenzy
+            listOf(Frenzy.Factory),
             listOf(GENERAL, MUTATIONS, STRENGTH),
             listOf(AGILITY),
         )
@@ -55,7 +56,7 @@ data object KhorneTeam : BB2020Roster {
             "Bloodspawn",
             160_000,
             5, 5, 4, null, 9,
-            emptyList(), // Claws, Frenzy, Loner(4+), Might Blow (+1), Unchanelled Fury
+            listOf(Frenzy.Factory), // Claws, Frenzy, Loner(4+), Might Blow (+1), Unchanelled Fury
             listOf(MUTATIONS, STRENGTH),
             listOf(AGILITY, GENERAL),
         )

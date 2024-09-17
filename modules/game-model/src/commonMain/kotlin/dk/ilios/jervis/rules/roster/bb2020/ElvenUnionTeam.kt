@@ -4,7 +4,10 @@ import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.AGILITY
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.GENERAL
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.PASSING
 import dk.ilios.jervis.rules.roster.RosterId
+import dk.ilios.jervis.rules.skills.Block
 import dk.ilios.jervis.rules.skills.CatchSkill
+import dk.ilios.jervis.rules.skills.Pass
+import dk.ilios.jervis.rules.skills.SideStep
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -29,7 +32,7 @@ data object ElvenUnionTeam : BB2020Roster {
             "Thrower",
             75_000,
             6, 3, 2, 2, 8,
-            listOf(/* Pass */),
+            listOf(Pass.Factory),
             listOf(AGILITY, GENERAL, PASSING),
             listOf(GENERAL),
         )
@@ -53,7 +56,7 @@ data object ElvenUnionTeam : BB2020Roster {
             "Blitzer",
             115_000,
             7, 3, 2, 3, 9,
-            emptyList(),
+            listOf(Block.Factory, SideStep.Factory),
             listOf(GENERAL, GENERAL),
             listOf(AGILITY, PASSING),
         )

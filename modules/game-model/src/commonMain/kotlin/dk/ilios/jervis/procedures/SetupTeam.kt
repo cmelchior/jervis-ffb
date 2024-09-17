@@ -2,6 +2,7 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndSetup
@@ -152,7 +153,9 @@ object SetupTeam : Procedure() {
             return listOf(ConfirmWhenReady)
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return GotoNode(SelectPlayerOrEndSetup)
+            return checkType<Confirm>(action) {
+                GotoNode(SelectPlayerOrEndSetup)
+            }
         }
     }
 }

@@ -15,34 +15,20 @@ class Field(val width: Int, val height: Int) : Iterable<FieldSquare> {
             }
         }
 
-    operator fun get(
-        x: Int,
-        y: Int,
-    ): FieldSquare = field[x][y]
-
+    operator fun get(x: Int, y: Int): FieldSquare = field[x][y]
     operator fun get(coordinate: FieldCoordinate): FieldSquare = field[coordinate.x][coordinate.y]
 
-    fun addPlayer(
-        player: Player,
-        x: Int,
-        y: Int,
-    ) {
+    fun addPlayer(player: Player, x: Int, y: Int) {
         assertEmptySquare(x, y)
         field[x][y].player = player
     }
 
-    fun removePlayer(
-        x: Int,
-        y: Int,
-    ): Player {
+    fun removePlayer(x: Int, y: Int): Player {
         val player: Player = field[x][y].player ?: INVALID_GAME_STATE("No player could be removed at: ($x, $y)")
         return player
     }
 
-    private fun assertEmptySquare(
-        x: Int,
-        y: Int,
-    ) {
+    private fun assertEmptySquare(x: Int, y: Int) {
         if (field[x][y].player != null) {
             INVALID_GAME_STATE("Cannot add player to location: ($x, $y)")
         }

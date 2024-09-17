@@ -65,7 +65,7 @@ object Stumble: Procedure() {
         val context = state.getContext<PushContext>()
         return compositeCommandOf(
             RemoveContext<PushContext>(),
-            ReportPowResult(context.pusher, context.pushee)
+            ReportPowResult(context.firstPusher, context.firstPushee)
         )
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockResultContext>()

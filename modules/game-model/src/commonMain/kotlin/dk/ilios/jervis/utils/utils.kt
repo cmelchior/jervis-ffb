@@ -79,6 +79,7 @@ import dk.ilios.jervis.rules.roster.bb2020.LizardmenTeam
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.skills.RerollSource
+import dk.ilios.jervis.rules.skills.SideStep
 import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.teamBuilder
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -283,7 +284,7 @@ fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = humanTeamAway())
             addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), HumanTeam.LINEMAN)
             addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), HumanTeam.LINEMAN)
             addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HumanTeam.THROWER)
-            addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HumanTeam.CATCHER)
+            addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HumanTeam.CATCHER, listOf(SideStep()))
             addPlayer(PlayerId("H7"), "Catcher-7-H", PlayerNo(7), HumanTeam.CATCHER)
             addPlayer(PlayerId("H8"), "Blitzer-8-H", PlayerNo(8), HumanTeam.BLITZER)
             addPlayer(PlayerId("H9"), "Blitzer-9-H", PlayerNo(9), HumanTeam.BLITZER)

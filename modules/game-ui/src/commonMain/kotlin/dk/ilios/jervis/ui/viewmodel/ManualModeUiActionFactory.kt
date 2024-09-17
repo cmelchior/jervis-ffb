@@ -125,6 +125,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
         controller: GameController,
         actions: List<ActionDescriptor>,
     ): GameAction? {
+
         if (model.menuViewModel.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) {
             if (actions.filterIsInstance<SelectNoReroll>().count { it.rollSuccessful == true} > 0) {
                 return NoRerollSelected
@@ -157,6 +158,10 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
             if (choices.size == 1) {
                 return choices.first() as DBlockResult
             }
+        }
+
+        if (currentNode is PushStep.DecideToFollowUp && actions.size == 1) {
+            return actions.first() as Confirm
         }
 
         return null

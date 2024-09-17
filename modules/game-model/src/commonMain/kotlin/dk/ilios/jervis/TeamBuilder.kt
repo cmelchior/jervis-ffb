@@ -9,8 +9,14 @@ import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
 import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
 import dk.ilios.jervis.rules.skills.RegularTeamReroll
+import dk.ilios.jervis.rules.skills.Skill
 
-private data class PlayerData(val id: PlayerId, val name: String, val number: PlayerNo, val type: Position)
+private data class PlayerData(
+    val id: PlayerId,
+    val name: String,
+    val number: PlayerNo,
+    val type: Position,
+    val extraSkills: List<Skill> = emptyList())
 
 class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     private val players: MutableMap<PlayerNo, PlayerData> = mutableMapOf()
@@ -44,6 +50,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
         name: String,
         number: PlayerNo,
         type: Position,
+        skills: List<Skill> = emptyList()
     ) {
         if (players.containsKey(number)) {
             throw IllegalArgumentException("Player with number $number already exits: ${players[number]}")
@@ -52,7 +59,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
         if (players.values.count { it.type == type } == allowedOnTeam) {
             throw IllegalArgumentException("Max number of $type are already on the team.")
         }
-        players[number] = PlayerData(id, name, number, type)
+        players[number] = PlayerData(id, name, number, type, skills)
     }
 
     fun build(): Team {
@@ -65,7 +72,9 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
                     data.id,
                     data.name,
                     data.number
-                ))
+                ).also { player ->
+                    player.extraSkills.addAll(data.extraSkills)
+                })
             }
             this.rerolls.addAll((0 ..<this@TeamBuilder.reRolls).map { RegularTeamReroll(it) })
             this.teamCheerleaders = this@TeamBuilder.cheerLeaders

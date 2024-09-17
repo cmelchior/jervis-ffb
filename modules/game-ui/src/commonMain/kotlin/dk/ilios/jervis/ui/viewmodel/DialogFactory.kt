@@ -60,6 +60,7 @@ import dk.ilios.jervis.procedures.tables.prayers.BadHabits
 import dk.ilios.jervis.procedures.tables.weather.SwelteringHeat
 import dk.ilios.jervis.rules.skills.Block
 import dk.ilios.jervis.rules.skills.Dodge
+import dk.ilios.jervis.rules.skills.SideStep
 import dk.ilios.jervis.rules.skills.Tackle
 
 /**
@@ -210,7 +211,7 @@ object DialogFactory {
                     DiceRollUserInputDialog.createInjuryRollDialog(rules, player)
                 }
 
-                is LastingInjuryRoll.RollDice -> {
+                is LastingInjuryRoll.RollDie -> {
                     val player = controller.state.getContext<RiskingInjuryContext>().player
                     DiceRollUserInputDialog.createLastingInjuryRollDialog(rules, player)
                 }
@@ -236,7 +237,14 @@ object DialogFactory {
 
                 is PushStep.DecideToFollowUp -> {
                     SingleChoiceInputDialog.createFollowUpDialog(
-                        controller.state.getContext<PushContext>().pusher
+                        controller.state.getContext<PushContext>().firstPusher
+                    )
+                }
+                is PushStep.DecideToUseSidestep -> {
+                    val player = controller.state.getContext<PushContext>().pushee()
+                    SingleChoiceInputDialog.createUseSkillDialog(
+                        player,
+                        player.getSkill<SideStep>()
                     )
                 }
 
