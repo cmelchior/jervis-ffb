@@ -7,6 +7,6 @@ class ReportPushResult(val player: Player, val location: FieldCoordinate) : LogE
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String
         get() {
-            return "${player.name} follows up to $location"
+            return "${player.name} follows up to ${location.toLogString()}"
         }
 }

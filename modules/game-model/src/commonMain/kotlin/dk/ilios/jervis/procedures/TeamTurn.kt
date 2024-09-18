@@ -2,19 +2,14 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
-import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.EndTurnWhenReady
 import dk.ilios.jervis.actions.GameAction
-import dk.ilios.jervis.actions.PlayerActionSelected
-import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
-import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.ResetAvailableTeamActions
-import dk.ilios.jervis.commands.SetActiveAction
-import dk.ilios.jervis.commands.SetActivePlayer
 import dk.ilios.jervis.commands.SetCanUseTeamRerolls
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerAvailability
@@ -34,13 +29,11 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.inducements.Timing
-import dk.ilios.jervis.procedures.tables.prayers.ResolveThrowARock
 import dk.ilios.jervis.procedures.inducements.ActivateInducementContext
 import dk.ilios.jervis.procedures.inducements.ActivateInducements
-import dk.ilios.jervis.reports.ReportActionSelected
+import dk.ilios.jervis.procedures.tables.prayers.ResolveThrowARock
 import dk.ilios.jervis.reports.ReportEndingTurn
 import dk.ilios.jervis.reports.ReportStartingTurn
-import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
@@ -90,6 +83,14 @@ object TeamTurn : Procedure() {
         }
     }
 
+    // According to the rules, you cannot take back activating a player, but that feels needlessly restrictive.
+    // So instead, we implement a multi-select process as following:
+    // 1. Select Player
+    // 2. Deselecting the player is possible and free.
+    // 3. Select Player Action, which is equivalent to Activating them.
+    // 4. Check for any activation events.
+    // 5. Start on the action. Until the player moves or roll dice, it is still allowed to end the
+    //    action without it counting as used.
     object SelectPlayerOrEndTurn : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.activeTeam
 
@@ -101,9 +102,8 @@ object TeamTurn : Procedure() {
             return when (action) {
                 is PlayerSelected -> {
                     compositeCommandOf(
-                        SetActivePlayer(action.getPlayer(state)),
-                        SetPlayerAvailability(action.getPlayer(state), Availability.IS_ACTIVE),
-                        GotoNode(DeselectPlayerOrSelectAction),
+                        SetContext(ActivatePlayerContext(action.getPlayer(state))),
+                        GotoNode(ActivatePlayer),
                     )
                 }
                 EndTurn -> GotoNode(ResolveEndOfTurn)
@@ -112,111 +112,16 @@ object TeamTurn : Procedure() {
         }
     }
 
-    object DeselectPlayerOrSelectAction : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.activeTeam
-
-        private fun getAvailableSpecialActions(state: Game, rules: Rules): Set<PlayerAction> {
-            return emptySet() // TODO Hypnotic Gaze, Ball & Chain, others?
-        }
-
-        private fun getAvailableTeamActions(state: Game, rules: Rules): Set<PlayerAction> {
-            val actions = mutableSetOf<PlayerAction>()
-            state.activeTeam.turnData.let {
-                if (it.moveActions > 0) actions.add(rules.teamActions.move.action)
-                if (it.passActions > 0) actions.add(rules.teamActions.pass.action)
-                if (it.handOffActions > 0) actions.add(rules.teamActions.handOff.action)
-                if (it.blockActions > 0) actions.add(rules.teamActions.block.action)
-                if (it.blitzActions > 0) actions.add(rules.teamActions.blitz.action)
-                if (it.foulActions > 0) actions.add(rules.teamActions.foul.action)
-            }
-            return actions
-        }
-
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val teamActions: Set<PlayerAction> = getAvailableTeamActions(state, rules)
-            val specialPlayerActions: Set<PlayerAction> = getAvailableSpecialActions(state, rules)
-            val allActions: List<SelectAction> =
-                (teamActions + specialPlayerActions).map {
-                    SelectAction(it)
-                }
-            val availableActions: List<SelectAction> = (
-                allActions.firstOrNull {
-                    it.action.compulsory
-                }?.let { listOf(it) } ?: allActions
-            )
-            val deselectPlayer: List<ActionDescriptor> = listOf(DeselectPlayer(state.activePlayer!!))
-            return deselectPlayer + availableActions
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when (action) {
-                PlayerDeselected ->
-                    compositeCommandOf(
-                        SetPlayerAvailability(state.activePlayer!!, Availability.AVAILABLE),
-                        SetActivePlayer(null),
-                        GotoNode(SelectPlayerOrEndTurn),
-                    )
-                is PlayerActionSelected -> {
-//                    val type: PlayerActionType = action.action.type
-                    // TODO We should probably not modify it here/
-                    // While it is probably technically correct, we allow
-                    // players to cancel most actions until they start
-                    // moving or rolling dice.
-//                    val modifyAvailableActions: Command =
-//                        when (type) {
-//                            PlayerActionType.MOVE,
-//                            PlayerActionType.PASS,
-//                            PlayerActionType.HAND_OFF,
-//                            PlayerActionType.BLOCK,
-//                            PlayerActionType.BLITZ,
-//                            PlayerActionType.FOUL,
-//                            -> {
-//                                val currentValue: Int = state.activeTeam.turnData.availableActions[type]!!
-//                                // Mark the action as used. Regardless what happens from here, the action
-//                                // has been considered "selected" and thus count as used.
-//                                SetAvailableActions(state.activeTeam, type, currentValue - 1)
-//                            }
-//                            PlayerActionType.SPECIAL ->
-//                                INVALID_ACTION(
-//                                    action,
-//                                ) // TODO Figure out what needs to happen here
-//                        }
-                    val selectedAction = rules.teamActions[action.action].action
-                    compositeCommandOf(
-//                        modifyAvailableActions,
-                        SetActiveAction(selectedAction),
-                        ReportActionSelected(state.activePlayer!!, selectedAction),
-                        GotoNode(ActivatePlayer),
-                    )
-                }
-                else -> INVALID_ACTION(action)
-            }
-        }
-    }
-
-    // Activating a player is an implicit step when choosing a player action (see page 42 in the rulebook)
-    // However, some skills will modify the behavior of the player, when this happens, so we inj
-    object ActivatePlayer : ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            // TODO Some rules to consider here: Bone Head
-            return compositeCommandOf(
-                GotoNode(ResolveSelectedAction),
-            )
-        }
-    }
-
-    object ResolveSelectedAction : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = state.activePlayerAction!!.procedure
+    object ActivatePlayer: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = dk.ilios.jervis.procedures.ActivatePlayer
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
-                SetActivePlayer(null),
-                SetActiveAction(null),
-                if (state.isTurnOver) {
+                RemoveContext<ActivatePlayerContext>(),
+                if (state.isTurnOver || state.goalScored) {
                     GotoNode(ResolveEndOfTurn)
                 } else {
                     GotoNode(SelectPlayerOrEndTurn)
-                },
+                }
             )
         }
     }

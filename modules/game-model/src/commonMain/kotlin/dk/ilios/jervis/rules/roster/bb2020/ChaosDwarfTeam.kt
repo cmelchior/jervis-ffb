@@ -6,6 +6,11 @@ import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.MUTATIONS
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.PASSING
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.STRENGTH
 import dk.ilios.jervis.rules.roster.RosterId
+import dk.ilios.jervis.rules.skills.Block
+import dk.ilios.jervis.rules.skills.Sprint
+import dk.ilios.jervis.rules.skills.SureFeet
+import dk.ilios.jervis.rules.skills.Tackle
+import dk.ilios.jervis.rules.skills.ThickSkull
 import kotlinx.serialization.Serializable
 
 // See Teams of Legend: https://www.warhammer-community.com/wp-content/uploads/2020/11/lFZy1SIuNmWvxPj1.pdf
@@ -31,7 +36,7 @@ data object ChaosDwarfTeam : BB2020Roster {
             "Chaos Dwarf Blocker",
             70_000,
             4, 3, 4, 6, 10,
-            emptyList(), // Block, Tackle, Thick Skull
+            listOf(Block.Factory, Tackle.Factory, ThickSkull.Factory),
             listOf(GENERAL, STRENGTH),
             listOf(AGILITY, MUTATIONS),
         )
@@ -43,7 +48,11 @@ data object ChaosDwarfTeam : BB2020Roster {
             "Bull Centaur Blitzer",
             130_000,
             6, 4, 4, 6, 10,
-            emptyList(), // Sprint, Sure Feet, Thick Skull
+            listOf(
+                Sprint.Factory,
+                SureFeet.Factory,
+                ThickSkull.Factory
+            ),
             listOf(GENERAL, STRENGTH),
             listOf(AGILITY),
         )

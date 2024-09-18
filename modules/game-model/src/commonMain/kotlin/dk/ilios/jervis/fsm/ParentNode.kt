@@ -1,9 +1,9 @@
 package dk.ilios.jervis.fsm
 
 import compositeCommandOf
-import dk.ilios.jervis.commands.fsm.ChangeParentNodeState
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.EnterProcedure
+import dk.ilios.jervis.commands.fsm.ChangeParentNodeState
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.Rules
 
@@ -27,6 +27,11 @@ abstract class ParentNode : Node {
         EXITING,
     }
 
+    // TODO Should we add something like a `skipNodeFor` method?
+    //  This would eliminate the need for `CheckFor<X>` computation nodes
+    //  and move the check inline into parent nodes. The downside is that the parent
+    //  node lifecycle gets even more complex :thinking:
+
     /**
      * Returns the [Procedure] this node should load and go into.
      */
@@ -37,6 +42,8 @@ abstract class ParentNode : Node {
      * [ParentNode] and not the procedure returned by [getChildProcedure].
      *
      * This makes it possible to define some state required by the child procedure.
+     *
+     * Calling [GotoNode] or [ExitProcedure] at this point is not legal.
      */
     open fun onEnterNode(state: Game, rules: Rules): Command? = null
 

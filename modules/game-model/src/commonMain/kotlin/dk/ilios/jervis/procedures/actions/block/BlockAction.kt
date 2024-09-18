@@ -17,7 +17,8 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.reports.ReportActionEnded
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 import kotlinx.serialization.Serializable
@@ -31,9 +32,7 @@ import kotlinx.serialization.Serializable
 object BlockAction : Procedure() {
     override val initialNode: Node = SelectDefenderOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
-    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object SelectDefenderOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
@@ -53,7 +52,13 @@ object BlockAction : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                EndAction -> ExitProcedure()
+                EndAction -> {
+                    val activeContext = state.getContext<ActivatePlayerContext>()
+                    compositeCommandOf(
+                        SetContext(activeContext.copy(markActionAsUsed = false)),
+                        ExitProcedure()
+                    )
+                }
                 is PlayerSelected -> {
                     val context =
                         BlockContext(
@@ -75,7 +80,11 @@ object BlockAction : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = BlockStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Regardless of the outcome of the block, the action is over
-            return ExitProcedure()
+            val activeContext = state.getContext<ActivatePlayerContext>()
+            return compositeCommandOf(
+                SetContext(activeContext.copy(markActionAsUsed = true)),
+                ExitProcedure()
+            )
         }
     }
 }

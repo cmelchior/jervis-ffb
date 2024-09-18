@@ -1,0 +1,401 @@
+package dk.ilios.jervis.procedures
+
+import buildCompositeCommand
+import compositeCommandOf
+import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.DeselectPlayer
+import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.PlayerActionSelected
+import dk.ilios.jervis.actions.PlayerDeselected
+import dk.ilios.jervis.actions.SelectAction
+import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetActivePlayer
+import dk.ilios.jervis.commands.SetAvailableActions
+import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetHasTackleZones
+import dk.ilios.jervis.commands.SetPlayerAvailability
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
+import dk.ilios.jervis.fsm.ActionNode
+import dk.ilios.jervis.fsm.ComputationNode
+import dk.ilios.jervis.fsm.Node
+import dk.ilios.jervis.fsm.ParentNode
+import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.Availability
+import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.context.ProcedureContext
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.hasSkill
+import dk.ilios.jervis.model.modifiers.TemporaryEffectType
+import dk.ilios.jervis.reports.ReportActionEnded
+import dk.ilios.jervis.reports.ReportActionSelected
+import dk.ilios.jervis.rules.PlayerAction
+import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.AnimalSavagery
+import dk.ilios.jervis.rules.skills.BloodLust
+import dk.ilios.jervis.rules.skills.BoneHead
+import dk.ilios.jervis.rules.skills.Duration
+import dk.ilios.jervis.rules.skills.ReallyStupid
+import dk.ilios.jervis.rules.skills.UnchannelledFury
+import dk.ilios.jervis.utils.INVALID_ACTION
+
+data class ActivatePlayerContext(
+    // The player being activated
+    val player: Player,
+    // As part of activating the player, some negative effect was cleared
+    val clearedNegativeEffects: Boolean = false,
+    // As part of activating the player, some negatrait was rolled for
+    val rolledForNegaTrait: Boolean = false,
+    // If some effect caused the activation to "end immediately". This does not include turn overs.
+    val activationEndsImmediately: Boolean = false,
+    // Which action does the player want to perform?
+    val declaredAction: PlayerAction? = null,
+    // The target of the action, if any is required.
+    val target: Player? = null,
+    // `true` if the action should count as being used, regardless of how the activation ended
+    val markActionAsUsed: Boolean = false,
+): ProcedureContext
+
+/**
+ * Procedure for activating a player and declaring their action as described on page 42 in the rulebook.
+ *
+ * The exact sequence for activating a player is not really clear in the rules. This is, e.g., a problem with regard
+ * to regaining tackle zones (which affect if Pro can be used for Bone Head).
+ *
+ * The following sequence is being used in this implementation.
+ *
+ * 1. Select Player (which triggers this procedure).
+ * 2. Mark them as Activate and clear any negative effect that last until the next activation (like missing tackle zones).
+ * 3. Declare an Action to perform. For some actions, like Blitz or Foul, this includes selecting a target.
+ * 5. Roll for all Nega-traits in order, stop at the first failure (no player normally has multiple of these).
+ *    a. Bone Head / Really Stupid: They might end the activation here, loose tackle zones and the action is used.
+ *    b. Unchannelled Fury: They might end the activation here and the action is used.
+ *    c. Animal Savagery: They might hit a nearby player or end their activation and loose tackle zones.
+ *    d. Blood Lust: If failed, they might change the declared action to Move.
+ * 6. If action has a target, roll for all opponent skills like Foul Appearance and Dump Off.
+ * 7. Perform the action.
+ *
+ * We allow a player to take back selecting an action as long as no side effects have occurred. I.e.,
+ * a Player is allowed to regret selecting an action as long as no dice has been rolled, no moves have
+ * been taken, or no negative state has been removed as part of Step 2.
+ *
+ * Note, this sequence is debatable and FUMBBL and BB3 doesn't agree on this.
+ * See https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=32167&postdays=0&postorder=asc&start=0
+ */
+object ActivatePlayer : Procedure() {
+    override val initialNode: Node = MarkPlayerAsActivate
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        val context = state.getContext<ActivatePlayerContext>()
+        val player = context.player
+        return buildCompositeCommand {
+            add(SetActivePlayer(null))
+
+            // If the action was considered "used", we should remove it from the pool
+            // of available actions
+            if (context.markActionAsUsed) {
+                val activeTeam = state.activeTeam
+                val markActionAsUsedCommand = when (context.declaredAction!!.type) {
+                    PlayerActionType.MOVE -> SetAvailableActions(activeTeam, PlayerActionType.MOVE, activeTeam.turnData.moveActions - 1 )
+                    PlayerActionType.PASS -> SetAvailableActions(activeTeam, PlayerActionType.PASS, activeTeam.turnData.passActions - 1 )
+                    PlayerActionType.HAND_OFF -> SetAvailableActions(activeTeam, PlayerActionType.HAND_OFF, activeTeam.turnData.handOffActions - 1 )
+                    PlayerActionType.BLOCK -> SetAvailableActions(activeTeam, PlayerActionType.BLOCK, activeTeam.turnData.blockActions - 1 )
+                    PlayerActionType.BLITZ -> SetAvailableActions(activeTeam, PlayerActionType.BLITZ, activeTeam.turnData.blitzActions - 1 )
+                    PlayerActionType.FOUL -> SetAvailableActions(activeTeam, PlayerActionType.FOUL, activeTeam.turnData.foulActions - 1 )
+                    PlayerActionType.SPECIAL -> TODO()
+                }
+                add(markActionAsUsedCommand)
+                add(ReportActionEnded(state.activePlayer!!, context.declaredAction))
+            }
+
+            // If the player is still "active" it means the declared action was never
+            // performed or canceled before it was "used". In that case, we allow the
+            // player to be activated again if they haven't done anything else that
+            // is considered irreversible.
+            if (
+                player.available == Availability.IS_ACTIVE &&
+                (context.clearedNegativeEffects || context.rolledForNegaTrait)
+            ) {
+                add(SetPlayerAvailability(player, Availability.AVAILABLE))
+            }
+        }
+    }
+
+    object MarkPlayerAsActivate : ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<ActivatePlayerContext>()
+            val player = context.player
+
+            // If the player is standing and have lost their tackle zone in the last turn,
+            // they will now regain it (if they are standing). All effects that cause
+            // a player to temporarily lose their tackle zone behave this way:
+            // Bone Head, Hypnotic Gaze, Really Stupid
+            val enableTackleZonesCommand = if (
+                player.state == PlayerState.STANDING &&
+                !player.hasTackleZones
+            ) {
+                compositeCommandOf(
+                    SetHasTackleZones(player, true),
+                    SetContext(context.copy(clearedNegativeEffects = true))
+                )
+            } else {
+                null
+            }
+
+            return compositeCommandOf(
+                *getResetTemporaryModifiersCommands(state, rules, Duration.START_OF_ACTIVATION),
+                enableTackleZonesCommand,
+                SetActivePlayer(player),
+                SetPlayerAvailability(player, Availability.IS_ACTIVE),
+                GotoNode(DeclareActionOrDeselectPlayer)
+            )
+        }
+    }
+
+    object DeclareActionOrDeselectPlayer : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules) = state.activeTeam
+
+        private fun getAvailableSpecialActions(state: Game, rules: Rules): Set<PlayerAction> {
+            return emptySet() // TODO Hypnotic Gaze, Ball & Chain, others?
+        }
+
+        private fun getAvailableTeamActions(state: Game, rules: Rules): Set<PlayerAction> {
+            val actions = mutableSetOf<PlayerAction>()
+            state.activeTeam.turnData.let {
+                if (it.moveActions > 0) actions.add(rules.teamActions.move.action)
+                if (it.passActions > 0) actions.add(rules.teamActions.pass.action)
+                if (it.handOffActions > 0) actions.add(rules.teamActions.handOff.action)
+                if (it.blockActions > 0) actions.add(rules.teamActions.block.action)
+                if (it.blitzActions > 0) actions.add(rules.teamActions.blitz.action)
+                if (it.foulActions > 0) actions.add(rules.teamActions.foul.action)
+            }
+            return actions
+        }
+
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            val teamActions: Set<PlayerAction> = getAvailableTeamActions(state, rules)
+            val specialPlayerActions: Set<PlayerAction> = getAvailableSpecialActions(state, rules)
+            val allActions: List<SelectAction> =
+                (teamActions + specialPlayerActions).map {
+                    SelectAction(it)
+                }
+            val availableActions: List<SelectAction> = (
+                allActions.firstOrNull {
+                    it.action.compulsory
+                }?.let { listOf(it) } ?: allActions
+            )
+            val deselectPlayer: List<ActionDescriptor> = listOf(DeselectPlayer(state.activePlayer!!))
+            return deselectPlayer + availableActions
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val activePlayer = state.activePlayer!!
+            return when (action) {
+                PlayerDeselected ->
+                    compositeCommandOf(
+                        SetPlayerAvailability(activePlayer, Availability.AVAILABLE),
+                        SetActivePlayer(null),
+                        ExitProcedure(),
+                    )
+                is PlayerActionSelected -> {
+                    val selectedAction = rules.teamActions[action.action].action
+                    val hasNegaTrait = hasNegaTrait(activePlayer)
+                    compositeCommandOf(
+                        SetContext(state.getContext<ActivatePlayerContext>().copy(declaredAction = selectedAction)),
+                        ReportActionSelected(activePlayer, selectedAction),
+                        if (hasNegaTrait) {
+                            GotoNode(CheckForBoneHead)
+                        } else {
+                            GotoNode(CheckForOpponentInterruptSkills)
+                        }
+                    )
+                }
+                else -> INVALID_ACTION(action)
+            }
+        }
+    }
+
+    object CheckForBoneHead: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            return if (state.activePlayer!!.hasSkill<BoneHead>()) {
+                GotoNode(ResolveBoneHead)
+            } else {
+                GotoNode(CheckForReallyStupid)
+            }
+        }
+    }
+
+    object ResolveBoneHead: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BoneHeadRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<ActivatePlayerContext>()
+            return if (context.activationEndsImmediately) {
+                compositeCommandOf(
+                    SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
+                    ExitProcedure()
+                )
+            } else {
+                GotoNode(CheckForReallyStupid)
+            }
+        }
+    }
+
+    object CheckForReallyStupid: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            return if (state.activePlayer!!.hasSkill<ReallyStupid>()) {
+                GotoNode(ResolveReallyStupid)
+            } else {
+                GotoNode(CheckForUnchannelledFury)
+            }
+        }
+    }
+
+    object ResolveReallyStupid: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ReallyStupidRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<ActivatePlayerContext>()
+            return if (context.activationEndsImmediately) {
+                compositeCommandOf(
+                    SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
+                    ExitProcedure()
+                )
+            } else {
+                GotoNode(CheckForUnchannelledFury)
+            }
+        }
+    }
+
+    object CheckForUnchannelledFury: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            return if (state.activePlayer!!.hasSkill<UnchannelledFury>()) {
+                GotoNode(ResolveUnchannelledFury)
+            } else {
+                GotoNode(CheckForBloodLust)
+            }
+        }
+    }
+
+    object ResolveUnchannelledFury: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = UnchannelledFuryRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<ActivatePlayerContext>()
+            return if (context.activationEndsImmediately) {
+                compositeCommandOf(
+                    SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
+                    ExitProcedure()
+                )
+            } else {
+                GotoNode(CheckForAnimalSavagery)
+            }
+        }
+    }
+
+    object CheckForAnimalSavagery: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            return if (state.activePlayer!!.hasSkill<AnimalSavagery>()) {
+                GotoNode(ResolveAnimalSavagery)
+            } else {
+                GotoNode(CheckForBloodLust)
+            }
+        }
+    }
+
+
+    object ResolveAnimalSavagery: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = AnimalSavageryRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<ActivatePlayerContext>()
+            return if (context.activationEndsImmediately) {
+                compositeCommandOf(
+                    SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
+                    ExitProcedure()
+                )
+            } else {
+                GotoNode(CheckForBloodLust)
+            }
+        }
+    }
+
+    object CheckForBloodLust: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            return if (state.activePlayer!!.hasSkill<BloodLust>()) {
+                GotoNode(ResolveBloodLust)
+            } else {
+                GotoNode(CheckForOpponentInterruptSkills)
+            }
+        }
+    }
+
+    object ResolveBloodLust: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BloodLustRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // Blood Lust does not cause the activation to end, it only goes into affect
+            // at the end of the activation
+            return GotoNode(CheckForOpponentInterruptSkills)
+        }
+    }
+
+    /**
+     * Some skills trigger when an opponent player are about to start their action,
+     * like Dump-off and Foul Appearance. This step checks for these cases
+     */
+    object CheckForOpponentInterruptSkills: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = CheckForActionInterruptSkills
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<ActivatePlayerContext>()
+            return if (context.activationEndsImmediately) {
+                ExitProcedure()
+            } else {
+                GotoNode(ResolveSelectedAction)
+            }
+        }
+    }
+
+    object ResolveSelectedAction : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return state.getContext<ActivatePlayerContext>().declaredAction!!.procedure
+        }
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<ActivatePlayerContext>()
+            return if (context.player.hasTemporaryEffect(TemporaryEffectType.BLOOD_LUST)) {
+                   GotoNode(ResolveBloodLustAtEndOfActivation)
+            } else {
+                return compositeCommandOf(
+                    SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
+                    ExitProcedure()
+                )
+            }
+        }
+    }
+
+    object ResolveBloodLustAtEndOfActivation: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BiteThrall
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
+                ExitProcedure()
+            )
+        }
+    }
+
+    /**
+     * Rather than figuring out every permutation of nega-traits, we just check
+     * if the player has _any_ and if so, we go through checking for all of them.
+     * If not, we can just skip that entire chain.
+     */
+    private fun hasNegaTrait(player: Player): Boolean {
+        return player.skills.any { skill ->
+            when (skill) {
+                is AnimalSavagery,
+                is BoneHead,
+                is BloodLust,
+                is ReallyStupid,
+                is UnchannelledFury -> true
+                else -> false
+            }
+        }
+    }
+}

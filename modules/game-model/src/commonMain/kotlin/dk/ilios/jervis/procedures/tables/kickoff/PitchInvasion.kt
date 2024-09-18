@@ -131,7 +131,7 @@ object PitchInvasion : Procedure() {
                     checkType<RandomPlayersSelected>(action) {
                         val playerCommands = it.getPlayers(state).flatMap { player ->
                             listOf(
-                                SetPlayerState(player, PlayerState.STUNNED),
+                                SetPlayerState(player, PlayerState.STUNNED, hasTackleZones = false),
                                 ReportGameProgress("${player.name} was Stunned by the crowd")
                             )
                         }.toTypedArray()
@@ -178,7 +178,7 @@ object PitchInvasion : Procedure() {
                     checkType<RandomPlayersSelected>(action) {
                         val playerCommands = it.getPlayers(state).flatMap { player ->
                             listOf(
-                                SetPlayerState(player, PlayerState.STUNNED),
+                                SetPlayerState(player, PlayerState.STUNNED, hasTackleZones = false),
                                 ReportGameProgress("${player.name} was Stunned by the crowd")
                             )
                         }.toTypedArray()

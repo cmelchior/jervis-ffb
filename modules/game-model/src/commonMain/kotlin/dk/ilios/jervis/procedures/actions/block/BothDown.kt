@@ -12,6 +12,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetHasTackleZones
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -176,8 +177,8 @@ object BothDown: Procedure() {
             // Otherwise check if one or both players need to roll injury
             if (context.attackerUsesWrestle || context.defenderUsesWrestle) {
                 return compositeCommandOf(
-                    SetPlayerState(context.attacker, PlayerState.PRONE),
-                    SetPlayerState(context.defender, PlayerState.PRONE),
+                    SetPlayerState(context.attacker, PlayerState.PRONE, hasTackleZones = false),
+                    SetPlayerState(context.defender, PlayerState.PRONE, hasTackleZones = false),
                     ExitProcedure()
                 )
             } else {

@@ -591,6 +591,7 @@ class KickOffEventTests: JervisGameTest() {
             )
         )
         assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
+        assertFalse(state.getPlayerById("A1".playerId).hasTackleZones)
     }
 
     @Test
@@ -666,6 +667,7 @@ class KickOffEventTests: JervisGameTest() {
             )
         )
         assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
+        assertFalse(state.getPlayerById("A1".playerId).hasBall())
     }
 
     @Test

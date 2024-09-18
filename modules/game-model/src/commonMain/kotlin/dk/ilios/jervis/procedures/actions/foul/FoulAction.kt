@@ -13,7 +13,6 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
-import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -29,13 +28,12 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.actions.move.ResolveMoveTypeStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
 import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
-import dk.ilios.jervis.reports.ReportActionEnded
 import dk.ilios.jervis.reports.ReportFoulResult
-import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.ArgueTheCallResult
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -77,13 +75,7 @@ object FoulAction : Procedure() {
         return compositeCommandOf(
             if (context.victim != null) ReportFoulResult(context) else null,
             RemoveContext<FoulContext>(),
-            if (context.hasFouled || context.hasMoved) {
-                val team = context.fouler.team
-                SetAvailableActions(team, PlayerActionType.FOUL, team.turnData.foulActions - 1)
-            } else {
-                null
-            },
-            ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
+            SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = context.hasFouled || context.hasMoved))
         )
     }
 

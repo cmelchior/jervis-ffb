@@ -12,7 +12,6 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
-import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -28,13 +27,12 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.procedures.actions.block.BlockStep
 import dk.ilios.jervis.procedures.actions.move.ResolveMoveTypeStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
-import dk.ilios.jervis.reports.ReportActionEnded
-import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -63,17 +61,15 @@ object BlitzAction : Procedure() {
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val context = state.getContext<BlitzContext>()
-        val player = state.activePlayer!!
+        val activateContext = state.getContext<ActivatePlayerContext>()
+        val blitzContext = state.getContext<BlitzContext>()
         return compositeCommandOf(
             RemoveContext<BlitzContext>(),
-            if (context.hasBlocked || context.hasMoved) {
-                val team = context.attacker.team
-                SetAvailableActions(team, PlayerActionType.FOUL, team.turnData.blitzActions - 1)
+            if (blitzContext.hasBlocked || blitzContext.hasMoved) {
+                SetContext(activateContext.copy(markActionAsUsed = false))
             } else {
-                null
-            },
-            ReportActionEnded(player, state.activePlayerAction!!)
+                SetContext(activateContext.copy(markActionAsUsed = true))
+            }
         )
     }
     override fun isValid(state: Game, rules: Rules) {

@@ -11,7 +11,6 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
-import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -28,12 +27,11 @@ import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.DiceModifier
+import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.actions.move.ResolveMoveTypeStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
-import dk.ilios.jervis.reports.ReportActionEnded
 import dk.ilios.jervis.reports.ReportPassResult
-import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Range
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -74,21 +72,12 @@ object PassAction : Procedure() {
             SetContext(PassContext(thrower = player))
         )
     }
-    override fun onExitProcedure(
-        state: Game,
-        rules: Rules,
-    ): Command {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PassContext>()
         return compositeCommandOf(
             if (context.target != null) ReportPassResult(context) else null,
             RemoveContext<PassContext>(),
-            if (context.hasMoved) {
-                val team = context.thrower.team
-                SetAvailableActions(team, PlayerActionType.PASS, team.turnData.passActions - 1)
-            } else {
-                null
-            },
-            ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
+            SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = context.hasMoved))
         )
     }
     override fun isValid(state: Game, rules: Rules) {

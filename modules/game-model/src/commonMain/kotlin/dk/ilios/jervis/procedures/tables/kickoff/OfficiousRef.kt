@@ -13,6 +13,7 @@ import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetHasTackleZones
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -237,7 +238,7 @@ object OfficiousRef : Procedure() {
                 ReportGameProgress("${player.name} angered the Ref and was Sent-off")
             )
             else -> compositeCommandOf(
-                SetPlayerState(player, PlayerState.STUNNED),
+                SetPlayerState(player, PlayerState.STUNNED, hasTackleZones = false),
                 ReportGameProgress("${player.name} came to blows with the Ref and was Stunned"),
             )
         }

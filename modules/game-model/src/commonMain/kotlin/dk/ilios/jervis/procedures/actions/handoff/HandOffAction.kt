@@ -10,7 +10,6 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
-import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
@@ -28,12 +27,11 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.Catch
 import dk.ilios.jervis.procedures.actions.move.ResolveMoveTypeStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
-import dk.ilios.jervis.reports.ReportActionEnded
-import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -64,13 +62,7 @@ object HandOffAction : Procedure() {
         val context = state.getContext<HandOffContext>()
         return compositeCommandOf(
             RemoveContext<HandOffContext>(),
-            if (context.hasMoved) {
-                val team = context.thrower.team
-                SetAvailableActions(team, PlayerActionType.HAND_OFF, team.turnData.handOffActions - 1)
-            } else {
-                null
-            },
-            ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
+            SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = context.hasMoved))
         )
     }
     override fun isValid(state: Game, rules: Rules) {

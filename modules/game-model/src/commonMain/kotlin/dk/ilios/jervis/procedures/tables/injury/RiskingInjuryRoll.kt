@@ -12,6 +12,7 @@ import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetHasTackleZones
 import dk.ilios.jervis.commands.SetNigglingInjuries
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
@@ -113,7 +114,7 @@ object RiskingInjuryRoll: Procedure() {
             } else {
                 // If armour is not broken, player is just placed prone.
                 compositeCommandOf(
-                    SetPlayerState(context.player, PlayerState.PRONE),
+                    SetPlayerState(context.player, PlayerState.PRONE, hasTackleZones = false),
                     ExitProcedure()
                 )
             }
@@ -139,7 +140,7 @@ object RiskingInjuryRoll: Procedure() {
                         )
                     } else {
                         compositeCommandOf(
-                            SetPlayerState(context.player, PlayerState.STUNNED),
+                            SetPlayerState(context.player, PlayerState.STUNNED, hasTackleZones = false),
                             ExitProcedure(),
                         )
                     }

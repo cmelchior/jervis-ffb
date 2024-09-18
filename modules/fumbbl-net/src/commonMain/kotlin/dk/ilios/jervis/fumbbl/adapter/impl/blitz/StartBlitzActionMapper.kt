@@ -14,6 +14,7 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.procedures.ActivatePlayer
 import dk.ilios.jervis.procedures.TeamTurn
 import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
 
@@ -57,7 +58,7 @@ object StartBlitzActionMapper: CommandActionMapper {
         newActions.add(PlayerSelected(movingPlayer.id), TeamTurn.SelectPlayerOrEndTurn)
         newActions.add(
             { state, rules -> PlayerActionSelected(rules.teamActions.blitz.action.type) },
-            TeamTurn.DeselectPlayerOrSelectAction
+            ActivatePlayer.DeclareActionOrDeselectPlayer
         )
 
         // Select target of the Blitz

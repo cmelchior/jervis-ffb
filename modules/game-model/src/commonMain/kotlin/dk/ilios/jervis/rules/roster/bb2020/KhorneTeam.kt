@@ -7,6 +7,9 @@ import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.PASSING
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.STRENGTH
 import dk.ilios.jervis.rules.roster.RosterId
 import dk.ilios.jervis.rules.skills.Frenzy
+import dk.ilios.jervis.rules.skills.Loner
+import dk.ilios.jervis.rules.skills.MightyBlow
+import dk.ilios.jervis.rules.skills.UnchannelledFury
 import kotlinx.serialization.Serializable
 
 // See Spike! Journal Issue 13
@@ -56,7 +59,13 @@ data object KhorneTeam : BB2020Roster {
             "Bloodspawn",
             160_000,
             5, 5, 4, null, 9,
-            listOf(Frenzy.Factory), // Claws, Frenzy, Loner(4+), Might Blow (+1), Unchanelled Fury
+            listOf(
+                // Claws
+                Frenzy.Factory,
+                Loner.Factory(4),
+                MightyBlow.Factory(1),
+                UnchannelledFury.Factory
+            ),
             listOf(MUTATIONS, STRENGTH),
             listOf(AGILITY, GENERAL),
         )

@@ -11,6 +11,7 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.procedures.ActivatePlayer
 import dk.ilios.jervis.procedures.TeamTurn
 
 object StartMoveActionMapper: CommandActionMapper {
@@ -39,7 +40,7 @@ object StartMoveActionMapper: CommandActionMapper {
         newActions.add(PlayerSelected(movingPlayer.id), TeamTurn.SelectPlayerOrEndTurn)
         newActions.add(
             { state, rules -> PlayerActionSelected(rules.teamActions.move.action.type) },
-            TeamTurn.DeselectPlayerOrSelectAction
+            ActivatePlayer.DeclareActionOrDeselectPlayer
         )
     }
 }

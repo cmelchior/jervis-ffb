@@ -8,7 +8,6 @@ import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.SetAvailableActions
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -19,9 +18,9 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
+import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
-import dk.ilios.jervis.reports.ReportActionEnded
-import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -37,13 +36,8 @@ object MoveAction : Procedure() {
         val player = state.activePlayer!!
         return getSetPlayerRushesCommand(rules, player)
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val activeTeam = state.activeTeam
-        return compositeCommandOf(
-            SetAvailableActions(activeTeam, PlayerActionType.MOVE, activeTeam.turnData.moveActions - 1 ),
-            ReportActionEnded(state.activePlayer!!, state.activePlayerAction!!)
-        )
-    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+
     override fun isValid(state: Game, rules: Rules) {
         if (state.activePlayer == null) INVALID_GAME_STATE("No active player")
     }
@@ -58,9 +52,14 @@ object MoveAction : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is EndAction -> ExitProcedure()
+                is EndAction -> {
+                    compositeCommandOf(
+                        ExitProcedure()
+                    )
+                }
                 is MoveTypeSelected -> {
                     compositeCommandOf(
+                        SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = true)),
                         SetContext(MoveContext(state.activePlayer!!, action.moveType)),
                         GotoNode(ResolveMoveType)
                     )

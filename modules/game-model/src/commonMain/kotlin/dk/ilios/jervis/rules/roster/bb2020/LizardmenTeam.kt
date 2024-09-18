@@ -5,9 +5,13 @@ import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.GENERAL
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.PASSING
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.STRENGTH
 import dk.ilios.jervis.rules.roster.RosterId
+import dk.ilios.jervis.rules.skills.BoneHead
 import dk.ilios.jervis.rules.skills.Dodge
+import dk.ilios.jervis.rules.skills.Loner
+import dk.ilios.jervis.rules.skills.MightyBlow
 import dk.ilios.jervis.rules.skills.PrehensileTail
 import dk.ilios.jervis.rules.skills.Stunty
+import dk.ilios.jervis.rules.skills.ThickSkull
 import kotlinx.serialization.Serializable
 
 /**
@@ -61,7 +65,13 @@ data object LizardmenTeam : BB2020Roster {
             "Kroxigor",
             140_000,
             6, 5, 5, null, 10,
-            listOf(/* Bone Head, Loner (4+), Might Blow (1+), Thick Skull */ PrehensileTail.Factory),
+            listOf(
+                BoneHead.Factory,
+                Loner.Factory(4),
+                MightyBlow.Factory(1),
+                ThickSkull.Factory,
+                PrehensileTail.Factory
+            ),
             listOf(STRENGTH),
             listOf(AGILITY, GENERAL),
         )

@@ -52,8 +52,14 @@ class Game(
     // one procedure, otherwise it should be moved into a [ProcedureContext]
     var isTurnOver = false
     var goalScored: Boolean = false
+    var endTurn: Boolean = false
     var homeGoals: Int = 0
     var awayGoals: Int = 0
+    /**
+     * The player that is being activated. This is set as soon as the player is
+     * selected. Whether the player counts as being activated is determined by
+     * [Player.available]
+     */
     var activePlayer: Player? = null
     var kickingPlayer: Player? = null // TODO Move into a context?
 
@@ -89,7 +95,6 @@ class Game(
     var kickingTeamInLastHalf: Team = kickingTeam
 
     // Temporary states - Figure out where/how to store these
-    var activePlayerAction: PlayerAction? = null
     var moveStepTarget: Pair<FieldCoordinate, FieldCoordinate>? = null
 
     // Context objects are state holders used by procedures

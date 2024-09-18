@@ -92,6 +92,22 @@ interpreted.
 18. A player that that falls through a Trapdoor does not cause a turnover unless they where holding the
     ball. (at least reading from the rules)
 
+19. Pro and rerolls https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=32167&postdays=0&postorder=asc&start=0
+
+20. Rules for activation are intepreted like this:
+    a. Select Player
+    b. Activate Player (this regains lost Tackle Zones)
+    c. Select Action. Some actions require a target as part of this:
+       a. Blitz, Foul, 
+    d. Roll for Bone Head etc. Pro is allowed here
+    e. If Bone Head fails, action is "used"
+    f. Roll for Foul Appearance, Dump-off (Pr. Designer's Commentary) 
+
+
+   
+
+
+
 # Differences compared to the rules as written
 
 1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 

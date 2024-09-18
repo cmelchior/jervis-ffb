@@ -13,6 +13,7 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.procedures.ActivatePlayer
 import dk.ilios.jervis.procedures.TeamTurn
 import dk.ilios.jervis.procedures.actions.move.MoveAction
 
@@ -43,9 +44,9 @@ object AbortActionMapper: CommandActionMapper {
 
         // Abort a previous started action if possible (only move right now?).
         // Jervis doesn't support undoing actions right now, so just remove the first action from the action list.
-        if (jervisCommands.last().expectedNode == TeamTurn.DeselectPlayerOrSelectAction) {
+        if (jervisCommands.last().expectedNode == ActivatePlayer.DeclareActionOrDeselectPlayer) {
             newActions.add(Undo, MoveAction.SelectMoveType) // Select Move Action
-            newActions.add(Undo, TeamTurn.DeselectPlayerOrSelectAction) // Select Player
+            newActions.add(Undo, ActivatePlayer.DeclareActionOrDeselectPlayer) // Select Player
         }
 
         when ((command.reportList.first() as PlayerActionReport).playerAction) {
@@ -55,7 +56,7 @@ object AbortActionMapper: CommandActionMapper {
                 newActions.add(PlayerSelected(movingPlayer.id), TeamTurn.SelectPlayerOrEndTurn)
                 newActions.add(
                     { state, rules -> PlayerActionSelected(rules.teamActions.move.action.type) },
-                    TeamTurn.DeselectPlayerOrSelectAction,
+                    ActivatePlayer.DeclareActionOrDeselectPlayer,
                 )
             }
             else -> { /* Fall through */ }

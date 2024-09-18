@@ -3,6 +3,7 @@ package dk.ilios.jervis.procedures
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemovePlayerSkill
 import dk.ilios.jervis.commands.RemovePlayerStatModifier
+import dk.ilios.jervis.commands.RemovePlayerTemporaryEffect
 import dk.ilios.jervis.commands.RemovePrayersToNuffle
 import dk.ilios.jervis.commands.RemoveTeamReroll
 import dk.ilios.jervis.commands.SetPlayerRushesLeft
@@ -52,6 +53,17 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
                 .map { RemovePlayerSkill(player, it) }
         }
     }
+
+    // Find all other temporary effects
+    val removableTemporaryEffects = teams.flatMap { team ->
+        team.flatMap { player ->
+            player.temporaryEffects
+                .filter { it.duration == duration }
+                .map { RemovePlayerTemporaryEffect(player, it) }
+        }
+    }
+
+
 
     // Remove all temporary rerolls that might have expired
     // TODO Consider overtime here

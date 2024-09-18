@@ -1,6 +1,8 @@
 package dk.ilios.jervis.model
 
 import dk.ilios.jervis.model.modifiers.StatModifier
+import dk.ilios.jervis.model.modifiers.TemporaryEffect
+import dk.ilios.jervis.model.modifiers.TemporaryEffectType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.skills.Skill
@@ -163,6 +165,10 @@ class Player(
     val passingModifiers = mutableListOf<StatModifier>()
     var baseArmorValue: Int = 0
     val armourModifiers = mutableListOf<StatModifier>()
+    // Some effects are hard to put into other buckets, like a player that failed a Blood Lust roll
+    // or a player that was added to the pitch through Spot The Sneak. In these cases, we might want
+    // to mark the player somehow. This is done through a TemporaryEffect
+    val temporaryEffects = mutableListOf<TemporaryEffect>()
     val extraSkills = mutableListOf<Skill>()
     var positionSkills = position.skills.map { it.createSkill() }.toMutableList()
     val skills: List<Skill>
@@ -262,6 +268,10 @@ class Player(
 
     fun getStatModifiers(): List<StatModifier> {
         return armourModifiers + moveModifiers + passingModifiers + agilityModifiers + strengthModifiers
+    }
+
+    fun hasTemporaryEffect(effect: TemporaryEffectType): Boolean {
+        return temporaryEffects.any { it.type == effect }
     }
 }
 
