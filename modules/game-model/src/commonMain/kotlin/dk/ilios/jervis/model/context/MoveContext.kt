@@ -1,7 +1,7 @@
 package dk.ilios.jervis.model.context
 
 import dk.ilios.jervis.actions.MoveType
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Player
 
 /**

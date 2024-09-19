@@ -19,7 +19,7 @@ import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.ext.d8
 import dk.ilios.jervis.ext.playerId
 import dk.ilios.jervis.model.DogOut
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.CatchRollContext

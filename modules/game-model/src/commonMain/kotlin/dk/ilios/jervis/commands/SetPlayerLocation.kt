@@ -1,9 +1,9 @@
 package dk.ilios.jervis.commands
 
 import dk.ilios.jervis.controller.GameController
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.Location
+import dk.ilios.jervis.model.locations.Location
 import dk.ilios.jervis.model.Player
 
 class SetPlayerLocation(private val player: Player, val location: Location) : Command {

@@ -4,7 +4,7 @@ import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerSubActionSelected
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.rules.pathfinder.PathFinder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch

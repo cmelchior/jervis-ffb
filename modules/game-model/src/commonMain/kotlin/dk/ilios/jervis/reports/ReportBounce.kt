@@ -1,6 +1,6 @@
 package dk.ilios.jervis.reports
 
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 
 class ReportBounce(bounceLocation: FieldCoordinate, outOfBoundsAt: FieldCoordinate? = null) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

@@ -103,7 +103,12 @@ interpreted.
     e. If Bone Head fails, action is "used"
     f. Roll for Foul Appearance, Dump-off (Pr. Designer's Commentary) 
 
-
+21. Multiple Block / Frenzy / Special Actions: https://fumbbl.com/p/blog?c=Candlejack&id=25322
+    My interpretation:
+     - Each block is its "own" action, i.e. either block can be replaced by a special action
+     - Some special actions have a "once pr. turn" limit, these can only be used on one of the
+       blocks.
+    
    
 
 

@@ -1,6 +1,6 @@
 package dk.ilios.jervis.rules.pathfinder
 
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 
 /**

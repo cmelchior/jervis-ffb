@@ -1,6 +1,6 @@
 package dk.ilios.jervis.tables
 
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.rules.tables.Range
 import dk.ilios.jervis.rules.tables.RangeRuler
 import kotlin.test.Test

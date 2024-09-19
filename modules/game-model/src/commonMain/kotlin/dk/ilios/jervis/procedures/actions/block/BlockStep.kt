@@ -18,6 +18,7 @@ import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.BlockDieRoll
+import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.Rules
 
 /**
@@ -28,13 +29,14 @@ data class BlockContext(
     val defender: Player,
     val isBlitzing: Boolean = false,
     val isUsingJuggernaught: Boolean = false,
+    val blockType: BlockType? = null,
     val isUsingMultiBlock: Boolean = false,
     val offensiveAssists: Int = 0,
     val defensiveAssists: Int = 0,
     val roll: List<BlockDieRoll> = emptyList(),
 ): ProcedureContext
 
-data class BlockResultContext(
+data class BlockRollContext(
     val attacker: Player,
     val defender: Player,
     val isBlitzing: Boolean = false,
@@ -55,7 +57,7 @@ object BlockStep : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
             RemoveContext<BlockContext>(),
-            RemoveContext<BlockResultContext>()
+            RemoveContext<BlockRollContext>()
         )
     }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockContext>()
@@ -121,7 +123,7 @@ object BlockStep : Procedure() {
     object ResolveBlockDie : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             // Select sub procedure based on the result of the die.
-            return when(state.getContext<BlockResultContext>().result.blockResult) {
+            return when(state.getContext<BlockRollContext>().result.blockResult) {
                 BlockDice.PLAYER_DOWN -> PlayerDown
                 BlockDice.BOTH_DOWN -> BothDown
                 BlockDice.PUSH_BACK -> PushBack

@@ -1,4 +1,4 @@
-package dk.ilios.jervis.model
+package dk.ilios.jervis.model.locations
 
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.CornerThrowInPosition
@@ -10,37 +10,9 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 /**
+ * A representation of the coordinates for a field square.
  * Top-left is (0,0), bottom-left is (25, 14) for a normal Blood Bowl Field.
  */
-@Serializable
-sealed interface Location {
-    val coordinate: FieldCoordinate
-
-    fun isOnLineOfScrimmage(rules: Rules): Boolean
-
-    fun isInWideZone(rules: Rules): Boolean
-
-    fun isInEndZone(rules: Rules): Boolean
-
-    fun isInCenterField(rules: Rules): Boolean
-
-    fun isOnHomeSide(rules: Rules): Boolean
-
-    fun isOnAwaySide(rules: Rules): Boolean
-
-    fun isOnField(rules: Rules): Boolean
-
-    fun isOutOfBounds(rules: Rules): Boolean
-
-    fun getCornerLocation(rules: Rules): CornerThrowInPosition?
-
-    fun isAdjacent(
-        rules: Rules,
-        location: Location,
-    ): Boolean
-}
-
-// (0, 0) is (top, left)
 @Serializable
 data class FieldCoordinate(val x: Int, val y: Int) : Location {
     companion object {
@@ -255,31 +227,4 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
         rules.fieldWidth
         return FieldCoordinate(rules.fieldWidth - x - 1, y)
     }
-}
-
-data object DogOut : Location {
-    override val coordinate: FieldCoordinate = FieldCoordinate.UNKNOWN
-
-    override fun isOnLineOfScrimmage(rules: Rules): Boolean = false
-
-    override fun isInWideZone(rules: Rules): Boolean = false
-
-    override fun isInEndZone(rules: Rules): Boolean = false
-
-    override fun isInCenterField(rules: Rules): Boolean = false
-
-    override fun isOnHomeSide(rules: Rules): Boolean = false
-
-    override fun isOnAwaySide(rules: Rules): Boolean = false
-
-    override fun isOnField(rules: Rules): Boolean = false
-
-    override fun isOutOfBounds(rules: Rules): Boolean = false
-
-    override fun getCornerLocation(rules: Rules): CornerThrowInPosition? = null
-
-    override fun isAdjacent(
-        rules: Rules,
-        location: Location,
-    ): Boolean = false
 }

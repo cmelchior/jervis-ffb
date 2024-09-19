@@ -2,7 +2,7 @@ package dk.ilios.jervis.reports
 
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.Rules
 

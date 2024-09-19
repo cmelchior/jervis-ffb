@@ -1,10 +1,11 @@
 package dk.ilios.jervis.actions
 
 import dk.ilios.jervis.model.Coin
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
@@ -272,3 +273,6 @@ data class SkillSelected(val skill: SkillFactory): GameAction
 
 @Serializable
 data class InducementSelected(val name: String): GameAction
+
+@Serializable
+data class BlockTypeSelected(val type: BlockType): GameAction

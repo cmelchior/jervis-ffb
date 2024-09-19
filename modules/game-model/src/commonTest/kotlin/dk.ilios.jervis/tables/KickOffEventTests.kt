@@ -17,7 +17,7 @@ import dk.ilios.jervis.ext.playerId
 import dk.ilios.jervis.ext.playerNo
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.DogOut
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.FullGame

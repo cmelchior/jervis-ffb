@@ -2,11 +2,11 @@ package dk.ilios.jervis.rules
 
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.model.FieldCoordinate
-import dk.ilios.jervis.model.FieldCoordinate.Companion.OUT_OF_BOUNDS
+import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate.Companion.OUT_OF_BOUNDS
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.Location
+import dk.ilios.jervis.model.locations.Location
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team

@@ -36,7 +36,7 @@ object Pow: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStep
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<BlockResultContext>()
+            val context = state.getContext<BlockRollContext>()
             return if (context.defender.location.isOnField(rules)) {
                 val injuryContext = RiskingInjuryContext(context.defender)
                 compositeCommandOf(

@@ -5,7 +5,7 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.ext.playerNo
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.SetupTeamContext
 import dk.ilios.jervis.serialize.JervisSerialization

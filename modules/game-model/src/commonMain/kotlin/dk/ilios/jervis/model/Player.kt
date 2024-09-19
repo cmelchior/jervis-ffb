@@ -1,5 +1,6 @@
 package dk.ilios.jervis.model
 
+import dk.ilios.jervis.model.locations.Location
 import dk.ilios.jervis.model.modifiers.StatModifier
 import dk.ilios.jervis.model.modifiers.TemporaryEffect
 import dk.ilios.jervis.model.modifiers.TemporaryEffectType

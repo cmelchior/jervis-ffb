@@ -1,5 +1,6 @@
 package dk.ilios.jervis.model
 
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 

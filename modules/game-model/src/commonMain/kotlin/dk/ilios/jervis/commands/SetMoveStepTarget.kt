@@ -1,7 +1,7 @@
 package dk.ilios.jervis.commands
 
 import dk.ilios.jervis.controller.GameController
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 
 class SetMoveStepTarget(private val from: FieldCoordinate, private val to: FieldCoordinate) : Command {

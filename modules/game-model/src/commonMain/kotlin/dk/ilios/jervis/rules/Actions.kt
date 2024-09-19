@@ -73,7 +73,7 @@ object PlayerActionSerializer : KSerializer<PlayerAction> {
 }
 
 /**
- * Wrapper representing a players action
+ * Wrapper representing a player action. This can either be a normal or special action.
  */
 @Serializable()
 data class PlayerAction(
@@ -97,6 +97,25 @@ enum class PlayerActionType {
     FOUL,
     SPECIAL,
 }
+
+@Serializable
+enum class BlockType {
+    CHAINSAW,
+    MULTIPLE_BLOCK,
+    PROJECTILE_VOMIT,
+    STAB,
+    STANDARD,
+    // Multiple Block (Not a special action, how to use this? )
+    // Ball & Chain (replace all other actions)
+    // Bombardier (Its own action, 1 pr. team turn)
+    // Chainsaw (Replace block action or block part of Blitz, 1. pr activation)
+    // Kick Team-mate (its own action, 1 pr. team turn)
+    // Projectile Vomit (Replace block action or block part of Blitz, 1. pr activation)
+    // Stab (Replace block action or block part of Blitz, no limit)
+    // Hypnotic Gaze (Its own action)
+    // Breathe Fire (replace block or block part of blitz, once pr. activation)
+}
+
 
 abstract class TeamActions {
     abstract operator fun get(type: PlayerActionType): TeamActionDescriptor

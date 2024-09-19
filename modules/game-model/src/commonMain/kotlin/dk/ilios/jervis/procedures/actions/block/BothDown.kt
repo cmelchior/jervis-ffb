@@ -12,7 +12,6 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
-import dk.ilios.jervis.commands.SetHasTackleZones
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -50,7 +49,7 @@ data class BothDownContext(
 object BothDown: Procedure() {
     override val initialNode: Node = AttackerChooseToUseWrestle
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        val blockContext = state.getContext<BlockResultContext>()
+        val blockContext = state.getContext<BlockRollContext>()
         return SetContext(BothDownContext(
             blockContext.attacker,
             blockContext.defender,

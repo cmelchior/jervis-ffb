@@ -2,7 +2,7 @@ package dk.ilios.jervis.rules.tables
 
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt

@@ -39,7 +39,7 @@ import dk.ilios.jervis.utils.INVALID_ACTION
 
 /**
  * Procedure for handling a Block dice roll. It is only responsible for handling the actual dice roll.
- * The result is stored in [BlockResultContext] and it is up to the caller of the procedure to
+ * The result is stored in [BlockRollContext] and it is up to the caller of the procedure to
  * choose the appropriate action depending on the outcome. This also includes deleting the [BlockContext]
  * again.
  */
@@ -176,7 +176,7 @@ object BlockRoll : Procedure() {
                 }
 
                 val roll = state.getContext<BlockContext>()
-                val result = BlockResultContext(
+                val result = BlockRollContext(
                     roll.attacker,
                     roll.defender,
                     roll.isBlitzing,

@@ -1,8 +1,9 @@
 package dk.ilios.jervis.actions
 
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.SkillFactory
@@ -98,6 +99,8 @@ data class SelectPlayer(val player: PlayerId) : ActionDescriptor {
 data class DeselectPlayer(val player: Player) : ActionDescriptor
 
 data class SelectAction(val action: PlayerAction) : ActionDescriptor
+
+data class SelectBlockType(val types: List<BlockType>): ActionDescriptor
 
 data class SelectRandomPlayers(val count: Int, val players: List<PlayerId>) : ActionDescriptor // This is not a single action
 

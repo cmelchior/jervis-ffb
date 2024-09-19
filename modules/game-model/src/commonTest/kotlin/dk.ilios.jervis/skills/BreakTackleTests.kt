@@ -15,7 +15,7 @@ import dk.ilios.jervis.defaultPregame
 import dk.ilios.jervis.defaultSetup
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.ext.playerId
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.context.DodgeRollContext
 import dk.ilios.jervis.model.context.getContext

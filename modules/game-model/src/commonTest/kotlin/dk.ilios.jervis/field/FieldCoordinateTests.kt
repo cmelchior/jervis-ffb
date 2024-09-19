@@ -1,6 +1,6 @@
 package dk.ilios.jervis.field
 
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.utils.createDefaultGameState

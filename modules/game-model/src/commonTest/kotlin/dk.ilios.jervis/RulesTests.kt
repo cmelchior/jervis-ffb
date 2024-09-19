@@ -1,6 +1,6 @@
 package dk.ilios.jervis
 
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.rules.BB2020Rules
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -1,6 +1,6 @@
 package dk.ilios.jervis.reports
 
-import dk.ilios.jervis.model.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Player
 
 class ReportPushResult(val player: Player, val location: FieldCoordinate) : LogEntry() {

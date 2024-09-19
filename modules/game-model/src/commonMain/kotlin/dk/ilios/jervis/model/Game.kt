@@ -2,8 +2,8 @@ package dk.ilios.jervis.model
 
 import dk.ilios.jervis.model.context.ContextHolder
 import dk.ilios.jervis.model.context.UseRerollContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.actions.pass.PassingInteferenceContext
-import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.rules.skills.RerollSourceId
 import dk.ilios.jervis.rules.tables.Weather

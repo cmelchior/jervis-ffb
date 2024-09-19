@@ -1,5 +1,7 @@
 package dk.ilios.jervis.model
 
+import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.model.locations.Location
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.CornerThrowInPosition
 import kotlinx.coroutines.flow.SharedFlow

@@ -23,7 +23,7 @@ import dk.ilios.jervis.rules.Rules
 object PlayerDown: Procedure() {
     override val initialNode: Node = ResolvePlayerDown
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        val context = state.getContext<BlockResultContext>()
+        val context = state.getContext<BlockRollContext>()
         val injuryContext = RiskingInjuryContext(context.attacker)
         return compositeCommandOf(
             SetPlayerState(context.attacker, PlayerState.KNOCKED_DOWN),
@@ -31,7 +31,7 @@ object PlayerDown: Procedure() {
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return ReportPlayerDownResult(state.getContext<BlockResultContext>().attacker)
+        return ReportPlayerDownResult(state.getContext<BlockRollContext>().attacker)
     }
 
     object ResolvePlayerDown: ParentNode() {

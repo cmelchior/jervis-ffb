@@ -54,7 +54,7 @@ data class StumbleContext(
 object Stumble: Procedure() {
     override val initialNode: Node = ChooseToUseTackle
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val blockContext = state.getContext<BlockResultContext>()
+        val blockContext = state.getContext<BlockRollContext>()
         val stumbleContext = StumbleContext(
             blockContext.attacker,
             blockContext.defender,
@@ -69,7 +69,7 @@ object Stumble: Procedure() {
             ReportStumbleResult(context.firstPusher, context.firstPushee, stumbleContext.isDefenderDown())
         )
     }
-    override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockResultContext>()
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockRollContext>()
 
     object ChooseToUseTackle: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<StumbleContext>().attacker.team
