@@ -10,17 +10,19 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 /**
+ * Helper function, making it easier to create FieldCoordinate from the interface.
+ */
+fun FieldCoordinate(x: Int, y: Int): FieldCoordinate {
+    return FieldCoordinate.create(x, y)
+}
+
+/**
  * A representation of the coordinates for a field square.
  * Top-left is (0,0), bottom-left is (25, 14) for a normal Blood Bowl Field.
  */
-@Serializable
-data class FieldCoordinate(val x: Int, val y: Int) : Location {
-    companion object {
-        val UNKNOWN = FieldCoordinate(Int.MAX_VALUE, Int.MAX_VALUE)
-        val OUT_OF_BOUNDS = FieldCoordinate(Int.MIN_VALUE, Int.MIN_VALUE)
-    }
-
-    override val coordinate: FieldCoordinate = this
+interface FieldCoordinate: Location {
+    val x: Int
+    val y: Int
 
     override fun isOnLineOfScrimmage(rules: Rules): Boolean {
         return x == rules.lineOfScrimmageHome || x == rules.lineOfScrimmageAway
@@ -67,18 +69,15 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
         }
     }
 
-    override fun isAdjacent(
-        rules: Rules,
-        location: Location,
-    ): Boolean {
-        return distanceTo(location.coordinate) == 1u
+    override fun isAdjacent(rules: Rules, location: Location): Boolean {
+        return distanceTo(location) == 1
     }
 
     fun move(
         direction: Direction,
         steps: Int,
     ): FieldCoordinate {
-        return FieldCoordinate(x + (direction.xModifier * steps), y + (direction.yModifier * steps))
+        return create(x + (direction.xModifier * steps), y + (direction.yModifier * steps))
     }
 
     fun toLogString(): String {
@@ -98,7 +97,7 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
         val result = mutableListOf<FieldCoordinate>()
         (x - distance..x + distance).forEach { x: Int ->
             (y - distance..y + distance).forEach { y: Int ->
-                val newCoordinate = FieldCoordinate(x, y)
+                val newCoordinate = create(x, y)
                 if (newCoordinate.isOnField(rules) && this != newCoordinate) {
                     result.add(newCoordinate)
                 }
@@ -117,8 +116,11 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
      *
      * See https://en.wikipedia.org/wiki/Chebyshev_distance
      */
-    fun distanceTo(target: FieldCoordinate): UInt {
-        return max(abs(target.x - this.x), abs(target.y - this.y)).toUInt()
+    fun distanceTo(target: Location): Int {
+        return when (target) {
+            DogOut -> Int.MAX_VALUE
+            is FieldCoordinate -> max(abs(target.x - this.x), abs(target.y - this.y))
+        }
     }
 
     /**
@@ -157,58 +159,58 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
                 // Top
                 direction.xModifier == 0 && direction.yModifier == -1 ->
                     listOf(
-                        FieldCoordinate(this.x - 1, this.y - 1),
-                        FieldCoordinate(this.x, this.y - 1),
-                        FieldCoordinate(this.x + 1, this.y - 1),
+                        create(this.x - 1, this.y - 1),
+                        create(this.x, this.y - 1),
+                        create(this.x + 1, this.y - 1),
                     )
                 // Bottom
                 direction.xModifier == 0 && direction.yModifier == 1 ->
                     listOf(
-                        FieldCoordinate(this.x - 1, this.y + 1),
-                        FieldCoordinate(this.x, this.y + 1),
-                        FieldCoordinate(this.x + 1, this.y + 1),
+                        create(this.x - 1, this.y + 1),
+                        create(this.x, this.y + 1),
+                        create(this.x + 1, this.y + 1),
                     )
                 // Left
                 direction.xModifier == -1 && direction.yModifier == 0 ->
                     listOf(
-                        FieldCoordinate(this.x - 1, this.y - 1),
-                        FieldCoordinate(this.x - 1, this.y + 0),
-                        FieldCoordinate(this.x - 1, this.y + 1),
+                        create(this.x - 1, this.y - 1),
+                        create(this.x - 1, this.y + 0),
+                        create(this.x - 1, this.y + 1),
                     )
                 // Right
                 direction.xModifier == 1 && direction.yModifier == 0 ->
                     listOf(
-                        FieldCoordinate(this.x + 1, this.y - 1),
-                        FieldCoordinate(this.x + 1, this.y + 0),
-                        FieldCoordinate(this.x + 1, this.y + 1),
+                        create(this.x + 1, this.y - 1),
+                        create(this.x + 1, this.y + 0),
+                        create(this.x + 1, this.y + 1),
                     )
                 // Top-left
                 direction.xModifier == -1 && direction.yModifier == -1 ->
                     listOf(
-                        FieldCoordinate(this.x - 1, this.y),
-                        FieldCoordinate(this.x - 1, this.y - 1),
-                        FieldCoordinate(this.x, this.y - 1),
+                        create(this.x - 1, this.y),
+                        create(this.x - 1, this.y - 1),
+                        create(this.x, this.y - 1),
                     )
                 // Top-right
                 direction.xModifier == 1 && direction.yModifier == -1 ->
                     listOf(
-                        FieldCoordinate(this.x, this.y - 1),
-                        FieldCoordinate(this.x + 1, this.y - 1),
-                        FieldCoordinate(this.x + 1, this.y),
+                        create(this.x, this.y - 1),
+                        create(this.x + 1, this.y - 1),
+                        create(this.x + 1, this.y),
                     )
                 // Bottom-left
                 direction.xModifier == -1 && direction.yModifier == 1 ->
                     listOf(
-                        FieldCoordinate(this.x - 1, this.y),
-                        FieldCoordinate(this.x - 1, this.y + 1),
-                        FieldCoordinate(this.x, this.y + 1),
+                        create(this.x - 1, this.y),
+                        create(this.x - 1, this.y + 1),
+                        create(this.x, this.y + 1),
                     )
                 // Bottom-Right
                 direction.xModifier == 1 && direction.yModifier == 1 ->
                     listOf(
-                        FieldCoordinate(this.x + 1, this.y),
-                        FieldCoordinate(this.x + 1, this.y + 1),
-                        FieldCoordinate(this.x, this.y + 1),
+                        create(this.x + 1, this.y),
+                        create(this.x + 1, this.y + 1),
+                        create(this.x, this.y + 1),
                     )
                 else -> throw IllegalArgumentException("Unsupported direction: $direction")
             }
@@ -225,6 +227,17 @@ data class FieldCoordinate(val x: Int, val y: Int) : Location {
     // TODO Figure out exactly where/how it is best to do this
     fun swapX(rules: Rules): FieldCoordinate {
         rules.fieldWidth
-        return FieldCoordinate(rules.fieldWidth - x - 1, y)
+        return create(rules.fieldWidth - x - 1, y)
+    }
+
+    companion object {
+        val UNKNOWN = create(Int.MAX_VALUE, Int.MAX_VALUE)
+        val OUT_OF_BOUNDS = create(Int.MIN_VALUE, Int.MIN_VALUE)
+        fun create(x: Int, y: Int): FieldCoordinate {
+            return FieldCoordinateImpl(x, y)
+        }
     }
 }
+
+@Serializable
+private data class FieldCoordinateImpl(override val x: Int, override val y: Int) : FieldCoordinate

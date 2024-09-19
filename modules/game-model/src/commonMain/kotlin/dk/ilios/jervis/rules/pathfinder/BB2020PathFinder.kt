@@ -1,9 +1,9 @@
 package dk.ilios.jervis.rules.pathfinder
 
 import dk.ilios.jervis.model.Field
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.rules.Rules
 import kotlin.math.abs
 

@@ -4,7 +4,7 @@ import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.CornerThrowInPosition
 
 data object DogOut : Location {
-    override val coordinate: FieldCoordinate = FieldCoordinate.UNKNOWN
+//    override val coordinate: FieldCoordinate = FieldCoordinate.UNKNOWN
     override fun isOnLineOfScrimmage(rules: Rules): Boolean = false
     override fun isInWideZone(rules: Rules): Boolean = false
     override fun isInEndZone(rules: Rules): Boolean = false

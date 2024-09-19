@@ -2,11 +2,11 @@ package dk.ilios.jervis.procedures.tables.injury
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -28,7 +28,7 @@ object FallingOver: Procedure() {
         return if (context.player.hasBall()) {
             compositeCommandOf(
                 SetBallState.bouncing(),
-                SetBallLocation(context.player.location.coordinate),
+                SetBallLocation(context.player.coordinates),
             )
         } else {
             null

@@ -1,5 +1,7 @@
 package dk.ilios.jervis.model
 
+import dk.ilios.jervis.model.locations.DogOut
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.locations.Location
 import dk.ilios.jervis.model.modifiers.StatModifier
 import dk.ilios.jervis.model.modifiers.TemporaryEffect
@@ -144,6 +146,15 @@ class Player(
             field = value
             if ((old == DogOut && value != DogOut) || old != DogOut && value == DogOut) {
                 team.notifyDogoutChange()
+            }
+        }
+    // Shortcut for getting a players coordinates. Only works for players currently on the the field
+    // taking up a single square.
+    val coordinates: FieldCoordinate
+        get() {
+            return when (val playerLocation = location) {
+                DogOut -> INVALID_GAME_STATE("Cannot ask for coordinates when player is in the DogOut")
+                is FieldCoordinate -> playerLocation
             }
         }
     var state: PlayerState = PlayerState.RESERVE

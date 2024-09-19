@@ -9,10 +9,10 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.Field
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.ui.ContextMenuOption
 import dk.ilios.jervis.ui.model.UiFieldSquare
@@ -75,14 +75,14 @@ class FieldViewModel(
                     if (
                         activePlayer != null &&
                         square != null &&
-                        activePlayer.location.coordinate != square &&
+                        activePlayer.coordinates != square &&
                         activePlayer.movesLeft > 0 &&
-                        rules.calculateMarks(game, activePlayer.team, activePlayer.location.coordinate) <= 0
+                        rules.calculateMarks(game, activePlayer.team, activePlayer.coordinates) <= 0
                     ) {
                         val path: List<FieldCoordinate> =
                             rules.pathFinder.calculateShortestPath(
                                 game,
-                                activePlayer.location.coordinate,
+                                activePlayer.coordinates,
                                 square,
                                 activePlayer.movesLeft ,
                             ).path

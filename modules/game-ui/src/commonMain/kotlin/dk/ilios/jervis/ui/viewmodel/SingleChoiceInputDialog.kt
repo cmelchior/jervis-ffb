@@ -1,5 +1,6 @@
 package dk.ilios.jervis.ui.viewmodel
 
+import dk.ilios.jervis.actions.BlockTypeSelected
 import dk.ilios.jervis.actions.CalculatedAction
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
@@ -79,6 +80,7 @@ data class SingleChoiceInputDialog(
                 is SkillSelected -> action.skill.toString()
                 is InducementSelected -> action.name
                 is CalculatedAction -> TODO("Should only be used in tests")
+                is BlockTypeSelected -> TODO()
             }
         }
 

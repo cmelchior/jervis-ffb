@@ -4,14 +4,12 @@ import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerDeselected
-import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
-import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
@@ -113,7 +111,7 @@ object MultipleBlockStep: Procedure() {
             val defender1 = state.getContext<MultipleBlockContext>().defender1
             val defender2 = state.getContext<MultipleBlockContext>().defender2
             val eligibleDefenders: List<ActionDescriptor> =
-                attacker.location.coordinate.getSurroundingCoordinates(rules)
+                attacker.coordinates.getSurroundingCoordinates(rules)
                     .filter { state.field[it].isOccupied() }
                     .filter { state.field[it].player!!.let { player ->
                         player.team != attacker.team &&
@@ -135,9 +133,10 @@ object MultipleBlockStep: Procedure() {
                     ExitProcedure()
                 }
                 else -> {
-                   checkTypeAndValue<PlayerSelected>(state, rules, action, this) { playerSelected ->
-                       playerSelected.getPlayer(state)
-                   }
+                    TODO()
+//                   checkTypeAndValue<PlayerSelected>(state, rules, action, this) { playerSelected ->
+//                       playerSelected.getPlayer(state)
+//                   }
                 }
             }
         }
@@ -160,31 +159,31 @@ object MultipleBlockStep: Procedure() {
     }
 
 
-    object RollTarget1BlockTypeDice: ActionNode() {
-
-    }
-
-    object RollTarget1BlockTypeDice: ActionNode() {}
-
-
-    object ChooseRerollSourcesOrContinueBlock: ActionNode()
-
-    object UseRerolls: ActionNode()
-
-    object SelectBlockResults: ActionNode() {}
-
-    object SelectPlayerToResolve: ActionNode() {}
-
-    object ResolveFirstPlayer: ParentNode() {}
-
-    object ResolveSecondPlayer: ParentNode() {}
-
-    object RollForTarget1Injuries: ActionNode() {}
-
-    object RollForTarget2Injuries: ActionNode() {}
-
-    object ResolveInjuries: ParentNode() {}
-
+//    object RollTarget1BlockTypeDice: ActionNode() {
+//
+//    }
+//
+//    object RollTarget1BlockTypeDice: ActionNode() {}
+//
+//
+//    object ChooseRerollSourcesOrContinueBlock: ActionNode()
+//
+//    object UseRerolls: ActionNode()
+//
+//    object SelectBlockResults: ActionNode() {}
+//
+//    object SelectPlayerToResolve: ActionNode() {}
+//
+//    object ResolveFirstPlayer: ParentNode() {}
+//
+//    object ResolveSecondPlayer: ParentNode() {}
+//
+//    object RollForTarget1Injuries: ActionNode() {}
+//
+//    object RollForTarget2Injuries: ActionNode() {}
+//
+//    object ResolveInjuries: ParentNode() {}
+//
 
 
 }

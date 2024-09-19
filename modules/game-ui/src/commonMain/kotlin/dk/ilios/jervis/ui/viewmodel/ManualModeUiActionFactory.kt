@@ -44,6 +44,7 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
+import dk.ilios.jervis.actions.SelectBlockType
 import dk.ilios.jervis.actions.SelectCoinSide
 import dk.ilios.jervis.actions.SelectDiceResult
 import dk.ilios.jervis.actions.SelectDogout
@@ -188,13 +189,13 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                             when (actionDescriptor.type) {
                                 MoveType.JUMP -> {
                                     SelectPlayerSubActionInput(
-                                        activePlayerLocation = player.location.coordinate,
+                                        activePlayerLocation = player.coordinates,
                                         actions = listOf(PlayerSubActionSelected("Jump", MoveTypeSelected(MoveType.JUMP)))
                                     )
                                 }
                                 MoveType.LEAP -> {
                                     SelectPlayerSubActionInput(
-                                        activePlayerLocation = player.location.coordinate,
+                                        activePlayerLocation = player.coordinates,
                                         actions = listOf(PlayerSubActionSelected("Leap", MoveTypeSelected(MoveType.LEAP)))
                                     )
                                 }
@@ -224,7 +225,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                                 MoveType.STANDARD -> {
                                     // Normal moves are converted to just choosing the square on the field
                                     val pathFinder = controller.rules.pathFinder
-                                    val startLocation = (controller.state.activePlayer!!.location as FieldCoordinate).coordinate
+                                    val startLocation = controller.state.activePlayer!!.coordinates
                                     val requiresDodge = controller.rules.calculateMarks(controller.state, player.team, startLocation) > 0
                                     val allPaths = pathFinder.calculateAllPaths(
                                         controller.state,
@@ -249,7 +250,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                                 }
                                 MoveType.STAND_UP -> {
                                     SelectPlayerSubActionInput(
-                                        activePlayerLocation = player.location.coordinate,
+                                        activePlayerLocation = player.coordinates,
                                         actions = listOf(PlayerSubActionSelected("Stand Up", MoveTypeSelected(MoveType.STAND_UP)))
                                     )
                                 }
@@ -422,6 +423,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                 is SelectMoveType -> MoveTypeSelected(action.type)
                 is SelectSkill -> SkillSelected(action.skill)
                 is SelectInducement -> InducementSelected(action.id)
+                is SelectBlockType -> TODO()
             }
         }
     }

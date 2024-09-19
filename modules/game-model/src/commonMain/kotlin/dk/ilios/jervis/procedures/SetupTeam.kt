@@ -24,8 +24,6 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DogOut
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
@@ -33,6 +31,8 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.DogOut
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 
@@ -97,7 +97,7 @@ object SetupTeam : Procedure() {
                         }
                     }
                     .filter { it.isUnoccupied() }
-                    .map { SelectFieldLocation.setup(it.coordinate) }
+                    .map { SelectFieldLocation.setup(it.coordinates) }
 
             val playerLocation = context.currentPlayer!!.location
             var playerSquare: List<SelectFieldLocation> = emptyList()

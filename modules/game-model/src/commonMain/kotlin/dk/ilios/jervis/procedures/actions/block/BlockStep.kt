@@ -97,12 +97,12 @@ object BlockStep : Procedure() {
         ): Command {
             val context = state.getContext<BlockContext>()
             val offensiveAssists =
-                context.defender.location.coordinate.getSurroundingCoordinates(rules)
+                context.defender.coordinates.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
                     .count { player -> rules.canOfferAssistAgainst(player, context.defender) }
 
             val defensiveAssists =
-                context.attacker.location.coordinate.getSurroundingCoordinates(rules)
+                context.attacker.coordinates.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
                     .count { player -> rules.canOfferAssistAgainst(player, context.attacker) }
 

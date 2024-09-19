@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 sealed interface Location {
-    val coordinate: FieldCoordinate
+//    val coordinate: FieldCoordinate
     fun isOnLineOfScrimmage(rules: Rules): Boolean
     fun isInWideZone(rules: Rules): Boolean
     fun isInEndZone(rules: Rules): Boolean

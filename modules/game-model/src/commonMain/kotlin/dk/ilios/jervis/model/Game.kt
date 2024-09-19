@@ -2,6 +2,7 @@ package dk.ilios.jervis.model
 
 import dk.ilios.jervis.model.context.ContextHolder
 import dk.ilios.jervis.model.context.UseRerollContext
+import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.actions.pass.PassingInteferenceContext
 import dk.ilios.jervis.rules.skills.RerollSource
@@ -108,9 +109,11 @@ class Game(
     val ballSquare: FieldSquare
         get() {
             return ball.carriedBy?.let { player ->
-                this.field[player.location.coordinate]
+                when (val location = player.location) {
+                    DogOut -> INVALID_GAME_STATE("Player not allowed to carry the ball when not on the field")
+                    is FieldCoordinate -> this.field[location]
+                }
             } ?: this.field[ball.location]
-
         }
 
     /**

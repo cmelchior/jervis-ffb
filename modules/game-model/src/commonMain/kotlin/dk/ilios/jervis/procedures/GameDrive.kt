@@ -11,8 +11,8 @@ import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.reports.ReportSetupKickingTeam
 import dk.ilios.jervis.reports.ReportSetupReceivingTeam
 import dk.ilios.jervis.reports.ReportStartingKickOff

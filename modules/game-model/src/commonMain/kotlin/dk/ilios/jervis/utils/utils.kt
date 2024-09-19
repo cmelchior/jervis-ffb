@@ -41,6 +41,7 @@ import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectAction
+import dk.ilios.jervis.actions.SelectBlockType
 import dk.ilios.jervis.actions.SelectCoinSide
 import dk.ilios.jervis.actions.SelectDiceResult
 import dk.ilios.jervis.actions.SelectDogout
@@ -62,13 +63,13 @@ import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.CoachId
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.Field
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.modifiers.StatModifier
 import dk.ilios.jervis.procedures.D6DieRoll
@@ -188,6 +189,7 @@ fun createRandomAction(
         is SelectMoveType -> MoveTypeSelected(action.type)
         is SelectSkill -> SkillSelected(action.skill)
         is SelectInducement -> InducementSelected(action.id)
+        is SelectBlockType -> TODO()
     }
 }
 

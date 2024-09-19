@@ -18,12 +18,12 @@ import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.SwelteringHeatContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportPlayerInjury
 import dk.ilios.jervis.rules.Rules

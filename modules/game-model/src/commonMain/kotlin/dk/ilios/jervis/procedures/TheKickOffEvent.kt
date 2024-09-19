@@ -21,12 +21,12 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.reports.ReportTouchback
 import dk.ilios.jervis.rules.Rules
@@ -95,8 +95,8 @@ object TheKickOffEvent : Procedure() {
      * Conditions.
      */
     object ScatterBallBeforeLanding : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
-            return SetContext(ScatterRollContext(from = state.ball.location.coordinate))
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            return SetContext(ScatterRollContext(from = state.ball.location))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter
         override fun onExitNode(state: Game, rules: Rules): Command {

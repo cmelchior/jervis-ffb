@@ -1,11 +1,11 @@
 package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.actions.PlayerSelected
-import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.isOnAwayTeam
+import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.ui.model.UiPlayer
 import dk.ilios.jervis.ui.model.UiPlayerCard
 import dk.ilios.jervis.utils.safeTryEmit

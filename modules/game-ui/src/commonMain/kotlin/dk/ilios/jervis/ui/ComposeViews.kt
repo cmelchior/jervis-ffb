@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import dk.ilios.jervis.actions.BlockTypeSelected
 import dk.ilios.jervis.actions.CalculatedAction
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
@@ -293,6 +294,7 @@ fun ActionSelector(
                                         is SkillSelected -> action.skill.toString()
                                         is InducementSelected -> action.name
                                         is CalculatedAction -> TODO("Should only be used in tests")
+                                        is BlockTypeSelected -> TODO()
                                     }
                                 Text(text, fontSize = 10.sp)
                             }

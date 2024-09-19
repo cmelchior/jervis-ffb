@@ -12,7 +12,6 @@ import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.SetHasTackleZones
 import dk.ilios.jervis.commands.SetNigglingInjuries
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
@@ -24,7 +23,6 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
@@ -33,6 +31,7 @@ import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.inducements.ApothecaryType
+import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.reports.ReportInjuryResult
 import dk.ilios.jervis.rules.Rules

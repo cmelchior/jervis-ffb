@@ -20,7 +20,6 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
@@ -28,6 +27,7 @@ import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.actions.block.PushStep.ResolvePush
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Frenzy
@@ -280,7 +280,7 @@ object PushStep: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PushContext>().pushChain.last()
             val hasSidestep = context.pushee.hasSkill<SideStep>()
-            val validSideStepTargets = context.pushee.location.coordinate
+            val validSideStepTargets = context.pushee.coordinates
                 .getSurroundingCoordinates(rules)
                 .count { state.field[it].isUnoccupied() } > 0
             val canUseSidestep = !(context.usedGrab || context.usedStandFirm)
@@ -355,7 +355,7 @@ object PushStep: Procedure() {
             val lastPushInChain = pushContext.pushChain.last()
             // TODO Add support for skills, right now just go with the default 3 options
             val pushOptions = if (lastPushInChain.usedSideStep) {
-                lastPushInChain.pushee.location.coordinate.getSurroundingCoordinates(rules).toSet()
+                lastPushInChain.pushee.coordinates.getSurroundingCoordinates(rules).toSet()
             } else {
                 rules.getPushOptions(lastPushInChain.pusher, lastPushInChain.pushee)
             }

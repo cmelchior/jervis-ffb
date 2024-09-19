@@ -5,6 +5,7 @@ import dk.ilios.jervis.model.inducements.Bribe
 import dk.ilios.jervis.model.inducements.InfamousCoachingStaff
 import dk.ilios.jervis.model.inducements.SpecialPlayCard
 import dk.ilios.jervis.model.inducements.wizards.Wizard
+import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
 import dk.ilios.jervis.rules.roster.bb2020.SpecialRules

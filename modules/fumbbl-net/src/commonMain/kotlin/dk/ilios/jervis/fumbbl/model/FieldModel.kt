@@ -4,7 +4,6 @@ import dk.ilios.jervis.fumbbl.model.change.MoveSquare
 import dk.ilios.jervis.fumbbl.model.change.PlayerId
 import dk.ilios.jervis.fumbbl.model.change.PushBackSquare
 import dk.ilios.jervis.fumbbl.model.change.TargetSelectionState
-import dk.ilios.jervis.model.DogOut.coordinate
 import kotlinx.serialization.Serializable
 
 @Serializable

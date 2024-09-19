@@ -21,11 +21,11 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.Catch
 import dk.ilios.jervis.procedures.DeviateRoll
@@ -56,9 +56,9 @@ object PassStep: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PassContext>().thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PassContext>()
-            val targetSquares = context.thrower.location.coordinate.getSurroundingCoordinates(rules, rules.rangeRuler.maxDistance)
+            val targetSquares = context.thrower.coordinates.getSurroundingCoordinates(rules, rules.rangeRuler.maxDistance)
                 .filter {
-                    val range = rules.rangeRuler.measure(context.thrower.location.coordinate, it)
+                    val range = rules.rangeRuler.measure(context.thrower.coordinates, it)
                     when (range) {
                         Range.PASSING_PLAYER -> false
                         Range.QUICK_PASS -> true
@@ -78,7 +78,7 @@ object PassStep: Procedure() {
                 else -> {
                     checkTypeAndValue<FieldSquareSelected>(state, rules, action, this) {
                         val context = state.getContext<PassContext>()
-                        val distance = rules.rangeRuler.measure(context.thrower.location.coordinate, it.coordinate)
+                        val distance = rules.rangeRuler.measure(context.thrower.coordinates, it.coordinate)
                         compositeCommandOf(
                             SetContext(context.copy(target = it.coordinate, range = distance)),
                             SetBallState.accurateThrow(), // Until proven otherwise. Should we invent a new type?
@@ -162,8 +162,8 @@ object PassStep: Procedure() {
             val passContext = state.getContext<PassContext>()
             return compositeCommandOf(
                 SetBallState.deviating(),
-                SetBallLocation(passContext.thrower.location.coordinate),
-                SetContext(DeviateRollContext(passContext.thrower.location.coordinate))
+                SetBallLocation(passContext.thrower.coordinates),
+                SetContext(DeviateRollContext(passContext.thrower.coordinates))
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
@@ -198,7 +198,7 @@ object PassStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetBallState.bouncing(),
-                SetBallLocation(state.getContext<PassContext>().thrower.location.coordinate)
+                SetBallLocation(state.getContext<PassContext>().thrower.coordinates)
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce

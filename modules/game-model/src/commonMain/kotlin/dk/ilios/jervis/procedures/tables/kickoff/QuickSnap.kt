@@ -21,12 +21,12 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.actions.move.MovePlayerIntoSquare
 import dk.ilios.jervis.procedures.actions.move.MovePlayerIntoSquareContext
 import dk.ilios.jervis.reports.ReportDiceRoll
@@ -106,7 +106,7 @@ object QuickSnap : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<QuickSnapContext>()
-            val currentLocation = context.currentPlayer!!.location.coordinate
+            val currentLocation = context.currentPlayer!!.coordinates
             // Player is allowed to move into any square next to it
             return currentLocation.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false)
                 .filter { state.field[it].isUnoccupied() }
@@ -116,7 +116,7 @@ object QuickSnap : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkTypeAndValue<FieldSquareSelected>(state, rules, action, this) { squareSelected ->
                 val context = state.getContext<QuickSnapContext>()
-                return if (squareSelected.coordinate == context.currentPlayer!!.location.coordinate) {
+                return if (squareSelected.coordinate == context.currentPlayer!!.coordinates) {
                     // If the same field is selected, just treat the player as not having moved at all
                     compositeCommandOf(
                         SetContext(context.copy(currentPlayer = null)),

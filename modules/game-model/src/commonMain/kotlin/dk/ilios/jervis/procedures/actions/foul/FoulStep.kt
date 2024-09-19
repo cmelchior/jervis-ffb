@@ -22,12 +22,12 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.DogOut
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.model.modifiers.DefensiveAssistsModifier
 import dk.ilios.jervis.model.modifiers.OffensiveAssistModifier
 import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
@@ -54,12 +54,12 @@ object FoulStep: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<FoulContext>()
             val offensiveAssists =
-                context.victim!!.location.coordinate.getSurroundingCoordinates(rules)
+                context.victim!!.coordinates.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
                     .count { player -> rules.canOfferAssistAgainst(player, context.victim) }
 
             val defensiveAssists =
-                context.fouler.location.coordinate.getSurroundingCoordinates(rules)
+                context.fouler.coordinates.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
                     .count { player -> rules.canOfferAssistAgainst(player, context.fouler) }
 

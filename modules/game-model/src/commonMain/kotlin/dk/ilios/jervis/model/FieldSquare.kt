@@ -8,12 +8,10 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.serialization.Serializable
 
 @Serializable
-class FieldSquare(val coordinates: FieldCoordinate) : Observable<FieldSquare>(), Location {
+class FieldSquare(
+    val coordinates: FieldCoordinate
+) : Observable<FieldSquare>(), FieldCoordinate by coordinates {
     constructor(x: Int, y: Int) : this(FieldCoordinate(x, y))
-
-    override val coordinate: FieldCoordinate = coordinates
-    val x = coordinates.x
-    val y = coordinates.y
     var player: Player? = null // observable(null)
     var ball: Ball? = null // by observable(null)
     var hasTrapdoor: Boolean = false
@@ -55,6 +53,6 @@ class FieldSquare(val coordinates: FieldCoordinate) : Observable<FieldSquare>(),
         rules: Rules,
         location: Location,
     ): Boolean {
-        return this.coordinates.distanceTo(location.coordinate) == 1u
+        return this.coordinates.distanceTo(location) == 1
     }
 }

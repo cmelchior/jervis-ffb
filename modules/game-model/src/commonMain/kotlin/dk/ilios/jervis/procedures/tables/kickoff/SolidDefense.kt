@@ -124,9 +124,9 @@ object SolidDefense : Procedure() {
                         }
                     }
                     .filter { it.isUnoccupied() }
-                    .map { SelectFieldLocation.setup(it.coordinate) }
+                    .map { SelectFieldLocation.setup(it.coordinates) }
 
-            val playerCoordinates = context.currentPlayer!!.location.coordinate
+            val playerCoordinates = context.currentPlayer!!.coordinates
             return freeFields + SelectFieldLocation.setup(playerCoordinates)
         }
 

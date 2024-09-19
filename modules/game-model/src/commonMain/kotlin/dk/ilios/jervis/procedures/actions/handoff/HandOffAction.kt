@@ -80,7 +80,7 @@ object HandOffAction : Procedure() {
 
             // Check if adjacent to a possible receiver
             if (context.thrower.hasBall()) {
-                context.thrower.location.coordinate.getSurroundingCoordinates(rules, 1)
+                context.thrower.coordinates.getSurroundingCoordinates(rules, 1)
                     .mapNotNull { state.field[it].player }
                     .filter { it.team == context.thrower.team && it.state == PlayerState.STANDING }
                     .forEach {
@@ -110,7 +110,7 @@ object HandOffAction : Procedure() {
                     compositeCommandOf(
                         SetContext(context.copy(catcher = action.getPlayer(state))),
                         SetBallState.accurateThrow(),
-                        SetBallLocation(action.getPlayer(state).location.coordinate),
+                        SetBallLocation(action.getPlayer(state).coordinates),
                         GotoNode(ResolveCatch)
                     )
                 }

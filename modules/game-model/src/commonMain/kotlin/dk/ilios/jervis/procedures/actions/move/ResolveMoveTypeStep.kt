@@ -10,13 +10,13 @@ import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.Pickup
 import dk.ilios.jervis.rules.Rules
 
@@ -31,10 +31,10 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
         MoveType.JUMP -> TODO()
         MoveType.LEAP -> TODO()
         MoveType.STANDARD -> {
-            val requiresDodge = rules.calculateMarks(state, player.team, player.location.coordinate) > 0
+            val requiresDodge = rules.calculateMarks(state, player.team, player.coordinates) > 0
             val eligibleEmptySquares: List<ActionDescriptor> =
                 if (player.movesLeft + player.rushesLeft > 0) {
-                    player.location.coordinate.getSurroundingCoordinates(rules)
+                    player.coordinates.getSurroundingCoordinates(rules)
                         .filter { state.field[it].isUnoccupied() }
                         .map { SelectFieldLocation.move(it, player.movesLeft <= 0, requiresDodge) }
                 } else {

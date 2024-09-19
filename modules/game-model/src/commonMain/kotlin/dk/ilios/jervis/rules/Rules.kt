@@ -2,14 +2,14 @@ package dk.ilios.jervis.rules
 
 import dk.ilios.jervis.actions.D3Result
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.model.locations.FieldCoordinate
-import dk.ilios.jervis.model.locations.FieldCoordinate.Companion.OUT_OF_BOUNDS
 import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.locations.Location
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.model.locations.FieldCoordinate.Companion.OUT_OF_BOUNDS
+import dk.ilios.jervis.model.locations.Location
 import dk.ilios.jervis.model.modifiers.CatchModifier
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.rules.pathfinder.BB2020PathFinder
@@ -178,8 +178,9 @@ interface Rules {
      */
     fun isMarked(player: Player, overrideLocation: Location): Boolean {
         if (!overrideLocation.isOnField(this)) return false
+        if (overrideLocation !is FieldCoordinate) return false
         val field = player.team.game.field
-        return overrideLocation.coordinate.getSurroundingCoordinates(this, 1)
+        return overrideLocation.getSurroundingCoordinates(this, 1)
             .asSequence()
             .filter {
                 val otherPlayer = field[it].player
@@ -191,7 +192,7 @@ interface Rules {
     fun isMarked(player: Player): Boolean {
         if (!player.location.isOnField(this)) return false
         val field = player.team.game.field
-        return player.location.coordinate.getSurroundingCoordinates(this, 1)
+        return player.coordinates.getSurroundingCoordinates(this, 1)
             .asSequence()
             .filter {
                 val otherPlayer = field[it].player
@@ -212,7 +213,7 @@ interface Rules {
         if (!assisting.location.isAdjacent(this, target.location)) return false
         if (!canMark(assisting)) return false
         // TODO If player has Guard, player can always assist
-        return assisting.location.coordinate.getSurroundingCoordinates(this).firstOrNull {
+        return assisting.coordinates.getSurroundingCoordinates(this).firstOrNull {
             assisting.team.game.field[it].player?.let { adjacentPlayer ->
                 adjacentPlayer != target &&
                     adjacentPlayer.team != assisting.team &&

@@ -51,7 +51,7 @@ object BlockAction : Procedure() {
 
             val attacker = state.activePlayer!!
             val eligibleDefenders: List<ActionDescriptor> =
-                attacker.location.coordinate.getSurroundingCoordinates(rules)
+                attacker.coordinates.getSurroundingCoordinates(rules)
                     .filter { state.field[it].isOccupied() }
                     .filter { state.field[it].player!!.team != attacker.team }
                     .map { SelectPlayer(state.field[it].player!!) }
