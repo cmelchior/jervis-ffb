@@ -2,6 +2,7 @@ package dk.ilios.jervis.model
 
 import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.model.locations.GiantLocation
 import dk.ilios.jervis.model.locations.Location
 import dk.ilios.jervis.model.modifiers.StatModifier
 import dk.ilios.jervis.model.modifiers.TemporaryEffect
@@ -155,8 +156,10 @@ class Player(
             return when (val playerLocation = location) {
                 DogOut -> INVALID_GAME_STATE("Cannot ask for coordinates when player is in the DogOut")
                 is FieldCoordinate -> playerLocation
+                is GiantLocation -> INVALID_GAME_STATE("Cannot ask for coordinates for a giant player")
             }
         }
+    var facing: PlayerFacing = PlayerFacing.UNKNOWN
     var state: PlayerState = PlayerState.RESERVE
     val isActive: Boolean get() = (team.game.activePlayer == this)
     var available: Availability = Availability.AVAILABLE

@@ -111,6 +111,9 @@ class Game(
     fun currentBall(): Ball {
         return currentBallReference ?: INVALID_GAME_STATE("No current ball found")
     }
+    fun currentBallOrNull(): Ball? {
+        return currentBallReference
+    }
 
     /**
      * Returns a reference to the current ball.

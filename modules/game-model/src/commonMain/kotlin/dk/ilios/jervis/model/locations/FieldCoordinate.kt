@@ -20,7 +20,7 @@ fun FieldCoordinate(x: Int, y: Int): FieldCoordinate {
  * A representation of the coordinates for a field square.
  * Top-left is (0,0), bottom-left is (25, 14) for a normal Blood Bowl Field.
  */
-interface FieldCoordinate: Location {
+interface FieldCoordinate: OnFieldLocation {
     val x: Int
     val y: Int
 
@@ -70,29 +70,36 @@ interface FieldCoordinate: Location {
     }
 
     override fun isAdjacent(rules: Rules, location: Location): Boolean {
-        return distanceTo(location) == 1
+        return when (location) {
+            DogOut -> false
+            is FieldCoordinate -> distanceTo(location) == 1
+            is GiantLocation -> distanceTo(location) == 1
+        }
     }
 
-    fun move(
+    override fun overlap(otherLocation: Location): Boolean {
+        return when (otherLocation) {
+            DogOut -> false
+            is FieldCoordinate -> otherLocation.x == x && otherLocation.y == y
+            is GiantLocation -> otherLocation.coordinates.contains(FieldCoordinate(x, y))
+        }
+    }
+
+    override fun move(
         direction: Direction,
         steps: Int,
     ): FieldCoordinate {
         return create(x + (direction.xModifier * steps), y + (direction.yModifier * steps))
     }
 
-    fun toLogString(): String {
+    override fun toLogString(): String {
         return "[${x+1}, ${y+1}]"
     }
 
-    /**
-     * Return all on-field coordinates around a specific on-field location.
-     * TODO Figure out if coordinates out of bounds should be returned as that or as their real coordinate
-     * value (to make it easier to make calculations)
-     */
-    fun getSurroundingCoordinates(
+    override fun getSurroundingCoordinates(
         rules: Rules,
-        distance: Int = 1,
-        includeOutOfBounds: Boolean = false,
+        distance: Int,
+        includeOutOfBounds: Boolean,
     ): List<FieldCoordinate> {
         val result = mutableListOf<FieldCoordinate>()
         (x - distance..x + distance).forEach { x: Int ->
@@ -109,51 +116,37 @@ interface FieldCoordinate: Location {
         return result
     }
 
-    /**
-     * Returns the Chebyshev Distance between this field and the target location.
-     * This is equal to the minimum number of squares between two squares on the game field, if we assume
-     * that the field is a square.
-     *
-     * See https://en.wikipedia.org/wiki/Chebyshev_distance
-     */
-    fun distanceTo(target: Location): Int {
+    override fun distanceTo(target: OnFieldLocation): Int {
         return when (target) {
-            DogOut -> Int.MAX_VALUE
             is FieldCoordinate -> max(abs(target.x - this.x), abs(target.y - this.y))
+            is GiantLocation -> target.coordinates.minOf { distanceTo(it) }
         }
     }
 
-    /**
-     * Returns the "real" distance between two fields, as if they were points in a coordinate system
-     * This means that unlike [distanceTo] diagonals will have a larger value than squares on a line.
-     */
-    fun realDistanceTo(target: FieldCoordinate): Double {
-        return sqrt((target.x - x).toDouble().pow(2) + (target.y - y).toDouble().pow(2))
+    override fun realDistanceTo(target: OnFieldLocation): Double {
+        return when (target) {
+            is FieldCoordinate -> sqrt((target.x - x).toDouble().pow(2) + (target.y - y).toDouble().pow(2))
+            is GiantLocation -> TODO()
+        }
     }
 
-    /**
-     * Returns `true` if a field is diagonal to another, false if they are not.
-     * This only works on two fields next to each other.
-     */
-    fun isDiagonalTo(target: FieldCoordinate): Boolean {
-        val onLine = (x - target.x == 0 || y - target.y == 0)
-        return !onLine
+    override fun isDiagonalTo(target: OnFieldLocation): Boolean {
+        return when (target) {
+            is FieldCoordinate -> {
+                val onLine = (x - target.x == 0 || y - target.y == 0)
+                !onLine
+            }
+            is GiantLocation -> TODO()
+        }
     }
 
-    /**
-     * Return all coordinates that are considered "away" from this coordinate from the point of view of the provided
-     * [location].
-     *
-     * See page 45 in the rulebook.
-     */
-    fun getCoordinatesAwayFromLocation(
+    override fun getCoordinatesAwayFromLocation(
         rules: Rules,
         location: FieldCoordinate,
-        includeOutOfBounds: Boolean = false,
+        includeOutOfBounds: Boolean,
     ): List<FieldCoordinate> {
         // Calculate direction
         val direction = Direction(this.x - location.x, this.y - location.y)
-
         val allCoordinates: List<FieldCoordinate> =
             when {
                 // Top

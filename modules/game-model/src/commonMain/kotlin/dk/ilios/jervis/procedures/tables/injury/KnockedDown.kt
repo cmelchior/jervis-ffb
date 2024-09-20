@@ -49,7 +49,7 @@ object KnockedDown: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.currentBall().state == BallState.BOUNCING) {
+            return if (state.currentBallOrNull()?.state == BallState.BOUNCING) {
                 GotoNode(BounceBall)
             } else {
                 compositeCommandOf(

@@ -15,4 +15,5 @@ data object DogOut : Location {
     override fun isOutOfBounds(rules: Rules): Boolean = false
     override fun getCornerLocation(rules: Rules): CornerThrowInPosition? = null
     override fun isAdjacent(rules: Rules, location: Location): Boolean = false
+    override fun overlap(otherLocation: Location): Boolean = otherLocation == DogOut
 }

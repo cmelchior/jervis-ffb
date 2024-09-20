@@ -4,6 +4,7 @@ import dk.ilios.jervis.actions.MoveType
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.model.locations.GiantLocation
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 /**
@@ -19,5 +20,6 @@ data class MoveContext(
     val startingSquare: FieldCoordinate = when (val location = player.location) {
         DogOut -> INVALID_GAME_STATE("Player in the dogout cannot move")
         is FieldCoordinate -> location
+        is GiantLocation -> TODO("Convert startingSquare to location and adjust procedures")
     },
 ): ProcedureContext
