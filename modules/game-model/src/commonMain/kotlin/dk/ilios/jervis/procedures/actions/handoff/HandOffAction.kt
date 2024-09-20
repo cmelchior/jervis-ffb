@@ -13,6 +13,7 @@ import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetCurrentBall
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -94,23 +95,23 @@ object HandOffAction : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<HandOffContext>()
+            val handOffContext = state.getContext<HandOffContext>()
             return when (action) {
                 EndAction -> ExitProcedure()
                 is MoveTypeSelected -> {
-                    val moveContext = MoveContext(context.thrower, action.moveType)
+                    val moveContext = MoveContext(handOffContext.thrower, action.moveType)
                     compositeCommandOf(
-                        SetContext(context.copy(hasMoved = true)),
+                        SetContext(handOffContext.copy(hasMoved = true)),
                         SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
                 is PlayerSelected -> {
-                    val context = state.getContext<HandOffContext>()
+                    val ball = handOffContext.thrower.ball!!
                     compositeCommandOf(
-                        SetContext(context.copy(catcher = action.getPlayer(state))),
-                        SetBallState.accurateThrow(),
-                        SetBallLocation(action.getPlayer(state).coordinates),
+                        SetContext(handOffContext.copy(catcher = action.getPlayer(state))),
+                        SetBallState.accurateThrow(ball),
+                        SetBallLocation(ball, action.getPlayer(state).coordinates),
                         GotoNode(ResolveCatch)
                     )
                 }
@@ -138,12 +139,16 @@ object HandOffAction : Procedure() {
     }
 
     object ResolveCatch : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            return SetCurrentBall(state.getContext<HandOffContext>().thrower.ball!!)
+        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If no player on the holds the ball after the hand-off is complete, it is a turnover.
             // otherwise the action just ends
             val context = state.getContext<HandOffContext>()
             return compositeCommandOf(
+                SetCurrentBall(null),
                 if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(true) else null,
                 ExitProcedure()
             )

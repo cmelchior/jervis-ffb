@@ -3,11 +3,12 @@ package dk.ilios.jervis.commands
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Ball
 import dk.ilios.jervis.model.BallState
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.locations.FieldCoordinate
 
 class SetBallState private constructor(
+    private val ball: Ball,
     private val ballState: BallState,
     private val carriedBy: Player? = null,
     private val exitLocation: FieldCoordinate? = null,
@@ -18,31 +19,71 @@ class SetBallState private constructor(
     private var originalLocation: FieldCoordinate? = null
 
     companion object {
-        fun accurateThrow(): Command = SetBallState(ballState = BallState.ACCURATE_THROW, carriedBy = null, exitLocation = null)
+        fun accurateThrow(ball: Ball): Command = SetBallState(
+            ball = ball,
+            ballState = BallState.ACCURATE_THROW,
+            carriedBy = null,
+            exitLocation = null
+        )
 
-        fun inAir(): Command = SetBallState(ballState = BallState.IN_AIR, carriedBy = null, exitLocation = null)
+        fun inAir(ball: Ball): Command = SetBallState(
+            ball = ball,
+            ballState = BallState.IN_AIR,
+            carriedBy = null,
+            exitLocation = null
+        )
 
-        fun carried(player: Player): Command = SetBallState(ballState = BallState.CARRIED, carriedBy = player, exitLocation = null)
+        fun carried(ball: Ball, player: Player): Command = SetBallState(
+            ball = ball,
+            ballState = BallState.CARRIED,
+            carriedBy = player,
+            exitLocation = null
+        )
 
-        fun onGround(): Command = SetBallState(ballState = BallState.ON_GROUND, carriedBy = null, exitLocation = null)
+        fun onGround(ball: Ball): Command = SetBallState(
+            ball = ball,
+            ballState = BallState.ON_GROUND,
+            carriedBy = null,
+            exitLocation = null
+        )
 
-        fun deviating(): Command = SetBallState(ballState = BallState.DEVIATING, carriedBy = null, exitLocation = null)
+        fun deviating(ball: Ball): Command = SetBallState(
+            ball = ball,
+            ballState = BallState.DEVIATING,
+            carriedBy = null,
+            exitLocation = null
+        )
 
-        fun bouncing(): Command = SetBallState(ballState = BallState.BOUNCING, carriedBy = null, exitLocation = null)
+        fun bouncing(ball: Ball): Command = SetBallState(
+            ball = ball,
+            ballState = BallState.BOUNCING,
+            carriedBy = null,
+            exitLocation = null
+        )
 
-        fun scattered(): Command = SetBallState(ballState = BallState.SCATTERED, carriedBy = null, exitLocation = null)
+        fun scattered(ball: Ball): Command = SetBallState(
+            ball = ball,
+            ballState = BallState.SCATTERED,
+            carriedBy = null,
+            exitLocation = null
+        )
 
-        fun outOfBounds(exit: FieldCoordinate): Command =
-            SetBallState(
+        fun outOfBounds(ball: Ball, exit: FieldCoordinate): Command = SetBallState(
+                ball = ball,
                 ballState = BallState.OUT_OF_BOUNDS,
                 exitLocation = exit,
             )
 
-        fun thrownIn(): Command = SetBallState(BallState.THROW_IN, carriedBy = null, exitLocation = null)
+        fun thrownIn(ball: Ball): Command = SetBallState(
+            ball = ball,
+            ballState = BallState.THROW_IN,
+            carriedBy = null,
+            exitLocation = null
+        )
     }
 
     override fun execute(state: Game, controller: GameController) {
-        val ball: Ball = state.ball
+        val ball: Ball = ball
         ball.let {
             this.originalState = it.state
             this.originalCarriedBy = it.carriedBy
@@ -62,13 +103,13 @@ class SetBallState private constructor(
     }
 
     override fun undo(state: Game, controller: GameController) {
-        state.ball.state = originalState
-        state.ball.carriedBy = originalCarriedBy
-        state.ball.outOfBoundsAt = originalExit
+        ball.state = originalState
+        ball.carriedBy = originalCarriedBy
+        ball.outOfBoundsAt = originalExit
         if (originalLocation != null) {
-            state.ball.location = originalLocation!!
+            ball.location = originalLocation!!
         }
-        state.ball.notifyUpdate()
-        state.ball.carriedBy?.notifyUpdate()
+        ball.notifyUpdate()
+        ball.carriedBy?.notifyUpdate()
     }
 }

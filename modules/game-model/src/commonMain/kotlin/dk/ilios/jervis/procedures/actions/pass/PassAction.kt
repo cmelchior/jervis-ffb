@@ -12,6 +12,7 @@ import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetCurrentBall
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -19,13 +20,13 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.actions.move.ResolveMoveTypeStep
@@ -142,16 +143,22 @@ object PassAction : Procedure() {
     }
 
     object ResolveThrow : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<PassContext>()
+            return SetCurrentBall(context.thrower.ball)
+        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
-            return if (context.target == null) {
-                // No target was selected, so no pass was attempted, continue the pass.
-                GotoNode(MoveOrPassOrEndAction)
-            } else {
-                ExitProcedure()
-
-            }
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                if (context.target == null) {
+                    // No target was selected, so no pass was attempted, continue the pass.
+                    GotoNode(MoveOrPassOrEndAction)
+                } else {
+                    ExitProcedure()
+                }
+            )
         }
     }
 }

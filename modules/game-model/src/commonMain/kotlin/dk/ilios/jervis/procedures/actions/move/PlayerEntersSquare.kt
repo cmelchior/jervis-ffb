@@ -2,8 +2,6 @@ package dk.ilios.jervis.procedures.actions.move
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
-import dk.ilios.jervis.actions.Continue
-import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.Dice
 import dk.ilios.jervis.actions.GameAction
@@ -11,15 +9,18 @@ import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetCurrentBall
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
+import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
@@ -29,6 +30,7 @@ import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
 import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryMode
 import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryRoll
@@ -55,47 +57,90 @@ object MovePlayerIntoSquare : Procedure() {
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<MovePlayerIntoSquareContext>()
     }
-    override val initialNode: Node = MoveIntoSquareAndRollForTrapdoorIfNeeded
+    override val initialNode: Node = MoveIntoSquare
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return RemoveContext<MovePlayerIntoSquareContext>()
     }
 
-    object MoveIntoSquareAndRollForTrapdoorIfNeeded : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MovePlayerIntoSquareContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+    // Move the player into the target square
+    object MoveIntoSquare: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MovePlayerIntoSquareContext>()
-            val hasTrapdoor = state.field[context.target].hasTrapdoor
-            val isTreacherous = state.homeTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR) ||
-                state.awayTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR)
-            return if (hasTrapdoor && isTreacherous) {
-                listOf(RollDice(Dice.D6))
+            return compositeCommandOf(
+                SetPlayerLocation(context.player, context.target),
+                GotoNode(CheckForBouncingBall),
+            )
+        }
+
+    }
+
+    // If the player was already holding a ball and moves into a square with a Ball Clone,
+    // the ball on the ground will bounce before anything else happens.
+    object CheckForBouncingBall: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<MovePlayerIntoSquareContext>()
+            val playerIsHoldingBall = (context.player.ball?.carriedBy == context.player)
+            val ballOnTheGround = (
+                state.balls.size > 1 &&
+                state.field[context.target].balls.count { it.state == BallState.ON_GROUND } > 0
+            )
+            return if (playerIsHoldingBall && ballOnTheGround) {
+                GotoNode(ResolveBouncingBall)
             } else {
-                listOf(ContinueWhenReady)
+                GotoNode(CheckForTrapdoor)
             }
         }
 
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+    }
+
+    object ResolveBouncingBall: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
             val context = state.getContext<MovePlayerIntoSquareContext>()
-            return when (action) {
-                is Continue -> {
-                    compositeCommandOf(
-                        SetPlayerLocation(context.player, context.target),
-                        ExitProcedure()
-                    )
-                }
-                else -> {
-                    checkDiceRoll<D6Result>(action) { d6 ->
-                        compositeCommandOf(
-                            SetPlayerLocation(context.player, context.target),
-                            ReportDiceRoll(DiceRollType.TREACHEROUS_TRAPDOOR, d6),
-                            if (d6.value != 1) ReportGameProgress("${context.player.name} narrowly avoided the trapdoor") else null,
-                            if (d6.value == 1) GotoNode(ResolveFallingThroughTrapdoor) else ExitProcedure()
-                        )
-                    }
-                }
+            val ball = state.field[context.target].balls.first { it.state == BallState.ON_GROUND }
+            return SetCurrentBall(ball)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                GotoNode(CheckForTrapdoor)
+            )
+        }
+    }
+
+    object CheckForTrapdoor: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<MovePlayerIntoSquareContext>()
+            val hasTrapdoor = state.field[context.target].hasTrapdoor
+            val isTreacherous = (
+                state.homeTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR) ||
+                state.awayTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR)
+            )
+            return if (hasTrapdoor && isTreacherous) {
+                GotoNode(RollForTrapdoor)
+            } else {
+                ExitProcedure()
             }
         }
+    }
+
+    object RollForTrapdoor: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MovePlayerIntoSquareContext>().player.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            return listOf(RollDice(Dice.D6))
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return checkDiceRoll<D6Result>(action) { d6 ->
+                val context = state.getContext<MovePlayerIntoSquareContext>()
+                compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.TREACHEROUS_TRAPDOOR, d6),
+                    if (d6.value != 1) ReportGameProgress("${context.player.name} narrowly avoided the trapdoor") else null,
+                    if (d6.value == 1) GotoNode(ResolveFallingThroughTrapdoor) else ExitProcedure()
+                )
+            }
+        }
+
     }
 
     object ResolveFallingThroughTrapdoor : ParentNode() {

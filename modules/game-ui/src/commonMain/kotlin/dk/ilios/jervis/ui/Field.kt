@@ -27,8 +27,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.FieldSquare
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.model.UiFieldSquare
 import dk.ilios.jervis.ui.viewmodel.FieldDetails
@@ -215,9 +215,9 @@ private fun FieldSquare(
         square.player?.let {
             Player(boxModifier, it, true)
         }
-        if (square.isBallOnGround) {
+        if (square.isBallOnGround || square.isBallExiting) {
             Image(
-                modifier = Modifier.fillMaxSize().padding(4.dp),
+                modifier = Modifier.fillMaxSize().padding(4.dp).background(color = if (square.isBallExiting) Color.Red else Color.Transparent),
                 alignment = Alignment.Center,
                 contentScale = ContentScale.FillBounds,
                 bitmap = IconFactory.getBall(),

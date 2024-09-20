@@ -21,6 +21,7 @@ import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.assertContext
@@ -45,12 +46,10 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
  * See page 48 in the rulebook.
  */
 object PassStep: Procedure() {
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<PassContext>()
-    }
     override val initialNode: Node = DeclareTargetSquare
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<PassContext>()
 
     object DeclareTargetSquare: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PassContext>().thrower.team
@@ -79,10 +78,11 @@ object PassStep: Procedure() {
                     checkTypeAndValue<FieldSquareSelected>(state, rules, action, this) {
                         val context = state.getContext<PassContext>()
                         val distance = rules.rangeRuler.measure(context.thrower.coordinates, it.coordinate)
+                        val ball = context.thrower.ball!!
                         compositeCommandOf(
                             SetContext(context.copy(target = it.coordinate, range = distance)),
-                            SetBallState.accurateThrow(), // Until proven otherwise. Should we invent a new type?
-                            SetBallLocation(it.coordinate),
+                            SetBallState.accurateThrow(ball), // Until proven otherwise. Should we invent a new type?
+                            SetBallLocation(ball, it.coordinate),
                             GotoNode(TestForAccuracy)
                         )
                     }
@@ -110,9 +110,10 @@ object PassStep: Procedure() {
             // Ball was successfully thrown to the target square.
             // Move the ball and check for interference
             val context = state.getContext<PassContext>()
+            val ball = state.currentBall()
             return compositeCommandOf(
-                SetBallState.accurateThrow(),
-                SetBallLocation(context.target!!),
+                SetBallState.accurateThrow(ball),
+                SetBallLocation(ball, context.target!!),
                 GotoNode(AttemptPassingInterference)
             )
         }
@@ -125,10 +126,14 @@ object PassStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             // Ball was inaccurate. It goes to the target square and then scatters.
             val context = state.getContext<PassContext>()
+            val ball = state.currentBall()
             return compositeCommandOf(
-                SetBallState.scattered(),
-                SetBallLocation(context.target!!),
-                SetContext(ScatterRollContext(from = context.target ))
+                SetBallState.scattered(ball),
+                SetBallLocation(ball, context.target!!),
+                SetContext(ScatterRollContext(
+                    ball = ball,
+                    from = context.target)
+                )
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter
@@ -136,17 +141,18 @@ object PassStep: Procedure() {
             // The opposite team can now run interference. How this is done
             // depends on if the scattered ball is about to go out of bounds or not.
             val context = state.getContext<ScatterRollContext>()
+            val ball = state.currentBall()
             return if (context.outOfBoundsAt != null) {
                 compositeCommandOf(
-                    SetBallState.outOfBounds(context.outOfBoundsAt),
-                    SetBallLocation(FieldCoordinate.OUT_OF_BOUNDS),
+                    SetBallState.outOfBounds(ball, context.outOfBoundsAt),
+                    SetBallLocation(ball, FieldCoordinate.OUT_OF_BOUNDS),
                     RemoveContext<ScatterRollContext>(),
                     GotoNode(AttemptPassingInterferenceBeforeGoingOutOfBounds)
                 )
             } else {
                 compositeCommandOf(
-                    SetBallState.scattered(),
-                    SetBallLocation(context.landsAt!!),
+                    SetBallState.scattered(ball),
+                    SetBallLocation(ball, context.landsAt!!),
                     RemoveContext<ScatterRollContext>(),
                     GotoNode(AttemptPassingInterference)
                 )
@@ -160,9 +166,10 @@ object PassStep: Procedure() {
     object ResolveWildlyInaccuratePass: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val passContext = state.getContext<PassContext>()
+            val ball = state.currentBall()
             return compositeCommandOf(
-                SetBallState.deviating(),
-                SetBallLocation(passContext.thrower.coordinates),
+                SetBallState.deviating(ball),
+                SetBallLocation(ball, passContext.thrower.coordinates),
                 SetContext(DeviateRollContext(passContext.thrower.coordinates))
             )
         }
@@ -172,17 +179,18 @@ object PassStep: Procedure() {
             // The opposite team can now run interference. How this is done
             // depends on if the deviated ball is about to go out of bounds or not.
             val context = state.getContext<DeviateRollContext>()
+            val ball = state.currentBall()
             return if (context.outOfBoundsAt != null) {
                 compositeCommandOf(
-                    SetBallState.outOfBounds(context.outOfBoundsAt),
-                    SetBallLocation(FieldCoordinate.OUT_OF_BOUNDS),
+                    SetBallState.outOfBounds(ball, context.outOfBoundsAt),
+                    SetBallLocation(ball, FieldCoordinate.OUT_OF_BOUNDS),
                     RemoveContext<DeviateRollContext>(),
                     GotoNode(AttemptPassingInterferenceBeforeGoingOutOfBounds)
                 )
             } else {
                 compositeCommandOf(
-                    SetBallState.deviating(),
-                    SetBallLocation(context.landsAt!!),
+                    SetBallState.deviating(ball),
+                    SetBallLocation(ball, context.landsAt!!),
                     RemoveContext<DeviateRollContext>(),
                     GotoNode(AttemptPassingInterference)
                 )
@@ -196,9 +204,10 @@ object PassStep: Procedure() {
      */
     object ResolveFumbledPass: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
+            val ball = state.currentBall()
             return compositeCommandOf(
-                SetBallState.bouncing(),
-                SetBallLocation(state.getContext<PassContext>().thrower.coordinates)
+                SetBallState.bouncing(ball),
+                SetBallLocation(ball, state.getContext<PassContext>().thrower.coordinates)
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
@@ -222,7 +231,7 @@ object PassStep: Procedure() {
             val passContext = state.getContext<PassContext>()
             return SetOldContext(Game::passingInteferenceContext, PassingInteferenceContext(
                 thrower = passContext.thrower,
-                target = state.ball.outOfBoundsAt!!,
+                target = state.currentBall().outOfBoundsAt!!,
             ))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassingInterferenceStep
@@ -256,7 +265,7 @@ object PassStep: Procedure() {
             val passContext = state.getContext<PassContext>()
             return SetOldContext(Game::passingInteferenceContext, PassingInteferenceContext(
                 thrower = passContext.thrower,
-                target = state.ball.location,
+                target = state.currentBall().location,
             ))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PassingInterferenceStep
@@ -287,8 +296,9 @@ object PassStep: Procedure() {
      * The ball will continue going out of bounds
      */
     object ResolveGoingOutOfBounds: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
-            return SetContext(ThrowInContext(state.ball.outOfBoundsAt!!))
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val ball = state.currentBall()
+            return SetContext(ThrowInContext(ball, ball.outOfBoundsAt!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowIn
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -308,15 +318,18 @@ object PassStep: Procedure() {
      * to be caught.
      */
     object ResolveBounceOrCatch: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
-            return if (state.ballSquare.player != null) {
-                SetBallState.scattered()
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val ball = state.currentBall()
+            val playerInSquare = state.field[ball.location].player
+            val playerIsHoldingBall = (playerInSquare?.ball != null)
+            return if (playerInSquare != null && !playerIsHoldingBall) {
+                SetBallState.scattered(ball) // TODO Is this true?
             } else {
-                SetBallState.bouncing()
+                SetBallState.bouncing(ball)
             }
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return if (state.ballSquare.player != null) {
+            return if (state.currentBall().state == BallState.SCATTERED) {
                 Catch
             } else {
                 Bounce

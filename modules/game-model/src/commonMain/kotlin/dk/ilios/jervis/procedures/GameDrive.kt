@@ -4,6 +4,7 @@ import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetActiveTeam
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetCurrentBall
 import dk.ilios.jervis.commands.SetKickingTeam
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -55,7 +56,11 @@ object GameDrive : Procedure() {
     object KickOff : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules) = TheKickOff
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return ReportStartingKickOff(state.kickingTeam)
+            return compositeCommandOf(
+                // Only one ball should exist at kick-off
+                SetCurrentBall(state.balls.single()),
+                ReportStartingKickOff(state.kickingTeam)
+            )
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
@@ -68,6 +73,7 @@ object GameDrive : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules) = TheKickOffEvent
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
+                SetCurrentBall(null),
                 GotoNode(Turn),
             )
         }

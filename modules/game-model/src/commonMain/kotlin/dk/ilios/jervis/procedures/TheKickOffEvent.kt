@@ -76,7 +76,7 @@ object TheKickOffEvent : Procedure() {
             val context = state.getContext<KickOffEventContext>()
             return if (context.scatterBallBeforeLanding) {
                 compositeCommandOf(
-                    SetBallState.scattered(),
+                    SetBallState.scattered(state.singleBall()),
                     RemoveContext<KickOffEventContext>(),
                     GotoNode(ScatterBallBeforeLanding)
                 )
@@ -96,7 +96,11 @@ object TheKickOffEvent : Procedure() {
      */
     object ScatterBallBeforeLanding : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetContext(ScatterRollContext(from = state.ball.location))
+            val ball = state.singleBall()
+            return SetContext(ScatterRollContext(
+                ball = ball,
+                from = ball.location,
+            ))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -118,9 +122,10 @@ object TheKickOffEvent : Procedure() {
             // if landing on a player, they must/can(?) attempt to catch it
             // TODO Ball lands again, and can either be caught, will bounce or result in a
             //  touchback
-            val ballLocation: FieldCoordinate = state.ball.location
+            val ball = state.singleBall()
+            val ballLocation: FieldCoordinate = ball.location
             val outOfBounds =
-                state.ball.state == BallState.OUT_OF_BOUNDS ||
+                ball.state == BallState.OUT_OF_BOUNDS ||
                     (state.kickingTeam.isHomeTeam() && ballLocation.isOnHomeSide(rules)) ||
                     (state.kickingTeam.isAwayTeam() && ballLocation.isOnAwaySide(rules))
             return if (outOfBounds) {
@@ -145,7 +150,7 @@ object TheKickOffEvent : Procedure() {
             // If field is empty or the player cannot catch the ball, the ball is now
             // bouncing rather than deviating.
             return if (!canCatch) {
-                SetBallState.bouncing()
+                SetBallState.bouncing(state.singleBall())
             } else {
                 null
             }
@@ -157,7 +162,7 @@ object TheKickOffEvent : Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             state.abortIfBallOutOfBounds = false
-            return if (state.ball.state == BallState.OUT_OF_BOUNDS) {
+            return if (state.singleBall().state == BallState.OUT_OF_BOUNDS) {
                 GotoNode(TouchBack)
             } else {
                 ExitProcedure()
@@ -180,7 +185,7 @@ object TheKickOffEvent : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<PlayerSelected>(action) {
                 return compositeCommandOf(
-                    SetBallState.carried(it.getPlayer(state)),
+                    SetBallState.carried(state.singleBall(), it.getPlayer(state)),
                     ReportTouchback(it.getPlayer(state)),
                     ExitProcedure(),
                 )

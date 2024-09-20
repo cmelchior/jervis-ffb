@@ -2,18 +2,18 @@ package dk.ilios.jervis.procedures.tables.kickoff
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetBallLocation
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.Scatter
 import dk.ilios.jervis.procedures.ScatterRollContext
 import dk.ilios.jervis.procedures.WeatherRoll
@@ -38,7 +38,7 @@ object ChangingWeather : Procedure() {
             // If the ball is not out-of-bounds already it scatters further
             return if (
                 state.weather == Weather.PERFECT_CONDITIONS &&
-                state.ball.location.isOnField(rules)
+                state.singleBall().location.isOnField(rules)
             ) {
                 GotoNode(ScatterBall)
             } else {
@@ -49,22 +49,26 @@ object ChangingWeather : Procedure() {
 
     object ScatterBall : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetContext(ScatterRollContext(state.ball.location))
+            return SetContext(ScatterRollContext(
+                ball = state.singleBall(),
+                from = state.singleBall().location
+            ))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ScatterRollContext>()
+            val ball = state.singleBall()
             return if (context.outOfBoundsAt != null) {
                 compositeCommandOf(
-                    SetBallState.outOfBounds(context.outOfBoundsAt),
-                    SetBallLocation(FieldCoordinate.OUT_OF_BOUNDS),
+                    SetBallState.outOfBounds(ball, context.outOfBoundsAt),
+                    SetBallLocation(ball, FieldCoordinate.OUT_OF_BOUNDS),
                     RemoveContext<ScatterRollContext>(),
                     ExitProcedure()
                 )
             } else {
                 compositeCommandOf(
-                    SetBallState.scattered(),
-                    SetBallLocation(context.landsAt!!),
+                    SetBallState.scattered(ball),
+                    SetBallLocation(ball, context.landsAt!!),
                     RemoveContext<ScatterRollContext>(),
                     ExitProcedure()
                 )

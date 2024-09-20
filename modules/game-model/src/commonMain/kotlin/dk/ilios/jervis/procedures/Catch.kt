@@ -2,11 +2,11 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -24,40 +24,23 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 /**
  * Resolve a player attempting to catch the ball.
- *
- * This can be used as a placeholder during development or testing.
  */
 object Catch : Procedure() {
     override val initialNode: Node = RollToCatch
-
-    override fun isValid(
-        state: Game,
-        rules: Rules,
-    ) {
-        super.isValid(state, rules)
-        // Check that this is only called on a standing player with tacklezones
-        val ballLocation = state.ball.location
-        if (state.field[ballLocation].player == null) {
-            INVALID_GAME_STATE("No player available to catch the ball at: $ballLocation")
-        }
-        if (!rules.canCatch(state, state.field[ballLocation].player!!)) {
-            INVALID_GAME_STATE("Player is not eligible for catching the ball at: $ballLocation")
-        }
-    }
-
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         // Determine target and modifiers for the Catch roll
-        val catchingPlayer = state.field[state.ball.location].player!!
+        val ball = state.currentBall()
+        val catchingPlayer = state.field[ball.location].player!!
         val diceRollTarget = catchingPlayer.agility
         val modifiers = mutableListOf<DiceModifier>()
         // TODO Convert deflection into Intercept
-        if (state.ball.state == BallState.BOUNCING) modifiers.add(CatchModifier.BOUNCING)
-        if (state.ball.state == BallState.THROW_IN) modifiers.add(CatchModifier.THROW_IN)
-        if (state.ball.state == BallState.DEVIATING) modifiers.add(CatchModifier.DEVIATED)
-        if (state.ball.state == BallState.SCATTERED) modifiers.add(CatchModifier.SCATTERED)
+        if (ball.state == BallState.BOUNCING) modifiers.add(CatchModifier.BOUNCING)
+        if (ball.state == BallState.THROW_IN) modifiers.add(CatchModifier.THROW_IN)
+        if (ball.state == BallState.DEVIATING) modifiers.add(CatchModifier.DEVIATED)
+        if (ball.state == BallState.SCATTERED) modifiers.add(CatchModifier.SCATTERED)
         // TODO Check for disturbing presence.
         // Check for field being marked
-        val marks = rules.calculateMarks(state, catchingPlayer.team, state.ballSquare.coordinates)
+        val marks = rules.calculateMarks(state, catchingPlayer.team, ball.location)
         modifiers.add(MarkedModifier(marks * -1))
 
         // Check the weather
@@ -66,11 +49,19 @@ object Catch : Procedure() {
         }
 
         val rollContext = CatchRollContext(catchingPlayer, diceRollTarget, modifiers)
-        return compositeCommandOf(
-            SetContext(rollContext),
-        )
+        return SetContext(rollContext)
     }
-
+    override fun isValid(state: Game, rules: Rules) {
+        super.isValid(state, rules)
+        // Check that this is only called on a standing player with tackle zones
+        val ballLocation = state.currentBall().location
+        if (state.field[ballLocation].player == null) {
+            INVALID_GAME_STATE("No player available to catch the ball at: $ballLocation")
+        }
+        if (!rules.canCatch(state, state.field[ballLocation].player!!)) {
+            INVALID_GAME_STATE("Player is not eligible for catching the ball at: $ballLocation")
+        }
+    }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
             RemoveContext<CatchRollContext>(),
@@ -82,15 +73,16 @@ object Catch : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<CatchRollContext>()
             val roll = context.roll!!
+            val ball = state.currentBall()
             return if (context.isSuccess) {
                 compositeCommandOf(
-                    SetBallState.carried(context.catchingPlayer),
+                    SetBallState.carried(ball, context.catchingPlayer),
                     ReportCatch(context.catchingPlayer, context.target, context.modifiers, roll.result, true),
                     ExitProcedure(),
                 )
             } else {
                 compositeCommandOf(
-                    SetBallState.bouncing(),
+                    SetBallState.bouncing(ball),
                     ReportCatch(context.catchingPlayer, context.target, context.modifiers, roll.result, false),
                     GotoNode(CatchFailed),
                 )

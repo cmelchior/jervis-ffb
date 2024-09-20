@@ -17,18 +17,20 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.model.Ball
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Direction
 import dk.ilios.jervis.utils.assert
 import dk.ilios.jervis.utils.sum
 
 data class ThrowInContext(
+    val ball: Ball,
     val outOfBoundsAt: FieldCoordinate,
     val directionRoll: D3Result? = null,
     val direction: Direction? = null,
@@ -57,12 +59,13 @@ object ThrowIn : Procedure() {
             return checkDiceRoll<D3Result>(action) { d3 ->
                 val context = state.getContext<ThrowInContext>()
                 val direction = rules.throwIn(context.outOfBoundsAt, d3)
+                val ball = context.ball
                 return compositeCommandOf(
                     SetContext(context.copy(
                         directionRoll =  d3,
                         direction = direction,
                     )),
-                    SetBallState.thrownIn(),
+                    SetBallState.thrownIn(ball),
                     GotoNode(RollDistance)
                 )
             }
@@ -83,6 +86,7 @@ object ThrowIn : Procedure() {
                 // Move the ball the entire distance until it either goes out of bounds again
                 // or hit an empty location
                 val direction = context.direction!!
+                val ball = context.ball
                 var ballPosition = context.outOfBoundsAt
                 var outOfBoundsAt: FieldCoordinate? = null
                 for (d in 1..distance) {
@@ -97,15 +101,15 @@ object ThrowIn : Procedure() {
                 return if (outOfBoundsAt != null) {
                     compositeCommandOf(
                         SetContext(context.copy(distance = dice)),
-                        SetBallState.outOfBounds(outOfBoundsAt),
-                        SetBallLocation(FieldCoordinate.OUT_OF_BOUNDS),
+                        SetBallState.outOfBounds(ball, outOfBoundsAt),
+                        SetBallLocation(ball, FieldCoordinate.OUT_OF_BOUNDS),
                         GotoNode(ResolveOutOfBounds)
                     )
                 } else {
                     compositeCommandOf(
                         SetContext(context.copy(distance = dice)),
-                        SetBallState.thrownIn(),
-                        SetBallLocation(ballPosition),
+                        SetBallState.thrownIn(ball),
+                        SetBallLocation(ball, ballPosition),
                         GotoNode(ResolveLandOnField)
                     )
                 }
@@ -117,18 +121,19 @@ object ThrowIn : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             // Replace the current throw in context
             // TODO Does this ruin reporting logging?
-            return SetContext(ThrowInContext(state.ball.outOfBoundsAt!!))
+            val oldContext = state.getContext<ThrowInContext>()
+            return SetContext(ThrowInContext(oldContext.ball, oldContext.ball.outOfBoundsAt!!))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowIn
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()
         }
-
     }
 
     object ResolveLandOnField : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            val isStandingPlayer = state.ballSquare.player?.isStanding(rules)
+            val ball = state.getContext<ThrowInContext>().ball
+            val isStandingPlayer = state.field[ball.location].player?.isStanding(rules)
             return if (isStandingPlayer == true) {
                 Catch
             } else {

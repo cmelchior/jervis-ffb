@@ -15,12 +15,12 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
@@ -46,9 +46,9 @@ object DeviateRoll : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<DeviateRollContext>()
-        val ball = state.field[state.getContext<DeviateRollContext>().from].ball
-        if (ball?.state != BallState.DEVIATING && ball?.state != BallState.IN_AIR) {
-            throw IllegalStateException("Ball is not deviating, but ${ball?.state}")
+        val ball = state.field[state.getContext<DeviateRollContext>().from].balls.single()
+        if (ball.state != BallState.DEVIATING && ball.state != BallState.IN_AIR) {
+            throw IllegalStateException("Ball is not deviating, but ${ball.state}")
         }
     }
 

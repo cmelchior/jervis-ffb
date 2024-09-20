@@ -240,4 +240,4 @@ interface FieldCoordinate: Location {
 }
 
 @Serializable
-private data class FieldCoordinateImpl(override val x: Int, override val y: Int) : FieldCoordinate
+data class FieldCoordinateImpl(override val x: Int, override val y: Int) : FieldCoordinate

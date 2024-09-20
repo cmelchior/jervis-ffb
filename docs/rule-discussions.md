@@ -108,10 +108,6 @@ interpreted.
      - Each block is its "own" action, i.e. either block can be replaced by a special action
      - Some special actions have a "once pr. turn" limit, these can only be used on one of the
        blocks.
-    
-   
-
-
 
 # Differences compared to the rules as written
 
@@ -138,4 +134,20 @@ interpreted.
     - Temporary Skills/Characteristics are removed
     - Stunned Players are now prone
 
+5. (Page 23 + Random Event: Ball Clone)
+    Ball clone says "one ball will immediately bounce", making it unclear which ball is
+    bouncing. Is it random, the ball already there? Or the ball coming into the field?
+    This is a problem when combined with a failed pass that could end up in a turnover.
+    E.g. what happens if you throw a ball at a player, it misses and hits a square with
+    another ball, a ball bounce from that square and is caught by the receiver. 
+    
+    This results in three two questions:
+    a. Does it matter which ball the receiver catches?
+    b. If yes, which ball is bouncing?
+    c. Does the player know which ball is bouncing? (Relevant for choosing to reroll 
+       the catch)
+
+    Since all of these aspects are undefined, the implementation always lets the last ball
+    bounce. This solves all of the questions above + increases the "Awesome"-factor if
+    it actually succeeds.
 

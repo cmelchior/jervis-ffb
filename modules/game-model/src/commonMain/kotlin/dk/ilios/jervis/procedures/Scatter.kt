@@ -12,19 +12,21 @@ import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
+import dk.ilios.jervis.model.Ball
 import dk.ilios.jervis.model.BallState
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.assert
 
 data class ScatterRollContext(
+    val ball: Ball,
     val from: FieldCoordinate,
     val scatterRoll: List<D8Result> = emptyList(),
     val landsAt: FieldCoordinate? = null, // Will be `null` if out of bounds
@@ -45,9 +47,8 @@ object Scatter : Procedure() {
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<ScatterRollContext>()
         val context = state.getContext<ScatterRollContext>()
-        val ball = state.field[context.from].ball
-        if (ball?.state != BallState.SCATTERED) {
-            throw IllegalStateException("Ball is not scattered, but ${ball?.state}")
+        if (context.ball.state != BallState.SCATTERED) {
+            throw IllegalStateException("Ball is not scattered, but ${context.ball.state}")
         }
     }
 

@@ -13,6 +13,7 @@ import dk.ilios.jervis.ui.ContextMenuOption
 data class UiFieldSquare(
     override val model: FieldSquare,
     val isBallOnGround: Boolean = false,
+    val isBallExiting: Boolean = false,
     val isBallCarried: Boolean = false,
     val player: UiPlayer? = null,
     val onSelected: (() -> Unit)? = null,

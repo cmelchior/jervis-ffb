@@ -8,8 +8,8 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.SetPlayerLocation
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
@@ -46,9 +46,10 @@ object HighKick : Procedure() {
                 .filter { rules.isOpen(it) }
                 .map { SelectPlayer(it) }
 
+            val ball = state.currentBall()
             return if (
-                state.ball.location.isOnField(rules) &&
-                state.ballSquare.isUnoccupied() &&
+                ball.location.isOnField(rules) &&
+                state.field[ball.location].isUnoccupied() &&
                 openPlayers.isNotEmpty()
             ) {
                 openPlayers
@@ -69,7 +70,7 @@ object HighKick : Procedure() {
                 else -> {
                     checkTypeAndValue<PlayerSelected>(state, rules, action, this) {
                         compositeCommandOf(
-                            SetPlayerLocation(it.getPlayer(state), state.ball.location),
+                            SetPlayerLocation(it.getPlayer(state), state.currentBall().location),
                             ReportGameProgress("${it.getPlayer(state).name} had time to move under the ball due to a High Kick"),
                             ExitProcedure()
                         )

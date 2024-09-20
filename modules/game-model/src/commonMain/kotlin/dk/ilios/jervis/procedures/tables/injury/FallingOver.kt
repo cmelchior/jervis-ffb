@@ -25,10 +25,14 @@ object FallingOver: Procedure() {
     override val initialNode: Node = RollForInjury
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<RiskingInjuryContext>()
+        // Since a ball is only picked up after the player finished current move step in the square,
+        // at this point there might stil be a ball on the ground, that will bounce.
+        // In case of an active Ball Clone, we might have two balls bouncing.
         return if (context.player.hasBall()) {
+            val ball = state.currentBall()
             compositeCommandOf(
-                SetBallState.bouncing(),
-                SetBallLocation(context.player.coordinates),
+                SetBallState.bouncing(ball),
+                SetBallLocation(ball, context.player.coordinates),
             )
         } else {
             null
@@ -48,7 +52,9 @@ object FallingOver: Procedure() {
     object RollForInjury: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.ball.state == BallState.BOUNCING) {
+            val context = state.getContext<RiskingInjuryContext>()
+            val ball = state.currentBall()
+            return if (ball.state == BallState.BOUNCING) {
                 GotoNode(BounceBall)
             } else {
                 ExitProcedure()

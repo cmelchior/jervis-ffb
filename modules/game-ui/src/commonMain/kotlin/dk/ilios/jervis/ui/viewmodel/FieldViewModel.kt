@@ -103,7 +103,7 @@ class FieldViewModel(
                                 }
                             } else {
                                 // Only check for balls now
-                                path.takeWhile { state[it].ball == null }.flatMap {
+                                path.takeWhile { state[it].balls.isEmpty() }.flatMap {
                                     listOf(MoveTypeSelected(MoveType.STANDARD), FieldSquareSelected(it))
                                 }
                             }
@@ -289,11 +289,14 @@ class FieldViewModel(
             }
         }
         val uiPlayer = square.player?.let { UiPlayer(it, squareAction) }
-        val isBallOnGround: Boolean = square.ball?.let {
+        val isBallOnGround: Boolean = square.balls.any {
             (it.state != BallState.CARRIED && it.state != BallState.OUT_OF_BOUNDS) &&
-                    it.location.x == x &&
-                    it.location.y == y
-        } == true
+                it.location.x == x &&
+                it.location.y == y
+        }
+        val isBallExiting: Boolean = controller.state.balls.any {
+            it.state == BallState.OUT_OF_BOUNDS && it.outOfBoundsAt == FieldCoordinate(x, y)
+        }
 
         // Choosing whether or not to showing the context menu is a bit complicated.
         // But we employ the rule that if one of the actions are a "main" action, it means
@@ -308,6 +311,7 @@ class FieldViewModel(
             UiFieldSquare(
                 square,
                 isBallOnGround,
+                isBallExiting,
                 square.player?.hasBall() == true,
                 uiPlayer,
                 squareAction, // Only allow a Square Action if no player is on the field

@@ -2,12 +2,12 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetTurnOver
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -28,26 +28,15 @@ import dk.ilios.jervis.rules.tables.Weather
  */
 object Pickup : Procedure() {
     override val initialNode: Node = RollToPickup
-
-    override fun isValid(state: Game, rules: Rules) {
-        if (state.ball.state != BallState.ON_GROUND) {
-            throw IllegalStateException("Ball is not on the ground, but ${state.ball.state}")
-        }
-        if (state.activePlayer?.location != state.ball.location) {
-            throw IllegalStateException(
-                "Active player is not on the ball: ${state.activePlayer?.location} vs. ${state.ball.location}",
-            )
-        }
-    }
-
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         // Determine target and modifiers for the Catch roll
-        val pickupPlayer = state.field[state.ball.location].player!!
+        val ball = state.currentBall()
+        val pickupPlayer = state.field[ball.location].player!!
         val diceRollTarget = pickupPlayer.agility
         val modifiers = mutableListOf<DiceModifier>()
 
         // Check for field being marked
-        val marks = rules.calculateMarks(state, pickupPlayer.team, state.ballSquare.coordinates)
+        val marks = rules.calculateMarks(state, pickupPlayer.team, ball.location)
         modifiers.add(MarkedModifier(marks * -1))
 
         // Other modifiers, like disturbing presence?
@@ -62,26 +51,36 @@ object Pickup : Procedure() {
             SetContext(rollContext),
         )
     }
-
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
             RemoveContext<PickupRollContext>()
         )
+    }
+    override fun isValid(state: Game, rules: Rules) {
+        if (state.currentBall().state != BallState.ON_GROUND) {
+            throw IllegalStateException("Ball is not on the ground, but ${state.currentBall().state}")
+        }
+        if (state.activePlayer?.location != state.currentBall().location) {
+            throw IllegalStateException(
+                "Active player is not on the ball: ${state.activePlayer?.location} vs. ${state.currentBall().location}",
+            )
+        }
     }
 
     object RollToPickup : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PickupRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val result = state.getContext<PickupRollContext>()
+            val ball = state.currentBall()
             return if (result.isSuccess) {
                 compositeCommandOf(
-                    SetBallState.carried(result.player),
+                    SetBallState.carried(ball, result.player),
                     ReportPickup(result.player, result.target, result.modifiers, result.roll!!.result, true),
                     ExitProcedure(),
                 )
             } else {
                 compositeCommandOf(
-                    SetBallState.bouncing(),
+                    SetBallState.bouncing(ball),
                     ReportPickup(result.player, result.target, result.modifiers, result.roll!!.result, false),
                     GotoNode(PickupFailed),
                 )

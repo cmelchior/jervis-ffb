@@ -208,12 +208,7 @@ class Player(
     var starPlayerPoints: Int = 0
     var level: PlayerLevel = PlayerLevel.ROOKIE
     val ball: Ball?
-        get() =
-            if (team.game.ball.carriedBy == this) {
-                team.game.ball
-            } else {
-                null
-            }
+        get() = team.game.balls.firstOrNull { it.carriedBy == this }
 
     fun addSkill(skill: Skill) {
         extraSkills.add(skill)

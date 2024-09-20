@@ -59,11 +59,11 @@ object AccuracyRoll: Procedure() {
                     else -> INVALID_GAME_STATE("Unsupported range: ${context.range}")
                 }?.let { modifiers.add(it) }
 
-                // Marked modifiers
+                // Marked modifiers for square where ball is landing
                 rules.addMarkedModifiers(
                     state,
                     context.thrower.team,
-                    state.ballSquare,
+                    state.field[state.currentBall().location],
                     modifiers,
                     AccuracyModifier.MARKED
                 )

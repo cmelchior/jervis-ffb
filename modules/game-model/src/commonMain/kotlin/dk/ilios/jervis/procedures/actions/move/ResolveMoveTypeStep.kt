@@ -1,10 +1,12 @@
 package dk.ilios.jervis.procedures.actions.move
 
+import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.MoveType
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectMoveType
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetCurrentBall
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
@@ -132,7 +134,7 @@ object ResolveMoveTypeStep : Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val player = state.getContext<MoveContext>().player
-            val pickupBall = player.isStanding(rules) && state.field[player.location as FieldCoordinate].ball != null
+            val pickupBall = player.isStanding(rules) && state.field[player.location as FieldCoordinate].balls.isNotEmpty()
             return if (pickupBall) {
                 GotoNode(PickUpBall)
             } else {
@@ -143,16 +145,17 @@ object ResolveMoveTypeStep : Procedure() {
 
     // If a player moved into the ball as part of the action, they must pick it up.
     object PickUpBall : ParentNode() {
-        override fun getChildProcedure(
-            state: Game,
-            rules: Rules,
-        ): Procedure = Pickup
-
-        override fun onExitNode(
-            state: Game,
-            rules: Rules,
-        ): Command {
-            return ExitProcedure()
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            val ball = state.field[context.player.coordinates].balls.single()
+            return SetCurrentBall(ball)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                ExitProcedure()
+            )
         }
     }
 }

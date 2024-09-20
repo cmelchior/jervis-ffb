@@ -32,6 +32,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
 import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.foul.FoulAction
@@ -94,6 +95,9 @@ object JervisSerialization {
             }
             polymorphic(Position::class) {
                 subclass(BB2020Position::class)
+            }
+            polymorphic(FieldCoordinate::class) {
+                subclass(dk.ilios.jervis.model.locations.FieldCoordinateImpl::class)
             }
             polymorphic(GameAction::class) {
                 subclass(Cancel::class)

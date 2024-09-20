@@ -2,7 +2,6 @@ package dk.ilios.jervis.model
 
 import dk.ilios.jervis.model.context.ContextHolder
 import dk.ilios.jervis.model.context.UseRerollContext
-import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.actions.pass.PassingInteferenceContext
 import dk.ilios.jervis.rules.skills.RerollSource
@@ -104,17 +103,26 @@ class Game(
     var passingInteferenceContext: PassingInteferenceContext? = null
     var rerollContext: UseRerollContext? = null
 
-    val ball: Ball = Ball()
+    val balls: MutableList<Ball> = mutableListOf(Ball())
+    // Easy reference to the ball that is currently being "handled" somehow.
+    var currentBallReference: Ball? = null
+    // Helper method for returning the current ball. Will throw an exception if no
+    // ball was set as current.
+    fun currentBall(): Ball {
+        return currentBallReference ?: INVALID_GAME_STATE("No current ball found")
+    }
 
-    val ballSquare: FieldSquare
-        get() {
-            return ball.carriedBy?.let { player ->
-                when (val location = player.location) {
-                    DogOut -> INVALID_GAME_STATE("Player not allowed to carry the ball when not on the field")
-                    is FieldCoordinate -> this.field[location]
-                }
-            } ?: this.field[ball.location]
+    /**
+     * Returns a reference to the current ball.
+     * This method only works if one ball exists, otherwise an
+     * exception is thrown.
+     */
+    fun singleBall(): Ball {
+        if (balls.size > 1) {
+            INVALID_GAME_STATE("More than one ball found")
         }
+        return balls.first()
+    }
 
     /**
      * Returns the player matching the given [PlayerId].

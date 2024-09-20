@@ -115,9 +115,10 @@ object TheKickOff : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<FieldSquareSelected>(action) {
+                val ball = state.balls.single()
                 compositeCommandOf(
-                    SetBallState.inAir(),
-                    SetBallLocation(FieldCoordinate(it.x, it.y)),
+                    SetBallState.inAir(ball),
+                    SetBallLocation(ball, FieldCoordinate(it.x, it.y)),
                     GotoNode(TheKickDeviates),
                 )
             }
@@ -126,15 +127,16 @@ object TheKickOff : Procedure() {
 
     object TheKickDeviates : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetContext(DeviateRollContext(from = state.ball.location))
+            return SetContext(DeviateRollContext(from = state.currentBall().location))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<DeviateRollContext>()
             val newLocation = context.landsAt ?: FieldCoordinate.OUT_OF_BOUNDS
+            val ball = state.currentBall()
             return compositeCommandOf(
-                if (context.outOfBoundsAt != null) SetBallState.outOfBounds(context.outOfBoundsAt) else SetBallState.deviating(),
-                SetBallLocation(newLocation),
+                if (context.outOfBoundsAt != null) SetBallState.outOfBounds(ball, context.outOfBoundsAt) else SetBallState.deviating(ball),
+                SetBallLocation(ball, newLocation),
                 ReportKickResult(state.kickingTeam, context.deviateRoll.first() as D8Result, context.deviateRoll.last() as D6Result, newLocation, rules),
                 ExitProcedure(),
             )
@@ -223,9 +225,10 @@ object TheFUMBBLKickOff : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<FieldSquareSelected>(action) {
+                val ball = state.balls.single()
                 compositeCommandOf(
-                    SetBallState.inAir(),
-                    SetBallLocation(FieldCoordinate(it.x, it.y)),
+                    SetBallState.inAir(ball),
+                    SetBallLocation(ball, FieldCoordinate(it.x, it.y)),
                     GotoNode(TheKickDeviates),
                 )
             }
@@ -242,9 +245,10 @@ object TheFUMBBLKickOff : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D8Result, D6Result>(action) { d8, d6 ->
                 val direction = rules.direction(d8)
-                val newLocation = state.ball.location.move(direction, d6.value)
+                val ball = state.currentBall()
+                val newLocation = ball.location.move(direction, d6.value)
                 compositeCommandOf(
-                    SetBallLocation(newLocation),
+                    SetBallLocation(ball, newLocation),
                     ReportKickResult(state.kickingTeam, d8, d6, newLocation, rules),
                     ExitProcedure(),
                 )
