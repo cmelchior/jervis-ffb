@@ -54,7 +54,7 @@ data class StumbleContext(
 object Stumble: Procedure() {
     override val initialNode: Node = ChooseToUseTackle
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val blockContext = state.getContext<BlockRollContext>()
+        val blockContext = state.getContext<BlockContext>()
         val stumbleContext = StumbleContext(
             blockContext.attacker,
             blockContext.defender,
@@ -69,7 +69,7 @@ object Stumble: Procedure() {
             ReportStumbleResult(context.firstPusher, context.firstPushee, stumbleContext.isDefenderDown())
         )
     }
-    override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockRollContext>()
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockContext>()
 
     object ChooseToUseTackle: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<StumbleContext>().attacker.team
@@ -148,17 +148,17 @@ object Stumble: Procedure() {
     object ResolvePlayerDown: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val defender = state.getContext<StumbleContext>().defender
-            val injuryContext = RiskingInjuryContext(defender)
+            val blockContext = state.getContext<BlockContext>()
+            val injuryContext = RiskingInjuryContext(
+                player = defender,
+                isPartOfMultipleBlock = blockContext.isUsingMultiBlock
+            )
             return compositeCommandOf(
-                SetPlayerState(defender, PlayerState.KNOCKED_DOWN),
+                SetPlayerState(defender, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
                 SetContext(injuryContext)
             )
         }
-
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return KnockedDown
-        }
-
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<RiskingInjuryContext>(),

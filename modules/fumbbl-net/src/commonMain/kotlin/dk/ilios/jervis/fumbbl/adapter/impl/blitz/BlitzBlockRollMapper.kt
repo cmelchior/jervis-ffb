@@ -15,7 +15,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
 import dk.ilios.jervis.procedures.actions.blitz.BlitzContext
-import dk.ilios.jervis.procedures.actions.block.BlockRoll
+import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockRollDice
 
 object BlitzBlockRollMapper: CommandActionMapper {
     override fun isApplicable(
@@ -45,6 +45,6 @@ object BlitzBlockRollMapper: CommandActionMapper {
             val context = jervisGame.getContext<BlitzContext>()
             PlayerSelected(context.defender!!.id)
        }, BlitzAction.MoveOrBlockOrEndAction)
-        newActions.add(DiceResults(diceRoll), BlockRoll.RollDice)
+        newActions.add(DiceResults(diceRoll), StandardBlockRollDice.RollDice)
     }
 }

@@ -103,7 +103,7 @@ object PickupRoll : Procedure() {
             } else {
                 val teamReroll =
                     if (hasTeamRerolls && allowedToUseTeamReroll) {
-                        listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), context.roll!!)))
+                        listOf(SelectRerollOption(DiceRerollOption(rules.getAvailableTeamReroll(team), context.roll!!)))
                     } else {
                         emptyList()
                     }

@@ -67,7 +67,7 @@ object SetupTeam : Procedure() {
             return when (action) {
                 EndSetup -> GotoNode(EndSetupAndValidate)
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, rules, action, this) { playerSelected ->
+                    checkTypeAndValue<PlayerSelected>(state, rules, action) { playerSelected ->
                         compositeCommandOf(
                             SetContext(context.copy(currentPlayer = playerSelected.getPlayer(state))),
                             GotoNode(PlacePlayer),

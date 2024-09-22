@@ -106,17 +106,18 @@ object ResolveThrowARock : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<ThrowARockContext>()
+                val player = context.currentPlayer!!
                 return if (d6.value >= 5) {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROW_A_ROCK, d6),
-                        SetPlayerState(context.currentPlayer!!, PlayerState.KNOCKED_DOWN),
-                        ReportGameProgress("${state.activeTeam} hit ${context.currentPlayer!!.name} with a rock"),
+                        SetPlayerState(player, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
+                        ReportGameProgress("${state.activeTeam} hit ${player.name} with a rock"),
                         GotoNode(ResolveInjuryByRock),
                     )
                 } else {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROW_A_ROCK, d6),
-                        ReportGameProgress("${state.activeTeam} ignores ${context.currentPlayer!!.name}"),
+                        ReportGameProgress("${state.activeTeam} ignores ${player.name}"),
                         GotoNode(SelectPlayer),
                     )
                 }

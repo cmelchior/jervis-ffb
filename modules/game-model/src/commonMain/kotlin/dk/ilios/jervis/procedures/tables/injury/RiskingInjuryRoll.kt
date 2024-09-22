@@ -1,24 +1,15 @@
 package dk.ilios.jervis.procedures.tables.injury
 
 import compositeCommandOf
-import dk.ilios.jervis.actions.ActionDescriptor
-import dk.ilios.jervis.actions.Cancel
-import dk.ilios.jervis.actions.CancelWhenReady
-import dk.ilios.jervis.actions.Confirm
-import dk.ilios.jervis.actions.ConfirmWhenReady
-import dk.ilios.jervis.actions.Continue
-import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetNigglingInjuries
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
-import dk.ilios.jervis.commands.UseApothecary
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
-import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -26,20 +17,18 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
-import dk.ilios.jervis.model.inducements.ApothecaryType
 import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.model.modifiers.DiceModifier
+import dk.ilios.jervis.procedures.actions.block.MultipleBlockContext
 import dk.ilios.jervis.reports.ReportInjuryResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.rules.tables.CasualtyResult
 import dk.ilios.jervis.rules.tables.InjuryResult
 import dk.ilios.jervis.rules.tables.LastingInjuryResult
-import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 enum class RiskingInjuryMode {
@@ -53,6 +42,7 @@ enum class RiskingInjuryMode {
 // What do we need to track?
 data class RiskingInjuryContext(
     val player: Player,
+    val isPartOfMultipleBlock: Boolean = false,
     val mode: RiskingInjuryMode = RiskingInjuryMode.KNOCKED_DOWN, // Do we need this?
     val armourRoll: List<D6Result> = listOf(),
     val armourResult: Int = -1,
@@ -82,7 +72,8 @@ data class RiskingInjuryContext(
 object RiskingInjuryRoll: Procedure() {
     override val initialNode: Node = DetermineStartingRoll
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
+        // TODO Report here for Multiple Block?
         return ReportInjuryResult(state.getContext<RiskingInjuryContext>())
     }
     override fun isValid(state: Game, rules: Rules) {
@@ -148,13 +139,13 @@ object RiskingInjuryRoll: Procedure() {
                     // TODO Add handling of things that might modify KO results (like thick skull)
                     compositeCommandOf(
                         SetPlayerState(context.player, PlayerState.KNOCKED_OUT),
-                        GotoNode(ChooseToUseApothecary),
+                        GotoNode(CheckApothecary),
                     )
                 }
                 InjuryResult.BADLY_HURT -> {
                     compositeCommandOf(
                         SetPlayerState(context.player, PlayerState.BADLY_HURT),
-                        GotoNode(ChooseToUseApothecary),
+                        GotoNode(CheckApothecary),
                     )
                 }
                 InjuryResult.CASUALTY -> {
@@ -199,7 +190,7 @@ object RiskingInjuryRoll: Procedure() {
             val exitCommand = if (context.casualtyResult == CasualtyResult.LASTING_INJURY) {
                 GotoNode(RollForLastingInjury)
             } else {
-                GotoNode(ChooseToUseApothecary)
+                GotoNode(CheckApothecary)
             }
 
             return compositeCommandOf(
@@ -217,48 +208,38 @@ object RiskingInjuryRoll: Procedure() {
             return compositeCommandOf(
                 // TODO Missing stat modifier
                 SetPlayerState(context.player, PlayerState.SERIOUS_INJURY),
-                GotoNode(ChooseToUseApothecary),
+                GotoNode(CheckApothecary),
             )
         }
     }
 
-    object ChooseToUseApothecary: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.getContext<RiskingInjuryContext>()
-            val hasApothecary = context.player.team.teamApothecaries.count { it.type == ApothecaryType.STANDARD && !it.used } > 0
-            return when (hasApothecary) {
-                true -> listOf(ConfirmWhenReady, CancelWhenReady)
-                false -> listOf(ContinueWhenReady)
-            }
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<RiskingInjuryContext>()
-            val player = context.player
-            val team = player.team
-            val moveToDogOut = context.armourBroken && context.injuryResult != InjuryResult.STUNNED
-
-            return when (action) {
-                Confirm -> {
-                    // TODO Figure out how to handle apothecary here
-                    compositeCommandOf(
-                        UseApothecary(team, team.teamApothecaries.first { it.type == ApothecaryType.STANDARD && !it.used }),
-                        SetPlayerState(player, PlayerState.STUNNED), // Override whatever injury they had
-                        ExitProcedure()
-                    )
-                }
-                Cancel,
-                Continue -> {
-                    compositeCommandOf(
-                        SetPlayerLocation(player, DogOut),
-                        ExitProcedure()  // Apothecary not used, just accept the result
-                    )
-                }
-                else -> INVALID_ACTION(action)
+    /**
+     * Check if want to check for Apothecary and Regeneration now or later.
+     *
+     * "later" is only applicable when part of a Multiple Block, so in that
+     * case we store the injury context inside the MultipleBlock context, so
+     * it can be safely deleted from the global scope. Otherwise the injury
+     * is always resolved right now.
+     */
+    object CheckApothecary: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            return if (state.getContext<RiskingInjuryContext>().isPartOfMultipleBlock) {
+                val injuryContext = state.getContext<RiskingInjuryContext>()
+                val mbContext = state.getContext<MultipleBlockContext>()
+                compositeCommandOf(
+                    SetContext(mbContext.copyAndSetInjuryReferenceForPlayer(injuryContext.player, injuryContext)),
+                    ExitProcedure(),
+                )
+            } else {
+                GotoNode(PatchingUpPlayer)
             }
         }
     }
 
-    // TODO Add support for other healing affects, like Regeneration?
+    object PatchingUpPlayer: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PatchUpPlayer
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return ExitProcedure()
+        }
+    }
 }

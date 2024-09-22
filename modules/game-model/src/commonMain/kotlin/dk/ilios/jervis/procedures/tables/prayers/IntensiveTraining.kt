@@ -73,7 +73,7 @@ object IntensiveTraining : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<SkillSelected>(state, rules, action, this) {
+            return checkTypeAndValue<SkillSelected>(state, rules, action) {
                 val context = state.getContext<IntensiveTrainingContext>()
                 val skill = it.skill.createSkill(isTemporary = true, expiresAt = Duration.END_OF_GAME)
                 return compositeCommandOf(

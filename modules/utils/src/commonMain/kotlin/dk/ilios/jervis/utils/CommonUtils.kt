@@ -3,6 +3,8 @@ package dk.ilios.jervis.utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import okio.Path
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 // These functions cannot be in the same file as an expect function,
 // it seems to break the compiler
@@ -21,3 +23,10 @@ fun Path.writeText(text: String) {
 
 val Path.isDirectory get() = (platformFileSystem.metadataOrNull(this)?.isDirectory == true)
 val Path.isRegularFile get() = (platformFileSystem.metadataOrNull(this)?.isRegularFile == true)
+
+@OptIn(ExperimentalContracts::class)
+inline fun <reified T: Any> Any.checkType(): T {
+    contract { returns() implies (this@checkType is T) }
+    return this as T
+}
+

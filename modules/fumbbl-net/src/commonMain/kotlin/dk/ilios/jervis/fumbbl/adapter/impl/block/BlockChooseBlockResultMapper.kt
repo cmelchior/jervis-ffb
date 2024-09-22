@@ -9,7 +9,8 @@ import dk.ilios.jervis.fumbbl.model.reports.BlockChoiceReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.actions.block.BlockRoll
+import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockChooseReroll
+import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockChooseResult
 
 object BlockChooseBlockResultMapper: CommandActionMapper {
     override fun isApplicable(
@@ -33,7 +34,7 @@ object BlockChooseBlockResultMapper: CommandActionMapper {
     ) {
         val report = command.reportList.last() as BlockChoiceReport
         // TODO Figure out how rerolls are represented
-        newActions.add(NoRerollSelected, BlockRoll.ChooseResultOrReRollSource)
-        newActions.add(report.blockResult.toJervisResult(), BlockRoll.SelectBlockResult)
+        newActions.add(NoRerollSelected(), StandardBlockChooseReroll.ReRollSourceOrAcceptRoll)
+        newActions.add(report.blockResult.toJervisResult(), StandardBlockChooseResult.SelectBlockResult)
     }
 }

@@ -8,9 +8,9 @@ import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.reports.ReportPushResult
 import dk.ilios.jervis.rules.Rules
 
@@ -18,7 +18,7 @@ import dk.ilios.jervis.rules.Rules
 // Helper method for creating a push context before moving a player back
 // This is used by all results that push back.
 fun createPushContext(state: Game): PushContext {
-    val blockContext = state.getContext<BlockRollContext>()
+    val blockContext = state.getContext<BlockContext>()
     // Setup the context needed to resolve the full push include
     val newContext = PushContext(
         blockContext.attacker,

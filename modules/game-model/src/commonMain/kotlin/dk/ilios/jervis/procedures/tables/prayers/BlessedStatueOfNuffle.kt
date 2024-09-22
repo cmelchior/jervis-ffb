@@ -62,7 +62,7 @@ object BlessedStatueOfNuffle : Procedure() {
                     )
                 }
                 else -> {
-                    return checkTypeAndValue<PlayerSelected>(state, rules, action, this) {
+                    return checkTypeAndValue<PlayerSelected>(state, rules, action) {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
                         compositeCommandOf(

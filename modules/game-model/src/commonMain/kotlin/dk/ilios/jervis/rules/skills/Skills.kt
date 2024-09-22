@@ -21,6 +21,7 @@ enum class DiceRollType {
     BRILLIANT_COACHING,
     CASUALTY,
     CATCH,
+    CHAINSAW,
     CHEERING_FANS,
     FAN_FACTOR,
     DEFLECTION,
@@ -53,6 +54,7 @@ enum class DiceRollType {
     THROW_TEAM_MATE,
     TREACHEROUS_TRAPDOOR,
     UNCHANNELLED_FURY,
+    PROJECTILE_VOMIT,
     WEATHER,
 }
 
@@ -161,7 +163,6 @@ interface D6StandardSkillReroll : RerollSource {
     }
 }
 
-// `rerollSource` is not set yet
 @Serializable
 data class DiceRerollOption(
     val source: RerollSource,

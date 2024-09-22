@@ -66,7 +66,7 @@ object StandardMoveStep: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when(action) {
                 EndAction -> ExitProcedure()
-                else -> checkTypeAndValue<FieldSquareSelected>(state, rules, action, this) {
+                else -> checkTypeAndValue<FieldSquareSelected>(state, rules, action) {
                     val context = state.getContext<MoveContext>()
                     compositeCommandOf(
                         SetContext(context.copy(target = it.coordinate)),
@@ -173,7 +173,7 @@ object StandardMoveStep: Procedure() {
                 )
             } else {
                 compositeCommandOf(
-                    SetPlayerState(player, PlayerState.KNOCKED_DOWN),
+                    SetPlayerState(player, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
                     RemoveContext<DodgeRollContext>(),
                     GotoNode(ResolvePlayerFallingOver)
                 )
@@ -199,7 +199,7 @@ object StandardMoveStep: Procedure() {
     object ResolvePlayerFallingOver: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            return SetContext(RiskingInjuryContext(context.player, RiskingInjuryMode.FALLING_OVER))
+            return SetContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver
         override fun onExitNode(state: Game, rules: Rules): Command {

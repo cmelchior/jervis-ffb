@@ -14,6 +14,7 @@ import dk.ilios.jervis.model.modifiers.CatchModifier
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.rules.pathfinder.BB2020PathFinder
 import dk.ilios.jervis.rules.pathfinder.PathFinder
+import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.rules.tables.ArgueTheCallTable
 import dk.ilios.jervis.rules.tables.CasualtyTable
 import dk.ilios.jervis.rules.tables.Direction
@@ -323,6 +324,14 @@ interface Rules {
      */
     fun teamHasBall(team: Team): Boolean {
         return team.firstOrNull { it.hasBall() } != null
+    }
+
+    /**
+     * Returns the best team reroll available.
+     * This means using temporary rerolls before using permanent ones
+     */
+    fun getAvailableTeamReroll(team: Team): RerollSource {
+        return team.availableRerolls.last()
     }
 
     val name: String

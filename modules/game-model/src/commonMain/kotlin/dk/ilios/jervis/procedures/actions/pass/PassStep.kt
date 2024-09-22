@@ -75,7 +75,7 @@ object PassStep: Procedure() {
             return when (action) {
                 is Cancel -> ExitProcedure() // Abort the throw
                 else -> {
-                    checkTypeAndValue<FieldSquareSelected>(state, rules, action, this) {
+                    checkTypeAndValue<FieldSquareSelected>(state, rules, action) {
                         val context = state.getContext<PassContext>()
                         val distance = rules.rangeRuler.measure(context.thrower.coordinates, it.coordinate)
                         val ball = context.thrower.ball!!

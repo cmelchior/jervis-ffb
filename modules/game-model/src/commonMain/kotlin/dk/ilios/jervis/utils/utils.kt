@@ -161,7 +161,7 @@ fun createRandomAction(
         SelectDogout -> DogoutSelected
         is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
         is SelectPlayer -> PlayerSelected(action.player)
-        is DeselectPlayer -> PlayerDeselected
+        is DeselectPlayer -> PlayerDeselected(action.player)
         is SelectAction -> PlayerActionSelected(action.action.type)
         EndActionWhenReady -> EndAction
         CancelWhenReady -> Cancel
@@ -183,7 +183,7 @@ fun createRandomAction(
         is SelectRandomPlayers ->
             RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
 
-        is SelectNoReroll -> NoRerollSelected
+        is SelectNoReroll -> NoRerollSelected(action.dicePoolId)
         is SelectRerollOption -> RerollOptionSelected(action.option)
         is SelectDiceResult -> action.choices.random()
         is SelectMoveType -> MoveTypeSelected(action.type)
@@ -401,7 +401,7 @@ fun calculateAvailableRerollsFor(
         emptyList()
     } else {
         val teamReroll = if (hasTeamRerolls && allowedToUseTeamReroll) {
-                listOf(SelectRerollOption(DiceRerollOption(team.availableRerolls.last(), listOf(roll))))
+                listOf(SelectRerollOption(DiceRerollOption(rules.getAvailableTeamReroll(team), listOf(roll))))
             } else {
                 emptyList()
             }

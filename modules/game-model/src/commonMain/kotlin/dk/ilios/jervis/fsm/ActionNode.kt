@@ -55,13 +55,13 @@ abstract class ActionNode : Node {
      * Check that not only verify the game action type, but also the value.
      * This is, e.g., relevant when selecting locations or players.
      */
-    inline fun <reified T : GameAction> checkTypeAndValue(
+    inline fun <reified T : GameAction> ActionNode.checkTypeAndValue(
         state: Game,
         rules: Rules,
         action: GameAction,
-        node: ActionNode,
         function: (T) -> Command,
     ): Command {
+        val node = this
         if (action is T) {
             val availableActions = node.getAvailableActions(state, rules)
             // Validate that an action descriptor exists with the provided value

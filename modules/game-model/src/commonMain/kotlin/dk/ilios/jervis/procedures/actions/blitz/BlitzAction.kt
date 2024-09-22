@@ -29,7 +29,7 @@ import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
-import dk.ilios.jervis.procedures.actions.block.BlockStep
+import dk.ilios.jervis.procedures.actions.block.StandardBlockStep
 import dk.ilios.jervis.procedures.actions.move.ResolveMoveTypeStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
@@ -190,7 +190,7 @@ object BlitzAction : Procedure() {
                 isBlitzing = true
             ))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = BlockStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = StandardBlockStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their blitz

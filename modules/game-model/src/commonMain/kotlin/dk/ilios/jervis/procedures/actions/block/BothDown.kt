@@ -1,5 +1,6 @@
 package dk.ilios.jervis.procedures.actions.block
 
+import buildCompositeCommand
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Cancel
@@ -13,6 +14,7 @@ import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
@@ -49,7 +51,7 @@ data class BothDownContext(
 object BothDown: Procedure() {
     override val initialNode: Node = AttackerChooseToUseWrestle
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        val blockContext = state.getContext<BlockRollContext>()
+        val blockContext = state.getContext<BlockContext>()
         return SetContext(BothDownContext(
             blockContext.attacker,
             blockContext.defender,
@@ -174,14 +176,23 @@ object BothDown: Procedure() {
 
             // If Wrestle was used, both players are just placed prone and nothing more happens.
             // Otherwise check if one or both players need to roll injury
-            if (context.attackerUsesWrestle || context.defenderUsesWrestle) {
-                return compositeCommandOf(
+            return if (context.attackerUsesWrestle || context.defenderUsesWrestle) {
+                compositeCommandOf(
                     SetPlayerState(context.attacker, PlayerState.PRONE, hasTackleZones = false),
                     SetPlayerState(context.defender, PlayerState.PRONE, hasTackleZones = false),
                     ExitProcedure()
                 )
             } else {
-                return GotoNode(ResolveDefenderInjury)
+                buildCompositeCommand {
+                    if (!context.attackUsesBlock) {
+                        add(SetTurnOver(true))
+                        add(SetPlayerState(context.attacker, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
+                    }
+                    if (!context.defenderUsesBlock) {
+                        add(SetPlayerState(context.defender, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
+                    }
+                    add(GotoNode(ResolveDefenderInjury))
+                }
             }
         }
     }
@@ -199,8 +210,12 @@ object BothDown: Procedure() {
 
     object RollDefenderInjury: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
+            val blockContext = state.getContext<BlockContext>()
             val context = state.getContext<BothDownContext>()
-            return SetContext(RiskingInjuryContext(context.defender))
+            return SetContext(RiskingInjuryContext(
+                player = context.defender,
+                isPartOfMultipleBlock = blockContext.isUsingMultiBlock
+            ))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -221,8 +236,12 @@ object BothDown: Procedure() {
 
     object RollAttackerInjury: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
+            val blockContext = state.getContext<BlockContext>()
             val context = state.getContext<BothDownContext>()
-            return SetContext(RiskingInjuryContext(context.attacker))
+            return SetContext(RiskingInjuryContext(
+                player = context.attacker,
+                isPartOfMultipleBlock = blockContext.isUsingMultiBlock
+            ))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = KnockedDown
         override fun onExitNode(state: Game, rules: Rules): Command {

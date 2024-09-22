@@ -148,7 +148,7 @@ object MovePlayerIntoSquare : Procedure() {
             val context = state.getContext<MovePlayerIntoSquareContext>()
             return compositeCommandOf(
                 SetPlayerLocation(context.player, DogOut),
-                SetPlayerState(context.player, PlayerState.KNOCKED_DOWN),
+                SetPlayerState(context.player, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
                 SetContext(
                     RiskingInjuryContext(
                     player = context.player,

@@ -64,8 +64,8 @@ import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.model.Coin
 import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.TheKickOff
-import dk.ilios.jervis.procedures.actions.block.BlockRoll
 import dk.ilios.jervis.procedures.actions.block.PushStep
+import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockChooseResult
 import dk.ilios.jervis.procedures.actions.move.calculateOptionsForMoveType
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
@@ -129,7 +129,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
 
         if (model.menuViewModel.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) {
             if (actions.filterIsInstance<SelectNoReroll>().count { it.rollSuccessful == true} > 0) {
-                return NoRerollSelected
+                return NoRerollSelected()
             }
         }
 
@@ -154,7 +154,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
         }
 
         // When selecting block results after reroll and only 1 dice is available.
-        if (currentNode == BlockRoll.SelectBlockResult && actions.size == 1) {
+        if (currentNode == StandardBlockChooseResult.SelectBlockResult && actions.size == 1) {
             val choices: List<DieResult> = (actions.first() as SelectDiceResult).choices
             if (choices.size == 1) {
                 return choices.first() as DBlockResult
@@ -272,7 +272,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                         )
                     }
                     action.key == DeselectPlayer::class -> {
-                        DeselectPlayerInput(listOf(PlayerDeselected))
+                        DeselectPlayerInput(action.value.map { PlayerDeselected((it as DeselectPlayer).player) })
                     }
                     action.key == SelectAction::class -> {
                         val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
@@ -394,7 +394,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                 SelectDogout -> DogoutSelected
                 is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
                 is SelectPlayer -> PlayerSelected(action.player)
-                is DeselectPlayer -> PlayerDeselected
+                is DeselectPlayer -> PlayerDeselected(action.player)
                 is SelectAction -> PlayerActionSelected(action.action.type)
                 EndActionWhenReady -> EndAction
                 CancelWhenReady -> Cancel
@@ -417,7 +417,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                     RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
                 }
 
-                is SelectNoReroll -> NoRerollSelected
+                is SelectNoReroll -> NoRerollSelected(action.dicePoolId)
                 is SelectRerollOption -> RerollOptionSelected(action.option)
                 is SelectDiceResult -> action.choices.random()
                 is SelectMoveType -> MoveTypeSelected(action.type)

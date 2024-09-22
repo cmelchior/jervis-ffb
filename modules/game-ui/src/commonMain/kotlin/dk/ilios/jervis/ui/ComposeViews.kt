@@ -279,13 +279,13 @@ fun ActionSelector(
                                         is PlayerSelected -> "Player[${action.playerId}]"
                                         is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
                                         is PlayerActionSelected -> "Action: ${action.action.name}"
-                                        PlayerDeselected -> "Deselect active player"
+                                        is PlayerDeselected -> "Deselect active player"
                                         EndAction -> "End Action"
                                         Cancel -> "Cancel"
                                         is CoinSideSelected -> "Selected: ${action.side}"
                                         is CoinTossResult -> "Coin flip: ${action.result}"
                                         is RandomPlayersSelected -> "Random players: $action"
-                                        NoRerollSelected -> "No reroll"
+                                        is NoRerollSelected -> "No reroll"
                                         is RerollOptionSelected -> action.option.toString()
                                         is MoveTypeSelected -> action.moveType.toString()
                                         Undo -> TODO()

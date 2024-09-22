@@ -13,7 +13,7 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.actions.block.BlockAction
-import dk.ilios.jervis.procedures.actions.block.BlockRoll
+import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockRollDice
 
 object BlockRollMapper: CommandActionMapper {
     override fun isApplicable(
@@ -44,6 +44,6 @@ object BlockRollMapper: CommandActionMapper {
         newActions.add({ state, rules ->
             PlayerSelected(blockReport.defenderId.toJervisId())
        }, BlockAction.SelectDefenderOrEndAction)
-        newActions.add(DiceResults(diceRoll), BlockRoll.RollDice)
+        newActions.add(DiceResults(diceRoll), StandardBlockRollDice.RollDice)
     }
 }

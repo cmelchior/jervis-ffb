@@ -57,7 +57,7 @@ object GreasyCleats : Procedure() {
                    )
                 }
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, rules, action, this) {
+                    checkTypeAndValue<PlayerSelected>(state, rules, action) {
                         compositeCommandOf(
                             AddPlayerStatModifier(it.getPlayer(state), PrayerStatModifier.GREASY_CLEATS),
                             SetContext(state.getContext<PrayersToNuffleRollContext>().copy(resultApplied = true)),

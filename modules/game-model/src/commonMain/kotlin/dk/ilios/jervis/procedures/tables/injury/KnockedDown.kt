@@ -3,6 +3,7 @@ package dk.ilios.jervis.procedures.tables.injury
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetBallState
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetCurrentBall
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -15,6 +16,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.Bounce
+import dk.ilios.jervis.procedures.actions.block.MultipleBlockContext
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
@@ -49,13 +51,29 @@ object KnockedDown: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.currentBallOrNull()?.state == BallState.BOUNCING) {
-                GotoNode(BounceBall)
-            } else {
-                compositeCommandOf(
-                    SetCurrentBall(null),
-                    ExitProcedure()
-                )
+            val context = state.getContext<RiskingInjuryContext>()
+            // If we are part of a Multiple Block, the bounce is delayed until later,
+            // so in that case, we just store a reference to the ball, otherwise,
+            // we resolve it here.
+            val isBouncing = state.currentBallOrNull()?.state == BallState.BOUNCING
+            return when {
+                isBouncing && context.isPartOfMultipleBlock -> {
+                    val mbContext = state.getContext<MultipleBlockContext>()
+                    compositeCommandOf(
+                        SetCurrentBall(null),
+                        SetContext(mbContext.copyAndTrackBouncingBallForPlayer(context.player, state.currentBall())),
+                        ExitProcedure()
+                    )
+                }
+                isBouncing && !context.isPartOfMultipleBlock-> {
+                    GotoNode(BounceBall)
+                }
+                else -> {
+                    compositeCommandOf(
+                        SetCurrentBall(null),
+                        ExitProcedure()
+                    )
+                }
             }
         }
     }

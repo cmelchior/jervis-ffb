@@ -59,7 +59,7 @@ object IronMan : Procedure() {
                     )
                 }
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, rules, action, this) {
+                    checkTypeAndValue<PlayerSelected>(state, rules, action) {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
                         return compositeCommandOf(

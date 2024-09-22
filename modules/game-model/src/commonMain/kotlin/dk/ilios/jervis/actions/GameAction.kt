@@ -216,12 +216,17 @@ data class DiceResults(val rolls: List<DieResult>) : GameAction, List<DieResult>
 data class PlayerSelected(val playerId: PlayerId) : GameAction {
     constructor(player: Player): this(player.id)
     fun getPlayer(state: Game): Player {
-        return state.getPlayerById(playerId) ?: error("No player with id $playerId")
+        return state.getPlayerById(playerId)
     }
 }
 
 @Serializable
-data object PlayerDeselected : GameAction
+data class PlayerDeselected(val playerId: PlayerId) : GameAction {
+    constructor(player: Player): this(player.id)
+    fun getPlayer(state: Game): Player {
+        return state.getPlayerById(playerId)
+    }
+}
 
 @Serializable
 data class PlayerActionSelected(val action: PlayerActionType) : GameAction
@@ -255,7 +260,7 @@ data class RandomPlayersSelected(val players: List<PlayerId>) : GameAction {
 }
 
 @Serializable
-data class RerollOptionSelected(val option: DiceRerollOption) : GameAction {
+data class RerollOptionSelected(val option: DiceRerollOption, val dicePoolId: Int = 0) : GameAction {
     fun getRerollSource(state: Game): RerollSource {
         return option.source
 //        return state.getRerollSourceById(option.source)
@@ -263,7 +268,7 @@ data class RerollOptionSelected(val option: DiceRerollOption) : GameAction {
 }
 
 @Serializable
-data object NoRerollSelected : GameAction
+data class NoRerollSelected(val dicePoolId: Int = 0) : GameAction
 
 @Serializable
 data class MoveTypeSelected(val moveType: MoveType) : GameAction

@@ -4,6 +4,7 @@ import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -22,16 +23,17 @@ import dk.ilios.jervis.rules.Rules
  */
 object PlayerDown: Procedure() {
     override val initialNode: Node = ResolvePlayerDown
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        val context = state.getContext<BlockRollContext>()
-        val injuryContext = RiskingInjuryContext(context.attacker)
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
+        val context = state.getContext<BlockContext>()
+        val injuryContext = RiskingInjuryContext(context.attacker, context.isUsingMultiBlock)
         return compositeCommandOf(
-            SetPlayerState(context.attacker, PlayerState.KNOCKED_DOWN),
+            SetTurnOver(true),
+            SetPlayerState(context.attacker, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
             SetContext(injuryContext),
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        return ReportPlayerDownResult(state.getContext<BlockRollContext>().attacker)
+        return ReportPlayerDownResult(state.getContext<BlockContext>().attacker)
     }
 
     object ResolvePlayerDown: ParentNode() {

@@ -9,6 +9,7 @@ import dk.ilios.jervis.rules.skills.BoneHead
 import dk.ilios.jervis.rules.skills.Dodge
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.MightyBlow
+import dk.ilios.jervis.rules.skills.MultipleBlock
 import dk.ilios.jervis.rules.skills.PrehensileTail
 import dk.ilios.jervis.rules.skills.Stunty
 import dk.ilios.jervis.rules.skills.ThickSkull
@@ -70,7 +71,8 @@ data object LizardmenTeam : BB2020Roster {
                 Loner.Factory(4),
                 MightyBlow.Factory(1),
                 ThickSkull.Factory,
-                PrehensileTail.Factory
+                PrehensileTail.Factory,
+                MultipleBlock.Factory
             ),
             listOf(STRENGTH),
             listOf(AGILITY, GENERAL),

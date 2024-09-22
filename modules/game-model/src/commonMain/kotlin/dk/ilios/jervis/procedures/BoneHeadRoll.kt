@@ -112,7 +112,7 @@ object BoneHeadRoll: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Continue -> ExitProcedure()
-                NoRerollSelected -> ExitProcedure()
+                is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
                     val rerollContext = UseRerollContext(DiceRollType.BONE_HEAD, action.getRerollSource(state))
                     compositeCommandOf(

@@ -204,7 +204,7 @@ object ActivatePlayer : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val activePlayer = state.activePlayer!!
             return when (action) {
-                PlayerDeselected ->
+                is PlayerDeselected ->
                     compositeCommandOf(
                         SetPlayerAvailability(activePlayer, Availability.AVAILABLE),
                         SetActivePlayer(null),

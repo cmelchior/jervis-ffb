@@ -68,7 +68,7 @@ object HighKick : Procedure() {
 
                 }
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, rules, action, this) {
+                    checkTypeAndValue<PlayerSelected>(state, rules, action) {
                         compositeCommandOf(
                             SetPlayerLocation(it.getPlayer(state), state.currentBall().location),
                             ReportGameProgress("${it.getPlayer(state).name} had time to move under the ball due to a High Kick"),

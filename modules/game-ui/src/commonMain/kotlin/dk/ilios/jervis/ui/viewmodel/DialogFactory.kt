@@ -32,13 +32,16 @@ import dk.ilios.jervis.procedures.TheKickOff
 import dk.ilios.jervis.procedures.TheKickOffEvent
 import dk.ilios.jervis.procedures.WeatherRoll
 import dk.ilios.jervis.procedures.actions.block.BlockContext
-import dk.ilios.jervis.procedures.actions.block.BlockRoll
 import dk.ilios.jervis.procedures.actions.block.BothDown
 import dk.ilios.jervis.procedures.actions.block.BothDownContext
 import dk.ilios.jervis.procedures.actions.block.PushContext
 import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.actions.block.Stumble
 import dk.ilios.jervis.procedures.actions.block.StumbleContext
+import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockChooseReroll
+import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockChooseResult
+import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockRerollDice
+import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockRollDice
 import dk.ilios.jervis.procedures.actions.foul.ArgueTheCallRoll
 import dk.ilios.jervis.procedures.actions.foul.FoulContext
 import dk.ilios.jervis.procedures.actions.foul.FoulStep
@@ -50,8 +53,8 @@ import dk.ilios.jervis.procedures.tables.injury.ArmourRoll
 import dk.ilios.jervis.procedures.tables.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.tables.injury.InjuryRoll
 import dk.ilios.jervis.procedures.tables.injury.LastingInjuryRoll
+import dk.ilios.jervis.procedures.tables.injury.PatchUpPlayer
 import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
-import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryRoll
 import dk.ilios.jervis.procedures.tables.kickoff.BrilliantCoaching
 import dk.ilios.jervis.procedures.tables.kickoff.CheeringFans
 import dk.ilios.jervis.procedures.tables.kickoff.OfficiousRef
@@ -93,19 +96,19 @@ object DialogFactory {
                     DiceRollUserInputDialog.createBadHabitsRoll()
                 }
 
-                is BlockRoll.ChooseResultOrReRollSource -> {
+                is StandardBlockChooseReroll.ReRollSourceOrAcceptRoll -> {
                     SingleChoiceInputDialog.createChooseBlockResultOrReroll(
                         mapUnknownActions(controller.getAvailableActions()),
                     )
                 }
 
-                is BlockRoll.ReRollDie,
-                is BlockRoll.RollDice -> {
+                is StandardBlockRollDice.RollDice,
+                is StandardBlockRerollDice.ReRollDie -> {
                     val diceCount = (request.actions.first() as RollDice).dice.size
                     DiceRollUserInputDialog.createBlockRollDialog(diceCount, controller.state.getContext<BlockContext>().isBlitzing)
                 }
 
-                is BlockRoll.SelectBlockResult -> {
+                is StandardBlockChooseResult.SelectBlockResult -> {
                     DiceRollUserInputDialog.createSelectBlockDie(
                         request.actions.first() as SelectDiceResult
                     )
@@ -248,7 +251,7 @@ object DialogFactory {
                     )
                 }
 
-                is RiskingInjuryRoll.ChooseToUseApothecary -> {
+                is PatchUpPlayer.ChooseToUseApothecary -> {
                     val context = controller.state.getContext<RiskingInjuryContext>()
                     SingleChoiceInputDialog.createUseApothecaryDialog(context)
                 }

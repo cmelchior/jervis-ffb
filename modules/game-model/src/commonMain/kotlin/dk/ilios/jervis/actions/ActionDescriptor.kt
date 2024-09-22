@@ -100,20 +100,31 @@ data class DeselectPlayer(val player: Player) : ActionDescriptor
 
 data class SelectAction(val action: PlayerAction) : ActionDescriptor
 
-data class SelectBlockType(val types: List<BlockType>): ActionDescriptor
+data class SelectBlockType(val type: BlockType): ActionDescriptor
 
 data class SelectRandomPlayers(val count: Int, val players: List<PlayerId>) : ActionDescriptor // This is not a single action
 
-// data class SelectSkillRerollSource(val skill: Skill): ActionDescriptor
-// data class SelectTeamRerollSource(val reroll: TeamReroll): ActionDescriptor
-data class SelectRerollOption(val option: DiceRerollOption) : ActionDescriptor
+data class SelectRerollOption(
+    val option: DiceRerollOption,
+    // Identifier for the dice pool being rerolled
+    // This is only used in the cases, where you might be juggling multiple dicerolls
+    // at the same time, like during Multiple Block
+    val dicePoolId: Int = 0,
+) : ActionDescriptor
 
 // Successful might be hard to interpret in some cases, in which this is `null`
 // Otherwise it contains
-// TODO Do we want to send things that are effectively just "state"?
-//  Could this open up a door for a lot of things.
-//  On the other side, it might just be useful information
-data class SelectNoReroll(val rollSuccessful: Boolean? = null) : ActionDescriptor
+data class SelectNoReroll(
+    // Whether the first roll was considered a "succcess".
+    // This is technically just state, but since this is normally
+    // defined inside various custom contexts. It is very tricky
+    // to get to this state from whoever is creating the GameAction.
+    val rollSuccessful: Boolean? = null,
+    // Optional dice pool id that can be used to identify the pool
+    // of dice. This is only relevant if multiple pools are being rolled
+    // at the same time.
+    val dicePoolId: Int = 0,
+) : ActionDescriptor
 
 // Available actions
 @Serializable

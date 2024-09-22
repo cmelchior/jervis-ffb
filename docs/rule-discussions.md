@@ -109,6 +109,10 @@ interpreted.
      - Some special actions have a "once pr. turn" limit, these can only be used on one of the
        blocks.
 
+22. A Teams "Active Turn" ends as soon as there is a Turn-over. This was specified in Designer's Commentary
+    from May 2022 regarding Regenerration where it was stated "No, as the active teams turn has ended by the time the Regeneration
+    roll is made". This clarification was removed in later versions of the FAQ though. Unclear why.
+
 # Differences compared to the rules as written
 
 1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 
