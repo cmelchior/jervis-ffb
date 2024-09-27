@@ -4,6 +4,8 @@ import dk.ilios.jervis.model.Coach
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.inducements.Apothecary
+import dk.ilios.jervis.model.inducements.ApothecaryType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
@@ -77,6 +79,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
                 })
             }
             this.rerolls.addAll((0 ..<this@TeamBuilder.reRolls).map { RegularTeamReroll(it) })
+            this.teamApothecaries.addAll((0 until this@TeamBuilder.apothecaries).map { Apothecary(false, ApothecaryType.STANDARD)})
             this.teamCheerleaders = this@TeamBuilder.cheerLeaders
             this.teamAssistentCoaches = this@TeamBuilder.assistentCoaches
             this.dedicatedFans = this@TeamBuilder.dedicatedFans

@@ -41,7 +41,11 @@ object MultipleBlockRerollDice: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
             val rerolls = context.rolls.flatMapIndexed { index: Int, actionDiceRoll: MultipleBlockDiceRoll ->
-                actionDiceRoll.getRerollOptions(rules, context.attacker, index)
+                if (!actionDiceRoll.hasAcceptedResult()) {
+                    actionDiceRoll.getRerollOptions(rules, context.attacker, index)
+                } else {
+                    emptyList()
+                }
             }
             return rerolls.ifEmpty {
                 listOf(ContinueWhenReady)

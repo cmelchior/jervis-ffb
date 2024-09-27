@@ -14,7 +14,7 @@ import dk.ilios.jervis.actions.D4Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DBlockResult
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndSetup
@@ -105,7 +105,7 @@ object JervisSerialization {
                 subclass(CoinTossResult::class)
                 subclass(Confirm::class)
                 subclass(Continue::class)
-                subclass(DiceResults::class)
+                subclass(DiceRollResults::class)
                 subclass(DogoutSelected::class)
                 subclass(EndAction::class)
                 subclass(EndTurn::class)

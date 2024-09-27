@@ -2,10 +2,10 @@ package dk.ilios.jervis.procedures.actions.block.standard
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.BlockDicePool
 import dk.ilios.jervis.actions.DBlockResult
-import dk.ilios.jervis.actions.DiceResults
 import dk.ilios.jervis.actions.GameAction
-import dk.ilios.jervis.actions.SelectDiceResult
+import dk.ilios.jervis.actions.SelectDicePoolResult
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -18,12 +18,11 @@ import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.utils.INVALID_ACTION
 
 /**
  * Roll block dice for the first time.
  *
- * @see [dk.ilios.jervis.procedures.actions.block.MultipleBlockStep]
+ * @see [dk.ilios.jervis.procedures.actions.block.MultipleBlockAction]
  * @see [dk.ilios.jervis.procedures.actions.block.StandardBlockStep]
  */
 object StandardBlockChooseResult: Procedure() {
@@ -38,18 +37,12 @@ object StandardBlockChooseResult: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             return listOf(
-                SelectDiceResult(state.getContext<BlockContext>().roll.map { it.result }, 1)
+                SelectDicePoolResult(BlockDicePool(state.getContext<BlockContext>().roll))
             )
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<DBlockResult>(action) {
-                val selectedDie = when(action) {
-                    is DBlockResult -> action
-                    is DiceResults -> action.rolls.first() as DBlockResult
-                    else -> INVALID_ACTION(action)
-                }
-
+            return checkDicePool<DBlockResult>(action) { selectedDie ->
                 val context = state.getContext<BlockContext>()
                 var selectedIndex = -1
                 for (i in context.roll.indices) {

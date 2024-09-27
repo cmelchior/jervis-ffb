@@ -57,7 +57,7 @@ object StartBlitzActionMapper: CommandActionMapper {
         val movingPlayer = jervisGame.getPlayerById(PlayerId(report.attackerId.id))
         newActions.add(PlayerSelected(movingPlayer.id), TeamTurn.SelectPlayerOrEndTurn)
         newActions.add(
-            { state, rules -> PlayerActionSelected(rules.teamActions.blitz.action.type) },
+            { state, rules -> PlayerActionSelected(rules.teamActions.blitz.type) },
             ActivatePlayer.DeclareActionOrDeselectPlayer
         )
 

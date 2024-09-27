@@ -20,7 +20,6 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.procedures.ActivatePlayerContext
@@ -32,48 +31,10 @@ import dk.ilios.jervis.utils.INVALID_ACTION
 import kotlinx.serialization.Serializable
 
 /**
- * Context for a "Block Action". This context only tracks the top-level state relevant to a block action.
- * All state related to the type of block is tracked in the relevant contexts.
- */
-data class BlockActionContext(
-    val attacker: Player,
-    val defender: Player,
-    val blockType: BlockType? = null,
-    val aborted: Boolean = false,
-): ProcedureContext
-
-/**
- * Procedure for controlling a player's Standard Block action. Multiple Block, Stab, Projectile Vomit etc. have
- * their own actions.
- *
- * See page 56 in the rulebook.
- *
- * Developer's Commentary:
- * A block action consists of quite a few steps, and because Multiple Block require us to run these in lock-step,
- * it means we need to split them up into multiple procedures so we can switch context after each step.
- *
- * This means that this complexity also bleeds into normal single blocks, at least if we want to avoid duplicating
- * the logic.
- *
- * For that reason, any action that is either a "block action" or a "special action" that can replace a block, it must
- * fulfill the following requirements:
- *
- * 1. Have an enum defined in [dk.ilios.jervis.rules.BlockType]
- *
- * 2. It must split its behavior into sub-procedures that cover the following phases:
- *    a. Select Modifiers (e.g. assists, Horns, Dauntless)
- *    b. Roll block dice or dice that isn't injury/armour rolls, e.g. Projectile Vomit roll to see who is hit.
- *    c. Select type of reroll or keep the result.
- *    d. Reroll dice using the selected reroll.
- *    e. For blocks with multiple dice you have to choose the final result.
- *    f. Apply the final result (multiple blocks also affect injury rolls, but this is handled in RiskingInjuryRoll)
- *    g. Handle injuries
- *
- * 3. It is up to [StandardBlockStep] and [MultipleBlockAction] to correctly set up the call order of these as well
- *    making sure that they have the correct context's set.
+ * Procedure for handling the Stab special action as described on page 86 in the rulebook
  */
 @Serializable
-object BlockAction : Procedure() {
+object ProjectileVomitAction : Procedure() {
     override val initialNode: Node = SelectDefenderOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -81,7 +42,6 @@ object BlockAction : Procedure() {
             RemoveContext<BlockContext>(),
             RemoveContext<BlockActionContext>()
         )
-
     }
 
     object SelectDefenderOrEndAction : ActionNode() {

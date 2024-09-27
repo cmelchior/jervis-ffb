@@ -55,7 +55,7 @@ object AbortActionMapper: CommandActionMapper {
                 val movingPlayer = jervisGame.getPlayerById(PlayerId(movingPlayerId.id))!!
                 newActions.add(PlayerSelected(movingPlayer.id), TeamTurn.SelectPlayerOrEndTurn)
                 newActions.add(
-                    { state, rules -> PlayerActionSelected(rules.teamActions.move.action.type) },
+                    { state, rules -> PlayerActionSelected(rules.teamActions.move.type) },
                     ActivatePlayer.DeclareActionOrDeselectPlayer,
                 )
             }

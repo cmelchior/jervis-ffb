@@ -16,7 +16,6 @@ import dk.ilios.jervis.commands.AddPlayerTemporaryEffect
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
-import dk.ilios.jervis.commands.SetHasTackleZones
 import dk.ilios.jervis.commands.SetOldContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -31,7 +30,7 @@ import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.TemporaryEffect
 import dk.ilios.jervis.reports.ReportDiceRoll
-import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.PlayerStandardActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -165,8 +164,8 @@ object UnchannelledFuryRoll: Procedure() {
 
     private fun calculateSuccess(context: ActivatePlayerContext, d6: D6Result): Boolean {
         val modifier = when (context.declaredAction!!.type) {
-            PlayerActionType.BLOCK,
-            PlayerActionType.BLITZ -> 2
+            PlayerStandardActionType.BLOCK,
+            PlayerStandardActionType.BLITZ -> 2
             // TODO How to detect special actions that replaces Blitz/Block actions
             else -> 0
         }

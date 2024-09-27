@@ -1,6 +1,6 @@
 package dk.ilios.jervis.fumbbl.adapter.impl.setup
 
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
@@ -35,7 +35,7 @@ object KickoffRollMapper: CommandActionMapper {
         val report: KickoffResultReport = command.reportList.reports.first() as KickoffResultReport
         val roll = report.kickoffRoll
         newActions.add(
-            DiceResults(roll.first().d6, roll.last().d6),
+            DiceRollResults(roll.first().d6, roll.last().d6),
             TheKickOffEvent.RollForKickOffEvent,
         )
     }

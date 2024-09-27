@@ -1,7 +1,8 @@
 package dk.ilios.jervis.fsm
 
 import dk.ilios.jervis.actions.ActionDescriptor
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DicePoolResultsSelected
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
@@ -103,7 +104,7 @@ abstract class ActionNode : Node {
         function: (T) -> Command,
     ): Command {
         val userAction =
-            if (action is DiceResults && action.rolls.size == 1) {
+            if (action is DiceRollResults && action.rolls.size == 1) {
                 action.rolls.first()
             } else {
                 action
@@ -121,7 +122,7 @@ abstract class ActionNode : Node {
         function: (D1) -> Command,
     ): Command {
         when (action) {
-            is DiceResults -> {
+            is DiceRollResults -> {
                 if (action.rolls.size != 1) {
                     throw IllegalArgumentException("Expected 1 dice rolls, got ${action.rolls.size}")
                 }
@@ -136,17 +137,35 @@ abstract class ActionNode : Node {
             }
             else -> {
                 throw IllegalArgumentException(
-                    "Action (${action::class}) is not of the expected type: ${DiceResults::class}",
+                    "Action (${action::class}) is not of the expected type: ${DiceRollResults::class}",
                 )
             }
         }
     }
 
+    inline fun <reified D1 : DieResult> checkDicePool(
+        action: GameAction,
+        function: (D1) -> Command,
+    ): Command {
+        if (action !is DicePoolResultsSelected) INVALID_ACTION(action)
+        if (action.results.size != 1) INVALID_ACTION(action, "Expected single dice pool result, got ${action.results.size}")
+        action.results.single().let {
+            if (it.id != 0) INVALID_ACTION(action)
+            if (it.diceSelected.size != 1) INVALID_ACTION(action)
+        }
+        val first = action.results.first().diceSelected.single()
+        if (first !is D1) {
+            INVALID_ACTION(action, "Expected first roll to be ${D1::class}, but was ${first::class}")
+        }
+        return function(first)
+    }
+
+
     inline fun <reified D1 : DieResult, reified D2 : DieResult> checkDiceRoll(
         action: GameAction,
         function: (D1, D2) -> Command,
     ): Command {
-        if (action is DiceResults) {
+        if (action is DiceRollResults) {
             if (action.rolls.size != 2) {
                 throw IllegalArgumentException("Expected 2 dice rolls, got ${action.rolls.size}")
             }
@@ -161,7 +180,7 @@ abstract class ActionNode : Node {
             return function(first, second)
         } else {
             throw IllegalArgumentException(
-                "Action (${action::class}) is not of the expected type: ${DiceResults::class}",
+                "Action (${action::class}) is not of the expected type: ${DiceRollResults::class}",
             )
         }
     }
@@ -170,7 +189,7 @@ abstract class ActionNode : Node {
         action: GameAction,
         function: (List<D1>) -> Command,
     ): Command {
-        if (action is DiceResults) {
+        if (action is DiceRollResults) {
             val first = action.rolls.first()
             if (first !is D1) {
                 throw IllegalArgumentException("Expected first roll to be ${D1::class}, but was ${first::class}")
@@ -181,8 +200,34 @@ abstract class ActionNode : Node {
             return function(listOf(action))
         } else {
             throw IllegalArgumentException(
-                "Action (${action::class}) is not of the expected type: ${DiceResults::class}",
+                "Action (${action::class}) is not of the expected type: ${DiceRollResults::class}",
             )
         }
     }
+
+    inline fun <reified D1 : DieResult, reified D2 : DieResult> checkDicePool(
+        action: GameAction,
+        function: (D1, D2) -> Command,
+    ): Command {
+        if (action !is DicePoolResultsSelected) INVALID_ACTION(action)
+        if (action.results.size != 2) INVALID_ACTION(action, "Expected 2 dice pool results, got ${action.results.size}")
+        action.results.first().let {
+            if (it.id != 0) INVALID_ACTION(action, "Unexpected dice pool result ID: ${it.id}")
+            if (it.diceSelected.size != 1) INVALID_ACTION(action)
+        }
+        action.results.last().let {
+            if (it.id != 1) INVALID_ACTION(action, "Unexpected dice pool result ID: ${it.id}")
+            if (it.diceSelected.size != 1) INVALID_ACTION(action)
+        }
+        val first = action.results.first().diceSelected.single()
+        val second = action.results.last().diceSelected.single()
+        if (first !is D1) {
+            INVALID_ACTION(action, "Expected first roll to be ${D1::class}, but was ${first::class}")
+        }
+        if (second !is D2) {
+            INVALID_ACTION(action, "Expected first roll to be ${D1::class}, but was ${second::class}")
+        }
+        return function(first, second)
+    }
+
 }

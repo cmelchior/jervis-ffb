@@ -1,16 +1,20 @@
+package dk.ilios.jervis.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -29,59 +33,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.Dice
-import dk.ilios.jervis.actions.DiceRollResults
-import dk.ilios.jervis.actions.DieResult
-import dk.ilios.jervis.ui.Theme
+import dk.ilios.jervis.actions.DicePool
+import dk.ilios.jervis.actions.DicePoolChoice
+import dk.ilios.jervis.actions.DicePoolResultsSelected
+import dk.ilios.jervis.procedures.DieRoll
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
-import dk.ilios.jervis.ui.viewmodel.DiceRollUserInputDialog
-import dk.ilios.jervis.ui.viewmodel.SingleChoiceInputDialog
+import dk.ilios.jervis.ui.viewmodel.DicePoolUserInputDialog
+import kotlin.random.Random
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun UserActionDialog(
-    dialog: SingleChoiceInputDialog,
-    vm: DialogsViewModel,
-) {
-    AlertDialog(
-        modifier = Modifier.border(4.dp, when {
-            dialog.owner?.isHomeTeam() == true -> Theme.homeTeamColor
-            dialog.owner?.isAwayTeam() == true -> Theme.awayTeamColor
-            else -> Color.Green
-        }, shape = RoundedCornerShape(4.dp)),
-        onDismissRequest = {},
-        title = { Text(text = dialog.title) },
-        text = { Text(text = dialog.message) },
-        confirmButton = {
-            dialog.actionDescriptions.forEach { (action, description) ->
-                Button(
-                    onClick = { vm.buttonActionSelected(action) },
-                ) {
-                    Text(text = description)
-                }
-            }
-        },
-        properties =
-            DialogProperties(
-                usePlatformDefaultWidth = true,
-                scrimColor = Color.Black.copy(alpha = 0.6f),
-            ),
-    )
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun MultipleSelectUserActionDialog(
-    dialog: DiceRollUserInputDialog,
+fun DicePoolSelectorDialog(
+    dialog: DicePoolUserInputDialog,
     vm: DialogsViewModel,
 ) {
     var showDialog by remember(dialog) { mutableStateOf(true) }
     if (showDialog) {
-        val selectedRolls = remember(dialog) {
-            mutableStateListOf<DieResult?>(*dialog.dice.map { vm.diceRollGenerator.rollDie(it.first) }.toTypedArray())
+        // TODO Support multiple choices, right now the UI only support one dice pr pool
+        val selectedRollIndex = remember(dialog) {
+            mutableStateListOf<Int>(*dialog.dice.map { Random.nextInt(it.second.dice.size) }.toTypedArray())
         }
-        val result = DiceRollResults(selectedRolls.filterNotNull())
-        val resultText = if (result.rolls.size < dialog.dice.size) null else dialog.result(result)
         AlertDialog(
             modifier = Modifier.border(4.dp, when {
                 dialog.owner?.isHomeTeam() == true -> Theme.homeTeamColor
@@ -91,30 +63,32 @@ fun MultipleSelectUserActionDialog(
             onDismissRequest = {
                 showDialog = false
             },
-            title = { Text(text = dialog.title) },
+            title = { Text(text = dialog.dialogTitle) },
             text = {
                 Column(modifier = Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(text = dialog.message)
-                    dialog.dice.forEachIndexed { i, el: Pair<Dice, List<DieResult>> ->
+                    dialog.dice.forEachIndexed { poolIndex, el: Pair<Dice, DicePool<*, *>> ->
+                        Divider(modifier = Modifier.height(1.dp).padding(top = 8.dp, bottom = 8.dp).background(color = Color.LightGray))
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            el.second.forEach { it: DieResult ->
-                                val isSelected = remember(dialog) { derivedStateOf { selectedRolls[i] == it } }
+                            val dicePool = el.second
+                            dicePool.dice.forEachIndexed { diceIndex, el: DieRoll<*> ->
+                                val isSelected = remember(dialog) { derivedStateOf { selectedRollIndex[poolIndex] == diceIndex } }
                                 val buttonColors =
                                     ButtonDefaults.buttonColors(
                                         backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background,
                                     )
 
-                                when(it) {
+                                when(val diceResult = el.result) {
                                     is DBlockResult -> {
-                                        val text = it.blockResult.name
+                                        val text = diceResult.blockResult.name
                                         Button(
                                             modifier = Modifier.weight(1f).aspectRatio(1.0f),
-                                            onClick = { selectedRolls[i] = it },
+                                            onClick = { selectedRollIndex[poolIndex] = diceIndex },
                                             colors = buttonColors,
                                         ) {
                                             Image(
                                                 modifier = Modifier.fillMaxSize(),
-                                                bitmap = IconFactory.getDiceIcon(it.blockResult),
+                                                bitmap = IconFactory.getDiceIcon(diceResult.blockResult),
                                                 contentDescription = text,
                                                 alignment = Alignment.Center,
                                                 contentScale = ContentScale.Fit
@@ -124,11 +98,11 @@ fun MultipleSelectUserActionDialog(
                                     else -> {
                                         Button(
                                             modifier = Modifier.weight(1f),
-                                            onClick = { selectedRolls[i] = it },
+                                            onClick = { selectedRollIndex[poolIndex] = diceIndex },
                                             colors = buttonColors,
                                         ) {
                                             Text(
-                                                text = it.value.toString(),
+                                                text = diceResult.value.toString(),
                                                 color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground,
                                             )
                                         }                                    }
@@ -142,12 +116,17 @@ fun MultipleSelectUserActionDialog(
                 Button(
                     onClick = {
                         showDialog = false
-                        vm.buttonActionSelected(result)
+                        val selectedResultsAction = DicePoolResultsSelected(
+                            dialog.dice.mapIndexed { i, el: Pair<Dice, DicePool<*, *>> ->
+                                val selectedRoll = el.second.dice[selectedRollIndex[i]]
+                                DicePoolChoice(el.second.id, listOf(selectedRoll.result))
+                            }
+                        )
+                        vm.buttonActionSelected(selectedResultsAction)
                     },
-                    enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
+                    enabled = true // (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
                 ) {
-                    val suffix by derivedStateOf { if (resultText != null) " - $resultText" else "" }
-                    Text("Confirm$suffix")
+                    Text("Confirm")
                 }
             },
             properties =

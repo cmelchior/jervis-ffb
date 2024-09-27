@@ -4,7 +4,7 @@ import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.Dice
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RollDice
@@ -34,7 +34,7 @@ import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.tables.TableResult
 
 data class KickOffEventContext(
-    val roll: DiceResults,
+    val roll: DiceRollResults,
     val result: TableResult,
     val scatterBallBeforeLanding: Boolean = false // If Changing Weather rolled Perfect Conditions
 ): ProcedureContext
@@ -61,7 +61,7 @@ object TheKickOffEvent : Procedure() {
                 val result: TableResult = rules.kickOffEventTable.roll(firstD6, secondD6)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.KICK_OFF_TABLE, listOf(firstD6, secondD6)),
-                    SetContext(KickOffEventContext(roll = DiceResults(firstD6, secondD6), result = result)),
+                    SetContext(KickOffEventContext(roll = DiceRollResults(firstD6, secondD6), result = result)),
                     GotoNode(ResolveKickOffTableEvent),
                 )
             }

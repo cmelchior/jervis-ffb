@@ -2,7 +2,7 @@ package dk.ilios.jervis.fumbbl.adapter.impl
 
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
@@ -36,9 +36,9 @@ object PickupRollMapper: CommandActionMapper {
         // TODO The report gives you the final result. We need to deconstruct it
         val diceRoll = D6Result(report.roll)
         if (report.reRolled) {
-            newActions.add(DiceResults(diceRoll), PickupRoll.ReRollDie)
+            newActions.add(DiceRollResults(diceRoll), PickupRoll.ReRollDie)
         } else {
-            newActions.add(DiceResults(diceRoll), PickupRoll.RollDie)
+            newActions.add(DiceRollResults(diceRoll), PickupRoll.RollDie)
             newActions.add(Continue, PickupRoll.ChooseReRollSource) // TODO How to choose reroll source here?
         }
     }

@@ -13,7 +13,8 @@ import dk.ilios.jervis.model.FieldSquare
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.locations.FieldCoordinate
-import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.PlayerSpecialActionType
+import dk.ilios.jervis.rules.PlayerStandardActionType
 import dk.ilios.jervis.ui.ContextMenuOption
 import dk.ilios.jervis.ui.model.UiFieldSquare
 import dk.ilios.jervis.ui.model.UiPlayer
@@ -230,13 +231,23 @@ class FieldViewModel(
                             contextActions.addAll(
                                 input.actions.map {
                                     val name = when (it.action) {
-                                        PlayerActionType.MOVE -> "Move"
-                                        PlayerActionType.PASS -> "Pass"
-                                        PlayerActionType.HAND_OFF -> "Hand-off"
-                                        PlayerActionType.BLOCK -> "Block"
-                                        PlayerActionType.BLITZ -> "Blitz"
-                                        PlayerActionType.FOUL -> "Foul"
-                                        PlayerActionType.SPECIAL -> "Special"
+                                        PlayerStandardActionType.MOVE -> "Move"
+                                        PlayerStandardActionType.PASS -> "Pass"
+                                        PlayerStandardActionType.HAND_OFF -> "Hand-off"
+                                        PlayerStandardActionType.BLOCK -> "Block"
+                                        PlayerStandardActionType.BLITZ -> "Blitz"
+                                        PlayerStandardActionType.FOUL -> "Foul"
+                                        PlayerStandardActionType.SPECIAL -> "Special"
+                                        PlayerStandardActionType.THROW_TEAM_MATE -> "Throw Team-mate"
+                                        PlayerSpecialActionType.BALL_AND_CHAIN -> "Ball & Chain"
+                                        PlayerSpecialActionType.BOMBARDIER -> "Bombardier"
+                                        PlayerSpecialActionType.BREATHE_FIRE -> "Breathe Fire"
+                                        PlayerSpecialActionType.CHAINSAW -> "Chainsaw"
+                                        PlayerSpecialActionType.HYPNOTIC_GAZE -> "Hypnotic Gaze"
+                                        PlayerSpecialActionType.KICK_TEAM_MATE -> "Kick Team-mate"
+                                        PlayerSpecialActionType.MULTIPLE_BLOCK -> "Multiple Block"
+                                        PlayerSpecialActionType.PROJECTILE_VOMIT -> "Projectile Vomit"
+                                        PlayerSpecialActionType.STAB -> "Stab"
                                     }
                                     ContextMenuOption(
                                         name,

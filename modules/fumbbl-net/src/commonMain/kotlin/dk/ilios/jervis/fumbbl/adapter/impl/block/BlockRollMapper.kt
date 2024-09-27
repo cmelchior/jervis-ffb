@@ -1,7 +1,7 @@
 package dk.ilios.jervis.fumbbl.adapter.impl.block
 
 import dk.ilios.jervis.actions.DBlockResult
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
@@ -44,6 +44,6 @@ object BlockRollMapper: CommandActionMapper {
         newActions.add({ state, rules ->
             PlayerSelected(blockReport.defenderId.toJervisId())
        }, BlockAction.SelectDefenderOrEndAction)
-        newActions.add(DiceResults(diceRoll), StandardBlockRollDice.RollDice)
+        newActions.add(DiceRollResults(diceRoll), StandardBlockRollDice.RollDice)
     }
 }

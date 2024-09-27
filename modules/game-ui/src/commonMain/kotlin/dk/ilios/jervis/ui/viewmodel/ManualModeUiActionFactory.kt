@@ -1,6 +1,7 @@
 package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.BlockTypeSelected
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CancelWhenReady
 import dk.ilios.jervis.actions.CoinSideSelected
@@ -21,8 +22,9 @@ import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.Dice
-import dk.ilios.jervis.actions.DiceResults
-import dk.ilios.jervis.actions.DieResult
+import dk.ilios.jervis.actions.DicePoolChoice
+import dk.ilios.jervis.actions.DicePoolResultsSelected
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndActionWhenReady
@@ -43,16 +45,16 @@ import dk.ilios.jervis.actions.PlayerSubActionSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
-import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectBlockType
 import dk.ilios.jervis.actions.SelectCoinSide
-import dk.ilios.jervis.actions.SelectDiceResult
+import dk.ilios.jervis.actions.SelectDicePoolResult
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectInducement
 import dk.ilios.jervis.actions.SelectMoveType
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectPlayer
+import dk.ilios.jervis.actions.SelectPlayerAction
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.SelectSkill
@@ -67,6 +69,7 @@ import dk.ilios.jervis.procedures.TheKickOff
 import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockChooseResult
 import dk.ilios.jervis.procedures.actions.move.calculateOptionsForMoveType
+import dk.ilios.jervis.ui.DialogFactory
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -155,9 +158,9 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
 
         // When selecting block results after reroll and only 1 dice is available.
         if (currentNode == StandardBlockChooseResult.SelectBlockResult && actions.size == 1) {
-            val choices: List<DieResult> = (actions.first() as SelectDiceResult).choices
-            if (choices.size == 1) {
-                return choices.first() as DBlockResult
+            val choices = (actions.first() as SelectDicePoolResult).pools
+            if (choices.size == 1 && choices.first().dice.size == 1) {
+                return choices.first().dice.single() as DBlockResult
             }
         }
 
@@ -274,11 +277,11 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                     action.key == DeselectPlayer::class -> {
                         DeselectPlayerInput(action.value.map { PlayerDeselected((it as DeselectPlayer).player) })
                     }
-                    action.key == SelectAction::class -> {
+                    action.key == SelectPlayerAction::class -> {
                         val playerLocation = controller.state.activePlayer?.location as FieldCoordinate
                         SelectPlayerActionInput(
                             playerLocation,
-                            action.value.map { PlayerActionSelected((it as SelectAction).action.type) },
+                            action.value.map { PlayerActionSelected((it as SelectPlayerAction).action.type) },
                         )
                     }
                     action.key == EndActionWhenReady::class -> {
@@ -310,6 +313,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                     error("Should not occur here: $event")
                 }
                 is DeselectPlayerInput -> fieldInputs.add(event)
+                is DicePoolUserInputDialog -> dialogInputs.add(event)
                 is EndActionInput -> fieldInputs.add(event)
                 is SelectFieldLocationInput -> fieldInputs.add(event)
                 is SelectPlayerActionInput -> fieldInputs.add(event)
@@ -325,6 +329,7 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                     fieldInputs.add(event)
                     unknownInputs.add(event)
                 }
+
             }
         }
 
@@ -366,7 +371,12 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
     private fun mapUnknownActions(actions: List<ActionDescriptor>): List<GameAction> {
         return actions.map { action ->
             when (action) {
+                CancelWhenReady -> Cancel
+                ConfirmWhenReady -> Confirm
                 ContinueWhenReady -> Continue
+                is DeselectPlayer -> PlayerDeselected(action.player)
+                EndActionWhenReady -> EndAction
+                EndSetupWhenReady -> EndSetup
                 EndTurnWhenReady -> EndTurn
                 is RollDice -> {
                     val rolls =
@@ -386,18 +396,10 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                     if (rolls.size == 1) {
                         rolls.first()
                     } else {
-                        DiceResults(rolls)
+                        DiceRollResults(rolls)
                     }
                 }
-                ConfirmWhenReady -> Confirm
-                EndSetupWhenReady -> EndSetup
-                SelectDogout -> DogoutSelected
-                is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
-                is SelectPlayer -> PlayerSelected(action.player)
-                is DeselectPlayer -> PlayerDeselected(action.player)
-                is SelectAction -> PlayerActionSelected(action.action.type)
-                EndActionWhenReady -> EndAction
-                CancelWhenReady -> Cancel
+                is SelectBlockType -> BlockTypeSelected(action.type)
                 SelectCoinSide -> {
                     when (Random.nextInt(2)) {
                         0 -> CoinSideSelected(Coin.HEAD)
@@ -405,6 +407,23 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                         else -> throw IllegalStateException("Unsupported value")
                     }
                 }
+                is SelectDicePoolResult -> {
+                    DicePoolResultsSelected(action.pools.map { pool ->
+                        DicePoolChoice(pool.id, pool.dice.shuffled().subList(0, pool.selectDice).map { it.result })
+                    })
+                }
+                SelectDogout -> DogoutSelected
+                is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
+                is SelectInducement -> InducementSelected(action.id)
+                is SelectMoveType -> MoveTypeSelected(action.type)
+                is SelectNoReroll -> NoRerollSelected(action.dicePoolId)
+                is SelectPlayer -> PlayerSelected(action.player)
+                is SelectPlayerAction -> PlayerActionSelected(action.action.type)
+                is SelectRandomPlayers -> {
+                    RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
+                }
+                is SelectRerollOption -> RerollOptionSelected(action.option)
+                is SelectSkill -> SkillSelected(action.skill)
                 TossCoin -> {
                     when (Random.nextInt(2)) {
                         0 -> CoinTossResult(Coin.HEAD)
@@ -412,18 +431,6 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                         else -> throw IllegalStateException("Unsupported value")
                     }
                 }
-
-                is SelectRandomPlayers -> {
-                    RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
-                }
-
-                is SelectNoReroll -> NoRerollSelected(action.dicePoolId)
-                is SelectRerollOption -> RerollOptionSelected(action.option)
-                is SelectDiceResult -> action.choices.random()
-                is SelectMoveType -> MoveTypeSelected(action.type)
-                is SelectSkill -> SkillSelected(action.skill)
-                is SelectInducement -> InducementSelected(action.id)
-                is SelectBlockType -> TODO()
             }
         }
     }

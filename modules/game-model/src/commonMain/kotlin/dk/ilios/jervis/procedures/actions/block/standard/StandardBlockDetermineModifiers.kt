@@ -17,7 +17,7 @@ import dk.ilios.jervis.rules.Rules
 /**
  * Calculate all modifiers before rolling the block dice.
  *
- * @see [dk.ilios.jervis.procedures.actions.block.MultipleBlockStep]
+ * @see [dk.ilios.jervis.procedures.actions.block.MultipleBlockAction]
  * @see [dk.ilios.jervis.procedures.actions.block.StandardBlockStep]
  */
 object StandardBlockDetermineModifiers: Procedure() {

@@ -5,8 +5,8 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.rules.ActionType
 import dk.ilios.jervis.rules.BlockType
-import dk.ilios.jervis.rules.PlayerActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.RerollSource
@@ -204,8 +204,13 @@ data class DBlockResult(override val value: Int) : DieResult() {
     }
 }
 
+data class DicePoolChoice(val id: Int, val diceSelected: List<DieResult>)
+data class DicePoolResultsSelected(val results: List<DicePoolChoice>): GameAction {
+    fun singleResult(): DieResult = results.single().diceSelected.single()
+}
+
 @Serializable
-data class DiceResults(val rolls: List<DieResult>) : GameAction, List<DieResult> by rolls {
+data class DiceRollResults(val rolls: List<DieResult>) : GameAction, List<DieResult> by rolls {
     constructor(vararg roll: DieResult) : this(listOf(*roll))
     fun sum(): Int {
         return rolls.sumOf { it.value }
@@ -229,7 +234,7 @@ data class PlayerDeselected(val playerId: PlayerId) : GameAction {
 }
 
 @Serializable
-data class PlayerActionSelected(val action: PlayerActionType) : GameAction
+data class PlayerActionSelected(val action: ActionType) : GameAction
 
 // TODO Merge with PlayerActionSelected
 @Serializable

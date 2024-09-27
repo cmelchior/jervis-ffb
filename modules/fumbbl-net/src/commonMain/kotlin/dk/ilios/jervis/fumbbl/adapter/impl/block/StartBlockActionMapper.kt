@@ -39,7 +39,7 @@ object StartBlockActionMapper: CommandActionMapper {
         val blockingPlayer = jervisGame.getPlayerById(PlayerId(report.actingPlayerId.id))
         newActions.add(PlayerSelected(blockingPlayer.id), TeamTurn.SelectPlayerOrEndTurn)
         newActions.add(
-            { state, rules -> PlayerActionSelected(rules.teamActions.block.action.type) },
+            { state, rules -> PlayerActionSelected(rules.teamActions.block.type) },
             ActivatePlayer.DeclareActionOrDeselectPlayer
         )
     }

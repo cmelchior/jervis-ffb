@@ -50,7 +50,8 @@ import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.CompositeGameAction
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.Continue
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DicePoolResultsSelected
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndAction
@@ -71,17 +72,18 @@ import dk.ilios.jervis.actions.SkillSelected
 import dk.ilios.jervis.actions.Undo
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
 import dk.ilios.jervis.ui.viewmodel.CompositeUserInput
-import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
-import dk.ilios.jervis.ui.viewmodel.DiceRollUserInputDialog
 import dk.ilios.jervis.ui.viewmodel.FieldViewModel
 import dk.ilios.jervis.ui.viewmodel.GameStatusViewModel
 import dk.ilios.jervis.ui.viewmodel.LogViewModel
 import dk.ilios.jervis.ui.viewmodel.ReplayViewModel
 import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
-import dk.ilios.jervis.ui.viewmodel.SingleChoiceInputDialog
-import dk.ilios.jervis.ui.viewmodel.UnknownInput
 import dk.ilios.jervis.ui.viewmodel.UserInput
 import dk.ilios.jervis.ui.viewmodel.WaitingForUserInput
+import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
+import dk.ilios.jervis.ui.viewmodel.DicePoolUserInputDialog
+import dk.ilios.jervis.ui.viewmodel.DiceRollUserInputDialog
+import dk.ilios.jervis.ui.viewmodel.SingleChoiceInputDialog
+import dk.ilios.jervis.ui.viewmodel.UnknownInput
 
 // Theme
 val debugBorder = BorderStroke(2.dp, Color.Red)
@@ -226,6 +228,10 @@ fun Dialogs(vm: DialogsViewModel) {
             val dialog = dialogData as DiceRollUserInputDialog
             MultipleSelectUserActionDialog(dialog, vm)
         }
+        is DicePoolUserInputDialog -> {
+            val dialog = dialogData as DicePoolUserInputDialog
+            DicePoolSelectorDialog(dialog, vm)
+        }
         null -> { /* Do nothing */ }
         else -> TODO("Not supported: $dialogData")
     }
@@ -277,8 +283,8 @@ fun ActionSelector(
                                         EndTurn -> "EndTurn"
                                         is FieldSquareSelected -> action.toString()
                                         is PlayerSelected -> "Player[${action.playerId}]"
-                                        is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
-                                        is PlayerActionSelected -> "Action: ${action.action.name}"
+                                        is DiceRollResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
+                                        is PlayerActionSelected -> "Action: $action"
                                         is PlayerDeselected -> "Deselect active player"
                                         EndAction -> "End Action"
                                         Cancel -> "Cancel"
@@ -293,8 +299,9 @@ fun ActionSelector(
                                         is PlayerSubActionSelected -> action.action.toString()
                                         is SkillSelected -> action.skill.toString()
                                         is InducementSelected -> action.name
+                                        is BlockTypeSelected -> action.type.toString()
                                         is CalculatedAction -> TODO("Should only be used in tests")
-                                        is BlockTypeSelected -> TODO()
+                                        is DicePoolResultsSelected -> "Dice pool: $action"
                                     }
                                 Text(text, fontSize = 10.sp)
                             }

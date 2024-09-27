@@ -7,13 +7,15 @@ import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
-import dk.ilios.jervis.actions.SelectAction
+import dk.ilios.jervis.actions.SelectPlayerAction
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetActivePlayer
 import dk.ilios.jervis.commands.SetAvailableActions
+import dk.ilios.jervis.commands.SetAvailableSpecialActions
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetHasTackleZones
 import dk.ilios.jervis.commands.SetPlayerAvailability
+import dk.ilios.jervis.commands.SetSpecialActionSkillUsed
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
@@ -32,13 +34,17 @@ import dk.ilios.jervis.model.modifiers.TemporaryEffectType
 import dk.ilios.jervis.reports.ReportActionEnded
 import dk.ilios.jervis.reports.ReportActionSelected
 import dk.ilios.jervis.rules.PlayerAction
-import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.PlayerSpecialActionType
+import dk.ilios.jervis.rules.PlayerStandardActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.AnimalSavagery
 import dk.ilios.jervis.rules.skills.BloodLust
 import dk.ilios.jervis.rules.skills.BoneHead
 import dk.ilios.jervis.rules.skills.Duration
+import dk.ilios.jervis.rules.skills.MultipleBlock
+import dk.ilios.jervis.rules.skills.ProjectileVomit
 import dk.ilios.jervis.rules.skills.ReallyStupid
+import dk.ilios.jervis.rules.skills.Stab
 import dk.ilios.jervis.rules.skills.UnchannelledFury
 import dk.ilios.jervis.utils.INVALID_ACTION
 
@@ -50,6 +56,7 @@ data class ActivatePlayerContext(
     // As part of activating the player, some negatrait was rolled for
     val rolledForNegaTrait: Boolean = false,
     // If some effect caused the activation to "end immediately". This does not include turn overs.
+    // Example: Unchannelled Fury
     val activationEndsImmediately: Boolean = false,
     // Which action does the player want to perform?
     val declaredAction: PlayerAction? = null,
@@ -88,7 +95,7 @@ data class ActivatePlayerContext(
 object ActivatePlayer : Procedure() {
     override val initialNode: Node = MarkPlayerAsActivate
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<ActivatePlayerContext>()
         val player = context.player
         return buildCompositeCommand {
@@ -98,16 +105,41 @@ object ActivatePlayer : Procedure() {
             // of available actions
             if (context.markActionAsUsed) {
                 val activeTeam = state.activeTeam
-                val markActionAsUsedCommand = when (context.declaredAction!!.type) {
-                    PlayerActionType.MOVE -> SetAvailableActions(activeTeam, PlayerActionType.MOVE, activeTeam.turnData.moveActions - 1 )
-                    PlayerActionType.PASS -> SetAvailableActions(activeTeam, PlayerActionType.PASS, activeTeam.turnData.passActions - 1 )
-                    PlayerActionType.HAND_OFF -> SetAvailableActions(activeTeam, PlayerActionType.HAND_OFF, activeTeam.turnData.handOffActions - 1 )
-                    PlayerActionType.BLOCK -> SetAvailableActions(activeTeam, PlayerActionType.BLOCK, activeTeam.turnData.blockActions - 1 )
-                    PlayerActionType.BLITZ -> SetAvailableActions(activeTeam, PlayerActionType.BLITZ, activeTeam.turnData.blitzActions - 1 )
-                    PlayerActionType.FOUL -> SetAvailableActions(activeTeam, PlayerActionType.FOUL, activeTeam.turnData.foulActions - 1 )
-                    PlayerActionType.SPECIAL -> TODO()
+                val markActionAsUsedCommand = when (val type = context.declaredAction!!.type) {
+                    PlayerStandardActionType.MOVE -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.MOVE)
+                    PlayerStandardActionType.PASS -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.PASS)
+                    PlayerStandardActionType.HAND_OFF -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.HAND_OFF)
+                    PlayerStandardActionType.BLOCK -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.BLOCK)
+                    PlayerStandardActionType.BLITZ -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.BLITZ)
+                    PlayerStandardActionType.FOUL -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.FOUL)
+                    PlayerStandardActionType.SPECIAL -> null
+                    PlayerSpecialActionType.BALL_AND_CHAIN -> TODO()
+                    PlayerSpecialActionType.BOMBARDIER -> TODO()
+                    PlayerSpecialActionType.BREATHE_FIRE -> TODO()
+                    PlayerSpecialActionType.CHAINSAW -> TODO()
+                    PlayerSpecialActionType.HYPNOTIC_GAZE -> TODO()
+                    PlayerSpecialActionType.KICK_TEAM_MATE -> TODO()
+                    PlayerSpecialActionType.MULTIPLE_BLOCK -> {
+                        compositeCommandOf(
+                            SetSpecialActionSkillUsed(player, player.getSkill<MultipleBlock>(), true),
+                            SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.MULTIPLE_BLOCK)
+                        )
+                    }
+                    PlayerSpecialActionType.PROJECTILE_VOMIT -> {
+                        compositeCommandOf(
+                            SetSpecialActionSkillUsed(player, player.getSkill<ProjectileVomit>(), true),
+                            SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.PROJECTILE_VOMIT)
+                        )
+                    }
+                    PlayerSpecialActionType.STAB -> {
+                        compositeCommandOf(
+                            SetSpecialActionSkillUsed(player, player.getSkill<Stab>(), true),
+                            SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.STAB)
+                        )
+                    }
+                    PlayerStandardActionType.THROW_TEAM_MATE -> TODO()
                 }
-                add(markActionAsUsedCommand)
+                if (markActionAsUsedCommand != null) add(markActionAsUsedCommand)
                 add(ReportActionEnded(state.activePlayer!!, context.declaredAction))
             }
 
@@ -158,46 +190,23 @@ object ActivatePlayer : Procedure() {
     object DeclareActionOrDeselectPlayer : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.activeTeam
 
-        private fun getAvailableSpecialActions(state: Game, rules: Rules): Set<PlayerAction> {
-            // Multiple Block (Not a special action, how to use this? )
-            // Ball & Chain (replace all other actions)
-            // Bombardier (Its own action, 1 pr. team turn)
-            // Chainsaw (Replace block action or block part of Blitz, 1. pr activation)
-            // Kick Team-mate (its own action, 1 pr. team turn)
-            // Projectile Vomit (Replace block action or block part of Blitz, 1. pr activation)
-            // Stab (Replace block action or block part of Blitz, no limit)
-            // Hypnotic Gaze (Its own action)
-            // Breathe Fire (replace block or block part of blitz, once pr. activation)
+//         Multiple Block (Not a special action, how to use this? )
+//         Ball & Chain (replace all other actions)
+//         Bombardier (Its own action, 1 pr. team turn)
+//         Chainsaw (Replace block action or block part of Blitz, 1. pr activation)
+//         Kick Team-mate (its own action, 1 pr. team turn)
+//         Projectile Vomit (Replace block action or block part of Blitz, 1. pr activation)
+//         Stab (Replace block action or block part of Blitz, no limit)
+//         Hypnotic Gaze (Its own action)
+//         Breathe Fire (replace block or block part of blitz, once pr. activation)
 
-            return emptySet() // TODO Hypnotic Gaze, Ball & Chain, others?
-        }
-
-        private fun getAvailableTeamActions(state: Game, rules: Rules): Set<PlayerAction> {
-            val actions = mutableSetOf<PlayerAction>()
-            state.activeTeam.turnData.let {
-                if (it.moveActions > 0) actions.add(rules.teamActions.move.action)
-                if (it.passActions > 0) actions.add(rules.teamActions.pass.action)
-                if (it.handOffActions > 0) actions.add(rules.teamActions.handOff.action)
-                if (it.blockActions > 0) actions.add(rules.teamActions.block.action)
-                if (it.blitzActions > 0) actions.add(rules.teamActions.blitz.action)
-                if (it.foulActions > 0) actions.add(rules.teamActions.foul.action)
-            }
-            return actions
-        }
 
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val teamActions: Set<PlayerAction> = getAvailableTeamActions(state, rules)
-            val specialPlayerActions: Set<PlayerAction> = getAvailableSpecialActions(state, rules)
-            val allActions: List<SelectAction> =
-                (teamActions + specialPlayerActions).map {
-                    SelectAction(it)
-                }
-            val availableActions: List<SelectAction> = (
-                allActions.firstOrNull {
-                    it.action.compulsory
-                }?.let { listOf(it) } ?: allActions
-            )
-            val deselectPlayer: List<ActionDescriptor> = listOf(DeselectPlayer(state.activePlayer!!))
+            val allActions = rules.getAvailableActions(state, state.activePlayer!!).map { SelectPlayerAction(it) }
+            val availableActions= allActions
+                .firstOrNull { it.action.compulsory }?.let { listOf(it) }
+                ?: allActions
+            val deselectPlayer = listOf(DeselectPlayer(state.activePlayer!!))
             return deselectPlayer + availableActions
         }
 
@@ -211,7 +220,8 @@ object ActivatePlayer : Procedure() {
                         ExitProcedure(),
                     )
                 is PlayerActionSelected -> {
-                    val selectedAction = rules.teamActions[action.action].action
+
+                    val selectedAction = rules.teamActions[action.action]
                     val hasNegaTrait = hasNegaTrait(activePlayer)
                     compositeCommandOf(
                         SetContext(state.getContext<ActivatePlayerContext>().copy(declaredAction = selectedAction)),

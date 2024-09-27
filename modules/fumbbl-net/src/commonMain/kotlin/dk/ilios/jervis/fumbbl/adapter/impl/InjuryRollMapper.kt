@@ -2,7 +2,7 @@ package dk.ilios.jervis.fumbbl.adapter.impl
 
 import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
@@ -36,20 +36,20 @@ object InjuryRollMapper: CommandActionMapper {
 
         if (report.armorRoll?.isNotEmpty() == true) {
             val armourRoll = report.armorRoll.map { D6Result(it) }
-            newActions.add(DiceResults(armourRoll), ArmourRoll.RollDice)
+            newActions.add(DiceRollResults(armourRoll), ArmourRoll.RollDice)
         }
 
         if (report.injuryRoll?.isNotEmpty() == true) {
             val injuryRoll = report.injuryRoll.map { D6Result(it) }
-            newActions.add(DiceResults(injuryRoll), InjuryRoll.RollDice)
+            newActions.add(DiceRollResults(injuryRoll), InjuryRoll.RollDice)
         }
 
         if (report.casualtyRoll?.isNotEmpty() == true) {
             val casualtyRoll = report.casualtyRoll.first().let { D16Result(it) }
-            newActions.add(DiceResults(casualtyRoll), CasualtyRoll.RollDie)
+            newActions.add(DiceRollResults(casualtyRoll), CasualtyRoll.RollDie)
             if (casualtyRoll.value in 13..14) {
                 val lastingCasualtyRoll = report.casualtyRoll.last().let { D6Result(it) }
-                newActions.add(DiceResults(lastingCasualtyRoll), LastingInjuryRoll.RollDie)
+                newActions.add(DiceRollResults(lastingCasualtyRoll), LastingInjuryRoll.RollDie)
             }
         }
     }

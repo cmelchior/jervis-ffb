@@ -3,7 +3,8 @@ package dk.ilios.jervis.commands
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.PlayerSpecialActionType
+import dk.ilios.jervis.rules.PlayerStandardActionType
 
 class ResetAvailableTeamActions(
     private val team: Team,
@@ -13,6 +14,7 @@ class ResetAvailableTeamActions(
     private val blockActions: Int,
     private val blitzActions: Int,
     private val foulActions: Int,
+    private val specialActions: Map<PlayerSpecialActionType, Int>
 ) : Command {
     var originalMoveActions = 0
     var originalPassActions = 0
@@ -20,17 +22,19 @@ class ResetAvailableTeamActions(
     var originalBlockActions = 0
     var originalBlitzActions = 0
     var originalFoulActions = 0
+    var originalSpecialActions = emptyMap<PlayerSpecialActionType, Int>()
 
     override fun execute(
         state: Game,
         controller: GameController,
     ) {
-        originalMoveActions = team.turnData.availableActions[PlayerActionType.MOVE]!!
-        originalPassActions = team.turnData.availableActions[PlayerActionType.PASS]!!
-        originalHandOffActions = team.turnData.availableActions[PlayerActionType.HAND_OFF]!!
-        originalBlockActions = team.turnData.availableActions[PlayerActionType.BLOCK]!!
-        originalBlitzActions = team.turnData.availableActions[PlayerActionType.BLITZ]!!
-        originalFoulActions = team.turnData.availableActions[PlayerActionType.FOUL]!!
+        originalMoveActions = team.turnData.availableStandardActions[PlayerStandardActionType.MOVE]!!
+        originalPassActions = team.turnData.availableStandardActions[PlayerStandardActionType.PASS]!!
+        originalHandOffActions = team.turnData.availableStandardActions[PlayerStandardActionType.HAND_OFF]!!
+        originalBlockActions = team.turnData.availableStandardActions[PlayerStandardActionType.BLOCK]!!
+        originalBlitzActions = team.turnData.availableStandardActions[PlayerStandardActionType.BLITZ]!!
+        originalFoulActions = team.turnData.availableStandardActions[PlayerStandardActionType.FOUL]!!
+        originalSpecialActions = team.turnData.availableSpecialActions.toMap()
         team.turnData.let {
             it.moveActions = moveActions
             it.passActions = passActions
@@ -38,6 +42,8 @@ class ResetAvailableTeamActions(
             it.blockActions = blockActions
             it.blitzActions = blitzActions
             it.foulActions = foulActions
+            it.availableSpecialActions.clear()
+            it.availableSpecialActions.putAll(specialActions)
         }
         team.notifyUpdate()
     }
@@ -53,6 +59,8 @@ class ResetAvailableTeamActions(
             it.blockActions = originalBlockActions
             it.blitzActions = originalBlitzActions
             it.foulActions = originalFoulActions
+            it.availableSpecialActions.clear()
+            it.availableSpecialActions.putAll(originalSpecialActions)
         }
         team.notifyUpdate()
     }

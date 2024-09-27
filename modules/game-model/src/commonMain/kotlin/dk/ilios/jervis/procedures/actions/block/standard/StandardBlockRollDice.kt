@@ -24,7 +24,7 @@ import dk.ilios.jervis.rules.Rules
 /**
  * Roll block dice for the first time.
  *
- * @see [dk.ilios.jervis.procedures.actions.block.MultipleBlockStep]
+ * @see [dk.ilios.jervis.procedures.actions.block.MultipleBlockAction]
  * @see [dk.ilios.jervis.procedures.actions.block.StandardBlockStep]
  */
 object StandardBlockRollDice: Procedure() {

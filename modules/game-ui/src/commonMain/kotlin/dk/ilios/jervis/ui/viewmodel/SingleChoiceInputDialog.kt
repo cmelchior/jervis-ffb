@@ -9,7 +9,8 @@ import dk.ilios.jervis.actions.CompositeGameAction
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.Continue
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DicePoolResultsSelected
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndAction
@@ -63,8 +64,8 @@ data class SingleChoiceInputDialog(
                 EndTurn -> "EndTurn"
                 is FieldSquareSelected -> action.toString()
                 is PlayerSelected -> "Player[${action.playerId}]"
-                is DiceResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
-                is PlayerActionSelected -> "Action: ${action.action.name}"
+                is DiceRollResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
+                is PlayerActionSelected -> "Action: ${action.action}"
                 is PlayerDeselected -> "Deselect active player"
                 EndAction -> "End Action"
                 Cancel -> "Cancel"
@@ -80,7 +81,8 @@ data class SingleChoiceInputDialog(
                 is SkillSelected -> action.skill.toString()
                 is InducementSelected -> action.name
                 is CalculatedAction -> TODO("Should only be used in tests")
-                is BlockTypeSelected -> TODO()
+                is BlockTypeSelected -> action.type.name
+                is DicePoolResultsSelected -> action.results.toString()
             }
         }
 

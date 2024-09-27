@@ -3,6 +3,9 @@ package dk.ilios.jervis.actions
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.procedures.BlockDieRoll
+import dk.ilios.jervis.procedures.D6DieRoll
+import dk.ilios.jervis.procedures.DieRoll
 import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.PlayerAction
 import dk.ilios.jervis.rules.skills.DiceRerollOption
@@ -87,8 +90,31 @@ data class SelectFieldLocation private constructor(
     }
 }
 
-// Give a number of dice results, the user needs to select 1 or more of them
-data class SelectDiceResult(val choices: List<DieResult>, val count: Int = 1): ActionDescriptor
+// Give a number of dice pools, the user needs to select 1 or more of them
+sealed interface DicePool<D: DieResult, out T: DieRoll<D>> {
+    val id: Int
+    val dice: List<T>
+    val selectDice: Int
+}
+
+data class BlockDicePool(
+    override val dice: List<BlockDieRoll>,
+    override val selectDice: Int = 1,
+    override val id: Int = 0
+): DicePool<DBlockResult, DieRoll<DBlockResult>>
+
+data class D6DicePool(
+    override val dice: List<D6DieRoll>,
+    override val selectDice: Int = 1,
+    override val id: Int = 0,
+): DicePool<D6Result, DieRoll<D6Result>>
+
+/**
+ * Select final result from 1 or more dice pools
+ */
+data class SelectDicePoolResult(val pools: List<DicePool<*, *>>): ActionDescriptor {
+    constructor(pool: DicePool<*, *>) : this(listOf(pool))
+}
 
 data object SelectDogout : ActionDescriptor
 
@@ -98,7 +124,7 @@ data class SelectPlayer(val player: PlayerId) : ActionDescriptor {
 
 data class DeselectPlayer(val player: Player) : ActionDescriptor
 
-data class SelectAction(val action: PlayerAction) : ActionDescriptor
+data class SelectPlayerAction(val action: PlayerAction) : ActionDescriptor
 
 data class SelectBlockType(val type: BlockType): ActionDescriptor
 

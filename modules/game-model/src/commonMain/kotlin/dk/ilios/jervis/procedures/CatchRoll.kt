@@ -84,7 +84,7 @@ object CatchRoll : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Continue -> ExitProcedure()
-                NoRerollSelected -> ExitProcedure()
+                is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
                     val rerollContext = UseRerollContext(DiceRollType.CATCH, action.getRerollSource(state))
                     compositeCommandOf(

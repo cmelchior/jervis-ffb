@@ -1,7 +1,7 @@
 package dk.ilios.jervis.fumbbl.adapter.impl.setup
 
 import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
@@ -33,6 +33,6 @@ object WeatherRollMapper: CommandActionMapper {
     ) {
         val report = command.reportList.reports.first() as WeatherReport
         val weatherRoll = report.weatherRoll.map { D6Result(it) }
-        newActions.add(DiceResults(weatherRoll), WeatherRoll.RollWeatherDice)
+        newActions.add(DiceRollResults(weatherRoll), WeatherRoll.RollWeatherDice)
     }
 }

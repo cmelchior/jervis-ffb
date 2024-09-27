@@ -4,7 +4,7 @@ import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
 import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
@@ -26,7 +26,7 @@ import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.rules.BB2020Rules
-import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.PlayerStandardActionType
 import dk.ilios.jervis.rules.skills.BreakTackle
 import dk.ilios.jervis.utils.createDefaultGameState
 import kotlin.test.BeforeTest
@@ -75,7 +75,7 @@ fun defaultFanFactor() = arrayOf(
     2.d3, // Away Fan Factor Roll
 )
 
-fun defaultWeather() = DiceResults(3.d6, 4.d6)
+fun defaultWeather() = DiceRollResults(3.d6, 4.d6)
 
 fun defaultJourneyMen() = emptyArray<GameAction>()
 
@@ -91,7 +91,7 @@ fun defaultDetermineKickingTeam() = arrayOf(
 
 fun defaultPregame(
     fanFactor: Array<out GameAction> = defaultFanFactor(),
-    weatherRoll: DiceResults = defaultWeather(),
+    weatherRoll: DiceRollResults = defaultWeather(),
     journeyMen: Array<out GameAction> = defaultJourneyMen(),
     inducements: Array<out GameAction> = defaultInducements(),
     prayersToNuffle: Array<out GameAction> = defaultPrayersToNuffle(),
@@ -148,14 +148,14 @@ fun defaultSetup(): Array<GameAction> {
 }
 
 fun defaultKickOffEvent(): Array<GameAction> = arrayOf(
-    DiceResults(3.d6, 4.d6), // Roll on kick-off table, does nothing for now
+    DiceRollResults(3.d6, 4.d6), // Roll on kick-off table, does nothing for now
     1.d6, // Brilliant coaching
     1.d6 // Brilliant coaching
 )
 
 fun defaultKickOffHomeTeam(
     placeKick: FieldSquareSelected = FieldSquareSelected(19, 7), // Center of Away Half,
-    deviate: DiceResults = DiceResults(4.d8, 1.d6), // Land on [18,7]
+    deviate: DiceRollResults = DiceRollResults(4.d8, 1.d6), // Land on [18,7]
     kickoffEvent: Array<GameAction> = defaultKickOffEvent(),
     bounce: D8Result? = 4.d8 // Bounce to [17,7]
 ) = arrayOf(
@@ -166,7 +166,7 @@ fun defaultKickOffHomeTeam(
     bounce
 )
 
-fun activatePlayer(playerId: String, type: PlayerActionType) = arrayOf(
+fun activatePlayer(playerId: String, type: PlayerStandardActionType) = arrayOf(
     PlayerSelected(PlayerId(playerId)),
     PlayerActionSelected(type),
 )

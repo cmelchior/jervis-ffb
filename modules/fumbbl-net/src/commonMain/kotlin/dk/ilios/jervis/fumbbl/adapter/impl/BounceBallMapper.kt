@@ -1,6 +1,6 @@
 package dk.ilios.jervis.fumbbl.adapter.impl
 
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
@@ -31,6 +31,6 @@ object BounceBallMapper: CommandActionMapper {
         val report = command.firstReport() as ScatterBallReport
         val direction = report.directionArray.first().transformToJervisDirection()
         val roll = RandomDirectionTemplate.getRollForDirection(direction)
-        newActions.add(DiceResults(roll), Bounce.RollDirection)
+        newActions.add(DiceRollResults(roll), Bounce.RollDirection)
     }
 }

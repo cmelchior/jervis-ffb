@@ -15,6 +15,7 @@ import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.rules.pathfinder.BB2020PathFinder
 import dk.ilios.jervis.rules.pathfinder.PathFinder
 import dk.ilios.jervis.rules.skills.RerollSource
+import dk.ilios.jervis.rules.skills.SpecialActionProvider
 import dk.ilios.jervis.rules.tables.ArgueTheCallTable
 import dk.ilios.jervis.rules.tables.CasualtyTable
 import dk.ilios.jervis.rules.tables.Direction
@@ -28,6 +29,7 @@ import dk.ilios.jervis.rules.tables.StuntyInjuryTable
 import dk.ilios.jervis.rules.tables.ThrowInPosition
 import dk.ilios.jervis.rules.tables.ThrowInTemplate
 import dk.ilios.jervis.rules.tables.WeatherTable
+import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 interface Rules {
     fun isValidSetup(state: Game, team: Team): Boolean {
@@ -332,6 +334,35 @@ interface Rules {
      */
     fun getAvailableTeamReroll(team: Team): RerollSource {
         return team.availableRerolls.last()
+    }
+
+    /**
+     * Returns all actions available to this player when they are activated.
+     */
+    fun getAvailableActions(state: Game, player: Player): List<PlayerAction> {
+        if (state.activePlayer != player) INVALID_GAME_STATE("$player is not the active player")
+
+        return buildList {
+            // Add any team actions that are available
+            state.activeTeam.turnData.let {
+                if (it.moveActions > 0) add(teamActions.move)
+                if (it.passActions > 0) add(teamActions.pass)
+                if (it.handOffActions > 0) add(teamActions.handOff)
+                if (it.blockActions > 0) add(teamActions.block)
+                if (it.blitzActions > 0) add(teamActions.blitz)
+                if (it.foulActions > 0) add(teamActions.foul)
+            }
+
+            // Add any special actions that are provided by skills
+            player.skills.filterIsInstance<SpecialActionProvider>().forEach {
+                val type = it.specialAction
+                val isSkillActionUsed = it.isSpecialActionUsed
+                val isActionAvailable = state.activeTeam.turnData.availableSpecialActions[type]!! > 0
+                if (!isSkillActionUsed && isActionAvailable) {
+                    add(teamActions[type])
+                }
+            }
+        }
     }
 
     val name: String

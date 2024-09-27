@@ -2,7 +2,7 @@ package dk.ilios.jervis.tables
 
 import dk.ilios.jervis.JervisGameTest
 import dk.ilios.jervis.actions.Confirm
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.activatePlayer
@@ -27,7 +27,7 @@ import dk.ilios.jervis.procedures.DetermineKickingTeam
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
 import dk.ilios.jervis.procedures.SetupTeam
-import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.PlayerStandardActionType
 import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.MightyBlow
@@ -136,10 +136,10 @@ class PrayersToNuffleTests: JervisGameTest() {
 
         // Foul player and roll 5 to trigger the prayer
         controller.rollForward(
-            *activatePlayer("A1", PlayerActionType.FOUL),
+            *activatePlayer("A1", PlayerStandardActionType.FOUL),
             PlayerSelected("H1".playerId), // Select H1 as the target of the action
             PlayerSelected("H1".playerId), // Foul H1 since he is next to A1
-            DiceResults(1.d6, 1.d6), // Armour roll = Caught by ref
+            DiceRollResults(1.d6, 1.d6), // Armour roll = Caught by ref
             Confirm, // Argue the call
             5.d6, // Argue the call roll
             Confirm, // Accept using Friends with the Ref

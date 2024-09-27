@@ -23,6 +23,7 @@ fun createPushContext(state: Game): PushContext {
     val newContext = PushContext(
         blockContext.attacker,
         blockContext.defender,
+        blockContext.isUsingMultiBlock,
         listOf(
             PushContext.PushData(
                 pusher = blockContext.attacker,
@@ -44,16 +45,16 @@ fun createPushContext(state: Game): PushContext {
 object PushBack: Procedure() {
     override val initialNode: Node = ResolvePush
 
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val newContext = createPushContext(state)
         return SetContext(newContext)
     }
 
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PushContext>()
         return compositeCommandOf(
             RemoveContext<PushContext>(),
-            ReportPushResult(context.firstPusher, context.pushChain.first().from)
+            ReportPushResult(context.firstPusher, context.pushChain.first().from, context.followsUp)
         )
     }
 

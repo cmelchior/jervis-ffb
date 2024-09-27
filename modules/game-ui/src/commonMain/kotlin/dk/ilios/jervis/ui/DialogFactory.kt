@@ -1,4 +1,4 @@
-package dk.ilios.jervis.ui.viewmodel
+package dk.ilios.jervis.ui
 
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CoinSideSelected
@@ -6,10 +6,10 @@ import dk.ilios.jervis.actions.CoinTossResult
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
-import dk.ilios.jervis.actions.SelectDiceResult
+import dk.ilios.jervis.actions.SelectDicePoolResult
 import dk.ilios.jervis.controller.ActionsRequest
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.context.CatchRollContext
@@ -65,6 +65,10 @@ import dk.ilios.jervis.rules.skills.Block
 import dk.ilios.jervis.rules.skills.Dodge
 import dk.ilios.jervis.rules.skills.SideStep
 import dk.ilios.jervis.rules.skills.Tackle
+import dk.ilios.jervis.ui.viewmodel.DiceRollUserInputDialog
+import dk.ilios.jervis.ui.viewmodel.SingleChoiceInputDialog
+import dk.ilios.jervis.ui.viewmodel.UserInput
+import dk.ilios.jervis.ui.viewmodel.UserInputDialog
 
 /**
  * Class responsible for setting up modal dialogs specifically for dice rolls.
@@ -84,7 +88,10 @@ object DialogFactory {
                 }
 
                 is ArgueTheCallRoll.RollDice -> {
-                    DiceRollUserInputDialog.createArgueTheCallRollDialog(controller.state.getContext<FoulContext>(), rules)
+                    DiceRollUserInputDialog.createArgueTheCallRollDialog(
+                        controller.state.getContext<FoulContext>(),
+                        rules
+                    )
                 }
 
                 is ArmourRoll.RollDice -> {
@@ -105,12 +112,15 @@ object DialogFactory {
                 is StandardBlockRollDice.RollDice,
                 is StandardBlockRerollDice.ReRollDie -> {
                     val diceCount = (request.actions.first() as RollDice).dice.size
-                    DiceRollUserInputDialog.createBlockRollDialog(diceCount, controller.state.getContext<BlockContext>().isBlitzing)
+                    DiceRollUserInputDialog.createBlockRollDialog(
+                        diceCount,
+                        controller.state.getContext<BlockContext>().isBlitzing
+                    )
                 }
 
                 is StandardBlockChooseResult.SelectBlockResult -> {
                     DiceRollUserInputDialog.createSelectBlockDie(
-                        request.actions.first() as SelectDiceResult
+                        request.actions.first() as SelectDicePoolResult
                     )
                 }
 
@@ -184,10 +194,10 @@ object DialogFactory {
                 }
 
                 is DeviateRoll.RollDice -> {
-                    val diceRolls = mutableListOf<DiceResults>()
+                    val diceRolls = mutableListOf<DiceRollResults>()
                     D8Result.allOptions().forEach { d8 ->
                         D6Result.allOptions().forEach { d6 ->
-                            diceRolls.add(DiceResults(d8, d6))
+                            diceRolls.add(DiceRollResults(d8, d6))
                         }
                     }
                     DiceRollUserInputDialog.createDeviateDialog(rules, false)
@@ -263,10 +273,10 @@ object DialogFactory {
                     DiceRollUserInputDialog.createFanFactorDialog(controller.state.homeTeam)
                 }
                 is WeatherRoll.RollWeatherDice -> {
-                    val diceRolls = mutableListOf<DiceResults>()
+                    val diceRolls = mutableListOf<DiceRollResults>()
                     D6Result.allOptions().forEach { firstD6 ->
                         D6Result.allOptions().forEach { secondD6 ->
-                            diceRolls.add(DiceResults(firstD6, secondD6))
+                            diceRolls.add(DiceRollResults(firstD6, secondD6))
                         }
                     }
                     DiceRollUserInputDialog.createWeatherRollDialog(rules)
@@ -308,10 +318,10 @@ object DialogFactory {
                 }
 
                 is TheKickOff.TheKickDeviates -> {
-                    val diceRolls = mutableListOf<DiceResults>()
+                    val diceRolls = mutableListOf<DiceRollResults>()
                     D8Result.allOptions().forEach { d8 ->
                         D6Result.allOptions().forEach { d6 ->
-                            diceRolls.add(DiceResults(d8, d6))
+                            diceRolls.add(DiceRollResults(d8, d6))
                         }
                     }
                     DiceRollUserInputDialog.createDeviateDialog(

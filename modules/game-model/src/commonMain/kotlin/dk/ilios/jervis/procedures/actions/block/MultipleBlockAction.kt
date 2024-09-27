@@ -3,323 +3,39 @@ package dk.ilios.jervis.procedures.actions.block
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.BlockTypeSelected
+import dk.ilios.jervis.actions.Cancel
+import dk.ilios.jervis.actions.CancelWhenReady
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
 import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
-import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.SelectBlockType
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetCurrentBall
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
+import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
-import dk.ilios.jervis.model.Ball
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
-import dk.ilios.jervis.model.context.ProcedureContext
-import dk.ilios.jervis.model.context.UseRerollContext
 import dk.ilios.jervis.model.context.getContext
-import dk.ilios.jervis.procedures.DieRoll
+import dk.ilios.jervis.procedures.ActivatePlayerContext
+import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.actions.block.multipleblock.MultipleBlockChoseResults
 import dk.ilios.jervis.procedures.actions.block.multipleblock.MultipleBlockRerollDice
-import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockApplyResult
-import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockRerollDice
-import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockRollDice
-import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
-import dk.ilios.jervis.rules.BlockType
-import dk.ilios.jervis.rules.BlockType.CHAINSAW
-import dk.ilios.jervis.rules.BlockType.MULTIPLE_BLOCK
-import dk.ilios.jervis.rules.BlockType.PROJECTILE_VOMIT
-import dk.ilios.jervis.rules.BlockType.STAB
-import dk.ilios.jervis.rules.BlockType.STANDARD
+import dk.ilios.jervis.procedures.actions.block.multipleblock.MultipleBlockResolveInjuries
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
-
-/**
- * Class wrapping one of the block actions part of a multiple block actions.
- * It also acts as a facade, exposing a shared API for all the different block types.
- */
-data class MultipleBlockDiceRoll(
-    val type: BlockType,
-    val rollContext: ProcedureContext, // The roll specific context for the given type
-) {
-
-    fun hasAcceptedResult(): Boolean {
-        return when (type) {
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> {
-                (rollContext as BlockContext).hasAcceptedResult
-            }
-        }
-    }
-
-    fun getRoll(): List<DieRoll<*>> {
-        return when (type) {
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> (rollContext as BlockContext).roll
-        }
-    }
-
-    fun copyAndSetHasAcceptedResult(acceptedResult: Boolean): MultipleBlockDiceRoll {
-        return when (type) {
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> {
-                this.copy(rollContext = (rollContext as BlockContext).copy(hasAcceptedResult = acceptedResult))
-            }
-        }
-    }
-
-    fun getRerollOptions(rules: Rules, attacker: Player, dicePoolId: Int): List<ActionDescriptor> {
-        return when (type) {
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> {
-                StandardBlockRerollDice.getRerollOptions(
-                    rules = rules,
-                    attackingPlayer = attacker,
-                    dicePoolId = dicePoolId,
-                    diceRoll = (rollContext as BlockContext).roll
-                )
-            }
-        }
-    }
-}
-
-/**
- * Context containing state related to doing a Multiple Block.
- *
- * Note, this context has been flattened to make it easier to update, but
- * it exposes an API that makes it possible to access rolls using list
- * indexes.
- */
-data class MultipleBlockContext(
-    val attacker: Player,
-    val defender1: Player?,
-    val defender2: Player? = null,
-    // Rolls for the two blocks
-    val roll1: MultipleBlockDiceRoll? = null,
-    val roll2: MultipleBlockDiceRoll? = null,
-    // Tracks the index of which defender is currently in focus. If set, it must either be 0 or 1.
-    val activeDefender: Int? = null,
-    // Tracks the ball for those players where it needs to bounce
-    val attackerBall: Ball? = null,
-    val defender1Ball: Ball? = null,
-    val defender2Ball: Ball? = null,
-    // Set if any of the players involved received an injury.
-    val attackerInjuryContext: RiskingInjuryContext? = null,
-    val defender1InjuryContext: RiskingInjuryContext? = null,
-    val defender2InjuryContext: RiskingInjuryContext? = null,
-    // Set to true, if a turnover happened during the first block.
-    val postponeTurnOver: Boolean = false
-): ProcedureContext {
-
-    val rolls: List<MultipleBlockDiceRoll>
-        get() = listOfNotNull(roll1, roll2)
-
-    operator fun get(index: Int): MultipleBlockDiceRoll {
-        return when (index) {
-            0 -> roll1!!
-            1 -> roll2!!
-            else -> throw IllegalArgumentException("Invalid index: $index")
-        }
-    }
-
-    fun getActiveRerollType(): BlockType {
-        return get(activeDefender!!).type
-    }
-
-    fun copyAndUpdateRollContext(index: Int, updatedRollContext: ProcedureContext): MultipleBlockContext {
-        return when (index) {
-            0 -> copy(roll1 = roll1!!.copy(rollContext = updatedRollContext))
-            1 -> copy(roll2 = roll2!!.copy(rollContext = updatedRollContext))
-            else -> throw IllegalArgumentException("Invalid roll index: $index")
-        }
-    }
-
-    fun copyAndUpdateHasAcceptedResult(index: Int, hasAcceptedResult: Boolean): MultipleBlockContext {
-        return when (index) {
-            0 -> copy(roll1 = roll1!!.copyAndSetHasAcceptedResult(hasAcceptedResult))
-            1 -> copy(roll2 = roll2!!.copyAndSetHasAcceptedResult(hasAcceptedResult))
-            else -> throw IllegalArgumentException("Invalid index: $index")
-        }
-    }
-
-    /**
-     * Creates a [UseRerollContext] for currently active Multiple Block Action its reroll type
-     */
-    fun createRerollContext(state: Game, action: RerollOptionSelected): UseRerollContext {
-        return when(getActiveRerollType()) {
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> UseRerollContext(DiceRollType.BLOCK, action.getRerollSource(state))
-        }
-    }
-
-    fun getRollDiceProcedure(): Procedure {
-        return when (getActiveRerollType()) {
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> StandardBlockRollDice
-        }
-    }
-    /**
-     * Returns the Procedure used to reroll dice for the given block type.
-     */
-    fun getRerollDiceProcedure(): Procedure {
-        return when (getActiveRerollType()) {
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> StandardBlockRerollDice
-        }
-    }
-
-    /**
-     * Returns the procedure responsible for applying a active block type
-     */
-    fun getResolveBlockResultProcedure(): Procedure {
-        return when (getActiveRerollType()) {
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> StandardBlockApplyResult
-        }
-    }
-
-    /**
-     * Calling this method will retrieve the roll context for the given
-     * block type and replace the active [MultipleBlockDiceRoll.rollContext]
-     * with it.
-     */
-    fun copyAndUpdateWithLatestBlockTypeContext(state: Game): MultipleBlockContext {
-        val updatedContext = when (getActiveRerollType()) {
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> state.getContext<BlockContext>()
-        }
-        return copyAndUpdateRollContext(activeDefender!!, updatedContext)
-    }
-
-    /**
-     * Remove the provided player from the context. Also unset it from being
-     * active if it was set there.
-     *
-     * Will throw exception if player was not found
-     */
-    fun copyAndUnsetDefender(player: Player): ProcedureContext {
-        return when (player) {
-            defender1 -> copy(defender1 = null, activeDefender = if (activeDefender == 0) null else 0)
-            defender2 -> copy(defender2 = null, activeDefender = if (activeDefender == 1) null else 1)
-            else -> throw IllegalArgumentException("Invalid defender: $player")
-        }
-    }
-
-    /**
-     * Set the ball reference for the current defender.
-     */
-    fun copyAndTrackBouncingBallForPlayer(player: Player, ball: Ball): ProcedureContext {
-        return when (player) {
-            attacker -> copy(attackerBall = ball)
-            defender1 -> copy(defender1Ball = ball)
-            defender2 -> copy(defender2Ball = ball)
-            else -> throw IllegalArgumentException("Invalid player: $player")
-        }
-    }
-
-    fun copyAndSetInjuryReferenceForPlayer(player: Player, injuryContext: RiskingInjuryContext): ProcedureContext {
-        return when (player) {
-            attacker -> copy(attackerInjuryContext = injuryContext)
-            defender1 -> copy(defender1InjuryContext = injuryContext)
-            defender2 -> copy(defender2InjuryContext = injuryContext)
-            else -> throw IllegalArgumentException("Invalid player: $player")
-        }
-    }
-
-    /**
-     * Sets the block type for the current active defender.
-     * This also c
-     */
-    fun copyAndSetBlockTypeForActiveDefender(type: BlockType): ProcedureContext {
-        val defender = when (activeDefender) {
-            0 -> defender1!!
-            1 -> defender2!!
-            else -> throw IllegalStateException("Invalid active defender")
-        }
-
-        val context = when (type) {
-            CHAINSAW -> TODO()
-            MULTIPLE_BLOCK -> TODO()
-            PROJECTILE_VOMIT -> TODO()
-            STAB -> TODO()
-            STANDARD -> BlockContext(
-                attacker,
-                defender,
-            )
-        }
-
-        return when(activeDefender) {
-            0 -> copy(roll1 = MultipleBlockDiceRoll(type, context))
-            1 -> copy(roll2 = MultipleBlockDiceRoll(type, context))
-            else -> throw IllegalArgumentException("Invalid active defender: $activeDefender")
-        }
-    }
-
-    fun getActiveDefender(): Player? {
-        return when (activeDefender) {
-            0 -> return defender1!!
-            1 -> return defender2!!
-            else -> null
-        }
-    }
-
-    /**
-     * Returns the block context for the currently active defender.
-     * Note, it is the context stored in _this_ context that is returned,
-     * and not the one stored globally.
-     *
-     * See [copyAndUpdateWithLatestBlockTypeContext] for that.
-     */
-    fun getContextForCurrentBlock(): ProcedureContext {
-        return when (activeDefender) {
-            0 -> roll1!!.rollContext
-            1 -> roll2!!.rollContext
-            else -> throw IllegalArgumentException("Invalid active defender: $activeDefender")
-        }
-    }
-
-
-}
 
 /**
  * This procedure is responsible for handling Multiple Block as described on page 80 in the rulebook.
@@ -403,17 +119,18 @@ data class MultipleBlockContext(
  * 8. Finally, if any of the attacker or two defenders had the ball. It will now bounce from their square,
  *    (or the square they left)
  */
-object MultipleBlockStep: Procedure() {
-    override val initialNode: Node = SelectDefenderOrContinueBlock
+object MultipleBlockAction: Procedure() {
+    override val initialNode: Node = SelectDefenderOrAbortActionOrContinueBlock
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val blockContext = state.getContext<BlockActionContext>()
+        val activeContext = state.getContext<ActivatePlayerContext>()
         return SetContext(MultipleBlockContext(
-            attacker = blockContext.attacker,
-            defender1 = blockContext.defender
+            attacker = activeContext.player
         ))
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
+        val context = state.getContext<MultipleBlockContext>()
         return compositeCommandOf(
+            SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = !context.actionAborted)),
             RemoveContext<MultipleBlockContext>()
         )
     }
@@ -422,11 +139,11 @@ object MultipleBlockStep: Procedure() {
      * Node responsible for selecting targets and optionally deselecting them again. Once
      * both targets are selected, we move to the next step using a `Confirm` action.
      *
-     * (We could also choose to transition automatically, but currently let this be up to
-     * the UI layer, as it choose to automatically respond with Confirm rather than showing
-     * it to the user).
+     * We could also choose to transition automatically, but currently let this be up to
+     * the UI layer, as it can then choose to automatically respond with Confirm rather than showing
+     * it to the user.
      */
-    object SelectDefenderOrContinueBlock: ActionNode() {
+    object SelectDefenderOrAbortActionOrContinueBlock: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
@@ -448,7 +165,8 @@ object MultipleBlockStep: Procedure() {
             val deselectCommands = listOf(
                 DeselectPlayer(attacker),
                 if (defender1 != null) DeselectPlayer(defender1) else null,
-                if (defender2 != null) DeselectPlayer(defender2) else null
+                if (defender2 != null) DeselectPlayer(defender2) else null,
+                CancelWhenReady,
             )
 
             // If both targets are selected, blocker can continue the multiblock.
@@ -461,15 +179,20 @@ object MultipleBlockStep: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val blockContext = state.getContext<BlockContext>()
             val context = state.getContext<MultipleBlockContext>()
             return when (action) {
+                Cancel -> {
+                    compositeCommandOf(
+                        SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = false)),
+                        ExitProcedure()
+                    )
+                }
                 is Confirm -> {
                     if (!getAvailableActions(state, rules).contains(ConfirmWhenReady)) {
                         INVALID_ACTION(action)
                     }
                     compositeCommandOf(
-                        SetContext(context.copy(activeDefender = null)),
+                        SetContext(context.copy(activeDefender = null, actionAborted = false)),
                         GotoNode(RollDiceForTarget1)
                     )
                 }
@@ -477,12 +200,12 @@ object MultipleBlockStep: Procedure() {
                     // If the attacker is deselected, it is a sign to cancel the block
                     // if a defender is deselected, that is fine, just update the context and redo this logic.
                     when (val player = action.getPlayer(state)) {
-                        blockContext.attacker -> ExitProcedure()
+                        context.attacker -> ExitProcedure()
                         else -> {
                             val updatedContext = context.copyAndUnsetDefender(player)
                             compositeCommandOf(
                                 SetContext(updatedContext),
-                                GotoNode(SelectDefenderOrContinueBlock)
+                                GotoNode(SelectDefenderOrAbortActionOrContinueBlock)
                             )
                         }
                     }
@@ -511,7 +234,7 @@ object MultipleBlockStep: Procedure() {
     }
 
     /**
-     * Once a target has been selected, we also need to set the block type for the given player.
+     * Once a target has been selected, we need to set the block type for the given player.
      * To give the UI more flexibility, we also allow the player to be deselected at this step,
      * which will remove the player as a target.
      */
@@ -532,7 +255,7 @@ object MultipleBlockStep: Procedure() {
                     if (player != context.getActiveDefender()) INVALID_ACTION(action)
                     compositeCommandOf(
                         SetContext(context.copyAndUnsetDefender(player)),
-                        GotoNode(SelectDefenderOrContinueBlock)
+                        GotoNode(SelectDefenderOrAbortActionOrContinueBlock)
                     )
                 }
                 else -> {
@@ -541,7 +264,7 @@ object MultipleBlockStep: Procedure() {
                         val updatedContext = context.copyAndSetBlockTypeForActiveDefender(type)
                         compositeCommandOf(
                             SetContext(updatedContext),
-                            GotoNode(SelectDefenderOrContinueBlock)
+                            GotoNode(SelectDefenderOrAbortActionOrContinueBlock)
                         )
                     }
                 }
@@ -716,21 +439,51 @@ object MultipleBlockStep: Procedure() {
      * skills or apothecaries to modify the result.
      */
     object ResolveInjuries: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            TODO("Not yet implemented")
-        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = MultipleBlockResolveInjuries
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(BounceBallIfNeeded)
+            return GotoNode(CheckForBouncingBalls)
         }
     }
 
-    object BounceBallIfNeeded: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            TODO()
+    /**
+     * Check if any of the players involved in the block dropped a ball that needs to bounce.
+     * The rules do not specify in which order this happens and it probably doesn't matter, so
+     * we just start with balls dropped by defenders, doing the attacker last.
+     */
+    object CheckForBouncingBalls: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<MultipleBlockContext>()
+            return if (context.defender1Ball != null) {
+                compositeCommandOf(
+                    SetCurrentBall(context.defender1Ball),
+                    GotoNode(BounceCurrentBall)
+                )
+            } else if (context.defender2Ball != null) {
+                compositeCommandOf(
+                    SetCurrentBall(context.defender2Ball),
+                    GotoNode(BounceCurrentBall)
+                )
+            } else if (context.attackerBall != null) {
+                compositeCommandOf(
+                    SetCurrentBall(context.attackerBall),
+                    GotoNode(BounceCurrentBall)
+                )
+            } else {
+                ExitProcedure()
+            }
         }
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
+
+    }
+
+    object BounceCurrentBall: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MultipleBlockContext>()
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                SetContext(context.copyAndRemoveBallRef(state.currentBall())),
+                GotoNode(CheckForBouncingBalls)
+            )
         }
     }
 
@@ -746,7 +499,7 @@ object MultipleBlockStep: Procedure() {
         val updatedContext = context.copy(activeDefender = activeDefender)
         return compositeCommandOf(
             SetContext(updatedContext),
-            SetContext(context.getContextForCurrentBlock())
+            SetContext(updatedContext.getContextForCurrentBlock())
         )
     }
 

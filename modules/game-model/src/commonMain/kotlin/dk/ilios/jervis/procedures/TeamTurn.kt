@@ -34,6 +34,7 @@ import dk.ilios.jervis.procedures.inducements.ActivateInducements
 import dk.ilios.jervis.procedures.tables.prayers.ResolveThrowARock
 import dk.ilios.jervis.reports.ReportEndingTurn
 import dk.ilios.jervis.reports.ReportStartingTurn
+import dk.ilios.jervis.rules.PlayerSpecialActionType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
@@ -169,6 +170,7 @@ object TeamTurn : Procedure() {
         val blockActions = rules.teamActions.block.availablePrTurn
         val blitzActions = rules.teamActions.blitz.availablePrTurn
         val foulActions = rules.teamActions.foul.availablePrTurn
+        val specialActions = rules.teamActions.specialActions
         return ResetAvailableTeamActions(
             state.activeTeam,
             moveActions,
@@ -177,6 +179,11 @@ object TeamTurn : Procedure() {
             blockActions,
             blitzActions,
             foulActions,
+            buildMap {
+                specialActions.forEach {
+                    put(it.type as PlayerSpecialActionType, it.availablePrTurn)
+                }
+            }
         )
     }
 

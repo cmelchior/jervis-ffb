@@ -94,7 +94,7 @@ object BlitzAction : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                PlayerDeselected -> ExitProcedure()
+                is PlayerDeselected -> ExitProcedure()
                 is PlayerSelected -> {
                     val context = state.getContext<BlitzContext>()
                     compositeCommandOf(
@@ -155,7 +155,7 @@ object BlitzAction : Procedure() {
                     compositeCommandOf(
                         SetContext(context.copy(hasBlocked = true)),
                         SetContext(blockContext),
-                        GotoNode(ResolveBlock)
+                        GotoNode(SelectBlockType)
                     )
                 }
 
@@ -181,8 +181,19 @@ object BlitzAction : Procedure() {
         }
     }
 
+    object SelectBlockType : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            TODO("Not yet implemented")
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return GotoNode(ResolveBlock)
+        }
+    }
+
     object ResolveBlock : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             val blitzContext = state.getContext<BlitzContext>()
             return SetContext(BlockContext(
                 blitzContext.attacker,

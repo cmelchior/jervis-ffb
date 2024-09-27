@@ -6,6 +6,7 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.procedures.DieRoll
 import dk.ilios.jervis.procedures.UseStandardSkillReroll
 import dk.ilios.jervis.procedures.UseTeamReroll
+import dk.ilios.jervis.rules.PlayerSpecialActionType
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
@@ -161,6 +162,18 @@ interface D6StandardSkillReroll : RerollSource {
         if (value.size != 1) error("Unsupported number of dice: ${value.joinToString()}")
         return listOf(DiceRerollOption(this, value))
     }
+}
+
+/**
+ * Interface for skills that provide a special action.
+ * Note, for skills that replace blocks, they procedure being referenced is the Standalone
+ * variant. Special skills that can be used as part of a Multiple Block
+ * are defined in [dk.ilios.jervis.procedures.actions.block.MultipleBlockContext] and will
+ * be handled separately there.
+ */
+interface SpecialActionProvider {
+    val specialAction: PlayerSpecialActionType
+    var isSpecialActionUsed: Boolean
 }
 
 @Serializable

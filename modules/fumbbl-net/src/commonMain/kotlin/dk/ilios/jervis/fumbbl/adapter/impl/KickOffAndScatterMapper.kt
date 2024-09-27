@@ -1,7 +1,7 @@
 package dk.ilios.jervis.fumbbl.adapter.impl
 
 import dk.ilios.jervis.actions.D6Result
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
@@ -73,7 +73,7 @@ object KickOffAndScatterMapper: CommandActionMapper {
         // TODO Kick not supported yet
         newActions.add(FieldSquareSelected(startingPoint.x, startingPoint.y), TheKickOff.PlaceTheKick)
         newActions.add(
-            DiceResults(
+            DiceRollResults(
                 RandomDirectionTemplate.getRollForDirection(
                     report.scatterDirection.transformToJervisDirection(),
                 ),

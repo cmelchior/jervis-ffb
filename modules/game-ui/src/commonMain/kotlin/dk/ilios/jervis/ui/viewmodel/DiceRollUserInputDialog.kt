@@ -10,14 +10,14 @@ import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.Dice
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.RollDice
-import dk.ilios.jervis.actions.SelectDiceResult
-import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.actions.SelectDicePoolResult
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.actions.foul.FoulContext
 import dk.ilios.jervis.procedures.actions.pass.PassContext
 import dk.ilios.jervis.rules.Rules
@@ -33,7 +33,7 @@ class DiceRollUserInputDialog(
     val title: String,
     val message: String,
     val dice: List<Pair<Dice, List<DieResult>>>,
-    val result: (DiceResults) -> String?,
+    val result: (DiceRollResults) -> String?,
     override var owner: Team? = null,
 ) : UserInputDialog {
     override val actions: List<GameAction> = emptyList()
@@ -44,7 +44,7 @@ class DiceRollUserInputDialog(
                 title = "Fan Factor Roll",
                 message = "Roll D3 for ${team.name}",
                 dice = listOf(Pair(Dice.D3, D3Result.allOptions())),
-                result = { rolls: DiceResults -> null },
+                result = { rolls: DiceRollResults -> null },
             )
         }
 
@@ -57,7 +57,7 @@ class DiceRollUserInputDialog(
                         Pair(Dice.D6, D6Result.allOptions()),
                         Pair(Dice.D6, D6Result.allOptions()),
                     ),
-                result = { rolls: DiceResults ->
+                result = { rolls: DiceRollResults ->
                     val description =
                         rules.weatherTable.roll(
                             rolls.rolls.first() as D6Result,
@@ -77,7 +77,7 @@ class DiceRollUserInputDialog(
                         Pair(Dice.D8, D8Result.allOptions()),
                         Pair(Dice.D6, D6Result.allOptions()),
                     ),
-                result = { rolls: DiceResults ->
+                result = { rolls: DiceRollResults ->
                     val d8 = rolls.first() as? D8Result ?: rolls.last() as D8Result
                     val d6 = rolls.last() as? D6Result ?: rolls.first() as D6Result
                     val description =
@@ -106,7 +106,7 @@ class DiceRollUserInputDialog(
                         Pair(Dice.D6, D6Result.allOptions()),
                         Pair(Dice.D6, D6Result.allOptions()),
                     ),
-                result = { rolls: DiceResults ->
+                result = { rolls: DiceRollResults ->
                     val description: String =
                         rules.kickOffEventTable.roll(
                             rolls.first() as D6Result,
@@ -122,16 +122,16 @@ class DiceRollUserInputDialog(
                 title = "${ if (isBlitz) "Blitz" else "Block"} roll",
                 message = "Roll ${diceCount}D6",
                 dice = (1..diceCount).map { Pair(Dice.BLOCK, DBlockResult.allOptions()) },
-                result = { rolls: DiceResults -> null },
+                result = { rolls: DiceRollResults -> null },
             )
         }
 
-        fun createSelectBlockDie(result: SelectDiceResult): UserInputDialog {
-            return DiceRollUserInputDialog(
-                title = "Select Block Result",
+        fun createSelectBlockDie(result: SelectDicePoolResult): UserInputDialog {
+            return DicePoolUserInputDialog(
+                dialogTitle = "Select Block Result",
                 message = "Select die to apply",
-                dice = listOf(Pair(Dice.BLOCK, result.choices)),
-                result = { rolls: DiceResults -> null },
+                poolTitles = emptyList(),
+                dice = result.pools.map { Pair(Dice.BLOCK, it) },
             )
         }
 
@@ -144,7 +144,7 @@ class DiceRollUserInputDialog(
                         Pair(Dice.D6, D6Result.allOptions()),
                         Pair(Dice.D6, D6Result.allOptions()),
                     ),
-                result = { rolls: DiceResults ->
+                result = { rolls: DiceRollResults ->
                     rolls.sum().toString()
                 },
             )
@@ -159,7 +159,7 @@ class DiceRollUserInputDialog(
                         Pair(Dice.D6, D6Result.allOptions()),
                         Pair(Dice.D6, D6Result.allOptions()),
                     ),
-                result = { rolls: DiceResults ->
+                result = { rolls: DiceRollResults ->
                     val result = rules.injuryTable.roll(rolls.first() as D6Result, rolls.last() as D6Result)
                     "${result.title} (${rolls.sum()})"
                 },
@@ -174,7 +174,7 @@ class DiceRollUserInputDialog(
                     listOf(
                         Pair(Dice.D16, D16Result.allOptions()),
                     ),
-                result = { rolls: DiceResults ->
+                result = { rolls: DiceRollResults ->
                     val result = rules.casualtyTable.roll(rolls.first() as D16Result)
                     "${result.title} (${rolls.sum()})"
                 },
@@ -186,7 +186,7 @@ class DiceRollUserInputDialog(
                 title = "Lasting Injury roll",
                 message = "Roll D6 for a Lasting Injury on ${player.name}",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { rolls: DiceResults ->
+                result = { rolls: DiceRollResults ->
                     val result = rules.lastingInjuryTable.roll(rolls.first() as D6Result)
                     "${result.description} (${rolls.sum()})"
                 },
@@ -198,7 +198,7 @@ class DiceRollUserInputDialog(
                 title = "Argue The Call Roll",
                 message = "Roll D6 to Argue The Call on behalf of ${context.fouler.name}",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { rolls: DiceResults ->
+                result = { rolls: DiceRollResults ->
                     val result = rules.argueTheCallTable.roll(rolls.first() as D6Result)
                     "${result.title} (${rolls.sum()})"
                 },
@@ -210,7 +210,7 @@ class DiceRollUserInputDialog(
                 title = "Test for Accuracy",
                 message = "${passContext.thrower.name} rolls a D6 to test for accuracy when making a pass",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceResults -> null }
+                result = { _: DiceRollResults -> null }
             )
         }
 
@@ -219,7 +219,7 @@ class DiceRollUserInputDialog(
                 title = "Scatter Roll",
                 message = "Roll 3D8 to scatter the ball",
                 dice = listOf(Pair(Dice.D8, D8Result.allOptions()), Pair(Dice.D8, D8Result.allOptions()), Pair(Dice.D8, D8Result.allOptions())),
-                result = { dice: DiceResults ->
+                result = { dice: DiceRollResults ->
                     dice.joinToString(prefix = "[", postfix = "]") { result: DieResult ->
                         if (result is D8Result) {
                             when (val direction = rules.direction(result)) {
@@ -246,7 +246,7 @@ class DiceRollUserInputDialog(
                 title = "Dodge Roll",
                 message = "${player.name} rolls D6 to dodge to ${target.toLogString()}.",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { rolls: DiceResults -> null }
+                result = { rolls: DiceRollResults -> null }
             )
         }
 
@@ -255,7 +255,7 @@ class DiceRollUserInputDialog(
                 title = "Rush Roll",
                 message = "${player.name} rolls D6 to rush to ${target.toLogString()}",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { rolls: DiceResults -> null }
+                result = { rolls: DiceRollResults -> null }
             )
         }
 
@@ -264,7 +264,7 @@ class DiceRollUserInputDialog(
                 title = "Sweltering Heat Roll",
                 message = "Roll D3 to find number of affected players.",
                 dice = listOf(Pair(Dice.D3, D3Result.allOptions())),
-                result = { rolls: DiceResults -> null }
+                result = { rolls: DiceRollResults -> null }
             )
         }
 
@@ -273,7 +273,7 @@ class DiceRollUserInputDialog(
                 title = "Prayer to Nuffle Roll ($rollsRemaining rolls)",
                 message = "Roll D16 to choose a prayer",
                 dice = listOf(Pair(Dice.D16, D16Result.allOptions())),
-                result = { rolls: DiceResults ->
+                result = { rolls: DiceRollResults ->
                     rules.prayersToNuffleTable.roll(rolls.first() as D16Result).description
                 }
             )
@@ -284,7 +284,7 @@ class DiceRollUserInputDialog(
                 title = "Bad Habits Roll",
                 message = "Roll D3 to find number of affected players",
                 dice = listOf(Pair(Dice.D3, D3Result.allOptions())),
-                result = { _: DiceResults -> null }
+                result = { _: DiceRollResults -> null }
             )
         }
 
@@ -293,7 +293,7 @@ class DiceRollUserInputDialog(
                 title = "Cheering Fans Roll",
                 message = "${team.name} rolls a D6 for Cheering Fans",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceResults -> null }
+                result = { _: DiceRollResults -> null }
             )
         }
 
@@ -302,7 +302,7 @@ class DiceRollUserInputDialog(
                 title = "Brilliant Coaching Roll",
                 message = "${team.name} rolls a D6 for Brilliant Coaching",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceResults -> null }
+                result = { _: DiceRollResults -> null }
             )
         }
 
@@ -311,7 +311,7 @@ class DiceRollUserInputDialog(
                 title = "Officious Ref Roll",
                 message = "${team.name} rolls a D6 for Officious Ref",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceResults -> null }
+                result = { _: DiceRollResults -> null }
             )
         }
 
@@ -320,7 +320,7 @@ class DiceRollUserInputDialog(
                 title = "Officious Ref Player Roll",
                 message = "${player.name} rolls a D6 while arguing with the Ref",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
-                result = { _: DiceResults -> null }
+                result = { _: DiceRollResults -> null }
             )
         }
 
@@ -343,7 +343,7 @@ class DiceRollUserInputDialog(
                 title = "Unknown Dice Roll",
                 message = "Unmapped die roll (see logs for details)",
                 dice = dice,
-                result = { _: DiceResults -> null }
+                result = { _: DiceRollResults -> null }
             )
         }
     }

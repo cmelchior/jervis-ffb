@@ -28,9 +28,9 @@ import kotlin.experimental.xor
  *
  * This class is not thread safe (yet).
  *
- * @see https://en.wikipedia.org/wiki/Fortuna_(PRNG)
+ * See https://en.wikipedia.org/wiki/Fortuna_(PRNG) for details on this algorithm.
  */
-class Fortuna: DiceGenerator {
+class Fortuna: DiceRollGenerator {
     private val pools: Array<EntropyPool?>
     private var currentPool: Int
     private var poolSelector: Int

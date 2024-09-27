@@ -1,6 +1,7 @@
 package dk.ilios.jervis.utils
 
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.BlockTypeSelected
 import dk.ilios.jervis.actions.Cancel
 import dk.ilios.jervis.actions.CancelWhenReady
 import dk.ilios.jervis.actions.CoinSideSelected
@@ -20,7 +21,9 @@ import dk.ilios.jervis.actions.D8Result
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.Dice
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DicePoolChoice
+import dk.ilios.jervis.actions.DicePoolResultsSelected
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.DieResult
 import dk.ilios.jervis.actions.DogoutSelected
 import dk.ilios.jervis.actions.EndAction
@@ -40,16 +43,16 @@ import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.actions.RerollOptionSelected
 import dk.ilios.jervis.actions.RollDice
-import dk.ilios.jervis.actions.SelectAction
 import dk.ilios.jervis.actions.SelectBlockType
 import dk.ilios.jervis.actions.SelectCoinSide
-import dk.ilios.jervis.actions.SelectDiceResult
+import dk.ilios.jervis.actions.SelectDicePoolResult
 import dk.ilios.jervis.actions.SelectDogout
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectInducement
 import dk.ilios.jervis.actions.SelectMoveType
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectPlayer
+import dk.ilios.jervis.actions.SelectPlayerAction
 import dk.ilios.jervis.actions.SelectRandomPlayers
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.actions.SelectSkill
@@ -154,7 +157,7 @@ fun createRandomAction(
                         Dice.BLOCK -> DBlockResult()
                     }
                 }
-            return DiceResults(results)
+            return DiceRollResults(results)
         }
         ConfirmWhenReady -> Confirm
         EndSetupWhenReady -> EndSetup
@@ -162,7 +165,7 @@ fun createRandomAction(
         is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
         is SelectPlayer -> PlayerSelected(action.player)
         is DeselectPlayer -> PlayerDeselected(action.player)
-        is SelectAction -> PlayerActionSelected(action.action.type)
+        is SelectPlayerAction -> PlayerActionSelected(action.action.type)
         EndActionWhenReady -> EndAction
         CancelWhenReady -> Cancel
         SelectCoinSide -> {
@@ -185,11 +188,15 @@ fun createRandomAction(
 
         is SelectNoReroll -> NoRerollSelected(action.dicePoolId)
         is SelectRerollOption -> RerollOptionSelected(action.option)
-        is SelectDiceResult -> action.choices.random()
+        is SelectDicePoolResult -> {
+            DicePoolResultsSelected(action.pools.map { pool ->
+                DicePoolChoice(pool.id, pool.dice.shuffled().subList(0, pool.selectDice).map { it.result })
+            })
+        }
         is SelectMoveType -> MoveTypeSelected(action.type)
         is SelectSkill -> SkillSelected(action.skill)
         is SelectInducement -> InducementSelected(action.id)
-        is SelectBlockType -> TODO()
+        is SelectBlockType -> BlockTypeSelected(action.type)
     }
 }
 

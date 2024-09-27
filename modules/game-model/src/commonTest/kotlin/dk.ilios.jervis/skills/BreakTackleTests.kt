@@ -3,7 +3,7 @@ package dk.ilios.jervis.skills
 import dk.ilios.jervis.JervisGameTest
 import dk.ilios.jervis.actions.CalculatedAction
 import dk.ilios.jervis.actions.Confirm
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.MoveType
 import dk.ilios.jervis.actions.MoveTypeSelected
@@ -21,7 +21,7 @@ import dk.ilios.jervis.model.context.DodgeRollContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.BreakTackleModifier
 import dk.ilios.jervis.procedures.FullGame
-import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.PlayerStandardActionType
 import dk.ilios.jervis.rules.skills.BreakTackle
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import kotlin.test.BeforeTest
@@ -57,10 +57,10 @@ class BreakTackleTests: JervisGameTest() {
             *defaultKickOffHomeTeam(),
             // Dodge A1 away using Break Tackle
             PlayerSelected(player),
-            PlayerActionSelected(PlayerActionType.MOVE),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
             FieldSquareSelected(FieldCoordinate(14, 5)),
-            DiceResults(2.d6), // Dodge roll, is not enough
+            DiceRollResults(2.d6), // Dodge roll, is not enough
             Confirm // Use Break Tackle
         )
         val context = state.getContext<DodgeRollContext>()
@@ -80,10 +80,10 @@ class BreakTackleTests: JervisGameTest() {
             *defaultKickOffHomeTeam(),
             // Dodge A1 away using Break Tackle
             PlayerSelected(player),
-            PlayerActionSelected(PlayerActionType.MOVE),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
             FieldSquareSelected(FieldCoordinate(14, 5)),
-            DiceResults(1.d6), // Dodge roll, is not enough
+            DiceRollResults(1.d6), // Dodge roll, is not enough
             Confirm, // Use Break Tackle, still not enough
             CalculatedAction { state, rules ->
                 val context = state.getContext<DodgeRollContext>()
@@ -91,7 +91,7 @@ class BreakTackleTests: JervisGameTest() {
                 val reroll = context.player.team.availableRerolls.first()
                 RerollOptionSelected(DiceRerollOption(reroll, listOf(roll)))
             },
-            DiceResults(2.d6), // Dodge roll, should now succeed
+            DiceRollResults(2.d6), // Dodge roll, should now succeed
         )
 
         val context = state.getContext<DodgeRollContext>()

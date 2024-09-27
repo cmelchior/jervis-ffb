@@ -24,7 +24,7 @@ import dk.ilios.jervis.reports.LogEntry
 import dk.ilios.jervis.reports.ReportAvailableActions
 import dk.ilios.jervis.reports.ReportHandleAction
 import dk.ilios.jervis.reports.SimpleLogEntry
-import dk.ilios.jervis.rng.DiceGenerator
+import dk.ilios.jervis.rng.DiceRollGenerator
 import dk.ilios.jervis.rng.UnsafeRandomDiceGenerator
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.serialize.JervisSerialization
@@ -49,7 +49,7 @@ data class RemoveEntry(val log: LogEntry) : ListEvent
 class GameController(
     rules: Rules,
     state: Game,
-    diceGenerator: DiceGenerator = UnsafeRandomDiceGenerator()
+    diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator()
 ) {
     // Copy of the state Home and Away teams, taken just before starting the game
     var initialHomeTeamState: JsonElement? = null
@@ -58,7 +58,7 @@ class GameController(
     private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 0, extraBufferCapacity = 20_000)
     val logsEvents: Flow<ListEvent> = _logsEvents
     val logs: MutableList<LogEntry> = mutableListOf()
-    val diceGenerator = diceGenerator
+    val diceRollGenerator = diceGenerator
     val rules: Rules = rules
     val stack: ProcedureStack = ProcedureStack()
     val actionHistory: MutableList<GameAction> = mutableListOf() // List all actions provided by the user.

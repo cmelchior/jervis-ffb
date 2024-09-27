@@ -39,7 +39,7 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 
 
-data class HandOffContext(
+data class ThrowTeamMateContext(
     val thrower: Player,
     val catcher: Player? = null,
     val hasMoved: Boolean = false,
@@ -50,7 +50,7 @@ data class HandOffContext(
  * See page 51 in the rulebook.
  */
 @Serializable
-object HandOffAction : Procedure() {
+object ThrowTeamMateAction : Procedure() {
     override val initialNode: Node = MoveOrHandOffOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val player = state.activePlayer!!

@@ -1,7 +1,7 @@
 package dk.ilios.jervis.tables
 
 import dk.ilios.jervis.JervisGameTest
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.PlayerSelected
@@ -45,7 +45,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 1.d6),
+                    DiceRollResults(1.d6, 1.d6),
                 )
             )
         )
@@ -61,7 +61,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 2.d6), // Roll Time-out
+                    DiceRollResults(1.d6, 2.d6), // Roll Time-out
                 )
             )
         )
@@ -83,7 +83,7 @@ class KickOffEventTests: JervisGameTest() {
         controller.rollForward(
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 2.d6), // Roll Time-out
+                    DiceRollResults(1.d6, 2.d6), // Roll Time-out
                 )
             )
         )
@@ -100,7 +100,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(2.d6, 2.d6), // Roll Solid Defense
+                    DiceRollResults(2.d6, 2.d6), // Roll Solid Defense
                     1.d3, // D3 + 3 players
                     PlayerSelected("H6".playerId),
                     FieldSquareSelected(0, 5),
@@ -123,7 +123,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(2.d6, 2.d6), // Roll Solid Defense
+                    DiceRollResults(2.d6, 2.d6), // Roll Solid Defense
                     1.d3, // D3 + 3 players
                     PlayerSelected("H6".playerId),
                     FieldSquareSelected(0, 0),
@@ -151,7 +151,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(2.d6, 2.d6), // Roll Solid Defense
+                    DiceRollResults(2.d6, 2.d6), // Roll Solid Defense
                 ),
                 bounce = null
             )
@@ -176,7 +176,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 4.d6), // Roll High Kick
+                    DiceRollResults(1.d6, 4.d6), // Roll High Kick
                     PlayerSelected("A10".playerId),
                 ),
                 bounce = null
@@ -197,9 +197,9 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = FieldSquareSelected(13, 6),
-                deviate = DiceResults(2.d8, 1.d6), // Move ball to [13,5] which is occupied
+                deviate = DiceRollResults(2.d8, 1.d6), // Move ball to [13,5] which is occupied
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 4.d6), // Roll High Kick
+                    DiceRollResults(1.d6, 4.d6), // Roll High Kick
                     6.d6, // Player at [13,5] catches the ball
                 ),
                 bounce = null
@@ -219,9 +219,9 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = FieldSquareSelected(13, 7),
-                deviate = DiceResults(4.d8, 2.d6), // Move ball to [11,7], behind opponent LoS
+                deviate = DiceRollResults(4.d8, 2.d6), // Move ball to [11,7], behind opponent LoS
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 4.d6), // Roll High Kick
+                    DiceRollResults(1.d6, 4.d6), // Roll High Kick
                     PlayerSelected("A10".playerId),
                 ),
                 bounce = null
@@ -242,9 +242,9 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = FieldSquareSelected(13, 0),
-                deviate = DiceResults(2.d8, 1.d6), // Move ball to [11,7], behind opponent LoS
+                deviate = DiceRollResults(2.d8, 1.d6), // Move ball to [11,7], behind opponent LoS
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 4.d6), // Roll High Kick, cannot be used
+                    DiceRollResults(1.d6, 4.d6), // Roll High Kick, cannot be used
                 ),
                 bounce = null
             ),
@@ -269,7 +269,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 5.d6), // Roll Cheering Fans
+                    DiceRollResults(1.d6, 5.d6), // Roll Cheering Fans
                     2.d6, // Home team roll
                     1.d6, // Away team roll, should be the same value
                 ),
@@ -287,7 +287,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(1.d6, 5.d6), // Roll Cheering Fans
+                    DiceRollResults(1.d6, 5.d6), // Roll Cheering Fans
                     3.d6, // Home team roll
                     2.d6, // Away team roll
                     2.d16 // Prayers To Nuffle: Friends with the ref
@@ -307,7 +307,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(2.d6, 5.d6), // Roll Brilliant Coaching
+                    DiceRollResults(2.d6, 5.d6), // Roll Brilliant Coaching
                     3.d6, // Home team roll
                     3.d6, // Away team roll
                 ),
@@ -328,7 +328,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(2.d6, 5.d6), // Roll Brilliant Coaching
+                    DiceRollResults(2.d6, 5.d6), // Roll Brilliant Coaching
                     3.d6, // Home team roll
                     3.d6, // Away team roll - Wins
                 ),
@@ -347,7 +347,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(2.d6, 5.d6), // Roll Brilliant Coaching
+                    DiceRollResults(2.d6, 5.d6), // Roll Brilliant Coaching
                     2.d6, // Home team roll - Wins
                     1.d6, // Away team roll
                 ),
@@ -370,8 +370,8 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(4.d6, 4.d6), // Roll Changing Weather
-                    DiceResults(1.d6, 1.d6), // Roll Sweltering Heat
+                    DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
+                    DiceRollResults(1.d6, 1.d6), // Roll Sweltering Heat
                 ),
             ),
         )
@@ -386,9 +386,9 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(4.d6, 4.d6), // Roll Changing Weather
-                    DiceResults(3.d6, 4.d6), // Roll Perfect Conditions
-                    DiceResults(2.d8, 2.d8, 2.d8) // Scatter 3 times up
+                    DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
+                    DiceRollResults(3.d6, 4.d6), // Roll Perfect Conditions
+                    DiceRollResults(2.d8, 2.d8, 2.d8) // Scatter 3 times up
                 ),
                 bounce = 2.d8 // Final bounce up
             ),
@@ -406,11 +406,11 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = FieldSquareSelected(13, 7),
-                deviate = DiceResults(4.d8, 1.d6), // Deviate to [12,7] on Kickers sid
+                deviate = DiceRollResults(4.d8, 1.d6), // Deviate to [12,7] on Kickers sid
                 kickoffEvent = arrayOf(
-                    DiceResults(4.d6, 4.d6), // Roll Changing Weather
-                    DiceResults(3.d6, 4.d6), // Roll Perfect Conditions
-                    DiceResults(2.d8, 2.d8, 2.d8), // Scatter 3 times up
+                    DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
+                    DiceRollResults(3.d6, 4.d6), // Roll Perfect Conditions
+                    DiceRollResults(2.d8, 2.d8, 2.d8), // Scatter 3 times up
                     PlayerSelected("A1".playerId), // Touchback -> give to A1
                 ),
                 bounce = null
@@ -429,11 +429,11 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = FieldSquareSelected(13, 7),
-                deviate = DiceResults(4.d8, 1.d6), // Deviate to [12,7] on Kickers side
+                deviate = DiceRollResults(4.d8, 1.d6), // Deviate to [12,7] on Kickers side
                 kickoffEvent = arrayOf(
-                    DiceResults(4.d6, 4.d6), // Roll Changing Weather
-                    DiceResults(3.d6, 4.d6), // Roll Perfect Conditions
-                    DiceResults(5.d8, 5.d8, 2.d8), // Scatter 3 times up to the right, back to receivers side [14, 6]
+                    DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
+                    DiceRollResults(3.d6, 4.d6), // Roll Perfect Conditions
+                    DiceRollResults(5.d8, 5.d8, 2.d8), // Scatter 3 times up to the right, back to receivers side [14, 6]
                 ),
                 bounce = 2.d8 // Bounce to [14, 5]
             ),
@@ -451,10 +451,10 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 placeKick = FieldSquareSelected(13, 0),
-                deviate = DiceResults(2.d8, 1.d6), // Deviate out of bounds with exit at [13, 0]
+                deviate = DiceRollResults(2.d8, 1.d6), // Deviate out of bounds with exit at [13, 0]
                 kickoffEvent = arrayOf(
-                    DiceResults(4.d6, 4.d6), // Roll Changing Weather
-                    DiceResults(3.d6, 4.d6), // Roll Perfect Conditions
+                    DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
+                    DiceRollResults(3.d6, 4.d6), // Roll Perfect Conditions
                     PlayerSelected("A5".playerId)
                 ),
                 bounce = null
@@ -475,7 +475,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(3.d6, 6.d6), // Roll Quick Snap
+                    DiceRollResults(3.d6, 6.d6), // Roll Quick Snap
                     1.d3, // D3 + 3 players
                 ),
                 bounce = null
@@ -506,7 +506,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(4.d6, 5.d6), // Roll Quick Snap
+                    DiceRollResults(4.d6, 5.d6), // Roll Quick Snap
                 ),
                 bounce = null
             )
@@ -531,7 +531,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(3.d6, 6.d6), // Roll Quick Snap
+                    DiceRollResults(3.d6, 6.d6), // Roll Quick Snap
                     1.d3, // D3 + 3 players
                     PlayerSelected("A6".playerId),
                     FieldSquareSelected(14,0),
@@ -555,7 +555,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(3.d6, 6.d6), // Roll Quick Snap
+                    DiceRollResults(3.d6, 6.d6), // Roll Quick Snap
                     1.d3, // D3 + 3 players
                     PlayerSelected("A6".playerId),
                     FieldSquareSelected(14,1), // Same location
@@ -582,7 +582,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(5.d6, 6.d6), // Roll Officious Ref
+                    DiceRollResults(5.d6, 6.d6), // Roll Officious Ref
                     6.d6, // Home team rolls
                     3.d6, // Away team rolls
                     RandomPlayersSelected(listOf("A1".playerId)),
@@ -602,7 +602,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(5.d6, 6.d6), // Roll Officious Ref
+                    DiceRollResults(5.d6, 6.d6), // Roll Officious Ref
                     6.d6, // Home team rolls
                     4.d6, // Away team rolls
                     RandomPlayersSelected(listOf("A1".playerId)),
@@ -635,7 +635,7 @@ class KickOffEventTests: JervisGameTest() {
         controller.rollForward(
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(5.d6, 6.d6), // Roll Officious Ref
+                    DiceRollResults(5.d6, 6.d6), // Roll Officious Ref
                     6.d6, // Home team rolls
                     4.d6, // Away team rolls
                     RandomPlayersSelected(listOf("A1".playerId)),
@@ -658,7 +658,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(6.d6, 6.d6), // Roll Pitch Invasion
+                    DiceRollResults(6.d6, 6.d6), // Roll Pitch Invasion
                     6.d6, // Home team rolls
                     3.d6, // Away team rolls
                     2.d3, // Affected players on Receiving team
@@ -678,7 +678,7 @@ class KickOffEventTests: JervisGameTest() {
             *defaultSetup(),
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(6.d6, 6.d6), // Roll Pitch Invasion
+                    DiceRollResults(6.d6, 6.d6), // Roll Pitch Invasion
                     6.d6, // Home team rolls
                     4.d6, // Away team rolls
                     2.d3, // Affected players on Receiving team
@@ -710,7 +710,7 @@ class KickOffEventTests: JervisGameTest() {
         controller.rollForward(
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
-                    DiceResults(6.d6, 6.d6), // Roll Officious Ref
+                    DiceRollResults(6.d6, 6.d6), // Roll Officious Ref
                     1.d6, // Home team rolls
                     6.d6, // Away team rolls
                     3.d3 // 3 players affected, but none are available

@@ -37,9 +37,12 @@ import dk.ilios.jervis.utils.INVALID_ACTION
 data class PushContext(
     val firstPusher: Player,
     val firstPushee: Player,
+    // Is the push part of a multiple block
+    val isMultipleBlock: Boolean,
     // Chain of pushes, for a single push, this contains one element
     // Should only be modified from within `PushStep`.
-    val pushChain: List<PushData>
+    val pushChain: List<PushData>,
+    val followsUp: Boolean = false,
 ) : ProcedureContext {
 
     // Returns last "pusher" in the push chain
@@ -465,10 +468,13 @@ object PushStep: Procedure() {
     }
 
     object DecideToFollowUp: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<PushContext>().firstPusher.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().firstPusher.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PushContext>()
-            return if (context.firstPusher.hasSkill<Frenzy>()) {
+            return if (
+                context.firstPusher.hasSkill<Frenzy>() || // Always follow up when having Frenzy
+                context.isMultipleBlock // Never follow up when using Multiple Block
+            ) {
                 listOf(ContinueWhenReady)
             } else {
                 return listOf(
@@ -482,14 +488,20 @@ object PushStep: Procedure() {
             val context = state.getContext<PushContext>()
             val actions = when(action) {
                 is Confirm -> arrayOf(
+                    SetContext(context.copy(followsUp = true)),
                     SetPlayerLocation(context.firstPusher, context.pushChain.first().from)
                 )
                 is Cancel -> arrayOf() // Do nothing
                 is Continue -> {
                     if (context.firstPusher.hasSkill<Frenzy>()) {
-                        arrayOf(SetPlayerLocation(context.firstPusher, context.pushChain.first().from))
+                        arrayOf(
+                            SetContext(context.copy(followsUp = true)),
+                            SetPlayerLocation(context.firstPusher, context.pushChain.first().from)
+                        )
                     } else {
-                        arrayOf() // Do nothing
+                        arrayOf(
+                            SetContext(context.copy(followsUp = false)),
+                        ) // Do nothing
                     }
                 }
                 else -> INVALID_ACTION(action)

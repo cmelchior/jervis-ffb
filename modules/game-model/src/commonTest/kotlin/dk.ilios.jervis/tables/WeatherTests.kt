@@ -2,7 +2,7 @@ package dk.ilios.jervis.tables
 
 import dk.ilios.jervis.JervisGameTest
 import dk.ilios.jervis.actions.Confirm
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
@@ -34,7 +34,7 @@ import dk.ilios.jervis.moveTo
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.procedures.actions.pass.PassContext
 import dk.ilios.jervis.procedures.actions.pass.PassingType
-import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.PlayerStandardActionType
 import dk.ilios.jervis.rules.tables.Range
 import dk.ilios.jervis.rules.tables.Weather
 import dk.ilios.jervis.skipTurns
@@ -52,7 +52,7 @@ class WeatherTests: JervisGameTest() {
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultFanFactor(),
-            DiceResults(6.d6, 6.d6), // Weather roll
+            DiceRollResults(6.d6, 6.d6), // Weather roll
         )
         assertEquals(Weather.BLIZZARD, state.weather)
     }
@@ -62,7 +62,7 @@ class WeatherTests: JervisGameTest() {
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
-                weatherRoll = DiceResults(1.d6, 1.d6), // Weather roll
+                weatherRoll = DiceRollResults(1.d6, 1.d6), // Weather roll
             ),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
@@ -94,12 +94,12 @@ class WeatherTests: JervisGameTest() {
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
-                weatherRoll = DiceResults(1.d6, 2.d6)
+                weatherRoll = DiceRollResults(1.d6, 2.d6)
             ),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
             PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerActionType.PASS),
+            PlayerActionSelected(PlayerStandardActionType.PASS),
             *moveTo(17, 7),
             4.d6, // Pickup ball
             NoRerollSelected,
@@ -123,11 +123,11 @@ class WeatherTests: JervisGameTest() {
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
-                weatherRoll = DiceResults(5.d6, 6.d6)
+                weatherRoll = DiceRollResults(5.d6, 6.d6)
             ),
             *defaultSetup(),
             *defaultKickOffHomeTeam(
-                deviate = DiceResults(4.d8, 3.d6), // Land on A10 at [16,7]
+                deviate = DiceRollResults(4.d8, 3.d6), // Land on A10 at [16,7]
                 bounce = null
             ),
             4.d6 // Attempt to catch the ball. Should fail due to -2 to catch.
@@ -142,12 +142,12 @@ class WeatherTests: JervisGameTest() {
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
-                weatherRoll = DiceResults(5.d6, 6.d6)
+                weatherRoll = DiceRollResults(5.d6, 6.d6)
             ),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
             PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerActionType.MOVE),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
             *moveTo(17, 7),
             3.d6 // Attempt to pick up the ball. Should fail due to -1 to pickup.
         )
@@ -161,11 +161,11 @@ class WeatherTests: JervisGameTest() {
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
-                weatherRoll = DiceResults(6.d6, 6.d6)
+                weatherRoll = DiceRollResults(6.d6, 6.d6)
             ),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
-            *activatePlayer("A11", PlayerActionType.MOVE),
+            *activatePlayer("A11", PlayerStandardActionType.MOVE),
             *moveTo(23, 7),
             *moveTo(24, 7),
             *moveTo(25, 7),
@@ -186,12 +186,12 @@ class WeatherTests: JervisGameTest() {
         controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
-                weatherRoll = DiceResults(6.d6, 6.d6)
+                weatherRoll = DiceRollResults(6.d6, 6.d6)
             ),
             *defaultSetup(),
             *defaultKickOffHomeTeam(),
             PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerActionType.PASS),
+            PlayerActionSelected(PlayerStandardActionType.PASS),
             *moveTo(17, 7),
             4.d6, // Pickup ball
             NoRerollSelected,

@@ -1,5 +1,6 @@
 package dk.ilios.jervis.rules.skills
 
+import dk.ilios.jervis.rules.PlayerSpecialActionType
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory
 import kotlinx.serialization.Serializable
 
@@ -7,7 +8,7 @@ import kotlinx.serialization.Serializable
 class Stab(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
-) : BB2020Skill {
+) : BB2020Skill, SpecialActionProvider {
     override val skillId: String = "stab-skill"
     override val name: String = "Stab"
     override val compulsory: Boolean = false
@@ -17,6 +18,8 @@ class Stab(
     override val value: Int? = null // Skill has no value
     override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = false
+    override val specialAction: PlayerSpecialActionType = PlayerSpecialActionType.STAB
+    override var isSpecialActionUsed: Boolean = false
 
     @Serializable
     data object Factory: SkillFactory {

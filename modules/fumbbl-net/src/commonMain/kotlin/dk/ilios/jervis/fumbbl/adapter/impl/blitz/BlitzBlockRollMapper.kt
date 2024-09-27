@@ -1,7 +1,7 @@
 package dk.ilios.jervis.fumbbl.adapter.impl.blitz
 
 import dk.ilios.jervis.actions.DBlockResult
-import dk.ilios.jervis.actions.DiceResults
+import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
@@ -45,6 +45,6 @@ object BlitzBlockRollMapper: CommandActionMapper {
             val context = jervisGame.getContext<BlitzContext>()
             PlayerSelected(context.defender!!.id)
        }, BlitzAction.MoveOrBlockOrEndAction)
-        newActions.add(DiceResults(diceRoll), StandardBlockRollDice.RollDice)
+        newActions.add(DiceRollResults(diceRoll), StandardBlockRollDice.RollDice)
     }
 }

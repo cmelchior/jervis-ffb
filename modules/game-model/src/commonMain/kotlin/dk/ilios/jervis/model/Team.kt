@@ -6,7 +6,8 @@ import dk.ilios.jervis.model.inducements.InfamousCoachingStaff
 import dk.ilios.jervis.model.inducements.SpecialPlayCard
 import dk.ilios.jervis.model.inducements.wizards.Wizard
 import dk.ilios.jervis.model.locations.DogOut
-import dk.ilios.jervis.rules.PlayerActionType
+import dk.ilios.jervis.rules.PlayerSpecialActionType
+import dk.ilios.jervis.rules.PlayerStandardActionType
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Roster
 import dk.ilios.jervis.rules.roster.bb2020.SpecialRules
 import dk.ilios.jervis.rules.skills.TeamReroll
@@ -39,44 +40,46 @@ class TeamTurnData(private val game: Game) {
         game.gameFlow.safeTryEmit(game)
     }
     var moveActions: Int
-        get() = availableActions[PlayerActionType.MOVE]!!
+        get() = availableStandardActions[PlayerStandardActionType.MOVE]!!
         set(value) {
-            availableActions[PlayerActionType.MOVE] = value
+            availableStandardActions[PlayerStandardActionType.MOVE] = value
         }
     var passActions: Int
-        get() = availableActions[PlayerActionType.PASS]!!
+        get() = availableStandardActions[PlayerStandardActionType.PASS]!!
         set(value) {
-            availableActions[PlayerActionType.PASS] = value
+            availableStandardActions[PlayerStandardActionType.PASS] = value
         }
     var handOffActions: Int
-        get() = availableActions[PlayerActionType.HAND_OFF]!!
+        get() = availableStandardActions[PlayerStandardActionType.HAND_OFF]!!
         set(value) {
-            availableActions[PlayerActionType.HAND_OFF] = value
+            availableStandardActions[PlayerStandardActionType.HAND_OFF] = value
         }
     var blockActions: Int
-        get() = availableActions[PlayerActionType.BLOCK]!!
+        get() = availableStandardActions[PlayerStandardActionType.BLOCK]!!
         set(value) {
-            availableActions[PlayerActionType.BLOCK] = value
+            availableStandardActions[PlayerStandardActionType.BLOCK] = value
         }
     var blitzActions: Int
-        get() = availableActions[PlayerActionType.BLITZ]!!
+        get() = availableStandardActions[PlayerStandardActionType.BLITZ]!!
         set(value) {
-            availableActions[PlayerActionType.BLITZ] = value
+            availableStandardActions[PlayerStandardActionType.BLITZ] = value
         }
     var foulActions: Int
-        get() = availableActions[PlayerActionType.FOUL]!!
+        get() = availableStandardActions[PlayerStandardActionType.FOUL]!!
         set(value) {
-            availableActions[PlayerActionType.FOUL] = value
+            availableStandardActions[PlayerStandardActionType.FOUL] = value
         }
-    val availableActions =
+    val availableStandardActions =
         mutableMapOf(
-            PlayerActionType.MOVE to 0,
-            PlayerActionType.PASS to 0,
-            PlayerActionType.HAND_OFF to 0,
-            PlayerActionType.BLOCK to 0,
-            PlayerActionType.BLITZ to 0,
-            PlayerActionType.FOUL to 0,
+            PlayerStandardActionType.MOVE to 0,
+            PlayerStandardActionType.PASS to 0,
+            PlayerStandardActionType.HAND_OFF to 0,
+            PlayerStandardActionType.BLOCK to 0,
+            PlayerStandardActionType.BLITZ to 0,
+            PlayerStandardActionType.FOUL to 0,
         )
+
+    val availableSpecialActions = mutableMapOf<PlayerSpecialActionType, Int>()
 }
 
 @Serializable

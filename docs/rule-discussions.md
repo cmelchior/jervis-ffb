@@ -155,3 +155,7 @@ interpreted.
     bounce. This solves all of the questions above + increases the "Awesome"-factor if
     it actually succeeds.
 
+6. Currently resolving injuries in a Multiple BLock is not done at the same time, instead you
+   choose which player to roll apothecary/regen for first. This is just to make it easier
+   and should be fixed once the patch-up player sequence has been implemented fully.
+

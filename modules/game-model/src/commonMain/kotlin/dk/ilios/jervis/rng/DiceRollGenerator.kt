@@ -9,6 +9,6 @@ import dk.ilios.jervis.actions.DieResult
  * Implementations of this interface are free to choose how they do it. So the returned
  * results can either be random or following some fixed pattern.
  */
-interface DiceGenerator {
+interface DiceRollGenerator {
     fun rollDie(die: Dice): DieResult
 }

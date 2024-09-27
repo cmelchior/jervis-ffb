@@ -16,8 +16,11 @@ import kotlin.random.Random
 /**
  * Dice Generator that just uses whatever default random implementation exists
  * on the platform.
+ *
+ * This is almost never random enough to model dice rolls in a game, so this class
+ * should only be used for testing.
  */
-class UnsafeRandomDiceGenerator: DiceGenerator {
+class UnsafeRandomDiceGenerator: DiceRollGenerator {
     val random = Random.Default
 
     override fun rollDie(die: Dice): DieResult {
