@@ -48,7 +48,7 @@ object CasualtyRoll: Procedure() {
                 val updatedContext = context.copy(
                     casualtyRoll = d16,
                     casualtyResult = result,
-                    casualtyModifiers = modifiers,
+//                    casualtyModifiers = modifiers,
                 )
 
                 compositeCommandOf(

@@ -160,7 +160,9 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
         if (currentNode == StandardBlockChooseResult.SelectBlockResult && actions.size == 1) {
             val choices = (actions.first() as SelectDicePoolResult).pools
             if (choices.size == 1 && choices.first().dice.size == 1) {
-                return choices.first().dice.single() as DBlockResult
+                DicePoolResultsSelected(listOf(
+                    DicePoolChoice(id = 0, listOf(choices.first().dice.single().result))
+                ))
             }
         }
 

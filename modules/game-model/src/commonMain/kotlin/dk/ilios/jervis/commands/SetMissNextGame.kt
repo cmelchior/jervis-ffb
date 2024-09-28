@@ -4,19 +4,23 @@ import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 
-class SetNigglingInjuries(val player: Player, val change: Int): Command {
-    var originalValue: Int = 0
+class SetMissNextGame(
+    private val player: Player,
+    private val missNextGame: Boolean,
+) : Command {
+    var originalValue: Boolean = false
+
     override fun execute(state: Game, controller: GameController) {
-        originalValue = player.nigglingInjuries
+        this.originalValue = player.missNextGame
         player.apply {
-            nigglingInjuries += change
+            missNextGame = this@SetMissNextGame.missNextGame
             notifyUpdate()
         }
     }
 
     override fun undo(state: Game, controller: GameController) {
         player.apply {
-            nigglingInjuries = originalValue
+            missNextGame = originalValue
             notifyUpdate()
         }
     }

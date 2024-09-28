@@ -5,7 +5,6 @@ import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetContext
-import dk.ilios.jervis.commands.SetNigglingInjuries
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -20,12 +19,11 @@ import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.inducements.Apothecary
 import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.procedures.actions.block.MultipleBlockContext
-import dk.ilios.jervis.reports.ReportInjuryResult
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.Skill
 import dk.ilios.jervis.rules.tables.CasualtyResult
 import dk.ilios.jervis.rules.tables.InjuryResult
 import dk.ilios.jervis.rules.tables.LastingInjuryResult
@@ -44,24 +42,48 @@ data class RiskingInjuryContext(
     val player: Player,
     val isPartOfMultipleBlock: Boolean = false,
     val mode: RiskingInjuryMode = RiskingInjuryMode.KNOCKED_DOWN, // Do we need this?
+
+    // Armour roll
     val armourRoll: List<D6Result> = listOf(),
     val armourResult: Int = -1,
     val armourModifiers: List<DiceModifier> = listOf(),
     val armourBroken: Boolean = false,
+
+    // Injury roll
     val injuryRoll: List<D6Result> = emptyList(),
     val injuryModifiers: List<DiceModifier> = listOf(),
     val injuryResult: InjuryResult? = null,
+
+    // Casualty roll
     val casualtyRoll: D16Result? = null,
-    val casualtyModifiers: List<Skill> = emptyList(),
+//    val casualtyModifiers: List<Skill> = emptyList(),
     val casualtyResult: CasualtyResult? = null,
     val lastingInjuryRoll: D6Result? = null,
-    val lastingInjuryModifiers: List<DiceModifier> = listOf(),
+//    val lastingInjuryModifiers: List<DiceModifier> = listOf(),
     val lastingInjuryResult: LastingInjuryResult? = null,
-    val useApothecary: Boolean = false,
+
+    // Apothecary + selecting final casualty result
+    val apothecaryUsed: Apothecary? = null,
+    val apothecaryCasualtyRoll: D16Result? = null,
+    val apothecaryCasualtyResult: CasualtyResult? = null,
+    val apothecaryLastingInjuryRoll: D6Result? = null,
+    val apothecaryLastingInjuryResult: LastingInjuryResult? = null,
+
+    // Store final result here
+    val finalCasualtyResult: CasualtyResult? = null,
+    val finalLastingInjury: LastingInjuryResult? = null,
+
+    // Regeneration
+    val regenerationRoll: D6Result? = null,
+    val regenerationApothecaryUsed: Apothecary? = null,
+    val regenerationReRoll: D6Result? = null,
+    val regenerationSuccess: Boolean = false
 ): ProcedureContext
 
 /**
  * Implement Armour and Injury Rolls as described on page 60-62 in the rulebook.
+ * Note, the final injury result is not applied until [PatchUpPlayer.ApplyInjury]
+ * is called. Up until then all context is stored in [RiskingInjuryContext].
  *
  * [RiskingInjuryContext] is not cleared when exiting this procedure.
  * The caller must do this.
@@ -72,10 +94,7 @@ data class RiskingInjuryContext(
 object RiskingInjuryRoll: Procedure() {
     override val initialNode: Node = DetermineStartingRoll
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
-        // TODO Report here for Multiple Block?
-        return ReportInjuryResult(state.getContext<RiskingInjuryContext>())
-    }
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<RiskingInjuryContext>()
     }
@@ -172,12 +191,11 @@ object RiskingInjuryRoll: Procedure() {
                 CasualtyResult.SERIOUS_INJURY -> {
                     compositeCommandOf(
                         SetPlayerState(context.player, PlayerState.SERIOUS_INJURY),
-                        SetNigglingInjuries(context.player, 1),
                     )
                 }
                 CasualtyResult.LASTING_INJURY -> {
                     compositeCommandOf(
-                        SetPlayerState(context.player, PlayerState.SERIOUS_INJURY),
+                        SetPlayerState(context.player, PlayerState.LASTING_INJURY),
                         GotoNode(RollForLastingInjury)
                     )
                 }
@@ -202,21 +220,15 @@ object RiskingInjuryRoll: Procedure() {
 
     object RollForLastingInjury: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = LastingInjuryRoll
-
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<RiskingInjuryContext>()
-            return compositeCommandOf(
-                // TODO Missing stat modifier
-                SetPlayerState(context.player, PlayerState.SERIOUS_INJURY),
-                GotoNode(CheckApothecary),
-            )
+            return GotoNode(CheckApothecary)
         }
     }
 
     /**
-     * Check if want to check for Apothecary and Regeneration now or later.
+     * Check if there are any options available for patching up the player now or later.
      *
-     * "later" is only applicable when part of a Multiple Block, so in that
+     * "later" is only applicable when part of a Multiple Block, as in that
      * case we store the injury context inside the MultipleBlock context, so
      * it can be safely deleted from the global scope. Otherwise the injury
      * is always resolved right now.
@@ -231,12 +243,12 @@ object RiskingInjuryRoll: Procedure() {
                     ExitProcedure(),
                 )
             } else {
-                GotoNode(PatchingUpPlayer)
+                GotoNode(PatchUpPlayerIfPossible)
             }
         }
     }
 
-    object PatchingUpPlayer: ParentNode() {
+    object PatchUpPlayerIfPossible: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PatchUpPlayer
         override fun onExitNode(state: Game, rules: Rules): Command {
             return ExitProcedure()

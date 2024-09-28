@@ -42,7 +42,7 @@ object LastingInjuryRoll: Procedure() {
                 val updatedContext = context.copy(
                     lastingInjuryRoll = d6,
                     lastingInjuryResult = result,
-                    lastingInjuryModifiers = emptyList(),
+//                    lastingInjuryModifiers = emptyList(),
                 )
 
                 compositeCommandOf(

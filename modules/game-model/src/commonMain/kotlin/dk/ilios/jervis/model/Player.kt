@@ -60,6 +60,8 @@ enum class PlayerState {
     RESERVE,
     KNOCKED_OUT,
     BADLY_HURT,
+    LASTING_INJURY,
+    SERIOUS_HURT,
     SERIOUS_INJURY,
     DEAD,
     FAINTED, // From Sweltering Heat
@@ -208,6 +210,7 @@ class Player(
     val armorValue: Int
         get() = (baseArmorValue + armourModifiers.sum()).coerceIn(armourRange)
     var nigglingInjuries: Int = 0
+    var missNextGame: Boolean = false
     var starPlayerPoints: Int = 0
     var level: PlayerLevel = PlayerLevel.ROOKIE
     val ball: Ball?
