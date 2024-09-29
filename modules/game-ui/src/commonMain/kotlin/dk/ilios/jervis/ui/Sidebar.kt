@@ -256,18 +256,18 @@ fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true, onExit: () 
                     }
                 }
             }
-        } else {
-            for (index in list.indices step 5) {
-                Row {
-                    val modifier = Modifier.weight(1f).aspectRatio(1f)
-                    repeat(5) { x ->
-                        if (list.size > (index + x)) {
-                            Player(modifier, list[index + x], false)
-                        } else {
-                            // Use empty box. Unsure if we can remove this
-                            // if we want a partial row to scale correctly.
-                            Box(modifier = modifier)
-                        }
+        }
+    } else {
+        for (index in list.indices step 5) {
+            Row {
+                val modifier = Modifier.weight(1f).aspectRatio(1f)
+                repeat(5) { x ->
+                    if (list.size > (index + x)) {
+                        Player(modifier, list[index + x], false)
+                    } else {
+                        // Use empty box. Unsure if we can remove this
+                        // if we want a partial row to scale correctly.
+                        Box(modifier = modifier)
                     }
                 }
             }

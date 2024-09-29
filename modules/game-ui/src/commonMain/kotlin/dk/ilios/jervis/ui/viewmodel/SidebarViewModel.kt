@@ -85,7 +85,7 @@ class SidebarViewModel(
 
     fun badlyHurt(): Flow<List<UiPlayer>> = mapTo(PlayerState.BADLY_HURT, team.dogoutFlow)
 
-    fun seriousInjuries(): Flow<List<UiPlayer>> = mapTo(PlayerState.SERIOUS_INJURY, team.dogoutFlow)
+    fun seriousInjuries(): Flow<List<UiPlayer>> = mapTo(listOf(PlayerState.SERIOUS_HURT, PlayerState.SERIOUS_INJURY, PlayerState.LASTING_INJURY), team.dogoutFlow)
 
     fun dead(): Flow<List<UiPlayer>> = mapTo(PlayerState.DEAD, team.dogoutFlow)
 
@@ -117,11 +117,15 @@ class SidebarViewModel(
         _view.value = SidebarView.INJURIES
     }
 
-    private fun mapTo(state: PlayerState, dogoutFlow: SharedFlow<List<Player>>): Flow<List<UiPlayer>> {
+    private fun mapTo(states: List<PlayerState>, dogoutFlow: SharedFlow<List<Player>>): Flow<List<UiPlayer>> {
         return dogoutFlow.map { players ->
-            players.filter { it.state == state }
+            players.filter { states.contains(it.state) }
         }.map { players ->
             players.map { UiPlayer(it, selectAction = null, onHover = { hoverOver(it) }, onHoverExit = { hoverExit() }) }
         }
+    }
+
+    private fun mapTo(state: PlayerState, dogoutFlow: SharedFlow<List<Player>>): Flow<List<UiPlayer>> {
+        return mapTo(listOf(state), dogoutFlow)
     }
 }
