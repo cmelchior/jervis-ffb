@@ -14,7 +14,6 @@ import dk.ilios.jervis.defaultKickOffHomeTeam
 import dk.ilios.jervis.defaultPregame
 import dk.ilios.jervis.defaultSetup
 import dk.ilios.jervis.defaultWeather
-import dk.ilios.jervis.skipTurns
 import dk.ilios.jervis.ext.d16
 import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
@@ -35,6 +34,7 @@ import dk.ilios.jervis.rules.skills.Pro
 import dk.ilios.jervis.rules.skills.Stab
 import dk.ilios.jervis.rules.tables.PrayerStatModifier
 import dk.ilios.jervis.rules.tables.PrayerToNuffle
+import dk.ilios.jervis.skipTurns
 import dk.ilios.jervis.utils.createDefaultGameState
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -370,8 +370,6 @@ class PrayersToNuffleTests: JervisGameTest() {
                     3.d3, // Number of players affected
                 )
             ),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
         )
 
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.BAD_HABITS))
@@ -415,7 +413,6 @@ class PrayersToNuffleTests: JervisGameTest() {
                     7.d16, // Roll Greasy Cleats. Will be ignored
                 )
             ),
-            *defaultSetup(),
         )
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
         assertEquals(0, homeTeam.count { it.getStatModifiers().contains(PrayerStatModifier.GREASY_CLEATS) })
@@ -435,7 +432,7 @@ class PrayersToNuffleTests: JervisGameTest() {
             *defaultKickOffHomeTeam()
         )
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.BLESSED_STATUE_OF_NUFFLE))
-        assertTrue(awayTeam[1.playerNo]!!.hasSkill<Pro>())
+        assertTrue(awayTeam[1.playerNo].hasSkill<Pro>())
     }
 
     @Test
@@ -454,7 +451,6 @@ class PrayersToNuffleTests: JervisGameTest() {
                     8.d16, // Roll BlessedStatue. Will be ignored
                 )
             ),
-            *defaultSetup(),
         )
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.BLESSED_STATUE_OF_NUFFLE))
         assertEquals(0, awayTeam.count { it.hasSkill<Pro>() && it.getSkill<Pro>().isTemporary })

@@ -18,14 +18,14 @@ import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.ext.d8
 import dk.ilios.jervis.ext.playerId
-import dk.ilios.jervis.model.DogOut
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.context.CatchRollContext
 import dk.ilios.jervis.model.context.PickupRollContext
 import dk.ilios.jervis.model.context.RushRollContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.locations.DogOut
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.modifiers.AccuracyModifier
 import dk.ilios.jervis.model.modifiers.CatchModifier
 import dk.ilios.jervis.model.modifiers.PickupModifier
@@ -69,18 +69,18 @@ class WeatherTests: JervisGameTest() {
             *skipTurns(16),
             2.d3, // Home Heat roll
             RandomPlayersSelected(listOf(
-                homeTeam[PlayerNo(1)]!!.id,
-                homeTeam[PlayerNo(2)]!!.id,
+                homeTeam[PlayerNo(1)].id,
+                homeTeam[PlayerNo(2)].id,
             )),
             1.d3, // Away Heat roll
-            RandomPlayersSelected(listOf(awayTeam[PlayerNo(1)]!!.id)),
+            RandomPlayersSelected(listOf(awayTeam[PlayerNo(1)].id)),
         )
         assertEquals(Weather.SWELTERING_HEAT, state.weather)
         assertEquals(2, state.halfNo) // We are at the start of 2nd drive.
         listOf(
-            homeTeam[PlayerNo(1)]!!,
-            homeTeam[PlayerNo(2)]!!,
-            awayTeam[PlayerNo(1)]!!,
+            homeTeam[PlayerNo(1)],
+            homeTeam[PlayerNo(2)],
+            awayTeam[PlayerNo(1)],
         ).forEach { player ->
             assertEquals(PlayerState.FAINTED, player.state, "Player $player")
             assertEquals(DogOut, player.location, "Player $player")
@@ -102,7 +102,7 @@ class WeatherTests: JervisGameTest() {
             PlayerActionSelected(PlayerStandardActionType.PASS),
             *moveTo(17, 7),
             4.d6, // Pickup ball
-            NoRerollSelected,
+            NoRerollSelected(),
             Confirm,
             FieldSquareSelected(18, 7), // 1 Field away = Quick Pass
             4.d6 // Roll for Accuracy roll (should be 5+ to be accurate)
@@ -194,7 +194,7 @@ class WeatherTests: JervisGameTest() {
             PlayerActionSelected(PlayerStandardActionType.PASS),
             *moveTo(17, 7),
             4.d6, // Pickup ball
-            NoRerollSelected,
+            NoRerollSelected(),
             Confirm,
         )
 

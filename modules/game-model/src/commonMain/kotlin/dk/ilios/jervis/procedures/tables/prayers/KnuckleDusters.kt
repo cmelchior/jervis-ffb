@@ -43,7 +43,7 @@ object KnuckleDusters : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val availablePlayers = context.team
-                .filter { it.state == PlayerState.STANDING }
+                .filter { it.state == PlayerState.RESERVE }
                 .filter { !it.hasSkill<Loner>() && !it.hasSkill<MightyBlow>() }
                 .map { SelectPlayer(it) }
 

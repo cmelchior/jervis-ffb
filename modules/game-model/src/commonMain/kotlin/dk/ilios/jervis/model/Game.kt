@@ -116,6 +116,14 @@ class Game(
     }
 
     /**
+     * Returns a reference to the only ball on the field.
+     * Will throw if multiple balls exits.
+     */
+    fun getBall(): Ball {
+        return balls.single()
+    }
+
+    /**
      * Returns a reference to the current ball.
      * This method only works if one ball exists, otherwise an
      * exception is thrown.

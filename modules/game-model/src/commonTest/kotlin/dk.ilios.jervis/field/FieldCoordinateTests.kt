@@ -1,7 +1,7 @@
 package dk.ilios.jervis.field
 
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.utils.createDefaultGameState
 import kotlin.test.BeforeTest
@@ -56,7 +56,7 @@ class FieldCoordinateTests {
     fun getSurroundingSquares_topRight() {
         val fields: List<FieldCoordinate> =
             FieldCoordinate(
-                rules.fieldWidth.toInt() - 1,
+                rules.fieldWidth - 1,
                 0,
             ).getSurroundingCoordinates(rules)
         assertEquals(3, fields.size)
@@ -75,7 +75,7 @@ class FieldCoordinateTests {
         val fields: List<FieldCoordinate> =
             FieldCoordinate(
                 0,
-                rules.fieldHeight.toInt() - 1,
+                rules.fieldHeight - 1,
             ).getSurroundingCoordinates(rules)
         assertEquals(3, fields.size)
         // Clockwise (starting at top-left)
@@ -92,8 +92,8 @@ class FieldCoordinateTests {
     fun getSurroundingSquares_bottomRight() {
         val fields: List<FieldCoordinate> =
             FieldCoordinate(
-                rules.fieldWidth.toInt() - 1,
-                rules.fieldHeight.toInt() - 1,
+                rules.fieldWidth - 1,
+                rules.fieldHeight - 1,
             ).getSurroundingCoordinates(rules)
         assertEquals(3, fields.size)
         // Clockwise (starting at top-left)
@@ -397,10 +397,10 @@ class FieldCoordinateTests {
     @Test
     fun distanceTo() {
         val a = FieldCoordinate(0, 0)
-        assertEquals(0u, a.distanceTo(FieldCoordinate(0, 0)))
-        assertEquals(1u, a.distanceTo(FieldCoordinate(0, -1))) // Up
-        assertEquals(2u, a.distanceTo(FieldCoordinate(2, -1))) // Top-right
-        assertEquals(3u, a.distanceTo(FieldCoordinate(-3, 3))) // Bottom-left
+        assertEquals(0, a.distanceTo(FieldCoordinate(0, 0)))
+        assertEquals(1, a.distanceTo(FieldCoordinate(0, -1))) // Up
+        assertEquals(2, a.distanceTo(FieldCoordinate(2, -1))) // Top-right
+        assertEquals(3, a.distanceTo(FieldCoordinate(-3, 3))) // Bottom-left
     }
 
     /**

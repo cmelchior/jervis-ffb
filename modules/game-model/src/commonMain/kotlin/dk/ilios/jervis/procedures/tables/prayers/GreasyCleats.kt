@@ -39,7 +39,7 @@ object GreasyCleats : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val availablePlayers = context.team.otherTeam()
-                .filter { it.state == PlayerState.STANDING }
+                .filter { it.state == PlayerState.RESERVE }
                 .map { SelectPlayer(it) }
 
             return availablePlayers.ifEmpty {

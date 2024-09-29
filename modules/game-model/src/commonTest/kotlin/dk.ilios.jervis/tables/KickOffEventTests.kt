@@ -16,9 +16,9 @@ import dk.ilios.jervis.ext.d8
 import dk.ilios.jervis.ext.playerId
 import dk.ilios.jervis.ext.playerNo
 import dk.ilios.jervis.model.BallState
-import dk.ilios.jervis.model.DogOut
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.locations.DogOut
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.Bounce
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.procedures.TeamTurn
@@ -184,9 +184,9 @@ class KickOffEventTests: JervisGameTest() {
         )
 
         val player = state.receivingTeam[10.playerNo]
-        assertEquals(player.location == state.ball.location, true)
+        assertEquals(player.location == state.getBall().location, true)
         assertFalse(player.hasBall())
-        assertEquals(BallState.DEVIATING, state.ball.state)
+        assertEquals(BallState.DEVIATING, state.getBall().state)
     }
 
     @Test
@@ -208,7 +208,7 @@ class KickOffEventTests: JervisGameTest() {
 
         val player = state.getPlayerById("A1".playerId)
         assertTrue(player.hasBall())
-        assertEquals(BallState.CARRIED, state.ball.state)
+        assertEquals(BallState.CARRIED, state.getBall().state)
     }
 
     @Test
@@ -230,8 +230,8 @@ class KickOffEventTests: JervisGameTest() {
 
         val player = state.getPlayerById("A10".playerId)
         assertFalse(player.hasBall())
-        assertEquals(FieldCoordinate(11, 7), player.location.coordinate)
-        assertEquals(BallState.DEVIATING, state.ball.state)
+        assertEquals(FieldCoordinate(11, 7), player.location)
+        assertEquals(BallState.DEVIATING, state.getBall().state)
     }
 
     @Test
@@ -249,13 +249,13 @@ class KickOffEventTests: JervisGameTest() {
                 bounce = null
             ),
         )
-        assertEquals(BallState.OUT_OF_BOUNDS, state.ball.state)
+        assertEquals(BallState.OUT_OF_BOUNDS, state.getBall().state)
         controller.rollForward(
             PlayerSelected("A2".playerId) // Touchback
         )
         val player = state.getPlayerById("A2".playerId)
         assertTrue(player.hasBall())
-        assertEquals(BallState.CARRIED, state.ball.state)
+        assertEquals(BallState.CARRIED, state.getBall().state)
     }
 
 
@@ -394,8 +394,8 @@ class KickOffEventTests: JervisGameTest() {
             ),
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
-        assertEquals(BallState.ON_GROUND, state.ball.state)
-        assertEquals(FieldCoordinate(18, 3), state.ball.location)
+        assertEquals(BallState.ON_GROUND, state.getBall().state)
+        assertEquals(FieldCoordinate(18, 3), state.getBall().location)
     }
 
     @Test
@@ -417,7 +417,7 @@ class KickOffEventTests: JervisGameTest() {
             ),
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
-        assertEquals(BallState.CARRIED, state.ball.state)
+        assertEquals(BallState.CARRIED, state.getBall().state)
         assertTrue(awayTeam[1.playerNo].hasBall())
     }
 
@@ -439,8 +439,8 @@ class KickOffEventTests: JervisGameTest() {
             ),
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
-        assertEquals(BallState.ON_GROUND, state.ball.state)
-        assertEquals(FieldCoordinate(14, 5), state.ball.location)
+        assertEquals(BallState.ON_GROUND, state.getBall().state)
+        assertEquals(FieldCoordinate(14, 5), state.getBall().location)
     }
 
     @Test
@@ -461,7 +461,7 @@ class KickOffEventTests: JervisGameTest() {
             ),
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)
-        assertEquals(BallState.CARRIED, state.ball.state)
+        assertEquals(BallState.CARRIED, state.getBall().state)
         assertTrue(awayTeam[5.playerNo].hasBall())
     }
 
