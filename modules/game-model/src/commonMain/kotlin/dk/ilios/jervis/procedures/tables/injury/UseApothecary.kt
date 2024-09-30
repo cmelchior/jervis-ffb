@@ -72,7 +72,8 @@ object UseApothecary: Procedure() {
                     compositeCommandOf(
                         SetApothecaryUsed(team, apothecary, true),
                         ReportApothecaryUsed(team, apothecary),
-                        GotoNode(ApothecaryCasualtyReRoll)
+                        SetContext(context.copy(apothecaryUsed = apothecary)),
+                        if (context.injuryResult == InjuryResult.KO) ExitProcedure() else GotoNode(ApothecaryCasualtyReRoll)
                     )
                 }
                 Cancel,

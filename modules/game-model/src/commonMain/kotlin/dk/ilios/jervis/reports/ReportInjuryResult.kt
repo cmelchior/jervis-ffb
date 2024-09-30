@@ -11,9 +11,15 @@ class ReportInjuryResult(val context: RiskingInjuryContext) : LogEntry() {
             append("${context.player.name}'s armour held up.")
         } else {
             when (context.injuryResult!!) {
-                InjuryResult.STUNNED -> append("${context.player.name}'s was stunned.")
-                InjuryResult.KO -> append("${context.player.name}'s was knocked out.")
-                InjuryResult.BADLY_HURT -> append("${context.player.name}'s was badly hurt.")
+                InjuryResult.STUNNED -> append("${context.player.name} was Stunned")
+                InjuryResult.KO -> {
+                    if (context.apothecaryUsed != null) {
+                        append("${context.player.name} was Stunned")
+                    } else {
+                        append("${context.player.name}'s was Knocked Out")
+                    }
+                }
+                InjuryResult.BADLY_HURT -> append("${context.player.name} was Badly Hurt")
                 InjuryResult.CASUALTY -> {
                     val (casualtyResult, lastingInjuryResult) = if (context.isPartOfMultipleBlock) {
                         (context.casualtyResult!! to context.lastingInjuryResult)
@@ -21,13 +27,13 @@ class ReportInjuryResult(val context: RiskingInjuryContext) : LogEntry() {
                         context.finalCasualtyResult!! to context.finalLastingInjury
                     }
                     when (casualtyResult) {
-                        CasualtyResult.BADLY_HURT -> append("${context.player.name} was badly hurt.")
-                        CasualtyResult.SERIOUS_HURT -> append("${context.player.name} was Serious Hurt.")
-                        CasualtyResult.SERIOUS_INJURY -> append("${context.player.name}'s gained a Serious Injury.")
+                        CasualtyResult.BADLY_HURT -> append("${context.player.name} was Badly Hurt")
+                        CasualtyResult.SERIOUS_HURT -> append("${context.player.name} was Serious Hurt")
+                        CasualtyResult.SERIOUS_INJURY -> append("${context.player.name} gained a Serious Injury")
                         CasualtyResult.LASTING_INJURY -> {
-                            append("${context.player.name}'s got a Lasting Injury: ${lastingInjuryResult!!.description}")
+                            append("${context.player.name} got a Lasting Injury: ${lastingInjuryResult!!.description}")
                         }
-                        CasualtyResult.DEAD -> append("${context.player.name}'s was killed DEAD!")
+                        CasualtyResult.DEAD -> append("${context.player.name} was killed DEAD!")
                     }
                 }
             }

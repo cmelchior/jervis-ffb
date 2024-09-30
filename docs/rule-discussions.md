@@ -113,6 +113,10 @@ interpreted.
     from May 2022 regarding Regenerration where it was stated "No, as the active teams turn has ended by the time the Regeneration
     roll is made". This clarification was removed in later versions of the FAQ though. Unclear why.
 
+23. When rolling on the Prayers To Nuffle table during the Kick-off Event, we treat "available
+    to play during this drive" as players on both the pitch and in the Reserves box. It is unclear
+    if players in the Dogout are covered by that phrase after you placed players on the field.
+
 # Differences compared to the rules as written
 
 1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 

@@ -252,6 +252,9 @@ object PatchUpPlayer: Procedure() {
                             SetPlayerLocation(player, DogOut),
                         )
                     }
+                    context.injuryResult == InjuryResult.KO && context.apothecaryUsed != null -> {
+                        SetPlayerState(player, PlayerState.STUNNED)
+                    }
                     context.finalCasualtyResult != null -> {
                         when (context.finalCasualtyResult) {
                             CasualtyResult.BADLY_HURT -> {
