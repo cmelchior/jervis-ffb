@@ -5,7 +5,7 @@ import dk.ilios.jervis.fumbbl.adapter.FumbblReplayAdapter
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandReplay
 import dk.ilios.jervis.fumbbl.utils.fromFumbblState
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.utils.platformFileSystem
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toPath
@@ -20,7 +20,7 @@ class ReplayFileTests {
             val adapter = FumbblFileReplayAdapter(file)
             adapter.start()
             val game = adapter.getGame()
-            val jervisGame: Game = Game.fromFumbblState(BB2020Rules, game)
+            val jervisGame: Game = Game.fromFumbblState(StandardBB2020Rules, game)
             var isDone = false
             while (!isDone) {
                 val cmd = adapter.receive()
@@ -36,7 +36,7 @@ class ReplayFileTests {
     @Test
     fun convertReplayFileToJervisCommands() =
         runBlocking {
-            val rules = BB2020Rules
+            val rules = StandardBB2020Rules
             val fumbbl = FumbblReplayAdapter("../../replays/game-1624379.json".toPath(), true)
             runBlocking {
                 fumbbl.loadCommands()
@@ -46,7 +46,7 @@ class ReplayFileTests {
     @Test
     fun convertReplayFileToJervisCommands2() =
         runBlocking {
-            val rules = BB2020Rules
+            val rules = StandardBB2020Rules
             val fumbbl = FumbblReplayAdapter("../../replays/game-1744037.json".toPath(), true)
             runBlocking {
                 fumbbl.loadCommands()

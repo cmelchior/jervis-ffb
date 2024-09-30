@@ -395,6 +395,12 @@ interface Rules {
     val turnsPrHalf: Int
         get() = 8
 
+    val hasExtraTime: Boolean
+        get() = false
+
+    val turnsInExtraTime
+        get() = 8
+
     // Field description
 
     // Total width of the field

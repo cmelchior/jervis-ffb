@@ -78,6 +78,7 @@ import dk.ilios.jervis.model.modifiers.StatModifier
 import dk.ilios.jervis.procedures.D6DieRoll
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.roster.bb2020.LizardmenTeam
 import dk.ilios.jervis.rules.skills.DiceRerollOption
@@ -92,7 +93,7 @@ import kotlin.jvm.JvmName
 import kotlin.random.Random
 
 fun humanTeamAway(): Team {
-    return teamBuilder(BB2020Rules, HumanTeam) {
+    return teamBuilder(StandardBB2020Rules, HumanTeam) {
         coach = Coach(CoachId("away-coach"), "AwayCoach")
         name = "AwayTeam"
         addPlayer(PlayerId("A1"), "Lineman-1-A", PlayerNo(1), HumanTeam.LINEMAN)
@@ -115,7 +116,7 @@ fun humanTeamAway(): Team {
 }
 
 fun lizardMenAwayTeam(): Team {
-    return teamBuilder(BB2020Rules, LizardmenTeam) {
+    return teamBuilder(StandardBB2020Rules, LizardmenTeam) {
         coach = Coach(CoachId("away-coach"), "AwayCoach")
         name = "AwayTeam"
         addPlayer(PlayerId("A1"), "Kroxigor-1-A", PlayerNo(1), LizardmenTeam.KROXIGOR)
@@ -320,7 +321,7 @@ fun createStartingTestSetup(state: Game) {
         fieldCoordinate: FieldCoordinate,
     ) {
         player?.let {
-            SetPlayerLocation(it, fieldCoordinate).execute(state, GameController(BB2020Rules, state))
+            SetPlayerLocation(it, fieldCoordinate).execute(state, GameController(StandardBB2020Rules, state))
             SetPlayerState(it, PlayerState.STANDING)
         } ?: error("")
     }

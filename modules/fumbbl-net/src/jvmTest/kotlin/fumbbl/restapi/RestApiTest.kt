@@ -3,7 +3,7 @@ package fumbbl.restapi
 import com.jervis.fumbbl.FumbblTeamLoader
 import com.jervis.fumbbl.restapi.Team
 import dk.ilios.jervis.fumbbl.net.auth.getHttpClient
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -30,7 +30,7 @@ class RestApiTest {
     fun teamLoader() =
         runBlocking<Unit> {
             // Human team
-            val team = FumbblTeamLoader.loadTeam(1187712, BB2020Rules)
+            val team = FumbblTeamLoader.loadTeam(1187712, StandardBB2020Rules)
             assertEquals(team.name, "Just Human Nothing More")
         }
 }

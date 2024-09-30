@@ -17,7 +17,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import dk.ilios.jervis.model.locations.FieldCoordinate
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.rules.pathfinder.BB2020PathFinder
 import dk.ilios.jervis.rules.pathfinder.PathFinder
 import dk.ilios.jervis.utils.createDefaultGameState
@@ -43,7 +43,7 @@ class AStarTests {
 
 @Composable
 fun AStarContent() {
-    val rules = BB2020Rules
+    val rules = StandardBB2020Rules
     val state = createDefaultGameState(rules)
     createStartingTestSetup(state)
 

@@ -54,7 +54,15 @@ class Game(
     var goalScored: Boolean = false
     var endTurn: Boolean = false
     var homeGoals: Int = 0
+    var homeExtraTimeGoals: Int = 0
+    var homeSuddenDeathGoals: Int = 0
     var awayGoals: Int = 0
+    var awayExtraTimeGoals: Int = 0
+    var awaySuddenDeathGoals: Int = 0
+
+    val homeScore: Int get() = homeGoals + homeExtraTimeGoals + homeSuddenDeathGoals
+    val awayScore: Int get() = awayGoals + awayExtraTimeGoals + awaySuddenDeathGoals
+
     /**
      * The player that is being activated. This is set as soon as the player is
      * selected. Whether the player counts as being activated is determined by

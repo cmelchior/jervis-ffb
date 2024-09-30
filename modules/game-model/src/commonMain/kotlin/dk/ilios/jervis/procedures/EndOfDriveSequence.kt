@@ -42,6 +42,7 @@ object EndOfDriveSequence: Procedure() {
             // Unclear where in this process Sweltering Heat is applied.
             // For now, it doesn't really matter, so just run it afterwards
             val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_DRIVE)
+            // TODO Check for multiple balls here and remove duplicates
             return compositeCommandOf(
                 *resetCommands,
                 if (state.weather == Weather.SWELTERING_HEAT) GotoNode(ResolveSwelteringHeat) else ExitProcedure()

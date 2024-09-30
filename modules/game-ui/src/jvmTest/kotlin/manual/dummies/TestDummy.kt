@@ -1,7 +1,7 @@
 package manual.dummies
 
 import dk.ilios.jervis.controller.GameController
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.ui.GameScreenModel
 import dk.ilios.jervis.ui.Manual
 import dk.ilios.jervis.ui.viewmodel.FieldViewModel
@@ -22,8 +22,8 @@ object TestDummy {
 
             override suspend fun start(scope: CoroutineScope) { /* Do nothing */ }
         }
-    val state = createDefaultGameState(BB2020Rules)
-    val controller = GameController(BB2020Rules, state)
+    val state = createDefaultGameState(StandardBB2020Rules)
+    val controller = GameController(StandardBB2020Rules, state)
     val fieldVieModel by lazy { FieldViewModel(controller, uiActionFactory, state.field, gameModel.hoverPlayerFlow) }
     val leftSidebar by lazy { SidebarViewModel(uiActionFactory, state.homeTeam, gameModel.hoverPlayerFlow) }
     val rightSidebar by lazy { SidebarViewModel(uiActionFactory, state.awayTeam, gameModel.hoverPlayerFlow) }

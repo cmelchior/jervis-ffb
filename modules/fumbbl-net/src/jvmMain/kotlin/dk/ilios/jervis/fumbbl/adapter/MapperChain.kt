@@ -6,7 +6,7 @@ import dk.ilios.jervis.fumbbl.adapter.impl.AbortActionMapper
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import org.reflections.Reflections
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
@@ -20,7 +20,7 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
     private val jervisGame: Game
     private val fumbblGame: FumbblGame
     private val checkCommands: Boolean
-    private val jervisGameController = GameController(BB2020Rules, jervisGame)
+    private val jervisGameController = GameController(StandardBB2020Rules, jervisGame)
     private val mappers: List<CommandActionMapper>
 
     actual fun getMappersInPackage(): List<KClass<*>> {

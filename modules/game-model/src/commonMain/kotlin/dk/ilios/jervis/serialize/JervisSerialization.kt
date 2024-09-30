@@ -37,7 +37,7 @@ import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
 import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.foul.FoulAction
 import dk.ilios.jervis.procedures.actions.move.MoveAction
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.Roster
@@ -75,7 +75,7 @@ object JervisSerialization {
                 subclass(FoulAction::class)
             }
             polymorphic(Rules::class) {
-                subclass(BB2020Rules::class)
+                subclass(StandardBB2020Rules::class)
             }
             polymorphic(Roster::class) {
                 subclass(ChaosDwarfTeam::class)

@@ -2,7 +2,7 @@ package dk.ilios.jervis.field
 
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.locations.FieldCoordinate
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.utils.createDefaultGameState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class FieldCoordinateTests {
-    private val rules = BB2020Rules
+    private val rules = StandardBB2020Rules
     private lateinit var state: Game
 
     @BeforeTest

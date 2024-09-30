@@ -3,17 +3,22 @@ package dk.ilios.jervis.procedures
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetActiveTeam
+import dk.ilios.jervis.commands.SetBallLocation
+import dk.ilios.jervis.commands.SetBallState
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetCurrentBall
 import dk.ilios.jervis.commands.SetKickingTeam
 import dk.ilios.jervis.commands.SetPlayerLocation
+import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.locations.DogOut
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.reports.ReportSetupKickingTeam
 import dk.ilios.jervis.reports.ReportSetupReceivingTeam
 import dk.ilios.jervis.reports.ReportStartingKickOff
@@ -95,10 +100,10 @@ object GameDrive : Procedure() {
                     switchTeamCommands,
                     ExitProcedure()
                 )
-            } else if (state.homeTeam.turnData.turnMarker == rules.turnsPrHalf && state.awayTeam.turnData.turnMarker == rules.turnsPrHalf) {
+            } else if (state.homeTeam.turnMarker == rules.turnsPrHalf && state.awayTeam.turnMarker == rules.turnsPrHalf) {
                 GotoNode(ResolveEndOfDrive)
                 // The other team can continue the drive
-            } else if (state.inactiveTeam.turnData.turnMarker < rules.turnsPrHalf) {
+            } else if (state.inactiveTeam.turnMarker < rules.turnsPrHalf) {
                 switchTeamCommands + GotoNode(Turn)
             } else {
                 INVALID_GAME_STATE()
@@ -110,14 +115,20 @@ object GameDrive : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = EndOfDriveSequence
         override fun onExitNode(state: Game, rules: Rules): Command {
             // The End of Drive Sequence doesn't mention moving players off the pitch, so we
-            // do it here after the sequence has completed.
-            val movePlayers: List<SetPlayerLocation> =
-                state.field
-                    .filter { !it.isUnoccupied() }
-                    .map {
-                        SetPlayerLocation(it.player!!, DogOut)
-                    }
+            // do it here after the sequence has completed. This also includes removing th
+            val movePlayers: List<Command> = state.field
+                .filter { !it.isUnoccupied() }
+                .map {
+                    val player = it.player!!
+                    compositeCommandOf(
+                        SetPlayerState(player, PlayerState.RESERVE),
+                        SetPlayerLocation(player, DogOut)
+                    )
+                }
+            // At this point, all temporary balls should have been removed.
             return compositeCommandOf(
+                SetBallState.onGround(state.getBall()),
+                SetBallLocation(state.getBall(), FieldCoordinate.UNKNOWN),
                 *movePlayers.toTypedArray(),
                 ExitProcedure(),
             )

@@ -2,8 +2,8 @@ package dk.ilios.jervis.procedures.tables.kickoff
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.SetTurnMarker
+import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.Procedure
@@ -22,9 +22,9 @@ object TimeOut : Procedure() {
 
     object MoveTurnMarker : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val kickingTurnNo = state.kickingTeam.turnData.turnMarker
-            val receivingTurnNo = state.receivingTeam.turnData.turnMarker
-            return if (state.kickingTeam.turnData.turnMarker in 6..8) {
+            val kickingTurnNo = state.kickingTeam.turnMarker
+            val receivingTurnNo = state.receivingTeam.turnMarker
+            return if (state.kickingTeam.turnMarker in 6..8) {
                 compositeCommandOf(
                     SetTurnMarker(state.kickingTeam, kickingTurnNo - 1),
                     SetTurnMarker(state.receivingTeam, receivingTurnNo - 1),

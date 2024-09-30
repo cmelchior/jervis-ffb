@@ -60,7 +60,7 @@ fun GameStatus(
             val half = when (progress.half) {
                 1 -> "1st half"
                 2 -> "2nd half"
-                3 -> "Overtime"
+                3 -> "Extra Time"
                 else -> null
             }
             if (half != null) {

@@ -74,8 +74,14 @@ This document lists all game mechanics that have been fully implemented with tes
 
 ## Game
 
-- [ ] Moving the turn marker
-- [ ] Halfs and overtime
+- [x] Moving the turn marker
+- [x] Halfs
+- [x] Extra Time
+- [x] Sudden Death
+- [ ] Drive counter
+- [ ] Score as soon as player with ball enters end zone
+- [ ] Turnover ends turn as quickly as possible
+- [ ] Conceding
 
 // ...
 
@@ -96,8 +102,6 @@ This document lists all game mechanics that have been fully implemented with tes
 - [ ] Setup and broken rules
 - [ ] Kick off 
 - [ ] Kickoff event
-- [ ] Moving turn marker
-- [ ] Going into overtime
 - [ ] Track Star Player Points and adjustments to it. Figure out how
 - [ ] Touchdown
 - [ ] Detect Stalling

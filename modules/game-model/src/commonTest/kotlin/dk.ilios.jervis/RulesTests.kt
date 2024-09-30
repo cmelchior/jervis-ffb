@@ -1,13 +1,13 @@
 package dk.ilios.jervis
 
 import dk.ilios.jervis.model.locations.FieldCoordinate
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class RulesTests {
 
-    val rules = BB2020Rules
+    val rules = StandardBB2020Rules
 
     @Test
     fun getSurroundingCoordinates_topLeftCorner_insideField() {

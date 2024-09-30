@@ -22,11 +22,11 @@ class GameStatusViewModel(val controller: GameController) {
                 game.halfNo,
                 game.driveNo,
                 game.homeTeam.name,
-                game.homeTeam.turnData.turnMarker,
+                game.homeTeam.turnMarker,
                 game.awayTeam.name,
-                game.awayTeam.turnData.turnMarker,
-                game.homeGoals,
-                game.awayGoals,
+                game.awayTeam.turnMarker,
+                game.homeScore,
+                game.awayScore,
             )
         }
     }

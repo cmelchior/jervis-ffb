@@ -20,13 +20,14 @@ import dk.ilios.jervis.ext.d3
 import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.ext.d8
 import dk.ilios.jervis.model.Coin
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.model.PlayerNo
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.rules.BB2020Rules
 import dk.ilios.jervis.rules.PlayerStandardActionType
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.rules.skills.BreakTackle
 import dk.ilios.jervis.utils.createDefaultGameState
 import kotlin.test.BeforeTest
@@ -39,7 +40,7 @@ import kotlin.test.BeforeTest
  */
 abstract class JervisGameTest {
 
-    val rules = BB2020Rules
+    open val rules: BB2020Rules = StandardBB2020Rules
     protected lateinit var state: Game
     protected lateinit var controller: GameController
     protected lateinit var homeTeam: Team
@@ -49,12 +50,12 @@ abstract class JervisGameTest {
     open fun setUp() {
         state = createDefaultGameState(rules).apply {
             // Should be on LoS
-            homeTeam[PlayerNo(1)]!!.apply {
+            homeTeam[PlayerNo(1)].apply {
                 addSkill(BreakTackle())
                 baseStrenght = 4
             }
             // Should be on LoS
-            homeTeam[PlayerNo(2)]!!.apply {
+            homeTeam[PlayerNo(2)].apply {
                 addSkill(BreakTackle())
                 baseStrenght = 5
             }
@@ -105,7 +106,7 @@ fun defaultPregame(
     *determineKickingTeam
 )
 
-fun defaultSetup(): Array<GameAction> {
+fun defaultSetup(homeFirst: Boolean = true): Array<GameAction> {
     val homeTeam = listOf(
         "H1" to FieldCoordinate(12, 5),
         "H2" to FieldCoordinate(12, 6),
@@ -139,12 +140,23 @@ fun defaultSetup(): Array<GameAction> {
         val playerId = PlayerId(it.first)
         listOf(PlayerSelected(playerId), FieldSquareSelected(it.second))
     }.toTypedArray()
-    return arrayOf(
-        *homeTeam,
-        EndSetup,
-        *awayTeam,
-        EndSetup,
-    )
+
+    return if (homeFirst) {
+        arrayOf(
+            *homeTeam,
+            EndSetup,
+            *awayTeam,
+            EndSetup,
+        )
+    } else {
+        arrayOf(
+            *awayTeam,
+            EndSetup,
+            *homeTeam,
+            EndSetup,
+        )
+    }
+
 }
 
 fun defaultKickOffEvent(): Array<GameAction> = arrayOf(
@@ -160,6 +172,19 @@ fun defaultKickOffHomeTeam(
     bounce: D8Result? = 4.d8 // Bounce to [17,7]
 ) = arrayOf(
     PlayerSelected(PlayerId("H8")), // Select Kicker
+    placeKick,
+    deviate,
+    *kickoffEvent,
+    bounce
+)
+
+fun defaultKickOffAwayTeam(
+    placeKick: FieldSquareSelected = FieldSquareSelected(6, 7), // Center of Away Half,
+    deviate: DiceRollResults = DiceRollResults(4.d8, 1.d6), // Land on [5,7]
+    kickoffEvent: Array<GameAction> = defaultKickOffEvent(),
+    bounce: D8Result? = 4.d8 // Bounce to [4,7]
+) = arrayOf(
+    PlayerSelected(PlayerId("A8")), // Select Kicker
     placeKick,
     deviate,
     *kickoffEvent,

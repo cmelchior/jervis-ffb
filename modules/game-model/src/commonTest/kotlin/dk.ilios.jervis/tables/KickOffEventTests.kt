@@ -65,8 +65,8 @@ class KickOffEventTests: JervisGameTest() {
                 )
             )
         )
-        assertEquals(1, homeTeam.turnData.turnMarker)
-        assertEquals(2, awayTeam.turnData.turnMarker)
+        assertEquals(1, homeTeam.turnMarker)
+        assertEquals(2, awayTeam.turnMarker)
     }
 
     @Test
@@ -78,8 +78,8 @@ class KickOffEventTests: JervisGameTest() {
         )
 
         // Fake turn number after setup
-        state.kickingTeam.turnData.turnMarker = 8
-        state.receivingTeam.turnData.turnMarker = 7
+        state.kickingTeam.turnMarker = 8
+        state.receivingTeam.turnMarker = 7
         controller.rollForward(
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -87,8 +87,8 @@ class KickOffEventTests: JervisGameTest() {
                 )
             )
         )
-        assertEquals(7, state.kickingTeam.turnData.turnMarker)
-        assertEquals(7, state.receivingTeam.turnData.turnMarker)
+        assertEquals(7, state.kickingTeam.turnMarker)
+        assertEquals(7, state.receivingTeam.turnMarker)
     }
 
 

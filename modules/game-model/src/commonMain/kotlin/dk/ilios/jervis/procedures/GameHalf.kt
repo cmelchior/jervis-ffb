@@ -2,14 +2,14 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.ResetAvailableTeamRerolls
 import dk.ilios.jervis.commands.SetActiveTeam
 import dk.ilios.jervis.commands.SetDrive
 import dk.ilios.jervis.commands.SetHalf
 import dk.ilios.jervis.commands.SetKickingTeamAtHalfTime
 import dk.ilios.jervis.commands.SetTurnMarker
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -61,7 +61,7 @@ object GameHalf : Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Both teams ran out of time
-            return if (state.homeTeam.turnData.turnMarker == rules.turnsPrHalf && state.awayTeam.turnData.turnMarker == rules.turnsPrHalf) {
+            return if (state.homeTeam.turnMarker == rules.turnsPrHalf && state.awayTeam.turnMarker == rules.turnsPrHalf) {
                 ExitProcedure()
             } else {
                 GotoNode(Drive)

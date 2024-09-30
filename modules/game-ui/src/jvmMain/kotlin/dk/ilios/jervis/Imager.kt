@@ -7,7 +7,7 @@ import dk.ilios.jervis.actions.ContinueWhenReady
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.ui.App
 import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 import dk.ilios.jervis.utils.createDefaultGameState
@@ -45,7 +45,7 @@ object Imager {
                 )
             val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
 //            val controller = GameController(BB2020Rules, state, actionProvider as ((GameController, List<ActionDescriptor>) -> GameAction))
-            val controller = GameController(BB2020Rules, state)
+            val controller = GameController(StandardBB2020Rules, state)
             App(MenuViewModel()) // controller, actionRequestChannel, actionSelectedChannel)
         }
     }
@@ -58,7 +58,7 @@ object Imager {
         height: Int,
     ): BufferedImage {
         return renderScreenshot(width, height) {
-            val rules = BB2020Rules
+            val rules = StandardBB2020Rules
             val state = createDefaultGameState(rules)
             val actionRequestChannel =
                 Channel<Pair<GameController, List<ActionDescriptor>>>(

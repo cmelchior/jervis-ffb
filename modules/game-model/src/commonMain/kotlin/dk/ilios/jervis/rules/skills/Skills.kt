@@ -49,6 +49,7 @@ enum class DiceRollType {
     RUSH,
     SCATTER,
     SOLID_DEFENSE,
+    SUDDEN_DEATH,
     SWELTERING_HEAT,
     TAKE_ROOT,
     THROW_A_ROCK,

@@ -36,9 +36,6 @@ class TeamDriveData(private val game: Game) {
 }
 
 class TeamTurnData(private val game: Game) {
-    var turnMarker by Delegates.observable(0) { prop, old, new ->
-        game.gameFlow.safeTryEmit(game)
-    }
     var moveActions: Int
         get() = availableStandardActions[PlayerStandardActionType.MOVE]!!
         set(value) {
@@ -148,6 +145,10 @@ class Team(val name: String, val roster: BB2020Roster, val coach: Coach) : Colle
 
     @Transient
     lateinit var turnData: TeamTurnData
+
+    var turnMarker by Delegates.observable(0) { prop, old, new ->
+        game.gameFlow.safeTryEmit(game)
+    }
 
     // Must be called before using this class.
     // Used to break circular reference between Team and Game instances

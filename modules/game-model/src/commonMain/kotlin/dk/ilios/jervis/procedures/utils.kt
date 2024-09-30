@@ -63,8 +63,6 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
         }
     }
 
-
-
     // Remove all temporary rerolls that might have expired
     // TODO Consider overtime here
     // TODO What about Leader?

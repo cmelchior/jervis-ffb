@@ -49,7 +49,7 @@ object TeamTurn : Procedure() {
     override val initialNode: Node = SelectPlayerOrEndTurn
 
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val turn = state.activeTeam.turnData.turnMarker + 1
+        val turn = state.activeTeam.turnMarker + 1
         // TODO Check for stalling players at this point.
         // If any player is starting the turn with the ball, check if they are stalling
         // We also need to check for this whenever a player receives the ball during their
@@ -69,7 +69,7 @@ object TeamTurn : Procedure() {
         return compositeCommandOf(
             SetTurnOver(false),
             SetCanUseTeamRerolls(false),
-            ReportEndingTurn(state.activeTeam, state.activeTeam.turnData.turnMarker),
+            ReportEndingTurn(state.activeTeam, state.activeTeam.turnMarker),
         )
     }
 

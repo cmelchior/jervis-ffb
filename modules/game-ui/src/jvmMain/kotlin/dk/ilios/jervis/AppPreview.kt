@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.controller.GameController
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.ui.App
 import dk.ilios.jervis.ui.viewmodel.MenuViewModel
 import dk.ilios.jervis.utils.createDefaultGameState
@@ -16,7 +16,7 @@ import kotlinx.coroutines.channels.Channel
 @Composable
 @Preview
 fun AppPreview() {
-    val rules = BB2020Rules
+    val rules = StandardBB2020Rules
     val state = createDefaultGameState(rules)
     val actionRequestChannel =
         Channel<Pair<GameController, List<ActionDescriptor>>>(capacity = 1, onBufferOverflow = BufferOverflow.SUSPEND)

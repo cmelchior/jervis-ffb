@@ -8,7 +8,7 @@ import dk.ilios.jervis.controller.ActionsRequest
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.fumbbl.adapter.FumbblReplayAdapter
 import dk.ilios.jervis.model.Player
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.ui.images.IconFactory
 import dk.ilios.jervis.ui.viewmodel.ActionSelectorViewModel
 import dk.ilios.jervis.ui.viewmodel.DialogsViewModel
@@ -41,7 +41,7 @@ class GameScreenModel(
 
     lateinit var controller: GameController
     var fumbbl: FumbblReplayAdapter? = null
-    val rules: BB2020Rules = BB2020Rules
+    val rules: StandardBB2020Rules = StandardBB2020Rules
 
     suspend fun initialize() {
         if (injectedController != null) {

@@ -4,11 +4,11 @@ import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.controller.GameController
 import dk.ilios.jervis.ext.playerNo
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
-import dk.ilios.jervis.rules.BB2020Rules
+import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.utils.createDefaultGameState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -20,7 +20,7 @@ import kotlin.test.assertTrue
  */
 class SetupTests {
 
-    private val rules = BB2020Rules
+    private val rules = StandardBB2020Rules
     private lateinit var state: Game
     private lateinit var controller: GameController
 
@@ -30,8 +30,7 @@ class SetupTests {
         controller = GameController(rules, state)
     }
 
-
-    // All players at the LoS with 2 on step back should be valid
+    // All players at the LoS with 2 one step back should be valid
     @Test
     fun valid_7_4_0() {
         state.homeTeam.apply {
