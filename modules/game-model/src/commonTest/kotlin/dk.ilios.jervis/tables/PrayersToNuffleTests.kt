@@ -185,6 +185,33 @@ class PrayersToNuffleTests: JervisGameTest() {
     }
 
     @Test
+    fun stiletto_asKickOffEvent() {
+        homeTeam.teamValue = 1_000_000
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
+                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
+                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
+                    DiceRollResults(3.d16),
+                ),
+                bounce = null
+            )
+        )
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.STILETTO))
+        assertFalse(homeTeam.hasPrayer(PrayerToNuffle.STILETTO))
+
+        controller.rollForward(PlayerSelected("H1".playerId))
+        assertTrue(homeTeam[1.playerNo].hasSkill<Stab>())
+        assertTrue(homeTeam[1.playerNo].getSkill<Stab>().isTemporary)
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.STILETTO))
+        assertTrue(homeTeam.hasPrayer(PrayerToNuffle.STILETTO))
+    }
+
+    @Test
     fun stiletto_notAvailableToSomePlayers() {
         awayTeam.forEachIndexed { i, it ->
             when (i) {
@@ -205,6 +232,52 @@ class PrayersToNuffleTests: JervisGameTest() {
         // Team is marked as having the prayer, even if no one could actually get it
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.STILETTO))
         assertEquals(1, awayTeam.filter{ it.hasSkill<Stab>() }.size)
+    }
+
+    @Test
+    fun ironMan() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(
+                prayersToNuffle = arrayOf(
+                    4.d16, // Roll Iron Man
+                    PlayerSelected("A1".playerId), // Give to A1
+                )
+            ),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam()
+        )
+
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffle.IRON_MAN))
+        val player = state.getPlayerById("A1".playerId)
+        assertTrue(player.armourModifiers.contains(PrayerStatModifier.IRON_MAN))
+        assertEquals(10, player.armorValue)
+    }
+
+    @Test
+    fun ironMan_asKickOffEvent() {
+        homeTeam.teamValue = 1_000_000
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
+                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
+                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
+                    DiceRollResults(4.d16),
+                ),
+                bounce = null
+            )
+        )
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.IRON_MAN))
+        assertFalse(homeTeam.hasPrayer(PrayerToNuffle.IRON_MAN))
+
+        controller.rollForward(PlayerSelected("H1".playerId))
+        assertTrue(homeTeam[1.playerNo].armourModifiers.contains(PrayerStatModifier.IRON_MAN))
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.IRON_MAN))
+        assertTrue(homeTeam.hasPrayer(PrayerToNuffle.IRON_MAN))
     }
 
     @Test
@@ -280,6 +353,33 @@ class PrayersToNuffleTests: JervisGameTest() {
     }
 
     @Test
+    fun knuckleDusters_asKickOffEvent() {
+        homeTeam.teamValue = 1_000_000
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
+                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
+                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
+                    DiceRollResults(5.d16),
+                ),
+                bounce = null
+            )
+        )
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
+        assertFalse(homeTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
+
+        controller.rollForward(PlayerSelected("H1".playerId))
+        assertTrue(homeTeam[1.playerNo].hasSkill<MightyBlow>())
+        assertTrue(homeTeam[1.playerNo].getSkill<MightyBlow>().isTemporary)
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.KNUCKLE_DUSTERS))
+        assertTrue(homeTeam.hasPrayer(PrayerToNuffle.KNUCKLE_DUSTERS))
+    }
+
+    @Test
     fun knuckleDusters_notAvailableToSomePlayers() {
         awayTeam.forEachIndexed { i, it ->
             when (i) {
@@ -328,6 +428,38 @@ class PrayersToNuffleTests: JervisGameTest() {
         )
         assertFalse(awayTeam.hasPrayer(PrayerToNuffle.BAD_HABITS))
         assertEquals(0, homeTeam.count { it.hasSkill<Loner>() && it.getSkill<Loner>().value == 2 })
+    }
+
+    @Test
+    fun badHabits_asKickOffEvent() {
+        homeTeam.teamValue = 1_000_000
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
+                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
+                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
+                    DiceRollResults(6.d16),
+                ),
+                bounce = null
+            )
+        )
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.BAD_HABITS))
+        assertFalse(homeTeam.hasPrayer(PrayerToNuffle.BAD_HABITS))
+
+        controller.rollForward(
+            2.d3, // Number of players affected
+            RandomPlayersSelected(listOf("A1".playerId, "A2".playerId)),
+        )
+        assertTrue(awayTeam[1.playerNo].hasSkill<Loner>())
+        assertTrue(awayTeam[1.playerNo].getSkill<Loner>().isTemporary)
+        assertTrue(awayTeam[2.playerNo].hasSkill<Loner>())
+        assertTrue(awayTeam[2.playerNo].getSkill<Loner>().isTemporary)
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.BAD_HABITS))
+        assertTrue(homeTeam.hasPrayer(PrayerToNuffle.BAD_HABITS))
     }
 
     @Test
@@ -402,6 +534,32 @@ class PrayersToNuffleTests: JervisGameTest() {
     }
 
     @Test
+    fun greasyCleats_asKickOffEvent() {
+        homeTeam.teamValue = 1_000_000
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
+                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
+                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
+                    DiceRollResults(7.d16),
+                ),
+                bounce = null
+            )
+        )
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
+        assertFalse(homeTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
+
+        controller.rollForward(PlayerSelected("A1".playerId))
+        assertTrue(awayTeam[1.playerNo].moveModifiers.contains(PrayerStatModifier.GREASY_CLEATS))
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
+        assertTrue(homeTeam.hasPrayer(PrayerToNuffle.GREASY_CLEATS))
+    }
+
+    @Test
     fun greasyCleats_noPlayersAvailable() {
         homeTeam.forEachIndexed { i, it ->
             it.state = PlayerState.KNOCKED_OUT
@@ -433,6 +591,33 @@ class PrayersToNuffleTests: JervisGameTest() {
         )
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.BLESSED_STATUE_OF_NUFFLE))
         assertTrue(awayTeam[1.playerNo].hasSkill<Pro>())
+    }
+
+    @Test
+    fun blessedStatueOfNuffle_asKickOffEvent() {
+        homeTeam.teamValue = 1_000_000
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(3.d6, 3.d6), // Cheering Fans
+                    DiceRollResults(6.d6), // Cheering Fans Roll - Home
+                    DiceRollResults(1.d6), // Cheering Fans Roll - Away
+                    DiceRollResults(8.d16),
+                ),
+                bounce = null
+            )
+        )
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.BLESSED_STATUE_OF_NUFFLE))
+        assertFalse(homeTeam.hasPrayer(PrayerToNuffle.BLESSED_STATUE_OF_NUFFLE))
+
+        controller.rollForward(PlayerSelected("H1".playerId))
+        assertTrue(homeTeam[1.playerNo].hasSkill<Pro>())
+        assertTrue(homeTeam[1.playerNo].getSkill<Pro>().isTemporary)
+        assertFalse(awayTeam.hasPrayer(PrayerToNuffle.BLESSED_STATUE_OF_NUFFLE))
+        assertTrue(homeTeam.hasPrayer(PrayerToNuffle.BLESSED_STATUE_OF_NUFFLE))
     }
 
     @Test

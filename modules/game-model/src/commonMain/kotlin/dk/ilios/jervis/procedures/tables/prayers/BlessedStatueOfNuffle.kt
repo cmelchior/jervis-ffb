@@ -44,7 +44,7 @@ object BlessedStatueOfNuffle : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val availablePlayers = context.team
-                .filter { it.state == PlayerState.RESERVE }
+                .filter { it.state == PlayerState.RESERVE || it.location.isOnField(rules) }
                 .filter { !it.hasSkill<Loner>() && !it.hasSkill<Pro>() }
                 .map { SelectPlayer(it) }
 

@@ -62,7 +62,7 @@ object BadHabits : Procedure() {
                 // Figure out how many players match the roll, if less players are available,
                 // Use the lower of the dice roll or number of players available
                 val prayerContext = state.getContext<PrayersToNuffleRollContext>()
-                val availablePlayers = getEligiblePlayers(prayerContext)
+                val availablePlayers = getEligiblePlayers(prayerContext, rules)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BAD_HABITS, d3),
                     SetContext(BadHabitsContext(roll = d3, mustSelectPlayers = min(availablePlayers.size, d3.value))),
@@ -77,7 +77,7 @@ object BadHabits : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
             val prayerContext = state.getContext<PrayersToNuffleRollContext>()
             val badHabitsContext = state.getContext<BadHabitsContext>()
-            val availablePlayers = getEligiblePlayers(prayerContext).map { it.id }
+            val availablePlayers = getEligiblePlayers(prayerContext, rules).map { it.id }
 
             return if (badHabitsContext.mustSelectPlayers == 0) {
                 listOf(ContinueWhenReady)
@@ -122,9 +122,9 @@ object BadHabits : Procedure() {
 
     // Helper functions below
 
-    private fun getEligiblePlayers(context: PrayersToNuffleRollContext): List<Player> {
+    private fun getEligiblePlayers(context: PrayersToNuffleRollContext, rules: Rules): List<Player> {
         return context.team.otherTeam().filter {
-            it.state == PlayerState.RESERVE && !it.hasSkill<Loner>()
+            (it.state == PlayerState.RESERVE || it.location.isOnField(rules)) && !it.hasSkill<Loner>()
         }
     }
 

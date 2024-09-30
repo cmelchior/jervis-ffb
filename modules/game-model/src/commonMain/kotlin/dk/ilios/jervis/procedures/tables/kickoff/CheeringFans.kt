@@ -51,7 +51,7 @@ object CheeringFans : Procedure() {
         }
 
         override fun applyAction(action: GameAction,state: Game, rules: Rules): Command {
-            return checkType<D6Result>(action) { d6 ->
+            return checkDiceRoll<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CHEERING_FANS, d6),
                     SetContext(CheeringFansContext(d6)),
@@ -67,7 +67,7 @@ object CheeringFans : Procedure() {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D6Result>(action) { d6 ->
+            return checkDiceRoll<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CHEERING_FANS, d6),
                     SetContext(state.getContext<CheeringFansContext>().copy(receivingTeamRoll = d6)),

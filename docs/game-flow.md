@@ -35,7 +35,7 @@ This document lists all game mechanics that have been fully implemented with tes
   - [ ] Biased Referee 
     - [ ] Biased Referee
     - [ ] How many others(???)
-- [ ] Roll on Prayers to Nuffle Table
+- [ ] Roll on Prayers to Nuffle Table (also test duplicates across teams)
   - [ ] Treacherous Trapdoor
   - [x] Friends with the Ref
   - [x] Stiletto
@@ -102,7 +102,7 @@ This document lists all game mechanics that have been fully implemented with tes
 - [ ] Setup and broken rules
 - [ ] Kick off 
 - [ ] Kickoff event
-- [ ] Track Star Player Points and adjustments to it. Figure out how
+- [ ] Track Star Player Points and adjustments to it.
 - [ ] Touchdown
 - [ ] Detect Stalling
 - [ ] Trapdoors

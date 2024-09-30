@@ -46,9 +46,13 @@ object PrayersToNuffleRoll : Procedure() {
             return checkType<D16Result>(action) { d16 ->
                 val context = state.getContext<PrayersToNuffleRollContext>()
                 val result: PrayerToNuffle = rules.prayersToNuffleTable.roll(d16)
-                if (context.team.activePrayersToNuffle.contains(result)) {
-                    // Teams are not allowed to have multiple instances of the same prayer
-                    // Neither as inducement nor as a kick-off table result
+
+                // Multiple instances of the same prayer is not allowed across both teams.
+                // Neither as inducement nor as a kick-off table result
+                if (
+                    context.team.activePrayersToNuffle.contains(result) ||
+                    context.team.otherTeam().activePrayersToNuffle.contains(result)
+                ) {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.PRAYERS_TO_NUFFLE, d16),
                         GotoNode(RollDie)
