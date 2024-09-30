@@ -55,7 +55,8 @@ class GameController(
     var initialHomeTeamState: JsonElement? = null
     var initialAwayTeamState: JsonElement? = null
 
-    private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 0, extraBufferCapacity = 20_000)
+    // TODO Figure out a better way to hook up the UI to the model, so we do not to create this buffer
+    private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 20_000)
     val logsEvents: Flow<ListEvent> = _logsEvents
     val logs: MutableList<LogEntry> = mutableListOf()
     val diceRollGenerator = diceGenerator
