@@ -10,6 +10,7 @@ import dk.ilios.jervis.commands.SetCurrentBall
 import dk.ilios.jervis.commands.SetKickingTeam
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.SetPlayerState
+import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.Node
@@ -17,6 +18,7 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.locations.DogOut
 import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.reports.ReportSetupKickingTeam
@@ -87,26 +89,41 @@ object GameDrive : Procedure() {
     object Turn : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules) = TeamTurn
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // TODO This logic is completely messed up. A Drive also ends at the end of the half
-            val switchTeamCommands =
-                compositeCommandOf(
-                    SetActiveTeam(state.inactiveTeam),
-                    SetKickingTeam(state.receivingTeam),
-                )
-            val goalScored = state.goalScored || state.isTurnOver
-            return if (goalScored) {
-                // TODO this is probably wrong if the inactive team scored. I.e. at the end of the half
-                compositeCommandOf(
-                    switchTeamCommands,
-                    ExitProcedure()
-                )
-            } else if (state.homeTeam.turnMarker == rules.turnsPrHalf && state.awayTeam.turnMarker == rules.turnsPrHalf) {
-                GotoNode(ResolveEndOfDrive)
-                // The other team can continue the drive
-            } else if (state.inactiveTeam.turnMarker < rules.turnsPrHalf) {
-                switchTeamCommands + GotoNode(Turn)
+            val isTurnOver = (state.turnOver == TurnOver.STANDARD)
+            val activeGoalScored = (state.turnOver == TurnOver.ACTIVE_TEAM_TOUCHDOWN)
+            // TODO If this is true, we need to run another turn for the team but exit it straight away.
+            val inactiveTouchdownScored = (state.turnOver == TurnOver.INACTIVE_TEAM_TOUCHDOWN)
+            val isOutOfTime = if (state.halfNo <= rules.halfsPrGame) {
+                state.homeTeam.turnMarker == rules.turnsPrHalf &&
+                state.awayTeam.turnMarker == rules.turnsPrHalf
             } else {
-                INVALID_GAME_STATE()
+                state.homeTeam.turnMarker == rules.turnsInExtraTime &&
+                state.awayTeam.turnMarker == rules.turnsInExtraTime
+            }
+            val endDrive = activeGoalScored || isOutOfTime
+            val swapTeams = !isOutOfTime && !activeGoalScored
+
+            return when {
+                inactiveTouchdownScored -> {
+                    TODO("Add support for this")
+                }
+                endDrive -> {
+                    compositeCommandOf(
+                        SetActiveTeam(state.inactiveTeam),
+                        SetKickingTeam(state.receivingTeam),
+                        SetTurnOver(null),
+                        GotoNode(ResolveEndOfDrive)
+                    )
+                }
+                swapTeams -> {
+                    compositeCommandOf(
+                        SetActiveTeam(state.inactiveTeam),
+                        SetKickingTeam(state.receivingTeam),
+                        SetTurnOver(null),
+                        GotoNode(Turn)
+                    )
+                }
+                else -> INVALID_GAME_STATE("Unsupported state")
             }
         }
     }

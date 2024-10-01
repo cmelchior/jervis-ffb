@@ -25,6 +25,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
@@ -93,7 +94,7 @@ object FoulAction : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                PlayerDeselected -> ExitProcedure()
+                is PlayerDeselected -> ExitProcedure()
                 is PlayerSelected -> {
                     val context = state.getContext<FoulContext>()
                     compositeCommandOf(
@@ -162,7 +163,7 @@ object FoulAction : Procedure() {
             val context = state.getContext<FoulContext>()
             return if (!context.fouler.isStanding(rules)) {
                 compositeCommandOf(
-                    SetTurnOver(true),
+                    SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()
                 )
             } else {

@@ -142,7 +142,7 @@ interface RerollSource {
     ): List<DiceRerollOption>
 
     // Helper method, for just rolling a single dice. Which is by far, the most common scenario.
-    fun calculateRerollOptions(type: DiceRollType, value: DieRoll<*>, wasSuccess: Boolean, ): List<DiceRerollOption> =
+    fun calculateRerollOptions(type: DiceRollType, value: DieRoll<*>, wasSuccess: Boolean?): List<DiceRerollOption> =
         calculateRerollOptions(
             type,
             listOf(value),

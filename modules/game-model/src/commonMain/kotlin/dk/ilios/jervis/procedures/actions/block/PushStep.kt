@@ -83,11 +83,12 @@ data class PushContext(
 }
 
 /**
- * Resolve push, including any chain pushes. If the last player is pushed into the crowd,
- * it is resolved here.
+ * Resolve push, including any chain pushes. If the last player is pushed into
+ * the crowd, it is resolved here.
  *
- * Pushing players is a complicated process, involving a lot of skills. The logic is
- * implemented in the following way, with Player A = pusher and Player B = pushee.
+ * Pushing players is a complicated process, involving a lot of skills and timings.
+ * The logic is implemented in the following way, with Player A = pusher and
+ * Player B = pushee.
  *
  * 1. Player A starts blitz or block and must decide to use Juggernaut or not (before the push start).
  *    a. Cannot be used on chain pushes.
@@ -116,47 +117,61 @@ data class PushContext(
  *
  * There exist at least three scenarios:
  *
- * 1. With 24 players, it is possible to push Player A away from its location,
- *    so it no longer is adjacent to Player B's starting location.
+ * 1. With 24 players, it is possible for a Player C to push Player A away from
+ *    its starting location, so it no longer is adjacent to Player B's starting
+ *    location.
  *
- * 2. With 24 players, it is possible to potentially push a player into Player B's
- *    starting location.
+ * 2. With 24 players, it is possible to potentially push a player C into Player
+ *    B's starting location.
  *
  * 3. With 28 players, it is possible to create an infinite circle that never ends.
- *    However, this is up to the player, and they can just choose a different chain
- *    push sequence to break it.
+ *    However, this is up to the pushing coach, and they can just choose a different
+ *    chain push sequence to break it.
  *
  * To account for these cases, this procedure implements the following logic:
  *
  * - When calculating a chain push, players are considered as having left their
- *   square as soon as the push direction is selected, i.e., their square is available
- *   in case of a circular chain. (But the players are not actively moved until the
- *   entire chain is resolved).
+ *   square as soon as the push direction is selected, i.e., their square is
+ *   available in case of a circular chain. But the players are not moved into
+ *   their target square until the entire chain is resolved.
  *
- * - If Player A is moved away so it is no longer adjacent to Player B's starting square,
- *   they are no longer allowed to follow up. The reason is due to the following
- *   sentence in the rules: "Sometimes, a player must follow-up due to an in-game effect,
- *   a special rule, or a Skill or Trait, whether they want to or not.", in this case,
- *   the in-game effect is Push/Chain-push.
+ * - If Player A is moved away so it is no longer adjacent to Player B's starting
+ *   square, they are no longer allowed to follow up. The reason is due to the
+ *   following sentence in the rules: "Sometimes, a player must follow-up due to
+ *   an in-game effect, a special rule, or a Skill or Trait, whether they want to
+ *   or not.", in this case, the in-game effect is a push or chain-push.
  *
  * - Due to the possibility of circular chain pushes, we risk having two players
  *   in the same location no matter if the chain is resolved from the start or
- *   from the end. To make it more natural, we thus resolve from the beginning,
- *   which also means that being pushed into the crowd is resolved at the end.
+ *   from the end. To make it more natural, we resolve the chain from the
+ *   beginning.
  *
- * This also affects Treacherous Trapdoor, if a chain-push results in a player
- * being pushed into another square with a player, what happens?
+ * The choice of resolving from the start has consequences for Treacherous
+ * Trapdoor, Scoring, Ball Clone, and being Pushed Into The Crowd.
  *
- *   a. The player can fall into the trapdoor before chain pushing the other player out.
- *      If it falls through, the chain just stops there. The original player stays on the
- *      trapdoor.
+ * **Treacherous Trapdoor**
+ * If a chain-push results in a player being pushed into another square with a
+ * player standing on a trapdoor, what happens?
+ *
+ *   a. The player can fall into the trapdoor before chain-pushing the other
+ *      player out. If it falls through, the chain just stops there. The original
+ *      player stays on the trapdoor.
  *   b. The check for trapdoor isn't done until after the full chain is resolved.
  *      Potentially leaving a "hole" in the chain.
  *
- * You could probably argue for both interpretations, so in this case, we use option A,
- * as it is easier to implement in [ResolvePush]. However, due to how the logic is setup,
- * you select all steps of the chain without checking for trapdoors, and the trapdoor check
- * is then done when fully resolving the chain.
+ * You could probably argue for both interpretations, so in this case, we use
+ * option A, as it is easier to implement in [ResolvePush]. However, due to how
+ * the logic is set up, you select all steps of the chain without checking for
+ * trapdoors, and the trapdoor check is then done when fully resolving the chain.
+ *
+ * **Scoring **
+ * If Ball Clone is in play, and you have a ball on the ground and a ball carried
+ * by a player that is pushed into the End Zone, then we are going to check for
+ * scoring for the player being pushed into the End Zone first, before checking
+ * for Pickup (because that will happen by the end of chain-push).
+ *
+ * If a touchdown is scored during the push-back, we will still resolve the entire
+ * chain (including pushing people into the crowd) before the turn-over is triggered.
  *
  * This means a push is modeled this way:
  * ```
@@ -167,6 +182,9 @@ data class PushContext(
  *   }
  * ```
  */
+// TODO Add support for Treacherous Trapdorr
+// TODO Add support for scoring
+// TODO Probably have to rethink the logic in this procedure a bit.
 object PushStep: Procedure() {
 
     // Start the push by figuring out what kind of push and what skills could impact it.
@@ -450,6 +468,8 @@ object PushStep: Procedure() {
                     SetPlayerLocation(push.pushee, to)
                 }
             }
+            // TODO If the last player is being pushed into the ball, they get a chance to pick
+            //  it up. Which can potentially trigger a scoring event.
             return compositeCommandOf(
                 *moveCommands.toTypedArray(),
                 GotoNode(DecideToFollowUp)

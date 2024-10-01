@@ -25,6 +25,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
@@ -56,11 +57,11 @@ object HandOffAction : Procedure() {
         val player = state.activePlayer!!
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(ThrowTeamMateContext(player))
+            SetContext(HandOffContext(player))
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val context = state.getContext<ThrowTeamMateContext>()
+        val context = state.getContext<HandOffContext>()
         return compositeCommandOf(
             RemoveContext<ThrowTeamMateContext>(),
             SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = context.hasMoved))
@@ -71,9 +72,9 @@ object HandOffAction : Procedure() {
     }
 
     object MoveOrHandOffOrEndAction : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ThrowTeamMateContext>().thrower.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<HandOffContext>().thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val context = state.getContext<ThrowTeamMateContext>()
+            val context = state.getContext<HandOffContext>()
             val options = mutableListOf<ActionDescriptor>()
 
             // Find possible move types
@@ -95,7 +96,7 @@ object HandOffAction : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val handOffContext = state.getContext<ThrowTeamMateContext>()
+            val handOffContext = state.getContext<HandOffContext>()
             return when (action) {
                 EndAction -> ExitProcedure()
                 is MoveTypeSelected -> {
@@ -126,10 +127,10 @@ object HandOffAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their hand-off.
-            val context = state.getContext<ThrowTeamMateContext>()
+            val context = state.getContext<HandOffContext>()
             return if (!context.thrower.isStanding(rules)) {
                 compositeCommandOf(
-                    SetTurnOver(true),
+                    SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()
                 )
             } else {
@@ -140,16 +141,19 @@ object HandOffAction : Procedure() {
 
     object ResolveCatch : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetCurrentBall(state.getContext<ThrowTeamMateContext>().thrower.ball!!)
+            val context = state.getContext<HandOffContext>()
+            // Only one ball should be present on the field at
+            val ball = state.field[context.catcher!!.coordinates].balls.singleOrNull() ?: INVALID_GAME_STATE("Multiple balls in ${context.catcher.location}")
+            return SetCurrentBall(ball)
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If no player on the holds the ball after the hand-off is complete, it is a turnover.
             // otherwise the action just ends
-            val context = state.getContext<ThrowTeamMateContext>()
+            val context = state.getContext<HandOffContext>()
             return compositeCommandOf(
                 SetCurrentBall(null),
-                if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(true) else null,
+                if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(TurnOver.STANDARD) else null,
                 ExitProcedure()
             )
         }

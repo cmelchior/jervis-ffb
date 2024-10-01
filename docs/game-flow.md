@@ -79,13 +79,29 @@ This document lists all game mechanics that have been fully implemented with tes
 - [x] Extra Time
 - [x] Sudden Death
 - [ ] Drive counter
-- [ ] Score as soon as player with ball enters end zone
+- [ ] Scoring
+  - [x] Moving into the End Zone with the ball using a standard move
+  - [ ] Follow-up into the End Zone
+  - [ ] Jumping into the End Zone with the ball
+  - [ ] Leaping into the End Zone with the ball
+  - [x] Picking the ball up in the Endzone
+  - [x] Catching the ball after a pass in the end zone
+  - [x] Catching the ball after a hand-off in the end zone
+  - [x] Catching the ball after it bouncing into the end zone
+  - [x] Catching the ball in the end zone after a throw-in 
+  - [ ] Throw Team-mate. Player lands in the end zone
+  - [ ] Chain push: Player with the ball is pushed into the end zone
+  - [ ] Chain push: Player is pushed into the ball and picks it up.
+  - [ ] Using Ball & Chain to move into the End Zone (not really supported, but just in case)
 - [ ] Turnover ends turn as quickly as possible
 - [ ] Conceding
 
 // ...
 
 - [ ] Team Rerolls
+  - [ ] Reset at half time
+  - [ ] Carry over into Extra Time
+  - [ ] Leader
 - [ ] Rushing
 - [ ] Dodging
 - [ ] Deviating Ball

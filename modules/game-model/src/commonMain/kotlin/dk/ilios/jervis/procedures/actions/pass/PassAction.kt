@@ -4,7 +4,6 @@ import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.ConfirmWhenReady
-import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.GameAction
@@ -23,16 +22,17 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.procedures.ActivatePlayerContext
+import dk.ilios.jervis.procedures.D6DieRoll
 import dk.ilios.jervis.procedures.actions.move.ResolveMoveTypeStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
-import dk.ilios.jervis.reports.ReportPassResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Range
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -51,7 +51,7 @@ data class PassContext(
     val hasMoved: Boolean = false,
     val target: FieldCoordinate? = null,
     val range: Range? = null,
-    val passingRoll: D6Result? = null,
+    val passingRoll: D6DieRoll? = null,
     val passingModifiers: List<DiceModifier> = emptyList(),
     val passingResult: PassingType? = null,
     val runInterference: Player? = null,
@@ -76,7 +76,6 @@ object PassAction : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PassContext>()
         return compositeCommandOf(
-            if (context.target != null) ReportPassResult(context) else null,
             RemoveContext<PassContext>(),
             SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = context.hasMoved))
         )
@@ -133,7 +132,7 @@ object PassAction : Procedure() {
             val context = state.getContext<PassContext>()
             return if (!context.thrower.isStanding(rules)) {
                 compositeCommandOf(
-                    SetTurnOver(true),
+                    SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()
                 )
             } else {

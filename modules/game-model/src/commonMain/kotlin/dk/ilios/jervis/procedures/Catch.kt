@@ -17,6 +17,8 @@ import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.CatchModifier
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.model.modifiers.MarkedModifier
+import dk.ilios.jervis.procedures.actions.move.ScoringATouchDownContext
+import dk.ilios.jervis.procedures.actions.move.ScoringATouchdown
 import dk.ilios.jervis.reports.ReportCatch
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Weather
@@ -33,6 +35,7 @@ object Catch : Procedure() {
         val catchingPlayer = state.field[ball.location].player!!
         val diceRollTarget = catchingPlayer.agility
         val modifiers = mutableListOf<DiceModifier>()
+        // TODO A player already carrying a ball will always fail the catch
         // TODO Convert deflection into Intercept
         if (ball.state == BallState.BOUNCING) modifiers.add(CatchModifier.BOUNCING)
         if (ball.state == BallState.THROW_IN) modifiers.add(CatchModifier.THROW_IN)
@@ -78,7 +81,7 @@ object Catch : Procedure() {
                 compositeCommandOf(
                     SetBallState.carried(ball, context.catchingPlayer),
                     ReportCatch(context.catchingPlayer, context.target, context.modifiers, roll.result, true),
-                    ExitProcedure(),
+                    GotoNode(CheckForTouchDown)
                 )
             } else {
                 compositeCommandOf(
@@ -96,6 +99,17 @@ object Catch : Procedure() {
             return compositeCommandOf(
                 ExitProcedure(), // TODO Not 100% sure what to do here?
             )
+        }
+    }
+
+    object CheckForTouchDown : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<CatchRollContext>()
+            return SetContext(ScoringATouchDownContext(context.catchingPlayer))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return ExitProcedure()
         }
     }
 }

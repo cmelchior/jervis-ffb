@@ -11,6 +11,7 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.tables.injury.KnockedDown
 import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
@@ -27,7 +28,7 @@ object PlayerDown: Procedure() {
         val context = state.getContext<BlockContext>()
         val injuryContext = RiskingInjuryContext(context.attacker, context.isUsingMultiBlock)
         return compositeCommandOf(
-            SetTurnOver(true),
+            SetTurnOver(TurnOver.STANDARD),
             SetPlayerState(context.attacker, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
             SetContext(injuryContext),
         )

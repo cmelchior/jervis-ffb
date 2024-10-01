@@ -24,6 +24,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.locations.FieldCoordinate
@@ -35,6 +36,7 @@ import dk.ilios.jervis.procedures.Scatter
 import dk.ilios.jervis.procedures.ScatterRollContext
 import dk.ilios.jervis.procedures.ThrowIn
 import dk.ilios.jervis.procedures.ThrowInContext
+import dk.ilios.jervis.reports.ReportPassResult
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.tables.Range
 import dk.ilios.jervis.rules.tables.Weather
@@ -80,6 +82,7 @@ object PassStep: Procedure() {
                         val distance = rules.rangeRuler.measure(context.thrower.coordinates, it.coordinate)
                         val ball = context.thrower.ball!!
                         compositeCommandOf(
+                            ReportPassResult(context),
                             SetContext(context.copy(target = it.coordinate, range = distance)),
                             SetBallState.accurateThrow(ball), // Until proven otherwise. Should we invent a new type?
                             SetBallLocation(ball, it.coordinate),
@@ -213,7 +216,7 @@ object PassStep: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
-                SetTurnOver(true),
+                SetTurnOver(TurnOver.STANDARD),
                 ExitProcedure()
             )
         }
@@ -307,7 +310,7 @@ object PassStep: Procedure() {
             val passContext = state.getContext<PassContext>()
             return compositeCommandOf(
                 RemoveContext<ThrowInContext>(),
-                if (!rules.teamHasBall(passContext.thrower.team)) SetTurnOver(true) else null,
+                if (!rules.teamHasBall(passContext.thrower.team)) SetTurnOver(TurnOver.STANDARD) else null,
                 ExitProcedure()
             )
         }
@@ -340,7 +343,7 @@ object PassStep: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<PassContext>()
             return compositeCommandOf(
-                if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(true) else null,
+                if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(TurnOver.STANDARD) else null,
                 ExitProcedure()
             )
         }

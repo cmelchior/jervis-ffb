@@ -25,6 +25,7 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.locations.DogOut
@@ -162,7 +163,7 @@ object FoulStep: Procedure() {
             }
             return compositeCommandOf(
                 resultCommand,
-                SetTurnOver(true),
+                SetTurnOver(TurnOver.STANDARD),
                 ExitProcedure()
             )
         }

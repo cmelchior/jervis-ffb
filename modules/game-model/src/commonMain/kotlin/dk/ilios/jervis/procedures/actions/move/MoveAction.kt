@@ -27,7 +27,7 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 
 /**
- * Procedure controlling a Move action as described on page XX in the rulebook.
+ * Procedure controlling a Move action as described on page 44 in the rulebook.
  */
 @Serializable
 object MoveAction : Procedure() {
@@ -37,7 +37,6 @@ object MoveAction : Procedure() {
         return getSetPlayerRushesCommand(rules, player)
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-
     override fun isValid(state: Game, rules: Rules) {
         if (state.activePlayer == null) INVALID_GAME_STATE("No active player")
     }
@@ -73,7 +72,7 @@ object MoveAction : Procedure() {
     object ResolveMoveType : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.isTurnOver) {
+            return if (state.turnOver != null) {
                 ExitProcedure()
             } else {
                 GotoNode(SelectMoveType)

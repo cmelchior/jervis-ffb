@@ -26,6 +26,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.tables.injury.KnockedDown
@@ -50,14 +51,14 @@ data class BothDownContext(
  */
 object BothDown: Procedure() {
     override val initialNode: Node = AttackerChooseToUseWrestle
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val blockContext = state.getContext<BlockContext>()
         return SetContext(BothDownContext(
             blockContext.attacker,
             blockContext.defender,
         ))
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
             ReportBothDownResult(state.getContext<BothDownContext>()),
             RemoveContext<BothDownContext>()
@@ -185,7 +186,7 @@ object BothDown: Procedure() {
             } else {
                 buildCompositeCommand {
                     if (!context.attackUsesBlock) {
-                        add(SetTurnOver(true))
+                        add(SetTurnOver(TurnOver.STANDARD))
                         add(SetPlayerState(context.attacker, PlayerState.KNOCKED_DOWN, hasTackleZones = false))
                     }
                     if (!context.defenderUsesBlock) {

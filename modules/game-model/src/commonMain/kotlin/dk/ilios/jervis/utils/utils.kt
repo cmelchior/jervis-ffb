@@ -369,7 +369,7 @@ fun <T : Any?> MutableSharedFlow<T>.safeTryEmit(value: T) {
     }
 }
 
-fun List<Skill>.getRerollActionDescriptors(type: DiceRollType, roll: D6DieRoll, successOnFirstRoll: Boolean): List<SelectRerollOption> {
+fun List<Skill>.getRerollActionDescriptors(type: DiceRollType, roll: D6DieRoll, successOnFirstRoll: Boolean?): List<SelectRerollOption> {
     return this.asSequence().filter { it is RerollSource }
         .map { it as RerollSource }
         .filter { it.canReroll(type, listOf(roll), successOnFirstRoll) }
@@ -388,7 +388,7 @@ fun calculateAvailableRerollsFor(
     player: Player, // Player rolling the dice
     type: DiceRollType, // Which type of dice roll
     roll: D6DieRoll, // The result of the first dice
-    firstRollWasSuccess: Boolean // Whether the first roll was a success.
+    firstRollWasSuccess: Boolean? // Whether the first roll was a success.
 ): List<SelectRerollOption> {
     if (type == DiceRollType.BLOCK) throw IllegalArgumentException("Use XX instead")
 

@@ -11,15 +11,12 @@ import dk.ilios.jervis.model.Player
  * - Temporary skills
  * - Temporary stat modifiers
  */
-class SetPlayerStats(
-    private val player: Player,
-    private val movesLeft: Int,
-): Command {
+class SetPlayerTemporaryStats(private val player: Player, private val movesLeft: Int): Command {
     private val originalMovesLeft: Int = player.movesLeft
 
     override fun execute(state: Game, controller: GameController) {
         player.apply {
-            this@apply.movesLeft = this@SetPlayerStats.movesLeft
+            this@apply.movesLeft = this@SetPlayerTemporaryStats.movesLeft
             notifyUpdate()
         }
     }

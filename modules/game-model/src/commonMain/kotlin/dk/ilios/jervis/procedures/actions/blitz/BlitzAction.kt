@@ -24,6 +24,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
@@ -172,7 +173,7 @@ object BlitzAction : Procedure() {
             val context = state.getContext<BlitzContext>()
             return if (!context.attacker.isStanding(rules)) {
                 compositeCommandOf(
-                    SetTurnOver(true),
+                    SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()
                 )
             } else {
@@ -208,7 +209,7 @@ object BlitzAction : Procedure() {
             val context = state.getContext<BlitzContext>()
             return if (!rules.isStanding(context.attacker)) {
                 compositeCommandOf(
-                    SetTurnOver(true),
+                    SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()
                 )
             } else {

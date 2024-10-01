@@ -21,6 +21,7 @@ import dk.ilios.jervis.actions.EndSetup
 import dk.ilios.jervis.actions.EndTurn
 import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerDeselected
@@ -37,8 +38,8 @@ import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
 import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.foul.FoulAction
 import dk.ilios.jervis.procedures.actions.move.MoveAction
-import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.rules.roster.Position
 import dk.ilios.jervis.rules.roster.Roster
 import dk.ilios.jervis.rules.roster.bb2020.BB2020Position
@@ -100,38 +101,40 @@ object JervisSerialization {
                 subclass(dk.ilios.jervis.model.locations.FieldCoordinateImpl::class)
             }
             polymorphic(GameAction::class) {
+                // polymorphic(DieResult::class) {
                 subclass(Cancel::class)
                 subclass(CoinSideSelected::class)
                 subclass(CoinTossResult::class)
                 subclass(Confirm::class)
                 subclass(Continue::class)
+                subclass(D12Result::class)
+                subclass(D16Result::class)
+                subclass(D20Result::class)
+                subclass(D2Result::class)
+                subclass(D3Result::class)
+                subclass(D4Result::class)
+                subclass(D6Result::class)
+                subclass(D8Result::class)
+                subclass(DBlockResult::class)
                 subclass(DiceRollResults::class)
                 subclass(DogoutSelected::class)
                 subclass(EndAction::class)
-                subclass(EndTurn::class)
                 subclass(EndSetup::class)
+                subclass(EndTurn::class)
                 subclass(FieldSquareSelected::class)
+                subclass(MoveTypeSelected::class)
                 subclass(NoRerollSelected::class)
                 subclass(PlayerActionSelected::class)
                 subclass(PlayerDeselected::class)
                 subclass(PlayerSelected::class)
                 subclass(RandomPlayersSelected::class)
                 subclass(RerollOptionSelected::class)
-                // polymorphic(DieResult::class) {
-                subclass(D2Result::class)
-                subclass(D3Result::class)
-                subclass(D4Result::class)
-                subclass(D6Result::class)
-                subclass(D8Result::class)
-                subclass(D12Result::class)
-                subclass(D16Result::class)
-                subclass(D20Result::class)
-                subclass(DBlockResult::class)
             }
         }
 
     private val jsonFormat =
         Json {
+            useArrayPolymorphism = true
             serializersModule = jervisModule
             prettyPrint = true
         }

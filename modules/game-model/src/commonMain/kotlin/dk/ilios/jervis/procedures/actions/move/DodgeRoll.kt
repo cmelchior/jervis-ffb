@@ -362,7 +362,7 @@ import dk.ilios.jervis.utils.sum
         ): Command {
             return when (action) {
                 Continue -> ExitProcedure()
-                NoRerollSelected -> ExitProcedure()
+                is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
                     val rerollContext = UseRerollContext(DiceRollType.DODGE, action.getRerollSource(state))
                     compositeCommandOf(

@@ -91,7 +91,7 @@ object StandardMoveStep: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = MovePlayerIntoSquare
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.isTurnOver) {
+            return if (state.turnOver != null) {
                 ExitProcedure() // Something went wrong when moving the player
             } else {
                 GotoNode(CheckIfRushingIsNeeded)
@@ -221,8 +221,19 @@ object StandardMoveStep: Procedure() {
                 // Player was already moved before rolling any dice, so here we just
                 // adjust stats.
                 SetPlayerMoveLeft(movingPlayer, movingPlayer.movesLeft - 1),
-                ExitProcedure()
+                GotoNode(CheckForScoring)
             )
+        }
+    }
+
+    object CheckForScoring : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            return SetContext(ScoringATouchDownContext(context.player))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return ExitProcedure()
         }
     }
 }

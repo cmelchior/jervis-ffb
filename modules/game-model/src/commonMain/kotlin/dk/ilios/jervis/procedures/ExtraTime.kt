@@ -2,8 +2,10 @@ package dk.ilios.jervis.procedures
 
 import compositeCommandOf
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetActiveTeam
 import dk.ilios.jervis.commands.SetDrive
 import dk.ilios.jervis.commands.SetHalf
+import dk.ilios.jervis.commands.SetKickingTeamAtHalfTime
 import dk.ilios.jervis.commands.SetTurnMarker
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -24,18 +26,15 @@ import dk.ilios.jervis.rules.skills.Duration
 object ExtraTime : Procedure() {
     override val initialNode: Node = DetermineKickingTeam
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-//        val currentHalf = state.halfNo + 1
-//        // At start of game use the kicking team from the pre-game sequence, otherwise alternate teams based
-//        // on who kicked off at last half.
-//        var kickingTeam = state.kickingTeam
-//        if (currentHalf > 1) {
-//            kickingTeam = state.kickingTeamInLastHalf.otherTeam()
-//        }
+        // Swap kicking team before entering Extra Time back to the Home team
+        // so it emulates starting the game, where it is always the Home Team
+        // that is throwing the coin and the Away Team that chooses the result
+        var kickingTeam = state.homeTeam
         return compositeCommandOf(
             SetHalf(state.halfNo + 1),
             SetDrive(0),
-//            SetKickingTeamAtHalfTime(kickingTeam),
-//            SetActiveTeam(kickingTeam.otherTeam()),
+            SetKickingTeamAtHalfTime(kickingTeam),
+            SetActiveTeam(kickingTeam.otherTeam()),
 //            ResetAvailableTeamRerolls(state.homeTeam),
 //            ResetAvailableTeamRerolls(state.awayTeam),
             SetTurnMarker(state.homeTeam, 0),

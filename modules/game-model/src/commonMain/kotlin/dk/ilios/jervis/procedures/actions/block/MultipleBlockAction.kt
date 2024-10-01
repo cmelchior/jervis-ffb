@@ -27,6 +27,7 @@ import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.Bounce
@@ -384,7 +385,7 @@ object MultipleBlockAction: Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
-            val isTurnOver = state.isTurnOver
+            val isTurnOver = state.turnOver != null
             val nextDefender = when (context.activeDefender) {
                 0 -> 1
                 1 -> 0
@@ -397,7 +398,7 @@ object MultipleBlockAction: Procedure() {
 
             return compositeCommandOf(
                 RemoveContext(contextClass),
-                SetTurnOver(false),
+                SetTurnOver(null),
                 SetContext(updatedMultiBlockContext),
                 GotoNode(ResolveSecondPlayer)
             )
@@ -427,7 +428,7 @@ object MultipleBlockAction: Procedure() {
 
             return compositeCommandOf(
                 RemoveContext(contextClass),
-                SetTurnOver(context.postponeTurnOver),
+                SetTurnOver(if (context.postponeTurnOver) TurnOver.STANDARD else null),
                 SetContext(updatedMultiBlockContext),
                 GotoNode(ResolveInjuries)
             )

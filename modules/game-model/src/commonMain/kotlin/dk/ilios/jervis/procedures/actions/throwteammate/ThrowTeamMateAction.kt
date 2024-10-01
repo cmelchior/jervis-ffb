@@ -25,6 +25,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
@@ -129,7 +130,7 @@ object ThrowTeamMateAction : Procedure() {
             val context = state.getContext<ThrowTeamMateContext>()
             return if (!context.thrower.isStanding(rules)) {
                 compositeCommandOf(
-                    SetTurnOver(true),
+                    SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()
                 )
             } else {
@@ -149,7 +150,7 @@ object ThrowTeamMateAction : Procedure() {
             val context = state.getContext<ThrowTeamMateContext>()
             return compositeCommandOf(
                 SetCurrentBall(null),
-                if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(true) else null,
+                if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(TurnOver.STANDARD) else null,
                 ExitProcedure()
             )
         }

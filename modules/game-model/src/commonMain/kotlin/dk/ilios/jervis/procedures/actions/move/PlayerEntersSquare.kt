@@ -25,6 +25,7 @@ import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerState
 import dk.ilios.jervis.model.Team
+import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
@@ -47,7 +48,9 @@ data class MovePlayerIntoSquareContext(
 ) : ProcedureContext
 
 /**
- * Procedure controlling a player entering a square.
+ * Procedure controlling a player entering a square using one of their
+ * normal movement options or by being pushed into it.
+ *
  * Normally it just means moving the player into that square, but if
  * Treacherous Trapdoors have been rolled on Prayers to Nuffle, it
  * might result in the player being removed from play immediately.
@@ -72,7 +75,6 @@ object MovePlayerIntoSquare : Procedure() {
                 GotoNode(CheckForBouncingBall),
             )
         }
-
     }
 
     // If the player was already holding a ball and moves into a square with a Ball Clone,
@@ -95,7 +97,7 @@ object MovePlayerIntoSquare : Procedure() {
     }
 
     object ResolveBouncingBall: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MovePlayerIntoSquareContext>()
             val ball = state.field[context.target].balls.first { it.state == BallState.ON_GROUND }
             return SetCurrentBall(ball)
@@ -164,7 +166,7 @@ object MovePlayerIntoSquare : Procedure() {
             return compositeCommandOf(
                 if (context.player.hasBall()) {
                     // TODO Should also bounce the ball
-                    SetTurnOver(true)
+                    SetTurnOver(TurnOver.STANDARD)
                 } else null,
                 ExitProcedure()
             )

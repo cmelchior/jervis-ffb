@@ -13,10 +13,9 @@ import dk.ilios.jervis.commands.ResetAvailableTeamActions
 import dk.ilios.jervis.commands.SetCanUseTeamRerolls
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerAvailability
-import dk.ilios.jervis.commands.SetPlayerStats
+import dk.ilios.jervis.commands.SetPlayerTemporaryStats
 import dk.ilios.jervis.commands.SetSkillUsed
 import dk.ilios.jervis.commands.SetTurnMarker
-import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
@@ -58,7 +57,7 @@ object TeamTurn : Procedure() {
             SetCanUseTeamRerolls(true),
             SetTurnMarker(state.activeTeam, turn),
             getResetTurnActionCommands(state, rules),
-            *resetPlayerStats(state, rules),
+            *resetPlayerTemporaryStats(state, rules),
             *getResetAvailablePlayers(state, rules),
             *resetSkillsUsed(state, rules),
             ReportStartingTurn(state.activeTeam, turn),
@@ -67,14 +66,13 @@ object TeamTurn : Procedure() {
 
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
-            SetTurnOver(false),
             SetCanUseTeamRerolls(false),
-            ReportEndingTurn(state.activeTeam, state.activeTeam.turnMarker),
+            ReportEndingTurn(state.activeTeam, state.activeTeam.turnMarker, state.turnOver),
         )
     }
 
     object UseSpecialEffects: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             return SetContext(ActivateInducementContext(state.activeTeam, Timing.END_OF_TURN))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducements
@@ -118,7 +116,7 @@ object TeamTurn : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<ActivatePlayerContext>(),
-                if (state.isTurnOver || state.goalScored) {
+                if (state.turnOver != null) {
                     GotoNode(ResolveEndOfTurn)
                 } else {
                     GotoNode(SelectPlayerOrEndTurn)
@@ -195,34 +193,35 @@ object TeamTurn : Procedure() {
             .filter { it.state == PlayerState.STANDING || it.state == PlayerState.PRONE } // Only Standing/Prone players
     }
 
-    // Reset player stats back to start, this e.g. include moves/rushes used/temporary skills
-    private fun resetPlayerStats(state: Game, rules: Rules): Array<Command> {
+    // Reset player stats back to start, this e.g. include moves
+    private fun resetPlayerTemporaryStats(state: Game, rules: Rules): Array<Command> {
         return state.activeTeam
             .filter { it.location.isOnField(rules) }
             .map {
-                SetPlayerStats(
+                SetPlayerTemporaryStats(
                     it,
                     it.baseMove,
                 )
             }.toTypedArray()
     }
 
-    // Reset player stats back to start, this e.g. include moves/rushes used/temporary skills
+    // Reset player stats back to start, this e.g. include temporary skills
     private fun resetSkillsUsed(state: Game, rules: Rules): Array<Command> {
         return state.activeTeam
             .map {
-                val skillsThatReset = it.skills.filter { it.used  && it.resetAt == Duration.END_OF_TURN}
+                val skillsThatReset = it.skills.filter {
+                    skill -> skill.used  && skill.resetAt == Duration.END_OF_TURN
+                }
                 Pair(it, skillsThatReset)
             }
             .flatMap {
-                it.second.map { skill -> SetSkillUsed(it.first, skill, false) }
+                it.second.map { skill ->
+                    SetSkillUsed(it.first, skill, false)
+                }
             }.toTypedArray()
     }
 
-    private fun getResetAvailablePlayers(
-        state: Game,
-        rules: Rules,
-    ): Array<SetPlayerAvailability> {
+    private fun getResetAvailablePlayers(state: Game, rules: Rules): Array<SetPlayerAvailability> {
         // TODO Is there anyone who should not be made available? I.e. Stunned players will be turned KO
         return state.activeTeam.map {
             if (it.location.isOnField(rules) && (it.state == PlayerState.STANDING || it.state == PlayerState.PRONE)) {

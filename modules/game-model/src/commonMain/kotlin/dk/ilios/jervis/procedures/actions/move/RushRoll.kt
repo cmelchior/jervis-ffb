@@ -13,10 +13,10 @@ import dk.ilios.jervis.actions.RollDice
 import dk.ilios.jervis.actions.SelectNoReroll
 import dk.ilios.jervis.actions.SelectRerollOption
 import dk.ilios.jervis.commands.Command
-import dk.ilios.jervis.commands.fsm.ExitProcedure
-import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetOldContext
+import dk.ilios.jervis.commands.fsm.ExitProcedure
+import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
@@ -145,7 +145,7 @@ import dk.ilios.jervis.utils.sum
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Continue -> ExitProcedure()
-                NoRerollSelected -> ExitProcedure()
+                is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
                     val rerollContext = UseRerollContext(DiceRollType.RUSH, action.getRerollSource(state))
                     compositeCommandOf(

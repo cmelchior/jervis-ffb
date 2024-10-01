@@ -95,6 +95,8 @@ Skills should only be marked as completed here if they are implemented and have 
 - [ ] Ball & Chain*
 - [ ] Bombardier
 - [ ] Bone Head*
+- [ ] Blood Lust (X+)*
+- [ ] Breathe Fire
 - [ ] Chainsaw*
 - [ ] Decay*
 - [ ] Hypnotic Gaze

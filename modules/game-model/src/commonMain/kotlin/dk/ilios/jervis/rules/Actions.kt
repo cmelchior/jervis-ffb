@@ -94,6 +94,7 @@ data class PlayerAction(
     val isSpecial = (type == PlayerStandardActionType.SPECIAL) || (countsAs == PlayerStandardActionType.SPECIAL)
 }
 
+@Serializable
 sealed interface ActionType
 
 /**
