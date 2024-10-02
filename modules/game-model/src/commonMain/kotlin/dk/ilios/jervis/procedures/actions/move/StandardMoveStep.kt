@@ -133,7 +133,7 @@ object StandardMoveStep: Procedure() {
             } else {
                 // Rush failed, player is Knocked Down in target square
                 return compositeCommandOf(
-                    SetPlayerState(player, PlayerState.FALLED_OVER),
+                    SetPlayerState(player, PlayerState.FALLEN_OVER),
                     RemoveContext<RushRollContext>(),
                     GotoNode(ResolvePlayerFallingOver)
                 )

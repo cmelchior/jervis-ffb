@@ -94,10 +94,18 @@ This document lists all game mechanics that have been fully implemented with tes
   - [ ] Chain push: Player is pushed into the ball and picks it up.
   - [ ] Using Ball & Chain to move into the End Zone (not really supported, but just in case)
 - [ ] Turnover ends turn as quickly as possible
+  - [ ] Falling Over
+  - [ ] Knocked Down
+  - [ ] Placed Prone with the Ball
+  - [ ] Player with ball goes into the crowd
+  - [ ] Fails to pickup ball
+  - [ ] Fumble Pass, even if caught
+  - [ ] No catch after Pass/Hand-off
+  - [ ] Deflection/Interception and ball not caught by throwing team
+  - [ ] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
+  - [ ] Sent-off for commiting a Foul
+  - [ ] Touchdown
 - [ ] Conceding
-
-// ...
-
 - [ ] Team Rerolls
   - [ ] Reset at half time
   - [ ] Carry over into Extra Time
@@ -125,3 +133,15 @@ This document lists all game mechanics that have been fully implemented with tes
 - [ ] Maximum Stats
 - [ ] Knocked Down
 - [ ] Falling Over
+- [ ] Roll over if stunned last turn
+- [ ] Standing up
+
+## Actions
+
+- [ ] Move Action
+- [ ] Pass Action
+- [ ] Hand-off Action
+- [ ] Throw Team-mate Action
+- [ ] Block Action
+- [ ] Blitz Action
+- [ ] Foul Action

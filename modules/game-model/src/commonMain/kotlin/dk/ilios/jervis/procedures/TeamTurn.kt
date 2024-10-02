@@ -13,6 +13,7 @@ import dk.ilios.jervis.commands.ResetAvailableTeamActions
 import dk.ilios.jervis.commands.SetCanUseTeamRerolls
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerAvailability
+import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.SetPlayerTemporaryStats
 import dk.ilios.jervis.commands.SetSkillUsed
 import dk.ilios.jervis.commands.SetTurnMarker
@@ -46,7 +47,6 @@ import dk.ilios.jervis.utils.INVALID_ACTION
  */
 object TeamTurn : Procedure() {
     override val initialNode: Node = SelectPlayerOrEndTurn
-
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val turn = state.activeTeam.turnMarker + 1
         // TODO Check for stalling players at this point.
@@ -63,7 +63,6 @@ object TeamTurn : Procedure() {
             ReportStartingTurn(state.activeTeam, turn),
         )
     }
-
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
             SetCanUseTeamRerolls(false),
@@ -130,6 +129,16 @@ object TeamTurn : Procedure() {
             // TODO Implement end-of-turn things
             //  - Players stunned at the beginning of the turn are now prone
 
+            val turnOverStunnedPlayersCommands = state.activeTeam
+                .filter { it.state == PlayerState.STUNNED }
+                .map  { SetPlayerState(it, PlayerState.PRONE) }
+                .toTypedArray()
+
+            val progressStunnedCommands = state.activeTeam
+                .filter { it.state == PlayerState.STUNNED_OWN_TURN }
+                .map  { SetPlayerState(it, PlayerState.STUNNED) }
+                .toTypedArray()
+
             // It isn't well-defined in which order things happen at the end of the turn.
             // E.g. it is unclear if Special Play Cards like Assassination Attempt trigger before or
             // after Throw a Rock and when temporary skills or abilities are moved.
@@ -148,6 +157,8 @@ object TeamTurn : Procedure() {
             }
 
             return compositeCommandOf(
+                *progressStunnedCommands,
+                *turnOverStunnedPlayersCommands,
                 *resetCommands,
                 nextNodeCommand
             )

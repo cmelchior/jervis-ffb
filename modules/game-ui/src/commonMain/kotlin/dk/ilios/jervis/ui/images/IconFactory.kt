@@ -114,9 +114,12 @@ object IconFactory {
 
     private val BALL = "icons/game/sball_30x30.png"
     private val HELD_BALL_OVERLAY = "icons/decorations/holdball.png"
+    private val STUNNED = "icons/decorations/stunned.gif"
+    private val PRONE = "icons/decorations/prone.gif"
     private val PLAYER_DETAIL_OVERLAY = "icons/sidebar/overlay_player_detail_blue2.png"
     private val SIDEBAR_BACKGROUND = "icons/sidebar/background_box.png"
     private val BUTTON_BACKGROUND = "icons/sidebar/box_button.gif"
+
 
     private val SIDEBAR_HOME_BANNER_TOP = "icons/sidebar/background_player_detail_red.png"
     private val SIDEBAR_HOME_BANNER_MIDDLE = "icons/sidebar/background_turn_dice_status_red.png"
@@ -137,6 +140,8 @@ object IconFactory {
     suspend fun initialize(homeTeam: Team, awayTeam: Team): Boolean {
         saveImageIntoCache(BALL)
         saveImageIntoCache(HELD_BALL_OVERLAY)
+        saveImageIntoCache(STUNNED)
+        saveImageIntoCache(PRONE)
         saveImageIntoCache(PLAYER_DETAIL_OVERLAY)
         saveImageIntoCache("i/332804.png")
         saveImageIntoCache(SIDEBAR_BACKGROUND)
@@ -287,5 +292,13 @@ object IconFactory {
 
     fun getScorebar(): ImageBitmap {
         return loadImageFromCache(SCOREBAR)
+    }
+
+    fun getStunnedDecoration(): ImageBitmap {
+        return loadImageFromCache(STUNNED)
+    }
+
+    fun getProneDecoration(): ImageBitmap {
+        return loadImageFromCache(PRONE)
     }
 }

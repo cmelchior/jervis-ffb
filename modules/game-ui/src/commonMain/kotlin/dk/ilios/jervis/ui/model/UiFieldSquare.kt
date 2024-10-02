@@ -33,7 +33,7 @@ class UiPlayer(
     val state: PlayerState = model.state
     val isOnHomeTeam = model.isOnHomeTeam()
     val isProne = (model.state == PlayerState.PRONE)
-    val isStunned = (model.state == PlayerState.STUNNED)
+    val isStunned = (model.state == PlayerState.STUNNED || model.state == PlayerState.STUNNED_OWN_TURN)
     val position = model.position
     val isActive = (model.available == Availability.IS_ACTIVE)
     val isSelectable = (selectAction != null)

@@ -68,13 +68,14 @@ enum class PlayerState {
     BANNED,
 
     // Intermediate states
-    FALLED_OVER,
+    FALLEN_OVER,
     KNOCKED_DOWN,
 
     // Field states
     STANDING,
     PRONE,
     STUNNED,
+    STUNNED_OWN_TURN,
 
 //    MOVING,
 //    UNKNOWN,
@@ -298,12 +299,12 @@ inline fun <reified T:Skill> Player.isSkillAvailable(): Boolean {
         if (!hasTackleZones && !skill.workWithoutTackleZones) {
             return@let false
         }
-        if ((state == PlayerState.PRONE || state == PlayerState.STUNNED) && !skill.workWhenProne) {
+        if ((state == PlayerState.PRONE || state == PlayerState.STUNNED || state == PlayerState.STUNNED_OWN_TURN) && !skill.workWhenProne) {
             return@let false
         }
-        if (state != PlayerState.STANDING && state != PlayerState.PRONE && state == PlayerState.STUNNED) {
-            return@let false
-        }
+//        if (state != PlayerState.STANDING && state != PlayerState.PRONE && state == PlayerState.STUNNED) {
+//            return@let false
+//        }
         return !skill.used
     } ?: false
 }

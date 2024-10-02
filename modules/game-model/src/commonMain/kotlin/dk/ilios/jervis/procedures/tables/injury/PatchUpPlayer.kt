@@ -243,7 +243,11 @@ object PatchUpPlayer: Procedure() {
                                 SetPlayerLocation(player, DogOut),
                             )
                         } else {
-                            SetPlayerState(player, PlayerState.STUNNED)
+                            if (state.activeTeam == player.team) {
+                                SetPlayerState(player, PlayerState.STUNNED_OWN_TURN)
+                            } else {
+                                SetPlayerState(player, PlayerState.STUNNED)
+                            }
                         }
                     }
                     context.injuryResult == InjuryResult.KO && context.apothecaryUsed == null -> {
@@ -253,7 +257,11 @@ object PatchUpPlayer: Procedure() {
                         )
                     }
                     context.injuryResult == InjuryResult.KO && context.apothecaryUsed != null -> {
-                        SetPlayerState(player, PlayerState.STUNNED)
+                        if (state.activeTeam == player.team) {
+                            SetPlayerState(player, PlayerState.STUNNED_OWN_TURN)
+                        } else {
+                            SetPlayerState(player, PlayerState.STUNNED)
+                        }
                     }
                     context.finalCasualtyResult != null -> {
                         when (context.finalCasualtyResult) {
