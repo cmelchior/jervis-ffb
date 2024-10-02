@@ -1,7 +1,7 @@
 package dk.ilios.jervis.rules.pathfinder
 
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.locations.FieldCoordinate
 
 /**
  * Interface encapsulating ways to calculate paths between squares on the field.
@@ -48,7 +48,9 @@ interface PathFinder {
     /**
      * Calculates the shortest distance between the [start] and every reachable square on the field.
      *
-     * A square is reachable if it can be reached without using any dice rolls.
+     * A square is reachable if it can be reached without using any dice rolls. This means that this
+     * should return paths that ends in squares with tackle zones or containing the ball, but should
+     * not contain paths that move through these squares.
      */
     fun calculateAllPaths(
         state: Game,

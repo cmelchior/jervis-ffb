@@ -1,5 +1,6 @@
 package dk.ilios.jervis.rules.pathfinder
 
+import dk.ilios.jervis.model.BallState
 import dk.ilios.jervis.model.Field
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
@@ -168,7 +169,11 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
             val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1)
             for (neighbor in neighbors) {
                 val neighborValue: Int = distances.getValue(neighbor)
-                if (fieldView[neighbor.x][neighbor.y] > 0) continue // Skip all intermediate steps going through tackle zones.
+                // Terminal nodes can be entered, but not exited.
+                val hasTackleZone = (fieldView[neighbor.x][neighbor.y] > 0)
+                val hasBall = state.field[neighbor.x, neighbor.y].balls.any { it.state == BallState.ON_GROUND }
+                val isTreacherousTrapdoor = false
+                val isTerminalNode = hasTackleZone || hasBall || isTreacherousTrapdoor
                 val tentativeDistance = distances.getValue(currentLocation) + 1
 
                 // We found a path that is straight up more optimal.
@@ -176,13 +181,16 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
                     distances[neighbor] = tentativeDistance
                     cameFrom[neighbor] = currentLocation
                     val realDistance = start.realDistanceTo(neighbor)
-                    openSet.offer(DjikstraNode(neighbor, tentativeDistance, realDistance))
+                    if (!isTerminalNode) {
+                        openSet.offer(DjikstraNode(neighbor, tentativeDistance, realDistance))
+                    }
                 } else if (tentativeDistance == neighborValue) {
                     // Check if we found a path that would appear more natural to players, but otherwise
                     // takes the same number of steps. This mostly means trying to find a path that is
-                    // as "direct" as possible. We estimate this by combing both the distance to the start as well as
-                    // the distance to the new location. Using this heuristic will favor straight lines over diagonals,
-                    // while still keeping the line from start to end as straight as possible.
+                    // as "direct" as possible. We estimate this by combing the real distance to the start
+                    // as well as the real distance to the new location. Using this heuristic will favor
+                    // straight lines over diagonals, while still keeping the line from start to end as
+                    // straight as possible.
                     val currentCameFromLocation: FieldCoordinate = cameFrom[neighbor]!!
                     val oldDistance = currentCameFromLocation.realDistanceTo(neighbor) + currentCameFromLocation.realDistanceTo(start)
                     val newDistance = currentLocation.realDistanceTo(neighbor) + currentLocation.realDistanceTo(start)

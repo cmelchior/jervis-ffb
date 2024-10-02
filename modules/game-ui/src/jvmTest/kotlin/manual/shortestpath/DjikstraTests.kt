@@ -21,12 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.rules.StandardBB2020Rules
 import dk.ilios.jervis.utils.createDefaultGameState
 import dk.ilios.jervis.utils.createStartingTestSetup
 import org.junit.Test
-import kotlin.to
 
 class DjikstraTests {
     @Test
@@ -51,11 +51,12 @@ fun DjiekstraContent() {
     val result = rules.pathFinder.calculateAllPaths(state, FieldCoordinate(12, 6), 6)
     val path = remember { mutableStateOf(listOf<FieldCoordinate>()) }
     DjiekstraBoxGrid(
-        rules.fieldHeight.toInt(),
-        rules.fieldWidth.toInt(),
+        state,
+        rules.fieldHeight,
+        rules.fieldWidth,
         result.distances,
         path.value,
-        { end: FieldCoordinate ->
+        update = { end: FieldCoordinate ->
             val newPath = rules.pathFinder.calculateShortestPath(state, FieldCoordinate(12, 6), end, 4, false)
             path.value = result.getClosestPathTo(end) // newPath.path
         },
@@ -65,6 +66,7 @@ fun DjiekstraContent() {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DjiekstraBoxGrid(
+    state: Game,
     rows: Int,
     cols: Int,
     distances: Map<FieldCoordinate, Int>,
@@ -77,8 +79,12 @@ fun DjiekstraBoxGrid(
                 repeat(cols) { x ->
                     val squareValue: Int? = distances[FieldCoordinate(x, y)]
                     val onPath = path.contains(FieldCoordinate(x, y))
+                    val isStart = distances[FieldCoordinate(x, y)] == 0
+                    val isOccupied = state.field[x, y].isOccupied()
                     val (text: String, bgColor: Color) =
                         when {
+                            isStart -> "" to Color.Red
+                            isOccupied -> "" to Color.Black
                             onPath -> (squareValue?.toString() ?: "") to Color.Blue
                             else -> (squareValue?.toString() ?: "") to Color.White
                         }
