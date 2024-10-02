@@ -3,6 +3,10 @@ package dk.ilios.jervis.tables
 import dk.ilios.jervis.JervisGameTest
 import dk.ilios.jervis.actions.Confirm
 import dk.ilios.jervis.actions.DiceRollResults
+import dk.ilios.jervis.actions.FieldSquareSelected
+import dk.ilios.jervis.actions.MoveType
+import dk.ilios.jervis.actions.MoveTypeSelected
+import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.actions.RandomPlayersSelected
 import dk.ilios.jervis.activatePlayer
@@ -20,12 +24,15 @@ import dk.ilios.jervis.ext.d6
 import dk.ilios.jervis.ext.playerId
 import dk.ilios.jervis.ext.playerNo
 import dk.ilios.jervis.model.PlayerState
+import dk.ilios.jervis.model.context.RushRollContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
+import dk.ilios.jervis.model.modifiers.RushModifier
 import dk.ilios.jervis.procedures.DetermineKickingTeam
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.procedures.PrayersToNuffleRollContext
 import dk.ilios.jervis.procedures.SetupTeam
+import dk.ilios.jervis.procedures.actions.move.RushRoll
 import dk.ilios.jervis.rules.PlayerStandardActionType
 import dk.ilios.jervis.rules.skills.Duration
 import dk.ilios.jervis.rules.skills.Loner
@@ -662,6 +669,74 @@ class PrayersToNuffleTests: JervisGameTest() {
         )
         assertFalse(awayTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
         assertFalse(homeTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
+    }
+
+    @Test
+    fun molesUnderThePitch_affectRushing() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(
+                prayersToNuffle = arrayOf(
+                    9.d16, // Roll Moles Under the Pitch.
+                )
+            ),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam()
+        )
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
+        assertFalse(homeTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
+
+        // Reduce movement so we trigger rushing straight away
+        awayTeam[6.playerNo].movesLeft = 0
+        controller.rollForward(
+            PlayerSelected("A6".playerId),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            MoveTypeSelected(MoveType.STANDARD),
+            FieldSquareSelected(13, 1), // Requires Rush
+            2.d6, // Should fail due to Moles Under The Pitch
+        )
+        assertEquals(RushRoll.ChooseReRollSource, controller.currentNode())
+        val context = state.getContext<RushRollContext>()
+        assertFalse(context.isSuccess)
+        assertTrue(context.modifiers.contains(RushModifier.MOLES_UNDER_THE_PITCH_AWAY))
+    }
+
+    @Test
+    fun molesUnderThePitch_canAffectRushingTwice() {
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultPregame(
+                prayersToNuffle = arrayOf(
+                    9.d16, // Roll Moles Under the Pitch.
+                )
+            ),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(3.d6, 3.d6), // Cheering fans
+                    6.d6, // Brilliant coaching, Home
+                    1.d6, // Brilliant coaching, Away
+                    9.d16, // Home Team rolls Moles Under The Pitch
+                )
+            )
+        )
+        assertTrue(awayTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
+        assertTrue(homeTeam.hasPrayer(PrayerToNuffle.MOLES_UNDER_THE_PITCH))
+
+        // Reduce movement so we trigger rushing straight away
+        awayTeam[6.playerNo].movesLeft = 0
+        controller.rollForward(
+            PlayerSelected("A6".playerId),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            MoveTypeSelected(MoveType.STANDARD),
+            FieldSquareSelected(13, 1), // Requires Rush
+            3.d6, // Should fail due to 2xMoles Under The Pitch
+        )
+        assertEquals(RushRoll.ChooseReRollSource, controller.currentNode())
+        val context = state.getContext<RushRollContext>()
+        assertFalse(context.isSuccess)
+        assertTrue(context.modifiers.contains(RushModifier.MOLES_UNDER_THE_PITCH_AWAY))
+        assertTrue(context.modifiers.contains(RushModifier.MOLES_UNDER_THE_PITCH_HOME))
     }
 
     @Test

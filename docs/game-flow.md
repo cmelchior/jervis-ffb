@@ -35,7 +35,7 @@ This document lists all game mechanics that have been fully implemented with tes
   - [ ] Biased Referee 
     - [ ] Biased Referee
     - [ ] How many others(???)
-- [ ] Roll on Prayers to Nuffle Table (also test duplicates across teams)
+- [ ] Roll on Prayers to Nuffle Table. Duplicates are only checked within the same team
   - [ ] Treacherous Trapdoor
   - [x] Friends with the Ref
   - [x] Stiletto
