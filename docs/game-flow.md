@@ -110,7 +110,8 @@ This document lists all game mechanics that have been fully implemented with tes
   - [ ] Reset at half time
   - [ ] Carry over into Extra Time
   - [ ] Leader
-- [ ] Rushing
+- [x] Rushing
+  - [ ] Rush To Blitz
 - [ ] Dodging
 - [ ] Deviating Ball
 - [ ] Scatter Ball
