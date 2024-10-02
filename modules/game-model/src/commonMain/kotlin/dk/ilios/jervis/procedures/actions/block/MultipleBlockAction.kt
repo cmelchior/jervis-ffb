@@ -242,7 +242,7 @@ object MultipleBlockAction: Procedure() {
     object SelectBlockTypeAgainstSelectedDefender: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val attacker = state.getContext<MultipleBlockContext>().getActiveDefender()!!
+            val attacker = state.getContext<MultipleBlockContext>().attacker
             val availableBlockTypes = BlockAction.getAvailableBlockType(attacker, true)
             return availableBlockTypes.map {
                 SelectBlockType(it)

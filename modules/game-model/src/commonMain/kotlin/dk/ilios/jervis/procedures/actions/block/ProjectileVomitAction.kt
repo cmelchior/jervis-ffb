@@ -18,15 +18,11 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.getContext
-import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.Rules
-import dk.ilios.jervis.rules.skills.ProjectileVomit
-import dk.ilios.jervis.rules.skills.Stab
 import dk.ilios.jervis.utils.INVALID_ACTION
 import kotlinx.serialization.Serializable
 
@@ -101,26 +97,6 @@ object ProjectileVomitAction : Procedure() {
                     add(SetContext(activeContext.copy(markActionAsUsed = true)))
                 }
                 add(ExitProcedure())
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------------------------------------------------
-    // HELPER FUNCTIONS
-
-    /**
-     * Return all available block types available to a given player.
-     */
-    fun getAvailableBlockType(player: Player, isMultipleBlock: Boolean): List<BlockType> {
-        return buildList {
-            BlockType.entries.forEach { type ->
-                when (type) {
-                    BlockType.CHAINSAW -> if (player.getSkillOrNull<ProjectileVomit>()?.used == false) add(type)
-                    BlockType.MULTIPLE_BLOCK -> if (!isMultipleBlock) add(type)
-                    BlockType.PROJECTILE_VOMIT -> if (player.getSkillOrNull<ProjectileVomit>()?.used == false) add(type)
-                    BlockType.STAB -> if (player.hasSkill<Stab>()) add(type)
-                    BlockType.STANDARD -> add(type)
-                }
             }
         }
     }

@@ -2,6 +2,7 @@ package dk.ilios.jervis.procedures.actions.blitz
 
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.BlockTypeSelected
 import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndActionWhenReady
@@ -9,6 +10,7 @@ import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.MoveTypeSelected
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.SelectBlockType
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
@@ -29,11 +31,13 @@ import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.ActivatePlayerContext
+import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.procedures.actions.block.StandardBlockStep
 import dk.ilios.jervis.procedures.actions.move.ResolveMoveTypeStep
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
+import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
@@ -42,6 +46,7 @@ import kotlinx.serialization.Serializable
 data class BlitzContext(
     val attacker: Player,
     val defender: Player? = null,
+    val blockType: BlockType? = null,
     val hasMoved: Boolean = false,
     val hasBlocked: Boolean = false,
 ) : ProcedureContext
@@ -170,6 +175,9 @@ object BlitzAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their blitz
+            // TODO This is wrong. It is only a turnover if the player was Knocked Down
+            //  or went prone with the Ball. Need to rework this.
+            //  This logic will probably also override scoring turn overs
             val context = state.getContext<BlitzContext>()
             return if (!context.attacker.isStanding(rules)) {
                 compositeCommandOf(
@@ -185,27 +193,63 @@ object BlitzAction : Procedure() {
     object SelectBlockType : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            TODO("Not yet implemented")
+            val attacker = state.getContext<BlitzContext>().attacker
+            val availableBlockTypes = BlockAction.getAvailableBlockType(attacker, true)
+            return availableBlockTypes.map {
+                SelectBlockType(it)
+            } + DeselectPlayer(attacker)
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return GotoNode(ResolveBlock)
+            val context = state.getContext<BlitzContext>()
+            return when (action) {
+                is PlayerDeselected -> {
+                    GotoNode(MoveOrBlockOrEndAction)
+                }
+                else -> {
+                    checkTypeAndValue<BlockTypeSelected>(state, rules, action) { typeSelected ->
+                        val type = typeSelected.type
+                        compositeCommandOf(
+                            SetContext(context.copy(blockType = typeSelected.type)),
+                            GotoNode(ResolveBlock),
+                        )
+                    }
+                }
+            }
         }
     }
 
     object ResolveBlock : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val blitzContext = state.getContext<BlitzContext>()
-            return SetContext(BlockContext(
-                blitzContext.attacker,
-                blitzContext.defender!!,
-                isBlitzing = true
-            ))
+            val context = state.getContext<BlitzContext>()
+            return when (context.blockType!!) {
+                BlockType.CHAINSAW -> TODO()
+                BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.STAB -> TODO()
+                BlockType.STANDARD -> {
+                    SetContext(BlockContext(
+                        context.attacker,
+                        context.defender!!,
+                        isBlitzing = true
+                    ))
+                }
+            }
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = StandardBlockStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            val context = state.getContext<BlitzContext>()
+            return when (context.blockType!!) {
+                BlockType.CHAINSAW -> TODO()
+                BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.STAB -> TODO()
+                BlockType.STANDARD -> StandardBlockStep
+            }
+        }
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their blitz
+            // TODO This approach to turn overs might not be correct, i.e. a goal
+            // could have been scored after a Blitz
             val context = state.getContext<BlitzContext>()
             return if (!rules.isStanding(context.attacker)) {
                 compositeCommandOf(

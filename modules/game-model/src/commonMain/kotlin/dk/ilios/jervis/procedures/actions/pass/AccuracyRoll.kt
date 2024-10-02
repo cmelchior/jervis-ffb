@@ -28,6 +28,7 @@ import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.modifiers.AccuracyModifier
 import dk.ilios.jervis.model.modifiers.DiceModifier
 import dk.ilios.jervis.procedures.D6DieRoll
+import dk.ilios.jervis.reports.ReportDiceRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRollType
 import dk.ilios.jervis.rules.tables.Range
@@ -59,6 +60,7 @@ object AccuracyRoll: Procedure() {
             return checkType<D6Result>(action) { d6 ->
                 val updatedContext = updatePassContext(state, rules, d6, false)
                 return compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.ACCURACY, d6),
                     SetContext(updatedContext),
                     GotoNode(ChooseReRollSource),
                 )
@@ -122,6 +124,7 @@ object AccuracyRoll: Procedure() {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val updatedContext = updatePassContext(state, rules, d6, true)
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.ACCURACY, d6),
                     SetContext(updatedContext),
                     ExitProcedure(),
                 )

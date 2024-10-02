@@ -119,8 +119,6 @@ This document lists all game mechanics that have been fully implemented with tes
 - [ ] Bounce
 - [ ] Throw-in
 - [ ] Weather
-- [ ] Fan Factor
-- [ ] Inducements
 - [ ] Track Star Player Points
 - [ ] Track more advanced stats
 - [ ] Setup and broken rules
