@@ -1,5 +1,6 @@
 package dk.ilios.jervis.procedures.actions.pass
 
+import buildCompositeCommand
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.Confirm
@@ -75,9 +76,14 @@ object PassAction : Procedure() {
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PassContext>()
+        val activePlayerContext = state.getContext<ActivatePlayerContext>()
         return compositeCommandOf(
             RemoveContext<PassContext>(),
-            SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = context.hasMoved))
+            SetContext(
+                activePlayerContext.copy(
+                    markActionAsUsed = (context.hasMoved || context.passingRoll != null)
+                )
+            )
         )
     }
     override fun isValid(state: Game, rules: Rules) {
@@ -114,7 +120,6 @@ object PassAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(
-                        SetContext(context.copy(hasMoved = true)),
                         SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
@@ -129,14 +134,18 @@ object PassAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their pass action.
+            val moveContext = state.getContext<MoveContext>()
             val context = state.getContext<PassContext>()
-            return if (!context.thrower.isStanding(rules)) {
-                compositeCommandOf(
-                    SetTurnOver(TurnOver.STANDARD),
-                    ExitProcedure()
-                )
-            } else {
-                GotoNode(MoveOrPassOrEndAction)
+            return buildCompositeCommand {
+                if (moveContext.hasMoved) {
+                    add(SetContext(context.copy(hasMoved = true)))
+                }
+                if (!context.thrower.isStanding(rules)) {
+                    add(SetTurnOver(TurnOver.STANDARD))
+                    add(ExitProcedure())
+                } else {
+                    add(GotoNode(MoveOrPassOrEndAction))
+                }
             }
         }
     }

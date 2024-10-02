@@ -72,9 +72,9 @@ object BlitzAction : Procedure() {
         return compositeCommandOf(
             RemoveContext<BlitzContext>(),
             if (blitzContext.hasBlocked || blitzContext.hasMoved) {
-                SetContext(activateContext.copy(markActionAsUsed = false))
-            } else {
                 SetContext(activateContext.copy(markActionAsUsed = true))
+            } else {
+                SetContext(activateContext.copy(markActionAsUsed = false))
             }
         )
     }
@@ -146,7 +146,6 @@ object BlitzAction : Procedure() {
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.attacker, action.moveType)
                     compositeCommandOf(
-                        SetContext(context.copy(hasMoved = true)),
                         SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
@@ -178,14 +177,21 @@ object BlitzAction : Procedure() {
             // TODO This is wrong. It is only a turnover if the player was Knocked Down
             //  or went prone with the Ball. Need to rework this.
             //  This logic will probably also override scoring turn overs
-            val context = state.getContext<BlitzContext>()
-            return if (!context.attacker.isStanding(rules)) {
+            val moveContext = state.getContext<MoveContext>()
+            val blitzContext = state.getContext<BlitzContext>()
+            return if (!blitzContext.attacker.isStanding(rules)) {
                 compositeCommandOf(
+                    if (moveContext.hasMoved) SetContext(blitzContext.copy(hasMoved = true)) else null,
+                    RemoveContext<MoveContext>(),
                     SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()
                 )
             } else {
-                GotoNode(if (context.hasBlocked) RemainingMovesOrEndAction else MoveOrBlockOrEndAction)
+                compositeCommandOf(
+                    if (moveContext.hasMoved) SetContext(blitzContext.copy(hasMoved = true)) else null,
+                    RemoveContext<MoveContext>(),
+                    GotoNode(if (blitzContext.hasBlocked) RemainingMovesOrEndAction else MoveOrBlockOrEndAction)
+                )
             }
         }
     }
@@ -251,13 +257,37 @@ object BlitzAction : Procedure() {
             // TODO This approach to turn overs might not be correct, i.e. a goal
             // could have been scored after a Blitz
             val context = state.getContext<BlitzContext>()
+
+            // Check if Block Action was completed or not
+            val removeContextCommand = when (context.blockType!!) {
+                BlockType.CHAINSAW -> TODO()
+                BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.STAB -> TODO()
+                BlockType.STANDARD -> RemoveContext<BlockContext>()
+            }
+
+            // Remove state required for the specific block type
+            val hasBlocked = when (context.blockType) {
+                BlockType.CHAINSAW -> TODO()
+                BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.STAB -> TODO()
+                BlockType.STANDARD -> !state.getContext<BlockContext>().aborted
+            }
+
             return if (!rules.isStanding(context.attacker)) {
                 compositeCommandOf(
+                    removeContextCommand,
+                    SetContext(context.copy(hasBlocked = hasBlocked)),
                     SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()
                 )
             } else {
-                GotoNode(RemainingMovesOrEndAction)
+                compositeCommandOf(
+                    removeContextCommand,
+                    GotoNode(RemainingMovesOrEndAction)
+                )
             }
         }
     }

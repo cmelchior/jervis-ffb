@@ -1,5 +1,6 @@
 package dk.ilios.jervis.procedures.actions.handoff
 
+import buildCompositeCommand
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.EndAction
@@ -62,9 +63,10 @@ object HandOffAction : Procedure() {
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<HandOffContext>()
+        val activePlayerContext = state.getContext<ActivatePlayerContext>()
         return compositeCommandOf(
             RemoveContext<ThrowTeamMateContext>(),
-            SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = context.hasMoved))
+            SetContext(activePlayerContext.copy(markActionAsUsed = context.hasMoved || context.catcher != null))
         )
     }
     override fun isValid(state: Game, rules: Rules) {
@@ -127,14 +129,18 @@ object HandOffAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their hand-off.
+            val moveContext = state.getContext<MoveContext>()
             val context = state.getContext<HandOffContext>()
-            return if (!context.thrower.isStanding(rules)) {
-                compositeCommandOf(
-                    SetTurnOver(TurnOver.STANDARD),
-                    ExitProcedure()
-                )
-            } else {
-                GotoNode(MoveOrHandOffOrEndAction)
+            return buildCompositeCommand {
+                if (moveContext.hasMoved) {
+                    add(SetContext(context.copy(hasMoved = true)))
+                }
+                if (!context.thrower.isStanding(rules)) {
+                    add(SetTurnOver(TurnOver.STANDARD))
+                    add(ExitProcedure())
+                } else {
+                    add(GotoNode(MoveOrHandOffOrEndAction))
+                }
             }
         }
     }

@@ -18,8 +18,6 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.MoveContext
-import dk.ilios.jervis.model.context.getContext
-import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -58,7 +56,6 @@ object MoveAction : Procedure() {
                 }
                 is MoveTypeSelected -> {
                     compositeCommandOf(
-                        SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = true)),
                         SetContext(MoveContext(state.activePlayer!!, action.moveType)),
                         GotoNode(ResolveMoveType)
                     )

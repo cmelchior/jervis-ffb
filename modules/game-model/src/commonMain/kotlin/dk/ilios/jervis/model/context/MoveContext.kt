@@ -16,6 +16,7 @@ import dk.ilios.jervis.utils.INVALID_GAME_STATE
 data class MoveContext(
     val player: Player,
     val moveType: MoveType,
+    val hasMoved: Boolean = false,
     val target: FieldCoordinate? = null,
     val startingSquare: FieldCoordinate = when (val location = player.location) {
         DogOut -> INVALID_GAME_STATE("Player in the dogout cannot move")

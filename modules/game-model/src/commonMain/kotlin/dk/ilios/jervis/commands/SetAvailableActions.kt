@@ -24,10 +24,21 @@ class SetAvailableActions(
 
     companion object {
         fun markAsUsed(team: Team, type: PlayerStandardActionType): SetAvailableActions {
+            val newValue = when (type) {
+                PlayerStandardActionType.MOVE -> team.turnData.moveActions - 1
+                PlayerStandardActionType.PASS -> team.turnData.passActions - 1
+                PlayerStandardActionType.HAND_OFF -> team.turnData.handOffActions - 1
+                PlayerStandardActionType.THROW_TEAM_MATE -> TODO()
+                PlayerStandardActionType.BLOCK -> team.turnData.blockActions - 1
+                PlayerStandardActionType.BLITZ -> team.turnData.blitzActions - 1
+                PlayerStandardActionType.FOUL -> team.turnData.foulActions - 1
+                PlayerStandardActionType.SPECIAL -> TODO()
+            }
+
             return SetAvailableActions(
                 team,
                 type,
-                team.turnData.moveActions - 1
+                newValue
             )
         }
     }

@@ -58,18 +58,20 @@ object StandardMoveStep: Procedure() {
     object SelectTargetSquareOrEndAction: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val player = state.getContext<MoveContext>().player
+            val context = state.getContext<MoveContext>()
+            val player = context.player
             val eligibleSquares = calculateOptionsForMoveType(state, rules, player, MoveType.STANDARD)
             return eligibleSquares + listOf(EndActionWhenReady)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
             return when(action) {
+                // If the player has not moved, this will not use their action
                 EndAction -> ExitProcedure()
                 else -> checkTypeAndValue<FieldSquareSelected>(state, rules, action) {
-                    val context = state.getContext<MoveContext>()
                     compositeCommandOf(
-                        SetContext(context.copy(target = it.coordinate)),
+                        SetContext(context.copy(target = it.coordinate, hasMoved = true)),
                         GotoNode(MovePlayer),
                     )
                 }

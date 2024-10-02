@@ -6,6 +6,7 @@ import dk.ilios.jervis.actions.MoveType
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.actions.SelectMoveType
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetCurrentBall
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -19,6 +20,7 @@ import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.Pickup
 import dk.ilios.jervis.rules.Rules
 
@@ -133,12 +135,21 @@ object ResolveMoveTypeStep : Procedure() {
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val player = state.getContext<MoveContext>().player
+            val moveContext = state.getContext<MoveContext>()
+            val activeContext = state.getContext<ActivatePlayerContext>()
+            val player = moveContext.player
             val pickupBall = player.isStanding(rules) && state.field[player.location as FieldCoordinate].balls.isNotEmpty()
+
             return if (pickupBall) {
-                GotoNode(PickUpBall)
+                compositeCommandOf(
+                    if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                    GotoNode(PickUpBall)
+                )
             } else {
-                ExitProcedure()
+                compositeCommandOf(
+                    if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                    ExitProcedure()
+                )
             }
         }
     }

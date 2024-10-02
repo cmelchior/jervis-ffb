@@ -1,5 +1,6 @@
 package dk.ilios.jervis.procedures.actions.foul
 
+import buildCompositeCommand
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.D6Result
@@ -73,10 +74,15 @@ object FoulAction : Procedure() {
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<FoulContext>()
+        val activePlayerContext = state.getContext<ActivatePlayerContext>()
         return compositeCommandOf(
             if (context.victim != null) ReportFoulResult(context) else null,
             RemoveContext<FoulContext>(),
-            SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = context.hasFouled || context.hasMoved))
+            SetContext(
+                activePlayerContext.copy(
+                    markActionAsUsed = context.hasFouled || context.hasMoved
+                )
+            )
         )
     }
 
@@ -161,14 +167,18 @@ object FoulAction : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their blitz
+            val moveContext = state.getContext<MoveContext>()
             val context = state.getContext<FoulContext>()
-            return if (!context.fouler.isStanding(rules)) {
-                compositeCommandOf(
-                    SetTurnOver(TurnOver.STANDARD),
-                    ExitProcedure()
-                )
-            } else {
-                GotoNode(MoveOrFoulOrEndAction)
+            return buildCompositeCommand {
+                if (moveContext.hasMoved) {
+                    add(SetContext(context.copy(hasMoved = true)))
+                }
+                if (!context.fouler.isStanding(rules)) {
+                    add(SetTurnOver(TurnOver.STANDARD))
+                    add(ExitProcedure())
+                } else {
+                    add(GotoNode(MoveOrFoulOrEndAction))
+                }
             }
         }
     }

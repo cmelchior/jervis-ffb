@@ -93,7 +93,7 @@ data class ActivatePlayerContext(
  * See https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=32167&postdays=0&postorder=asc&start=0
  */
 object ActivatePlayer : Procedure() {
-    override val initialNode: Node = MarkPlayerAsActivate
+    override val initialNode: Node = MarkPlayerAsActive
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<ActivatePlayerContext>()
@@ -156,7 +156,7 @@ object ActivatePlayer : Procedure() {
         }
     }
 
-    object MarkPlayerAsActivate : ComputationNode() {
+    object MarkPlayerAsActive : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
             val player = context.player
@@ -384,7 +384,7 @@ object ActivatePlayer : Procedure() {
                    GotoNode(ResolveBloodLustAtEndOfActivation)
             } else {
                 return compositeCommandOf(
-                    SetPlayerAvailability(state.activePlayer!!, Availability.HAS_ACTIVATED),
+                    SetPlayerAvailability(state.activePlayer!!, if (context.markActionAsUsed) Availability.HAS_ACTIVATED else Availability.AVAILABLE),
                     ExitProcedure()
                 )
             }
@@ -400,6 +400,9 @@ object ActivatePlayer : Procedure() {
             )
         }
     }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // HELPER FUNCTIONS
 
     /**
      * Rather than figuring out every permutation of nega-traits, we just check

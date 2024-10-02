@@ -172,6 +172,9 @@ object TeamTurn : Procedure() {
         }
     }
 
+    // ------------------------------------------------------------------------------------------------------------
+    // HELPER FUNCTIONS
+
     private fun getResetTurnActionCommands(state: Game, rules: Rules): ResetAvailableTeamActions {
         val moveActions = rules.teamActions.move.availablePrTurn
         val passActions = rules.teamActions.pass.availablePrTurn
