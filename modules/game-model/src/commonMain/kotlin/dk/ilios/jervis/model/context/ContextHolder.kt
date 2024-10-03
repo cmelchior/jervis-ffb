@@ -74,6 +74,15 @@ inline fun <reified T: ProcedureContext> Game.getContext(id: Int = 0): T {
  * Returns the [ProcedureContext] matching the given class, or throws
  * if none exists.
  */
+inline fun <reified T: ProcedureContext> Game.getContextOrNull(id: Int = 0): T? {
+    return this.contexts.getContext(T::class, id)
+}
+
+
+/**
+ * Returns the [ProcedureContext] matching the given class, or throws
+ * if none exists.
+ */
 inline fun <reified T: ProcedureContext> Game.hasContext(id: Int = 0): Boolean {
     return this.contexts.getContext(T::class) != null
 }

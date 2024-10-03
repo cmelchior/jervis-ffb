@@ -26,6 +26,7 @@ import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.context.getContextOrNull
 import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.model.isSkillAvailable
 import dk.ilios.jervis.procedures.ActivatePlayerContext
@@ -85,9 +86,9 @@ object BlockAction : Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val activatePlayerContext = state.getContext<ActivatePlayerContext>()
-        val blockActionContext = state.getContext<BlockActionContext>()
+        val blockActionContext = state.getContextOrNull<BlockActionContext>()
         return compositeCommandOf(
-            SetContext(activatePlayerContext.copy(markActionAsUsed = blockActionContext.hasBlocked)),
+            SetContext(activatePlayerContext.copy(markActionAsUsed = (blockActionContext?.hasBlocked == true))),
             RemoveContext<BlockContext>(),
             RemoveContext<BlockActionContext>()
         )
