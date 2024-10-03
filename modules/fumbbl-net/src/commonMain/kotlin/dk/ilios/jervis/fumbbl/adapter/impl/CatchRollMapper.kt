@@ -6,6 +6,7 @@ import dk.ilios.jervis.actions.DiceRollResults
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
+import dk.ilios.jervis.fumbbl.model.TurnMode
 import dk.ilios.jervis.fumbbl.model.reports.CatchRollReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
@@ -39,7 +40,10 @@ object CatchRollMapper: CommandActionMapper {
             newActions.add(DiceRollResults(diceRoll), CatchRoll.ReRollDie)
         } else {
             newActions.add(DiceRollResults(diceRoll), CatchRoll.RollDie)
-            newActions.add(Continue, CatchRoll.ChooseReRollSource)
+            // What if a player has the Catch skill?
+            if (fumbblGame.turnMode != TurnMode.KICKOFF) {
+                newActions.add(Continue, CatchRoll.ChooseReRollSource)
+            }
         }
     }
 }

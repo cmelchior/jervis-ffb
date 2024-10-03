@@ -1,9 +1,17 @@
 package dk.ilios.jervis.fumbbl.adapter.impl.block
 
+import dk.ilios.jervis.actions.DBlockResult
+import dk.ilios.jervis.actions.DicePoolChoice
+import dk.ilios.jervis.actions.DicePoolResultsSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
+import dk.ilios.jervis.fumbbl.model.BlockResult.BOTH_DOWN
+import dk.ilios.jervis.fumbbl.model.BlockResult.POW
+import dk.ilios.jervis.fumbbl.model.BlockResult.POW_PUSHBACK
+import dk.ilios.jervis.fumbbl.model.BlockResult.PUSHBACK
+import dk.ilios.jervis.fumbbl.model.BlockResult.SKULL
 import dk.ilios.jervis.fumbbl.model.PlayerAction
 import dk.ilios.jervis.fumbbl.model.reports.BlockChoiceReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
@@ -33,8 +41,27 @@ object BlockChooseBlockResultMapper: CommandActionMapper {
         newActions: MutableList<JervisActionHolder>
     ) {
         val report = command.reportList.last() as BlockChoiceReport
+
         // TODO Figure out how rerolls are represented
         newActions.add(NoRerollSelected(), StandardBlockChooseReroll.ReRollSourceOrAcceptRoll)
-        newActions.add(report.blockResult.toJervisResult(), StandardBlockChooseResult.SelectBlockResult)
+
+        // There isn't an easy way to figure out exactly which die PUSHBACK
+        // points to when selected (i.e. if you rolled 3 and 4). For now,
+        // we just find the first matching die and hope it works.
+        val selectedBlockDie = when (report.blockResult) {
+            SKULL -> DBlockResult(1)
+            BOTH_DOWN -> DBlockResult(2)
+            PUSHBACK -> {
+                if (report.blockRoll.contains(3)) {
+                    DBlockResult(3)
+                } else {
+                    DBlockResult(4)
+                }
+            }
+            POW_PUSHBACK -> DBlockResult(5)
+            POW -> DBlockResult(6)
+        }
+        val action = DicePoolResultsSelected(listOf(DicePoolChoice(id = 0, diceSelected = listOf(selectedBlockDie))))
+        newActions.add(action, StandardBlockChooseResult.SelectBlockResult)
     }
 }

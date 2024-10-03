@@ -2,6 +2,8 @@ package dk.ilios.jervis.fumbbl.adapter.impl.blitz
 
 import dk.ilios.jervis.actions.BlockDice
 import dk.ilios.jervis.actions.Confirm
+import dk.ilios.jervis.actions.DBlockResult
+import dk.ilios.jervis.actions.DicePoolResultsSelected
 import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
@@ -37,12 +39,14 @@ object BlitzChooseBlockResultMapper: CommandActionMapper {
     ) {
         val report = command.reportList.last() as BlockChoiceReport
         // TODO Figure out how rerolls are represented
-        val result = report.blockResult.toJervisResult()
+        val result: DicePoolResultsSelected = report.blockResult.toJervisResult()
         newActions.add(NoRerollSelected(), StandardBlockChooseReroll.ReRollSourceOrAcceptRoll)
         newActions.add(report.blockResult.toJervisResult(), StandardBlockChooseResult.SelectBlockResult)
 
         // TODO What does FUMBBL do exactly in the case of Blocking and using Block/Wrestle
-        if (result.blockResult == BlockDice.BOTH_DOWN) {
+        val firstChoice = result.results.first()
+        val selectedDie = firstChoice.diceSelected.first() as DBlockResult
+        if (selectedDie.blockResult == BlockDice.BOTH_DOWN) {
             if (fumbblGame.getPlayerById(fumbblGame.actingPlayer.playerId!!.id)?.skillArray?.contains("Block") == true) {
                 newActions.add(Confirm, BothDown.AttackerChooseToUseBlock)
             }

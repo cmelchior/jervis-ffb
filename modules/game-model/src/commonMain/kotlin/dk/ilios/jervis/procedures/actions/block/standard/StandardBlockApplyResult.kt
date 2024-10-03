@@ -31,7 +31,7 @@ object StandardBlockApplyResult: Procedure() {
     object ResolveBlockDie : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             // Select sub procedure based on the result of the die.
-            return when(state.getContext<BlockContext>().result.blockResult) {
+             return when(state.getContext<BlockContext>().result.blockResult) {
                 BlockDice.PLAYER_DOWN -> PlayerDown
                 BlockDice.BOTH_DOWN -> BothDown
                 BlockDice.PUSH_BACK -> PushBack

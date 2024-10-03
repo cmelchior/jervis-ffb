@@ -295,7 +295,7 @@ inline fun <reified T:Skill> Player.hasSkill(): Boolean {
 
 // This method assumes the player is on the field
 inline fun <reified T:Skill> Player.isSkillAvailable(): Boolean {
-    return skills.filterIsInstance<T>().firstOrNull()?.let { skill ->
+    return getSkillOrNull<T>()?.let { skill ->
         if (!hasTackleZones && !skill.workWithoutTackleZones) {
             return@let false
         }

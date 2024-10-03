@@ -10,6 +10,7 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
+import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.move.MoveAction
 
 /**
@@ -37,7 +38,7 @@ object EndPlayerTurn: CommandActionMapper {
     ) {
         when (val action = fumbblGame.actingPlayer.playerAction) {
             PlayerAction.MOVE -> newActions.add(EndAction, MoveAction.SelectMoveType)
-            PlayerAction.BLOCK -> { /* Action ends automatically */ }
+            PlayerAction.BLOCK -> newActions.add(EndAction, BlockAction.SelectDefenderOrEndAction)
 //            PlayerAction.BLITZ -> TODO()
             PlayerAction.BLITZ_MOVE -> newActions.add(EndAction, BlitzAction.RemainingMovesOrEndAction)
 //            PlayerAction.BLITZ_SELECT -> TODO()

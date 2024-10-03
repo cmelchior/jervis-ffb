@@ -1,16 +1,20 @@
 package dk.ilios.jervis.procedures.actions.block
 
-import buildCompositeCommand
 import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
+import dk.ilios.jervis.actions.BlockTypeSelected
+import dk.ilios.jervis.actions.DeselectPlayer
 import dk.ilios.jervis.actions.EndAction
 import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.GameAction
+import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
+import dk.ilios.jervis.actions.SelectBlockType
 import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetSkillUsed
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
@@ -23,9 +27,12 @@ import dk.ilios.jervis.model.Team
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
+import dk.ilios.jervis.model.isSkillAvailable
 import dk.ilios.jervis.procedures.ActivatePlayerContext
+import dk.ilios.jervis.procedures.actions.blitz.BlitzAction.MoveOrBlockOrEndAction
 import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.Frenzy
 import dk.ilios.jervis.rules.skills.ProjectileVomit
 import dk.ilios.jervis.rules.skills.Stab
 import dk.ilios.jervis.utils.INVALID_ACTION
@@ -39,7 +46,7 @@ data class BlockActionContext(
     val attacker: Player,
     val defender: Player,
     val blockType: BlockType? = null,
-    val aborted: Boolean = false,
+    val hasBlocked: Boolean = false,
 ): ProcedureContext
 
 /**
@@ -77,11 +84,13 @@ object BlockAction : Procedure() {
     override val initialNode: Node = SelectDefenderOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
+        val activatePlayerContext = state.getContext<ActivatePlayerContext>()
+        val blockActionContext = state.getContext<BlockActionContext>()
         return compositeCommandOf(
+            SetContext(activatePlayerContext.copy(markActionAsUsed = blockActionContext.hasBlocked)),
             RemoveContext<BlockContext>(),
             RemoveContext<BlockActionContext>()
         )
-
     }
 
     object SelectDefenderOrEndAction : ActionNode() {
@@ -100,13 +109,7 @@ object BlockAction : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                EndAction -> {
-                    val activeContext = state.getContext<ActivatePlayerContext>()
-                    compositeCommandOf(
-                        SetContext(activeContext.copy(markActionAsUsed = false)),
-                        ExitProcedure()
-                    )
-                }
+                EndAction -> ExitProcedure()
                 is PlayerSelected -> {
                     val context = BlockActionContext(
                         attacker = state.activePlayer!!,
@@ -114,7 +117,7 @@ object BlockAction : Procedure() {
                     )
                     compositeCommandOf(
                         SetContext(context),
-                        GotoNode(ResolveBlock),
+                        GotoNode(SelectBlockType),
                     )
                 }
                 else -> INVALID_ACTION(action)
@@ -122,25 +125,118 @@ object BlockAction : Procedure() {
         }
     }
 
+    object SelectBlockType : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockActionContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+            val attacker = state.getContext<BlockActionContext>().attacker
+            val availableBlockTypes = getAvailableBlockType(attacker, true)
+            return availableBlockTypes.map {
+                SelectBlockType(it)
+            } + DeselectPlayer(attacker)
+        }
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<BlockActionContext>()
+            return when (action) {
+                is PlayerDeselected -> {
+                    GotoNode(MoveOrBlockOrEndAction)
+                }
+                else -> {
+                    checkTypeAndValue<BlockTypeSelected>(state, rules, action) { typeSelected ->
+                        val type = typeSelected.type
+                        compositeCommandOf(
+                            SetContext(context.copy(blockType = typeSelected.type)),
+                            GotoNode(ResolveBlock),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     object ResolveBlock : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            val actionContext = state.getContext<BlockActionContext>()
-            return SetContext(BlockContext(
-                attacker = actionContext.attacker,
-                defender = actionContext.defender,
-                blockType = BlockType.STANDARD
-            ))
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = StandardBlockStep
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            // Regardless of the outcome of the block, the action is over
-            val activeContext = state.getContext<ActivatePlayerContext>()
-            val actionContext = state.getContext<BlockActionContext>()
-            return buildCompositeCommand {
-                if (!actionContext.aborted) {
-                    add(SetContext(activeContext.copy(markActionAsUsed = true)))
+            val context = state.getContext<BlockActionContext>()
+            return when (context.blockType!!) {
+                BlockType.CHAINSAW -> TODO()
+                BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.STAB -> TODO()
+                BlockType.STANDARD -> {
+                    SetContext(BlockContext(
+                        context.attacker,
+                        context.defender!!,
+                        isBlitzing = false
+                    ))
                 }
-                add(ExitProcedure())
+            }
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            val context = state.getContext<BlockActionContext>()
+            return when (context.blockType!!) {
+                BlockType.CHAINSAW -> TODO()
+                BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.STAB -> TODO()
+                BlockType.STANDARD -> StandardBlockStep
+            }
+        }
+
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // If player is not standing on the field after the move, it is a turn over,
+            // otherwise they are free to continue their blitz
+            // TODO This approach to turn overs might not be correct, i.e. a goal
+            // could have been scored after a Blitz
+            val context = state.getContext<BlockActionContext>()
+
+            // Check if Block Action was completed or not
+            val removeContextCommand = when (context.blockType!!) {
+                BlockType.CHAINSAW -> TODO()
+                BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.STAB -> TODO()
+                BlockType.STANDARD -> RemoveContext<BlockContext>()
+            }
+
+            // Remove state required for the specific block type
+            val hasBlocked = when (context.blockType) {
+                BlockType.CHAINSAW -> TODO()
+                BlockType.MULTIPLE_BLOCK -> TODO()
+                BlockType.PROJECTILE_VOMIT -> TODO()
+                BlockType.STAB -> TODO()
+                BlockType.STANDARD -> !state.getContext<BlockContext>().aborted
+            }
+
+            val didFollowUp = when (context.blockType) {
+                BlockType.CHAINSAW -> false
+                BlockType.MULTIPLE_BLOCK -> false
+                BlockType.PROJECTILE_VOMIT -> false
+                BlockType.STAB -> false
+                BlockType.STANDARD -> !state.getContext<BlockContext>().didFollowUp
+            }
+
+            // After the Push was resolved, if the target is still standing
+            // and the attacker has frenzy and was able to follow up, a
+            // second block is thrown
+            val hasFrenzy = context.attacker.isSkillAvailable<Frenzy>()
+            val isNextToTarget = rules.isStanding(context.defender) && context.attacker.coordinates
+                .getSurroundingCoordinates(rules, distance = 1)
+                .contains(context.defender.coordinates)
+
+            // TODO Use frenzy
+
+            return if (hasBlocked && hasFrenzy && isNextToTarget) {
+                compositeCommandOf(
+                    removeContextCommand,
+                    SetContext(context.copy(hasBlocked = hasBlocked)),
+                    SetSkillUsed(context.attacker, context.attacker.getSkill<Frenzy>(), true),
+                    GotoNode(SelectBlockType),
+                )
+            } else {
+                compositeCommandOf(
+                    removeContextCommand,
+                    SetContext(context.copy(hasBlocked = hasBlocked)),
+                    ExitProcedure()
+                )
             }
         }
     }
@@ -157,7 +253,7 @@ object BlockAction : Procedure() {
                 when (type) {
                     BlockType.CHAINSAW -> if (player.getSkillOrNull<ProjectileVomit>()?.used == false) add(type)
                     BlockType.MULTIPLE_BLOCK -> if (!isMultipleBlock) add(type)
-                    BlockType.PROJECTILE_VOMIT -> if (player.getSkillOrNull<ProjectileVomit>()?.used == false) add(type)
+                    BlockType.PROJECTILE_VOMIT -> if (player.isSkillAvailable<ProjectileVomit>()) add(type)
                     BlockType.STAB -> if (player.hasSkill<Stab>()) add(type)
                     BlockType.STANDARD -> add(type)
                 }

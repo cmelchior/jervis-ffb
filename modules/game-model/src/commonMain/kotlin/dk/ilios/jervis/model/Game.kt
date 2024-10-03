@@ -50,6 +50,7 @@ class Game(
     // Global state properties
     // We should only have properties here that are relevant to more than
     // one procedure, otherwise it should be moved into a [ProcedureContext]
+    fun isTurnOver(): Boolean = turnOver != null
     var turnOver: TurnOver? = null
     var homeGoals: Int = 0
     var homeExtraTimeGoals: Int = 0

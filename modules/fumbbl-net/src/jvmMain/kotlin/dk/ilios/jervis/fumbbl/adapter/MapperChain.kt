@@ -53,12 +53,13 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
         var i = 0
         while (i < commands.size) {
             val serverCommand: ServerCommandModelSync = commands[i]
-            println("Processing ${serverCommand.commandNr}")
+            print("Processing CommandNr: ${serverCommand.commandNr}")
 
             // Map CommandModelSync changes to Jervis actions using all configured mappers
             val mapper = mappers.firstOrNull { it: CommandActionMapper ->
                 it.isApplicable(fumbblGame, serverCommand, processedCommands)
             }
+            println(" - Using: ${mapper?.javaClass?.simpleName ?: "<none>" }")
             if (mapper != null) {
                 val newActions = mutableListOf<JervisActionHolder>()
                 mapper.mapServerCommand(fumbblGame, jervisGame, serverCommand, processedCommands, actions, newActions)
@@ -67,7 +68,7 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
                         if (jervisGameController.currentProcedure()?.currentNode() != action.expectedNode) {
                             val serverCommandIndex = i
                             val errorMessage = """
-                                Processing index $serverCommandIndex failed.
+                                Processing CommandNr ${serverCommand.commandNr} failed.
                                 Using mapper: ${mapper.javaClass.simpleName}
                                 Current node: ${jervisGameController.stack.currentNode()::class.qualifiedName}
                                 Expected node: ${action.expectedNode::class.qualifiedName}

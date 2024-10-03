@@ -15,6 +15,7 @@ import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetSkillUsed
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
@@ -30,6 +31,7 @@ import dk.ilios.jervis.model.TurnOver
 import dk.ilios.jervis.model.context.MoveContext
 import dk.ilios.jervis.model.context.ProcedureContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.isSkillAvailable
 import dk.ilios.jervis.procedures.ActivatePlayerContext
 import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.block.BlockContext
@@ -39,6 +41,7 @@ import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
 import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.Frenzy
 import dk.ilios.jervis.utils.INVALID_ACTION
 import dk.ilios.jervis.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
@@ -49,6 +52,7 @@ data class BlitzContext(
     val blockType: BlockType? = null,
     val hasMoved: Boolean = false,
     val hasBlocked: Boolean = false,
+    val didFollowUp: Boolean = false,
 ) : ProcedureContext
 
 /**
@@ -276,16 +280,25 @@ object BlitzAction : Procedure() {
                 BlockType.STANDARD -> !state.getContext<BlockContext>().aborted
             }
 
-            return if (!rules.isStanding(context.attacker)) {
+            // After the Push was resolved, if the target is still standing
+            // and the attacker has frenzy and was able to follow up, a
+            // second block is thrown
+            val hasFrenzy = context.attacker.isSkillAvailable<Frenzy>()
+            val isNextToTarget = rules.isStanding(context.defender!!) && context.attacker.coordinates
+                .getSurroundingCoordinates(rules, distance = 1)
+                .contains(context.defender.coordinates)
+
+            return if (hasBlocked && hasFrenzy && isNextToTarget) {
                 compositeCommandOf(
                     removeContextCommand,
                     SetContext(context.copy(hasBlocked = hasBlocked)),
-                    SetTurnOver(TurnOver.STANDARD),
-                    ExitProcedure()
+                    SetSkillUsed(context.attacker, context.attacker.getSkill<Frenzy>(), true),
+                    GotoNode(SelectBlockType),
                 )
             } else {
                 compositeCommandOf(
                     removeContextCommand,
+                    SetContext(context.copy(hasBlocked = hasBlocked)),
                     GotoNode(RemainingMovesOrEndAction)
                 )
             }

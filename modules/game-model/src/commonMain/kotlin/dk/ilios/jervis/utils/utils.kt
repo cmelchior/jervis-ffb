@@ -83,6 +83,7 @@ import dk.ilios.jervis.rules.roster.bb2020.HumanTeam
 import dk.ilios.jervis.rules.roster.bb2020.LizardmenTeam
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.DiceRollType
+import dk.ilios.jervis.rules.skills.Frenzy
 import dk.ilios.jervis.rules.skills.RerollSource
 import dk.ilios.jervis.rules.skills.SideStep
 import dk.ilios.jervis.rules.skills.Skill
@@ -124,8 +125,8 @@ fun lizardMenAwayTeam(): Team {
         addPlayer(PlayerId("A3"), "Saurus-3-A", PlayerNo(3), LizardmenTeam.SAURUS_BLOCKERS)
         addPlayer(PlayerId("A4"), "Saurus-4-A", PlayerNo(4), LizardmenTeam.SAURUS_BLOCKERS)
         addPlayer(PlayerId("A5"), "Saurus-5-A", PlayerNo(5), LizardmenTeam.SAURUS_BLOCKERS)
-        addPlayer(PlayerId("A6"), "Saurus-6-A", PlayerNo(6), LizardmenTeam.SAURUS_BLOCKERS)
-        addPlayer(PlayerId("A7"), "Saurus-7-A", PlayerNo(7), LizardmenTeam.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A6"), "Saurus-6-A", PlayerNo(6), LizardmenTeam.SAURUS_BLOCKERS, listOf(Frenzy()))
+        addPlayer(PlayerId("A7"), "Saurus-7-A", PlayerNo(7), LizardmenTeam.SAURUS_BLOCKERS, listOf(Frenzy()))
         addPlayer(PlayerId("A8"), "ChameleonSkink-8-A", PlayerNo(8), LizardmenTeam.CHAMELEON_SKINKS)
         addPlayer(PlayerId("A9"), "Skink-9-A", PlayerNo(9), LizardmenTeam.SKINK_RUNNER_LINEMEN)
         addPlayer(PlayerId("A10"), "Skink-10-A", PlayerNo(10), LizardmenTeam.SKINK_RUNNER_LINEMEN)

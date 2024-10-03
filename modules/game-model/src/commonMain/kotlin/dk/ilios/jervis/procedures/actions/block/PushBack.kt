@@ -9,6 +9,7 @@ import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.reports.ReportPushResult
@@ -44,12 +45,10 @@ fun createPushContext(state: Game): PushContext {
  */
 object PushBack: Procedure() {
     override val initialNode: Node = ResolvePush
-
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val newContext = createPushContext(state)
         return SetContext(newContext)
     }
-
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PushContext>()
         return compositeCommandOf(
@@ -58,12 +57,21 @@ object PushBack: Procedure() {
         )
     }
 
+    override fun isValid(state: Game, rules: Rules) {
+        state.assertContext<BlockContext>()
+    }
+
     object ResolvePush: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStep
         override fun onExitNode(state: Game, rules: Rules): Command {
             // Target is still standing after a pushback. Any injuries due to being
             // pushed into the crowd are handled in PushStep, so here we just exit.
-            return ExitProcedure()
+            val blockContext = state.getContext<BlockContext>()
+            val pushContext = state.getContext<PushContext>()
+            return compositeCommandOf(
+                SetContext(blockContext.copy(didFollowUp = pushContext.followsUp)),
+                ExitProcedure()
+            )
         }
     }
 }

@@ -93,7 +93,7 @@ object ProjectileVomitAction : Procedure() {
             val activeContext = state.getContext<ActivatePlayerContext>()
             val actionContext = state.getContext<BlockActionContext>()
             return buildCompositeCommand {
-                if (!actionContext.aborted) {
+                if (!actionContext.hasBlocked) {
                     add(SetContext(activeContext.copy(markActionAsUsed = true)))
                 }
                 add(ExitProcedure())
