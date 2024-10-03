@@ -17,9 +17,12 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
         val currentLocation: Pair<FieldCoordinate, Int>,
     )
 
-    data class AStarNode(val point: FieldCoordinate, val g: Double, val h: Int) : Comparable<AStarNode> {
+    data class AStarNode(
+        val point: FieldCoordinate,
+        val g: Double,
+        val h: Int,
+    ) : Comparable<AStarNode> {
         val f = g + h
-
         override fun compareTo(other: AStarNode) = f.compareTo(other.f)
     }
 
@@ -90,20 +93,24 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
         gScore[start] = 0.0
 
         while (!openSet.isEmpty) {
-            val currentLocation: FieldCoordinate = openSet.poll()!!.point
+            val currentNode = openSet.poll()!!
+            val currentLocation: FieldCoordinate = currentNode.point
             if (currentLocation == goal) {
                 pathState = reconstructPath(cameFrom, currentLocation, maxMove)
                 break
             }
             val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1)
             for (neighbor in neighbors) {
-                // Skip all fields that contain tackle zones or players (except the goal
+                // We do not allow any path to go through a square that either contains Tackle Zones
+                // or the Ball (anything that might require a dice roll), but we allow the path
+                // to terminate there.
                 val neighborValue = fieldView[neighbor.x][neighbor.y]
-                val isGoal = (neighbor == goal)
-                if (
-                    (isGoal && neighborValue == Int.MAX_VALUE) || // Only skip goal if occupied by another player
-                    (neighborValue > 0 && !isGoal) // Skip all intermediate steps going through tackle zones.
-                ) {
+                val hasBall = state.field[neighbor].balls.any { it.state == BallState.ON_GROUND }
+                val inTackleZone = (neighborValue > 0 && neighborValue < Int.MAX_VALUE)
+                val isTerminalNode = hasBall || inTackleZone
+
+                // Skip all squares containing a player
+                if (neighborValue  == Int.MAX_VALUE) {
                     continue
                 }
                 val tentativeGScore = gScore.getValue(currentLocation) + currentLocation.realDistanceTo(neighbor)
@@ -112,7 +119,9 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
                     gScore[neighbor] = tentativeGScore
                     val heuristicDistance = calculateHeuristicValue(neighbor, goal)
                     closestLocation = if (heuristicDistance < closestLocation.second) Pair(neighbor, heuristicDistance) else closestLocation
-                    openSet.offer(AStarNode(neighbor, tentativeGScore, heuristicDistance))
+                    if (!isTerminalNode) {
+                        openSet.offer(AStarNode(neighbor, tentativeGScore, heuristicDistance))
+                    }
                 }
             }
             pathState = reconstructPath(cameFrom, currentLocation, maxMove)
@@ -245,7 +254,6 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
         // - Int.MAX if the location is occupied
         // - i > 0 is the number of tackle zones.
         // - 0 = Field is safe to move to
-
         val fieldView =
             Array(26) {
                 Array(15) { 0 }
@@ -272,7 +280,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
         start: FieldCoordinate,
         end: FieldCoordinate,
     ): Int {
-        return start.distanceTo(end).toInt()
+        return start.distanceTo(end)
     }
 
     private fun reconstructPath(
