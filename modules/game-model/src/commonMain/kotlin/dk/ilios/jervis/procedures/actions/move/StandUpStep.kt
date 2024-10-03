@@ -3,6 +3,7 @@ package dk.ilios.jervis.procedures.actions.move
 import compositeCommandOf
 import dk.ilios.jervis.actions.MoveType
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerMoveLeft
 import dk.ilios.jervis.commands.SetPlayerState
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -44,11 +45,13 @@ object StandUpStep : Procedure() {
     // otherwise they need to roll for it
     object AttemptToStandUpAutomatically : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val movingPlayer = state.getContext<MoveContext>().player
+            val context = state.getContext<MoveContext>()
+            val movingPlayer = context.player
             return if (movingPlayer.movesLeft >= 3) {
                 compositeCommandOf(
-                    SetPlayerState(movingPlayer, PlayerState.STANDING),
+                    SetPlayerState(movingPlayer, PlayerState.STANDING, hasTackleZones = true),
                     SetPlayerMoveLeft(movingPlayer, movingPlayer.movesLeft - 3),
+                    SetContext(context.copy(hasMoved = true)),
                     ExitProcedure()
                 )
             } else {

@@ -1,6 +1,7 @@
 package dk.ilios.jervis.fumbbl.adapter.impl
 
 import dk.ilios.jervis.actions.EndAction
+import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
@@ -14,7 +15,7 @@ import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.move.MoveAction
 
 /**
- * Active player ended its move action (variant 1)
+ * Active player ended its action (variant 1)
  */
 object EndPlayerTurn: CommandActionMapper {
     override fun isApplicable(
@@ -38,7 +39,16 @@ object EndPlayerTurn: CommandActionMapper {
     ) {
         when (val action = fumbblGame.actingPlayer.playerAction) {
             PlayerAction.MOVE -> newActions.add(EndAction, MoveAction.SelectMoveType)
-            PlayerAction.BLOCK -> newActions.add(EndAction, BlockAction.SelectDefenderOrEndAction)
+            PlayerAction.BLOCK -> {
+                // If the player hasn't blocked, it means they stopped the block early. So it needs
+                // to be manually canceled.
+                if (!fumbblGame.actingPlayer.hasBlocked) {
+                     newActions.add(
+                         action = PlayerDeselected(fumbblGame.actingPlayer.playerId!!.toJervisId()),
+                         expectedNode = BlockAction.SelectDefenderOrEndAction
+                     )
+                }
+            }
 //            PlayerAction.BLITZ -> TODO()
             PlayerAction.BLITZ_MOVE -> newActions.add(EndAction, BlitzAction.RemainingMovesOrEndAction)
 //            PlayerAction.BLITZ_SELECT -> TODO()

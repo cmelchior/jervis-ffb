@@ -12,6 +12,7 @@ import dk.ilios.jervis.actions.FieldSquareSelected
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.commands.Command
+import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.SetPlayerLocation
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -19,6 +20,7 @@ import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
 import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
+import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.Player
@@ -29,6 +31,9 @@ import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.procedures.actions.block.PushStep.ResolvePush
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryMode
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryRoll
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Frenzy
 import dk.ilios.jervis.rules.skills.SideStep
@@ -395,20 +400,15 @@ object PushStep: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             // If the chosen direction results in a chain push, modify the push context
             // and redo the entire chain.
-            return checkType<FieldSquareSelected>(action) { action ->
-                val availableActions = getAvailableActions(state, rules)
-                if (!availableActions.contains(SelectFieldLocation.push(action.coordinate))) {
-                    INVALID_ACTION(action, "Target $action is not valid: $availableActions")
-                }
-
+            return checkTypeAndValue<FieldSquareSelected>(state, rules, action) { squareSelected ->
                 val isEmpty = isSquaresEmptyForPushing(
                     state.getContext<PushContext>(),
-                    setOf(action.coordinate),
+                    setOf(squareSelected.coordinate),
                     state
                 ).isNotEmpty()
 
                 val context = state.getContext<PushContext>()
-                val updatedContext = context.copyModifyPushChain(context.pushChain.last().copy(to = action.coordinate))
+                val updatedContext = context.copyModifyPushChain(context.pushChain.last().copy(to = squareSelected.coordinate))
 
                 val commands = if (isEmpty) {
                     // Player was moved into an empty square, which means we can start resolving
@@ -422,8 +422,8 @@ object PushStep: Procedure() {
                     // new chain push to the context and restart the process
                     val newPush = PushContext.PushData(
                         pusher = context.pushChain.last().pushee,
-                        pushee = state.field[action.coordinate].player!!, // TODO This doesn't take into account chain pushes
-                        from = action.coordinate,
+                        pushee = state.field[squareSelected.coordinate].player!!, // TODO This doesn't take into account chain pushes
+                        from = squareSelected.coordinate,
                         isChainPush = true,
                     )
                     val newContext = updatedContext.copyAddPushChain(newPush)
@@ -477,13 +477,23 @@ object PushStep: Procedure() {
         }
     }
 
-    object PushedIntoTheCrowd: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            TODO("Not yet implemented")
+    object PushedIntoTheCrowd: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            val context = state.getContext<PushContext>()
+            return SetContext(
+                    RiskingInjuryContext(
+                        player = context.pushChain.last().pushee,
+                        mode = RiskingInjuryMode.PUSHED_INTO_CROWD
+                    )
+            )
         }
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            TODO("Not yet implemented")
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // TODO What about turnovers
+            return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
+                ExitProcedure()
+            )
         }
     }
 
@@ -521,7 +531,7 @@ object PushStep: Procedure() {
                     } else {
                         arrayOf(
                             SetContext(context.copy(followsUp = false)),
-                        ) // Do nothing
+                        )
                     }
                 }
                 else -> INVALID_ACTION(action)
@@ -530,6 +540,7 @@ object PushStep: Procedure() {
             return if (pushedIntoTheCrowd) {
                 compositeCommandOf(
                     *actions,
+//                    SetPlayerLocation(context.pushChain.last().pushee, FieldCoordinate.UNKNOWN),
                     GotoNode(PushedIntoTheCrowd)
                 )
             } else {

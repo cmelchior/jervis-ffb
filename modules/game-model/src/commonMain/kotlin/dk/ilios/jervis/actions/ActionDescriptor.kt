@@ -47,7 +47,6 @@ data class RollDice(val dice: List<Dice>) : ActionDescriptor {
 enum class MoveType {
     JUMP,
     LEAP,
-    // RUSH,
     STANDARD,
     STAND_UP,
 }

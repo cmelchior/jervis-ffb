@@ -3,6 +3,8 @@ package dk.ilios.jervis.fumbbl.adapter.impl
 import dk.ilios.jervis.actions.D16Result
 import dk.ilios.jervis.actions.D6Result
 import dk.ilios.jervis.actions.DiceRollResults
+import dk.ilios.jervis.actions.FieldSquareSelected
+import dk.ilios.jervis.actions.SelectFieldLocation
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
@@ -10,10 +12,12 @@ import dk.ilios.jervis.fumbbl.model.reports.InjuryReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.procedures.actions.block.PushStep
 import dk.ilios.jervis.procedures.tables.injury.ArmourRoll
 import dk.ilios.jervis.procedures.tables.injury.CasualtyRoll
 import dk.ilios.jervis.procedures.tables.injury.InjuryRoll
 import dk.ilios.jervis.procedures.tables.injury.LastingInjuryRoll
+import dk.ilios.jervis.rules.Rules
 
 object InjuryRollMapper: CommandActionMapper {
     override fun isApplicable(
@@ -33,6 +37,17 @@ object InjuryRollMapper: CommandActionMapper {
         newActions: MutableList<JervisActionHolder>
     ) {
         val report = command.firstReport() as InjuryReport
+
+        if (report.injuryType == "crowdpush") {
+            newActions.add(
+                action = { state: Game, rules: Rules ->
+                    // Any of them will push the player of the field
+                    val loc = PushStep.SelectPushDirection.getAvailableActions(state, rules).random() as SelectFieldLocation
+                    FieldSquareSelected(loc.coordinate)
+                },
+                expectedNode = PushStep.SelectPushDirection
+            )
+        }
 
         if (report.armorRoll?.isNotEmpty() == true) {
             val armourRoll = report.armorRoll.map { D6Result(it) }

@@ -8,6 +8,7 @@ import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
+import dk.ilios.jervis.fumbbl.model.BlockResult
 import dk.ilios.jervis.fumbbl.model.PlayerAction
 import dk.ilios.jervis.fumbbl.model.reports.BlockChoiceReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
@@ -46,6 +47,11 @@ object BlitzChooseBlockResultMapper: CommandActionMapper {
         // TODO What does FUMBBL do exactly in the case of Blocking and using Block/Wrestle
         val firstChoice = result.results.first()
         val selectedDie = firstChoice.diceSelected.first() as DBlockResult
+
+        if (report.blockResult == BlockResult.PUSHBACK) {
+
+        }
+
         if (selectedDie.blockResult == BlockDice.BOTH_DOWN) {
             if (fumbblGame.getPlayerById(fumbblGame.actingPlayer.playerId!!.id)?.skillArray?.contains("Block") == true) {
                 newActions.add(Confirm, BothDown.AttackerChooseToUseBlock)

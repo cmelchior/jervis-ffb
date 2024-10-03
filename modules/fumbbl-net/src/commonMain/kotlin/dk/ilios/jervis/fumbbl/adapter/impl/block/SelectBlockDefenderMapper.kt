@@ -1,28 +1,30 @@
 package dk.ilios.jervis.fumbbl.adapter.impl.block
 
-import dk.ilios.jervis.actions.PlayerActionSelected
 import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
+import dk.ilios.jervis.fumbbl.model.ModelChangeId
 import dk.ilios.jervis.fumbbl.model.PlayerAction
-import dk.ilios.jervis.fumbbl.model.reports.PlayerActionReport
+import dk.ilios.jervis.fumbbl.model.change.GameSetDefenderId
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.procedures.ActivatePlayer
-import dk.ilios.jervis.procedures.TeamTurn
+import dk.ilios.jervis.model.PlayerId
+import dk.ilios.jervis.procedures.actions.block.BlockAction
+import dk.ilios.jervis.rules.Rules
 
-object StartBlockActionMapper: CommandActionMapper {
+object SelectBlockDefenderMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
         processedCommands: MutableList<ServerCommandModelSync>
     ): Boolean {
-        val firstReport = command.firstReport()
         return (
-            firstReport is PlayerActionReport &&
-            firstReport.playerAction == PlayerAction.BLOCK
+            game.actingPlayer.playerAction == PlayerAction.BLOCK &&
+            command.reportList.isEmpty() &&
+            command.firstChangeId() == ModelChangeId.GAME_SET_DEFENDER_ID &&
+            (command.modelChangeList.first() as GameSetDefenderId).key != null
         )
     }
 
@@ -34,12 +36,10 @@ object StartBlockActionMapper: CommandActionMapper {
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {
-        val report = command.firstReport() as PlayerActionReport
-        val blockingPlayer = jervisGame.getPlayerById(report.actingPlayerId.toJervisId())
-        newActions.add(PlayerSelected(blockingPlayer.id), TeamTurn.SelectPlayerOrEndTurn)
+        val defenderId = (command.modelChangeList.first() as GameSetDefenderId).key!!
         newActions.add(
-            action = { _: Game, rules -> PlayerActionSelected(rules.teamActions.block.type) },
-            expectedNode = ActivatePlayer.DeclareActionOrDeselectPlayer
+            action = { _: Game, _: Rules -> PlayerSelected(PlayerId(defenderId)) },
+            expectedNode = BlockAction.SelectDefenderOrEndAction
         )
     }
 }

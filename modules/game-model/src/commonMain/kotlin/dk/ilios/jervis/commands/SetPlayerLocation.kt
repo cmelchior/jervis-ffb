@@ -1,10 +1,10 @@
 package dk.ilios.jervis.commands
 
 import dk.ilios.jervis.controller.GameController
-import dk.ilios.jervis.model.locations.FieldCoordinate
 import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.model.locations.Location
 import dk.ilios.jervis.model.Player
+import dk.ilios.jervis.model.locations.FieldCoordinate
+import dk.ilios.jervis.model.locations.Location
 
 class SetPlayerLocation(private val player: Player, val location: Location) : Command {
     private lateinit var originalPlayerLocation: Location
@@ -13,12 +13,17 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
     override fun execute(state: Game, controller: GameController) {
         this.originalPlayerLocation = player.location
         if (originalPlayerLocation is FieldCoordinate) {
-            this.originalPlayerOnField = state.field[player.location as FieldCoordinate].player
+            val currentLocation = player.location as FieldCoordinate
+            if (player.location == FieldCoordinate.UNKNOWN || player.location == FieldCoordinate.OUT_OF_BOUNDS) {
+                this.originalPlayerOnField = null
+            } else {
+                this.originalPlayerOnField = state.field[player.location as FieldCoordinate].player
+            }
         }
 
         // Remove from old location
         val oldLocation = originalPlayerLocation
-        if (oldLocation is FieldCoordinate) {
+        if (oldLocation is FieldCoordinate && oldLocation != FieldCoordinate.UNKNOWN && oldLocation != FieldCoordinate.OUT_OF_BOUNDS) {
             state.field[oldLocation].apply {
                 // In some cases, players are in an intermediate state, where
                 // field.location doesn't match player.location In that case,
@@ -31,20 +36,20 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
 
         // Add to new location
         player.location = location
-        if (location is FieldCoordinate) {
+        if (location is FieldCoordinate && location != FieldCoordinate.UNKNOWN && location != FieldCoordinate.OUT_OF_BOUNDS) {
             state.field[location].apply {
                 player = this@SetPlayerLocation.player
             }
         }
 
         // Only run notifications after all changes are applied
-        if (oldLocation is FieldCoordinate) {
+        if (oldLocation is FieldCoordinate && oldLocation != FieldCoordinate.UNKNOWN && oldLocation != FieldCoordinate.OUT_OF_BOUNDS) {
             state.field[oldLocation].notifyUpdate()
         }
         player.notifyUpdate()
         player.team.notifyDogoutChange()
         player.location.let {
-            if (it is FieldCoordinate) {
+            if (it is FieldCoordinate && location != FieldCoordinate.UNKNOWN && location != FieldCoordinate.OUT_OF_BOUNDS) {
                 state.field[it].notifyUpdate()
             }
         }

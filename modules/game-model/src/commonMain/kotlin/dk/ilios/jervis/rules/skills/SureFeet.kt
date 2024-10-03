@@ -29,7 +29,7 @@ class SureFeet(
         value: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): Boolean {
-        return type == DiceRollType.PICKUP
+        return type == DiceRollType.RUSH
     }
 
     @Serializable

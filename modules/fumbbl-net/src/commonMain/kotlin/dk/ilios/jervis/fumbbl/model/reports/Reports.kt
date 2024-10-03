@@ -324,6 +324,11 @@ data class GameOptionsReport(
 @SerialName("goForItRoll")
 data class GoForItRollReport(
     override val reportId: ReportId = ReportId.GO_FOR_IT_ROLL,
+    val playerId: PlayerId,
+    val successful: Boolean,
+    val roll: Int,
+    val minimumRoll: Int,
+    val reRolled: Boolean,
 ) : Report
 
 @Serializable
@@ -728,6 +733,10 @@ data class RegenerationRollReport(
 @SerialName("reRoll")
 data class ReRollReport(
     override val reportId: ReportId = ReportId.RE_ROLL,
+    val playerId: PlayerId,
+    val reRollSource: String,
+    val successful: Boolean,
+    val roll: Int
 ) : Report
 
 @Serializable

@@ -1,45 +1,45 @@
 package dk.ilios.jervis.fumbbl.adapter.impl.blitz
 
-import dk.ilios.jervis.actions.BlockTypeSelected
-import dk.ilios.jervis.actions.DBlockResult
-import dk.ilios.jervis.actions.DiceRollResults
+import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
+import dk.ilios.jervis.fumbbl.model.ModelChangeId
 import dk.ilios.jervis.fumbbl.model.PlayerAction
-import dk.ilios.jervis.fumbbl.model.reports.BlockReport
-import dk.ilios.jervis.fumbbl.model.reports.BlockRollReport
+import dk.ilios.jervis.fumbbl.model.change.GameSetDefenderId
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
+import dk.ilios.jervis.model.PlayerId
 import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
-import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockRollDice
-import dk.ilios.jervis.rules.BlockType
+import dk.ilios.jervis.rules.Rules
 
-object BlitzBlockRollMapper: CommandActionMapper {
+object SelectBlitzDefenderMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,
         command: ServerCommandModelSync,
         processedCommands: MutableList<ServerCommandModelSync>
     ): Boolean {
         return (
-            game.actingPlayer.playerAction == PlayerAction.BLITZ &&
-            command.firstReport() is BlockReport
-            && command.sound == "block"
+            (game.actingPlayer.playerAction == PlayerAction.BLITZ || game.actingPlayer.playerAction == PlayerAction.BLITZ_MOVE) &&
+            command.reportList.isEmpty() &&
+            command.firstChangeId() == ModelChangeId.GAME_SET_DEFENDER_ID &&
+            (command.modelChangeList.first() as GameSetDefenderId).key != null
         )
     }
 
     override fun mapServerCommand(
-        fumbblGame: dk.ilios.jervis.fumbbl.model.Game,
+        fumbblGame: FumbblGame,
         jervisGame: Game,
         command: ServerCommandModelSync,
         processedCommands: MutableList<ServerCommandModelSync>,
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {
-        val report = command.reportList.last() as BlockRollReport
-        val diceRoll = report.blockRoll.map { DBlockResult(it) }
-        newActions.add(BlockTypeSelected(BlockType.STANDARD), BlitzAction.SelectBlockType)
-        newActions.add(DiceRollResults(diceRoll), StandardBlockRollDice.RollDice)
+        val defenderId = (command.modelChangeList.first() as GameSetDefenderId).key!!
+        newActions.add(
+            action = { _: Game, _: Rules -> PlayerSelected(PlayerId(defenderId)) },
+            expectedNode = BlitzAction.MoveOrBlockOrEndAction
+        )
     }
 }

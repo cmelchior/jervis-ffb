@@ -1,19 +1,21 @@
 package dk.ilios.jervis.fumbbl.adapter.impl.block
 
+import dk.ilios.jervis.actions.BlockTypeSelected
 import dk.ilios.jervis.actions.DBlockResult
 import dk.ilios.jervis.actions.DiceRollResults
-import dk.ilios.jervis.actions.PlayerSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
 import dk.ilios.jervis.fumbbl.model.PlayerAction
 import dk.ilios.jervis.fumbbl.model.reports.BlockReport
 import dk.ilios.jervis.fumbbl.model.reports.BlockRollReport
+import dk.ilios.jervis.fumbbl.model.reports.ReRollReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockRollDice
+import dk.ilios.jervis.rules.BlockType
 
 object BlockRollMapper: CommandActionMapper {
     override fun isApplicable(
@@ -25,6 +27,7 @@ object BlockRollMapper: CommandActionMapper {
             game.actingPlayer.playerAction == PlayerAction.BLOCK &&
             command.firstReport() is BlockReport &&
             command.reportList.last() is BlockRollReport &&
+            command.reportList.first() !is ReRollReport &&
             command.sound == "block"
         )
     }
@@ -37,13 +40,9 @@ object BlockRollMapper: CommandActionMapper {
         jervisCommands: List<JervisActionHolder>,
         newActions: MutableList<JervisActionHolder>
     ) {
-        val blockReport = command.firstReport() as BlockReport
         val rollReport = command.reportList.last() as BlockRollReport
         val diceRoll = rollReport.blockRoll.map { DBlockResult(it) }
-        // TODO Double check how Fumbbl map block dice values
-        newActions.add({ state, rules ->
-            PlayerSelected(blockReport.defenderId.toJervisId())
-       }, BlockAction.SelectDefenderOrEndAction)
+        newActions.add(BlockTypeSelected(BlockType.STANDARD), BlockAction.SelectBlockType)
         newActions.add(DiceRollResults(diceRoll), StandardBlockRollDice.RollDice)
     }
 }

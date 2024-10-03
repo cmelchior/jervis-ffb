@@ -16,6 +16,7 @@ import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockApplyResul
 import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockChooseReroll
 import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockChooseResult
 import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockDetermineModifiers
+import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockRerollDice
 import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockRollDice
 import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.Rules
@@ -81,7 +82,7 @@ object StandardBlockStep : Procedure() {
     }
 
     object RerollDice : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = StandardBlockRollDice
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = StandardBlockRerollDice
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(SelectRerollType)
         }

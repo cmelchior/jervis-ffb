@@ -4,8 +4,6 @@ import compositeCommandOf
 import dk.ilios.jervis.actions.ActionDescriptor
 import dk.ilios.jervis.actions.BlockTypeSelected
 import dk.ilios.jervis.actions.DeselectPlayer
-import dk.ilios.jervis.actions.EndAction
-import dk.ilios.jervis.actions.EndActionWhenReady
 import dk.ilios.jervis.actions.GameAction
 import dk.ilios.jervis.actions.PlayerDeselected
 import dk.ilios.jervis.actions.PlayerSelected
@@ -97,7 +95,7 @@ object BlockAction : Procedure() {
     object SelectDefenderOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val end: List<ActionDescriptor> = listOf(EndActionWhenReady)
+            val end: List<ActionDescriptor> = listOf(DeselectPlayer(state.activePlayer!!))
 
             val attacker = state.activePlayer!!
             val eligibleDefenders: List<ActionDescriptor> =
@@ -110,7 +108,7 @@ object BlockAction : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                EndAction -> ExitProcedure()
+                is PlayerDeselected -> ExitProcedure()
                 is PlayerSelected -> {
                     val context = BlockActionContext(
                         attacker = state.activePlayer!!,

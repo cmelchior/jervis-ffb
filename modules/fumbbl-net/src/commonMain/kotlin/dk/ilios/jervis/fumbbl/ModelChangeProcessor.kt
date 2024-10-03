@@ -168,7 +168,7 @@ object ModelChangeProcessor {
             is ActingPlayerSetLeaping -> game.actingPlayer.jumping = change.value
             is ActingPlayerSetOldPlayerState -> game.actingPlayer.playerStateOld = change.value
             is ActingPlayerSetPlayerAction -> game.actingPlayer.playerAction = change.value
-            is ActingPlayerSetPlayerId -> game.actingPlayer.playerId = change.value
+            is ActingPlayerSetPlayerId -> game.actingPlayer.updatePlayerId(change.value)
             is ActingPlayerSetStandingUp -> game.actingPlayer.standingUp = change.value
             is ActingPlayerSetStrength -> game.actingPlayer.strenght = change.value
             is ActingPlayerSetSufferingAnimosity -> game.actingPlayer.sufferingAnimosity = change.value

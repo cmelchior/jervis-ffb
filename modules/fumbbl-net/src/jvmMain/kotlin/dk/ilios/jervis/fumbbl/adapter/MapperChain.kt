@@ -66,7 +66,6 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
                 newActions.forEach { action: JervisActionHolder ->
                     if (checkCommands) {
                         if (jervisGameController.currentProcedure()?.currentNode() != action.expectedNode) {
-                            val serverCommandIndex = i
                             val errorMessage = """
                                 Processing CommandNr ${serverCommand.commandNr} failed.
                                 Using mapper: ${mapper.javaClass.simpleName}

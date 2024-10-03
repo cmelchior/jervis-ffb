@@ -36,9 +36,10 @@ object BlitzMoveMapper: CommandActionMapper {
         newActions: MutableList<JervisActionHolder>
     ) {
         val moves: List<FieldModelSetPlayerCoordinate> = command.modelChangeList.filterIsInstance<FieldModelSetPlayerCoordinate>()
+        val hasBlocked = fumbblGame.actingPlayer.hasBlocked
         moves.forEach {
             val coord = FieldCoordinate(it.value!!.x, it.value.y)
-            newActions.add(MoveTypeSelected(MoveType.STANDARD), BlitzAction.MoveOrBlockOrEndAction)
+            newActions.add(MoveTypeSelected(MoveType.STANDARD), if (hasBlocked) BlitzAction.RemainingMovesOrEndAction else BlitzAction.MoveOrBlockOrEndAction)
             newActions.add(FieldSquareSelected(coord), StandardMoveStep.SelectTargetSquareOrEndAction)
         }
     }

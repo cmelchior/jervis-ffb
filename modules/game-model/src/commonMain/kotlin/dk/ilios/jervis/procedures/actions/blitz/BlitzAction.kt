@@ -15,11 +15,13 @@ import dk.ilios.jervis.actions.SelectPlayer
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.RemoveContext
 import dk.ilios.jervis.commands.SetContext
+import dk.ilios.jervis.commands.SetPlayerMoveLeft
 import dk.ilios.jervis.commands.SetSkillUsed
 import dk.ilios.jervis.commands.SetTurnOver
 import dk.ilios.jervis.commands.fsm.ExitProcedure
 import dk.ilios.jervis.commands.fsm.GotoNode
 import dk.ilios.jervis.fsm.ActionNode
+import dk.ilios.jervis.fsm.ComputationNode
 import dk.ilios.jervis.fsm.Node
 import dk.ilios.jervis.fsm.ParentNode
 import dk.ilios.jervis.fsm.Procedure
@@ -37,8 +39,12 @@ import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.procedures.actions.block.StandardBlockStep
 import dk.ilios.jervis.procedures.actions.move.ResolveMoveTypeStep
+import dk.ilios.jervis.procedures.actions.move.RushRoll
 import dk.ilios.jervis.procedures.actions.move.calculateMoveTypesAvailable
 import dk.ilios.jervis.procedures.getSetPlayerRushesCommand
+import dk.ilios.jervis.procedures.tables.injury.FallingOver
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryContext
+import dk.ilios.jervis.procedures.tables.injury.RiskingInjuryMode
 import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Frenzy
@@ -220,11 +226,53 @@ object BlitzAction : Procedure() {
                         val type = typeSelected.type
                         compositeCommandOf(
                             SetContext(context.copy(blockType = typeSelected.type)),
-                            GotoNode(ResolveBlock),
+                            GotoNode(UseMoveToBlock),
                         )
                     }
                 }
             }
+        }
+    }
+
+    object UseMoveToBlock : ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<BlitzContext>()
+            val player = context.attacker
+            return if (player.movesLeft > 0) {
+                compositeCommandOf(
+                    SetPlayerMoveLeft(state.activePlayer!!, state.activePlayer!!.movesLeft - 1),
+                    GotoNode(ResolveBlock)
+                )
+            } else if (player.rushesLeft > 0) {
+                compositeCommandOf(
+                    GotoNode(RushBeforeBlock)
+                )
+            } else {
+                INVALID_GAME_STATE("Player has no moves left: $context.attacker")
+            }
+        }
+    }
+
+    // TODO
+    object RushBeforeBlock : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            TODO("Not yet implemented")
+        }
+    }
+
+    // TODO
+    object ResolveFallingOverBeforeBlock: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            return SetContext(RiskingInjuryContext(context.player, mode = RiskingInjuryMode.FALLING_OVER))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = FallingOver
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // Regardless of the outcome, the player's action ends in a turnover
+            return compositeCommandOf(
+                ExitProcedure()
+            )
         }
     }
 

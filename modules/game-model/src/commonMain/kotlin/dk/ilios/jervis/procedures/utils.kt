@@ -25,6 +25,9 @@ import dk.ilios.jervis.rules.skills.Sprint
  * Returns the [Command] for setting the available number of rushes for this action.
  */
 fun getSetPlayerRushesCommand(rules: Rules, player: Player): Command {
+    // We unconditionally use Sprint as the coach can just decide _not_ to use
+    // the extra move. Which is faster than us spending time asking to use the
+    // skill or not.
     val rushesPrAction = if (player.hasSkill<Sprint>()) rules.rushesPrAction + 1 else rules.rushesPrAction
     return SetPlayerRushesLeft(player, rushesPrAction)
 }
