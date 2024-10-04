@@ -28,6 +28,8 @@ fun getSetPlayerRushesCommand(rules: Rules, player: Player): Command {
     // We unconditionally use Sprint as the coach can just decide _not_ to use
     // the extra move. Which is faster than us spending time asking to use the
     // skill or not.
+    // TODO This is not correct. When combined with Frenzy, there might be cases
+    //  where you do not want to use Sprint.
     val rushesPrAction = if (player.hasSkill<Sprint>()) rules.rushesPrAction + 1 else rules.rushesPrAction
     return SetPlayerRushesLeft(player, rushesPrAction)
 }

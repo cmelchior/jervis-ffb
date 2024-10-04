@@ -117,48 +117,61 @@ interpreted.
     to play during this drive" as players on both the pitch and in the Reserves box. It is unclear
     if players in the Dogout are covered by that phrase after you placed players on the field.
 
+
 # Differences compared to the rules as written
 
 1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 
    this choice always come after the roll. There is no valid reason for asking it before, and asking
-   both before and after would create a lot of noise.
+   both before and after would create a lot of noise. The exception being Diving Tackle, where 
+   there are valid reasons for choosing it both before and after.
 
-2. (Page 37) Rolling for the weather should be done by each coach rolling once dice. This doesn't
-   matter in this case, so both dice are just rolled as a single step.
+2. (Page 37) Rolling for the weather should be done by each coach rolling one die. This doesn't
+   matter in this case, so both dice are just rolled as a single step by the Home coach.
 
 3. (Page 38) The Prayers to Nuffle Table
    It is unclear what happens if you roll a result that is not a duplicate, but cannot be
    applied, e.g., because the entire team has Loner. For now, Jervis just treat the roll as 
-   wasted. Mostly because it is easier to implement and the the chance of this happening 
+   wasted. Mostly because it is easier to implement and the chance of this happening 
    is virtually zero.
 
-4. (Page 42) Order of events in End-of-Turn isn't well-defined. E.g. it is unclear if Special Play 
+4. (Page 42) Order of events in End-of-Turn is not well-defined, e.g., it is unclear if Special Play 
     Cards like Assassination Attempt trigger before or after Throw a Rock and when temporary skills
     or abilities are removed.
 
-    For now we choose the (somewhat arbitrary) order:
+    For now, we choose the (somewhat arbitrary) order:
     - Prayers Of Nuffle (Throw a Rock)
     - Special Play Cards
     - Temporary Skills/Characteristics are removed
-    - Stunned Players are now prone
+    - Stunned Players are turned to Prone
 
 5. (Page 23 + Random Event: Ball Clone)
     Ball clone says "one ball will immediately bounce", making it unclear which ball is
-    bouncing. Is it random, the ball already there? Or the ball coming into the field?
+    bouncing: 
+     - Is it random? 
+     - The ball already there? 
+     - Or the ball coming into the field?
+   
     This is a problem when combined with a failed pass that could end up in a turnover.
-    E.g. what happens if you throw a ball at a player, it misses and hits a square with
+    E.g., what happens if you throw a ball at a player, it misses and hits a square with
     another ball, a ball bounce from that square and is caught by the receiver. 
     
-    This results in three two questions:
-    a. Does it matter which ball the receiver catches?
-    b. If yes, which ball is bouncing?
-    c. Does the player know which ball is bouncing? (Relevant for choosing to reroll 
+    This results in three questions:
+     a. Does it matter which ball the receiver catches?
+     b. If yes, which ball is bouncing?
+     c. Does the player know which ball is bouncing? (Relevant for choosing to reroll 
        the catch)
 
     Since all of these aspects are undefined, the implementation always lets the last ball
-    bounce. This solves all of the questions above + increases the "Awesome"-factor if
-    it actually succeeds.
+    bounce. This solves all the questions above as well as increases the "awesome"-factor if
+    it actually succeeds since it prevents the turn-over.
+   
+6. When using Multiple Block, it is unclear what "Both Block actions are performed simultaneously"
+   means exactly. I.e., does this also apply to injury rolls? 
 
-6. Currently resolving injuries in a Multiple BLock is not done at the same time, instead you
-   choose which player to roll apothecary/regen for first. This is mostly because this is easier
-   to implement.
+   I am mostly leaning towards "No". The reason being that "Risking Injury" (page 60) is described as 
+   "as a result of a Block Action" and other skills, like Pro, are not working on Regeneration 
+   (Designer's FAQ). This indicates that the action ends with a player being Knocked Down.
+
+   For that reason, while Multiple Block injuries are collected in an "Injury Pool". We fully
+   resolve each injury from there, letting the attacking player choose the order. 
+   (This is also easier to implement)

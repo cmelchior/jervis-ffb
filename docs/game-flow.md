@@ -1,6 +1,8 @@
 # Game Flow Implementation
 
-This document lists all game mechanics that have been fully implemented with tests.
+This document is used during development as a list tracker for things that needs
+to be implemented. Things should only be marked as completed when they have unit 
+tests covering the particular feature.
 
 ## Pregame
 - [x] The Fans
@@ -138,6 +140,11 @@ This document lists all game mechanics that have been fully implemented with tes
 ## Actions
 
 - [ ] Move Action
+  - [ ] Standup and end movement
+  - [ ] Standup with less than 3 strenght
+  - [ ] Starting a move action while prone and aborting it again
+  - [ ] Deselecting a player before it moves 
+  - [ ] Moving any square mark the action as "used"
 - [ ] Pass Action
 - [ ] Hand-off Action
 - [ ] Throw Team-mate Action

@@ -3,6 +3,7 @@
 This document describes some of the architectural decisions that have been made in the Jervis codebase,
 and what the central concepts are.
 
+
 ## What are the design goals for the project?
 
 This project was started with the following design goals in mind.
@@ -10,8 +11,8 @@ This project was started with the following design goals in mind.
 1. The implementation should be a faithful representation of the rules "as written". This includes things 
    like always choosing to use a skill or not, or rerolling successful rolls. 
 
-2. The rules engine should not care what generates an action, it could be the player through the UI,
-   or some automated process.
+2. The rules engine should not be tightly coupled to the UI. It should not care what generated an 
+   action. It t could be the player through the UI, or some automated process.
 
 3. The rule implementation should be flexible and extendable. Blood Bowl is a game of exceptions,
    and it should be possible to capture all these exceptions in the code.
@@ -19,8 +20,9 @@ This project was started with the following design goals in mind.
 4. The code should be A.I. friendly. I.e., it should be easy for an AI training process or model to 
    interact with the rules and the state of the game. 
 
-5. The rules should be decoupled from the UI. It should be possible to hook many different kinds of UIs
-   up to the same rules engine.
+5. It should be easy to move the state back and forth, e.g. to support Undo or an AI algorithm that
+   is exploring different branches.
+
 
 ## What are the future goals?
 
@@ -41,7 +43,7 @@ The most honest answer is: Because I am familiar with it.
 But there are other more compelling reasons:
 
 1. Kotlin Multiplatform has 100% compatibility with the JVM and can use any Java library when running there.
-   This is relevant because the entire FUMBBL Client/Server is written in Java, so it would be easier to 
+   This is relevant because the FUMBBL Client/Server is written in Java, so it would be easier to 
    copy (with credit) code from that codebase.
    
 2. Kotlin Multiplatform allows for one codebase to compile to many targets: Android, iOS, JVM, Web through Wasm 
@@ -52,7 +54,7 @@ But there are other more compelling reasons:
    Unfortunately, the trade-off would be that all UI implementations would need to write an FFI layer to 
    interact with it. That didn't seem like a lot of fun.
 
-4. The JVM is blazingly fast these days also compared to e.g. C++.
+4. The JVM is pretty fast these days also compared to e.g., C++.
 
 5. I considered Python, but I really dislike the language, and on top, it has poor compatibility with other 
    languages. It would be more challenging to have the rule engine in Python and then write an IPad or Android 
@@ -62,17 +64,10 @@ But there are other more compelling reasons:
 6. If Kotlin Multiplatform ends up being a dead end. The code can still run as-is on both Android and the
    JVM.
 
-## Why Jervis?
-
-As a homage to the original creator of Blood Bowl: Jervis Johnson. Who would be better at playing 
-Blood Bowl, than the man who invented it. 
-
-Also, it sounds similar to J.A.R.V.I.S, the A.I from the Marvel Universe, so it also a funny play 
-of words.
-
+   
 ## How is the rules implemented?
 
-The rules are implemented in `modules/game-model`.
+The rules are implemented in `modules/jervis-model`.
 
 ...
 
@@ -93,11 +88,13 @@ The rules are implemented in `modules/game-model`.
     <Animations>
     <Multiple actions in one go>
 
+
 ## How is the UI implemented?
 
 <TODO>
 
-## How does the server architecture work
+
+## How does the server architecture work?
 
 It doesn't look like anything right now, since no server has been implemented yet.
 But it is envisioned to look like the following:
@@ -129,10 +126,14 @@ The disadvantages are:
 - Loading older save games will be made more complicated unless we can also restore the same version
   of the rules engine.
 
+
 ## What does a Jervis save file look like?
 
 The main idea behind a Jervis save file is that it isn't just a _snapshot_ of the 
 current game state, but it also encapsulates all events leading up to that state.
 
-This means that when you load a save file, it is possible to roll back as long
-as you would like.
+This means that when you load a save file, it is possible to either pick up a
+game from where it ended. As well as undoing some steps and continue playing
+from there.
+
+<TODO Expand description once save format is more formalized>
