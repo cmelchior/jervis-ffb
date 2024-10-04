@@ -38,4 +38,4 @@ jobs:
           cache-read-only: false
 
       - name: Run Tests
-        run: ./gradlew :modules:jervis-model:jvmRun -DmainClass=dk.ilios.jervis.MainKt
+        run: ./gradlew :modules:jervis-model:jvmTest

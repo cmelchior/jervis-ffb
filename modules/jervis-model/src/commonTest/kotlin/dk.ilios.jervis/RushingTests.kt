@@ -12,6 +12,7 @@ import dk.ilios.jervis.ext.playerId
 import dk.ilios.jervis.procedures.FullGame
 import dk.ilios.jervis.procedures.TeamTurn
 import dk.ilios.jervis.rules.PlayerStandardActionType
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -81,6 +82,7 @@ class RushingTests: JervisGameTest() {
     }
 
     @Test
+    @Ignore
     fun rushToBlitz() {
         TODO("Rush to blitz when out of moves. Test should probably be in BlitzTests")
     }
