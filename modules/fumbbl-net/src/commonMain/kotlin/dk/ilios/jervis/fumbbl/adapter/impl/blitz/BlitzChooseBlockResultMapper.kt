@@ -22,6 +22,7 @@ import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.actions.block.BothDown
+import dk.ilios.jervis.procedures.actions.block.Stumble
 import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockChooseReroll
 import dk.ilios.jervis.procedures.actions.block.standard.StandardBlockChooseResult
 
@@ -77,6 +78,14 @@ object BlitzChooseBlockResultMapper: CommandActionMapper {
         // TODO What does FUMBBL do exactly in the case of Blocking and using Block/Wrestle
         if (report.blockResult == BlockResult.PUSHBACK) {
 
+        }
+
+        if (report.blockResult == POW_PUSHBACK) {
+            // Always use Tackle (I think there are a few cases where Fumbbl will ask for this)
+            // Fix this when we encounter them
+            if (fumbblGame.getPlayerById(fumbblGame.actingPlayer.playerId!!.id)?.skillArray?.contains("Tackle") == true) {
+                newActions.add(Confirm, Stumble.ChooseToUseTackle)
+            }
         }
 
         if (selectedBlockDie.blockResult == BlockDice.BOTH_DOWN) {
