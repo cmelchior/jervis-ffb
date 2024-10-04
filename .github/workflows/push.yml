@@ -1,0 +1,41 @@
+name: Main Build
+on:
+  workflow_dispatch:  # Add this line to enable manual triggering
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# For now, just run all rules tests. Mostly as a proof-of-concept.
+jobs:
+
+  # We build the same JNI SWIG stub once and re-use it across platforms to ensure any problems
+  # with SWIG if we compile on each seperate platform.
+  test-rules:
+    runs-on: ubuntu-latest
+    if: always() && !cancelled()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Setup Gradle and task/dependency caching
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Run Tests
+        run: ./gradlew :modules:jervis-model:jvmRun -DmainClass=dk.ilios.jervis.MainKt
