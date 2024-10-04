@@ -12,8 +12,8 @@ dependencyResolutionManagement {
 
 include(":modules:fumbbl-cli")
 include(":modules:fumbbl-net")
-include(":modules:game-model")
+include(":modules:jervis-model")
+include(":modules:jervis-ui")
 include(":Debug-FantasyFootballClient")
 include(":modules:replay-analyzer")
-include(":modules:game-ui")
 include("modules:utils")

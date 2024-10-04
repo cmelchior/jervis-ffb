@@ -1,7 +1,7 @@
 package dk.ilios.jervis.ui.images
 
 import androidx.compose.ui.graphics.ImageBitmap
-import dk.ilios.bloodbowl.ui.game_ui.generated.resources.Res
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.Res
 import dk.ilios.jervis.actions.BlockDice
 import dk.ilios.jervis.model.Player
 import dk.ilios.jervis.model.PlayerId

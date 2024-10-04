@@ -36,7 +36,7 @@ kotlin {
             dependencies {
                 implementation(project(":modules:utils"))
                 implementation(project(":modules:fumbbl-net"))
-                implementation(project(":modules:game-model"))
+                implementation(project(":modules:jervis-model"))
                 implementation(libs.okio)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.coroutines)
@@ -88,7 +88,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg)
 //            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "game-ui"
+            packageName = "jervis-ui"
             packageVersion = "1.0.0"
         }
     }

@@ -55,7 +55,7 @@ class IntroScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
     val availableReplayFiles: List<Path>
         get() {
-            val dir = "/Users/christian.melchior/Private/jervis-bloodbowl-agent/replays-fumbbl".toPath()
+            val dir = "/Users/christian.melchior/Private/jervis-ffb/replays-fumbbl".toPath()
             return if (!platformFileSystem.exists(dir)) {
                 emptyList()
             } else {

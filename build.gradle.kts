@@ -40,8 +40,8 @@ tasks.register("buildTools") {
 val subprojects = listOf(
     "modules/fumbbl-cli",
     "modules/fumbbl-net",
-    "modules/game-model",
-    "modules/game-ui",
+    "modules/jervis-model",
+    "modules/jervis-ui",
     "modules/replay-analyzer",
 )
 

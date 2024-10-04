@@ -30,7 +30,7 @@ kotlin {
                 implementation(project(":modules:utils"))
                 implementation(libs.coroutines)
                 implementation(project(":modules:fumbbl-net"))
-                implementation(project(":modules:game-model"))
+                implementation(project(":modules:jervis-model"))
             }
         }
         val commonTest by getting {
