@@ -1,7 +1,7 @@
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
 }
-rootProject.name = "Jervis-A-Blood-Bowl-AI"
+rootProject.name = "Jervis-Fantasy-Football"
 
 dependencyResolutionManagement {
     repositories {
