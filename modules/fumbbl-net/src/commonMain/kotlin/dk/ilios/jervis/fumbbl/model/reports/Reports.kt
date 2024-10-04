@@ -908,6 +908,15 @@ data class TrapDoorReport(
 @SerialName("turnEnd")
 data class TurnEndReport(
     override val reportId: ReportId = ReportId.TURN_END,
+    val playerIdTouchdown: PlayerId?,
+    val heartRoll: Int = 0,
+
+//    "playerIdTouchdown" : null,
+//    "knockoutRecoveryArray" : [ ],
+//"heatExhaustionArray" : [ ],
+//"unzapArray" : [ ],
+//"heatRoll" : 0
+
 ) : Report
 
 @Serializable

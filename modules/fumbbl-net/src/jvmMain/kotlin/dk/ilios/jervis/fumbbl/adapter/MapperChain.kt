@@ -64,7 +64,7 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
                 val newActions = mutableListOf<JervisActionHolder>()
                 mapper.mapServerCommand(fumbblGame, jervisGame, serverCommand, processedCommands, actions, newActions)
                 newActions.forEach { action: JervisActionHolder ->
-                    if (checkCommands) {
+                    if (checkCommands && action !is OptionalJervisAction) {
                         if (jervisGameController.currentProcedure()?.currentNode() != action.expectedNode) {
                             val errorMessage = """
                                 Processing CommandNr ${serverCommand.commandNr} failed.
@@ -81,11 +81,17 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
                             is CalculatedJervisAction -> {
                                 action.actionFunc(jervisGame, jervisGameController.rules)
                             }
-
                             is JervisAction -> action.action
+                            is OptionalJervisAction -> if (jervisGameController.currentNode() == action.expectedNode) {
+                                action.action
+                            } else {
+                                null
+                            }
                         }
                         try {
-                            jervisGameController.processAction(jervisAction)
+                            if (jervisAction != null) {
+                                jervisGameController.processAction(jervisAction)
+                            }
                         } catch (ex: Exception) {
                             println("Processed up to: ${serverCommand.commandNr}")
                             throw ex

@@ -19,56 +19,6 @@ import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.DiceRerollOption
 import dk.ilios.jervis.rules.skills.RegularTeamReroll
 
-/**
- * {
- *     "netCommandId" : "serverModelSync",
- *     "commandNr" : 64,
- *     "modelChangeList" : {
- *       "modelChangeArray" : [ {
- *         "modelChangeId" : "turnDataSetReRolls",
- *         "modelChangeKey" : "away",
- *         "modelChangeValue" : 1
- *       }, {
- *         "modelChangeId" : "gameSetDialogParameter",
- *         "modelChangeKey" : null,
- *         "modelChangeValue" : {
- *           "dialogId" : "blockRollPartialReRoll",
- *           "choosingTeamId" : "1128152",
- *           "nrOfDice" : 1,
- *           "blockRoll" : [ 5 ],
- *           "reRolledDice" : [ ],
- *           "teamReRollOption" : false,
- *           "proReRollOption" : false,
- *           "brawlerOption" : false,
- *           "reRollSourceSingleUse" : null,
- *           "consummateOption" : false,
- *           "addBlockDieSkill" : null
- *         }
- *       } ]
- *     },
- *     "reportList" : {
- *       "reports" : [ {
- *         "reportId" : "reRoll",
- *         "playerId" : "15602213",
- *         "reRollSource" : "Team ReRoll",
- *         "successful" : false,
- *         "roll" : 0
- *       }, {
- *         "reportId" : "block",
- *         "defenderId" : "15521055"
- *       }, {
- *         "reportId" : "blockRoll",
- *         "choosingTeamId" : "1128152",
- *         "blockRoll" : [ 5 ],
- *         "defenderId" : null
- *       } ]
- *     },
- *     "sound" : "block",
- *     "gameTime" : 272491,
- *     "turnTime" : 55809
- *   }
- */
-
 object BlockChooseRerollMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,

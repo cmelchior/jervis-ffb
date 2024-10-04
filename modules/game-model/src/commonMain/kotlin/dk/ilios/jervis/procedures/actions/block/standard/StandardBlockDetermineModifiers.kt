@@ -1,6 +1,8 @@
 package dk.ilios.jervis.procedures.actions.block.standard
 
+import buildCompositeCommand
 import compositeCommandOf
+import dk.ilios.jervis.commands.AddPlayerStatModifier
 import dk.ilios.jervis.commands.Command
 import dk.ilios.jervis.commands.SetContext
 import dk.ilios.jervis.commands.fsm.ExitProcedure
@@ -11,8 +13,11 @@ import dk.ilios.jervis.fsm.Procedure
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
+import dk.ilios.jervis.model.hasSkill
+import dk.ilios.jervis.model.modifiers.SkillStatModifier
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.rules.skills.Horns
 
 /**
  * Calculate all modifiers before rolling the block dice.
@@ -33,7 +38,13 @@ object StandardBlockDetermineModifiers: Procedure() {
     object ResolveHorns : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             // TODO Implement Horns logic. Modify strength using the modifier system
-            return GotoNode(ResolveDauntless)
+            val context = state.getContext<BlockContext>()
+            return buildCompositeCommand {
+                if (context.isBlitzing && context.attacker.hasSkill<Horns>()) {
+                    add(AddPlayerStatModifier(context.attacker, SkillStatModifier.HORNS))
+                }
+                add(GotoNode(ResolveDauntless))
+            }
         }
     }
 

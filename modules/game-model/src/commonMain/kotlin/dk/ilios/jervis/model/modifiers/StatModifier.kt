@@ -1,5 +1,6 @@
 package dk.ilios.jervis.model.modifiers
 
+import dk.ilios.jervis.model.modifiers.StatModifier.Type
 import dk.ilios.jervis.rules.skills.Duration
 
 /**
@@ -18,17 +19,11 @@ interface StatModifier {
     val expiresAt: Duration
 }
 
-//@Serializable
-//class StatModifier private constructor(
-//    val modifier: Int,
-//    val type: Type,
-//    val expiresAt: ResetPolicy = ResetPolicy.NEVER
-//) {
-//    companion object {
-//        fun AV(modifier: Int) = StatModifier(modifier, Type.AV)
-//        fun MA(modifier: Int) = StatModifier(modifier, Type.MA)
-//        fun PA(modifier: Int) = StatModifier(modifier, Type.PA)
-//        fun AG(modifier: Int) = StatModifier(modifier, Type.AG)
-//        fun ST(modifier: Int) = StatModifier(modifier, Type.ST)
-//    }
-//}
+enum class SkillStatModifier(
+    override val description: String,
+    override val modifier: Int,
+    override val type: Type,
+    override val expiresAt: Duration = Duration.PERMANENT
+): StatModifier {
+    HORNS("Horns (+1 ST)", 1, Type.ST, expiresAt = Duration.END_OF_ACTION),
+}

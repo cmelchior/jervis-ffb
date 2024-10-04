@@ -14,6 +14,13 @@ data class JervisAction(
     override val expectedNode: Node,
 ) : JervisActionHolder
 
+// Only run this action if the expectedNode matches,
+// otherwise just ignore it.
+data class OptionalJervisAction(
+    val action: GameAction,
+    override val expectedNode: Node,
+): JervisActionHolder
+
 data class CalculatedJervisAction(
     val actionFunc: (state: Game, rules: Rules) -> GameAction,
     override val expectedNode: Node,
@@ -32,3 +39,11 @@ fun MutableList<JervisActionHolder>.add(
 ) {
     this.add(CalculatedJervisAction(action, expectedNode))
 }
+
+fun MutableList<JervisActionHolder>.addOptional(
+    action: GameAction,
+    expectedNode: Node,
+) {
+    this.add(OptionalJervisAction(action, expectedNode))
+}
+

@@ -186,11 +186,11 @@ data class DiceRerollOption(
 }
 
 // When does the "used" state reset?
-// TODO Rename to Duration?
 enum class Duration {
     IMMEDIATE, // The effect expires immediately.
     START_OF_ACTIVATION, // The effect expires when the player is activated
     END_OF_ACTIVATION, // The effect expires at the end of the current players activation
+    END_OF_ACTION, // The effect expires at the end of the action, this also includes subactions, like the Block part of a Blitz.
     END_OF_TURN, // The effect expires at the end of the current teams turn.
     END_OF_DRIVE, // The effect expires at the end of the current drive
     END_OF_HALF, // The effect expires at the end of the current half

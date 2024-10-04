@@ -7,6 +7,7 @@ import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.PASSING
 import dk.ilios.jervis.rules.bb2020.BB2020SkillCategory.STRENGTH
 import dk.ilios.jervis.rules.roster.RosterId
 import dk.ilios.jervis.rules.skills.Frenzy
+import dk.ilios.jervis.rules.skills.Horns
 import dk.ilios.jervis.rules.skills.Loner
 import dk.ilios.jervis.rules.skills.MightyBlow
 import dk.ilios.jervis.rules.skills.UnchannelledFury
@@ -35,7 +36,7 @@ data object KhorneTeam : BB2020Roster {
             "Khorngor",
             70_000,
             6, 3, 4, 4, 9,
-            emptyList(), // Horns, Juggernaut
+            listOf(Horns.Factory /*, Juggernaut */),
             listOf(GENERAL, MUTATIONS, STRENGTH),
             listOf(AGILITY, PASSING),
         )

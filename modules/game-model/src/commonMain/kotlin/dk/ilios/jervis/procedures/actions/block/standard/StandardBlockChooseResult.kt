@@ -18,6 +18,7 @@ import dk.ilios.jervis.model.context.assertContext
 import dk.ilios.jervis.model.context.getContext
 import dk.ilios.jervis.procedures.actions.block.BlockContext
 import dk.ilios.jervis.rules.Rules
+import dk.ilios.jervis.utils.INVALID_GAME_STATE
 
 /**
  * Roll block dice for the first time.
@@ -52,6 +53,9 @@ object StandardBlockChooseResult: Procedure() {
                         selectedIndex = i
                         break
                     }
+                }
+                if (selectedIndex == -1) {
+                    INVALID_GAME_STATE("No matching roll for $selectedDie: ${context.roll}")
                 }
                 compositeCommandOf(
                     SetContext(context.copy(resultIndex = selectedIndex)),

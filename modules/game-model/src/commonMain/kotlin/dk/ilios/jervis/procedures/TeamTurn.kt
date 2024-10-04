@@ -99,10 +99,12 @@ object TeamTurn : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 is PlayerSelected -> {
-                    compositeCommandOf(
-                        SetContext(ActivatePlayerContext(action.getPlayer(state))),
-                        GotoNode(ActivatePlayer),
-                    )
+                    checkTypeAndValue<PlayerSelected>(state, rules, action) { playerSelected ->
+                        compositeCommandOf(
+                            SetContext(ActivatePlayerContext(playerSelected.getPlayer(state))),
+                            GotoNode(ActivatePlayer),
+                        )
+                    }
                 }
                 EndTurn -> GotoNode(ResolveEndOfTurn)
                 else -> INVALID_ACTION(action)
@@ -131,12 +133,12 @@ object TeamTurn : Procedure() {
 
             val turnOverStunnedPlayersCommands = state.activeTeam
                 .filter { it.state == PlayerState.STUNNED }
-                .map  { SetPlayerState(it, PlayerState.PRONE) }
+                .map { SetPlayerState(it, PlayerState.PRONE) }
                 .toTypedArray()
 
             val progressStunnedCommands = state.activeTeam
                 .filter { it.state == PlayerState.STUNNED_OWN_TURN }
-                .map  { SetPlayerState(it, PlayerState.STUNNED) }
+                .map { SetPlayerState(it, PlayerState.STUNNED) }
                 .toTypedArray()
 
             // It isn't well-defined in which order things happen at the end of the turn.
@@ -201,9 +203,7 @@ object TeamTurn : Procedure() {
 
     private fun getAvailablePlayers(state: Game, rules: Rules): List<Player> {
         return state.activeTeam
-            .filter {
-                it.available == Availability.AVAILABLE
-            } // Players that hasn't already been activated
+            .filter { it.available == Availability.AVAILABLE } // Players that hasn't already been activated
             .filter { it.state == PlayerState.STANDING || it.state == PlayerState.PRONE } // Only Standing/Prone players
     }
 

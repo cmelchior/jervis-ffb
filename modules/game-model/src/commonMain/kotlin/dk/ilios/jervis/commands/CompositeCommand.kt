@@ -6,9 +6,7 @@ import dk.ilios.jervis.model.Game
 class CompositeCommand private constructor(private val commands: List<Command>) : Command {
     class Builder {
         private val commands = mutableListOf<Command>()
-
         fun add(command: Command) = commands.add(command)
-
         fun build(): CompositeCommand {
             return CompositeCommand(commands)
         }

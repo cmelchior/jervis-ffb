@@ -2,6 +2,7 @@ package dk.ilios.jervis.ui.viewmodel
 
 import dk.ilios.jervis.fumbbl.adapter.CalculatedJervisAction
 import dk.ilios.jervis.fumbbl.adapter.JervisAction
+import dk.ilios.jervis.fumbbl.adapter.OptionalJervisAction
 import dk.ilios.jervis.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,7 @@ class ReplayModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
             while (!controller.stack.isEmpty()) {
                 if (replayCommands != null && index <= replayCommands.size) {
                     val commandFromReplay = replayCommands[index]
-                    if (commandFromReplay.expectedNode != controller.stack.currentNode()) {
+                    if (commandFromReplay !is OptionalJervisAction && commandFromReplay.expectedNode != controller.stack.currentNode()) {
                         throw IllegalStateException(
                             """
                             Current node: ${controller.stack.currentNode()::class.qualifiedName}
@@ -32,6 +33,7 @@ class ReplayModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
                                             controller.rules,
                                         )
                                     is JervisAction -> commandFromReplay.action
+                                    is OptionalJervisAction -> commandFromReplay.action
                                 }}
                             """.trimIndent(),
                         )
@@ -42,6 +44,11 @@ class ReplayModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
                                 commandFromReplay.actionFunc(controller.state, controller.rules),
                             )
                         is JervisAction -> controller.processAction(commandFromReplay.action)
+                        is OptionalJervisAction -> {
+                            if (controller.currentNode() == commandFromReplay.expectedNode) {
+                                controller.processAction(commandFromReplay.action)
+                            }
+                        }
                     }
                     controller.state.notifyUpdate()
                     index += 1

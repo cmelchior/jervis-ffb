@@ -8,6 +8,7 @@ import dk.ilios.jervis.actions.NoRerollSelected
 import dk.ilios.jervis.fumbbl.adapter.CommandActionMapper
 import dk.ilios.jervis.fumbbl.adapter.JervisActionHolder
 import dk.ilios.jervis.fumbbl.adapter.add
+import dk.ilios.jervis.fumbbl.adapter.addOptional
 import dk.ilios.jervis.fumbbl.model.BlockResult.BOTH_DOWN
 import dk.ilios.jervis.fumbbl.model.BlockResult.POW
 import dk.ilios.jervis.fumbbl.model.BlockResult.POW_PUSHBACK
@@ -15,7 +16,6 @@ import dk.ilios.jervis.fumbbl.model.BlockResult.PUSHBACK
 import dk.ilios.jervis.fumbbl.model.BlockResult.SKULL
 import dk.ilios.jervis.fumbbl.model.PlayerAction
 import dk.ilios.jervis.fumbbl.model.reports.BlockChoiceReport
-import dk.ilios.jervis.fumbbl.model.reports.BlockRollReport
 import dk.ilios.jervis.fumbbl.net.commands.ServerCommandModelSync
 import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
@@ -45,13 +45,12 @@ object BlockChooseBlockResultMapper: CommandActionMapper {
     ) {
         val report = command.reportList.last() as BlockChoiceReport
 
-        // Skipping Rerolls are not visible in the logs so we have to guess based on
-        // the last command. If it contains a `blockRoll` report, we guess they went
-        // straight for the result
-        val skippedReroll = processedCommands.last().reportList.any { it is BlockRollReport }
-        if (skippedReroll) {
-            newActions.add(NoRerollSelected(), StandardBlockChooseReroll.ReRollSourceOrAcceptRoll)
-        }
+        // From the logs we cannot detect when the user stops re-rolling things.
+        // We only see that they finally choose a result. This is problematic because
+        // Jervis has a "NoRerollSelected" event to make that transition.
+        // But if no rerolls are available, this event is just skipped.
+        // Making it optional here _should_ cover all the cases.
+        newActions.addOptional(NoRerollSelected(), StandardBlockChooseReroll.ReRollSourceOrAcceptRoll)
 
         // There isn't an easy way to figure out exactly which die PUSHBACK
         // points to when selected (i.e. if you rolled 3 and 4). For now,
