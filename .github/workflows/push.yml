@@ -14,9 +14,6 @@ concurrency:
 
 # For now, just run all rules tests. Mostly as a proof-of-concept.
 jobs:
-
-  # We build the same JNI SWIG stub once and re-use it across platforms to ensure any problems
-  # with SWIG if we compile on each seperate platform.
   test-rules:
     runs-on: ubuntu-latest
     if: always() && !cancelled()

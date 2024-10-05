@@ -28,7 +28,6 @@ import dk.ilios.jervis.model.context.getContextOrNull
 import dk.ilios.jervis.model.hasSkill
 import dk.ilios.jervis.model.isSkillAvailable
 import dk.ilios.jervis.procedures.ActivatePlayerContext
-import dk.ilios.jervis.procedures.actions.blitz.BlitzAction.MoveOrBlockOrEndAction
 import dk.ilios.jervis.rules.BlockType
 import dk.ilios.jervis.rules.Rules
 import dk.ilios.jervis.rules.skills.Frenzy
@@ -136,9 +135,7 @@ object BlockAction : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<BlockActionContext>()
             return when (action) {
-                is PlayerDeselected -> {
-                    GotoNode(MoveOrBlockOrEndAction)
-                }
+                is PlayerDeselected -> ExitProcedure()
                 else -> {
                     checkTypeAndValue<BlockTypeSelected>(state, rules, action) { typeSelected ->
                         val type = typeSelected.type
@@ -217,11 +214,13 @@ object BlockAction : Procedure() {
             // and the attacker has frenzy and was able to follow up, a
             // second block is thrown
             val hasFrenzy = context.attacker.isSkillAvailable<Frenzy>()
-            val isNextToTarget = rules.isStanding(context.defender) && context.attacker.coordinates
-                .getSurroundingCoordinates(rules, distance = 1)
-                .contains(context.defender.coordinates)
-
-            // TODO Use frenzy
+            val isNextToTarget = (
+                rules.isStanding(context.attacker) &&
+                rules.isStanding(context.defender) &&
+                context.attacker.coordinates
+                    .getSurroundingCoordinates(rules, distance = 1)
+                    .contains(context.defender.coordinates)
+            )
 
             return if (hasBlocked && hasFrenzy && isNextToTarget) {
                 compositeCommandOf(

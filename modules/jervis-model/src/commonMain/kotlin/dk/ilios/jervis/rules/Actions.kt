@@ -6,7 +6,7 @@ import dk.ilios.jervis.procedures.actions.block.BlockAction
 import dk.ilios.jervis.procedures.actions.block.MultipleBlockAction
 import dk.ilios.jervis.procedures.actions.block.ProjectileVomitAction
 import dk.ilios.jervis.procedures.actions.block.StabAction
-import dk.ilios.jervis.procedures.actions.foul.FoulAction
+import dk.ilios.jervis.procedures.actions.foul.FumbblFoulAction
 import dk.ilios.jervis.procedures.actions.handoff.HandOffAction
 import dk.ilios.jervis.procedures.actions.handoff.ThrowTeamMateAction
 import dk.ilios.jervis.procedures.actions.move.MoveAction
@@ -242,7 +242,7 @@ class BB2020TeamActions : TeamActions() {
             countsAs = null,
             availablePrTurn = 1,
             worksDuringBlitz = false,
-            procedure = FoulAction,
+            procedure = FumbblFoulAction,
             compulsory = false,
         ),
     )

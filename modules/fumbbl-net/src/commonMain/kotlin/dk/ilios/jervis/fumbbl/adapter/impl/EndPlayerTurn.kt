@@ -12,6 +12,7 @@ import dk.ilios.jervis.fumbbl.utils.FumbblGame
 import dk.ilios.jervis.model.Game
 import dk.ilios.jervis.procedures.actions.blitz.BlitzAction
 import dk.ilios.jervis.procedures.actions.block.BlockAction
+import dk.ilios.jervis.procedures.actions.foul.FumbblFoulAction
 import dk.ilios.jervis.procedures.actions.move.MoveAction
 
 /**
@@ -57,7 +58,16 @@ object EndPlayerTurn: CommandActionMapper {
 //            PlayerAction.PASS -> TODO()
 //            PlayerAction.PASS_MOVE -> TODO()
 //            PlayerAction.FOUL -> TODO()
-//            PlayerAction.FOUL_MOVE -> TODO()
+            PlayerAction.FOUL_MOVE ->  {
+                // If the player hasn't fouled or moved, it means they stopped the block early. So it needs
+                // to be manually canceled.
+                if (!fumbblGame.actingPlayer.hasFouled && !fumbblGame.actingPlayer.hasMoved) {
+                    newActions.add(
+                        action = PlayerDeselected(fumbblGame.actingPlayer.playerId!!.toJervisId()),
+                        expectedNode = FumbblFoulAction.MoveOrFoulOrEndAction
+                    )
+                }
+            }
 //            PlayerAction.STAND_UP -> TODO()
 //            PlayerAction.THROW_TEAM_MATE -> TODO()
 //            PlayerAction.THROW_TEAM_MATE_MOVE -> TODO()

@@ -90,9 +90,9 @@ object FoulStep: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val foulContext =state.getContext<FoulContext>()
             val injuryContext = state.getContext<RiskingInjuryContext>()
-            val spottedByRef: Boolean =
-                (injuryContext.armourRoll[0] == 1.d6 && injuryContext.armourRoll[1] == 1.d6) ||
-                (injuryContext.injuryRoll[0] == 1.d6 && injuryContext.injuryRoll[1] == 1.d6)
+            val spottedByRefArmour: Boolean = (injuryContext.armourRoll[0] == 1.d6 && injuryContext.armourRoll[1] == 1.d6)
+            val spottedByRefInjury: Boolean = (injuryContext.injuryRoll.isNotEmpty() && injuryContext.injuryRoll[0] == 1.d6 && injuryContext.injuryRoll[1] == 1.d6)
+            val spottedByRef = spottedByRefArmour || spottedByRefInjury
             return compositeCommandOf(
                 RemoveContext<RiskingInjuryContext>(),
                 SetContext(foulContext.copy(

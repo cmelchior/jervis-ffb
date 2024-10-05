@@ -288,6 +288,7 @@ data class FanFactorRollReport(
 @SerialName("foul")
 data class FoulReport(
     override val reportId: ReportId = ReportId.FOUL,
+    val defenderId: PlayerId,
 ) : Report
 
 @Serializable
