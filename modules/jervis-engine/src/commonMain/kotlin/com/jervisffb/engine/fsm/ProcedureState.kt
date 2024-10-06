@@ -1,0 +1,64 @@
+package com.jervisffb.engine.fsm
+
+/**
+ * Class responsible for tracking the current state of a single [Procedure].
+ */
+class ProcedureState(val procedure: Procedure, initialNode: Node) {
+
+    // Tracks the current active node
+    private var activeNode: Node = initialNode
+
+    // Track state related to ParentNode. It should only be allowed to modify this
+    // if `currentNode` is a ParentNode
+    private var parentNodeState: ParentNode.State? = null
+
+    private constructor(
+        procedure: Procedure,
+        history: Node,
+        parentNodeState: ParentNode.State?,
+    ) : this(procedure, history) {
+        this.parentNodeState = parentNodeState
+    }
+
+    /**
+     * If the current node is a [ParentNode], this will return its [ParentNode.State].
+     * If it is any other type, an [IllegalStateException] is thrown.
+     */
+    fun getParentNodeState(): ParentNode.State {
+        if (activeNode !is ParentNode) throw IllegalStateException("Current state is not a ParentNode: $activeNode")
+        return parentNodeState!!
+    }
+
+    /**
+     * Returns the current active node.
+     */
+    fun currentNode(): Node = activeNode
+
+    /**
+     * Sets the node that is currently active.
+     */
+    fun setCurrentNode(node: Node) {
+        activeNode = node
+    }
+
+    /**
+     * Creates a deep copy of the entire state object.
+     */
+    fun copy(): ProcedureState {
+        return ProcedureState(procedure, activeNode, parentNodeState)
+    }
+
+    /**
+     * Returns a name describing this state object.
+     */
+    fun name(): String = procedure.name()
+
+    override fun toString(): String {
+         return "${name()}[${activeNode.name()}]"
+    }
+
+    fun setParentNodeState(nextState: ParentNode.State?) {
+        if (activeNode !is ParentNode) throw IllegalStateException("Current state is not a ParentNode: $activeNode")
+        parentNodeState = nextState
+    }
+}

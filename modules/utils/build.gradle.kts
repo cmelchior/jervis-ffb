@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.multiplatform)
 }
 
-group = "dk.ilios.jervis.utils"
+group = "com.jervisffb.utils"
 version = "1.0-SNAPSHOT"
 
 kotlin {

@@ -20,10 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import dk.ilios.jervis.model.locations.FieldCoordinate
-import dk.ilios.jervis.rules.StandardBB2020Rules
-import dk.ilios.jervis.utils.createDefaultGameState
-import dk.ilios.jervis.utils.createStartingTestSetup
+import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.utils.createDefaultGameState
+import com.jervisffb.engine.utils.createStartingTestSetup
 import org.junit.Test
 
 class BresenhamTests {

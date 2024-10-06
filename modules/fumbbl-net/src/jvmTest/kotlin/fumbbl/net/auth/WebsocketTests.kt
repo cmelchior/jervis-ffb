@@ -1,6 +1,6 @@
 package fumbbl.net.auth
 
-import dk.ilios.jervis.fumbbl.FumbblWebsocketConnection
+import com.jervisffb.fumbbl.net.FumbblWebsocketConnection
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

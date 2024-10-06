@@ -11,11 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import dk.ilios.jervis.ui.Field
-import dk.ilios.jervis.ui.Sidebar
+import com.jervisffb.ui.Field
+import com.jervisffb.ui.Sidebar
 import manual.dummies.TestDummy
-import dk.ilios.jervis.ui.viewmodel.FieldViewModel
-import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
+import com.jervisffb.ui.viewmodel.FieldViewModel
+import com.jervisffb.ui.viewmodel.SidebarViewModel
 import org.junit.Test
 
 class PlayerStatsCard {
@@ -43,8 +43,8 @@ class PlayerStatsCard {
 
 @Composable
 private fun PlayerStatsContent(
-    leftDugout: SidebarViewModel,
-    rightDugout: SidebarViewModel,
+    leftDugout: com.jervisffb.ui.viewmodel.SidebarViewModel,
+    rightDugout: com.jervisffb.ui.viewmodel.SidebarViewModel,
     field: FieldViewModel,
 ) {
     Row(

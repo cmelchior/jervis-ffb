@@ -26,7 +26,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("dk.ilios.jervis.fumbblcli.MainCliKt")
+    mainClass.set("com.jervisffb.fumbbl.netcli.MainCliKt")
 }
 
 kotlin {

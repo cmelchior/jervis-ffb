@@ -1,0 +1,49 @@
+package com.jervisffb.engine.commands
+
+import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.model.Ball
+import com.jervisffb.engine.model.BallState
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.utils.assert
+
+class SetBallLocation(val ball: Ball, val location: FieldCoordinate) : Command {
+    private lateinit var originalLocation: FieldCoordinate
+
+    override fun execute(state: Game, controller: GameController) {
+        assert(ball.state != BallState.CARRIED)
+        val rules: Rules = controller.rules
+        this.originalLocation = ball.location
+        ball.location = location
+        if (originalLocation.isOnField(rules)) {
+            state.field[originalLocation].apply {
+                balls.remove(ball)
+                notifyUpdate()
+            }
+        }
+        if (location.isOnField(rules)) {
+            state.field[location].apply {
+                balls.add(ball)
+                notifyUpdate()
+            }
+        }
+    }
+
+    override fun undo(state: Game, controller: GameController) {
+        val rules = controller.rules
+        if (location.isOnField(rules)) {
+            state.field[location].apply {
+                balls.remove(this@SetBallLocation.ball)
+                notifyUpdate()
+            }
+        }
+        if (originalLocation.isOnField(rules)) {
+            state.field[originalLocation].apply {
+                balls.add(this@SetBallLocation.ball)
+                notifyUpdate()
+            }
+        }
+        ball.location = originalLocation
+    }
+}

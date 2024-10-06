@@ -1,6 +1,6 @@
 package dk.ilios.analyzer
 
-import dk.ilios.jervis.fumbbl.net.commands.NetCommand
+import com.jervisffb.fumbbl.net.api.commands.NetCommand
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor

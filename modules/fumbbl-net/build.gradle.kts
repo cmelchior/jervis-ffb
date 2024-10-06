@@ -32,7 +32,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":modules:utils"))
-                implementation(project(":modules:jervis-model"))
+                implementation(project(":modules:jervis-engine"))
                 implementation(kotlin("reflect"))
                 implementation(libs.coroutines)
                 implementation(libs.okio)

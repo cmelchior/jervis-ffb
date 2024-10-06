@@ -1,6 +1,6 @@
 package fumbbl.net.auth
 
-import dk.ilios.jervis.fumbbl.net.auth.FumbblAuth
+import com.jervisffb.fumbbl.net.api.auth.FumbblAuth
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 

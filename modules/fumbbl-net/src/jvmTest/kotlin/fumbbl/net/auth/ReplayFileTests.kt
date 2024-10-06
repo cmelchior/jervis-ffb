@@ -1,12 +1,12 @@
 package fumbbl.net.auth
 
-import dk.ilios.jervis.fumbbl.FumbblFileReplayAdapter
-import dk.ilios.jervis.fumbbl.adapter.FumbblReplayAdapter
-import dk.ilios.jervis.fumbbl.net.commands.ServerCommandReplay
-import dk.ilios.jervis.fumbbl.utils.fromFumbblState
-import dk.ilios.jervis.model.Game
-import dk.ilios.jervis.rules.StandardBB2020Rules
-import dk.ilios.jervis.utils.platformFileSystem
+import com.jervisffb.fumbbl.net.FumbblFileReplayAdapter
+import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandReplay
+import com.jervisffb.fumbbl.net.utils.fromFumbblState
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.utils.platformFileSystem
 import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toPath
 import org.junit.jupiter.api.Test

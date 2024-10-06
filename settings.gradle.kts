@@ -12,7 +12,7 @@ dependencyResolutionManagement {
 
 include(":modules:fumbbl-cli")
 include(":modules:fumbbl-net")
-include(":modules:jervis-model")
+include(":modules:jervis-engine")
 include(":modules:jervis-ui")
 include(":Debug-FantasyFootballClient")
 include(":modules:replay-analyzer")

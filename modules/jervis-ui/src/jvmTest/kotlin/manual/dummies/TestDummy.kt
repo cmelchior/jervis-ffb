@@ -1,14 +1,13 @@
 package manual.dummies
 
-import dk.ilios.jervis.controller.GameController
-import dk.ilios.jervis.rules.StandardBB2020Rules
-import dk.ilios.jervis.ui.GameScreenModel
-import dk.ilios.jervis.ui.Manual
-import dk.ilios.jervis.ui.viewmodel.FieldViewModel
-import dk.ilios.jervis.ui.viewmodel.MenuViewModel
-import dk.ilios.jervis.ui.viewmodel.SidebarViewModel
-import dk.ilios.jervis.ui.viewmodel.UiActionFactory
-import dk.ilios.jervis.utils.createDefaultGameState
+import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.ui.GameScreenModel
+import com.jervisffb.ui.Manual
+import com.jervisffb.ui.viewmodel.FieldViewModel
+import com.jervisffb.ui.viewmodel.MenuViewModel
+import com.jervisffb.ui.viewmodel.UiActionFactory
+import com.jervisffb.engine.utils.createDefaultGameState
 import kotlinx.coroutines.CoroutineScope
 
 object TestDummy {
@@ -25,6 +24,18 @@ object TestDummy {
     val state = createDefaultGameState(StandardBB2020Rules)
     val controller = GameController(StandardBB2020Rules, state)
     val fieldVieModel by lazy { FieldViewModel(controller, uiActionFactory, state.field, gameModel.hoverPlayerFlow) }
-    val leftSidebar by lazy { SidebarViewModel(uiActionFactory, state.homeTeam, gameModel.hoverPlayerFlow) }
-    val rightSidebar by lazy { SidebarViewModel(uiActionFactory, state.awayTeam, gameModel.hoverPlayerFlow) }
+    val leftSidebar by lazy {
+        com.jervisffb.ui.viewmodel.SidebarViewModel(
+            uiActionFactory,
+            state.homeTeam,
+            gameModel.hoverPlayerFlow
+        )
+    }
+    val rightSidebar by lazy {
+        com.jervisffb.ui.viewmodel.SidebarViewModel(
+            uiActionFactory,
+            state.awayTeam,
+            gameModel.hoverPlayerFlow
+        )
+    }
 }

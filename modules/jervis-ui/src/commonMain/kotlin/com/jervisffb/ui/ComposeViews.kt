@@ -1,0 +1,343 @@
+package com.jervisffb.ui
+
+import MultipleSelectUserActionDialog
+import UserActionDialog
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.Divider
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
+import com.jervisffb.engine.actions.BlockTypeSelected
+import com.jervisffb.engine.actions.CalculatedAction
+import com.jervisffb.engine.actions.Cancel
+import com.jervisffb.engine.actions.CoinSideSelected
+import com.jervisffb.engine.actions.CoinTossResult
+import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.DicePoolResultsSelected
+import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.actions.DogoutSelected
+import com.jervisffb.engine.actions.EndAction
+import com.jervisffb.engine.actions.EndSetup
+import com.jervisffb.engine.actions.EndTurn
+import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.InducementSelected
+import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PlayerActionSelected
+import com.jervisffb.engine.actions.PlayerDeselected
+import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.PlayerSubActionSelected
+import com.jervisffb.engine.actions.RandomPlayersSelected
+import com.jervisffb.engine.actions.RerollOptionSelected
+import com.jervisffb.engine.actions.SkillSelected
+import com.jervisffb.engine.actions.Undo
+import com.jervisffb.ui.viewmodel.ActionSelectorViewModel
+import com.jervisffb.ui.viewmodel.CompositeUserInput
+import com.jervisffb.ui.viewmodel.FieldViewModel
+import com.jervisffb.ui.viewmodel.GameStatusViewModel
+import com.jervisffb.ui.viewmodel.LogViewModel
+import com.jervisffb.ui.viewmodel.ReplayViewModel
+import com.jervisffb.ui.viewmodel.UserInput
+import com.jervisffb.ui.viewmodel.WaitingForUserInput
+import com.jervisffb.ui.viewmodel.DialogsViewModel
+import com.jervisffb.ui.viewmodel.DicePoolUserInputDialog
+import com.jervisffb.ui.viewmodel.DiceRollUserInputDialog
+import com.jervisffb.ui.viewmodel.SingleChoiceInputDialog
+import com.jervisffb.ui.viewmodel.UnknownInput
+
+// Theme
+val debugBorder = BorderStroke(2.dp, Color.Red)
+
+data class FumbblButtonColors(
+    private val backgroundColor: Color = Color.Gray,
+    private val contentColor: Color = Color.White,
+    private val disabledBackgroundColor: Color = Color.DarkGray,
+    private val disabledContentColor: Color = Color.White,
+) : ButtonColors {
+    @Composable
+    override fun backgroundColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(if (enabled) backgroundColor else disabledBackgroundColor)
+    }
+
+    @Composable
+    override fun contentColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(if (enabled) contentColor else disabledContentColor)
+    }
+}
+
+// TODO Figure out how to do drop shadows
+@Composable
+fun SectionDivider(modifier: Modifier) {
+    Box(
+        modifier =
+            modifier
+                .padding(4.dp)
+                .height(2.dp)
+                .background(color = Color.White)
+//                .dropShadow(color = Color.Red, offsetX = 2.dp, offsetY = 2.dp, blurRadius = 2.dp)
+
+    )
+}
+
+@Composable
+fun SectionHeader(title: String) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .aspectRatio(152.42f / (452f / 15)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        SectionDivider(modifier = Modifier.weight(1f))
+        Text(
+            text = title,
+            color = Color.White,
+            maxLines = 1,
+            modifier = Modifier.wrapContentSize(),
+            style = LocalTextStyle.current.copy(
+                shadow = Shadow(
+                    color = Color.Black,
+                    offset = Offset(2f, 2f),
+                    blurRadius = 2f
+                )
+            )
+        )
+        SectionDivider(modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun Screen(
+    field: FieldViewModel,
+    leftDugout: com.jervisffb.ui.viewmodel.SidebarViewModel,
+    rightDugout: com.jervisffb.ui.viewmodel.SidebarViewModel,
+    gameStatusController: GameStatusViewModel,
+    replayController: ReplayViewModel,
+    actionSelector: ActionSelectorViewModel,
+    logs: LogViewModel,
+    dialogsViewModel: DialogsViewModel,
+) {
+    Dialogs(dialogsViewModel)
+    val aspectRation = (145f+145f+782f)/690f
+    Row(modifier = Modifier.aspectRatio(aspectRation).fillMaxSize()) {
+        Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
+            Sidebar(leftDugout, Modifier)
+        }
+        Column(modifier = Modifier.weight(782f).align(Alignment.Top)) {
+            Field(field, Modifier.aspectRatio(field.aspectRatio))
+            GameStatus(gameStatusController, modifier = Modifier.aspectRatio(782f/32f).fillMaxSize())
+            // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
+            Row(modifier = Modifier.fillMaxSize()) {
+                LogViewer(logs, modifier = Modifier.weight(1f).fillMaxSize())
+                Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))
+                ActionSelector(actionSelector, modifier = Modifier.weight(1f).fillMaxSize())
+            }
+        }
+        Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
+            Sidebar(rightDugout, Modifier)
+        }
+    }
+}
+
+
+
+@Composable
+fun ReplayController(
+    vm: ReplayViewModel,
+    actionSelector: ActionSelectorViewModel,
+    modifier: Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(color = Color.Red),
+    ) {
+        Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = { vm.enableReplay() }) {
+                Text("Start replay")
+            }
+            Button(onClick = { vm.rewind() }) {
+                Text("Rewind")
+            }
+            Button(onClick = { vm.back() }) {
+                Text("Back")
+            }
+            Button(onClick = { vm.forward() }) {
+                Text("Forward")
+            }
+            Button(onClick = { vm.stopReplay() }) {
+                Text("Stop replay")
+            }
+            Button(onClick = { actionSelector.start() }) {
+                Text("Start Game")
+            }
+        }
+    }
+}
+
+@Composable
+fun Dialogs(vm: DialogsViewModel) {
+    val dialogData: UserInput? by vm.availableActions.collectAsState(null)
+    when (dialogData) {
+        is SingleChoiceInputDialog -> {
+            val dialog = dialogData as SingleChoiceInputDialog
+            UserActionDialog(dialog, vm)
+        }
+        is DiceRollUserInputDialog -> {
+            val dialog = dialogData as DiceRollUserInputDialog
+            MultipleSelectUserActionDialog(dialog, vm)
+        }
+        is DicePoolUserInputDialog -> {
+            val dialog = dialogData as DicePoolUserInputDialog
+            DicePoolSelectorDialog(dialog, vm)
+        }
+        null -> { /* Do nothing */ }
+        else -> TODO("Not supported: $dialogData")
+    }
+}
+
+@Composable
+fun ActionSelector(
+    vm: ActionSelectorViewModel,
+    modifier: Modifier,
+) {
+    val inputs: UserInput? by vm.availableActions.collectAsState(null)
+    Box(modifier = modifier.padding(8.dp)) {
+        Column(
+            modifier =
+                modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            val userInputs: List<UserInput> =
+                remember(inputs) {
+                    when (inputs) {
+                        is CompositeUserInput -> (inputs as CompositeUserInput).inputs
+                        null -> emptyList()
+                        else -> listOf(inputs!!)
+                    }
+                }
+
+            userInputs.forEach { input ->
+                val actions = input.actions
+                when (input) {
+                    is WaitingForUserInput -> {
+                        // Do nothing
+                    }
+                    is UnknownInput -> {
+                        actions.forEach { action: GameAction ->
+                            Button(
+                                modifier = Modifier.padding(0.dp),
+                                contentPadding = PaddingValues(2.dp),
+                                onClick = { vm.actionSelected(action) },
+                            ) {
+                                val text =
+                                    when (action) {
+                                        Confirm -> "Confirm"
+                                        Continue -> "Continue"
+                                        is DieResult -> action.toString()
+                                        DogoutSelected -> "DogoutSelected"
+                                        EndSetup -> "EndSetup"
+                                        EndTurn -> "EndTurn"
+                                        is FieldSquareSelected -> action.toString()
+                                        is PlayerSelected -> "Player[${action.playerId}]"
+                                        is DiceRollResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
+                                        is PlayerActionSelected -> "Action: $action"
+                                        is PlayerDeselected -> "Deselect active player"
+                                        EndAction -> "End Action"
+                                        Cancel -> "Cancel"
+                                        is CoinSideSelected -> "Selected: ${action.side}"
+                                        is CoinTossResult -> "Coin flip: ${action.result}"
+                                        is RandomPlayersSelected -> "Random players: $action"
+                                        is NoRerollSelected -> "No reroll"
+                                        is RerollOptionSelected -> action.option.toString()
+                                        is MoveTypeSelected -> action.moveType.toString()
+                                        Undo -> TODO()
+                                        is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
+                                        is PlayerSubActionSelected -> action.action.toString()
+                                        is SkillSelected -> action.skill.toString()
+                                        is InducementSelected -> action.name
+                                        is BlockTypeSelected -> action.type.toString()
+                                        is CalculatedAction -> TODO("Should only be used in tests")
+                                        is DicePoolResultsSelected -> "Dice pool: $action"
+                                    }
+                                Text(text, fontSize = 10.sp)
+                            }
+                        }
+                    }
+                    else -> TODO("Unsupported type: $actions")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LogViewer(
+    vm: LogViewModel,
+    modifier: Modifier,
+) {
+    val listData by vm.logs.collectAsState(initial = emptyList())
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(listData) {
+        if (listData.isNotEmpty()) {
+            listState.scrollToItem(listData.size - 1)
+        }
+    }
+
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        state = listState
+    ) {
+        items(items = listData, key = { item -> item.hashCode() }) {
+            Text(
+                text = it.message,
+                lineHeight = if (it.message.lines().size > 1) 1.5.em else 1.0.em,
+            )
+        }
+    }
+}

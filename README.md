@@ -45,7 +45,7 @@ Note, this has only been tested on Mac, so things on Windows might be broken.
 A local desktop game client can be started using:
 
 ```shell
-./gradlew :modules:jervis-ui:jvmRun -DmainClass=dk.ilios.jervis.MainKt
+./gradlew :modules:jervis-ui:jvmRun -DmainClass=com.jervisffb.MainKt
 ```
 
 A local WASM client can be started using:
@@ -77,9 +77,10 @@ of the following modules:
   be used sparingly and for testing as it taxes too much if used in bulk. 
 
 - `fumbbl-net`: Network code and classes for communicating with the FUMBBL 
-   server.
+   server as well as adapters for converting a FUMBBL game into a Jervis
+   equivalent.
 
-- `jervis-model`: This contains a full model of a Blood Bowl game and can be 
+- `jervis-engine`: This contains a full model of a Blood Bowl game and can be 
   used to model both the game state and rules. 
 
 - `jervis-ui`: An UI for driving a game of Blood Bowl. It has been largely 

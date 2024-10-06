@@ -67,7 +67,7 @@ But there are other more compelling reasons:
    
 ## How is the rules implemented?
 
-The rules are implemented in `modules/jervis-model`.
+The rules are implemented in `modules/jervis-engine`.
 
 ...
 

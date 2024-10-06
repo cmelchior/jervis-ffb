@@ -1,9 +1,7 @@
 package fumbbl.restapi
 
-import com.jervis.fumbbl.FumbblTeamLoader
-import com.jervis.fumbbl.restapi.Team
-import dk.ilios.jervis.fumbbl.net.auth.getHttpClient
-import dk.ilios.jervis.rules.StandardBB2020Rules
+import com.jervisffb.fumbbl.net.api.auth.getHttpClient
+import com.jervisffb.engine.rules.StandardBB2020Rules
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -22,7 +20,7 @@ class RestApiTest {
                 }
             getHttpClient().use { client: HttpClient ->
                 val jsonText = client.get("https://fumbbl.com/api/team/get/1158751").bodyAsText()
-                val team = json.decodeFromString<Team>(jsonText)
+                val team = json.decodeFromString<com.jervisffb.fumbbl.web.api.Team>(jsonText)
             }
         }
 
@@ -30,7 +28,7 @@ class RestApiTest {
     fun teamLoader() =
         runBlocking<Unit> {
             // Human team
-            val team = FumbblTeamLoader.loadTeam(1187712, StandardBB2020Rules)
+            val team = com.jervisffb.fumbbl.web.FumbblTeamLoader.loadTeam(1187712, StandardBB2020Rules)
             assertEquals(team.name, "Just Human Nothing More")
         }
 }

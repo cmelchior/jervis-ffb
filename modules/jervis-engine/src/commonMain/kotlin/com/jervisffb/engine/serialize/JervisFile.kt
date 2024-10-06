@@ -1,0 +1,34 @@
+package com.jervisffb.engine.serialize
+
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.rules.Rules
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
+
+@Serializable
+data class JervisFile(
+    val metadata: JervisMetaData,
+    val configuration: JervisConfiguration,
+    val game: JervisGameData,
+)
+
+@Serializable
+data class JervisMetaData(
+    val fileFormat: Int = 1,
+)
+
+// Class encapsulating all rules, teams and other game configurations that are user defined.
+@Serializable
+data class JervisConfiguration(
+    val rules: Rules,
+)
+
+/**
+ * Class encapsulating the actual game state and all actions
+ */
+@Serializable
+data class JervisGameData(
+    val homeTeam: JsonElement,
+    val awayTeam: JsonElement,
+    val actions: List<GameAction>,
+)

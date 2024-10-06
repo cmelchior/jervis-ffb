@@ -36,7 +36,7 @@ kotlin {
             dependencies {
                 implementation(project(":modules:utils"))
                 implementation(project(":modules:fumbbl-net"))
-                implementation(project(":modules:jervis-model"))
+                implementation(project(":modules:jervis-engine"))
                 implementation(libs.okio)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.coroutines)

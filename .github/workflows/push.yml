@@ -35,4 +35,4 @@ jobs:
           cache-read-only: false
 
       - name: Run Tests
-        run: ./gradlew :modules:jervis-model:jvmTest
+        run: ./gradlew :modules:jervis-engine:jvmTest
