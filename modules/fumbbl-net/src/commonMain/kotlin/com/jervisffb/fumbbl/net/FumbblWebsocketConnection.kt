@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 /**
  * Class for controlling the websocket connection to FUMBBL.
- * It only controls sending/receiving messages. It is up to users
+ * It only controls sending/receiving messages. It is up to users of this class
  * to know which messages to send and receive.
  */
 class FumbblWebsocketConnection() {

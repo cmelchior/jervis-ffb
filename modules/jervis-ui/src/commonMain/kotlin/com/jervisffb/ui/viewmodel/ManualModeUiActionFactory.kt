@@ -76,6 +76,14 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.reflect.KClass
 
+/**
+ * A variant of [UiActionFactory] that requires manual input from the user.
+ * This works by converting [ActionDescriptor] objects into [UserInput] objects.
+ *
+ * Then UI will then use those objects to determine how to modify the UI so
+ * input can be requested. An example could be enabling click listeners.
+ * This can also modify the UI, .e.g., by showing push directions or dialogs.
+ */
 class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedActions: List<GameAction>) : UiActionFactory(
     model,
 ) {
@@ -122,13 +130,22 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
 
     /**
      * Check if we can respond automatically to an event without having to involve the user.
-     * Some examples:
-     * - During an action and the only choice is EndAction
+     *
+     * Some requirements:
+     * - Any action returned this way should also have an entry in [Feature]
      */
     private fun calculateAutomaticResponse(
         controller: GameController,
         actions: List<ActionDescriptor>,
     ): GameAction? {
+
+        // When reacting to an `Undo` command, all automatic responses are disabled.
+        // If not disabled, UNDO'ing an action might put us in a state that will
+        // automatically move us forward again, which will make it appear as the
+        // UNDO didn't work.
+        if (controller.lastActionWasUndo) {
+            return null
+        }
 
         if (model.menuViewModel.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) {
             if (actions.filterIsInstance<SelectNoReroll>().count { it.rollSuccessful == true} > 0) {

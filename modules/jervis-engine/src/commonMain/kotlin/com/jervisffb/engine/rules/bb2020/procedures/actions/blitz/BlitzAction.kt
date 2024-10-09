@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.blitz
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.DeselectPlayer
@@ -34,6 +33,8 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.isSkillAvailable
+import com.jervisffb.engine.rules.BlockType
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
@@ -45,11 +46,10 @@ import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.rules.BlockType
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import compositeCommandOf
 import kotlinx.serialization.Serializable
 
 data class BlitzContext(
@@ -336,7 +336,12 @@ object BlitzAction : Procedure() {
                 .getSurroundingCoordinates(rules, distance = 1)
                 .contains(context.defender.coordinates)
 
-            return if (hasBlocked && hasFrenzy && isNextToTarget) {
+            return if (state.isTurnOver()) {
+                return compositeCommandOf(
+                    removeContextCommand,
+                    ExitProcedure()
+                )
+            } else if (hasBlocked && hasFrenzy && isNextToTarget) {
                 compositeCommandOf(
                     removeContextCommand,
                     SetContext(context.copy(hasBlocked = hasBlocked)),

@@ -117,13 +117,19 @@ interpreted.
     to play during this drive" as players on both the pitch and in the Reserves box. It is unclear
     if players in the Dogout are covered by that phrase after you placed players on the field.
 
+24. Can you reroll a roll with a team reroll if the pro roll failed? 
+    - FUMBBL just fixed this so you can, but unclear where that interpretation came from.
+    - "Once this player has attempted to use this skill, they may not use a re-roll from any other source to re-roll this one die"
+      seems pretty clear to me? :thinking:
+    - https://www.reddit.com/r/bloodbowl/comments/193k4g9/pro_question_bb_2020/
+
 
 # Differences compared to the rules as written
 
 1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 
    this choice always come after the roll. There is no valid reason for asking it before, and asking
    both before and after would create a lot of noise. The exception being Diving Tackle, where 
-   there are valid reasons for choosing it both before and after.
+   there could b reasons for choosing it both before and after.
 
 2. (Page 37) Rolling for the weather should be done by each coach rolling one die. This doesn't
    matter in this case, so both dice are just rolled as a single step by the Home coach.
@@ -131,7 +137,7 @@ interpreted.
 3. (Page 38) The Prayers to Nuffle Table
    It is unclear what happens if you roll a result that is not a duplicate, but cannot be
    applied, e.g., because the entire team has Loner. For now, Jervis just treat the roll as 
-   wasted. Mostly because it is easier to implement and the chance of this happening 
+   wasted. Mostly because it is easier to implement, and the chance of this happening 
    is virtually zero.
 
 4. (Page 42) Order of events in End-of-Turn is not well-defined, e.g., it is unclear if Special Play 

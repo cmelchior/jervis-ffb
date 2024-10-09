@@ -44,7 +44,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
 
         Menu ("Automated Actions", mnemonic = 'A') {
             CheckboxItem(
-                text = "Do not reroll successful actions",
+                text = "Keep successful dice rolls",
                 checked = rerollSuccessfulActions,
                 onCheckedChange = {
                     rerollSuccessfulActions = !rerollSuccessfulActions
