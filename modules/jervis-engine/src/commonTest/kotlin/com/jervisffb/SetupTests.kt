@@ -2,7 +2,7 @@ package com.jervisffb
 
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player

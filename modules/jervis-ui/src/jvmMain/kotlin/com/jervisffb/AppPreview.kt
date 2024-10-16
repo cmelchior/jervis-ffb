@@ -4,7 +4,7 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.ui.App
 import com.jervisffb.ui.viewmodel.MenuViewModel

@@ -10,8 +10,8 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectDicePoolResult
-import com.jervisffb.engine.controller.ActionsRequest
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.ActionsRequest
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext

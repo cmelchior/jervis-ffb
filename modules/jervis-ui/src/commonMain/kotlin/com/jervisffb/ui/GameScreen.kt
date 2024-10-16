@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.controller.ActionsRequest
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.ActionsRequest
+import com.jervisffb.engine.GameController
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.rules.StandardBB2020Rules

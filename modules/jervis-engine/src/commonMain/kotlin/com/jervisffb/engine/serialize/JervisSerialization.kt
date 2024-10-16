@@ -28,7 +28,7 @@ import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game

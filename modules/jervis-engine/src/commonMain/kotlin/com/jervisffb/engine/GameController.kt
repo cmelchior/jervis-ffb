@@ -1,4 +1,4 @@
-package com.jervisffb.engine.controller
+package com.jervisffb.engine
 
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.CalculatedAction

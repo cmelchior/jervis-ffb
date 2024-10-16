@@ -1,6 +1,6 @@
 package manual.dummies
 
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.ui.GameScreenModel
 import com.jervisffb.ui.Manual

@@ -1,8 +1,8 @@
 package com.jervisffb.ui.viewmodel
 
-import com.jervisffb.engine.controller.AddEntry
-import com.jervisffb.engine.controller.GameController
-import com.jervisffb.engine.controller.RemoveEntry
+import com.jervisffb.engine.AddEntry
+import com.jervisffb.engine.GameController
+import com.jervisffb.engine.RemoveEntry
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
 import kotlinx.coroutines.flow.Flow

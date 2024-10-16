@@ -60,8 +60,8 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.SelectSkill
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.TossCoin
-import com.jervisffb.engine.controller.ActionsRequest
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.ActionsRequest
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.locations.FieldCoordinate

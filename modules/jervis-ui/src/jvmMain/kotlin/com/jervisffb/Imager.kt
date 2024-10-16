@@ -5,7 +5,7 @@ import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.ui.App

@@ -1,5 +1,6 @@
 package com.jervisffb.engine.utils
 
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
@@ -61,7 +62,6 @@ import com.jervisffb.engine.actions.TossCoin
 import com.jervisffb.engine.commands.ResetAvailableTeamRerolls
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Coin

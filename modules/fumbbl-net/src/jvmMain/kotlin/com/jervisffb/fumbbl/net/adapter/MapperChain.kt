@@ -1,6 +1,6 @@
 package com.jervisffb.fumbbl.net.adapter
 
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.fumbbl.net.ModelChangeProcessor

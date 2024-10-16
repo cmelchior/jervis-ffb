@@ -3,7 +3,7 @@ package com.jervisffb.ui.viewmodel
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.context.getContext

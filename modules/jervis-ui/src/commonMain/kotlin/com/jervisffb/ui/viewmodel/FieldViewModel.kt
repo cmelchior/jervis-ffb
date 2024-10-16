@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.FieldSquare

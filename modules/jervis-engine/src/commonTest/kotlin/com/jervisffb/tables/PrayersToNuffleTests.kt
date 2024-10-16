@@ -10,7 +10,7 @@ import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.activatePlayer
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.defaultFanFactor
 import com.jervisffb.defaultInducements
 import com.jervisffb.defaultJourneyMen

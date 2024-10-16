@@ -3,7 +3,7 @@ package com.jervisffb.ui.viewmodel
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team

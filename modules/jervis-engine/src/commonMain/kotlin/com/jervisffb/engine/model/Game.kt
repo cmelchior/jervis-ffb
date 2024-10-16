@@ -1,8 +1,8 @@
 package com.jervisffb.engine.model
 
-import com.jervisffb.engine.controller.AddEntry
-import com.jervisffb.engine.controller.ListEvent
-import com.jervisffb.engine.controller.RemoveEntry
+import com.jervisffb.engine.AddEntry
+import com.jervisffb.engine.ListEvent
+import com.jervisffb.engine.RemoveEntry
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.ProcedureStack

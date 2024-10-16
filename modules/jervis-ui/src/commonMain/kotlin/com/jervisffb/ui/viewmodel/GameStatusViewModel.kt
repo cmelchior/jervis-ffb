@@ -1,6 +1,6 @@
 package com.jervisffb.ui.viewmodel
 
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

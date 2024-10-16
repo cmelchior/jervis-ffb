@@ -15,7 +15,7 @@ import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
