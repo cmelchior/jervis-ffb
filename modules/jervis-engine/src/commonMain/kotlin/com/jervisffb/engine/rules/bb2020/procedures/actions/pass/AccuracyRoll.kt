@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -20,6 +19,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.UseRerollContext
@@ -27,15 +28,16 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.AccuracyModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.tables.Range
 import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
+import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Implement the Accuracy Roll as described on page 49 in the rulebook.

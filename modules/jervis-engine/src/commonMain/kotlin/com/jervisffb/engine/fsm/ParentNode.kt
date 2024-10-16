@@ -1,6 +1,6 @@
 package com.jervisffb.engine.fsm
 
-import compositeCommandOf
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.EnterProcedure
 import com.jervisffb.engine.commands.fsm.ChangeParentNodeState

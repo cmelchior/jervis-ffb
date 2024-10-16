@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import buildCompositeCommand
-import compositeCommandOf
+import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.GameAction

@@ -9,7 +9,7 @@ class ProcedureState(val procedure: Procedure, initialNode: Node) {
     private var activeNode: Node = initialNode
 
     // Track state related to ParentNode. It should only be allowed to modify this
-    // if `currentNode` is a ParentNode
+    // if `activeNode` is a ParentNode
     private var parentNodeState: ParentNode.State? = null
 
     private constructor(
@@ -27,6 +27,15 @@ class ProcedureState(val procedure: Procedure, initialNode: Node) {
     fun getParentNodeState(): ParentNode.State {
         if (activeNode !is ParentNode) throw IllegalStateException("Current state is not a ParentNode: $activeNode")
         return parentNodeState!!
+    }
+
+    /**
+     * Sets the state of the current active parent.
+     * If the current node is not a [ParentNode], an [IllegalStateException] is thrown.
+     */
+    fun setParentNodeState(nextState: ParentNode.State?) {
+        if (activeNode !is ParentNode) throw IllegalStateException("Current state is not a ParentNode: $activeNode")
+        parentNodeState = nextState
     }
 
     /**
@@ -55,10 +64,5 @@ class ProcedureState(val procedure: Procedure, initialNode: Node) {
 
     override fun toString(): String {
          return "${name()}[${activeNode.name()}]"
-    }
-
-    fun setParentNodeState(nextState: ParentNode.State?) {
-        if (activeNode !is ParentNode) throw IllegalStateException("Current state is not a ParentNode: $activeNode")
-        parentNodeState = nextState
     }
 }

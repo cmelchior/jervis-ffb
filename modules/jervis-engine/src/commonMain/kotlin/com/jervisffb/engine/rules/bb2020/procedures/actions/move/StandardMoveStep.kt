@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -20,6 +19,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -27,10 +27,11 @@ import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Handle a player moving a single step using a normal move.

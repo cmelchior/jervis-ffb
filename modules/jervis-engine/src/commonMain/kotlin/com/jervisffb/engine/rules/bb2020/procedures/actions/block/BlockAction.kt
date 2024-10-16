@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.DeselectPlayer
@@ -19,6 +18,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
@@ -27,13 +27,14 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
-import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.commands.compositeCommandOf
 import kotlinx.serialization.Serializable
 
 /**

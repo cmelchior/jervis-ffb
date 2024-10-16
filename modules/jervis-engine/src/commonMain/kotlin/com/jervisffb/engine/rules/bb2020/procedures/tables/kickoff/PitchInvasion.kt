@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -20,6 +19,8 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -31,6 +32,7 @@ import com.jervisffb.engine.reports.ReportPitchInvasionRoll
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.commands.compositeCommandOf
 
 data class PitchInvasionContext(
     val kickingRoll: D6Result,

@@ -1,7 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import buildCompositeCommand
-import compositeCommandOf
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -24,6 +23,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ProcedureContext
@@ -34,6 +34,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
+import com.jervisffb.engine.commands.compositeCommandOf
 
 data class BoneHeadRollContext(
     val player: Player,

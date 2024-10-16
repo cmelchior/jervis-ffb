@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.D3Result
@@ -23,6 +22,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
@@ -33,6 +34,7 @@ import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.commands.compositeCommandOf
 
 data class SolidDefenseContext(
     val roll: D3Result,

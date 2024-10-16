@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import compositeCommandOf
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
@@ -25,6 +25,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver

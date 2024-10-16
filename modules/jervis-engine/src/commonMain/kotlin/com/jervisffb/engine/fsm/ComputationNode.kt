@@ -9,8 +9,10 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 
 /**
- * Helper node type that makes it easier to create "transition" nodes, that just
- * run computations but doesn't require user input.
+ * Helper node type that makes it easier to create "transition" nodes. These
+ * nodes are defined as only accepting a [Continue] action and are generally
+ * just used to organize the [Procedure]s in a better way. This means they will
+ * just run some computation and automatically continue after that.
  */
 abstract class ComputationNode : ActionNode() {
     override fun actionOwner(state: Game, rules: Rules) = null

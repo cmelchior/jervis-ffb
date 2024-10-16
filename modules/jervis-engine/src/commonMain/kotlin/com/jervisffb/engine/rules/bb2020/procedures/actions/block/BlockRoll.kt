@@ -1,6 +1,6 @@
 //package com.jervisffb.rules.bb2020.procedures.actions.block
 //
-//import compositeCommandOf
+//import com.jervisffb.engine.commands.compositeCommandOf
 //import com.jervisffb.actions.ActionDescriptor
 //import com.jervisffb.actions.Continue
 //import com.jervisffb.actions.ContinueWhenReady

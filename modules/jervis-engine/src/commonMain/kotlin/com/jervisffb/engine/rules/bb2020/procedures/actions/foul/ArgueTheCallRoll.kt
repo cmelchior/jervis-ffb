@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.foul
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -18,6 +17,7 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
@@ -28,6 +28,7 @@ import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallResult
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.commands.compositeCommandOf
 
 enum class ArgueTheCallRollModifier(
     override val modifier: Int,

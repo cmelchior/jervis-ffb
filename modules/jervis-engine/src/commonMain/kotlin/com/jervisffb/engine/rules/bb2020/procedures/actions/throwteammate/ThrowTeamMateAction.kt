@@ -1,6 +1,6 @@
 package com.jervisffb.rules.bb2020.procedures.actions.handoff
 
-import compositeCommandOf
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady

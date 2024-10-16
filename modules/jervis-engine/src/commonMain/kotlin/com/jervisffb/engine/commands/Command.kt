@@ -2,7 +2,7 @@ package com.jervisffb.engine.commands
 
 import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
-import compositeCommandOf
+import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * The cain interface for manipulating [Game] state. All changes to game state

@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -13,10 +12,12 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Procedure for handling the Kick-Off Event: "HighKick" as described on page 41

@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.prayers
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -20,21 +19,23 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.reports.ReportGameProgress
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
-import com.jervisffb.engine.reports.ReportDiceRoll
-import com.jervisffb.engine.reports.ReportGameProgress
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.commands.compositeCommandOf
 
 data class ThrowARockContext(
     val stallingPlayers: List<Player>,

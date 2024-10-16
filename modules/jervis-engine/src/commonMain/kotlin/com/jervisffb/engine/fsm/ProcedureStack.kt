@@ -1,34 +1,35 @@
 package com.jervisffb.engine.fsm
 
 import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.commands.Command
 
 /**
- * This class represents a dynamic Finite-State-Machine (FSM) that makes it possible to expand nodes dynamically,
- * i.e., you do not need to define the entire FSM from the start, but it can be done as you navigate the state
- * machine.
+ * This class is the main way to organize the rules of Blood Bowl, or more correctly the "flow" of the game.
  *
- * Conceptually this is modeled as a stack of [Procedure]s, where you can add extra layers
- * through the use of [ParentNode]s that will put a new [Procedure] on the stack. Each layer remembers their
- * current node, so when you pop a [Procedure], the stack remembers where to continue from in the parent layer.
+ * The rules as implemented using a dynamic Finite-State-Machine (FSM). This makes it possible to expand nodes
+ * dynamically, i.e., you do not need to define the entire FSM from the start, but it can be done as you navigate
+ * the state machine.
  *
- * --------------
- *
- * Note, both [ParentNode] and [Procedure] has a lifecycle attached. See these classes for mor details.
+ * Conceptually this is modeled as a stack of [Procedure]s. Each procedure is its own FSM where "state"
+ * is encapsulated in a [Node]. New procedures are pushed to the stack through the use of [ParentNode]s. Each
+ * procedure remembers their current node, so when you pop a [Procedure], the stack can automatically resume in the
+ * parent procedure.
  *
  * Navigating the FSM is done through the use of the [ActionDescriptor], [GameAction] and [Command] classes.
  *
- * - [ActionDescriptor]: Describes the valid actions that a given [Node] will accept
- * - [GameAction]: Are the actual action the [Node] is asked to handle
- * - [Command]: Wraps the intent of modifying the FSM or some other state.
+ * - [ActionDescriptor]: Describes the valid actions that a given [Node] will accept.
+ * - [GameAction]: Are the actual action the [Node] is asked to handle.
+ * - [Command]: Wraps the modification of the FSM or some other state.
  *
  * Currently, three node types are supported:
+ *
  * - [ActionNode]: A node type that requires user input.
  * - [ParentNode]: A node type that will load a new [Procedure] and put it on the stack.
- * - [ComputationNode]: A subtype of [ActionNode] that only accept a `Continue` action
+ * - [ComputationNode]: A subtype of [ActionNode] that only accept a [Continue] action.
  *
- * But new node types can be introduced by subclassing the [Node] interface.
+ * New node types can be introduced by subclassing the [Node] interface.
  */
 class ProcedureStack {
 

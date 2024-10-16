@@ -1,5 +1,4 @@
-import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.CompositeCommand
+package com.jervisffb.engine.commands
 
 /**
  * Creates a [CompositeCommand] from a known list of sub commands. `null` commands

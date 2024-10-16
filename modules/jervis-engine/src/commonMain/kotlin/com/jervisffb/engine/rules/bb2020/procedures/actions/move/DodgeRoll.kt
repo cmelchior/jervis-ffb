@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -29,6 +28,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
@@ -43,11 +43,11 @@ import com.jervisffb.engine.model.modifiers.BreakTackleModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.DodgeRollModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
-import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportDodgeResult
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.skills.DivingTackle
@@ -58,6 +58,7 @@ import com.jervisffb.engine.rules.bb2020.skills.TwoHeads
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
+import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Handle a player making a dodge roll.

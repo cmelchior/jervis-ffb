@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
@@ -12,6 +11,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.reports.ReportDiceRoll
@@ -19,6 +19,7 @@ import com.jervisffb.engine.reports.ReportWeatherResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.tables.Weather
+import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * This procedure controls rolling for the weather as described on

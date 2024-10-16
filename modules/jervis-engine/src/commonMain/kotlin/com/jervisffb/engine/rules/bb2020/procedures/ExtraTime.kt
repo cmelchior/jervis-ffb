@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import compositeCommandOf
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetActiveTeam
 import com.jervisffb.engine.commands.SetDrive

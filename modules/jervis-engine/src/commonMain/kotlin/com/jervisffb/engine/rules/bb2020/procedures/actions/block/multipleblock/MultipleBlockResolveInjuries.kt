@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -15,16 +14,18 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.PatchUpPlayer
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Procedure responsible for resolving the "Injury Pool" for a Multiple Block.

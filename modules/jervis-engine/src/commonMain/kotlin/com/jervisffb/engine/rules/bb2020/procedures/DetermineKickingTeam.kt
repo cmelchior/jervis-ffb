@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -18,6 +17,7 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -26,6 +26,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportKickingTeamResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.commands.compositeCommandOf
 
 data class CoinTossContext(
     val sideSelected: Coin,

@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D6Result
@@ -17,6 +16,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkDiceRoll
+import com.jervisffb.engine.fsm.checkDiceRollList
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -28,6 +29,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.tables.Direction
 import com.jervisffb.engine.utils.assert
 import com.jervisffb.engine.utils.sum
+import com.jervisffb.engine.commands.compositeCommandOf
 
 data class ThrowInContext(
     val ball: Ball,

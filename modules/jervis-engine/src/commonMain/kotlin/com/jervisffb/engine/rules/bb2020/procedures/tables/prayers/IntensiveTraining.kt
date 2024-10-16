@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.prayers
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PlayerSelected
@@ -15,6 +14,8 @@ import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -23,12 +24,13 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Loner
+import com.jervisffb.engine.commands.compositeCommandOf
 
 data class IntensiveTrainingContext(
     val player: Player,

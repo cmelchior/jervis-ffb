@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.prayers
 
-import compositeCommandOf
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.SetContext

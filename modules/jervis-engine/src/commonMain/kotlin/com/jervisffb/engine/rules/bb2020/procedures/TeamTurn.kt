@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.EndTurnWhenReady
@@ -24,21 +23,23 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.inducements.Timing
-import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducementContext
-import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducements
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.ResolveThrowARock
 import com.jervisffb.engine.reports.ReportEndingTurn
 import com.jervisffb.engine.reports.ReportStartingTurn
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducementContext
+import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducements
+import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.ResolveThrowARock
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Procedure for controlling the active teams turn.

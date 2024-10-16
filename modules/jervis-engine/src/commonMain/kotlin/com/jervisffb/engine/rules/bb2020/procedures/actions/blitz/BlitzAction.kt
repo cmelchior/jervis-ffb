@@ -24,6 +24,7 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -49,7 +50,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryM
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import compositeCommandOf
+import com.jervisffb.engine.commands.compositeCommandOf
 import kotlinx.serialization.Serializable
 
 data class BlitzContext(

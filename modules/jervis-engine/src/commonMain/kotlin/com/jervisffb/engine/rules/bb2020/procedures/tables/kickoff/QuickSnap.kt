@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
@@ -21,18 +20,21 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquare
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquareContext
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportQuickSnapResult
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquare
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquareContext
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
+import com.jervisffb.engine.commands.compositeCommandOf
 
 data class QuickSnapContext(
     val roll: D3Result,

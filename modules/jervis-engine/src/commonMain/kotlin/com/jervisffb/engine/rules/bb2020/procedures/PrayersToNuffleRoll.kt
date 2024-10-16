@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.actions.Dice
@@ -16,6 +15,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
@@ -24,6 +24,7 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
+import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Roll on the Prayers to Nuffle table as many times as defined in [PrayersToNuffleRollContext].
