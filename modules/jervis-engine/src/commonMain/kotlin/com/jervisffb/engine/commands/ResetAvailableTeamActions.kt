@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.PlayerSpecialActionType
@@ -26,7 +25,6 @@ class ResetAvailableTeamActions(
 
     override fun execute(
         state: Game,
-        controller: GameController,
     ) {
         originalMoveActions = team.turnData.availableStandardActions[PlayerStandardActionType.MOVE]!!
         originalPassActions = team.turnData.availableStandardActions[PlayerStandardActionType.PASS]!!
@@ -50,7 +48,6 @@ class ResetAvailableTeamActions(
 
     override fun undo(
         state: Game,
-        controller: GameController,
     ) {
         team.turnData.let {
             it.moveActions = originalMoveActions

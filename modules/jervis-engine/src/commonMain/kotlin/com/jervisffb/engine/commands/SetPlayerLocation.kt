@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -10,7 +9,7 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
     private lateinit var originalPlayerLocation: Location
     private var originalPlayerOnField: Player? = null
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(state: Game) {
         this.originalPlayerLocation = player.location
         if (originalPlayerLocation is FieldCoordinate) {
             val currentLocation = player.location as FieldCoordinate
@@ -55,7 +54,7 @@ class SetPlayerLocation(private val player: Player, val location: Location) : Co
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(state: Game) {
         if (location is FieldCoordinate) {
             state.field[location].apply {
                 player = null

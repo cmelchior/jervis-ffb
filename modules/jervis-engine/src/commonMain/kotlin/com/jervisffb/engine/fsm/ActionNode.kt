@@ -38,7 +38,7 @@ abstract class ActionNode : Node {
     abstract fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor>
 
     /**
-     * Calculate all changes that will happen as a consequence of applying a specific
+     * Calculate and return all changes that should happen as a consequence of applying a specific
      * [GameAction] to this node.
      *
      * Warning: It is up to implementers of this method to also modify the [Procedure] state in order

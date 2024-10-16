@@ -4,15 +4,15 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.controller.GameController
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
-import com.jervisffb.ui.GameScreenModel
 import com.jervisffb.engine.utils.createRandomAction
+import com.jervisffb.ui.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
@@ -24,7 +24,7 @@ class RandomModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
         val start = Clock.System.now()
         controller.startManualMode()
         emitToField(WaitingForUserInput)
-        while (!controller.stack.isEmpty()) {
+        while (!controller.state.stack.isEmpty()) {
             val request = controller.getAvailableActions()
             if (!useManualAutomatedActions(controller)) {
                 val selectedAction = createRandomAction(controller.state, request.actions)
@@ -36,7 +36,7 @@ class RandomModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
     }
 
     private suspend fun useManualAutomatedActions(controller: GameController): Boolean {
-        if (controller.stack.peepOrNull()?.procedure == SetupTeam && controller.stack.peepOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+        if (controller.state.stack.peepOrNull()?.procedure == SetupTeam && controller.state.stack.peepOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
             val context = controller.state.getContext<SetupTeamContext>()
             if (context.team.isHomeTeam()) {
                 handleManualHomeKickingSetup(controller)

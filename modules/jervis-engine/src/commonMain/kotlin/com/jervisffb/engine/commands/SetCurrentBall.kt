@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -18,7 +17,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 class SetCurrentBall(private val ball: Ball?) : Command {
     private var originalValue: Ball? = null
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(state: Game) {
         originalValue = state.currentBallReference
         if (originalValue != null && ball != null) {
             INVALID_GAME_STATE("Attempting to override an already existing current ball")
@@ -27,7 +26,7 @@ class SetCurrentBall(private val ball: Ball?) : Command {
         // No need to update state here since this is just an internal optimization.
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(state: Game) {
         state.currentBallReference = originalValue
         // No need to update state here since this is just an internal optimization.
     }

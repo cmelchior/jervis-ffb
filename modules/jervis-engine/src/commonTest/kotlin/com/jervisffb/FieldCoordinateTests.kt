@@ -33,6 +33,6 @@ fun getDefaultTestSetup(rules: Rules): Game {
     val p1 = team1
     val p2 = team1
     val field = Field.createForRuleset(rules)
-    return Game(p1, p2, field)
+    return Game(rules, p1, p2, field)
 }
 

@@ -32,6 +32,6 @@ class LogViewModel(val controller: GameController) {
         }
 
     init {
-        logsCache.addAll(controller.logs)
+        logsCache.addAll(controller.state.logs)
     }
 }

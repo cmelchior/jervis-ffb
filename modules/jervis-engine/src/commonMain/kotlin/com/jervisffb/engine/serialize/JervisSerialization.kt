@@ -175,7 +175,7 @@ object JervisSerialization {
         val awayTeam = jsonFormat.decodeFromJsonElement<Team>(gameData.game.awayTeam)
         awayTeam.noToPlayer.values.forEach { it.team = awayTeam }
         awayTeam.notifyDogoutChange()
-        val state = Game(homeTeam, awayTeam, Field.createForRuleset(rules))
+        val state = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
         val controller = GameController(rules, state)
         return Pair(controller, remapActionRefs(gameData.game.actions, state))
     }

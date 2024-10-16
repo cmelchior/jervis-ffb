@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 
@@ -10,7 +9,7 @@ import com.jervisffb.engine.model.Team
 class ResetAvailableTeamRerolls(private val team: Team) : Command {
     private var originalUsed = mutableListOf<Int>() // Track indexes modified
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(state: Game) {
         team.rerolls.forEachIndexed { i, reroll ->
             if (reroll.rerollUsed) {
                 originalUsed.add(i)
@@ -19,7 +18,7 @@ class ResetAvailableTeamRerolls(private val team: Team) : Command {
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(state: Game) {
         originalUsed.forEach { i ->
             team.rerolls[i].rerollUsed = true
         }

@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -20,7 +19,7 @@ class SetPlayerState(
     private lateinit var originalState: PlayerState
     private var originalHasTackleZones: Boolean = false
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(state: Game) {
         this.originalState = player.state
         this.originalHasTackleZones = player.hasTackleZones
         player.apply {
@@ -32,7 +31,7 @@ class SetPlayerState(
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(state: Game) {
         player.apply {
             if (this@SetPlayerState.hasTackleZones != null) {
                 this.hasTackleZones = originalHasTackleZones

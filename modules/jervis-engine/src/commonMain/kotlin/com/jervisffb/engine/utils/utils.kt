@@ -62,7 +62,6 @@ import com.jervisffb.engine.commands.ResetAvailableTeamRerolls
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.controller.GameController
-import com.jervisffb.engine.rules.bb2020.skills.SideStep
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Coin
@@ -76,17 +75,18 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
-import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.rules.BB2020Rules
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
+import com.jervisffb.engine.rules.bb2020.roster.HumanTeam
+import com.jervisffb.engine.rules.bb2020.roster.LizardmenTeam
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
+import com.jervisffb.engine.rules.bb2020.skills.SideStep
 import com.jervisffb.engine.rules.bb2020.skills.Skill
-import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.rules.bb2020.roster.HumanTeam
-import com.jervisffb.engine.rules.bb2020.roster.LizardmenTeam
 import com.jervisffb.engine.teamBuilder
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -276,13 +276,13 @@ fun setupTeamsOnField(controller: GameController) {
     }
 
     (homeCommands + awayCommands).forEach { command ->
-        command.execute(controller.state, controller)
+        command.execute(controller.state)
     }
 
     // Also enable Team rerolls
     controller.state.activeTeam = controller.state.homeTeam
-    ResetAvailableTeamRerolls(controller.state.homeTeam).execute(controller.state, controller)
-    ResetAvailableTeamRerolls(controller.state.awayTeam).execute(controller.state, controller)
+    ResetAvailableTeamRerolls(controller.state.homeTeam).execute(controller.state)
+    ResetAvailableTeamRerolls(controller.state.awayTeam).execute(controller.state)
 }
 
 fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = humanTeamAway()): Game {
@@ -308,7 +308,7 @@ fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = humanTeamAway())
             teamValue = 1_000_000
         }
     val field = Field.createForRuleset(rules)
-    return Game(team1, awayTeam, field)
+    return Game(rules, team1, awayTeam, field)
 }
 
 /**
@@ -322,7 +322,7 @@ fun createStartingTestSetup(state: Game) {
         fieldCoordinate: FieldCoordinate,
     ) {
         player?.let {
-            SetPlayerLocation(it, fieldCoordinate).execute(state, GameController(StandardBB2020Rules, state))
+            SetPlayerLocation(it, fieldCoordinate).execute(state)
             SetPlayerState(it, PlayerState.STANDING)
         } ?: error("")
     }

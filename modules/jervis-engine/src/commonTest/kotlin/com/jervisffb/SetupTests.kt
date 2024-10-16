@@ -228,7 +228,7 @@ class SetupTests {
     }
 
     private fun moveTo(player: Player, x: Int, y: Int) {
-        SetPlayerState(player, PlayerState.STANDING).execute(state, controller)
-        SetPlayerLocation(player, FieldCoordinate(x, y)).execute(state, controller)
+        SetPlayerState(player, PlayerState.STANDING).execute(state)
+        SetPlayerLocation(player, FieldCoordinate(x, y)).execute(state)
     }
 }

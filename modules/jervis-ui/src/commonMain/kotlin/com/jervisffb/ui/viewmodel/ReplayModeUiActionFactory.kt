@@ -17,13 +17,13 @@ class ReplayModeUiActionFactory(model: GameScreenModel) : UiActionFactory(model)
             val controller = model.controller
             emitToField(WaitingForUserInput) // Init flows
             controller.startManualMode()
-            while (!controller.stack.isEmpty()) {
+            while (!controller.state.stack.isEmpty()) {
                 if (replayCommands != null && index <= replayCommands.size) {
                     val commandFromReplay = replayCommands[index]
-                    if (commandFromReplay !is OptionalJervisAction && commandFromReplay.expectedNode != controller.stack.currentNode()) {
+                    if (commandFromReplay !is OptionalJervisAction && commandFromReplay.expectedNode != controller.state.stack.currentNode()) {
                         throw IllegalStateException(
                             """
-                            Current node: ${controller.stack.currentNode()::class.qualifiedName}
+                            Current node: ${controller.state.stack.currentNode()::class.qualifiedName}
                             Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
                             Action: ${
                                 when (commandFromReplay) {

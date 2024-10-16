@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.inducements.Apothecary
@@ -12,13 +11,13 @@ class SetApothecaryUsed(
 ) : Command {
     private var originalValue: Boolean = false
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(state: Game) {
         originalValue = apothecary.used
         apothecary.used = used
         team.notifyUpdate()
    }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(state: Game) {
         apothecary.used = originalValue
         team.notifyUpdate()
     }

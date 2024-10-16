@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
@@ -11,9 +10,9 @@ import com.jervisffb.engine.utils.assert
 class SetBallLocation(val ball: Ball, val location: FieldCoordinate) : Command {
     private lateinit var originalLocation: FieldCoordinate
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(state: Game) {
         assert(ball.state != BallState.CARRIED)
-        val rules: Rules = controller.rules
+        val rules: Rules = state.rules
         this.originalLocation = ball.location
         ball.location = location
         if (originalLocation.isOnField(rules)) {
@@ -30,8 +29,8 @@ class SetBallLocation(val ball: Ball, val location: FieldCoordinate) : Command {
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
-        val rules = controller.rules
+    override fun undo(state: Game) {
+        val rules = state.rules
         if (location.isOnField(rules)) {
             state.field[location].apply {
                 balls.remove(this@SetBallLocation.ball)

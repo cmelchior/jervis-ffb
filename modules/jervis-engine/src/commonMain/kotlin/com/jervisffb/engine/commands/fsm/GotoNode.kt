@@ -1,7 +1,6 @@
 package com.jervisffb.engine.commands.fsm
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.model.Game
@@ -15,29 +14,29 @@ class GotoNode(private val nextNode: Node) : Command {
     private lateinit var originalNode: Node
     private lateinit var originalParentState: ParentNode.State
 
-    override fun execute(state: Game, controller: GameController) {
-        val currentProcedure = controller.currentProcedure() ?: INVALID_GAME_STATE("No procedure is running.")
+    override fun execute(state: Game) {
+        val currentProcedure = state.currentProcedure() ?: INVALID_GAME_STATE("No procedure is running.")
         logEntry = SimpleLogEntry("Transition to: ${currentProcedure.name()}[${nextNode.name()}]", LogCategory.STATE_MACHINE)
-        controller.addLog(logEntry)
+        state.addLog(logEntry)
         originalNode = currentProcedure.currentNode()
         if (originalNode is ParentNode) {
             originalParentState = currentProcedure.getParentNodeState()
         }
-        controller.setCurrentNode(nextNode)
+        state.setCurrentNode(nextNode)
         if (nextNode is ParentNode) {
             currentProcedure.setParentNodeState(ParentNode.State.ENTERING)
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
-        val currentProcedure = controller.currentProcedure()!!
+    override fun undo(state: Game) {
+        val currentProcedure = state.currentProcedure()!!
         if (nextNode is ParentNode) {
             currentProcedure.setParentNodeState(null)
         }
-        controller.setCurrentNode(originalNode)
+        state.setCurrentNode(originalNode)
         if (originalNode is ParentNode) {
             currentProcedure.setParentNodeState(originalParentState)
         }
-        controller.removeLog(logEntry)
+        state.removeLog(logEntry)
     }
 }

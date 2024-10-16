@@ -1,12 +1,12 @@
 package com.jervisffb.fumbbl.net.adapter
 
+import com.jervisffb.engine.controller.GameController
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.fumbbl.net.ModelChangeProcessor
 import com.jervisffb.fumbbl.net.adapter.impl.AbortActionMapper
 import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.controller.GameController
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import org.reflections.Reflections
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
@@ -69,7 +69,7 @@ actual class MapperChain actual constructor(jervisGame: Game, fumbblGame: Fumbbl
                             val errorMessage = """
                                 Processing CommandNr ${serverCommand.commandNr} failed.
                                 Using mapper: ${mapper.javaClass.simpleName}
-                                Current node: ${jervisGameController.stack.currentNode()::class.qualifiedName}
+                                Current node: ${jervisGameController.state.stack.currentNode()::class.qualifiedName}
                                 Expected node: ${action.expectedNode::class.qualifiedName}
                             """.trimIndent()
                             throw IllegalStateException(errorMessage)

@@ -81,7 +81,7 @@ object DialogFactory {
     fun createDialogIfPossible(controller: GameController, request: ActionsRequest, mapUnknownActions: (ActionsRequest) -> List<GameAction>): UserInput? {
         val rules = controller.rules
         val userInput: UserInputDialog? =
-            when (controller.stack.currentNode()) {
+            when (controller.state.stack.currentNode()) {
 
                 is AccuracyRoll.RollDice -> {
                     DiceRollUserInputDialog.createAccuracyRollDialog(controller.state.getContext<PassContext>(), rules)

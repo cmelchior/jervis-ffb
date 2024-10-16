@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 
@@ -9,7 +8,6 @@ class SetTeamRerollUsed(private val source: RerollSource) : Command {
 
     override fun execute(
         state: Game,
-        controller: GameController,
     ) {
         original = source.rerollUsed
         source.rerollUsed = true
@@ -17,7 +15,6 @@ class SetTeamRerollUsed(private val source: RerollSource) : Command {
 
     override fun undo(
         state: Game,
-        controller: GameController,
     ) {
         source.rerollUsed = original
     }

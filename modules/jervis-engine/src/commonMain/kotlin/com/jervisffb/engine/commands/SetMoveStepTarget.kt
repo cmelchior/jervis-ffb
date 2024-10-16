@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.Game
 
@@ -9,7 +8,6 @@ class SetMoveStepTarget(private val from: FieldCoordinate, private val to: Field
 
     override fun execute(
         state: Game,
-        controller: GameController,
     ) {
         originalTarget = state.moveStepTarget
         state.moveStepTarget = Pair(from, to)
@@ -17,7 +15,6 @@ class SetMoveStepTarget(private val from: FieldCoordinate, private val to: Field
 
     override fun undo(
         state: Game,
-        controller: GameController,
     ) {
         state.moveStepTarget = originalTarget
     }

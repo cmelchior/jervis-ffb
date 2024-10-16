@@ -1,8 +1,17 @@
 package com.jervisffb.engine.model
 
+import com.jervisffb.engine.controller.AddEntry
+import com.jervisffb.engine.controller.ListEvent
+import com.jervisffb.engine.controller.RemoveEntry
+import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.ProcedureStack
+import com.jervisffb.engine.fsm.ProcedureState
 import com.jervisffb.engine.model.context.ContextHolder
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.reports.LogEntry
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassingInteferenceContext
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.RerollSourceId
@@ -22,6 +31,7 @@ import kotlin.properties.Delegates
  * or by calling methods in [com.jervisffb.rules.Rules]
  */
 class Game(
+    val rules: Rules,
     val homeTeam: Team,
     val awayTeam: Team,
     val field: Field
@@ -34,6 +44,16 @@ class Game(
     }
 
     companion object
+
+    // Track all current active procedures.
+    val stack = ProcedureStack()
+
+    // Track all logs related to the game state, this includes
+    // game progress as well as meta data debug events like procedure
+    // changes.
+    val logs: MutableList<LogEntry> = mutableListOf()
+    // TODO Figure out a better way to hook up the UI to the model, so we do not to create this buffer
+    val logChanges: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 20_000)
 
     // Weather conditions for the field
     var weather: Weather = Weather.PERFECT_CONDITIONS
@@ -165,4 +185,37 @@ class Game(
 
     @Transient
     val gameFlow = MutableSharedFlow<Game>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    fun currentProcedure(): ProcedureState? = stack.peepOrNull()
+
+    fun addProcedure(procedure: Procedure) {
+        stack.pushProcedure(procedure)
+    }
+
+    fun addProcedure(procedure: ProcedureState) {
+        stack.pushProcedure(procedure)
+    }
+
+    fun removeProcedure(): ProcedureState {
+        return stack.popProcedure()
+    }
+
+    fun addLog(entry: LogEntry) {
+        logs.add(entry)
+        logChanges.safeTryEmit(AddEntry(entry))
+    }
+
+    fun removeLog(entry: LogEntry) {
+        if (logs.lastOrNull() == entry) {
+            val logEntry = logs.removeLast()
+            logChanges.safeTryEmit(RemoveEntry(logEntry))
+        } else {
+            throw IllegalStateException("Log could not be removed: ${entry.message}")
+        }
+    }
+
+    fun setCurrentNode(nextState: Node) {
+        stack.peepOrNull()!!.setCurrentNode(nextState)
+    }
+
 }

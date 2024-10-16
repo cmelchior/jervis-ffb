@@ -1,6 +1,5 @@
 package com.jervisffb.fumbbl.net.utils
 
-import com.jervisffb.fumbbl.net.model.SpecialRule
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Field
@@ -12,16 +11,17 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.ChaosDwarfTeam
 import com.jervisffb.engine.rules.bb2020.roster.ElvenUnionTeam
-import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.roster.HumanTeam
 import com.jervisffb.engine.rules.bb2020.roster.KhorneTeam
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.roster.SkavenTeam
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.bb2020.skills.Block
+import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.skills.Tackle
 import com.jervisffb.engine.rules.bb2020.skills.Wrestle
 import com.jervisffb.engine.teamBuilder
+import com.jervisffb.fumbbl.net.model.SpecialRule
 
 typealias FumbblGame = com.jervisffb.fumbbl.net.model.Game
 typealias FumbblTeam = com.jervisffb.fumbbl.net.model.Team
@@ -41,7 +41,7 @@ fun Game.Companion.fromFumbblState(rules: Rules, game: FumbblGame): Game {
     val homeTeam = extractTeam(rules, game.teamHome)
     val awayTeam = extractTeam(rules, game.teamAway)
     val field: Field = extractField(game.fieldModel)
-    return Game(homeTeam, awayTeam, field)
+    return Game(rules, homeTeam, awayTeam, field)
 }
 
 private fun extractTeam(rules: Rules, team: FumbblTeam): Team {

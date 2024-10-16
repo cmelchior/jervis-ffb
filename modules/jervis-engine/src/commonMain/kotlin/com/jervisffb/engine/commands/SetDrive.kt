@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 
 class SetDrive(private val nextDrive: Int) : Command {
@@ -8,7 +7,6 @@ class SetDrive(private val nextDrive: Int) : Command {
 
     override fun execute(
         state: Game,
-        controller: GameController,
     ) {
         originalDrive = state.driveNo
         state.driveNo = nextDrive
@@ -16,7 +14,6 @@ class SetDrive(private val nextDrive: Int) : Command {
 
     override fun undo(
         state: Game,
-        controller: GameController,
     ) {
         state.driveNo = originalDrive
     }

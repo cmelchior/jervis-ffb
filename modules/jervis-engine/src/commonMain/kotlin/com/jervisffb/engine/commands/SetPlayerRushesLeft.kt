@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 
@@ -12,7 +11,7 @@ import com.jervisffb.engine.model.Player
 class SetPlayerRushesLeft(private val player: Player, val remainingRushes: Int) : Command {
     private var originalRushes: Int = 0
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(state: Game) {
         this.originalRushes = player.rushesLeft
         player.apply {
             rushesLeft = remainingRushes
@@ -20,7 +19,7 @@ class SetPlayerRushesLeft(private val player: Player, val remainingRushes: Int) 
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(state: Game) {
         player.apply {
             rushesLeft = originalRushes
             notifyUpdate()

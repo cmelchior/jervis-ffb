@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import kotlin.reflect.KMutableProperty1
 
@@ -9,7 +8,6 @@ class SetOldContext<T>(private val property: KMutableProperty1<Game, T?>, privat
 
     override fun execute(
         state: Game,
-        controller: GameController,
     ) {
         originalValue = property.get(state)
         property.set(state, value)
@@ -17,7 +15,6 @@ class SetOldContext<T>(private val property: KMutableProperty1<Game, T?>, privat
 
     override fun undo(
         state: Game,
-        controller: GameController,
     ) {
         try {
             property.set(state, originalValue)

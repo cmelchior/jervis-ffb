@@ -1,6 +1,5 @@
 package com.jervisffb.engine.controller
 
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Continue
@@ -9,6 +8,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.EnterProcedure
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
@@ -18,7 +18,6 @@ import com.jervisffb.engine.fsm.ProcedureStack
 import com.jervisffb.engine.fsm.ProcedureState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.reports.ReportAvailableActions
@@ -27,10 +26,9 @@ import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.serialize.JervisSerialization
-import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.json.JsonElement
 
 class ActionsRequest(
@@ -55,13 +53,9 @@ class GameController(
     var initialHomeTeamState: JsonElement? = null
     var initialAwayTeamState: JsonElement? = null
 
-    // TODO Figure out a better way to hook up the UI to the model, so we do not to create this buffer
-    private val _logsEvents: MutableSharedFlow<ListEvent> = MutableSharedFlow(replay = 20_000)
-    val logsEvents: Flow<ListEvent> = _logsEvents
-    val logs: MutableList<LogEntry> = mutableListOf()
+    val logsEvents: Flow<ListEvent> = state.logChanges
     val diceRollGenerator = diceGenerator
     val rules: Rules = rules
-    val stack: ProcedureStack = ProcedureStack()
     val actionHistory: MutableList<GameAction> = mutableListOf() // List all actions provided by the user.
     val commands: MutableList<Command> = mutableListOf()
     val state: Game = state
@@ -83,7 +77,7 @@ class GameController(
                 // Reduce noise from Continue events
                 val command = currentNode.applyAction(Continue, state, rules)
                 commands.add(command)
-                command.execute(state, this)
+                command.execute(state)
             }
 
             is ActionNode -> {
@@ -101,7 +95,7 @@ class GameController(
                 } else {
                     val reportAvailableActions = ReportAvailableActions(request.actions)
                     commands.add(reportAvailableActions)
-                    reportAvailableActions.execute(state, this)
+                    reportAvailableActions.execute(state)
                     actionProvider(this@GameController, request)
                 }
 
@@ -109,10 +103,10 @@ class GameController(
                     lastActionWasUndo = false
                     val reportSelectedAction = ReportHandleAction(selectedAction)
                     commands.add(reportSelectedAction)
-                    reportSelectedAction.execute(state, this)
+                    reportSelectedAction.execute(state)
                     val command = currentNode.applyAction(selectedAction, state, rules)
                     commands.add(command)
-                    command.execute(state, this)
+                    command.execute(state)
                     state.notifyUpdate()
                 } else {
                     lastActionWasUndo = true
@@ -128,7 +122,7 @@ class GameController(
                         ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
                     }
                 this.commands.add(commands)
-                commands.execute(state, this)
+                commands.execute(state)
             }
 
             else -> {
@@ -146,7 +140,7 @@ class GameController(
         val actions = currentNode.getAvailableActions(state, rules)
         val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}", LogCategory.STATE_MACHINE)
         commands.add(reportAvailableActions)
-        reportAvailableActions.execute(state, this)
+        reportAvailableActions.execute(state)
         return ActionsRequest(currentNode.actionOwner(state, rules), actions)
     }
 
@@ -154,11 +148,11 @@ class GameController(
         actionHistory.add(userAction)
         val reportSelectedAction = ReportHandleAction(userAction)
         commands.add(reportSelectedAction)
-        reportSelectedAction.execute(state, this)
+        reportSelectedAction.execute(state)
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val command = currentNode.applyAction(userAction, state, rules)
         commands.add(command)
-        command.execute(state, this)
+        command.execute(state)
         rollForwardToNextActionNode()
     }
 
@@ -170,7 +164,6 @@ class GameController(
     fun startTestMode(start: Procedure) {
         setupInitialStartingState(start)
         rollForwardToNextActionNode()
-
     }
 
     // TODO What does this do exactly
@@ -179,9 +172,9 @@ class GameController(
             !stack.isEmpty() &&
             (
                 stack.currentNode() is ComputationNode ||
-                stack.currentNode() is ParentNode ||
+                    stack.currentNode() is ParentNode ||
                 // Skip action nodes that only accept "Continue" events
-                stack.currentNode() is ActionNode && getAvailableActions().let { it.actions.size == 1 && it.actions.first() == ContinueWhenReady }
+                    stack.currentNode() is ActionNode && getAvailableActions().let { it.actions.size == 1 && it.actions.first() == ContinueWhenReady }
             )
         ) {
             when (val currentNode: Node = stack.currentNode()) {
@@ -189,12 +182,12 @@ class GameController(
                     // Reduce noise from Continue events
                     val command = currentNode.applyAction(Continue, state, rules)
                     commands.add(command)
-                    command.execute(state, this)
+                    command.execute(state)
                 }
                 is ActionNode -> {
                     val command = currentNode.applyAction(Continue, state, rules)
                     commands.add(command)
-                    command.execute(state, this)
+                    command.execute(state)
                 }
                 is ParentNode -> {
                     val commands =
@@ -204,7 +197,7 @@ class GameController(
                             ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
                         }
                     this.commands.add(commands)
-                    commands.execute(state, this)
+                    commands.execute(state)
                 }
                 else -> {
                     throw IllegalStateException("Unsupported type: ${currentNode::class.simpleName}")
@@ -252,42 +245,12 @@ class GameController(
                 EnterProcedure(procedure),
             )
         commands.add(command)
-        command.execute(state, this)
-    }
-
-    fun addLog(entry: LogEntry) {
-        logs.add(entry)
-        _logsEvents.safeTryEmit(AddEntry(entry))
-    }
-
-    fun removeLog(entry: LogEntry) {
-        if (logs.lastOrNull() == entry) {
-            val logEntry = logs.removeLast()
-            _logsEvents.safeTryEmit(RemoveEntry(logEntry))
-        } else {
-            throw IllegalStateException("Log could not be removed: ${entry.message}")
-        }
-    }
-
-    fun addProcedure(procedure: Procedure) {
-        stack.pushProcedure(procedure)
-    }
-
-    fun addProcedure(procedure: ProcedureState) {
-        stack.pushProcedure(procedure)
-    }
-
-    fun removeProcedure(): ProcedureState {
-        return stack.popProcedure()
+        command.execute(state)
     }
 
     fun currentProcedure(): ProcedureState? = stack.peepOrNull()
 
     fun currentNode(): Node? = currentProcedure()?.currentNode()
-
-    fun setCurrentNode(nextState: Node) {
-        stack.peepOrNull()!!.setCurrentNode(nextState)
-    }
 
     fun enableReplayMode() {
         this.replayMode = true
@@ -317,18 +280,18 @@ class GameController(
 
         // Remove initial logs for the current node that is waiting for input.
         while (commands.last() is ReportHandleAction || commands.last() is ReportAvailableActions) {
-            commands.removeLast().undo(state, this)
+            commands.removeLast().undo(state)
         }
 
         // Now revert all commands from the last action
         while (commands.last() !is ReportHandleAction)  {
             val undoCommand = commands.removeLast()
-            undoCommand.undo(state, this)
+            undoCommand.undo(state)
         }
 
         // Then remove the logs describing entering that node
         while (commands.last() is ReportHandleAction || commands.last() is ReportAvailableActions) {
-            commands.removeLast().undo(state, this)
+            commands.removeLast().undo(state)
         }
 
         // Finally, remove the entry from the action history
@@ -344,7 +307,7 @@ class GameController(
         }
         replayIndex -= 1
         val undoCommand = commands[replayIndex]
-        undoCommand.undo(state, this)
+        undoCommand.undo(state)
         return true
     }
 
@@ -359,7 +322,7 @@ class GameController(
         if (replayIndex == commands.size) {
             return false
         }
-        commands[replayIndex].execute(state, this)
+        commands[replayIndex].execute(state)
         replayIndex += 1
         return true
     }
@@ -388,4 +351,7 @@ class GameController(
             newActions = getAvailableActions()
         }
     }
+
+    // Shortcut for accessing the stack
+    val stack: ProcedureStack = state.stack
 }

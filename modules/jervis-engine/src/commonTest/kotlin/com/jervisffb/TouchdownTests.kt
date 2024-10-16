@@ -275,7 +275,7 @@ class TouchdownTests: JervisGameTest() {
         assertTrue(player.hasBall())
 
         // Move opponent player in the way, so it forces a dodge
-        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(0, 4)).execute(state, controller)
+        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(0, 4)).execute(state)
 
         // Give player enough move to reach the End Zone
         player.movesLeft = 20
@@ -335,8 +335,8 @@ class TouchdownTests: JervisGameTest() {
 
         // Away turn has started. Fake the position of two away players
         // to make it easier to do a pass
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state, controller)
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(2, 3)).execute(state, controller)
+        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(2, 3)).execute(state)
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)
 
@@ -371,8 +371,8 @@ class TouchdownTests: JervisGameTest() {
 
         // Away turn has started. Fake the position of two away players
         // to make it easier to do a hand-off
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state, controller)
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(1, 3)).execute(state, controller)
+        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(1, 3)).execute(state)
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)
 
@@ -403,8 +403,8 @@ class TouchdownTests: JervisGameTest() {
 
         // Away turn has started. Fake the position of two away players
         // to make it easier to do a pass
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state, controller)
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(2, 3)).execute(state, controller)
+        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(2, 3)).execute(state)
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)
 
@@ -439,8 +439,8 @@ class TouchdownTests: JervisGameTest() {
 
         // Away turn has started. Fake the position of two away players
         // to make it easier to do a pass
-        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state, controller)
-        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(2, 3)).execute(state, controller)
+        SetPlayerLocation(awayTeam[5.playerNo], FieldCoordinate(0, 3)).execute(state)
+        SetPlayerLocation(awayTeam[6.playerNo], FieldCoordinate(2, 3)).execute(state)
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)
 
@@ -474,7 +474,7 @@ class TouchdownTests: JervisGameTest() {
             ),
         )
         // Fake moving the ball into the Home team End Zone
-        SetBallLocation(state.singleBall(), FieldCoordinate(0, 3)).execute(state, controller)
+        SetBallLocation(state.singleBall(), FieldCoordinate(0, 3)).execute(state)
 
         val player = awayTeam[6.playerNo]
         assertEquals(0, state.awayScore)

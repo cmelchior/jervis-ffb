@@ -1,7 +1,6 @@
 package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import kotlin.random.Random
 
@@ -16,12 +15,12 @@ abstract class LogEntry : Command {
     abstract val category: LogCategory
     abstract val message: String
 
-    override fun execute(state: Game, controller: GameController) {
-        controller.addLog(this)
+    override fun execute(state: Game) {
+        state.addLog(this)
     }
 
-    override fun undo(state: Game, controller: GameController) {
-        controller.removeLog(this)
+    override fun undo(state: Game) {
+        state.removeLog(this)
     }
 
     override fun toString(): String {

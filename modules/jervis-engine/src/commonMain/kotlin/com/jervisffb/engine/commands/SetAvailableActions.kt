@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.PlayerStandardActionType
@@ -13,12 +12,12 @@ class SetAvailableActions(
 ) : Command {
     private var originalActions: Int = 0
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(state: Game) {
         originalActions = team.turnData.availableStandardActions[type] ?: INVALID_GAME_STATE("Type has not been configured: $type")
         team.turnData.availableStandardActions[type] = availableActions
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(state: Game) {
         team.turnData.availableStandardActions[type] = originalActions
     }
 

@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 
@@ -9,7 +8,6 @@ class SetKickingTeamAtHalfTime(private val kickingTeam: Team) : Command {
 
     override fun execute(
         state: Game,
-        controller: GameController,
     ) {
         this.originalKickingTeam = state.kickingTeamInLastHalf
         state.kickingTeamInLastHalf = kickingTeam
@@ -19,7 +17,6 @@ class SetKickingTeamAtHalfTime(private val kickingTeam: Team) : Command {
 
     override fun undo(
         state: Game,
-        controller: GameController,
     ) {
         state.receivingTeam = originalKickingTeam.otherTeam()
         state.kickingTeam = originalKickingTeam

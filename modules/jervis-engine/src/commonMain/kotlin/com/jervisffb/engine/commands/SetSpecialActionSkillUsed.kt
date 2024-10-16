@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.rules.bb2020.skills.Skill
@@ -17,13 +16,13 @@ class SetSpecialActionSkillUsed(private val player: Player, private val skill: S
         if (skill !is SpecialActionProvider) INVALID_GAME_STATE("SpecialActionProvider is required: $skill")
     }
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(state: Game) {
         this.originalUsed = (skill as SpecialActionProvider).isSpecialActionUsed
         skill.isSpecialActionUsed = this@SetSpecialActionSkillUsed.used
         player.notifyUpdate()
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(state: Game) {
         (skill as SpecialActionProvider).isSpecialActionUsed = originalUsed
         player.notifyUpdate()
     }

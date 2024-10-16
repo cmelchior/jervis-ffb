@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Game
 
 /**
@@ -18,18 +17,16 @@ class CompositeCommand private constructor(private val commands: List<Command>) 
 
     override fun undo(
         state: Game,
-        controller: GameController,
     ) {
         for (i in commands.size - 1 downTo 0) {
-            commands[i].undo(state, controller)
+            commands[i].undo(state)
         }
     }
 
     override fun execute(
         state: Game,
-        controller: GameController,
     ) {
-        commands.forEach { it.execute(state, controller) }
+        commands.forEach { it.execute(state) }
     }
 
     companion object {

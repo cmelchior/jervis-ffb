@@ -1,6 +1,5 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.controller.GameController
 import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
@@ -82,7 +81,7 @@ class SetBallState private constructor(
         )
     }
 
-    override fun execute(state: Game, controller: GameController) {
+    override fun execute(state: Game) {
         val ball: Ball = ball
         ball.let {
             this.originalState = it.state
@@ -102,7 +101,7 @@ class SetBallState private constructor(
         }
     }
 
-    override fun undo(state: Game, controller: GameController) {
+    override fun undo(state: Game) {
         ball.state = originalState
         ball.carriedBy = originalCarriedBy
         ball.outOfBoundsAt = originalExit
