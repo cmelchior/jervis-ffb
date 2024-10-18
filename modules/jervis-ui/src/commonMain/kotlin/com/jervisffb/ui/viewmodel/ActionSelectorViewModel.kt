@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSubActionSelected
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +44,7 @@ class SelectPlayerInput(override val actions: List<GameAction>) : UserInput
 
 class DeselectPlayerInput(override val actions: List<GameAction>) : UserInput
 
-data class FieldSquareAction(val coordinate: FieldCoordinate, val action: GameAction, val requiresRoll: Boolean)
+data class FieldSquareAction(val coordinate: FieldCoordinate, val action: GameAction, val requiresRoll: Boolean, val direction: Direction?)
 
 class SelectFieldLocationInput(val wrapperAction: List<FieldSquareAction>) : UserInput {
     override val actions = wrapperAction.map { it.action }

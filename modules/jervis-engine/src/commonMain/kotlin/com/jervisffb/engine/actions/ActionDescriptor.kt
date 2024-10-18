@@ -1,13 +1,15 @@
 package com.jervisffb.engine.actions
 
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.rules.BlockType
+import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
-import com.jervisffb.engine.rules.BlockType
-import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import kotlinx.serialization.Serializable
@@ -15,18 +17,25 @@ import kotlinx.serialization.Serializable
 // Action descriptors
 sealed interface ActionDescriptor
 
-data object ContinueWhenReady : ActionDescriptor // "internal event" for continuing the game state
+// "internal event" for continuing the game state
+data object ContinueWhenReady : ActionDescriptor
 
-data object ConfirmWhenReady : ActionDescriptor // An generic action that requires explicit confirmation by a player
+// An generic action representing "Accept" or "Yes"
+data object ConfirmWhenReady : ActionDescriptor
 
-data object CancelWhenReady : ActionDescriptor // An generic action that requires explicit confirmation by a player
+// An generic action representing "Cancel" or "No"
+data object CancelWhenReady : ActionDescriptor
 
-data object EndSetupWhenReady : ActionDescriptor // Mark the setup phase as ended for a team
+// Mark the setup phase as ended for a team
+data object EndSetupWhenReady : ActionDescriptor
 
-data object EndTurnWhenReady : ActionDescriptor // Mark the turn as ended for a team
+// Mark the turn as ended for a team
+data object EndTurnWhenReady : ActionDescriptor
 
+// Mark the current action for the active player as done.
 data object EndActionWhenReady : ActionDescriptor
 
+// Action owner must select a coin side
 data object SelectCoinSide : ActionDescriptor
 
 data class SelectSkill(val skill: SkillFactory) : ActionDescriptor
@@ -53,6 +62,11 @@ enum class MoveType {
 
 data class SelectMoveType(val type: MoveType): ActionDescriptor
 
+data class SelectDirection(
+    val origin: OnFieldLocation,
+    val directions: List<Direction>
+): ActionDescriptor
+
 data class SelectFieldLocation private constructor(
     val x: Int,
     val y: Int,
@@ -64,7 +78,7 @@ data class SelectFieldLocation private constructor(
     // This is in order so the UI can filter or show options in different ways.
     enum class Type {
         SETUP,
-        PUSH,
+        DIRECTION,
         STAND_UP,
         MOVE,
         RUSH,
@@ -78,7 +92,7 @@ data class SelectFieldLocation private constructor(
 
     companion object {
         fun setup(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.SETUP)
-        fun push(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.PUSH)
+        fun direction(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.DIRECTION)
         fun standUp(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.STAND_UP)
         fun move(coordinate: FieldCoordinate, needRush: Boolean, needDodge: Boolean) = SelectFieldLocation(coordinate, Type.MOVE, needRush, needDodge)
         fun rush(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.RUSH)

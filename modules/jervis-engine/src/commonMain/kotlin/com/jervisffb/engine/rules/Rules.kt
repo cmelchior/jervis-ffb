@@ -18,7 +18,7 @@ import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyTable
-import com.jervisffb.engine.rules.bb2020.tables.Direction
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.rules.bb2020.tables.InjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.KickOffEventTable
 import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryTable

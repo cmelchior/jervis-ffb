@@ -7,13 +7,14 @@ import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -22,6 +23,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
@@ -38,7 +40,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryR
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.bb2020.skills.SideStep
 import com.jervisffb.engine.utils.INVALID_ACTION
-import com.jervisffb.engine.commands.compositeCommandOf
 
 data class PushContext(
     val firstPusher: Player,
@@ -391,25 +392,35 @@ object PushStep: Procedure() {
             // In chain pushes, only the square of Player B could be empty, but it might
             // not be in case of a circular chain.
             val emptyFields = isSquaresEmptyForPushing(pushContext, pushOptions, state)
-            return if (emptyFields.isNotEmpty()) {
-                emptyFields.map { SelectFieldLocation.push(it) }
-            } else {
-                pushOptions.map { SelectFieldLocation.push(it) }
-            }
+            return listOf(
+                if (emptyFields.isNotEmpty()) {
+                    SelectDirection(
+                        origin = lastPushInChain.pushee.coordinates,
+                        directions = emptyFields.map { Direction.from(lastPushInChain.pushee.coordinates, it) }
+                    )
+                } else {
+                    SelectDirection(
+                        origin = lastPushInChain.pushee.coordinates,
+                        directions = pushOptions.map { Direction.from(lastPushInChain.pushee.coordinates, it) }
+                    )
+                }
+            )
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             // If the chosen direction results in a chain push, modify the push context
             // and redo the entire chain.
-            return checkTypeAndValue<FieldSquareSelected>(state, rules, action) { squareSelected ->
+            return checkTypeAndValue<DirectionSelected>(state, rules, action) { squareSelected ->
+                val context = state.getContext<PushContext>()
+                val origin = context.pushee().coordinates
+                val target = origin.move(squareSelected.direction, 1)
                 val isEmpty = isSquaresEmptyForPushing(
                     state.getContext<PushContext>(),
-                    setOf(squareSelected.coordinate),
+                    setOf(target),
                     state
                 ).isNotEmpty()
 
-                val context = state.getContext<PushContext>()
-                val updatedContext = context.copyModifyPushChain(context.pushChain.last().copy(to = squareSelected.coordinate))
+                val updatedContext = context.copyModifyPushChain(context.pushChain.last().copy(to = target))
 
                 val commands = if (isEmpty) {
                     // Player was moved into an empty square, which means we can start resolving
@@ -423,8 +434,8 @@ object PushStep: Procedure() {
                     // new chain push to the context and restart the process
                     val newPush = PushContext.PushData(
                         pusher = context.pushChain.last().pushee,
-                        pushee = state.field[squareSelected.coordinate].player!!, // TODO This doesn't take into account chain pushes
-                        from = squareSelected.coordinate,
+                        pushee = state.field[target].player!!, // TODO This doesn't take into account chain pushes
+                        from = target,
                         isChainPush = true,
                     )
                     val newContext = updatedContext.copyAddPushChain(newPush)

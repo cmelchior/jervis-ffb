@@ -1,7 +1,7 @@
 package com.jervisffb.engine.model.locations
 
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.tables.Direction
+import com.jervisffb.engine.model.Direction
 
 /**
  * Interface representing a location on the field of Blood Bowl match

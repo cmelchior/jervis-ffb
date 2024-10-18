@@ -1,6 +1,7 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.model.Coin
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
@@ -242,6 +243,9 @@ data class PlayerSubActionSelected(val name: String, val action: GameAction) : G
 
 @Serializable
 data object DogoutSelected : GameAction
+
+@Serializable
+data class DirectionSelected(val direction: Direction) : GameAction
 
 @Serializable
 data class FieldSquareSelected(val coordinate: FieldCoordinate) : GameAction {

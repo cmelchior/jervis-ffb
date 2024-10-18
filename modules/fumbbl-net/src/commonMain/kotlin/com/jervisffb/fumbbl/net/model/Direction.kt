@@ -21,16 +21,16 @@ enum class Direction(override val id: String) : FumbblEnum {
     /**
      * Transform a Direction in FUMBBL to a Direection in Jervis.
      */
-    fun transformToJervisDirection(): com.jervisffb.engine.rules.bb2020.tables.Direction {
+    fun transformToJervisDirection(): com.jervisffb.engine.model.Direction {
         return when (this) {
-            NORTH -> com.jervisffb.engine.rules.bb2020.tables.Direction(0, -1)
-            NORTHEAST -> com.jervisffb.engine.rules.bb2020.tables.Direction(1, -1)
-            EAST -> com.jervisffb.engine.rules.bb2020.tables.Direction(1, 0)
-            SOUTHEAST -> com.jervisffb.engine.rules.bb2020.tables.Direction(1, 1)
-            SOUTH -> com.jervisffb.engine.rules.bb2020.tables.Direction(0, 1)
-            SOUTHWEST -> com.jervisffb.engine.rules.bb2020.tables.Direction(-1, 1)
-            WEST -> com.jervisffb.engine.rules.bb2020.tables.Direction(-1, 0)
-            NORTHWEST -> com.jervisffb.engine.rules.bb2020.tables.Direction(-1, -1)
+            NORTH -> com.jervisffb.engine.model.Direction(0, -1)
+            NORTHEAST -> com.jervisffb.engine.model.Direction(1, -1)
+            EAST -> com.jervisffb.engine.model.Direction(1, 0)
+            SOUTHEAST -> com.jervisffb.engine.model.Direction(1, 1)
+            SOUTH -> com.jervisffb.engine.model.Direction(0, 1)
+            SOUTHWEST -> com.jervisffb.engine.model.Direction(-1, 1)
+            WEST -> com.jervisffb.engine.model.Direction(-1, 0)
+            NORTHWEST -> com.jervisffb.engine.model.Direction(-1, -1)
         }
     }
 

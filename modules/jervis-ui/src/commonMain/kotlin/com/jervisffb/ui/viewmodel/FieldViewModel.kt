@@ -1,13 +1,14 @@
 package com.jervisffb.ui.viewmodel
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.GameController
 import com.jervisffb.engine.model.BallState
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
@@ -15,10 +16,10 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.PlayerStandardActionType
+import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.ContextMenuOption
 import com.jervisffb.ui.model.UiFieldSquare
 import com.jervisffb.ui.model.UiPlayer
-import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -182,6 +183,7 @@ class FieldViewModel(
         var requiresRoll = false
         val contextActions: MutableList<ContextMenuOption> = mutableListOf()
         var showContextMenu = false
+        var direction: Direction? = null
         if (!ignoreUserInput) {
             val inputs =
                 when (userInput) {
@@ -213,6 +215,7 @@ class FieldViewModel(
                             ]?.let { action: FieldSquareAction ->
                                 { uiActionFactory.userSelectedAction(action.action) }
                             } ?: squareAction
+                        direction = input.fieldAction[FieldCoordinate(x, y)]?.direction
                     }
 
                     is SelectPlayerInput -> {
@@ -278,6 +281,7 @@ class FieldViewModel(
                                 { uiActionFactory.userSelectedAction(action.action) }
                             }
                         requiresRoll = input.fieldAction[FieldCoordinate(x, y)]?.requiresRoll ?: false
+                        direction = input.fieldAction[FieldCoordinate(x, y)]?.direction
                     }
 
                     is EndActionInput -> {
@@ -325,6 +329,7 @@ class FieldViewModel(
                 isBallExiting,
                 square.player?.hasBall() == true,
                 uiPlayer,
+                direction,
                 squareAction, // Only allow a Square Action if no player is on the field
                 onMenuHiddenAction,
                 requiresRoll,

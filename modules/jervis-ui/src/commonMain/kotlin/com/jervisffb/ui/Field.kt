@@ -173,6 +173,7 @@ private fun FieldSquare(
     val bgColor by remember(square) {
         mutableStateOf(when {
             square.onSelected != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
+            square.direction != null -> Color.Yellow.copy(alpha = 0.25f)
             square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
             else -> Color.Transparent
         })

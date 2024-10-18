@@ -2,6 +2,7 @@ package com.jervisffb.engine.rules.bb2020.tables
 
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import kotlin.math.PI
 import kotlin.math.cos

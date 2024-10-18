@@ -12,6 +12,7 @@ import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
@@ -29,13 +30,13 @@ import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Skill
-import com.jervisffb.engine.rules.bb2020.tables.Direction
 
 sealed interface UserInputDialog : UserInput {
     var owner: Team?
@@ -83,6 +84,7 @@ data class SingleChoiceInputDialog(
                 is CalculatedAction -> TODO("Should only be used in tests")
                 is BlockTypeSelected -> action.type.name
                 is DicePoolResultsSelected -> action.results.toString()
+                is DirectionSelected -> action.direction.toString()
             }
         }
 

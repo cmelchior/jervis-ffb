@@ -26,6 +26,7 @@ import com.jervisffb.engine.actions.DicePoolChoice
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -47,6 +48,7 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectCoinSide
 import com.jervisffb.engine.actions.SelectDicePoolResult
+import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.actions.SelectDogout
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectInducement
@@ -199,6 +201,7 @@ fun createRandomAction(
         is SelectSkill -> SkillSelected(action.skill)
         is SelectInducement -> InducementSelected(action.id)
         is SelectBlockType -> BlockTypeSelected(action.type)
+        is SelectDirection -> DirectionSelected(action.directions.random())
     }
 }
 

@@ -26,7 +26,7 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.tables.Direction
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.utils.assert
 import com.jervisffb.engine.utils.sum
 import com.jervisffb.engine.commands.compositeCommandOf

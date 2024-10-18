@@ -8,6 +8,13 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
+/**
+ * Internal representation of a Blood Bowl Field. It is laid horizontally,
+ * with the home team on the left side and the away team on the right side.
+ *
+ * Top-left has the coordinates [0, 0] and Bottom-right has the coordinates
+ * [ fieldWidth - 1, fieldHeight - 1].
+ */
 class Field(val width: Int, val height: Int) : Iterable<FieldSquare> {
     private val field: Array<Array<FieldSquare>> =
         Array(width) { x: Int ->

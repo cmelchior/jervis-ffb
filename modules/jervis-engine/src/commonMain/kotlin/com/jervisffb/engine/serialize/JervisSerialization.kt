@@ -1,5 +1,7 @@
 package com.jervisffb.engine.serialize
 
+import com.jervisffb.engine.GameController
+import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
@@ -15,6 +17,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
@@ -28,7 +31,6 @@ import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.GameController
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
@@ -103,6 +105,7 @@ object JervisSerialization {
             }
             polymorphic(GameAction::class) {
                 // polymorphic(DieResult::class) {
+                subclass(BlockTypeSelected::class)
                 subclass(Cancel::class)
                 subclass(CoinSideSelected::class)
                 subclass(CoinTossResult::class)
@@ -118,6 +121,7 @@ object JervisSerialization {
                 subclass(D8Result::class)
                 subclass(DBlockResult::class)
                 subclass(DiceRollResults::class)
+                subclass(DirectionSelected::class)
                 subclass(DogoutSelected::class)
                 subclass(EndAction::class)
                 subclass(EndSetup::class)

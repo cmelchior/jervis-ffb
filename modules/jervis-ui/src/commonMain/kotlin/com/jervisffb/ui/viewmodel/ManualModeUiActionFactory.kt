@@ -1,5 +1,7 @@
 package com.jervisffb.ui.viewmodel
 
+import com.jervisffb.engine.ActionsRequest
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
@@ -25,6 +27,7 @@ import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DicePoolChoice
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -48,6 +51,7 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectCoinSide
 import com.jervisffb.engine.actions.SelectDicePoolResult
+import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.actions.SelectDogout
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectInducement
@@ -60,8 +64,6 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.SelectSkill
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.TossCoin
-import com.jervisffb.engine.ActionsRequest
-import com.jervisffb.engine.GameController
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -264,7 +266,8 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                                                         FieldSquareSelected(it.coordinate)
                                                     )
                                                 ),
-                                                requiresRoll = it.requiresRush || it.requiresDodge
+                                                requiresRoll = it.requiresRush || it.requiresDodge,
+                                                direction = null
                                             )
                                         },
                                         distances = allPaths
@@ -284,12 +287,32 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                     action.key == SelectFieldLocation::class -> {
                         SelectFieldLocationInput(
                             action.value.map {
-                                val coords = (it as SelectFieldLocation).coordinate
+                                val square = (it as SelectFieldLocation)
+                                val coords = square.coordinate
                                 FieldSquareAction(
                                     coordinate = coords,
                                     action = FieldSquareSelected(coords),
-                                    requiresRoll = it.requiresRush
+                                    requiresRoll = square.requiresRush,
+                                    direction = null
                                 )
+                            }
+                        )
+                    }
+                    action.key == SelectDirection::class -> {
+                        SelectFieldLocationInput(
+                            action.value.flatMap {
+                                val directionAction = (it as SelectDirection)
+                                directionAction.directions.map { dir ->
+                                    // TODO This breaks with giants
+                                    val target = directionAction.origin.move(dir, 1) as FieldCoordinate
+                                    FieldSquareAction(
+                                        coordinate = directionAction.origin.move(dir, 1) as FieldCoordinate,
+                                        action = DirectionSelected(dir),
+                                        requiresRoll = false,
+                                        direction = dir
+                                    )
+
+                                }
                             }
                         )
                     }
@@ -450,6 +473,8 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                         else -> throw IllegalStateException("Unsupported value")
                     }
                 }
+
+                is SelectDirection -> action.directions.random().let { DirectionSelected(it) }
             }
         }
     }

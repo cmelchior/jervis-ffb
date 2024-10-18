@@ -9,6 +9,7 @@ serialization = "1.7.3"
 voyager = "1.1.0-beta03"
 datetimex = "0.6.1"
 okio = "3.9.1"
+jgit = "7.0.0.202409031743-r"
 
 [libraries]
 coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -16,6 +17,7 @@ jsonserialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serializa
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 okio-fake = { group = "com.squareup.okio", name = "okio-fakefilesystem", version.ref = "okio" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetimex" }
+jgit = { group = "org.eclipse.jgit", name = "org.eclipse.jgit", version.ref = "jgit" }
 
 voyager-navigator = { group = "cafe.adriel.voyager", name = "voyager-navigator", version.ref = "voyager" }
 voyager-screenmodel = { group = "cafe.adriel.voyager", name = "voyager-screenmodel", version.ref = "voyager" }

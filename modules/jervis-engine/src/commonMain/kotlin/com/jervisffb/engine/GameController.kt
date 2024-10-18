@@ -39,9 +39,7 @@ class ActionsRequest(
 }
 
 sealed interface ListEvent
-
 data class AddEntry(val log: LogEntry) : ListEvent
-
 data class RemoveEntry(val log: LogEntry) : ListEvent
 
 class GameController(
@@ -49,7 +47,9 @@ class GameController(
     state: Game,
     diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator()
 ) {
-    // Copy of the state Home and Away teams, taken just before starting the game
+    // Copy of Home and Away teams state, taken just before starting the game.
+    // This is required so we can write the initial state to a save file (which
+    // is required as we apply all commands in the save file to this state).
     var initialHomeTeamState: JsonElement? = null
     var initialAwayTeamState: JsonElement? = null
 

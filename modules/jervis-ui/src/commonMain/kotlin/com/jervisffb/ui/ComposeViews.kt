@@ -53,6 +53,7 @@ import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
@@ -72,17 +73,17 @@ import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.ui.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.viewmodel.CompositeUserInput
+import com.jervisffb.ui.viewmodel.DialogsViewModel
+import com.jervisffb.ui.viewmodel.DicePoolUserInputDialog
+import com.jervisffb.ui.viewmodel.DiceRollUserInputDialog
 import com.jervisffb.ui.viewmodel.FieldViewModel
 import com.jervisffb.ui.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.viewmodel.LogViewModel
 import com.jervisffb.ui.viewmodel.ReplayViewModel
-import com.jervisffb.ui.viewmodel.UserInput
-import com.jervisffb.ui.viewmodel.WaitingForUserInput
-import com.jervisffb.ui.viewmodel.DialogsViewModel
-import com.jervisffb.ui.viewmodel.DicePoolUserInputDialog
-import com.jervisffb.ui.viewmodel.DiceRollUserInputDialog
 import com.jervisffb.ui.viewmodel.SingleChoiceInputDialog
 import com.jervisffb.ui.viewmodel.UnknownInput
+import com.jervisffb.ui.viewmodel.UserInput
+import com.jervisffb.ui.viewmodel.WaitingForUserInput
 
 // Theme
 val debugBorder = BorderStroke(2.dp, Color.Red)
@@ -301,6 +302,7 @@ fun ActionSelector(
                                         is BlockTypeSelected -> action.type.toString()
                                         is CalculatedAction -> TODO("Should only be used in tests")
                                         is DicePoolResultsSelected -> "Dice pool: $action"
+                                        is DirectionSelected -> "Direction: ${action.direction}"
                                     }
                                 Text(text, fontSize = 10.sp)
                             }
