@@ -37,6 +37,7 @@ is in no way official and is not endorsed by Games Workshop Limited.
 
 Development requirements are:
 - Java 21
+- Git on the commandline
 
 Note, this has only been tested on Mac, so things on Windows might be broken.
 
@@ -88,6 +89,22 @@ of the following modules:
 
 - `replay-analyzer`: This module is intended for processing and analyzing the
    JSON content of a FUMBBL replay file.
+
+### UI Resources
+
+The Jervis Client is heavily inspired by FUMBBL and borrows all (almost) of
+its assets from there. All rights and credits go to their respective authors.
+
+It is possible to sync the latest FUMBBL resource with the Jervis project
+by using this gradle command:
+
+```
+./gradlew updateFFBResources
+```
+
+This task will clone the FFB respository, take the resource folder and 
+flatten it so it is usable by Compose Multiplatform and then finally moving it
+into place in the project so it is ready for immediate use.
 
 
 ## Why Jervis?

@@ -1,7 +1,17 @@
 package com.jervisffb.ui.images
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import com.jervisffb.engine.actions.BlockDice
+import com.jervisffb.engine.model.Direction
+import com.jervisffb.engine.model.Direction.Companion.BOTTOM
+import com.jervisffb.engine.model.Direction.Companion.BOTTOM_LEFT
+import com.jervisffb.engine.model.Direction.Companion.BOTTOM_RIGHT
+import com.jervisffb.engine.model.Direction.Companion.LEFT
+import com.jervisffb.engine.model.Direction.Companion.RIGHT
+import com.jervisffb.engine.model.Direction.Companion.UP
+import com.jervisffb.engine.model.Direction.Companion.UP_LEFT
+import com.jervisffb.engine.model.Direction.Companion.UP_RIGHT
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
@@ -15,10 +25,47 @@ import com.jervisffb.engine.rules.bb2020.roster.SkavenTeam
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.ui.getSubImage
+import com.jervisffb.ui.loadFileAsImage
 import com.jervisffb.ui.loadImage
 import com.jervisffb.ui.model.UiPlayer
 import com.jervisffb.ui.viewmodel.FieldDetails
 import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.Res
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_holdball
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_prone
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_stunned
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_east
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_east_filled
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_north
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_north_filled
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_northeast
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_northeast_filled
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_northwest
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_northwest_filled
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_south
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_south_filled
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_southeast
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_southeast_filled
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_southwest
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_southwest_filled
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_west
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_pb_west_filled
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_game_sball_30x30
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_scorebar_background_scorebar
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_background_box
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_background_player_detail_blue
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_background_player_detail_red
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_background_resource_blue
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_background_resource_red
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_background_turn_dice_status_blue
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_background_turn_dice_status_red
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_box_button
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_1
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_2
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_3_4
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_5
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_6
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_blue
+import org.jetbrains.compose.resources.imageResource
 
 
 const val iconRootPath = "icons/cached/players/iconsets"
@@ -112,66 +159,21 @@ object IconFactory {
     private val cachedPlayers: MutableMap<Player, PositionImage> = mutableMapOf()
     private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
 
-    private val BALL = "icons/game/sball_30x30.png"
-    private val HELD_BALL_OVERLAY = "icons/decorations/holdball.png"
-    private val STUNNED = "icons/decorations/stunned.gif"
-    private val PRONE = "icons/decorations/prone.gif"
-    private val PLAYER_DETAIL_OVERLAY = "icons/sidebar/overlay_player_detail_blue2.png"
-    private val SIDEBAR_BACKGROUND = "icons/sidebar/background_box.png"
-    private val BUTTON_BACKGROUND = "icons/sidebar/box_button.gif"
-
-
-    private val SIDEBAR_HOME_BANNER_TOP = "icons/sidebar/background_player_detail_red.png"
-    private val SIDEBAR_HOME_BANNER_MIDDLE = "icons/sidebar/background_turn_dice_status_red.png"
-    private val SIDEBAR_HOME_BANNER_BOTTOM = "icons/sidebar/background_resource_red.png"
-
-    private val SIDEBAR_AWAY_BANNER_TOP = "icons/sidebar/background_player_detail_blue.png"
-    private val SIDEBAR_AWAY_BANNER_MIDDLE = "icons/sidebar/background_turn_dice_status_blue.png"
-    private val SIDEBAR_AWAY_BANNER_BOTTOM = "icons/sidebar/background_resource_blue.png"
-
-    private val SCOREBAR = "icons/scorebar/background_scorebar.png"
-
     // Load all image resources used.
     // It looks like we cannot lazy load them due to how Compose Resources work on WasmJS
     // `Res.readBytes` is suspendable and runBlocking doesn't work on wasmJs, which makes
     // loading images in the middle of a Composable function quite a nightmare.
-    // Instead we pre-load all resources up front. This will probably result in slightly
+    // Instead we pre-load all dynamic resources up front. This will probably result in slightly
     // higher memory usage, but it will probably not be problematic.
     suspend fun initialize(homeTeam: Team, awayTeam: Team): Boolean {
-        saveImageIntoCache(BALL)
-        saveImageIntoCache(HELD_BALL_OVERLAY)
-        saveImageIntoCache(STUNNED)
-        saveImageIntoCache(PRONE)
-        saveImageIntoCache(PLAYER_DETAIL_OVERLAY)
-        saveImageIntoCache("i/332804.png")
-        saveImageIntoCache(SIDEBAR_BACKGROUND)
-        saveImageIntoCache(BUTTON_BACKGROUND)
-        saveImageIntoCache(SIDEBAR_HOME_BANNER_TOP)
-        saveImageIntoCache(SIDEBAR_HOME_BANNER_MIDDLE)
-        saveImageIntoCache(SIDEBAR_HOME_BANNER_BOTTOM)
-        saveImageIntoCache(SIDEBAR_AWAY_BANNER_TOP)
-        saveImageIntoCache(SIDEBAR_AWAY_BANNER_MIDDLE)
-        saveImageIntoCache(SIDEBAR_AWAY_BANNER_BOTTOM)
-        saveImageIntoCache(SCOREBAR)
+        // TODO How to map player images?
+        saveFileIntoCache("icons/cached/players/portraits/AnqiPanqi.png")
 
         FieldDetails.entries.forEach {
-            saveImageIntoCache(it.resource)
-        }
-        BlockDice.entries.forEach { die ->
-            val root = "icons/sidebar/dice"
-            val path = when(die) {
-                BlockDice.PLAYER_DOWN -> "new_skool_black_1.png"
-                BlockDice.BOTH_DOWN -> "new_skool_black_2.png"
-                BlockDice.PUSH_BACK -> "new_skool_black_3_4.png"
-                BlockDice.STUMBLE -> "new_skool_black_5.png"
-                BlockDice.POW -> "new_skool_black_6.png"
-            }
-            saveImageIntoCache("$root/$path")
+            saveFileIntoCache(it.resource)
         }
         saveTeamPlayerImagesToCache(homeTeam)
         saveTeamPlayerImagesToCache(awayTeam)
-
-        // Just load all player imsage
         return true
     }
 
@@ -179,6 +181,12 @@ object IconFactory {
         val image = Res.loadImage(path)
         cachedImages[path] = image
     }
+
+    private suspend fun saveFileIntoCache(path: String) {
+        val image = Res.loadFileAsImage(path)
+        cachedImages[path] = image
+    }
+
 
     private fun loadImageFromCache(path: String): ImageBitmap {
         return cachedImages[path] ?: error("Could not find: $path")
@@ -192,7 +200,7 @@ object IconFactory {
             return cachedImages[path]!!
         } else {
             try {
-                val image = Res.loadImage(path)
+                val image = Res.loadFileAsImage(path)
                 cachedImages[path] = image
                 return image
             } catch (ex: NullPointerException) {
@@ -213,19 +221,7 @@ object IconFactory {
         }
     }
 
-    fun getDiceIcon(die: BlockDice): ImageBitmap {
-        val root = "icons/sidebar/dice"
-        val path = when(die) {
-            BlockDice.PLAYER_DOWN -> "new_skool_black_1.png"
-            BlockDice.BOTH_DOWN -> "new_skool_black_2.png"
-            BlockDice.PUSH_BACK -> "new_skool_black_3_4.png"
-            BlockDice.STUMBLE -> "new_skool_black_5.png"
-            BlockDice.POW -> "new_skool_black_6.png"
-        }
-        return loadImageFromCache("$root/$path")
-    }
-
-    suspend fun saveTeamPlayerImagesToCache(team: Team) {
+    private suspend fun saveTeamPlayerImagesToCache(team: Team) {
         team.forEach { player ->
             val variants = getPositionSpriteSheet(player.position)
             val playerImage: PositionImage = variants.getVariant(player)
@@ -250,55 +246,121 @@ object IconFactory {
         }
     }
 
+    @Composable
+    fun getDiceIcon(die: BlockDice): ImageBitmap {
+        val res = when (die) {
+            BlockDice.PLAYER_DOWN -> Res.drawable.icons_sidebar_dice_new_skool_black_1
+            BlockDice.BOTH_DOWN -> Res.drawable.icons_sidebar_dice_new_skool_black_2
+            BlockDice.PUSH_BACK -> Res.drawable.icons_sidebar_dice_new_skool_black_3_4
+            BlockDice.STUMBLE -> Res.drawable.icons_sidebar_dice_new_skool_black_5
+            BlockDice.POW -> Res.drawable.icons_sidebar_dice_new_skool_black_6
+        }
+        return imageResource(res)
+    }
+
+    @Composable
     fun getHeldBallOverlay(): ImageBitmap {
-        return loadImageFromCache(HELD_BALL_OVERLAY)
+        return imageResource(Res.drawable.icons_decorations_holdball)
     }
 
+    @Composable
     fun getBall(): ImageBitmap {
-        return loadImageFromCache(BALL)
+        return imageResource(Res.drawable.icons_game_sball_30x30)
     }
 
+    @Composable
     fun getPlayerDetailOverlay(): ImageBitmap {
-        return loadImageFromCache(PLAYER_DETAIL_OVERLAY)
+        return imageResource(Res.drawable.icons_sidebar_overlay_player_detail_blue)
     }
 
     fun getPlayerImage(player: PlayerId): ImageBitmap {
-        return loadImageFromCache("i/332804.png")
+        // TODO If we want the jervis-engine to not track
+        //  player images. Where/how do we do the mapping?
+        return loadImageFromCache("icons/cached/players/portraits/AnqiPanqi.png")
     }
 
+    @Composable
     fun getSidebarBackground(): ImageBitmap {
-        return loadImageFromCache(SIDEBAR_BACKGROUND)
+        return imageResource(Res.drawable.icons_sidebar_background_box)
     }
 
     fun getField(field: FieldDetails): ImageBitmap {
         return loadImageFromCache(field.resource)
     }
 
+    @Composable
     fun getButton(): ImageBitmap {
-        return loadImageFromCache(BUTTON_BACKGROUND)
+        return imageResource(Res.drawable.icons_sidebar_box_button)
     }
 
+    @Composable
     fun getSidebarBannerTop(isHomeTeam: Boolean): ImageBitmap {
-        return loadImageFromCache(if (isHomeTeam) SIDEBAR_HOME_BANNER_TOP else SIDEBAR_AWAY_BANNER_TOP)
+        return when(isHomeTeam) {
+            true -> imageResource(Res.drawable.icons_sidebar_background_player_detail_red)
+            false -> imageResource(Res.drawable.icons_sidebar_background_player_detail_blue)
+        }
     }
 
+    @Composable
     fun getSidebarBannerMiddle(isHomeTeam: Boolean): ImageBitmap {
-        return loadImageFromCache(if (isHomeTeam) SIDEBAR_HOME_BANNER_MIDDLE else SIDEBAR_AWAY_BANNER_MIDDLE)
+        return when(isHomeTeam) {
+            true -> imageResource(Res.drawable.icons_sidebar_background_turn_dice_status_red)
+            false -> imageResource(Res.drawable.icons_sidebar_background_turn_dice_status_blue)
+        }
     }
 
+    @Composable
     fun getSidebarBannerBottom(isHomeTeam: Boolean): ImageBitmap {
-        return loadImageFromCache(if (isHomeTeam) SIDEBAR_HOME_BANNER_BOTTOM else SIDEBAR_AWAY_BANNER_BOTTOM)
+        return when(isHomeTeam) {
+            true -> imageResource(Res.drawable.icons_sidebar_background_resource_red)
+            false -> imageResource(Res.drawable.icons_sidebar_background_resource_blue)
+        }
     }
 
+    @Composable
     fun getScorebar(): ImageBitmap {
-        return loadImageFromCache(SCOREBAR)
+        return imageResource(Res.drawable.icons_scorebar_background_scorebar)
     }
 
+    @Composable
     fun getStunnedDecoration(): ImageBitmap {
-        return loadImageFromCache(STUNNED)
+        return imageResource(Res.drawable.icons_decorations_stunned)
     }
 
+    @Composable
     fun getProneDecoration(): ImageBitmap {
-        return loadImageFromCache(PRONE)
+        return imageResource(Res.drawable.icons_decorations_prone)
+    }
+
+    @Composable
+    fun getDirection(direction: Direction, active: Boolean): ImageBitmap {
+        val res = when (direction) {
+            UP_LEFT -> {
+                if (active) Res.drawable.icons_game_pb_northwest else Res.drawable.icons_game_pb_northwest_filled
+            }
+            UP -> {
+                if (active) Res.drawable.icons_game_pb_north else Res.drawable.icons_game_pb_north_filled
+            }
+            UP_RIGHT -> {
+                if (active) Res.drawable.icons_game_pb_northeast else Res.drawable.icons_game_pb_northeast_filled
+            }
+            LEFT -> {
+                if (active) Res.drawable.icons_game_pb_west else Res.drawable.icons_game_pb_west_filled
+            }
+            RIGHT -> {
+                if (active) Res.drawable.icons_game_pb_east else Res.drawable.icons_game_pb_east_filled
+            }
+            BOTTOM_LEFT -> {
+                if (active) Res.drawable.icons_game_pb_southwest else Res.drawable.icons_game_pb_southwest_filled
+            }
+            BOTTOM -> {
+                if (active) Res.drawable.icons_game_pb_south else Res.drawable.icons_game_pb_south_filled
+            }
+            BOTTOM_RIGHT -> {
+                if (active) Res.drawable.icons_game_pb_southeast else Res.drawable.icons_game_pb_southeast_filled
+            }
+            else -> error("Unsupported direction: $direction")
+        }
+        return imageResource(res)
     }
 }

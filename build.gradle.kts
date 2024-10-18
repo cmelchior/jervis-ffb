@@ -49,31 +49,92 @@ fun taskName(subdir: String): String {
     return subdir.split("/", "-").map { it.capitalize() }.joinToString(separator = "")
 }
 
-//tasks {
-//
-//    register("ktlintCheck") {
-//        description = "Runs ktlintCheck on all projects."
-//        group = "Verification"
-//        dependsOn(subprojects.map { "ktlintCheck${taskName(it)}" })
+// Internal task for cloning or updating the FFB repo
+tasks.register<Exec>("cloneFFBRepo") {
+    // Either clone the FFB codebase or update our clone if it was already cloned.
+    val targetDir = File(layout.buildDirectory.get().asFile, "ffb-repo")
+    if (!targetDir.exists()) {
+        val repoUrl = "https://github.com/christerk/ffb"
+        commandLine("git", "clone", repoUrl, targetDir.absolutePath)
+    } else {
+        workingDir = targetDir
+        commandLine("git", "pull")
+    }
+    outputs.upToDateWhen { false }
+}
+
+// Internal task that will flatten the fumbble resource directory and move the
+// resulting files to a new temporary location
+tasks.register<Copy>("flattenFFBResources") {
+    dependsOn("cloneFFBRepo")
+
+    val sourceDir = File(layout.buildDirectory.get().asFile, "ffb-repo/ffb-resources/src/main/resources")
+    val targetDir = File(layout.buildDirectory.get().asFile, "ffb-resources")
+
+    from(sourceDir)
+    into(targetDir)
+
+    eachFile {
+        // Ignore directories
+        if (this.isDirectory) {
+            this.exclude()
+        }
+
+        if (this.relativePath.segments.size > 1) {
+            // TODO How to handle pitches? They are currently included as zip-files
+            //  For now I have manually unzipped the default pitch and uses that.
+            // We have 3 locations:
+            // - drawable/: Images that need a static reference
+            // - files/sounds: Sound files
+            // - files/cached: All files under the "cached" folder.
+            //   This is player icons/images and are loaded dynamically
+            when {
+                this.relativePath.startsWith("sounds/") -> {
+                    this.path = "files/${this.path}"
+                }
+                this.relativePath.startsWith("icons/cached") -> {
+                    this.path = "files/${this.path}"
+                }
+                else -> {
+                    // Names are required to be flattened in order to generate accessors for them
+                    val newFileName = this.relativePath.segments.joinToString("_")
+                    this.path = "drawable/$newFileName"
+                }
+            }
+        }
+    }
+
+    // Make the task fail if the source directory does not exist
+    onlyIf {
+        if (!sourceDir.exists()) {
+            throw GradleException("Source directory does not exist: ${sourceDir.absolutePath}")
+        }
+        true
+    }
+
+    includeEmptyDirs = false
+}
+
+tasks.register<Copy>("updateFFBResources") {
+    description = "Update Jervis UI with latest version of FFB resources"
+    group = "Jervis Tasks"
+    dependsOn("flattenFFBResources") // Make sure this runs after flattenFolder
+
+    val tempDir = file("${layout.buildDirectory.get().asFile.absolutePath}/ffb-resources")
+    val targetDir = file("${layout.projectDirectory.asFile.absolutePath}/modules/jervis-ui/src/commonMain/composeResources")
+
+    onlyIf {
+        if (!tempDir.exists()) {
+            throw GradleException("Source directory does not exist: ${tempDir.absolutePath}")
+        }
+        true
+    }
+
+    from(tempDir) {
+        include("**/*") // Include all files
+    }
+    into(targetDir) // Move files into the final destination
+//    doLast {
+//        delete(tempDir)
 //    }
-//
-//    register("ktlintFormat") {
-//        description = "Runs ktlintFormat on all projects."
-//        group = "Formatting"
-//        dependsOn(subprojects.map { "ktlintFormat${taskName(it)}" })
-//    }
-//
-//    subprojects.forEach { subdir ->
-//        register<Exec>("ktlintCheck${taskName(subdir)}") {
-//            description = "Run ktlintCheck on /$subdir project"
-//            workingDir = file("${rootDir}/$subdir")
-//            commandLine = listOf("./gradlew", "ktlintCheck")
-//        }
-//
-//        register<Exec>("ktlintFormat${taskName(subdir)}") {
-//            description = "Run ktlintFormat on /$subdir project"
-//            workingDir = file("${rootDir}/$subdir")
-//            commandLine = listOf("./gradlew", "ktlintFormat")
-//        }
-//    }
-//}
+}

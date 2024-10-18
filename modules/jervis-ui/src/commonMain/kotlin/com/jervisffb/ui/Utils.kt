@@ -25,6 +25,11 @@ internal suspend fun Res.loadImage(path: String): ImageBitmap {
     return Image.makeFromEncoded(readBytes("drawable/$path")).toComposeImageBitmap()
 }
 
+@OptIn(ExperimentalResourceApi::class)
+internal suspend fun Res.loadFileAsImage(path: String): ImageBitmap {
+    return Image.makeFromEncoded(readBytes("files/$path")).toComposeImageBitmap()
+}
+
 fun ImageBitmap.getSubImage(x: Int, y: Int, width: Int, height: Int): ImageBitmap {
     val newImageBitmap = ImageBitmap(width, height)
     val canvas = Canvas(newImageBitmap)
