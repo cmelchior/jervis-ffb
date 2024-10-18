@@ -3,6 +3,9 @@ package com.jervisffb.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,12 +30,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.ui.images.IconFactory
 import com.jervisffb.ui.model.UiFieldSquare
 import com.jervisffb.ui.viewmodel.FieldDetails
 import com.jervisffb.ui.viewmodel.FieldViewModel
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -173,7 +178,7 @@ private fun FieldSquare(
     val bgColor by remember(square) {
         mutableStateOf(when {
             square.onSelected != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
-            square.direction != null -> Color.Yellow.copy(alpha = 0.25f)
+            square.direction != null -> Color.Transparent // Hide square color
             square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
             else -> Color.Transparent
         })
@@ -225,5 +230,21 @@ private fun FieldSquare(
                 contentDescription = "",
             )
         }
+        if (square.direction != null) {
+            HoverImage(square.direction)
+        }
     }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun HoverImage(direction: Direction) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val imageRes = IconFactory.getDirection(direction, isHovered)
+    Image(
+        modifier = Modifier.fillMaxSize().hoverable(interactionSource = interactionSource),
+        painter = painterResource(imageRes),
+        contentDescription = null,
+    )
 }

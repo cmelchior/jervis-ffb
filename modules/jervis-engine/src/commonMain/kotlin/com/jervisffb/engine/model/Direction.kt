@@ -23,9 +23,9 @@ data class Direction(val xModifier: Int, val yModifier: Int) {
      * field model and might not present the direction shown in the UI.
      */
     companion object {
-        val UP_LEFT = Direction(0, -1)
+        val UP_LEFT = Direction(-1, -1)
         val UP = Direction(0, -1)
-        val UP_RIGHT = Direction(0, -1)
+        val UP_RIGHT = Direction(1, -1)
         val LEFT = Direction(-1, 0)
         val RIGHT = Direction(1, 0)
         val BOTTOM_LEFT = Direction(-1, 1)

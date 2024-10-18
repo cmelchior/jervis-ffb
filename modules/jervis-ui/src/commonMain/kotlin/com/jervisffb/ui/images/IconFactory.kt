@@ -65,6 +65,7 @@ import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_dice_ne
 import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_5
 import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_6
 import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_blue
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
 
 
@@ -332,35 +333,33 @@ object IconFactory {
         return imageResource(Res.drawable.icons_decorations_prone)
     }
 
-    @Composable
-    fun getDirection(direction: Direction, active: Boolean): ImageBitmap {
-        val res = when (direction) {
+    fun getDirection(direction: Direction, active: Boolean): DrawableResource {
+        return when (direction) {
             UP_LEFT -> {
-                if (active) Res.drawable.icons_game_pb_northwest else Res.drawable.icons_game_pb_northwest_filled
+                if (active) Res.drawable.icons_game_pb_northwest_filled else Res.drawable.icons_game_pb_northwest
             }
             UP -> {
-                if (active) Res.drawable.icons_game_pb_north else Res.drawable.icons_game_pb_north_filled
+                if (active) Res.drawable.icons_game_pb_north_filled else Res.drawable.icons_game_pb_north
             }
             UP_RIGHT -> {
-                if (active) Res.drawable.icons_game_pb_northeast else Res.drawable.icons_game_pb_northeast_filled
+                if (active) Res.drawable.icons_game_pb_northeast_filled else Res.drawable.icons_game_pb_northeast
             }
             LEFT -> {
-                if (active) Res.drawable.icons_game_pb_west else Res.drawable.icons_game_pb_west_filled
+                if (active) Res.drawable.icons_game_pb_west_filled else Res.drawable.icons_game_pb_west
             }
             RIGHT -> {
-                if (active) Res.drawable.icons_game_pb_east else Res.drawable.icons_game_pb_east_filled
+                if (active) Res.drawable.icons_game_pb_east_filled else Res.drawable.icons_game_pb_east
             }
             BOTTOM_LEFT -> {
-                if (active) Res.drawable.icons_game_pb_southwest else Res.drawable.icons_game_pb_southwest_filled
+                if (active) Res.drawable.icons_game_pb_southwest_filled else Res.drawable.icons_game_pb_southwest
             }
             BOTTOM -> {
-                if (active) Res.drawable.icons_game_pb_south else Res.drawable.icons_game_pb_south_filled
+                if (active) Res.drawable.icons_game_pb_south_filled else Res.drawable.icons_game_pb_south
             }
             BOTTOM_RIGHT -> {
-                if (active) Res.drawable.icons_game_pb_southeast else Res.drawable.icons_game_pb_southeast_filled
+                if (active) Res.drawable.icons_game_pb_southeast_filled else Res.drawable.icons_game_pb_southeast
             }
             else -> error("Unsupported direction: $direction")
         }
-        return imageResource(res)
     }
 }
