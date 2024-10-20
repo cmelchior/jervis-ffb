@@ -71,19 +71,19 @@ import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.ui.userinput.CompositeUserInput
 import com.jervisffb.ui.viewmodel.ActionSelectorViewModel
-import com.jervisffb.ui.viewmodel.CompositeUserInput
 import com.jervisffb.ui.viewmodel.DialogsViewModel
-import com.jervisffb.ui.viewmodel.DicePoolUserInputDialog
-import com.jervisffb.ui.viewmodel.DiceRollUserInputDialog
+import com.jervisffb.ui.userinput.DicePoolUserInputDialog
+import com.jervisffb.ui.userinput.DiceRollUserInputDialog
 import com.jervisffb.ui.viewmodel.FieldViewModel
 import com.jervisffb.ui.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.viewmodel.LogViewModel
 import com.jervisffb.ui.viewmodel.ReplayViewModel
-import com.jervisffb.ui.viewmodel.SingleChoiceInputDialog
-import com.jervisffb.ui.viewmodel.UnknownInput
-import com.jervisffb.ui.viewmodel.UserInput
-import com.jervisffb.ui.viewmodel.WaitingForUserInput
+import com.jervisffb.ui.userinput.SingleChoiceInputDialog
+import com.jervisffb.ui.userinput.UnknownInput
+import com.jervisffb.ui.userinput.UserInput
+import com.jervisffb.ui.userinput.WaitingForUserInput
 
 // Theme
 val debugBorder = BorderStroke(2.dp, Color.Red)

@@ -1,5 +1,7 @@
 package com.jervisffb.ui
 
+import com.jervisffb.engine.ActionsRequest
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
@@ -10,8 +12,6 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectDicePoolResult
-import com.jervisffb.engine.ActionsRequest
-import com.jervisffb.engine.GameController
 import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext
@@ -65,10 +65,10 @@ import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.skills.SideStep
 import com.jervisffb.engine.rules.bb2020.skills.Tackle
-import com.jervisffb.ui.viewmodel.DiceRollUserInputDialog
-import com.jervisffb.ui.viewmodel.SingleChoiceInputDialog
-import com.jervisffb.ui.viewmodel.UserInput
-import com.jervisffb.ui.viewmodel.UserInputDialog
+import com.jervisffb.ui.userinput.DiceRollUserInputDialog
+import com.jervisffb.ui.userinput.SingleChoiceInputDialog
+import com.jervisffb.ui.userinput.UserInput
+import com.jervisffb.ui.userinput.UserInputDialog
 
 /**
  * Class responsible for setting up modal dialogs specifically for dice rolls.

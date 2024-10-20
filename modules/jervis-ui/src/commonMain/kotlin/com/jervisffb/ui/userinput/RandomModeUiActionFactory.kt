@@ -1,4 +1,4 @@
-package com.jervisffb.ui.viewmodel
+package com.jervisffb.ui.userinput
 
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected

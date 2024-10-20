@@ -15,10 +15,10 @@ import com.jervisffb.ui.viewmodel.DialogsViewModel
 import com.jervisffb.ui.viewmodel.FieldViewModel
 import com.jervisffb.ui.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.viewmodel.LogViewModel
-import com.jervisffb.ui.viewmodel.ManualModeUiActionFactory
+import com.jervisffb.ui.userinput.ManualModeUiActionFactory
 import com.jervisffb.ui.viewmodel.MenuViewModel
-import com.jervisffb.ui.viewmodel.RandomModeUiActionFactory
-import com.jervisffb.ui.viewmodel.ReplayModeUiActionFactory
+import com.jervisffb.ui.userinput.RandomModeUiActionFactory
+import com.jervisffb.ui.userinput.ReplayModeUiActionFactory
 import com.jervisffb.ui.viewmodel.ReplayViewModel
 import com.jervisffb.engine.utils.createDefaultGameState
 import com.jervisffb.engine.utils.lizardMenAwayTeam

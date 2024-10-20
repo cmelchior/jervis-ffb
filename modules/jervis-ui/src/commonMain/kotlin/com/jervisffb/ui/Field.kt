@@ -236,7 +236,6 @@ private fun FieldSquare(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HoverImage(direction: Direction) {
     val interactionSource = remember { MutableInteractionSource() }

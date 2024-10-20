@@ -6,9 +6,12 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isOnAwayTeam
 import com.jervisffb.engine.model.locations.DogOut
+import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.model.UiPlayer
 import com.jervisffb.ui.model.UiPlayerCard
-import com.jervisffb.engine.utils.safeTryEmit
+import com.jervisffb.ui.userinput.SelectPlayerInput
+import com.jervisffb.ui.userinput.UiActionFactory
+import com.jervisffb.ui.userinput.UserInput
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,14 +28,14 @@ enum class SidebarView {
 }
 
 class SidebarViewModel(
-    private val uiActionFactory: com.jervisffb.ui.viewmodel.UiActionFactory,
+    private val uiActionFactory: UiActionFactory,
     val team: Team,
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
 ) {
     // Image is 145f/430f, but we need to stretch to make it fit the field image.
     val aspectRatio: Float = 145f/430f // 152.42f / 452f
 
-    private val _view = MutableStateFlow(com.jervisffb.ui.viewmodel.SidebarView.RESERVES)
+    private val _view = MutableStateFlow(SidebarView.RESERVES)
     private val _reserveCount = MutableStateFlow<Int?>(null)
     private val _injuriesCount = MutableStateFlow<Int?>(null)
 
@@ -55,7 +58,7 @@ class SidebarViewModel(
             player?.let { UiPlayerCard(it) }
         }
 
-    fun view(): StateFlow<com.jervisffb.ui.viewmodel.SidebarView> = _view
+    fun view(): StateFlow<SidebarView> = _view
 
     fun reserveCount(): Flow<Int> = team.dogoutFlow.map {
         // Available players in the Dogout should only have this state
@@ -68,8 +71,8 @@ class SidebarViewModel(
                 players
                     .filter { it.state == PlayerState.RESERVE }
                     .sortedBy { it.number }
-            }.combine(uiActionFactory.fieldActions) { e1: List<Player>, e2: com.jervisffb.ui.viewmodel.UserInput ->
-                val userInput = e2 as? com.jervisffb.ui.viewmodel.SelectPlayerInput
+            }.combine(uiActionFactory.fieldActions) { e1: List<Player>, e2: UserInput ->
+                val userInput = e2 as? SelectPlayerInput
                 val selectablePlayers = userInput?.actions?.associateBy { (it as PlayerSelected).getPlayer(team.game) } ?: emptyMap()
                 e1.map {
                     val selectAction =
@@ -110,11 +113,11 @@ class SidebarViewModel(
     }
 
     fun toggleToReserves() {
-        _view.value = com.jervisffb.ui.viewmodel.SidebarView.RESERVES
+        _view.value = SidebarView.RESERVES
     }
 
     fun toggleInjuries() {
-        _view.value = com.jervisffb.ui.viewmodel.SidebarView.INJURIES
+        _view.value = SidebarView.INJURIES
     }
 
     private fun mapTo(states: List<PlayerState>, dogoutFlow: SharedFlow<List<Player>>): Flow<List<UiPlayer>> {

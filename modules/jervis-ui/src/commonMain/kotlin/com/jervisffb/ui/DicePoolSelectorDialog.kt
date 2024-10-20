@@ -39,7 +39,7 @@ import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.ui.images.IconFactory
 import com.jervisffb.ui.viewmodel.DialogsViewModel
-import com.jervisffb.ui.viewmodel.DicePoolUserInputDialog
+import com.jervisffb.ui.userinput.DicePoolUserInputDialog
 import kotlin.random.Random
 
 @OptIn(ExperimentalComposeUiApi::class)

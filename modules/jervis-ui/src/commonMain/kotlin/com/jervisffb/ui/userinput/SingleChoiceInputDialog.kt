@@ -1,4 +1,4 @@
-package com.jervisffb.ui.viewmodel
+package com.jervisffb.ui.userinput
 
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction
@@ -37,10 +37,6 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.skills.Skill
-
-sealed interface UserInputDialog : UserInput {
-    var owner: Team?
-}
 
 /**
  * Class wrapping the intent of choosing a single option between many

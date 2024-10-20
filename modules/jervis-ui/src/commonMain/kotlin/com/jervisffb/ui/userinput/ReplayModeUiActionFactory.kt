@@ -1,4 +1,4 @@
-package com.jervisffb.ui.viewmodel
+package com.jervisffb.ui.userinput
 
 import com.jervisffb.fumbbl.net.adapter.CalculatedJervisAction
 import com.jervisffb.fumbbl.net.adapter.JervisAction

@@ -1,4 +1,4 @@
-package com.jervisffb.ui.viewmodel
+package com.jervisffb.ui.userinput
 
 import com.jervisffb.engine.ActionsRequest
 import com.jervisffb.engine.GameController
@@ -73,6 +73,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.Stand
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.calculateOptionsForMoveType
 import com.jervisffb.ui.DialogFactory
 import com.jervisffb.ui.GameScreenModel
+import com.jervisffb.ui.viewmodel.Feature
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -155,7 +156,9 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
             }
         }
 
-        if (controller.currentProcedure()?.currentNode() == TheKickOff.NominateKickingPlayer && model.menuViewModel.isFeatureEnabled(Feature.SELECT_KICKING_PLAYER)) {
+        if (controller.currentProcedure()?.currentNode() == TheKickOff.NominateKickingPlayer && model.menuViewModel.isFeatureEnabled(
+                Feature.SELECT_KICKING_PLAYER
+            )) {
             return (controller.currentProcedure()!!.currentNode() as ActionNode).getAvailableActions(controller.state, controller.rules)
                 .random().let {
                     PlayerSelected((it as SelectPlayer).player)
@@ -257,16 +260,16 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                                         if (requiresDodge) 1 else player.movesLeft,
                                     )
                                     SelectMoveActionFieldLocationInput(
-                                        wrapperAction = calculateOptionsForMoveType(controller.state, controller.rules, player, MoveType.STANDARD).map { it: ActionDescriptor ->
+                                        wrapperAction = calculateOptionsForMoveType(controller.state, controller.rules, player, MoveType.STANDARD).map { descriptor: ActionDescriptor ->
                                             FieldSquareAction(
-                                                coordinate = (it as SelectFieldLocation).coordinate,
+                                                coordinate = (descriptor as SelectFieldLocation).coordinate,
                                                 action = CompositeGameAction(
                                                     list = listOf(
                                                         MoveTypeSelected(MoveType.STANDARD),
-                                                        FieldSquareSelected(it.coordinate)
+                                                        FieldSquareSelected(descriptor.coordinate)
                                                     )
                                                 ),
-                                                requiresRoll = it.requiresRush || it.requiresDodge,
+                                                requiresRoll = descriptor.requiresRush || descriptor.requiresDodge,
                                                 direction = null
                                             )
                                         },
@@ -311,7 +314,6 @@ class ManualModeUiActionFactory(model: GameScreenModel, private val preloadedAct
                                         requiresRoll = false,
                                         direction = dir
                                     )
-
                                 }
                             }
                         )

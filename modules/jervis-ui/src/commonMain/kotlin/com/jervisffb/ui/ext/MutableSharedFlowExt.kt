@@ -1,6 +1,6 @@
 package com.jervisffb.ui.ext
 
-import com.jervisffb.ui.viewmodel.WaitingForUserInput
+import com.jervisffb.ui.userinput.WaitingForUserInput
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.scan

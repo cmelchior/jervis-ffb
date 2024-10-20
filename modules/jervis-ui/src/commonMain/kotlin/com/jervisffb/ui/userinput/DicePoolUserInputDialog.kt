@@ -1,4 +1,4 @@
-package com.jervisffb.ui.viewmodel
+package com.jervisffb.ui.userinput
 
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DicePool

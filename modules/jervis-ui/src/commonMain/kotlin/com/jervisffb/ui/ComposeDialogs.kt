@@ -34,8 +34,8 @@ import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.ui.Theme
 import com.jervisffb.ui.images.IconFactory
 import com.jervisffb.ui.viewmodel.DialogsViewModel
-import com.jervisffb.ui.viewmodel.DiceRollUserInputDialog
-import com.jervisffb.ui.viewmodel.SingleChoiceInputDialog
+import com.jervisffb.ui.userinput.DiceRollUserInputDialog
+import com.jervisffb.ui.userinput.SingleChoiceInputDialog
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
