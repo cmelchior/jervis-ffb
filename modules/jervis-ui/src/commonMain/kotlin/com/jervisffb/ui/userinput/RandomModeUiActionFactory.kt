@@ -12,7 +12,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.utils.createRandomAction
-import com.jervisffb.ui.GameScreenModel
+import com.jervisffb.ui.screen.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock

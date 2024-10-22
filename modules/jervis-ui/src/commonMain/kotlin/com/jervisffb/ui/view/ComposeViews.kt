@@ -1,7 +1,5 @@
-package com.jervisffb.ui
+package com.jervisffb.ui.view
 
-import MultipleSelectUserActionDialog
-import UserActionDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

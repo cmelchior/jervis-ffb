@@ -3,7 +3,7 @@ package com.jervisffb.ui.userinput
 import com.jervisffb.fumbbl.net.adapter.CalculatedJervisAction
 import com.jervisffb.fumbbl.net.adapter.JervisAction
 import com.jervisffb.fumbbl.net.adapter.OptionalJervisAction
-import com.jervisffb.ui.GameScreenModel
+import com.jervisffb.ui.screen.GameScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

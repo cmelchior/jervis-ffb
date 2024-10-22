@@ -6,7 +6,7 @@ import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.isOnHomeTeam
-import com.jervisffb.ui.ContextMenuOption
+import com.jervisffb.ui.view.ContextMenuOption
 
 /**
  * Represents all information needed to render a single square

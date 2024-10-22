@@ -11,11 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.jervisffb.ui.Field
-import com.jervisffb.ui.Sidebar
+import com.jervisffb.ui.view.Field
+import com.jervisffb.ui.view.Sidebar
 import manual.dummies.TestDummy
 import com.jervisffb.ui.viewmodel.FieldViewModel
-import com.jervisffb.ui.viewmodel.SidebarViewModel
 import org.junit.Test
 
 class PlayerStatsCard {

@@ -1,4 +1,4 @@
-package com.jervisffb.ui
+package com.jervisffb.ui.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,8 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.images.IconFactory
 import com.jervisffb.ui.model.UiPlayer
-import com.jervisffb.ui.viewmodel.SidebarView
-import com.jervisffb.ui.viewmodel.SidebarViewModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable

@@ -1,4 +1,4 @@
-package com.jervisffb.ui
+package com.jervisffb.ui.view
 
 import com.jervisffb.engine.ActionsRequest
 import com.jervisffb.engine.GameController

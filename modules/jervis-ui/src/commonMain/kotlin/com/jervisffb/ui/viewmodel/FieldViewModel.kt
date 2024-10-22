@@ -17,7 +17,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.utils.safeTryEmit
-import com.jervisffb.ui.ContextMenuOption
+import com.jervisffb.ui.view.ContextMenuOption
 import com.jervisffb.ui.model.UiFieldSquare
 import com.jervisffb.ui.model.UiPlayer
 import com.jervisffb.ui.userinput.CompositeUserInput

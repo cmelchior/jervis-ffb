@@ -1,6 +1,6 @@
 package com.jervisffb.ui.viewmodel
 
-import com.jervisffb.ui.GameScreenModel
+import com.jervisffb.ui.screen.GameScreenModel
 import com.jervisffb.ui.userinput.UiActionFactory
 
 class ReplayViewModel(

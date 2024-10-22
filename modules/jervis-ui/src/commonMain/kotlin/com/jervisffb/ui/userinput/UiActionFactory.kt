@@ -3,7 +3,7 @@ package com.jervisffb.ui.userinput
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveTypeSelected
-import com.jervisffb.ui.GameScreenModel
+import com.jervisffb.ui.screen.GameScreenModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope

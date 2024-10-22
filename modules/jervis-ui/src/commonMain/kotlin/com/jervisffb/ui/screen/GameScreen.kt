@@ -1,27 +1,29 @@
-package com.jervisffb.ui
+package com.jervisffb.ui.screen
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.ActionsRequest
 import com.jervisffb.engine.GameController
-import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
+import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.utils.createDefaultGameState
+import com.jervisffb.engine.utils.lizardMenAwayTeam
+import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.ui.images.IconFactory
+import com.jervisffb.ui.userinput.ManualModeUiActionFactory
+import com.jervisffb.ui.userinput.RandomModeUiActionFactory
+import com.jervisffb.ui.userinput.ReplayModeUiActionFactory
+import com.jervisffb.ui.view.Screen
 import com.jervisffb.ui.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.viewmodel.DialogsViewModel
 import com.jervisffb.ui.viewmodel.FieldViewModel
 import com.jervisffb.ui.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.viewmodel.LogViewModel
-import com.jervisffb.ui.userinput.ManualModeUiActionFactory
 import com.jervisffb.ui.viewmodel.MenuViewModel
-import com.jervisffb.ui.userinput.RandomModeUiActionFactory
-import com.jervisffb.ui.userinput.ReplayModeUiActionFactory
 import com.jervisffb.ui.viewmodel.ReplayViewModel
-import com.jervisffb.engine.utils.createDefaultGameState
-import com.jervisffb.engine.utils.lizardMenAwayTeam
+import com.jervisffb.ui.viewmodel.SidebarViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -73,6 +75,8 @@ class GameScreenModel(
 class GameScreen(val screenModel: GameScreenModel, private val actions: List<GameAction>) : Screen {
     @Composable
     override fun Content() {
+
+
         val uiActionFactory =
             when (screenModel.mode) {
                 Manual -> ManualModeUiActionFactory(screenModel, actions)
@@ -87,12 +91,12 @@ class GameScreen(val screenModel: GameScreenModel, private val actions: List<Gam
                 screenModel.controller.state.field,
                 screenModel.hoverPlayerFlow,
             ),
-            com.jervisffb.ui.viewmodel.SidebarViewModel(
+            SidebarViewModel(
                 uiActionFactory,
                 screenModel.controller.state.homeTeam,
                 screenModel.hoverPlayerFlow
             ),
-            com.jervisffb.ui.viewmodel.SidebarViewModel(
+            SidebarViewModel(
                 uiActionFactory,
                 screenModel.controller.state.awayTeam,
                 screenModel.hoverPlayerFlow

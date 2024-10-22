@@ -1,4 +1,4 @@
-package com.jervisffb.ui
+package com.jervisffb.ui.view
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable

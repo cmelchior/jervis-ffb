@@ -71,8 +71,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.calculateOptionsForMoveType
-import com.jervisffb.ui.DialogFactory
-import com.jervisffb.ui.GameScreenModel
+import com.jervisffb.ui.view.DialogFactory
+import com.jervisffb.ui.screen.GameScreenModel
 import com.jervisffb.ui.viewmodel.Feature
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
