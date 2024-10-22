@@ -42,6 +42,8 @@ class SelectPlayerSubActionInput(val activePlayerLocation: FieldCoordinate, over
 
 class EndActionInput(val activePlayerLocation: FieldCoordinate, override val actions: List<EndAction>) : UserInput
 
+data class PlayerSquareAction(val coordinate: FieldCoordinate, val action: GameAction, val dice: Int)
+
 class SelectPlayerInput(override val actions: List<GameAction>) : UserInput
 
 class DeselectPlayerInput(override val actions: List<GameAction>) : UserInput

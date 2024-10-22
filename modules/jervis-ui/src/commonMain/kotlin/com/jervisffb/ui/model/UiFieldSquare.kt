@@ -1,11 +1,11 @@
 package com.jervisffb.ui.model
 
 import com.jervisffb.engine.model.Availability
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.isOnHomeTeam
-import com.jervisffb.engine.model.Direction
 import com.jervisffb.ui.ContextMenuOption
 
 /**
@@ -18,6 +18,7 @@ data class UiFieldSquare(
     val isBallCarried: Boolean = false,
     val player: UiPlayer? = null,
     val direction: Direction? = null,
+    val dice: Int = 0,
     val onSelected: (() -> Unit)? = null,
     val onMenuHidden: (() -> Unit?)? = null,
     val requiresRoll: Boolean = false,

@@ -24,6 +24,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
@@ -231,19 +232,34 @@ private fun FieldSquare(
             )
         }
         if (square.direction != null) {
-            HoverImage(square.direction)
+            DictionImage(square.direction)
+        }
+        if (square.dice != 0) {
+            BlockDiceIndicatorImage(square.dice)
         }
     }
 }
 
 @Composable
-fun HoverImage(direction: Direction) {
+fun DictionImage(direction: Direction) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val imageRes = IconFactory.getDirection(direction, isHovered)
     Image(
         modifier = Modifier.fillMaxSize().hoverable(interactionSource = interactionSource),
         painter = painterResource(imageRes),
+        contentDescription = null,
+    )
+}
+
+@Composable
+fun BlockDiceIndicatorImage(dice: Int) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val imageRes = IconFactory.getBlockDiceRolledIndicator(dice)
+    Image(
+        modifier = Modifier.fillMaxSize().hoverable(interactionSource = interactionSource),
+        painter = if (isHovered) painterResource(imageRes) else ColorPainter(Color.Transparent),
         contentDescription = null,
     )
 }

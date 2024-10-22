@@ -197,6 +197,7 @@ class FieldViewModel(
         val contextActions: MutableList<ContextMenuOption> = mutableListOf()
         var showContextMenu = false
         var direction: Direction? = null
+        var dice: Int = 0 // 0 = Not shown, > 0 (positive), < 0 (negative)
         if (!ignoreUserInput) {
             val inputs =
                 when (userInput) {
@@ -240,6 +241,7 @@ class FieldViewModel(
                                         { uiActionFactory.userSelectedAction(playerAction) }
                                     }
                             } ?: squareAction
+//                        dice = input.
                     }
 
                     is SelectPlayerActionInput -> {
@@ -343,6 +345,7 @@ class FieldViewModel(
                 square.player?.hasBall() == true,
                 uiPlayer,
                 direction,
+                dice,
                 squareAction, // Only allow a Square Action if no player is on the field
                 onMenuHiddenAction,
                 requiresRoll,

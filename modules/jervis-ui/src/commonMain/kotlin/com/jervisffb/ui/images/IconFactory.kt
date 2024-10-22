@@ -30,6 +30,11 @@ import com.jervisffb.ui.loadImage
 import com.jervisffb.ui.model.UiPlayer
 import com.jervisffb.ui.viewmodel.FieldDetails
 import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.Res
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_block1d
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_block2d
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_block2dagainst
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_block3d
+import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_block3dagainst
 import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_holdball
 import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_prone
 import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_decorations_stunned
@@ -360,6 +365,17 @@ object IconFactory {
                 if (active) Res.drawable.icons_game_pb_southeast_filled else Res.drawable.icons_game_pb_southeast
             }
             else -> error("Unsupported direction: $direction")
+        }
+    }
+
+    fun getBlockDiceRolledIndicator(dice: Int): DrawableResource {
+        return when (dice) {
+            -3 -> Res.drawable.icons_decorations_block3dagainst
+            -2 -> Res.drawable.icons_decorations_block2dagainst
+            1 -> Res.drawable.icons_decorations_block1d
+            2 -> Res.drawable.icons_decorations_block2d
+            3 -> Res.drawable.icons_decorations_block3d
+            else -> error("Unsupported number of dice: $dice")
         }
     }
 }
