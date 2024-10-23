@@ -145,15 +145,21 @@ class GameController(
     }
 
     fun processAction(userAction: GameAction) {
-        actionHistory.add(userAction)
-        val reportSelectedAction = ReportHandleAction(userAction)
-        commands.add(reportSelectedAction)
-        reportSelectedAction.execute(state)
-        val currentNode: ActionNode = stack.currentNode() as ActionNode
-        val command = currentNode.applyAction(userAction, state, rules)
-        commands.add(command)
-        command.execute(state)
-        rollForwardToNextActionNode()
+        if (userAction != Undo) {
+            lastActionWasUndo = false
+            actionHistory.add(userAction)
+            val reportSelectedAction = ReportHandleAction(userAction)
+            commands.add(reportSelectedAction)
+            reportSelectedAction.execute(state)
+            val currentNode: ActionNode = stack.currentNode() as ActionNode
+            val command = currentNode.applyAction(userAction, state, rules)
+            commands.add(command)
+            command.execute(state)
+            rollForwardToNextActionNode()
+        } else {
+            lastActionWasUndo = true
+            undoLastAction()
+        }
     }
 
     fun startManualMode() {
