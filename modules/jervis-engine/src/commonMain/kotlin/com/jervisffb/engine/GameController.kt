@@ -62,7 +62,7 @@ class GameController(
     // How is the GameController consuming actions. Once started, it poses
     // restrictions on the Controller is used.
     enum class ActionMode {
-        MANUAL, CALLBACK, NOT_STARTED
+        MANUAL, CALLBACK, TEST, NOT_STARTED
     }
 
     // Copy of Home and Away teams state, taken just before starting the game.
@@ -77,6 +77,7 @@ class GameController(
     val actionHistory: MutableList<GameAction> = mutableListOf() // List all actions provided by the user.
     val commands: MutableList<Command> = mutableListOf()
     val state: Game = state
+    val stack: ProcedureStack = state.stack // Shortcut for accessing the stack
     private var actionMode = ActionMode.NOT_STARTED
     private var isStarted: Boolean = false
     private var replayMode: Boolean = false
@@ -87,6 +88,9 @@ class GameController(
     // with a `source` hint, but is that overkill?
     var lastActionWasUndo = false
 
+    /**
+     * Process current node when in Callback mode. i.e
+     */
     private suspend fun processNode(
         currentNode: Node,
         actionProvider: suspend (controller: GameController, availableActions: ActionsRequest) -> GameAction,
@@ -112,7 +116,7 @@ class GameController(
                 val selectedAction = if (request.actions.size == 1 && request.actions.first() == ContinueWhenReady) {
                     Continue
                 } else {
-                    val reportAvailableActions = ReportAvailableActions(request.actions)
+                    val reportAvailableActions = ReportAvailableActions(request)
                     commands.add(reportAvailableActions)
                     reportAvailableActions.execute(state)
                     actionProvider(this@GameController, request)
@@ -157,21 +161,23 @@ class GameController(
         }
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val actions = currentNode.getAvailableActions(state, rules)
-        val reportAvailableActions = ReportAvailableActions(actions)
-        commands.add(reportAvailableActions)
-        reportAvailableActions.execute(state)
         return ActionsRequest(currentNode.actionOwner(state, rules), actions)
     }
 
 
     fun processAction(action: GameAction) {
-        if (actionMode != ActionMode.MANUAL) {
-            error("Invalid action mode: $actionMode. Must be ActionMode.MANUAL.")
+        if (actionMode != ActionMode.MANUAL && actionMode != ActionMode.TEST) {
+            error("Invalid action mode: $actionMode. Must be ActionMode.MANUAL or ActionMode.TEST.")
         }
         when (action) {
             is CompositeGameAction -> action.list.forEach { processSingleAction(it) }
             else -> processSingleAction(action)
         }
+
+        // Report actions available to the node we moved to after processing the action.
+        val reportAvailableActions = ReportAvailableActions(getAvailableActions())
+        commands.add(reportAvailableActions)
+        reportAvailableActions.execute(state)
     }
 
     private fun processSingleAction(userAction: GameAction) {
@@ -228,20 +234,22 @@ class GameController(
     }
 
     fun startTestMode(start: Procedure) {
-        actionMode = ActionMode.MANUAL
+        actionMode = ActionMode.TEST
         setupInitialStartingState(start)
         rollForwardToNextActionNode()
     }
 
-    // TODO What does this do exactly
+    // Move the state machine forward until we get to the next ActionNode that requires
+    // user input.
     private fun rollForwardToNextActionNode() {
         if (
             !stack.isEmpty() &&
             (
                 stack.currentNode() is ComputationNode ||
-                    stack.currentNode() is ParentNode ||
-                // Skip action nodes that only accept "Continue" events
-                    stack.currentNode() is ActionNode && getAvailableActions().let { it.actions.size == 1 && it.actions.first() == ContinueWhenReady }
+                stack.currentNode() is ParentNode ||
+                // Some action nodes only accept "Continue" events if all other options have been exhausted
+                // We want to roll over these as well.
+                stack.currentNode() is ActionNode && getAvailableActions().let { it.actions.size == 1 && it.actions.first() == ContinueWhenReady }
             )
         ) {
             when (val currentNode: Node = stack.currentNode()) {
@@ -398,31 +406,18 @@ class GameController(
         return true
     }
 
-    // Test method
+    /**
+     * Test method. Used to apply multiple [GameAction]s in on go.
+     */
     fun rollForward(vararg actions: GameAction?) {
+        if (actionMode != ActionMode.TEST) {
+            error("Invalid action mode: $actionMode. Must be ActionMode.TEST.")
+        }
         actions.forEach {
             if (it != null) {
                 val action = if (it is CalculatedAction) it.get(state, rules) else it
                 processAction(action)
-                rollForwardToNextActionNode()
-                gotoNextUserAction()
             }
         }
-        gotoNextUserAction()
     }
-
-    // Roll forward to next action that requires user input.
-    // This means automatically providing "Continue" events if that
-    // is the only option.
-    private fun gotoNextUserAction() {
-        var newActions = getAvailableActions()
-        while (newActions.actions.size == 1 && newActions.actions.first() == ContinueWhenReady) {
-            processAction(Continue)
-            rollForwardToNextActionNode()
-            newActions = getAvailableActions()
-        }
-    }
-
-    // Shortcut for accessing the stack
-    val stack: ProcedureStack = state.stack
 }
