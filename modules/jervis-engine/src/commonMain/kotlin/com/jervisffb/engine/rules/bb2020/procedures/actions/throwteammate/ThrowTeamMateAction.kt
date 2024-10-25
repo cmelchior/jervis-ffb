@@ -1,6 +1,5 @@
 package com.jervisffb.rules.bb2020.procedures.actions.handoff
 
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -15,6 +14,7 @@ import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -29,12 +29,12 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.procedures.Catch
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
@@ -128,7 +128,9 @@ object ThrowTeamMateAction : Procedure() {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their hand-off.
             val context = state.getContext<ThrowTeamMateContext>()
-            return if (!context.thrower.isStanding(rules)) {
+            return if (state.isTurnOver()) {
+                ExitProcedure()
+            } else if (!context.thrower.isStanding(rules)) {
                 compositeCommandOf(
                     SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()

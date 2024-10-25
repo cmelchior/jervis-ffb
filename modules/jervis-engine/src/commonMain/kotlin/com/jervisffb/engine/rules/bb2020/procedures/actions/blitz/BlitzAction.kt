@@ -17,6 +17,7 @@ import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -50,7 +51,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryM
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.engine.commands.compositeCommandOf
 import kotlinx.serialization.Serializable
 
 data class BlitzContext(
@@ -190,19 +190,22 @@ object BlitzAction : Procedure() {
             //  This logic will probably also override scoring turn overs
             val moveContext = state.getContext<MoveContext>()
             val blitzContext = state.getContext<BlitzContext>()
-            return if (!blitzContext.attacker.isStanding(rules)) {
+            return if (!blitzContext.attacker.isStanding(rules) && !state.isTurnOver()) {
                 compositeCommandOf(
                     if (moveContext.hasMoved) SetContext(blitzContext.copy(hasMoved = true)) else null,
                     RemoveContext<MoveContext>(),
                     SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()
                 )
-            } else {
+            } else if (!state.isTurnOver()) {
                 compositeCommandOf(
                     if (moveContext.hasMoved) SetContext(blitzContext.copy(hasMoved = true)) else null,
                     RemoveContext<MoveContext>(),
                     GotoNode(if (blitzContext.hasBlocked) RemainingMovesOrEndAction else MoveOrBlockOrEndAction)
                 )
+            } else {
+                // Some turn-over happened in the sub-procedure somehow
+                ExitProcedure()
             }
         }
     }

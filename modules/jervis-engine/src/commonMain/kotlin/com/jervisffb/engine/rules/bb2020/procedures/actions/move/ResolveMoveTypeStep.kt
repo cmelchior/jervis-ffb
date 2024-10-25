@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.SelectFieldLocation
@@ -8,11 +7,13 @@ import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetCurrentBall
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -20,9 +21,9 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.procedures.Pickup
-import com.jervisffb.engine.rules.Rules
 
 /**
  * Returns all the reachable squares. player can go to using a specific type of move.
@@ -138,9 +139,13 @@ object ResolveMoveTypeStep : Procedure() {
             val moveContext = state.getContext<MoveContext>()
             val activeContext = state.getContext<ActivatePlayerContext>()
             val player = moveContext.player
-            val pickupBall = player.isStanding(rules) && state.field[player.location as FieldCoordinate].balls.isNotEmpty()
+            val pickupBall = (
+                player.isStanding(rules) &&
+                state.field[player.location as FieldCoordinate].balls.isNotEmpty() &&
+                state.field[player.location as FieldCoordinate].balls.all { it.state == BallState.ON_GROUND }
+            )
 
-            return if (pickupBall) {
+            return if (pickupBall && !state.isTurnOver()) {
                 compositeCommandOf(
                     if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
                     GotoNode(PickUpBall)
