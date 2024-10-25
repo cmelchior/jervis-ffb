@@ -9,8 +9,8 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
-import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
+import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
 import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
@@ -147,7 +147,7 @@ class Team(val name: String, val roster: BB2020Roster, val coach: Coach) : Colle
     lateinit var turnData: TeamTurnData
 
     var turnMarker by Delegates.observable(0) { prop, old, new ->
-        game.gameFlow.safeTryEmit(game)
+//        game.gameFlow.safeTryEmit(game)
     }
 
     // Must be called before using this class.

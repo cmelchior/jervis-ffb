@@ -6,7 +6,7 @@ import com.jervisffb.ui.screen.GameScreenModel
 import com.jervisffb.ui.screen.Manual
 import com.jervisffb.ui.viewmodel.FieldViewModel
 import com.jervisffb.ui.viewmodel.MenuViewModel
-import com.jervisffb.ui.userinput.UiActionFactory
+import com.jervisffb.ui.dialogs.UiActionFactory
 import com.jervisffb.engine.utils.createDefaultGameState
 import kotlinx.coroutines.CoroutineScope
 

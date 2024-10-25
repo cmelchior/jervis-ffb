@@ -1,15 +1,15 @@
 package com.jervisffb.ui.viewmodel
 
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
-import com.jervisffb.engine.GameController
 import com.jervisffb.engine.ext.playerNo
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.serialize.JervisSerialization
-import com.jervisffb.ui.userinput.UiActionFactory
+import com.jervisffb.ui.UiGameController
 import okio.Path
 
 enum class Feature {
@@ -20,7 +20,7 @@ enum class Feature {
 
 class MenuViewModel {
     var controller: GameController? = null
-    lateinit var uiActionFactory: UiActionFactory
+    lateinit var uiState: UiGameController
 
     // Default values .. figure out a way to persist these
     private var features: MutableMap<Feature, Boolean> = mutableMapOf(
@@ -33,7 +33,7 @@ class MenuViewModel {
     }
 
     fun undoAction() {
-        uiActionFactory.userSelectedAction(Undo)
+        uiState.userSelectedAction(Undo)
     }
 
     fun toggleFeature(rerollSuccessfulActions: Feature, enabled: Boolean) {
@@ -53,7 +53,7 @@ class MenuViewModel {
                 if (team.isAwayTeam()) FieldSquareSelected(fieldCoordinate.swapX(controller!!.rules)) else FieldSquareSelected(fieldCoordinate)
             )
         }
-        uiActionFactory.userSelectedMultipleActions(setupActions, delayEvent = false)
+        uiState.userSelectedMultipleActions(setupActions, delayEvent = false)
     }
 }
 

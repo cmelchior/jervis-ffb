@@ -2,6 +2,7 @@ package com.jervisffb.engine
 
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.CalculatedAction
+import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -42,11 +43,28 @@ sealed interface ListEvent
 data class AddEntry(val log: LogEntry) : ListEvent
 data class RemoveEntry(val log: LogEntry) : ListEvent
 
+data class GameDelta(
+    val commands: List<Command>
+)
+
+/**
+ * Main entry point for controlling a single game.
+ *
+ * This class should not be used until both teams have been identified and a ruleset
+ * has been agreed upon.
+ */
 class GameController(
     rules: Rules,
     state: Game,
     diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator()
 ) {
+
+    // How is the GameController consuming actions. Once started, it poses
+    // restrictions on the Controller is used.
+    enum class ActionMode {
+        MANUAL, CALLBACK, NOT_STARTED
+    }
+
     // Copy of Home and Away teams state, taken just before starting the game.
     // This is required so we can write the initial state to a save file (which
     // is required as we apply all commands in the save file to this state).
@@ -59,6 +77,7 @@ class GameController(
     val actionHistory: MutableList<GameAction> = mutableListOf() // List all actions provided by the user.
     val commands: MutableList<Command> = mutableListOf()
     val state: Game = state
+    private var actionMode = ActionMode.NOT_STARTED
     private var isStarted: Boolean = false
     private var replayMode: Boolean = false
     private var replayIndex: Int = -1
@@ -138,13 +157,24 @@ class GameController(
         }
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val actions = currentNode.getAvailableActions(state, rules)
-        val reportAvailableActions = SimpleLogEntry("Available actions: ${actions.joinToString()}", LogCategory.STATE_MACHINE)
+        val reportAvailableActions = ReportAvailableActions(actions)
         commands.add(reportAvailableActions)
         reportAvailableActions.execute(state)
         return ActionsRequest(currentNode.actionOwner(state, rules), actions)
     }
 
-    fun processAction(userAction: GameAction) {
+
+    fun processAction(action: GameAction) {
+        if (actionMode != ActionMode.MANUAL) {
+            error("Invalid action mode: $actionMode. Must be ActionMode.MANUAL.")
+        }
+        when (action) {
+            is CompositeGameAction -> action.list.forEach { processSingleAction(it) }
+            else -> processSingleAction(action)
+        }
+    }
+
+    private fun processSingleAction(userAction: GameAction) {
         if (userAction != Undo) {
             lastActionWasUndo = false
             actionHistory.add(userAction)
@@ -162,7 +192,37 @@ class GameController(
         }
     }
 
+    /**
+     * Returns the delta from the last [GameAction] that was processed.
+     *
+     * This includes, the command processed and the resulting log statements
+     * and [Command] updates that happened because of it.
+     *
+     * This allows a consumer better insights into what changed and make
+     * it possible to keep shadow data structures updated in a more granular way,
+     * rather than doing a full copy.
+     */
+    fun getDelta(): GameDelta {
+        return GameDelta(commands)
+    }
+
+    /**
+     * Start the GameController in manual mode. This mode requires consumers
+     * to manually drive the rule engine. A simple example looks like this:
+     *
+     * ```
+     * while (!controller.stack.isEmpty()) {
+     *   val request = controller.getAvailableActions()
+     *   val action = createAction(request)
+     *   controller.processAction(action)
+     * }
+     * ```
+     */
     fun startManualMode() {
+        if (actionMode != ActionMode.NOT_STARTED) {
+            error("Controller already started: $actionMode")
+        }
+        actionMode = ActionMode.MANUAL
         setupInitialStartingState()
         rollForwardToNextActionNode()
     }
@@ -231,6 +291,10 @@ class GameController(
     }
 
     suspend fun startCallbackMode(actionProvider: suspend (controller: GameController, availableActions: ActionsRequest) -> GameAction) {
+        if (actionMode != ActionMode.NOT_STARTED) {
+            error("Controller already started: $actionMode")
+        }
+        actionMode = ActionMode.CALLBACK
         val backupActionProvider: suspend (GameController, ActionsRequest) -> GameAction = { controller: GameController, request: ActionsRequest ->
             actionProvider(controller, request).also { selectedAction ->
                 if (selectedAction != Undo) {

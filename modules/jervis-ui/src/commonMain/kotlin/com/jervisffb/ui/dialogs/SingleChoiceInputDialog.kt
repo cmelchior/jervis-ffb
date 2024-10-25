@@ -1,4 +1,4 @@
-package com.jervisffb.ui.userinput
+package com.jervisffb.ui.dialogs
 
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction
@@ -48,8 +48,6 @@ data class SingleChoiceInputDialog(
     val actionDescriptions: List<Pair<GameAction, String>>,
     override var owner: Team? = null,
 ) : UserInputDialog {
-    override val actions: List<GameAction> = actionDescriptions.map { it.first }
-
     companion object {
         private fun getDescription(action: GameAction): String {
             return when (action) {
@@ -261,5 +259,3 @@ data class SingleChoiceInputDialog(
         }
     }
 }
-
-class UnknownInput(override val actions: List<GameAction>) : UserInput

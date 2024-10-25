@@ -1,6 +1,6 @@
 package com.jervisffb.ui.viewmodel
 
-import com.jervisffb.engine.GameController
+import com.jervisffb.ui.UiGameController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -15,9 +15,10 @@ data class GameProgress(
     val awayTeamScore: Int = 0,
 )
 
-class GameStatusViewModel(val controller: GameController) {
+class GameStatusViewModel(val controller: UiGameController) {
     fun progress(): Flow<GameProgress> {
-        return controller.state.gameFlow.map { game ->
+        return controller.uiStateFlow.map { uiSnapshot ->
+            val game = uiSnapshot.game
             GameProgress(
                 game.halfNo,
                 game.driveNo,

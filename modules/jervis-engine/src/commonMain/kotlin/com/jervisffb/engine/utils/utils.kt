@@ -143,7 +143,17 @@ fun createRandomAction(
     state: Game,
     availableActions: List<ActionDescriptor>,
 ): GameAction {
-    return when (val action = availableActions.random()) {
+
+    // Select a random action but disallow certain ones
+    var actionDesc: ActionDescriptor? = null
+    val filtered = availableActions.filter { it != EndActionWhenReady }
+    if (filtered.isEmpty()) {
+        actionDesc = availableActions.random()
+    } else {
+        actionDesc = filtered.random()
+    }
+
+    return when (val action = actionDesc) {
         ContinueWhenReady -> Continue
         EndTurnWhenReady -> EndTurn
         is RollDice -> {
@@ -202,6 +212,7 @@ fun createRandomAction(
         is SelectInducement -> InducementSelected(action.id)
         is SelectBlockType -> BlockTypeSelected(action.type)
         is SelectDirection -> DirectionSelected(action.directions.random())
+        null -> TODO()
     }
 }
 

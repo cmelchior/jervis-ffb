@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jervisffb.ui.images.IconFactory
+import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.model.UiPlayerCard
 import kotlinx.coroutines.flow.Flow
 import org.pushingpixels.artemis.drawTextOnPath

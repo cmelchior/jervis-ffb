@@ -37,8 +37,8 @@ import com.jervisffb.engine.actions.DicePool
 import com.jervisffb.engine.actions.DicePoolChoice
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
-import com.jervisffb.ui.images.IconFactory
-import com.jervisffb.ui.userinput.DicePoolUserInputDialog
+import com.jervisffb.ui.icons.IconFactory
+import com.jervisffb.ui.dialogs.DicePoolUserInputDialog
 import com.jervisffb.ui.viewmodel.DialogsViewModel
 import kotlin.random.Random
 

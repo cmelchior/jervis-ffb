@@ -31,10 +31,10 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
-import com.jervisffb.ui.images.IconFactory
+import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.viewmodel.DialogsViewModel
-import com.jervisffb.ui.userinput.DiceRollUserInputDialog
-import com.jervisffb.ui.userinput.SingleChoiceInputDialog
+import com.jervisffb.ui.dialogs.DiceRollUserInputDialog
+import com.jervisffb.ui.dialogs.SingleChoiceInputDialog
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

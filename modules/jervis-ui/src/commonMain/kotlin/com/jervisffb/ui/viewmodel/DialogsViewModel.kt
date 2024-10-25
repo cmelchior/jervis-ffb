@@ -1,19 +1,19 @@
 package com.jervisffb.ui.viewmodel
 
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.ui.userinput.UiActionFactory
-import com.jervisffb.ui.userinput.UserInputDialog
+import com.jervisffb.ui.UiGameController
+import com.jervisffb.ui.dialogs.UserInputDialog
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
  * Class responsible for handling and showing model dialogs.
  */
-class DialogsViewModel(val uiActionFactory: UiActionFactory) {
-    val diceRollGenerator = uiActionFactory.model.controller.diceRollGenerator
+class DialogsViewModel(private val uiState: UiGameController) {
+    val diceRollGenerator = uiState.controller.diceRollGenerator
 
     fun buttonActionSelected(action: GameAction) {
-        uiActionFactory.userSelectedAction(action)
+        uiState.userSelectedAction(action)
     }
-
-    val availableActions: Flow<UserInputDialog?> = uiActionFactory.dialogActions
+    val availableActions: Flow<UserInputDialog?> = uiState.uiStateFlow.map { it.dialogInput }
 }

@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.Divider
@@ -30,7 +28,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,49 +36,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
-import com.jervisffb.engine.actions.BlockTypeSelected
-import com.jervisffb.engine.actions.CalculatedAction
-import com.jervisffb.engine.actions.Cancel
-import com.jervisffb.engine.actions.CoinSideSelected
-import com.jervisffb.engine.actions.CoinTossResult
-import com.jervisffb.engine.actions.CompositeGameAction
-import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.Continue
-import com.jervisffb.engine.actions.DicePoolResultsSelected
-import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.DieResult
-import com.jervisffb.engine.actions.DirectionSelected
-import com.jervisffb.engine.actions.DogoutSelected
-import com.jervisffb.engine.actions.EndAction
-import com.jervisffb.engine.actions.EndSetup
-import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.InducementSelected
-import com.jervisffb.engine.actions.MoveTypeSelected
-import com.jervisffb.engine.actions.NoRerollSelected
-import com.jervisffb.engine.actions.PlayerActionSelected
-import com.jervisffb.engine.actions.PlayerDeselected
-import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.PlayerSubActionSelected
-import com.jervisffb.engine.actions.RandomPlayersSelected
-import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.SkillSelected
-import com.jervisffb.engine.actions.Undo
-import com.jervisffb.ui.userinput.CompositeUserInput
+import com.jervisffb.ui.dialogs.DicePoolUserInputDialog
+import com.jervisffb.ui.dialogs.DiceRollUserInputDialog
+import com.jervisffb.ui.dialogs.SingleChoiceInputDialog
+import com.jervisffb.ui.dialogs.UserInputDialog
 import com.jervisffb.ui.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.viewmodel.DialogsViewModel
-import com.jervisffb.ui.userinput.DicePoolUserInputDialog
-import com.jervisffb.ui.userinput.DiceRollUserInputDialog
 import com.jervisffb.ui.viewmodel.FieldViewModel
 import com.jervisffb.ui.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.viewmodel.LogViewModel
-import com.jervisffb.ui.viewmodel.ReplayViewModel
-import com.jervisffb.ui.userinput.SingleChoiceInputDialog
-import com.jervisffb.ui.userinput.UnknownInput
-import com.jervisffb.ui.userinput.UserInput
-import com.jervisffb.ui.userinput.WaitingForUserInput
+import com.jervisffb.ui.viewmodel.RandomActionsControllerViewModel
+import com.jervisffb.ui.viewmodel.ReplayControllerViewModel
+import kotlin.uuid.ExperimentalUuidApi
 
 // Theme
 val debugBorder = BorderStroke(2.dp, Color.Red)
@@ -150,8 +116,9 @@ fun Screen(
     leftDugout: com.jervisffb.ui.viewmodel.SidebarViewModel,
     rightDugout: com.jervisffb.ui.viewmodel.SidebarViewModel,
     gameStatusController: GameStatusViewModel,
-    replayController: ReplayViewModel,
-    actionSelector: ActionSelectorViewModel,
+    replayActionsBar: ReplayControllerViewModel? = null,
+    randomActionsBar: RandomActionsControllerViewModel? = null,
+    unknownActions: ActionSelectorViewModel,
     logs: LogViewModel,
     dialogsViewModel: DialogsViewModel,
 ) {
@@ -168,7 +135,16 @@ fun Screen(
             Row(modifier = Modifier.fillMaxSize()) {
                 LogViewer(logs, modifier = Modifier.weight(1f).fillMaxSize())
                 Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))
-                ActionSelector(actionSelector, modifier = Modifier.weight(1f).fillMaxSize())
+                Column(modifier = Modifier.weight(1f).fillMaxSize()) {
+                    if (replayActionsBar != null) {
+                        ReplayCommandBar(replayActionsBar, modifier = Modifier)
+                    }
+                    if (randomActionsBar != null) {
+                        RandomCommandBar(randomActionsBar, modifier = Modifier)
+                    }
+                    ActionSelector(unknownActions, modifier = Modifier.fillMaxSize())
+                }
+
             }
         }
         Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
@@ -180,9 +156,8 @@ fun Screen(
 
 
 @Composable
-fun ReplayController(
-    vm: ReplayViewModel,
-    actionSelector: ActionSelectorViewModel,
+fun ReplayCommandBar(
+    vm: ReplayControllerViewModel,
     modifier: Modifier,
 ) {
     Box(
@@ -192,22 +167,22 @@ fun ReplayController(
                 .background(color = Color.Red),
     ) {
         Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { vm.enableReplay() }) {
+            Button(modifier = Modifier.weight(1f), onClick = { vm.enableReplay() }) {
                 Text("Start replay")
             }
-            Button(onClick = { vm.rewind() }) {
+            Button(modifier = Modifier.weight(1f), onClick = { vm.rewind() }) {
                 Text("Rewind")
             }
-            Button(onClick = { vm.back() }) {
+            Button(modifier = Modifier.weight(1f), onClick = { vm.back() }) {
                 Text("Back")
             }
-            Button(onClick = { vm.forward() }) {
+            Button(modifier = Modifier.weight(1f), onClick = { vm.forward() }) {
                 Text("Forward")
             }
-            Button(onClick = { vm.stopReplay() }) {
+            Button(modifier = Modifier.weight(1f), onClick = { vm.stopReplay() }) {
                 Text("Stop replay")
             }
-            Button(onClick = { actionSelector.start() }) {
+            Button(modifier = Modifier.weight(1f), onClick = { vm.start() }) {
                 Text("Start Game")
             }
         }
@@ -215,8 +190,30 @@ fun ReplayController(
 }
 
 @Composable
+fun RandomCommandBar(
+    vm: RandomActionsControllerViewModel,
+    modifier: Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(color = Color.Red),
+    ) {
+        Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = { vm.startActions() }) {
+                Text("Start")
+            }
+            Button(onClick = { vm.pauseActions() }) {
+                Text("Pause")
+            }
+        }
+    }
+}
+
+@Composable
 fun Dialogs(vm: DialogsViewModel) {
-    val dialogData: UserInput? by vm.availableActions.collectAsState(null)
+    val dialogData: UserInputDialog? by vm.availableActions.collectAsState(null)
     when (dialogData) {
         is SingleChoiceInputDialog -> {
             val dialog = dialogData as SingleChoiceInputDialog
@@ -231,88 +228,11 @@ fun Dialogs(vm: DialogsViewModel) {
             DicePoolSelectorDialog(dialog, vm)
         }
         null -> { /* Do nothing */ }
-        else -> TODO("Not supported: $dialogData")
     }
 }
 
-@Composable
-fun ActionSelector(
-    vm: ActionSelectorViewModel,
-    modifier: Modifier,
-) {
-    val inputs: UserInput? by vm.availableActions.collectAsState(null)
-    Box(modifier = modifier.padding(8.dp)) {
-        Column(
-            modifier =
-                modifier
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            val userInputs: List<UserInput> =
-                remember(inputs) {
-                    when (inputs) {
-                        is CompositeUserInput -> (inputs as CompositeUserInput).inputs
-                        null -> emptyList()
-                        else -> listOf(inputs!!)
-                    }
-                }
 
-            userInputs.forEach { input ->
-                val actions = input.actions
-                when (input) {
-                    is WaitingForUserInput -> {
-                        // Do nothing
-                    }
-                    is UnknownInput -> {
-                        actions.forEach { action: GameAction ->
-                            Button(
-                                modifier = Modifier.padding(0.dp),
-                                contentPadding = PaddingValues(2.dp),
-                                onClick = { vm.actionSelected(action) },
-                            ) {
-                                val text =
-                                    when (action) {
-                                        Confirm -> "Confirm"
-                                        Continue -> "Continue"
-                                        is DieResult -> action.toString()
-                                        DogoutSelected -> "DogoutSelected"
-                                        EndSetup -> "EndSetup"
-                                        EndTurn -> "EndTurn"
-                                        is FieldSquareSelected -> action.toString()
-                                        is PlayerSelected -> "Player[${action.playerId}]"
-                                        is DiceRollResults -> action.rolls.joinToString(prefix = "DiceRolls[", postfix = "]")
-                                        is PlayerActionSelected -> "Action: $action"
-                                        is PlayerDeselected -> "Deselect active player"
-                                        EndAction -> "End Action"
-                                        Cancel -> "Cancel"
-                                        is CoinSideSelected -> "Selected: ${action.side}"
-                                        is CoinTossResult -> "Coin flip: ${action.result}"
-                                        is RandomPlayersSelected -> "Random players: $action"
-                                        is NoRerollSelected -> "No reroll"
-                                        is RerollOptionSelected -> action.option.toString()
-                                        is MoveTypeSelected -> action.moveType.toString()
-                                        Undo -> TODO()
-                                        is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
-                                        is PlayerSubActionSelected -> action.action.toString()
-                                        is SkillSelected -> action.skill.toString()
-                                        is InducementSelected -> action.name
-                                        is BlockTypeSelected -> action.type.toString()
-                                        is CalculatedAction -> TODO("Should only be used in tests")
-                                        is DicePoolResultsSelected -> "Dice pool: $action"
-                                        is DirectionSelected -> "Direction: ${action.direction}"
-                                    }
-                                Text(text, fontSize = 10.sp)
-                            }
-                        }
-                    }
-                    else -> TODO("Unsupported type: $actions")
-                }
-            }
-        }
-    }
-}
-
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun LogViewer(
     vm: LogViewModel,
@@ -333,7 +253,7 @@ fun LogViewer(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         state = listState
     ) {
-        items(items = listData, key = { item -> item.hashCode() }) {
+        items(items = listData, key = { item -> item.id.toString() }) {
             Text(
                 text = it.message,
                 lineHeight = if (it.message.lines().size > 1) 1.5.em else 1.0.em,

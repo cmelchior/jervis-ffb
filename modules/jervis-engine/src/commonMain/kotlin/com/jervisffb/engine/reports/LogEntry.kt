@@ -2,7 +2,8 @@ package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
-import kotlin.random.Random
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /**
  * Developer's Commentary:
@@ -10,8 +11,9 @@ import kotlin.random.Random
  * be shown using Spannables in Compose. This would allow us to theme it.
  * https://issuetracker.google.com/issues/139320238
  */
+@OptIn(ExperimentalUuidApi::class)
 abstract class LogEntry : Command {
-    private val id: Long = Random.nextLong()
+    val id: Uuid = Uuid.random()
     abstract val category: LogCategory
     abstract val message: String
 
@@ -24,6 +26,6 @@ abstract class LogEntry : Command {
     }
 
     override fun toString(): String {
-        return "${this::class.simpleName}(id=$id, category=$category, message='$message')"
+        return "${this::class.simpleName}(id=${id.toHexString()}, category=$category, message='$message')"
     }
 }

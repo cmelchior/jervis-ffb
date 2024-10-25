@@ -3,21 +3,21 @@ package com.jervisffb.fumbbl.net.adapter.impl
 import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.SelectFieldLocation
-import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
-import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
-import com.jervisffb.fumbbl.net.adapter.add
-import com.jervisffb.fumbbl.net.model.reports.InjuryReport
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
-import com.jervisffb.fumbbl.net.utils.FumbblGame
+import com.jervisffb.engine.actions.DirectionSelected
+import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.CasualtyRoll
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.LastingInjuryRoll
-import com.jervisffb.engine.rules.Rules
+import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
+import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
+import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
+import com.jervisffb.fumbbl.net.model.reports.InjuryReport
+import com.jervisffb.fumbbl.net.utils.FumbblGame
 
 object InjuryRollMapper: CommandActionMapper {
     override fun isApplicable(
@@ -42,8 +42,8 @@ object InjuryRollMapper: CommandActionMapper {
             newActions.add(
                 action = { state: Game, rules: Rules ->
                     // Any of them will push the player of the field
-                    val loc = PushStep.SelectPushDirection.getAvailableActions(state, rules).random() as SelectFieldLocation
-                    FieldSquareSelected(loc.coordinate)
+                    val action = PushStep.SelectPushDirection.getAvailableActions(state, rules).single() as SelectDirection
+                    DirectionSelected(action.directions.random())
                 },
                 expectedNode = PushStep.SelectPushDirection
             )

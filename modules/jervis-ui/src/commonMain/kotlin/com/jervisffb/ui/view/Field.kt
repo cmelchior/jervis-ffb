@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.ui.images.IconFactory
+import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.model.UiFieldSquare
 import com.jervisffb.ui.viewmodel.FieldDetails
 import com.jervisffb.ui.viewmodel.FieldViewModel
@@ -174,12 +174,11 @@ private fun FieldSquare(
     vm: FieldViewModel,
     square: UiFieldSquare,
 ) {
-    var showPopup by remember(square) { mutableStateOf(square.showContextMenu) }
-
+    var showPopup: Boolean by remember(square) { mutableStateOf(square.showContextMenu) }
     val bgColor by remember(square) {
         mutableStateOf(when {
             square.onSelected != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
-            square.direction != null -> Color.Transparent // Hide square color
+            square.selectableDirection != null || square.directionSelected != null -> Color.Transparent // Hide square color
             square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
             else -> Color.Transparent
         })
@@ -231,8 +230,8 @@ private fun FieldSquare(
                 contentDescription = "",
             )
         }
-        if (square.direction != null) {
-            DictionImage(square.direction)
+        square.selectableDirection?.let {
+            DictionImage(it)
         }
         if (square.dice != 0) {
             BlockDiceIndicatorImage(square.dice)

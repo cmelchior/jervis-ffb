@@ -10,10 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
-import com.jervisffb.ui.images.IconFactory
+import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.model.UiPlayer
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -33,18 +31,18 @@ fun Player(
             player.selectAction!!()
         }
     }
-    if (player.onHover != null) {
-        playerModifier =
-            playerModifier.onPointerEvent(eventType = PointerEventType.Enter) {
-                player.onHover.invoke()
-            }
-    }
-    if (player.onHoverExit != null) {
-        playerModifier =
-            playerModifier.onPointerEvent(eventType = PointerEventType.Exit) {
-                player.onHoverExit.invoke()
-            }
-    }
+//    if (player.onHover != null) {
+//        playerModifier =
+//            playerModifier.onPointerEvent(eventType = PointerEventType.Enter) {
+//                player.onHover.invoke()
+//            }
+//    }
+//    if (player.onHoverExit != null) {
+//        playerModifier =
+//            playerModifier.onPointerEvent(eventType = PointerEventType.Exit) {
+//                player.onHoverExit.invoke()
+//            }
+//    }
 
     Box(modifier = playerModifier) {
         Image(

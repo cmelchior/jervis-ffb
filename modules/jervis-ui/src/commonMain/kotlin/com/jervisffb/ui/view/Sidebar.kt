@@ -36,7 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jervisffb.ui.images.IconFactory
+import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.model.UiPlayer
 import kotlinx.coroutines.flow.Flow
 

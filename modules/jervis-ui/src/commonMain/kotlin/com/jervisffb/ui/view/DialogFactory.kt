@@ -65,10 +65,9 @@ import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.skills.SideStep
 import com.jervisffb.engine.rules.bb2020.skills.Tackle
-import com.jervisffb.ui.userinput.DiceRollUserInputDialog
-import com.jervisffb.ui.userinput.SingleChoiceInputDialog
-import com.jervisffb.ui.userinput.UserInput
-import com.jervisffb.ui.userinput.UserInputDialog
+import com.jervisffb.ui.dialogs.DiceRollUserInputDialog
+import com.jervisffb.ui.dialogs.SingleChoiceInputDialog
+import com.jervisffb.ui.dialogs.UserInputDialog
 
 /**
  * Class responsible for setting up modal dialogs specifically for dice rolls.
@@ -78,7 +77,7 @@ import com.jervisffb.ui.userinput.UserInputDialog
  * by some other part of the UI.
  */
 object DialogFactory {
-    fun createDialogIfPossible(controller: GameController, request: ActionsRequest, mapUnknownActions: (ActionsRequest) -> List<GameAction>): UserInput? {
+    fun createDialogIfPossible(controller: GameController, request: ActionsRequest, mapUnknownActions: (ActionsRequest) -> List<GameAction>): UserInputDialog? {
         val rules = controller.rules
         val userInput: UserInputDialog? =
             when (controller.state.stack.currentNode()) {

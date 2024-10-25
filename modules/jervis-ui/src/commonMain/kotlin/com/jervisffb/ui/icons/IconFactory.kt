@@ -1,4 +1,4 @@
-package com.jervisffb.ui.images
+package com.jervisffb.ui.icons
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap

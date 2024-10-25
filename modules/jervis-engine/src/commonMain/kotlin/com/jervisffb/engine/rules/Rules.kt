@@ -2,6 +2,7 @@ package com.jervisffb.engine.rules
 
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -10,15 +11,13 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.FieldCoordinate.Companion.OUT_OF_BOUNDS
 import com.jervisffb.engine.model.locations.Location
+import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
-import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyTable
-import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.rules.bb2020.tables.InjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.KickOffEventTable
 import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryTable
@@ -29,6 +28,8 @@ import com.jervisffb.engine.rules.bb2020.tables.StuntyInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.ThrowInPosition
 import com.jervisffb.engine.rules.bb2020.tables.ThrowInTemplate
 import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
+import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
+import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 interface Rules {
@@ -255,7 +256,7 @@ interface Rules {
     fun calculateMarks(
         game: Game,
         movingTeam: Team,
-        square: FieldCoordinate,
+        square: OnFieldLocation,
     ): Int {
         if (!square.isOnField(this)) throw IllegalArgumentException("${square.toLogString()} is not on the field")
         return square.getSurroundingCoordinates(this).fold(initial = 0) { acc, coordinate ->

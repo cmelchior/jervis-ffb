@@ -1,6 +1,5 @@
 package com.jervisffb.ui.viewmodel
 
-import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -9,9 +8,8 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.model.UiPlayer
 import com.jervisffb.ui.model.UiPlayerCard
-import com.jervisffb.ui.userinput.SelectPlayerInput
-import com.jervisffb.ui.userinput.UiActionFactory
-import com.jervisffb.ui.userinput.UserInput
+import com.jervisffb.ui.UiGameController
+import com.jervisffb.ui.UiGameSnapshot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,10 +26,11 @@ enum class SidebarView {
 }
 
 class SidebarViewModel(
-    private val uiActionFactory: UiActionFactory,
+    private val uiState: UiGameController,
     val team: Team,
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
 ) {
+
     // Image is 145f/430f, but we need to stretch to make it fit the field image.
     val aspectRatio: Float = 145f/430f // 152.42f / 452f
 
@@ -71,16 +70,12 @@ class SidebarViewModel(
                 players
                     .filter { it.state == PlayerState.RESERVE }
                     .sortedBy { it.number }
-            }.combine(uiActionFactory.fieldActions) { e1: List<Player>, e2: UserInput ->
-                val userInput = e2 as? SelectPlayerInput
-                val selectablePlayers = userInput?.actions?.associateBy { (it as PlayerSelected).getPlayer(team.game) } ?: emptyMap()
-                e1.map {
-                    val selectAction =
-                        selectablePlayers[it]?.let {
-                            { uiActionFactory.userSelectedAction(it) }
-                        }
-                    UiPlayer(it, selectAction, onHover = { hoverOver(it) }, onHoverExit = { hoverExit() })
-            }
+            }.combine(uiState.uiStateFlow) { players: List<Player>, uiState: UiGameSnapshot ->
+                val dogoutActions = uiState.dogoutActions
+                players.map {
+                    val playerAction = dogoutActions[it.id]
+                    UiPlayer(it, playerAction, onHover = { hoverOver(it) }, onHoverExit = { hoverExit() })
+                }
         }
     }
 
@@ -95,8 +90,6 @@ class SidebarViewModel(
     fun banned(): Flow<List<UiPlayer>> = mapTo(PlayerState.BANNED, team.dogoutFlow)
 
     fun special(): Flow<List<UiPlayer>> = mapTo(PlayerState.FAINTED, team.dogoutFlow)
-
-
 
     fun injuriesCount(): Flow<Int> = team.dogoutFlow.map {
         // Available players should be in RESERVE, all others should be treated

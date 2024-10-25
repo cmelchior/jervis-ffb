@@ -29,11 +29,8 @@ import okio.Path
 import okio.Path.Companion.toPath
 
 sealed interface GameMode
-
 data object Random : GameMode
-
 data object Manual : GameMode
-
 data class Replay(val file: Path) : GameMode
 
 class IntroScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
@@ -41,16 +38,16 @@ class IntroScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
         GlobalScope.launch {
             val screenModel = GameScreenModel(mode, menuViewModel)
             screenModel.initialize()
-            navigator.push(GameScreen(screenModel, emptyList()))
+            navigator.push(GameScreen(screenModel))
         }
     }
 
     fun loadGame(navigator: Navigator, file: Path) {
         GlobalScope.launch {
             val (controller, actions) = JervisSerialization.loadFromFile(file)
-            val screenModel = GameScreenModel(Manual, menuViewModel, controller)
+            val screenModel = GameScreenModel(Manual, menuViewModel, controller, actions)
             screenModel.initialize()
-            navigator.push(GameScreen(screenModel, actions))
+            navigator.push(GameScreen(screenModel))
         }
     }
 

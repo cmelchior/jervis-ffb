@@ -1,4 +1,4 @@
-package com.jervisffb.ui.userinput
+package com.jervisffb.ui.dialogs
 
 import com.jervisffb.engine.actions.D12Result
 import com.jervisffb.engine.actions.D16Result
@@ -12,7 +12,6 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
-import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.model.Player
@@ -36,7 +35,6 @@ class DiceRollUserInputDialog(
     val result: (DiceRollResults) -> String?,
     override var owner: Team? = null,
 ) : UserInputDialog {
-    override val actions: List<GameAction> = emptyList()
 
     companion object {
         fun createFanFactorDialog(team: Team): UserInputDialog {

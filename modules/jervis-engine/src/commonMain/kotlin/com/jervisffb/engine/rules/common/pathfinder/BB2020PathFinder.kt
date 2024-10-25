@@ -178,6 +178,12 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
             val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1)
             for (neighbor in neighbors) {
                 val neighborValue: Int = distances.getValue(neighbor)
+
+                // Skip all squares containing a player
+                if (fieldView[neighbor.x][neighbor.y] == Int.MAX_VALUE) {
+                    continue
+                }
+
                 // Terminal nodes can be entered, but not exited.
                 val hasTackleZone = (fieldView[neighbor.x][neighbor.y] > 0)
                 val hasBall = state.field[neighbor.x, neighbor.y].balls.any { it.state == BallState.ON_GROUND }

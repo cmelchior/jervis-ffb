@@ -3,7 +3,6 @@ package com.jervisffb.ui.screen
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import com.jervisffb.engine.ActionsRequest
 import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Player
@@ -11,10 +10,11 @@ import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.utils.createDefaultGameState
 import com.jervisffb.engine.utils.lizardMenAwayTeam
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
-import com.jervisffb.ui.images.IconFactory
-import com.jervisffb.ui.userinput.ManualModeUiActionFactory
-import com.jervisffb.ui.userinput.RandomModeUiActionFactory
-import com.jervisffb.ui.userinput.ReplayModeUiActionFactory
+import com.jervisffb.ui.icons.IconFactory
+import com.jervisffb.ui.state.ManualActionProvider
+import com.jervisffb.ui.state.RandomActionProvider
+import com.jervisffb.ui.state.ReplayActionProvider
+import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.view.Screen
 import com.jervisffb.ui.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.viewmodel.DialogsViewModel
@@ -22,24 +22,22 @@ import com.jervisffb.ui.viewmodel.FieldViewModel
 import com.jervisffb.ui.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.viewmodel.LogViewModel
 import com.jervisffb.ui.viewmodel.MenuViewModel
-import com.jervisffb.ui.viewmodel.ReplayViewModel
+import com.jervisffb.ui.viewmodel.RandomActionsControllerViewModel
+import com.jervisffb.ui.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.viewmodel.SidebarViewModel
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class GameScreenModel(
     val mode: GameMode,
     val menuViewModel: MenuViewModel,
     private val injectedController: GameController? = null,
+    private val actions: List<GameAction> = emptyList(),
 ) : ScreenModel {
-    val actionRequestChannel =
-        Channel<Pair<GameController, ActionsRequest>>(capacity = 2, onBufferOverflow = BufferOverflow.SUSPEND)
-    val actionSelectedChannel =
-        Channel<GameAction>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
-    val hoverPlayerFlow =
-        MutableSharedFlow<Player?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
+    val hoverPlayerFlow = MutableSharedFlow<Player?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    lateinit var uiState: UiGameController
     lateinit var controller: GameController
     var fumbbl: FumbblReplayAdapter? = null
     val rules: StandardBB2020Rules = StandardBB2020Rules
@@ -67,45 +65,50 @@ class GameScreenModel(
                 }
             }
         }
+
         menuViewModel.controller = this.controller
         IconFactory.initialize(controller.state.homeTeam, controller.state.awayTeam)
+        uiState = UiGameController(mode, controller, menuViewModel, actions)
+        val uiActionFactory =
+            when (mode) {
+                Manual -> ManualActionProvider(uiState, menuViewModel)
+                Random -> RandomActionProvider(uiState)
+                is Replay -> ReplayActionProvider(uiState, fumbbl)
+            }
+
+        // Setup references and start action listener
+        menuViewModel.uiState = uiState
+        uiState.startGameEventLoop(uiActionFactory)
     }
 }
 
-class GameScreen(val screenModel: GameScreenModel, private val actions: List<GameAction>) : Screen {
+class GameScreen(val screenModel: GameScreenModel) : Screen {
+
+    val controller = screenModel.controller
+
     @Composable
     override fun Content() {
-
-
-        val uiActionFactory =
-            when (screenModel.mode) {
-                Manual -> ManualModeUiActionFactory(screenModel, actions)
-                Random -> RandomModeUiActionFactory(screenModel)
-                is Replay -> ReplayModeUiActionFactory(screenModel)
-            }
-        screenModel.menuViewModel.uiActionFactory = uiActionFactory
         Screen(
             FieldViewModel(
-                screenModel.controller,
-                uiActionFactory,
-                screenModel.controller.state.field,
+                screenModel.uiState,
                 screenModel.hoverPlayerFlow,
             ),
             SidebarViewModel(
-                uiActionFactory,
-                screenModel.controller.state.homeTeam,
+                screenModel.uiState,
+                controller.state.homeTeam,
                 screenModel.hoverPlayerFlow
             ),
             SidebarViewModel(
-                uiActionFactory,
-                screenModel.controller.state.awayTeam,
+                screenModel.uiState,
+                controller.state.awayTeam,
                 screenModel.hoverPlayerFlow
             ),
-            GameStatusViewModel(screenModel.controller),
-            ReplayViewModel(uiActionFactory, screenModel),
-            ActionSelectorViewModel(uiActionFactory),
-            LogViewModel(screenModel.controller),
-            DialogsViewModel(uiActionFactory),
+            GameStatusViewModel(screenModel.uiState),
+            if (screenModel.mode is Replay) ReplayControllerViewModel(screenModel.uiState, screenModel) else null,
+            if (screenModel.mode is Random) RandomActionsControllerViewModel(screenModel.uiState, screenModel) else null,
+            ActionSelectorViewModel(screenModel.uiState),
+            LogViewModel(screenModel.uiState),
+            DialogsViewModel(screenModel.uiState),
         )
     }
 }

@@ -1,30 +1,26 @@
 package com.jervisffb.ui.viewmodel
 
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.ui.userinput.UiActionFactory
-import com.jervisffb.ui.userinput.UserInput
+import com.jervisffb.ui.UiGameController
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 
 /**
- * View model for the unknown action selector part of the UI. Eventually, this should be removed.
+ * View model responsible for "unknown actions" coming from the Rules Engine.
+ *
+ * These actions are actions that are not otherwise handled and we need a generic
+ * way to show them to users so we do not accidentially risk blocking the UI
+ * indefinitely.
+ *
+ * In an ideal world, no actions are "unknown" and is thus only assumed to produce
+ * events during development.
  */
 class ActionSelectorViewModel(
-    private val uiActionFactory: UiActionFactory,
+    private val uiState: UiGameController,
 ) {
-    val availableActions: Flow<UserInput> = uiActionFactory.unknownActions
-
-    fun start() {
-        uiActionFactory.scope.launch {
-            uiActionFactory.start(this)
-        }
-    }
-
-    init {
-        start()
-    }
+    val availableActions: Flow<List<GameAction>> = uiState.uiStateFlow.map { it.unknownActions }
 
     fun actionSelected(action: GameAction) {
-        uiActionFactory.userSelectedAction(action)
+        uiState.userSelectedAction(action)
     }
 }

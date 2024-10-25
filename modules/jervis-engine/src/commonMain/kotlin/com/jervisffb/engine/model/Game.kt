@@ -18,9 +18,7 @@ import com.jervisffb.engine.rules.bb2020.skills.RerollSourceId
 import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.safeTryEmit
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.serialization.Transient
 import kotlin.properties.Delegates
 
 /**
@@ -61,10 +59,10 @@ class Game(
     // Game progress
     var abortIfBallOutOfBounds: Boolean = false
     var halfNo by Delegates.observable(0) { prop, old, new ->
-        gameFlow.safeTryEmit(this)
+//        gameFlow.safeTryEmit(this)
     }
     var driveNo by Delegates.observable(0) { prop, old, new ->
-        gameFlow.safeTryEmit(this)
+//        gameFlow.safeTryEmit(this)
     }
 
     // Global state properties
@@ -180,11 +178,11 @@ class Game(
     }
 
     fun notifyUpdate() {
-        gameFlow.safeTryEmit(this)
+        // gameFlow.safeTryEmit(this)
     }
 
-    @Transient
-    val gameFlow = MutableSharedFlow<Game>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+//    @Transient
+//    val gameFlow = MutableSharedFlow<Game>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     fun currentProcedure(): ProcedureState? = stack.peepOrNull()
 
