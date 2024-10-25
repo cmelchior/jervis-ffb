@@ -1,4 +1,4 @@
-package com.jervisffb.rng
+package com.jervisffb.test.rng
 
 import com.jervisffb.engine.rng.Fortuna
 import kotlin.test.Test

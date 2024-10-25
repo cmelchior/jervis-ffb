@@ -1,6 +1,6 @@
-package com.jervisffb.skills
+package com.jervisffb.test.skills
 
-import com.jervisffb.JervisGameTest
+import com.jervisffb.test.JervisGameTest
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
@@ -10,9 +10,9 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.defaultKickOffHomeTeam
-import com.jervisffb.defaultPregame
-import com.jervisffb.defaultSetup
+import com.jervisffb.test.defaultKickOffHomeTeam
+import com.jervisffb.test.defaultPregame
+import com.jervisffb.test.defaultSetup
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.locations.FieldCoordinate

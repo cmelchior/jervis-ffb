@@ -1,6 +1,6 @@
-package com.jervisffb.pregame
+package com.jervisffb.test.pregame
 
-import com.jervisffb.JervisGameTest
+import com.jervisffb.test.JervisGameTest
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.rules.bb2020.procedures.FanFactorRolls
 import kotlin.test.Test

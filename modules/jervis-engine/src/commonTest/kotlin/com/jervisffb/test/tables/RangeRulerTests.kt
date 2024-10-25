@@ -1,4 +1,4 @@
-package com.jervisffb.tables
+package com.jervisffb.test.tables
 
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.tables.Range

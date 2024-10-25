@@ -1,4 +1,4 @@
-package com.jervisffb
+package com.jervisffb.test
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected

@@ -1,4 +1,4 @@
-package com.jervisffb
+package com.jervisffb.test
 
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame

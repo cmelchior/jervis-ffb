@@ -1,4 +1,4 @@
-package com.jervisffb.rng
+package com.jervisffb.test.rng
 
 import com.jervisffb.engine.rng.EntropyPool
 import kotlin.test.Test

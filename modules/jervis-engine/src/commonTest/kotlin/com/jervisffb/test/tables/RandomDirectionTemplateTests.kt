@@ -1,4 +1,4 @@
-package com.jervisffb.tables
+package com.jervisffb.test.tables
 
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result

@@ -1,4 +1,4 @@
-package com.jervisffb
+package com.jervisffb.test
 
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules

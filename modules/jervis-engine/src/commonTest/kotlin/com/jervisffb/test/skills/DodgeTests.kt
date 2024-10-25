@@ -1,4 +1,4 @@
-package com.jervisffb.skills
+package com.jervisffb.test.skills
 
 import kotlin.test.Test
 

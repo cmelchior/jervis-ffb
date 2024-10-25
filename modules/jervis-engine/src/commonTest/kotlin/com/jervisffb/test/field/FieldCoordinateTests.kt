@@ -1,4 +1,4 @@
-package com.jervisffb.field
+package com.jervisffb.test.field
 
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
