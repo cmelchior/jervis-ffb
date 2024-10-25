@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -19,7 +20,6 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Implement the lasting injury roll as described on page 61 in the rulebook.
@@ -35,7 +35,7 @@ object LastingInjuryRoll: Procedure() {
 
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team.otherTeam()
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6, Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<RiskingInjuryContext>()
