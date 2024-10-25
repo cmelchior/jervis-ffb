@@ -228,6 +228,7 @@ class GameController(
     }
 
     fun startTestMode(start: Procedure) {
+        actionMode = ActionMode.MANUAL
         setupInitialStartingState(start)
         rollForwardToNextActionNode()
     }
