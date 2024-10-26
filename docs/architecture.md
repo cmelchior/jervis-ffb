@@ -12,7 +12,7 @@ This project was started with the following design goals in mind.
    like always choosing to use a skill or not, or rerolling successful rolls. 
 
 2. The rules engine should not be tightly coupled to the UI. It should not care what generated an 
-   action. It t could be the player through the UI, or some automated process.
+   action. It could be the player through the UI, or some automated process.
 
 3. The rule implementation should be flexible and extendable. Blood Bowl is a game of exceptions,
    and it should be possible to capture all these exceptions in the code.
@@ -28,7 +28,7 @@ This project was started with the following design goals in mind.
 
 1. Be able to replay all FUMBBL Games inside the Jervis Client.
 
-2. Be a alternative to the current FUMBBL Client.
+2. Be an alternative to the current FUMBBL Client.
 
 3. Be an AI client you can hook up to any FUMBBL game.
 
