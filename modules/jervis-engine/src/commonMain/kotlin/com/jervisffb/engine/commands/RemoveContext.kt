@@ -24,8 +24,8 @@ class RemoveContext<T: ProcedureContext>(private val type: KClass<T>) : Command 
     }
 
     override fun undo(state: Game) {
-//        if (originalValue == null) {
+        if (originalValue != null) {
             state.setContext(originalValue!!)
-//        }
+        }
     }
 }

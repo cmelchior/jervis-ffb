@@ -28,7 +28,7 @@ object KickOffEventTable {
     fun roll(
         die1: D6Result,
         die2: D6Result,
-    ): TableResult {
+    ): KickOffEvent {
         val result = die1.value + die2.value
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Kick-Off Event Table.")
     }

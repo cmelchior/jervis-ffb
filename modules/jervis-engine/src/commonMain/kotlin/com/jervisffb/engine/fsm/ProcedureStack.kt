@@ -83,4 +83,13 @@ class ProcedureStack {
      * Will throw [NoSuchElementException] if [isEmpty] returns `true`.
      */
     fun currentNode(): Node = history.last().currentNode()
+
+    /**
+     * Returns the procedure at the given index. Indexes are i <= 0, so 0 is the
+     * current procedure, -1 is the parent, -2 is the parents parent, and so on.
+     */
+    fun get(index: Int): ProcedureState {
+        if (index > 0) throw IllegalArgumentException("Index $index out of bound [0, -${history.size - 1}]")
+        return history[history.size - 1 + index]
+    }
 }

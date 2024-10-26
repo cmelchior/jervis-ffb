@@ -8,9 +8,10 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.utils.safeTryEmit
-import com.jervisffb.ui.model.UiFieldSquare
+import com.jervisffb.ui.JervisAnimation
 import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.UiGameSnapshot
+import com.jervisffb.ui.model.UiFieldSquare
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +49,10 @@ class FieldViewModel(
         val target: FieldCoordinate,
         val action: () -> Unit,
     )
+
+    fun observeAnimation(): Flow<Pair<UiGameController, JervisAnimation>?> {
+        return uiState.animationFlow.map { if (it != null) Pair(uiState, it) else null }
+    }
 
     fun observeOverlays(): Flow<PathInfo?> {
         // Calculate any path info data we want to display
@@ -106,5 +111,9 @@ class FieldViewModel(
         return uiState.uiStateFlow.map { uiState: UiGameSnapshot ->
             uiState.fieldSquares
         }
+    }
+
+    fun finishAnimation() {
+        uiState.notifyAnimationDone()
     }
 }
