@@ -188,7 +188,7 @@ fun KickOffEventResult(vm: FieldViewModel, animation: KickOffEventAnimation) {
                 // Let the image come in from a lower position rather than directly from the center
                 // Makes it look more dynamic
                 animate(
-                    initialValue = 200.0f,
+                    initialValue = 100.0f,
                     targetValue = 0f,
                     animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
                 ) { value: Float, _: Float ->
