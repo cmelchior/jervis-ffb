@@ -1,6 +1,7 @@
 package com.jervisffb.ui.viewmodel
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.layout.LayoutCoordinates
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
@@ -40,6 +41,10 @@ class FieldViewModel(
     private val field = MutableStateFlow(FieldDetails.NICE)
     private val highlights = SnapshotStateList<FieldCoordinate>()
     private val _highlights = MutableStateFlow<FieldCoordinate?>(null)
+
+    // Track offsets of field squares (so we can use them to animate things between squares)
+    var fieldOffset: LayoutCoordinates? = null
+    val offsets: MutableMap<FieldCoordinate, LayoutCoordinates> = mutableMapOf()
 
     fun field(): StateFlow<FieldDetails> = field
 
@@ -115,5 +120,13 @@ class FieldViewModel(
 
     fun finishAnimation() {
         uiState.notifyAnimationDone()
+    }
+
+    fun updateOffset(coordinate: FieldCoordinate, layoutCoords: LayoutCoordinates) {
+        offsets[coordinate] = layoutCoords
+    }
+
+    fun updateFieldOffSet(layoutCoords: LayoutCoordinates) {
+        fieldOffset = layoutCoords
     }
 }

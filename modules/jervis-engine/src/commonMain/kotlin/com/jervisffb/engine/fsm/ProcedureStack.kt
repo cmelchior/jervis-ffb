@@ -74,8 +74,16 @@ class ProcedureStack {
     /**
      * Returns `true` if the given [Procedure] is part of the current stack.
      */
-    fun contains(procedure: Procedure): Boolean {
+    fun containsProcedure(procedure: Procedure): Boolean {
         return history.firstOrNull { it.procedure == procedure } != null
+    }
+
+    /**
+     * Returns `true` if the given [Node] is the active node at any part
+     * of the stack.
+     */
+    fun containsNode(node: Node): Boolean {
+        return history.firstOrNull { it.currentNode() == node } != null
     }
 
     /**
@@ -91,5 +99,20 @@ class ProcedureStack {
     fun get(index: Int): ProcedureState {
         if (index > 0) throw IllegalArgumentException("Index $index out of bound [0, -${history.size - 1}]")
         return history[history.size - 1 + index]
+    }
+
+    /**
+     * Returns the procedure at the given index. Indexes are i <= 0, so 0 is the
+     * current procedure, -1 is the parent, -2 is the parents parent, and so on.
+     *
+     * If the stack is too shallow to contain the index, `null` is returned.
+     */
+    fun getOrNull(index: Int): ProcedureState? {
+        if (index > 0) throw IllegalArgumentException("Index $index out of bound [0, -${history.size - 1}]")
+        return if (history.size <= index * -1) {
+            null
+        } else {
+            history[history.size - 1 + index]
+        }
     }
 }

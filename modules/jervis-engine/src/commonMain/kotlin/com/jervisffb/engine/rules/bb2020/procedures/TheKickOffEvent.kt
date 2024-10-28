@@ -12,6 +12,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -33,7 +34,6 @@ import com.jervisffb.engine.reports.ReportTouchback
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.tables.TableResult
-import com.jervisffb.engine.commands.compositeCommandOf
 
 data class KickOffEventContext(
     val roll: DiceRollResults,
@@ -136,21 +136,22 @@ object TheKickOffEvent : Procedure() {
                 GotoNode(TouchBack)
             } else {
                 compositeCommandOf(
-                    GotoNode(ResolveBallLanding(ballLocation)),
+                    GotoNode(ResolveBallLanding),
                 )
             }
         }
     }
 
     // Move this logic to its own procedure. It will be needed when blocking, throwing and otherwise.
-    class ResolveBallLanding(private val location: FieldCoordinate) : ParentNode() {
+    object ResolveBallLanding : ParentNode() {
         var isFieldEmpty: Boolean = true
         var canCatch: Boolean = false
 
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             state.abortIfBallOutOfBounds = true // TODO Wrong way to do this
-            isFieldEmpty = state.field[location].player != null
-            canCatch = state.field[location].player?.let { rules.canCatch(state, it) } ?: false
+            val ballLocation = state.singleBall().location
+            isFieldEmpty = state.field[ballLocation].player != null
+            canCatch = state.field[ballLocation].player?.let { rules.canCatch(state, it) } ?: false
             // If field is empty or the player cannot catch the ball, the ball is now
             // bouncing rather than deviating.
             return if (!canCatch) {

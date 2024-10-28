@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.bb2020.procedures.WeatherRoll
@@ -52,9 +53,15 @@ import org.jetbrains.compose.resources.DrawableResource
 
 sealed interface JervisAnimation
 class KickOffEventAnimation(val image: DrawableResource): JervisAnimation
+class PassAnimation(val from: OnFieldLocation, val to: FieldCoordinate) : JervisAnimation
 
 /**
- * Class responsible for detecting if an animation should be run, and which one
+ * Class responsible for detecting if an animation should be run, and which one.
+ * There are 3 places an animation can run:
+ *
+ * 1. At the beginning of the loop, but before the UI is updated.
+ * 2. After the UI is updated, but before action decorators are used.
+ * 3. After an action has been selected, but before it is applied to the model.
  */
 object AnimationFactory {
 
@@ -62,7 +69,24 @@ object AnimationFactory {
      * Return animation being run at the beginning of a frame, before the
      * UI has updated to the latest state.
      */
+    fun getPreUpdateAnimation(state: Game): JervisAnimation? {
+        return null
+    }
+
+    /**
+     * Return animation being run after the UI has been updated to the latest state,
+     * but before action decorators are used.
+     */
     fun getFrameAnimation(state: Game, rules: Rules): JervisAnimation? {
+        val currentNode = state.currentProcedure()?.currentNode()
+
+        // Animate kick-off
+        if (state.stack.containsNode(TheKickOffEvent.ResolveBallLanding)) {
+            val from = state.kickingPlayer!!.location as OnFieldLocation
+            val to = state.singleBall().location
+            return PassAnimation(from, to)
+        }
+
         return null
     }
 
@@ -203,14 +227,7 @@ class UiGameController(
                 val delta = controller.getDelta()
                 val actions = controller.getAvailableActions()
 
-                // Detect animations and run them before updating the UI
-                // TODO Implement two examples: Kick-off result and kick-off.
-                //  This should cover our use cases and flesh out problems.
-                val animation = AnimationFactory.getFrameAnimation(state, rules)
-                if (animation != null) {
-                    _animationFlow.emit(animation)
-                    animationDone.receive()
-                }
+                runPreUpdateAnimations()
 
                 // Log entries from last action should be added after the animation,
                 // so we don't accidentally reveal the result too soon.
@@ -220,6 +237,12 @@ class UiGameController(
                 // Update UI State based on latest model state
                 actionProvider.prepareForNextAction(controller)
                 var newUiState = createNewUiSnapshot(state, actions, delta, lastUiState)
+                _uiStateFlow.emit(newUiState)
+
+                // Detect animations and run them after updating the UI, but before making it ready
+                // for the next set of actions
+                runPostUpdateAnimations()
+
                 actionProvider.decorateAvailableActions(newUiState, controller.getAvailableActions())
                 lastUiState = newUiState
                 _uiStateFlow.emit(newUiState)
@@ -234,12 +257,8 @@ class UiGameController(
                 actionProvider.decorateSelectedAction(newUiState, userAction)
                 _uiStateFlow.emit(newUiState)
 
-                // Then run any animations triggered by the action (but before state is updated)
-                val postActionAnimation = AnimationFactory.getPostActionAnimation(state, userAction)
-                if (postActionAnimation != null) {
-                    _animationFlow.emit(postActionAnimation)
-                    animationDone.receive()
-                }
+                // Then run any animations triggered by the action (but before the state is updated)
+                runPostActionAnimations(userAction)
 
                 // Last, send action to the Rules Engine for processing.
                 // This will start the next iteration of the game loop.
@@ -251,6 +270,36 @@ class UiGameController(
                 } else {
                     controller.processAction(userAction)
                 }
+            }
+        }
+    }
+
+    private suspend fun runPreUpdateAnimations() {
+        if (!controller.lastActionWasUndo) {
+            val animation = AnimationFactory.getPreUpdateAnimation(state)
+            if (animation != null) {
+                _animationFlow.emit(animation)
+                animationDone.receive()
+            }
+        }
+    }
+
+    private suspend fun runPostUpdateAnimations() {
+        if (!controller.lastActionWasUndo) {
+            val animation = AnimationFactory.getFrameAnimation(state, rules)
+            if (animation != null) {
+                _animationFlow.emit(animation)
+                animationDone.receive()
+            }
+        }
+    }
+
+    private suspend fun runPostActionAnimations(action: GameAction) {
+        if (!controller.lastActionWasUndo) {
+            val animation = AnimationFactory.getPostActionAnimation(state, action)
+            if (animation != null) {
+                _animationFlow.emit(animation)
+                animationDone.receive()
             }
         }
     }

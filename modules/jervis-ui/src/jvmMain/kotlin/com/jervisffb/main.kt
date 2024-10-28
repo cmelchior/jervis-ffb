@@ -1,14 +1,12 @@
 package com.jervisffb
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.App
+import com.jervisffb.ui.pixelsToDp
 import com.jervisffb.ui.viewmodel.MenuViewModel
 
 
@@ -27,9 +25,3 @@ fun main() =
             App(menuViewModel)
         }
     }
-
-@Composable
-fun pixelsToDp(pixels: Float): Dp {
-    val density = LocalDensity.current
-    return with(density) { (this.density * pixels).toDp() }
-}

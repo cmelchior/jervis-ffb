@@ -1,5 +1,7 @@
 package com.jervisffb.ui
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -10,6 +12,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -19,6 +22,31 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.skia.FilterBlurMode
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.MaskFilter
+
+
+/**
+ * Convert a pixel value to the corresponding dp value taking the screen
+ * density into account.
+ *
+ * On Retina displays, this will scale the pixels up.
+ */
+@Composable
+fun pixelsToDp(px: Float): Dp {
+    val density = LocalDensity.current
+    return with(density) { (this.density * px).toDp() }
+}
+
+/**
+ * Convert a Pixel value back to its Dp value
+ *
+ * This is e.g. used when using LayoutCoordinates to define the size of another
+ * composable.
+ */
+@Composable
+fun Float.asDp(): Dp {
+    val density = LocalDensity.current
+    return remember(this, density) { with(density) { this@asDp.toDp() } }
+}
 
 @OptIn(ExperimentalResourceApi::class)
 internal suspend fun Res.loadImage(path: String): ImageBitmap {
