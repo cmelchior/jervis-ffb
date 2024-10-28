@@ -3,6 +3,8 @@ package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.DeselectPlayer
+import com.jervisffb.engine.actions.EndAction
+import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -12,6 +14,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetSkillUsed
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -34,7 +37,6 @@ import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.utils.INVALID_ACTION
-import com.jervisffb.engine.commands.compositeCommandOf
 import kotlinx.serialization.Serializable
 
 /**
@@ -95,7 +97,7 @@ object BlockAction : Procedure() {
     object SelectDefenderOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
         override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val end: List<ActionDescriptor> = listOf(DeselectPlayer(state.activePlayer!!))
+            val end: List<ActionDescriptor> = listOf(EndActionWhenReady)
 
             val attacker = state.activePlayer!!
             val eligibleDefenders: List<ActionDescriptor> =
@@ -108,7 +110,7 @@ object BlockAction : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is PlayerDeselected -> ExitProcedure()
+                is EndAction -> ExitProcedure()
                 is PlayerSelected -> {
                     val context = BlockActionContext(
                         attacker = state.activePlayer!!,
