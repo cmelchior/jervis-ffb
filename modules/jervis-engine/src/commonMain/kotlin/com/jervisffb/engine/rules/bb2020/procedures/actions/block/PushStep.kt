@@ -554,7 +554,7 @@ object PushStep: Procedure() {
             return if (pushedIntoTheCrowd) {
                 compositeCommandOf(
                     *actions,
-//                    SetPlayerLocation(context.pushChain.last().pushee, FieldCoordinate.UNKNOWN),
+                    SetPlayerLocation(context.pushChain.last().pushee, FieldCoordinate.UNKNOWN),
                     GotoNode(PushedIntoTheCrowd)
                 )
             } else {
