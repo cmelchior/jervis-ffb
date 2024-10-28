@@ -241,8 +241,11 @@ private fun FieldSquare(
                 contentDescription = "",
             )
         }
+        square.directionSelected?.let {
+            DictionImage(it, interactive = false)
+        }
         square.selectableDirection?.let {
-            DictionImage(it)
+            DictionImage(it, interactive = true)
         }
         if (square.dice != 0) {
             BlockDiceIndicatorImage(square.dice)
@@ -251,12 +254,17 @@ private fun FieldSquare(
 }
 
 @Composable
-fun DictionImage(direction: Direction) {
+fun DictionImage(direction: Direction, interactive: Boolean) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
-    val imageRes = IconFactory.getDirection(direction, isHovered)
+    val imageRes = IconFactory.getDirection(direction, if (interactive) isHovered else true)
+    val modifier = if (interactive) {
+        Modifier.fillMaxSize().hoverable(interactionSource = interactionSource)
+    } else {
+        Modifier.fillMaxSize()
+    }
     Image(
-        modifier = Modifier.fillMaxSize().hoverable(interactionSource = interactionSource),
+        modifier = modifier,
         painter = painterResource(imageRes),
         contentDescription = null,
     )

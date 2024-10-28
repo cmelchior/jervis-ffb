@@ -469,7 +469,9 @@ object PushStep: Procedure() {
     object ResolvePush: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
-            val moveCommands = context.pushChain.map { push ->
+            // Resolve push from the last to the first. As doing the other way seems
+            // to cause issues with Undo. Probably a bug, so it needs to be investigated.
+            val moveCommands = context.pushChain.reversed().map { push ->
                 val to = push.to!!
                 if (to == FieldCoordinate.OUT_OF_BOUNDS) {
                     // We do not know where the player is going until after the injury roll,

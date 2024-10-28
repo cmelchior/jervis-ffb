@@ -9,12 +9,15 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.BallState
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.bb2020.procedures.WeatherRoll
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.ChangingWeather
 import com.jervisffb.engine.rules.bb2020.tables.KickOffEvent
 import com.jervisffb.engine.rules.bb2020.tables.TableResult
@@ -263,6 +266,9 @@ class UiGameController(
                 // Last, send action to the Rules Engine for processing.
                 // This will start the next iteration of the game loop.
                 // TODO Add error handling here. What to do for invalid actions?
+                // TODO This approach doesn't support UNDO very well, as Undo doesn't
+                //  treat composite actions as a "whole". This probably needs to be
+                //  thought a bit about
                 if (userAction is CompositeGameAction) {
                     userAction.list.forEach { action: GameAction ->
                         controller.processAction(action)
@@ -333,8 +339,20 @@ class UiGameController(
                 it.location.x == coordinate.x &&
                 it.location.y == coordinate.y
         }
+
+        // We add a special indicator where the ball is leaving the pitch (if it is)
         val isBallExiting: Boolean = game.balls.any {
             it.state == BallState.OUT_OF_BOUNDS && it.outOfBoundsAt == coordinate
+        }
+
+        // Add direction arrows for already selected directions during a chain push
+        var directionSelected: Direction? = null
+        state.getContextOrNull<PushContext>()?.let { context ->
+            directionSelected = context.pushChain
+                .firstOrNull { it.to == coordinate }
+                ?.let { data: PushContext.PushData ->
+                    Direction.from(data.from, data.to!!)
+                }
         }
 
         return UiFieldSquare(
@@ -343,7 +361,9 @@ class UiGameController(
             isBallExiting,
             square.player?.hasBall() == true,
             uiPlayer,
-        )
+        ).apply {
+            this.directionSelected = directionSelected
+        }
     }
 
     fun userSelectedAction(action: GameAction) { actionProvider.userActionSelected(action)}
