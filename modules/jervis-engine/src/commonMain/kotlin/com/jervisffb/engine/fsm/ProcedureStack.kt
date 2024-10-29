@@ -83,7 +83,7 @@ class ProcedureStack {
      * of the stack.
      */
     fun containsNode(node: Node): Boolean {
-        return history.firstOrNull { it.currentNode() == node } != null
+        return history.any { procedure -> procedure.currentNode() == node }
     }
 
     /**
@@ -114,5 +114,24 @@ class ProcedureStack {
         } else {
             history[history.size - 1 + index]
         }
+    }
+
+    /**
+     * Returns the number of active nodes in the entire stack.
+     *
+     * This can, e.g., be used to detect if a chain of bounces or catches are
+     * happening.
+     */
+    fun nodeCount(node: Node): Int {
+        return history.count { it.currentNode() == node }
+    }
+
+    /**
+     * Returns `true` if the current active is the provided one, and it doesn't
+     * exist anywhere else in the stack.
+     */
+    fun singleCurrentNode(node: Node): Boolean {
+        if (nodeCount(node) > 1) return false
+        return peepOrNull()?.currentNode() == node
     }
 }

@@ -238,9 +238,8 @@ class UiGameController(
             isBallExiting,
             square.player?.hasBall() == true,
             uiPlayer,
-        ).apply {
-            this.directionSelected = directionSelected
-        }
+            directionSelected = directionSelected
+        )
     }
 
     fun userSelectedAction(action: GameAction) { actionProvider.userActionSelected(action)}

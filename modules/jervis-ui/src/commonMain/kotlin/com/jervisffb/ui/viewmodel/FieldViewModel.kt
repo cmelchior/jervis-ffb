@@ -114,7 +114,8 @@ class FieldViewModel(
 
     fun observeField(): Flow<Map<FieldCoordinate, UiFieldSquare>> {
         return uiState.uiStateFlow.map { uiState: UiGameSnapshot ->
-            uiState.fieldSquares
+            // Create new map to trigger recomposition
+            uiState.fieldSquares.toMap()
         }
     }
 

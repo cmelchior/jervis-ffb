@@ -133,7 +133,7 @@ class ManualActionProvider(
             // Do not pause for flow-control events, only events that would appear "visible"
             // to the player
             if (action !is MoveTypeSelected && delayEvents) {
-                delay(200)
+                delay(150)
             }
             return action
         }
@@ -185,50 +185,49 @@ class ManualActionProvider(
      */
     // TODO Should probably refactor this so every case is in its own function. Perhaps move to a separate
     //  class to make it more explicit?
-    private fun addNonDialogActionDecorators(state: UiGameSnapshot, request: ActionsRequest) {
+    private fun addNonDialogActionDecorators(snapshot: UiGameSnapshot, request: ActionsRequest) {
         request.actions.forEach { action ->
             when (action) {
                 is DeselectPlayer -> {
                     val coordinate = action.player.location as FieldCoordinate
-                    state.fieldSquares[coordinate]?.let {
-                        it.onMenuHidden = { userActionSelected(PlayerDeselected(action.player)) }
-                    } ?: error ("Could not find square: $coordinate")
+                    snapshot.fieldSquares[coordinate] = snapshot.fieldSquares[coordinate]?.copy(
+                        onMenuHidden = { userActionSelected(PlayerDeselected(action.player)) }
+                    ) ?: error ("Could not find square: $coordinate")
                 }
                 EndActionWhenReady -> {
-                    state.game.activePlayer?.location?.let { location ->
-                        state.fieldSquares[location]?.let { square ->
-                            square.contextMenuOptions.add(
-                                ContextMenuOption(
-                                    "End action",
-                                    { userActionSelected(EndAction) },
-                                )
+                    snapshot.game.activePlayer?.location?.let { location ->
+                        snapshot.fieldSquares[location as FieldCoordinate] = snapshot.fieldSquares[location]?.copyAddContextMenu(
+                            ContextMenuOption(
+                                "End action",
+                                { userActionSelected(EndAction) },
                             )
-                        } ?: error("Could not find square: $location")
+                        ) ?: error("Could not find square: $location")
                     } ?: error("No active player")
                 }
                 is SelectDirection -> {
-                    val origin = state.game.field[action.origin as FieldCoordinate]
+                    val origin = snapshot.game.field[action.origin as FieldCoordinate]
                     action.directions.forEach { direction ->
-                        val square = state.fieldSquares[origin.move(direction, 1)]
-                        square?.let {
-                            it.onSelected = { userActionSelected(DirectionSelected(direction)) }
-                            it.selectableDirection = direction
-                        } ?: error("Cannot find square: ${origin.move(direction, 1)}")
+                        val square = snapshot.fieldSquares[origin.move(direction, 1)]
+                        snapshot.fieldSquares[origin.move(direction, 1)] = square?.copy(
+                            onSelected = { userActionSelected(DirectionSelected(direction)) },
+                            selectableDirection = direction
+                        ) ?: error("Cannot find square: ${origin.move(direction, 1)}")
                     }
                 }
                 is SelectFieldLocation -> {
                     val selectedAction = {
                         userActionSelected(FieldSquareSelected(action.coordinate))
                     }
-                    state.fieldSquares[action.coordinate]?.let {
-                        it.onSelected = selectedAction
-                        it.requiresRoll = (action.requiresRush || action.requiresDodge)
-                    } ?: error("Unexpected location : ${action.coordinate}")
+                    val square = snapshot.fieldSquares[action.coordinate]
+                    snapshot.fieldSquares[action.coordinate] = square?.copy(
+                        onSelected = selectedAction,
+                        requiresRoll = (action.requiresRush || action.requiresDodge)
+                    ) ?: error("Unexpected location : ${action.coordinate}")
                 }
                 is SelectMoveType -> {
-                    val player = state.game.activePlayer ?: error("No active player")
+                    val player = snapshot.game.activePlayer ?: error("No active player")
                     val activeLocation = player.location as OnFieldLocation
-                    val activeSquare = state.fieldSquares[activeLocation] ?: error("No square found: $activeLocation")
+                    val activeSquare = snapshot.fieldSquares[activeLocation] ?: error("No square found: $activeLocation")
                     // For move selection, some types of moves we want to display on the field
                     // others should be a specific action that must be selected.
                     // On-field moves are shortcutting the Rules engine, so we need to account for that as well
@@ -261,23 +260,24 @@ class ManualActionProvider(
                                 activeLocation as FieldCoordinate,
                                 if (requiresDodge) 1 else player.movesLeft,
                             )
-                            state.pathFinder = allPaths
+                            snapshot.pathFinder = allPaths
 
                             // Also mark all fields around the player as immediately selectable
-                            activeLocation.getSurroundingCoordinates(state.game.rules, 1, includeOutOfBounds = false)
-                                .filter { state.game.field[it].isUnoccupied() }
+                            activeLocation.getSurroundingCoordinates(snapshot.game.rules, 1, includeOutOfBounds = false)
+                                .filter { snapshot.game.field[it].isUnoccupied() }
                                 .forEach { loc ->
-                                    state.fieldSquares[loc]?.let { square ->
-                                        square.onSelected = {
+                                    val square = snapshot.fieldSquares[loc]
+                                    snapshot.fieldSquares[loc] = square?.copy(
+                                        onSelected = {
                                             userActionSelected(CompositeGameAction(
                                                 listOf(
                                                     MoveTypeSelected(MoveType.STANDARD),
                                                     FieldSquareSelected(loc)
                                                 )
                                             ))
-                                        }
-                                        square.requiresRoll = requiresDodge || requiresRush
-                                    } ?: error("Could not find square: $loc")
+                                        },
+                                        requiresRoll = requiresDodge || requiresRush
+                                    ) ?: error("Could not find square: $loc")
                                 }
                         }
 
@@ -298,14 +298,15 @@ class ManualActionProvider(
                     }
 
                     // Depending on the location, the event is tracked slightly different
-                    when (val location = state.game.getPlayerById(action.player).location) {
+                    when (val location = snapshot.game.getPlayerById(action.player).location) {
                         DogOut -> {
-                            state.dogoutActions[action.player] = selectedAction
+                            snapshot.dogoutActions[action.player] = selectedAction
                         }
                         is FieldCoordinate -> {
-                            state.fieldSquares[location]?.let {
-                                it.onSelected = selectedAction
-                            } ?: error("Unexpected player location : $location")
+                            val square = snapshot.fieldSquares[location]
+                            snapshot.fieldSquares[location] = square?.copy(
+                                onSelected = selectedAction
+                            ) ?: error("Unexpected player location : $location")
                         }
                         is GiantLocation -> TODO("Not supported right now")
                     }
@@ -313,8 +314,8 @@ class ManualActionProvider(
                     // TODO Other UI modifications, like dice decoration
                 }
                 is SelectPlayerAction -> {
-                    state.game.activePlayer?.location?.let { location ->
-                        state.fieldSquares[location]?.let { activePlayerSquare ->
+                    snapshot.game.activePlayer?.location?.let { location ->
+                        snapshot.fieldSquares[location]?.let { activePlayerSquare ->
                             activePlayerSquare.contextMenuOptions.add(
                                 action.action.let {
                                     val name = when (it.type) {
@@ -362,7 +363,7 @@ class ManualActionProvider(
                     // Any action that isn't being mapped to an UI component needs to go here.
                     // This way, we ensure that the UI is never blocked during development.
                     // In an ideal world, nothing should ever go here.
-                    state.unknownActions.add(
+                    snapshot.unknownActions.add(
                         mapUnknownAction(action)
                     )
                 }
@@ -375,11 +376,12 @@ class ManualActionProvider(
         // the player was just selected, and we should show the context menu up front.
         // Otherwise, it means that the player is in the middle of their action and we should
         // not show the context menu up front. That should be up to the player
-        state.game.activePlayer?.location?.let { activePlayerLocation ->
-            state.fieldSquares[activePlayerLocation]?.let {
-                if (it.contextMenuOptions.isNotEmpty() && it.contextMenuOptions.count { it.title == "End action" } == 0) {
-                    it.showContextMenu = true
-                }
+        snapshot.game.activePlayer?.location?.let { activePlayerLocation ->
+            val square = snapshot.fieldSquares[activePlayerLocation]
+            if (square != null && square.contextMenuOptions.isNotEmpty() && square.contextMenuOptions.count { it.title == "End action" } == 0) {
+                snapshot.fieldSquares[activePlayerLocation as FieldCoordinate] = square.copy(
+                    showContextMenu = true
+                )
             }
         }
 

@@ -12,7 +12,7 @@ import kotlin.math.tan
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class PassAnimation(val from: OnFieldLocation, val to: FieldCoordinate) : JervisAnimation {
+class PassAnimation(val from: OnFieldLocation, val to: FieldCoordinate, val outOufBounds: Boolean) : JervisAnimation {
 
     val viewingDistance = 500f
     val angleRadians = toRadians(45.0)

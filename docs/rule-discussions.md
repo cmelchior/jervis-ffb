@@ -94,14 +94,16 @@ interpreted.
 
 19. Pro and rerolls https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=32167&postdays=0&postorder=asc&start=0
 
-20. Rules for activation are intepreted like this:
+20. Rules for activation are interpreted like this (this list is not defined anywhere)
     a. Select Player
-    b. Activate Player (this regains lost Tackle Zones)
+    b. Start Activation (this regains lost Tackle Zones).
     c. Select Action. Some actions require a target as part of this:
        a. Blitz, Foul, 
+    d. Start of Activation
+       d1. Rodney's Catch of the Day
     d. Roll for Bone Head etc. Pro is allowed here
     e. If Bone Head fails, action is "used"
-    f. Roll for Foul Appearance, Dump-off (Pr. Designer's Commentary) 
+    f. Roll for Foul Appearance, Dump-off (Pr. Designer's Commentary)
 
 21. Multiple Block / Frenzy / Special Actions: https://fumbbl.com/p/blog?c=Candlejack&id=25322
     My interpretation:

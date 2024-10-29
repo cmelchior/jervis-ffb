@@ -135,9 +135,7 @@ object TheKickOffEvent : Procedure() {
             return if (outOfBounds) {
                 GotoNode(TouchBack)
             } else {
-                compositeCommandOf(
-                    GotoNode(ResolveBallLanding),
-                )
+                GotoNode(ResolveBallLanding)
             }
         }
     }

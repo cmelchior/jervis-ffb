@@ -106,12 +106,12 @@ object BlitzAction : Procedure() {
             }.map {
                 SelectPlayer(it)
             }
-            return availableTargetPlayers + listOf(DeselectPlayer(attacker))
+            return availableTargetPlayers + listOf(EndActionWhenReady)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is PlayerDeselected -> ExitProcedure()
+                EndAction -> ExitProcedure()
                 is PlayerSelected -> {
                     val context = state.getContext<BlitzContext>()
                     compositeCommandOf(

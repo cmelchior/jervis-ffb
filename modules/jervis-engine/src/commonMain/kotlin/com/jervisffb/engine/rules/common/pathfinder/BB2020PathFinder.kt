@@ -34,7 +34,6 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
 
     /**
      * Calculate the straight line (using squares) between two squares using Bresenham's line algorithm.
-     *
      * See https://en.m.wikipedia.org/wiki/Bresenham%27s_line_algorithm
      */
     override fun getStraightLine(

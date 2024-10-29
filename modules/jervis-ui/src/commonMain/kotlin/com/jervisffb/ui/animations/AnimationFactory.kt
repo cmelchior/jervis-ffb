@@ -8,6 +8,9 @@ import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.Bounce
+import com.jervisffb.engine.rules.bb2020.procedures.Catch
+import com.jervisffb.engine.rules.bb2020.procedures.CatchRoll
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.bb2020.procedures.WeatherRoll
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.ChangingWeather
@@ -57,13 +60,21 @@ object AnimationFactory {
      * but before action decorators are used.
      */
     fun getFrameAnimation(state: Game, rules: Rules): JervisAnimation? {
-        val currentNode = state.currentProcedure()?.currentNode()
+        val stack = state.stack
 
         // Animate kick-off
-        if (state.stack.containsNode(TheKickOffEvent.ResolveBallLanding)) {
+        val firstCatch = (stack.singleCurrentNode(CatchRoll.RollDie) && !stack.containsNode(Catch.CatchFailed))
+        val firstBounce = (stack.singleCurrentNode(Bounce.RollDirection) && !stack.containsNode(Catch.CatchFailed))
+        val catchOrBounce = (firstCatch || firstBounce) && stack.containsNode(TheKickOffEvent.ResolveBallLanding)
+        val touchBack = stack.currentNode() == TheKickOffEvent.TouchBack
+        if ( catchOrBounce || touchBack) {
             val from = state.kickingPlayer!!.location as OnFieldLocation
-            val to = state.singleBall().location
-            return PassAnimation(from, to)
+            var to = state.singleBall().location
+            var outOfBounds = false
+            if (to.isOutOfBounds(rules)) {
+                to = state.singleBall().outOfBoundsAt!!
+            }
+            return PassAnimation(from, to, outOfBounds)
         }
 
         return null

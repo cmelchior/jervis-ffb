@@ -73,6 +73,8 @@ tests covering the particular feature.
   - [x] Pitch Invasion
 - [ ] What goes up, must come down
 - [ ] Touchbacks
+  - [ ] End sequence as soon as ball goes over middle. I.e., not catch rolls etc.
+  - [ ] Going out of bounds
 
 ## Game
 
@@ -141,10 +143,14 @@ tests covering the particular feature.
 
 - [ ] Move Action
   - [ ] Standup and end movement
-  - [ ] Standup with less than 3 strenght
+  - [ ] Standup with less than 3 strength
   - [ ] Starting a move action while prone and aborting it again
-  - [ ] Deselecting a player before it moves 
+  - [ ] Ending action before the player moves shouldn't use the action.
   - [ ] Moving any square mark the action as "used"
+- [ ] Jump Sub action
+  - [ ] Can only jump over prone player
+  - [ ] Use 2 moves
+  - [ ]
 - [ ] Pass Action
 - [ ] Hand-off Action
 - [ ] Throw Team-mate Action
