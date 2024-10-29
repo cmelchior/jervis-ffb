@@ -21,6 +21,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
     var isOpen by remember { mutableStateOf(true) }
     var rerollSuccessfulActions by remember { mutableStateOf(vm.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) }
     var selectKickingPlayer by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_KICKING_PLAYER)) }
+    var autoEndPlayerAction by remember { mutableStateOf(vm.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTON)) }
     MenuBar {
 
         Menu("Developer Tools", mnemonic = 'D') {
@@ -57,6 +58,14 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
                 onCheckedChange = {
                     selectKickingPlayer = !selectKickingPlayer
                     vm.toggleFeature(Feature.SELECT_KICKING_PLAYER, selectKickingPlayer)
+                }
+            )
+            CheckboxItem(
+                text = "End action automatically",
+                checked = autoEndPlayerAction,
+                onCheckedChange = {
+                    autoEndPlayerAction = !autoEndPlayerAction
+                    vm.toggleFeature(Feature.END_PLAYER_ACTION_IF_ONLY_OPTON, autoEndPlayerAction)
                 }
             )
         }

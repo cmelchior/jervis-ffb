@@ -504,8 +504,8 @@ class ManualActionProvider(
                 }
         }
 
-        // If a team has no further actions, just end their turn immediately
-        if (actions.size == 1 && actions.first() is EndActionWhenReady) {
+        // If a player action can only end, just end it immediately
+        if (menuViewModel.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTON) && actions.size == 1 && actions.first() is EndActionWhenReady) {
             return EndAction
         }
 

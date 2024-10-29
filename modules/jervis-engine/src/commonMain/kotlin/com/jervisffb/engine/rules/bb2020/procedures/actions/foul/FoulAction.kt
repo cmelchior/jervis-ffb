@@ -2,12 +2,10 @@ package com.jervisffb.engine.rules.bb2020.procedures.actions.foul
 
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveTypeSelected
-import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
@@ -96,12 +94,12 @@ object FoulAction : Procedure() {
             }.map {
                 SelectPlayer(it)
             }
-            return availableTargetPlayers + listOf(DeselectPlayer(fouler))
+            return availableTargetPlayers + listOf(EndActionWhenReady)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is PlayerDeselected -> ExitProcedure()
+                is EndAction -> ExitProcedure()
                 is PlayerSelected -> {
                     val context = state.getContext<FoulContext>()
                     compositeCommandOf(
