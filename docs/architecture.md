@@ -121,7 +121,7 @@ This approach has a number of advantages:
 
 The disadvantages are:
 
-- Server and Client needs to 100% agree on the rules being used. So exact same rules engine needs to 
+- Server and Client needs to 100% agree on the rules being used. So the exact same rules engine needs to 
   run both places.
 - Loading older save games will be made more complicated unless we can also restore the same version
   of the rules engine.

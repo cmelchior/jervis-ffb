@@ -29,8 +29,8 @@ Desktop targets.
 ## Disclaimer
 
 Blood Bowl is a trademark of Games Workshop Limited, used without permission, 
-used without intent to infringe, or in opposition to their copyright. This site
-is in no way official and is not endorsed by Games Workshop Limited.
+used without intent to infringe, or in opposition to their copyright. This 
+project is in no way official and is not endorsed by Games Workshop Limited.
 
 
 ## Requirements
@@ -60,30 +60,31 @@ A local WASM client can be started using:
 
 This repository is structured in the following way:
 
-- `moduls/`: The main entry point for all code. See the section below
-- `docs/`: Contains more fine-grained docs about various aspects of the project
-- `tools/`: Contains commandline tools used by the project
-- `Debug-FantasyFootballClient/`: Contains the modified FUMBBL Client that can
+- `modules/`: The main entry point for all code. See the section below.
+- `docs/`: Contains more fine-grained docs about various aspects of the project.
+- `tools/`: Contains commandline tools used by the project.
+- `Debug-FantasyFootballClient/`: Contains a modified FUMBBL Client that can
   be used to introspect FUMMBL network traffic. See 
   [the documentation](modules/fumbbl-cli/README.md) for more details.
 
 ### Modules Structure
 
-The `modules/` sub folder is the main entry point for the project and consists 
+The `modules/` subfolder is the main entry point for the project and consists 
 of the following modules:
 
 - `fumbbl-cli`: Small commandline tool for either downloading the FUMBBL Client 
-  and modifying it so all websocket traffic is outputted to the console or 
+  and modifying it, so all websocket traffic is sent to the console or 
   download a replay for further analysis. Note, the last functionality should only 
-  be used sparingly and for testing as it taxes too much if used in bulk. 
+  be used sparingly and for testing as it taxes the server too much if used in 
+  bulk. 
 
 - `fumbbl-net`: Network code and classes for communicating with the FUMBBL 
    server as well as adapters for converting a FUMBBL game into a Jervis
    equivalent.
 
-- `jervis-engine`: This contains a full model of a Blood Bowl game and can be 
-  used to model both the game state and rules. 
-
+- `jervis-engine`: This contains a full model of the Blood Bowl rules and 
+  contains the logic for running a game.
+- 
 - `jervis-ui`: An UI for driving a game of Blood Bowl. It has been largely 
   copied from the FUMBBL Client UI.
 
@@ -102,18 +103,17 @@ by using this gradle command:
 ./gradlew updateFFBResources
 ```
 
-This task will clone the FFB respository, take the resource folder and 
+This task will clone the FFB repository, take the resource folder and 
 flatten it so it is usable by Compose Multiplatform and then finally moving it
 into place in the project so it is ready for immediate use.
 
 
 ## Why Jervis?
 
-As a homage to the original creator of Blood Bowl: Jervis Johnson. Who would be 
-better at playing Blood Bowl, than the man who invented it.
+As a homage to the original creator of Blood Bowl: Jervis Johnson. 
 
 Also, it sounds similar to J.A.R.V.I.S, the A.I. from the Marvel Universe, so it 
-also a funny play of words.
+also a fun play on that pronunciation.
 
 
 ## Other resources

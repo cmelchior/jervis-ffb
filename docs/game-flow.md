@@ -72,6 +72,8 @@ tests covering the particular feature.
   - [x] Officious Ref
   - [x] Pitch Invasion
 - [ ] What goes up, must come down
+  - [ ] Rerolls not available for catch
+  - [ ] Some skills are available (but it isn't a team turn)
 - [ ] Touchbacks
   - [ ] End sequence as soon as ball goes over middle. I.e., not catch rolls etc.
   - [ ] Going out of bounds

@@ -11,7 +11,8 @@ things as they come up.
 - [ ] Add numbers where the player has moved already
 - [ ] Passes going out of bounds currently land in exitAt, make the animation move the
       ball out of bounds.
-- [ ] Add UI indicator signaling limit of opponent players move (see BB3)
+- [ ] Add UI indicator signaling limit of opponent players move (see BB3).
+- [ ] Add scrollbar indicator to game log components.
 - [ ] If possible, move dice roll dialogs away from the pitch.
 - [ ] Rethink dialog design. They are currently way too big. As a minimum
       you need to be able to drag them away from the screen.
