@@ -9,21 +9,40 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class LogViewModel(val uiState: UiGameController) {
+    val showDebugLogs: Boolean = false
     val state = uiState.state
     val controller = uiState.controller
-    val logStateMachine = false
     val logsCache = mutableListOf<LogEntry>()
+    val debugLogsCache = mutableListOf<LogEntry>()
+    val debugLogs: Flow<List<LogEntry>> =
+        controller.logsEvents.map {
+            when (it) {
+                is AddEntry -> {
+                    if (it.log.category == LogCategory.STATE_MACHINE) {
+                        debugLogsCache.add(it.log)
+                    }
+                }
+                is RemoveEntry -> {
+                    if (it.log.category != LogCategory.STATE_MACHINE) {
+                        if (debugLogsCache.isNotEmpty()) {
+                            debugLogsCache.removeLast()
+                        }
+                    }
+                }
+            }
+            debugLogsCache.map { it }
+        }
     val logs: Flow<List<LogEntry>> =
         controller.logsEvents.map {
             println(it)
             when (it) {
                 is AddEntry -> {
-                    if (it.log.category != LogCategory.STATE_MACHINE || logStateMachine) {
+                    if (it.log.category != LogCategory.STATE_MACHINE) {
                         logsCache.add(it.log)
                     }
                 }
                 is RemoveEntry -> {
-                    if (it.log.category != LogCategory.STATE_MACHINE || logStateMachine) {
+                    if (it.log.category != LogCategory.STATE_MACHINE) {
                         if (logsCache.isNotEmpty()) {
                             logsCache.removeLast()
                         }
@@ -32,8 +51,4 @@ class LogViewModel(val uiState: UiGameController) {
             }
             logsCache.map { it }
         }
-
-    init {
-        //        logsCache.addAll(controller.state.logs.filter { it.category != LogCategory.STATE_MACHINE })
-    }
 }

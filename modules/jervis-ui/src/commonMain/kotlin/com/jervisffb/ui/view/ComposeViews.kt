@@ -22,13 +22,18 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.Divider
 import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -238,17 +243,44 @@ fun LogViewer(
     vm: LogViewModel,
     modifier: Modifier,
 ) {
+    var tabIndex by remember { mutableStateOf(0) }
+    val tabs = listOf("Game", "Debug")
+
+    Column(modifier = modifier) {
+        if (vm.showDebugLogs) {
+            TabRow(
+                selectedTabIndex = tabIndex,
+                backgroundColor = Color.White // 0xFFEEEEEE
+            ) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(text = { Text(title) },
+                        selected = tabIndex == index,
+                        onClick = { tabIndex = index }
+                    )
+                }
+            }
+            when (tabIndex) {
+                0 -> GameLog(vm)
+                1 -> DebugLog(vm)
+            }
+        } else {
+            GameLog(vm)
+        }
+    }
+}
+
+@OptIn(ExperimentalUuidApi::class)
+@Composable
+fun GameLog(vm: LogViewModel) {
     val listData by vm.logs.collectAsState(initial = emptyList())
     val listState = rememberLazyListState()
-
     LaunchedEffect(listData) {
         if (listData.isNotEmpty()) {
             listState.scrollToItem(listData.size - 1)
         }
     }
-
     LazyColumn(
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         state = listState
@@ -261,3 +293,31 @@ fun LogViewer(
         }
     }
 }
+
+@OptIn(ExperimentalUuidApi::class)
+@Composable
+fun DebugLog(vm: LogViewModel) {
+    val listData by vm.debugLogs.collectAsState(initial = emptyList())
+    val listState = rememberLazyListState()
+    LaunchedEffect(listData) {
+        if (listData.isNotEmpty()) {
+            listState.scrollToItem(listData.size - 1)
+        }
+    }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        state = listState
+    ) {
+        items(items = listData, key = { item -> item.id.toString() }) {
+            Text(
+                text = it.message,
+                softWrap = false,
+                lineHeight = if (it.message.lines().size > 1) 1.5.em else 1.0.em,
+            )
+        }
+    }
+}
+
+
