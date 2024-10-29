@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.jervisffb.ui.KickOffEventAnimation
-import com.jervisffb.ui.PassAnimation
+import com.jervisffb.ui.animations.KickOffEventAnimation
+import com.jervisffb.ui.animations.PassAnimation
 import com.jervisffb.ui.viewmodel.FieldViewModel
 
 @Composable

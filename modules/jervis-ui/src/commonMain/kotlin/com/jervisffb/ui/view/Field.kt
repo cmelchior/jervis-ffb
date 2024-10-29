@@ -234,7 +234,10 @@ private fun FieldSquare(
         }
         if (square.isBallOnGround || square.isBallExiting) {
             Image(
-                modifier = Modifier.fillMaxSize().padding(4.dp).background(color = if (square.isBallExiting) Color.Red else Color.Transparent),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(4.dp)
+                    .background(color = if (square.isBallExiting) Color.Red else Color.Transparent),
                 alignment = Alignment.Center,
                 contentScale = ContentScale.FillBounds,
                 bitmap = IconFactory.getBall(),

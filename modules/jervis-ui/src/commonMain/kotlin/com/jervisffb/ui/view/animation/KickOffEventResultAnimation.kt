@@ -20,7 +20,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.jervisffb.ui.KickOffEventAnimation
+import com.jervisffb.ui.animations.KickOffEventAnimation
 import com.jervisffb.ui.viewmodel.FieldViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay

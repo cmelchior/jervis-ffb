@@ -9,9 +9,9 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.utils.safeTryEmit
-import com.jervisffb.ui.JervisAnimation
 import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.UiGameSnapshot
+import com.jervisffb.ui.animations.JervisAnimation
 import com.jervisffb.ui.model.UiFieldSquare
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

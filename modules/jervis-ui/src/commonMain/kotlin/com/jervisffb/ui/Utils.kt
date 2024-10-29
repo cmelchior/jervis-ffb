@@ -22,7 +22,9 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.skia.FilterBlurMode
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.MaskFilter
+import kotlin.math.PI
 
+fun toRadians(deg: Double): Double = deg / 180.0 * PI
 
 /**
  * Convert a pixel value to the corresponding dp value taking the screen
