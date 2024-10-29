@@ -8,6 +8,10 @@ things as they come up.
 
 
 ## Todo List
+- [ ] Keep player card open for the currently active player.
+- [ ] Add support for Rerolls / Apothecary / etc. in the sidebars
+- [ ] Create "dice"-like background for dice rolls.
+- [ ] Only have 3 players pr. row in the Dugout (similar to FUMBBL).
 - [ ] Add numbers where the player has moved already
 - [ ] Passes going out of bounds currently land in exitAt, make the animation move the
       ball out of bounds.
