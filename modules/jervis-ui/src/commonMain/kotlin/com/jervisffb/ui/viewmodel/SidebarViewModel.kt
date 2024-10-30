@@ -6,10 +6,10 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isOnAwayTeam
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.utils.safeTryEmit
-import com.jervisffb.ui.model.UiPlayer
-import com.jervisffb.ui.model.UiPlayerCard
 import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.UiGameSnapshot
+import com.jervisffb.ui.model.UiPlayer
+import com.jervisffb.ui.model.UiPlayerCard
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -74,7 +74,12 @@ class SidebarViewModel(
                 val dogoutActions = uiState.dogoutActions
                 players.map {
                     val playerAction = dogoutActions[it.id]
-                    UiPlayer(it, playerAction, onHover = { hoverOver(it) }, onHoverExit = { hoverExit() })
+                    UiPlayer(
+                        it,
+                        playerAction,
+                        onHover = { hoverOver(it) },
+                        onHoverExit = { hoverExit() }
+                    )
                 }
         }
     }

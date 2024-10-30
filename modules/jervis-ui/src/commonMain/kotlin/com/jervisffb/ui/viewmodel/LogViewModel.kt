@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class LogViewModel(val uiState: UiGameController) {
-    val showDebugLogs: Boolean = false
+    val showDebugLogs: Boolean = true
     val state = uiState.state
     val controller = uiState.controller
     val logsCache = mutableListOf<LogEntry>()

@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
@@ -18,6 +17,7 @@ import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -30,12 +30,12 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock.MultipleBlockChoseResults
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock.MultipleBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock.MultipleBlockResolveInjuries
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -61,7 +61,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  *
  * Since the rules define none of this, we opt for simplicity and implement lock-step up until the
  * point of resolving a block type, then resolve that block type up to the point of having rolled for armour/injury.
- * And then finally choose to use apothecary/regeneration or not.
+ * And then finally, choose to use apothecary/regeneration or not.
  *
  * For pushes, this means that we fully resolve one push before doing the next.
 
@@ -69,15 +69,15 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * empty. This also mirrors the normal push behavior.
  *
  * The starting square will be considered "occupied" for when using Grab on the 2nd player. While this is
- * inconsistent with pushes, it does match the rules described in the Designer's Commentary.
+ * inconsistent with pushes, it is required as per the rules described in the Designer's Commentary.
  *
  * Also, if we treated the starting square as blocked for pushes, it could result in some scenarios that
  * would look weird on a board. So given that this scenario will probably never surface in a realistic
- * game of Blood Bowl, having the behaviour being different seems acceptable.
+ * game of Blood Bowl, having the behavior being different seems acceptable.
  *
  * For injuries, we are introducing an "Injury Pool". This means that all injuries that happened to attacker
  * and defenders are placed in that pool and not fully resolved until both actions are "done". Then the blocking
- * coach can see the full effect of the block before deciding whether to use the apothecary on
+ * coach can see the full effect of all blocks before deciding whether to use the apothecary on
  * all or some of them.
  *
  * For the sake of ease of implementation, crowd-pushes on other players than the ones being blocked
@@ -85,11 +85,11 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  *
  * All of this means that the logic of operations is as follows:
  *
- * 1. Select both block target and type of block, i.e., normal block or special action.
+ * 1. Select both block targets and type of block, i.e., normal block or special action.
  *    a. It is possible to deselect an already selected player again.
  *    b. It is possible to abort the Multiple Block at this point.
  *
- * 2. Roll non-armor/injury dice for actions.
+ * 2. Roll dice that are not armour/injury for actions.
  *    a. Block: Normal block dice
  *    b. Projectile Vomit: D6 for who is hit.
  *    c. Chainsaw: D6 for who is hit.
@@ -105,17 +105,17 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * 5. Let the active player decide which player to resolve first.
  *
  * 6. Resolve block results:
- *    a. If two normal blocks, resolve push/chainpushes individually, including rolling for injuries,
- *       but not rolling for apothecary or bouncing the ball. The player still stays on the field and
+ *    a. If two normal blocks, resolve push/chain-pushes individually, including rolling for injuries,
+ *       but not rolling for apothecary or bouncing the ball. The player still stays on the field, and
  *       any injuries are placed in an "Injury Pool". Injuries caused by chain pushing other players
  *       into the crowd are resolved fully immediately.
  *    b. If a special action is combined with a block. Resolve each action as chosen by the blocker. Any
  *       injuries are placed in the "injury pool".
  *
  *    c. Any turn-over caused by the first block is postponed until the 2nd block has resolved, i.e., the
- *       blocker does not loose access to skills mid-block.
+ *       blocker does not lose access to skills mid-block.
  *
- * 7. Show the "injury pool" and let the blocking coach decide where to apply the apothecary. Even on all
+ * 7. Show the "injury pool" to both coaches and let them decide where to apply the apothecary. Even on all
  *    injuries or only some of them.
  *
  * 8. Finally, if any of the attacker or two defenders had the ball. It will now bounce from their square,

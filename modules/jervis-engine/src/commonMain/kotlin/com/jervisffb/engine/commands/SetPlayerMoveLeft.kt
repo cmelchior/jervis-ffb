@@ -14,9 +14,7 @@ class SetPlayerMoveLeft(private val player: Player, val remainingMove: Int) : Co
         if (remainingMove < 0) throw IllegalArgumentException("Remaining move cannot be negative")
     }
 
-    override fun execute(
-        state: Game,
-    ) {
+    override fun execute(state: Game) {
         this.originalMove = player.movesLeft
         player.apply {
             movesLeft = remainingMove
@@ -24,9 +22,7 @@ class SetPlayerMoveLeft(private val player: Player, val remainingMove: Int) : Co
         }
     }
 
-    override fun undo(
-        state: Game,
-    ) {
+    override fun undo(state: Game) {
         player.apply {
             movesLeft = originalMove
             notifyUpdate()

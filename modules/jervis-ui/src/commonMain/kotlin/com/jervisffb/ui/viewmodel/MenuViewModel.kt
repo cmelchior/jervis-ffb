@@ -43,7 +43,7 @@ class MenuViewModel {
     }
 
     fun isFeatureEnabled(feature: Feature): Boolean {
-        val isUndoing = controller?.lastActionWasUndo ?: false
+        val isUndoing = controller?.lastActionWasUndo() ?: false
         return !isUndoing && (features[feature] ?: false)
     }
 

@@ -1,6 +1,6 @@
 package com.jervisffb.ui
 
-import com.jervisffb.engine.ActionsRequest
+import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
@@ -20,9 +20,20 @@ import com.jervisffb.ui.model.UiFieldSquare
  */
 class UiGameSnapshot(
     val game: Game,
-    var actionsRequest: ActionsRequest,
-    val fieldSquares: MutableMap<FieldCoordinate, UiFieldSquare> = mutableMapOf()
+    var actionsRequest: ActionRequest,
+    val fieldSquares: MutableMap<FieldCoordinate, UiFieldSquare>,
 ) {
+    fun clearHoverData() {
+        // Clear the hover data, only update squares that actually changed
+        fieldSquares.entries.forEach {
+            if (it.value.futureMoveValue != null) {
+                fieldSquares[it.key] = it.value.copy(
+                    futureMoveValue = null,
+                    hoverAction = null,
+                )
+            }
+        }
+    }
 
     // Attach actions to players found in the dogout
     val dogoutActions: MutableMap<PlayerId, () -> Unit> = mutableMapOf()

@@ -1,16 +1,22 @@
 package com.jervisffb.ui
 
-import com.jervisffb.engine.ActionsRequest
+import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameController
 import com.jervisffb.engine.GameDelta
-import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.MoveType
+import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.MoveContext
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayer
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
 import com.jervisffb.ui.animations.AnimationFactory
 import com.jervisffb.ui.animations.JervisAnimation
@@ -51,6 +57,9 @@ class UiGameController(
     val rules: Rules = controller.rules
     lateinit var actionProvider: UiActionProvider
 
+    // Persistent UI decorations that needs to be stored across frames
+    val uiDecorations = UiGameDecorations()
+
     // Scopes
     val errorHandler = CoroutineExceptionHandler { _, exception ->
         exception.printStackTrace()
@@ -80,7 +89,7 @@ class UiGameController(
      * Each execution of the loop can thus be seen as the controller of a single
      * logical "step" of the game. It will run until the game is over.
      *
-     * TODO How to handle interruptions, i.e. players accidentially leaving and
+     * TODO How to handle interruptions, i.e. players accidentally leaving and
      *  rejoining.
      */
     fun startGameEventLoop(uiActionFactory: UiActionProvider) {
@@ -146,19 +155,13 @@ class UiGameController(
                 // TODO This approach doesn't support UNDO very well, as Undo doesn't
                 //  treat composite actions as a "whole". This probably needs to be
                 //  thought a bit about
-                if (userAction is CompositeGameAction) {
-                    userAction.list.forEach { action: GameAction ->
-                        controller.processAction(action)
-                    }
-                } else {
-                    controller.processAction(userAction)
-                }
+                controller.processAction(userAction)
             }
         }
     }
 
     private suspend fun runPreUpdateAnimations() {
-        if (!controller.lastActionWasUndo) {
+        if (!controller.lastActionWasUndo()) {
             val animation = AnimationFactory.getPreUpdateAnimation(state)
             if (animation != null) {
                 _animationFlow.emit(animation)
@@ -168,7 +171,7 @@ class UiGameController(
     }
 
     private suspend fun runPostUpdateAnimations() {
-        if (!controller.lastActionWasUndo) {
+        if (!controller.lastActionWasUndo()) {
             val animation = AnimationFactory.getFrameAnimation(state, rules)
             if (animation != null) {
                 _animationFlow.emit(animation)
@@ -178,7 +181,7 @@ class UiGameController(
     }
 
     private suspend fun runPostActionAnimations(action: GameAction) {
-        if (!controller.lastActionWasUndo) {
+        if (!controller.lastActionWasUndo()) {
             val animation = AnimationFactory.getPostActionAnimation(state, action)
             if (animation != null) {
                 _animationFlow.emit(animation)
@@ -190,7 +193,11 @@ class UiGameController(
     /**
      * Method responsible for updating the UI state based on recent changes.
      */
-    private fun createNewUiSnapshot(state: Game, actions: ActionsRequest, delta: GameDelta, lastUiState: UiGameSnapshot?): UiGameSnapshot {
+    private fun createNewUiSnapshot(state: Game, actions: ActionRequest, delta: GameDelta, lastUiState: UiGameSnapshot?): UiGameSnapshot {
+
+        // Update the persistent UI decorations before starting
+        updatePersistentUiDecorations(state, delta, uiDecorations)
+
         // Re-render the entire field. This feels a bit like overkill, but making it more granular
         // is going to be painful, and it doesn't look like there is a performance problem doing it.
         val squares: MutableMap<FieldCoordinate, UiFieldSquare> = mutableMapOf<FieldCoordinate, UiFieldSquare>().apply {
@@ -203,6 +210,33 @@ class UiGameController(
         }
 
         return UiGameSnapshot(state, actions, squares)
+    }
+
+    private fun updatePersistentUiDecorations(state: Game, delta: GameDelta, uiDecorations: UiGameDecorations) {
+        if (delta.reversed) {
+            uiDecorations.undo(delta.id)
+            return
+        }
+
+        // Clear move markers when an action ends
+        if (delta.containsCommand { it is ExitProcedure && it.procedure == ActivatePlayer }) {
+            uiDecorations.resetMovesUsed()
+        }
+
+        // Add decoration when moving player
+        // TODO Add support JUMP/LEAP
+        if (
+            delta.steps.firstOrNull()?.action == MoveTypeSelected(MoveType.STANDARD) &&
+            delta.steps.lastOrNull()?.action is FieldSquareSelected
+        ) {
+            val context = state.getContext<MoveContext>()
+            val start = context.startingSquare
+            uiDecorations.addMoveUsed(start)
+            uiDecorations.registerUndo(
+                deltaId = delta.id,
+                action = { uiDecorations.removeLastMoveUsed() }
+            )
+        }
     }
 
     private fun renderSquare(
@@ -238,6 +272,7 @@ class UiGameController(
             isBallExiting,
             square.player?.hasBall() == true,
             uiPlayer,
+            moveUsed = uiDecorations.getMoveUsedOrNull(coordinate),
             directionSelected = directionSelected
         )
     }

@@ -14,6 +14,12 @@ data class UiFieldSquare(
     val isBallExiting: Boolean = false,
     val isBallCarried: Boolean = false,
     val player: UiPlayer? = null,
+    val moveUsed: Int? = null, // Indicate how many move steps the user used to reach this square
+    // Indicate the amount of move used to reach a potential target square.
+    // This number will override moveused
+    val futureMoveValue: Int? = null,
+    // Action triggered when square is entered as part of an UI hover action
+    val hoverAction: (() -> Unit)? = null,
 
     // State that are related to actions
     val selectableDirection: Direction? = null, // Show selectable direction arrow (i.e. with hover effect)
@@ -25,6 +31,8 @@ data class UiFieldSquare(
     val showContextMenu: Boolean = false, // The context menu is automatically opened
     val contextMenuOptions: MutableList<ContextMenuOption> = mutableListOf() // The options inside the context menu
 ) {
+
+    fun isEmpty() = !isBallOnGround && player == null
 
     fun copyAddContextMenu(item: ContextMenuOption): UiFieldSquare {
         return this.copy().also { contextMenuOptions += item }

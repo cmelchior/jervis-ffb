@@ -144,12 +144,21 @@ tests covering the particular feature.
 ## Actions
 
 - [ ] Move Action
-  - [ ] Standup and end movement
-  - [ ] Standup with less than 3 strength
-  - [ ] Starting a move action while prone and aborting it again
-  - [ ] Ending action before the player moves shouldn't use the action.
+  - [ ] Select player and end action before moving doesn't doesn't mark the player as used. 
+  - [ ] Starting a move action while prone and aborting it again doesn't mark player as used
+  - [ ] Standup and end movement as a single action.
+  - [ ] Standup with less than 3 strength requires a roll
   - [ ] Moving any square mark the action as "used"
-- [ ] Jump Sub action
+- [ ] Dodge
+  - [ ] Moving away from marking player requires a dodge.
+  - [ ] Moving away from non-marking player is free.
+  - [ ] Rush + Dodge at the same time.
+- [ ] Rush
+  - [ ] A player can normally rush twice pr. action
+  - [ ] Rush is 2+
+  - [ ] Failing a Rush puts player in target square.
+  - [ ] Move action is over after rushing twice.
+- [ ] Jump Sub-action
   - [ ] Can only jump over prone player
   - [ ] Use 2 moves
   - [ ]

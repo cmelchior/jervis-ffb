@@ -33,6 +33,10 @@ data class GameDelta(
         return steps.flatMap { it.commands }
     }
 
+    fun containsCommand(predicate: (Command) -> Boolean): Boolean {
+        return steps.any { it.commands.any(predicate) }
+    }
+
     /**
      * Return a copy of this delta, but with all actions, commands reversed
      */

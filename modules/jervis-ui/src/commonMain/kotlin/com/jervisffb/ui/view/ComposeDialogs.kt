@@ -44,8 +44,8 @@ fun UserActionDialog(
 ) {
     AlertDialog(
         modifier = Modifier.border(4.dp, when {
-            dialog.owner?.isHomeTeam() == true -> Theme.homeTeamColor
-            dialog.owner?.isAwayTeam() == true -> Theme.awayTeamColor
+            dialog.owner?.isHomeTeam() == true -> JervisTheme.homeTeamColor
+            dialog.owner?.isAwayTeam() == true -> JervisTheme.awayTeamColor
             else -> Color.Green
         }, shape = RoundedCornerShape(4.dp)),
         onDismissRequest = {},
@@ -83,8 +83,8 @@ fun MultipleSelectUserActionDialog(
         val resultText = if (result.rolls.size < dialog.dice.size) null else dialog.result(result)
         AlertDialog(
             modifier = Modifier.border(4.dp, when {
-                dialog.owner?.isHomeTeam() == true -> Theme.homeTeamColor
-                dialog.owner?.isAwayTeam() == true -> Theme.awayTeamColor
+                dialog.owner?.isHomeTeam() == true -> JervisTheme.homeTeamColor
+                dialog.owner?.isAwayTeam() == true -> JervisTheme.awayTeamColor
                 else -> Color.Green
             }, shape = RoundedCornerShape(4.dp)),
             onDismissRequest = {

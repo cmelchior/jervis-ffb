@@ -29,9 +29,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -51,6 +49,7 @@ fun Field(
     val field: FieldDetails by vm.field().collectAsState()
     val flow = remember { vm.observeField() }
     val fieldData: Map<FieldCoordinate, UiFieldSquare> by flow.collectAsState(emptyMap())
+
     Box(
         modifier =
             modifier
@@ -61,7 +60,7 @@ fun Field(
                 }
                 .onPointerEvent(PointerEventType.Exit) {
                     vm.exitHover()
-                }
+                },
     ) {
         Image(
             painter = BitmapPainter(IconFactory.getField(field)),
@@ -73,7 +72,6 @@ fun Field(
         )
         FieldUnderlay(vm)
         FieldData(vm, fieldData)
-        FieldOverlay(vm)
         AnimationLayer(vm)
     }
 }
@@ -109,41 +107,6 @@ fun FieldSquares(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun FieldOverlay(vm: FieldViewModel) {
-    val flow = remember { vm.observeOverlays() }
-    val pathInfo by flow.collectAsState(initial = null)
-    FieldSquares(vm) { modifier: Modifier, x, y: Int ->
-        val number = pathInfo?.pathSteps?.get(FieldCoordinate(x, y))
-        val isTarget = pathInfo?.target == FieldCoordinate(x, y)
-        val selectPathAction: (() -> Unit)? = pathInfo?.action
-        var updatedModifier = modifier
-        updatedModifier =
-            if (isTarget) {
-                updatedModifier
-                    .onPointerEvent(PointerEventType.Enter) {
-                        // The overlay needs to report onHover events when enabled
-                        // because it is shadowing for the FieldData
-                        vm.hoverOver(FieldCoordinate(x, y))
-                    }
-                    .clickable {
-                        selectPathAction!!()
-                    }
-            } else {
-                updatedModifier
-            }
-        Box(
-            modifier = updatedModifier,
-            contentAlignment = Alignment.Center,
-        ) {
-            if (number != null && (pathInfo?.path?.size ?: 0) > 1) {
-                Text(text = number.toString(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-            }
-        }
-    }
-}
-
 @Composable
 fun FieldData(
     vm: FieldViewModel,
@@ -157,7 +120,7 @@ fun FieldData(
             x,
             y,
             vm,
-            squareData ?: UiFieldSquare(FieldSquare(-1, -1))
+            squareData ?: UiFieldSquare(FieldSquare(-1, -1)),
         )
     }
 }
@@ -190,7 +153,7 @@ private fun FieldSquare(
         mutableStateOf(when {
             square.onSelected != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
             square.selectableDirection != null || square.directionSelected != null -> Color.Transparent // Hide square color
-            square.onSelected != null -> Color.Green.copy(alpha = 0.25f)
+            square.onSelected != null -> Color.Green.copy(alpha = 0.25f) // Fallback for active squares
             else -> Color.Transparent
         })
     }
@@ -203,11 +166,15 @@ private fun FieldSquare(
                 vm.hoverOver(FieldCoordinate(width, height))
             }
 
-        if (square.onSelected != null || square.contextMenuOptions.isNotEmpty()) {
+        if (square.onSelected != null || square.hoverAction != null || square.contextMenuOptions.isNotEmpty()) {
             modifier.clickable {
                 showPopup = !showPopup
-                square.onSelected?.let {
-                    it()
+                if (square.hoverAction != null) {
+                    square.hoverAction()
+                } else {
+                    square.onSelected?.let {
+                        it()
+                    }
                 }
             }
         } else {
@@ -229,9 +196,6 @@ private fun FieldSquare(
                 commands = square.contextMenuOptions,
             )
         }
-        square.player?.let {
-            Player(boxModifier, it, true)
-        }
         if (square.isBallOnGround || square.isBallExiting) {
             Image(
                 modifier = Modifier
@@ -243,7 +207,30 @@ private fun FieldSquare(
                 bitmap = IconFactory.getBall(),
                 contentDescription = "",
             )
+        } else if (square.futureMoveValue != null && square.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = square.futureMoveValue.toString(),
+                    style = JervisTheme.fieldSquareTextStyle.copy(
+                        color = Color.White.copy(0.75f)
+                    ),
+                )
+            }
+        } else if (square.moveUsed != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = square.moveUsed.toString(),
+                    style = JervisTheme.fieldSquareTextStyle.copy(
+                        color = Color.Cyan.copy(0.75f)
+                    )
+                )
+            }
         }
+
+        square.player?.let {
+            Player(boxModifier, it, true)
+        }
+
         square.directionSelected?.let {
             DictionImage(it, interactive = false)
         }

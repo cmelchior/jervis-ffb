@@ -10,7 +10,6 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.UiGameController
-import com.jervisffb.ui.UiGameSnapshot
 import com.jervisffb.ui.animations.JervisAnimation
 import com.jervisffb.ui.model.UiFieldSquare
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +38,6 @@ class FieldViewModel(
     val height = rules.fieldHeight
 
     private val field = MutableStateFlow(FieldDetails.NICE)
-    private val highlights = SnapshotStateList<FieldCoordinate>()
     private val _highlights = MutableStateFlow<FieldCoordinate?>(null)
 
     // Track offsets of field squares (so we can use them to animate things between squares)
@@ -48,55 +46,8 @@ class FieldViewModel(
 
     fun field(): StateFlow<FieldDetails> = field
 
-    data class PathInfo(
-        val path: List<FieldCoordinate>,
-        val pathSteps: Map<FieldCoordinate, Int>,
-        val target: FieldCoordinate,
-        val action: () -> Unit,
-    )
-
     fun observeAnimation(): Flow<Pair<UiGameController, JervisAnimation>?> {
         return uiState.animationFlow.map { if (it != null) Pair(uiState, it) else null }
-    }
-
-    fun observeOverlays(): Flow<PathInfo?> {
-        // Calculate any path info data we want to display
-        return combine(_highlights, uiState.uiStateFlow) { square, uiSnapshot: UiGameSnapshot ->
-            val activePlayer: Player? = game.activePlayer
-            uiSnapshot.pathFinder?.let {
-                if (
-                    activePlayer != null &&
-                    square != null &&
-                    activePlayer.coordinates != square &&
-                    activePlayer.movesLeft > 0 &&
-                    rules.calculateMarks(game, activePlayer.team, activePlayer.coordinates) <= 0
-                ) {
-                    val path: List<FieldCoordinate> = uiSnapshot.pathFinder!!.getClosestPathTo(square, activePlayer.movesLeft)
-
-                    val pathSteps = path
-                        .mapIndexed { index, fieldCoordinate -> fieldCoordinate to (index + 1) }
-                        .toMap()
-
-                    val action = {
-                        // If a path consists of only 1 step, always execute it, since
-                        // we assume the user wants to execute it.
-                        val selectedSquares = path.map {
-                            CompositeGameAction(
-                                listOf(MoveTypeSelected(MoveType.STANDARD), FieldSquareSelected(it))
-                            )
-                        }
-                        if (selectedSquares.size == 1) {
-                            uiState.userSelectedAction(selectedSquares.first())
-                        } else {
-                            uiState.userSelectedMultipleActions(selectedSquares)
-                        }
-                    }
-                    PathInfo(path, pathSteps, path.lastOrNull() ?: activePlayer.location as FieldCoordinate, action)
-                } else {
-                    null
-                }
-            }
-        }
     }
 
     fun highlights(): StateFlow<FieldCoordinate?> = _highlights
@@ -113,9 +64,61 @@ class FieldViewModel(
     }
 
     fun observeField(): Flow<Map<FieldCoordinate, UiFieldSquare>> {
-        return uiState.uiStateFlow.map { uiState: UiGameSnapshot ->
-            // Create new map to trigger recomposition
-            uiState.fieldSquares.toMap()
+        return combine(_highlights, uiState.uiStateFlow) { mouseEnter, uiSnapshot ->
+            // If a highlighted square exists, we are going to calculate the shortest path to that
+            // square and annotate the path towards it as well. These decorations take precedence
+            // over already existing move decorations.
+            val activePlayer: Player? = uiSnapshot.game.activePlayer
+
+            // Clear all existing highlight data.
+            uiSnapshot.clearHoverData()
+
+            uiSnapshot.pathFinder?.let { pathFinder ->
+                if (
+                    activePlayer != null &&
+                    mouseEnter != null &&
+                    activePlayer.coordinates != mouseEnter &&
+                    activePlayer.movesLeft > 0 &&
+                    rules.calculateMarks(game, activePlayer.team, activePlayer.coordinates) <= 0
+                ) {
+                    val path: List<FieldCoordinate> = pathFinder.getClosestPathTo(mouseEnter, activePlayer.movesLeft)
+
+                    // Create the action triggered if clicking the mouse-over field.
+                    val action = {
+                        // If a path consists of only 1 step, always execute it, since
+                        // we assume the user wants to execute it.
+                        val selectedSquares = path.map {
+                            CompositeGameAction(
+                                listOf(MoveTypeSelected(MoveType.STANDARD), FieldSquareSelected(it))
+                            )
+                        }
+                        if (selectedSquares.size == 1) {
+                            uiState.userSelectedAction(selectedSquares.first())
+                        } else {
+                            uiState.userSelectedMultipleActions(selectedSquares)
+                        }
+                    }
+
+                    // Annotate all fields + add action on target square
+                    val currentMovesLeft = activePlayer.move - activePlayer.movesLeft
+                    path.forEachIndexed { index, pathSquare ->
+                        val currentSquareData = uiSnapshot.fieldSquares[pathSquare]!!
+
+                        val shownMoveValue = when(index) {
+                            0 -> currentMovesLeft + index + 1
+                            else -> currentMovesLeft + index + 1
+                        }
+
+                        uiSnapshot.fieldSquares[pathSquare] = currentSquareData.copy(
+                            futureMoveValue = shownMoveValue,
+                            hoverAction = if (currentSquareData.model.coordinates == mouseEnter) action else null
+                        )
+                    }
+                }
+            }
+
+            // Finally, return the potentially modified squares
+            uiSnapshot.fieldSquares.toMap()
         }
     }
 
