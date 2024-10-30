@@ -177,10 +177,6 @@ class Game(
             ?: INVALID_GAME_STATE("Reroll $id could not be found")
     }
 
-    fun notifyUpdate() {
-        // gameFlow.safeTryEmit(this)
-    }
-
 //    @Transient
 //    val gameFlow = MutableSharedFlow<Game>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 

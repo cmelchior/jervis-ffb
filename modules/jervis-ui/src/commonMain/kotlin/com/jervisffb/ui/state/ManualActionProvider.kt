@@ -1,6 +1,6 @@
 package com.jervisffb.ui.state
 
-import com.jervisffb.engine.ActionsRequest
+import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.ActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
@@ -72,6 +72,8 @@ import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
+import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.ui.UiGameController
@@ -84,13 +86,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
+/**
+ * Class responsible for enhancing the UI, so it is able to create a [GameAction]
+ * that can be sent to the [GameController].
+ */
 class ManualActionProvider(
     private val uiState: UiGameController,
     private val menuViewModel: MenuViewModel
 ): UiActionProvider() {
 
     private lateinit var controller: GameController
-    private lateinit var actions: ActionsRequest
+    private lateinit var actions: ActionRequest
 
     // If set, it contains an action that should automatically be sent on the next call to getAction()
     var automatedAction: GameAction? = null
@@ -108,7 +114,7 @@ class ManualActionProvider(
         }
     }
 
-    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionsRequest) {
+    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
         if (queuedActions.isNotEmpty()) return
 
         // TODO What to do here when it is the other team having its turn.
@@ -166,7 +172,7 @@ class ManualActionProvider(
      * to create a [GameAction]. If yes, the data needed to build the dialog is added
      * to the UI state.
      */
-    private fun addDialogDecorators(state: UiGameSnapshot, actions: ActionsRequest) {
+    private fun addDialogDecorators(state: UiGameSnapshot, actions: ActionRequest) {
         val dialogData = DialogFactory.createDialogIfPossible(
             controller,
             actions,
@@ -185,7 +191,7 @@ class ManualActionProvider(
      */
     // TODO Should probably refactor this so every case is in its own function. Perhaps move to a separate
     //  class to make it more explicit?
-    private fun addNonDialogActionDecorators(snapshot: UiGameSnapshot, request: ActionsRequest) {
+    private fun addNonDialogActionDecorators(snapshot: UiGameSnapshot, request: ActionRequest) {
         request.actions.forEach { action ->
             when (action) {
                 is DeselectPlayer -> {
@@ -311,6 +317,8 @@ class ManualActionProvider(
                         is GiantLocation -> TODO("Not supported right now")
                     }
 
+                    val isSelectingBlockDefender = (controller.state.stack.currentNode() == BlockAction.SelectDefenderOrEndAction)
+                    val isSelectingBlitzDefender = (controller.state.stack.currentNode() == BlitzAction.SelectTargetOrCancel)
                     // TODO Other UI modifications, like dice decoration
                 }
                 is SelectPlayerAction -> {
@@ -480,7 +488,7 @@ class ManualActionProvider(
         // If not disabled, Undo'ing an action might put us in a state that will
         // automatically move us forward again, which will make it appear as the
         // Undo didn't work.
-        if (controller.lastActionWasUndo) {
+        if (controller.lastActionWasUndo()) {
             return null
         }
 

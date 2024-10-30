@@ -1,8 +1,8 @@
 package com.jervisffb.ui.viewmodel
 
+import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.screen.GameScreenModel
 import com.jervisffb.ui.state.ReplayActionProvider
-import com.jervisffb.ui.UiGameController
 
 class ReplayControllerViewModel(
     private val uiState: UiGameController,
@@ -28,15 +28,15 @@ class ReplayControllerViewModel(
     }
 
     fun forward() {
-        controller.forward()
+//        controller.forward()
     }
 
     fun stopReplay() {
-        controller.disableReplayMode()
+        // controller.disableReplayMode()
     }
 
     fun enableReplay() {
-        controller.enableReplayMode()
+        // controller.enableReplayMode()
     }
 
     fun start() {

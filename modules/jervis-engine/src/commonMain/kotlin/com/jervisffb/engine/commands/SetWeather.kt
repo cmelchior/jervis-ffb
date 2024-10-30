@@ -9,11 +9,9 @@ class SetWeather(private val weather: Weather) : Command {
     override fun execute(state: Game) {
         originalWeather = state.weather
         state.weather = weather
-        state.notifyUpdate()
     }
 
     override fun undo(state: Game) {
         state.weather = originalWeather
-        state.notifyUpdate()
     }
 }

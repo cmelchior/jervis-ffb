@@ -5,7 +5,7 @@ import com.jervisffb.engine.model.Game
 /**
  * Class for wrapping multiple commands while still exposing them as one command.
  */
-class CompositeCommand private constructor(private val commands: List<Command>) : Command {
+class CompositeCommand private constructor(val commands: List<Command>) : Command {
 
     class Builder {
         private val commands = mutableListOf<Command>()

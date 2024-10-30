@@ -232,7 +232,7 @@ fun List<DiceModifier>.sum(): Int = this.sumOf { it.modifier }
 @JvmName("sumOfStatModifiers")
 fun List<StatModifier>.sum(): Int = this.sumOf { it.modifier }
 
-class InvalidAction(message: String) : RuntimeException(message)
+class InvalidActionException(message: String) : RuntimeException(message)
 
 class InvalidGameStateException(message: String) : IllegalStateException(message)
 
@@ -241,7 +241,7 @@ inline fun INVALID_GAME_STATE(message: String = "Unexpected game state"): Nothin
 }
 
 inline fun INVALID_ACTION(action: GameAction, customMessage: String? = null): Nothing {
-    throw InvalidAction(customMessage?.let {
+    throw InvalidActionException(customMessage?.let {
         customMessage
     } ?: "Invalid action selected: $action")
 }

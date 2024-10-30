@@ -156,7 +156,7 @@ object JervisSerialization {
             JervisFile(
                 JervisMetaData(),
                 JervisConfiguration(controller.rules),
-                JervisGameData(controller.initialHomeTeamState!!, controller.initialAwayTeamState!!, controller.actionHistory),
+                JervisGameData(controller.initialHomeTeamState!!, controller.initialAwayTeamState!!, controller.history.flatMap { it.steps.map { it.action }}),
             )
         val fileContent = jsonFormat.encodeToString(fileData)
         platformFileSystem.sink(file).use { fileSink ->

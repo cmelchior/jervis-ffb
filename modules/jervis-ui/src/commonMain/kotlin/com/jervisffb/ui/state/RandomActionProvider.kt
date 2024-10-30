@@ -1,6 +1,6 @@
 package com.jervisffb.ui.state
 
-import com.jervisffb.engine.ActionsRequest
+import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
@@ -19,22 +19,20 @@ import com.jervisffb.ui.UiGameSnapshot
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 
 class RandomActionProvider(private val uiState: UiGameController): UiActionProvider() {
 
     private var job: Job? = null
     private var paused = false
     private lateinit var controller: GameController
-    private lateinit var actions: ActionsRequest
+    private lateinit var actions: ActionRequest
 
     override fun prepareForNextAction(controller: GameController) {
         this.controller = controller
         this.actions = controller.getAvailableActions()
     }
 
-    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionsRequest) {
+    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
         // Do nothing
     }
 
@@ -146,16 +144,5 @@ class RandomActionProvider(private val uiState: UiGameController): UiActionProvi
         if (!isLast) {
             actionRequestChannel.receive()
         }
-    }
-
-    private fun printStats(
-        controller: GameController,
-        start: Instant,
-    ) {
-        val end = Clock.System.now()
-        val duration = (end - start).inWholeMilliseconds
-        val commands = controller.commands.size
-        val msPrCommand: Float = duration / commands.toFloat()
-        println("Total time: $duration ms., Commands: $commands, timePrCommand: $msPrCommand ms.")
     }
 }
