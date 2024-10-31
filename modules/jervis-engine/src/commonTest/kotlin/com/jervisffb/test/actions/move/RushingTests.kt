@@ -16,6 +16,7 @@ import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
+import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import kotlin.test.Ignore
 import kotlin.test.Test

@@ -1,9 +1,10 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.rules.BB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DetermineKickingTeam
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
-import com.jervisffb.engine.rules.BB2020Rules
+import com.jervisffb.test.ext.rollForward
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

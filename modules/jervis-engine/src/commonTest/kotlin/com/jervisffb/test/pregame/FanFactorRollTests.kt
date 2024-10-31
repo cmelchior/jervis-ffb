@@ -1,8 +1,9 @@
 package com.jervisffb.test.pregame
 
-import com.jervisffb.test.JervisGameTest
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.rules.bb2020.procedures.FanFactorRolls
+import com.jervisffb.test.JervisGameTest
+import com.jervisffb.test.ext.rollForward
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

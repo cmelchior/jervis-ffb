@@ -1,6 +1,6 @@
 package com.jervisffb.test.tables
 
-import com.jervisffb.test.JervisGameTest
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.FieldSquareSelected
@@ -9,15 +9,6 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
-import com.jervisffb.test.activatePlayer
-import com.jervisffb.engine.GameController
-import com.jervisffb.test.defaultFanFactor
-import com.jervisffb.test.defaultInducements
-import com.jervisffb.test.defaultJourneyMen
-import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
-import com.jervisffb.test.defaultSetup
-import com.jervisffb.test.defaultWeather
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
@@ -28,12 +19,12 @@ import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.modifiers.RushModifier
+import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.DetermineKickingTeam
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.RushRoll
-import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
@@ -41,8 +32,18 @@ import com.jervisffb.engine.rules.bb2020.skills.Pro
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.bb2020.tables.PrayerStatModifier
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
-import com.jervisffb.test.skipTurns
 import com.jervisffb.engine.utils.createDefaultGameState
+import com.jervisffb.test.JervisGameTest
+import com.jervisffb.test.activatePlayer
+import com.jervisffb.test.defaultFanFactor
+import com.jervisffb.test.defaultInducements
+import com.jervisffb.test.defaultJourneyMen
+import com.jervisffb.test.defaultKickOffHomeTeam
+import com.jervisffb.test.defaultPregame
+import com.jervisffb.test.defaultSetup
+import com.jervisffb.test.defaultWeather
+import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.skipTurns
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test

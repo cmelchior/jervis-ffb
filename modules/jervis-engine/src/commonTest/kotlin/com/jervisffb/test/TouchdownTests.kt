@@ -19,9 +19,10 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
-import com.jervisffb.engine.rules.PlayerStandardActionType
+import com.jervisffb.test.ext.rollForward
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals

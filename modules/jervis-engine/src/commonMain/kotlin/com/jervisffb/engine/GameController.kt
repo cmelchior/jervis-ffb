@@ -1,6 +1,5 @@
 package com.jervisffb.engine
 
-import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -69,7 +68,7 @@ class GameController(
     private var deltaBuilder = DeltaBuilder(_history.size)
     val state: Game = state
     val stack: ProcedureStack = state.stack // Shortcut for accessing the stack
-    private var actionMode = ActionMode.NOT_STARTED
+    var actionMode = ActionMode.NOT_STARTED
     private var isStarted: Boolean = false
     private var replayMode: Boolean = false
     private var replayIndex: Int = -1
@@ -173,21 +172,6 @@ class GameController(
     fun currentProcedure(): ProcedureState? = stack.peepOrNull()
 
     fun currentNode(): Node? = currentProcedure()?.currentNode()
-
-    /**
-     * Test method. Used to apply multiple [GameAction]s in on go.
-     */
-    fun rollForward(vararg actions: GameAction?) {
-        if (actionMode != ActionMode.TEST) {
-            error("Invalid action mode: $actionMode. Must be ActionMode.TEST.")
-        }
-        actions.forEach {
-            if (it != null) {
-                val action = if (it is CalculatedAction) it.get(state, rules) else it
-                processAction(action)
-            }
-        }
-    }
 
     private fun undoLastAction() {
         if (replayMode) {

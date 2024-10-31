@@ -1,6 +1,5 @@
 package com.jervisffb.test.skills
 
-import com.jervisffb.test.JervisGameTest
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
@@ -10,20 +9,22 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
-import com.jervisffb.test.defaultSetup
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.BreakTackleModifier
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.PlayerStandardActionType
+import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
+import com.jervisffb.test.JervisGameTest
+import com.jervisffb.test.defaultKickOffHomeTeam
+import com.jervisffb.test.defaultPregame
+import com.jervisffb.test.defaultSetup
+import com.jervisffb.test.ext.rollForward
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
