@@ -48,7 +48,7 @@ class GameController(
     // How is the GameController consuming actions. Once started, it poses
     // restrictions on the Controller is used.
     enum class ActionMode {
-        MANUAL, CALLBACK, TEST, NOT_STARTED
+        MANUAL, TEST, NOT_STARTED
     }
 
     // Copy of Home and Away teams state, taken just before starting the game.
@@ -148,19 +148,6 @@ class GameController(
         actionMode = ActionMode.MANUAL
         setupInitialStartingState()
         rollForwardToNextActionNode()
-    }
-
-    suspend fun startCallbackMode(actionProvider: suspend (controller: GameController, availableActions: ActionRequest) -> GameAction) {
-        if (actionMode != ActionMode.NOT_STARTED) {
-            error("Controller already started: $actionMode")
-        }
-        actionMode = ActionMode.CALLBACK
-        setupInitialStartingState()
-        while (!stack.isEmpty()) {
-            val availableActions = getAvailableActions()
-            val action = actionProvider(this, availableActions)
-            processAction(action)
-        }
     }
 
     fun startTestMode(start: Procedure) {
