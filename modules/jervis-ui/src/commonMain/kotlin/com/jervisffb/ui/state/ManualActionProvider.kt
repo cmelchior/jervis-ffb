@@ -338,8 +338,9 @@ class ManualActionProvider(
                 }
                 is SelectPlayerAction -> {
                     state.activePlayer?.location?.let { location ->
-                        snapshot.fieldSquares[location]?.let { activePlayerSquare ->
-                            activePlayerSquare.contextMenuOptions.add(
+                        val oldData = snapshot.fieldSquares[location]!!
+                        snapshot.fieldSquares[location as FieldCoordinate] =
+                            oldData.copyAddContextMenu(
                                 action.action.let {
                                     val name = when (it.type) {
                                         PlayerStandardActionType.MOVE -> "Move"
@@ -366,7 +367,6 @@ class ManualActionProvider(
                                     )
                                 },
                             )
-                        } ?: error("Could not find square: $location")
                     } ?: error("No active player")
                 }
 //                EndSetupWhenReady -> TODO()

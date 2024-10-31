@@ -148,6 +148,7 @@ private fun FieldSquare(
     square: UiFieldSquare,
 ) {
     var showPopup: Boolean by remember(square) { mutableStateOf(square.showContextMenu) }
+
     val bgColor by remember(square) {
         mutableStateOf(when {
             square.onSelected != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
@@ -165,7 +166,7 @@ private fun FieldSquare(
                 vm.hoverOver(FieldCoordinate(width, height))
             }
 
-        if (square.onSelected != null || square.hoverAction != null || square.contextMenuOptions.isNotEmpty()) {
+        if (square.contextMenuOptions.isNotEmpty() || square.onSelected != null || square.hoverAction != null) {
             modifier.clickable {
                 showPopup = !showPopup
                 if (square.hoverAction != null) {
@@ -229,7 +230,6 @@ private fun FieldSquare(
         square.player?.let {
             Player(boxModifier, it, true)
         }
-
         square.directionSelected?.let {
             DictionImage(it, interactive = false)
         }
