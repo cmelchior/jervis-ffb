@@ -8,6 +8,7 @@ things as they come up.
 
 
 ## Todo List
+- [ ] Standup and end movement as a single action (UI only).
 - [ ] Custom cursors:
   - [ ] During move
   - [ ] When selecting block

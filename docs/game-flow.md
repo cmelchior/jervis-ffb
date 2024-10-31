@@ -143,12 +143,15 @@ tests covering the particular feature.
 
 ## Actions
 
-- [ ] Move Action
-  - [ ] Select player and end action before moving doesn't doesn't mark the player as used. 
-  - [ ] Starting a move action while prone and aborting it again doesn't mark player as used
-  - [ ] Standup and end movement as a single action.
-  - [ ] Standup with less than 3 strength requires a roll
-  - [ ] Moving any square mark the action as "used"
+- [x] Move Action
+  - [x] Select player and end action before moving doesn't doesn't mark the player as used. 
+  - [x] Starting a move action while prone and aborting it again doesn't mark player as used
+  - [x] Moving any square mark the action as "used".
+  - [x] Action doesn't end when no more "normal move" is left, only when all rushes are also used.
+- [ ] Stand Up
+  - [ ] Must stand up before moving 
+  - [ ] Standup with less than 3 strength requires a roll.
+  - Roll D6 if less than 3 moves, use all moves
 - [ ] Dodge
   - [ ] Moving away from marking player requires a dodge.
   - [ ] Moving away from non-marking player is free.

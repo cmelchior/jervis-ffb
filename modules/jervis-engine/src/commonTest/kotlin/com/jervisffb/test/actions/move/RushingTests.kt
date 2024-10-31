@@ -1,4 +1,4 @@
-package com.jervisffb.test
+package com.jervisffb.test.actions.move
 
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -9,17 +9,23 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
+import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
-import com.jervisffb.engine.rules.PlayerStandardActionType
+import com.jervisffb.test.JervisGameTest
+import com.jervisffb.test.defaultKickOffHomeTeam
+import com.jervisffb.test.defaultPregame
+import com.jervisffb.test.defaultSetup
+import com.jervisffb.test.moveTo
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * Class responsible for testing Rushing. Note, this class is only testing
- * standard rushes. Skills and effects that could modify a Rush should be
- * tested in the test classes for those skills.
+ * Test a player rushing as described on page 44 in the BB2020 Rulebook.
+ *
+ * Note, any skills that affect dodges are testing in their own test class.
+ * This class only tests the basic functionality.
  */
 class RushingTests: JervisGameTest() {
 

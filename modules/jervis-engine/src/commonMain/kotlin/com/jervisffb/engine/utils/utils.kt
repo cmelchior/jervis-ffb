@@ -260,32 +260,32 @@ inline fun INVALID_ACTION(action: GameAction, customMessage: String? = null): No
 fun setupTeamsOnField(controller: GameController) {
     val homeCommands = with(controller.state.homeTeam) {
         listOf(
-            SetPlayerLocation(get(PlayerNo(1))!!, FieldCoordinate(12, 5)),
-            SetPlayerLocation(get(PlayerNo(2))!!, FieldCoordinate(12, 6)),
-            SetPlayerLocation(get(PlayerNo(3))!!, FieldCoordinate(12, 7)),
-            SetPlayerLocation(get(PlayerNo(4))!!, FieldCoordinate(12, 8)),
-            SetPlayerLocation(get(PlayerNo(5))!!, FieldCoordinate(12, 9)),
-            SetPlayerLocation(get(PlayerNo(6))!!, FieldCoordinate(11, 1)),
-            SetPlayerLocation(get(PlayerNo(7))!!, FieldCoordinate(11, 2)),
-            SetPlayerLocation(get(PlayerNo(8))!!, FieldCoordinate(11, 12)),
-            SetPlayerLocation(get(PlayerNo(9))!!, FieldCoordinate(11, 13)),
-            SetPlayerLocation(get(PlayerNo(10))!!, FieldCoordinate(9, 7)),
-            SetPlayerLocation(get(PlayerNo(11))!!, FieldCoordinate(3, 7))
+            SetPlayerLocation(get(PlayerNo(1)), FieldCoordinate(12, 5)),
+            SetPlayerLocation(get(PlayerNo(2)), FieldCoordinate(12, 6)),
+            SetPlayerLocation(get(PlayerNo(3)), FieldCoordinate(12, 7)),
+            SetPlayerLocation(get(PlayerNo(4)), FieldCoordinate(12, 8)),
+            SetPlayerLocation(get(PlayerNo(5)), FieldCoordinate(12, 9)),
+            SetPlayerLocation(get(PlayerNo(6)), FieldCoordinate(11, 1)),
+            SetPlayerLocation(get(PlayerNo(7)), FieldCoordinate(11, 2)),
+            SetPlayerLocation(get(PlayerNo(8)), FieldCoordinate(11, 12)),
+            SetPlayerLocation(get(PlayerNo(9)), FieldCoordinate(11, 13)),
+            SetPlayerLocation(get(PlayerNo(10)), FieldCoordinate(9, 7)),
+            SetPlayerLocation(get(PlayerNo(11)), FieldCoordinate(3, 7))
         )
     }
     val awayCommands = with(controller.state.awayTeam) {
         listOf(
-            SetPlayerLocation(get(PlayerNo(1))!!, FieldCoordinate(13, 5)),
-            SetPlayerLocation(get(PlayerNo(2))!!, FieldCoordinate(13, 6)),
-            SetPlayerLocation(get(PlayerNo(3))!!, FieldCoordinate(13, 7)),
-            SetPlayerLocation(get(PlayerNo(4))!!, FieldCoordinate(13, 8)),
-            SetPlayerLocation(get(PlayerNo(5))!!, FieldCoordinate(13, 9)),
-            SetPlayerLocation(get(PlayerNo(6))!!, FieldCoordinate(14, 1)),
-            SetPlayerLocation(get(PlayerNo(7))!!, FieldCoordinate(14, 2)),
-            SetPlayerLocation(get(PlayerNo(8))!!, FieldCoordinate(14, 12)),
-            SetPlayerLocation(get(PlayerNo(9))!!, FieldCoordinate(14, 13)),
-            SetPlayerLocation(get(PlayerNo(10))!!, FieldCoordinate(16, 7)),
-            SetPlayerLocation(get(PlayerNo(11))!!, FieldCoordinate(22, 7))
+            SetPlayerLocation(get(PlayerNo(1)), FieldCoordinate(13, 5)),
+            SetPlayerLocation(get(PlayerNo(2)), FieldCoordinate(13, 6)),
+            SetPlayerLocation(get(PlayerNo(3)), FieldCoordinate(13, 7)),
+            SetPlayerLocation(get(PlayerNo(4)), FieldCoordinate(13, 8)),
+            SetPlayerLocation(get(PlayerNo(5)), FieldCoordinate(13, 9)),
+            SetPlayerLocation(get(PlayerNo(6)), FieldCoordinate(14, 1)),
+            SetPlayerLocation(get(PlayerNo(7)), FieldCoordinate(14, 2)),
+            SetPlayerLocation(get(PlayerNo(8)), FieldCoordinate(14, 12)),
+            SetPlayerLocation(get(PlayerNo(9)), FieldCoordinate(14, 13)),
+            SetPlayerLocation(get(PlayerNo(10)), FieldCoordinate(16, 7)),
+            SetPlayerLocation(get(PlayerNo(11)), FieldCoordinate(22, 7))
         )
     }
 
