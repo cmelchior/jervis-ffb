@@ -1,6 +1,5 @@
 package com.jervisffb.test.actions.move
 
-import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
@@ -9,9 +8,10 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
+import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerStandardActionType
-import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.defaultKickOffHomeTeam
@@ -60,6 +60,7 @@ class RushingTests: JervisGameTest() {
             reroll,
             6.d6
         )
+        // After rushing twice, no more moves are allowed
         val actions = controller.getAvailableActions().actions
         assertEquals(EndActionWhenReady, actions.single())
     }
@@ -82,10 +83,9 @@ class RushingTests: JervisGameTest() {
             *moveTo(23, 13), // Rush
             1.d6, // Fail Rush
             NoRerollSelected(),
-            DiceRollResults(1.d6, 1.d6), // Armour Roll
         )
-        assertEquals(TeamTurn.SelectPlayerOrEndTurn, controller.currentNode())
-        assertEquals(homeTeam, state.activeTeam)
+        assertEquals(PlayerState.FALLEN_OVER, state.getPlayerById("A8".playerId).state)
+        assertEquals(TurnOver.STANDARD, state.turnOver)
     }
 
     @Test

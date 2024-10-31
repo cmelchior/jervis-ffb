@@ -157,12 +157,12 @@ tests covering the particular feature.
   - [x] Moving away from non-marking player is free.
   - [x] Need agility roll to dodge.
   - [x] Failure: Knocked over in target square
-- [ ] Rush
-  - [ ] Rush before Dodge.
-  - [ ] A player can normally rush twice pr. action
-  - [ ] Rush is 2+
-  - [ ] Failing a Rush puts player in target square.
-  - [ ] Move action is over after rushing twice.
+- [x] Rush
+  - [x] Rush before Dodge.
+  - [x] A player can normally rush twice pr. action
+  - [x] Rush is 2+
+  - [x] Failing a Rush puts player in target square.
+  - [x] Move action is over after rushing twice.
 - [ ] Jump Sub-action
   - [ ] Can only jump over prone player
   - [ ] Use 2 moves
