@@ -24,7 +24,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
@@ -262,12 +261,13 @@ fun DictionImage(direction: Direction, interactive: Boolean) {
 
 @Composable
 fun BlockDiceIndicatorImage(dice: Int) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isHovered by interactionSource.collectIsHoveredAsState()
+//    val interactionSource = remember { MutableInteractionSource() }
+//    val isHovered by interactionSource.collectIsHoveredAsState()
     val imageRes = IconFactory.getBlockDiceRolledIndicator(dice)
     Image(
-        modifier = Modifier.fillMaxSize().hoverable(interactionSource = interactionSource),
-        painter = if (isHovered) painterResource(imageRes) else ColorPainter(Color.Transparent),
+        modifier = Modifier.fillMaxSize() /* .hoverable(interactionSource = interactionSource) */,
+        painter = painterResource(imageRes),
+        // painter = if (isHovered) painterResource(imageRes) else ColorPainter(Color.Transparent),
         contentDescription = null,
     )
 }

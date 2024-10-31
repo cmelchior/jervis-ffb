@@ -91,6 +91,42 @@ The rules are implemented in `modules/jervis-engine`.
 
 ## How is the UI implemented?
 
+The UI is implemented using Compose Multiplatform, a declarative UI framework
+similar to React on web.
+
+The primary reason for choosing this approach over a more normal game engine
+approach, is that it is available across all platforms, making it easier to 
+write the UI.
+
+This also allows us to lean into the possibility of easily moving the UI state 
+both back and forward along side the game state.
+
+The downside is that it is probably more heavy-weight than a traditional 
+Game Engine, but as UI isn't that demanding, the UI performance, so far, seems 
+to hold up.
+
+We want to have an independent Rules Engine, so there is a strict separation 
+between "Rules" and "UI". This means we do not want to track things in the model 
+layer that are only UI-related. This does complicate detecting in-game events
+though so e.g. knowing when to trigger animations can be a bit tricky.
+
+The main entry classes for the UI are:
+
+- UiGameController: This class runs the main game loop and is responsible 
+  for communicating with GameController that runs the rules. The main 
+  responsibility of this loop is to create a `UiGameSnapshot`, which is a 
+  datastructure that represents the full state of the UI at a given point
+  in time. This is then sent to Compose for rendering.
+
+- UiGameSnapshot: Contains all the data to render the current game step.
+
+- UiGameDecorations: Is responsible for tracking "model" state that is only
+  relevant to the UI.
+
+- ManualActionProvider: This class is responsible for 
+  decorating the UiGameSnapshot, so the UI enables click-handlers and otherwise
+  show where actions can be performed.
+
 <TODO>
 
 

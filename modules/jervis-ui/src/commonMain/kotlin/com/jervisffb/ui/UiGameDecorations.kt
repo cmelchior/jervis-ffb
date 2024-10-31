@@ -1,6 +1,7 @@
 package com.jervisffb.ui
 
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
 import com.jervisffb.fumbbl.net.model.BloodSpot
 import org.jetbrains.compose.resources.DrawableResource
@@ -23,7 +24,8 @@ class UiGameDecorations {
 
     private val movesUsed: MutableList<MoveUsed> = mutableListOf()
 
-    fun addMoveUsed(coordinate: FieldCoordinate) {
+    fun addMoveUsed(coordinate: Location) {
+        if (coordinate !is FieldCoordinate) TODO("Missing support for $coordinate")
         movesUsed.add(MoveUsed(coordinate, movesUsed.size))
     }
 

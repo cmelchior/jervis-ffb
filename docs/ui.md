@@ -3,12 +3,16 @@
 This document is used to track various todo lists for the UI as well as 
 bugs encountered that are not fixed.
 
-The TODO list are by no means exhaustive, but is just a place to dump
+The TODO list are by no means exhaustive, it is just a place to dump
 things as they come up.
 
 
 ## Todo List
-- [ ] Hover on block shows dice indicator.
+- [ ] Custom cursors:
+  - [ ] During move
+  - [ ] When selecting block
+  - [ ] When selecting pass target
+  - [ ] When selecting foul target
 - [ ] Add numbers to yellow squares to indicate the target number for rush/dodge.
 - [ ] Keep player card open for the currently active player.
 - [ ] Add support for Rerolls / Apothecary / etc. in the sidebars
@@ -30,6 +34,7 @@ things as they come up.
       on my machine, but it also feels like it could be optimized. Currently there
       are two places changes are happening. In the rules engine and in 
       ManualActionProvider when setting up listeners.
+- [x] Hover on block shows dice indicator.
 - [x] Better ball animation using Projectile Motion equations.
     - https://www.youtube.com/watch?v=qtsxHx1MpUI&ab_channel=PhysicsAlmanac
     - Size-Distance Scaling Equation: https://sites.millersville.edu/sgallagh/Publications/top2013.pdf
@@ -43,8 +48,9 @@ things as they come up.
 - [ ] Experiment with an action system similar to BB3 (round action circle around player)
 - [ ] Think about an UI that can work across Desktop: 16:9 and iPad 4:3.
 - [ ] Is it worth exploring an isometric view (to make it more immersive)? 
+  - How feasible is it to use the current player graphics?
 
 
 ## Known bugs
 
-- Pass animation triggers multiple times when rerolling catch during kick-off.
+- Pass animation triggers multiple times when landing on player (catch) and catch fails.

@@ -1,10 +1,10 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
-import com.jervisffb.engine.commands.buildCompositeCommand
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.AddPlayerStatModifier
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -14,8 +14,9 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
+import com.jervisffb.engine.model.modifiers.SkillStatModifier
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.skills.Horns
 
 /**
@@ -40,9 +41,9 @@ object StandardBlockDetermineModifiers: Procedure() {
             val context = state.getContext<BlockContext>()
             return buildCompositeCommand {
                 if (context.isBlitzing && context.attacker.hasSkill<Horns>()) {
-                    add(AddPlayerStatModifier(context.attacker, com.jervisffb.engine.model.modifiers.SkillStatModifier.HORNS))
+                    add(AddPlayerStatModifier(context.attacker, SkillStatModifier.HORNS))
                 }
-                add(GotoNode(com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockDetermineModifiers.ResolveDauntless))
+                add(GotoNode(ResolveDauntless))
             }
         }
     }

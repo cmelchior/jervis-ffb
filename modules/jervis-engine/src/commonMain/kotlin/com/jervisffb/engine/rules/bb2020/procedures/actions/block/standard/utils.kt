@@ -5,7 +5,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 
 // Helper method to share logic between roll and reroll
-fun calculateNoOfBlockDice(state: Game): Int {
+fun calculateNoOfBlockDice(state: Game, isBlitzing: Boolean = false): Int {
     val context = state.getContext<BlockContext>()
     val attackStrength = context.attacker.strength + context.offensiveAssists
     val defenderStrength = context.defender.strength + context.defensiveAssists

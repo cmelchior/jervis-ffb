@@ -11,8 +11,6 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.MoveContext
-import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
@@ -229,8 +227,7 @@ class UiGameController(
             delta.steps.firstOrNull()?.action == MoveTypeSelected(MoveType.STANDARD) &&
             delta.steps.lastOrNull()?.action is FieldSquareSelected
         ) {
-            val context = state.getContext<MoveContext>()
-            val start = context.startingSquare
+            val start = state.activePlayer!!.location // TODO Giant location?
             uiDecorations.addMoveUsed(start)
             uiDecorations.registerUndo(
                 deltaId = delta.id,
