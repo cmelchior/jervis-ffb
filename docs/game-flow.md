@@ -150,15 +150,15 @@ tests covering the particular feature.
   - [x] Action doesn't end when no more "normal move" is left, only when all rushes are also used.
 - [ ] Stand Up
   - [ ] Must stand up before moving 
-  - [ ] Standup with less than 3 strength requires a roll.
-  - Roll D6 if less than 3 moves, use all moves
-- [ ] Dodge
-  - [ ] Moving away from marking player requires a dodge roll.
-  - [ ] Moving away from non-marking player is free.
-  - [ ] Need agility roll to dodge.
-  - [ ] Failure: Knocked over in target square
-  - [ ] Rush before Dodge.
+  - [ ] Standup with less than 3 strength requires a roll and use all move.
+  - [ ] Failing stand-up roll ends action and uses player action
+- [x] Dodge
+  - [x] Moving away from marking player requires a dodge roll.
+  - [x] Moving away from non-marking player is free.
+  - [x] Need agility roll to dodge.
+  - [x] Failure: Knocked over in target square
 - [ ] Rush
+  - [ ] Rush before Dodge.
   - [ ] A player can normally rush twice pr. action
   - [ ] Rush is 2+
   - [ ] Failing a Rush puts player in target square.

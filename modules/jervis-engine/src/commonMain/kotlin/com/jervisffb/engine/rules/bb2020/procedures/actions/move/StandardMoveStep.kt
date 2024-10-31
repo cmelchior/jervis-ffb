@@ -12,6 +12,8 @@ import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetPlayerMoveLeft
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
 import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -23,6 +25,7 @@ import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.RushRollContext
@@ -31,7 +34,6 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Handle a player moving a single step using a normal move.
@@ -137,6 +139,7 @@ object StandardMoveStep: Procedure() {
                 // Rush failed, player is Knocked Down in target square
                 return compositeCommandOf(
                     SetPlayerState(player, PlayerState.FALLEN_OVER),
+                    SetTurnOver(TurnOver.STANDARD),
                     RemoveContext<RushRollContext>(),
                     GotoNode(ResolvePlayerFallingOver)
                 )
@@ -177,7 +180,8 @@ object StandardMoveStep: Procedure() {
                 )
             } else {
                 compositeCommandOf(
-                    SetPlayerState(player, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
+                    SetPlayerState(player, PlayerState.FALLEN_OVER, hasTackleZones = false),
+                    SetTurnOver(TurnOver.STANDARD),
                     RemoveContext<DodgeRollContext>(),
                     GotoNode(ResolvePlayerFallingOver)
                 )

@@ -1,11 +1,10 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.injury
 
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
-import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -16,9 +15,9 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquare
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
@@ -27,6 +26,9 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 object FallingOver: Procedure() {
     override val initialNode: Node = RollForInjury
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+        if (state.turnOver != TurnOver.STANDARD) {
+            INVALID_GAME_STATE("Wrong turn over state: ${state.turnOver}")
+        }
         val context = state.getContext<RiskingInjuryContext>()
 
         /**
@@ -52,7 +54,6 @@ object FallingOver: Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
             if (state.currentBallOrNull() != null) SetCurrentBall(null) else null,
-            SetTurnOver(TurnOver.STANDARD)
         )
     }
     override fun isValid(state: Game, rules: Rules) {

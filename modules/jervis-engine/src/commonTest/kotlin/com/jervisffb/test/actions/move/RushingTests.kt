@@ -9,8 +9,10 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
@@ -20,6 +22,7 @@ import com.jervisffb.test.moveTo
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Test a player rushing as described on page 44 in the BB2020 Rulebook.
@@ -86,9 +89,31 @@ class RushingTests: JervisGameTest() {
     }
 
     @Test
-    @Ignore 
     fun rushBeforeDodge() {
-        // TODO()
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam()
+        )
+
+        val player = state.field[13, 6].player!!
+        player.movesLeft = 0
+        assertTrue(rules.isMarked(player))
+
+        controller.rollForward(
+            PlayerSelected(player.id),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *moveTo(14, 5),
+            2.d6, // Rush
+            NoRerollSelected(),
+            3.d6, // Dodge
+            NoRerollSelected(),
+        )
+
+        assertEquals(1, player.rushesLeft)
+        assertEquals(0, player.movesLeft)
+        assertEquals(FieldCoordinate(14, 5), player.location)
+        assertEquals(MoveAction.SelectMoveType, controller.currentNode())
     }
 
     @Test

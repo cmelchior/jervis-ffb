@@ -125,6 +125,8 @@ interpreted.
       seems pretty clear to me? :thinking:
     - https://www.reddit.com/r/bloodbowl/comments/193k4g9/pro_question_bb_2020/
 
+25. For Falling Over and Knocked Down, does the turnover happen before those are resolved,
+    which would end the team turn, making rerolls unavailable. It looks like yes.
 
 # Differences compared to the rules as written
 

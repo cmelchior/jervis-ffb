@@ -15,7 +15,6 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerStandardActionType
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
@@ -37,7 +36,6 @@ class MoveActionTests: JervisGameTest() {
     @BeforeTest
     override fun setUp() {
         super.setUp()
-        // Start a move action for a player
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),

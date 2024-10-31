@@ -204,5 +204,3 @@ fun moveTo(x: Int, y: Int) = arrayOf(
 )
 
 fun skipTurns(count: Int) = Array(count) { EndTurn }
-
-
