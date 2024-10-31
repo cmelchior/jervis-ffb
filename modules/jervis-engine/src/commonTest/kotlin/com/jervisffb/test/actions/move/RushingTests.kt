@@ -10,7 +10,6 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.rules.PlayerStandardActionType
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.defaultKickOffHomeTeam
@@ -32,7 +31,6 @@ class RushingTests: JervisGameTest() {
 
     @Test
     fun successfulRush() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -65,7 +63,6 @@ class RushingTests: JervisGameTest() {
 
     @Test
     fun failedRush() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -86,6 +83,12 @@ class RushingTests: JervisGameTest() {
         )
         assertEquals(TeamTurn.SelectPlayerOrEndTurn, controller.currentNode())
         assertEquals(homeTeam, state.activeTeam)
+    }
+
+    @Test
+    @Ignore 
+    fun rushBeforeDodge() {
+        // TODO()
     }
 
     @Test

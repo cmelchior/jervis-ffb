@@ -1,5 +1,6 @@
 package com.jervisffb.test
 
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
@@ -15,7 +16,6 @@ import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.engine.GameController
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -28,6 +28,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BB2020Rules
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
 import com.jervisffb.engine.utils.createDefaultGameState
 import kotlin.test.BeforeTest
@@ -63,6 +64,7 @@ abstract class JervisGameTest {
         homeTeam = state.homeTeam
         awayTeam = state.awayTeam
         controller = GameController(rules, state)
+        controller.startTestMode(FullGame)
     }
 
     protected fun useTeamReroll(controller: GameController) =

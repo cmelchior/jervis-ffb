@@ -3,7 +3,6 @@ package com.jervisffb.test
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.rules.BB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DetermineKickingTeam
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.test.ext.rollForward
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,7 +20,6 @@ class ExtraTimeTests: JervisGameTest() {
 
     @Test
     fun stoppingGameAfterNormalTimeIfWinnerFound() {
-        controller.startTestMode(FullGame)
         controller.state.homeGoals = 1 // Fake Home having one goal
         controller.rollForward(
             *defaultPregame(),
@@ -41,7 +39,6 @@ class ExtraTimeTests: JervisGameTest() {
 
     @Test
     fun goIntoExtraTimeIfDraw() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -58,7 +55,6 @@ class ExtraTimeTests: JervisGameTest() {
 
     @Test
     fun endExtraTimeIfWinnerFound() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -83,7 +79,6 @@ class ExtraTimeTests: JervisGameTest() {
 
     @Test
     fun suddenDeath() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),

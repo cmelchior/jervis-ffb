@@ -16,7 +16,6 @@ class GameProgressTests: JervisGameTest() {
 
     @Test
     fun increaseTurnAndHalfCounter() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),

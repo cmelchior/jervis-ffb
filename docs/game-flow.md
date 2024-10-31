@@ -153,9 +153,11 @@ tests covering the particular feature.
   - [ ] Standup with less than 3 strength requires a roll.
   - Roll D6 if less than 3 moves, use all moves
 - [ ] Dodge
-  - [ ] Moving away from marking player requires a dodge.
+  - [ ] Moving away from marking player requires a dodge roll.
   - [ ] Moving away from non-marking player is free.
-  - [ ] Rush + Dodge at the same time.
+  - [ ] Need agility roll to dodge.
+  - [ ] Failure: Knocked over in target square
+  - [ ] Rush before Dodge.
 - [ ] Rush
   - [ ] A player can normally rush twice pr. action
   - [ ] Rush is 2+

@@ -38,7 +38,6 @@ class MoveActionTests: JervisGameTest() {
     override fun setUp() {
         super.setUp()
         // Start a move action for a player
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),

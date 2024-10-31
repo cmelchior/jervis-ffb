@@ -20,7 +20,6 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerStandardActionType
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.test.ext.rollForward
 import kotlin.test.Ignore
@@ -36,7 +35,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun movingAwayPlayerIntoHomeEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -77,7 +75,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun movingAwayPlayerIntoAwayEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -119,7 +116,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun movingHomePlayerIntoAwayEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 determineKickingTeam = arrayOf(
@@ -166,7 +162,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun movingHomePlayerIntoHomeEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 determineKickingTeam = arrayOf(
@@ -212,7 +207,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun failRushInEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -259,7 +253,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun failDodgeInOpponentEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -321,7 +314,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun catchPassInOpponentEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -357,7 +349,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun catchHandOffInOpponentEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -389,7 +380,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun catchBounceInOpponentEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -425,7 +415,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun catchThrowInInInOpponentEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -463,7 +452,6 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun pickupBallInOpponentEndZone() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),

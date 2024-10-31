@@ -50,7 +50,6 @@ class WeatherTests: JervisGameTest() {
 
     @Test
     fun weatherRollChangesWeather() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultFanFactor(),
             DiceRollResults(6.d6, 6.d6), // Weather roll
@@ -60,7 +59,6 @@ class WeatherTests: JervisGameTest() {
 
     @Test
     fun swelteringHeat() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 weatherRoll = DiceRollResults(1.d6, 1.d6), // Weather roll
@@ -92,7 +90,6 @@ class WeatherTests: JervisGameTest() {
 
     @Test
     fun verySunny_throwBall() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 weatherRoll = DiceRollResults(1.d6, 2.d6)
@@ -121,7 +118,6 @@ class WeatherTests: JervisGameTest() {
 
     @Test
     fun pouringRain_catchRoll() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 weatherRoll = DiceRollResults(5.d6, 6.d6)
@@ -140,7 +136,6 @@ class WeatherTests: JervisGameTest() {
 
     @Test
     fun pouringRain_pickupRoll() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 weatherRoll = DiceRollResults(5.d6, 6.d6)
@@ -159,7 +154,6 @@ class WeatherTests: JervisGameTest() {
 
     @Test
     fun blizzard_rushRoll() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 weatherRoll = DiceRollResults(6.d6, 6.d6)
@@ -184,7 +178,6 @@ class WeatherTests: JervisGameTest() {
 
     @Test
     fun blizzard_restrictPassRange() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 weatherRoll = DiceRollResults(6.d6, 6.d6)

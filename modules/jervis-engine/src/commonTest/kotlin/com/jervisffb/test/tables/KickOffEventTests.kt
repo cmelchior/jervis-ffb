@@ -16,7 +16,6 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
@@ -40,7 +39,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun getTheRef() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -56,7 +54,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun timeOut_moveForward() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -72,7 +69,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun timeOut_moveBack() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup()
@@ -95,7 +91,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun solidDefense() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -118,7 +113,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun solidDefense_invalid() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -146,7 +140,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun solidDefense_lessPlayersThanRolled() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -171,7 +164,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun highKick() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -192,7 +184,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun highKick_onPlayer() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -214,7 +205,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun highKick_acrossLoS() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -237,7 +227,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun highKick_noValidPlayers() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -264,7 +253,6 @@ class KickOffEventTests: JervisGameTest() {
     fun cheeringFans_equalRoll() {
         homeTeam.tempCheerleaders = 0
         awayTeam.tempCheerleaders = 1
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -282,7 +270,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun cheeringFans_homeWins() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -302,7 +289,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun brilliantCoaching_noRerollGiven() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -323,7 +309,6 @@ class KickOffEventTests: JervisGameTest() {
     fun brilliantCoaching_awayTeamWins() {
         homeTeam.tempAssistantCoaches = 0
         awayTeam.tempAssistantCoaches = 1
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -342,7 +327,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun brilliantCoaching_rerollExpire() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -365,7 +349,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun changingWeather() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -381,7 +364,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun changingWeather_scatter() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -401,7 +383,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun changingWeather_scatterBackToReceiverField() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -424,7 +405,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun changingWeather_scatterBackToKickerField() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -446,7 +426,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun changingWeather_perfectWeatherWhenOutOfBounds() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -470,7 +449,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun quickSnap() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -501,7 +479,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun quickSnap_notEnoughPlayers() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -526,7 +503,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun quickSnap_automaticallyEndSetup() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -550,7 +526,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun quickSnap_sameFieldDoesNotCountAsMoved() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -577,7 +552,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun officiousRef() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -597,7 +571,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun officiousRef_bothTeams() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -622,7 +595,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun officiousRef_noPlayersOnField() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup()
@@ -653,7 +625,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun pitchInvasion() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -673,7 +644,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun pitchInvasion_bothTeams() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -698,7 +668,6 @@ class KickOffEventTests: JervisGameTest() {
 
     @Test
     fun pitchInvasion_noPlayersOnField() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup()

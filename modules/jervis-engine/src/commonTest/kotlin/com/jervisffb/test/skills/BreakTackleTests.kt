@@ -51,7 +51,6 @@ class BreakTackleTests: JervisGameTest() {
     @Test
     fun useBreakTackleOnDodge() {
         val player = state.getPlayerById("A1".playerId)
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -74,7 +73,6 @@ class BreakTackleTests: JervisGameTest() {
     @Test
     fun breakTackleAlsoAppliesToReroll() {
         val player = state.getPlayerById("A1".playerId)
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),

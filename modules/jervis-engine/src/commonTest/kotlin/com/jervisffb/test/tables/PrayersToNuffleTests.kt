@@ -103,7 +103,6 @@ class PrayersToNuffleTests: JervisGameTest() {
         // Trigger two rolls on Prayers to Nuffle
         homeTeam.teamValue = 1_100_000
         awayTeam.teamValue = 1_000_000
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -127,7 +126,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun friendsWithTheRef() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -164,7 +162,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun stiletto() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -195,7 +192,6 @@ class PrayersToNuffleTests: JervisGameTest() {
     @Test
     fun stiletto_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -228,7 +224,6 @@ class PrayersToNuffleTests: JervisGameTest() {
                 else -> it.addSkill(Loner(2))
             }
         }
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -244,7 +239,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun ironMan() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -265,7 +259,6 @@ class PrayersToNuffleTests: JervisGameTest() {
     @Test
     fun ironMan_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -297,7 +290,6 @@ class PrayersToNuffleTests: JervisGameTest() {
                 else -> it.addSkill(Loner(2))
             }
         }
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -316,7 +308,6 @@ class PrayersToNuffleTests: JervisGameTest() {
     fun ironMan_onAV11() {
         val player = state.getPlayerById("A1".playerId)
         player.baseArmorValue = 11
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -332,7 +323,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun knuckleDusters() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -363,7 +353,6 @@ class PrayersToNuffleTests: JervisGameTest() {
     @Test
     fun knuckleDusters_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -397,7 +386,6 @@ class PrayersToNuffleTests: JervisGameTest() {
                 else -> it.addSkill(Loner(2))
             }
         }
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -414,7 +402,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun badHabits() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -441,7 +428,6 @@ class PrayersToNuffleTests: JervisGameTest() {
     @Test
     fun badHabits_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -477,7 +463,6 @@ class PrayersToNuffleTests: JervisGameTest() {
         homeTeam.forEachIndexed { i, it ->
             if (i > 0) it.addSkill(Loner(4))
         }
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -502,7 +487,6 @@ class PrayersToNuffleTests: JervisGameTest() {
                 else -> it.addSkill(Loner(4))
             }
         }
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -518,7 +502,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun greasyCleats() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -544,7 +527,6 @@ class PrayersToNuffleTests: JervisGameTest() {
     @Test
     fun greasyCleats_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -572,7 +554,6 @@ class PrayersToNuffleTests: JervisGameTest() {
         homeTeam.forEachIndexed { i, it ->
             it.state = PlayerState.KNOCKED_OUT
         }
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -586,7 +567,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun blessedStatueOfNuffle() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -604,7 +584,6 @@ class PrayersToNuffleTests: JervisGameTest() {
     @Test
     fun blessedStatueOfNuffle_asKickOffEvent() {
         homeTeam.teamValue = 1_000_000
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -637,7 +616,6 @@ class PrayersToNuffleTests: JervisGameTest() {
                 else -> player.addSkill(Loner(2))
             }
         }
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -651,7 +629,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun molesUnderThePitch() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -674,7 +651,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun molesUnderThePitch_affectRushing() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(
@@ -704,7 +680,6 @@ class PrayersToNuffleTests: JervisGameTest() {
 
     @Test
     fun molesUnderThePitch_canAffectRushingTwice() {
-        controller.startTestMode(FullGame)
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(

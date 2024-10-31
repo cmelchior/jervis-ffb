@@ -1,7 +1,6 @@
 package com.jervisffb.test.pregame
 
 import com.jervisffb.engine.ext.d3
-import com.jervisffb.engine.rules.bb2020.procedures.FanFactorRolls
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.ext.rollForward
 import kotlin.test.Test
@@ -11,7 +10,6 @@ class FanFactorRollTests: JervisGameTest() {
 
     @Test
     fun rollingForFanFactor() {
-        controller.startTestMode(FanFactorRolls)
         controller.rollForward(
             1.d3, // Home team roll
             2.d3, // Away team roll
