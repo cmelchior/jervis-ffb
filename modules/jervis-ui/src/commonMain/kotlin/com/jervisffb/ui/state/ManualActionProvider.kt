@@ -8,7 +8,6 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
-import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.Continue
@@ -38,7 +37,6 @@ import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.InducementSelected
-import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
@@ -65,27 +63,27 @@ import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.TossCoin
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Coin
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.model.locations.GiantLocation
-import com.jervisffb.engine.model.locations.OnFieldLocation
-import com.jervisffb.engine.rules.PlayerSpecialActionType
-import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
-import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.UiGameSnapshot
-import com.jervisffb.ui.view.ContextMenuOption
+import com.jervisffb.ui.state.decorators.DeselectPlayerDecorator
+import com.jervisffb.ui.state.decorators.EndActionDecorator
+import com.jervisffb.ui.state.decorators.FieldActionDecorator
+import com.jervisffb.ui.state.decorators.SelectDirectionDecorator
+import com.jervisffb.ui.state.decorators.SelectFieldLocationDecorator
+import com.jervisffb.ui.state.decorators.SelectMoveTypeDecorator
+import com.jervisffb.ui.state.decorators.SelectPlayerActionDecorator
+import com.jervisffb.ui.state.decorators.SelectPlayerDecorator
 import com.jervisffb.ui.view.DialogFactory
 import com.jervisffb.ui.viewmodel.Feature
 import com.jervisffb.ui.viewmodel.MenuViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+import kotlin.reflect.KClass
 
 /**
  * Class responsible for enhancing the UI, so it is able to create a [GameAction]
@@ -106,6 +104,33 @@ class ManualActionProvider(
     // sending anything else
     var delayEvents = false
     val queuedActions = mutableListOf<GameAction>()
+
+    val fieldActionDecorators = mapOf(
+        // EndSetupWhenReady -> TODO()
+        // EndTurnWhenReady -> TODO()
+        // is RollDice -> TODO()
+        // is SelectBlockType -> TODO()
+        // SelectCoinSide -> TODO()
+        // is SelectDicePoolResult -> TODO()
+        // SelectDogout -> TODO()
+        // is SelectInducement -> TODO()
+        // is SelectNoReroll -> TODO()
+        // is SelectRandomPlayers -> TODO()
+        // is SelectRerollOption -> TODO()
+        // is SelectSkill -> TODO()
+        // TossCoin -> TODO()
+        DeselectPlayer::class to DeselectPlayerDecorator(),
+        EndActionWhenReady::class to EndActionDecorator(),
+        SelectDirection::class to SelectDirectionDecorator(),
+        SelectFieldLocation::class to SelectFieldLocationDecorator(),
+        SelectMoveType::class to SelectMoveTypeDecorator(),
+        SelectPlayer::class to SelectPlayerDecorator(),
+        SelectPlayerAction::class to SelectPlayerActionDecorator(),
+    )
+
+    private fun <T: ActionDescriptor> getDecorator(type: KClass<T>): FieldActionDecorator<ActionDescriptor>? {
+        return fieldActionDecorators[type] as? FieldActionDecorator<ActionDescriptor>
+    }
 
     override fun prepareForNextAction(controller: GameController) {
         this.controller = controller
@@ -194,109 +219,15 @@ class ManualActionProvider(
     //  class to make it more explicit?
     private fun addNonDialogActionDecorators(snapshot: UiGameSnapshot, request: ActionRequest) {
         val state = snapshot.game
-        request.actions.forEach { action ->
-            when (action) {
-                is DeselectPlayer -> {
-                    val coordinate = action.player.location as FieldCoordinate
-                    snapshot.fieldSquares[coordinate] = snapshot.fieldSquares[coordinate]?.copy(
-                        onMenuHidden = { userActionSelected(PlayerDeselected(action.player)) }
-                    ) ?: error ("Could not find square: $coordinate")
-                }
-                EndActionWhenReady -> {
-                    state.activePlayer?.location?.let { location ->
-                        snapshot.fieldSquares[location as FieldCoordinate] = snapshot.fieldSquares[location]?.copyAddContextMenu(
-                            ContextMenuOption(
-                                "End action",
-                                { userActionSelected(EndAction) },
-                            )
-                        ) ?: error("Could not find square: $location")
-                    } ?: error("No active player")
-                }
-                is SelectDirection -> {
-                    val origin = state.field[action.origin as FieldCoordinate]
-                    action.directions.forEach { direction ->
-                        val square = snapshot.fieldSquares[origin.move(direction, 1)]
-                        snapshot.fieldSquares[origin.move(direction, 1)] = square?.copy(
-                            onSelected = { userActionSelected(DirectionSelected(direction)) },
-                            selectableDirection = direction
-                        ) ?: error("Cannot find square: ${origin.move(direction, 1)}")
-                    }
-                }
-                is SelectFieldLocation -> {
-                    val selectedAction = {
-                        userActionSelected(FieldSquareSelected(action.coordinate))
-                    }
-                    val square = snapshot.fieldSquares[action.coordinate]
-                    snapshot.fieldSquares[action.coordinate] = square?.copy(
-                        onSelected = selectedAction,
-                        requiresRoll = (action.requiresRush || action.requiresDodge)
-                    ) ?: error("Unexpected location : ${action.coordinate}")
-                }
-                is SelectMoveType -> {
-                    addSelectMoveTypeDecoratorsToField(state, snapshot, action)
-                }
-                is SelectPlayer -> {
-                    // Define onClick event
-                    val selectedAction = {
-                        userActionSelected(PlayerSelected(action.player))
-                    }
-
-                    val playerLocation = state.getPlayerById(action.player).location
-
-                    // Calculate dice decorators
-                    var dice = when (controller.currentNode()) {
-                        BlockAction.SelectDefenderOrEndAction -> {
-                            val attacker = state.activePlayer!!
-                            val defender = state.getPlayerById(action.player)
-                            calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = false)
-                        }
-                        BlitzAction.MoveOrBlockOrEndAction -> {
-                            val attacker = state.activePlayer!!
-                            val defender = state.getPlayerById(action.player)
-                            calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = true)
-                        }
-                        else -> 0
-                    }
-
-                    // Depending on the location, the event is tracked slightly different
-                    when (playerLocation) {
-                        DogOut -> {
-                            snapshot.dogoutActions[action.player] = selectedAction
-                        }
-                        is FieldCoordinate -> {
-                            val square = snapshot.fieldSquares[playerLocation]
-                            snapshot.fieldSquares[playerLocation] = square?.copy(
-                                dice = dice,
-                                onSelected = selectedAction
-                            ) ?: error("Unexpected player location : $playerLocation")
-                        }
-                        is GiantLocation -> TODO("Not supported right now")
-                    }
-                }
-                is SelectPlayerAction -> {
-                    addSelectPlayerActionFieldDecorators(state, snapshot, action)
-                }
-//                EndSetupWhenReady -> TODO()
-//                EndTurnWhenReady -> TODO()
-//                is RollDice -> TODO()
-//                is SelectBlockType -> TODO()
-//                SelectCoinSide -> TODO()
-//                is SelectDicePoolResult -> TODO()
-//                SelectDogout -> TODO()
-//                is SelectInducement -> TODO()
-//                is SelectNoReroll -> TODO()
-//                is SelectRandomPlayers -> TODO()
-//                is SelectRerollOption -> TODO()
-//                is SelectSkill -> TODO()
-//                TossCoin -> TODO()
-                else -> {
-                    // Any action that isn't being mapped to an UI component needs to go here.
-                    // This way, we ensure that the UI is never blocked during development.
-                    // In an ideal world, nothing should ever go here.
-                    snapshot.unknownActions.add(
-                        mapUnknownAction(action)
-                    )
-                }
+        request.actions.forEach { descriptor ->
+            val decorator = getDecorator(descriptor::class)
+            if (decorator != null) {
+                decorator.decorate(this, state, snapshot, descriptor)
+            } else {
+                // Any action that isn't being mapped to an UI component needs to go here.
+                // This way, we ensure that the UI is never blocked during development.
+                // In an ideal world, nothing should ever go here.
+                snapshot.unknownActions.add(mapUnknownAction(descriptor))
             }
         }
 
@@ -465,120 +396,6 @@ class ManualActionProvider(
         }
 
         return null
-    }
-
-    private fun addSelectMoveTypeDecoratorsToField(
-        state: Game,
-        snapshot: UiGameSnapshot,
-        action: SelectMoveType
-    ) {
-        val player = state.activePlayer ?: error("No active player")
-        val activeLocation = player.location as OnFieldLocation
-        val activeSquare = snapshot.fieldSquares[activeLocation] ?: error("No square found: $activeLocation")
-        // For move selection, some types of moves we want to display on the field
-        // others should be a specific action that must be selected.
-        // On-field moves are shortcutting the Rules engine, so we need to account for that as well
-        when (action.type) {
-            MoveType.JUMP -> {
-                activeSquare.contextMenuOptions.add(
-                    ContextMenuOption(
-                        "Jump",
-                        { userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
-                    )
-                )
-            }
-
-            MoveType.LEAP -> {
-                activeSquare.contextMenuOptions.add(
-                    ContextMenuOption(
-                        "Leap",
-                        { userActionSelected(MoveTypeSelected(MoveType.LEAP)) },
-                    )
-                )
-            }
-
-            MoveType.STANDARD -> {
-                val requiresDodge = controller.rules.calculateMarks(controller.state, player.team, activeLocation) > 0
-                val requiresRush = player.movesLeft == 0 && player.rushesLeft > 0
-
-                // We calculate all paths here, rather than doing it in the ViewModel. Mostly because
-                // it allows us to front-load slightly more computations. But it hasn't been benchmarked,
-                // Maybe doing the calculation on the fly is fine.
-                val allPaths = controller.rules.pathFinder.calculateAllPaths(
-                    controller.state,
-                    activeLocation as FieldCoordinate,
-                    if (requiresDodge) 1 else player.movesLeft,
-                )
-                snapshot.pathFinder = allPaths
-
-                // Also mark all fields around the player as immediately selectable
-                activeLocation.getSurroundingCoordinates(state.rules, 1, includeOutOfBounds = false)
-                    .filter { state.field[it].isUnoccupied() }
-                    .forEach { loc ->
-                        val square = snapshot.fieldSquares[loc]
-                        snapshot.fieldSquares[loc] = square?.copy(
-                            onSelected = {
-                                userActionSelected(
-                                    CompositeGameAction(
-                                        listOf(
-                                            MoveTypeSelected(MoveType.STANDARD),
-                                            FieldSquareSelected(loc)
-                                        )
-                                    )
-                                )
-                            },
-                            requiresRoll = requiresDodge || requiresRush
-                        ) ?: error("Could not find square: $loc")
-                    }
-            }
-
-            MoveType.STAND_UP -> {
-                activeSquare.contextMenuOptions.add(
-                    ContextMenuOption(
-                        "Stand-Up",
-                        { userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
-                    )
-                )
-            }
-        }
-    }
-
-    private fun addSelectPlayerActionFieldDecorators(
-        state: Game,
-        snapshot: UiGameSnapshot,
-        action: SelectPlayerAction
-    ) {
-        state.activePlayer?.location?.let { location ->
-            val oldData = snapshot.fieldSquares[location]!!
-            snapshot.fieldSquares[location as FieldCoordinate] =
-                oldData.copyAddContextMenu(
-                    action.action.let {
-                        val name = when (it.type) {
-                            PlayerStandardActionType.MOVE -> "Move"
-                            PlayerStandardActionType.PASS -> "Pass"
-                            PlayerStandardActionType.HAND_OFF -> "Hand-off"
-                            PlayerStandardActionType.BLOCK -> "Block"
-                            PlayerStandardActionType.BLITZ -> "Blitz"
-                            PlayerStandardActionType.FOUL -> "Foul"
-                            PlayerStandardActionType.SPECIAL -> "Special"
-                            PlayerStandardActionType.THROW_TEAM_MATE -> "Throw Team-mate"
-                            PlayerSpecialActionType.BALL_AND_CHAIN -> "Ball & Chain"
-                            PlayerSpecialActionType.BOMBARDIER -> "Bombardier"
-                            PlayerSpecialActionType.BREATHE_FIRE -> "Breathe Fire"
-                            PlayerSpecialActionType.CHAINSAW -> "Chainsaw"
-                            PlayerSpecialActionType.HYPNOTIC_GAZE -> "Hypnotic Gaze"
-                            PlayerSpecialActionType.KICK_TEAM_MATE -> "Kick Team-mate"
-                            PlayerSpecialActionType.MULTIPLE_BLOCK -> "Multiple Block"
-                            PlayerSpecialActionType.PROJECTILE_VOMIT -> "Projectile Vomit"
-                            PlayerSpecialActionType.STAB -> "Stab"
-                        }
-                        ContextMenuOption(
-                            title = name,
-                            command = { userActionSelected(PlayerActionSelected(it.type)) },
-                        )
-                    },
-                )
-        } ?: error("No active player")
     }
 }
 

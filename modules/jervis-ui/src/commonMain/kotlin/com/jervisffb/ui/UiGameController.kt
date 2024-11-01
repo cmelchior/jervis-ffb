@@ -130,6 +130,8 @@ class UiGameController(
                 // for the next set of actions
                 runPostUpdateAnimations()
 
+                // TODO Just changing the existing uiState might not trigger recomposition correctly
+                //  We need an efficient way to copy the old one.
                 actionProvider.decorateAvailableActions(newUiState, controller.getAvailableActions())
                 lastUiState = newUiState
                 _uiStateFlow.emit(newUiState)
