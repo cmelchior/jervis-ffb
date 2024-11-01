@@ -1,7 +1,7 @@
 package com.jervisffb.engine
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Team
 
@@ -16,6 +16,17 @@ data class ActionRequest(
     val actions: List<GameActionDescriptor>
 ) {
     val size = actions.size
+
+    /**
+     * Returns `true` if the given action is one part of this request.
+     *
+     * Note, this method can be expensive to call.
+     */
+    fun isValid(action: GameAction): Boolean {
+        return actions.any {
+            it.createAll().contains(action)
+        }
+    }
 }
 
 

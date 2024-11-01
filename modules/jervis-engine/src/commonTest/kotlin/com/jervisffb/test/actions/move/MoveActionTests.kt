@@ -8,7 +8,6 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectFieldLocation
-import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
@@ -23,7 +22,6 @@ import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -135,7 +133,7 @@ class MoveActionTests: JervisGameTest() {
             *moveTo(16, 14)
         )
         assertEquals(0, movingPlayer.movesLeft)
-        assertContains(controller.getAvailableActions().actions, SelectMoveType(MoveType.STANDARD))
+        assertTrue(controller.getAvailableActions().isValid(MoveTypeSelected(MoveType.STANDARD)))
         controller.rollForward(
             *moveTo(17, 14),
             6.d6, // Rush
