@@ -1,5 +1,6 @@
 package com.jervisffb.engine.actions
 
+import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
@@ -15,7 +16,21 @@ import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import kotlinx.serialization.Serializable
 
 // Action descriptors
-sealed interface ActionDescriptor
+/**
+ * Interface describing all legal inputs to a [ActionNode] of a given type.
+ *
+ *
+ *
+ *
+ *
+ */
+sealed interface ActionDescriptor {
+//    /**
+//     * Creates a random game action from pool of
+//     */
+//    fun createRandom(): GameAction
+//    fun createAll(): List<GameAction>
+}
 
 // "internal event" for continuing the game state
 data object ContinueWhenReady : ActionDescriptor

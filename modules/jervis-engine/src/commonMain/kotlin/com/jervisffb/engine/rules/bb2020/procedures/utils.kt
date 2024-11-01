@@ -1,5 +1,9 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
+import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.MoveType
+import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemovePlayerSkill
 import com.jervisffb.engine.commands.RemovePlayerStatModifier
@@ -10,6 +14,7 @@ import com.jervisffb.engine.commands.SetPlayerRushesLeft
 import com.jervisffb.engine.commands.SetSpecialPlayCardActive
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.inducements.InfamousCoachAbility
 import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
@@ -20,6 +25,60 @@ import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Sprint
+
+/**
+ * Returns a list of all possible move actions for a given player.
+ * This should take into account normal moves, rushing, jump and all
+ * skills like Leap and Ball & Chain
+ *
+ * TODO Maybe not ball an chain? :thinking:
+ */
+fun calculateMoveTypesAvailable(player: Player, rules: Rules): List<ActionDescriptor> {
+
+    val options = mutableListOf<MoveType>()
+
+    // Normal move (with a potential rush)
+    if (player.movesLeft + player.rushesLeft >= 1 && player.isStanding(rules)) {
+        options.add(MoveType.STANDARD)
+    }
+
+//    // Jump/Leap (with potential rushes)
+//    if (player.movesLeft + player.rushesLeft >= 2 && player.isStanding(rules)) {
+//        options.add(MoveType.JUMP)
+//        options.add(MoveType.LEAP)
+//    }
+//
+    // Standup
+    if (player.location.isOnField(rules) && player.state == PlayerState.PRONE) {
+        options.add(MoveType.STAND_UP)
+    }
+
+    return options.map { SelectMoveType(it) }
+}
+
+/**
+ * Returns all the reachable squares a player can go to using a specific type of
+ * move.
+ */
+fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type: MoveType): List<ActionDescriptor> {
+    return when (type) {
+        MoveType.JUMP -> TODO()
+        MoveType.LEAP -> TODO()
+        MoveType.STANDARD -> {
+            val requiresDodge = rules.calculateMarks(state, player.team, player.coordinates) > 0
+            val eligibleEmptySquares: List<ActionDescriptor> =
+                if (player.movesLeft + player.rushesLeft > 0) {
+                    player.coordinates.getSurroundingCoordinates(rules)
+                        .filter { state.field[it].isUnoccupied() }
+                        .map { SelectFieldLocation.move(it, player.movesLeft <= 0, requiresDodge) }
+                } else {
+                    emptyList()
+                }
+            eligibleEmptySquares
+        }
+        MoveType.STAND_UP -> TODO()
+    }
+}
 
 /**
  * Returns the [Command] for setting the available number of rushes for this action.

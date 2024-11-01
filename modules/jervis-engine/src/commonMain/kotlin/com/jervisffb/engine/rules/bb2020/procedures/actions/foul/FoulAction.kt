@@ -32,7 +32,7 @@ import com.jervisffb.engine.reports.ReportFoulResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.calculateMoveTypesAvailable
+import com.jervisffb.engine.rules.bb2020.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallResult

@@ -43,7 +43,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.RushRoll
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.calculateMoveTypesAvailable
+import com.jervisffb.engine.rules.bb2020.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
