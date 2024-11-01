@@ -116,8 +116,6 @@ tests covering the particular feature.
   - [ ] Reset at half time
   - [ ] Carry over into Extra Time
   - [ ] Leader
-- [x] Rushing
-  - [ ] Rush To Blitz
 - [ ] Dodging
 - [ ] Deviating Ball
 - [ ] Scatter Ball
@@ -172,4 +170,5 @@ tests covering the particular feature.
 - [ ] Throw Team-mate Action
 - [ ] Block Action
 - [ ] Blitz Action
+  - [ ] Rush To Blitz
 - [ ] Foul Action

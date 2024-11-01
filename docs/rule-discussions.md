@@ -7,20 +7,22 @@ interpreted.
    You cannot use MB _against_ the player that has Chainsaw
 
 2. When resolving Both Dow during a Block. Who is resolved first: Attacker or Defender?
+   a. Does it matter? Yes, because if a knocked down player leaves the field, it can affect
+      how a dropped ball bounces.
 
-3. When selecting skill usage. Who goes first? E.g. choosing Dodge/Tackle f or Stumble
+3. When selecting skill usage. Who goes first when it involves both teams? 
+   Examples being: Dodge/Tackle and Break Tackle/Diving Tackle. 
+      a Does it matter? Yes, for break tackle / diving tackle, which are both "use once".
+      b. Is it "Active then InActive", "InActive then Active", "Active Coach Decides" or "InActive Coach Decides"
 
-4. In which order is skill usage declared when both teams have to choose? E.g. Break Tackle and Diving Tackle?
-   Is it "Active then InActive", "InActive then Active", "Active Coach Decides" or "InActive Coache Decides"
-
-5. It is a bit unclear if Sweltering Heat or Deal with Secret Weapons happens first, but Sweltering heat 
+4. It is a bit unclear if Sweltering Heat or Deal with Secret Weapons happens first, but Sweltering heat 
    does mention "once a drive ends", which matches the "The Drive Ends" step of the End of Drive sequence.
 
-6. It isn't well-defined what happens in which order things happen at the end of the turn
+5. It isn't well-defined what happens in which order things happen at the end of the turn
    but currently the only thing that reset/expire is skills that uses rerolls. None of these
    should interfer with Throw A Rock. So the order here doesn't matter
 
-7. (Page 64) Stalling is worded slightly weird, ie. the steps mention "at any point during your team
+6. (Page 64) Stalling is worded slightly weird, ie. the steps mention "at any point during your team
    turn", but the last section talk about activating players marked as "Stalling", indicating
    it is something checked before activation. Designers Commentary does clarify a bit, but some things are
    still unclear. 
@@ -37,18 +39,18 @@ interpreted.
    off to B, which hasn't activated yet and can also reach the end zone. B is now also Stalling.
    If B had activated, they are not marked as Stalling since it would violate check 3.
 
-8. Can Throw a Rock hit people in the Reserves? From how Stalling is defined, it is hard to be stalling
+7. Can Throw a Rock hit people in the Reserves? From how Stalling is defined, it is hard to be stalling
    and in the Dogout (you will need to start with the ball, hand-off, then some effect put you in the 
    Dogout (knock down ))
 
-9. Sweltering Heat and Throw a Rock. Throw a Rock, happens at the end of a team turn, while Sweltering
+8. Sweltering Heat and Throw a Rock. Throw a Rock, happens at the end of a team turn, while Sweltering
    Heat happens in the "End of Drive" sequence. So people hit by a rock are not on the pitch and cannot
    faint from the heat. 
 
-10. It is unclear what happens if you put a player on a trapdoor during setup. Does that count 
+9. It is unclear what happens if you put a player on a trapdoor during setup. Does that count 
     as "enter for any reason"? For we do nothing
 
-11. The timing of Trapdoor vs. Dodge/Jump is a bit unclear. Since Dodge/Jump is rolled after the player
+10. The timing of Trapdoor vs. Dodge/Jump is a bit unclear. Since Dodge/Jump is rolled after the player
     is moved, I read it as the following sequence:
     a. Announce Jump
     b. Roll Rush 1 (if failed, fall over in starting square)
@@ -62,15 +64,15 @@ interpreted.
     c. Roll for Trapdoor
     d. Roll for Dodge
       
-12. How does Chain-pushes and Trapdoors interact? When does the player count as being "moved"?
+11. How does Chain-pushes and Trapdoors interact? When does the player count as being "moved"?
     E.g. if Player A is pushed into Player B who is standing on a Trapdoor, 
 
-13. What happens if you cannot apply a Prayers To Nuffle result, e.g. because the entire team
+12. What happens if you cannot apply a Prayers To Nuffle result, e.g. because the entire team
     has Loner? Designers Commentary for Lasting Injury indicates you reroll until you get
     a viable result. But Prayers also says "May roll", indicating that it is optional, so not being
     able to apply the result is okay.
 
-14. Can a player that already have AV 11 receive Iron Man from Prayers of Nuffle? It wil not work
+13. Can a player that already have AV 11 receive Iron Man from Prayers of Nuffle? It wil not work
     for sure, but can they still get it? And what happens if they cannot?
 
 15. For High Kick: Following the strict ordering of the rules, the Kick-Off Event is resolved 
@@ -128,12 +130,20 @@ interpreted.
 25. For Falling Over and Knocked Down, does the turnover happen before those are resolved,
     which would end the team turn, making rerolls unavailable. It looks like yes.
 
+26. Tentacles and Dodge/Rushing. From the rules it is a bit unclear what happens first,
+    but dodge is described as "The agility test is made after the dodging player has been moved".
+    And since the tentacles prevent the move, the dodge roll never happens. Tentacles say
+    "...Marking voluntarily moves out of an square". So the interpretation depends if there
+    is a short point in time, where the player did actually move. But since. Tentacles don't
+    say anything about "moving back". The interpretation is that Tentacles trigger on the "intent"
+    of moving. See https://www.reddit.com/r/bloodbowl/comments/11w0p1b/comment/jdbzakx/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+
 # Differences compared to the rules as written
 
 1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 
    this choice always come after the roll. There is no valid reason for asking it before, and asking
    both before and after would create a lot of noise. The exception being Diving Tackle, where 
-   there could b reasons for choosing it both before and after.
+   there could be reasons for choosing it both before and after.
 
 2. (Page 37) Rolling for the weather should be done by each coach rolling one die. This doesn't
    matter in this case, so both dice are just rolled as a single step by the Home coach.
@@ -168,7 +178,7 @@ interpreted.
     This results in three questions:
      a. Does it matter which ball the receiver catches?
      b. If yes, which ball is bouncing?
-     c. Does the player know which ball is bouncing? (Relevant for choosing to reroll 
+     c. Does the coach know which ball is bouncing? (Relevant for choosing to reroll 
        the catch)
 
     Since all of these aspects are undefined, the implementation always lets the last ball

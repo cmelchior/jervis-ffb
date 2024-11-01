@@ -1,10 +1,10 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
@@ -43,16 +43,16 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryM
  * responsible for controlling the lifecycle of [MoveContext].
  *
  * The order of checks is:
- * 1. Tentacles
- * 1. Rush
+ * 1. Tentacles. The order is a bit unclear in the r
+ * 2. Rush
  *  a. Sprint
  *  b. Sure Feet
- * 2. Dodge
+ * 3. Dodge
  *   a. Two Heads / Stunty* / Titchy*
  *   b. Break Tackle
  *   c. Prehensile Tail
  *   d. Diving Tackle
- * 3. Shadowing
+ * 4. Shadowing
  */
 object StandardMoveStep: Procedure() {
     override val initialNode: Node = SelectTargetSquareOrEndAction
