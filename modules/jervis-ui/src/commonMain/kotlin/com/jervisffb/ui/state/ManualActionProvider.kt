@@ -65,6 +65,7 @@ import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.TossCoin
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Coin
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
@@ -232,71 +233,7 @@ class ManualActionProvider(
                     ) ?: error("Unexpected location : ${action.coordinate}")
                 }
                 is SelectMoveType -> {
-                    val player = state.activePlayer ?: error("No active player")
-                    val activeLocation = player.location as OnFieldLocation
-                    val activeSquare = snapshot.fieldSquares[activeLocation] ?: error("No square found: $activeLocation")
-                    // For move selection, some types of moves we want to display on the field
-                    // others should be a specific action that must be selected.
-                    // On-field moves are shortcutting the Rules engine, so we need to account for that as well
-                    when (action.type) {
-                        MoveType.JUMP -> {
-                            activeSquare.contextMenuOptions.add(
-                                ContextMenuOption(
-                                    "Jump",
-                                    { userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
-                                )
-                            )
-                        }
-                        MoveType.LEAP -> {
-                            activeSquare.contextMenuOptions.add(
-                                ContextMenuOption(
-                                    "Leap",
-                                    { userActionSelected(MoveTypeSelected(MoveType.LEAP)) },
-                                )
-                            )
-                        }
-                        MoveType.STANDARD -> {
-                            val requiresDodge = controller.rules.calculateMarks(controller.state, player.team, activeLocation) > 0
-                            val requiresRush = player.movesLeft == 0 && player.rushesLeft > 0
-
-                            // We calculate all paths here, rather than doing it in the ViewModel. Mostly because
-                            // it allows us to front-load slightly more computations. But it hasn't been benchmarked,
-                            // Maybe doing the calculation on the fly is fine.
-                            val allPaths = controller.rules.pathFinder.calculateAllPaths(
-                                controller.state,
-                                activeLocation as FieldCoordinate,
-                                if (requiresDodge) 1 else player.movesLeft,
-                            )
-                            snapshot.pathFinder = allPaths
-
-                            // Also mark all fields around the player as immediately selectable
-                            activeLocation.getSurroundingCoordinates(state.rules, 1, includeOutOfBounds = false)
-                                .filter { state.field[it].isUnoccupied() }
-                                .forEach { loc ->
-                                    val square = snapshot.fieldSquares[loc]
-                                    snapshot.fieldSquares[loc] = square?.copy(
-                                        onSelected = {
-                                            userActionSelected(CompositeGameAction(
-                                                listOf(
-                                                    MoveTypeSelected(MoveType.STANDARD),
-                                                    FieldSquareSelected(loc)
-                                                )
-                                            ))
-                                        },
-                                        requiresRoll = requiresDodge || requiresRush
-                                    ) ?: error("Could not find square: $loc")
-                                }
-                        }
-
-                        MoveType.STAND_UP -> {
-                            activeSquare.contextMenuOptions.add(
-                                ContextMenuOption(
-                                    "Stand-Up",
-                                    { userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
-                                )
-                            )
-                        }
-                    }
+                    addSelectMoveTypeDecoratorsToField(state, snapshot, action)
                 }
                 is SelectPlayer -> {
                     // Define onClick event
@@ -337,37 +274,7 @@ class ManualActionProvider(
                     }
                 }
                 is SelectPlayerAction -> {
-                    state.activePlayer?.location?.let { location ->
-                        val oldData = snapshot.fieldSquares[location]!!
-                        snapshot.fieldSquares[location as FieldCoordinate] =
-                            oldData.copyAddContextMenu(
-                                action.action.let {
-                                    val name = when (it.type) {
-                                        PlayerStandardActionType.MOVE -> "Move"
-                                        PlayerStandardActionType.PASS -> "Pass"
-                                        PlayerStandardActionType.HAND_OFF -> "Hand-off"
-                                        PlayerStandardActionType.BLOCK -> "Block"
-                                        PlayerStandardActionType.BLITZ -> "Blitz"
-                                        PlayerStandardActionType.FOUL -> "Foul"
-                                        PlayerStandardActionType.SPECIAL -> "Special"
-                                        PlayerStandardActionType.THROW_TEAM_MATE -> "Throw Team-mate"
-                                        PlayerSpecialActionType.BALL_AND_CHAIN -> "Ball & Chain"
-                                        PlayerSpecialActionType.BOMBARDIER -> "Bombardier"
-                                        PlayerSpecialActionType.BREATHE_FIRE -> "Breathe Fire"
-                                        PlayerSpecialActionType.CHAINSAW -> "Chainsaw"
-                                        PlayerSpecialActionType.HYPNOTIC_GAZE -> "Hypnotic Gaze"
-                                        PlayerSpecialActionType.KICK_TEAM_MATE -> "Kick Team-mate"
-                                        PlayerSpecialActionType.MULTIPLE_BLOCK -> "Multiple Block"
-                                        PlayerSpecialActionType.PROJECTILE_VOMIT -> "Projectile Vomit"
-                                        PlayerSpecialActionType.STAB -> "Stab"
-                                    }
-                                    ContextMenuOption(
-                                        title = name,
-                                        command = { userActionSelected(PlayerActionSelected(it.type)) },
-                                    )
-                                },
-                            )
-                    } ?: error("No active player")
+                    addSelectPlayerActionFieldDecorators(state, snapshot, action)
                 }
 //                EndSetupWhenReady -> TODO()
 //                EndTurnWhenReady -> TODO()
@@ -559,4 +466,120 @@ class ManualActionProvider(
 
         return null
     }
+
+    private fun addSelectMoveTypeDecoratorsToField(
+        state: Game,
+        snapshot: UiGameSnapshot,
+        action: SelectMoveType
+    ) {
+        val player = state.activePlayer ?: error("No active player")
+        val activeLocation = player.location as OnFieldLocation
+        val activeSquare = snapshot.fieldSquares[activeLocation] ?: error("No square found: $activeLocation")
+        // For move selection, some types of moves we want to display on the field
+        // others should be a specific action that must be selected.
+        // On-field moves are shortcutting the Rules engine, so we need to account for that as well
+        when (action.type) {
+            MoveType.JUMP -> {
+                activeSquare.contextMenuOptions.add(
+                    ContextMenuOption(
+                        "Jump",
+                        { userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
+                    )
+                )
+            }
+
+            MoveType.LEAP -> {
+                activeSquare.contextMenuOptions.add(
+                    ContextMenuOption(
+                        "Leap",
+                        { userActionSelected(MoveTypeSelected(MoveType.LEAP)) },
+                    )
+                )
+            }
+
+            MoveType.STANDARD -> {
+                val requiresDodge = controller.rules.calculateMarks(controller.state, player.team, activeLocation) > 0
+                val requiresRush = player.movesLeft == 0 && player.rushesLeft > 0
+
+                // We calculate all paths here, rather than doing it in the ViewModel. Mostly because
+                // it allows us to front-load slightly more computations. But it hasn't been benchmarked,
+                // Maybe doing the calculation on the fly is fine.
+                val allPaths = controller.rules.pathFinder.calculateAllPaths(
+                    controller.state,
+                    activeLocation as FieldCoordinate,
+                    if (requiresDodge) 1 else player.movesLeft,
+                )
+                snapshot.pathFinder = allPaths
+
+                // Also mark all fields around the player as immediately selectable
+                activeLocation.getSurroundingCoordinates(state.rules, 1, includeOutOfBounds = false)
+                    .filter { state.field[it].isUnoccupied() }
+                    .forEach { loc ->
+                        val square = snapshot.fieldSquares[loc]
+                        snapshot.fieldSquares[loc] = square?.copy(
+                            onSelected = {
+                                userActionSelected(
+                                    CompositeGameAction(
+                                        listOf(
+                                            MoveTypeSelected(MoveType.STANDARD),
+                                            FieldSquareSelected(loc)
+                                        )
+                                    )
+                                )
+                            },
+                            requiresRoll = requiresDodge || requiresRush
+                        ) ?: error("Could not find square: $loc")
+                    }
+            }
+
+            MoveType.STAND_UP -> {
+                activeSquare.contextMenuOptions.add(
+                    ContextMenuOption(
+                        "Stand-Up",
+                        { userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
+                    )
+                )
+            }
+        }
+    }
+
+    private fun addSelectPlayerActionFieldDecorators(
+        state: Game,
+        snapshot: UiGameSnapshot,
+        action: SelectPlayerAction
+    ) {
+        state.activePlayer?.location?.let { location ->
+            val oldData = snapshot.fieldSquares[location]!!
+            snapshot.fieldSquares[location as FieldCoordinate] =
+                oldData.copyAddContextMenu(
+                    action.action.let {
+                        val name = when (it.type) {
+                            PlayerStandardActionType.MOVE -> "Move"
+                            PlayerStandardActionType.PASS -> "Pass"
+                            PlayerStandardActionType.HAND_OFF -> "Hand-off"
+                            PlayerStandardActionType.BLOCK -> "Block"
+                            PlayerStandardActionType.BLITZ -> "Blitz"
+                            PlayerStandardActionType.FOUL -> "Foul"
+                            PlayerStandardActionType.SPECIAL -> "Special"
+                            PlayerStandardActionType.THROW_TEAM_MATE -> "Throw Team-mate"
+                            PlayerSpecialActionType.BALL_AND_CHAIN -> "Ball & Chain"
+                            PlayerSpecialActionType.BOMBARDIER -> "Bombardier"
+                            PlayerSpecialActionType.BREATHE_FIRE -> "Breathe Fire"
+                            PlayerSpecialActionType.CHAINSAW -> "Chainsaw"
+                            PlayerSpecialActionType.HYPNOTIC_GAZE -> "Hypnotic Gaze"
+                            PlayerSpecialActionType.KICK_TEAM_MATE -> "Kick Team-mate"
+                            PlayerSpecialActionType.MULTIPLE_BLOCK -> "Multiple Block"
+                            PlayerSpecialActionType.PROJECTILE_VOMIT -> "Projectile Vomit"
+                            PlayerSpecialActionType.STAB -> "Stab"
+                        }
+                        ContextMenuOption(
+                            title = name,
+                            command = { userActionSelected(PlayerActionSelected(it.type)) },
+                        )
+                    },
+                )
+        } ?: error("No active player")
+    }
 }
+
+
