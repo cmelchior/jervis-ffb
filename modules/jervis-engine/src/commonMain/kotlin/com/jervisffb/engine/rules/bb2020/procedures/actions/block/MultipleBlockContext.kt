@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.BlockDicePool
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.RerollOptionSelected
@@ -80,7 +80,7 @@ data class MultipleBlockDiceRoll(
         }
     }
 
-    fun getRerollOptions(rules: Rules, attacker: Player, dicePoolId: Int): List<ActionDescriptor> {
+    fun getRerollOptions(rules: Rules, attacker: Player, dicePoolId: Int): List<GameActionDescriptor> {
         return when (type) {
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()

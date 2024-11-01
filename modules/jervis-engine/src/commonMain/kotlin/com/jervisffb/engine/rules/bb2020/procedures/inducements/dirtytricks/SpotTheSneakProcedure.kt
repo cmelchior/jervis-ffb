@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.inducements.dirtytricks
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.ActionNode
@@ -28,7 +28,7 @@ object SpotTheSneakProcedure: Procedure() {
 
     object SelectPlayer : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ActivateInducementContext>().team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             TODO("Not yet implemented")
         }
 
@@ -39,7 +39,7 @@ object SpotTheSneakProcedure: Procedure() {
 
     object PlacePlayer : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ActivateInducementContext>().team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             TODO("Not yet implemented")
         }
 

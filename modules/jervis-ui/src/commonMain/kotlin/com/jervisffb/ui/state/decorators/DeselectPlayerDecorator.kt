@@ -9,9 +9,11 @@ import com.jervisffb.ui.state.UiActionProvider
 
 class DeselectPlayerDecorator: FieldActionDecorator<DeselectPlayer> {
     override fun decorate(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: DeselectPlayer) {
-        val coordinate = descriptor.player.location as FieldCoordinate
-        snapshot.fieldSquares[coordinate] = snapshot.fieldSquares[coordinate]?.copy(
-            onMenuHidden = { actionProvider.userActionSelected(PlayerDeselected(descriptor.player)) }
-        ) ?: error ("Could not find square: $coordinate")
+        descriptor.players.forEach { player ->
+            val coordinate = player.location as FieldCoordinate
+            snapshot.fieldSquares[coordinate] = snapshot.fieldSquares[coordinate]?.copy(
+                onMenuHidden = { actionProvider.userActionSelected(PlayerDeselected(player)) }
+            ) ?: error ("Could not find square: $coordinate")
+        }
     }
 }

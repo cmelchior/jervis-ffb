@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
@@ -54,7 +54,7 @@ object PickupRoll : Procedure() {
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PickupRollContext>().player.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -76,7 +76,7 @@ object PickupRoll : Procedure() {
     object ChooseReRollSource : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PickupRollContext>().player.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PickupRollContext>()
             val successOnFirstRoll = context.isSuccess
             val pickupPlayer = context.player
@@ -157,7 +157,7 @@ object PickupRoll : Procedure() {
     object ReRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PickupRollContext>().player.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->

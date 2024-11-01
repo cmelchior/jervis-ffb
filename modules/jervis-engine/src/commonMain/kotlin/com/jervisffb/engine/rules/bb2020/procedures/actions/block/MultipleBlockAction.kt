@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -149,13 +149,13 @@ object MultipleBlockAction: Procedure() {
      */
     object SelectDefenderOrAbortActionOrContinueBlock: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
             val attacker = context.attacker
             val defender1 = context.defender1
             val defender2 = context.defender2
 
-            val eligibleDefenders: List<ActionDescriptor> =
+            val eligibleDefenders: List<GameActionDescriptor> =
                 attacker.coordinates.getSurroundingCoordinates(rules)
                     .filter { state.field[it].isOccupied() }
                     .filter { state.field[it].player!!.let { player ->
@@ -244,12 +244,13 @@ object MultipleBlockAction: Procedure() {
      */
     object SelectBlockTypeAgainstSelectedDefender: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val attacker = state.getContext<MultipleBlockContext>().attacker
             val availableBlockTypes = BlockAction.getAvailableBlockType(attacker, true)
-            return availableBlockTypes.map {
-                SelectBlockType(it)
-            } + DeselectPlayer(attacker)
+            return listOf(
+                SelectBlockType(availableBlockTypes),
+                DeselectPlayer(attacker)
+            )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
@@ -346,11 +347,10 @@ object MultipleBlockAction: Procedure() {
      */
     object SelectPlayerToResolve: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
             return listOf(
-                SelectPlayer(context.defender1!!.id),
-                SelectPlayer(context.defender2!!.id),
+                SelectPlayer(listOf(context.defender1!!.id, context.defender2!!.id)),
             )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -451,7 +451,7 @@ object MultipleBlockAction: Procedure() {
 
     /**
      * Check if any of the players involved in the block dropped a ball that needs to bounce.
-     * The rules do not specify in which order this happens and it probably doesn't matter, so
+     * The rules do not specify in which order this happens, and it probably doesn't matter, so
      * we just start with balls dropped by defenders, doing the attacker last.
      */
     object CheckForBouncingBalls: ComputationNode() {
@@ -508,7 +508,7 @@ object MultipleBlockAction: Procedure() {
     }
 
     /**
-     * Returns the commands needed to clear the context from a specific sub procedure,
+     * Return the commands needed to clear the context from a specific sub procedure,
      * as well as making sure that [MultipleBlockContext] is updated.
      */
     fun getLeaveBlockTypeNodeCommands(state: Game): Command {

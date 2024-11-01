@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
@@ -33,7 +33,7 @@ object FanFactorRolls : Procedure() {
     object SetFanFactorForHomeTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.homeTeam
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
 
@@ -54,7 +54,7 @@ object FanFactorRolls : Procedure() {
     object SetFanFactorForAwayTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.awayTeam
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
 

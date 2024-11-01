@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.prayers
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D3Result
@@ -55,7 +55,7 @@ object BadHabits : Procedure() {
 
     object RollDie: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
 
@@ -76,7 +76,7 @@ object BadHabits : Procedure() {
 
     object SelectPlayers: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val prayerContext = state.getContext<PrayersToNuffleRollContext>()
             val badHabitsContext = state.getContext<BadHabitsContext>()
             val availablePlayers = getEligiblePlayers(prayerContext, rules).map { it.id }

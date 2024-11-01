@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.SelectDicePoolResult
@@ -38,7 +38,7 @@ object MultipleBlockChoseResults: Procedure() {
     // We might need to have both attacker and defender choose dice
     object AttackerSelectBlockResults : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MultipleBlockContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
             val roll1 = context.roll1!!
             val roll2 = context.roll2!!

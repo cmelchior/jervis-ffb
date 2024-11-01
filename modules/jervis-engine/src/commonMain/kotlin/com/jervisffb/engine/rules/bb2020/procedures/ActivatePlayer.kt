@@ -1,8 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.commands.buildCompositeCommand
-import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PlayerActionSelected
@@ -15,6 +13,8 @@ import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetHasTackleZones
 import com.jervisffb.engine.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetSpecialActionSkillUsed
+import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -198,13 +198,14 @@ object ActivatePlayer : Procedure() {
 //         Breathe Fire (replace block or block part of blitz, once pr. activation)
 
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val allActions = rules.getAvailableActions(state, state.activePlayer!!).map { SelectPlayerAction(it) }
-            val availableActions= allActions
-                .firstOrNull { it.action.compulsory }?.let { listOf(it) }
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val allActions = SelectPlayerAction(actions = rules.getAvailableActions(state, state.activePlayer!!))
+            val availableActions: SelectPlayerAction = allActions.actions
+                // Compulsory actions take precedence over everything else
+                .firstOrNull { it.compulsory }?.let { SelectPlayerAction(it) }
                 ?: allActions
-            val deselectPlayer = listOf(DeselectPlayer(state.activePlayer!!))
-            return deselectPlayer + availableActions
+            val deselectPlayer = DeselectPlayer(state.activePlayer!!)
+            return listOf(deselectPlayer, availableActions)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

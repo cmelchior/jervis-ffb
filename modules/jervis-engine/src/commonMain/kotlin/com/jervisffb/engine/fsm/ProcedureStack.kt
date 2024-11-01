@@ -1,6 +1,6 @@
 package com.jervisffb.engine.fsm
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.commands.Command
@@ -17,9 +17,9 @@ import com.jervisffb.engine.commands.Command
  * procedure remembers their current node, so when you pop a [Procedure], the stack can automatically resume in the
  * parent procedure.
  *
- * Navigating the FSM is done through the use of the [ActionDescriptor], [GameAction] and [Command] classes.
+ * Navigating the FSM is done through the use of the [GameActionDescriptor], [GameAction] and [Command] classes.
  *
- * - [ActionDescriptor]: Describes the valid actions that a given [Node] will accept.
+ * - [GameActionDescriptor]: Describes the valid actions that a given [Node] will accept.
  * - [GameAction]: Are the actual action the [Node] is asked to handle.
  * - [Command]: Wraps the modification of the FSM or some other state.
  *

@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -25,7 +26,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockC
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.PatchUpPlayer
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Procedure responsible for resolving the "Injury Pool" for a Multiple Block.
@@ -50,14 +50,19 @@ object MultipleBlockResolveInjuries: Procedure() {
     // We might need to have both attacker and defender choose dice
     object SelectDefender : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MultipleBlockContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
             val defender1Injury = context.defender1InjuryContext
             val defender2Injury = context.defender2InjuryContext
-            return buildList {
-                if (defender1Injury != null) add(SelectPlayer(context.defender1!!.id))
-                if (defender2Injury != null) add(SelectPlayer(context.defender2!!.id))
-                if (defender1Injury == null && defender2Injury == null) add(ContinueWhenReady)
+
+            val injuredPlayers = buildList {
+                if (defender1Injury != null) add(context.defender1!!.id)
+                if (defender2Injury != null) add(context.defender2!!.id)
+            }
+            return if (injuredPlayers.isNotEmpty())
+                listOf(SelectPlayer(injuredPlayers))
+            else {
+                listOf(ContinueWhenReady)
             }
         }
 

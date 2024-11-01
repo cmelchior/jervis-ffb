@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.prayers
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
@@ -65,7 +65,7 @@ object ResolveThrowARock : Procedure() {
 
     object SelectPlayer: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<ThrowARockContext>()
             return if (context.stallingPlayers.isEmpty()) {
                 listOf(ContinueWhenReady)
@@ -101,7 +101,7 @@ object ResolveThrowARock : Procedure() {
 
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ThrowARockContext>().currentPlayer!!.team.otherTeam()
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

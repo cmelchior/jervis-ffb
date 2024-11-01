@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.foul
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -38,6 +38,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryC
 import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallResult
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.addIfNotNull
 import kotlinx.serialization.Serializable
 
 
@@ -86,7 +87,7 @@ object FoulAction : Procedure() {
 
     object SelectFoulTargetOrCancel : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val fouler = state.getContext<FoulContext>().fouler
             val availableTargetPlayers = fouler.team.otherTeam().filter {
                 // You cannot foul your own players, so no need to check for STUNNED_OWN_TURN
@@ -115,12 +116,12 @@ object FoulAction : Procedure() {
 
     object MoveOrFoulOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<FoulContext>()
-            val options = mutableListOf<ActionDescriptor>()
+            val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addAll(calculateMoveTypesAvailable(state.activePlayer!!, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(state.activePlayer!!, rules))
 
             // Check if adjacent to target of the Blitz
             if (context.fouler.location.isAdjacent(rules, context.victim!!.location)) {

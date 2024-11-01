@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
@@ -66,7 +66,7 @@ object OfficiousRef : Procedure() {
 
     object KickingTeamRollDie: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
 
@@ -92,7 +92,7 @@ object OfficiousRef : Procedure() {
 
     object ReceivingTeamRollDie: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
 
@@ -116,7 +116,7 @@ object OfficiousRef : Procedure() {
 
     object SelectPlayerFromReceivingTeam: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<OfficiousRefContext>()
             return if (context.kickingTeamResult >= context.receivingTeamResult) {
                 selectFromTeam(state.receivingTeam, rules)
@@ -146,7 +146,7 @@ object OfficiousRef : Procedure() {
     object RollForKickingTeamSelectedPlayer: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
 
@@ -166,7 +166,7 @@ object OfficiousRef : Procedure() {
 
     object SelectPlayerFromKickingTeam: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<OfficiousRefContext>()
             return if (context.kickingTeamResult <= context.receivingTeamResult) {
                 selectFromTeam(state.kickingTeam, rules)
@@ -202,7 +202,7 @@ object OfficiousRef : Procedure() {
     object RollForReceivingTemSelectedPlayer: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
 
@@ -220,7 +220,7 @@ object OfficiousRef : Procedure() {
         }
     }
 
-    private fun selectFromTeam(team: Team, rules: Rules): List<ActionDescriptor> {
+    private fun selectFromTeam(team: Team, rules: Rules): List<GameActionDescriptor> {
         return team
             .filter { it.location.isOnField(rules) }
             .let { players ->

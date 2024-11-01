@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
@@ -56,7 +56,7 @@ object PassStep: Procedure() {
 
     object DeclareTargetSquare: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PassContext>().thrower.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PassContext>()
             val targetSquares = context.thrower.coordinates.getSurroundingCoordinates(rules, rules.rangeRuler.maxDistance)
                 .filter {

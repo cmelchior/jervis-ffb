@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -73,7 +73,7 @@ object Stumble: Procedure() {
 
     object ChooseToUseTackle: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<StumbleContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val stumbleContext = state.getContext<StumbleContext>()
             return if (stumbleContext.attacker.hasSkill<Tackle>()) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
@@ -98,7 +98,7 @@ object Stumble: Procedure() {
 
     object ChooseToUseDodge: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<StumbleContext>().defender.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val stumbleContext = state.getContext<StumbleContext>()
             return if (stumbleContext.defender.hasSkill<Dodge>()) {
                 listOf(ConfirmWhenReady, CancelWhenReady)

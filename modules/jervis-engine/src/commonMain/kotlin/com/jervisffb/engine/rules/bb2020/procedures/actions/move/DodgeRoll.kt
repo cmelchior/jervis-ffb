@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -109,7 +109,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
     object RollDie: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
 
@@ -160,7 +160,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
     object ChooseToUseTwoHeads: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             return if (context.player.hasSkill<TwoHeads>()) {
                 return listOf(ConfirmWhenReady, CancelWhenReady)
@@ -192,7 +192,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
     object ChooseToUseBreakTackle: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             return if (context.player.isSkillAvailable<BreakTackle>()) {
                 return listOf(ConfirmWhenReady, CancelWhenReady)
@@ -228,7 +228,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
     object ChooseToUsePrehensileTail: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team.otherTeam()
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
                 .filter { coord ->
@@ -274,7 +274,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
     object ChooseToUseDivingTackle: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team.otherTeam()
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             val eligiblePlayers = context.startingSquare.getSurroundingCoordinates(rules)
                 .filter { coord ->
@@ -339,7 +339,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
         override fun getAvailableActions(
             state: Game,
             rules: Rules,
-        ): List<ActionDescriptor> {
+        ): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
             val dodgingPlayer = context.player
             val availableReRolls: List<SelectRerollOption> = calculateAvailableRerollsFor(
@@ -404,7 +404,7 @@ import com.jervisffb.engine.commands.compositeCommandOf
         override fun getAvailableActions(
             state: Game,
             rules: Rules,
-        ): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        ): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
 
         override fun applyAction(
             action: GameAction,

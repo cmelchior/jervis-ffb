@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.prayers
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.commands.AddPlayerSkill
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -30,7 +31,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Loner
-import com.jervisffb.engine.commands.compositeCommandOf
 
 data class IntensiveTrainingContext(
     val player: Player,
@@ -48,7 +48,7 @@ object IntensiveTraining : Procedure() {
 
     object SelectPlayer : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return state.activeTeam
                 .filter { it.state == PlayerState.STANDING }
                 .filter { !it.hasSkill<Loner>() }
@@ -67,11 +67,9 @@ object IntensiveTraining : Procedure() {
 
     object SelectSkill : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<IntensiveTrainingContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<IntensiveTrainingContext>()
-            return (context.player.position as BB2020Position).primary.flatMap { it.skills }.map {
-                SelectSkill(it)
-            }
+            return listOf(SelectSkill(skills = (context.player.position as BB2020Position).primary.flatMap { it.skills }))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

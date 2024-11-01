@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
@@ -53,7 +53,7 @@ object ThrowIn : Procedure() {
     object RollDirection : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
 
@@ -76,7 +76,7 @@ object ThrowIn : Procedure() {
 
     object RollDistance : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6, Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

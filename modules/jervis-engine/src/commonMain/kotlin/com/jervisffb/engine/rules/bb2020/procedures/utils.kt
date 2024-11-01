@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectMoveType
@@ -33,7 +33,7 @@ import com.jervisffb.engine.rules.bb2020.skills.Sprint
  *
  * TODO Maybe not ball an chain? :thinking:
  */
-fun calculateMoveTypesAvailable(player: Player, rules: Rules): List<ActionDescriptor> {
+fun calculateMoveTypesAvailable(player: Player, rules: Rules): SelectMoveType? {
 
     val options = mutableListOf<MoveType>()
 
@@ -53,20 +53,20 @@ fun calculateMoveTypesAvailable(player: Player, rules: Rules): List<ActionDescri
         options.add(MoveType.STAND_UP)
     }
 
-    return options.map { SelectMoveType(it) }
+    return if (options.isNotEmpty()) SelectMoveType(options) else null
 }
 
 /**
  * Returns all the reachable squares a player can go to using a specific type of
  * move.
  */
-fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type: MoveType): List<ActionDescriptor> {
+fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type: MoveType): List<GameActionDescriptor> {
     return when (type) {
         MoveType.JUMP -> TODO()
         MoveType.LEAP -> TODO()
         MoveType.STANDARD -> {
             val requiresDodge = rules.calculateMarks(state, player.team, player.coordinates) > 0
-            val eligibleEmptySquares: List<ActionDescriptor> =
+            val eligibleEmptySquares: List<GameActionDescriptor> =
                 if (player.movesLeft + player.rushesLeft > 0) {
                     player.coordinates.getSurroundingCoordinates(rules)
                         .filter { state.field[it].isUnoccupied() }

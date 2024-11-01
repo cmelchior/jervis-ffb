@@ -1,6 +1,6 @@
 package com.jervisffb.engine.fsm
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -19,7 +19,7 @@ abstract class ComputationNode : ActionNode() {
 
     abstract fun apply(state: Game, rules: Rules): Command
 
-    override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+    override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
         return listOf(ContinueWhenReady)
     }
 

@@ -86,7 +86,7 @@ class GameController(
      */
     fun getAvailableActions(): ActionRequest {
         if (stack.isEmpty()) return ActionRequest(null, emptyList())
-        if (stack.currentNode() !is ActionNode || stack.currentNode() is ComputationNode) {
+        if (stack.currentNode() !is ActionNode) {
             throw IllegalStateException("State machine is not waiting at an ActionNode: ${stack.currentNode()}")
         }
         val currentNode: ActionNode = stack.currentNode() as ActionNode

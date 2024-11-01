@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
@@ -61,7 +61,7 @@ object StandardMoveStep: Procedure() {
 
     object SelectTargetSquareOrEndAction: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MoveContext>()
             val player = context.player
             val eligibleSquares = calculateOptionsForMoveType(state, rules, player, MoveType.STANDARD)
@@ -192,7 +192,7 @@ object StandardMoveStep: Procedure() {
 
     object CheckIfShadowingIsAvailable: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team.otherTeam()
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             TODO("Not yet implemented")
         }
 

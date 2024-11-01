@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.EndAction
@@ -96,11 +96,11 @@ object BlockAction : Procedure() {
 
     object SelectDefenderOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val end: List<ActionDescriptor> = listOf(EndActionWhenReady)
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val end: List<GameActionDescriptor> = listOf(EndActionWhenReady)
 
             val attacker = state.activePlayer!!
-            val eligibleDefenders: List<ActionDescriptor> =
+            val eligibleDefenders: List<GameActionDescriptor> =
                 attacker.coordinates.getSurroundingCoordinates(rules)
                     .filter { state.field[it].isOccupied() }
                     .filter { state.field[it].player!!.team != attacker.team }
@@ -128,12 +128,13 @@ object BlockAction : Procedure() {
 
     object SelectBlockType : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockActionContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val attacker = state.getContext<BlockActionContext>().attacker
             val availableBlockTypes = getAvailableBlockType(attacker, true)
-            return availableBlockTypes.map {
-                SelectBlockType(it)
-            } + DeselectPlayer(attacker)
+            return listOf(
+                SelectBlockType(availableBlockTypes),
+                DeselectPlayer(attacker)
+            )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<BlockActionContext>()
@@ -164,7 +165,7 @@ object BlockAction : Procedure() {
                     SetContext(
                         BlockContext(
                         context.attacker,
-                        context.defender!!,
+                            context.defender,
                         isBlitzing = false
                     )
                     )

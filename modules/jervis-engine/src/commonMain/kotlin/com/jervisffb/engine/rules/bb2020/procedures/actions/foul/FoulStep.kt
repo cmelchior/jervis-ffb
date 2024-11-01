@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.foul
 
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -109,7 +109,7 @@ object FoulStep: Procedure() {
 
     object DecideToArgueTheCall: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return if (state.activeTeam.coachBanned) {
                 // If the coach was already banned, they cannot argue the call again.
                 listOf(CancelWhenReady)

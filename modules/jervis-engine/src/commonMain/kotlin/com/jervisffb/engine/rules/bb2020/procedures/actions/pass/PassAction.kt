@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.EndAction
@@ -38,6 +38,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.bb2020.tables.Range
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.addIfNotNull
 import kotlinx.serialization.Serializable
 
 enum class PassingType {
@@ -92,12 +93,12 @@ object PassAction : Procedure() {
 
     object MoveOrPassOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PassContext>()
-            val options = mutableListOf<ActionDescriptor>()
+            val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addAll(calculateMoveTypesAvailable(state.activePlayer!!, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(state.activePlayer!!, rules))
 
             // If holding the ball, the player can start the "Pass" section of the Pass action
             if (context.thrower.hasBall()) {

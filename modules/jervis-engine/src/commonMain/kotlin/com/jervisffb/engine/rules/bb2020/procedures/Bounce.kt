@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
@@ -45,7 +45,7 @@ object Bounce : Procedure() {
 
     object RollDirection : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D8))
         }
 

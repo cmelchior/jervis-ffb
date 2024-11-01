@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.weather
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
@@ -48,7 +48,7 @@ object SwelteringHeat : Procedure() {
 
     object RollForHomeTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -64,7 +64,7 @@ object SwelteringHeat : Procedure() {
 
     object SelectPlayersOnHomeTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val onFieldPlayers = state.homeTeam.filter { it.location.isOnField(rules) }.map { it.id }
             val affectedPlayers = state.getContext<SwelteringHeatContext>().homeRoll!!.value
             return listOf(SelectRandomPlayers(affectedPlayers, onFieldPlayers))
@@ -89,7 +89,7 @@ object SwelteringHeat : Procedure() {
 
     object RollForAwayTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
 
@@ -106,7 +106,7 @@ object SwelteringHeat : Procedure() {
 
     object SelectPlayersOnAwayTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val onFieldPlayers = state.awayTeam.filter { it.location.isOnField(rules) }.map { it.id }
             val affectedPlayers = state.getContext<SwelteringHeatContext>().awayRoll!!.value
             return listOf(SelectRandomPlayers(affectedPlayers, onFieldPlayers))

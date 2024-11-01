@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.DogoutSelected
@@ -51,7 +51,7 @@ object SetupTeam : Procedure() {
 
     object SelectPlayerOrEndSetup : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<SetupTeamContext>().team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<SetupTeamContext>()
             val availablePlayers =
                 context.team.filter {
@@ -82,7 +82,7 @@ object SetupTeam : Procedure() {
 
     object PlacePlayer : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<SetupTeamContext>().team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
             val context = state.getContext<SetupTeamContext>()
@@ -151,7 +151,7 @@ object SetupTeam : Procedure() {
 
     object InformOfInvalidSetup : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<SetupTeamContext>().team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(ConfirmWhenReady)
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

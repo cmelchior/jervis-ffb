@@ -1,72 +1,16 @@
 package com.jervisffb.engine.utils
 
 import com.jervisffb.engine.GameController
-import com.jervisffb.engine.actions.ActionDescriptor
-import com.jervisffb.engine.actions.BlockTypeSelected
-import com.jervisffb.engine.actions.Cancel
-import com.jervisffb.engine.actions.CancelWhenReady
-import com.jervisffb.engine.actions.CoinSideSelected
-import com.jervisffb.engine.actions.CoinTossResult
-import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.ConfirmWhenReady
-import com.jervisffb.engine.actions.Continue
-import com.jervisffb.engine.actions.ContinueWhenReady
-import com.jervisffb.engine.actions.D12Result
-import com.jervisffb.engine.actions.D16Result
-import com.jervisffb.engine.actions.D20Result
-import com.jervisffb.engine.actions.D2Result
-import com.jervisffb.engine.actions.D3Result
-import com.jervisffb.engine.actions.D4Result
-import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.actions.D8Result
-import com.jervisffb.engine.actions.DBlockResult
-import com.jervisffb.engine.actions.DeselectPlayer
-import com.jervisffb.engine.actions.Dice
-import com.jervisffb.engine.actions.DicePoolChoice
-import com.jervisffb.engine.actions.DicePoolResultsSelected
-import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.DieResult
-import com.jervisffb.engine.actions.DirectionSelected
-import com.jervisffb.engine.actions.DogoutSelected
-import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
-import com.jervisffb.engine.actions.EndSetup
-import com.jervisffb.engine.actions.EndSetupWhenReady
-import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.EndTurnWhenReady
-import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.InducementSelected
-import com.jervisffb.engine.actions.MoveTypeSelected
-import com.jervisffb.engine.actions.NoRerollSelected
-import com.jervisffb.engine.actions.PlayerActionSelected
-import com.jervisffb.engine.actions.PlayerDeselected
-import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.RandomPlayersSelected
-import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.RollDice
-import com.jervisffb.engine.actions.SelectBlockType
-import com.jervisffb.engine.actions.SelectCoinSide
-import com.jervisffb.engine.actions.SelectDicePoolResult
-import com.jervisffb.engine.actions.SelectDirection
-import com.jervisffb.engine.actions.SelectDogout
-import com.jervisffb.engine.actions.SelectFieldLocation
-import com.jervisffb.engine.actions.SelectInducement
-import com.jervisffb.engine.actions.SelectMoveType
-import com.jervisffb.engine.actions.SelectNoReroll
-import com.jervisffb.engine.actions.SelectPlayer
-import com.jervisffb.engine.actions.SelectPlayerAction
-import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.engine.actions.SelectSkill
-import com.jervisffb.engine.actions.SkillSelected
-import com.jervisffb.engine.actions.TossCoin
 import com.jervisffb.engine.commands.ResetAvailableTeamRerolls
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
-import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -93,7 +37,6 @@ import com.jervisffb.engine.teamBuilder
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.jvm.JvmName
-import kotlin.random.Random
 
 fun humanTeamAway(): Team {
     return teamBuilder(StandardBB2020Rules, HumanTeam) {
@@ -141,11 +84,11 @@ fun lizardMenAwayTeam(): Team {
 
 fun createRandomAction(
     state: Game,
-    availableActions: List<ActionDescriptor>,
+    availableActions: List<GameActionDescriptor>,
 ): GameAction {
 
     // Select a random action but disallow certain ones
-    var actionDesc: ActionDescriptor? = null
+    var actionDesc: GameActionDescriptor? = null
     val filtered = availableActions.filter { it != EndActionWhenReady }
     if (filtered.isEmpty()) {
         actionDesc = availableActions.random()
@@ -153,67 +96,69 @@ fun createRandomAction(
         actionDesc = filtered.random()
     }
 
-    return when (val action = actionDesc) {
-        ContinueWhenReady -> Continue
-        EndTurnWhenReady -> EndTurn
-        is RollDice -> {
-            val results =
-                action.dice.map {
-                    when (it) {
-                        Dice.D2 -> D2Result()
-                        Dice.D3 -> D3Result()
-                        Dice.D4 -> D4Result()
-                        Dice.D6 -> D6Result()
-                        Dice.D8 -> D8Result()
-                        Dice.D12 -> D12Result()
-                        Dice.D16 -> D16Result()
-                        Dice.D20 -> D20Result()
-                        Dice.BLOCK -> DBlockResult()
-                    }
-                }
-            return DiceRollResults(results)
-        }
-        ConfirmWhenReady -> Confirm
-        EndSetupWhenReady -> EndSetup
-        SelectDogout -> DogoutSelected
-        is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
-        is SelectPlayer -> PlayerSelected(action.player)
-        is DeselectPlayer -> PlayerDeselected(action.player)
-        is SelectPlayerAction -> PlayerActionSelected(action.action.type)
-        EndActionWhenReady -> EndAction
-        CancelWhenReady -> Cancel
-        SelectCoinSide -> {
-            when (Random.nextInt(2)) {
-                0 -> CoinSideSelected(Coin.HEAD)
-                1 -> CoinSideSelected(Coin.TAIL)
-                else -> throw IllegalStateException()
-            }
-        }
-        TossCoin -> {
-            when (Random.nextInt(2)) {
-                0 -> CoinTossResult(Coin.HEAD)
-                1 -> CoinTossResult(Coin.TAIL)
-                else -> throw IllegalStateException()
-            }
-        }
+    return actionDesc.createRandom()
 
-        is SelectRandomPlayers ->
-            RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
-
-        is SelectNoReroll -> NoRerollSelected(action.dicePoolId)
-        is SelectRerollOption -> RerollOptionSelected(action.option)
-        is SelectDicePoolResult -> {
-            DicePoolResultsSelected(action.pools.map { pool ->
-                DicePoolChoice(pool.id, pool.dice.shuffled().subList(0, pool.selectDice).map { it.result })
-            })
-        }
-        is SelectMoveType -> MoveTypeSelected(action.type)
-        is SelectSkill -> SkillSelected(action.skill)
-        is SelectInducement -> InducementSelected(action.id)
-        is SelectBlockType -> BlockTypeSelected(action.type)
-        is SelectDirection -> DirectionSelected(action.directions.random())
-        null -> TODO()
-    }
+//    return when (val action = actionDesc) {
+//        ContinueWhenReady -> Continue
+//        EndTurnWhenReady -> EndTurn
+//        is RollDice -> {
+//            val results =
+//                action.dice.map {
+//                    when (it) {
+//                        Dice.D2 -> D2Result()
+//                        Dice.D3 -> D3Result()
+//                        Dice.D4 -> D4Result()
+//                        Dice.D6 -> D6Result()
+//                        Dice.D8 -> D8Result()
+//                        Dice.D12 -> D12Result()
+//                        Dice.D16 -> D16Result()
+//                        Dice.D20 -> D20Result()
+//                        Dice.BLOCK -> DBlockResult()
+//                    }
+//                }
+//            return DiceRollResults(results)
+//        }
+//        ConfirmWhenReady -> Confirm
+//        EndSetupWhenReady -> EndSetup
+//        SelectDogout -> DogoutSelected
+//        is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
+//        is SelectPlayer -> PlayerSelected(action.player)
+//        is DeselectPlayer -> PlayerDeselected(action.player)
+//        is SelectPlayerAction -> PlayerActionSelected(action.action.type)
+//        EndActionWhenReady -> EndAction
+//        CancelWhenReady -> Cancel
+//        SelectCoinSide -> {
+//            when (Random.nextInt(2)) {
+//                0 -> CoinSideSelected(Coin.HEAD)
+//                1 -> CoinSideSelected(Coin.TAIL)
+//                else -> throw IllegalStateException()
+//            }
+//        }
+//        TossCoin -> {
+//            when (Random.nextInt(2)) {
+//                0 -> CoinTossResult(Coin.HEAD)
+//                1 -> CoinTossResult(Coin.TAIL)
+//                else -> throw IllegalStateException()
+//            }
+//        }
+//
+//        is SelectRandomPlayers ->
+//            RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
+//
+//        is SelectNoReroll -> NoRerollSelected(action.dicePoolId)
+//        is SelectRerollOption -> RerollOptionSelected(action.option)
+//        is SelectDicePoolResult -> {
+//            DicePoolResultsSelected(action.pools.map { pool ->
+//                DicePoolChoice(pool.id, pool.dice.shuffled().subList(0, pool.selectDice).map { it.result })
+//            })
+//        }
+//        is SelectMoveType -> MoveTypeSelected(action.type)
+//        is SelectSkill -> SkillSelected(action.skill)
+//        is SelectInducement -> InducementSelected(action.id)
+//        is SelectBlockType -> BlockTypeSelected(action.type)
+//        is SelectDirection -> DirectionSelected(action.directions.random())
+//        null -> TODO()
+//    }
 }
 
 const val enableAsserts = true
@@ -438,5 +383,21 @@ fun calculateAvailableRerollsFor(
             }
         skillRerolls + teamReroll
     }
+}
+
+/**
+ * Return all combinations of [size] from the list.
+ */
+fun <T> List<T>.combinations(size: Int): List<Set<T>> {
+    if (size == 0) return listOf(emptySet())
+    if (this.size < size) return emptyList()
+
+    return this.withIndex().flatMap { (index, element) ->
+        this.drop(index + 1).combinations(size - 1).map { setOf(element) + it }
+    }
+}
+
+fun MutableList<GameActionDescriptor>.addIfNotNull(descriptor: GameActionDescriptor?) {
+    descriptor?.let { this.add(it)}
 }
 

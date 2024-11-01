@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D3Result
@@ -60,7 +60,7 @@ object PitchInvasion : Procedure() {
 
     object RollForKickingTeamFans : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val fanFactor = state.kickingTeam.fanFactor
@@ -76,7 +76,7 @@ object PitchInvasion : Procedure() {
 
     object RollForReceivingTeamFans : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<PitchInvasionContext>()
@@ -100,7 +100,7 @@ object PitchInvasion : Procedure() {
 
     object RollForReceivingTeamStuns : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D3))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D3))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D3Result>(action) { d3 ->
                 val context = state.getContext<PitchInvasionContext>()
@@ -115,7 +115,7 @@ object PitchInvasion : Procedure() {
 
     object SelectReceivingTeamAffectedPlayers: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PitchInvasionContext>()
             return selectFromTeam(context.receivingPlayersAffected, state.receivingTeam, rules)
         }
@@ -149,7 +149,7 @@ object PitchInvasion : Procedure() {
 
     object RollForKickingTeamStuns : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D3))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D3))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D3Result>(action) { d3 ->
                 val context = state.getContext<PitchInvasionContext>()
@@ -164,7 +164,7 @@ object PitchInvasion : Procedure() {
 
     object SelectKickingTeamAffectedPlayers: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PitchInvasionContext>()
             return selectFromTeam(context.kickingPlayersAffected, state.kickingTeam, rules)
         }
@@ -194,7 +194,7 @@ object PitchInvasion : Procedure() {
         }
     }
 
-    private fun selectFromTeam(affectedPlayers: Int, team: Team, rules: Rules): List<ActionDescriptor> {
+    private fun selectFromTeam(affectedPlayers: Int, team: Team, rules: Rules): List<GameActionDescriptor> {
         return team
             .filter { it.location.isOnField(rules) }
             .let { players ->

@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.blitz
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.EndAction
@@ -51,6 +51,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryM
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.addIfNotNull
 import kotlinx.serialization.Serializable
 
 data class BlitzContext(
@@ -99,7 +100,7 @@ object BlitzAction : Procedure() {
         override fun getAvailableActions(
             state: Game,
             rules: Rules,
-        ): List<ActionDescriptor> {
+        ): List<GameActionDescriptor> {
             val attacker = state.getContext<BlitzContext>().attacker
             val availableTargetPlayers = attacker.team.otherTeam().filter {
                 it.location.isOnField(rules) && it.state == PlayerState.STANDING
@@ -128,13 +129,13 @@ object BlitzAction : Procedure() {
     object MoveOrBlockOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BlitzContext>()
             val blitzer = context.attacker
-            val options = mutableListOf<ActionDescriptor>()
+            val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addAll(calculateMoveTypesAvailable(blitzer, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(blitzer, rules))
 
             // Check if adjacent to target of the Blitz
             val hasMovesLeft = blitzer.movesLeft + blitzer.rushesLeft > 0
@@ -212,12 +213,10 @@ object BlitzAction : Procedure() {
 
     object SelectBlockType : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val attacker = state.getContext<BlitzContext>().attacker
             val availableBlockTypes = BlockAction.getAvailableBlockType(attacker, true)
-            return availableBlockTypes.map {
-                SelectBlockType(it)
-            } + DeselectPlayer(attacker)
+            return listOf(SelectBlockType(availableBlockTypes), DeselectPlayer(attacker))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<BlitzContext>()
@@ -365,10 +364,11 @@ object BlitzAction : Procedure() {
     object RemainingMovesOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlitzContext>().attacker.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val options = mutableListOf<ActionDescriptor>()
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val options = mutableListOf<GameActionDescriptor>()
             // Find possible move types
-            options.addAll(calculateMoveTypesAvailable(state.activePlayer!!, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(state.activePlayer!!, rules))
+
             // End action before the block
             // As soon as a target is selected, you can no longer cancel the action
             // (Ideally this should be allowed until you take the first move)

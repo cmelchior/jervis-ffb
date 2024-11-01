@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.foul
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -52,7 +52,7 @@ object ArgueTheCallRoll: Procedure() {
     object RollDice : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
 
@@ -89,7 +89,7 @@ object ArgueTheCallRoll: Procedure() {
     object ResolveFriendsWithTheReferences : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(ConfirmWhenReady, CancelWhenReady)
         }
 

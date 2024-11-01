@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -43,7 +43,7 @@ object StandardBlockChooseReroll: Procedure() {
 
     object ReRollSourceOrAcceptRoll : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BlockContext>()
             val attackingPlayer = context.attacker
 
@@ -79,7 +79,7 @@ object StandardBlockChooseReroll: Procedure() {
     // ------------------------------------------------------------------------------------------------------------
     // HELPER FUNCTIONS
 
-    fun getRerollOptions(rules: Rules, attackingPlayer: Player, diceRoll: List<BlockDieRoll>): List<ActionDescriptor> {
+    fun getRerollOptions(rules: Rules, attackingPlayer: Player, diceRoll: List<BlockDieRoll>): List<GameActionDescriptor> {
         // Re-rolling block dice can be pretty complex,
         // Brawler: Can reroll a single "Both Down"
         // Pro: Can reroll any single die

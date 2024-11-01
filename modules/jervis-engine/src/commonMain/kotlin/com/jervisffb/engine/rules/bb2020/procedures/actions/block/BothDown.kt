@@ -2,7 +2,7 @@ package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -69,7 +69,7 @@ object BothDown: Procedure() {
 
     object AttackerChooseToUseWrestle: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BothDownContext>()
             // TODO Figure out how to check for Wrestle
             val hasWrestle = false
@@ -96,7 +96,7 @@ object BothDown: Procedure() {
 
     object DefenderChooseToUseWrestle: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().defender.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BothDownContext>()
             // TODO Figure out how to check for Wrestle
             val hasWrestle = false
@@ -123,7 +123,7 @@ object BothDown: Procedure() {
 
     object AttackerChooseToUseBlock: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BothDownContext>()
             val hasBlock = (context.attacker.getSkillOrNull<Block>() != null)
             return when (hasBlock) {
@@ -149,7 +149,7 @@ object BothDown: Procedure() {
 
     object DefenderChooseToUseBlock: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().defender.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BothDownContext>()
             val hasBlock = context.defender.getSkillOrNull<Block>() != null
             return when (hasBlock) {

@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.injury
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -52,7 +52,7 @@ object UseApothecary: Procedure() {
     // TODO Change this to select the type of apothecary instead?
     object ChooseToUseApothecary: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<RiskingInjuryContext>()
             val hasApothecary = context.player.team.teamApothecaries.count { it.type == ApothecaryType.STANDARD && !it.used } > 0
             return when (hasApothecary) {
@@ -98,7 +98,7 @@ object UseApothecary: Procedure() {
      */
     object ApothecaryCasualtyReRoll: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D16))
         }
 
@@ -120,7 +120,7 @@ object UseApothecary: Procedure() {
 
     object ApothecaryLastingInjuryReroll: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
 
@@ -139,7 +139,7 @@ object UseApothecary: Procedure() {
 
     object SelectInjury: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Treat confirm as choosing the rerolled result, cancel as keeping the original result
             return listOf(ConfirmWhenReady, CancelWhenReady)
         }

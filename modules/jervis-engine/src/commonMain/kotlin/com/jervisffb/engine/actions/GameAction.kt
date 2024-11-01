@@ -244,6 +244,7 @@ data class PlayerSubActionSelected(val name: String, val action: GameAction) : G
 @Serializable
 data object DogoutSelected : GameAction
 
+// TODO This should propably also include the origin
 @Serializable
 data class DirectionSelected(val direction: Direction) : GameAction
 

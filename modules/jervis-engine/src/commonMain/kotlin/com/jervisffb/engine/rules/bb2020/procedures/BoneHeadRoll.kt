@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
 import com.jervisffb.engine.commands.buildCompositeCommand
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
@@ -74,7 +74,7 @@ object BoneHeadRoll: Procedure() {
 
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<ActivatePlayerContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val activateContext = state.getContext<ActivatePlayerContext>()
@@ -95,7 +95,7 @@ object BoneHeadRoll: Procedure() {
 
     object ChooseReRollSource : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<BoneHeadRollContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BoneHeadRollContext>()
             val availableRerolls = calculateAvailableRerollsFor(
                 rules = rules,
@@ -143,7 +143,7 @@ object BoneHeadRoll: Procedure() {
 
     object ReRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<BoneHeadRollContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val activateContext = state.getContext<ActivatePlayerContext>()

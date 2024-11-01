@@ -14,6 +14,12 @@ import com.jervisffb.ui.view.ContextMenuOption
 
 class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
     override fun decorate(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectMoveType) {
+        descriptor.type.forEach {
+            handleType(actionProvider, state, snapshot, it)
+        }
+    }
+
+    private fun handleType(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, type: MoveType) {
         val player = state.activePlayer ?: error("No active player")
         val activeLocation = player.location as OnFieldLocation
         val activeSquare = snapshot.fieldSquares[activeLocation] ?: error("No square found: $activeLocation")
@@ -21,7 +27,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
         // For move selection, some types of moves we want to display on the field
         // others should be a specific action that must be selected.
         // On-field moves are shortcutting the Rules engine, so we need to account for that as well
-        when (descriptor.type) {
+        when (type) {
             MoveType.JUMP -> {
                 activeSquare.contextMenuOptions.add(
                     ContextMenuOption(

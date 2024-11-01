@@ -1,7 +1,7 @@
 package com.jervisffb
 
 import androidx.compose.runtime.Composable
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -32,14 +32,14 @@ object Imager {
         return renderScreenshot(width, height) {
             val actionProvider: (
                 Game,
-                List<ActionDescriptor>,
-            ) -> Any = { state: Game, availableActions: List<ActionDescriptor> ->
+                List<GameActionDescriptor>,
+            ) -> Any = { state: Game, availableActions: List<GameActionDescriptor> ->
                 if (availableActions.first() == ContinueWhenReady) {
                     Continue
                 }
             }
             val actionRequestChannel =
-                Channel<Pair<GameController, List<ActionDescriptor>>>(
+                Channel<Pair<GameController, List<GameActionDescriptor>>>(
                     capacity = 1,
                     onBufferOverflow = BufferOverflow.SUSPEND,
                 )
@@ -61,12 +61,12 @@ object Imager {
             val rules = StandardBB2020Rules
             val state = createDefaultGameState(rules)
             val actionRequestChannel =
-                Channel<Pair<GameController, List<ActionDescriptor>>>(
+                Channel<Pair<GameController, List<GameActionDescriptor>>>(
                     capacity = 1,
                     onBufferOverflow = BufferOverflow.SUSPEND,
                 )
             val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
-            val actionProvider = { controller: GameController, availableActions: List<ActionDescriptor> ->
+            val actionProvider = { controller: GameController, availableActions: List<GameActionDescriptor> ->
                 createRandomAction(state, availableActions)
             }
 //            val controller = GameController(rules, state, actionProvider)

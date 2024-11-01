@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.inducements
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -15,10 +15,10 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.inducements.Timing
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.getAvailableAbilities
 import com.jervisffb.engine.rules.bb2020.procedures.getAvailableCards
 import com.jervisffb.engine.rules.bb2020.procedures.getAvailableSpells
-import com.jervisffb.engine.rules.Rules
 
 data class ActivateInducementContext(
     val team: Team,
@@ -43,7 +43,7 @@ object ActivateInducements : Procedure() {
 
     object SelectInducement : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ActivateInducementContext>().team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<ActivateInducementContext>()
             val currentTrigger = context.timing
 
@@ -52,10 +52,12 @@ object ActivateInducements : Procedure() {
                 val specialPlayCards = specialPlayCards.getAvailableCards(currentTrigger, state, rules)
                 val infamousCoachAbilities = infamousCoachingStaff.getAvailableAbilities(currentTrigger, state, rules)
                 spells + specialPlayCards + infamousCoachAbilities
-            }.map { SelectInducement(it.name) } + listOf(CancelWhenReady)
+            }.map { it.name }
 
-            return inducements.ifEmpty {
+            return if (inducements.isEmpty()) {
                 listOf(ContinueWhenReady)
+            } else {
+                listOf(SelectInducement(inducements), CancelWhenReady)
             }
         }
 

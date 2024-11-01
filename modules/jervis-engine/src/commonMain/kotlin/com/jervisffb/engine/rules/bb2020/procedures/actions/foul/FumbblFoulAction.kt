@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.foul
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -35,6 +35,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.addIfNotNull
 import kotlinx.serialization.Serializable
 
 
@@ -70,11 +71,11 @@ object FumbblFoulAction : Procedure() {
 
     object MoveOrFoulOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val options = mutableListOf<ActionDescriptor>()
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addAll(calculateMoveTypesAvailable(state.activePlayer!!, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(state.activePlayer!!, rules))
 
             // Check if adjacent to target of the Blitz
             val foulContext= state.getContext<FoulContext>()

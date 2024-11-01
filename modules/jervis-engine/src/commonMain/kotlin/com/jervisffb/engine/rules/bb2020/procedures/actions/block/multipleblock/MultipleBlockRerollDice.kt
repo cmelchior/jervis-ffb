@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock
 
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -38,7 +38,7 @@ object MultipleBlockRerollDice: Procedure() {
 
     object ReRollSourceOrAcceptRoll : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MultipleBlockContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
             val rerolls = context.rolls.flatMapIndexed { index: Int, actionDiceRoll: MultipleBlockDiceRoll ->
                 if (!actionDiceRoll.hasAcceptedResult()) {

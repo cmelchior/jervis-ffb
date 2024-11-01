@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
@@ -33,7 +33,7 @@ object WeatherRoll : Procedure() {
     object RollWeatherDice : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null // TODO Is this always true, e.g. if called from Kick-off Event
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Each coach should role a dice, but just treat this as a single dice roll here
             return listOf(RollDice(Dice.D6, Dice.D6))
         }

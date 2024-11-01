@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
@@ -55,7 +55,7 @@ object SolidDefense : Procedure() {
 
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
 
@@ -73,7 +73,7 @@ object SolidDefense : Procedure() {
 
     object SelectPlayerOrEndSetup: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Max D3 + 3 players must be selected, including those in the playersMoved list.
             // If player is not already in the playersMoved list, they must be open.
             val context = state.getContext<SolidDefenseContext>()
@@ -109,7 +109,7 @@ object SolidDefense : Procedure() {
 
     object PlacePlayer: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<SolidDefenseContext>()
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
@@ -161,7 +161,7 @@ object SolidDefense : Procedure() {
 
     object InformOfInvalidSetup : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(ConfirmWhenReady)
         }
 

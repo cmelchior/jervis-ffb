@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -43,9 +43,12 @@ object MoveAction : Procedure() {
     object SelectMoveType : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val moveOptions = calculateMoveTypesAvailable(state.activePlayer!!, rules)
-            return moveOptions + listOf(EndActionWhenReady)
+            return buildList {
+                moveOptions?.let { add(it) }
+                add(EndActionWhenReady)
+            }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

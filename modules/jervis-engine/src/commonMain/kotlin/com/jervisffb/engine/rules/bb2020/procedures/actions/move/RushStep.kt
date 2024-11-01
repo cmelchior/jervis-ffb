@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.EndAction
@@ -38,7 +38,7 @@ object RushStep: Procedure() {
 
     object SelectTargetSquareOrCancelStep: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MoveContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val player = state.getContext<MoveContext>().player
             val eligibleSquares = calculateOptionsForMoveType(state, rules, player, MoveType.STANDARD)
             return eligibleSquares + listOf(CancelWhenReady, EndActionWhenReady)

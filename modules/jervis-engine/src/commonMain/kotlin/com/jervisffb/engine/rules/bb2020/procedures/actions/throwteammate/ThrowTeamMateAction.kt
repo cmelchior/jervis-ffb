@@ -1,6 +1,6 @@
 package com.jervisffb.rules.bb2020.procedures.actions.handoff
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -37,6 +37,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.addIfNotNull
 import kotlinx.serialization.Serializable
 
 
@@ -73,12 +74,12 @@ object ThrowTeamMateAction : Procedure() {
 
     object MoveOrHandOffOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ThrowTeamMateContext>().thrower.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<ThrowTeamMateContext>()
-            val options = mutableListOf<ActionDescriptor>()
+            val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addAll(calculateMoveTypesAvailable(context.thrower, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(context.thrower, rules))
 
             // Check if adjacent to a possible receiver
             if (context.thrower.hasBall()) {

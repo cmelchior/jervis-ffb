@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
@@ -47,7 +47,7 @@ object CheeringFans : Procedure() {
 
     object KickingTeamRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
 
@@ -64,7 +64,7 @@ object CheeringFans : Procedure() {
 
     object ReceivingTeamRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

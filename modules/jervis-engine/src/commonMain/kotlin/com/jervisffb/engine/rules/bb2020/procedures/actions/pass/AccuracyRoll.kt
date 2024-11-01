@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
@@ -53,7 +53,7 @@ object AccuracyRoll: Procedure() {
 
     object RollDice : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PassContext>().thrower.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(
             action: GameAction,
             state: Game,
@@ -73,7 +73,7 @@ object AccuracyRoll: Procedure() {
     // Team Reroll, Pro, Catch (only if failed), other skills
     object ChooseReRollSource : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<PassContext>().thrower.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PassContext>()
             val availableRerolls = calculateAvailableRerollsFor(
                 rules,
@@ -121,7 +121,7 @@ object AccuracyRoll: Procedure() {
 
     object ReRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<PassContext>().thrower.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(RollDice(Dice.D6))
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val updatedContext = updatePassContext(state, rules, d6, true)

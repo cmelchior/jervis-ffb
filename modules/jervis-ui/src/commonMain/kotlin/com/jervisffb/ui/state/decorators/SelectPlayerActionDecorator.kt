@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.ui.UiGameSnapshot
@@ -12,11 +13,18 @@ import com.jervisffb.ui.view.ContextMenuOption
 
 class SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
     override fun decorate(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectPlayerAction) {
+        // TODO Fix this, so we do not update each square multiple times
+        descriptor.actions.forEach {
+            handleAction(actionProvider, state, snapshot, it)
+        }
+    }
+
+    private fun handleAction(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, action: PlayerAction) {
         state.activePlayer?.location?.let { location ->
             val oldData = snapshot.fieldSquares[location]!!
             snapshot.fieldSquares[location as FieldCoordinate] =
                 oldData.copyAddContextMenu(
-                    descriptor.action.let {
+                    action.let {
                         val name = when (it.type) {
                             PlayerStandardActionType.MOVE -> "Move"
                             PlayerStandardActionType.PASS -> "Pass"

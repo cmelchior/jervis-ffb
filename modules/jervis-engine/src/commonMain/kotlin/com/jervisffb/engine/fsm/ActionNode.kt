@@ -1,6 +1,6 @@
 package com.jervisffb.engine.fsm
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.Rules
 /**
  * Node type that represents the need of a users "action" to progress.
  *
- * Action "requests" are described using [ActionDescriptor], while the actual user action
+ * Action "requests" are described using [GameActionDescriptor], while the actual user action
  * is represented using a [GameAction]
  */
 abstract class ActionNode : Node {
@@ -23,7 +23,7 @@ abstract class ActionNode : Node {
      * Developer's Commentary:
      * We need to have a way to tell the rest of the system who is responsible for
      * creating the [GameAction]. It might technically be more correct to store this
-     * inside [Game] or the [ActionDescriptor], but either of these approaches
+     * inside [Game] or the [GameActionDescriptor], but either of these approaches
      * would make the code quite a bit more convoluted. So for now, we are just
      * treating it as metadata that are part of a node, similar to [Procedure.initialNode]
      *
@@ -35,7 +35,7 @@ abstract class ActionNode : Node {
     /**
      * Returns the set of valid [GameAction]s that will be accepted by this node.
      */
-    abstract fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor>
+    abstract fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor>
 
     /**
      * Calculate and return all changes that should happen as a consequence of applying a specific

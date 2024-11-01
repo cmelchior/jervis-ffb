@@ -41,7 +41,7 @@ inline fun <reified T : GameAction> ActionNode.checkTypeAndValue(
             is PlayerSelected -> {
                 val hasActionDescriptor = node.getAvailableActions(state, rules)
                     .filterIsInstance<SelectPlayer>()
-                    .firstOrNull { it.player == action.playerId } != null
+                    .firstOrNull { it.players.contains(action.playerId) } != null
                 if (!hasActionDescriptor) {
                     INVALID_ACTION(action, "Player $action wasn't recognised as a valid action: $availableActions")
                 }
@@ -49,7 +49,7 @@ inline fun <reified T : GameAction> ActionNode.checkTypeAndValue(
             is SkillSelected -> {
                 val hasActionDescriptor = node.getAvailableActions(state, rules)
                     .filterIsInstance<SelectSkill>()
-                    .firstOrNull { it.skill == action } != null
+                    .firstOrNull { it.skills.contains(action.skill) } != null
                 if (!hasActionDescriptor) {
                     INVALID_ACTION(action, "Skill wasn't recognised as a valid action: $availableActions")
                 }

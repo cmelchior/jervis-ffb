@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.injury
 
 import com.jervisffb.engine.commands.buildCompositeCommand
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -69,7 +69,7 @@ object PatchUpPlayer: Procedure() {
     // available, but e.g. using Sweatband of Conquest does allow it.
     object ChooseToUseRegeneration: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<RiskingInjuryContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<RiskingInjuryContext>()
             if (context.player.hasSkill<Regeneration>()) {
                 return listOf(
@@ -96,7 +96,7 @@ object PatchUpPlayer: Procedure() {
      */
     object RollRegeneration: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<RiskingInjuryContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -119,7 +119,7 @@ object PatchUpPlayer: Procedure() {
      */
     object ChooseToUseMortuaryAssistant: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<RiskingInjuryContext>()
             val isAvailable = context.player.team.getApothecaries().any {
                 it.type == ApothecaryType.MORTUARY_ASSISTANT && !it.used
@@ -159,7 +159,7 @@ object PatchUpPlayer: Procedure() {
      */
     object ChooseToUsePlagueDoctor: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<RiskingInjuryContext>()
             val isAvailable = context.player.team.getApothecaries().any {
                 it.type == ApothecaryType.PLAGUE_DOCTOR && !it.used
@@ -199,7 +199,7 @@ object PatchUpPlayer: Procedure() {
      */
     object ReRollRegeneration: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<RiskingInjuryContext>().player.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.BlockDicePool
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.GameAction
@@ -37,7 +37,7 @@ object StandardBlockChooseResult: Procedure() {
 
     object SelectBlockResult : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(
                 SelectDicePoolResult(BlockDicePool(state.getContext<BlockContext>().roll))
             )

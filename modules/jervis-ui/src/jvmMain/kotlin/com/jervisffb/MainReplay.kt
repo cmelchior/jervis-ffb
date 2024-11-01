@@ -1,7 +1,7 @@
 package com.jervisffb
 
 import androidx.compose.ui.window.application
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.GameController
 import com.jervisffb.engine.rules.StandardBB2020Rules
@@ -11,7 +11,7 @@ import kotlinx.coroutines.channels.Channel
 fun main() =
     application {
         val actionRequestChannel =
-            Channel<Pair<GameController, List<ActionDescriptor>>>(
+            Channel<Pair<GameController, List<GameActionDescriptor>>>(
                 capacity = 2,
                 onBufferOverflow = BufferOverflow.SUSPEND,
             )

@@ -2,7 +2,7 @@ package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -47,11 +47,11 @@ object StabAction : Procedure() {
 
     object SelectDefenderOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
-            val end: List<ActionDescriptor> = listOf(EndActionWhenReady)
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val end: List<GameActionDescriptor> = listOf(EndActionWhenReady)
 
             val attacker = state.activePlayer!!
-            val eligibleDefenders: List<ActionDescriptor> =
+            val eligibleDefenders: List<GameActionDescriptor> =
                 attacker.coordinates.getSurroundingCoordinates(rules)
                     .filter { state.field[it].isOccupied() }
                     .filter { state.field[it].player!!.team != attacker.team }

@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.EndSetup
@@ -56,7 +56,7 @@ object QuickSnap : Procedure() {
 
     object RollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = null
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -73,7 +73,7 @@ object QuickSnap : Procedure() {
 
     object SelectPlayerOrEndSetup: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Max D3 + 3 players must be selected, once a player has moved, it cannot move again
             val context = state.getContext<QuickSnapContext>()
             return if (context.playersMoved.size >= context.roll.value + 3) {
@@ -106,7 +106,7 @@ object QuickSnap : Procedure() {
 
     object SelectSquare: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<QuickSnapContext>()
             val currentLocation = context.currentPlayer!!.coordinates
             // Player is allowed to move into any square next to it

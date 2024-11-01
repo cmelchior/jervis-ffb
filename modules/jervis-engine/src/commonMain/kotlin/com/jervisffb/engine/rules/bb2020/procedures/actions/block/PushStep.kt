@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -210,7 +210,7 @@ object PushStep: Procedure() {
     // TODO Juggernaut probably doesn't apply to chain pushes?
     object DecideToUseJuggernaut: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.last().pusher.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             val hasJuggernaut = false // How to check?
             val canUseJuggernaut = !context.pushChain.last().usingJuggernaut
@@ -243,7 +243,7 @@ object PushStep: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team? {
             return state.getContext<PushContext>().pushChain.last().pushee.team
         }
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             val hasStandFirm = false // How to check?
             val canUseStandFirm = !context.pushChain.last().usingJuggernaut
@@ -274,7 +274,7 @@ object PushStep: Procedure() {
 
     object DecideToUseGrab: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pusher.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             val hasGrab = false // How to check?
             val canUseGrab = true // TODO Is this true?
@@ -305,7 +305,7 @@ object PushStep: Procedure() {
 
     object DecideToUseSidestep: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pushee.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>().pushChain.last()
             val hasSidestep = context.pushee.hasSkill<SideStep>()
             val validSideStepTargets = context.pushee.coordinates
@@ -339,7 +339,7 @@ object PushStep: Procedure() {
 
     object DecideToUseFend: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pushee.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>().pushChain.last()
             val hasFend = false // How to check?
             val canUseFend = false // How?
@@ -378,7 +378,7 @@ object PushStep: Procedure() {
                 context.pushChain.last().pusher.team
             }
         }
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val pushContext = state.getContext<PushContext>()
             val lastPushInChain = pushContext.pushChain.last()
             // TODO Add support for skills, right now just go with the default 3 options
@@ -513,7 +513,7 @@ object PushStep: Procedure() {
 
     object DecideToFollowUp: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().firstPusher.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             return if (
                 context.firstPusher.hasSkill<Frenzy>() || // Always follow up when having Frenzy

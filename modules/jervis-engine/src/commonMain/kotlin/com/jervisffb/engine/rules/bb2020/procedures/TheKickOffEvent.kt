@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DiceRollResults
@@ -54,7 +54,7 @@ object TheKickOffEvent : Procedure() {
     object RollForKickOffEvent : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6, Dice.D6))
         }
 
@@ -176,7 +176,7 @@ object TheKickOffEvent : Procedure() {
     object TouchBack : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // TODO Handle no valid players, so it will bounce
             return state.receivingTeam.filter {
                 it.hasTackleZones && it.state == PlayerState.STANDING && it.location.isOnField(rules)

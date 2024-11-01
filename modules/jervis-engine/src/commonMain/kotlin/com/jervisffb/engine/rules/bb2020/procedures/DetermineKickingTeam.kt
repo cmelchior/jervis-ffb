@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.CoinSideSelected
@@ -46,7 +46,7 @@ object DetermineKickingTeam : Procedure() {
 
     object SelectCoinSide : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.receivingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(com.jervisffb.engine.actions.SelectCoinSide)
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -61,7 +61,7 @@ object DetermineKickingTeam : Procedure() {
 
     object CoinToss : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules) = state.kickingTeam
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> = listOf(TossCoin)
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(TossCoin)
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<CoinTossResult>(action) { coinToss ->
                 val context = state.getContext<CoinTossContext>()
@@ -81,7 +81,7 @@ object DetermineKickingTeam : Procedure() {
             val context = state.getContext<CoinTossContext>()
             return context.winner!!
         }
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> =
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> =
             listOf(
                 ConfirmWhenReady, /* Chooser becomes kicker */
                 CancelWhenReady, /* Chooser becomes receiver */

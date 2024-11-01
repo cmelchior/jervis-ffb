@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.ActionDescriptor
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.Dice
@@ -55,7 +55,7 @@ object TheKickOff : Procedure() {
             val playersAvailable: MutableList<Player> = mutableListOf(),
         )
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Nominate a player on the center field that should kick the ball
             // If all players are on the line of scrimmage or in the wide zone, a player on the
             // line of scrimmage must be selected.
@@ -108,7 +108,7 @@ object TheKickOff : Procedure() {
     object PlaceTheKick : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Place the ball anywhere on the opposing teams side
             return state.field
                 .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
@@ -218,7 +218,7 @@ object TheFUMBBLKickOff : Procedure() {
     object PlaceTheKick : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Place the ball anywhere on the opposing teams side
             return state.field
                 .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
@@ -240,7 +240,7 @@ object TheFUMBBLKickOff : Procedure() {
     object TheKickDeviates : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
 
-        override fun getAvailableActions(state: Game, rules: Rules): List<ActionDescriptor> {
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D8, Dice.D6))
         }
 
