@@ -1,18 +1,20 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectNoReroll
+import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetOldContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -37,7 +39,6 @@ import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Implement the Accuracy Roll as described on page 49 in the rulebook.
@@ -75,14 +76,14 @@ object AccuracyRoll: Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.getContext<PassContext>().thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PassContext>()
-            val availableRerolls = calculateAvailableRerollsFor(
+            val availableRerolls: SelectRerollOption? = calculateAvailableRerollsFor(
                 rules,
                 context.thrower,
                 DiceRollType.ACCURACY,
                 context.passingRoll!!,
                 null
             )
-            return if (availableRerolls.isEmpty()) {
+            return if (availableRerolls == null) {
                 listOf(ContinueWhenReady)
             } else {
                 listOf(SelectNoReroll(null)) + availableRerolls

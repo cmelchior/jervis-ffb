@@ -1,5 +1,6 @@
 package com.jervisffb.engine.actions
 
+import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
@@ -20,7 +21,7 @@ sealed interface GameAction
 
 /**
  * Game Action that can delay its value until called.
- * This is only for testing and should never be accepted by a `Procedure.
+ * This is only for testing and should never be accepted by a [Procedure].
  */
 class CalculatedAction(private val action: (Game, Rules) -> GameAction) : GameAction {
     fun get(state: Game, rules: Rules): GameAction {
@@ -28,6 +29,7 @@ class CalculatedAction(private val action: (Game, Rules) -> GameAction) : GameAc
     }
 }
 
+// Group multiple actions together as one.
 @Serializable
 data class CompositeGameAction(val list: List<GameAction>): GameAction
 
@@ -291,3 +293,29 @@ data class InducementSelected(val name: String): GameAction
 
 @Serializable
 data class BlockTypeSelected(val type: BlockType): GameAction
+
+// Available actions
+@Serializable
+sealed class DieResult : Number(), GameAction {
+    abstract val value: Int
+    abstract val min: Short
+    abstract val max: Short
+
+    init {
+        if (value < min || value > max) {
+            throw IllegalArgumentException("Result outside range: $min <= $value <= $max")
+        }
+    }
+
+    override fun toByte(): Byte = value.toByte()
+    override fun toDouble(): Double = value.toDouble()
+    override fun toFloat(): Float = value.toFloat()
+    override fun toInt(): Int = value.toInt()
+    override fun toLong(): Long = value.toLong()
+    override fun toShort(): Short = value.toShort()
+    override fun toString(): String {
+        return "${this::class.simpleName}[$value]"
+    }
+
+    fun toLogString(): String = "[$value]"
+}

@@ -1,19 +1,19 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectNoReroll
-import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetOldContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -29,12 +29,10 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
-import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Procedure for handling a Pickup Roll as described on page 46 in the rulebook.
@@ -78,45 +76,18 @@ object PickupRoll : Procedure() {
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PickupRollContext>()
-            val successOnFirstRoll = context.isSuccess
             val pickupPlayer = context.player
-            val availableSkills: List<SelectRerollOption> =
-                pickupPlayer.skills.asSequence()
-                    .filter { it is RerollSource }
-                    .map { it as RerollSource }
-                    .filter { skill -> skill.canReroll(DiceRollType.PICKUP, listOf(context.roll!!), successOnFirstRoll) }
-                    .flatMap { it: RerollSource ->
-                        it.calculateRerollOptions(DiceRollType.PICKUP, context.roll!!, successOnFirstRoll)
-                    }
-                    .map { SelectRerollOption(it) }
-                    .toList()
-
-            val team = pickupPlayer.team
-            val hasTeamRerolls = team.availableRerollCount > 0
-            val allowedToUseTeamReroll =
-                when (team.usedRerollThisTurn) {
-                    true -> rules.allowMultipleTeamRerollsPrTurn
-                    false -> true
-                }
-
-            return if (availableSkills.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
+            val availableRerolls = calculateAvailableRerollsFor(
+                rules,
+                pickupPlayer,
+                DiceRollType.PICKUP,
+                context.roll!!,
+                context.isSuccess
+            )
+            return if (availableRerolls == null) {
                 listOf(ContinueWhenReady)
             } else {
-                val teamReroll =
-                    if (hasTeamRerolls && allowedToUseTeamReroll) {
-                        listOf(
-                            SelectRerollOption(
-                            DiceRerollOption(
-                                rules.getAvailableTeamReroll(
-                                    team
-                                ), context.roll!!
-                            )
-                        )
-                        )
-                    } else {
-                        emptyList()
-                    }
-                listOf(SelectNoReroll(context.isSuccess)) + availableSkills + teamReroll
+                listOf(SelectNoReroll(context.isSuccess)) + availableRerolls
             }
         }
 

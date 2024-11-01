@@ -17,6 +17,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.bb2020.skills.SureFeet
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 object RushRollMapper: CommandActionMapper {
     override fun isApplicable(
@@ -45,29 +46,18 @@ object RushRollMapper: CommandActionMapper {
         } else {
             val rerollReport = command.reportList.reports[1] as ReRollReport
             val rerolResult = command.reportList.reports[2] as GoForItRollReport
-            val source = rerollReport.reRollSource
-
+            val fumbblSource = rerollReport.reRollSource
             newActions.add(
                 action = { state: Game, rules: Rules ->
-                    RushRoll.ChooseReRollSource.getAvailableActions(state, rules).first {
-                        if (it is SelectRerollOption) {
-                            when (source) {
-                                "Team ReRoll" -> (it.option.source is RegularTeamReroll)
-                                "Sure Feet" -> (it.option.source is SureFeet)
-                                else -> false
-                            }
-                        } else {
-                            false
-                        }
-                    }.let {
-                        val option = it as SelectRerollOption
-                        RerollOptionSelected(
-                            DiceRerollOption(
-                                option.option.source,
-                                option.option.dice
-                            )
-                        )
+                    val rerollOptions = RushRoll.ChooseReRollSource.getAvailableActions(state, rules)
+                        .first { it is SelectRerollOption }
+                        .let { it as SelectRerollOption }
+                    val selectedOption = when (fumbblSource) {
+                        "Team ReRoll" -> rerollOptions.options.first { it.source is RegularTeamReroll }
+                        "Sure Feet" -> rerollOptions.options.first { it.source is SureFeet }
+                        else -> INVALID_GAME_STATE("No matching reroll: $rerollOptions")
                     }
+                    RerollOptionSelected(selectedOption)
                 },
                 expectedNode = RushRoll.ChooseReRollSource
             )

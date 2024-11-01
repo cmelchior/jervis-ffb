@@ -4,20 +4,20 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
+import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
+import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.model.PlayerAction
 import com.jervisffb.fumbbl.net.model.reports.BlockRollReport
 import com.jervisffb.fumbbl.net.model.reports.ReRollReport
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
-import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
-import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 
 object BlitzChooseRerollMapper: CommandActionMapper {
     override fun isApplicable(
@@ -49,17 +49,17 @@ object BlitzChooseRerollMapper: CommandActionMapper {
 //        }
         newActions.add(
             action = { state: Game, rules: Rules ->
-                StandardBlockChooseReroll.ReRollSourceOrAcceptRoll.getAvailableActions(state, rules).first {
-                    (it is SelectRerollOption) && (it.option.source is RegularTeamReroll)
-                }.let {
-                    val option = it as SelectRerollOption
-                    RerollOptionSelected(
-                        DiceRerollOption(
-                            option.option.source,
-                            option.option.dice
+                StandardBlockChooseReroll.ReRollSourceOrAcceptRoll.getAvailableActions(state, rules)
+                    .first { it is SelectRerollOption }
+                    .let { (it as SelectRerollOption).options.first { option -> option.source is RegularTeamReroll } }
+                    .let { option ->
+                        RerollOptionSelected(
+                            DiceRerollOption(
+                                option.source,
+                                option.dice
+                            )
                         )
-                    )
-                }
+                    }
             },
             expectedNode = StandardBlockChooseReroll.ReRollSourceOrAcceptRoll
         )

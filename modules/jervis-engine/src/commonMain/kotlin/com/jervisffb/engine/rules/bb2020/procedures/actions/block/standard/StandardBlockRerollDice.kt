@@ -1,14 +1,15 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -29,7 +30,6 @@ import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Use a reroll and then reroll the block dice (if allowed).
@@ -89,13 +89,12 @@ object StandardBlockRerollDice: Procedure() {
         // Brawler: Can reroll a single "Both Down"
         // Pro: Can reroll any single die
         // Team reroll: Can reroll all of them
-        val availableSkills: List<SelectRerollOption> =
+        val availableSkills: List<DiceRerollOption> =
             attackingPlayer.skills
                 .filter { skill: Skill -> skill is RerollSource }
                 .map { it as RerollSource }
                 .filter { it.canReroll(DiceRollType.BLOCK, diceRoll) }
                 .flatMap { it.calculateRerollOptions(DiceRollType.BLOCK, diceRoll) }
-                .map { rerollOption: DiceRerollOption -> SelectRerollOption(rerollOption, dicePoolId) }
 
         val team = attackingPlayer.team
         val hasTeamRerolls = team.availableRerollCount > 0
@@ -110,18 +109,15 @@ object StandardBlockRerollDice: Procedure() {
         } else {
             val teamRerolls = if (hasTeamRerolls && allowedToUseTeamReroll) {
                 listOf(
-                    SelectRerollOption(
-                        option = DiceRerollOption(
-                            rules.getAvailableTeamReroll(team),
-                            diceRoll
-                        ),
-                        dicePoolId = dicePoolId,
-                    )
+                    DiceRerollOption(
+                        rules.getAvailableTeamReroll(team),
+                        diceRoll
+                    ),
                 )
             } else {
                 emptyList()
             }
-            listOf(SelectNoReroll(null, dicePoolId)) + availableSkills + teamRerolls
+            listOf(SelectNoReroll(null, dicePoolId), SelectRerollOption(availableSkills + teamRerolls))
         }
     }
 }

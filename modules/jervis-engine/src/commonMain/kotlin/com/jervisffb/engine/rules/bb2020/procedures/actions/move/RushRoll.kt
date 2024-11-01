@@ -1,11 +1,11 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.RollDice
@@ -14,6 +14,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetOldContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -38,7 +39,6 @@ import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Handle a player rushing a single square.
@@ -129,14 +129,14 @@ import com.jervisffb.engine.commands.compositeCommandOf
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<RushRollContext>()
             val rushingPlayer = context.player
-            val availableReRolls: List<SelectRerollOption> = calculateAvailableRerollsFor(
+            val availableReRolls: SelectRerollOption? = calculateAvailableRerollsFor(
                 rules,
                 rushingPlayer,
                 DiceRollType.RUSH,
                 context.roll!!,
                 context.isSuccess
             )
-            return if (availableReRolls.isEmpty()) {
+            return if (availableReRolls == null) {
                 listOf(ContinueWhenReady)
             } else {
                 listOf(SelectNoReroll(context.isSuccess)) + availableReRolls

@@ -1,10 +1,10 @@
 package com.jervisffb.engine.utils
 
 import com.jervisffb.engine.GameController
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.commands.ResetAvailableTeamRerolls
 import com.jervisffb.engine.commands.SetPlayerLocation
@@ -329,12 +329,12 @@ fun <T : Any?> MutableSharedFlow<T>.safeTryEmit(value: T) {
     }
 }
 
-fun List<Skill>.getRerollActionDescriptors(type: DiceRollType, roll: D6DieRoll, successOnFirstRoll: Boolean?): List<SelectRerollOption> {
+fun List<Skill>.getRerollOptions(type: DiceRollType, roll: D6DieRoll, successOnFirstRoll: Boolean?): List<DiceRerollOption> {
     return this.asSequence().filter { it is RerollSource }
         .map { it as RerollSource }
         .filter { it.canReroll(type, listOf(roll), successOnFirstRoll) }
         .flatMap { it: RerollSource -> it.calculateRerollOptions(type, roll, successOnFirstRoll) }
-        .map { SelectRerollOption(it) }.toList()
+        .toList()
 }
 
 /**
@@ -349,11 +349,11 @@ fun calculateAvailableRerollsFor(
     type: DiceRollType, // Which type of dice roll
     roll: D6DieRoll, // The result of the first dice
     firstRollWasSuccess: Boolean? // Whether the first roll was a success.
-): List<SelectRerollOption> {
+): SelectRerollOption? {
     if (type == DiceRollType.BLOCK) throw IllegalArgumentException("Use XX instead")
 
     // Check any skills available to the player
-    val skillRerolls: List<SelectRerollOption> = player.skills.getRerollActionDescriptors(
+    val skillRerolls: List<DiceRerollOption> = player.skills.getRerollOptions(
         type,
         roll,
         firstRollWasSuccess
@@ -365,23 +365,23 @@ fun calculateAvailableRerollsFor(
     val allowedToUseTeamReroll = rules.canUseTeamReroll(player.team.game, player)
 
     // Calculate the full list of re-roll options
-    return if (skillRerolls.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
+    val allOptions = if (skillRerolls.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
         emptyList()
     } else {
         val teamReroll = if (hasTeamRerolls && allowedToUseTeamReroll) {
                 listOf(
-                    SelectRerollOption(
-                    DiceRerollOption(
-                        rules.getAvailableTeamReroll(
-                            team
-                        ), listOf(roll)
-                    )
-                )
+                    DiceRerollOption(rules.getAvailableTeamReroll(team), listOf(roll))
                 )
             } else {
                 emptyList()
             }
         skillRerolls + teamReroll
+    }
+
+    return if (allOptions.isEmpty()) {
+        null
+    } else {
+        SelectRerollOption(allOptions)
     }
 }
 

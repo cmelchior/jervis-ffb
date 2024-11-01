@@ -1,11 +1,11 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectFieldLocation
@@ -15,6 +15,7 @@ import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetKickingPlayer
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -25,6 +26,7 @@ import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -32,7 +34,6 @@ import com.jervisffb.engine.reports.ReportKickResult
 import com.jervisffb.engine.reports.ReportKickingPlayer
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Do the Kick-Off.
@@ -78,20 +79,16 @@ object TheKickOff : Procedure() {
                     acc
                 }
 
-            val eligiblePlayers: List<SelectPlayer> =
+            val eligiblePlayers: List<PlayerId> =
                 if (players.available > 0) {
-                    players.playersAvailable.map {
-                        SelectPlayer(it)
-                    }
+                    players.playersAvailable.map { it.id }
                 } else {
-                    players.playersOnLoS.map {
-                        SelectPlayer(it)
-                    }
+                    players.playersOnLoS.map { it.id }
                 }
             if (eligiblePlayers.isEmpty()) {
                 INVALID_GAME_STATE("No player available for kicking")
             }
-            return eligiblePlayers
+            return listOf(SelectPlayer(eligiblePlayers))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

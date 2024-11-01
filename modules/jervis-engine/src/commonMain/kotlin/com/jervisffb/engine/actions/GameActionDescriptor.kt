@@ -1,6 +1,7 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameController
+import com.jervisffb.engine.actions.SelectFieldLocation.Type
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
@@ -12,7 +13,6 @@ import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.utils.combinations
-import kotlinx.serialization.Serializable
 
 /**
  * Interface describing all legal [GameAction] events of a certain type that an
@@ -146,6 +146,15 @@ data class SelectDirection(
     override fun createAll(): List<GameAction> = directions.map { DirectionSelected(it) }
 }
 
+
+data class Square(
+    val x: Int,
+    val y: Int,
+    val type: Type,
+    val requiresRush: Boolean = false,
+    val requiresDodge: Boolean = false,
+)
+
 data class SelectFieldLocation private constructor(
     val x: Int,
     val y: Int,
@@ -153,7 +162,7 @@ data class SelectFieldLocation private constructor(
     val requiresRush: Boolean = false,
     val requiresDodge: Boolean = false,
 ) : GameActionDescriptor {
-    // What is causing this field location to be selectable
+
     // This is in order so the UI can filter or show options in different ways.
     enum class Type {
         SETUP,
@@ -258,17 +267,17 @@ data class SelectRandomPlayers(
 }
 
 data class SelectRerollOption(
-    val option: DiceRerollOption,
+    val options: List<DiceRerollOption>,
     // Identifier for the dice pool being rerolled
-    // This is only used in the cases, where you might be juggling multiple dicerolls
-    // at the same time, like during Multiple Block
+    // This is only used in the cases, where you might be juggling multiple dice
+    // rolls at the same time, like during Multiple Block
     val dicePoolId: Int = 0,
 ) : GameActionDescriptor {
-    override fun createRandom(): GameAction {
-        TODO("Not yet implemented")
-    }
+    override fun createRandom(): GameAction = RerollOptionSelected(options.random(), dicePoolId)
     override fun createAll(): List<GameAction> {
-        TODO("Not yet implemented")
+        return options.map {
+            RerollOptionSelected(it, dicePoolId)
+        }
     }
 }
 
@@ -285,36 +294,6 @@ data class SelectNoReroll(
     // at the same time.
     val dicePoolId: Int = 0,
 ) : GameActionDescriptor {
-    override fun createRandom(): GameAction {
-        TODO("Not yet implemented")
-    }
-    override fun createAll(): List<GameAction> {
-        TODO("Not yet implemented")
-    }
-}
-
-// Available actions
-@Serializable
-sealed class DieResult : Number(), GameAction {
-    abstract val value: Int
-    abstract val min: Short
-    abstract val max: Short
-
-    init {
-        if (value < min || value > max) {
-            throw IllegalArgumentException("Result outside range: $min <= $value <= $max")
-        }
-    }
-
-    override fun toByte(): Byte = value.toByte()
-    override fun toDouble(): Double = value.toDouble()
-    override fun toFloat(): Float = value.toFloat()
-    override fun toInt(): Int = value.toInt()
-    override fun toLong(): Long = value.toLong()
-    override fun toShort(): Short = value.toShort()
-    override fun toString(): String {
-        return "${this::class.simpleName}[$value]"
-    }
-
-    fun toLogString(): String = "[$value]"
+    override fun createRandom(): GameAction = NoRerollSelected(dicePoolId)
+    override fun createAll(): List<GameAction> = listOf(NoRerollSelected(dicePoolId))
 }

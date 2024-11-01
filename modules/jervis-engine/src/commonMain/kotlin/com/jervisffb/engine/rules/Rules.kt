@@ -332,6 +332,8 @@ interface Rules {
     /**
      * Returns the best team reroll available.
      * This means using temporary rerolls before using permanent ones
+     * TODO Should we instead return a list here, so players can manually select
+     *  between all the temporary rerolls?
      */
     fun getAvailableTeamReroll(team: Team): RerollSource {
         return team.availableRerolls.last()
