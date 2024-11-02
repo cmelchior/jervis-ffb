@@ -1,9 +1,9 @@
 package com.jervisffb.rules.bb2020.procedures.actions.handoff
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
@@ -129,7 +129,7 @@ object ThrowTeamMateAction : Procedure() {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their hand-off.
             val context = state.getContext<ThrowTeamMateContext>()
-            return if (state.isTurnOver()) {
+            return if (state.endActionImmediately()) {
                 ExitProcedure()
             } else if (!context.thrower.isStanding(rules)) {
                 compositeCommandOf(

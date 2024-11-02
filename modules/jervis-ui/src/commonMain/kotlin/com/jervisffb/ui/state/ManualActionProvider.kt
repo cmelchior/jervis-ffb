@@ -2,7 +2,6 @@ package com.jervisffb.ui.state
 
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameController
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -14,6 +13,7 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.SelectDicePoolResult
@@ -45,6 +45,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
+typealias QueuedActionsGenerator = (GameController) -> QueuedActionsResult?
+
+data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenActions: Boolean = false) {
+    constructor(action: GameAction, delayEvent: Boolean = false): this(listOf(action), delayEvent)
+}
+
 /**
  * Class responsible for enhancing the UI, so it is able to create a [GameAction]
  * that can be sent to the [GameController].
@@ -62,8 +68,10 @@ class ManualActionProvider(
 
     // If a user selected multiple actions, they are all listed here. This queue should be emptied before
     // sending anything else
-    var delayEvents = false
-    val queuedActions = mutableListOf<GameAction>()
+    private var delayBetweenActions = false
+    private val queuedActions = mutableListOf<GameAction>()
+
+    private val queuedActionsGeneratorFuncs = mutableListOf<QueuedActionsGenerator>()
 
     val fieldActionDecorators = mapOf(
         // EndSetupWhenReady -> TODO()
@@ -95,6 +103,22 @@ class ManualActionProvider(
     override fun prepareForNextAction(controller: GameController) {
         this.controller = controller
         this.actions = controller.getAvailableActions()
+
+        // If the UI has registered any queued action generators, we run them first before
+        // trying to find other automated actions.
+        val iter = queuedActionsGeneratorFuncs.iterator()
+        while(iter.hasNext()) {
+            val result = iter.next()(controller)
+            if (result != null) {
+                delayBetweenActions = result.delayBetweenActions
+                queuedActions.addAll(result.actions)
+                iter.remove()
+            }
+        }
+
+        // We only want to check for other automated settings if no queued up actions exists.
+        // This also means that anyone quing up actions, most queue up all intermediate actions
+        // as well.
         if (queuedActions.isEmpty()) {
             automatedAction = calculateAutomaticResponse(controller, controller.getAvailableActions().actions)
         }
@@ -119,16 +143,19 @@ class ManualActionProvider(
     }
 
     override suspend fun getAction(): GameAction {
+
         // Empty queued data if present
         if (queuedActions.isNotEmpty()) {
             val action = queuedActions.removeFirst()
             // Do not pause for flow-control events, only events that would appear "visible"
             // to the player
-            if (action !is MoveTypeSelected && delayEvents) {
+            if (action !is MoveTypeSelected && delayBetweenActions) {
                 delay(150)
             }
             return action
         }
+        delayBetweenActions = false
+
         // Otherwise empty automated response
         // otherwise wait for response
         return automatedAction?.let { action ->
@@ -146,7 +173,7 @@ class ManualActionProvider(
     override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
         // Store all events to be sent and sent the first one to be processed
         queuedActions.addAll(actions)
-        delayEvents = delayEvent
+        delayBetweenActions = delayEvent
         actionScope.launch {
             val action = queuedActions.removeFirst()
             actionSelectedChannel.send(action)
@@ -217,71 +244,6 @@ class ManualActionProvider(
      */
     private fun mapUnknownAction(action: GameActionDescriptor): List<GameAction> {
         return action.createAll()
-//
-//        return when (action) {
-//            CancelWhenReady -> Cancel
-//            ConfirmWhenReady -> Confirm
-//            ContinueWhenReady -> Continue
-//            is DeselectPlayer -> PlayerDeselected(action.player)
-//            EndActionWhenReady -> EndAction
-//            EndSetupWhenReady -> EndSetup
-//            EndTurnWhenReady -> EndTurn
-//            is RollDice -> {
-//                val rolls =
-//                    action.dice.map {
-//                        when (it) {
-//                            Dice.D2 -> D2Result()
-//                            Dice.D3 -> D3Result()
-//                            Dice.D4 -> D4Result()
-//                            Dice.D6 -> D6Result()
-//                            Dice.D8 -> D8Result()
-//                            Dice.D12 -> D12Result()
-//                            Dice.D16 -> D16Result()
-//                            Dice.D20 -> D20Result()
-//                            Dice.BLOCK -> DBlockResult()
-//                        }
-//                    }
-//                if (rolls.size == 1) {
-//                    rolls.first()
-//                } else {
-//                    DiceRollResults(rolls)
-//                }
-//            }
-//            is SelectBlockType -> BlockTypeSelected(action.type)
-//            SelectCoinSide -> {
-//                when (Random.nextInt(2)) {
-//                    0 -> CoinSideSelected(Coin.HEAD)
-//                    1 -> CoinSideSelected(Coin.TAIL)
-//                    else -> throw IllegalStateException("Unsupported value")
-//                }
-//            }
-//            is SelectDicePoolResult -> {
-//                DicePoolResultsSelected(action.pools.map { pool ->
-//                    DicePoolChoice(pool.id, pool.dice.shuffled().subList(0, pool.selectDice).map { it.result })
-//                })
-//            }
-//            SelectDogout -> DogoutSelected
-//            is SelectFieldLocation -> FieldSquareSelected(action.x, action.y)
-//            is SelectInducement -> InducementSelected(action.id)
-//            is SelectMoveType -> MoveTypeSelected(action.type)
-//            is SelectNoReroll -> NoRerollSelected(action.dicePoolId)
-//            is SelectPlayer -> PlayerSelected(action.player)
-//            is SelectPlayerAction -> PlayerActionSelected(action.action.type)
-//            is SelectRandomPlayers -> {
-//                RandomPlayersSelected(action.players.shuffled().subList(0, action.count))
-//            }
-//            is SelectRerollOption -> RerollOptionSelected(action.option)
-//            is SelectSkill -> SkillSelected(action.skill)
-//            TossCoin -> {
-//                when (Random.nextInt(2)) {
-//                    0 -> CoinTossResult(Coin.HEAD)
-//                    1 -> CoinTossResult(Coin.TAIL)
-//                    else -> throw IllegalStateException("Unsupported value")
-//                }
-//            }
-//
-//            is SelectDirection -> action.directions.random().let { DirectionSelected(it) }
-//        }
     }
 
     private fun mapUnknownAction(actions: List<GameActionDescriptor>): List<GameAction> {
@@ -358,6 +320,20 @@ class ManualActionProvider(
         }
 
         return null
+    }
+
+    /**
+     * Allow the UI to register a queued action generator, that will run at a
+     * later stage. This is useful if the UI wants to generate a chain of actions, but some
+     * of the intermediate action are unknown.
+     *
+     * E.g. when standing up to move, the coach might (or might not) have to
+     * roll for Negatraits or just Standing Up, before being allowed to move.
+     * In this case, we will register an action generator that only trigger
+     * once the player can actually move.
+     */
+    fun registerQueuedActionGenerator(function: QueuedActionsGenerator) {
+        queuedActionsGeneratorFuncs.add(function)
     }
 }
 

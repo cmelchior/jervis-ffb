@@ -25,6 +25,10 @@ import com.jervisffb.engine.utils.combinations
  * @see [GameController.getAvailableActions]
  */
 sealed interface GameActionDescriptor {
+
+    // Returns how many GameActions are described by this descriptor
+//    val size: Int
+
     /**
      * Creates a random game action from the pool of actions described by this
      * descriptor.

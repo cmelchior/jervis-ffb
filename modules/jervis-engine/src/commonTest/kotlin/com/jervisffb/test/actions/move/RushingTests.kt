@@ -54,7 +54,7 @@ class RushingTests: JervisGameTest() {
             1.d6,
         )
         val reroll = RerollOptionSelected(
-            option = (controller.getAvailableActions().actions.last() as SelectRerollOption).option
+            option = (controller.getAvailableActions().actions.last() as SelectRerollOption).options.first()
         )
         controller.rollForward(
             reroll,

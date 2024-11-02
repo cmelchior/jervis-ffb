@@ -1,14 +1,15 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetActivePlayer
 import com.jervisffb.engine.commands.SetAvailableActions
+import com.jervisffb.engine.commands.SetAvailableSpecialActions
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetHasTackleZones
 import com.jervisffb.engine.commands.SetPlayerAvailability
@@ -33,6 +34,8 @@ import com.jervisffb.engine.model.modifiers.TemporaryEffectType
 import com.jervisffb.engine.reports.ReportActionEnded
 import com.jervisffb.engine.reports.ReportActionSelected
 import com.jervisffb.engine.rules.PlayerAction
+import com.jervisffb.engine.rules.PlayerSpecialActionType
+import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.AnimalSavagery
 import com.jervisffb.engine.rules.bb2020.skills.BloodLust
@@ -99,42 +102,43 @@ object ActivatePlayer : Procedure() {
             add(SetActivePlayer(null))
 
             // If the action was considered "used", we should remove it from the pool
-            // of available actions
-            if (context.markActionAsUsed) {
+            // of available actions. If an action was ended prematurely (either due
+            // to a turnover or failing some roll), the action is always considered used.
+            if (context.markActionAsUsed || state.endActionImmediately()) {
                 val activeTeam = state.activeTeam
                 val markActionAsUsedCommand = when (val type = context.declaredAction!!.type) {
-                    com.jervisffb.engine.rules.PlayerStandardActionType.MOVE -> SetAvailableActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerStandardActionType.MOVE)
-                    com.jervisffb.engine.rules.PlayerStandardActionType.PASS -> SetAvailableActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerStandardActionType.PASS)
-                    com.jervisffb.engine.rules.PlayerStandardActionType.HAND_OFF -> SetAvailableActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerStandardActionType.HAND_OFF)
-                    com.jervisffb.engine.rules.PlayerStandardActionType.BLOCK -> SetAvailableActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerStandardActionType.BLOCK)
-                    com.jervisffb.engine.rules.PlayerStandardActionType.BLITZ -> SetAvailableActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerStandardActionType.BLITZ)
-                    com.jervisffb.engine.rules.PlayerStandardActionType.FOUL -> SetAvailableActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerStandardActionType.FOUL)
-                    com.jervisffb.engine.rules.PlayerStandardActionType.SPECIAL -> null
-                    com.jervisffb.engine.rules.PlayerSpecialActionType.BALL_AND_CHAIN -> TODO()
-                    com.jervisffb.engine.rules.PlayerSpecialActionType.BOMBARDIER -> TODO()
-                    com.jervisffb.engine.rules.PlayerSpecialActionType.BREATHE_FIRE -> TODO()
-                    com.jervisffb.engine.rules.PlayerSpecialActionType.CHAINSAW -> TODO()
-                    com.jervisffb.engine.rules.PlayerSpecialActionType.HYPNOTIC_GAZE -> TODO()
-                    com.jervisffb.engine.rules.PlayerSpecialActionType.KICK_TEAM_MATE -> TODO()
-                    com.jervisffb.engine.rules.PlayerSpecialActionType.MULTIPLE_BLOCK -> {
+                    PlayerStandardActionType.MOVE -> SetAvailableActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerStandardActionType.MOVE)
+                    PlayerStandardActionType.PASS -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.PASS)
+                    PlayerStandardActionType.HAND_OFF -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.HAND_OFF)
+                    PlayerStandardActionType.BLOCK -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.BLOCK)
+                    PlayerStandardActionType.BLITZ -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.BLITZ)
+                    PlayerStandardActionType.FOUL -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.FOUL)
+                    PlayerStandardActionType.THROW_TEAM_MATE -> TODO()
+                    PlayerStandardActionType.SPECIAL -> null
+                    PlayerSpecialActionType.BALL_AND_CHAIN -> TODO()
+                    PlayerSpecialActionType.BOMBARDIER -> TODO()
+                    PlayerSpecialActionType.BREATHE_FIRE -> TODO()
+                    PlayerSpecialActionType.CHAINSAW -> TODO()
+                    PlayerSpecialActionType.HYPNOTIC_GAZE -> TODO()
+                    PlayerSpecialActionType.KICK_TEAM_MATE -> TODO()
+                    PlayerSpecialActionType.MULTIPLE_BLOCK -> {
                         compositeCommandOf(
                             SetSpecialActionSkillUsed(player, player.getSkill<MultipleBlock>(), true),
-                            com.jervisffb.engine.commands.SetAvailableSpecialActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerSpecialActionType.MULTIPLE_BLOCK)
+                            SetAvailableSpecialActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerSpecialActionType.MULTIPLE_BLOCK)
                         )
                     }
-                    com.jervisffb.engine.rules.PlayerSpecialActionType.PROJECTILE_VOMIT -> {
+                    PlayerSpecialActionType.PROJECTILE_VOMIT -> {
                         compositeCommandOf(
                             SetSpecialActionSkillUsed(player, player.getSkill<ProjectileVomit>(), true),
-                            com.jervisffb.engine.commands.SetAvailableSpecialActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerSpecialActionType.PROJECTILE_VOMIT)
+                            SetAvailableSpecialActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerSpecialActionType.PROJECTILE_VOMIT)
                         )
                     }
-                    com.jervisffb.engine.rules.PlayerSpecialActionType.STAB -> {
+                    PlayerSpecialActionType.STAB -> {
                         compositeCommandOf(
                             SetSpecialActionSkillUsed(player, player.getSkill<Stab>(), true),
-                            com.jervisffb.engine.commands.SetAvailableSpecialActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerSpecialActionType.STAB)
+                            SetAvailableSpecialActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerSpecialActionType.STAB)
                         )
                     }
-                    com.jervisffb.engine.rules.PlayerStandardActionType.THROW_TEAM_MATE -> TODO()
                 }
                 if (markActionAsUsedCommand != null) add(markActionAsUsedCommand)
                 add(ReportActionEnded(state.activePlayer!!, context.declaredAction))
@@ -145,10 +149,10 @@ object ActivatePlayer : Procedure() {
             // player to be activated again if they haven't done anything else that
             // is considered irreversible.
             if (
-                player.available == com.jervisffb.engine.model.Availability.IS_ACTIVE &&
+                player.available == Availability.IS_ACTIVE &&
                 (context.clearedNegativeEffects || context.rolledForNegaTrait)
             ) {
-                add(SetPlayerAvailability(player, com.jervisffb.engine.model.Availability.AVAILABLE))
+                add(SetPlayerAvailability(player, Availability.AVAILABLE))
             }
         }
     }
@@ -197,7 +201,6 @@ object ActivatePlayer : Procedure() {
 //         Hypnotic Gaze (Its own action)
 //         Breathe Fire (replace block or block part of blitz, once pr. activation)
 
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val allActions = SelectPlayerAction(actions = rules.getAvailableActions(state, state.activePlayer!!))
             val availableActions: SelectPlayerAction = allActions.actions
@@ -218,7 +221,6 @@ object ActivatePlayer : Procedure() {
                         ExitProcedure(),
                     )
                 is PlayerActionSelected -> {
-
                     val selectedAction = rules.teamActions[action.action]
                     val hasNegaTrait = hasNegaTrait(activePlayer)
                     compositeCommandOf(
@@ -382,7 +384,7 @@ object ActivatePlayer : Procedure() {
                    GotoNode(ResolveBloodLustAtEndOfActivation)
             } else {
                 return compositeCommandOf(
-                    SetPlayerAvailability(state.activePlayer!!, if (context.markActionAsUsed) Availability.HAS_ACTIVATED else Availability.AVAILABLE),
+                    SetPlayerAvailability(state.activePlayer!!, if (context.markActionAsUsed || context.activationEndsImmediately) Availability.HAS_ACTIVATED else Availability.AVAILABLE),
                     ExitProcedure()
                 )
             }

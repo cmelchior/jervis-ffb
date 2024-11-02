@@ -299,6 +299,8 @@ inline fun <reified T: Skill> Player.isSkillAvailable(): Boolean {
         if (!hasTackleZones && !skill.workWithoutTackleZones) {
             return@let false
         }
+
+        // TODO Is a Stunned player considered Prone or are they completely separate?
         if ((state == PlayerState.PRONE || state == PlayerState.STUNNED || state == PlayerState.STUNNED_OWN_TURN) && !skill.workWhenProne) {
             return@let false
         }

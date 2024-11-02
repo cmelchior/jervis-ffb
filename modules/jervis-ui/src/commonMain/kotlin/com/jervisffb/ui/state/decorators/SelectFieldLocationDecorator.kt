@@ -4,10 +4,10 @@ import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.model.Game
 import com.jervisffb.ui.UiGameSnapshot
-import com.jervisffb.ui.state.UiActionProvider
+import com.jervisffb.ui.state.ManualActionProvider
 
 class SelectFieldLocationDecorator: FieldActionDecorator<SelectFieldLocation> {
-    override fun decorate(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectFieldLocation) {
+    override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectFieldLocation) {
         val selectedAction = {
             actionProvider.userActionSelected(FieldSquareSelected(descriptor.coordinate))
         }

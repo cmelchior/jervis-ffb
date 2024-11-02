@@ -116,6 +116,7 @@ tests covering the particular feature.
   - [ ] Reset at half time
   - [ ] Carry over into Extra Time
   - [ ] Leader
+  - [ ] Can be used to reroll types of rolls
 - [ ] Dodging
 - [ ] Deviating Ball
 - [ ] Scatter Ball
@@ -146,10 +147,19 @@ tests covering the particular feature.
   - [x] Starting a move action while prone and aborting it again doesn't mark player as used
   - [x] Moving any square mark the action as "used".
   - [x] Action doesn't end when no more "normal move" is left, only when all rushes are also used.
-- [ ] Stand Up
-  - [ ] Must stand up before moving 
-  - [ ] Standup with less than 3 strength requires a roll and use all move.
-  - [ ] Failing stand-up roll ends action and uses player action
+- [x] Stand Up
+  - [x] Must stand up doing any action
+  - [x] Standing up uses 3 move
+  - [x] Standup with less than 3 strength requires a roll and use all move.
+  - [x] Failing stand-up roll ends action and uses player action
+    - [x] Move
+    - [x] Block
+    - [x] Blitz
+    - [x] Pass
+    - [x] HandOff
+    - [x] Foul
+    - [ ] Throw Teammate
+    - [ ] Special actions
 - [x] Dodge
   - [x] Moving away from marking player requires a dodge roll.
   - [x] Moving away from non-marking player is free.

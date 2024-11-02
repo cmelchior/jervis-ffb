@@ -1,11 +1,11 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.blitz
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -191,21 +191,22 @@ object BlitzAction : Procedure() {
             //  This logic will probably also override scoring turn overs
             val moveContext = state.getContext<MoveContext>()
             val blitzContext = state.getContext<BlitzContext>()
-            return if (!blitzContext.attacker.isStanding(rules) && !state.isTurnOver()) {
+            val endNow = state.endActionImmediately()
+            return if (!blitzContext.attacker.isStanding(rules) && !endNow) {
                 compositeCommandOf(
                     if (moveContext.hasMoved) SetContext(blitzContext.copy(hasMoved = true)) else null,
                     RemoveContext<MoveContext>(),
                     SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()
                 )
-            } else if (!state.isTurnOver()) {
+            } else if (!endNow) {
                 compositeCommandOf(
                     if (moveContext.hasMoved) SetContext(blitzContext.copy(hasMoved = true)) else null,
                     RemoveContext<MoveContext>(),
                     GotoNode(if (blitzContext.hasBlocked) RemainingMovesOrEndAction else MoveOrBlockOrEndAction)
                 )
             } else {
-                // Some turn-over happened in the sub-procedure somehow
+                // Something caused Blitz to end prematurely.
                 ExitProcedure()
             }
         }

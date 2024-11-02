@@ -6,7 +6,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.Location
 
 class SetPlayerLocation(val player: Player, val location: Location) : Command {
-    private lateinit var originalPlayerLocation: Location
+    lateinit var originalPlayerLocation: Location
     private var originalPlayerOnField: Player? = null
 
     override fun execute(state: Game) {

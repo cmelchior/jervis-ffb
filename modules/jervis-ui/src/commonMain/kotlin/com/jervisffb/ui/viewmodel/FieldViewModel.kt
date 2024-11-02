@@ -1,17 +1,19 @@
 package com.jervisffb.ui.viewmodel
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.layout.LayoutCoordinates
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.animations.JervisAnimation
 import com.jervisffb.ui.model.UiFieldSquare
+import com.jervisffb.ui.state.ManualActionProvider
+import com.jervisffb.ui.state.QueuedActionsResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,44 +71,67 @@ class FieldViewModel(
             // square and annotate the path towards it as well. These decorations take precedence
             // over already existing move decorations.
             val activePlayer: Player? = uiSnapshot.game.activePlayer
+            val requiresStandingUp = (activePlayer?.state == PlayerState.PRONE)
 
             // Clear all existing highlight data.
             uiSnapshot.clearHoverData()
 
+            // Use path finder
             uiSnapshot.pathFinder?.let { pathFinder ->
-                if (
-                    activePlayer != null &&
-                    mouseEnter != null &&
-                    activePlayer.coordinates != mouseEnter &&
-                    activePlayer.movesLeft > 0 &&
-                    rules.calculateMarks(game, activePlayer.team, activePlayer.coordinates) <= 0
-                ) {
-                    val path: List<FieldCoordinate> = pathFinder.getClosestPathTo(mouseEnter, activePlayer.movesLeft)
+                if (showPathFinder(activePlayer, mouseEnter)) {
+                    val standingUpPenalty = if (requiresStandingUp) rules.moveRequiredForStandingUp else 0
+                    // TODO This logic fails when Undo'ing. Figure out why.
+                    val path: List<FieldCoordinate> = pathFinder.getClosestPathTo(mouseEnter!!, (activePlayer!!.movesLeft - standingUpPenalty))
 
                     // Create the action triggered if clicking the mouse-over field.
                     val action = {
-                        // If a path consists of only 1 step, always execute it, since
-                        // we assume the user wants to execute it.
-                        val selectedSquares = path.map {
-                            CompositeGameAction(
-                                listOf(MoveTypeSelected(MoveType.STANDARD), FieldSquareSelected(it))
-                            )
-                        }
-                        if (selectedSquares.size == 1) {
-                            uiState.userSelectedAction(selectedSquares.first())
-                        } else {
-                            uiState.userSelectedMultipleActions(selectedSquares)
-                        }
-                    }
+                        val actionProvider = (uiState.actionProvider as ManualActionProvider)
 
-                    // Annotate all fields + add action on target square
+
+                        fun getQueuedActionsForPath(): QueuedActionsResult {
+                            val selectedSquares = path.map {
+                                CompositeGameAction(
+                                    listOf(MoveTypeSelected(MoveType.STANDARD), FieldSquareSelected(it))
+                                )
+                            }
+                            return if (selectedSquares.size == 1) {
+                                QueuedActionsResult(selectedSquares.first())
+                            } else {
+                                QueuedActionsResult(selectedSquares, true)
+                            }
+                        }
+
+                        if (requiresStandingUp) {
+                            // If the player is about to stand up, there is room for uncertainty
+                            // in which game actions to queue up, as the player might have to roll
+                            // and reroll for it. In that case, we just stand up first, and queue
+                            // up all move actions up until the player can actually move.
+                            actionProvider.registerQueuedActionGenerator { controller ->
+                                if (controller.getAvailableActions().contains(MoveType.STANDARD)) {
+                                    getQueuedActionsForPath()
+                                } else {
+                                    null
+                                }
+                            }
+                            // Trigger Stand-up
+                            actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP))
+                        } else {
+                            // Nothing should prevent the player from moving straight away, so
+                            // just queue up all pathfinder data directly.
+                            actionProvider.userMultipleActionsSelected(getQueuedActionsForPath().actions)
+                        }
+                   }
+
+                    // Annotate all fields with "Move Used" amount + add action on the square
+                    // that is currently being hovered over.
+                    val standingUpModifier = if (requiresStandingUp) rules.moveRequiredForStandingUp else 0
                     val currentMovesLeft = activePlayer.move - activePlayer.movesLeft
                     path.forEachIndexed { index, pathSquare ->
                         val currentSquareData = uiSnapshot.fieldSquares[pathSquare]!!
 
-                        val shownMoveValue = when(index) {
-                            0 -> currentMovesLeft + index + 1
-                            else -> currentMovesLeft + index + 1
+                        val shownMoveValue = when (index) {
+                            0 -> currentMovesLeft + index + 1 + standingUpModifier
+                            else -> currentMovesLeft + index + 1 + standingUpModifier
                         }
 
                         uiSnapshot.fieldSquares[pathSquare] = currentSquareData.copy(
@@ -121,6 +146,17 @@ class FieldViewModel(
             uiSnapshot.fieldSquares.toMap()
         }
     }
+
+    private fun showPathFinder(
+        activePlayer: Player?,
+        mouseEnter: FieldCoordinate?
+    ): Boolean = (
+        activePlayer != null &&
+        mouseEnter != null &&
+        activePlayer.coordinates != mouseEnter &&
+        activePlayer.movesLeft > 0 &&
+        rules.calculateMarks(game, activePlayer.team, activePlayer.coordinates) <= 0
+    )
 
     fun finishAnimation() {
         uiState.notifyAnimationDone()

@@ -14,13 +14,13 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectDicePoolResult
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassContext
-import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.model.Direction
 
 /**
  * Class wrapping the intent to show a dialog for a dice roll involving multiple dice.
@@ -317,6 +317,15 @@ class DiceRollUserInputDialog(
             return DiceRollUserInputDialog(
                 title = "Officious Ref Player Roll",
                 message = "${player.name} rolls a D6 while arguing with the Ref",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { _: DiceRollResults -> null }
+            )
+        }
+
+        fun createStandingUpRollDialog(player: Player): UserInputDialog {
+            return DiceRollUserInputDialog(
+                title = "Standing up Roll",
+                message = "Roll D6 for ${player.name} to stand up.",
                 dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
                 result = { _: DiceRollResults -> null }
             )

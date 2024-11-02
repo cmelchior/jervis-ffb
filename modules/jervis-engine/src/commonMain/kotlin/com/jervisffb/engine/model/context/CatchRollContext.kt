@@ -11,6 +11,5 @@ data class CatchRollContext(
     val roll: D6DieRoll? = null,
     val isSuccess: Boolean = false
 ) : ProcedureContext {
-    fun diceModifier(): Int = modifiers.sumOf { it.modifier }
     val rerolled: Boolean = roll?.rerollSource != null && roll.rerolledResult != null
 }

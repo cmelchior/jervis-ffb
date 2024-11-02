@@ -22,11 +22,17 @@ class UiGameDecorations {
     private val undostack: MutableMap<Int, () -> Unit> = mutableMapOf()
     private val blodspots: MutableMap<FieldCoordinate, BloodSpot> = mutableMapOf()
 
+    private var usedMoveToStandUp: Int? = null
     private val movesUsed: MutableList<MoveUsed> = mutableListOf()
+
+    // Track when standing up, so we can adjust showing "Move Used" decorator
+    fun addMoveUsedToStandUp(move: Int) {
+        usedMoveToStandUp = move
+    }
 
     fun addMoveUsed(coordinate: Location) {
         if (coordinate !is FieldCoordinate) TODO("Missing support for $coordinate")
-        movesUsed.add(MoveUsed(coordinate, movesUsed.size))
+        this.movesUsed.add(MoveUsed(coordinate, movesUsed.size + (usedMoveToStandUp ?: 0)))
     }
 
     fun getMoveUsedOrNull(coordinate: FieldCoordinate): Int? {
@@ -43,6 +49,7 @@ class UiGameDecorations {
     }
 
     fun resetMovesUsed() {
+        usedMoveToStandUp = null
         movesUsed.clear()
     }
 

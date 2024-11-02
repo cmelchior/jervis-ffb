@@ -222,6 +222,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
                 goal: FieldCoordinate,
                 maxMove: Int,
             ): List<FieldCoordinate> {
+                if (maxMove < 0) throw IllegalArgumentException("Illegal max move: $maxMove")
                 if (distances.containsKey(goal)) {
                     return reconstructPath(cameFrom, goal, maxMove)
                 } else {

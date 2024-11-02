@@ -485,4 +485,11 @@ interface Rules {
 //    val wideZone = 2
 //    val endZone = 1
 //    val lineOfScrimmage = 7
+
+    // Dice roll targets defined in the rulebook
+    val standingUpTarget
+        get() = 4 // See page 44
+
+    val moveRequiredForStandingUp
+        get() = 3
 }

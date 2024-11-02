@@ -30,30 +30,33 @@ import com.jervisffb.engine.rules.bb2020.procedures.Pickup
  *  - Jump
  *  - Leap
  *
- *  Turnovers are handled in procedures calling this one.
+ *  Turnovers are handled in the procedures that called this one.
  *
  *  --------------
  *  Developer's Notes:
  *
- *  To make it easier to handle each type, it is required to select
- *  the type before choosing the target.
+ *  To make it easier to handle the different kinds of movement, it is required
+ *  to select the type before choosing the target.
  *
- *  This means a normal move is represented as [NormalMove, (x,y), NormalMove, (x1, y1), ...].
+ *  This means a normal move is represented as
+ *  [MoveType.STANDARD, Square(x,y), MoveType.STANDARD, Square(x1, y1), ...]
  *
  * The other option would have been to calculate all possible targets and
- * then enhance the field location with type data. This was considered, but
- * rejected, because it would lead to a lot of calculations on each move.
+ * then enhance the field location with that type data. This was considered, but
+ * rejected, because it would lead to a lot of calculations on each move,
+ * especially if you also want to support the UI moving multiple steps in one go.
  *
- * Mixing the two would fundamentally mean that UI logic bleeds into this
+ * Mixing the two would fundamentally mean that UI logic bleeds into the rules
  * layer, which is also not desirable.
  *
- * The FUMBBL Client mixes the two options as e.g. rushes are shown on the field,
- * but you have to choose Jump as an action. The Jervis UI can choose which
- * route to go by using automated actions instead. Which allows us to change the
- * UI without touching this layer.
+ * Even though the move logic looks a little more ugly due to this, we can
+ * hide it in the UI layer using automated actions.
+ *
+ * The FUMBBL Client also has different UI for e.g., rushing (yellow square) vs.
+ * Jump (context menu action).
  *
  * Jumping are handled in [JumpStep]
- * Standing up are handled in [StandUpStep]
+ * Standing up are handled in [StandingUpStep]
  */
 object ResolveMoveTypeStep : Procedure() {
     override fun isValid(state: Game, rules: Rules) {
@@ -68,7 +71,7 @@ object ResolveMoveTypeStep : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return when(val moveType = state.getContext<MoveContext>().moveType) {
                 MoveType.STANDARD -> StandardMoveStep
-                MoveType.STAND_UP -> StandUpStep
+                MoveType.STAND_UP -> StandingUpStep
                 MoveType.JUMP,
                 MoveType.LEAP -> TODO("Not supported: $moveType")
             }
@@ -77,6 +80,7 @@ object ResolveMoveTypeStep : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
             val activeContext = state.getContext<ActivatePlayerContext>()
+            val endNow = activeContext.activationEndsImmediately || state.isTurnOver()
             val player = moveContext.player
             val pickupBall = (
                 player.isStanding(rules) &&
@@ -84,7 +88,7 @@ object ResolveMoveTypeStep : Procedure() {
                 state.field[player.location as FieldCoordinate].balls.all { it.state == BallState.ON_GROUND }
             )
 
-            return if (pickupBall && !state.isTurnOver()) {
+            return if (pickupBall && !endNow) {
                 compositeCommandOf(
                     if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
                     GotoNode(PickUpBall)

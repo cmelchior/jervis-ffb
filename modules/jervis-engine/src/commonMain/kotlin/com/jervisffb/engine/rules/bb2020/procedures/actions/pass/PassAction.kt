@@ -1,11 +1,11 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
@@ -141,9 +141,9 @@ object PassAction : Procedure() {
                 if (moveContext.hasMoved) {
                     add(SetContext(context.copy(hasMoved = true)))
                 }
-                if (state.isTurnOver()) {
+                if (state.endActionImmediately()) {
                     add(ExitProcedure())
-                } else if (!context.thrower.isStanding(rules)) {
+                } else if (!rules.isStanding(context.thrower)) {
                     add(SetTurnOver(TurnOver.STANDARD))
                     add(ExitProcedure())
                 } else {

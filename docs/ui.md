@@ -8,7 +8,10 @@ things as they come up.
 
 
 ## Todo List
-- [ ] Standup and end movement as a single action (UI only).
+- [ ] Filter actions that cannot be used because they cannot select a target
+  - Foul
+  - Block if Prone (but yes combined with Jump Up)
+  - Blitz if no players
 - [ ] Custom cursors:
   - [ ] During move
   - [ ] When selecting block
@@ -43,6 +46,8 @@ things as they come up.
     - https://www.quora.com/Do-objects-appear-exponentially-smaller-as-you-move-away-from-them
     - https://www.youtube.com/watch?v=_KLfj84SOh8&ab_channel=ErikRosolowsky
     - https://www.omnicalculator.com/physics/time-of-flight-projectile-motion
+- [x] Standup and end movement as a single action (UI only).
+
 
 ## Design ideas
 
@@ -55,3 +60,10 @@ things as they come up.
 ## Known bugs
 
 - Pass animation triggers multiple times when landing on player (catch) and catch fails.
+- Block against Kroxigor with 1 asssist 4 < 5 only rolls 1 dice
+- Can block from prone
+- UI does not restore moved used indicators correctly when undo'ing across player actions.
+- Player with ball blocking across middle line drops ball that bounce, crash
+  java.lang.IllegalArgumentException: Cannot determine position of: FieldCoordinateImpl(x=2147483647, y=2147483647)
+  at com.jervisffb.engine.rules.Rules$DefaultImpls.throwIn(Rules.kt:141)
+  at com.jervisffb.engine.rules.BB2020Rules.throwIn(StandardBB2020Rules.kt:5)

@@ -6,20 +6,36 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.rules.PlayerStandardActionType
+import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.ui.UiGameSnapshot
-import com.jervisffb.ui.state.UiActionProvider
+import com.jervisffb.ui.state.ManualActionProvider
+import com.jervisffb.ui.state.QueuedActionsResult
 import com.jervisffb.ui.view.ContextMenuOption
 
 class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
-    override fun decorate(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectMoveType) {
+
+    // Actions we allow to skip manually selecting Stand Up
+    val eligibleActions = setOf(
+        PlayerStandardActionType.MOVE,
+        PlayerStandardActionType.FOUL,
+        PlayerStandardActionType.PASS,
+        PlayerStandardActionType.BLITZ,
+        PlayerStandardActionType.HAND_OFF,
+        PlayerStandardActionType.THROW_TEAM_MATE
+    )
+
+    override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectMoveType) {
         descriptor.type.forEach {
             handleType(actionProvider, state, snapshot, it)
         }
     }
 
-    private fun handleType(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, type: MoveType) {
+    private fun handleType(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, type: MoveType) {
         val player = state.activePlayer ?: error("No active player")
         val activeLocation = player.location as OnFieldLocation
         val activeSquare = snapshot.fieldSquares[activeLocation] ?: error("No square found: $activeLocation")
@@ -82,13 +98,81 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
             }
 
             MoveType.STAND_UP -> {
+                // Add Standing Up Action to the context menu.
                 activeSquare.contextMenuOptions.add(
                     ContextMenuOption(
                         "Stand-Up",
-                        { actionProvider.userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
+                        { actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP)) },
                     )
                 )
+                addEnhancedStandUpOptions(actionProvider, state, player, activeLocation, snapshot)
             }
         }
+    }
+
+    // Add UI options that allows the User to skip manually selecting Stand Up
+    // and then move. Instead players can move directly.
+    private fun addEnhancedStandUpOptions(
+        actionProvider: ManualActionProvider,
+        state: Game,
+        player: Player,
+        activeLocation: OnFieldLocation,
+        snapshot: UiGameSnapshot
+    ) {
+        // For Standing Up, we make it easier for the player depending
+        // on their Action. So if there is a move part of their
+        // current action, we try to calculate what they can do after standing
+        // up and allow the player to go directly that.
+        val action = state.getContext<ActivatePlayerContext>().declaredAction?.type
+        if (!eligibleActions.contains(action)) return
+
+        val requiresDodge = state.rules.calculateMarks(state, player.team, activeLocation) > 0
+        val requiresRush = player.move < state.rules.moveRequiredForStandingUp
+
+        // If Player must either dodge or has less than 3 move, it requires a Rush/Dodge Roll to move anywhere, so we
+        // just mark all open squares around the player as "requires a roll" to move to, but do not otherwise use the
+        // PathFinder.
+        if (requiresRush || requiresDodge) {
+            addSelectableRushSquares(activeLocation, state, snapshot, actionProvider)
+        } else {
+            val allPaths = state.rules.pathFinder.calculateAllPaths(
+                state,
+                activeLocation as FieldCoordinate,
+                (player.move - state.rules.moveRequiredForStandingUp).coerceAtLeast(0),
+            )
+            snapshot.pathFinder = allPaths
+        }
+    }
+
+    private fun addSelectableRushSquares(
+        activeLocation: OnFieldLocation,
+        state: Game,
+        snapshot: UiGameSnapshot,
+        actionProvider: ManualActionProvider
+    ) {
+        activeLocation.getSurroundingCoordinates(state.rules, 1, includeOutOfBounds = false)
+            .filter { state.field[it].isUnoccupied() }
+            .forEach { loc ->
+                val square = snapshot.fieldSquares[loc]
+                snapshot.fieldSquares[loc] = square?.copy(
+                    onSelected = {
+                        actionProvider.registerQueuedActionGenerator { controller ->
+                            val availableActions = controller.getAvailableActions()
+                            val canMove = availableActions.contains(MoveType.STANDARD)
+                            if (canMove) {
+                                val action = CompositeGameAction(
+                                    MoveTypeSelected(MoveType.STANDARD),
+                                    FieldSquareSelected(loc)
+                                )
+                                QueuedActionsResult(action)
+                            } else {
+                                null
+                            }
+                        }
+                        actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP))
+                    },
+                    requiresRoll = true
+                ) ?: error("Could not find square: $loc")
+            }
     }
 }

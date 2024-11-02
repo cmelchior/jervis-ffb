@@ -9,11 +9,11 @@ import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.ui.UiGameSnapshot
-import com.jervisffb.ui.state.UiActionProvider
+import com.jervisffb.ui.state.ManualActionProvider
 import com.jervisffb.ui.state.calculateAssumedNoOfBlockDice
 
 class SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
-    override fun decorate(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectPlayer) {
+    override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectPlayer) {
         descriptor.players.forEach { player ->
             // Define onClick event
             val selectedAction = {

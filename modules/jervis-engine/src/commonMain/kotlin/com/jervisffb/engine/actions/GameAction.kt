@@ -31,7 +31,9 @@ class CalculatedAction(private val action: (Game, Rules) -> GameAction) : GameAc
 
 // Group multiple actions together as one.
 @Serializable
-data class CompositeGameAction(val list: List<GameAction>): GameAction
+data class CompositeGameAction(val list: List<GameAction>): GameAction {
+    constructor(vararg actions: GameAction) : this(listOf(*actions))
+}
 
 @Serializable
 data object Undo : GameAction
@@ -207,7 +209,10 @@ data class DBlockResult(override val value: Int) : DieResult() {
     }
 }
 
+@Serializable
 data class DicePoolChoice(val id: Int, val diceSelected: List<DieResult>)
+
+@Serializable
 data class DicePoolResultsSelected(val results: List<DicePoolChoice>): GameAction {
     fun singleResult(): DieResult = results.single().diceSelected.single()
 }

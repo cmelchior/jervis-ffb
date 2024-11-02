@@ -9,9 +9,11 @@ import com.jervisffb.engine.fsm.ProcedureStack
 import com.jervisffb.engine.fsm.ProcedureState
 import com.jervisffb.engine.model.context.ContextHolder
 import com.jervisffb.engine.model.context.UseRerollContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassingInteferenceContext
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.RerollSourceId
@@ -69,7 +71,21 @@ class Game(
     // We should only have properties here that are relevant to more than
     // one procedure, otherwise it should be moved into a [ProcedureContext]
     fun isTurnOver(): Boolean = turnOver != null
+
+    // Checks if an action should end immediately.
+    // It feels wrong to have this method here (since contains some logic and
+    // reference a context). Should it be an utility method or be in the Rules
+    // instead?
+    fun endActionImmediately(): Boolean {
+        return (
+            isTurnOver() ||
+            hasConceeded != null ||
+            getContextOrNull<ActivatePlayerContext>()?.activationEndsImmediately == true
+        )
+    }
+
     var turnOver: TurnOver? = null
+    var hasConceeded: Team? = null
     var homeGoals: Int = 0
     var homeExtraTimeGoals: Int = 0
     var homeSuddenDeathGoals: Int = 0

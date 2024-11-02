@@ -1,10 +1,10 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
@@ -59,6 +59,9 @@ object MoveAction : Procedure() {
                     )
                 }
                 is MoveTypeSelected -> {
+                    if (calculateMoveTypesAvailable(state.activePlayer!!, rules)?.type?.contains(action.moveType) != true) {
+                        INVALID_ACTION(action)
+                    }
                     compositeCommandOf(
                         SetContext(MoveContext(state.activePlayer!!, action.moveType)),
                         GotoNode(ResolveMoveType)
@@ -73,7 +76,7 @@ object MoveAction : Procedure() {
     object ResolveMoveType : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.isTurnOver()) {
+            return if (state.endActionImmediately()) {
                 ExitProcedure()
             } else {
                 GotoNode(SelectMoveType)

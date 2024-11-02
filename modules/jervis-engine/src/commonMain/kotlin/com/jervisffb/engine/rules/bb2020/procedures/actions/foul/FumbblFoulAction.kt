@@ -1,10 +1,10 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.foul
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -43,7 +43,7 @@ import kotlinx.serialization.Serializable
  * Procedure for controlling a player's Foul action.
  *
  * FUMBBL does not follow the rulebook and allow the fouler to wait with
- * selecting the victim until they are going to perform the foul
+ * selecting the victim until they are going to perform the foul.
  */
 @Serializable
 object FumbblFoulAction : Procedure() {
@@ -131,17 +131,21 @@ object FumbblFoulAction : Procedure() {
             // otherwise they are free to continue their blitz
             val moveContext = state.getContext<MoveContext>()
             val context = state.getContext<FoulContext>()
+            val endNow = state.endActionImmediately()
             return buildCompositeCommand {
                 if (moveContext.hasMoved) {
                     add(SetContext(context.copy(hasMoved = true)))
                 }
-                if (!context.fouler.isStanding(rules)) {
+                if (endNow) {
+                    add(ExitProcedure())
+                } else if (!rules.isStanding(context.fouler)) {
                     add(SetTurnOver(TurnOver.STANDARD))
                     add(ExitProcedure())
                 } else {
-                    add(GotoNode(com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FumbblFoulAction.MoveOrFoulOrEndAction))
+                    add(GotoNode(MoveOrFoulOrEndAction))
                 }
             }
+
         }
     }
 

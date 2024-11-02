@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.bb2020.procedures
+package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -28,35 +28,37 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
 
 /**
- * Procedure for handling a Catch Roll as described on page 51 in the rulebook.
+ * Procedure for handling a Standing Up Roll as described on page 44 in the rulebook.
  * It is only responsible for handling the actual dice roll. The result is stored
- * in [CatchRollContext] and it is up to the caller of the procedure to choose
+ * in [StandingUpRollContext] and it is up to the caller of the procedure to choose
  * the appropriate action depending on the outcome.
  */
-object CatchRoll : Procedure() {
+object StandingUpRoll : Procedure() {
+
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) = state.assertContext<CatchRollContext>()
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<StandingUpRollContext>()
 
     object RollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchRollContext>().catchingPlayer.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<StandingUpRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
-                val rollContext = state.getContext<CatchRollContext>()
+                val rollContext = state.getContext<StandingUpRollContext>()
                 val resultContext = rollContext.copy(
                     roll = D6DieRoll(d6),
-                    isSuccess = isCatchSuccess(d6, rollContext.target, rollContext)
+                    isSuccess = isStandingUp(d6, rules.standingUpTarget, rollContext)
                 )
                 return compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.CATCH, d6),
+                    ReportDiceRoll(DiceRollType.STANDING_UP, d6),
                     SetContext(resultContext),
                     GotoNode(ChooseReRollSource),
                 )
@@ -64,15 +66,14 @@ object CatchRoll : Procedure() {
         }
     }
 
-    // Team Reroll, Pro, Catch (only if failed), other skills
     object ChooseReRollSource : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<CatchRollContext>().catchingPlayer.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<StandingUpRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<CatchRollContext>()
+            val context = state.getContext<StandingUpRollContext>()
             val availableRerolls = calculateAvailableRerollsFor(
                 rules,
-                context.catchingPlayer,
-                DiceRollType.CATCH,
+                context.player,
+                DiceRollType.STANDING_UP,
                 context.roll!!,
                 context.isSuccess
             )
@@ -118,15 +119,13 @@ object CatchRoll : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
-                val rollResultContext = state.getContext<CatchRollContext>()
-                val rollContext = state.getContext<CatchRollContext>()
-                val target = rollContext.catchingPlayer.agility + rollContext.modifiers.sum()
-                val rerollResult = rollResultContext.copy(
-                    roll = rollResultContext.roll!!.copy(
+                val rollContext = state.getContext<StandingUpRollContext>()
+                val rerollResult = rollContext.copy(
+                    roll = rollContext.roll!!.copy(
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),
-                    isSuccess = isCatchSuccess(d6, target, rollContext)
+                    isSuccess = isStandingUp(d6, rules.standingUpTarget, rollContext)
                 )
                 compositeCommandOf(
                     SetContext(rerollResult),
@@ -136,10 +135,10 @@ object CatchRoll : Procedure() {
         }
     }
 
-    private fun isCatchSuccess(
+    private fun isStandingUp(
         it: D6Result,
         target: Int,
-        rollContext: CatchRollContext,
+        rollContext: StandingUpRollContext,
     ): Boolean {
         return it.value != 1 && (target <= it.value + rollContext.modifiers.sum())
     }

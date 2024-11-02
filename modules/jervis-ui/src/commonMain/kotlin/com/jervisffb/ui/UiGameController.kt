@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
@@ -152,9 +153,6 @@ class UiGameController(
                 // Last, send action to the Rules Engine for processing.
                 // This will start the next iteration of the game loop.
                 // TODO Add error handling here. What to do for invalid actions?
-                // TODO This approach doesn't support UNDO very well, as Undo doesn't
-                //  treat composite actions as a "whole". This probably needs to be
-                //  thought a bit about
                 controller.processAction(userAction)
             }
         }
@@ -220,7 +218,23 @@ class UiGameController(
 
         // Clear move markers when an action ends
         if (delta.containsCommand { it is ExitProcedure && it.procedure == ActivatePlayer }) {
+            // TODO Restore path info
+            // uiDecorations.registerUndo(
+            //   deltaId = delta.id,
+            //   action = { /* TODO */ }
+            // )
             uiDecorations.resetMovesUsed()
+        }
+
+
+        // Track standing up so we can adjust "Move used" correctly.
+        if (delta.containsAction(MoveTypeSelected(MoveType.STAND_UP))) {
+            val activePlayer = state.activePlayer!!
+            if (activePlayer.move >= rules.moveRequiredForStandingUp) {
+                uiDecorations.addMoveUsedToStandUp(rules.moveRequiredForStandingUp)
+            } else {
+                uiDecorations.addMoveUsedToStandUp(activePlayer.move)
+            }
         }
 
         // Add decoration when moving player
@@ -229,7 +243,7 @@ class UiGameController(
             delta.steps.firstOrNull()?.action == MoveTypeSelected(MoveType.STANDARD) &&
             delta.steps.lastOrNull()?.action is FieldSquareSelected
         ) {
-            val start = state.activePlayer!!.location // TODO Giant location?
+            val start = delta.allCommands().filterIsInstance<SetPlayerLocation>().single().originalPlayerLocation
             uiDecorations.addMoveUsed(start)
             uiDecorations.registerUndo(
                 deltaId = delta.id,

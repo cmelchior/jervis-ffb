@@ -1,12 +1,12 @@
 package com.jervisffb.ui.state.decorators
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.ui.UiGameSnapshot
-import com.jervisffb.ui.state.UiActionProvider
+import com.jervisffb.ui.state.ManualActionProvider
 
 /**
  * Interface that allows a specific [GameActionDescriptor] to change the [UiGameSnapshot]
@@ -17,5 +17,5 @@ import com.jervisffb.ui.state.UiActionProvider
  * for the given fields.
  */
 interface FieldActionDecorator<T: GameActionDescriptor> {
-    fun decorate(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: T)
+    fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: T)
 }

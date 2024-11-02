@@ -38,7 +38,7 @@ fun calculateMoveTypesAvailable(player: Player, rules: Rules): SelectMoveType? {
     val options = mutableListOf<MoveType>()
 
     // Normal move (with a potential rush)
-    if (player.movesLeft + player.rushesLeft >= 1 && player.isStanding(rules)) {
+    if (player.movesLeft + player.rushesLeft >= 1 && rules.isStanding(player)) {
         options.add(MoveType.STANDARD)
     }
 

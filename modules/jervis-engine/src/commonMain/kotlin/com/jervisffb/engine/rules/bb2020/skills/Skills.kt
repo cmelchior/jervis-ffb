@@ -10,56 +10,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.UseTeamReroll
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
-enum class DiceRollType {
-    ACCURACY, // For passing
-    ARMOUR,
-    BAD_HABITS,
-    BLOCK,
-    BLITZ,
-    BLOODLUST,
-    BONE_HEAD,
-    BOUNCE,
-    BRILLIANT_COACHING,
-    CASUALTY,
-    CATCH,
-    CHAINSAW,
-    CHEERING_FANS,
-    FAN_FACTOR,
-    DEFLECTION,
-    DODGE,
-    DEVIATE,
-    FOUl,
-    HYPNOTIC_GAZE,
-    INJURY,
-    INTERCEPT,
-    KICK_OFF_TABLE,
-    LASTING_INJURY,
-    LONER,
-    OFFICIOUS_REF_FAN_FACTOR,
-    OFFICIOUS_REF_REFEREE,
-    PASS,
-    PICKUP,
-    PITCH_INVASION_FAN_FACTOR,
-    PITCH_INVASION_PLAYERS_AFFECTED,
-    PRAYERS_TO_NUFFLE,
-    REALLY_STUPID,
-    REGENERATION,
-    PRO,
-    QUICK_SNAP,
-    RUSH,
-    SCATTER,
-    SOLID_DEFENSE,
-    SUDDEN_DEATH,
-    SWELTERING_HEAT,
-    TAKE_ROOT,
-    THROW_A_ROCK,
-    THROW_TEAM_MATE,
-    TREACHEROUS_TRAPDOOR,
-    UNCHANNELLED_FURY,
-    PROJECTILE_VOMIT,
-    WEATHER,
-}
-
 @Serializable
 sealed interface TeamReroll : RerollSource {
     val carryOverIntoOvertime: Boolean
@@ -212,11 +162,11 @@ sealed interface Skill {
     val skillId: String
     // Human readable name of this skill
     val name: String
-    // Whether or not this skill is compulsory to use
+    // Whether this skill is compulsory to use
     val compulsory: Boolean
     // Whether this skill count as being "used". The meaning of this is interpreted in the context it is used.
+    // If the skill is always available, this should always be false.
     // Note, this specifically does not apply to a "reroll" part of a skill.
-    // See
     var used: Boolean
     // Represents any value in brackes, like Might Blow(1+) or Loner(4+). It is up to the context to correctly interpret this value
     val value: Int?
@@ -228,7 +178,7 @@ sealed interface Skill {
     val workWithoutTackleZones: Boolean
     // Whether this skill works when the player is prone or stunned
     val workWhenProne: Boolean
-    // Whether or not this skill is temporary
+    // Whether this skill is temporary
     val isTemporary: Boolean
     val expiresAt: Duration
 }

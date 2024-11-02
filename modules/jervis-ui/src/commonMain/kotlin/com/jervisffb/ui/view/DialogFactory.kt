@@ -47,6 +47,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.RushRoll
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.StandingUpRoll
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.StandingUpRollContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.AccuracyRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.ArmourRoll
@@ -299,6 +301,12 @@ object DialogFactory {
 
                 is SetupTeam.InformOfInvalidSetup -> {
                     SingleChoiceInputDialog.createInvalidSetupDialog(controller.state.activeTeam)
+                }
+
+                is StandingUpRoll.RollDie,
+                is StandingUpRoll.ReRollDie -> {
+                    val player = controller.state.getContext<StandingUpRollContext>().player
+                    DiceRollUserInputDialog.createStandingUpRollDialog(player)
                 }
 
                 is Stumble.ChooseToUseDodge -> {

@@ -16,6 +16,7 @@ import com.jervisffb.engine.actions.D4Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DBlockResult
+import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.DogoutSelected
@@ -120,6 +121,7 @@ object JervisSerialization {
                 subclass(D6Result::class)
                 subclass(D8Result::class)
                 subclass(DBlockResult::class)
+                subclass(DicePoolResultsSelected::class)
                 subclass(DiceRollResults::class)
                 subclass(DirectionSelected::class)
                 subclass(DogoutSelected::class)

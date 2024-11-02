@@ -5,13 +5,14 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Context data for a player moving. This includes standing up, moving
  * a single square, jumping or leaping, but no other special actions.
  *
- * @see [com.jervisffb.rules.bb2020.procedures.actions.move.MoveAction]
+ * @see [MoveAction]
  */
 data class MoveContext(
     val player: Player,

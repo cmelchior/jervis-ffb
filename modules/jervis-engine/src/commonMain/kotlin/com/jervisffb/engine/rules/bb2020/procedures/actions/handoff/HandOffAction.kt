@@ -1,9 +1,9 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.handoff
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
@@ -132,18 +132,19 @@ object HandOffAction : Procedure() {
             // If player is not standing on the field after the move, it is a turn over,
             // otherwise they are free to continue their hand-off.
             val moveContext = state.getContext<MoveContext>()
-            val context = state.getContext<HandOffContext>()
+            val handOffContext = state.getContext<HandOffContext>()
+            val endNow = state.endActionImmediately()
             return buildCompositeCommand {
                 if (moveContext.hasMoved) {
-                    add(SetContext(context.copy(hasMoved = true)))
+                    add(SetContext(handOffContext.copy(hasMoved = true)))
                 }
-                if (state.isTurnOver()) {
+                if (endNow) {
                     add(ExitProcedure())
-                } else if (!context.thrower.isStanding(rules)) {
+                } else if (!rules.isStanding(handOffContext.thrower)) {
                     add(SetTurnOver(TurnOver.STANDARD))
                     add(ExitProcedure())
                 } else {
-                    add(GotoNode(com.jervisffb.engine.rules.bb2020.procedures.actions.handoff.HandOffAction.MoveOrHandOffOrEndAction))
+                    add(GotoNode(MoveOrHandOffOrEndAction))
                 }
             }
         }
