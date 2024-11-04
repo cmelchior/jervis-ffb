@@ -11,6 +11,8 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
+import com.jervisffb.engine.rules.BlockType
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
@@ -18,8 +20,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.Stand
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockDetermineModifiers
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
-import com.jervisffb.engine.rules.BlockType
-import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.calculateBlockDiceToRoll
 
 /**
  * Wrap temporary data needed to track a "standard block". This can either
@@ -42,6 +43,16 @@ data class BlockContext(
 ): ProcedureContext {
     val result: DBlockResult
         get() = roll[resultIndex].result
+
+    // Helper method to share logic between roll and reroll
+    fun calculateNoOfBlockDice(): Int {
+        return calculateBlockDiceToRoll(
+            attacker.strength,
+            offensiveAssists,
+            defender.strength,
+            defensiveAssists
+        )
+    }
 }
 
 /**

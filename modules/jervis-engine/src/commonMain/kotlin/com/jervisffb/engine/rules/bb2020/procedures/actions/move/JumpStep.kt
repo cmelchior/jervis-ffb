@@ -1,5 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
@@ -120,15 +121,20 @@ object JumpStep : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<FieldSquareSelected>(state, rules, action) { target ->
-                val context = state.getContext<MoveContext>()
+            return when (action) {
+                Cancel -> ExitProcedure()
+                else -> {
+                    checkTypeAndValue<FieldSquareSelected>(state, rules, action) { target ->
+                        val context = state.getContext<MoveContext>()
 
-                // Move player into target location before start rolling any dice.
-                compositeCommandOf(
-                    SetPlayerLocation(context.player, target.coordinate),
-                    SetContext(context.copy(target = target.coordinate)),
-                    GotoNode(CheckIfRushingIsNeeded)
-                )
+                        // Move player into target location before start rolling any dice.
+                        compositeCommandOf(
+                            SetPlayerLocation(context.player, target.coordinate),
+                            SetContext(context.copy(target = target.coordinate)),
+                            GotoNode(CheckIfRushingIsNeeded)
+                        )
+                    }
+                }
             }
         }
     }

@@ -99,6 +99,7 @@ tests covering the particular feature.
   - [ ] Chain push: Player with the ball is pushed into the end zone
   - [ ] Chain push: Player is pushed into the ball and picks it up.
   - [ ] Using Ball & Chain to move into the End Zone (not really supported, but just in case)
+  - [ ] Pushed into end zone after a block
 - [ ] Turnover ends turn as quickly as possible
   - [ ] Falling Over
   - [ ] Knocked Down
@@ -139,9 +140,9 @@ tests covering the particular feature.
 - [ ] Falling Over
 - [ ] Roll over if stunned last turn
 - [ ] Moving into a square
-  - Moving voluntarily
-  - Being pushed
-  - Need Dodge/Rush/Jump to go there
+  - [ ] Moving voluntarily
+  - [ ] Being pushed
+  - [ ] Need Dodge/Rush/Jump to go there
 
 ## Actions
 

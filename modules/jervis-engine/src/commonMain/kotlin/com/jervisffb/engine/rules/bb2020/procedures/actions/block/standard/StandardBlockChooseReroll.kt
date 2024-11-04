@@ -37,9 +37,7 @@ object StandardBlockChooseReroll: Procedure() {
     override val initialNode: Node = ReRollSourceOrAcceptRoll
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<BlockContext>()
-    }
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockContext>()
 
     object ReRollSourceOrAcceptRoll : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team

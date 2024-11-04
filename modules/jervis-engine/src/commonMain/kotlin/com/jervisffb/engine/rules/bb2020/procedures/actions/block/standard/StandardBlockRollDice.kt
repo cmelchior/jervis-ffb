@@ -1,12 +1,13 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -20,7 +21,7 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
-import com.jervisffb.engine.commands.compositeCommandOf
+import kotlin.math.absoluteValue
 
 /**
  * Roll block dice for the first time.
@@ -37,7 +38,7 @@ object StandardBlockRollDice: Procedure() {
     object RollDice : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val noOfDice = calculateNoOfBlockDice(state)
+            val noOfDice = state.getContext<BlockContext>().calculateNoOfBlockDice().absoluteValue
             return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
         }
 

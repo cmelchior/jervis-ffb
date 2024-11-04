@@ -17,13 +17,15 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.modifiers.SkillStatModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
 import com.jervisffb.engine.rules.bb2020.skills.Horns
 
 /**
  * Calculate all modifiers before rolling the block dice.
  *
- * @see [com.jervisffb.rules.bb2020.procedures.actions.block.MultipleBlockAction]
- * @see [com.jervisffb.rules.bb2020.procedures.actions.block.StandardBlockStep]
+ * @see [MultipleBlockAction]
+ * @see [StandardBlockStep]
  */
 object StandardBlockDetermineModifiers: Procedure() {
     override val initialNode: Node = DetermineAssists
@@ -67,11 +69,13 @@ object StandardBlockDetermineModifiers: Procedure() {
             val offensiveAssists =
                 context.defender.coordinates.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
+                    .filter { it != context.attacker}
                     .count { player -> rules.canOfferAssistAgainst(player, context.defender) }
 
             val defensiveAssists =
                 context.attacker.coordinates.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
+                    .filter { it != context.defender}
                     .count { player -> rules.canOfferAssistAgainst(player, context.attacker) }
 
             return compositeCommandOf(

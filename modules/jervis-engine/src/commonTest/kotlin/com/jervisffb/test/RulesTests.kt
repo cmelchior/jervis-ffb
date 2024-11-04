@@ -79,4 +79,8 @@ class RulesTests {
         assertEquals(8, coords.intersect(expectedCoordinates).size, coords.toString())
     }
 
+    @Test
+    fun canOfferAssistAgainst() {
+
+    }
 }

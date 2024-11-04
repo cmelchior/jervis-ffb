@@ -1,18 +1,24 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
-
-// Helper method to share logic between roll and reroll
-fun calculateNoOfBlockDice(state: Game, isBlitzing: Boolean = false): Int {
-    val context = state.getContext<BlockContext>()
-    val attackStrength = context.attacker.strength + context.offensiveAssists
-    val defenderStrength = context.defender.strength + context.defensiveAssists
+/**
+ * Returns the number of block dice to roll during a block. x < 0 means the defender
+ * chooses, x > 0 means the attacker chooses
+ */
+fun calculateBlockDiceToRoll(
+    attackerStrength: Int,
+    offensiveAssists: Int,
+    defenderStrength: Int,
+    defensiveAssists: Int
+): Int {
+    val attackerTotal = attackerStrength + offensiveAssists
+    val defenderTotal = defenderStrength + defensiveAssists
     return when {
-        attackStrength == defenderStrength -> 1
-        attackStrength > defenderStrength * 2 -> 3
-        defenderStrength > attackStrength * 2 -> 3
-        else -> 2
+        attackerTotal == defenderTotal -> 1
+        attackerTotal > (defenderTotal * 2) -> 3
+        defenderTotal > (attackerTotal * 2) -> -3
+        attackerTotal > defenderTotal -> 2
+        defenderTotal > attackerTotal -> -2
+        else -> 0 // Unclear, do not report anything
     }
 }
+

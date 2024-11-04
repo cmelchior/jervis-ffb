@@ -1,12 +1,13 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.BlockDicePool
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -19,13 +20,12 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Roll block dice for the first time.
  *
- * @see [com.jervisffb.rules.bb2020.procedures.actions.block.MultipleBlockAction]
- * @see [com.jervisffb.rules.bb2020.procedures.actions.block.StandardBlockStep]
+ * @see [MultipleBlockAction]
+ * @see [StandardBlockStep]
  */
 object StandardBlockChooseResult: Procedure() {
     override val initialNode: Node = SelectBlockResult
@@ -36,7 +36,14 @@ object StandardBlockChooseResult: Procedure() {
     }
 
     object SelectBlockResult : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team {
+            val context = state.getContext<BlockContext>()
+            return if (context.calculateNoOfBlockDice() < 0) {
+                context.defender.team
+            } else {
+                context.attacker.team
+            }
+        }
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(
                 SelectDicePoolResult(BlockDicePool(state.getContext<BlockContext>().roll))

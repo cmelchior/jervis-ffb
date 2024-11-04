@@ -30,6 +30,7 @@ import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlin.math.absoluteValue
 
 /**
  * Use a reroll and then reroll the block dice (if allowed).
@@ -58,7 +59,7 @@ object StandardBlockRerollDice: Procedure() {
     object ReRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val noOfDice = calculateNoOfBlockDice(state)
+            val noOfDice = state.getContext<BlockContext>().calculateNoOfBlockDice().absoluteValue
             return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
         }
 
