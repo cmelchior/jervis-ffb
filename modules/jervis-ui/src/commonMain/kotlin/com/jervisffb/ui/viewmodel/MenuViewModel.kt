@@ -13,10 +13,10 @@ import com.jervisffb.ui.UiGameController
 import okio.Path
 
 enum class Feature {
-    ROLL_DICE,
     DO_NOT_REROLL_SUCCESSFUL_ACTIONS,
     SELECT_KICKING_PLAYER,
     END_PLAYER_ACTION_IF_ONLY_OPTON,
+    SELECT_BLOCK_TYPE_IF_ONLY_OPTON,
 }
 
 class MenuViewModel {
@@ -27,7 +27,8 @@ class MenuViewModel {
     private var features: MutableMap<Feature, Boolean> = mutableMapOf(
         Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS to true,
         Feature.SELECT_KICKING_PLAYER to true,
-        Feature.END_PLAYER_ACTION_IF_ONLY_OPTON to true
+        Feature.END_PLAYER_ACTION_IF_ONLY_OPTON to true,
+        Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTON to true
     )
 
     fun saveGameState(destination: Path) {

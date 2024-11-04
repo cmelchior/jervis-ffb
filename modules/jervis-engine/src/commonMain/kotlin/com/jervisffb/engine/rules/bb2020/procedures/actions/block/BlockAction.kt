@@ -1,12 +1,10 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.BlockTypeSelected
-import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.PlayerDeselected
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectPlayer
@@ -28,11 +26,11 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
-import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
+import com.jervisffb.engine.rules.bb2020.skills.BreatheFire
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2020.skills.Stab
@@ -133,13 +131,13 @@ object BlockAction : Procedure() {
             val availableBlockTypes = getAvailableBlockType(attacker, true)
             return listOf(
                 SelectBlockType(availableBlockTypes),
-                DeselectPlayer(attacker)
+                EndActionWhenReady
             )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<BlockActionContext>()
             return when (action) {
-                is PlayerDeselected -> ExitProcedure()
+                is EndAction -> ExitProcedure()
                 else -> {
                     checkTypeAndValue<BlockTypeSelected>(state, rules, action) { typeSelected ->
                         val type = typeSelected.type
@@ -157,6 +155,7 @@ object BlockAction : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BlockActionContext>()
             return when (context.blockType!!) {
+                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
@@ -175,6 +174,7 @@ object BlockAction : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             val context = state.getContext<BlockActionContext>()
             return when (context.blockType!!) {
+                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
@@ -192,6 +192,7 @@ object BlockAction : Procedure() {
 
             // Check if Block Action was completed or not
             val removeContextCommand = when (context.blockType!!) {
+                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
@@ -201,6 +202,7 @@ object BlockAction : Procedure() {
 
             // Remove state required for the specific block type
             val hasBlocked = when (context.blockType) {
+                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
@@ -209,6 +211,7 @@ object BlockAction : Procedure() {
             }
 
             val didFollowUp = when (context.blockType) {
+                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> false
                 BlockType.MULTIPLE_BLOCK -> false
                 BlockType.PROJECTILE_VOMIT -> false
@@ -255,10 +258,11 @@ object BlockAction : Procedure() {
         return buildList {
             BlockType.entries.forEach { type ->
                 when (type) {
-                    BlockType.CHAINSAW -> if (player.getSkillOrNull<ProjectileVomit>()?.used == false) add(type)
+                    BlockType.BREATHE_FIRE -> if (player.isSkillAvailable<BreatheFire>()) add(type)
+                    BlockType.CHAINSAW -> if (player.isSkillAvailable<ProjectileVomit>()) add(type)
                     BlockType.MULTIPLE_BLOCK -> if (!isMultipleBlock) add(type)
                     BlockType.PROJECTILE_VOMIT -> if (player.isSkillAvailable<ProjectileVomit>()) add(type)
-                    BlockType.STAB -> if (player.hasSkill<Stab>()) add(type)
+                    BlockType.STAB -> if (player.isSkillAvailable<Stab>()) add(type)
                     BlockType.STANDARD -> add(type)
                 }
             }

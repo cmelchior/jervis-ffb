@@ -2,6 +2,7 @@ package com.jervisffb.ui.state
 
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameController
+import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -16,6 +17,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.actions.SelectFieldLocation
@@ -26,6 +28,7 @@ import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.ui.UiGameController
@@ -33,6 +36,7 @@ import com.jervisffb.ui.UiGameSnapshot
 import com.jervisffb.ui.state.decorators.DeselectPlayerDecorator
 import com.jervisffb.ui.state.decorators.EndActionDecorator
 import com.jervisffb.ui.state.decorators.FieldActionDecorator
+import com.jervisffb.ui.state.decorators.SelectBlockTypeDecorator
 import com.jervisffb.ui.state.decorators.SelectDirectionDecorator
 import com.jervisffb.ui.state.decorators.SelectFieldLocationDecorator
 import com.jervisffb.ui.state.decorators.SelectMoveTypeDecorator
@@ -89,6 +93,7 @@ class ManualActionProvider(
         // TossCoin -> TODO()
         DeselectPlayer::class to DeselectPlayerDecorator(),
         EndActionWhenReady::class to EndActionDecorator(),
+        SelectBlockType::class to SelectBlockTypeDecorator(),
         SelectDirection::class to SelectDirectionDecorator(),
         SelectFieldLocation::class to SelectFieldLocationDecorator(),
         SelectMoveType::class to SelectMoveTypeDecorator(),
@@ -304,9 +309,18 @@ class ManualActionProvider(
         if (currentNode == StandardBlockChooseResult.SelectBlockResult && actions.size == 1) {
             val choices = (actions.first() as SelectDicePoolResult).pools
             if (choices.size == 1 && choices.first().dice.size == 1) {
-                DicePoolResultsSelected(listOf(
+                return DicePoolResultsSelected(listOf(
                     DicePoolChoice(id = 0, listOf(choices.first().dice.single().result))
                 ))
+            }
+        }
+
+        // When there is only one block type for a block, just select that one straight away
+        if (currentNode == BlockAction.SelectBlockType) {
+            actions.filterIsInstance<SelectBlockType>().firstOrNull()?.let {
+                if (it.size == 1) {
+                    return BlockTypeSelected(it.types.first())
+                }
             }
         }
 

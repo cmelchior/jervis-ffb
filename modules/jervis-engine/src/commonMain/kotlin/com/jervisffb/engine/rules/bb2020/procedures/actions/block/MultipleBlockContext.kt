@@ -1,8 +1,8 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.BlockDicePool
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Ball
@@ -11,11 +11,6 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
-import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.BlockType.CHAINSAW
 import com.jervisffb.engine.rules.BlockType.MULTIPLE_BLOCK
@@ -23,6 +18,11 @@ import com.jervisffb.engine.rules.BlockType.PROJECTILE_VOMIT
 import com.jervisffb.engine.rules.BlockType.STAB
 import com.jervisffb.engine.rules.BlockType.STANDARD
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -37,6 +37,7 @@ data class MultipleBlockDiceRoll(
 
     fun createDicePool(id: Int): BlockDicePool {
         return when (type) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -48,6 +49,7 @@ data class MultipleBlockDiceRoll(
 
     fun hasAcceptedResult(): Boolean {
         return when (type) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -60,6 +62,7 @@ data class MultipleBlockDiceRoll(
 
     fun getRoll(): List<DieRoll<*>> {
         return when (type) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -70,6 +73,7 @@ data class MultipleBlockDiceRoll(
 
     fun copyAndSetHasAcceptedResult(acceptedResult: Boolean): MultipleBlockDiceRoll {
         return when (type) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -82,6 +86,7 @@ data class MultipleBlockDiceRoll(
 
     fun getRerollOptions(rules: Rules, attacker: Player, dicePoolId: Int): List<GameActionDescriptor> {
         return when (type) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -99,6 +104,7 @@ data class MultipleBlockDiceRoll(
 
     fun copyAndSetSelectedResult(die: DieResult): MultipleBlockDiceRoll {
         return when (type) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -188,6 +194,7 @@ data class MultipleBlockContext(
      */
     fun createRerollContext(state: Game, action: RerollOptionSelected): UseRerollContext {
         return when(getActiveRerollType()) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -198,6 +205,7 @@ data class MultipleBlockContext(
 
     fun getRollDiceProcedure(): Procedure {
         return when (getActiveRerollType()) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -210,6 +218,7 @@ data class MultipleBlockContext(
      */
     fun getRerollDiceProcedure(): Procedure {
         return when (getActiveRerollType()) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -223,6 +232,7 @@ data class MultipleBlockContext(
      */
     fun getResolveBlockResultProcedure(): Procedure {
         return when (getActiveRerollType()) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -238,6 +248,7 @@ data class MultipleBlockContext(
      */
     fun copyAndUpdateWithLatestBlockTypeContext(state: Game): MultipleBlockContext {
         val updatedContext = when (getActiveRerollType()) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()
@@ -294,6 +305,7 @@ data class MultipleBlockContext(
         }
 
         val context = when (type) {
+            BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
             PROJECTILE_VOMIT -> TODO()

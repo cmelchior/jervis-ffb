@@ -284,6 +284,7 @@ object BlitzAction : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<BlitzContext>()
             return when (context.blockType!!) {
+                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
@@ -300,6 +301,7 @@ object BlitzAction : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             val context = state.getContext<BlitzContext>()
             return when (context.blockType!!) {
+                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
@@ -316,6 +318,7 @@ object BlitzAction : Procedure() {
 
             // Check if Block Action was completed or not
             val removeContextCommand = when (context.blockType!!) {
+                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()
@@ -325,6 +328,7 @@ object BlitzAction : Procedure() {
 
             // Remove state required for the specific block type
             val hasBlocked = when (context.blockType) {
+                BlockType.BREATHE_FIRE -> TODO()
                 BlockType.CHAINSAW -> TODO()
                 BlockType.MULTIPLE_BLOCK -> TODO()
                 BlockType.PROJECTILE_VOMIT -> TODO()

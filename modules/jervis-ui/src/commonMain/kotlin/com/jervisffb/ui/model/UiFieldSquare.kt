@@ -34,8 +34,12 @@ data class UiFieldSquare(
 
     fun isEmpty() = !isBallOnGround && player == null
 
-    fun copyAddContextMenu(item: ContextMenuOption): UiFieldSquare {
-        return this.copy().also { contextMenuOptions += item }
+    fun copyAddContextMenu(item: ContextMenuOption, showContextMenu: Boolean? = null): UiFieldSquare {
+        if (showContextMenu != null) {
+            return this.copy(showContextMenu = showContextMenu).also { contextMenuOptions += item }
+        } else {
+            return this.copy().also { contextMenuOptions += item }
+        }
     }
 }
 

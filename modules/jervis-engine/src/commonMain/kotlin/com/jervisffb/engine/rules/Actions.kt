@@ -115,6 +115,7 @@ enum class PlayerStandardActionType: ActionType {
 }
 
 // All special actions are tied to skills
+
 /**
  * Enumerate the different special action types possible in Blood Bowl.
  */
@@ -133,6 +134,7 @@ enum class PlayerSpecialActionType: ActionType {
 
 @Serializable
 enum class BlockType {
+    BREATHE_FIRE,
     CHAINSAW,
     MULTIPLE_BLOCK,
     PROJECTILE_VOMIT,

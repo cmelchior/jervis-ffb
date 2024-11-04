@@ -1,16 +1,16 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import com.jervisffb.engine.commands.buildCompositeCommand
-import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -18,15 +18,11 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
-import com.jervisffb.engine.rules.bb2020.skills.Stab
+import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.utils.INVALID_ACTION
 import kotlinx.serialization.Serializable
 
@@ -104,26 +100,6 @@ object StabAction : Procedure() {
                     add(SetContext(activeContext.copy(markActionAsUsed = true)))
                 }
                 add(ExitProcedure())
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------------------------------------------------
-    // HELPER FUNCTIONS
-
-    /**
-     * Return all available block types available to a given player.
-     */
-    fun getAvailableBlockType(player: Player, isMultipleBlock: Boolean): List<BlockType> {
-        return buildList {
-            BlockType.entries.forEach { type ->
-                when (type) {
-                    BlockType.CHAINSAW -> if (player.getSkillOrNull<ProjectileVomit>()?.used == false) add(type)
-                    BlockType.MULTIPLE_BLOCK -> if (!isMultipleBlock) add(type)
-                    BlockType.PROJECTILE_VOMIT -> if (player.getSkillOrNull<ProjectileVomit>()?.used == false) add(type)
-                    BlockType.STAB -> if (player.hasSkill<Stab>()) add(type)
-                    BlockType.STANDARD -> add(type)
-                }
             }
         }
     }
