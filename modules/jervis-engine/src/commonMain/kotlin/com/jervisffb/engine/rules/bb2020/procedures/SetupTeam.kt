@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.DogoutSelected
@@ -8,15 +7,18 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectDogout
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -36,7 +38,6 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
-import com.jervisffb.engine.commands.compositeCommandOf
 
 data class SetupTeamContext(
     val team: Team,
@@ -87,26 +88,26 @@ object SetupTeam : Procedure() {
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
             val context = state.getContext<SetupTeamContext>()
             val isHomeTeam = context.team.isHomeTeam()
-            val freeFields: List<SelectFieldLocation> =
+            val freeFields: List<TargetSquare> =
                 state.field
                     .filter {
                         // Only select from fields on teams half
                         // TODO How does this generalize to BB7?
                         if (isHomeTeam) {
-                            it.x < rules.fieldWidth.toInt() / 2
+                            it.x < rules.fieldWidth / 2
                         } else {
-                            it.x >= rules.fieldWidth.toInt() / 2
+                            it.x >= rules.fieldWidth / 2
                         }
                     }
                     .filter { it.isUnoccupied() }
-                    .map { SelectFieldLocation.setup(it.coordinates) }
+                    .map { TargetSquare.setup(it.coordinates) }
 
             val playerLocation = context.currentPlayer!!.location
-            var playerSquare: List<SelectFieldLocation> = emptyList()
+            var playerSquare: List<TargetSquare> = emptyList()
             if (playerLocation is FieldCoordinate) {
-                playerSquare = listOf(SelectFieldLocation.setup(playerLocation))
+                playerSquare = listOf(TargetSquare.setup(playerLocation))
             }
-            return freeFields + SelectDogout + playerSquare
+            return listOf(SelectDogout, SelectFieldLocation(playerSquare + freeFields))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

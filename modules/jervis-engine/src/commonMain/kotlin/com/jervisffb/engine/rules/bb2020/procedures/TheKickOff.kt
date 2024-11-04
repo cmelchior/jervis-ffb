@@ -10,6 +10,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -109,7 +110,8 @@ object TheKickOff : Procedure() {
             // Place the ball anywhere on the opposing teams side
             return state.field
                 .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
-                .map { SelectFieldLocation.kick(it.coordinates) }
+                .map { TargetSquare.kick(it.coordinates) }
+                .let { listOf(SelectFieldLocation(it)) }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -219,7 +221,8 @@ object TheFUMBBLKickOff : Procedure() {
             // Place the ball anywhere on the opposing teams side
             return state.field
                 .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
-                .map { SelectFieldLocation.kick(it.coordinates) }
+                .map { TargetSquare.kick(it.coordinates) }
+                .let { listOf(SelectFieldLocation(it)) }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

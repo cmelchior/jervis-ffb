@@ -452,6 +452,8 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     fun pickupBallInOpponentEndZone() {
+        assertEquals(0, state.awayScore)
+        assertEquals(0, state.homeScore)
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -492,6 +494,7 @@ class TouchdownTests: JervisGameTest() {
             NoRerollSelected(),
         )
         assertEquals(1, state.awayScore)
+        assertEquals(0, state.homeScore)
     }
 
     @Test

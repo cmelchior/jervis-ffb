@@ -243,6 +243,7 @@ class UiGameController(
             delta.steps.firstOrNull()?.action == MoveTypeSelected(MoveType.STANDARD) &&
             delta.steps.lastOrNull()?.action is FieldSquareSelected
         ) {
+            // TODO This seems to break on touch downs
             val start = delta.allCommands().filterIsInstance<SetPlayerLocation>().single().originalPlayerLocation
             uiDecorations.addMoveUsed(start)
             uiDecorations.registerUndo(

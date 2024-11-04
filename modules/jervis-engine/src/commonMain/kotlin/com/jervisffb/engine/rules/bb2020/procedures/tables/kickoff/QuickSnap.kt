@@ -1,19 +1,21 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -34,7 +36,6 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquareContext
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
-import com.jervisffb.engine.commands.compositeCommandOf
 
 data class QuickSnapContext(
     val roll: D3Result,
@@ -112,7 +113,10 @@ object QuickSnap : Procedure() {
             // Player is allowed to move into any square next to it
             return currentLocation.getSurroundingCoordinates(rules, distance = 1, includeOutOfBounds = false)
                 .filter { state.field[it].isUnoccupied() }
-                .map { SelectFieldLocation.setup(it) } + SelectFieldLocation.setup(currentLocation)
+                .map { TargetSquare.setup(it) }
+                .let { unOccupiedSquares ->
+                    listOf(SelectFieldLocation(unOccupiedSquares + TargetSquare.setup(currentLocation)))
+                }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

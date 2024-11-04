@@ -1,9 +1,9 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.move
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
@@ -12,6 +12,7 @@ import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -40,7 +41,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryM
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
-import com.jervisffb.engine.commands.compositeCommandOf
 import kotlinx.serialization.Serializable
 
 data class MovePlayerIntoSquareContext(
@@ -55,6 +55,12 @@ data class MovePlayerIntoSquareContext(
  * Normally it just means moving the player into that square, but if
  * Treacherous Trapdoors have been rolled on Prayers to Nuffle, it
  * might result in the player being removed from play immediately.
+ *
+ * This procedure should not be called until after all rolls for entering the
+ * square have been resolved, i.e., Rush, Dodge, Jump and Leap. This is covered
+ * under Picking Up The Ball on page 46 in the rulebook.
+ *
+ * TODO This logic here is wrong and needs to be reworked. See rule-discussions.md
  */
 @Serializable
 object MovePlayerIntoSquare : Procedure() {

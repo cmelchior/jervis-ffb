@@ -79,7 +79,7 @@ object ThrowTeamMateAction : Procedure() {
             val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(context.thrower, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(state, context.thrower))
 
             // Check if adjacent to a possible receiver
             if (context.thrower.hasBall()) {

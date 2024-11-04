@@ -10,9 +10,6 @@ import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
 import com.jervisffb.test.JervisGameTest
-import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
-import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import kotlin.test.BeforeTest
@@ -32,11 +29,7 @@ class DodgeTests: JervisGameTest() {
     @BeforeTest
     override fun setUp() {
         super.setUp()
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
-        )
+        startDefaultGame()
     }
 
     @Test

@@ -43,7 +43,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryM
  * responsible for controlling the lifecycle of [MoveContext].
  *
  * The order of checks is:
- * 1. Tentacles. The order is a bit unclear in the r
+ * 1. Tentacles. The order is a bit unclear.
  * 2. Rush
  *  a. Sprint
  *  b. Sure Feet
@@ -230,19 +230,8 @@ object StandardMoveStep: Procedure() {
                 // Player was already moved before rolling any dice, so here we just
                 // adjust stats.
                 SetPlayerMoveLeft(movingPlayer, movingPlayer.movesLeft - 1),
-                GotoNode(CheckForScoring)
+                ExitProcedure()
             )
-        }
-    }
-
-    object CheckForScoring : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<MoveContext>()
-            return SetContext(ScoringATouchDownContext(context.player))
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
         }
     }
 }

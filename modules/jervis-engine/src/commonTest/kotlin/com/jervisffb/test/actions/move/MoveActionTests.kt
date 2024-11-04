@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Availability
@@ -15,9 +16,6 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.test.JervisGameTest
-import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
-import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import kotlin.test.BeforeTest
@@ -34,11 +32,7 @@ class MoveActionTests: JervisGameTest() {
     @BeforeTest
     override fun setUp() {
         super.setUp()
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
-        )
+        startDefaultGame()
     }
 
     private fun startMoveAction() {
@@ -100,7 +94,8 @@ class MoveActionTests: JervisGameTest() {
 
         val availableTargets = controller.getAvailableActions().actions
             .filterIsInstance<SelectFieldLocation>()
-            .filter { it.type == SelectFieldLocation.Type.MOVE }
+            .first().squares
+            .filter { it.type == TargetSquare.Type.MOVE }
             .map { it.coordinate }
             .toSet()
 

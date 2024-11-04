@@ -22,6 +22,7 @@ enum class DiceRollType {
     HYPNOTIC_GAZE,
     INJURY,
     INTERCEPT,
+    JUMP,
     KICK_OFF_TABLE,
     LASTING_INJURY,
     LONER,

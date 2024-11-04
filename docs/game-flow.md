@@ -116,7 +116,7 @@ tests covering the particular feature.
   - [ ] Reset at half time
   - [ ] Carry over into Extra Time
   - [ ] Leader
-  - [ ] Can be used to reroll types of rolls
+  - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
 - [ ] Dodging
 - [ ] Deviating Ball
 - [ ] Scatter Ball
@@ -138,7 +138,10 @@ tests covering the particular feature.
 - [ ] Knocked Down
 - [ ] Falling Over
 - [ ] Roll over if stunned last turn
-- [ ] Standing up
+- [ ] Moving into a square
+  - Moving voluntarily
+  - Being pushed
+  - Need Dodge/Rush/Jump to go there
 
 ## Actions
 
@@ -171,14 +174,37 @@ tests covering the particular feature.
   - [x] Rush is 2+
   - [x] Failing a Rush puts player in target square.
   - [x] Move action is over after rushing twice.
-- [ ] Jump Sub-action
-  - [ ] Can only jump over prone player
-  - [ ] Use 2 moves
-  - [ ]
+- [x] Jump Sub-action
+  - [x] Can only jump over prone/stunned player
+  - [x] Jump over stunned/prone player from both teams
+  - [x] Must use two move to reach target square. If not enough move left (including rush), no jump is allowed.
+  - [x] If Rushing twice and fail, ends up in target square
+  - [x] Can only jump to opposite squares. Similar to pushes
+  - [ ] Cannot jump over a Giant since the rules specify a "single square"
+  - [x] Modifiers on leaving and entering
 - [ ] Pass Action
 - [ ] Hand-off Action
 - [ ] Throw Team-mate Action
 - [ ] Block Action
+  - [ ] Cannot block while prone
+  - [ ] Cannot mark if not marking player
+  - [ ] Unlimited blocks
+  - [ ] 1 - 3 dice rolls depending on strength
+  - [ ] Turnover if knocked down
+  - [ ] Assists
+    - [ ] Assists from open players
+    - [ ] Players being marked themselves cannot assist
+    - [ ] Prone players cannot assist
+  - [ ] Player Down!
+  - [ ] Both Down!
+  - [ ] Push Back!
+    - [ ] Push direction
+    - [ ] Can only push into empty squares
+    - [ ] Follow up
+    - [ ] Chain Push into free space
+    - [ ] Push into the crowd if no free space. Crowd take predence
+  - [ ] Stumble
+  - [ ] Pow!
 - [ ] Blitz Action
   - [ ] Rush To Blitz
 - [ ] Foul Action

@@ -295,8 +295,8 @@ class ManualActionProvider(
         }
 
         // Automatically select pushback direction when only one option is available.
-        if (actions.size == 1 && actions.first() is SelectFieldLocation && currentNode is PushStep.SelectPushDirection) {
-            val loc = actions.first() as SelectFieldLocation
+        if (actions.size == 1 && actions.first() is SelectFieldLocation && actions.first().createAll().size == 1 && currentNode is PushStep.SelectPushDirection) {
+            val loc = (actions.first() as SelectFieldLocation).squares.first()
             return FieldSquareSelected(loc.coordinate)
         }
 

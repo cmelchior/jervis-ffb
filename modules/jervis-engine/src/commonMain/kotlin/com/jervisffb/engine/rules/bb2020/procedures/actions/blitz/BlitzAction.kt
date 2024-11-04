@@ -135,7 +135,7 @@ object BlitzAction : Procedure() {
             val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(blitzer, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(state, blitzer))
 
             // Check if adjacent to target of the Blitz
             val hasMovesLeft = blitzer.movesLeft + blitzer.rushesLeft > 0
@@ -368,7 +368,7 @@ object BlitzAction : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val options = mutableListOf<GameActionDescriptor>()
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state.activePlayer!!, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
 
             // End action before the block
             // As soon as a target is selected, you can no longer cancel the action

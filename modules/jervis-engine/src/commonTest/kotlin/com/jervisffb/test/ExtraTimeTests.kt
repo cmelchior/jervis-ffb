@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.rules.BB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DetermineKickingTeam
 import com.jervisffb.test.ext.rollForward
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -18,13 +19,16 @@ class ExtraTimeTests: JervisGameTest() {
         override val turnsInExtraTime: Int = 8
     }
 
+    @BeforeTest
+    override fun setUp() {
+        super.setUp()
+        startDefaultGame()
+    }
+
     @Test
     fun stoppingGameAfterNormalTimeIfWinnerFound() {
         controller.state.homeGoals = 1 // Fake Home having one goal
         controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
             *skipTurns(16),
             *defaultSetup(homeFirst = false),
             *defaultKickOffAwayTeam(),
@@ -40,9 +44,6 @@ class ExtraTimeTests: JervisGameTest() {
     @Test
     fun goIntoExtraTimeIfDraw() {
         controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
             *skipTurns(16),
             *defaultSetup(homeFirst = false),
             *defaultKickOffAwayTeam(),
@@ -56,9 +57,6 @@ class ExtraTimeTests: JervisGameTest() {
     @Test
     fun endExtraTimeIfWinnerFound() {
         controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
             *skipTurns(16),
             *defaultSetup(homeFirst = false),
             *defaultKickOffAwayTeam(),
@@ -80,9 +78,6 @@ class ExtraTimeTests: JervisGameTest() {
     @Test
     fun suddenDeath() {
         controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
             *skipTurns(16),
             *defaultSetup(homeFirst = false),
             *defaultKickOffAwayTeam(),

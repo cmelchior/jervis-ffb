@@ -21,13 +21,15 @@ import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
 import com.jervisffb.engine.reports.ReportPickup
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchDownContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchdown
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.bb2020.tables.Weather
 
 /**
  * Resolve a Pickup, i.e., when a player moves into a field where the ball is placed.
  * See page 46 in the rulebook.
+ *
+ * Scoring is checked in [ResolveMoveTypeStep] to avoid duplicating this check across
+ * all procedures reacting to a player being moved.
  */
 object Pickup : Procedure() {
     override val initialNode: Node = RollToPickup
@@ -42,7 +44,7 @@ object Pickup : Procedure() {
 
         // Check for field being marked
         val marks = rules.calculateMarks(state, pickupPlayer.team, ball.location)
-        modifiers.add(MarkedModifier(marks * -1))
+        modifiers.add(MarkedModifier(marks))
 
         // Other modifiers, like disturbing presence?
 
@@ -82,7 +84,7 @@ object Pickup : Procedure() {
                 compositeCommandOf(
                     SetBallState.carried(ball, result.player),
                     ReportPickup(result.player, result.target, result.modifiers, result.roll!!.result, true),
-                    GotoNode(CheckForTouchDown),
+                    ExitProcedure()
                 )
             } else {
                 compositeCommandOf(
@@ -103,17 +105,6 @@ object Pickup : Procedure() {
                 state.activePlayer?.let { SetTurnOver(TurnOver.STANDARD) },
                 ExitProcedure(), // This is copied from Catch, which has a comment about it.
             )
-        }
-    }
-
-    object CheckForTouchDown : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<PickupRollContext>()
-            return SetContext(ScoringATouchDownContext(context.player))
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return ExitProcedure()
         }
     }
 }

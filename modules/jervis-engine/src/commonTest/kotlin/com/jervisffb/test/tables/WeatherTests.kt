@@ -25,7 +25,6 @@ import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
 import com.jervisffb.engine.model.modifiers.RushModifier
 import com.jervisffb.engine.rules.PlayerStandardActionType
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassingType
 import com.jervisffb.engine.rules.bb2020.tables.Range
@@ -193,7 +192,7 @@ class WeatherTests: JervisGameTest() {
         )
 
         // Check that no squares outside the valid range can be selected.
-        controller.getAvailableActions().actions.filterIsInstance<SelectFieldLocation>().forEach {
+        controller.getAvailableActions().actions.filterIsInstance<SelectFieldLocation>().first().squares.forEach {
             val range = rules.rangeRuler.measure(FieldCoordinate(17, 7), it.coordinate)
             if (range != Range.QUICK_PASS && range != Range.SHORT_PASS) {
                 fail("Invalid range: $range for ${it.coordinate}")

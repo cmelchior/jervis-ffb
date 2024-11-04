@@ -141,7 +141,7 @@ import com.jervisffb.engine.utils.sum
                 // Add marking modifiers if moving player doesn't have Stunty.
                 if (!player.hasSkill<Stunty>()) {
                     val marks = rules.calculateMarks(state, player.team, context.targetSquare)
-                    if (marks > 0) add(MarkedModifier(marks * -1))
+                    if (marks > 0) add(MarkedModifier(marks))
                 }
                 if (player.hasSkill<Titchy>()) {
                     add(DodgeRollModifier.TITCHY)

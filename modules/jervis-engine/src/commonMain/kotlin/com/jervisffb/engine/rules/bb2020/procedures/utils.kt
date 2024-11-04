@@ -1,9 +1,9 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectMoveType
+import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemovePlayerSkill
 import com.jervisffb.engine.commands.RemovePlayerStatModifier
@@ -33,8 +33,8 @@ import com.jervisffb.engine.rules.bb2020.skills.Sprint
  *
  * TODO Maybe not ball an chain? :thinking:
  */
-fun calculateMoveTypesAvailable(player: Player, rules: Rules): SelectMoveType? {
-
+fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
+    val rules = state.rules
     val options = mutableListOf<MoveType>()
 
     // Normal move (with a potential rush)
@@ -42,16 +42,30 @@ fun calculateMoveTypesAvailable(player: Player, rules: Rules): SelectMoveType? {
         options.add(MoveType.STANDARD)
     }
 
-//    // Jump/Leap (with potential rushes)
-//    if (player.movesLeft + player.rushesLeft >= 2 && player.isStanding(rules)) {
-//        options.add(MoveType.JUMP)
-//        options.add(MoveType.LEAP)
-//    }
-//
+    // Jump, if next to a prone player and space on the opposite side
+    val hasMoveLeft = player.movesLeft + player.rushesLeft >= 2 && rules.isStanding(player)
+    val legalJumpSquares = player.coordinates.getSurroundingCoordinates(rules, distance = 1)
+        .mapNotNull { state.field[it].player }
+        .filter { !rules.isStanding(it) }
+        .any {
+            rules.getPushOptions(player, it).any { coords ->
+                state.field[coords].isUnoccupied()
+            }
+        }
+
+    if (hasMoveLeft && legalJumpSquares) {
+        options.add(MoveType.JUMP)
+    }
+
     // Standup
     if (player.location.isOnField(rules) && player.state == PlayerState.PRONE) {
         options.add(MoveType.STAND_UP)
     }
+
+    // Skills
+    // Leap
+    // Ball & Chain
+    // Others?
 
     return if (options.isNotEmpty()) SelectMoveType(options) else null
 }
@@ -60,21 +74,21 @@ fun calculateMoveTypesAvailable(player: Player, rules: Rules): SelectMoveType? {
  * Returns all the reachable squares a player can go to using a specific type of
  * move.
  */
-fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type: MoveType): List<GameActionDescriptor> {
+fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type: MoveType): List<SelectFieldLocation> {
     return when (type) {
         MoveType.JUMP -> TODO()
         MoveType.LEAP -> TODO()
         MoveType.STANDARD -> {
             val requiresDodge = rules.calculateMarks(state, player.team, player.coordinates) > 0
-            val eligibleEmptySquares: List<GameActionDescriptor> =
-                if (player.movesLeft + player.rushesLeft > 0) {
-                    player.coordinates.getSurroundingCoordinates(rules)
-                        .filter { state.field[it].isUnoccupied() }
-                        .map { SelectFieldLocation.move(it, player.movesLeft <= 0, requiresDodge) }
-                } else {
-                    emptyList()
-                }
-            eligibleEmptySquares
+            if (player.movesLeft + player.rushesLeft > 0) {
+                player.coordinates.getSurroundingCoordinates(rules)
+                    .filter { state.field[it].isUnoccupied() }
+                    .map { TargetSquare.move(it, player.movesLeft <= 0, requiresDodge) }
+                    .let { SelectFieldLocation(it) }
+                    .let { listOf(it) }
+            } else {
+                emptyList()
+            }
         }
         MoveType.STAND_UP -> TODO()
     }

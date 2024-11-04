@@ -17,13 +17,9 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.BreakTackleModifier
 import com.jervisffb.engine.rules.PlayerStandardActionType
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.test.JervisGameTest
-import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
-import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -46,15 +42,13 @@ class BreakTackleTests: JervisGameTest() {
                 baseStrenght = 4
             }
         }
+        startDefaultGame()
     }
 
     @Test
     fun useBreakTackleOnDodge() {
         val player = state.getPlayerById("A1".playerId)
         controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
             // Dodge A1 away using Break Tackle
             PlayerSelected(player),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
@@ -74,9 +68,6 @@ class BreakTackleTests: JervisGameTest() {
     fun breakTackleAlsoAppliesToReroll() {
         val player = state.getPlayerById("A1".playerId)
         controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
             // Dodge A1 away using Break Tackle
             PlayerSelected(player),
             PlayerActionSelected(PlayerStandardActionType.MOVE),

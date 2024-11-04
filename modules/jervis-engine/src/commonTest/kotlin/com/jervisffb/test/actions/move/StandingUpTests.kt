@@ -14,9 +14,6 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.test.JervisGameTest
-import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
-import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import kotlin.test.BeforeTest
@@ -37,12 +34,7 @@ class StandingUpTests: JervisGameTest() {
     @BeforeTest
     override fun setUp() {
         super.setUp()
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
-        )
-
+        startDefaultGame()
         val player = state.getPlayerById("A10".playerId)
         player.state = PlayerState.PRONE
         player.hasTackleZones = false
@@ -57,7 +49,7 @@ class StandingUpTests: JervisGameTest() {
         )
         assertEquals(7, player.movesLeft)
         with(controller.getAvailableActions()) {
-            assertEquals(2, size)
+            assertEquals(2, actionsCount)
             assertTrue(contains(EndAction))
             assertTrue(contains(MoveType.STAND_UP))
         }

@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
@@ -8,14 +7,17 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -34,7 +36,6 @@ import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.utils.INVALID_ACTION
-import com.jervisffb.engine.commands.compositeCommandOf
 
 data class SolidDefenseContext(
     val roll: D3Result,
@@ -114,7 +115,7 @@ object SolidDefense : Procedure() {
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
             val isHomeTeam = state.kickingTeam.isHomeTeam()
-            val freeFields: List<SelectFieldLocation> =
+            val freeFields: List<TargetSquare> =
                 state.field
                     .filter {
                         // Only select from fields on teams half
@@ -126,10 +127,12 @@ object SolidDefense : Procedure() {
                         }
                     }
                     .filter { it.isUnoccupied() }
-                    .map { SelectFieldLocation.setup(it.coordinates) }
+                    .map { TargetSquare.setup(it.coordinates) }
 
             val playerCoordinates = context.currentPlayer!!.coordinates
-            return freeFields + SelectFieldLocation.setup(playerCoordinates)
+            return listOf(
+                SelectFieldLocation(freeFields + TargetSquare.setup(playerCoordinates))
+            )
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

@@ -14,11 +14,9 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
 import com.jervisffb.test.JervisGameTest
-import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
-import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -32,12 +30,15 @@ import kotlin.test.assertTrue
  */
 class RushingTests: JervisGameTest() {
 
+    @BeforeTest
+    override fun setUp() {
+        super.setUp()
+        startDefaultGame()
+    }
+
     @Test
     fun successfulRush() {
         controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
             PlayerSelected("A8".playerId),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             *moveTo(16, 13),
@@ -68,9 +69,6 @@ class RushingTests: JervisGameTest() {
     @Test
     fun failedRush() {
         controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(),
             PlayerSelected("A8".playerId),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             *moveTo(16, 13),
@@ -90,12 +88,6 @@ class RushingTests: JervisGameTest() {
 
     @Test
     fun rushBeforeDodge() {
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
-        )
-
         val player = state.field[13, 6].player!!
         player.movesLeft = 0
         assertTrue(rules.isMarked(player))

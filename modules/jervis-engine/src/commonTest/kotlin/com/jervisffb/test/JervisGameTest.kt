@@ -31,6 +31,7 @@ import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
 import com.jervisffb.engine.utils.createDefaultGameState
+import com.jervisffb.test.ext.rollForward
 import kotlin.test.BeforeTest
 
 /**
@@ -65,6 +66,14 @@ abstract class JervisGameTest {
         awayTeam = state.awayTeam
         controller = GameController(rules, state)
         controller.startTestMode(FullGame)
+    }
+
+    fun startDefaultGame() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(),
+        )
     }
 
     protected fun useTeamReroll(controller: GameController) =

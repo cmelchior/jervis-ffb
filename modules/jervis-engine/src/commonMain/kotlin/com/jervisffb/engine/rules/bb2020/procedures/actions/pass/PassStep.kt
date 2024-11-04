@@ -1,11 +1,12 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetBallLocation
@@ -13,6 +14,7 @@ import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -41,7 +43,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.ThrowInContext
 import com.jervisffb.engine.rules.bb2020.tables.Range
 import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Procedure for handling the passing part of a [PassAction].
@@ -70,8 +71,9 @@ object PassStep: Procedure() {
                         Range.OUT_OF_RANGE -> false
                     }
                 }
-                .map { SelectFieldLocation.throwTarget(it) }
-            return targetSquares + listOf(CancelWhenReady)
+                .map { TargetSquare.throwTarget(it) }
+                .let { SelectFieldLocation(it) }
+            return listOf(targetSquares, CancelWhenReady)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

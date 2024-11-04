@@ -121,7 +121,7 @@ object FoulAction : Procedure() {
             val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state.activePlayer!!, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
 
             // Check if adjacent to target of the Blitz
             if (context.fouler.location.isAdjacent(rules, context.victim!!.location)) {

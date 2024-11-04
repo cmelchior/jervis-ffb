@@ -35,30 +35,29 @@ import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
 
 /**
- * Procedure for handling a Standing Up Roll as described on page 44 in the rulebook.
+ * Procedure for handling a Jump Roll as described on page 45 in the rulebook.
  * It is only responsible for handling the actual dice roll. The result is stored
- * in [StandingUpRollContext] and it is up to the caller of the procedure to choose
+ * in [JumpRollContext] and it is up to the caller of the procedure to choose
  * the appropriate action depending on the outcome.
  */
-object StandingUpRoll : Procedure() {
-
+object JumpRoll : Procedure() {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) = state.assertContext<StandingUpRollContext>()
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<JumpRollContext>()
 
     object RollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<StandingUpRollContext>().player.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<JumpRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
-                val rollContext = state.getContext<StandingUpRollContext>()
+                val rollContext = state.getContext<JumpRollContext>()
                 val resultContext = rollContext.copy(
                     roll = D6DieRoll(d6),
-                    isSuccess = isStandingUp(d6, rules.standingUpTarget, rollContext.modifiers)
+                    isSuccess = isJumpSuccessful(d6, rollContext.player.agility, rollContext.modifiers)
                 )
                 return compositeCommandOf(
-                    ReportDiceRoll(DiceRollType.STANDING_UP, d6),
+                    ReportDiceRoll(DiceRollType.JUMP, d6),
                     SetContext(resultContext),
                     GotoNode(ChooseReRollSource),
                 )
@@ -67,13 +66,13 @@ object StandingUpRoll : Procedure() {
     }
 
     object ChooseReRollSource : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<StandingUpRollContext>().player.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<JumpRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<StandingUpRollContext>()
+            val context = state.getContext<JumpRollContext>()
             val availableRerolls = calculateAvailableRerollsFor(
                 rules,
                 context.player,
-                DiceRollType.STANDING_UP,
+                DiceRollType.JUMP,
                 context.roll!!,
                 context.isSuccess
             )
@@ -89,7 +88,7 @@ object StandingUpRoll : Procedure() {
                 Continue -> ExitProcedure()
                 is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.STANDING_UP, action.getRerollSource(state))
+                    val rerollContext = UseRerollContext(DiceRollType.JUMP, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),
@@ -115,19 +114,20 @@ object StandingUpRoll : Procedure() {
     }
 
     object ReRollDie : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.getContext<StandingUpRollContext>().player.team
+        override fun actionOwner(state: Game, rules: Rules) = state.getContext<JumpRollContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
-                val rollContext = state.getContext<StandingUpRollContext>()
+                val rollContext = state.getContext<JumpRollContext>()
                 val rerollResult = rollContext.copy(
                     roll = rollContext.roll!!.copy(
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),
-                    isSuccess = isStandingUp(d6, rules.standingUpTarget, rollContext.modifiers)
+                    isSuccess = isJumpSuccessful(d6, rollContext.player.agility, rollContext.modifiers)
                 )
                 compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.JUMP, d6),
                     SetContext(rerollResult),
                     ExitProcedure(),
                 )
@@ -135,7 +135,7 @@ object StandingUpRoll : Procedure() {
         }
     }
 
-    private fun isStandingUp(
+    private fun isJumpSuccessful(
         it: D6Result,
         target: Int,
         modifiers: List<DiceModifier>,

@@ -8,6 +8,11 @@ things as they come up.
 
 
 ## Todo List
+- [ ] When selecting a team reroll, what to do about temporary rerolls.
+      Right now the rules just select the most appropriate one, but most likely we need 
+      to list all types of rerolls and let it be up to the UI to filter/show them somehow.
+- [ ] Add "quick"-action when prone, where you can also select Jump if it would be 
+      possible after standing up.
 - [ ] Filter actions that cannot be used because they cannot select a target
   - Foul
   - Block if Prone (but yes combined with Jump Up)

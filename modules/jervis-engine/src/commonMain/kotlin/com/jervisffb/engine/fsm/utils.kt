@@ -33,7 +33,9 @@ inline fun <reified T : GameAction> ActionNode.checkTypeAndValue(
             is FieldSquareSelected -> {
                 val hasActionDescriptor = node.getAvailableActions(state, rules)
                     .filterIsInstance<SelectFieldLocation>()
-                    .firstOrNull { action.x == it.x && action.y == it.y } != null
+                    .firstOrNull()?.squares
+                    ?.any {  action.x == it.x && action.y == it.y }
+                    ?: false
                 if (!hasActionDescriptor) {
                     INVALID_ACTION(action, "Location wasn't recognised as a valid action: $availableActions")
                 }

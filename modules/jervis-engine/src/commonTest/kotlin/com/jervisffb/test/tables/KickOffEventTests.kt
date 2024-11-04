@@ -465,7 +465,7 @@ class KickOffEventTests: JervisGameTest() {
 
         // Move 3 players then end the Quick Snap
         controller.rollForward(PlayerSelected("A6".playerId))
-        assertEquals(8, controller.getAvailableActions().size) // Can move into all nearby fields
+        assertEquals(8, controller.getAvailableActions().actionsCount) // Can move into all nearby fields
         controller.rollForward(
             FieldSquareSelected(14,0),
             PlayerSelected("A7".playerId),
@@ -498,7 +498,7 @@ class KickOffEventTests: JervisGameTest() {
             1.d3, // D3 + 3 players
         )
         // 1 player + EndSetup
-        assertEquals(2, controller.getAvailableActions().size)
+        assertEquals(2, controller.getAvailableActions().actionsCount)
     }
 
     @Test

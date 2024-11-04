@@ -18,8 +18,8 @@ import com.jervisffb.engine.model.Team
 data class ActionRequest(
     val team: Team?,
     val actions: List<GameActionDescriptor>
-) {
-    val size = actions.size // TODO Should also count all sub actions
+): List<GameActionDescriptor> by actions {
+    val actionsCount = actions.sumOf { it.size } // TODO Should also count all sub actions
 
     /**
      * Returns `true` if the given action is one part of this request.
@@ -39,7 +39,7 @@ data class ActionRequest(
     fun contains(type: MoveType): Boolean {
         val found = actions.firstOrNull {
             it is SelectMoveType }
-        ?.let { (it as SelectMoveType).type.contains(type) }
+        ?.let { (it as SelectMoveType).types.contains(type) }
         return found == true
     }
 }

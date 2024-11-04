@@ -1,7 +1,6 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameController
-import com.jervisffb.engine.actions.SelectFieldLocation.Type
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
@@ -27,7 +26,7 @@ import com.jervisffb.engine.utils.combinations
 sealed interface GameActionDescriptor {
 
     // Returns how many GameActions are described by this descriptor
-//    val size: Int
+    val size: Int
 
     /**
      * Creates a random game action from the pool of actions described by this
@@ -43,42 +42,49 @@ sealed interface GameActionDescriptor {
 
 // "internal event" for continuing the game state
 data object ContinueWhenReady : GameActionDescriptor {
+    override val size: Int = 1
     override fun createRandom(): GameAction = Continue
     override fun createAll(): List<GameAction> = listOf(Continue)
 }
 
 // An generic action representing "Accept" or "Yes"
 data object ConfirmWhenReady : GameActionDescriptor {
+    override val size: Int = 1
     override fun createRandom(): GameAction = Confirm
     override fun createAll(): List<GameAction> = listOf(Confirm)
 }
 
 // An generic action representing "Cancel" or "No"
 data object CancelWhenReady : GameActionDescriptor {
+    override val size: Int = 1
     override fun createRandom(): GameAction = Cancel
     override fun createAll(): List<GameAction> = listOf(Cancel)
 }
 
 // Mark the setup phase as ended for a team
 data object EndSetupWhenReady : GameActionDescriptor {
+    override val size: Int = 1
     override fun createRandom(): GameAction = EndSetup
     override fun createAll(): List<GameAction> = listOf(EndSetup)
 }
 
 // Mark the turn as ended for a team
 data object EndTurnWhenReady : GameActionDescriptor {
+    override val size: Int = 1
     override fun createRandom(): GameAction = EndTurn
     override fun createAll(): List<GameAction> = listOf(EndTurn)
 }
 
 // Mark the current action for the active player as done.
 data object EndActionWhenReady : GameActionDescriptor {
+    override val size: Int = 1
     override fun createRandom(): GameAction = EndAction
     override fun createAll(): List<GameAction> = listOf(EndAction)
 }
 
 // Action owner must select a coin side
 data object SelectCoinSide : GameActionDescriptor {
+    override val size: Int = 2
     override fun createRandom(): GameAction = CoinSideSelected.allOptions().random()
     override fun createAll(): List<GameAction> = CoinSideSelected.allOptions()
 }
@@ -86,6 +92,7 @@ data object SelectCoinSide : GameActionDescriptor {
 data class SelectSkill(
     val skills: List<SkillFactory>
 ) : GameActionDescriptor {
+    override val size: Int = skills.size
     override fun createRandom(): GameAction = SkillSelected(skills.random())
     override fun createAll(): List<GameAction> = skills.map { SkillSelected(it) }
 }
@@ -94,6 +101,7 @@ data class SelectSkill(
 data class SelectInducement(
     val id: List<String>
 ): GameActionDescriptor {
+    override val size: Int = id.size
     override fun createRandom(): GameAction {
         TODO("Not yet implemented")
     }
@@ -103,6 +111,7 @@ data class SelectInducement(
 }
 
 data object TossCoin : GameActionDescriptor {
+    override val size: Int = 2
     override fun createRandom(): GameAction = CoinTossResult.allOptions().random()
     override fun createAll(): List<GameAction> = CoinTossResult.allOptions()
 }
@@ -112,6 +121,24 @@ data class RollDice(
     val dice: List<Dice>
 ) : GameActionDescriptor {
     constructor(vararg dice: Dice) : this(dice.toList())
+    override val size: Int
+        get() {
+            return dice.fold(1) { acc, die ->
+                val sides = when (die) {
+                    Dice.D2 -> 2
+                    Dice.D3 -> 3
+                    Dice.D4 -> 4
+                    Dice.D6 -> 6
+                    Dice.D8 -> 8
+                    Dice.D12 -> 12
+                    Dice.D16 -> 16
+                    Dice.D20 -> 20
+                    Dice.BLOCK -> 6
+                }
+                acc * sides
+        }
+    }
+
     override fun createRandom(): GameAction {
         return dice.map {
             when(it) {
@@ -136,36 +163,40 @@ data class RollDice(
 }
 
 data class SelectMoveType(
-    val type: List<MoveType>
+    val types: List<MoveType>
 ): GameActionDescriptor {
-    override fun createRandom(): GameAction = MoveTypeSelected(type.random())
-    override fun createAll(): List<GameAction> = type.map { MoveTypeSelected(it) }
+    override val size: Int = types.size
+    override fun createRandom(): GameAction = MoveTypeSelected(types.random())
+    override fun createAll(): List<GameAction> = types.map { MoveTypeSelected(it) }
 }
 
 data class SelectDirection(
     val origin: OnFieldLocation,
     val directions: List<Direction>
 ): GameActionDescriptor {
+    override val size: Int = directions.size
     override fun createRandom(): GameAction = DirectionSelected(directions.random())
     override fun createAll(): List<GameAction> = directions.map { DirectionSelected(it) }
 }
 
-
-data class Square(
+data class TargetSquare(
     val x: Int,
     val y: Int,
     val type: Type,
     val requiresRush: Boolean = false,
     val requiresDodge: Boolean = false,
-)
+    val requiresJump: Boolean = false
+) {
+    constructor(coordinate: FieldCoordinate, type: Type, requiresRush: Boolean = false, requiresDodge: Boolean = false, requiresJump: Boolean = false) : this(
+        coordinate.x,
+        coordinate.y,
+        type,
+        requiresRush,
+        requiresDodge,
+        requiresJump
+    )
 
-data class SelectFieldLocation private constructor(
-    val x: Int,
-    val y: Int,
-    val type: Type,
-    val requiresRush: Boolean = false,
-    val requiresDodge: Boolean = false,
-) : GameActionDescriptor {
+    val coordinate: FieldCoordinate = FieldCoordinate(x, y)
 
     // This is in order so the UI can filter or show options in different ways.
     enum class Type {
@@ -179,27 +210,27 @@ data class SelectFieldLocation private constructor(
         KICK,
         THROW_TARGET
     }
-    val coordinate: FieldCoordinate = FieldCoordinate(x, y)
-    private constructor(coordinate: FieldCoordinate, type: Type, needRush: Boolean = false, needDodge: Boolean = false) : this(coordinate.x, coordinate.y, type, needRush, needDodge)
 
     companion object {
-        fun setup(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.SETUP)
-        fun direction(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.DIRECTION)
-        fun standUp(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.STAND_UP)
-        fun move(coordinate: FieldCoordinate, needRush: Boolean, needDodge: Boolean) = SelectFieldLocation(coordinate, Type.MOVE, needRush, needDodge)
-        fun rush(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.RUSH)
-        fun jump(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.JUMP)
-        fun leap(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.LEAP)
-        fun kick(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.KICK)
-        fun throwTarget(coordinate: FieldCoordinate) = SelectFieldLocation(coordinate, Type.THROW_TARGET)
+        fun setup(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.SETUP)
+        fun direction(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.DIRECTION)
+        fun standUp(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.STAND_UP)
+        fun move(coordinate: FieldCoordinate, needRush: Boolean, needDodge: Boolean) = TargetSquare(coordinate, Type.MOVE, needRush, needDodge)
+        fun rush(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.RUSH)
+        fun jump(coordinate: FieldCoordinate, needRush: Boolean) = TargetSquare(coordinate, Type.JUMP, needRush, requiresDodge = false, requiresJump = true)
+        fun leap(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.LEAP)
+        fun kick(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.KICK)
+        fun throwTarget(coordinate: FieldCoordinate) = TargetSquare(coordinate, Type.THROW_TARGET)
     }
+}
 
-    override fun createRandom(): GameAction {
-        TODO("Not yet implemented")
-    }
-
+data class SelectFieldLocation(val squares: List<TargetSquare>) : GameActionDescriptor {
+    override val size: Int = squares.size
+    override fun createRandom(): GameAction = FieldSquareSelected(squares.random().coordinate)
     override fun createAll(): List<GameAction> {
-        TODO("Not yet implemented")
+        return squares.map {
+            FieldSquareSelected(it.coordinate)
+        }
     }
 }
 
@@ -209,6 +240,7 @@ data class SelectFieldLocation private constructor(
 data class SelectDicePoolResult(
     val pools: List<DicePool<*, *>>
 ): GameActionDescriptor {
+    override val size: Int = pools.size
     constructor(pool: DicePool<*, *>) : this(listOf(pool))
     override fun createRandom(): GameAction {
         TODO("Not yet implemented")
@@ -219,6 +251,7 @@ data class SelectDicePoolResult(
 }
 
 data object SelectDogout : GameActionDescriptor {
+    override val size: Int = 1
     override fun createRandom(): GameAction = DogoutSelected
     override fun createAll(): List<GameAction> = listOf(DogoutSelected)
 }
@@ -227,8 +260,7 @@ data class SelectPlayer(
     val players: List<PlayerId>
 ) : GameActionDescriptor {
     constructor(player: Player): this(listOf(player.id))
-    // constructor(player: List<Player>): this(player.map { it.id })
-
+    override val size: Int = players.size
     override fun createRandom(): GameAction = PlayerSelected(players.random())
     override fun createAll(): List<GameAction> = players.map { PlayerSelected(it) }
 }
@@ -237,6 +269,7 @@ data class DeselectPlayer(
     val players: List<Player>
 ) : GameActionDescriptor {
     constructor(player: Player): this(listOf(player))
+    override val size: Int = players.size
     override fun createRandom(): GameAction = PlayerDeselected(players.random())
     override fun createAll(): List<GameAction> = players.map { PlayerDeselected(it) }
 }
@@ -245,6 +278,7 @@ data class SelectPlayerAction(
     val actions: List<PlayerAction>
 ) : GameActionDescriptor {
     constructor(action: PlayerAction): this(listOf(action))
+    override val size: Int = actions.size
     override fun createRandom(): GameAction = PlayerActionSelected(actions.random().type)
     override fun createAll(): List<GameAction> = actions.map { PlayerActionSelected(it.type) }
 }
@@ -252,6 +286,7 @@ data class SelectPlayerAction(
 data class SelectBlockType(
     val types: List<BlockType>
 ): GameActionDescriptor {
+    override val size: Int = types.size
     override fun createRandom(): GameAction = BlockTypeSelected(types.random())
     override fun createAll(): List<GameAction> = types.map { BlockTypeSelected(it) }
 }
@@ -260,6 +295,14 @@ data class SelectRandomPlayers(
     val count: Int,
     val players: List<PlayerId>
 ): GameActionDescriptor {
+    override val size: Int
+        get() {
+            var results = 0
+            for (i in 0 until count) {
+                results *= (players.size - i)
+            }
+            return results
+        }
     override fun createRandom(): GameAction {
         return RandomPlayersSelected(players.shuffled().subList(0, count))
     }
@@ -277,6 +320,7 @@ data class SelectRerollOption(
     // rolls at the same time, like during Multiple Block
     val dicePoolId: Int = 0,
 ) : GameActionDescriptor {
+    override val size: Int = options.size
     override fun createRandom(): GameAction = RerollOptionSelected(options.random(), dicePoolId)
     override fun createAll(): List<GameAction> {
         return options.map {
@@ -298,6 +342,7 @@ data class SelectNoReroll(
     // at the same time.
     val dicePoolId: Int = 0,
 ) : GameActionDescriptor {
+    override val size: Int = 1
     override fun createRandom(): GameAction = NoRerollSelected(dicePoolId)
     override fun createAll(): List<GameAction> = listOf(NoRerollSelected(dicePoolId))
 }

@@ -30,7 +30,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
     )
 
     override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectMoveType) {
-        descriptor.type.forEach {
+        descriptor.types.forEach {
             handleType(actionProvider, state, snapshot, it)
         }
     }
@@ -105,14 +105,14 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                         { actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP)) },
                     )
                 )
-                addEnhancedStandUpOptions(actionProvider, state, player, activeLocation, snapshot)
+                addStandUpAndMoveOptions(actionProvider, state, player, activeLocation, snapshot)
             }
         }
     }
 
     // Add UI options that allows the User to skip manually selecting Stand Up
     // and then move. Instead players can move directly.
-    private fun addEnhancedStandUpOptions(
+    private fun addStandUpAndMoveOptions(
         actionProvider: ManualActionProvider,
         state: Game,
         player: Player,

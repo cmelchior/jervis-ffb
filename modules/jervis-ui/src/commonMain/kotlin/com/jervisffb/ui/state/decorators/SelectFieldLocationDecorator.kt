@@ -8,13 +8,16 @@ import com.jervisffb.ui.state.ManualActionProvider
 
 class SelectFieldLocationDecorator: FieldActionDecorator<SelectFieldLocation> {
     override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectFieldLocation) {
-        val selectedAction = {
-            actionProvider.userActionSelected(FieldSquareSelected(descriptor.coordinate))
+        descriptor.squares.forEach { squareData ->
+            val selectedAction = {
+                actionProvider.userActionSelected(FieldSquareSelected(squareData.coordinate))
+            }
+            val square = snapshot.fieldSquares[squareData.coordinate]
+            snapshot.fieldSquares[squareData.coordinate] = square?.copy(
+                onSelected = selectedAction,
+                requiresRoll = (squareData.requiresRush || squareData.requiresDodge || squareData.requiresJump)
+            ) ?: error("Unexpected location : ${squareData.coordinate}")
+
         }
-        val square = snapshot.fieldSquares[descriptor.coordinate]
-        snapshot.fieldSquares[descriptor.coordinate] = square?.copy(
-            onSelected = selectedAction,
-            requiresRoll = (descriptor.requiresRush || descriptor.requiresDodge)
-        ) ?: error("Unexpected location : ${descriptor.coordinate}")
     }
 }

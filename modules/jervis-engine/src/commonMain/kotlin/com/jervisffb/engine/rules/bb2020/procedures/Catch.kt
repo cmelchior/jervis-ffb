@@ -1,10 +1,10 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -17,10 +17,10 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchDownContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.reports.ReportCatch
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchDownContext
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -44,7 +44,7 @@ object Catch : Procedure() {
         // TODO Check for disturbing presence.
         // Check for field being marked
         val marks = rules.calculateMarks(state, catchingPlayer.team, ball.location)
-        modifiers.add(MarkedModifier(marks * -1))
+        modifiers.add(MarkedModifier(marks))
 
         // Check the weather
         if (state.weather == Weather.POURING_RAIN) {

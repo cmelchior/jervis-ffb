@@ -44,7 +44,7 @@ object MoveAction : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val moveOptions = calculateMoveTypesAvailable(state.activePlayer!!, rules)
+            val moveOptions = calculateMoveTypesAvailable(state, state.activePlayer!!)
             return buildList {
                 moveOptions?.let { add(it) }
                 add(EndActionWhenReady)
@@ -59,7 +59,7 @@ object MoveAction : Procedure() {
                     )
                 }
                 is MoveTypeSelected -> {
-                    if (calculateMoveTypesAvailable(state.activePlayer!!, rules)?.type?.contains(action.moveType) != true) {
+                    if (calculateMoveTypesAvailable(state, state.activePlayer!!)?.types?.contains(action.moveType) != true) {
                         INVALID_ACTION(action)
                     }
                     compositeCommandOf(

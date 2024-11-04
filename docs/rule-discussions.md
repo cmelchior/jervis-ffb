@@ -50,20 +50,26 @@ interpreted.
 9. It is unclear what happens if you put a player on a trapdoor during setup. Does that count 
     as "enter for any reason"? For we do nothing
 
-10. The timing of Trapdoor vs. Dodge/Jump is a bit unclear. Since Dodge/Jump is rolled after the player
-    is moved, I read it as the following sequence:
-    a. Announce Jump
-    b. Roll Rush 1 (if failed, fall over in starting square)
-    c. Move to target
-    d. Roll for Trapdoor
-    e. Roll for Jump
+10. The timing of Trapdoor vs. Dodge/Rush/Jump is unclear when reading the rule. 
+    I am using the following interpretation:
+    a. Announce move type: Standard/Dodge, Rush, Jump
+    b. Move to target
+    d. Roll Rush(es)
+    e. Roll Dodge
+    e. Roll for Jump. On (1) move player back to starting square
+    c. Roll for Trapdoor. If you leave the field, ball stays there.
+    f. If standing and moving voluntarily: Pickup Ball
+    g. If Falling Over/Knocked Down/Moved involuntarily: Bounce ball (We assume this has the same timing as picking up)
 
-    Same for Dodge
-    a. Announce Dodge
-    b. Move Player
-    c. Roll for Trapdoor
-    d. Roll for Dodge
-      
+    The reason being that Jump can move a player back, which would create weird situations if 
+    if you start bouncing balls before being moved back. I see moving the player first
+    as a "Tabletop" thing just to indicate the action, but in reality the player is not yet
+    "fully" in the square, which means that all effects using the wording "enter square" doesn't
+    trigger until Dodge/Rush/Jump has finished rolling. The result of these rolls determine
+    "how" the player enters the square, either falling, knocked down or never entered it in the 
+    first place. This interpretation also solves the timing with Tentacles.
+
+
 11. How does Chain-pushes and Trapdoors interact? When does the player count as being "moved"?
     E.g. if Player A is pushed into Player B who is standing on a Trapdoor, 
 
@@ -137,6 +143,11 @@ interpreted.
     is a short point in time, where the player did actually move. But since. Tentacles don't
     say anything about "moving back". The interpretation is that Tentacles trigger on the "intent"
     of moving. See https://www.reddit.com/r/bloodbowl/comments/11w0p1b/comment/jdbzakx/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    This also impact Jumping, i.e. you roll for Tentacles before rolling any Rush/Agility.
+
+27. Jumping and Rushing twice: https://www.reddit.com/r/bloodbowl/comments/nht634/bb2020_rules_query_involving_rush_and_jumping_a/
+    Right now it looks like the interpretation is that if you fail the rush, you end up
+    in the jumping square.
 
 # Differences compared to the rules as written
 

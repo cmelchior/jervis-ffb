@@ -59,20 +59,17 @@ import com.jervisffb.engine.rules.bb2020.procedures.Pickup
  * Standing up are handled in [StandingUpStep]
  */
 object ResolveMoveTypeStep : Procedure() {
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<MoveContext>()
-
-    }
     override val initialNode: Node = ResolveMove
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<MoveContext>()
 
     object ResolveMove : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             return when(val moveType = state.getContext<MoveContext>().moveType) {
                 MoveType.STANDARD -> StandardMoveStep
                 MoveType.STAND_UP -> StandingUpStep
-                MoveType.JUMP,
+                MoveType.JUMP -> JumpStep
                 MoveType.LEAP -> TODO("Not supported: $moveType")
             }
         }
@@ -93,10 +90,15 @@ object ResolveMoveTypeStep : Procedure() {
                     if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
                     GotoNode(PickUpBall)
                 )
-            } else {
+            } else if (endNow) {
                 compositeCommandOf(
                     if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
                     ExitProcedure()
+                )
+            } else {
+                compositeCommandOf(
+                    if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                    GotoNode(CheckForScoring)
                 )
             }
         }
@@ -114,8 +116,22 @@ object ResolveMoveTypeStep : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetCurrentBall(null),
-                ExitProcedure()
+                GotoNode(CheckForScoring)
             )
         }
     }
+
+    // Finally, once all rolls have been resolved, check if the moving player is scoring
+    // a touch down
+    object CheckForScoring : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            return SetContext(ScoringATouchDownContext(context.player))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return ExitProcedure()
+        }
+    }
+
 }

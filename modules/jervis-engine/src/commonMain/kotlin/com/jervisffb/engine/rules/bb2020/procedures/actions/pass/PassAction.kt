@@ -98,7 +98,7 @@ object PassAction : Procedure() {
             val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state.activePlayer!!, rules))
+            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
 
             // If holding the ball, the player can start the "Pass" section of the Pass action
             if (context.thrower.hasBall()) {
