@@ -43,6 +43,7 @@ things as they come up.
       on my machine, but it also feels like it could be optimized. Currently there
       are two places changes are happening. In the rules engine and in 
       ManualActionProvider when setting up listeners.
+- [ ] Could we add 3d dice rolling across the board? Probably difficult in pure Compose, but maybe using Lottie?
 - [x] Hover on block shows dice indicator.
 - [x] Better ball animation using Projectile Motion equations.
     - https://www.youtube.com/watch?v=qtsxHx1MpUI&ab_channel=PhysicsAlmanac

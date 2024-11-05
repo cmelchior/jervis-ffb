@@ -186,26 +186,87 @@ tests covering the particular feature.
 - [ ] Pass Action
 - [ ] Hand-off Action
 - [ ] Throw Team-mate Action
-- [ ] Block Action
-  - [ ] Cannot block while prone
-  - [ ] Cannot mark if not marking player
-  - [ ] Unlimited blocks
-  - [ ] 1 - 3 dice rolls depending on strength
-  - [ ] Turnover if knocked down
-  - [ ] Assists
-    - [ ] Assists from open players
-    - [ ] Players being marked themselves cannot assist
-    - [ ] Prone players cannot assist
-  - [ ] Player Down!
-  - [ ] Both Down!
+- [x] Block Action
+  - [x] Cannot block while prone
+  - [x] Can only block if marking the player.
+  - [x] Unlimited blocks
+  - [x] 1 - 3 dice rolls depending on strength
+  - [x] Turnover if knocked down
+  - [x] Assists
+    - [x] Assists from open players
+    - [x] Players being marked themselves cannot assist
+    - [x] Prone players cannot assist
+  - [x] Player Down!
+  - [x] Both Down!
   - [ ] Push Back!
     - [ ] Push direction
     - [ ] Can only push into empty squares
     - [ ] Follow up
     - [ ] Chain Push into free space
     - [ ] Push into the crowd if no free space. Crowd take predence
-  - [ ] Stumble
-  - [ ] Pow!
+  - [x] Stumble
+  - [x] Pow!
 - [ ] Blitz Action
   - [ ] Rush To Blitz
 - [ ] Foul Action
+  - [ ] Must select player when starting action
+  - [ ] Can only foul selected player
+  - [ ] Assists
+  - [ ] Caught by the Ref
+
+## Game Timer
+
+A game timer isn't described as such in the rules, but one would probably need to
+be implemented for practical reasons.
+
+It is unclear exactly how such a timer should work in practise, so this 
+section just contain my current thoughts:
+
+When `processAction` returns, the timer starts for `actionOwner`. It ends when 
+`processAction` is called again. This should accurately detect the time
+it takes a player to select an action.
+
+Of course this doesn't account for a lot of cases, like disconnecting, being
+AFK for valid reasons. This will need to be considered.
+
+Also there is a very open question about what happns when a timer "runs out".
+
+The obvious answer would be an Turnover, but just setting Turnover to true
+in the model, doesn't actually trigger that. It would need some GameAction input.
+
+I guess the server could just feed automatic actions to the model. It could
+automatically select EndAction, EndTurn, Cancel, NoRerollSelected when they
+are available. But in some cases these are not present, e.g. during chain pushes
+or during setup.
+
+So there will be some cases where we need to make a judgement call about what
+to do.
+
+In theory, we could just force stop the turn by incrementing the turncounter,
+but there would be a high chance that some state is left inconsistent. I.e.
+removal of temporary stats at the end of a turn.
+
+In the old Blood Bowl rules, it say 4 minutes pr. turn, but that doesn't take
+into account all the interruptions during a turn, i.e. if all actions during
+a team turn was attributed to the active team, an annoying player could run
+down the other players clock by not selecting options.
+
+Some alternatives:
+
+1. Chess clock: You just get allocated 4x16 minutes of time for the entire game.
+   If you run out of time, your turns basically turn into No-ops.
+
+2. Allocated something like 3 minutes pr. turn + a pool to be used during the 
+   opponents turn.
+
+
+
+
+
+
+
+
+
+
+
+

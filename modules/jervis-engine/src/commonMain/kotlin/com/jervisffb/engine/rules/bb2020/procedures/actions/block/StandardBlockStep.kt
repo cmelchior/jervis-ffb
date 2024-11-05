@@ -11,6 +11,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
@@ -95,7 +96,12 @@ object StandardBlockStep : Procedure() {
     object RerollDice : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = StandardBlockRerollDice
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(SelectRerollType)
+            val context = state.getContext<BlockContext>()
+            return if (context.roll.all { it.rerollSource != null }) {
+                GotoNode(SelectBlockResult)
+            } else {
+                GotoNode(SelectRerollType)
+            }
         }
     }
 

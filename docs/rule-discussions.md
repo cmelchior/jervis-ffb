@@ -14,6 +14,7 @@ interpreted.
    Examples being: Dodge/Tackle and Break Tackle/Diving Tackle. 
       a Does it matter? Yes, for break tackle / diving tackle, which are both "use once".
       b. Is it "Active then InActive", "InActive then Active", "Active Coach Decides" or "InActive Coach Decides"
+      c. For Both Down the order is: Defender then Attacker
 
 4. It is a bit unclear if Sweltering Heat or Deal with Secret Weapons happens first, but Sweltering heat 
    does mention "once a drive ends", which matches the "The Drive Ends" step of the End of Drive sequence.

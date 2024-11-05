@@ -22,6 +22,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
@@ -59,18 +60,24 @@ object StandardBlockRerollDice: Procedure() {
     object ReRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BlockContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            // TODO Some skills allow only rerolling some dice. We need to capture this somehow
             val noOfDice = state.getContext<BlockContext>().calculateNoOfBlockDice().absoluteValue
             return listOf(RollDice(List(noOfDice) { Dice.BLOCK }))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRollList<DBlockResult>(action) { rolls: List<DBlockResult> ->
-                val roll =
-                    rolls.map { blockRoll: DBlockResult ->
-                        BlockDieRoll(originalRoll = blockRoll)
+            return checkDiceRollList<DBlockResult>(action) { rerolls: List<DBlockResult> ->
+                val rerollContext = state.rerollContext!!
+                val blockContext = state.getContext<BlockContext>()
+                val updatedRoll = blockContext.roll.mapIndexed { i, blockRoll: BlockDieRoll ->
+                    blockRoll.also {
+                        it.rerollSource = rerollContext.source
+                        it.rerolledResult = rerolls[i] // TODO This requires that the rerolls are in the same order. Is that acceptable?
                     }
+                }
                 compositeCommandOf(
-                    SetContext(state.getContext<BlockContext>().copy(roll = roll)),
+                    ReportDiceRoll(DiceRollType.BLOCK, rerolls),
+                    SetContext(blockContext.copy(roll = updatedRoll)),
                     ExitProcedure(),
                 )
             }

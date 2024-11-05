@@ -235,7 +235,9 @@ data class SelectFieldLocation(val squares: List<TargetSquare>) : GameActionDesc
 }
 
 /**
- * Select final result from 1 or more dice pools
+ * Select final result from 1 or more dice pools.
+ *
+ * We have multiple dice pools during Multiple Block.
  */
 data class SelectDicePoolResult(
     val pools: List<DicePool<*, *>>

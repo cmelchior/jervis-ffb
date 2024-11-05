@@ -22,6 +22,11 @@ value class DieId(val id: String) {
     }
 }
 
+/**
+ * Interface allowing us to track a single die all the way from rolling it
+ * the first time to it getting rerolled. This includes both single die rolls as
+ * well as rolls involving multiple dice (dice pools).
+ */
 sealed interface DieRoll<D : DieResult> {
     val id: DieId
     val originalRoll: D

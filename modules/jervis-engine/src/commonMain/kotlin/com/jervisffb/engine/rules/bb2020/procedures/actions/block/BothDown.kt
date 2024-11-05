@@ -1,8 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
-import com.jervisffb.engine.commands.buildCompositeCommand
-import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -10,11 +7,14 @@ import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.buildCompositeCommand
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -29,10 +29,10 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.KnockedDown
-import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.reports.ReportBothDownResult
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.KnockedDown
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.utils.INVALID_ACTION
 
@@ -48,9 +48,19 @@ data class BothDownContext(
 /**
  * Resolve a "Both Down" selected as a block result.
  * See page 57 in the rulebook.
+ *
+ * Developer's Commentary:
+ * The order of choosing skills is unclear from the rules. In this implementation,
+ * we have chosen that the defender goes first. It is somewhat arbitrary, but
+ * means that the order of checking is:
+ *
+ * 1. Defender chooses to use Wrestle
+ * 2. Attacker chooses to use Wrestle
+ * 3. Defender chooses to use block
+ * 4. Attacker chooses to use block
  */
 object BothDown: Procedure() {
-    override val initialNode: Node = AttackerChooseToUseWrestle
+    override val initialNode: Node = DefenderChooseToUseWrestle
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val blockContext = state.getContext<BlockContext>()
         return SetContext(
@@ -65,33 +75,6 @@ object BothDown: Procedure() {
             ReportBothDownResult(state.getContext<BothDownContext>()),
             RemoveContext<BothDownContext>()
         )
-    }
-
-    object AttackerChooseToUseWrestle: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().attacker.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<BothDownContext>()
-            // TODO Figure out how to check for Wrestle
-            val hasWrestle = false
-            return when (hasWrestle) {
-                true -> listOf(ConfirmWhenReady, CancelWhenReady)
-                false -> listOf(ContinueWhenReady)
-            }
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<BothDownContext>()
-            val useWrestle = when (action) {
-                Confirm -> true
-                Cancel,
-                Continue -> false
-                else -> INVALID_ACTION(action)
-            }
-            return compositeCommandOf(
-                SetContext(context.copy(attackerUsesWrestle = useWrestle)),
-                GotoNode(DefenderChooseToUseWrestle)
-            )
-        }
     }
 
     object DefenderChooseToUseWrestle: ActionNode() {
@@ -116,6 +99,64 @@ object BothDown: Procedure() {
             }
             return compositeCommandOf(
                 SetContext(context.copy(defenderUsesWrestle = useWrestle)),
+                GotoNode(AttackerChooseToUseWrestle)
+            )
+        }
+    }
+
+    object AttackerChooseToUseWrestle: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().attacker.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<BothDownContext>()
+            // TODO Figure out how to check for Wrestle
+            val hasWrestle = false
+            return when (hasWrestle) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+            val useWrestle = when (action) {
+                Confirm -> true
+                Cancel,
+                Continue -> false
+                else -> INVALID_ACTION(action)
+            }
+            val updatedContext = context.copy(attackerUsesWrestle = useWrestle)
+            return compositeCommandOf(
+                SetContext(updatedContext),
+                if (updatedContext.attackerUsesWrestle || updatedContext.defenderUsesWrestle) {
+                    GotoNode(ResolveBothDown)
+                } else {
+                    GotoNode(DefenderChooseToUseBlock)
+                }
+            )
+        }
+    }
+
+    object DefenderChooseToUseBlock: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().defender.team
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<BothDownContext>()
+            val hasBlock = context.defender.getSkillOrNull<Block>() != null
+            return when (hasBlock) {
+                true -> listOf(ConfirmWhenReady, CancelWhenReady)
+                false -> listOf(ContinueWhenReady)
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<BothDownContext>()
+            val useBlock = when (action) {
+                Confirm -> true
+                Cancel,
+                Continue -> false
+                else -> INVALID_ACTION(action)
+            }
+            return compositeCommandOf(
+                SetContext(context.copy(defenderUsesBlock = useBlock)),
                 GotoNode(AttackerChooseToUseBlock)
             )
         }
@@ -142,32 +183,6 @@ object BothDown: Procedure() {
             }
             return compositeCommandOf(
                 SetContext(context.copy(attackUsesBlock = useBlock)),
-                GotoNode(DefenderChooseToUseBlock)
-            )
-        }
-    }
-
-    object DefenderChooseToUseBlock: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().defender.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<BothDownContext>()
-            val hasBlock = context.defender.getSkillOrNull<Block>() != null
-            return when (hasBlock) {
-                true -> listOf(ConfirmWhenReady, CancelWhenReady)
-                false -> listOf(ContinueWhenReady)
-            }
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<BothDownContext>()
-            val useBlock = when (action) {
-                Confirm -> true
-                Cancel,
-                Continue -> false
-                else -> INVALID_ACTION(action)
-            }
-            return compositeCommandOf(
-                SetContext(context.copy(defenderUsesBlock = useBlock)),
                 GotoNode(ResolveBothDown)
             )
         }

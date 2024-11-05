@@ -1,5 +1,6 @@
 package com.jervisffb.test.skills
 
+import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import kotlin.test.Test
 
 /**

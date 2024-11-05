@@ -205,6 +205,15 @@ interface Rules {
             .firstOrNull { canMark(field[it].player!!) } != null
     }
 
+    fun isMarking(state: Game, player: Player, target: Player): Boolean {
+        if (!player.location.isOnField(this)) return false
+        if (!target.location.isOnField(this)) return false
+        if (!player.hasTackleZones) return false
+
+        return player.coordinates.getSurroundingCoordinates(this, 1)
+            .any { state.field[it].player == target }
+    }
+
     /**
      * Return `true` if the [assisting] player can assist another player against
      * [target], `false` if not.
@@ -344,6 +353,7 @@ interface Rules {
      */
     fun getAvailableActions(state: Game, player: Player): List<PlayerAction> {
         if (state.activePlayer != player) INVALID_GAME_STATE("$player is not the active player")
+        if (player.location !is OnFieldLocation) return emptyList()
 
         return buildList {
             // Add any team actions that are available
@@ -351,9 +361,27 @@ interface Rules {
                 if (it.moveActions > 0) add(teamActions.move)
                 if (it.passActions > 0) add(teamActions.pass)
                 if (it.handOffActions > 0) add(teamActions.handOff)
-                if (it.blockActions > 0) add(teamActions.block)
-                if (it.blitzActions > 0) add(teamActions.blitz)
-                if (it.foulActions > 0) add(teamActions.foul)
+                if (it.blockActions > 0) {
+                    val isStanding = (player.state == PlayerState.STANDING)
+                    val hasEligibleTargets = (player.location as OnFieldLocation)
+                        .getSurroundingCoordinates(this@Rules, 1)
+                        .mapNotNull { state.field[it].player }
+                        .filter { otherPlayer -> otherPlayer.team != player.team }
+                        .filter { otherPlayer -> isStanding(otherPlayer)}
+                        .any { otherPlayer -> isMarking(state, player, otherPlayer)}
+
+                    if (isStanding && hasEligibleTargets) {
+                        add(teamActions.block)
+                    }
+                }
+                if (it.blitzActions > 0) {
+                    // TODO There must be a valid target to declare a blitz
+                    add(teamActions.blitz)
+                }
+                if (it.foulActions > 0) {
+                    // TODO Check if any players are currently prone/stunned
+                    add(teamActions.foul)
+                }
             }
 
             // Add any special actions that are provided by skills

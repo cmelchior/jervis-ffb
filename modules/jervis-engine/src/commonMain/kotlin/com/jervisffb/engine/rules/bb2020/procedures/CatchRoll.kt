@@ -118,15 +118,14 @@ object CatchRoll : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
-                val rollResultContext = state.getContext<CatchRollContext>()
-                val rollContext = state.getContext<CatchRollContext>()
-                val target = rollContext.catchingPlayer.agility + rollContext.modifiers.sum()
-                val rerollResult = rollResultContext.copy(
-                    roll = rollResultContext.roll!!.copy(
+                val catchRollContext = state.getContext<CatchRollContext>()
+                val target = catchRollContext.catchingPlayer.agility + catchRollContext.modifiers.sum()
+                val rerollResult = catchRollContext.copy(
+                    roll = catchRollContext.roll!!.copy(
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),
-                    isSuccess = isCatchSuccess(d6, target, rollContext)
+                    isSuccess = isCatchSuccess(d6, target, catchRollContext)
                 )
                 compositeCommandOf(
                     SetContext(rerollResult),
