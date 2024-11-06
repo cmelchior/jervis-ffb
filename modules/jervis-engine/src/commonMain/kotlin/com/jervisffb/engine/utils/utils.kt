@@ -385,6 +385,20 @@ fun calculateAvailableRerollsFor(
     }
 }
 
+
+/**
+ * Returns all possible combinations from a given list, excluding the empty set.
+ */
+fun <T> List<T>.allCombinations(): List<List<T>> {
+    if (this.isEmpty()) return emptyList()
+    val result = mutableListOf<List<T>>()
+    val rest = this.drop(1).allCombinations()
+    result.addAll(rest)
+    result.addAll(rest.map { listOf(this.first()) + it }) // Ensure order is maintained
+    result.add(listOf(this.first())) // Add single-element combination
+    return result
+}
+
 /**
  * Return all combinations of [size] from the list.
  */
