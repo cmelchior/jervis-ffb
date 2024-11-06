@@ -1,4 +1,4 @@
-package com.jervisffb.test.actions.move
+package com.jervisffb.test.actions
 
 import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.EndAction

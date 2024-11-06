@@ -1,4 +1,4 @@
-package com.jervisffb.test.actions.block
+package com.jervisffb.test.actions
 
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext

@@ -20,7 +20,8 @@ data class Direction(val xModifier: Int, val yModifier: Int) {
 
     /**
      * Named directions. These represent a direction as defined on the internal
-     * field model and might not present the direction shown in the UI.
+     * field model, which is horizontal (left to right), and might not present
+     * the direction shown in the UI.
      */
     companion object {
         val UP_LEFT = Direction(-1, -1)

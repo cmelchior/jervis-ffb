@@ -28,6 +28,7 @@ import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
+import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
@@ -316,7 +317,10 @@ class ManualActionProvider(
         }
 
         // When there is only one block type for a block, just select that one straight away
-        if (currentNode == BlockAction.SelectBlockType) {
+        if (
+            menuViewModel.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTON) &&
+            (currentNode == BlockAction.SelectBlockType || currentNode == BlitzAction.SelectBlockType)
+        ) {
             actions.filterIsInstance<SelectBlockType>().firstOrNull()?.let {
                 if (it.size == 1) {
                     return BlockTypeSelected(it.types.first())

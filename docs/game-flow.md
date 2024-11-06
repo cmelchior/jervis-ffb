@@ -95,6 +95,7 @@ tests covering the particular feature.
   - [x] Catching the ball after a hand-off in the end zone
   - [x] Catching the ball after it bouncing into the end zone
   - [x] Catching the ball in the end zone after a throw-in 
+  - [ ] Push player to scoring position during block, but blocker is knocked down.
   - [ ] Throw Team-mate. Player lands in the end zone
   - [ ] Chain push: Player with the ball is pushed into the end zone
   - [ ] Chain push: Player is pushed into the ball and picks it up.
@@ -206,13 +207,22 @@ tests covering the particular feature.
     - [ ] Push into the crowd if no free space. Crowd take predence
   - [x] Stumble
   - [x] Pow!
-- [ ] Blitz Action
-  - [ ] Rush To Blitz
+- [x] Blitz Action
+  - [x] Must select target before starting blitz 
+  - [x] Rush To Blitz
+  - [x] Cannot blitz if no more move
+  - [x] Cannot blitz if no valid targets
+  - [x] Move after blitz
+  - [x] Blitz uses 1 move
+  - [x] Fail rush just before blitz
 - [ ] Foul Action
   - [ ] Must select player when starting action
   - [ ] Can only foul selected player
   - [ ] Assists
   - [ ] Caught by the Ref
+- Hand-off Action
+- Pass Action
+- Throw Team-mate Action
 
 ## Game Timer
 

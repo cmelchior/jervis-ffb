@@ -15,14 +15,13 @@ import com.jervisffb.ui.state.calculateAssumedNoOfBlockDice
 class SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
     override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectPlayer) {
         descriptor.players.forEach { player ->
-            // Define onClick event
             val selectedAction = {
                 actionProvider.userActionSelected(PlayerSelected(player))
             }
 
             val playerLocation = state.getPlayerById(player).location
 
-            // Calculate dice decorators
+            // Calculate dice decorators (if any)
             var dice = when (state.stack.currentNode()) {
                 BlockAction.SelectDefenderOrEndAction -> {
                     val attacker = state.activePlayer!!

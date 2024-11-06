@@ -1,4 +1,4 @@
-package com.jervisffb.test.actions.block
+package com.jervisffb.test.actions
 
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction

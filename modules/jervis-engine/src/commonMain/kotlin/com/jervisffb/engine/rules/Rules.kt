@@ -375,8 +375,13 @@ interface Rules {
                     }
                 }
                 if (it.blitzActions > 0) {
-                    // TODO There must be a valid target to declare a blitz
-                    add(teamActions.blitz)
+                    val hasEligibleTargets = player.team.otherTeam()
+                        .filter { targetPlayer ->  targetPlayer.location.isOnField(this@Rules) }
+                        .any {  targetPlayer -> isStanding(targetPlayer) }
+
+                    if (hasEligibleTargets) {
+                        add(teamActions.blitz)
+                    }
                 }
                 if (it.foulActions > 0) {
                     // TODO Check if any players are currently prone/stunned

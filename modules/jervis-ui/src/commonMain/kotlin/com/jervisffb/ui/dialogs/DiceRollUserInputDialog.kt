@@ -18,6 +18,7 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassContext
@@ -248,7 +249,7 @@ class DiceRollUserInputDialog(
             )
         }
 
-        fun createRushRollDialog(player: Player, target: FieldCoordinate): UserInputDialog {
+        fun createRushRollDialog(player: Player, target: OnFieldLocation): UserInputDialog {
             return DiceRollUserInputDialog(
                 title = "Rush Roll",
                 message = "${player.name} rolls D6 to rush to ${target.toLogString()}",
