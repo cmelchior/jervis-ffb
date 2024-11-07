@@ -112,7 +112,7 @@ jobs:
           retention-days: 1
 
   build-linux-desktop:
-    runs-on: macos-latest
+    runs-on: debian-latest
     needs: [ run-tests ]
     if: |
       always() && 
@@ -149,7 +149,7 @@ jobs:
           retention-days: 1
 
   build-wasm:
-    runs-on: debian-latest
+    runs-on: linux-latest
     needs: [ run-tests ]
     if: |
       always() && 
