@@ -64,7 +64,7 @@ jobs:
           cache-read-only: false
 
       - name: Build Distribution for Windows
-        run: ./gradlew packageReleaseMsi -Pjervis.releaseType=dev
+        run: ./gradlew packageReleaseMsi -P"jervis.releaseType=dev"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
