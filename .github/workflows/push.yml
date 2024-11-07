@@ -63,7 +63,7 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Run Tests
+      - name: Build Distribution for Windows
         run: ./gradlew packageReleaseMsi -Pjervis.releaseType=dev
 
       - name: Upload artifacts
@@ -71,6 +71,7 @@ jobs:
         with:
           name: app-windows
           path: ./modules/jervis-ui/build/compose/binaries/main-release/msi/*
+          if-no-files-found: error
           retention-days: 1
 
   build-macos-desktop:
@@ -99,14 +100,15 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Run Tests
-        run: ./gradlew packageReleaseMsi -Pjervis.releaseType=dev
+      - name: Build Distribution for MacOS
+        run: ./gradlew packageReleaseDmg -Pjervis.releaseType=dev
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: app-macos
           path: ./modules/jervis-ui/build/compose/binaries/main-release/dmg/*
+          if-no-files-found: error
           retention-days: 1
 
   build-linux-desktop:
@@ -135,14 +137,15 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Run Tests
-        run: ./gradlew packageReleaseMsi -Pjervis.releaseType=dev
+      - name: Build Distribution for Linux
+        run: ./gradlew packageReleaseDeb -Pjervis.releaseType=dev
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: app-linux
           path: ./modules/jervis-ui/build/compose/binaries/main-release/deb/*
+          if-no-files-found: error
           retention-days: 1
 
   build-wasm:
@@ -179,6 +182,7 @@ jobs:
         with:
           name: app-browser
           path: ./modules/jervis-ui/build/dist/wasmJs/productionExecutable/*
+          if-no-files-found: error
           retention-days: 1
 
   upload-dev-versions:
