@@ -1,4 +1,4 @@
-package dk.ilios.analyzer
+package com.jervisffb.analyzer
 
 import com.jervisffb.fumbbl.net.api.commands.NetCommand
 import kotlinx.serialization.KSerializer

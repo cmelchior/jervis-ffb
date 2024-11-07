@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.serialization)
 }
 
-group = "dk.ilios.jervis"
-version = "fumbbl-net"
+group = "com.jervisffb"
+version = rootProject.ext["mavenVersion"] as String
 
 repositories {
     mavenCentral()

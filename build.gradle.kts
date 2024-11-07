@@ -7,9 +7,67 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1" apply false
 }
 
+enum class ReleaseType {
+    SNAPSHOT, DEV, PROD
+}
+
+val releaseType = when(properties["jervis.releaseType"]) {
+    "snapshot" -> ReleaseType.SNAPSHOT
+    "dev" -> ReleaseType.DEV
+    "prod" -> ReleaseType.PROD
+    else -> ReleaseType.SNAPSHOT
+}
+
+val gitHash: String by lazy {
+    Runtime.getRuntime().exec(arrayOf("git", "rev-parse", "--short",  "HEAD"))
+        .inputStream
+        .bufferedReader()
+        .use { it.readText().trim() }
+}
+
+// Create Maven version
+private fun createMavenVersion(): String {
+    val versionStr = properties["jervis.version"] as String
+    return when (releaseType) {
+        ReleaseType.SNAPSHOT -> "$versionStr-SNAPSHOT"
+        ReleaseType.DEV -> "$versionStr-dev-$gitHash"
+        ReleaseType.PROD -> versionStr
+    }
+}
+
+// Create Public version (as visible inside the app)
+private fun createProjectVersion(): String {
+    val versionStr = properties["jervis.version"] as String
+    return when (releaseType) {
+        ReleaseType.SNAPSHOT -> "$versionStr.dev.local"
+        ReleaseType.DEV -> "$versionStr.dev.$gitHash"
+        ReleaseType.PROD -> versionStr
+    }
+}
+
+// Create version used when creating distribution packages.
+// See https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/Native_distributions_and_local_execution/README.md
+// for restrictions on these.
+private fun createDistributionVersion(): String {
+    val versionStr = properties["jervis.version"] as String
+    return if (versionStr.startsWith("0.")) {
+        "1.0.0"
+    } else {
+        versionStr
+    }
+}
+
+// Version number used for Maven Artifacts
+rootProject.ext["mavenVersion"] = createMavenVersion()
+// Version number used in the App
+rootProject.ext["publicVersion"] = createProjectVersion()
+// Used in Distribution packages (must be SemVer >= 1.0.0)
+rootProject.ext["distributionVersion"] = createDistributionVersion()
+// Current short git hash
+rootProject.ext["gitHash"] = gitHash
+
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
-
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         debug.set(true)
         verbose.set(true)
@@ -134,7 +192,4 @@ tasks.register<Copy>("updateFFBResources") {
         include("**/*") // Include all files
     }
     into(targetDir) // Move files into the final destination
-//    doLast {
-//        delete(tempDir)
-//    }
 }

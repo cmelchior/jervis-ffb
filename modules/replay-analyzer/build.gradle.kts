@@ -4,15 +4,15 @@ plugins {
     id("application")
 }
 
-group = "dk.ilios"
-version = "1.0.0-SNAPSHOT"
+group = "com.jervisffb"
+version = rootProject.ext["mavenVersion"] as String
 
 repositories {
     mavenCentral()
 }
 
 application {
-    mainClass.set("dk.ilios.fumble.MainKt")
+    mainClass.set("com.jervisffb.analyzer.MainKt")
 }
 
 kotlin {

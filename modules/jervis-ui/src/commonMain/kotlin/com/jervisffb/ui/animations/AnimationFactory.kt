@@ -17,22 +17,22 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.ChangingWeath
 import com.jervisffb.engine.rules.bb2020.tables.KickOffEvent
 import com.jervisffb.engine.rules.bb2020.tables.TableResult
 import com.jervisffb.engine.rules.bb2020.tables.Weather
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.Res
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_blitz
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_blizzard
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_brilliant_coaching
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_cheering_fans
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_get_the_ref
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_high_kick
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_nice
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_officious_ref
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_pitch_invasion
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_pouring_rain
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_quick_snap
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_solid_defence
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_sweltering_heat
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_timeout
-import dk.ilios.bloodbowl.ui.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_very_sunny
+import com.jervisffb.jervis_ui.generated.resources.Res
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_blitz
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_blizzard
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_brilliant_coaching
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_cheering_fans
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_get_the_ref
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_high_kick
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_nice
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_officious_ref
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_pitch_invasion
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_pouring_rain
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_quick_snap
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_solid_defence
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_sweltering_heat
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_timeout
+import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_very_sunny
 
 /**
  * Class responsible for detecting if an animation should be run, and which one.

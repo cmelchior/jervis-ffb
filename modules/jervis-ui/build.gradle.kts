@@ -1,4 +1,10 @@
+@file:OptIn(
+    ExperimentalWasmDsl::class,
+    org.jetbrains.compose.ExperimentalComposeLibrary::class
+)
+
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -6,10 +12,17 @@ plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.composeCompiler)
+    id("com.github.gmazzo.buildconfig") version "5.5.0"
 }
 
-group = "dk.ilios.bloodbowl.ui"
-version = "1.0-SNAPSHOT"
+group = "com.jervisffb"
+version = rootProject.ext["mavenVersion"] as String
+
+buildConfig {
+    this.packageName("com.jervisffb.ui")
+    buildConfigField("releaseVersion", rootProject.ext["publicVersion"] as String)
+    buildConfigField("gitHash", rootProject.ext["gitHash"] as String)
+}
 
 kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())
@@ -59,7 +72,6 @@ kotlin {
                 implementation(compose.desktop.currentOs)
 //                implementation(compose.desktop.macos_arm64)
 //                implementation("org.jetbrains.skiko:skiko-awt-runtime-macos-arm64:+")
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.desktop.uiTestJUnit4)
             }
         }
@@ -68,28 +80,26 @@ kotlin {
     }
 }
 
-// android {
-//    compileSdkVersion(33)
-//    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-//    defaultConfig {
-//        minSdkVersion(24)
-//        targetSdkVersion(33)
-//    }
-//    compileOptions {
-//        sourceCompatibility = JavaVersion.VERSION_1_8
-//        targetCompatibility = JavaVersion.VERSION_1_8
-//    }
-// }
-
-
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "com.jervisffb.MainKt"
+        // See https://youtrack.jetbrains.com/issue/CMP-7048/Missing-customization-options-for-About-dialog-on-MacOS
+        // for request to customize the UI
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg)
-//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "jervis-ui"
-            packageVersion = "1.0.0"
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "Test app"
+            packageVersion = rootProject.ext["distributionVersion"] as String
+        }
+
+        // See https://youtrack.jetbrains.com/issue/CMP-4216
+        buildTypes.release.proguard {
+            // Enabling Proguard prevents the app from launching.
+            // Needs more investigation
+            isEnabled = false
+            version.set("7.6.0")
+            configurationFiles.from(project.file("jervisffb.pro"))
+            optimize = true
+            obfuscate = false
         }
     }
 }

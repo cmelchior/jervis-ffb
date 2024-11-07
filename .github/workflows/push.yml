@@ -1,4 +1,4 @@
-name: Main Build
+name: Main Build and Publish Dev Build
 on:
   workflow_dispatch:  # Add this line to enable manual triggering
   pull_request:
@@ -14,7 +14,7 @@ concurrency:
 
 # For now, just run all rules tests. Mostly as a proof-of-concept.
 jobs:
-  test-rules:
+  run-tests:
     runs-on: ubuntu-latest
     if: always() && !cancelled()
     steps:
@@ -36,3 +36,161 @@ jobs:
 
       - name: Run Tests
         run: ./gradlew :modules:jervis-engine:jvmTest
+
+  build-windows-desktop:
+    runs-on: windows-latest
+    needs: [ run-tests ]
+    if: |
+      always() && 
+      !cancelled() && 
+      !contains(needs.*.result, 'failure') && 
+      !contains(needs.*.result, 'cancelled')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Setup Gradle and task/dependency caching
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Run Tests
+        run: ./gradlew packageReleaseMsi -Pjervis.releaseType=dev
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-windows
+          path: ./modules/jervis-ui/build/compose/binaries/main-release/msi/*
+          retention-days: 1
+
+  build-macos-desktop:
+    runs-on: macos-latest
+    needs: [ run-tests ]
+    if: |
+      always() && 
+      !cancelled() && 
+      !contains(needs.*.result, 'failure') && 
+      !contains(needs.*.result, 'cancelled')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Setup Gradle and task/dependency caching
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Run Tests
+        run: ./gradlew packageReleaseMsi -Pjervis.releaseType=dev
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-macos
+          path: ./modules/jervis-ui/build/compose/binaries/main-release/dmg/*
+          retention-days: 1
+
+  build-linux-desktop:
+    runs-on: macos-latest
+    needs: [ run-tests ]
+    if: |
+      always() && 
+      !cancelled() && 
+      !contains(needs.*.result, 'failure') && 
+      !contains(needs.*.result, 'cancelled')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Setup Gradle and task/dependency caching
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Run Tests
+        run: ./gradlew packageReleaseMsi -Pjervis.releaseType=dev
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-linux
+          path: ./modules/jervis-ui/build/compose/binaries/main-release/deb/*
+          retention-days: 1
+
+  build-wasm:
+    runs-on: linux-latest
+    needs: [ run-tests ]
+    if: |
+      always() && 
+      !cancelled() && 
+      !contains(needs.*.result, 'failure') && 
+      !contains(needs.*.result, 'cancelled')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Setup Gradle and task/dependency caching
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Run Tests
+        run: ./gradlew wasmJsBrowserDistribution -Pjervis.releaseType=dev
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-browser
+          path: ./modules/jervis-ui/build/dist/wasmJs/productionExecutable/*
+          retention-days: 1
+
+  upload-dev-versions:
+    runs-on: linux-latest
+    needs: [ build-linux-desktop, build-macos-desktop, build-windows-desktop, build-wasm ]
+    if: |
+      always() && 
+      !cancelled() && 
+      !contains(needs.*.result, 'failure') && 
+      !contains(needs.*.result, 'cancelled')
+
+    steps:
+      - name: Upload Dev version
+        run: echo "It is working"
+

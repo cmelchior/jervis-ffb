@@ -5,8 +5,8 @@ plugins {
     application
 }
 
-group = "dk.ilios.jervis"
-version = "1.0.0-SNAPSHOT"
+group = "com.jervisffb"
+version = rootProject.ext["mavenVersion"] as String
 
 repositories {
     mavenCentral()

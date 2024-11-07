@@ -3,8 +3,8 @@ plugins {
     alias(libs.plugins.serialization)
 }
 
-group = "dk.ilios"
-version = "1.0-SNAPSHOT"
+group = "com.jervisffb"
+version = rootProject.ext["mavenVersion"] as String
 
 repositories {
     mavenCentral()
