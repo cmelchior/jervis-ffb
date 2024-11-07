@@ -112,7 +112,7 @@ jobs:
           retention-days: 1
 
   build-linux-desktop:
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
     needs: [ run-tests ]
     if: |
       always() && 
@@ -149,7 +149,7 @@ jobs:
           retention-days: 1
 
   build-wasm:
-    runs-on: linux-latest
+    runs-on: ubuntu-latest
     needs: [ run-tests ]
     if: |
       always() && 
@@ -186,7 +186,7 @@ jobs:
           retention-days: 1
 
   upload-dev-versions:
-    runs-on: linux-latest
+    runs-on: ubuntu-latest
     needs: [ build-linux-desktop, build-macos-desktop, build-windows-desktop, build-wasm ]
     if: |
       always() && 
