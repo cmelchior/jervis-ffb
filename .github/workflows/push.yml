@@ -149,7 +149,7 @@ jobs:
           retention-days: 1
 
   build-wasm:
-    runs-on: linux-latest
+    runs-on: debian-latest
     needs: [ run-tests ]
     if: |
       always() && 
