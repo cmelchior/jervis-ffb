@@ -213,6 +213,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASSWORD }}
           source: "./dist/wasm.zip"
           target: ./jervis_upload
 
@@ -223,6 +224,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASSWORD }}
           script: |
             rm -rf ./jervis_new
             unzip ./jervis_upload/wasm.zip -d ./jervis_new
