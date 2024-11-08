@@ -237,7 +237,6 @@ fun Dialogs(vm: DialogsViewModel) {
 }
 
 
-@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun LogViewer(
     vm: LogViewModel,
@@ -285,7 +284,7 @@ fun GameLog(vm: LogViewModel) {
         verticalArrangement = Arrangement.spacedBy(4.dp),
         state = listState
     ) {
-        items(items = listData, key = { item -> item.id.toString() }) {
+        items(items = listData, key = { item -> item.id }) {
             Text(
                 text = it.message,
                 lineHeight = if (it.message.lines().size > 1) 1.5.em else 1.0.em,
@@ -310,7 +309,7 @@ fun DebugLog(vm: LogViewModel) {
         verticalArrangement = Arrangement.spacedBy(4.dp),
         state = listState
     ) {
-        items(items = listData, key = { item -> item.id.toString() }) {
+        items(items = listData, key = { item -> item.id }) {
             Text(
                 text = it.message,
                 softWrap = false,

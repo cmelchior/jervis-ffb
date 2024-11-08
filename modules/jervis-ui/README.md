@@ -3,6 +3,11 @@
 This module contains the Jervis Game UI.
 
 
+## Gothas
+
+- kotlin.uuid does not work out of the box on `localhost` as it relies on https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID
+
+
 
 ## Creating releases
 
@@ -35,5 +40,15 @@ Push Wasm to http://jervisffb.ilios.dk
 Create GitHub release
 Push to Github release
 
+## Test production build 
 
+For Wasm:
+
+```
+./gradlew wasmJsBrowserDistribution
+cd modules/jervis-ui/build/dist/wasmJs/productionExecutable
+python3 -m http.server
+```
+
+Open a web browser at: `localhost:8000`
 

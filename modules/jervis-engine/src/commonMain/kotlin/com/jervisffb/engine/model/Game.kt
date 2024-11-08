@@ -23,6 +23,23 @@ import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlin.properties.Delegates
 
+// Very much NOT thread-safe and should only be used internally when processing
+// actions
+// TODO Just keep it as a singleton until we explore the requirements futher
+object IdGenerator {
+    var diceId: Int = 0
+    var logId: Int = 0
+
+    fun generateDiceId(): String {
+        return (++diceId).toString()
+    }
+
+    fun generateLogId(): String {
+        return (++logId).toString()
+    }
+}
+
+
 /**
  * Entry point for tracking the state of a game of Blood Bowl.
  * It should only contain the static state and not enforce any rules.
