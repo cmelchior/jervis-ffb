@@ -52,7 +52,7 @@ object CatchRoll : Procedure() {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val rollContext = state.getContext<CatchRollContext>()
                 val resultContext = rollContext.copy(
-                    roll = D6DieRoll(d6),
+                    roll = D6DieRoll.create(state, d6),
                     isSuccess = isCatchSuccess(d6, rollContext.target, rollContext)
                 )
                 return compositeCommandOf(

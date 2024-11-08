@@ -2,7 +2,6 @@ package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.IdGenerator
 
 /**
  * Developer's Commentary:
@@ -10,8 +9,8 @@ import com.jervisffb.engine.model.IdGenerator
  * be shown using Spannables in Compose. This would allow us to theme it.
  * https://issuetracker.google.com/issues/139320238
  */
-abstract class LogEntry() : Command {
-    val id: String = IdGenerator.generateLogId()
+abstract class LogEntry : Command {
+    var id: String = "" // Currently being set from the outside...not nice, but easier for now
     abstract val category: LogCategory
     abstract val message: String
 

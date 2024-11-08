@@ -118,7 +118,7 @@ import com.jervisffb.engine.utils.sum
                 val context = state.getContext<DodgeRollContext>()
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DODGE, d6),
-                    SetContext(context.copy(roll = D6DieRoll(d6))),
+                    SetContext(context.copy(roll = D6DieRoll.create(state, d6))),
                     GotoNode(CalculateMandatoryModifiers)
                 )
             }

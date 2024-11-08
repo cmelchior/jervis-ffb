@@ -81,7 +81,7 @@ object UnchannelledFuryRoll: Procedure() {
                 val isSuccess = calculateSuccess(activateContext, d6)
                 val rollContext = UnchannelledFuryRollContext(
                     state.activePlayer!!,
-                    D6DieRoll(d6),
+                    D6DieRoll.create(state, d6),
                     isSuccess
                 )
                 return compositeCommandOf(

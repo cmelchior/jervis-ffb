@@ -56,11 +56,11 @@ object PickupRoll : Procedure() {
             return listOf(RollDice(Dice.D6))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkDiceRoll<D6Result>(action) {
+            return checkDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<PickupRollContext>()
                 val updatedContext = context.copy(
-                    roll = D6DieRoll(originalRoll = it),
-                    isSuccess = isPickupSuccess(it, context.player.agility, context.modifiers),
+                    roll = D6DieRoll.create(state, d6),
+                    isSuccess = isPickupSuccess(d6, context.player.agility, context.modifiers),
                 )
                 return compositeCommandOf(
                     SetContext(updatedContext),

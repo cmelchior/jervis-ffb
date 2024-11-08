@@ -53,7 +53,7 @@ object JumpRoll : Procedure() {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val rollContext = state.getContext<JumpRollContext>()
                 val resultContext = rollContext.copy(
-                    roll = D6DieRoll(d6),
+                    roll = D6DieRoll.create(state, d6),
                     isSuccess = isJumpSuccessful(d6, rollContext.player.agility, rollContext.modifiers)
                 )
                 return compositeCommandOf(

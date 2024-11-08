@@ -192,7 +192,7 @@ object AccuracyRoll: Procedure() {
             )
         } else {
             context.copy(
-                passingRoll = D6DieRoll(d6),
+                passingRoll = D6DieRoll.create(state, d6),
                 passingModifiers = modifiers,
                 passingResult = result
             )

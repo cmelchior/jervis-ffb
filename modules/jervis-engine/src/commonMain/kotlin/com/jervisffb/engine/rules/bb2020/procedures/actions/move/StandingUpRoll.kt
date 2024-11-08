@@ -54,7 +54,7 @@ object StandingUpRoll : Procedure() {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val rollContext = state.getContext<StandingUpRollContext>()
                 val resultContext = rollContext.copy(
-                    roll = D6DieRoll(d6),
+                    roll = D6DieRoll.create(state, d6),
                     isSuccess = isStandingUp(d6, rules.standingUpTarget, rollContext.modifiers)
                 )
                 return compositeCommandOf(

@@ -81,7 +81,7 @@ object BoneHeadRoll: Procedure() {
                 val isSuccess = calculateSuccess(d6)
                 val rollContext = BoneHeadRollContext(
                     state.activePlayer!!,
-                    D6DieRoll(d6),
+                    D6DieRoll.create(state, d6),
                     isSuccess
                 )
                 compositeCommandOf(

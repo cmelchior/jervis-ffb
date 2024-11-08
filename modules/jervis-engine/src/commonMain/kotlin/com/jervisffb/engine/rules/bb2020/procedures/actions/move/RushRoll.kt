@@ -111,7 +111,7 @@ import com.jervisffb.engine.utils.sum
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.RUSH, d6),
                     SetContext(context.copy(
-                        roll = D6DieRoll(d6),
+                        roll = D6DieRoll.create(state, d6),
                         isSuccess = success,
                     )),
                     GotoNode(ChooseReRollSource)

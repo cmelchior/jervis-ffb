@@ -1,8 +1,10 @@
 package com.jervisffb.engine.model
 
 import com.jervisffb.engine.AddEntry
+import com.jervisffb.engine.GameController
 import com.jervisffb.engine.ListEvent
 import com.jervisffb.engine.RemoveEntry
+import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.ProcedureStack
@@ -14,6 +16,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
+import com.jervisffb.engine.rules.bb2020.procedures.DieId
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassingInteferenceContext
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.RerollSourceId
@@ -23,19 +26,58 @@ import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlin.properties.Delegates
 
-// Very much NOT thread-safe and should only be used internally when processing
-// actions
-// TODO Just keep it as a singleton until we explore the requirements futher
-object IdGenerator {
-    var diceId: Int = 0
-    var logId: Int = 0
+// TODO Just keep it as a singleton until we explore the requirements further.
+/**
+ * Deterministic ID generator used to generate IDs [Command] and other
+ * objects created as part of [ActionNode.applyAction].
+ *
+ * Note, in particular, this class should _NOT_ be used as part of
+ * [ActionNode.getAvailableActions] since we do not control when this is called,
+ *
+ * These ID's should only be generated from inside a request to
+ * [GameController.processAction] ensuring that all access to the generator
+ * is thread-safe. As it is not thread-safe by itself.
+ *
+ * The generator is tied to a specific [Game] instance and will also undo
+ * itself as part of undoing actions. This will ensure that the same
+ * IDs will be generated across multiple machines.
+ */
+class IdGenerator {
+    private data class Snapshot(
+        val diceId: Int,
+        val logId: Int,
+    )
 
-    fun generateDiceId(): String {
-        return (++diceId).toString()
+    private var diceId: Int = 0
+    private var logId: Int = 0
+    private val snapshots: MutableList<Snapshot> = mutableListOf()
+
+    fun reset() {
+        diceId = 0
+        logId = 0
+        snapshots.clear()
     }
 
-    fun generateLogId(): String {
+    fun nextDiceId(): DieId {
+        return DieId((++diceId).toString())
+    }
+
+    fun nextLogId(): String {
         return (++logId).toString()
+    }
+
+    fun saveSnapshot() {
+        snapshots.add(Snapshot(diceId, logId))
+    }
+
+    fun restoreSnapshot() {
+        val (savedDiceId, savedLogId) = snapshots.removeLast()
+        diceId = savedDiceId
+        logId = savedLogId
+    }
+
+    fun removeLogId() {
+        logId -= 1
     }
 }
 
@@ -51,7 +93,7 @@ class Game(
     val rules: Rules,
     val homeTeam: Team,
     val awayTeam: Team,
-    val field: Field
+    val field: Field,
 ) {
     init {
         // Setup circular references, making it easier to navigate
@@ -61,6 +103,8 @@ class Game(
     }
 
     companion object
+
+    val idGenerator = IdGenerator()
 
     // Track all current active procedures.
     val stack = ProcedureStack()
@@ -228,6 +272,9 @@ class Game(
     }
 
     fun addLog(entry: LogEntry) {
+        // Inject log id before exposing it to the outside.
+        // Not the nicest, but quick to do while figuring out a better solution.
+        entry.id = idGenerator.nextLogId()
         logs.add(entry)
         logChanges.safeTryEmit(AddEntry(entry))
     }

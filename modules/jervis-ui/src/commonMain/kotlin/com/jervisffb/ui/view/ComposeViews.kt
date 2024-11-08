@@ -52,7 +52,6 @@ import com.jervisffb.ui.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.viewmodel.LogViewModel
 import com.jervisffb.ui.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.viewmodel.ReplayControllerViewModel
-import kotlin.uuid.ExperimentalUuidApi
 
 // Theme
 val debugBorder = BorderStroke(2.dp, Color.Red)
@@ -268,7 +267,6 @@ fun LogViewer(
     }
 }
 
-@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun GameLog(vm: LogViewModel) {
     val listData by vm.logs.collectAsState(initial = emptyList())
@@ -293,7 +291,6 @@ fun GameLog(vm: LogViewModel) {
     }
 }
 
-@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun DebugLog(vm: LogViewModel) {
     val listData by vm.debugLogs.collectAsState(initial = emptyList())

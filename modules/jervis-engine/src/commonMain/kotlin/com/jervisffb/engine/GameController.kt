@@ -107,7 +107,9 @@ class GameController(
         }
         if (action is Undo) {
             undoLastAction()
+            state.idGenerator.restoreSnapshot()
         } else {
+            state.idGenerator.saveSnapshot()
             processForwardAction(action)
         }
     }

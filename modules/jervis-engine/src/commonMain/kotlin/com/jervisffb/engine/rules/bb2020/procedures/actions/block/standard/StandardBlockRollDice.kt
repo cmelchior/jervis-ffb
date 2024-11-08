@@ -46,7 +46,10 @@ object StandardBlockRollDice: Procedure() {
             return checkDiceRollList<DBlockResult>(action) { it: List<DBlockResult> ->
                 val roll =
                     it.map { diceRoll: DBlockResult ->
-                        BlockDieRoll(originalRoll = diceRoll)
+                        BlockDieRoll(
+                            id = state.idGenerator.nextDiceId(),
+                            originalRoll = diceRoll
+                        )
                     }
                 return compositeCommandOf(
                     ReportDiceRoll(roll),
