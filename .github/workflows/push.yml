@@ -185,7 +185,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  upload-dev-versions:
+  upload-dev-version:
     runs-on: ubuntu-latest
     needs: [ build-linux-desktop, build-macos-desktop, build-windows-desktop, build-wasm ]
     if: |
@@ -195,6 +195,49 @@ jobs:
       !contains(needs.*.result, 'cancelled')
 
     steps:
-      - name: Upload Dev version
-        run: echo "It is working"
+      - name: Restore release packages
+        uses: actions/download-artifact@v4
+        with:
+          name: app-browser
+          path: ./dist/wasm
 
+      - name: Prepare upload
+        run: |
+          cd ./dist/wasm
+          zip -r ../wasm.zip .
+
+      - name: Upload package
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_HOST }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "./dist/wasm.zip"
+          target: ./jervis_upload
+
+      - name: Upload package
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_HOST }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "./dist/wasm.zip"
+          target: ./jervis_upload
+
+      - name: Prepare dev version on server
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.KEY }}
+          script: |
+            rm -rf ./jervis_new
+            unzip ./jervis_upload/wasm.zip -d ./jervis_new
+            mv ./jervis ./jervis_old
+            mv ./jervis_new ./jervis
+            rm -rf ./jervis_old
+            rm ./jervis_upload/wasm.zip
+            rm -rf ./jervis_new
