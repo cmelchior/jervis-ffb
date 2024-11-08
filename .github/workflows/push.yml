@@ -226,11 +226,13 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_KEY_PASSWORD }}
+          script_stop: true
           script: |
             rm -rf ./jervis_new
             unzip ./jervis_upload/dist/wasm.zip -d ./jervis_new
+            cp ./jervis/.htaccess ./jervis_new
             mv ./jervis ./jervis_old
             mv ./jervis_new ./jervis
             rm -rf ./jervis_old
-            rm ./jervis_upload/wasm.zip
+            rm ./jervis_upload/dist/wasm.zip
             rm -rf ./jervis_new
