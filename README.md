@@ -3,8 +3,7 @@
 This repository contains the source code for the Jervis project.
 
 Jervis is a collection of tools and libraries for creating and running a game of 
-[Blood Bowl](https://start-warhammer.com/blood-bowl/), a board game created by 
-Games Workshop.
+[Blood Bowl](https://start-warhammer.com/blood-bowl/), a board game owned by Games Workshop.
 
 This includes:
  
@@ -33,15 +32,28 @@ used without intent to infringe, or in opposition to their copyright. This
 project is in no way official and is not endorsed by Games Workshop Limited.
 
 
-## Requirements
+## Developer Releases
+
+Test builds are created on every successful push to `main`.
+
+* The HTML version can be found here: https://jervis.ilios.dk. It is built
+  using WASM, so will only work on the latest browsers. Specifically, it does
+  not work on Safari. Read here for more info: 
+  https://kotlinlang.org/docs/wasm-troubleshooting.html#browser-versions
+
+* Desktop client installers for Windows, MacOS and Linux can be found here:
+  https://jervis.ilios.dk/download/.
+
+No guarantees are given for them.
+
+
+## How To Build
 
 Development requirements are:
 - Java 21
 - Git on the commandline
 
 Note, this has only been tested on Mac, so things on Windows might be broken.
-
-## How to Use
 
 A local desktop game client can be started using:
 
@@ -84,9 +96,9 @@ of the following modules:
 
 - `jervis-engine`: This contains a full model of the Blood Bowl rules and 
   contains the logic for running a game.
-- 
+
 - `jervis-ui`: An UI for driving a game of Blood Bowl. It has been largely 
-  copied from the FUMBBL Client UI.
+  copied from the FUMBBL Client UI. 
 
 - `replay-analyzer`: This module is intended for processing and analyzing the
    JSON content of a FUMBBL replay file.
