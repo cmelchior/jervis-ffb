@@ -195,16 +195,44 @@ jobs:
       !contains(needs.*.result, 'cancelled')
 
     steps:
-      - name: Restore release packages
+      - name: Restore release packages - Wasm
         uses: actions/download-artifact@v4
         with:
           name: app-browser
           path: ./dist/wasm
 
+      - name: Restore release packages - MacOS
+        uses: actions/download-artifact@v4
+        with:
+          name: app-macos
+          path: ./dist/macos
+
+      - name: Restore release packages - Windows
+        uses: actions/download-artifact@v4
+        with:
+          name: app-windows
+          path: ./dist/windows
+
+      - name: Restore release packages - Linux
+        uses: actions/download-artifact@v4
+        with:
+          name: app-linux
+          path: ./dist/linux
+
       - name: Prepare upload
         run: |
-          cd ./dist/wasm
-          zip -r ../wasm.zip .
+          cd ./dist
+          mkdir download
+          mv ./dist/macos/* ./dist/download
+          mv ./dist/linux/* ./dist/download
+          mv ./dist/windows/* ./dist/download
+          zip -r ./download/wasm.zip ./wasm/*
+          mv ./wasm/* ./
+          rm -rf macos
+          rm -rf linux
+          rm -rf windows
+          rm -rf wasm
+          
 
       - name: Upload package
         uses: appleboy/scp-action@v0.1.7
@@ -214,7 +242,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_KEY_PASSWORD }}
-          source: "./dist/wasm.zip"
+          source: "./devbuilds.zip"
           target: ./jervis_upload
           strip_components: 1
 
@@ -229,10 +257,9 @@ jobs:
           script_stop: true
           script: |
             rm -rf ./jervis_new
-            unzip ./jervis_upload/dist/wasm.zip -d ./jervis_new
+            unzip ./jervis_upload/devbuilds.zip -d ./jervis_new
             cp ./jervis/.htaccess ./jervis_new
             mv ./jervis ./jervis_old
             mv ./jervis_new ./jervis
             rm -rf ./jervis_old
-            rm ./jervis_upload/dist/wasm.zip
-            rm -rf ./jervis_new
+            rm ./jervis_upload/devbuilds.zip
