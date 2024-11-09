@@ -223,15 +223,16 @@ jobs:
         run: |
           cd ./dist
           mkdir download
-          mv ./dist/macos/* ./dist/download
-          mv ./dist/linux/* ./dist/download
-          mv ./dist/windows/* ./dist/download
+          mv ./macos/* ./download
+          mv ./linux/* ./download
+          mv ./windows/* ./download
           zip -r ./download/wasm.zip ./wasm/*
           mv ./wasm/* ./
           rm -rf macos
           rm -rf linux
           rm -rf windows
           rm -rf wasm
+          zip -r ../devbuilds.zip .
           
 
       - name: Upload package
