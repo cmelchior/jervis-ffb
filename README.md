@@ -10,7 +10,7 @@ This includes:
 - A standalone, UI agnostic rules engine for the 2020 version of Blood Bowl.
   This engine can be hooked into any UI framework or AI agents.
 
-- A Game Client UI that can run either as a website or a desktop client.
+- A Game Client UI that can run either as a website, desktop client or iPad app.
 
 - An AI Agent Framework that makes it possible to replace a player with a custom
   AI agent.
@@ -44,6 +44,9 @@ Test builds are created on every successful push to `main`.
 * Desktop client installers for Windows, MacOS and Linux can be found here:
   https://jervis.ilios.dk/download/.
 
+* No test builds for iPad is currently being created. Instead these must be
+  built from source.
+
 No guarantees are given for them.
 
 
@@ -66,6 +69,10 @@ A local WASM client can be started using:
 ```shell
 ./gradlew :modules:jervis-ui:wasmJsBrowserDevelopmentRun
 ```
+
+The iPad version can be built and installed by using Xcode and this project file
+`modules/iosApp/iosApp.xcodeproj`. You will need to supply your own signature
+under "Signing & Capabilities".
 
 
 ## Repository Structure

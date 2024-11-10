@@ -1,10 +1,15 @@
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
+    // this is necessary to avoid the plugins to be loaded multiple times
+    // in each subproject's classloader
+    alias(libs.plugins.composeCompiler) apply false
+    alias(libs.plugins.jetbrainsCompose) apply false
     alias(libs.plugins.jvm) apply false
+    alias(libs.plugins.ktor) apply false
     alias(libs.plugins.multiplatform) apply false
     alias(libs.plugins.serialization) apply false
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.1" apply false
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 enum class ReleaseType {

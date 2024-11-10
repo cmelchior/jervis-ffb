@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.serialization)
@@ -12,6 +14,7 @@ repositories {
 
 kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())
+
     jvm {
         withJava()
         testRuns["test"].executionTask.configure {
@@ -19,6 +22,11 @@ kotlin {
         }
     }
 
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "game-model"
         browser()

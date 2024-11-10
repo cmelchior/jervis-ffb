@@ -27,6 +27,18 @@ buildConfig {
 kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())
     jvm()
+
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "JervisUI"
+            isStatic = true
+        }
+    }
+
     wasmJs {
         moduleName = "common"
         browser {
@@ -56,6 +68,7 @@ kotlin {
                 implementation(libs.bundles.voyager)
                 implementation(libs.jsonserialization)
                 implementation(compose.components.resources)
+//                api(compose.preview)
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
@@ -70,13 +83,22 @@ kotlin {
             dependencies {
                 api(compose.preview)
                 implementation(compose.desktop.currentOs)
-//                implementation(compose.desktop.macos_arm64)
-//                implementation("org.jetbrains.skiko:skiko-awt-runtime-macos-arm64:+")
                 implementation(compose.desktop.uiTestJUnit4)
             }
         }
         val jvmTest by getting
         val wasmJsMain by getting
+        val iosX64Main by getting
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+        val iosMain by creating {
+            dependsOn(commonMain)
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+            dependencies {
+            }
+        }
     }
 }
 

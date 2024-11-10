@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -15,17 +15,23 @@ repositories {
 
 kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())
+
     jvm {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
     }
+
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "fumbbl-net"
         browser()
     }
-
 
     val ktor = libs.versions.ktor.get()
     sourceSets {
@@ -60,6 +66,15 @@ kotlin {
             dependencies {
 //                implementation("io.ktor:ktor-client-core-wasm-js:$ktor")
             }
+        }
+        val iosX64Main by getting
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+        val iosMain by creating {
+            dependsOn(commonMain)
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
         }
     }
 }
