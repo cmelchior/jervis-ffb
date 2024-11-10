@@ -10,6 +10,8 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.ui.UiGameController
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
 import okio.Path
 
 enum class Feature {
@@ -22,6 +24,8 @@ enum class Feature {
 class MenuViewModel {
     var controller: GameController? = null
     lateinit var uiState: UiGameController
+
+    val navigatorContext = CoroutineScope(CoroutineName("ScreenNavigator"))
 
     // Default values .. figure out a way to persist these
     private var features: MutableMap<Feature, Boolean> = mutableMapOf(

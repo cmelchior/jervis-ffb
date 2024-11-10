@@ -3,6 +3,7 @@ package com.jervisffb.ui.screen
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
 import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Player
@@ -10,11 +11,11 @@ import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.utils.createDefaultGameState
 import com.jervisffb.engine.utils.lizardMenAwayTeam
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
+import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.state.ManualActionProvider
 import com.jervisffb.ui.state.RandomActionProvider
 import com.jervisffb.ui.state.ReplayActionProvider
-import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.view.Screen
 import com.jervisffb.ui.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.viewmodel.DialogsViewModel
@@ -83,7 +84,7 @@ class GameScreenModel(
 }
 
 class GameScreen(val screenModel: GameScreenModel) : Screen {
-
+    override val key: ScreenKey = "GameScreen"
     val controller = screenModel.controller
 
     @Composable

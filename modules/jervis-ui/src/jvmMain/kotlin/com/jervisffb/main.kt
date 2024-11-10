@@ -1,16 +1,49 @@
 package com.jervisffb
 
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.App
+import com.jervisffb.ui.BackNavigationHandler
 import com.jervisffb.ui.pixelsToDp
 import com.jervisffb.ui.viewmodel.MenuViewModel
 
 
-fun main() =
+fun main() {
+
+// TODO Create a better About page
+//    java.awt.Desktop.getDesktop().setAboutHandler {
+//
+//        val versionLabel = JLabel("<html><b>Version: 0.1.0.dev.local (dev build)<b></html>").apply {
+//            horizontalAlignment = SwingConstants.CENTER
+//            alignmentX = Component.CENTER_ALIGNMENT
+//            font = Font("SansSerif", Font.PLAIN, 12)
+//        }
+//
+//        val contentPanel = JPanel().apply {
+//            border = EmptyBorder(12, 12, 12, 12)
+//            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+//            alignmentX = JPanel.CENTER_ALIGNMENT
+//
+////            add(iconLabel)
+//            add(Box.createVerticalStrut(10)) // Adds spacing
+//            add(versionLabel)
+//            add(Box.createVerticalStrut(5))
+////            add(descriptionLabel)
+//        }
+//
+//        val frame = JFrame("About Jervis Fantasy Football")
+//        frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+//        frame.contentPane = contentPanel
+//        frame.pack()
+//        frame.isVisible = true
+//        frame.isResizable = false
+//    }
+
     application {
         val scale = 1.22f
         val menuViewModel = MenuViewModel()
@@ -20,8 +53,22 @@ fun main() =
                     DpSize(pixelsToDp(145f + 782f + 145f), pixelsToDp(690f)) * scale) // Game content
                     + DpSize(0.dp, pixelsToDp(28f)),  // Window decoration
             )
-        Window(onCloseRequest = ::exitApplication, state = windowState) {
+        Window(
+            onCloseRequest = ::exitApplication,
+            state = windowState,
+            onKeyEvent = { event ->
+                if (event.key == Key.Escape) {
+                    BackNavigationHandler.execute()
+                    true
+                } else {
+                    false
+                }
+            },
+            title = "Jervis Fantasy Football"
+        ) {
             WindowMenuBar(menuViewModel)
             App(menuViewModel)
         }
     }
+}
+

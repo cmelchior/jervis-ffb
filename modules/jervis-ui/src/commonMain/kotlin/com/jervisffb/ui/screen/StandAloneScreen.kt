@@ -20,55 +20,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.jervisffb.ui.BuildConfig
-import com.jervisffb.ui.view.Screen
 import com.jervisffb.ui.viewmodel.MenuViewModel
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class IntroScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
-
-    fun gotoFumbblScreen(navigator: Navigator) {
-        menuViewModel.navigatorContext.launch {
-            val screenModel = FumbblScreenModel(menuViewModel)
-            navigator.push(FumbblScreen(menuViewModel, screenModel))
+class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
+    fun startAiGame(navigator: Navigator, mode: GameMode) {
+        GlobalScope.launch {
+            val screenModel = GameScreenModel(mode, menuViewModel)
+            screenModel.initialize()
+            navigator.push(GameScreen(screenModel))
         }
     }
 
-    fun gotoStandAloneScreen(navigator: Navigator) {
+    fun startHotSeatGame(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = StandAloneScreenModel(menuViewModel)
-            navigator.push(StandAloneScreen(menuViewModel, screenModel))
-        }
-
-    }
-
-    fun gotoDevModeScreen(navigator: Navigator) {
-        menuViewModel.navigatorContext.launch {
-            val screenModel = DevScreenModel(menuViewModel)
-            navigator.push(DevScreen(menuViewModel, screenModel))
+            val screenModel = GameScreenModel(Manual, menuViewModel)
+            screenModel.initialize()
+            navigator.push(GameScreen(screenModel))
         }
     }
-
-    val clientVersion: String = BuildConfig.releaseVersion
 }
 
-class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
-
-    override val key: ScreenKey = "IntroScreen"
-
+class StandAloneScreen(private val menuViewModel: MenuViewModel, screenModel: StandAloneScreenModel) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel { IntroScreenModel(menuViewModel) }
+        val screenModel = rememberScreenModel { StandAloneScreenModel(menuViewModel) }
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
@@ -79,41 +66,43 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     MenuBox(
-                        label = "FUMBBL",
-                        onClick = { screenModel.gotoFumbblScreen(navigator) },
+                        label = "P2P Server",
+                        onClick = { /* screenModel.start(navigator, Manual) */ },
                     )
                     MenuBox(
-                        label = "Standalone",
-                        onClick = { screenModel.gotoStandAloneScreen(navigator) },
+                        label = "P2P Client",
+                        onClick = { /* screenModel.start(navigator, Manual) */ },
                     )
                     MenuBox(
-                        label = "Dev Mode",
-                        onClick = { screenModel.gotoDevModeScreen(navigator) },
+                        label = "Hotseat",
+                        onClick = { screenModel.startHotSeatGame(navigator) },
                     )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .padding(8.dp)
-                        .align(Alignment.BottomStart),
-                ) {
-                    Text(text = screenModel.clientVersion)
+                    MenuBox(
+                        label = "vs. AI",
+                        onClick = { /* */ },
+                        enabled = false
+                    )
                 }
             }
     }
 
     @Composable
-    private fun RowScope.MenuBox(label: String, onClick: () -> Unit) {
+    private fun RowScope.MenuBox(label: String, onClick: () -> Unit, enabled: Boolean = true) {
+
+        var modifier = Modifier
+            .padding(24.dp)
+            .fillMaxHeight()
+            .weight(1f,  false)
+            .aspectRatio(1f)
+
+        if (enabled) {
+            modifier = modifier.background(color = Color.Red).clickable { onClick() }
+        } else {
+            modifier = modifier.background(color = Color.Gray)
+        }
+
         Box(
-            modifier = Modifier
-                .padding(24.dp)
-                .fillMaxHeight()
-                .weight(1f,  false)
-                .aspectRatio(1f)
-                .background(color = Color.Red)
-                .clickable { onClick() }
-            ,
+            modifier = modifier,
             contentAlignment = Alignment.BottomEnd,
 
         ) {
@@ -121,6 +110,7 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
                 modifier = Modifier.padding(16.dp),
                 text = label,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 color = Color.White,
                 fontSize = 48.sp,
             )
