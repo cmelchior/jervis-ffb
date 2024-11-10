@@ -35,8 +35,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":modules:utils"))
-                implementation(kotlin("reflect"))
+                implementation(project(":modules:platform-utils"))
                 implementation("dev.whyoleg.cryptography:cryptography-core:0.3.1")
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.coroutines)

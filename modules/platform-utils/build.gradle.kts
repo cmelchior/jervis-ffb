@@ -2,30 +2,22 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.multiplatform)
-    alias(libs.plugins.serialization)
 }
 
-group = "com.jervisffb"
-version = rootProject.ext["mavenVersion"] as String
-
-repositories {
-    mavenCentral()
-    google()
-}
+group = "com.jervisffb.utils"
+version = "1.0-SNAPSHOT"
 
 kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())
-    jvm {
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
+    jvm()
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "fumbbl-net"
+        moduleName = "utils"
         browser()
     }
 
@@ -33,21 +25,31 @@ kotlin {
         val ktor = libs.versions.ktor.get()
         val commonMain by getting {
             dependencies {
-                implementation(project(":modules:platform-utils"))
-                implementation(project(":modules:jervis-engine"))
+                implementation(kotlin("reflect"))
                 implementation(libs.coroutines)
                 implementation(libs.okio)
-                implementation(libs.kotlinx.datetime)
+                implementation(libs.okio.fake)
+                api(libs.jsonserialization)
+                api("io.ktor:ktor-client-core:$ktor")
+                api("io.ktor:ktor-client-logging:$ktor")
+                api("io.ktor:ktor-client-websockets:$ktor")
+                api("io.ktor:ktor-serialization-kotlinx-json:$ktor")
             }
         }
-        val commonTest by getting {
+
+        val jvmMain by getting {
             dependencies {
-                implementation(kotlin("test"))
+                implementation("io.ktor:ktor-client-okhttp:$ktor")
+                implementation("org.reflections:reflections:0.10.2")
             }
         }
-        val jvmMain by getting
-        val jvmTest by getting
-        val wasmJsMain by getting
+
+        val wasmJsMain by getting {
+            dependencies {
+//                implementation("io.ktor:ktor-client-core-wasm-js:$ktor")
+            }
+        }
+
         val iosX64Main by getting
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
@@ -59,3 +61,4 @@ kotlin {
         }
     }
 }
+

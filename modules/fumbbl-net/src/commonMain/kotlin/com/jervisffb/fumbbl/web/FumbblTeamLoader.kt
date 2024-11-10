@@ -1,6 +1,5 @@
 package com.jervisffb.fumbbl.web
 
-import com.jervisffb.fumbbl.net.api.auth.getHttpClient
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.PlayerId
@@ -12,6 +11,7 @@ import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.HumanTeam
 import com.jervisffb.engine.teamBuilder
+import com.jervisffb.utils.getHttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess

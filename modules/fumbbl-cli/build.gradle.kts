@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":modules:utils"))
+    implementation(project(":modules:platform-utils"))
     implementation(project(":modules:fumbbl-net"))
     implementation("com.eclipsesource.minimal-json:minimal-json:${libs.versions.minimalJson.get()}")
     implementation("com.github.ajalt.clikt:clikt:4.2.1")

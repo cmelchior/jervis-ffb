@@ -1,8 +1,8 @@
 package com.jervisffb.fumbbl.net
 
-import com.jervisffb.fumbbl.net.api.auth.getHttpClient
 import com.jervisffb.fumbbl.net.api.commands.ClientCommand
 import com.jervisffb.fumbbl.net.api.commands.ServerCommand
+import com.jervisffb.utils.getHttpClient
 import io.ktor.client.plugins.websocket.receiveDeserialized
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.plugins.websocket.webSocket

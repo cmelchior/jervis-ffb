@@ -1,5 +1,6 @@
 package com.jervisffb.fumbbl.net.api.auth
 
+import com.jervisffb.utils.getHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse

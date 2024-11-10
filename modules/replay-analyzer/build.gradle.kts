@@ -27,7 +27,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":modules:utils"))
+                implementation(project(":modules:platform-utils"))
                 implementation(libs.coroutines)
                 implementation(project(":modules:fumbbl-net"))
                 implementation(project(":modules:jervis-engine"))

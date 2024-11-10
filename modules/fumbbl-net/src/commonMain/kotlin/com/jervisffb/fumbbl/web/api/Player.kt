@@ -1,6 +1,6 @@
 package com.jervisffb.fumbbl.web.api
 
-import com.jervisffb.fumbbl.net.api.auth.getHttpClient
+import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.runBlocking
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -26,28 +26,28 @@ data class Player(
     // val position: String,
     @SerialName("positionId")
     @Serializable(with = PositionDeserializer::class)
-    val position: com.jervisffb.fumbbl.web.api.Position,
+    val position: Position,
 //    val record: Record,
     val refundable: Boolean,
 //    val skillCosts: List<Any>,
-    val skillStatus: com.jervisffb.fumbbl.web.api.SkillStatus,
+    val skillStatus: SkillStatus,
     val skills: List<String>,
     val status: Int,
 )
 
-object PositionDeserializer : KSerializer<com.jervisffb.fumbbl.web.api.Position> {
+object PositionDeserializer : KSerializer<Position> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Position", PrimitiveKind.INT)
     private val json = Json { ignoreUnknownKeys = true }
 
-    override fun deserialize(decoder: Decoder): com.jervisffb.fumbbl.web.api.Position {
+    override fun deserialize(decoder: Decoder): Position {
         val id = decoder.decodeInt()
         val contentData = fetchContentById(id)
-        return json.decodeFromString(com.jervisffb.fumbbl.web.api.Position.serializer(), contentData)
+        return json.decodeFromString(Position.serializer(), contentData)
     }
 
     override fun serialize(
         encoder: Encoder,
-        value: com.jervisffb.fumbbl.web.api.Position,
+        value: Position,
     ) {
         TODO("Not supported")
     }
