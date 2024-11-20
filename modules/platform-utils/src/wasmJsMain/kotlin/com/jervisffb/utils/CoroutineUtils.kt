@@ -3,7 +3,7 @@ package com.jervisffb.utils
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.CoroutineContext
 
-actual fun <T> runBlocking(context: CoroutineContext, block: suspend CoroutineScope.() -> T): T {
+actual fun <T> runBlocking(context: CoroutineContext?, block: suspend CoroutineScope.() -> T): T {
     TODO("runBlocking not supported yet in wasm")
 //    var isDone = false
 //    var result: T? = null

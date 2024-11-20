@@ -244,30 +244,32 @@ fun setupTeamsOnField(controller: GameController) {
     ResetAvailableTeamRerolls(controller.state.awayTeam).execute(controller.state)
 }
 
+val defaultHomeTeam: Team =
+    teamBuilder(BB2020Rules(), HumanTeam) {
+        coach = Coach(CoachId("home-coach"), "HomeCoach")
+        name = "HomeTeam"
+        addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), HumanTeam.LINEMAN)
+        addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), HumanTeam.LINEMAN)
+        addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), HumanTeam.LINEMAN)
+        addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), HumanTeam.LINEMAN)
+        addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HumanTeam.THROWER)
+        addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HumanTeam.CATCHER, listOf(SideStep()))
+        addPlayer(PlayerId("H7"), "Catcher-7-H", PlayerNo(7), HumanTeam.CATCHER)
+        addPlayer(PlayerId("H8"), "Blitzer-8-H", PlayerNo(8), HumanTeam.BLITZER)
+        addPlayer(PlayerId("H9"), "Blitzer-9-H", PlayerNo(9), HumanTeam.BLITZER)
+        addPlayer(PlayerId("H10"), "Blitzer-10-H", PlayerNo(10), HumanTeam.BLITZER)
+        addPlayer(PlayerId("H11"), "Blitzer-11-H", PlayerNo(11), HumanTeam.BLITZER)
+        addPlayer(PlayerId("H12"), "Lineman-12-H", PlayerNo(12), HumanTeam.LINEMAN)
+        reRolls = 4
+        apothecaries = 1
+        dedicatedFans = 1
+        teamValue = 1_000_000
+    }
+
+
 fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = humanTeamAway()): Game {
-    val team1: Team =
-        teamBuilder(rules, HumanTeam) {
-            coach = Coach(CoachId("home-coach"), "HomeCoach")
-            name = "HomeTeam"
-            addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), HumanTeam.LINEMAN)
-            addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), HumanTeam.LINEMAN)
-            addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), HumanTeam.LINEMAN)
-            addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), HumanTeam.LINEMAN)
-            addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HumanTeam.THROWER)
-            addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HumanTeam.CATCHER, listOf(SideStep()))
-            addPlayer(PlayerId("H7"), "Catcher-7-H", PlayerNo(7), HumanTeam.CATCHER)
-            addPlayer(PlayerId("H8"), "Blitzer-8-H", PlayerNo(8), HumanTeam.BLITZER)
-            addPlayer(PlayerId("H9"), "Blitzer-9-H", PlayerNo(9), HumanTeam.BLITZER)
-            addPlayer(PlayerId("H10"), "Blitzer-10-H", PlayerNo(10), HumanTeam.BLITZER)
-            addPlayer(PlayerId("H11"), "Blitzer-11-H", PlayerNo(11), HumanTeam.BLITZER)
-            addPlayer(PlayerId("H12"), "Lineman-12-H", PlayerNo(12), HumanTeam.LINEMAN)
-            reRolls = 4
-            apothecaries = 1
-            dedicatedFans = 1
-            teamValue = 1_000_000
-        }
     val field = Field.createForRuleset(rules)
-    return Game(rules, team1, awayTeam, field)
+    return Game(rules, defaultHomeTeam, awayTeam, field)
 }
 
 /**

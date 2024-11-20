@@ -10,9 +10,11 @@ voyager = "1.1.0-beta03"
 datetimex = "0.6.1"
 okio = "3.9.1"
 jgit = "7.0.0.202409031743-r"
+atomicfu = "0.26.0"
 
 [libraries]
 coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "coroutines"}
 jsonserialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 okio-fake = { group = "com.squareup.okio", name = "okio-fakefilesystem", version.ref = "okio" }
@@ -32,6 +34,7 @@ serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref 
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "atomicfu" }
 
 [bundles]
 voyager = [ "voyager-navigator", "voyager-screenmodel", "voyager-bottom-sheet-navigator", "voyager-tab-navigator", "voyager-transitions" ]

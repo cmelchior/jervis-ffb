@@ -13,6 +13,7 @@ dependencyResolutionManagement {
 include(":modules:fumbbl-cli")
 include(":modules:fumbbl-net")
 include(":modules:jervis-engine")
+include(":modules:jervis-net")
 include(":modules:jervis-ui")
 include(":modules:replay-analyzer")
 include(":modules:platform-utils")

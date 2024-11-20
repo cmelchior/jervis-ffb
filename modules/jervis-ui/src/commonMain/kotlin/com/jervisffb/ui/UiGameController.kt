@@ -24,10 +24,11 @@ import com.jervisffb.ui.model.UiPlayer
 import com.jervisffb.ui.screen.GameMode
 import com.jervisffb.ui.state.UiActionProvider
 import com.jervisffb.ui.viewmodel.MenuViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -59,12 +60,8 @@ class UiGameController(
     // Persistent UI decorations that needs to be stored across frames
     val uiDecorations = UiGameDecorations()
 
-    // Scopes
-    val errorHandler = CoroutineExceptionHandler { _, exception ->
-        exception.printStackTrace()
-    }
-    private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + Dispatchers.Default + errorHandler)
-    val gameScope = CoroutineScope(CoroutineName("GameLoopScope") + Dispatchers.Default + errorHandler)
+    private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + Dispatchers.Default)
+    val gameScope = CoroutineScope(Job() + CoroutineName("GameLoopScope") + Dispatchers.Default)
 
     // Storing a reference to a UiGameSnap is generally a bad idea as it becomes invalid when the game loop
     // rolls over, but we only use the replay during setting up the UI. After that, we should have all consumers
@@ -154,6 +151,10 @@ class UiGameController(
                 // This will start the next iteration of the game loop.
                 // TODO Add error handling here. What to do for invalid actions?
                 controller.processAction(userAction)
+            }
+        }.invokeOnCompletion {
+            if (it != null && it !is CancellationException) {
+                throw it
             }
         }
     }
@@ -301,6 +302,10 @@ class UiGameController(
         animationScope.launch {
             animationDone.send(true)
             _animationFlow.emit(null)
+        }.invokeOnCompletion {
+            if (it != null && it !is CancellationException) {
+                throw it
+            }
         }
     }
 }

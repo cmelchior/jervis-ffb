@@ -105,6 +105,9 @@ of the following modules:
 - `jervis-engine`: This contains a full model of the Blood Bowl rules and 
   contains the logic for running a game.
 
+- `jervis-net`: This contains the infrastructure to create and communicate with
+   a light-weight Game Server that is only used to play a single game.
+
 - `jervis-ui`: An UI for driving a game of Blood Bowl. It has been largely 
   copied from the FUMBBL Client UI. 
 

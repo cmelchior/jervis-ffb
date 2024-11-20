@@ -132,6 +132,15 @@ The main entry classes for the UI are:
 
 ## How does the server architecture work?
 
+The project is planning to implement two server variants:
+
+1. A light-weight game server running inside a single Client that is only used
+  in Standalone Mode.
+
+2. A full-blown game server that can handle multiple games being played.
+
+It is the latter being described in this section.
+
 It doesn't look like anything right now, since no server has been implemented yet.
 But it is envisioned to look like the following:
 

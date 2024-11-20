@@ -71,7 +71,7 @@ import okio.use
  * Class encapsulating the the logic for serializing and deserializing a Jervis game file.
  */
 object JervisSerialization {
-    private val jervisModule =
+    val jervisEngineModule =
         SerializersModule {
             polymorphic(Procedure::class) {
                 subclass(MoveAction::class)
@@ -142,7 +142,7 @@ object JervisSerialization {
     private val jsonFormat =
         Json {
             useArrayPolymorphism = true
-            serializersModule = jervisModule
+            serializersModule = jervisEngineModule
             prettyPrint = true
         }
 
