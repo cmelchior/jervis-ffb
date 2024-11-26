@@ -1,7 +1,9 @@
 package com.jervisffb
 
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -57,7 +59,7 @@ fun main() {
             onCloseRequest = ::exitApplication,
             state = windowState,
             onKeyEvent = { event ->
-                if (event.key == Key.Escape) {
+                if (event.key == Key.Escape && event.type == KeyEventType.KeyDown) {
                     BackNavigationHandler.execute()
                     true
                 } else {

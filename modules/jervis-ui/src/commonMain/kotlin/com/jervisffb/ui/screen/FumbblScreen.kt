@@ -55,21 +55,24 @@ class FumbblScreen(private val menuViewModel: MenuViewModel, screenModel: Fumbbl
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel { FumbblScreenModel(menuViewModel) }
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            screenModel.availableReplayFiles.forEach { file ->
-                Button(onClick = {
-                    screenModel.start(navigator, Replay(file))
-                }) {
-                    Text(
-                        text = "Start replay: ${file.name}",
-                        modifier = Modifier.padding(16.dp),
-                    )
+
+        MenuScreen {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                screenModel.availableReplayFiles.forEach { file ->
+                    Button(onClick = {
+                        screenModel.start(navigator, Replay(file))
+                    }) {
+                        Text(
+                            text = "Start replay: ${file.name}",
+                            modifier = Modifier.padding(16.dp),
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

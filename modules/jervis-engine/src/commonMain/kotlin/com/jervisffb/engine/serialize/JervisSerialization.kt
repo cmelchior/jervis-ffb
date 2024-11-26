@@ -46,12 +46,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
-import com.jervisffb.engine.rules.bb2020.roster.ChaosDwarfTeam
-import com.jervisffb.engine.rules.bb2020.roster.ElvenUnionTeam
-import com.jervisffb.engine.rules.bb2020.roster.HumanTeam
-import com.jervisffb.engine.rules.bb2020.roster.KhorneTeam
-import com.jervisffb.engine.rules.bb2020.roster.LizardmenTeam
-import com.jervisffb.engine.rules.bb2020.roster.SkavenTeam
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.utils.platformFileSystem
@@ -83,20 +77,7 @@ object JervisSerialization {
                 subclass(StandardBB2020Rules::class)
             }
             polymorphic(Roster::class) {
-                subclass(ChaosDwarfTeam::class)
-                subclass(ElvenUnionTeam::class)
-                subclass(HumanTeam::class)
-                subclass(KhorneTeam::class)
-                subclass(LizardmenTeam::class)
-                subclass(SkavenTeam::class)
-            }
-            polymorphic(BB2020Roster::class) {
-                subclass(ChaosDwarfTeam::class)
-                subclass(ElvenUnionTeam::class)
-                subclass(HumanTeam::class)
-                subclass(KhorneTeam::class)
-                subclass(LizardmenTeam::class)
-                subclass(SkavenTeam::class)
+                subclass(BB2020Roster::class)
             }
             polymorphic(Position::class) {
                 subclass(BB2020Position::class)
@@ -155,8 +136,8 @@ object JervisSerialization {
         file: Path,
     ) {
         val fileData =
-            JervisFile(
-                JervisMetaData(),
+            JervisGameFile(
+                JervisMetaData(FILE_FORMAT_VERSION),
                 JervisConfiguration(controller.rules),
                 JervisGameData(controller.initialHomeTeamState!!, controller.initialAwayTeamState!!, controller.history.flatMap { it.steps.map { it.action }}),
             )
@@ -173,7 +154,7 @@ object JervisSerialization {
             platformFileSystem.source(file).use { fileSource ->
                 fileSource.buffer().readUtf8()
             }
-        val gameData = jsonFormat.decodeFromString<JervisFile>(fileContent)
+        val gameData = jsonFormat.decodeFromString<JervisGameFile>(fileContent)
         val rules = gameData.configuration.rules
         val homeTeam = jsonFormat.decodeFromJsonElement<Team>(gameData.game.homeTeam)
         homeTeam.noToPlayer.values.forEach { it.team = homeTeam }

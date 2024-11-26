@@ -8,11 +8,12 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.engine.rules.common.roster.PositionId
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class BB2020Position(
-    override val roster: BB2020Roster,
+    override val id: PositionId,
     override val quantity: Int,
     override val position: String,
     override val positionSingular: String,

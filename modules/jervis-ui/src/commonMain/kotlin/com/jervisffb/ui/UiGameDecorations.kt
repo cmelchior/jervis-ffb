@@ -12,7 +12,7 @@ data class BloodSpot(val coordinate: FieldCoordinate, val injury: CasualtyResult
 /**
  * Tracking persistent UI decorations, i.e., things that are consequences of
  * model changes, but shouldn't be tracked there. Some examples being
- * blod spots after injuries and showing where a player moved during their move.
+ * blood spots after injuries and showing where a player moved during their move.
  */
 class UiGameDecorations {
 

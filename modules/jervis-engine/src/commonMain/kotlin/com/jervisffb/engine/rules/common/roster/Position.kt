@@ -6,10 +6,15 @@ import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
+@Serializable
+@JvmInline
+value class PositionId(val id: String)
 
 interface Position {
-    val roster: Roster
+    val id: PositionId
     val quantity: Int
     val position: String
     val positionSingular: String

@@ -6,11 +6,14 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import com.jervisffb.engine.GameController
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.model.Field
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.engine.utils.createDefaultGameState
-import com.jervisffb.engine.utils.lizardMenAwayTeam
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
+import com.jervisffb.resources.StandaloneTeams
 import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.state.ManualActionProvider
@@ -44,6 +47,8 @@ class GameScreenModel(
     val rules: StandardBB2020Rules = StandardBB2020Rules
 
     suspend fun initialize() {
+        var homeTeam: JervisTeamFile? = null
+        var awayTeam: JervisTeamFile? = null
         if (injectedController != null) {
             this.controller = injectedController
             fumbbl = null
@@ -51,7 +56,9 @@ class GameScreenModel(
             when (mode) {
                 Manual -> {
                     fumbbl = null
-                    this.controller = GameController(rules, createDefaultGameState(rules, awayTeam = lizardMenAwayTeam()))
+                    homeTeam = StandaloneTeams.defaultTeams["human-starter-team.jrt"]!!
+                    awayTeam = StandaloneTeams.defaultTeams["lizardmen-starter-team.jrt"]!!
+                    this.controller = GameController(rules, Game(rules, homeTeam.team, awayTeam.team, Field.createForRuleset(rules)))
                 }
 
                 Random -> {
@@ -68,7 +75,7 @@ class GameScreenModel(
         }
 
         menuViewModel.controller = this.controller
-        IconFactory.initialize(controller.state.homeTeam, controller.state.awayTeam)
+        IconFactory.initialize(controller.state.homeTeam, homeTeam!!.uiData, controller.state.awayTeam, awayTeam!!.uiData)
         uiState = UiGameController(mode, controller, menuViewModel, actions)
         val uiActionFactory =
             when (mode) {

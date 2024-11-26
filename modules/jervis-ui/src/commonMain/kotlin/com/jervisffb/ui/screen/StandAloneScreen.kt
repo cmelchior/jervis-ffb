@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
@@ -20,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -49,6 +48,18 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
             navigator.push(GameScreen(screenModel))
         }
     }
+
+    fun startP2PServer(navigator: Navigator) {
+        menuViewModel.navigatorContext.launch {
+            val screenModel = P2PServerScreenModel(menuViewModel)
+            navigator.push(P2PServerScreen(menuViewModel, screenModel))
+        }
+    }
+
+    fun startP2PClient(navigator: Navigator) {
+
+
+    }
 }
 
 class StandAloneScreen(private val menuViewModel: MenuViewModel, screenModel: StandAloneScreenModel) : Screen {
@@ -56,22 +67,19 @@ class StandAloneScreen(private val menuViewModel: MenuViewModel, screenModel: St
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel { StandAloneScreenModel(menuViewModel) }
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
+            MenuScreen {
                 Row(
                     modifier = Modifier.fillMaxHeight(0.5f).fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     MenuBox(
-                        label = "P2P Server",
-                        onClick = { /* screenModel.start(navigator, Manual) */ },
+                        label = "P2P\nServer",
+                        onClick = { screenModel.startP2PServer(navigator) },
                     )
                     MenuBox(
-                        label = "P2P Client",
-                        onClick = { /* screenModel.start(navigator, Manual) */ },
+                        label = "P2P\nClient",
+                        onClick = { screenModel.startP2PClient(navigator) },
                     )
                     MenuBox(
                         label = "Hotseat",
@@ -109,8 +117,9 @@ class StandAloneScreen(private val menuViewModel: MenuViewModel, screenModel: St
             Text(
                 modifier = Modifier.padding(16.dp),
                 text = label,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.End,
+                maxLines = 2,
+//                overflow = TextOverflow.Ellipsis,
                 color = Color.White,
                 fontSize = 48.sp,
             )

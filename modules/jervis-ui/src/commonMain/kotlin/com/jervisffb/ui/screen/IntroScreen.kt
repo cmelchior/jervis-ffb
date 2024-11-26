@@ -4,24 +4,20 @@
 )
 package com.jervisffb.ui.screen
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
@@ -30,7 +26,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.ui.BuildConfig
-import com.jervisffb.ui.view.Screen
+import com.jervisffb.ui.view.MenuBox
 import com.jervisffb.ui.viewmodel.MenuViewModel
 import kotlinx.coroutines.launch
 
@@ -69,10 +65,7 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel { IntroScreenModel(menuViewModel) }
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
+            MenuScreen {
                 Row(
                     modifier = Modifier.fillMaxHeight(0.5f).fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -91,39 +84,26 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
                         onClick = { screenModel.gotoDevModeScreen(navigator) },
                     )
                 }
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .padding(8.dp)
                         .align(Alignment.BottomStart),
                 ) {
-                    Text(text = screenModel.clientVersion)
+                    Text(
+                        text = screenModel.clientVersion,
+                        color = Color.White,
+                        style = LocalTextStyle.current.copy(
+                            shadow = Shadow(
+                                color = Color.Black,
+                                offset = Offset(2f, 2f),
+                                blurRadius = 2f
+                            )
+                        )
+                    )
                 }
             }
     }
 
-    @Composable
-    private fun RowScope.MenuBox(label: String, onClick: () -> Unit) {
-        Box(
-            modifier = Modifier
-                .padding(24.dp)
-                .fillMaxHeight()
-                .weight(1f,  false)
-                .aspectRatio(1f)
-                .background(color = Color.Red)
-                .clickable { onClick() }
-            ,
-            contentAlignment = Alignment.BottomEnd,
 
-        ) {
-            Text(
-                modifier = Modifier.padding(16.dp),
-                text = label,
-                maxLines = 1,
-                color = Color.White,
-                fontSize = 48.sp,
-            )
-        }
-    }
 }

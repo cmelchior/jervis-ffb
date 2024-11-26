@@ -15,15 +15,15 @@ import com.jervisffb.engine.model.Direction.Companion.UP_RIGHT
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.isOnHomeTeam
-import com.jervisffb.engine.rules.bb2020.roster.ChaosDwarfTeam
-import com.jervisffb.engine.rules.bb2020.roster.ElvenUnionTeam
-import com.jervisffb.engine.rules.bb2020.roster.HumanTeam
-import com.jervisffb.engine.rules.bb2020.roster.KhorneTeam
-import com.jervisffb.engine.rules.bb2020.roster.LizardmenTeam
-import com.jervisffb.engine.rules.bb2020.roster.SkavenTeam
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.Roster
+import com.jervisffb.engine.serialize.SingleSprite
+import com.jervisffb.engine.serialize.SpriteLocation
+import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.engine.serialize.SpriteSource
+import com.jervisffb.engine.serialize.TeamSpriteData
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block1d
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block2d
@@ -73,97 +73,49 @@ import com.jervisffb.ui.viewmodel.FieldDetails
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
 
-
-const val iconRootPath = "icons/cached/players/iconsets"
-val playerIconSpriteSheets =
-    mutableMapOf(
-        HumanTeam.LINEMAN to "$iconRootPath/human_lineman.png",
-        HumanTeam.THROWER to "$iconRootPath/human_thrower.png",
-        HumanTeam.CATCHER to "$iconRootPath/human_catcher.png",
-        HumanTeam.BLITZER to "$iconRootPath/human_blitzer.png",
-        HumanTeam.HALFLING_HOPEFUL to "$iconRootPath/human_halflinghopeful.png",
-        HumanTeam.OGRE to "$iconRootPath/human_ogre.png",
-        ChaosDwarfTeam.HOBGOBLIN_LINEMEN to "$iconRootPath/chaosdwarf_hobgoblinlineman.png",
-        ChaosDwarfTeam.CHAOS_DWARF_BLOCKERS to "$iconRootPath/chaosdwarf_chaosdwarfblocker.png",
-        ChaosDwarfTeam.BULL_CENTAUR_BLITZERS to "$iconRootPath/chaosdwarf_bullcentaurblitzer.png",
-        ChaosDwarfTeam.ENSLAVED_MINOTAUR to "$iconRootPath/chaosdwarf_enslavedminotaur.png",
-        KhorneTeam.BLOODBORN_MARAUDER_LINEMEN to "$iconRootPath/khorne_bloodbornmarauderlineman.png",
-        KhorneTeam.KHORNGORS to "$iconRootPath/khorne_khorngor.png",
-        KhorneTeam.BLOODSEEKERS to "$iconRootPath/khorne_bloodseeker.png",
-        KhorneTeam.BLOODSPAWN to "$iconRootPath/khorne_bloodspawn.png",
-        ElvenUnionTeam.LINEMAN to "$iconRootPath/elvenunion_lineman.png",
-        ElvenUnionTeam.CATCHER to "$iconRootPath/elvenunion_catcher.png",
-        ElvenUnionTeam.THROWER to "$iconRootPath/elvenunion_thrower.png",
-        ElvenUnionTeam.BLITZER to "$iconRootPath/elvenunion_blitzer.png",
-        SkavenTeam.LINEMAN to "$iconRootPath/skaven_lineman.png",
-        SkavenTeam.THROWER to "$iconRootPath/skaven_thrower.png",
-        SkavenTeam.GUTTER_RUNNER to "$iconRootPath/skaven_gutterrunner.png",
-        SkavenTeam.BLITZER to "$iconRootPath/skaven_blitzer.png",
-        SkavenTeam.RAT_OGRE to "$iconRootPath/skaven_ratogre.png",
-        LizardmenTeam.SKINK_RUNNER_LINEMEN to "$iconRootPath/lizardmen_skinkrunnerlineman.png",
-        LizardmenTeam.CHAMELEON_SKINKS to "$iconRootPath/lizardmen_chameleonskink.png",
-        LizardmenTeam.SAURUS_BLOCKERS to "$iconRootPath/lizardmen_saurusblocker.png",
-        LizardmenTeam.KROXIGOR to "$iconRootPath/lizardmen_kroxigor.png",
-    )
-
-data class PositionImage(
+data class PlayerSprite(
     val default: ImageBitmap,
     val active: ImageBitmap,
 )
 
-class PositionImageFactory(spriteSheet: ImageBitmap) {
-    private val homeTeamIcons: List<PositionImage>
-    private val awayTeamIcons: List<PositionImage>
-
-    init {
-        val homeIcons = mutableListOf<PositionImage>()
-        val awayIcons = mutableListOf<PositionImage>()
-        extractSprites(spriteSheet).forEach {
-            homeIcons.add(it.first)
-            awayIcons.add(it.second)
-        }
-        homeTeamIcons = homeIcons
-        awayTeamIcons = awayIcons
-    }
-
-    private fun extractSprites(image: ImageBitmap): List<Pair<PositionImage, PositionImage>> {
-        val spriteWidth = image.width / 4 // There are always 4 sprites pr line.
-        val spriteHeight: Int = spriteWidth
-        val lines = image.height / spriteHeight
-        return (0 until lines).map { line: Int ->
-            val homeDefaultX = 0
-            val homeActiveX = spriteWidth
-            val awayDefaultX = spriteWidth * 2
-            val awayActiveX = spriteWidth * 3
-            val homeDefault = image.getSubImage(homeDefaultX, line * spriteHeight, spriteWidth, spriteHeight)
-            val homeActive = image.getSubImage(homeActiveX, line * spriteHeight, spriteWidth, spriteHeight)
-            val awayDefault = image.getSubImage(awayDefaultX, line * spriteHeight, spriteWidth, spriteHeight)
-            val awayActive = image.getSubImage(awayActiveX, line * spriteHeight, spriteWidth, spriteHeight)
-            val homePlayer = PositionImage(homeDefault, homeActive)
-            val awayPlayer = PositionImage(awayDefault, awayActive)
-            Pair(homePlayer, awayPlayer)
-        }
-    }
-
-    fun getVariant(player: Player): PositionImage {
-        val imageIndex = player.number.value % homeTeamIcons.size
-        return if (player.isOnHomeTeam()) {
-            homeTeamIcons[imageIndex]
-        } else {
-            awayTeamIcons[imageIndex]
-        }
-    }
-}
+//class PlayerSpriteFactory(spriteSheet: ImageBitmap, playerUiData: PlayerUiData) {
+//    private val homeTeamIcons: List<PlayerSprite>
+//    private val awayTeamIcons: List<PlayerSprite>
+//
+//    init {
+//        val homeIcons = mutableListOf<PlayerSprite>()
+//        val awayIcons = mutableListOf<PlayerSprite>()
+//        extractSprites(spriteSheet).forEach {
+//            homeIcons.add(it.first)
+//            awayIcons.add(it.second)
+//        }
+//        homeTeamIcons = homeIcons
+//        awayTeamIcons = awayIcons
+//    }
+//
+//
+//
+//    fun getVariant(player: Player): PlayerSprite {
+//        val imageIndex = player.number.value % homeTeamIcons.size
+//        return if (player.isOnHomeTeam()) {
+//            homeTeamIcons[imageIndex]
+//        } else {
+//            awayTeamIcons[imageIndex]
+//        }
+//    }
+//}
 
 object IconFactory {
     private val iconHeight = 40
     private val iconWidth = 40
     // private var classLoader: ClassLoader
-
-    private val cachedSpriteSheets: MutableMap<Position, ImageBitmap> = mutableMapOf()
-    private val cachedPositionVariants: MutableMap<Position, PositionImageFactory> = mutableMapOf()
-    private val cachedPlayers: MutableMap<Player, PositionImage> = mutableMapOf()
+//    private val cachedSpriteSheets: MutableMap<Position, ImageBitmap> = mutableMapOf()
+//    private val cachedPositionVariants: MutableMap<PlayerId, PlayerSpriteFactory> = mutableMapOf()
+    private val cachedPlayers: MutableMap<Player, PlayerSprite> = mutableMapOf()
+    // Map from resource "path" to loaded in-memory image
     private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
+    private val cachedPortraits: MutableMap<PlayerId, ImageBitmap> = mutableMapOf()
+    private val cachedLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
 
     // Load all image resources used.
     // It looks like we cannot lazy load them due to how Compose Resources work on WasmJS
@@ -171,15 +123,15 @@ object IconFactory {
     // loading images in the middle of a Composable function quite a nightmare.
     // Instead we pre-load all dynamic resources up front. This will probably result in slightly
     // higher memory usage, but it will probably not be problematic.
-    suspend fun initialize(homeTeam: Team, awayTeam: Team): Boolean {
+    suspend fun initialize(homeTeam: Team, homeUiData: TeamSpriteData, awayTeam: Team, awayUiData: TeamSpriteData): Boolean {
         // TODO How to map player images?
         saveFileIntoCache("icons/cached/players/portraits/AnqiPanqi.png")
 
         FieldDetails.entries.forEach {
             saveFileIntoCache(it.resource)
         }
-        saveTeamPlayerImagesToCache(homeTeam)
-        saveTeamPlayerImagesToCache(awayTeam)
+        saveTeamPlayerImagesToCache(homeTeam, homeUiData)
+        saveTeamPlayerImagesToCache(awayTeam, awayUiData)
         return true
     }
 
@@ -200,7 +152,7 @@ object IconFactory {
 
     private suspend fun loadImageFromResources(
         path: String,
-        cache: Boolean = false,
+        cache: Boolean = true,
     ): ImageBitmap {
         if (cache && cachedImages.containsKey(path)) {
             return cachedImages[path]!!
@@ -215,29 +167,67 @@ object IconFactory {
         }
     }
 
-    private suspend fun getPositionSpriteSheet(position: Position): PositionImageFactory {
-        if (cachedPositionVariants.contains(position)) {
-            return cachedPositionVariants[position]!!
-        } else {
-            val path: String = playerIconSpriteSheets[position] ?: throw IllegalStateException("Cannot find player icons configured for: $position")
-            val spriteSheet: ImageBitmap = loadImageFromResources(path)
-            return PositionImageFactory(spriteSheet).also {
-                cachedPositionVariants[position] = it
+    private suspend fun createPlayerSprite(player: PlayerId, isHomeTeam: Boolean, uiData: TeamSpriteData): PlayerSprite {
+        val playerUiData = uiData.players[player]!!
+        val playerSprite = playerUiData.sprite ?: throw IllegalStateException("Cannot find sprite configured for: $player")
+        val image = when (playerSprite.type) {
+            SpriteLocation.EMBEDDED -> loadImageFromResources(playerSprite.resource)
+            SpriteLocation.URL -> loadImageFromNetwork(playerSprite.resource)
+        }
+        return when (val sprite = playerUiData.sprite) {
+            is SingleSprite -> {
+                PlayerSprite(image, image)
             }
+            is SpriteSheet -> {
+                 extractSprites(image, sprite.variants, sprite.selectedIndex ?: 0, isHomeTeam)
+            }
+            null -> TODO()
         }
     }
 
-    private suspend fun saveTeamPlayerImagesToCache(team: Team) {
+    private fun extractSprites(image: ImageBitmap, variants: Int, selectedIndex: Int, onHomeTeam: Boolean): PlayerSprite {
+        val spriteWidth = image.width / 4 // There are always 4 sprites pr line.
+        val spriteHeight: Int = spriteWidth
+        val lines = variants // image.height / spriteHeight
+        val line = selectedIndex
+        val homeDefaultX = 0
+        val homeActiveX = spriteWidth
+        val awayDefaultX = spriteWidth * 2
+        val awayActiveX = spriteWidth * 3
+        val homeDefault = image.getSubImage(homeDefaultX, line * spriteHeight, spriteWidth, spriteHeight)
+        val homeActive = image.getSubImage(homeActiveX, line * spriteHeight, spriteWidth, spriteHeight)
+        val awayDefault = image.getSubImage(awayDefaultX, line * spriteHeight, spriteWidth, spriteHeight)
+        val awayActive = image.getSubImage(awayActiveX, line * spriteHeight, spriteWidth, spriteHeight)
+        val homePlayer = PlayerSprite(homeDefault, homeActive)
+        val awayPlayer = PlayerSprite(awayDefault, awayActive)
+        return if (onHomeTeam) {
+            homePlayer
+        } else {
+            awayPlayer
+        }
+    }
+
+    private fun loadImageFromNetwork(resource: String): ImageBitmap {
+        TODO("Not yet implemented")
+    }
+
+    private suspend fun saveTeamPlayerImagesToCache(team: Team, uiData: TeamSpriteData) {
         team.forEach { player ->
-            val variants = getPositionSpriteSheet(player.position)
-            val playerImage: PositionImage = variants.getVariant(player)
-            cachedPlayers[player] = playerImage
+            val playerSprite = createPlayerSprite(player.id, player.isOnHomeTeam(), uiData)
+            cachedPlayers[player] = playerSprite
+            val portrait = uiData.players[player.id]?.portrait ?: TODO()
+            val portraitImage = when (portrait.type) {
+                SpriteLocation.EMBEDDED -> loadImageFromResources(portrait.resource)
+                SpriteLocation.URL -> loadImageFromNetwork(portrait.resource)
+                null -> TODO()
+            }
+            cachedPortraits[player.id] = portraitImage
         }
     }
 
     fun getImage(player: UiPlayer): ImageBitmap {
         val isHomeTeam: Boolean = player.isOnHomeTeam
-        val roster: Roster = player.position.roster
+        val roster: Roster = player.model.team.roster
         val playerType: Position = player.position
         val isActive = player.isActive
 
@@ -280,9 +270,7 @@ object IconFactory {
     }
 
     fun getPlayerImage(player: PlayerId): ImageBitmap {
-        // TODO If we want the jervis-engine to not track
-        //  player images. Where/how do we do the mapping?
-        return loadImageFromCache("icons/cached/players/portraits/AnqiPanqi.png")
+        return cachedPortraits[player]!!
     }
 
     @Composable
@@ -377,5 +365,21 @@ object IconFactory {
             3 -> Res.drawable.icons_decorations_block3d
             else -> error("Unsupported number of dice: $dice")
         }
+    }
+
+    fun hasLogo(id: TeamId): Boolean {
+        return cachedLogos.contains(id)
+    }
+
+    suspend fun saveLogo(id: TeamId, logo: SpriteSource) {
+        val image = when (logo.type) {
+            SpriteLocation.EMBEDDED -> loadImageFromResources(logo.resource)
+            SpriteLocation.URL -> loadImageFromNetwork(logo.resource)
+        }
+        cachedLogos[id] = image
+    }
+
+    fun getLogo(id: TeamId): ImageBitmap {
+        return cachedLogos[id]!!
     }
 }

@@ -80,7 +80,7 @@ class TeamTurnData(private val game: Game) {
 }
 
 @Serializable
-class Team(val name: String, val roster: BB2020Roster, val coach: Coach) : Collection<Player>, Observable<Team>() {
+class Team(val name: String, val roster: BB2020Roster/*, val coach: Coach*/) : Collection<Player>, Observable<Team>() {
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
     // Fixed Team data, identifying the team

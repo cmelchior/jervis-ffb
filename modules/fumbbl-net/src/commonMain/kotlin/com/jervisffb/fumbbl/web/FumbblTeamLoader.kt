@@ -9,7 +9,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
-import com.jervisffb.engine.rules.bb2020.roster.HumanTeam
+import com.jervisffb.engine.rules.bb2020.roster.HUMAN_TEAM
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.utils.getHttpClient
 import io.ktor.client.request.get
@@ -32,8 +32,8 @@ object FumbblTeamLoader {
         return getHttpClient().use { client ->
             val result = client.get("https://fumbbl.com/api/team/get/$teamId")
             if (result.status.isSuccess()) {
-                val fumbblTeam = com.jervisffb.fumbbl.web.FumbblTeamLoader.json.decodeFromString<com.jervisffb.fumbbl.web.api.Team>(result.bodyAsText())
-                com.jervisffb.fumbbl.web.FumbblTeamLoader.convertToBB2020JervisTeam(fumbblTeam)
+                val fumbblTeam = json.decodeFromString<com.jervisffb.fumbbl.web.api.Team>(result.bodyAsText())
+                convertToBB2020JervisTeam(fumbblTeam)
             } else {
                 throw IllegalStateException("Loading team $teamId failed with status ${result.status}")
             }
@@ -43,7 +43,7 @@ object FumbblTeamLoader {
     // Convert a FUMBBL Team Data into a Jervis Team
     private fun convertToBB2020JervisTeam(team: com.jervisffb.fumbbl.web.api.Team): Team {
         if (team.ruleset != 4) throw IllegalStateException("Unsupported ruleset ${team.ruleset}") // 4 is BB2020
-        val jervisRoster: BB2020Roster = com.jervisffb.fumbbl.web.FumbblTeamLoader.getBB2020Roster(team.roster)
+        val jervisRoster: BB2020Roster = getBB2020Roster(team.roster)
         return teamBuilder(StandardBB2020Rules, jervisRoster) {
             name = team.name
             coach = Coach(CoachId(team.coach.id.toString()), team.coach.name)
@@ -75,7 +75,7 @@ object FumbblTeamLoader {
 
     private fun getBB2020Roster(roster: com.jervisffb.fumbbl.web.api.Roster): BB2020Roster {
         return when (roster.name) {
-            "Human" -> HumanTeam
+            "Human" -> HUMAN_TEAM
             else -> error("Unsupported roster ${roster.name}")
         }
     }

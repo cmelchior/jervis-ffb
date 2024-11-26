@@ -9,12 +9,12 @@ import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
-import com.jervisffb.engine.rules.bb2020.roster.ChaosDwarfTeam
-import com.jervisffb.engine.rules.bb2020.roster.ElvenUnionTeam
-import com.jervisffb.engine.rules.bb2020.roster.HumanTeam
-import com.jervisffb.engine.rules.bb2020.roster.KhorneTeam
+import com.jervisffb.engine.rules.bb2020.roster.CHAOS_DWARF_TEAM
+import com.jervisffb.engine.rules.bb2020.roster.ELVEN_UNION_TEAM
+import com.jervisffb.engine.rules.bb2020.roster.HUMAN_TEAM
+import com.jervisffb.engine.rules.bb2020.roster.KHORNE_TEAM
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
-import com.jervisffb.engine.rules.bb2020.roster.SkavenTeam
+import com.jervisffb.engine.rules.bb2020.roster.SKAVEN_TEAM
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
@@ -121,11 +121,11 @@ private fun extractRoster(roster: FumbblRoster): BB2020Roster {
     // TODO Add logic for building custom rosters, for now
     //  just refer to the original rules
     return when (roster.rosterName) {
-        "Chaos Dwarf" -> ChaosDwarfTeam
-        "Human" -> HumanTeam
-        "Khorne" -> KhorneTeam
-        "Elven Union" -> ElvenUnionTeam
-        "Skaven" -> SkavenTeam
+        "Chaos Dwarf" -> CHAOS_DWARF_TEAM
+        "Human" -> HUMAN_TEAM
+        "Khorne" -> KHORNE_TEAM
+        "Elven Union" -> ELVEN_UNION_TEAM
+        "Skaven" -> SKAVEN_TEAM
         else -> TODO("Missing team: ${roster.rosterName}")
     }
 }

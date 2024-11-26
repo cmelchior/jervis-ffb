@@ -1,8 +1,8 @@
 package com.jervisffb.engine.model.locations
 
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.tables.CornerThrowInPosition
-import com.jervisffb.engine.model.Direction
 import kotlinx.serialization.Serializable
 import kotlin.math.abs
 import kotlin.math.max

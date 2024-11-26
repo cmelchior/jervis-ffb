@@ -1,7 +1,7 @@
 package fumbbl.restapi
 
-import com.jervisffb.fumbbl.net.api.auth.getHttpClient
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.utils.getHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText

@@ -107,8 +107,9 @@ to hold up.
 
 We want to have an independent Rules Engine, so there is a strict separation 
 between "Rules" and "UI". This means we do not want to track things in the model 
-layer that are only UI-related. This does complicate detecting in-game events
-though so e.g. knowing when to trigger animations can be a bit tricky.
+layer that are only UI-related. This does complicate some things though, like
+detecting in-game events in order to trigger animations as well as storing
+links to player and roster sprites.
 
 The main entry classes for the UI are:
 

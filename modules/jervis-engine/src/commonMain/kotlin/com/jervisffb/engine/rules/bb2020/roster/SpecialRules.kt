@@ -1,9 +1,13 @@
 package com.jervisffb.engine.rules.bb2020.roster
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 sealed interface SpecialRules {
     val description: String
 }
 
+@Serializable
 enum class RegionalSpecialRule(override val description: String) : SpecialRules {
     BADLANDS_BRAWL("Badlands Brawl"),
     ELVEN_KINGDOM_LEAGUE("Elven Kingdom League"),
@@ -15,6 +19,7 @@ enum class RegionalSpecialRule(override val description: String) : SpecialRules 
     WORLDS_EDGE_SUPERLEAGUE("Worlds Edge Superleague")
 }
 
+@Serializable
 enum class TeamSpecialRule(override val description: String): SpecialRules {
     BRIBERY_AND_CORRUPTION("Bribery and Corruption"),
     FAVOURED_OF_CHAOS_UNDIVIDED("Favoured of Chaos Undivided"),
@@ -28,6 +33,7 @@ enum class TeamSpecialRule(override val description: String): SpecialRules {
 
 // Special rules that are being applied by procedures, i.e. they do not
 // have any "state", just an effect on how the game is played.
+@Serializable
 enum class PlayerSpecialRule(override val description: String): SpecialRules {
     RIOTOUS_ROOKIE("Riotous Rookie"), // Inducement, see page 91 in the rulebook.
     CLOSE_SCRUTINY("Close Scrutiny"), // Biased Referee Inducement, see page 95 in the rulebook.

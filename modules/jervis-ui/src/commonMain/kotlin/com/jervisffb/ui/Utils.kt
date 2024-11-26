@@ -26,6 +26,8 @@ import kotlin.math.PI
 
 fun toRadians(deg: Double): Double = deg / 180.0 * PI
 
+fun String.isDigitsOnly(): Boolean = this.all { it.isDigit() }
+
 /**
  * Convert a pixel value to the corresponding dp value taking the screen
  * density into account.
@@ -133,3 +135,4 @@ fun Modifier.dropShadow(
         }
     }
 )
+

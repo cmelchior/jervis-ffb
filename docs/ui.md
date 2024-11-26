@@ -73,3 +73,4 @@ things as they come up.
   java.lang.IllegalArgumentException: Cannot determine position of: FieldCoordinateImpl(x=2147483647, y=2147483647)
   at com.jervisffb.engine.rules.Rules$DefaultImpls.throwIn(Rules.kt:141)
   at com.jervisffb.engine.rules.BB2020Rules.throwIn(StandardBB2020Rules.kt:5)
+- Hover over player in dugout during setup doesn't show stat card.
