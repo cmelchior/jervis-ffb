@@ -27,6 +27,9 @@ import kotlinx.serialization.json.JsonElement
  * - 1: Initial version
  */
 const val FILE_FORMAT_VERSION = 1
+const val FILE_EXTENSION_GAME_FILE = "jgf"
+const val FILE_EXTENSION_ROSTER_FILE = "jrf"
+const val FILE_EXTENSION_TEAM_FILE = "jtf"
 
 @Serializable
 data class JervisMetaData(
@@ -115,6 +118,10 @@ data class SingleSprite(
         fun url(url: String): SpriteSource {
             return SingleSprite(SpriteLocation.URL, url)
         }
+        fun fumbbl(path: String): SingleSprite {
+            val relativePath = if (path.startsWith("/")) path.removeSuffix("/") else path
+            return SingleSprite(SpriteLocation.URL, "https://fumbbl.com/$relativePath")
+        }
     }
 }
 
@@ -122,8 +129,8 @@ data class SingleSprite(
 data class SpriteSheet(
     override val type: SpriteLocation,
     override val resource: String,
-    val variants: Int,
-    val selectedIndex: Int? = null,
+    val variants: Int? = null, // How many variants in the spritesheet. If `null` we need to calculate it
+    val selectedIndex: Int? = null, // If
 ): SpriteSource {
     companion object {
         fun embedded(path: String, variants: Int, selectedIndex: Int? = null): SpriteSource {
@@ -132,6 +139,10 @@ data class SpriteSheet(
         fun url(path: String, variants: Int, selectedIndex: Int? = null): SpriteSource {
             return SpriteSheet(SpriteLocation.URL, path, variants, selectedIndex)
         }
+        fun fumbbl(path: String, variants: Int? = null, selectedIndex: Int? = null): SpriteSource {
+            val relativePath = if (path.startsWith("/")) path.removeSuffix("/") else path
+            return SpriteSheet(SpriteLocation.URL, "https://fumbbl.com/$relativePath", variants, selectedIndex)
+        }
     }
 }
 
@@ -139,6 +150,7 @@ data class SpriteSheet(
 data class PlayerUiData(
     val sprite: SpriteSource?,
     val portrait: SpriteSource?,
+
 )
 
 @Serializable

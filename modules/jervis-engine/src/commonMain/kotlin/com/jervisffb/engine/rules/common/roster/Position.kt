@@ -18,8 +18,8 @@ interface Position {
     val quantity: Int
     val position: String
     val positionSingular: String
+    val shortHand: String
     val cost: Int
-
     val move: Int
     val strenght: Int
     val agility: Int

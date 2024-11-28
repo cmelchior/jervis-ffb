@@ -21,5 +21,3 @@ interface Roster {
     val positions: List<Position>
     operator fun get(id: PositionId): Position = positions.first { it.id == id }
 }
-
-interface BB20216Roster : Roster

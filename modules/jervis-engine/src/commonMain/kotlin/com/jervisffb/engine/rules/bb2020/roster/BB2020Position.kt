@@ -17,6 +17,7 @@ data class BB2020Position(
     override val quantity: Int,
     override val position: String,
     override val positionSingular: String,
+    override val shortHand: String,
     override val cost: Int,
     override val move: Int,
     override val strenght: Int,

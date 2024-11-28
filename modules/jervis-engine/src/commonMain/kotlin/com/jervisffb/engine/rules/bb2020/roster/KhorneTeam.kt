@@ -12,7 +12,6 @@ import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
 import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
 import com.jervisffb.engine.rules.common.roster.PositionId
 import com.jervisffb.engine.rules.common.roster.RosterId
-import kotlinx.serialization.Serializable
 
 val BLOODBORN_MARAUDER_LINEMEN =
     BB2020Position(
@@ -20,6 +19,7 @@ val BLOODBORN_MARAUDER_LINEMEN =
         16,
         "Bloodborn Marauder Linemen",
         "Bloodborn Marauder Lineman",
+        "L",
         50_000,
         6, 3, 3, 4, 8,
         listOf(Frenzy.Factory),
@@ -32,6 +32,7 @@ val KHORNGORS =
         4,
         "Khorngors",
         "Khorngor",
+        "K",
         70_000,
         6, 3, 4, 4, 9,
         listOf(Horns.Factory /*, Juggernaut */),
@@ -44,6 +45,7 @@ val BLOODSEEKERS =
         4,
         "Bloodseekers",
         "Bloodseeker",
+        "Bs",
         110_000,
         5, 4, 4, 6, 10,
         listOf(Frenzy.Factory),
@@ -56,6 +58,7 @@ val BLOODSPAWN =
         1,
         "Bloodspawn",
         "Bloodspawn",
+        "B",
         160_000,
         5, 5, 4, null, 9,
         listOf(

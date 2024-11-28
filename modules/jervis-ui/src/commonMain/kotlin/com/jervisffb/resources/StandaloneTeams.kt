@@ -198,7 +198,6 @@ fun Team.createDefaultUiData(rosterData: RosterSpriteData): Map<PlayerId, Player
                     selectedIndex = index
                 )
             }
-
             null -> TODO("Add fallback sprites")
         }
         Pair(
