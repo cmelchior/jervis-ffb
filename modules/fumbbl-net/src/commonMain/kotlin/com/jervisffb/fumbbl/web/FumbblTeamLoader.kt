@@ -194,6 +194,7 @@ class FumbblTeamLoader {
         if (team.ruleset != 4) throw IllegalStateException("Unsupported ruleset ${team.ruleset}") // 4 is BB2020
         return teamBuilder(StandardBB2020Rules, jervisRoster) {
             name = team.name
+            teamValue = team.teamValue
             coach = Coach(CoachId(team.coach.id.toString()), team.coach.name)
             reRolls = team.rerolls
             fanFactor = team.fanFactor

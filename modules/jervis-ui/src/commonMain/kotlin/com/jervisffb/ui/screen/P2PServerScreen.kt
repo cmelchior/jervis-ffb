@@ -47,7 +47,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.engine.model.TeamId
-import com.jervisffb.resources.StandaloneTeams
+import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.viewmodel.MenuViewModel
@@ -84,22 +84,38 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
 
     private fun loadTeamList() {
         menuViewModel.navigatorContext.launch {
-            StandaloneTeams.defaultTeams.map { teamFile ->
-                val team = teamFile.value.team
+            CacheManager.loadTeams().map { teamFile ->
+                val team = teamFile.team
                 if (!IconFactory.hasLogo(team.id)) {
-                    IconFactory.saveLogo(team.id, teamFile.value.uiData.teamLogo ?: teamFile.value.rosterUiData.rosterLogo!!)
+                    IconFactory.saveLogo(team.id, teamFile.uiData.teamLogo ?: teamFile.rosterUiData.rosterLogo!!)
                 }
                 TeamInfo(
-                    team.id,
-                    team.name,
-                    team.roster.name,
-                    team.teamValue,
-                    team.rerolls.size,
-                    IconFactory.getLogo(team.id)
+                    teamId = team.id,
+                    teamName = team.name,
+                    teamRoster = team.roster.name,
+                    teamValue = team.teamValue,
+                    rerolls = team.rerolls.size,
+                    logo = IconFactory.getLogo(team.id),
                 )
-            }.also {
+            }.let {
                 availableTeams.value = it
             }
+//            StandaloneTeams.defaultTeams.map { teamFile ->
+//                val team = teamFile.value.team
+//                if (!IconFactory.hasLogo(team.id)) {
+//                    IconFactory.saveLogo(team.id, teamFile.value.uiData.teamLogo ?: teamFile.value.rosterUiData.rosterLogo!!)
+//                }
+//                TeamInfo(
+//                    team.id,
+//                    team.name,
+//                    team.roster.name,
+//                    team.teamValue,
+//                    team.rerolls.size,
+//                    IconFactory.getLogo(team.id)
+//                )
+//            }.also {
+//                availableTeams.value = it
+//            }
         }
     }
 

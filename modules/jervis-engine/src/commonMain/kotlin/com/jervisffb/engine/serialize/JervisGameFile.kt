@@ -27,9 +27,9 @@ import kotlinx.serialization.json.JsonElement
  * - 1: Initial version
  */
 const val FILE_FORMAT_VERSION = 1
-const val FILE_EXTENSION_GAME_FILE = "jgf"
-const val FILE_EXTENSION_ROSTER_FILE = "jrf"
-const val FILE_EXTENSION_TEAM_FILE = "jtf"
+const val FILE_EXTENSION_GAME_FILE = "jrg"
+const val FILE_EXTENSION_ROSTER_FILE = "jrr"
+const val FILE_EXTENSION_TEAM_FILE = "jrt"
 
 @Serializable
 data class JervisMetaData(
@@ -100,12 +100,23 @@ enum class SpriteLocation {
     URL
 }
 
+
+fun normalizeFumbblIconPath(path: String): String {
+    var relativePath = path
+    // All fumbbl icons are in /i/*, but it looks like some of the REST APIs only return the id and not the
+    // full path.
+    relativePath = if (relativePath.startsWith("/")) relativePath.removeSuffix("/") else relativePath
+    if (!relativePath.startsWith("i/")) {
+        relativePath = "i/$relativePath"
+    }
+    return relativePath
+}
+
 @Serializable
 sealed interface SpriteSource {
     val type: SpriteLocation
     val resource: String
 }
-
 @Serializable
 data class SingleSprite(
     override val type: SpriteLocation,
@@ -119,7 +130,7 @@ data class SingleSprite(
             return SingleSprite(SpriteLocation.URL, url)
         }
         fun fumbbl(path: String): SingleSprite {
-            val relativePath = if (path.startsWith("/")) path.removeSuffix("/") else path
+            val relativePath = normalizeFumbblIconPath(path)
             return SingleSprite(SpriteLocation.URL, "https://fumbbl.com/$relativePath")
         }
     }
@@ -140,7 +151,7 @@ data class SpriteSheet(
             return SpriteSheet(SpriteLocation.URL, path, variants, selectedIndex)
         }
         fun fumbbl(path: String, variants: Int? = null, selectedIndex: Int? = null): SpriteSource {
-            val relativePath = if (path.startsWith("/")) path.removeSuffix("/") else path
+            val relativePath = normalizeFumbblIconPath(path)
             return SpriteSheet(SpriteLocation.URL, "https://fumbbl.com/$relativePath", variants, selectedIndex)
         }
     }

@@ -2,6 +2,7 @@ package com.jervisffb.ui.icons
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.jervisffb.engine.actions.BlockDice
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Direction.Companion.BOTTOM
@@ -65,13 +66,20 @@ import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_5
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_6
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_blue
+import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.getSubImage
 import com.jervisffb.ui.loadFileAsImage
 import com.jervisffb.ui.loadImage
 import com.jervisffb.ui.model.UiPlayer
 import com.jervisffb.ui.viewmodel.FieldDetails
+import com.jervisffb.utils.getHttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.readBytes
+import io.ktor.http.Url
+import io.ktor.http.isSuccess
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.skia.Image
 
 data class PlayerSprite(
     val default: ImageBitmap,
@@ -116,6 +124,8 @@ object IconFactory {
     private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
     private val cachedPortraits: MutableMap<PlayerId, ImageBitmap> = mutableMapOf()
     private val cachedLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
+
+    private val httpClient = getHttpClient()
 
     // Load all image resources used.
     // It looks like we cannot lazy load them due to how Compose Resources work on WasmJS
@@ -172,7 +182,7 @@ object IconFactory {
         val playerSprite = playerUiData.sprite ?: throw IllegalStateException("Cannot find sprite configured for: $player")
         val image = when (playerSprite.type) {
             SpriteLocation.EMBEDDED -> loadImageFromResources(playerSprite.resource)
-            SpriteLocation.URL -> loadImageFromNetwork(playerSprite.resource)
+            SpriteLocation.URL -> loadImageFromNetwork(Url(playerSprite.resource))!! // TODO
         }
         return when (val sprite = playerUiData.sprite) {
             is SingleSprite -> {
@@ -185,10 +195,10 @@ object IconFactory {
         }
     }
 
-    private fun extractSprites(image: ImageBitmap, variants: Int, selectedIndex: Int, onHomeTeam: Boolean): PlayerSprite {
+    private fun extractSprites(image: ImageBitmap, variants: Int?, selectedIndex: Int, onHomeTeam: Boolean): PlayerSprite {
         val spriteWidth = image.width / 4 // There are always 4 sprites pr line.
         val spriteHeight: Int = spriteWidth
-        val lines = variants // image.height / spriteHeight
+        val lines = variants ?: (image.height / spriteHeight)
         val line = selectedIndex
         val homeDefaultX = 0
         val homeActiveX = spriteWidth
@@ -207,8 +217,18 @@ object IconFactory {
         }
     }
 
-    private fun loadImageFromNetwork(resource: String): ImageBitmap {
-        TODO("Not yet implemented")
+    private suspend fun loadImageFromNetwork(url: Url): ImageBitmap? {
+        val cachedImage = CacheManager.getCachedImage(url)
+        if (cachedImage != null) return cachedImage
+        val result = httpClient.get(url)
+        return if (result.status.isSuccess()) {
+            val bytes = result.readBytes()
+            val image = Image.makeFromEncoded(bytes).toComposeImageBitmap()
+            CacheManager.saveImage(url, image)
+            image
+        } else {
+            null
+        }
     }
 
     private suspend fun saveTeamPlayerImagesToCache(team: Team, uiData: TeamSpriteData) {
@@ -218,10 +238,10 @@ object IconFactory {
             val portrait = uiData.players[player.id]?.portrait ?: TODO()
             val portraitImage = when (portrait.type) {
                 SpriteLocation.EMBEDDED -> loadImageFromResources(portrait.resource)
-                SpriteLocation.URL -> loadImageFromNetwork(portrait.resource)
+                SpriteLocation.URL -> loadImageFromNetwork(Url(portrait.resource))
                 null -> TODO()
             }
-            cachedPortraits[player.id] = portraitImage
+            cachedPortraits[player.id] = portraitImage!! // TODO Fix null value
         }
     }
 
@@ -374,9 +394,9 @@ object IconFactory {
     suspend fun saveLogo(id: TeamId, logo: SpriteSource) {
         val image = when (logo.type) {
             SpriteLocation.EMBEDDED -> loadImageFromResources(logo.resource)
-            SpriteLocation.URL -> loadImageFromNetwork(logo.resource)
+            SpriteLocation.URL -> loadImageFromNetwork(Url(logo.resource))
         }
-        cachedLogos[id] = image
+        cachedLogos[id] = image ?: error("Could not find: ${logo.resource}")
     }
 
     fun getLogo(id: TeamId): ImageBitmap {

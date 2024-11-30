@@ -39,3 +39,15 @@ actual val platformFileSystem: FileSystem = object: FileSystem() {
     }
 }
 
+actual class FileManager {
+    actual suspend fun getFilesWithExtension(directory: String, extension: String): List<Path> {
+        TODO()
+    }
+    actual suspend fun getFile(path: String): Path? {
+        TODO()
+    }
+    actual suspend fun writeFile(dir: String, fileName: String, fileContent: ByteArray) {
+        TODO()
+    }
+}
+
