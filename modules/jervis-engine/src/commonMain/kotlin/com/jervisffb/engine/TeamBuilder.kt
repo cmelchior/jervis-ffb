@@ -4,6 +4,7 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.inducements.Apothecary
 import com.jervisffb.engine.model.inducements.ApothecaryType
 import com.jervisffb.engine.rules.Rules
@@ -12,6 +13,7 @@ import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.rules.common.roster.Position
+import kotlin.random.Random
 
 private data class PlayerData(
     val id: PlayerId,
@@ -22,6 +24,7 @@ private data class PlayerData(
 
 class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     private val players: MutableMap<PlayerNo, PlayerData> = mutableMapOf()
+    var id: TeamId = TeamId("team-${Random.nextLong()}")
     var coach: Coach? = null
     var name: String = ""
     var reRolls: Int = 0
@@ -65,7 +68,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     }
 
     fun build(): Team {
-        return Team(name, roster/*, coach!!*/).apply {
+        return Team(id, name, roster/*, coach!!*/).apply {
             this@TeamBuilder.players.forEach {
                 val data: PlayerData = it.value
                 add(data.type.createPlayer(

@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
@@ -193,6 +194,7 @@ class FumbblTeamLoader {
     private fun convertToBB2020JervisTeam(jervisRoster: BB2020Roster, team: TeamDetails): Team {
         if (team.ruleset != 4) throw IllegalStateException("Unsupported ruleset ${team.ruleset}") // 4 is BB2020
         return teamBuilder(StandardBB2020Rules, jervisRoster) {
+            id = TeamId(team.id.toString())
             name = team.name
             teamValue = team.teamValue
             coach = Coach(CoachId(team.coach.id.toString()), team.coach.name)

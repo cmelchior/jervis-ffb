@@ -23,14 +23,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -46,9 +51,14 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.rules.BB2020Rules
+import com.jervisffb.engine.serialize.JervisTeamFile
+import com.jervisffb.fumbbl.web.FumbblTeamLoader
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.icons.IconFactory
+import com.jervisffb.ui.isDigitsOnly
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.viewmodel.MenuViewModel
 import dashedBorder
@@ -56,7 +66,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 import kotlin.random.Random
-
 
 data class TeamInfo(
     val teamId: TeamId,
@@ -67,7 +76,6 @@ data class TeamInfo(
     val logo: ImageBitmap
 )
 
-
 class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())
@@ -77,7 +85,6 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
     val canCreateGame = MutableStateFlow<Boolean>(false)
     val loadingTeams: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
-
     init {
          loadTeamList()
     }
@@ -86,45 +93,25 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
         menuViewModel.navigatorContext.launch {
             CacheManager.loadTeams().map { teamFile ->
                 val team = teamFile.team
-                if (!IconFactory.hasLogo(team.id)) {
-                    IconFactory.saveLogo(team.id, teamFile.uiData.teamLogo ?: teamFile.rosterUiData.rosterLogo!!)
-                }
-                TeamInfo(
-                    teamId = team.id,
-                    teamName = team.name,
-                    teamRoster = team.roster.name,
-                    teamValue = team.teamValue,
-                    rerolls = team.rerolls.size,
-                    logo = IconFactory.getLogo(team.id),
-                )
+                getTeamInfo(teamFile, team)
             }.let {
-                availableTeams.value = it
+                availableTeams.value = it.sortedBy { it.teamName }
             }
-//            StandaloneTeams.defaultTeams.map { teamFile ->
-//                val team = teamFile.value.team
-//                if (!IconFactory.hasLogo(team.id)) {
-//                    IconFactory.saveLogo(team.id, teamFile.value.uiData.teamLogo ?: teamFile.value.rosterUiData.rosterLogo!!)
-//                }
-//                TeamInfo(
-//                    team.id,
-//                    team.name,
-//                    team.roster.name,
-//                    team.teamValue,
-//                    team.rerolls.size,
-//                    IconFactory.getLogo(team.id)
-//                )
-//            }.also {
-//                availableTeams.value = it
-//            }
         }
     }
 
-    private fun teamList(): List<TeamInfo> {
-        // Load teams from a server
-        // Load teams from local storage
-        // Add a team from a file
-        // Create a new team
-        return emptyList()
+    private suspend fun getTeamInfo(teamFile: JervisTeamFile, team: Team): TeamInfo {
+        if (!IconFactory.hasLogo(team.id)) {
+            IconFactory.saveLogo(team.id, teamFile.uiData.teamLogo ?: teamFile.rosterUiData.rosterLogo!!)
+        }
+        return TeamInfo(
+            teamId = team.id,
+            teamName = team.name,
+            teamRoster = team.roster.name,
+            teamValue = team.teamValue,
+            rerolls = team.rerolls.size,
+            logo = IconFactory.getLogo(team.id),
+        )
     }
 
     fun startGame() {
@@ -159,8 +146,8 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
         }
     }
 
-    fun setSelectedTeam(team: TeamInfo) {
-        if (selectedTeam.value == team) {
+    fun setSelectedTeam(team: TeamInfo?) {
+        if (team == null || selectedTeam.value == team) {
             selectedTeam.value = null
             canCreateGame.value = false
         } else {
@@ -176,6 +163,25 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
         } else {
             selectedTeam.value = team
             canCreateGame.value = true
+        }
+    }
+
+    fun loadTeamFromNetwork(
+        teamId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        val team = teamId.toIntOrNull() ?: error("Do something here")
+        menuViewModel.navigatorContext.launch {
+            try {
+                val teamFile = FumbblTeamLoader().loadTeam(team, BB2020Rules())
+                CacheManager.saveTeam(teamFile)
+                val teamInfo = getTeamInfo(teamFile, teamFile.team)
+                availableTeams.value = (availableTeams.value.filter { it.teamId != teamInfo.teamId } + teamInfo).sortedBy { it.teamName }
+                onSuccess()
+            } catch (e: Exception) {
+                onError(e.message ?: "Unknown error")
+            }
         }
     }
 }
@@ -201,6 +207,7 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
         val gameName by viewModel.gameName.collectAsState("")
         val gamePort by viewModel.port.collectAsState( null)
         val canCreateGame: Boolean by screenModel.canCreateGame.collectAsState(false)
+        val selectedTeam by screenModel.selectedTeam.collectAsState(null)
         Box(modifier = modifier.background(color = JervisTheme.awayTeamColor)) {
             Column(
                 modifier = Modifier
@@ -232,23 +239,7 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
 
                     }
                 )
-                BoxWithConstraints {
-                    Box(
-                        modifier = Modifier
-                            .alpha(0.75f)
-                            .width(maxWidth * 0.5f)
-                            .height(175.dp)
-                            .padding(top = 32.dp)
-                            .dashedBorder(width = 2.dp, color = Color.White, on = 10.dp, off = 10.dp)
-                        ,
-                        contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Select Team",
-                            color = Color.White,
-                            style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold)
-                        )
-                    }
-                }
+                SelectedTeamBox(selectedTeam, viewModel)
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
                     modifier = Modifier
@@ -272,8 +263,52 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
     }
 
     @Composable
+    private fun SelectedTeamBox(
+        selectedTeam: TeamInfo?,
+        viewModel: P2PServerScreenModel
+    ) {
+        BoxWithConstraints {
+            if (selectedTeam != null) {
+                Box(
+                    modifier = Modifier
+                        .width(maxWidth * 0.5f)
+                        .height(175.dp)
+                        .padding(top = 32.dp)
+                ) {
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        TeamInfo(
+                            name = selectedTeam.teamName,
+                            teamValue = selectedTeam.teamValue,
+                            rerolls = selectedTeam.rerolls,
+                            logo = selectedTeam.logo,
+                            onClick = { viewModel.setSelectedTeam(null) },
+                        )
+                    }
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .alpha(0.75f)
+                        .width(maxWidth * 0.5f)
+                        .height(175.dp)
+                        .padding(top = 32.dp)
+                        .dashedBorder(width = 2.dp, color = Color.White, on = 10.dp, off = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Select Team on the right",
+                        color = Color.White,
+                        style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
     fun TeamSelector(modifier: Modifier, viewModel: P2PServerScreenModel) {
         val availableTeams by viewModel.availableTeams.collectAsState()
+        var showImportFumbblTeam by remember { mutableStateOf(false) }
         Box(modifier = modifier.background(color = JervisTheme.awayTeamColor)) {
             Column(
                 modifier = Modifier
@@ -301,7 +336,9 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
                         )
                     }
                     Spacer(modifier = Modifier.width(16.dp))
-                    Button(onClick = { }, modifier = Modifier.weight(1f)) {
+                    Button(onClick = {
+                        showImportFumbblTeam = !showImportFumbblTeam
+                    }, modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Import from FUMBBL",
                             style = MaterialTheme.typography.body1.copy(
@@ -326,8 +363,9 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
                             TeamInfo(
                                 name = team1.teamName,
                                 teamValue = team1.teamValue,
-                                logo = team1.logo,
                                 rerolls = team1.rerolls,
+                                logo = team1.logo,
+                                onClick = { viewModel.setSelectedTeam(team1) },
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             if (team2 != null) {
@@ -336,19 +374,80 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
                                     teamValue = team2.teamValue,
                                     logo = team2.logo,
                                     rerolls = team2.rerolls,
+                                    onClick = { viewModel.setSelectedTeam(team2) },
                                 )
                             } else {
                                 Box(modifier = Modifier.weight(1f))
                             }
                         }
-                        if (lines < 4) {
+                        if (line < lines - 1) {
                             Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
                 }
             }
         }
+        if (showImportFumbblTeam) {
+            LoadTeamDialog(viewModel, onCloseRequest = { showImportFumbblTeam = false })
+        }
     }
+}
+
+@Composable
+fun LoadTeamDialog(
+    viewModel: P2PServerScreenModel,
+    onCloseRequest: () -> Unit
+) {
+    var inputText by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    AlertDialog(
+        onDismissRequest = { /* Do nothing */ },
+        title = { Text("Import FUMBBL Team") },
+        text = {
+            Column {
+                Text("Enter the team ID (found in the team URL):")
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = inputText,
+                    onValueChange = { inputText = it },
+                    isError = !inputText.isDigitsOnly(),
+                    placeholder = { Text("Team ID") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                if (error?.isNotBlank() == true) {
+                    Text(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp), text = error!!, color = Color.Red)
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    isLoading = true
+                    viewModel.loadTeamFromNetwork(
+                        inputText,
+                        onSuccess = {
+                            isLoading = false
+                            onCloseRequest()
+                        },
+                        onError = { msg ->
+                            isLoading = false
+                            error = msg
+                        },
+                    )
+                },
+                enabled = !isLoading && inputText.isNotBlank() && inputText.isDigitsOnly()
+            ) {
+                Text(if (isLoading) "Downloading..." else "Import Team")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onCloseRequest) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 @Composable
@@ -357,9 +456,14 @@ fun RowScope.TeamInfo(
     teamValue: Int,
     rerolls: Int,
     logo: ImageBitmap,
-    emptyTeam: Boolean = false) {
+    emptyTeam: Boolean = false,
+    onClick: (() -> Unit)?
+) {
     Box(
-        modifier = Modifier.weight(1f).background(Color.White).clickable(!emptyTeam, onClick = { })
+        modifier = Modifier
+            .weight(1f)
+            .background(Color.White)
+            .let { if (onClick != null) it.clickable(!emptyTeam, onClick = onClick) else it }
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(modifier = Modifier.fillMaxWidth()) {

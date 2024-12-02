@@ -9,6 +9,7 @@ import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.utils.FileManager
 import com.jervisffb.utils.platformFileSystem
 import io.ktor.http.Url
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.buffer
 import okio.use
@@ -62,5 +63,11 @@ object CacheManager {
             format = format,
         )?.bytes ?: error("This bitmap cannot be encoded")
         fileManager.writeFile("$imageCacheRoot/$host", fileName, imageData)
+    }
+
+    suspend fun saveTeam(file: JervisTeamFile) {
+        val fileContent = json.encodeToString(file)
+        val fileName = "team_${file.team.id.value}.$FILE_EXTENSION_TEAM_FILE"
+        fileManager.writeFile(teamsCacheRoot, fileName, fileContent.encodeToByteArray())
     }
 }
