@@ -35,7 +35,7 @@ jobs:
           cache-read-only: false
 
       - name: Run Tests
-        run: ./gradlew :modules:jervis-engine:jvmTest
+        run: ./gradlew jvmTest
 
   build-windows-desktop:
     runs-on: windows-latest

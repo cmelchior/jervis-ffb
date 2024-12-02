@@ -23,12 +23,11 @@ import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.utils.createDefaultGameState
 import com.jervisffb.engine.utils.createStartingTestSetup
 import org.junit.Test
-import kotlin.let
-import kotlin.text.format
-import kotlin.to
+import kotlin.test.Ignore
 
 class AStarTests {
     @Test
+    @Ignore // Run this manually
     fun run() {
         application {
             val windowState = rememberWindowState()

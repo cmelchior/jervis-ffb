@@ -26,10 +26,12 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.utils.createDefaultGameState
 import com.jervisffb.engine.utils.createStartingTestSetup
+import org.junit.Ignore
 import org.junit.Test
 
 class DjikstraTests {
     @Test
+    @Ignore // Run this manually
     fun run() {
         application {
             val windowState = rememberWindowState()

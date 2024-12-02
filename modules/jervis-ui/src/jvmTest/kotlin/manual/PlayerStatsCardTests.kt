@@ -16,9 +16,11 @@ import com.jervisffb.ui.view.Sidebar
 import com.jervisffb.ui.viewmodel.FieldViewModel
 import manual.dummies.TestDummy
 import org.junit.Test
+import kotlin.test.Ignore
 
-class PlayerStatsCard {
+class PlayerStatsCardTests {
     @Test
+    @Ignore // Run this manually
     fun run() {
         val left = TestDummy.leftSidebar
         val right = TestDummy.rightSidebar
