@@ -1,6 +1,6 @@
 package com.jervisffb.net.test
 
-import com.jervisffb.engine.utils.defaultHomeTeam
+import com.jervisffb.engine.utils.createDefaultHomeTeam
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisExitCode
 import com.jervisffb.net.LightServer
@@ -14,7 +14,7 @@ class WebSocketClientConnectionTests {
     @Test
     fun closeMultipleTimes() = runBlocking {
         // Start server
-        val server = LightServer(defaultHomeTeam, "test", testMode = true)
+        val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
 
         val conn = WebSocketClientConnection(GameId("test"), "ws://localhost:8080/game")

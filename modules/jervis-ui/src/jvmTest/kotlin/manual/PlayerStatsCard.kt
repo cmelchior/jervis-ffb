@@ -13,8 +13,8 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.view.Field
 import com.jervisffb.ui.view.Sidebar
-import manual.dummies.TestDummy
 import com.jervisffb.ui.viewmodel.FieldViewModel
+import manual.dummies.TestDummy
 import org.junit.Test
 
 class PlayerStatsCard {
@@ -23,7 +23,7 @@ class PlayerStatsCard {
         val left = TestDummy.leftSidebar
         val right = TestDummy.rightSidebar
         val field = TestDummy.fieldVieModel
-        TestDummy.state.notifyUpdate()
+//        TestDummy.state.notifyUpdate()
         TestDummy.state.awayTeam.notifyUpdate()
         TestDummy.state.homeTeam.notifyUpdate()
         TestDummy.state.awayTeam.notifyDogoutChange()

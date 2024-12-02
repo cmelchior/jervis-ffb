@@ -1,7 +1,7 @@
 package com.jervisffb.net.test
 
 import com.jervisffb.engine.actions.Continue
-import com.jervisffb.engine.utils.defaultHomeTeam
+import com.jervisffb.engine.utils.createDefaultHomeTeam
 import com.jervisffb.engine.utils.lizardMenAwayTeam
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisExitCode
@@ -38,7 +38,7 @@ class StandaloneHostTests {
     @Test
     fun startStandaloneGame() = runBlocking {
         // Start server
-        val server = LightServer(defaultHomeTeam, "test", testMode = true)
+        val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
 
         val conn1 = WebSocketClientConnection(GameId("test"),"ws://localhost:8080/game")
@@ -51,7 +51,7 @@ class StandaloneHostTests {
             GameId("test"),
             "host",
             null,
-            defaultHomeTeam,
+            createDefaultHomeTeam(),
         )
         conn1.send(join1)
         checkServerMessage<PlayerJoinedMessage>(conn1) {
@@ -104,7 +104,7 @@ class StandaloneHostTests {
 
     @Test
     fun closeSessionWithoutSendingData() = runBlocking {
-        val server = LightServer(defaultHomeTeam, "test", testMode = true)
+        val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
         try {
             val conn = WebSocketClientConnection("test".gameId,"ws://localhost:8080/game")
@@ -120,7 +120,7 @@ class StandaloneHostTests {
     // Client connecting, we need to verify this case as well.
     @Test
     fun sendingUnsupportedMessageStopsConnection() = runBlocking {
-        val server = LightServer(defaultHomeTeam, "test", testMode = true)
+        val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
         val client = getHttpClient()
         val session = client.webSocketSession("ws://localhost:8080/game")
@@ -140,7 +140,7 @@ class StandaloneHostTests {
 
     @Test
     fun sendingWrongInitialMessageTerminatesConnection() = runBlocking {
-        val server = LightServer(defaultHomeTeam, "test", testMode = true)
+        val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
         val conn = WebSocketClientConnection(GameId("test"),"ws://localhost:8080/game")
         conn.start()
@@ -162,7 +162,7 @@ class StandaloneHostTests {
     @Test
     fun sendingWrongMessageAfterInitialJoinDoesNotTerminateSession() = runBlocking {
         // Start server
-        val server = LightServer(defaultHomeTeam, "test", testMode = true)
+        val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
 
         val conn1 = WebSocketClientConnection(GameId("test"),"ws://localhost:8080/game")
@@ -175,7 +175,7 @@ class StandaloneHostTests {
             GameId("test"),
             "host",
             null,
-            defaultHomeTeam,
+            createDefaultHomeTeam(),
         )
         conn1.send(join1)
         checkServerMessage<PlayerJoinedMessage>(conn1) {

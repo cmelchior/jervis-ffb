@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class WebsocketTests {
@@ -22,6 +23,7 @@ class WebsocketTests {
     }
 
     @Test
+    @Ignore // This is not testing anything right now
     fun traffic() =
         runBlocking<Unit> {
             adapter.start()

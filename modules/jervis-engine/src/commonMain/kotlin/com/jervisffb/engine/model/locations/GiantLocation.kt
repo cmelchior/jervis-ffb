@@ -1,17 +1,17 @@
 package com.jervisffb.engine.model.locations
 
+import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.tables.CornerThrowInPosition
-import com.jervisffb.engine.model.Direction
+import kotlinx.serialization.Serializable
 
 /**
  * This class represents a Giants location on the board.
  *
  * See page 54 in Death Zone.
  */
-class GiantLocation(coordinates: List<FieldCoordinate>): OnFieldLocation {
-    private val _coordiantes: MutableList<FieldCoordinate> = coordinates.toMutableList()
-    val coordinates: List<FieldCoordinate> = _coordiantes
+@Serializable
+class GiantLocation(val coordinates: MutableList<FieldCoordinate>): OnFieldLocation {
 
     override fun isOnLineOfScrimmage(rules: Rules): Boolean {
         TODO()

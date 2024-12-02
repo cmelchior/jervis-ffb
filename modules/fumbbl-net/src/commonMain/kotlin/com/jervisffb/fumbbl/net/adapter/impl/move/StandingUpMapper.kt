@@ -5,19 +5,20 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
-import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
-import com.jervisffb.fumbbl.net.adapter.add
-import com.jervisffb.fumbbl.net.model.PlayerAction
-import com.jervisffb.fumbbl.net.model.reports.PlayerActionReport
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
-import com.jervisffb.fumbbl.net.utils.FumbblGame
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayer
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
-import com.jervisffb.engine.rules.PlayerStandardActionType
+import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
+import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
+import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
+import com.jervisffb.fumbbl.net.model.PlayerAction
+import com.jervisffb.fumbbl.net.model.reports.PlayerActionReport
+import com.jervisffb.fumbbl.net.utils.FumbblGame
 
+// Map player only standing up and ending their action
 object StandingUpMapper: CommandActionMapper {
     override fun isApplicable(
         game: FumbblGame,

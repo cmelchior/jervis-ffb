@@ -46,9 +46,9 @@ data class BloodSpot(
 
 @Serializable
 data class PlayerData(
-    val playerId: String,
+    val playerId: PlayerId,
     val playerCoordinate: List<Int>,
-    val playerState: Int,
+    val playerState: PlayerState,
     val cards: List<String>,
     val cardEffects: List<String>,
 )

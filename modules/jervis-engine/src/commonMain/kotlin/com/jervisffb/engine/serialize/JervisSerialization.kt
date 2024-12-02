@@ -34,10 +34,14 @@ import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Field
+import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.FieldCoordinateImpl
+import com.jervisffb.engine.model.locations.GiantLocation
+import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
@@ -81,6 +85,12 @@ object JervisSerialization {
             }
             polymorphic(Position::class) {
                 subclass(BB2020Position::class)
+            }
+            polymorphic(Location::class) {
+                subclass(DogOut::class)
+                subclass(GiantLocation::class)
+                subclass(FieldSquare::class)
+                subclass(FieldCoordinateImpl::class)
             }
             polymorphic(FieldCoordinate::class) {
                 subclass(FieldCoordinateImpl::class)

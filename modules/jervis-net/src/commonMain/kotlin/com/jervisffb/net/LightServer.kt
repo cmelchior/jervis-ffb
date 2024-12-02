@@ -3,6 +3,8 @@ package com.jervisffb.net
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class LightServer(
     host: Team,
@@ -29,8 +31,12 @@ class LightServer(
     }
 
     suspend fun stop() {
-        gameCache.shutdownAll()
-        websocketServer.stop()
+        // TODO Stopping the server in tests seems to deadlock, need to figure out why
+        //  For now running shutting down on a seperate thread seems to work
+        withContext(Dispatchers.Default) {
+            gameCache.shutdownAll()
+            websocketServer.stop()
+        }
     }
 }
 

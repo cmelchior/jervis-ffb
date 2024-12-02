@@ -68,7 +68,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     }
 
     fun build(): Team {
-        return Team(id, name, roster/*, coach!!*/).apply {
+        return Team(id, name, roster, coach!!).apply {
             this@TeamBuilder.players.forEach {
                 val data: PlayerData = it.value
                 add(data.type.createPlayer(

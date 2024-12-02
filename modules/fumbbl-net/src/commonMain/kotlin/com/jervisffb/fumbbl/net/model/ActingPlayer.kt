@@ -49,11 +49,11 @@ data class ActingPlayer(
         hasFed = false
         jumping = false
         playerAction = null
-        standingUp= false
+        standingUp = false
         sufferingBloodlust = false
         sufferingAnimosity = false
         hasJumped = false
-//        wasProne = false
+        // wasProne = false
         fumblerooskiePending = false
 //        val player: Player<*> = getGame().getPlayerById(getPlayerId())
 //        setStrength(if (player != null) player.getStrengthWithModifiers() else 0)
