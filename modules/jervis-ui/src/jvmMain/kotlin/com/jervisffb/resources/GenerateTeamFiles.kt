@@ -36,6 +36,10 @@ class GenerateTeamFiles {
 
         StandaloneTeams.defaultTeams.forEach { (fileName, roster) ->
             val json = json.encodeToString(roster)
+            val file = File(rosterCache, fileName)
+            if (file.exists()) {
+                file.delete()
+            }
             File(rosterCache, fileName).writeText(json, charset = Charsets.UTF_8)
         }
     }

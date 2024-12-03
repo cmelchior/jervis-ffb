@@ -1,6 +1,7 @@
 package com.jervisffb.engine
 
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
@@ -25,7 +26,7 @@ private data class PlayerData(
 class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     private val players: MutableMap<PlayerNo, PlayerData> = mutableMapOf()
     var id: TeamId = TeamId("team-${Random.nextLong()}")
-    var coach: Coach? = null
+    var coach: Coach = Coach(CoachId("jervis-coach"), "Jervis")
     var name: String = ""
     var reRolls: Int = 0
         set(value) {
