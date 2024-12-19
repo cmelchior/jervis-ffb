@@ -35,7 +35,7 @@ jobs:
           cache-read-only: false
 
       - name: Run Tests
-        run: ./gradlew jvmTest
+        run: ./gradlew jvmTest --info
 
   build-windows-desktop:
     runs-on: windows-latest
