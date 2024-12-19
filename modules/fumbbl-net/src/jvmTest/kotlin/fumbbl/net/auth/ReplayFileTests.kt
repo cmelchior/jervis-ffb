@@ -15,6 +15,7 @@ import kotlin.test.Ignore
 class ReplayFileTests {
 
     @Test
+    @Ignore // Only run manually
     fun readReplayFile() =
         runBlocking {
             val file = platformFileSystem.canonicalize("".toPath()) / ("../../replays/game-1624379.json".toPath())
@@ -35,7 +36,7 @@ class ReplayFileTests {
         }
 
     @Test
-    @Ignore // Fouling is broken. We need to revisit How rules are setup.
+    @Ignore // Fouling is broken. We need to revisit How rules are setup. Also, only run manually
     fun convertReplayFileToJervisCommands() =
         runBlocking {
             val rules = StandardBB2020Rules
