@@ -3,6 +3,7 @@ package com.jervisffb.net
 import com.jervisffb.net.messages.ClientMessage
 import com.jervisffb.net.messages.JoinGameMessage
 import com.jervisffb.net.serialize.jervisNetworkSerializer
+import com.jervisffb.utils.jervisLogger
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.readText
@@ -22,8 +23,6 @@ enum class JervisExitCode(val code: Short) {
     WRONG_STARTING_MESSAGE(4006), // The first message to /game wasn't a JoinGameMessage
 }
 
-
-
 /**
  * Class responsible for the websocket connections to connected clients.
  *
@@ -32,12 +31,17 @@ class PlatformWebSocketServer(
     val server: LightServer,
 ) {
 
+    companion object {
+        val LOG = jervisLogger()
+    }
+
     private lateinit var platformClient: Any
+
 
     fun start() {
         // Warning: Leaving the scope will automatically close the session.
         val newConnectionCallback: suspend (WebSocketSession) -> Unit = { connection: WebSocketSession ->
-            println("New connection: $connection")
+            LOG.d { "New connection detected: $connection" }
             // All games should either have been created either programmatically (for standalone games), a HTTP
             // request (FUMBBL) or through the /lobby API (Self-hosted server). So when a websocket connection is
             // established, the first message is required to be a `JoinGameMessage` with a `gameId` that exists. If not,
@@ -46,7 +50,6 @@ class PlatformWebSocketServer(
             try {
                 val message = connection.incoming.receive() as Frame.Text
                 val json = message.readText()
-                println("New connection: $connection")
                 val clientMessage = jervisNetworkSerializer.decodeFromString<ClientMessage>(json)
                 if (clientMessage !is JoinGameMessage) {
                     connection.close(JervisExitCode.WRONG_STARTING_MESSAGE, "First message must be a JoinGameMessage: ${message::class.simpleName}")
@@ -63,13 +66,13 @@ class PlatformWebSocketServer(
             } catch (ex: ClosedReceiveChannelException) {
                 // The connection was closed while waiting for the first message
                 // We just ignore this.
-                println("New connection closed before receiving first message: $connection")
+                LOG.d("New connection closed before receiving first message: $connection")
             } catch (ex: Throwable) {
                 if (ex is CancellationException) throw ex
-                println("New connection exception: ${ex.stackTraceToString()}")
+                LOG.i("Server Connection closed due to an error: $connection")
                 connection.close(JervisExitCode.UNEXPECTED_ERROR, ex.stackTraceToString())
             }
-            println("Connection closed: $connection")
+            LOG.d("Server Connection closed: $connection")
         }
         platformClient = startEmbeddedServer(
             this.server,

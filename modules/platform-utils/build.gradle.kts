@@ -30,6 +30,7 @@ kotlin {
                 implementation(libs.okio)
                 implementation(libs.okio.fake)
                 api(libs.jsonserialization)
+                api(libs.kermit)
                 api("io.ktor:ktor-client-core:$ktor")
                 api("io.ktor:ktor-client-logging:$ktor")
                 api("io.ktor:ktor-client-websockets:$ktor")

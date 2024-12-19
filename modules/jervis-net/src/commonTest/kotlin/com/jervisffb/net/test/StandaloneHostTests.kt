@@ -4,9 +4,9 @@ import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.utils.createDefaultHomeTeam
 import com.jervisffb.engine.utils.lizardMenAwayTeam
 import com.jervisffb.net.GameId
+import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode
 import com.jervisffb.net.LightServer
-import com.jervisffb.net.WebSocketClientConnection
 import com.jervisffb.net.gameId
 import com.jervisffb.net.messages.ConfirmGameStartMessage
 import com.jervisffb.net.messages.GameActionMessage
@@ -41,9 +41,9 @@ class StandaloneHostTests {
         val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
 
-        val conn1 = WebSocketClientConnection(GameId("test"),"ws://localhost:8080/game")
+        val conn1 = JervisClientWebSocketConnection(GameId("test"),"ws://localhost:8080/game")
         conn1.start()
-        val conn2 = WebSocketClientConnection(GameId("test"),"ws://localhost:8080/game")
+        val conn2 = JervisClientWebSocketConnection(GameId("test"),"ws://localhost:8080/game")
         conn2.start()
 
         // Host Joins
@@ -107,7 +107,7 @@ class StandaloneHostTests {
         val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
         try {
-            val conn = WebSocketClientConnection("test".gameId,"ws://localhost:8080/game")
+            val conn = JervisClientWebSocketConnection("test".gameId,"ws://localhost:8080/game")
             conn.start()
             conn.close()
             assertEquals(JervisExitCode.CLIENT_CLOSING.code, conn.getCloseReason()?.code)
@@ -142,7 +142,7 @@ class StandaloneHostTests {
     fun sendingWrongInitialMessageTerminatesConnection() = runBlocking {
         val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
-        val conn = WebSocketClientConnection(GameId("test"),"ws://localhost:8080/game")
+        val conn = JervisClientWebSocketConnection(GameId("test"),"ws://localhost:8080/game")
         conn.start()
         try {
             conn.send(StartGameMessage("test".gameId))
@@ -165,9 +165,9 @@ class StandaloneHostTests {
         val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
 
-        val conn1 = WebSocketClientConnection(GameId("test"),"ws://localhost:8080/game")
+        val conn1 = JervisClientWebSocketConnection(GameId("test"),"ws://localhost:8080/game")
         conn1.start()
-        val conn2 = WebSocketClientConnection(GameId("test"),"ws://localhost:8080/game")
+        val conn2 = JervisClientWebSocketConnection(GameId("test"),"ws://localhost:8080/game")
         conn2.start()
 
         // Host Joins
@@ -220,7 +220,7 @@ class StandaloneHostTests {
 
     }
 
-    private suspend inline fun <reified T> checkServerMessage(connection: WebSocketClientConnection, assertFunc: (T) -> Unit) {
+    private suspend inline fun <reified T> checkServerMessage(connection: JervisClientWebSocketConnection, assertFunc: (T) -> Unit) {
         val serverMessage = connection.receiveOrNull()
         if (serverMessage !is T) {
             throw AssertionError("Expected ${T::class.simpleName}, got $serverMessage. Close reason: ${connection.getCloseReason()}")
@@ -228,7 +228,7 @@ class StandaloneHostTests {
         assertFunc(serverMessage)
     }
 
-    private suspend inline fun <reified T> consumeServerMessage(connection: WebSocketClientConnection) {
+    private suspend inline fun <reified T> consumeServerMessage(connection: JervisClientWebSocketConnection) {
         val serverMessage = connection.receiveOrNull()
         if (serverMessage !is T) throw AssertionError("Expected ${T::class.simpleName}, got $serverMessage. Close reason: ${connection.getCloseReason()}")
     }

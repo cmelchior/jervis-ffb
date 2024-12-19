@@ -58,9 +58,9 @@ class ServerCommunication(
         // TODO Send the messages in parallel, not sequentially
         //  Check for parallelizeSend
         session.players.forEach {
-            println("Sending: $message to ${it.connection}")
+//            println("Sending: $message to ${it.connection}")
             it.connection.send(Frame.Text(jsonMessage))
-            println("Sent: $message to ${it.connection}")
+//            println("Sent: $message to ${it.connection}")
         }
         session.spectators.forEach {
             it.connection.send(Frame.Text(jsonMessage))

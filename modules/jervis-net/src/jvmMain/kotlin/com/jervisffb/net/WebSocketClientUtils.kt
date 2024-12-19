@@ -1,5 +1,6 @@
 package com.jervisffb.net
 
+import com.jervisffb.utils.jervisLogger
 import io.ktor.server.application.install
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.embeddedServer
@@ -38,17 +39,19 @@ actual fun startEmbeddedServer(
             }
         }
     }
-    platformServer.start()
+    platformServer.start(wait = false)
+    jervisLogger().i { "Embedded server started" }
     return platformServer
 }
 
 actual fun stopEmbeddedServer(server: Any) {
     if (server is EmbeddedServer<*, *>) {
-        server.stop(
-            shutdownGracePeriod = 500,
-            shutdownTimeout = 500,
-            timeUnit = TimeUnit.MILLISECONDS,
-        )
+            server.stop(
+                shutdownGracePeriod = 500,
+                shutdownTimeout = 500,
+                timeUnit = TimeUnit.MILLISECONDS,
+            )
+        jervisLogger().i { "Embedded server stopped" }
     } else {
         throw IllegalArgumentException("Invalid server type: $server")
     }

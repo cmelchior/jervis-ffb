@@ -11,6 +11,7 @@ datetimex = "0.6.1"
 okio = "3.9.1"
 jgit = "7.0.0.202409031743-r"
 atomicfu = "0.26.0"
+kermit = "2.0.5"
 
 [libraries]
 coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -26,6 +27,7 @@ voyager-screenmodel = { group = "cafe.adriel.voyager", name = "voyager-screenmod
 voyager-bottom-sheet-navigator = { group = "cafe.adriel.voyager", name = "voyager-bottom-sheet-navigator", version.ref = "voyager" }
 voyager-tab-navigator = { group = "cafe.adriel.voyager", name = "voyager-tab-navigator", version.ref = "voyager" }
 voyager-transitions = { group = "cafe.adriel.voyager", name = "voyager-transitions", version.ref = "voyager" }
+kermit  = { group = "co.touchlab", name = "kermit", version.ref = "kermit" }
 
 [plugins]
 jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

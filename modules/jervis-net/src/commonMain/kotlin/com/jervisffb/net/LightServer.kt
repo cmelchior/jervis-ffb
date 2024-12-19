@@ -26,7 +26,7 @@ class LightServer(
         gameCache.safeAddGame(session)
     }
 
-    fun start() {
+    suspend fun start() {
         websocketServer.start()
     }
 

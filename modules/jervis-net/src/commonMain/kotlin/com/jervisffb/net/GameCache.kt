@@ -25,7 +25,7 @@ class GameCache {
     suspend fun shutdownAll() {
         gamesLock.withLock {
             games.forEach { (id, session) ->
-                session.shutdownGame(JervisExitCode.SERVER_CLOSING, "")
+                session.shutdownGame(JervisExitCode.SERVER_CLOSING, "Server is shutting down.")
             }
         }
     }

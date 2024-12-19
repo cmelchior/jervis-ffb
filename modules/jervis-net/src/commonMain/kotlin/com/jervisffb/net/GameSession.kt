@@ -21,6 +21,7 @@ import com.jervisffb.net.messages.ReceivedMessage
 import com.jervisffb.net.messages.ServerError
 import com.jervisffb.net.messages.StartGameMessage
 import com.jervisffb.net.serialize.jervisNetworkSerializer
+import com.jervisffb.utils.jervisLogger
 import io.ktor.utils.io.CancellationException
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
@@ -66,6 +67,10 @@ class GameSession(
     val playingTeams: List<TeamId>, // The teams in the game was predetermined up front. Only these teams can join as player clients.
     val testMode: Boolean
 ) {
+
+    companion object {
+        val LOG = jervisLogger()
+    }
 
     private val messageHandlers = mapOf(
         InternalJoinMessage::class to InternalJoinHandler(this),
@@ -145,12 +150,10 @@ class GameSession(
         // Launch a coroutine that consumes all messages from the client and
         // put them on the shared message queue for this game session.
         scope.launch {
-            println("Starting client handler for ${client.connection}")
             for (message in client.connection.incoming) {
                 try {
                     when (message) {
                         is Frame.Text -> {
-                            println("Receiving message from ${client.connection}: ${message.readText()}")
                             val clientMessage = jervisNetworkSerializer.decodeFromString<ClientMessage>(message.readText())
                             incomingMessages.send(ReceivedMessage(client.connection, clientMessage))
                         }
@@ -167,7 +170,6 @@ class GameSession(
                     sendError(client, error)
                 }
             }
-            println("Closing client handler for ${client.connection}")
         }
     }
 
