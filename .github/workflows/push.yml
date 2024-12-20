@@ -34,7 +34,7 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Run Tests
+      - name: Build Distribution for Linux
         run: ./gradlew jvmTest --info
 
   build-windows-desktop:
@@ -63,7 +63,7 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Build Distribution for Windows
+      - name: Build Installer for Windows
         run: ./gradlew packageReleaseMsi -P"jervis.releaseType=dev"
 
       - name: Upload artifacts
@@ -100,7 +100,7 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Build Distribution for MacOS
+      - name: Build Installer for MacOS
         run: ./gradlew packageReleaseDmg -Pjervis.releaseType=dev
 
       - name: Upload artifacts
@@ -137,7 +137,7 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Build Distribution for Linux
+      - name: Build Installer for Linux
         run: ./gradlew packageReleaseDeb -Pjervis.releaseType=dev
 
       - name: Upload artifacts
@@ -174,7 +174,7 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Run Tests
+      - name: Build Package for Wasm
         run: ./gradlew wasmJsBrowserDistribution -Pjervis.releaseType=dev
 
       - name: Upload artifacts
