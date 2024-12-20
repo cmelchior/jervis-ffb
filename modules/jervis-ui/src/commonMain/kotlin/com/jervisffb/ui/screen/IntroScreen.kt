@@ -69,7 +69,7 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
                 Row(
                     modifier = Modifier.fillMaxHeight(0.5f).fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     MenuBox(
                         label = "FUMBBL",
