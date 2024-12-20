@@ -14,9 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -94,11 +92,14 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
                         text = screenModel.clientVersion,
                         color = Color.White,
                         style = LocalTextStyle.current.copy(
-                            shadow = Shadow(
-                                color = Color.Black,
-                                offset = Offset(2f, 2f),
-                                blurRadius = 2f
-                            )
+                            // It looks better without a Shadow but it requires
+                            // that the grass in the bottom-left corner has a
+                            // darker hue, so the contrast is good.
+                            // shadow = Shadow(
+                            //    color = Color.Black,
+                            //    offset = Offset(2f, 2f),
+                            //    blurRadius = 2f
+                            // )
                         )
                     )
                 }
