@@ -6,6 +6,25 @@ import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import com.jervisffb.ui.screen.IntroScreen
 import com.jervisffb.ui.viewmodel.MenuViewModel
+import com.jervisffb.utils.FileManager
+import com.jervisffb.utils.PropertiesManager
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+
+val FILE_MANAGER = FileManager()
+val PROPERTIES_MANAGER = PropertiesManager()
+
+fun initApplication() {
+    GlobalScope.launch {
+        if (PROPERTIES_MANAGER.getBoolean("initialized") != true) {
+            println("Initializing application...")
+            CacheManager.createInitialTeamFiles()
+            PROPERTIES_MANAGER.setProperty("initialized", true)
+        } else {
+            println("Application already initialized.")
+        }
+    }
+}
 
 @Composable
 fun App(menuViewModel: MenuViewModel) {

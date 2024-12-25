@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.juul.indexeddb</groupId>
+  <artifactId>core</artifactId>
+  <versioning>
+    <latest>main-SNAPSHOT</latest>
+    <versions>
+      <version>main-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20241224230736</lastUpdated>
+  </versioning>
+</metadata>

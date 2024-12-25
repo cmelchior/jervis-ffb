@@ -1,0 +1,183 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.juul.indexeddb",
+    "module": "core",
+    "version": "main-SNAPSHOT",
+    "attributes": {
+      "org.gradle.status": "integration"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.10"
+    }
+  },
+  "variants": [
+    {
+      "name": "metadataApiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "dependencies": [
+        {
+          "group": "com.juul.indexeddb",
+          "module": "external",
+          "version": {
+            "requires": "main-SNAPSHOT"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": {
+            "requires": "1.8.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.0.20"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "core-metadata.jar",
+          "url": "core-main-SNAPSHOT.jar",
+          "size": 10748,
+          "sha512": "09e1ca7d9024fcf7ade9db879f16975a6c011021adc55d9a424a47a6c534c5df18205fad7140977fbd1c8124d1d67aeac59701b3b185c0794dde4923b0a5fa2f",
+          "sha256": "7ea44498344a1eb4095ba83665a598dbcabf13eed41ce0782b894172b27cd1ea",
+          "sha1": "8c7273c852eade04f5d50f31cdcf66f82ca8e071",
+          "md5": "cd2ca31c32f72db355d39b0455b37cfd"
+        }
+      ]
+    },
+    {
+      "name": "metadataSourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "files": [
+        {
+          "name": "core-kotlin-sources.jar",
+          "url": "core-main-SNAPSHOT-sources.jar",
+          "size": 9653,
+          "sha512": "de9f944e3a2021f40a59ca44c8b73f60da1f14cf9380ecd27836133efe541889696e24fac4e3ec427148aa78d979f43f677cf2cb7ce5430dc9dd758d98560c50",
+          "sha256": "0eeaa52a0075fb2947e3312a4b21f6f45b85d13f267d99209c5a86beab9b5d80",
+          "sha1": "c10591c21cb1ab9f64425964a83e257be96886da",
+          "md5": "490f7287fdaa519a1687dc601480019d"
+        }
+      ]
+    },
+    {
+      "name": "jsApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.js.compiler": "ir",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../core-js/main-SNAPSHOT/core-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "core-js",
+        "version": "main-SNAPSHOT"
+      }
+    },
+    {
+      "name": "jsRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.js.compiler": "ir",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../core-js/main-SNAPSHOT/core-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "core-js",
+        "version": "main-SNAPSHOT"
+      }
+    },
+    {
+      "name": "jsSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.js.compiler": "ir",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../core-js/main-SNAPSHOT/core-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "core-js",
+        "version": "main-SNAPSHOT"
+      }
+    },
+    {
+      "name": "wasmJsApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.platform.type": "wasm",
+        "org.jetbrains.kotlin.wasm.target": "js"
+      },
+      "available-at": {
+        "url": "../../core-wasm-js/main-SNAPSHOT/core-wasm-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "core-wasm-js",
+        "version": "main-SNAPSHOT"
+      }
+    },
+    {
+      "name": "wasmJsRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.platform.type": "wasm",
+        "org.jetbrains.kotlin.wasm.target": "js"
+      },
+      "available-at": {
+        "url": "../../core-wasm-js/main-SNAPSHOT/core-wasm-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "core-wasm-js",
+        "version": "main-SNAPSHOT"
+      }
+    },
+    {
+      "name": "wasmJsSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.platform.type": "wasm",
+        "org.jetbrains.kotlin.wasm.target": "js"
+      },
+      "available-at": {
+        "url": "../../core-wasm-js/main-SNAPSHOT/core-wasm-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "core-wasm-js",
+        "version": "main-SNAPSHOT"
+      }
+    }
+  ]
+}

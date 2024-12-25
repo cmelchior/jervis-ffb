@@ -1,0 +1,169 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.juul.indexeddb",
+    "module": "external",
+    "version": "main-SNAPSHOT",
+    "attributes": {
+      "org.gradle.status": "integration"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.10"
+    }
+  },
+  "variants": [
+    {
+      "name": "metadataApiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.0.20"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "external-metadata.jar",
+          "url": "external-main-SNAPSHOT.jar",
+          "size": 11102,
+          "sha512": "c09a3dca8c5152fc93b23556eeb248b1b8cd2282cd556057e2c3b72072a75329f1b6038cfdc8cc2832e35f67d3cbaa451f9bf9550bce58e7d8f93ed5e0ca6004",
+          "sha256": "315c2c7e72c44dd64be03779d933e827afb1a878ccf7390487b9ae2b85538df4",
+          "sha1": "fdb1511917e5e7194ab3de264a008a9d2dda0b57",
+          "md5": "9a7101f819e456e3abe629a95487ba07"
+        }
+      ]
+    },
+    {
+      "name": "metadataSourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "files": [
+        {
+          "name": "external-kotlin-sources.jar",
+          "url": "external-main-SNAPSHOT-sources.jar",
+          "size": 6426,
+          "sha512": "720e0459405b17775c0217acf6ece6a2927729498c0960e70c69d6625edf7ea20fa56470736ba4f0bf96c5292dfd6400b555de49db87556431eef154af47b25f",
+          "sha256": "1ad39be7691ab643e61470194ad1896bbcaefdb413e349bf4eb60e6dcb0abdc1",
+          "sha1": "b258a8cb1960ebb0ab79d52adda6f258f61d9425",
+          "md5": "ded69552f501427f47eba7b63378c623"
+        }
+      ]
+    },
+    {
+      "name": "jsApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.js.compiler": "ir",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../external-js/main-SNAPSHOT/external-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "external-js",
+        "version": "main-SNAPSHOT"
+      }
+    },
+    {
+      "name": "jsRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.js.compiler": "ir",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../external-js/main-SNAPSHOT/external-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "external-js",
+        "version": "main-SNAPSHOT"
+      }
+    },
+    {
+      "name": "jsSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.js.compiler": "ir",
+        "org.jetbrains.kotlin.platform.type": "js"
+      },
+      "available-at": {
+        "url": "../../external-js/main-SNAPSHOT/external-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "external-js",
+        "version": "main-SNAPSHOT"
+      }
+    },
+    {
+      "name": "wasmJsApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.platform.type": "wasm",
+        "org.jetbrains.kotlin.wasm.target": "js"
+      },
+      "available-at": {
+        "url": "../../external-wasm-js/main-SNAPSHOT/external-wasm-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "external-wasm-js",
+        "version": "main-SNAPSHOT"
+      }
+    },
+    {
+      "name": "wasmJsRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.platform.type": "wasm",
+        "org.jetbrains.kotlin.wasm.target": "js"
+      },
+      "available-at": {
+        "url": "../../external-wasm-js/main-SNAPSHOT/external-wasm-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "external-wasm-js",
+        "version": "main-SNAPSHOT"
+      }
+    },
+    {
+      "name": "wasmJsSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.platform.type": "wasm",
+        "org.jetbrains.kotlin.wasm.target": "js"
+      },
+      "available-at": {
+        "url": "../../external-wasm-js/main-SNAPSHOT/external-wasm-js-main-SNAPSHOT.module",
+        "group": "com.juul.indexeddb",
+        "module": "external-wasm-js",
+        "version": "main-SNAPSHOT"
+      }
+    }
+  ]
+}

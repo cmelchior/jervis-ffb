@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -42,12 +43,15 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-client-okhttp:$ktor")
                 implementation("org.reflections:reflections:0.10.2")
+                implementation("androidx.datastore:datastore-jvm:1.1.0")
+                implementation("androidx.datastore:datastore-preferences-jvm:1.1.0")
             }
         }
 
         val wasmJsMain by getting {
             dependencies {
-//                implementation("io.ktor:ktor-client-core-wasm-js:$ktor")
+                implementation("com.juul.indexeddb:core:main-SNAPSHOT")
+                implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3")
             }
         }
 
@@ -63,3 +67,8 @@ kotlin {
     }
 }
 
+tasks.withType<KotlinCompile<*>>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xwasm-use-new-exception-proposal")
+    }
+}

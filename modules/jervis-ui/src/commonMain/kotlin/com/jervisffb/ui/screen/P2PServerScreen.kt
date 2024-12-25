@@ -49,8 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.BB2020Rules
@@ -189,9 +187,7 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
 class P2PServerScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PServerScreenModel) : Screen {
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
         MenuScreen {
-//            val canCreateGame: Boolean by screenModel.canCreateGame.collectAsState(false)
             Box(modifier = Modifier.fillMaxSize().padding(24.dp)) {
                 Row(modifier = Modifier.fillMaxSize()) {
                     GameCreation(modifier = Modifier.weight(1f).fillMaxSize(), screenModel)
@@ -354,8 +350,7 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    val lines = (ceil(availableTeams.size / 2f)).toInt()
-                    if (availableTeams.isEmpty()) return
+                    val lines = if (availableTeams.isEmpty()) 0 else (ceil(availableTeams.size / 2f)).toInt()
                     repeat(lines) { line ->
                         val team1 = availableTeams[line * 2]
                         val team2 = availableTeams.getOrNull(line * 2 + 1)
@@ -388,7 +383,10 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
             }
         }
         if (showImportFumbblTeam) {
+            println("Show Import FUMBBL Team Dialog")
             LoadTeamDialog(viewModel, onCloseRequest = { showImportFumbblTeam = false })
+        } else {
+            println("Hide Import FUMBBL Team Dialog")
         }
     }
 }
@@ -401,6 +399,7 @@ fun LoadTeamDialog(
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    println("Show LoadTeamDialog")
     AlertDialog(
         onDismissRequest = { /* Do nothing */ },
         title = { Text("Import FUMBBL Team") },

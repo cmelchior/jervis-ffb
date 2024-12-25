@@ -38,8 +38,10 @@ actual val platformFileSystem: FileSystem = object: FileSystem() {
         TODO("Not yet implemented")
     }
 }
+actual val APPLICATION_DIRECTORY: String = "TODO"
 
 actual class FileManager {
+
     actual suspend fun getFilesWithExtension(directory: String, extension: String): List<Path> {
         TODO()
     }
@@ -50,4 +52,21 @@ actual class FileManager {
         TODO()
     }
 }
+
+actual class PropertiesManager actual constructor() {
+
+    actual suspend fun getString(key: String): String? {
+        TODO()
+    }
+    actual suspend fun getBoolean(key: String): Boolean? {
+        TODO()
+    }
+    actual suspend fun getInt(key: String): Int? {
+        TODO()
+    }
+    actual suspend fun setProperty(key: String, value: Any?) {
+        TODO()
+    }
+}
+
 

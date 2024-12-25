@@ -6,13 +6,11 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.jervisffb.engine.serialize.FILE_EXTENSION_TEAM_FILE
 import com.jervisffb.engine.serialize.JervisSerialization.jervisEngineModule
 import com.jervisffb.engine.serialize.JervisTeamFile
+import com.jervisffb.resources.StandaloneTeams
 import com.jervisffb.utils.FileManager
-import com.jervisffb.utils.platformFileSystem
 import io.ktor.http.Url
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okio.buffer
-import okio.use
 import org.jetbrains.skia.EncodedImageFormat
 import org.jetbrains.skia.Image
 
@@ -23,18 +21,28 @@ object CacheManager {
     val rosterCacheRoot = "rosters"
 
     val fileManager = FileManager()
-    val json = Json {
+    val jsonSerializer = Json {
         useArrayPolymorphism = true
         serializersModule = jervisEngineModule
         prettyPrint = true
     }
 
+    suspend fun createInitialTeamFiles() {
+        StandaloneTeams.defaultTeams.forEach { (fileName, roster) ->
+            val json = jsonSerializer.encodeToString(roster).encodeToByteArray()
+            FILE_MANAGER.writeFile(teamsCacheRoot, fileName, json)
+        }
+    }
+
     suspend fun loadTeams(): List<JervisTeamFile> {
         return fileManager.getFilesWithExtension(teamsCacheRoot, FILE_EXTENSION_TEAM_FILE).map { file ->
-            platformFileSystem.source(file).use { source ->
-                val fileContent = source.buffer().readUtf8()
-                json.decodeFromString<JervisTeamFile>(fileContent)
+            val fileContent = fileManager.getFile(file.toString())
+            if (fileContent == null) {
+                throw IllegalStateException("Could not find: $file")
+
             }
+            val json = fileContent.map { Char(it.toInt()) }.toCharArray().concatToString()
+            jsonSerializer.decodeFromString<JervisTeamFile>(json)
         }
     }
 
@@ -44,11 +52,8 @@ object CacheManager {
     suspend fun getCachedImage(url: Url): ImageBitmap? {
         val host = url.host
         val path = url.encodedPath.replace("/", "_")
-        return fileManager.getFile("$imageCacheRoot/$host/$path")?.let { file ->
-            platformFileSystem.source(file).use { source ->
-                val fileContent = source.buffer().readByteArray()
-                Image.makeFromEncoded(fileContent).toComposeImageBitmap()
-            }
+        return fileManager.getFile("$imageCacheRoot/$host/$path")?.let { fileContent ->
+            Image.makeFromEncoded(fileContent).toComposeImageBitmap()
         }
     }
 
@@ -66,7 +71,7 @@ object CacheManager {
     }
 
     suspend fun saveTeam(file: JervisTeamFile) {
-        val fileContent = json.encodeToString(file)
+        val fileContent = jsonSerializer.encodeToString(file)
         val fileName = "team_${file.team.id.value}.$FILE_EXTENSION_TEAM_FILE"
         fileManager.writeFile(teamsCacheRoot, fileName, fileContent.encodeToByteArray())
     }

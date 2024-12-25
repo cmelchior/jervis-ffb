@@ -1,6 +1,7 @@
 package com.jervisffb.resources
 
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.utils.APPLICATION_DIRECTORY
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -8,7 +9,7 @@ import java.io.File
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
-    val args = arrayOf("/Users/christian.melchior/.jervis")
+    val args = arrayOf(APPLICATION_DIRECTORY)
     if (args.isEmpty() || args.size > 1) {
         println("Usage: ./gradlew jvmRun -DmainClass=com.jervisffb.resources.GenerateTeamFilesKt <fullPathToCacheDir>")
         exitProcess(1)

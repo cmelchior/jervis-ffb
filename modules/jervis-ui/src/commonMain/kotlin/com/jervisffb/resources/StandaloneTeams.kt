@@ -36,6 +36,8 @@ import com.jervisffb.engine.serialize.SpriteSheet
 import com.jervisffb.engine.serialize.TeamSpriteData
 import com.jervisffb.engine.teamBuilder
 
+// List of default starter team rosters
+// This is primarely usd by Standalone Mode
 object StandaloneTeams {
     val defaultTeams = mapOf(
         "human-starter-team.jrt" to buildTeamFile {
