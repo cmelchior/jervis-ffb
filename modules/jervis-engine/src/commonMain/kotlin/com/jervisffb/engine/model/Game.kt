@@ -87,7 +87,9 @@ class IdGenerator {
  * It should only contain the static state and not enforce any rules.
  *
  * All rules should either be enforced by a [com.jervisffb.fsm.Procedure]
- * or by calling methods in [com.jervisffb.rules.Rules]
+ * or by calling methods in [com.jervisffb.rules.Rules]. This means that
+ * changes to this class must only happen through [com.jervisffb.engine.commands]
+ * objects.
  */
 class Game(
     val rules: Rules,

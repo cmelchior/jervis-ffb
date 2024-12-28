@@ -99,8 +99,8 @@ class UiGameController(
             // We do this before starting the main loop so the UI start from
             // that state.
             // TODO Error handling here?
-            preloadedActions.forEach {
-                controller.processAction(it)
+            preloadedActions.forEach { preloadedAction ->
+                controller.processAction(preloadedAction)
             }
 
             // Run main game loop

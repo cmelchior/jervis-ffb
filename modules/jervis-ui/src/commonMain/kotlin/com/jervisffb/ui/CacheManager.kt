@@ -39,7 +39,6 @@ object CacheManager {
             val fileContent = fileManager.getFile(file.toString())
             if (fileContent == null) {
                 throw IllegalStateException("Could not find: $file")
-
             }
             val json = fileContent.map { Char(it.toInt()) }.toCharArray().concatToString()
             jsonSerializer.decodeFromString<JervisTeamFile>(json)

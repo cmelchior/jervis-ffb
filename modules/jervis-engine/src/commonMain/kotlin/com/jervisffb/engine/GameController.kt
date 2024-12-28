@@ -98,7 +98,7 @@ class GameController(
      * Process the given [action] as input to the currently active [Node].
      *
      * [getAvailableActions] will return a description of valid input to this
-     * method. So if an invalid is provided, a [com.jervisffb.engine.utils.InvalidActionException]
+     * method. So if an invalid action is provided, a [com.jervisffb.engine.utils.InvalidActionException]
      * is thrown.
      */
     fun processAction(action: GameAction) {
