@@ -101,7 +101,7 @@ class GameController(
      * method. So if an invalid action is provided, a [com.jervisffb.engine.utils.InvalidActionException]
      * is thrown.
      */
-    fun processAction(action: GameAction) {
+    fun handleAction(action: GameAction) {
         if (actionMode != ActionMode.MANUAL && actionMode != ActionMode.TEST) {
             error("Invalid action mode: $actionMode. Must be ActionMode.MANUAL or ActionMode.TEST.")
         }

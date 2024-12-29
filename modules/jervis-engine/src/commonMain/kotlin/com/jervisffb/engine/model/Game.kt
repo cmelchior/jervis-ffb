@@ -35,7 +35,7 @@ import kotlin.properties.Delegates
  * [ActionNode.getAvailableActions] since we do not control when this is called,
  *
  * These ID's should only be generated from inside a request to
- * [GameController.processAction] ensuring that all access to the generator
+ * [GameController.handleAction] ensuring that all access to the generator
  * is thread-safe. As it is not thread-safe by itself.
  *
  * The generator is tied to a specific [Game] instance and will also undo

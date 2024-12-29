@@ -91,7 +91,7 @@ class MapperChain constructor(jervisGame: Game, fumbblGame: FumbblGame, checkCom
                         }
                         try {
                             if (jervisAction != null) {
-                                jervisGameController.processAction(jervisAction)
+                                jervisGameController.handleAction(jervisAction)
                             }
                         } catch (ex: Exception) {
                             println("Processed up to: ${serverCommand.commandNr}")

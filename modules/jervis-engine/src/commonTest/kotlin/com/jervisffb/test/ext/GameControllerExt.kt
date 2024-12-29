@@ -16,7 +16,7 @@ fun GameController.rollForward(vararg actions: GameAction?) {
     actions.forEach {
         if (it != null) {
             val action = if (it is CalculatedAction) it.get(state, rules) else it
-            processAction(action)
+            handleAction(action)
         }
     }
 }
@@ -26,6 +26,6 @@ fun GameController.rollForward(vararg actions: GameAction?) {
  */
 fun GameController.undoActions(actions: Int) {
     repeat(actions) {
-        this.processAction(Undo)
+        this.handleAction(Undo)
     }
 }

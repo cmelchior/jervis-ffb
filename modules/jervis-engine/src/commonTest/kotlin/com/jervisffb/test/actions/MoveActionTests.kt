@@ -48,7 +48,7 @@ class MoveActionTests: JervisGameTest() {
         val movingPlayer = state.getPlayerById("A8".playerId)
         assertEquals(Int.MAX_VALUE, state.activeTeam.turnData.moveActions)
         assertEquals(Availability.IS_ACTIVE, movingPlayer.available)
-        controller.processAction(EndAction)
+        controller.handleAction(EndAction)
         assertEquals(Availability.AVAILABLE, movingPlayer.available)
         assertEquals(Int.MAX_VALUE, state.activeTeam.turnData.moveActions)
     }
@@ -60,7 +60,7 @@ class MoveActionTests: JervisGameTest() {
         startMoveAction()
         assertEquals(Int.MAX_VALUE, state.activeTeam.turnData.moveActions)
         assertEquals(Availability.IS_ACTIVE, movingPlayer.available)
-        controller.processAction(EndAction)
+        controller.handleAction(EndAction)
         assertEquals(Availability.AVAILABLE, movingPlayer.available)
         assertEquals(Int.MAX_VALUE, state.activeTeam.turnData.moveActions)
     }
@@ -70,7 +70,7 @@ class MoveActionTests: JervisGameTest() {
         val movingPlayer = state.getPlayerById("A8".playerId)
         startMoveAction()
         controller.rollForward(*moveTo(14, 14))
-        controller.processAction(EndAction)
+        controller.handleAction(EndAction)
         assertEquals(Availability.HAS_ACTIVATED, movingPlayer.available)
         assertEquals(Int.MAX_VALUE - 1, state.activeTeam.turnData.moveActions)
     }

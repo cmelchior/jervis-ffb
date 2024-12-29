@@ -100,7 +100,7 @@ class UiGameController(
             // that state.
             // TODO Error handling here?
             preloadedActions.forEach { preloadedAction ->
-                controller.processAction(preloadedAction)
+                controller.handleAction(preloadedAction)
             }
 
             // Run main game loop
@@ -150,7 +150,7 @@ class UiGameController(
                 // Last, send action to the Rules Engine for processing.
                 // This will start the next iteration of the game loop.
                 // TODO Add error handling here. What to do for invalid actions?
-                controller.processAction(userAction)
+                controller.handleAction(userAction)
             }
         }.invokeOnCompletion {
             if (it != null && it !is CancellationException) {

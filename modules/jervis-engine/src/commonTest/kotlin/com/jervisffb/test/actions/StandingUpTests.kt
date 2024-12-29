@@ -176,7 +176,7 @@ class StandingUpTests: JervisGameTest() {
                     )
                     checkActionUsed()
                     for (i in 0 until rollBack()) {
-                        controller.processAction(Undo)
+                        controller.handleAction(Undo)
                     }
                 } catch (ex: Throwable) {
                     fail("$action failed: $ex")
