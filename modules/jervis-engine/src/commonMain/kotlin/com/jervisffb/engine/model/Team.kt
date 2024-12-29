@@ -21,10 +21,6 @@ import kotlinx.serialization.Transient
 import kotlin.jvm.JvmInline
 import kotlin.properties.Delegates
 
-@Serializable
-@JvmInline
-value class TeamId(val value: String = "")
-
 class TeamHalfData(private val game: Game) {
     var totalRerolls: Int = 0
     var usedRerolls: Int = 0

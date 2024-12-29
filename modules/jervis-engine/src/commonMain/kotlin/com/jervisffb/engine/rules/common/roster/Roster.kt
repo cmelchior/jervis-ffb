@@ -1,12 +1,5 @@
 package com.jervisffb.engine.rules.common.roster
 
-import kotlinx.serialization.Serializable
-import kotlin.jvm.JvmInline
-
-@Serializable
-@JvmInline
-value class RosterId(val id: String)
-
 interface Race {
     val id: Long
     val name: String

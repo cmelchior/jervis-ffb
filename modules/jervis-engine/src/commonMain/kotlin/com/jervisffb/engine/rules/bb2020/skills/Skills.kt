@@ -72,10 +72,6 @@ class BrilliantCoachingReroll(val team: Team) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
-@Serializable
-@JvmInline
-value class RerollSourceId(val id: String)
-
 // Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {
     val id: RerollSourceId // Unique identifier for this reroll. Should only be unique within a single team.

@@ -9,10 +9,6 @@ import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
-@Serializable
-@JvmInline
-value class PositionId(val id: String)
-
 interface Position {
     val id: PositionId
     val quantity: Int

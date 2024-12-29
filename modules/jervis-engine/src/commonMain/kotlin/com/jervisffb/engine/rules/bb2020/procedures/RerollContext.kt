@@ -8,16 +8,6 @@ import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
-// ID that identities a single die
-// Used to track individual dice through rerolls
-@JvmInline
-@Serializable
-value class DieId(val id: String) {
-    companion object {
-        fun generate(state: Game): DieId = state.idGenerator.nextDiceId()
-    }
-}
-
 /**
  * Interface allowing us to track a single die all the way from rolling it
  * the first time to it getting rerolled. This includes both single die rolls as

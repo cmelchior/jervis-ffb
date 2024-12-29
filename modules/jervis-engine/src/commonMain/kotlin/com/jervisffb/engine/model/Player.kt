@@ -121,10 +121,6 @@ enum class Availability {
     UNAVAILABLE, // Unavailable for this turn
 }
 
-@JvmInline
-@Serializable
-value class PlayerId(val value: String)
-
 @Serializable
 class Player(
     val id: PlayerId,
