@@ -5,7 +5,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.ui.App
@@ -39,13 +39,13 @@ object Imager {
                 }
             }
             val actionRequestChannel =
-                Channel<Pair<GameController, List<GameActionDescriptor>>>(
+                Channel<Pair<GameEngineController, List<GameActionDescriptor>>>(
                     capacity = 1,
                     onBufferOverflow = BufferOverflow.SUSPEND,
                 )
             val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
 //            val controller = GameController(BB2020Rules, state, actionProvider as ((GameController, List<ActionDescriptor>) -> GameAction))
-            val controller = GameController(StandardBB2020Rules, state)
+            val controller = GameEngineController(StandardBB2020Rules, state)
             App(MenuViewModel()) // controller, actionRequestChannel, actionSelectedChannel)
         }
     }
@@ -61,16 +61,16 @@ object Imager {
             val rules = StandardBB2020Rules
             val state = createDefaultGameState(rules)
             val actionRequestChannel =
-                Channel<Pair<GameController, List<GameActionDescriptor>>>(
+                Channel<Pair<GameEngineController, List<GameActionDescriptor>>>(
                     capacity = 1,
                     onBufferOverflow = BufferOverflow.SUSPEND,
                 )
             val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
-            val actionProvider = { controller: GameController, availableActions: List<GameActionDescriptor> ->
+            val actionProvider = { controller: GameEngineController, availableActions: List<GameActionDescriptor> ->
                 createRandomAction(state, availableActions)
             }
 //            val controller = GameController(rules, state, actionProvider)
-            val controller = GameController(rules, state)
+            val controller = GameEngineController(rules, state)
             App(MenuViewModel()) // controller, actionRequestChannel, actionSelectedChannel)
         }
     }

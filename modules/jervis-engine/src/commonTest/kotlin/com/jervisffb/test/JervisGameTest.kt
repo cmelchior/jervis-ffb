@@ -1,6 +1,6 @@
 package com.jervisffb.test
 
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
@@ -44,7 +44,7 @@ abstract class JervisGameTest {
 
     open val rules: BB2020Rules = StandardBB2020Rules
     protected lateinit var state: Game
-    protected lateinit var controller: GameController
+    protected lateinit var controller: GameEngineController
     protected lateinit var homeTeam: Team
     protected lateinit var awayTeam: Team
 
@@ -64,7 +64,7 @@ abstract class JervisGameTest {
         }
         homeTeam = state.homeTeam
         awayTeam = state.awayTeam
-        controller = GameController(rules, state)
+        controller = GameEngineController(rules, state)
         controller.startTestMode(FullGame)
     }
 
@@ -76,7 +76,7 @@ abstract class JervisGameTest {
         )
     }
 
-    protected fun useTeamReroll(controller: GameController) =
+    protected fun useTeamReroll(controller: GameEngineController) =
         RerollOptionSelected(
             controller.getAvailableActions().actions.filterIsInstance<SelectRerollOption>().first().options.first()
         )

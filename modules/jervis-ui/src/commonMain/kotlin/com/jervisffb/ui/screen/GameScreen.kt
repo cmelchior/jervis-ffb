@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
@@ -35,14 +35,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 class GameScreenModel(
     val mode: GameMode,
     val menuViewModel: MenuViewModel,
-    private val injectedController: GameController? = null,
+    private val injectedController: GameEngineController? = null,
     private val actions: List<GameAction> = emptyList(),
 ) : ScreenModel {
 
     val hoverPlayerFlow = MutableSharedFlow<Player?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     lateinit var uiState: UiGameController
-    lateinit var controller: GameController
+    lateinit var controller: GameEngineController
     var fumbbl: FumbblReplayAdapter? = null
     val rules: StandardBB2020Rules = StandardBB2020Rules
 
@@ -58,18 +58,18 @@ class GameScreenModel(
                     fumbbl = null
                     homeTeam = StandaloneTeams.defaultTeams["human-starter-team.jrt"]!!
                     awayTeam = StandaloneTeams.defaultTeams["lizardmen-starter-team.jrt"]!!
-                    this.controller = GameController(rules, Game(rules, homeTeam.team, awayTeam.team, Field.createForRuleset(rules)))
+                    this.controller = GameEngineController(rules, Game(rules, homeTeam.team, awayTeam.team, Field.createForRuleset(rules)))
                 }
 
                 Random -> {
                     fumbbl = null
-                    this.controller = GameController(rules, createDefaultGameState(rules))
+                    this.controller = GameEngineController(rules, createDefaultGameState(rules))
                 }
 
                 is Replay -> {
                     fumbbl = FumbblReplayAdapter(mode.file, checkCommandsWhenLoading = false)
                     fumbbl!!.loadCommands()
-                    this.controller = GameController(rules, fumbbl!!.getGame())
+                    this.controller = GameEngineController(rules, fumbbl!!.getGame())
                 }
             }
         }

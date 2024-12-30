@@ -34,12 +34,13 @@ data class AddEntry(val log: LogEntry) : ListEvent
 data class RemoveEntry(val log: LogEntry) : ListEvent
 
 /**
- * Main entry point for controlling a single game.
- *
+ * Main entry point for running a single game according to some predefined rules.
+ **
  * This class should not be used until both teams have been identified and a ruleset
- * has been agreed upon.
+ * has been agreed upon. This should be the responsibility of a specific
+ * [GameRunner]
  */
-class GameController(
+class GameEngineController(
     rules: Rules,
     state: Game,
     diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator()

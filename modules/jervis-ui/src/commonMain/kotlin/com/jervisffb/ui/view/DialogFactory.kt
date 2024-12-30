@@ -1,7 +1,7 @@
 package com.jervisffb.ui.view
 
 import com.jervisffb.engine.ActionRequest
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
@@ -79,7 +79,7 @@ import com.jervisffb.ui.dialogs.UserInputDialog
  * by some other part of the UI.
  */
 object DialogFactory {
-    fun createDialogIfPossible(controller: GameController, request: ActionRequest, mapUnknownActions: (ActionRequest) -> List<GameAction>): UserInputDialog? {
+    fun createDialogIfPossible(controller: GameEngineController, request: ActionRequest, mapUnknownActions: (ActionRequest) -> List<GameAction>): UserInputDialog? {
         val rules = controller.rules
         val userInput: UserInputDialog? =
             when (controller.state.stack.currentNode()) {

@@ -1,7 +1,7 @@
 package com.jervisffb.engine.model
 
 import com.jervisffb.engine.AddEntry
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.ListEvent
 import com.jervisffb.engine.RemoveEntry
 import com.jervisffb.engine.fsm.ActionNode
@@ -16,10 +16,8 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
-import com.jervisffb.engine.rules.bb2020.procedures.DieId
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassingInteferenceContext
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
-import com.jervisffb.engine.rules.bb2020.skills.RerollSourceId
 import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.safeTryEmit
@@ -35,7 +33,7 @@ import kotlin.properties.Delegates
  * [ActionNode.getAvailableActions] since we do not control when this is called,
  *
  * These ID's should only be generated from inside a request to
- * [GameController.handleAction] ensuring that all access to the generator
+ * [GameEngineController.handleAction] ensuring that all access to the generator
  * is thread-safe. As it is not thread-safe by itself.
  *
  * The generator is tied to a specific [Game] instance and will also undo

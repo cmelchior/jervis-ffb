@@ -1,8 +1,8 @@
 package com.jervisffb.ui
 
 import com.jervisffb.engine.ActionRequest
-import com.jervisffb.engine.GameController
 import com.jervisffb.engine.GameDelta
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
@@ -36,9 +36,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 /**
- * This class is the main entry point for holding the UI game state.
+ * This class is the main entry point for holding the UI game state. It acts
+ * as the main ViewModel in MVVM.
  *
- * It responsible for acting as a bridge towards [com.jervisffb.engine.GameController],
+ * It responsible for acting as a bridge towards [com.jervisffb.engine.GameEngineController],
  * which means it should consume all events from there as well as being the only one
  * to send UI actions back to it.
  *
@@ -47,7 +48,7 @@ import kotlinx.coroutines.launch
  */
 class UiGameController(
     private val mode: GameMode,
-    val controller: GameController,
+    val controller: GameEngineController,
     private val menuViewModel: MenuViewModel,
     private val preloadedActions: List<GameAction>
 ) {
@@ -79,7 +80,7 @@ class UiGameController(
      * Start the main game loop.
      *
      * This will start executing the game by setting up receiving updates from
-     * [GameController], process them to set up the UI as well as sending back
+     * [GameEngineController], process them to set up the UI as well as sending back
      * actions.
      *
      * Each execution of the loop can thus be seen as the controller of a single

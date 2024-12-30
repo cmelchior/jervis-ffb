@@ -1,6 +1,6 @@
 package com.jervisffb.ui.animations
 
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
@@ -82,7 +82,7 @@ object AnimationFactory {
 
     /**
      * Returns animation being run after an action has been selected, but
-     * before it is being sent to the [GameController].
+     * before it is being sent to the [GameEngineController].
      */
     fun getPostActionAnimation(state: Game, action: GameAction): JervisAnimation? {
         if (action == Undo) return null

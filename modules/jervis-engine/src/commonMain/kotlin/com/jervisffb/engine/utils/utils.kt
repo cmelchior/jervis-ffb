@@ -1,6 +1,6 @@
 package com.jervisffb.engine.utils
 
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -210,7 +210,7 @@ inline fun INVALID_ACTION(action: GameAction, customMessage: String? = null): No
  * - 8-9 are setup next to each on the left line 1 step away from LoS
  * - 10-11 are setup in the backfield
  */
-fun setupTeamsOnField(controller: GameController) {
+fun setupTeamsOnField(controller: GameEngineController) {
     val homeCommands = with(controller.state.homeTeam) {
         listOf(
             SetPlayerLocation(get(PlayerNo(1)), FieldCoordinate(12, 5)),

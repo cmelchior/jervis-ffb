@@ -1,6 +1,6 @@
 package com.jervisffb.ui.viewmodel
 
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
@@ -22,7 +22,7 @@ enum class Feature {
 }
 
 class MenuViewModel {
-    var controller: GameController? = null
+    var controller: GameEngineController? = null
     lateinit var uiState: UiGameController
 
     val navigatorContext = CoroutineScope(CoroutineName("ScreenNavigator"))

@@ -1,7 +1,7 @@
 package com.jervisffb.ui.state
 
 import com.jervisffb.engine.ActionRequest
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.ui.UiGameSnapshot
 import com.jervisffb.ui.screen.GameMode
@@ -26,10 +26,10 @@ abstract class UiActionProvider {
     protected val actionScope = CoroutineScope(CoroutineName("ActionSelectorScope") + Dispatchers.Default + errorHandler)
 
     // Used to communicate internally in the ActionProvider. Needed so we can decouple the lifecycle of things.
-    protected val actionRequestChannel = Channel<Pair<GameController, ActionRequest>>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
+    protected val actionRequestChannel = Channel<Pair<GameEngineController, ActionRequest>>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
     protected val actionSelectedChannel = Channel<GameAction>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
 
-    abstract fun prepareForNextAction(controller: GameController)
+    abstract fun prepareForNextAction(controller: GameEngineController)
     abstract fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest)
     abstract fun decorateSelectedAction(state: UiGameSnapshot, action: GameAction)
     abstract suspend fun getAction(): GameAction

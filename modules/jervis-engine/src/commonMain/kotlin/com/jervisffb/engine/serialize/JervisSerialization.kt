@@ -1,6 +1,6 @@
 package com.jervisffb.engine.serialize
 
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected
@@ -142,7 +142,7 @@ object JervisSerialization {
     }
 
     fun saveToFile(
-        controller: GameController,
+        controller: GameEngineController,
         file: Path,
     ) {
         val fileData =
@@ -159,7 +159,7 @@ object JervisSerialization {
         }
     }
 
-    suspend fun loadFromFile(file: Path): Pair<GameController, List<GameAction>> {
+    suspend fun loadFromFile(file: Path): Pair<GameEngineController, List<GameAction>> {
         val fileContent =
             platformFileSystem.source(file).use { fileSource ->
                 fileSource.buffer().readUtf8()
@@ -173,7 +173,7 @@ object JervisSerialization {
         awayTeam.noToPlayer.values.forEach { it.team = awayTeam }
         awayTeam.notifyDogoutChange()
         val state = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
-        val controller = GameController(rules, state)
+        val controller = GameEngineController(rules, state)
         return Pair(controller, remapActionRefs(gameData.game.actions, state))
     }
 

@@ -1,7 +1,7 @@
 package com.jervisffb.ui.state
 
 import com.jervisffb.engine.ActionRequest
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.fumbbl.net.adapter.CalculatedJervisAction
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
@@ -17,12 +17,12 @@ class ReplayActionProvider(private val uiState: UiGameController, private val fu
 
     private var job: Job? = null
     private var paused = false
-    private lateinit var controller: GameController
+    private lateinit var controller: GameEngineController
     private lateinit var actions: ActionRequest
     var started = false
 
 
-    override fun prepareForNextAction(controller: GameController) {
+    override fun prepareForNextAction(controller: GameEngineController) {
         this.controller = controller
         this.actions = controller.getAvailableActions()
     }

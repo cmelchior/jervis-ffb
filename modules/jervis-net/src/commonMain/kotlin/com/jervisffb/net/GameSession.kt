@@ -1,6 +1,6 @@
 package com.jervisffb.net
 
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TeamId
@@ -93,7 +93,7 @@ class GameSession(
     var state: GameState = GameState.PLANNED
     private var plannedAt: Instant = Clock.System.now()
     private val rules: Rules = BB2020Rules()
-    private var game: GameController? = null
+    private var game: GameEngineController? = null
     val players: MutableList<JoinedPlayerClient> = mutableListOf()
     val spectators: MutableList<JoinedSpectatorClient> = mutableListOf()
 
@@ -241,7 +241,7 @@ class GameSession(
             throw IllegalStateException("Game is already running.")
         }
         state = GameState.ACTIVE
-        game = GameController(
+        game = GameEngineController(
             rules,
             Game(
                 rules,

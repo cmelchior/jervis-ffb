@@ -2,7 +2,7 @@ package com.jervisffb.test
 
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -22,12 +22,12 @@ class SetupTests {
 
     private val rules = StandardBB2020Rules
     private lateinit var state: Game
-    private lateinit var controller: GameController
+    private lateinit var controller: GameEngineController
 
     @BeforeTest
     fun setUp() {
         state = createDefaultGameState(rules)
-        controller = GameController(rules, state)
+        controller = GameEngineController(rules, state)
     }
 
     // All players at the LoS with 2 one step back should be valid

@@ -1,7 +1,7 @@
 package com.jervisffb.ui.state
 
 import com.jervisffb.engine.ActionRequest
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -50,7 +50,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
-typealias QueuedActionsGenerator = (GameController) -> QueuedActionsResult?
+typealias QueuedActionsGenerator = (GameEngineController) -> QueuedActionsResult?
 
 data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenActions: Boolean = false) {
     constructor(action: GameAction, delayEvent: Boolean = false): this(listOf(action), delayEvent)
@@ -58,14 +58,14 @@ data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenAc
 
 /**
  * Class responsible for enhancing the UI, so it is able to create a [GameAction]
- * that can be sent to the [GameController].
+ * that can be sent to the [GameEngineController].
  */
 class ManualActionProvider(
     private val uiState: UiGameController,
     private val menuViewModel: MenuViewModel
 ): UiActionProvider() {
 
-    private lateinit var controller: GameController
+    private lateinit var controller: GameEngineController
     private lateinit var actions: ActionRequest
 
     // If set, it contains an action that should automatically be sent on the next call to getAction()
@@ -106,7 +106,7 @@ class ManualActionProvider(
         return fieldActionDecorators[type] as? FieldActionDecorator<GameActionDescriptor>
     }
 
-    override fun prepareForNextAction(controller: GameController) {
+    override fun prepareForNextAction(controller: GameEngineController) {
         this.controller = controller
         this.actions = controller.getAvailableActions()
 
@@ -263,7 +263,7 @@ class ManualActionProvider(
      * - Any action returned this way should also have an entry in [Feature]
      */
     private fun calculateAutomaticResponse(
-        controller: GameController,
+        controller: GameEngineController,
         actions: List<GameActionDescriptor>,
     ): GameAction? {
 

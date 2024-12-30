@@ -1,6 +1,6 @@
 package com.jervisffb.engine.actions
 
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
@@ -12,6 +12,24 @@ import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.utils.combinations
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
+
+
+/**
+ * These ID's uniquely identify [GameAction] that has been handled by the
+ * [GameEngineController]. The IDs should be sequential. This means that looking
+ * at the action history should have a list of actions ranging from 0 until
+ * count(actions) - 1.
+ *
+ * This also makes it possible to reason about multiple events arriving
+ * at the GameController. If it sees a GameAction with an ID that has already
+ * been processed, the next action with the same ID should be ignored (or throw
+ * an error).
+ */
+@Serializable
+@JvmInline
+value class GameActionId(val value: Int)
 
 /**
  * Interface describing all legal [GameAction] events of a certain type that an
@@ -21,7 +39,7 @@ import com.jervisffb.engine.utils.combinations
  * types of events.
  *
  * @see [ActionNode.getAvailableActions]
- * @see [GameController.getAvailableActions]
+ * @see [GameEngineController.getAvailableActions]
  */
 sealed interface GameActionDescriptor {
 

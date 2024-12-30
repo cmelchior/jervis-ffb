@@ -10,10 +10,10 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Team
 
 /**
- * This class represents a request from the [GameController] to generate
+ * This class represents a request from the [GameEngineController] to generate
  * a [GameAction] for the current [ActionNode]..
  *
- * @see [GameController.getAvailableActions]
+ * @see [GameEngineController.getAvailableActions]
  */
 data class ActionRequest(
     val team: Team?,

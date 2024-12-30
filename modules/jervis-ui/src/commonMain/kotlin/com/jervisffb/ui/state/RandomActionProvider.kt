@@ -1,7 +1,7 @@
 package com.jervisffb.ui.state
 
 import com.jervisffb.engine.ActionRequest
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
@@ -24,10 +24,10 @@ class RandomActionProvider(private val uiState: UiGameController): UiActionProvi
 
     private var job: Job? = null
     private var paused = false
-    private lateinit var controller: GameController
+    private lateinit var controller: GameEngineController
     private lateinit var actions: ActionRequest
 
-    override fun prepareForNextAction(controller: GameController) {
+    override fun prepareForNextAction(controller: GameEngineController) {
         this.controller = controller
         this.actions = controller.getAvailableActions()
     }
@@ -98,7 +98,7 @@ class RandomActionProvider(private val uiState: UiGameController): UiActionProvi
         }
     }
 
-    private suspend fun handleManualHomeKickingSetup(controller: GameController) {
+    private suspend fun handleManualHomeKickingSetup(controller: GameEngineController) {
         val game: Game = controller.state
         val team = game.homeTeam
 
@@ -115,7 +115,7 @@ class RandomActionProvider(private val uiState: UiGameController): UiActionProvi
         setupPlayer(team, PlayerNo(11), FieldCoordinate(8, 13), isLast = true)
     }
 
-    private suspend fun handleManualAwayKickingSetup(controller: GameController) {
+    private suspend fun handleManualAwayKickingSetup(controller: GameEngineController) {
         val game: Game = controller.state
         val team = game.awayTeam
 

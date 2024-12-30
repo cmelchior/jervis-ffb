@@ -1,6 +1,6 @@
 package com.jervisffb.test.tables
 
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.FieldSquareSelected
@@ -78,7 +78,7 @@ class PrayersToNuffleTests: JervisGameTest() {
             val state = createDefaultGameState(rules)
             state.homeTeam.teamValue = homeTv
             state.awayTeam.teamValue = awayTv
-            val controller = GameController(rules, state)
+            val controller = GameEngineController(rules, state)
             controller.startTestMode(FullGame)
             controller.rollForward(
                 *defaultFanFactor(),

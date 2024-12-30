@@ -1,7 +1,7 @@
 package com.jervisffb.test.ext
 
-import com.jervisffb.engine.GameController
-import com.jervisffb.engine.GameController.ActionMode
+import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.GameEngineController.ActionMode
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Undo
@@ -9,7 +9,7 @@ import com.jervisffb.engine.actions.Undo
 /**
  * Test method. Used to apply multiple [GameAction]s in on go.
  */
-fun GameController.rollForward(vararg actions: GameAction?) {
+fun GameEngineController.rollForward(vararg actions: GameAction?) {
     if (actionMode != ActionMode.TEST) {
         error("Invalid action mode: $actionMode. Must be ActionMode.TEST.")
     }
@@ -24,7 +24,7 @@ fun GameController.rollForward(vararg actions: GameAction?) {
 /**
  * Undo a given number of actions already processed
  */
-fun GameController.undoActions(actions: Int) {
+fun GameEngineController.undoActions(actions: Int) {
     repeat(actions) {
         this.handleAction(Undo)
     }

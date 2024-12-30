@@ -1,6 +1,6 @@
 package com.jervisffb.test.actions
 
-import com.jervisffb.engine.GameController
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
@@ -109,7 +109,7 @@ class StandingUpTests: JervisGameTest() {
 
         // Just check normal actions for now
         PlayerStandardActionType.entries.forEach { action ->
-            var startAction: ((GameController) -> Unit)? = null
+            var startAction: ((GameEngineController) -> Unit)? = null
             lateinit var checkActionUsed: () -> Unit
             lateinit var rollBack: () -> Int
             when (action) {
