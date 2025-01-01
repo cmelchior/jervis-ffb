@@ -24,6 +24,8 @@ actual class FileManager {
         val dirPath = "$APPLICATION_DIRECTORY/$directory".toPath()
         return platformFileSystem.listOrNull(dirPath)
             ?.filter { it.name.endsWith(extension) }
+            ?.map { it.toString().substringAfter("$APPLICATION_DIRECTORY/") }
+            ?.map { it.toPath() }
             ?: emptyList()
     }
 
