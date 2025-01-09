@@ -64,7 +64,7 @@ abstract class JervisGameTest {
         }
         homeTeam = state.homeTeam
         awayTeam = state.awayTeam
-        controller = GameEngineController(rules, state)
+        controller = GameEngineController(state)
         controller.startTestMode(FullGame)
     }
 

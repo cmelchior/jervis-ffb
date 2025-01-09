@@ -72,14 +72,17 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
                     MenuBox(
                         label = "FUMBBL",
                         onClick = { screenModel.gotoFumbblScreen(navigator) },
+                        frontPage = true
                     )
                     MenuBox(
                         label = "Standalone",
                         onClick = { screenModel.gotoStandAloneScreen(navigator) },
+                        frontPage = true
                     )
                     MenuBox(
                         label = "Dev Mode",
                         onClick = { screenModel.gotoDevModeScreen(navigator) },
+                        frontPage = true
                     )
                 }
                 Row(

@@ -242,7 +242,6 @@ class GameSession(
         }
         state = GameState.ACTIVE
         game = GameEngineController(
-            rules,
             Game(
                 rules,
                 players[0].team!!,

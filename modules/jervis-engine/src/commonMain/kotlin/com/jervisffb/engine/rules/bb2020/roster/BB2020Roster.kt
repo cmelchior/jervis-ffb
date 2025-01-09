@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.roster
 
+import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.common.roster.Roster
-import com.jervisffb.engine.rules.common.roster.RosterId
 import kotlinx.serialization.Serializable
 
 @Serializable

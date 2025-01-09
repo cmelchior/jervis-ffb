@@ -41,7 +41,6 @@ data class RemoveEntry(val log: LogEntry) : ListEvent
  * [GameRunner]
  */
 class GameEngineController(
-    rules: Rules,
     state: Game,
     diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator()
 ) {
@@ -60,7 +59,7 @@ class GameEngineController(
 
     val logsEvents: Flow<ListEvent> = state.logChanges
     val diceRollGenerator = diceGenerator
-    val rules: Rules = rules
+    val rules: Rules = state.rules
 
     // Track the entire "forward" history. In case of Undo's. The last delta
     // is removed from history, reversed and put in `lastActionIfUndo`

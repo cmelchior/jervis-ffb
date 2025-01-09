@@ -4,9 +4,28 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
+ * Interface representing a Kick-off Table.
+ */
+interface KickOffTable {
+    /**
+     * Name of the table.
+     */
+    val name: String
+
+    /**
+     * Roll on the Kick-Off table and return the result.
+     */
+    fun roll(
+        die1: D6Result,
+        die2: D6Result,
+    ): KickOffEvent
+}
+
+/**
  * Class representing the Kick-Off Event Table on page 41 in the rulebook.
  */
-object KickOffEventTable {
+object StandardKickOffEventTable: KickOffTable {
+    override val name: String = "Standard Kick-Off Table"
     private val table =
         mapOf(
             2 to KickOffEvent.GET_THE_REF,
@@ -22,10 +41,7 @@ object KickOffEventTable {
             12 to KickOffEvent.PITCH_INVASION,
         )
 
-    /**
-     * Roll on the Kick-Off table and return the result.
-     */
-    fun roll(
+    override fun roll(
         die1: D6Result,
         die2: D6Result,
     ): KickOffEvent {

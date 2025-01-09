@@ -1,8 +1,8 @@
 package com.jervisffb.test
 
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
-import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
@@ -27,7 +27,7 @@ class SetupTests {
     @BeforeTest
     fun setUp() {
         state = createDefaultGameState(rules)
-        controller = GameEngineController(rules, state)
+        controller = GameEngineController(state)
     }
 
     // All players at the LoS with 2 one step back should be valid

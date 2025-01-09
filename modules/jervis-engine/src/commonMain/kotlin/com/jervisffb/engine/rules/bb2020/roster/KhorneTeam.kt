@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.roster
 
+import com.jervisffb.engine.model.PositionId
+import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.MUTATIONS
@@ -10,8 +12,6 @@ import com.jervisffb.engine.rules.bb2020.skills.Horns
 import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
 import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
-import com.jervisffb.engine.rules.common.roster.PositionId
-import com.jervisffb.engine.rules.common.roster.RosterId
 
 val BLOODBORN_MARAUDER_LINEMEN =
     BB2020Position(

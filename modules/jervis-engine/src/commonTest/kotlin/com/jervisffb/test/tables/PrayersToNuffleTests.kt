@@ -78,7 +78,7 @@ class PrayersToNuffleTests: JervisGameTest() {
             val state = createDefaultGameState(rules)
             state.homeTeam.teamValue = homeTv
             state.awayTeam.teamValue = awayTv
-            val controller = GameEngineController(rules, state)
+            val controller = GameEngineController(state)
             controller.startTestMode(FullGame)
             controller.rollForward(
                 *defaultFanFactor(),

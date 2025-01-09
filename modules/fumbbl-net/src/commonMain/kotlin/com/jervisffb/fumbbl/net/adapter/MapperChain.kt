@@ -3,7 +3,6 @@ package com.jervisffb.fumbbl.net.adapter
 //import org.reflections.Reflections
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.fumbbl.net.ModelChangeProcessor
 import com.jervisffb.fumbbl.net.adapter.impl.AbortActionMapper
 import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
@@ -19,7 +18,7 @@ class MapperChain constructor(jervisGame: Game, fumbblGame: FumbblGame, checkCom
     private val jervisGame: Game
     private val fumbblGame: FumbblGame
     private val checkCommands: Boolean
-    private val jervisGameController = GameEngineController(StandardBB2020Rules, jervisGame)
+    private val jervisGameController = GameEngineController( jervisGame)
     private val mappers: List<CommandActionMapper>
 
     fun getMappersInPackage(): List<KClass<*>> {

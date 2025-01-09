@@ -67,7 +67,7 @@ object AnimationFactory {
         val firstBounce = (stack.singleCurrentNode(Bounce.RollDirection) && !stack.containsNode(Catch.CatchFailed))
         val catchOrBounce = (firstCatch || firstBounce) && stack.containsNode(TheKickOffEvent.ResolveBallLanding)
         val touchBack = stack.currentNode() == TheKickOffEvent.TouchBack
-        if ( catchOrBounce || touchBack) {
+        if (catchOrBounce || touchBack) {
             val from = state.kickingPlayer!!.location as OnFieldLocation
             var to = state.singleBall().location
             var outOfBounds = false
@@ -90,9 +90,9 @@ object AnimationFactory {
 
         // Animate KickOff Event Result
         // Right now we just "guess" that the rules do the same table lookup.
-        // This is pretty annoying, but there is no stable place we can check before
+        // This is pretty annoying, but there is no stable place we can check after
         // executing the event (and some events are just pure computation nodes).
-        // We could also introduce a "Confirm"-node in the Rules, but doing that solely
+        // We could also introduce a "Confirm"-node in the Engine, but doing that solely
         // to support animations is also annoying.
         if (currentNode == TheKickOffEvent.RollForKickOffEvent) {
             val roll = (action as DiceRollResults).rolls.map { it as D6Result }

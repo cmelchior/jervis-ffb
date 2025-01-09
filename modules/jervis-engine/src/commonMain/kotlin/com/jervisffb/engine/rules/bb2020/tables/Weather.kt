@@ -5,6 +5,9 @@ package com.jervisffb.engine.rules.bb2020.tables
  * page 37 in the rulebook.
  */
 enum class Weather(val title: String, val description: String) {
+
+    // Standard Table
+
     SWELTERING_HEAT(
         "Sweltering Heat",
         "D3 random players from each team on the pitch will faint from the heat and will not be available this drive."

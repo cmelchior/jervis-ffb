@@ -3,10 +3,9 @@ package com.jervisffb.engine.rules.bb2020.procedures
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.model.DieId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
-import kotlinx.serialization.Serializable
-import kotlin.jvm.JvmInline
 
 /**
  * Interface allowing us to track a single die all the way from rolling it

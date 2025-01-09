@@ -19,7 +19,7 @@ import com.jervisffb.engine.rules.bb2020.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyTable
 import com.jervisffb.engine.rules.bb2020.tables.InjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.KickOffEventTable
+import com.jervisffb.engine.rules.bb2020.tables.StandardKickOffEventTable
 import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.RandomDirectionTemplate
@@ -27,7 +27,7 @@ import com.jervisffb.engine.rules.bb2020.tables.RangeRuler
 import com.jervisffb.engine.rules.bb2020.tables.StuntyInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.ThrowInPosition
 import com.jervisffb.engine.rules.bb2020.tables.ThrowInTemplate
-import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
+import com.jervisffb.engine.rules.bb2020.tables.StandardWeatherTable
 import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -476,13 +476,13 @@ interface Rules {
         get() = RandomDirectionTemplate
 
     val kickOffEventTable
-        get() = KickOffEventTable
+        get() = StandardKickOffEventTable
 
     val prayersToNuffleTable
         get() = PrayersToNuffleTable
 
     val weatherTable
-        get() = WeatherTable
+        get() = StandardWeatherTable
 
     val injuryTable
         get() = InjuryTable

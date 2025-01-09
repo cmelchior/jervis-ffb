@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.roster
 
+import com.jervisffb.engine.model.PositionId
+import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
@@ -8,8 +10,6 @@ import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.skills.SureHands
-import com.jervisffb.engine.rules.common.roster.PositionId
-import com.jervisffb.engine.rules.common.roster.RosterId
 
 /**
  * Human Teams

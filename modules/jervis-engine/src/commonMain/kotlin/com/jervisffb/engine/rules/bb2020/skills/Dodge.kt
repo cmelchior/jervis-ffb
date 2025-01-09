@@ -1,5 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.skills
 
+import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import kotlinx.serialization.Serializable

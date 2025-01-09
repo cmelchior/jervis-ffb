@@ -4,14 +4,12 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.GameRunner
+import com.jervisffb.engine.HotSeatGameRunner
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.model.Field
-import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.serialize.JervisTeamFile
-import com.jervisffb.engine.utils.createDefaultGameState
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.resources.StandaloneTeams
 import com.jervisffb.ui.UiGameController
@@ -35,22 +33,22 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 class GameScreenModel(
     val mode: GameMode,
     val menuViewModel: MenuViewModel,
-    private val injectedController: GameEngineController? = null,
+    private val injectedGameRunner: GameRunner? = null,
     private val actions: List<GameAction> = emptyList(),
 ) : ScreenModel {
 
     val hoverPlayerFlow = MutableSharedFlow<Player?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     lateinit var uiState: UiGameController
-    lateinit var controller: GameEngineController
+    lateinit var gameRunner: GameRunner
     var fumbbl: FumbblReplayAdapter? = null
     val rules: StandardBB2020Rules = StandardBB2020Rules
 
     suspend fun initialize() {
         var homeTeam: JervisTeamFile? = null
         var awayTeam: JervisTeamFile? = null
-        if (injectedController != null) {
-            this.controller = injectedController
+        if (injectedGameRunner != null) {
+            this.gameRunner = injectedGameRunner
             fumbbl = null
         } else {
             when (mode) {
@@ -58,25 +56,27 @@ class GameScreenModel(
                     fumbbl = null
                     homeTeam = StandaloneTeams.defaultTeams["human-starter-team.jrt"]!!
                     awayTeam = StandaloneTeams.defaultTeams["lizardmen-starter-team.jrt"]!!
-                    this.controller = GameEngineController(rules, Game(rules, homeTeam.team, awayTeam.team, Field.createForRuleset(rules)))
+                    this
+                    this.gameRunner = HotSeatGameRunner(rules, homeTeam.team, awayTeam.team)
                 }
-
-                Random -> {
-                    fumbbl = null
-                    this.controller = GameEngineController(rules, createDefaultGameState(rules))
-                }
-
-                is Replay -> {
-                    fumbbl = FumbblReplayAdapter(mode.file, checkCommandsWhenLoading = false)
-                    fumbbl!!.loadCommands()
-                    this.controller = GameEngineController(rules, fumbbl!!.getGame())
-                }
+//
+//                Random -> {
+//                    fumbbl = null
+//                    this.gameRunner = GameEngineController(createDefaultGameState(rules))
+//                }
+//
+//                is Replay -> {
+//                    fumbbl = FumbblReplayAdapter(mode.file, checkCommandsWhenLoading = false)
+//                    fumbbl!!.loadCommands()
+//                    this.gameRunner = GameEngineController(fumbbl!!.getGame())
+//                }
+                else -> TODO()
             }
         }
 
-        menuViewModel.controller = this.controller
-        IconFactory.initialize(controller.state.homeTeam, homeTeam!!.uiData, controller.state.awayTeam, awayTeam!!.uiData)
-        uiState = UiGameController(mode, controller, menuViewModel, actions)
+        menuViewModel.controller = this.gameRunner.controller
+        IconFactory.initialize(gameRunner.state!!.homeTeam, homeTeam!!.uiData, gameRunner.state!!.awayTeam, awayTeam!!.uiData)
+        uiState = UiGameController(mode, gameRunner, menuViewModel, actions)
         val uiActionFactory =
             when (mode) {
                 Manual -> ManualActionProvider(uiState, menuViewModel)
@@ -92,7 +92,7 @@ class GameScreenModel(
 
 class GameScreen(val screenModel: GameScreenModel) : Screen {
     override val key: ScreenKey = "GameScreen"
-    val controller = screenModel.controller
+    val controller = screenModel.gameRunner
 
     @Composable
     override fun Content() {
@@ -103,12 +103,12 @@ class GameScreen(val screenModel: GameScreenModel) : Screen {
             ),
             SidebarViewModel(
                 screenModel.uiState,
-                controller.state.homeTeam,
+                controller.state!!.homeTeam,
                 screenModel.hoverPlayerFlow
             ),
             SidebarViewModel(
                 screenModel.uiState,
-                controller.state.awayTeam,
+                controller.state!!.awayTeam,
                 screenModel.hoverPlayerFlow
             ),
             GameStatusViewModel(screenModel.uiState),

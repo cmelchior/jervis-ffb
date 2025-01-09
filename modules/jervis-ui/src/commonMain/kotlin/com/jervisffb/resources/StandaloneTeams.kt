@@ -2,6 +2,7 @@ package com.jervisffb.resources
 
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.BB2020Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -24,7 +25,6 @@ import com.jervisffb.engine.rules.bb2020.roster.SKAVEN_LINEMAN
 import com.jervisffb.engine.rules.bb2020.roster.SKAVEN_TEAM
 import com.jervisffb.engine.rules.bb2020.roster.SKAVEN_THROWER
 import com.jervisffb.engine.rules.bb2020.roster.SKINK_RUNNER_LINEMEN
-import com.jervisffb.engine.rules.common.roster.PositionId
 import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialize.GameHistory
 import com.jervisffb.engine.serialize.JervisMetaData

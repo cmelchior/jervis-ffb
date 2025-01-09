@@ -1,5 +1,6 @@
 package com.jervisffb.ui
 
+import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -77,6 +78,8 @@ fun ImageBitmap.getSubImage(x: Int, y: Int, width: Int, height: Int): ImageBitma
     return newImageBitmap
 }
 
+
+fun Modifier.debugBorder(): Modifier = this.border(1.dp, Color.Cyan)
 
 fun Modifier.coloredShadow(
     color: Color,

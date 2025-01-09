@@ -1,5 +1,8 @@
 package com.jervisffb.engine.rules.common.roster
 
+import com.jervisffb.engine.model.PositionId
+import com.jervisffb.engine.model.RosterId
+
 interface Race {
     val id: Long
     val name: String

@@ -134,6 +134,8 @@ This task will clone the FFB repository, take the resource folder and
 flatten it so it is usable by Compose Multiplatform and then finally moving it
 into place in the project so it is ready for immediate use.
 
+Team Roster logos have been copied manually from https://fumbbl.com/p/createteam
+
 
 ## Why Jervis?
 

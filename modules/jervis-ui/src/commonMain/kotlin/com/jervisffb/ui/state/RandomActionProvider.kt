@@ -83,9 +83,9 @@ class RandomActionProvider(private val uiState: UiGameController): UiActionProvi
         if (stack.peepOrNull()?.procedure == SetupTeam && stack.peepOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
             val context = state.getContext<SetupTeamContext>()
             if (context.team.isHomeTeam()) {
-                handleManualHomeKickingSetup(uiController.controller)
+                handleManualHomeKickingSetup(uiController.gameRunner.controller)
             } else {
-                handleManualAwayKickingSetup(uiController.controller)
+                handleManualAwayKickingSetup(uiController.gameRunner.controller)
             }
             actionRequestChannel.receive()
             actionSelectedChannel.send(EndSetup)

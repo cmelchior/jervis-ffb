@@ -2,9 +2,9 @@ package com.jervisffb.engine.serialize
 
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.roster.PositionId
 import com.jervisffb.engine.rules.common.roster.Roster
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement

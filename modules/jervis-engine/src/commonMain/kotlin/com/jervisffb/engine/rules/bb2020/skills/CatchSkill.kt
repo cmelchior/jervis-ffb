@@ -1,5 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.skills
 
+import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
 import kotlinx.serialization.Serializable
@@ -9,8 +10,7 @@ class CatchSkill(
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill, D6StandardSkillReroll {
-    override val id: RerollSourceId =
-        RerollSourceId("catch-reroll")
+    override val id: RerollSourceId = RerollSourceId("catch-reroll")
     override val skillId: String = "catch-skill"
     override val name: String = "Catch"
     override val compulsory: Boolean = false

@@ -9,7 +9,7 @@ class ReplayControllerViewModel(
     private val gameModel: GameScreenModel,
 ) {
     private val actionProvider: ReplayActionProvider = uiState.actionProvider as ReplayActionProvider
-    val controller = gameModel.controller
+    val controller = gameModel.gameRunner
 
     fun startActions() {
         actionProvider.startActionProvider()

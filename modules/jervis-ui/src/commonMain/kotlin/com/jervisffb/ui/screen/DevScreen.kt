@@ -22,6 +22,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jervisffb.engine.HotSeatGameRunner
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.ui.view.filePicker
 import com.jervisffb.ui.viewmodel.MenuViewModel
@@ -48,7 +49,8 @@ class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
     fun loadGame(navigator: Navigator, file: Path) {
         menuViewModel.navigatorContext.launch {
             val (controller, actions) = JervisSerialization.loadFromFile(file)
-            val screenModel = GameScreenModel(Manual, menuViewModel, controller, actions)
+            val runner = HotSeatGameRunner(controller.rules, controller.state.homeTeam, controller.state.awayTeam)
+            val screenModel = GameScreenModel(Manual, menuViewModel, runner, actions)
             screenModel.initialize()
             navigator.push(GameScreen(screenModel))
         }

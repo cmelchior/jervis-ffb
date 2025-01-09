@@ -173,7 +173,7 @@ object JervisSerialization {
         awayTeam.noToPlayer.values.forEach { it.team = awayTeam }
         awayTeam.notifyDogoutChange()
         val state = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
-        val controller = GameEngineController(rules, state)
+        val controller = GameEngineController(state)
         return Pair(controller, remapActionRefs(gameData.game.actions, state))
     }
 

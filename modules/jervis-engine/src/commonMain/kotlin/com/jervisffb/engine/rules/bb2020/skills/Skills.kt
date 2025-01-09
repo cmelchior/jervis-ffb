@@ -2,13 +2,13 @@ package com.jervisffb.engine.rules.bb2020.skills
 
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.UseStandardSkillReroll
 import com.jervisffb.engine.rules.bb2020.procedures.UseTeamReroll
 import kotlinx.serialization.Serializable
-import kotlin.jvm.JvmInline
 
 @Serializable
 sealed interface TeamReroll : RerollSource {

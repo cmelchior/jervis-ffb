@@ -1,68 +1,85 @@
-@file:OptIn(
-    org.jetbrains.compose.resources.InternalResourceApi::class,
-    org.jetbrains.compose.resources.ExperimentalResourceApi::class,
-)
 package com.jervisffb.ui.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.ScrollableTabRow
+import androidx.compose.material.Switch
+import androidx.compose.material.Tab
+import androidx.compose.material.TabPosition
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TabRowDefaults.Divider
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import com.jervisffb.engine.model.BallType
+import com.jervisffb.engine.model.PitchType
+import com.jervisffb.engine.model.StadiumType
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.BB2020Rules
+import com.jervisffb.engine.rules.bb2020.tables.KickOffTable
+import com.jervisffb.engine.rules.bb2020.tables.SpringWeatherTable
+import com.jervisffb.engine.rules.bb2020.tables.StandardKickOffEventTable
+import com.jervisffb.engine.rules.bb2020.tables.StandardWeatherTable
+import com.jervisffb.engine.rules.bb2020.tables.SummerWeatherTable
+import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
+import com.jervisffb.engine.rules.bb2020.tables.WinterWeatherTable
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.fumbbl.web.FumbblTeamLoader
 import com.jervisffb.ui.CacheManager
+import com.jervisffb.ui.dropShadow
 import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.isDigitsOnly
+import com.jervisffb.ui.screen.p2pserver.TeamSelectorPage
+import com.jervisffb.ui.screen.p2pserver.WaitForOpponentPage
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.viewmodel.MenuViewModel
-import dashedBorder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlin.math.ceil
 import kotlin.random.Random
 
 data class TeamInfo(
@@ -74,7 +91,59 @@ data class TeamInfo(
     val logo: ImageBitmap
 )
 
+interface DropdownEntry {
+    val name: String
+    val available: Boolean
+}
+
+data class WeatherTableEntry(
+    override val name: String,
+    val table: WeatherTable,
+    override val available: Boolean,
+): DropdownEntry
+
+data class KickOffTableEntry(
+    override val name: String,
+    val table: KickOffTable,
+    override val available: Boolean,
+): DropdownEntry
+
+data class PitchEntry(
+    override val name: String,
+    val pitch: PitchType,
+    override val available: Boolean = false
+): DropdownEntry
+
+data class StadiumEntry(
+    override val name: String,
+    val stadium: StadiumRule,
+    override val available: Boolean = false
+): DropdownEntry
+
+interface UnusualBallRule
+data object NoUnusualBall: UnusualBallRule
+data object RollOnUnusualBallTable: UnusualBallRule
+data class SpecificUnusualBall(val type: BallType): UnusualBallRule
+
+interface StadiumRule
+data object NoStadium: StadiumRule
+data object RollForStadiumUsed: StadiumRule
+data class SpecificStadium(val type: StadiumType): StadiumRule
+
+data class UnusualBallEntry(
+    override val name: String,
+    val ball: UnusualBallRule,
+    override val available: Boolean,
+): DropdownEntry
+
 class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
+
+    // Which page are currently being shown
+    val currentPage = MutableStateFlow(0)
+
+    val validGameSetup = MutableStateFlow(true)
+    val validTeamSelection = MutableStateFlow(false)
+    val validWaitingForOpponent = MutableStateFlow(false)
 
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
@@ -83,8 +152,103 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
     val canCreateGame = MutableStateFlow<Boolean>(false)
     val loadingTeams: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
+    val selectedWeatherTable = MutableStateFlow<WeatherTableEntry?>(null)
+    val selectedKickOffTable = MutableStateFlow<KickOffTableEntry?>(null)
+    val selectedUnusualBall = MutableStateFlow<UnusualBallEntry?>(null)
+    val selectedPitch = MutableStateFlow<PitchEntry?>(null)
+
+    val weatherTables = listOf(
+        "Rulebook" to listOf(
+            WeatherTableEntry("Standard", StandardWeatherTable, true),
+        ),
+        "Death Zone" to listOf(
+            WeatherTableEntry("Spring", SpringWeatherTable, false),
+            WeatherTableEntry("Summer", SummerWeatherTable, false),
+            WeatherTableEntry("Autumn", SummerWeatherTable, false),
+            WeatherTableEntry("Winter", WinterWeatherTable, false),
+            WeatherTableEntry("Subterranean", StandardWeatherTable, false),
+            WeatherTableEntry("Primordial", StandardWeatherTable, false),
+            WeatherTableEntry("Graveyard", StandardWeatherTable, false),
+            WeatherTableEntry("Desolate Wasteland", StandardWeatherTable, false),
+            WeatherTableEntry("Mountainous", StandardWeatherTable, false),
+            WeatherTableEntry("Coastal", StandardWeatherTable, false),
+            WeatherTableEntry("Desert", StandardWeatherTable, false),
+        )
+    )
+
+    val kickOffTables = listOf(
+        "Rulebook" to listOf(
+            KickOffTableEntry("Standard", StandardKickOffEventTable, true),
+        ),
+        "Spike Magazine 15 (Amazons)" to listOf(
+            KickOffTableEntry("Temple-City", StandardKickOffEventTable, false),
+        )
+    )
+
+    val unusualBallList = listOf(
+        "Rulebook" to listOf(
+            UnusualBallEntry("Normal Ball", NoUnusualBall, true)
+        ),
+        "Death Zone" to listOf(
+            UnusualBallEntry("Roll On Unusual Balls Table", RollOnUnusualBallTable, false),
+            UnusualBallEntry("Explodin'", SpecificUnusualBall(BallType.EXPLODIN), false),
+            UnusualBallEntry("Deamonic", SpecificUnusualBall(BallType.DEAMONIC), false),
+            UnusualBallEntry("Stacked Lunch", SpecificUnusualBall(BallType.STACKED_LUNCH), false),
+            UnusualBallEntry("Draconic", SpecificUnusualBall(BallType.DRACONIC), false),
+            UnusualBallEntry("Spiteful Sprite", SpecificUnusualBall(BallType.SPITEFUL_SPRITE), false),
+            UnusualBallEntry("Master-hewn", SpecificUnusualBall(BallType.MASTER_HEWN), false),
+            UnusualBallEntry("Extra Spiky", SpecificUnusualBall(BallType.EXTRA_SPIKY), false),
+            UnusualBallEntry("Greedy Nurgling", SpecificUnusualBall(BallType.GREEDY_NURGLING), false),
+            UnusualBallEntry("Dark Majesty", SpecificUnusualBall(BallType.DARK_MAJESTY), false),
+            UnusualBallEntry("Shady Special", SpecificUnusualBall(BallType.SHADY_SPECIAL), false),
+            UnusualBallEntry("Soulstone", SpecificUnusualBall(BallType.SOULSTONE), false),
+            UnusualBallEntry("Frozen", SpecificUnusualBall(BallType.FROZEN_BALL), false),
+            UnusualBallEntry("Sacred Egg", SpecificUnusualBall(BallType.SACRED_EGG), false),
+            UnusualBallEntry("Snotling Ball-suite", SpecificUnusualBall(BallType.SNOTLING_BALL_SUIT), false),
+            UnusualBallEntry("Limpin' Squig", SpecificUnusualBall(BallType.LIMPIN_SQUIG), false),
+            UnusualBallEntry("Warpstone Brazier", SpecificUnusualBall(BallType.WARPSTONE_BRAZIER), false),
+        ),
+        "Spike Magazine 14 (Norse)" to listOf(
+            UnusualBallEntry("Hammer of Legend", SpecificUnusualBall(BallType.HAMMER_OF_LEGEND), false),
+            UnusualBallEntry("The Runestone", SpecificUnusualBall(BallType.THE_RUNESTONE), false),
+        ),
+        "Spike Magazine 15 (Amazons)" to listOf(
+            UnusualBallEntry("Crystal Skull", SpecificUnusualBall(BallType.CRYSTAL_SKULL), false),
+            UnusualBallEntry("Snake-swallowed", SpecificUnusualBall(BallType.SNAKE_SWALLOWED), false),
+        ),
+    )
+
+    val pitches = listOf(
+        "Rulebook" to listOf(
+            PitchEntry("Standard", PitchType.STANDARD, true),
+        ),
+        "Spike Magazine 14 (Norse)" to listOf(
+            PitchEntry("Frozen Lake", PitchType.FROZEN_LAKE, false),
+        ),
+        "Spike Magazine 15 (Amazons)" to listOf(
+            PitchEntry("Overgrown Jungle", PitchType.OVERGROWN_JUNGLE, false),
+        )
+    )
+
+    val stadia = listOf(
+        "Death Zone" to listOf(
+            StadiumEntry("Disabled", NoStadium, true),
+            StadiumEntry("Enabled", RollForStadiumUsed, false),
+        ),
+        "Unusual Playing Surface" to listOf(
+            StadiumEntry("Ankle-Deep Water", SpecificStadium(StadiumType.ANKLE_DEEP_WATER), false),
+            StadiumEntry("Sloping Pitch", SpecificStadium(StadiumType.SLOPING_PITCH), false),
+            StadiumEntry("Ice", SpecificStadium(StadiumType.ICE), false),
+            StadiumEntry("Astrogranite", SpecificStadium(StadiumType.ASTROGRANITE), false),
+            StadiumEntry("Uneven Footing", SpecificStadium(StadiumType.UNEVEN_FOOTING), false),
+            StadiumEntry("Solid Stone", SpecificStadium(StadiumType.SOLID_STONE), false),
+        ),
+    )
+
+
+
     init {
-         loadTeamList()
+        loadTeamList()
     }
 
     private fun loadTeamList() {
@@ -110,10 +274,6 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
             rerolls = team.rerolls.size,
             logo = IconFactory.getLogo(team.id),
         )
-    }
-
-    fun startGame() {
-
     }
 
     fun setPort(port: String) {
@@ -182,211 +342,63 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
             }
         }
     }
+
+    fun setWeatherTable(entry: WeatherTableEntry) {
+        selectedWeatherTable.value = entry
+    }
+
+    fun setKickOffTable(entry: KickOffTableEntry) {
+        selectedKickOffTable.value = entry
+    }
+
+    fun setUnusualBall(entry: UnusualBallEntry) {
+        selectedUnusualBall.value = entry
+    }
+
+    fun setPitch(entry: PitchEntry) {
+        selectedPitch.value = entry
+    }
+
+    fun gameSetupDone() {
+        // Should anything be saved here?
+        currentPage.value = 1
+    }
+
+    fun teamSelectionDone() {
+        // Should anything be saved here
+        currentPage.value = 2
+    }
+
+    fun goBackToPage(previousPage: Int) {
+        if (previousPage >= currentPage.value) {
+            error("It is only allowed to go back: $previousPage")
+        }
+        currentPage.value = previousPage
+    }
 }
 
 class P2PServerScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PServerScreenModel) : Screen {
     @Composable
     override fun Content() {
-        MenuScreen {
-            Box(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-                Row(modifier = Modifier.fillMaxSize()) {
-                    GameCreation(modifier = Modifier.weight(1f).fillMaxSize(), screenModel)
-                    Spacer(modifier = Modifier.width(16.dp).fillMaxHeight().background(color = Color.Transparent))
-                    TeamSelector(modifier = Modifier.weight(1f).fillMaxSize(), screenModel)
-                }
-            }
-        }
-    }
+        MenuScreenWithTitle("Peer-to-Peer Game") {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 24.dp, top = 48.dp, end = 24.dp, bottom = 24.dp)
+                .background(color = JervisTheme.contentBackgroundColor)
+                .border(width = 8.dp, color = JervisTheme.awayTeamColor)
 
-    @Composable
-    fun GameCreation(modifier: Modifier, viewModel: P2PServerScreenModel) {
-        val gameName by viewModel.gameName.collectAsState("")
-        val gamePort by viewModel.port.collectAsState( null)
-        val canCreateGame: Boolean by screenModel.canCreateGame.collectAsState(false)
-        val selectedTeam by screenModel.selectedTeam.collectAsState(null)
-        Box(modifier = modifier.background(color = JervisTheme.awayTeamColor)) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxSize()
-                ,
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    modifier = Modifier.padding(top = 32.dp, bottom = 32.dp),
-                    text = "Game Settings",
-                    style = MaterialTheme.typography.h2.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-
-                    ),
-                )
-                OutlinedTextField(
-                    value = gameName,
-                    onValueChange = { viewModel.setGameName(it) },
-                    label = { Text("Name") }
-                )
-                OutlinedTextField(
-                    value = gamePort?.toString() ?: "",
-                    onValueChange = { viewModel.setPort(it) },
-                    label = { Text("Port") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    keyboardActions = KeyboardActions {
-
-                    }
-                )
-                SelectedTeamBox(selectedTeam, viewModel)
-                Spacer(modifier = Modifier.weight(1f))
-                Button(
-                    modifier = Modifier
-                        .padding(bottom = 48.dp)
-                    ,
-                    onClick = { screenModel.startGame() },
-                    enabled = canCreateGame,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = JervisTheme.homeTeamColor)
-                ) {
-                    Text(
-                        modifier = Modifier.padding(16.dp),
-                        text = "Create Game",
-                        style = MaterialTheme.typography.h4.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = JervisTheme.buttonTextColor,
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    @Composable
-    private fun SelectedTeamBox(
-        selectedTeam: TeamInfo?,
-        viewModel: P2PServerScreenModel
-    ) {
-        BoxWithConstraints {
-            if (selectedTeam != null) {
-                Box(
-                    modifier = Modifier
-                        .width(maxWidth * 0.5f)
-                        .height(175.dp)
-                        .padding(top = 32.dp)
-                ) {
-                    Row(modifier = Modifier.fillMaxSize()) {
-                        TeamInfo(
-                            name = selectedTeam.teamName,
-                            teamValue = selectedTeam.teamValue,
-                            rerolls = selectedTeam.rerolls,
-                            logo = selectedTeam.logo,
-                            onClick = { viewModel.setSelectedTeam(null) },
-                        )
-                    }
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .alpha(0.75f)
-                        .width(maxWidth * 0.5f)
-                        .height(175.dp)
-                        .padding(top = 32.dp)
-                        .dashedBorder(width = 2.dp, color = Color.White, on = 10.dp, off = 10.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Select Team on the right",
-                        color = Color.White,
-                        style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold)
-                    )
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun TeamSelector(modifier: Modifier, viewModel: P2PServerScreenModel) {
-        val availableTeams by viewModel.availableTeams.collectAsState()
-        var showImportFumbblTeam by remember { mutableStateOf(false) }
-        Box(modifier = modifier.background(color = JervisTheme.awayTeamColor)) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
+                Box(modifier = Modifier
                     .fillMaxSize()
-                ,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    modifier = Modifier.padding(top = 32.dp, bottom = 32.dp),
-                    text = "Available Teams",
-                    style = MaterialTheme.typography.h2.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                    ),
-                )
-                Row {
-                    Button(onClick = { }, modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Load from file",
-                            style = MaterialTheme.typography.body1.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                            ),
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(onClick = {
-                        showImportFumbblTeam = !showImportFumbblTeam
-                    }, modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Import from FUMBBL",
-                            style = MaterialTheme.typography.body1.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                            ),
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
+                    .dropShadow(
+                        color = Color.Black,
+                        blurRadius = 4.dp
+                    )
+                    .background(color = JervisTheme.contentBackgroundColor)
                 ) {
-                    val lines = if (availableTeams.isEmpty()) 0 else (ceil(availableTeams.size / 2f)).toInt()
-                    repeat(lines) { line ->
-                        val team1 = availableTeams[line * 2]
-                        val team2 = availableTeams.getOrNull(line * 2 + 1)
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            TeamInfo(
-                                name = team1.teamName,
-                                teamValue = team1.teamValue,
-                                rerolls = team1.rerolls,
-                                logo = team1.logo,
-                                onClick = { viewModel.setSelectedTeam(team1) },
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            if (team2 != null) {
-                                TeamInfo(
-                                    name = team2.teamName,
-                                    teamValue = team2.teamValue,
-                                    logo = team2.logo,
-                                    rerolls = team2.rerolls,
-                                    onClick = { viewModel.setSelectedTeam(team2) },
-                                )
-                            } else {
-                                Box(modifier = Modifier.weight(1f))
-                            }
-                        }
-                        if (line < lines - 1) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                        }
-                    }
+                    PageContent(screenModel)
                 }
             }
-        }
-        if (showImportFumbblTeam) {
-            println("Show Import FUMBBL Team Dialog")
-            LoadTeamDialog(viewModel, onCloseRequest = { showImportFumbblTeam = false })
-        } else {
-            println("Hide Import FUMBBL Team Dialog")
         }
     }
 }
@@ -450,47 +462,300 @@ fun LoadTeamDialog(
 }
 
 @Composable
-fun RowScope.TeamInfo(
-    name: String,
-    teamValue: Int,
-    rerolls: Int,
-    logo: ImageBitmap,
-    emptyTeam: Boolean = false,
-    onClick: (() -> Unit)?
-) {
-    Box(
-        modifier = Modifier
-            .weight(1f)
-            .background(Color.White)
-            .let { if (onClick != null) it.clickable(!emptyTeam, onClick = onClick) else it }
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(8.dp)) {
-                    val adjustedTv = teamValue / 1_000
-                    Text(text = "$adjustedTv K", fontSize = 14.sp)
-                    Text("$rerolls RR")
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Image(
-                    modifier = Modifier.padding(8.dp),
-                    bitmap = logo,
-                    contentDescription = null,
-                    contentScale = ContentScale.Inside,
-                )
-            }
-            Row (
-                modifier = Modifier.background(JervisTheme.accentTeamColor),
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    textAlign = TextAlign.Start,
-                    text = name,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
+fun PageContent(screenModel: P2PServerScreenModel) {
+    val currentPage by screenModel.currentPage.collectAsState()
+    val tabs = listOf("1. Configure Game", "2. Select Team", "3. Wait for Opponent", "4. Start Game")
+    val pagerState = rememberPagerState(0) { tabs.size }
+    val scope = rememberCoroutineScope()
+    val defaultIndicator = @Composable { tabPositions: List<TabPosition> ->
+        TabRowDefaults.Indicator(
+            modifier = Modifier
+                .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                .padding(horizontal = 16.dp)
+                .height(6.dp)
+            ,
+            color = JervisTheme.homeTeamColor,
+        )
+    }
+
+    // Animate going to a new page
+    LaunchedEffect(currentPage) {
+        pagerState.animateScrollToPage(currentPage)
+    }
+
+    Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
+        ScrollableTabRow(
+            selectedTabIndex = pagerState.currentPage,
+            backgroundColor = JervisTheme.contentBackgroundColor,
+            edgePadding = 0.dp,
+            indicator = defaultIndicator,
+            divider = @Composable { /* None */ }
+        ){
+            tabs.forEachIndexed { index, title ->
+                Tab(
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        top = 0.dp,
+                        end = 16.dp,
+                        bottom = 6.dp
+                    ),
+                    text = {
+                        Text(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            fontFamily = JervisTheme.fontFamily(),
+                            fontSize = 24.sp,
+                            text = title.uppercase(),
+                        )
+                    },
+                    selected = (pagerState.currentPage == index),
+                    onClick = {
+                        screenModel.goBackToPage(index)
+                    },
+                    enabled = (index < currentPage)
                 )
             }
         }
+        HorizontalPager(
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            state = pagerState,
+        ) { page ->
+            when (page) {
+                0 -> GameSetupPage(screenModel, Modifier, screenModel)
+                1 -> TeamSelectorPage(Modifier, screenModel)
+                2 -> WaitForOpponentPage(viewModel = screenModel)
+                3 -> Box(modifier = Modifier.fillMaxSize()) {}
+            }
+        }
     }
+}
+
+@Composable
+fun GameSetupPage(screenModel: P2PServerScreenModel, modifier: Modifier, viewModel: P2PServerScreenModel) {
+    val gameName by viewModel.gameName.collectAsState("")
+    val gamePort by viewModel.port.collectAsState( null)
+    val canCreateGame: Boolean by screenModel.canCreateGame.collectAsState(false)
+    val selectedTeam by screenModel.selectedTeam.collectAsState(null)
+
+    Column(
+        modifier = modifier.fillMaxSize().padding(16.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+            ,
+            verticalAlignment = Alignment.Top
+        ) {
+            SettingsCard("DETAILS") {
+                OutlinedTextField(
+                    value = gameName,
+                    onValueChange = { viewModel.setGameName(it) },
+                    label = { Text("Name") }
+                )
+                OutlinedTextField(
+                    value = gamePort?.toString() ?: "",
+                    onValueChange = { viewModel.setPort(it) },
+                    label = { Text("Port") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardActions = KeyboardActions {
+
+                    }
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "IP: 85.191.6.149"
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.fillMaxSize()) {
+                val pagerStateTop = rememberPagerState(0) { 5 }
+                val pagerStateBottom = rememberPagerState(0) { 4 }
+                val tabs = listOf("Standard", "BB7", "Dungeon Bowl", "Gutter Bowl", "From File")
+                val tabs2 = listOf("Tables/Modifications", "Timers", "Inducements", "Rules")
+                val coroutineScope = rememberCoroutineScope()
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        TabRow(
+                            backgroundColor = Color.Transparent,
+                            selectedTabIndex = pagerStateTop.currentPage
+                        ) {
+                            tabs.forEachIndexed { index, title ->
+                                Tab(
+                                    selected = pagerStateTop.currentPage == index,
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            pagerStateTop.animateScrollToPage(index)
+                                        }
+                                    },
+                                    text = { Text(title) }
+                                )
+                            }
+                        }
+                        TabRow(
+                            backgroundColor = Color.Transparent,
+                            selectedTabIndex = pagerStateBottom.currentPage
+                        ) {
+                            tabs2.forEachIndexed { index, title ->
+                                Tab(
+                                    selected = pagerStateBottom.currentPage == index,
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            pagerStateBottom.animateScrollToPage(index)
+                                        }
+                                    },
+                                    text = { Text(title) }
+                                )
+                            }
+                        }
+                        HorizontalPager(
+                            modifier = Modifier.fillMaxSize(),
+                            state = pagerStateBottom,
+                        ) { page ->
+                            when (page) {
+                                0 -> StandardGameSetup(screenModel)
+                                else -> StandardGameSetup(screenModel)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Button(
+                onClick = { viewModel.gameSetupDone() },
+            ) {
+                Text("NEXT")
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun StandardGameSetup(screenModel: P2PServerScreenModel) {
+    Box(
+        modifier = Modifier.fillMaxSize().padding(top = 16.dp),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp).wrapContentSize().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+            ExposedDropdownMenuWithSections<WeatherTableEntry>("Weather Table", screenModel.weatherTables) {
+                screenModel.setWeatherTable(it)
+            }
+            ExposedDropdownMenuWithSections<KickOffTableEntry>("Kick-off Table", screenModel.kickOffTables) {
+                screenModel.setKickOffTable(it)
+            }
+            ExposedDropdownMenuWithSections<PitchEntry>("Pitch", screenModel.pitches) {
+                screenModel.setPitch(it)
+            }
+            ExposedDropdownMenuWithSections<UnusualBallEntry>("Ball", screenModel.unusualBallList) {
+                screenModel.setUnusualBall(it)
+            }
+            ExposedDropdownMenuWithSections<DropdownEntry>("Stadia of the Old World", screenModel.stadia) {
+                // Do nothing
+            }
+            SimpleSwitch("Match Events", false) {
+
+            }
+        }
+    }
+}
+
+@Composable
+fun SimpleSwitch(label: String, isSelected: Boolean, onSelected: (Boolean) -> Unit) {
+    var isOn by remember { mutableStateOf(isSelected) }
+    Row(modifier = Modifier.width(400.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(text = label)
+        Spacer(modifier = Modifier.weight(1f))
+        Switch(
+            checked = isOn, // Current state
+            onCheckedChange = { isOn = it } // Update state when toggled
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun <T> ExposedDropdownMenuWithSections(
+    title: String,
+    entries: List<Pair<String, List<DropdownEntry>>>,
+    onSelected: (T) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf(entries.first().second.first()) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+    ) {
+        OutlinedTextField(
+            modifier = Modifier.padding(bottom = 8.dp),
+            value = selectedOption.name,
+            onValueChange = { },
+            readOnly = true,
+            label = { Text(title) },
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            entries.forEachIndexed { index, (sectionTitle, items) ->
+                DropdownHeader(sectionTitle.uppercase())
+                items.forEach { item ->
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedOption = item
+                            expanded = false
+                        }
+                    ) {
+                        Text(item.name)
+                    }
+                }
+                if (index < entries.lastIndex) {
+                    Divider()
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun SettingsCard(title: String, content: @Composable () -> Unit) {
+    Box(modifier = Modifier.padding(bottom = 8.dp)) {
+        Column(modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)) {
+            BoxHeader(title)
+            content()
+        }
+    }
+}
+
+@Composable
+fun BoxHeader(text: String) {
+    Text(
+        modifier = Modifier.padding(bottom = 8.dp),
+        text = text,
+        style = MaterialTheme.typography.body1.copy(
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Gray
+        ),
+    )
+}
+
+@Composable
+fun DropdownHeader(text: String) {
+    Text(
+        modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
+        text = text,
+        style = MaterialTheme.typography.body1.copy(
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Gray
+        ),
+    )
 }

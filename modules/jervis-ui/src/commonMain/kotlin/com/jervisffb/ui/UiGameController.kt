@@ -3,6 +3,7 @@ package com.jervisffb.ui
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.GameRunner
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
@@ -48,14 +49,14 @@ import kotlinx.coroutines.launch
  */
 class UiGameController(
     private val mode: GameMode,
-    val controller: GameEngineController,
+    val gameRunner: GameRunner,
     private val menuViewModel: MenuViewModel,
     private val preloadedActions: List<GameAction>
 ) {
     // Reference to the current rules engine state of the game
     // DO NOT modify the state on this end.
-    val state: Game = controller.state
-    val rules: Rules = controller.rules
+    val state: Game = gameRunner.state ?: error("UI requires state and rules to be set")
+    val rules: Rules = gameRunner.rules ?: error("UI requires state and rules to be set")
     lateinit var actionProvider: UiActionProvider
 
     // Persistent UI decorations that needs to be stored across frames
@@ -91,6 +92,7 @@ class UiGameController(
      */
     fun startGameEventLoop(uiActionFactory: UiActionProvider) {
         this.actionProvider = uiActionFactory
+        val controller = gameRunner.controller
         gameScope.launch {
 
             // We need to start the Rules Engine first.
@@ -161,7 +163,7 @@ class UiGameController(
     }
 
     private suspend fun runPreUpdateAnimations() {
-        if (!controller.lastActionWasUndo()) {
+        if (!gameRunner.controller.lastActionWasUndo()) {
             val animation = AnimationFactory.getPreUpdateAnimation(state)
             if (animation != null) {
                 _animationFlow.emit(animation)
@@ -171,7 +173,7 @@ class UiGameController(
     }
 
     private suspend fun runPostUpdateAnimations() {
-        if (!controller.lastActionWasUndo()) {
+        if (!gameRunner.controller.lastActionWasUndo()) {
             val animation = AnimationFactory.getFrameAnimation(state, rules)
             if (animation != null) {
                 _animationFlow.emit(animation)
@@ -181,7 +183,7 @@ class UiGameController(
     }
 
     private suspend fun runPostActionAnimations(action: GameAction) {
-        if (!controller.lastActionWasUndo()) {
+        if (!gameRunner.controller.lastActionWasUndo()) {
             val animation = AnimationFactory.getPostActionAnimation(state, action)
             if (animation != null) {
                 _animationFlow.emit(animation)

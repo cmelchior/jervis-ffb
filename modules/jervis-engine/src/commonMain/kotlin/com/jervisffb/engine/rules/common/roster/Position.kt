@@ -3,11 +3,10 @@ package com.jervisffb.engine.rules.common.roster
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
-import kotlinx.serialization.Serializable
-import kotlin.jvm.JvmInline
 
 interface Position {
     val id: PositionId

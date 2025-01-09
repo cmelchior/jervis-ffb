@@ -2,14 +2,14 @@ package com.jervisffb
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
-import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.ui.App
-import com.jervisffb.ui.viewmodel.MenuViewModel
 import com.jervisffb.engine.utils.createDefaultGameState
 import com.jervisffb.engine.utils.createRandomAction
+import com.jervisffb.ui.App
+import com.jervisffb.ui.viewmodel.MenuViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 
@@ -25,6 +25,6 @@ fun AppPreview() {
         createRandomAction(controller.state, availableActions)
     }
 //    val controller = GameController(rules, state, actionProvider)
-    val controller = GameEngineController(rules, state)
+    val controller = GameEngineController(state)
     App(MenuViewModel()) // controller, actionRequestChannel, actionSelectedChannel)
 }
