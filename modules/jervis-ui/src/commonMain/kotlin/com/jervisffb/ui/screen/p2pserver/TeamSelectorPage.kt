@@ -2,8 +2,10 @@ package com.jervisffb.ui.screen.p2pserver
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -16,9 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
 import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,6 +39,8 @@ import com.jervisffb.ui.screen.LoadTeamDialog
 import com.jervisffb.ui.screen.P2PServerScreenModel
 import com.jervisffb.ui.screen.TeamInfo
 import com.jervisffb.ui.view.JervisTheme
+import com.jervisffb.ui.view.utils.JervisButton
+import com.jervisffb.ui.view.utils.TitleBorder
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -47,7 +49,7 @@ fun TeamSelectorPage(modifier: Modifier, viewModel: P2PServerScreenModel) {
     var showImportFumbblTeam by remember { mutableStateOf(false) }
     val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
     Column(
-        modifier = Modifier.padding(16.dp).fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
@@ -73,34 +75,14 @@ fun TeamSelectorPage(modifier: Modifier, viewModel: P2PServerScreenModel) {
                 }
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                Button(onClick = { }) {
-                    Text(
-                        text = "Load from file",
-                        style = MaterialTheme.typography.body1.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                        ),
-                    )
-                }
+                Spacer(modifier = Modifier.width(60.dp))
+                JervisButton(text = "Load from file", onClick = { viewModel.gameSetupDone() })
                 Spacer(modifier = Modifier.width(16.dp))
-                Button(onClick = {
+                JervisButton(text = "Import from FUMBBL", onClick = {
                     showImportFumbblTeam = !showImportFumbblTeam
-                }) {
-                    Text(
-                        text = "Import from FUMBBL",
-                        style = MaterialTheme.typography.body1.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                        ),
-                    )
-                }
+                })
                 Spacer(modifier = Modifier.weight(1f))
-                Button(
-                    onClick = { viewModel.teamSelectionDone() },
-                    enabled = (selectedTeam != null),
-                ) {
-                    Text("NEXT")
-                }
+                JervisButton("NEXT", onClick = { viewModel.teamSelectionDone() }, enabled = (selectedTeam != null))
             }
         }
     }
@@ -111,6 +93,91 @@ fun TeamSelectorPage(modifier: Modifier, viewModel: P2PServerScreenModel) {
 
 @Composable
 fun RowScope.TeamCard(
+    name: String,
+    teamValue: Int,
+    rerolls: Int,
+    logo: ImageBitmap,
+    isSelected: Boolean = false,
+    emptyTeam: Boolean = false,
+    onClick: (() -> Unit)?
+) {
+    Box(
+        modifier = Modifier
+            .width(300.dp)
+            .background(JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.5f))
+            .border(width = if (isSelected) 3.dp else 0.dp, color = if (isSelected) JervisTheme.rulebookRed else Color.Transparent)
+            .let { if (onClick != null) it.clickable(!emptyTeam, onClick = onClick) else it }
+        ,
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Column (
+                modifier = Modifier.fillMaxWidth(), //.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 0.dp),
+//                verticalAlignment = Alignment.Top,
+            ) {
+                val color = JervisTheme.rulebookRed
+//                val color = if (isSelected) JervisTheme.rulebookGreen else JervisTheme.rulebookRed
+//                Divider(
+//                    modifier = Modifier
+//                        .padding(bottom = 2.dp)
+//                        .wrapContentWidth()
+//                        .height(2.dp)
+//                    ,
+//                    color = JervisTheme.rulebookBlue,
+//                )
+                TitleBorder(color)
+                Box(
+                    modifier = Modifier.fillMaxWidth().background(color),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        modifier = Modifier.padding(start = 8.dp, bottom = 2.dp),
+                        text = name.uppercase(),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+//                        color = if (isSelected) JervisTheme.rulebookOrange else JervisTheme.white
+                        color = JervisTheme.white
+                    )
+                }
+                TitleBorder(color)
+//
+//
+//                BoxHeader(name, color = JervisTheme.rulebookRed)
+//                Text(
+//                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 10.dp),
+//                    textAlign = TextAlign.Start,
+//                    text = name,
+//                    color = JervisTheme.accentContentBackgroundColor,
+//                    fontWeight = FontWeight.Bold,
+//                )
+            }
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 4.dp)) {
+                    val adjustedTv = teamValue / 1_000
+                    Text(text = "$adjustedTv K", color = JervisTheme.contentTextColor)
+                    Text("$rerolls RR", color = JervisTheme.contentTextColor)
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Image(
+                    modifier = Modifier.padding(8.dp),
+                    bitmap = logo,
+                    contentDescription = null,
+                    contentScale = ContentScale.Inside,
+                )
+            }
+//            Divider(
+//                modifier = Modifier
+//                    .padding(top = 2.dp)
+//                    .wrapContentWidth()
+//                    .height(2.dp)
+//                ,
+//                color = JervisTheme.rulebookBlue,
+//            )
+        }
+    }
+}
+
+@Composable
+fun RowScope.TeamCardV0(
     name: String,
     teamValue: Int,
     rerolls: Int,

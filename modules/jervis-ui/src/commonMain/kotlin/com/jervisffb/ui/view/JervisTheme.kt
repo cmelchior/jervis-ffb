@@ -8,12 +8,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.jervisffb.ui.theme.TrattatelloFamily
+import com.jervisffb.ui.theme.TrumpTownPro
 
 
 object JervisTheme {
     @Composable
-    fun fontFamily() = TrattatelloFamily()
+    fun fontFamily() = TrumpTownPro()
+
+    val white = Color(0xFFFFFFFF)
+
+
     val awayTeamColor = Color(0xFF4588c4)
     val homeTeamColor = Color(0xFFcc0102) // Color(0xFFca0000)
     val accentTeamColorDark =  Color(0xFF236A29) // Color(0xFF006600)
@@ -36,6 +40,7 @@ object JervisTheme {
             blurRadius = 2f
         )
     )
+
 
     // Blue shades
     val darkBlue = Color(0xFF0B5598)
@@ -67,6 +72,10 @@ object JervisTheme {
     val rulebookRed = Color(0xFFC60000) // Color(0xFF991612)
     val rulebookOrange = Color(0xFFFFBE26) //Color(0xFFeca316)
     val rulebookGreen = Color(0xFF388235)
+    val rulebookPaperDark = Color(0xFF867048)
+    val rulebookPaperMediumDark = Color(0xFFe2d2be)
+    val rulebookPaper = Color(0xFFf5e3ce)
+    val rulebookDisabled = Color.Gray
 
 //    val fumbblBlue = Color(0xFF0093d8)
 //    val fumbblRed = Color(0xFFe10525)

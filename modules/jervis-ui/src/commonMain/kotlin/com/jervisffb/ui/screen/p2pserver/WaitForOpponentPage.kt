@@ -1,16 +1,26 @@
 package com.jervisffb.ui.screen.p2pserver
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,120 +28,100 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asSkiaBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.ajalt.colormath.extensions.android.composecolor.toComposeColor
-import com.github.ajalt.colormath.model.HSL
-import com.github.ajalt.colormath.model.RGB
+import androidx.compose.ui.unit.sp
+import com.jervisffb.jervis_ui.generated.resources.Res
+import com.jervisffb.jervis_ui.generated.resources.icon_menu_copy
 import com.jervisffb.ui.screen.P2PServerScreenModel
 import com.jervisffb.ui.screen.TeamInfo
-import com.kmpalette.palette.graphics.Palette
+import com.jervisffb.ui.view.JervisTheme
+import com.jervisffb.ui.view.utils.JervisButton
+import com.jervisffb.ui.view.utils.TitleBorder
+import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.painterResource
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WaitForOpponentPage(viewModel: P2PServerScreenModel) {
     val availableTeams by viewModel.availableTeams.collectAsState()
     var showImportFumbblTeam by remember { mutableStateOf(false) }
     val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
-    Column(
-        modifier = Modifier.padding(16.dp).fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
-        selectedTeam?.let {
-            ComplementaryBackgroundImage(it.logo)
+        Column(modifier = Modifier.width(600.dp).padding(bottom = 100.dp)) {
+            WaitForOpponentHeader()
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    value = "http://84.432.235.054:8080/joinGame?id=game4343",
+                    onValueChange = { },
+                    readOnly = true,
+                    singleLine = true,
+                    label = { Text("Game URL") },
+                )
+                Box(
+                    modifier = Modifier
+                        .padding(start = 4.dp, top = 16.dp, bottom = 8.dp)
+                        .size(48.dp)
+                        .offset(x = 4.dp)
+                        .clip(shape = RoundedCornerShape(4.dp))
+                        .clickable {  }
+                    ,
+                    contentAlignment = Alignment.Center,
+//                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+                ) {
+                        Image(
+                            modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
+                            colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
+                            painter = painterResource(Res.drawable.icon_menu_copy),
+                            contentDescription = "Copy URL",
+//                            contentScale = ContentScale.,
+
+                        )
+                    }
+                }
+            }
+        Row(modifier = Modifier.fillMaxWidth().align(Alignment.BottomEnd), horizontalArrangement = Arrangement.Start) {
+            Spacer(modifier = Modifier.weight(1f))
+            JervisButton("REJECT TEAM", onClick = { viewModel.userAcceptGame(false) }, enabled = (selectedTeam != null))
+            Spacer(modifier = Modifier.width(16.dp))
+            JervisButton("START GAME", onClick = { viewModel.userAcceptGame(true) }, enabled = (selectedTeam != null))
         }
     }
-}
 
+}
 
 @Composable
-fun ComplementaryBackgroundImage(bitmap: ImageBitmap) {
-    val dominantColor = extractDominantColor(bitmap)
-    // val dominantColor = extractAverageColor(bitmap) // extractDominantColor(bitmap)
-    val complementaryColor = dominantColor?.let { getComplementaryColor(it) } ?: Color.White
-    val bgColor = complementaryColor// ?: Color.Black
+fun WaitForOpponentHeader(color: Color = JervisTheme.rulebookRed) {
+    var dotCount by remember { mutableStateOf(1) } // Track the number of dots (1 to 3)
+    LaunchedEffect(Unit) {
+        while (true) {
+            dotCount = (dotCount % 3) + 1
+            delay(500L)
+        }
+    }
+    val loadingText = "Waiting For Opponent" + ".".repeat(dotCount)
+
+    TitleBorder(color)
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.height(36.dp),
+        contentAlignment = Alignment.CenterStart,
     ) {
-        Row(modifier = Modifier.fillMaxWidth().height(48.dp)) {
-            Box(
-                modifier = Modifier.aspectRatio(1f).weight(1f).background(
-                    color = dominantColor ?: Color.Black
-                )
-            )
-            Box(
-                modifier = Modifier.aspectRatio(1f).weight(1f).background(
-                    color = complementaryColor
-                )
-            )
-        }
-        Box(
-            modifier = Modifier.fillMaxSize().background(bgColor)
-        ) {
-            Image(
-                bitmap = bitmap,
-                contentDescription = "Image with complementary background",
-                contentScale = ContentScale.None,
-                modifier = Modifier.matchParentSize()
-            )
-        }
+        Text(
+            modifier = Modifier.padding(bottom = 2.dp),
+            text = loadingText.uppercase(),
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            color = color
+        )
     }
-
-
-
+    TitleBorder(color)
 }
-
-// Function to extract the dominant color from a Bitmap using Palette
-private fun extractDominantColor(bitmap: ImageBitmap): Color? {
-    val palette = Palette.from(bitmap).generate()
-    val dominantSwatch = palette.dominantSwatch!!
-    val color = HSL(dominantSwatch.hsl[0], dominantSwatch.hsl[1], dominantSwatch.hsl[2])
-    return color.toComposeColor()
-}
-
-// Function to calculate the complementary color
-private fun getComplementaryColor(color: Color): Color {
-
-    val hsl = RGB(color.red, color.green, color.blue).toHSL()
-    return hsl.copy(h = (hsl.h + 180) % 360).toComposeColor()
-//
-//    val r = 255 - color.red * 255
-//    val g = 255 - color.green * 255
-//    val b = 255 - color.blue * 255
-//    return Color(r / 255f, g / 255f, b / 255f)
-}
-
-// Function to extract the average color from a Bitmap
-// See https://sighack.com/post/averaging-rgb-colors-the-right-way
-private fun extractAverageColor(bitmap: ImageBitmap): Color? {
-    var redSum = 0f
-    var greenSum = 0f
-    var blueSum = 0f
-    var pixelCount = 0
-    val width = bitmap.width
-    val height = bitmap.height
-    val skiaBitmap = bitmap.asSkiaBitmap()
-
-    // Loop through all pixels
-    for (x in 0 until width) {
-        for (y in 0 until height) {
-            val color = Color(skiaBitmap.getColor(x, y))
-            val alpha = skiaBitmap.getAlphaf(x, y)
-            if (alpha > 0f) {
-                redSum += color.red
-                greenSum += color.green
-                blueSum += color.blue
-                pixelCount++
-            }
-        }
-    }
-
-    // Calculate average RGB values
-    val avgRed = (redSum * 255 / pixelCount).toInt()
-    val avgGreen = (greenSum * 255 / pixelCount).toInt()
-    val avgBlue = (blueSum * 255 / pixelCount).toInt()
-    return Color(avgRed, avgGreen, avgBlue)
-}
-

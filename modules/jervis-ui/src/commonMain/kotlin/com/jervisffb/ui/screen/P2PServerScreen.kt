@@ -1,7 +1,5 @@
 package com.jervisffb.ui.screen
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +15,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -27,30 +23,24 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Switch
-import androidx.compose.material.Tab
-import androidx.compose.material.TabPosition
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.Divider
-import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -70,13 +60,16 @@ import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
 import com.jervisffb.engine.rules.bb2020.tables.WinterWeatherTable
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.fumbbl.web.FumbblTeamLoader
+import com.jervisffb.jervis_ui.generated.resources.Res
+import com.jervisffb.jervis_ui.generated.resources.frontpage_ball
 import com.jervisffb.ui.CacheManager
-import com.jervisffb.ui.dropShadow
 import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.isDigitsOnly
+import com.jervisffb.ui.screen.p2pserver.GameSetupPage
 import com.jervisffb.ui.screen.p2pserver.TeamSelectorPage
 import com.jervisffb.ui.screen.p2pserver.WaitForOpponentPage
 import com.jervisffb.ui.view.JervisTheme
+import com.jervisffb.ui.view.utils.TitleBorder
 import com.jervisffb.ui.viewmodel.MenuViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -139,6 +132,7 @@ data class UnusualBallEntry(
 class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
     // Which page are currently being shown
+    val totalPages = 4
     val currentPage = MutableStateFlow(0)
 
     val validGameSetup = MutableStateFlow(true)
@@ -375,30 +369,22 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
         }
         currentPage.value = previousPage
     }
+
+    fun userAcceptGame(acceptGame: Boolean) {
+        // TODO
+    }
 }
 
 class P2PServerScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PServerScreenModel) : Screen {
     @Composable
     override fun Content() {
-        MenuScreenWithTitle("Peer-to-Peer Game") {
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 24.dp, top = 48.dp, end = 24.dp, bottom = 24.dp)
-                .background(color = JervisTheme.contentBackgroundColor)
-                .border(width = 8.dp, color = JervisTheme.awayTeamColor)
-
-            ) {
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .dropShadow(
-                        color = Color.Black,
-                        blurRadius = 4.dp
-                    )
-                    .background(color = JervisTheme.contentBackgroundColor)
-                ) {
-                    PageContent(screenModel)
-                }
-            }
+        MenuScreenWithSidebarAndTitle(
+            title = "Peer-to-Peer Game",
+            icon = Res.drawable.frontpage_ball,
+            currentPageFlow = screenModel.currentPage,
+            onClick = { page -> screenModel.goBackToPage(page) },
+        ) {
+            PageContent(screenModel)
         }
     }
 }
@@ -464,19 +450,7 @@ fun LoadTeamDialog(
 @Composable
 fun PageContent(screenModel: P2PServerScreenModel) {
     val currentPage by screenModel.currentPage.collectAsState()
-    val tabs = listOf("1. Configure Game", "2. Select Team", "3. Wait for Opponent", "4. Start Game")
-    val pagerState = rememberPagerState(0) { tabs.size }
-    val scope = rememberCoroutineScope()
-    val defaultIndicator = @Composable { tabPositions: List<TabPosition> ->
-        TabRowDefaults.Indicator(
-            modifier = Modifier
-                .tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                .padding(horizontal = 16.dp)
-                .height(6.dp)
-            ,
-            color = JervisTheme.homeTeamColor,
-        )
-    }
+    val pagerState = rememberPagerState(0) { screenModel.totalPages }
 
     // Animate going to a new page
     LaunchedEffect(currentPage) {
@@ -484,39 +458,9 @@ fun PageContent(screenModel: P2PServerScreenModel) {
     }
 
     Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
-        ScrollableTabRow(
-            selectedTabIndex = pagerState.currentPage,
-            backgroundColor = JervisTheme.contentBackgroundColor,
-            edgePadding = 0.dp,
-            indicator = defaultIndicator,
-            divider = @Composable { /* None */ }
-        ){
-            tabs.forEachIndexed { index, title ->
-                Tab(
-                    modifier = Modifier.padding(
-                        start = 16.dp,
-                        top = 0.dp,
-                        end = 16.dp,
-                        bottom = 6.dp
-                    ),
-                    text = {
-                        Text(
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
-                            fontFamily = JervisTheme.fontFamily(),
-                            fontSize = 24.sp,
-                            text = title.uppercase(),
-                        )
-                    },
-                    selected = (pagerState.currentPage == index),
-                    onClick = {
-                        screenModel.goBackToPage(index)
-                    },
-                    enabled = (index < currentPage)
-                )
-            }
-        }
         HorizontalPager(
             modifier = Modifier.fillMaxWidth().weight(1f),
+            userScrollEnabled = false,
             state = pagerState,
         ) { page ->
             when (page) {
@@ -529,109 +473,7 @@ fun PageContent(screenModel: P2PServerScreenModel) {
     }
 }
 
-@Composable
-fun GameSetupPage(screenModel: P2PServerScreenModel, modifier: Modifier, viewModel: P2PServerScreenModel) {
-    val gameName by viewModel.gameName.collectAsState("")
-    val gamePort by viewModel.port.collectAsState( null)
-    val canCreateGame: Boolean by screenModel.canCreateGame.collectAsState(false)
-    val selectedTeam by screenModel.selectedTeam.collectAsState(null)
 
-    Column(
-        modifier = modifier.fillMaxSize().padding(16.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-            ,
-            verticalAlignment = Alignment.Top
-        ) {
-            SettingsCard("DETAILS") {
-                OutlinedTextField(
-                    value = gameName,
-                    onValueChange = { viewModel.setGameName(it) },
-                    label = { Text("Name") }
-                )
-                OutlinedTextField(
-                    value = gamePort?.toString() ?: "",
-                    onValueChange = { viewModel.setPort(it) },
-                    label = { Text("Port") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    keyboardActions = KeyboardActions {
-
-                    }
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "IP: 85.191.6.149"
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.fillMaxSize()) {
-                val pagerStateTop = rememberPagerState(0) { 5 }
-                val pagerStateBottom = rememberPagerState(0) { 4 }
-                val tabs = listOf("Standard", "BB7", "Dungeon Bowl", "Gutter Bowl", "From File")
-                val tabs2 = listOf("Tables/Modifications", "Timers", "Inducements", "Rules")
-                val coroutineScope = rememberCoroutineScope()
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        TabRow(
-                            backgroundColor = Color.Transparent,
-                            selectedTabIndex = pagerStateTop.currentPage
-                        ) {
-                            tabs.forEachIndexed { index, title ->
-                                Tab(
-                                    selected = pagerStateTop.currentPage == index,
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            pagerStateTop.animateScrollToPage(index)
-                                        }
-                                    },
-                                    text = { Text(title) }
-                                )
-                            }
-                        }
-                        TabRow(
-                            backgroundColor = Color.Transparent,
-                            selectedTabIndex = pagerStateBottom.currentPage
-                        ) {
-                            tabs2.forEachIndexed { index, title ->
-                                Tab(
-                                    selected = pagerStateBottom.currentPage == index,
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            pagerStateBottom.animateScrollToPage(index)
-                                        }
-                                    },
-                                    text = { Text(title) }
-                                )
-                            }
-                        }
-                        HorizontalPager(
-                            modifier = Modifier.fillMaxSize(),
-                            state = pagerStateBottom,
-                        ) { page ->
-                            when (page) {
-                                0 -> StandardGameSetup(screenModel)
-                                else -> StandardGameSetup(screenModel)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Button(
-                onClick = { viewModel.gameSetupDone() },
-            ) {
-                Text("NEXT")
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -640,36 +482,45 @@ fun StandardGameSetup(screenModel: P2PServerScreenModel) {
         modifier = Modifier.fillMaxSize().padding(top = 16.dp),
         contentAlignment = Alignment.TopCenter
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp).wrapContentSize().verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+        Row(horizontalArrangement = Arrangement.Center) {
+            Column(
+                modifier = Modifier.weight(1f).padding(16.dp).wrapContentSize().verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-            ExposedDropdownMenuWithSections<WeatherTableEntry>("Weather Table", screenModel.weatherTables) {
-                screenModel.setWeatherTable(it)
+                ExposedDropdownMenuWithSections<WeatherTableEntry>("Weather Table", screenModel.weatherTables) {
+                    screenModel.setWeatherTable(it)
+                }
+                ExposedDropdownMenuWithSections<PitchEntry>("Pitch", screenModel.pitches) {
+                    screenModel.setPitch(it)
+                }
+                ExposedDropdownMenuWithSections<DropdownEntry>("Stadia of the Old World", screenModel.stadia) {
+                    // Do nothing
+                }
             }
-            ExposedDropdownMenuWithSections<KickOffTableEntry>("Kick-off Table", screenModel.kickOffTables) {
-                screenModel.setKickOffTable(it)
-            }
-            ExposedDropdownMenuWithSections<PitchEntry>("Pitch", screenModel.pitches) {
-                screenModel.setPitch(it)
-            }
-            ExposedDropdownMenuWithSections<UnusualBallEntry>("Ball", screenModel.unusualBallList) {
-                screenModel.setUnusualBall(it)
-            }
-            ExposedDropdownMenuWithSections<DropdownEntry>("Stadia of the Old World", screenModel.stadia) {
-                // Do nothing
-            }
-            SimpleSwitch("Match Events", false) {
+            Column(
+                modifier = Modifier.weight(1f).padding(16.dp).wrapContentSize().verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                ExposedDropdownMenuWithSections<KickOffTableEntry>("Kick-off Table", screenModel.kickOffTables) {
+                    screenModel.setKickOffTable(it)
+                }
+                ExposedDropdownMenuWithSections<UnusualBallEntry>("Ball", screenModel.unusualBallList) {
+                    screenModel.setUnusualBall(it)
+                }
+                SimpleSwitch("Match Events", false) {
 
+                }
             }
         }
+
+
     }
 }
 
 @Composable
 fun SimpleSwitch(label: String, isSelected: Boolean, onSelected: (Boolean) -> Unit) {
     var isOn by remember { mutableStateOf(isSelected) }
-    Row(modifier = Modifier.width(400.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = Modifier.width(TextFieldDefaults.MinWidth), verticalAlignment = Alignment.CenterVertically) {
         Text(text = label)
         Spacer(modifier = Modifier.weight(1f))
         Switch(
@@ -725,26 +576,33 @@ fun <T> ExposedDropdownMenuWithSections(
 
 
 @Composable
-fun SettingsCard(title: String, content: @Composable () -> Unit) {
-    Box(modifier = Modifier.padding(bottom = 8.dp)) {
-        Column(modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)) {
+fun SettingsCard(title: String, width: Dp, content: @Composable () -> Unit) {
+    Box(modifier = Modifier.width(width).padding(bottom = 8.dp)) {
+        Column(modifier = Modifier.wrapContentSize()/*.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)*/) {
             BoxHeader(title)
+            Spacer(modifier = Modifier.height(16.dp))
             content()
         }
     }
 }
 
 @Composable
-fun BoxHeader(text: String) {
-    Text(
-        modifier = Modifier.padding(bottom = 8.dp),
-        text = text,
-        style = MaterialTheme.typography.body1.copy(
-            fontSize = 10.sp,
+fun BoxHeader(text: String, color: Color = JervisTheme.rulebookRed) {
+    TitleBorder(color)
+    Box(
+        modifier = Modifier.height(36.dp),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Text(
+            modifier = Modifier.padding(bottom = 2.dp),
+            text = text.uppercase(),
+//            fontFamily = JervisTheme.fontFamily(),
             fontWeight = FontWeight.Bold,
-            color = Color.Gray
-        ),
-    )
+            fontSize = 16.sp,
+            color = color
+        )
+    }
+    TitleBorder(color)
 }
 
 @Composable

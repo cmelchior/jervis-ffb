@@ -6,8 +6,8 @@ package com.jervisffb.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +19,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jervisffb.jervis_ui.generated.resources.Res
+import com.jervisffb.jervis_ui.generated.resources.frontpage_ball
 import com.jervisffb.ui.view.MenuBox
 import com.jervisffb.ui.viewmodel.MenuViewModel
 import kotlinx.coroutines.GlobalScope
@@ -59,9 +61,9 @@ class StandAloneScreen(private val menuViewModel: MenuViewModel, screenModel: St
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel { StandAloneScreenModel(menuViewModel) }
-            MenuScreenWithTitle("Standalone Games") {
+            MenuScreenWithTitle("Standalone Games", Res.drawable.frontpage_ball) {
                 Row(
-                    modifier = Modifier.fillMaxHeight(0.5f).fillMaxWidth().padding(18.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).offset(y = -40.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
