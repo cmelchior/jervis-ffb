@@ -1,8 +1,9 @@
 @file:OptIn(
-    org.jetbrains.compose.resources.InternalResourceApi::class,
-    org.jetbrains.compose.resources.ExperimentalResourceApi::class,
+    InternalResourceApi::class,
+    ExperimentalResourceApi::class,
 )
-package com.jervisffb.ui.screen
+
+package com.jervisffb.ui.screen.fumbbl
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,12 +23,19 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jervisffb.ui.screen.GameMode
+import com.jervisffb.ui.screen.GameScreen
+import com.jervisffb.ui.screen.GameScreenModel
+import com.jervisffb.ui.screen.MenuScreen
+import com.jervisffb.ui.screen.Replay
 import com.jervisffb.ui.viewmodel.MenuViewModel
 import com.jervisffb.utils.isRegularFile
 import com.jervisffb.utils.platformFileSystem
 import kotlinx.coroutines.launch
 import okio.Path
 import okio.Path.Companion.toPath
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.InternalResourceApi
 
 class FumbblScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
     fun start(navigator: Navigator, mode: GameMode) {

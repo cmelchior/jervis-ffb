@@ -34,8 +34,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFontLoader
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
@@ -52,6 +52,8 @@ import com.jervisffb.jervis_ui.generated.resources.frontpage_orc
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
 import com.jervisffb.jervis_ui.generated.resources.trump_town_pro
 import com.jervisffb.ui.BuildConfig
+import com.jervisffb.ui.screen.fumbbl.FumbblScreen
+import com.jervisffb.ui.screen.fumbbl.FumbblScreenModel
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.MenuBox
 import com.jervisffb.ui.view.utils.OrangeTitleBorder
@@ -218,12 +220,12 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
 fun NewsEntry(header: String, body: String) {
     Text(
         modifier = Modifier.padding(bottom = 8.dp),
-        text = AnnotatedString.Builder().apply {
+        text = buildAnnotatedString {
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
             append("$header: ")
             pop()
             append(body)
-        }.toAnnotatedString(),
+        },
         color = JervisTheme.white,
     )
 }
