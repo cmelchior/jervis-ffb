@@ -12,6 +12,16 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+        maven {
+            url = uri("${rootProject.projectDir}/mavenRepo")
+        }
+        mavenLocal()    }
+}
+
 enum class ReleaseType {
     SNAPSHOT, DEV, PROD
 }
