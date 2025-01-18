@@ -1,5 +1,7 @@
 package com.jervisffb.utils
 
+import kotlinx.browser.window
+
 public actual fun threadId(): ULong {
     return 0uL // TODO Figure out how to get it here
 }
@@ -13,6 +15,7 @@ public actual fun getLocalIpAddress(): String {
 }
 
 public actual fun openUrlInBrowser(url: String): Boolean {
-    TODO()
+    window.open(url, "_blank")
+    return true
 }
 
