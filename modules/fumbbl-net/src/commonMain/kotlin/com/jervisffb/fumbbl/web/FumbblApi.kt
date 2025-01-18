@@ -25,19 +25,93 @@ import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
 import com.jervisffb.engine.serialize.TeamSpriteData
 import com.jervisffb.engine.teamBuilder
+import com.jervisffb.fumbbl.web.api.AuthResult
+import com.jervisffb.fumbbl.web.api.CoachSearchResult
+import com.jervisffb.fumbbl.web.api.CurrentMatchResult
 import com.jervisffb.fumbbl.web.api.PlayerDetails
 import com.jervisffb.fumbbl.web.api.RosterDetails
 import com.jervisffb.fumbbl.web.api.TeamDetails
 import com.jervisffb.utils.getHttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import io.ktor.util.encodeBase64
 import kotlinx.serialization.json.Json
 
-class FumbblTeamLoader {
+/**
+ * Wrapper around https://fumbbl.com/apidoc/
+ *
+ *
+ * The class is intended to be coach-specific. So while the class can be created
+ * without providing a coach name, it isn't possible to authenticate or use
+ * authenticated methods in that case.
+ *
+ * This class also tracks the access token internally and will automatically
+ * refresh it if needed (not currently implemented).
+ */
+class FumbblApi(private val coachName: String? = null, private var oauthToken: String? = null) {
 
-    val client = getHttpClient()
-    val json = Json { ignoreUnknownKeys = true }
+    companion object {
+        val BASE_URL = "https://fumbbl.com/api"
+    }
+
+    private val client = getHttpClient()
+    private val json = Json { ignoreUnknownKeys = true }
+    private var authToken: AuthResult? = null
+    private var coachId: Long? = null
+
+    /**
+     * Returns `true` if the client thinks it is authenticated. Note, the
+     * server might think otherwise and reject the credentials.
+     */
+    fun isAuthenticated(): Boolean = (authToken != null && coachId != null)
+
+    /**
+     * Authenticate the client and store the access token in memory. It will be used by other endpoints if required.
+     *
+     * If authentication fails and [IllegalStateException] is thrown.
+     */
+    suspend fun authenticate(clientId: String, clientSecret: String): Result<AuthResult> = runCatching {
+        checkNotNull(coachName) { "Coach name required to log in." }
+        val response = client.post("$BASE_URL/oauth/token") {
+            header("Authorization", "Basic ${"$clientId:$clientSecret".encodeBase64()}")
+            contentType(ContentType.Application.FormUrlEncoded)
+            setBody("grant_type=client_credentials")
+        }
+        if (response.status.isSuccess()) {
+            authToken = json.decodeFromString(response.bodyAsText())
+            oauthToken = authToken?.accessToken
+            coachId = getCoachId(coachName)
+            if (coachId == null) {
+                authToken = null
+                oauthToken = null
+                coachId = null
+                throw IllegalStateException("Unable to find coach id for $coachName")
+            }
+            authToken!!
+        } else {
+            throw IllegalStateException("Authentication failed with status ${response.status}")
+        }
+    }
+
+    /**
+     * Returns the coach id for a given coach name.
+     * Returns `null` if the coach could not be found.
+     */
+    suspend fun getCoachId(coachName: String): Long? {
+        val result: List<CoachSearchResult> = client.get("$BASE_URL/coach/search/$coachName").body()
+        return result.firstOrNull { it.name.equals(coachName, ignoreCase = true) }?.id
+    }
+
+    suspend fun getCurrentMatches(): List<CurrentMatchResult> {
+        TODO()
+    }
 
     /**
      * Load a FUMBBL Team and convert it to a Jervis, so it can be used
@@ -63,7 +137,7 @@ class FumbblTeamLoader {
     }
 
     private suspend fun loadRosterFromFumbbl(rosterId: Int): RosterDetails {
-        val result = client.get("https://fumbbl.com/api/roster/get/$rosterId")
+        val result = client.get("$BASE_URL/roster/get/$rosterId")
         if (result.status.isSuccess()) {
             return json.decodeFromString<com.jervisffb.fumbbl.web.api.RosterDetails>(result.bodyAsText())
         } else {
@@ -72,7 +146,7 @@ class FumbblTeamLoader {
     }
 
     private suspend fun loadTeamFromFumbbl(teamId: Int): TeamDetails {
-        val result = client.get("https://fumbbl.com/api/team/get/$teamId")
+        val result = client.get("$BASE_URL/api/team/get/$teamId")
         if (result.status.isSuccess()) {
             return json.decodeFromString<TeamDetails>(result.bodyAsText())
         } else {
@@ -85,7 +159,7 @@ class FumbblTeamLoader {
     }
 
     private suspend fun loadPlayer(playerId: Int): PlayerDetails {
-        val result = client.get("https://fumbbl.com/api/player/get/$playerId")
+        val result = client.get("$BASE_URL/api/player/get/$playerId")
         val details = json.decodeFromString<PlayerDetails>(result.bodyAsText())
         return details
     }

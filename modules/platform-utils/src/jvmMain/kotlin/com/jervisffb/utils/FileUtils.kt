@@ -50,6 +50,10 @@ actual class FileManager {
 
 actual class PropertiesManager actual constructor() {
 
+    actual fun getSystemEnv(key: String): String {
+        return System.getenv(key)
+    }
+
     private val store: DataStore<Preferences> = PreferenceDataStoreFactory.create {
         File("${System.getProperty("user.home")}/.jervis/settings.preferences_pb")
     }

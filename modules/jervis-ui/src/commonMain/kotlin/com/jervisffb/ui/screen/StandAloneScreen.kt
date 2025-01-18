@@ -59,32 +59,39 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
 class StandAloneScreen(private val menuViewModel: MenuViewModel, screenModel: StandAloneScreenModel) : Screen {
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel { StandAloneScreenModel(menuViewModel) }
-            MenuScreenWithTitle("Standalone Games", Res.drawable.frontpage_ball) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).offset(y = -40.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    MenuBox(
-                        label = "Peer-to-Peer",
-                        onClick = { screenModel.startP2PServer(navigator) },
-                    )
-                    MenuBox(
-                        label = "Hotseat",
-                        onClick = { screenModel.startHotSeatGame(navigator) },
-                    )
-                    MenuBox(
-                        label = "vs AI",
-                        onClick = { /* */ },
-                    )
-                    MenuBox(
-                        label = "Replay",
-                        onClick = { /* */ },
-                        enabled = false
-                    )
-                }
-            }
+        JervisScreen(menuViewModel) {
+            StandaloneScreen(menuViewModel)
+        }
+    }
+}
+
+@Composable
+fun Screen.StandaloneScreen(menuViewModel: MenuViewModel) {
+    val navigator = LocalNavigator.currentOrThrow
+    val screenModel = rememberScreenModel { StandAloneScreenModel(menuViewModel) }
+    MenuScreenWithTitle(menuViewModel, "Standalone Games", Res.drawable.frontpage_ball) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).offset(y = -40.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            MenuBox(
+                label = "Peer-to-Peer",
+                onClick = { screenModel.startP2PServer(navigator) },
+            )
+            MenuBox(
+                label = "Hotseat",
+                onClick = { screenModel.startHotSeatGame(navigator) },
+            )
+            MenuBox(
+                label = "vs AI",
+                onClick = { /* */ },
+            )
+            MenuBox(
+                label = "Replay",
+                onClick = { /* */ },
+                enabled = false
+            )
+        }
     }
 }

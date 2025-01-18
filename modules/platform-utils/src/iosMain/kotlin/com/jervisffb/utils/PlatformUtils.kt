@@ -11,3 +11,7 @@ public actual fun getPublicIp(): String {
 public actual fun getLocalIpAddress(): String {
     TODO()
 }
+
+public actual fun openUrlInBrowser(url: String): Boolean {
+    TODO()
+}

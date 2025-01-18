@@ -13,12 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
@@ -36,6 +34,7 @@ import com.jervisffb.jervis_ui.generated.resources.menu_background
 import com.jervisffb.jervis_ui.generated.resources.trump_town_pro
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.utils.paperBackground
+import com.jervisffb.ui.viewmodel.MenuViewModel
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
@@ -47,11 +46,17 @@ import kotlin.math.atan
 import kotlin.math.tan
 
 @Composable
-fun MenuScreenWithTitle(title: String, icon: DrawableResource, content: @Composable BoxScope.() -> Unit) {
-    val topPadding = 24.dp
-    val fontSize = 30.sp
+fun MenuScreenWithTitle(
+    menuViewModel: MenuViewModel,
+    title: String,
+    icon: DrawableResource,
+    content: @Composable BoxScope.() -> Unit
+) {
     Box(
-        modifier = Modifier.fillMaxSize().paperBackground(JervisTheme.rulebookPaper),
+        modifier = Modifier
+            .fillMaxSize()
+            .paperBackground(JervisTheme.rulebookPaper)
+        ,
         contentAlignment = Alignment.TopStart,
     ) {
         Image(
@@ -66,19 +71,11 @@ fun MenuScreenWithTitle(title: String, icon: DrawableResource, content: @Composa
             Box {
                 TitleBar(Modifier.fillMaxHeight(0.20f).fillMaxWidth(), title = title)
                 Row(
-                    modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)
+                    modifier = Modifier.align(Alignment.TopStart).padding(start = 16.dp, top = 4.dp, end = 8.dp, bottom = 16.dp)
                 ) {
-                    Image(
-                        modifier = Modifier.size(36.dp).alpha(0.8f),
-                        painter = painterResource(Res.drawable.icon_menu_back),
-                        contentDescription = "Back"
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Image(
-                        modifier = Modifier.size(36.dp).alpha(0.8f),
-                        painter = painterResource(Res.drawable.icon_menu_settings),
-                        contentDescription = "Settings"
-                    )
+                    TopbarButton(Res.drawable.icon_menu_back, "Back", onClick = { menuViewModel.backToLastScreen() })
+                    Spacer(modifier = Modifier.weight(1f))
+                    TopbarButton(Res.drawable.icon_menu_settings, "Settings", onClick = { menuViewModel.openSettings(true) })
                 }
             }
             Box(modifier = Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {

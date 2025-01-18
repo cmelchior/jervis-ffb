@@ -9,9 +9,12 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.ui.BackNavigationHandler
 import com.jervisffb.ui.UiGameController
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import okio.Path
 
 enum class Feature {
@@ -25,6 +28,8 @@ class MenuViewModel {
     var controller: GameEngineController? = null
     lateinit var uiState: UiGameController
 
+    private val _showSettingsDialog = MutableStateFlow(false)
+
     val navigatorContext = CoroutineScope(CoroutineName("ScreenNavigator"))
 
     // Default values .. figure out a way to persist these
@@ -34,6 +39,16 @@ class MenuViewModel {
         Feature.END_PLAYER_ACTION_IF_ONLY_OPTON to true,
         Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTON to true
     )
+
+    fun backToLastScreen() {
+        BackNavigationHandler.execute()
+    }
+
+    fun openSettings(bool: Boolean = true) {
+        _showSettingsDialog.value = bool
+    }
+
+    fun showSettingsDialog(): StateFlow<Boolean> = _showSettingsDialog
 
     fun saveGameState(destination: Path) {
         JervisSerialization.saveToFile(controller!!, destination)

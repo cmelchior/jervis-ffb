@@ -55,6 +55,10 @@ actual class FileManager {
 
 actual class PropertiesManager actual constructor() {
 
+    actual fun getSystemEnv(key: String): String {
+        TODO()
+    }
+
     actual suspend fun getString(key: String): String? {
         TODO()
     }

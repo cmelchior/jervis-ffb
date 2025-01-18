@@ -16,8 +16,6 @@ object JervisTheme {
     fun fontFamily() = TrumpTownPro()
 
     val white = Color(0xFFFFFFFF)
-
-
     val awayTeamColor = Color(0xFF4588c4)
     val homeTeamColor = Color(0xFFcc0102) // Color(0xFFca0000)
     val accentTeamColorDark =  Color(0xFF236A29) // Color(0xFF006600)
@@ -52,25 +50,16 @@ object JervisTheme {
     val darkGreen =  Color(0xFF236A29) // Color(0xFF006600)
     val lightGreen = Color(0xFF38a23b) // Color(0xFF006600)
 
-
-    // Palette
-    val p1aColor = Color(0xFF2274A5)
-    val p1bColor = Color(0xFFE6AF2E)
-    val p1cColor = Color(0xFF632B30)
-
-    val newRed = Color(0XFFFF5964)
-    val newBlue = Color(0XFF35A7FF)
-
-    // https://paletton.com/#uid=33s0I0k++NGtrZOLq+V+WuL+5oc
-    val fumbblBlue = Color(0xFF0092D8)
-    val fumbblBlueDarker = Color(0xFF00527A)
-    val fumbblBlueDark = Color(0xFF00699B)
-    val fumbblAccent = Color(0xFFFFCD00)
-    val fumbblRed = Color(0xFFFB001D)
+    // Colors lifted from BB 2024 website images. Keep them here for reference
+    //    val rulebookBlue = Color(0xFF163f7f)
+    //    val rulebookRed = Color(0xFF9c0704)
+    //    val rulebookOrange = Color(0xFFfbca1a)
 
     val rulebookBlue = Color(0xFF0077C6) // Color(0xFF2a4479)
     val rulebookRed = Color(0xFFC60000) // Color(0xFF991612)
+    val rulebookRedLight = Color(0xFFC60000) // Color(0xFF991612)
     val rulebookOrange = Color(0xFFFFBE26) //Color(0xFFeca316)
+    val rulebookOrangeContrast = Color(0xFF765912)
     val rulebookGreen = Color(0xFF388235)
     val rulebookPaperDark = Color(0xFF867048)
     val rulebookPaperMediumDark = Color(0xFFe2d2be)

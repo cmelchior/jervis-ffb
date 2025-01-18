@@ -7,11 +7,12 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.screen.createGrayscaleNoiseShader
+import com.jervisffb.ui.view.JervisTheme
 
 /**
  * Add noise to a background color so it mimics a paper-like texture.
  */
-fun Modifier.paperBackground(color: Color): Modifier {
+fun Modifier.paperBackground(color: Color = JervisTheme.rulebookPaper): Modifier {
     val paperShader = createGrayscaleNoiseShader()
     return this.drawBehind {
         // Add desired background color

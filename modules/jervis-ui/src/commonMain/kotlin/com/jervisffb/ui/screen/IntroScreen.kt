@@ -16,14 +16,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Paint
@@ -40,7 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -62,7 +59,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.imageResource
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.ColorFilter
 import org.jetbrains.skia.ColorMatrix
 import org.jetbrains.skia.Font
@@ -73,11 +69,12 @@ import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.tan
 
-class IntroScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
+class IntroScreenModel(private val menuViewModel: MenuViewModel) : JervisScreenModel {
 
     fun gotoFumbblScreen(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
             val screenModel = FumbblScreenModel(menuViewModel)
+            screenModel.initialize()
             navigator.push(FumbblScreen(menuViewModel, screenModel))
         }
     }
@@ -106,113 +103,89 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
 
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel { IntroScreenModel(menuViewModel) }
-            MenuScreen {
-                Row {
-                    Column(modifier = Modifier.fillMaxWidth(0.67f)) {
-                        TitleHeader()
-                        Row(
-                            modifier = Modifier.fillMaxWidth().weight(1f),
-                            verticalAlignment = Alignment.CenterVertically,
+        JervisScreen(menuViewModel) {
+            IntroPage(menuViewModel)
+        }
+    }
+}
+
+@Composable
+private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
+    val navigator = LocalNavigator.currentOrThrow
+    val screenModel = rememberScreenModel { IntroScreenModel(menuViewModel) }
+    MenuScreen {
+        Row {
+            Column(modifier = Modifier.fillMaxWidth(0.67f)) {
+                TitleHeader()
+                Row(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
 //                            horizontalArrangement = Arrangement.SpaceEvenly,
-                        ) {
-                            Spacer(modifier = Modifier.weight(4f/36f))
-                            MenuBox(
-                                label = "FUMBBL",
-                                onClick = { screenModel.gotoFumbblScreen(navigator) },
-                                frontPage = true
-                            )
-                            Spacer(modifier = Modifier.weight(2f/36f))
-                            MenuBox(
-                                label = "Standalone",
-                                onClick = { screenModel.gotoStandAloneScreen(navigator) },
-                                frontPage = true
-                            )
-//                            MenuBox(
-//                                label = "Dev Mode",
-//                                onClick = { screenModel.gotoDevModeScreen(navigator) },
-//                                frontPage = true
-//                    )
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(0.5f)
-                                .padding(8.dp)
-                        ) {
-                            Text(
-                                text = screenModel.clientVersion,
-                                color = JervisTheme.contentTextColor,
-                            )
-                        }
-                    }
-                    Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.BottomEnd) {
-                        Column(modifier = Modifier
-                            .fillMaxWidth(0.67f)
-                            .fillMaxHeight()
-                            .drawBehind { drawPaperBackground(size) }
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                horizontalArrangement = Arrangement.End) {
-                                Image(
-                                    modifier = Modifier.size(36.dp).alpha(0.8f),
-                                    painter = painterResource(Res.drawable.icon_menu_settings),
-                                    contentDescription = "Settings"
-                                )
-                            }
-                            Column(
-                              modifier = Modifier.fillMaxWidth().padding(16.dp).wrapContentHeight(align = Alignment.CenterVertically),
-                            ) {
-                                OrangeTitleBorder()
-                                Text(
-                                    modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
-                                    text = "News",
-                                    fontFamily = JervisTheme.fontFamily(),
-                                    fontSize = 24.sp,
-                                    color = JervisTheme.rulebookOrange
-                                )
-                                OrangeTitleBorder()
-                                Spacer(modifier = Modifier.height(8.dp))
-                                NewsEntry("11-01-2025", "Lorem ipsum dolor sit amet")
-                                NewsEntry("11-01-2025", "Lorem ipsum dolor sit amet")
-                            }
-
-                        }
-                        Image(
-                            modifier = Modifier.fillMaxWidth(1f).offset(x = 24.dp),
-                            bitmap = imageResource(Res.drawable.frontpage_orc),
-                            contentDescription = null,
-                            contentScale = ContentScale.FillWidth,
-                        )
-                    }
+                ) {
+                    Spacer(modifier = Modifier.weight(4f / 36f))
+                    MenuBox(
+                        label = "FUMBBL",
+                        onClick = { screenModel.gotoFumbblScreen(navigator) },
+                        frontPage = true
+                    )
+                    Spacer(modifier = Modifier.weight(2f / 36f))
+                    MenuBox(
+                        label = "Standalone",
+                        onClick = { screenModel.gotoStandAloneScreen(navigator) },
+                        frontPage = true
+                    )
                 }
-//
-//
-//
-//                Row(
-//                    modifier = Modifier.fillMaxHeight(0.5f).fillMaxWidth(),
-//                    verticalAlignment = Alignment.CenterVertically,
-//                    horizontalArrangement = Arrangement.Center,
-//                ) {
-//                    MenuBox(
-//                        label = "FUMBBL",
-//                        onClick = { screenModel.gotoFumbblScreen(navigator) },
-//                        frontPage = true
-//                    )
-//                    MenuBox(
-//                        label = "Standalone",
-//                        onClick = { screenModel.gotoStandAloneScreen(navigator) },
-//                        frontPage = true
-//                    )
-//                    MenuBox(
-//                        label = "Dev Mode",
-//                        onClick = { screenModel.gotoDevModeScreen(navigator) },
-//                        frontPage = true
-//                    )
-//                }
-
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .padding(8.dp)
+                ) {
+                    Text(
+                        text = screenModel.clientVersion,
+                        color = JervisTheme.contentTextColor,
+                    )
+                }
             }
+            Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.BottomEnd) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(0.67f)
+                        .fillMaxHeight()
+                        .drawBehind { drawPaperBackground(size) }
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 4.dp, end = 8.dp, bottom = 16.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TopbarButton("Dev Mode", onClick = { screenModel.gotoDevModeScreen(navigator) })
+                        TopbarButton(Res.drawable.icon_menu_settings, "Settings", onClick = { menuViewModel.openSettings(true) })
+                    }
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp).wrapContentHeight(align = Alignment.CenterVertically),
+                    ) {
+                        OrangeTitleBorder()
+                        Text(
+                            modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
+                            text = "News",
+                            fontFamily = JervisTheme.fontFamily(),
+                            fontSize = 24.sp,
+                            color = JervisTheme.rulebookOrange
+                        )
+                        OrangeTitleBorder()
+                        Spacer(modifier = Modifier.height(8.dp))
+                        NewsEntry("11-01-2025", "Lorem ipsum dolor sit amet")
+                        NewsEntry("11-01-2025", "Lorem ipsum dolor sit amet")
+                    }
+
+                }
+                Image(
+                    modifier = Modifier.fillMaxWidth(1f).offset(x = 24.dp),
+                    bitmap = imageResource(Res.drawable.frontpage_orc),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                )
+            }
+        }
     }
 }
 

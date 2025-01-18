@@ -3,9 +3,11 @@ package com.jervisffb.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -59,9 +61,9 @@ import com.jervisffb.engine.rules.bb2020.tables.SummerWeatherTable
 import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
 import com.jervisffb.engine.rules.bb2020.tables.WinterWeatherTable
 import com.jervisffb.engine.serialize.JervisTeamFile
-import com.jervisffb.fumbbl.web.FumbblTeamLoader
+import com.jervisffb.fumbbl.web.FumbblApi
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.frontpage_ball
+import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.isDigitsOnly
@@ -70,6 +72,7 @@ import com.jervisffb.ui.screen.p2pserver.TeamSelectorPage
 import com.jervisffb.ui.screen.p2pserver.WaitForOpponentPage
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.utils.TitleBorder
+import com.jervisffb.ui.view.utils.paperBackgroundWithLine
 import com.jervisffb.ui.viewmodel.MenuViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -326,7 +329,7 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
         val team = teamId.toIntOrNull() ?: error("Do something here")
         menuViewModel.navigatorContext.launch {
             try {
-                val teamFile = FumbblTeamLoader().loadTeam(team, BB2020Rules())
+                val teamFile = FumbblApi().loadTeam(team, BB2020Rules())
                 CacheManager.saveTeam(teamFile)
                 val teamInfo = getTeamInfo(teamFile, teamFile.team)
                 availableTeams.value = (availableTeams.value.filter { it.teamId != teamInfo.teamId } + teamInfo).sortedBy { it.teamName }
@@ -378,13 +381,33 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
 class P2PServerScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PServerScreenModel) : Screen {
     @Composable
     override fun Content() {
-        MenuScreenWithSidebarAndTitle(
-            title = "Peer-to-Peer Game",
-            icon = Res.drawable.frontpage_ball,
-            currentPageFlow = screenModel.currentPage,
-            onClick = { page -> screenModel.goBackToPage(page) },
-        ) {
-            PageContent(screenModel)
+        JervisScreen(menuViewModel) {
+            MenuScreenWithSidebarAndTitle(
+                menuViewModel,
+                title = "Peer-to-Peer Game",
+                icon = Res.drawable.frontpage_wall_player,
+                topMenuRightContent = null,
+                sidebarContent = {
+                    val currentPage by screenModel.currentPage.collectAsState()
+                    val onClick = { page: Int -> screenModel.goBackToPage(page) }
+                    val entries = listOf("1. Configure Game", "2. Select Team", "3. Wait For Opponent", "4. Start Game")
+                    Column(
+                        modifier = Modifier.paperBackgroundWithLine(JervisTheme.rulebookBlue).padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 8.dp),
+                    ) {
+                        Spacer(modifier = Modifier.fillMaxHeight(0.2f))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        entries.forEachIndexed { index, entry ->
+                            val selected = (index == currentPage)
+                            val isPrevious = (index < currentPage)
+                            val clickHandler: () -> Unit = if (isPrevious) ({ onClick(index) }) else ({ })
+                            SidebarEntry(entry, selected = selected, onClick = clickHandler)
+                        }
+                        Spacer(modifier = Modifier.fillMaxHeight(0.20f))
+                    }
+                }
+            ) {
+                PageContent(screenModel)
+            }
         }
     }
 }
@@ -587,7 +610,7 @@ fun SettingsCard(title: String, width: Dp, content: @Composable () -> Unit) {
 }
 
 @Composable
-fun BoxHeader(text: String, color: Color = JervisTheme.rulebookRed) {
+fun ColumnScope.BoxHeader(text: String, color: Color = JervisTheme.rulebookRed) {
     TitleBorder(color)
     Box(
         modifier = Modifier.height(36.dp),
@@ -596,7 +619,6 @@ fun BoxHeader(text: String, color: Color = JervisTheme.rulebookRed) {
         Text(
             modifier = Modifier.padding(bottom = 2.dp),
             text = text.uppercase(),
-//            fontFamily = JervisTheme.fontFamily(),
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             color = color

@@ -35,6 +35,7 @@ kotlin {
                 api("io.ktor:ktor-client-core:$ktor")
                 api("io.ktor:ktor-client-logging:$ktor")
                 api("io.ktor:ktor-client-websockets:$ktor")
+                api("io.ktor:ktor-client-content-negotiation:$ktor")
                 api("io.ktor:ktor-serialization-kotlinx-json:$ktor")
             }
         }
