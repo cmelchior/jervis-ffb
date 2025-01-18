@@ -146,9 +146,9 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
     }
 
     private suspend fun loadTeamFromFumbbl(teamId: Int): TeamDetails {
-        val result = client.get("$BASE_URL/api/team/get/$teamId")
+        val result = client.get("$BASE_URL/team/get/$teamId")
         if (result.status.isSuccess()) {
-            return json.decodeFromString<TeamDetails>(result.bodyAsText())
+            return result.body<TeamDetails>()
         } else {
             throw IllegalStateException("Loading team $teamId failed with status ${result.status}")
         }
@@ -159,7 +159,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
     }
 
     private suspend fun loadPlayer(playerId: Int): PlayerDetails {
-        val result = client.get("$BASE_URL/api/player/get/$playerId")
+        val result = client.get("$BASE_URL/player/get/$playerId")
         val details = json.decodeFromString<PlayerDetails>(result.bodyAsText())
         return details
     }

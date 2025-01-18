@@ -4,6 +4,7 @@ import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.fumbbl.web.FumbblApi
 import kotlinx.coroutines.runBlocking
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -24,6 +25,7 @@ class RestApiTest {
     }
 
     @Test
+    @Ignore // Manual test
     fun authenticate() = runBlocking<Unit> {
         val id = System.getenv("FUMBBL_CLIENT_ID")
         val secret = System.getenv("FUMBBL_CLIENT_SECRET")

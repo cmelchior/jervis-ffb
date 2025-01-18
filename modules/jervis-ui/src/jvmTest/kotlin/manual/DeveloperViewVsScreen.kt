@@ -52,6 +52,7 @@ import com.jervisffb.jervis_ui.generated.resources.roster_logo_elven_union
 import com.jervisffb.ui.view.JervisTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.Point
+import org.junit.Ignore
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.max
@@ -539,6 +540,7 @@ fun RowScope.AmplitudeBox(header: String, valueRange: ClosedFloatingPointRange<F
 
 class DeveloperViewVsScreen {
     @Test
+    @Ignore // Run this manually
     fun run() {
         mainVs()
     }
