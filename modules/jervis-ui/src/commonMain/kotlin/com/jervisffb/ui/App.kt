@@ -5,11 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
-import com.jervisffb.ui.screen.IntroScreen
+import com.jervisffb.ui.screen.intro.IntroScreen
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.viewmodel.MenuViewModel
 import com.jervisffb.utils.FileManager
 import com.jervisffb.utils.PropertiesManager
+import com.jervisffb.utils.jervisLogger
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -17,13 +19,14 @@ val FILE_MANAGER = FileManager()
 val PROPERTIES_MANAGER = PropertiesManager()
 
 fun initApplication() {
+    @OptIn(DelicateCoroutinesApi::class)
     GlobalScope.launch {
         if (PROPERTIES_MANAGER.getBoolean("initialized") != true) {
-            println("Initializing application...")
+            jervisLogger().i { "initializing application" }
             CacheManager.createInitialTeamFiles()
             PROPERTIES_MANAGER.setProperty("initialized", true)
         } else {
-            println("Application already initialized.")
+            jervisLogger().i { "Application already initialized. Skipping." }
         }
     }
 }

@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.unit.dp
-import com.jervisffb.ui.screen.createGrayscaleNoiseShader
+import com.jervisffb.ui.screen.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.view.JervisTheme
 
 /**

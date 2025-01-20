@@ -1,4 +1,4 @@
-package com.jervisffb.ui.screen.p2pserver
+package com.jervisffb.ui.screen.p2p.host
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -32,9 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jervisffb.ui.screen.P2PServerScreenModel
-import com.jervisffb.ui.screen.SettingsCard
-import com.jervisffb.ui.screen.StandardGameSetup
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.utils.JervisButton
 import com.jervisffb.ui.view.utils.TitleBorder

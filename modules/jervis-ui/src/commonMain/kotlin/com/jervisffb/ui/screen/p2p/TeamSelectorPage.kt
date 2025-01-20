@@ -1,4 +1,4 @@
-package com.jervisffb.ui.screen.p2pserver
+package com.jervisffb.ui.screen.p2p
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,18 +35,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jervisffb.ui.screen.LoadTeamDialog
-import com.jervisffb.ui.screen.P2PServerScreenModel
-import com.jervisffb.ui.screen.TeamInfo
+import com.jervisffb.ui.screen.p2p.host.LoadTeamDialog
+import com.jervisffb.ui.screen.p2p.host.TeamInfo
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.utils.JervisButton
 import com.jervisffb.ui.view.utils.TitleBorder
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TeamSelectorPage(modifier: Modifier, viewModel: P2PServerScreenModel) {
+fun TeamSelectorPage(
+    viewModel: TeamSelectorScreenModel,
+    onNext: () -> Unit,
+) {
     val availableTeams by viewModel.availableTeams.collectAsState()
-    var showImportFumbblTeam by remember { mutableStateOf(false) }
+    var showImportFumbblTeamDialog by remember { mutableStateOf(false) }
+    var showLoadTeamFromFileDialog by remember { mutableStateOf(false) }
     val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -76,18 +79,20 @@ fun TeamSelectorPage(modifier: Modifier, viewModel: P2PServerScreenModel) {
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
                 Spacer(modifier = Modifier.width(60.dp))
-                JervisButton(text = "Load from file", onClick = { viewModel.gameSetupDone() })
+                JervisButton(text = "Load from file", onClick = {
+                    showLoadTeamFromFileDialog = !showLoadTeamFromFileDialog
+                })
                 Spacer(modifier = Modifier.width(16.dp))
                 JervisButton(text = "Import from FUMBBL", onClick = {
-                    showImportFumbblTeam = !showImportFumbblTeam
+                    showImportFumbblTeamDialog = !showImportFumbblTeamDialog
                 })
                 Spacer(modifier = Modifier.weight(1f))
-                JervisButton("NEXT", onClick = { viewModel.teamSelectionDone() }, enabled = (selectedTeam != null))
+                JervisButton("NEXT", onClick = { onNext() }, enabled = (selectedTeam != null))
             }
         }
     }
-    if (showImportFumbblTeam) {
-        LoadTeamDialog(viewModel, onCloseRequest = { showImportFumbblTeam = false })
+    if (showImportFumbblTeamDialog) {
+        LoadTeamDialog(viewModel, onCloseRequest = { showImportFumbblTeamDialog = false })
     }
 }
 

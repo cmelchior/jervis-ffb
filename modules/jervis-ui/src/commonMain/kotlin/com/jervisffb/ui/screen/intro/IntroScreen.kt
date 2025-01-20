@@ -1,8 +1,4 @@
-@file:OptIn(
-    InternalResourceApi::class,
-    ExperimentalResourceApi::class,
-)
-package com.jervisffb.ui.screen
+package com.jervisffb.ui.screen.intro
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -42,22 +38,18 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_orc
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
 import com.jervisffb.jervis_ui.generated.resources.trump_town_pro
-import com.jervisffb.ui.BuildConfig
-import com.jervisffb.ui.screen.fumbbl.FumbblScreen
-import com.jervisffb.ui.screen.fumbbl.FumbblScreenModel
+import com.jervisffb.ui.screen.JervisScreen
+import com.jervisffb.ui.screen.MenuScreen
+import com.jervisffb.ui.screen.TopbarButton
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.MenuBox
 import com.jervisffb.ui.view.utils.OrangeTitleBorder
 import com.jervisffb.ui.viewmodel.MenuViewModel
-import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.skia.ColorFilter
 import org.jetbrains.skia.ColorMatrix
@@ -69,34 +61,9 @@ import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.tan
 
-class IntroScreenModel(private val menuViewModel: MenuViewModel) : JervisScreenModel {
-
-    fun gotoFumbblScreen(navigator: Navigator) {
-        menuViewModel.navigatorContext.launch {
-            val screenModel = FumbblScreenModel(menuViewModel)
-            screenModel.initialize()
-            navigator.push(FumbblScreen(menuViewModel, screenModel))
-        }
-    }
-
-    fun gotoStandAloneScreen(navigator: Navigator) {
-        menuViewModel.navigatorContext.launch {
-            val screenModel = StandAloneScreenModel(menuViewModel)
-            navigator.push(StandAloneScreen(menuViewModel, screenModel))
-        }
-
-    }
-
-    fun gotoDevModeScreen(navigator: Navigator) {
-        menuViewModel.navigatorContext.launch {
-            val screenModel = DevScreenModel(menuViewModel)
-            navigator.push(DevScreen(menuViewModel, screenModel))
-        }
-    }
-
-    val clientVersion: String = BuildConfig.releaseVersion
-}
-
+/**
+ * Layout class for the Main starting screen.
+ */
 class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
 
     override val key: ScreenKey = "IntroScreen"
@@ -120,7 +87,6 @@ private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
                 Row(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     verticalAlignment = Alignment.CenterVertically,
-//                            horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     Spacer(modifier = Modifier.weight(4f / 36f))
                     MenuBox(
@@ -154,14 +120,21 @@ private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
                         .drawBehind { drawPaperBackground(size) }
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 4.dp, end = 8.dp, bottom = 16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(start = 16.dp, top = 4.dp, end = 8.dp, bottom = 16.dp),
                         horizontalArrangement = Arrangement.End
                     ) {
-                        TopbarButton("Dev Mode", onClick = { screenModel.gotoDevModeScreen(navigator) })
-                        TopbarButton(Res.drawable.icon_menu_settings, "Settings", onClick = { menuViewModel.openSettings(true) })
+                        TopbarButton(
+                            "Dev Mode",
+                            onClick = { screenModel.gotoDevModeScreen(navigator) })
+                        TopbarButton(
+                            Res.drawable.icon_menu_settings,
+                            "Settings",
+                            onClick = { menuViewModel.openSettings(true) })
                     }
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp).wrapContentHeight(align = Alignment.CenterVertically),
+                        modifier = Modifier.fillMaxWidth().padding(16.dp)
+                            .wrapContentHeight(align = Alignment.CenterVertically),
                     ) {
                         OrangeTitleBorder()
                         Text(

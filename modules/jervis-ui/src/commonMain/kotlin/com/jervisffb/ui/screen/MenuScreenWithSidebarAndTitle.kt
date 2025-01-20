@@ -46,6 +46,7 @@ import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_back
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
 import com.jervisffb.jervis_ui.generated.resources.trump_town_pro
+import com.jervisffb.ui.screen.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.utils.OrangeTitleBorder
 import com.jervisffb.ui.view.utils.paperBackground

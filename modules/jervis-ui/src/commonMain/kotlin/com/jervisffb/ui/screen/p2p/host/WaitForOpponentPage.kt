@@ -1,4 +1,4 @@
-package com.jervisffb.ui.screen.p2pserver
+package com.jervisffb.ui.screen.p2p.host
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -36,8 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_copy
-import com.jervisffb.ui.screen.P2PServerScreenModel
-import com.jervisffb.ui.screen.TeamInfo
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.utils.JervisButton
 import com.jervisffb.ui.view.utils.TitleBorder
@@ -47,10 +45,7 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WaitForOpponentPage(viewModel: P2PServerScreenModel) {
-    val availableTeams by viewModel.availableTeams.collectAsState()
-    var showImportFumbblTeam by remember { mutableStateOf(false) }
     val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
-
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
