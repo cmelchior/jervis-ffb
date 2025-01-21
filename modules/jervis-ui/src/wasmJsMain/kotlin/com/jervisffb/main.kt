@@ -12,6 +12,7 @@ import kotlinx.browser.window
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     try {
+        clearLoadingScreen()
         initApplication()
         window.onkeydown = { event ->
             if (event.key == "Escape") {
@@ -28,4 +29,8 @@ fun main() {
         ex.printStackTrace()
         throw ex
     }
+}
+
+private fun clearLoadingScreen() {
+    document.body?.innerHTML = ""
 }
