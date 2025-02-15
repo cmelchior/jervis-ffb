@@ -100,7 +100,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                                 path.moveTo(this.size.width, this.size.height - 5)
                                 path.lineTo(size.width, 5f)
 
-                                val name = player.model.position.positionSingular.takeDot(10)
+                                val name = player.model.position.titleSingular.takeDot(10)
                                 drawTextOnPath(
                                     text = "$name #${player.model.number.value}",
                                     textSize = 14.sp.toDp(),

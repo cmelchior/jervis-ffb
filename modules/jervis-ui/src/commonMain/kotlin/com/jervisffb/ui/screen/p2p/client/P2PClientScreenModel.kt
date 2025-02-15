@@ -45,7 +45,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
     }
 
     // Page 3: Accept game and load resources
-    val acceptGameModel = StartGameScreenModel(menuViewModel)
+    val acceptGameModel = StartGameScreenModel(controller, menuViewModel)
 
     val validGameSetup = MutableStateFlow(true)
     val validTeamSelection = MutableStateFlow(false)

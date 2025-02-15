@@ -367,4 +367,30 @@ object IconFactory {
     fun getLogo(id: TeamId): ImageBitmap {
         return cachedLogos[id]!!
     }
+
+    suspend fun loadPlayerSprite(player: Player, isOnHomeTeam: Boolean): PlayerSprite? {
+        if (player.icon?.sprite == null) return null
+        val playerSprite = player.icon?.sprite!!
+        val image = when (playerSprite.type) {
+            SpriteLocation.EMBEDDED -> loadImageFromResources(playerSprite.resource)
+            SpriteLocation.URL -> loadImageFromNetwork(Url(playerSprite.resource))!! // TODO
+        }
+        val sprite = when (val sprite = playerSprite) {
+            is SingleSprite -> {
+                PlayerSprite(image, image)
+            }
+            is SpriteSheet -> {
+                extractSprites(image, sprite.variants, sprite.selectedIndex ?: 0, isOnHomeTeam)
+            }
+            null -> TODO()
+        }
+        cachedPlayers[player] = sprite
+        return sprite
+    }
+
+    suspend fun loadRosterIcon(team: TeamId, logo: SpriteSource?): ImageBitmap? {
+        if (logo == null) return null
+        saveLogo(team, logo)
+        return getLogo(team)
+    }
 }

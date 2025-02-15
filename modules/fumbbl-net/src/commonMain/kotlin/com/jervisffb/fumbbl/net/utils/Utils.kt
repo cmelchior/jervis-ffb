@@ -86,7 +86,7 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
             if (fumbblPosition == null) {
                 throw IllegalStateException("Could not find matching position: ${fumbblPlayer.positionId}")
             }
-            val position = roster.positions.firstOrNull { it.positionSingular == fumbblPosition.positionName }
+            val position = roster.positions.firstOrNull { it.titleSingular == fumbblPosition.positionName }
             if (position == null) {
                 throw IllegalStateException(
                     "Could not find position '${fumbblPosition.positionName}' in '${team.roster.rosterName}'",

@@ -13,8 +13,8 @@ import com.jervisffb.engine.serialize.SpriteSource
 interface Position {
     val id: PositionId
     val quantity: Int
-    val position: String
-    val positionSingular: String
+    val title: String
+    val titleSingular: String
     val shortHand: String
     val cost: Int
     val move: Int

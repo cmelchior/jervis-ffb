@@ -86,9 +86,9 @@ fun WaitForOpponentPage(viewModel: P2PServerScreenModel) {
             }
         Row(modifier = Modifier.fillMaxWidth().align(Alignment.BottomEnd), horizontalArrangement = Arrangement.Start) {
             Spacer(modifier = Modifier.weight(1f))
-            JervisButton("REJECT TEAM", onClick = { viewModel.userAcceptGame(false) }, enabled = (selectedTeam != null))
+            JervisButton("Cancel Game", onClick = { viewModel.userAcceptGame(false) }, enabled = (selectedTeam != null))
             Spacer(modifier = Modifier.width(16.dp))
-            JervisButton("START GAME", onClick = { viewModel.userAcceptGame(true) }, enabled = (selectedTeam != null))
+            JervisButton("Start Game", onClick = { viewModel.userAcceptGame(true) }, enabled = (selectedTeam != null))
         }
     }
 

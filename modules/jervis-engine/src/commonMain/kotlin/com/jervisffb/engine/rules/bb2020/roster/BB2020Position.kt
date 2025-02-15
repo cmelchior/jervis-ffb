@@ -17,8 +17,8 @@ import kotlinx.serialization.Serializable
 data class BB2020Position(
     override val id: PositionId,
     override val quantity: Int,
-    override val position: String,
-    override val positionSingular: String,
+    override val title: String,
+    override val titleSingular: String,
     override val shortHand: String,
     override val cost: Int,
     override val move: Int,
@@ -63,6 +63,6 @@ data class BB2020Position(
     }
 
     override fun toString(): String {
-        return "BB2020Position(position='$position')"
+        return "BB2020Position(position='$title')"
     }
 }

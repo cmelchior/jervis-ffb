@@ -107,6 +107,7 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, val coach
     var dedicatedFans: Int = 0
 
     var teamValue: Int = 0
+    var currentTeamValue: Int = 0
     val specialRules = mutableListOf<SpecialRules>()
     val activePrayersToNuffle = mutableSetOf<PrayerToNuffle>()
 

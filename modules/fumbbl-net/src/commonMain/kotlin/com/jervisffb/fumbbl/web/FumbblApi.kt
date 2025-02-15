@@ -186,8 +186,8 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             BB2020Position(
                 id = PositionId(position.id),
                 quantity = position.quantity,
-                position = position.type, // API doesn't return the "group" title, only the singular title
-                positionSingular = position.type,
+                title = position.type, // API doesn't return the "group" title, only the singular title
+                titleSingular = position.type,
                 shortHand = position.iconLetter,
                 cost = position.cost,
                 move = position.stats.MA,

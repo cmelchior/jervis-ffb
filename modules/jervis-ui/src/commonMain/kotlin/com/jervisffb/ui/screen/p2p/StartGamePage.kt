@@ -24,6 +24,8 @@ import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.TeamTable
 import com.jervisffb.ui.view.utils.JervisButton
@@ -43,6 +46,9 @@ fun StartGamePage(
     viewModel: StartGameScreenModel,
     onAcceptGame: (Boolean) -> Unit,
 ) {
+    val homeTeam: Team? by viewModel.homeTeam.collectAsState()
+    val awayTeam: Team? by viewModel.awayTeam.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -102,8 +108,8 @@ fun StartGamePage(
                     state = pagerStateTop,
                 ) { page ->
                     when (page) {
-                        0 -> TeamData()
-                        1 -> TeamData()
+                        0 -> TeamData(homeTeam, true)
+                        1 -> TeamData(awayTeam, false)
                         else -> error("Invalid page index: $page")
                     }
                 }
@@ -118,7 +124,7 @@ fun StartGamePage(
 }
 
 @Composable
-private fun PagerScope.TeamData() {
+private fun PagerScope.TeamData(team: Team?, isOnHomeTeam: Boolean = true) {
     Column(
         modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -128,7 +134,12 @@ private fun PagerScope.TeamData() {
             contentAlignment = Alignment.TopCenter,
         ) {
             val width = if (950.dp < this.minWidth) 950.dp else this.minWidth
-            TeamTable(width)
+            if (team != null) {
+                TeamTable(width, team, isOnHomeTeam)
+            } else {
+                // Figure out what to do here
+                Text("No team data available.")
+            }
         }
     }
 }

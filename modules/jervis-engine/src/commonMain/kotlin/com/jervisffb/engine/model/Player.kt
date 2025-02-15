@@ -214,6 +214,7 @@ class Player(
     var level: PlayerLevel = PlayerLevel.ROOKIE
     val ball: Ball?
         get() = team.game.balls.firstOrNull { it.carriedBy == this }
+    var cost: Int = 0
 
     fun addSkill(skill: Skill) {
         extraSkills.add(skill)

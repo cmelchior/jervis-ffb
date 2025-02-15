@@ -7,12 +7,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -21,10 +28,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -35,9 +44,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.roster_logo_chaos_chosen
-import org.jetbrains.compose.resources.painterResource
+import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.serialize.SpriteSource
+import com.jervisffb.ui.formatCurrency
+import com.jervisffb.ui.icons.IconFactory
+import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.exp
@@ -53,268 +66,49 @@ private val col5Width = 40.dp // St
 private val col6Width = 40.dp // Ag
 private val col7Width = 40.dp // Pa
 private val col8Width = 40.dp // Av
-private val col9Width = 242.dp // Skills & Traits
+private val col9Width = 234.dp // Skills & Traits
 private val col10Width = 100.dp // Injury
 private val col11Width = 60.dp // Spp
 private val col12Width = 60.dp // Cost
 private val totalWidth = col1Width + col2Width + col3Width + col4Width + col5Width + col6Width + col7Width + col8Width + col9Width + col10Width + col11Width + col12Width
 
 @Composable
-fun TeamTable(width: Dp) {
+fun TeamTable(width: Dp, team: Team, isOnHomeTeam: Boolean) {
     Column(modifier = Modifier.width(width).background(Color.Transparent)) {
-        TeamTableWrapper("Saltwater Saints")
+        TeamTableWrapper(team.name)
         TeamTableHeader()
-        TeamTableRow(
-            rowNo = 0,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-        TeamTableRow(
-            rowNo = 1,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-        TeamTableRow(
-            rowNo = 2,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-        TeamTableRow(
-            rowNo = 3,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-        TeamTableRow(
-            rowNo = 4,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-        TeamTableRow(
-            rowNo = 5,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-        TeamTableRow(
-            rowNo = 6,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-        TeamTableRow(
-            rowNo = 7,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-        TeamTableRow(
-            rowNo = 8,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-        TeamTableRow(
-            rowNo = 9,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-        TeamTableRow(
-            rowNo = 10,
-            1,
-            "",
-            listOf("Kelgor Foobar", "Human Blitzer"),
-            5,
-            3,
-            3,
-            -1,
-            10,
-            listOf("Dodge", "Right Stuff", "Side Step"),
-            "N",
-            0,
-            15_000
-        )
-//        TeamTableRow(
-//            rowNo = 11,
-//            1,
-//            "",
-//            listOf("Kelgor Foobar", "Human Blitzer"),
-//            5,
-//            3,
-//            3,
-//            -1,
-//            10,
-//            listOf("Dodge", "Right Stuff", "Side Step"),
-//            "N",
-//            0,
-//            15_000
-//        )
-//        TeamTableRow(
-//            rowNo = 12,
-//            1,
-//            "",
-//            listOf("Kelgor Foobar", "Human Blitzer"),
-//            5,
-//            3,
-//            3,
-//            -1,
-//            10,
-//            listOf("Dodge", "Right Stuff", "Side Step"),
-//            "N",
-//            0,
-//            15_000
-//        )
-//        TeamTableRow(
-//            rowNo = 13,
-//            1,
-//            "",
-//            listOf("Kelgor Foobar", "Human Blitzer"),
-//            5,
-//            3,
-//            3,
-//            -1,
-//            10,
-//            listOf("Dodge", "Right Stuff", "Side Step"),
-//            "N",
-//            0,
-//            15_000
-//        )
-//        TeamTableRow(
-//            rowNo = 14,
-//            1,
-//            "",
-//            listOf("Kelgor Foobar", "Human Blitzer"),
-//            5,
-//            3,
-//            3,
-//            -1,
-//            10,
-//            listOf("Dodge", "Right Stuff", "Side Step"),
-//            "N",
-//            0,
-//            15_000
-//        )
-//        TeamTableRow(
-//            rowNo = 15,
-//            1,
-//            "",
-//            listOf("Kelgor Foobar", "Human Blitzer"),
-//            5,
-//            3,
-//            3,
-//            -1,
-//            10,
-//            listOf("Dodge", "Right Stuff", "Side Step"),
-//            "N",
-//            0,
-//            15_000
-//        )
+        team.forEachIndexed { index, player ->
+            TeamTableRow(
+                isOnHomeTeam = isOnHomeTeam,
+                rowNo = index,
+                player.number.value,
+                player,
+                listOf(player.name, player.position.titleSingular),
+                player.move,
+                player.strength,
+                player.agility,
+                player.passing ,
+                player.armorValue,
+                listOf(player.positionSkills.map { it.name }, player.extraSkills.map { it.name }),
+                Pair(player.missNextGame, player.nigglingInjuries),
+                player.starPlayerPoints,
+                player.cost
+            )
+        }
         TeamTableDivider()
         TeamInfoSection(
-            "Ilios",
-            "Human",
-            4,
-            1,
-            0,
-            0,
-            1,
-            1_00,
-            1_000
+            team.id,
+            team.coach.name,
+            team.roster.name,
+            team.rerolls.size,
+            team.dedicatedFans,
+            team.assistantCoaches,
+            team.cheerLeaders,
+            team.apothecaries,
+            team.treasury,
+            team.teamValue,
+            team.currentTeamValue,
+            team.teamLogo ?: team.roster.rosterLogo
         )
         TeamTableWrapper()
     }
@@ -334,6 +128,7 @@ private fun TeamTableDivider() {
 
 @Composable
 private fun TeamInfoSection(
+    team: TeamId,
     coachName: String,
     roster: String,
     rerolls: Int,
@@ -342,8 +137,12 @@ private fun TeamInfoSection(
     cheerleaders: Int,
     apothecary: Int,
     treasury: Int,
-    teamValue: Int
+    teamValue: Int,
+    currentTeamValue: Int,
+    icon: SpriteSource?,
 ) {
+    val scope = rememberCoroutineScope()
+
     Row(modifier = Modifier.background(JervisTheme.rulebookPaperMediumDark)) {
         Column(
             modifier = Modifier.weight(1f).padding(4.dp),
@@ -351,16 +150,25 @@ private fun TeamInfoSection(
         ) {
             TeamDataRow("Coach", coachName, "Re-Rerolls", rerolls.toString())
             TeamDataRow("Roster", roster, "Dedicated Fans", dedicatedFanFactor.toString())
-            TeamDataRow("Treasury", treasury.toString(), "Assistant Coaches", assistantCoaches.toString())
-            TeamDataRow("Team Value", teamValue.toString(), "Cheerleaders", cheerleaders.toString())
-            TeamDataRow("Current Team Value", "900 K", "Apothecary", if (apothecary > 0) "Yes" else "No")
+            TeamDataRow("Treasury", formatCurrency(treasury), "Assistant Coaches", assistantCoaches.toString())
+            TeamDataRow("Team Value", formatCurrency(teamValue), "Cheerleaders", cheerleaders.toString())
+            TeamDataRow("Current Team Value", formatCurrency(currentTeamValue), "Apothecary", if (apothecary > 0) "Yes" else "No")
+        }
+
+        var teamIcon: ImageBitmap? by remember { mutableStateOf(null) }
+        LaunchedEffect(icon) {
+            scope.launch {
+                teamIcon = IconFactory.loadRosterIcon(team, icon)
+            }
         }
         Box(modifier = Modifier.align(Alignment.CenterVertically).background(JervisTheme.rulebookPaperMediumDark).padding(end = 16.dp)) {
-            Image(
-                painter = painterResource(Res.drawable.roster_logo_chaos_chosen),
-                contentDescription = "",
-                contentScale = ContentScale.FillHeight,
-            )
+            if (teamIcon != null) {
+                Image(
+                    bitmap = teamIcon!!,
+                    contentDescription = "",
+                    contentScale = ContentScale.FillHeight,
+                )
+            }
         }
     }
 }
@@ -399,17 +207,18 @@ private fun TeamDataRow(col1Header: String, col1Value: String, col2Header: Strin
 
 @Composable
 private fun TeamTableRow(
+    isOnHomeTeam: Boolean,
     rowNo: Int,
     no: Int,
-    icon: String,
+    player: Player,
     nameAndPosition: List<String>,
     ma: Int,
     st: Int,
     ag: Int,
-    pa: Int,
+    pa: Int?,
     av: Int,
-    skills: List<String>,
-    injury: String,
+    skills: List<List<String>>,
+    injury: Pair<Boolean, Int>,
     spp: Int,
     cost: Int
 ) {
@@ -420,18 +229,34 @@ private fun TeamTableRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         TeamTableCellText(no.toString(), col1Width)
-        TeamTableCellText("", col2Width)
-        TeamTablePlayerNameText("Foo ba", col3Width)
+        TeamTableCellIcon(player, isOnHomeTeam, col2Width)
+        Spacer(modifier = Modifier.width(8.dp))
+        TeamTablePlayerNameText(nameAndPosition.first(), nameAndPosition.last(), col3Width)
         TeamTableCellText(ma.toString(), col4Width)
         TeamTableCellText(st.toString(), col5Width)
         TeamTableCellText("$ag+", col6Width)
-        TeamTableCellText(if (pa > 0) "$pa+" else "-", col7Width)
+        TeamTableCellText(if (pa != null) "$pa+" else "-", col7Width)
         TeamTableCellText("$av+", col8Width)
         Spacer(modifier = Modifier.width(8.dp))
-        TeamTableCellSkillText(skills.subList(0, 2), emptyList(), col9Width)
+        TeamTableCellSkillText(skills.first(), skills.last(), col9Width)
+
+        val injury = buildString {
+            if (injury.first) append("M")
+            if (injury.second > 0) {
+                val niglings = when (injury.second) {
+                    1 -> append("N")
+                    else -> append("${injury.second}N")
+                }
+                if (injury.first) {
+                    append(", $niglings")
+                } else {
+                    append(niglings)
+                }
+            }
+        }
         TeamTableCellText(injury, col10Width)
         TeamTableCellText(spp.toString(), col11Width)
-        TeamTableCellText("${cost/1000}K", col12Width)
+        TeamTableCellText(formatCurrency(cost), col12Width)
     }
 }
 
@@ -569,6 +394,7 @@ private fun TeamTableHeader() {
     Row(modifier = Modifier.background(color = JervisTheme.rulebookRed).padding(4.dp)) {
         TeamTableHeaderTitle("Nr.", col1Width)
         TeamTableHeaderTitle("", col2Width)
+        Spacer(modifier = Modifier.width(8.dp))
         TeamTableHeaderTitle("Name", col3Width, center = false)
         TeamTableHeaderTitle("Ma", col4Width)
         TeamTableHeaderTitle("St", col5Width)
@@ -607,21 +433,45 @@ private fun TeamTableCellText(text: String, width: Dp, center: Boolean = true) {
 }
 
 @Composable
-private fun TeamTablePlayerNameText(text: String, width: Dp) {
+private fun TeamTableCellIcon(player: Player, isOnHomeTeam: Boolean, width: Dp, center: Boolean = true) {
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(player) {
+        scope.launch {
+            player.icon?.sprite?.let {
+                imageBitmap = IconFactory.loadPlayerSprite(player, isOnHomeTeam)?.default
+            }
+        }
+    }
+    Box(
+        modifier = Modifier.width(width).padding(2.dp),
+    ) {
+        if (imageBitmap != null) {
+            Image(
+                // TODO Need to check this on a non-retina screen
+                modifier = Modifier.aspectRatio(1f).fillMaxSize().graphicsLayer(scaleX = 2f, scaleY = 2f),
+                bitmap = imageBitmap!!,
+                contentDescription = player.name,
+                contentScale = ContentScale.None,
+            )
+        }
+    }
+}
+
+@Composable
+private fun TeamTablePlayerNameText(name: String, position: String, width: Dp) {
     Column(modifier = Modifier.width(width)) {
         Text(
             modifier = Modifier.width(width),
-            text = text,
+            text = name,
             fontSize = 14.sp,
             lineHeight = 1.em,
-//        fontWeight = FontWeight.Bold,
         )
         Text(
             modifier = Modifier.width(width),
-            text = "Blitzer",
+            text = position,
             lineHeight = 1.em,
             fontSize = 10.sp
-//        fontWeight = FontWeight.Bold,
         )
     }
 }

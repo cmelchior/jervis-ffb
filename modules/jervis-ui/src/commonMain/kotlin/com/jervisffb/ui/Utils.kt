@@ -174,3 +174,11 @@ fun createDefaultHomeTeam(): Team {
         teamValue = 1_000_000
     }
 }
+
+/**
+ * Format a Blood Bowl cost. Thousands are moved and replaced with K
+ */
+fun formatCurrency(value: Int): String {
+    val prettyValue = (value/1000).toString().reversed().chunked(3).joinToString(".").reversed()
+    return "${prettyValue}K"
+}
