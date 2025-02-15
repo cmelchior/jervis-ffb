@@ -22,8 +22,8 @@ import com.jervisffb.net.messages.TeamJoinedMessage
 import com.jervisffb.net.messages.TeamSelectedMessage
 import com.jervisffb.net.messages.UpdateClientStateMessage
 import com.jervisffb.net.messages.UpdateHostStateMessage
-import com.jervisffb.net.test.utils.createDefaultHomeTeam
-import com.jervisffb.net.test.utils.lizardMenAwayTeam
+import com.jervisffb.test.createDefaultHomeTeam
+import com.jervisffb.test.lizardMenAwayTeam
 import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.runBlocking
 import io.ktor.client.plugins.websocket.webSocketSession

@@ -24,8 +24,8 @@ import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.utils.createDefaultGameState
-import com.jervisffb.engine.utils.createStartingTestSetup
+import com.jervisffb.test.createDefaultGameState
+import com.jervisffb.test.createStartingTestSetup
 import org.junit.Ignore
 import org.junit.Test
 
@@ -46,7 +46,7 @@ class DjikstraTests {
 
 @Composable
 fun DjiekstraContent() {
-    val rules = StandardBB2020Rules
+    val rules = StandardBB2020Rules()
     val state = createDefaultGameState(rules)
     createStartingTestSetup(state)
 

@@ -1,14 +1,17 @@
-package com.jervisffb.net.test.utils
+package com.jervisffb.test
 
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.commands.ResetAvailableTeamRerolls
 import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BB2020Rules
@@ -140,4 +143,51 @@ fun createDefaultHomeTeam(): Team {
 fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = humanTeamAway()): Game {
     val field = Field.createForRuleset(rules)
     return Game(rules, createDefaultHomeTeam(), awayTeam, field)
+}
+
+/**
+ * Move all players onto the field as if starting a game.
+ * Only works on the setup defined above
+ */
+fun createStartingTestSetup(state: Game) {
+    fun setupPlayer(
+        state: Game,
+        player: Player?,
+        fieldCoordinate: FieldCoordinate,
+    ) {
+        player?.let {
+            SetPlayerLocation(it, fieldCoordinate).execute(state)
+            SetPlayerState(it, PlayerState.STANDING)
+        } ?: error("")
+    }
+
+    // Home
+    with(state.homeTeam) {
+        setupPlayer(state, this[PlayerNo(1)], FieldCoordinate(12, 6))
+        setupPlayer(state, this[PlayerNo(2)], FieldCoordinate(12, 7))
+        setupPlayer(state, this[PlayerNo(3)], FieldCoordinate(12, 8))
+        setupPlayer(state, this[PlayerNo(4)], FieldCoordinate(10, 1))
+        setupPlayer(state, this[PlayerNo(5)], FieldCoordinate(10, 4))
+        setupPlayer(state, this[PlayerNo(6)], FieldCoordinate(10, 10))
+        setupPlayer(state, this[PlayerNo(7)], FieldCoordinate(10, 13))
+        setupPlayer(state, this[PlayerNo(8)], FieldCoordinate(8, 1))
+        setupPlayer(state, this[PlayerNo(9)], FieldCoordinate(8, 4))
+        setupPlayer(state, this[PlayerNo(10)], FieldCoordinate(8, 10))
+        setupPlayer(state, this[PlayerNo(11)], FieldCoordinate(8, 13))
+    }
+
+    // Away
+    with(state.awayTeam) {
+        setupPlayer(state, this[PlayerNo(1)], FieldCoordinate(13, 6))
+        setupPlayer(state, this[PlayerNo(2)], FieldCoordinate(13, 7))
+        setupPlayer(state, this[PlayerNo(3)], FieldCoordinate(13, 8))
+        setupPlayer(state, this[PlayerNo(4)], FieldCoordinate(15, 1))
+        setupPlayer(state, this[PlayerNo(5)], FieldCoordinate(15, 4))
+        setupPlayer(state, this[PlayerNo(6)], FieldCoordinate(15, 10))
+        setupPlayer(state, this[PlayerNo(7)], FieldCoordinate(15, 13))
+        setupPlayer(state, this[PlayerNo(8)], FieldCoordinate(17, 1))
+        setupPlayer(state, this[PlayerNo(9)], FieldCoordinate(17, 4))
+        setupPlayer(state, this[PlayerNo(10)], FieldCoordinate(17, 10))
+        setupPlayer(state, this[PlayerNo(11)], FieldCoordinate(17, 13))
+    }
 }

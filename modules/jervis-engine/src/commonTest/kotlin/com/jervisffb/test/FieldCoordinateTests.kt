@@ -9,11 +9,6 @@ import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.teamBuilder
-import com.jervisffb.test.utils.HUMAN_BLITZER
-import com.jervisffb.test.utils.HUMAN_CATCHER
-import com.jervisffb.test.utils.HUMAN_LINEMAN
-import com.jervisffb.test.utils.HUMAN_TEAM
-import com.jervisffb.test.utils.HUMAN_THROWER
 
 fun getDefaultTestSetup(rules: Rules): Game {
     val team1: Team =

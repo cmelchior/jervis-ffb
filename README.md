@@ -111,6 +111,12 @@ of the following modules:
 - `jervis-ui`: An UI for driving a game of Blood Bowl. It has been largely 
   copied from the FUMBBL Client UI. 
 
+- `jervis-resources`: This contains icons and the logic for loading them as well
+   as default rosters/teams.
+
+- `jervis-test-utils`: Contains test setups used across multiple modules.
+  This is a work-around for https://youtrack.jetbrains.com/issue/KT-35073.
+
 - `replay-analyzer`: This module is intended for processing and analyzing the
    JSON content of a FUMBBL replay file.
 

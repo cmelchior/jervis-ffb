@@ -1,4 +1,4 @@
-package com.jervisffb.net.test.utils
+package com.jervisffb.test
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -17,7 +17,6 @@ import com.jervisffb.engine.rules.bb2020.skills.MultipleBlock
 import com.jervisffb.engine.rules.bb2020.skills.PrehensileTail
 import com.jervisffb.engine.rules.bb2020.skills.Stunty
 import com.jervisffb.engine.rules.bb2020.skills.ThickSkull
-import kotlinx.serialization.Serializable
 
 val SKINK_RUNNER_LINEMEN =
     BB2020Position(
@@ -92,7 +91,6 @@ val KROXIGOR =
  *
  * See page 118 in the rulebook
  */
-@Serializable
 val LIZARDMEN_TEAM = BB2020Roster(
     id = RosterId("jervis-lizardmen"),
     name = "Lizardmen Team",

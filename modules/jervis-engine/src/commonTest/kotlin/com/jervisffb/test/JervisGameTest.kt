@@ -31,7 +31,6 @@ import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
 import com.jervisffb.test.ext.rollForward
-import com.jervisffb.test.utils.createDefaultGameState
 import kotlin.test.BeforeTest
 
 /**

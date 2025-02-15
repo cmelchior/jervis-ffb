@@ -4,7 +4,7 @@ import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode
 import com.jervisffb.net.LightServer
-import com.jervisffb.net.test.utils.createDefaultHomeTeam
+import com.jervisffb.test.createDefaultHomeTeam
 import com.jervisffb.utils.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals

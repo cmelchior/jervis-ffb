@@ -3,7 +3,7 @@ package com.jervisffb.test.field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.test.utils.createDefaultGameState
+import com.jervisffb.test.createDefaultGameState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

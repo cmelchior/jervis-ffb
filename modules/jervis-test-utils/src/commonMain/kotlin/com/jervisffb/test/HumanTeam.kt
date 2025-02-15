@@ -1,4 +1,4 @@
-package com.jervisffb.net.test.utils
+package com.jervisffb.test
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId

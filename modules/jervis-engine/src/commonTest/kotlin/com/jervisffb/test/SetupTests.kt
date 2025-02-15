@@ -9,7 +9,6 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.test.utils.createDefaultGameState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse

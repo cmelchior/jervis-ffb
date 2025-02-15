@@ -1,4 +1,4 @@
-package com.jervisffb.test.utils
+package com.jervisffb.test
 
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION

@@ -3,7 +3,7 @@ package manual.dummies
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.HotSeatGameRunner
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.utils.createDefaultGameState
+import com.jervisffb.test.createDefaultGameState
 import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.screen.GameScreenModel
 import com.jervisffb.ui.screen.Manual
@@ -12,8 +12,8 @@ import com.jervisffb.ui.viewmodel.MenuViewModel
 
 object TestDummy {
     val menuViewModel = MenuViewModel()
-    val gameModel = GameScreenModel(Manual, menuViewModel)
-    val state = createDefaultGameState(StandardBB2020Rules)
+    val gameModel = GameScreenModel(null, null,Manual, menuViewModel)
+    val state = createDefaultGameState(StandardBB2020Rules())
     val controller = GameEngineController(state)
     val runner = HotSeatGameRunner(controller.rules, state.homeTeam, state.awayTeam)
     val uiController = UiGameController(Manual, runner, menuViewModel, emptyList())

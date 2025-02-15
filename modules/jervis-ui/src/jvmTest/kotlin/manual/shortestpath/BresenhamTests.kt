@@ -22,8 +22,8 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.utils.createDefaultGameState
-import com.jervisffb.engine.utils.createStartingTestSetup
+import com.jervisffb.test.createDefaultGameState
+import com.jervisffb.test.createStartingTestSetup
 import org.junit.Ignore
 import org.junit.Test
 
@@ -35,7 +35,7 @@ class BresenhamTests {
             val windowState = rememberWindowState()
             Window(onCloseRequest = ::exitApplication, state = windowState) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    val rules = StandardBB2020Rules
+                    val rules = StandardBB2020Rules()
                     val state = createDefaultGameState(rules)
                     createStartingTestSetup(state)
                     val path = remember { mutableStateOf(listOf<FieldCoordinate>()) }
