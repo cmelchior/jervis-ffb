@@ -28,7 +28,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "game-model"
+        moduleName = "jervis-engine"
         browser()
     }
 

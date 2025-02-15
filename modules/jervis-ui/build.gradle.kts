@@ -40,7 +40,7 @@ kotlin {
     }
 
     wasmJs {
-        moduleName = "common"
+        moduleName = "jervis-ui"
         browser {
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
@@ -66,20 +66,15 @@ kotlin {
                 implementation(project(":modules:jervis-engine"))
                 implementation(project(":modules:jervis-net"))
                 implementation(project(":modules:jervis-resources"))
-
-//                implementation("com.kmpalette:kmpalette-core:3.1.0")
-//                implementation("com.github.ajalt.colormath:colormath:3.6.1")
-//                implementation("com.github.ajalt.colormath:colormath-ext-jetpack-compose:3.6.1")
                 implementation(libs.okio)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.coroutines)
                 implementation(libs.bundles.voyager)
                 implementation(libs.jsonserialization)
                 implementation(compose.components.resources)
-//                api(compose.preview)
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
             }
         }
         val commonTest by getting {
@@ -90,10 +85,9 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                api(compose.preview)
+                implementation(compose.preview)
                 implementation(compose.desktop.currentOs)
                 implementation(compose.desktop.uiTestJUnit4)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.10.1")
             }
         }
         val jvmTest by getting

@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.multiplatform)
 }
 
-group = "com.jervisffb.resources"
+group = "com.jervisffb"
 version = "1.0-SNAPSHOT"
 
 kotlin {
@@ -17,7 +17,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "utils"
+        moduleName = "jervis-resources"
         browser()
     }
 

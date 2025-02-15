@@ -26,7 +26,7 @@ kotlin {
     iosSimulatorArm64()
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "fumbbl-net"
+        moduleName = "jervis-net"
         browser()
     }
 
@@ -40,7 +40,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-logging:$ktor")
                 implementation("io.ktor:ktor-client-websockets:$ktor")
                 implementation(libs.coroutines)
-                implementation(libs.coroutines.debug)
+                // implementation(libs.coroutines.debug) This crashes with java.util.zip.ZipException: duplicate entry: META-INF/versions/9/module-info.class
                 implementation(libs.jsonserialization)
                 implementation(libs.okio)
                 implementation(libs.kotlinx.datetime)

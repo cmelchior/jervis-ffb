@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.multiplatform)
 }
 
-group = "com.jervisffb.utils"
+group = "com.jervisffb"
 version = "1.0-SNAPSHOT"
 
 kotlin {
@@ -42,6 +42,7 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.10.1")
                 implementation("io.ktor:ktor-client-okhttp:$ktor")
                 implementation("org.reflections:reflections:0.10.2")
                 implementation("androidx.datastore:datastore-jvm:1.1.0")
