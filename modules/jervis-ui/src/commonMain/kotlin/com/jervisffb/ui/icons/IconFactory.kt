@@ -85,39 +85,9 @@ data class PlayerSprite(
     val active: ImageBitmap,
 )
 
-//class PlayerSpriteFactory(spriteSheet: ImageBitmap, playerUiData: PlayerUiData) {
-//    private val homeTeamIcons: List<PlayerSprite>
-//    private val awayTeamIcons: List<PlayerSprite>
-//
-//    init {
-//        val homeIcons = mutableListOf<PlayerSprite>()
-//        val awayIcons = mutableListOf<PlayerSprite>()
-//        extractSprites(spriteSheet).forEach {
-//            homeIcons.add(it.first)
-//            awayIcons.add(it.second)
-//        }
-//        homeTeamIcons = homeIcons
-//        awayTeamIcons = awayIcons
-//    }
-//
-//
-//
-//    fun getVariant(player: Player): PlayerSprite {
-//        val imageIndex = player.number.value % homeTeamIcons.size
-//        return if (player.isOnHomeTeam()) {
-//            homeTeamIcons[imageIndex]
-//        } else {
-//            awayTeamIcons[imageIndex]
-//        }
-//    }
-//}
-
 object IconFactory {
     private val iconHeight = 40
     private val iconWidth = 40
-    // private var classLoader: ClassLoader
-//    private val cachedSpriteSheets: MutableMap<Position, ImageBitmap> = mutableMapOf()
-//    private val cachedPositionVariants: MutableMap<PlayerId, PlayerSpriteFactory> = mutableMapOf()
     private val cachedPlayers: MutableMap<Player, PlayerSprite> = mutableMapOf()
     // Map from resource "path" to loaded in-memory image
     private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
@@ -133,9 +103,6 @@ object IconFactory {
     // Instead we pre-load all dynamic resources up front. This will probably result in slightly
     // higher memory usage, but it will probably not be problematic.
     suspend fun initialize(homeTeam: Team, awayTeam: Team): Boolean {
-        // TODO How to map player images?
-        saveFileIntoCache("icons/cached/players/portraits/AnqiPanqi.png")
-
         FieldDetails.entries.forEach {
             saveFileIntoCache(it.resource)
         }
