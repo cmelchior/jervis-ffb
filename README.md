@@ -3,7 +3,8 @@
 This repository contains the source code for the Jervis project.
 
 Jervis is a collection of tools and libraries for creating and running a game of 
-[Blood Bowl](https://start-warhammer.com/blood-bowl/), a board game owned by Games Workshop.
+[Blood Bowl](https://start-warhammer.com/blood-bowl/), a board game owned by Games 
+Workshop.
 
 This includes:
  
@@ -12,18 +13,18 @@ This includes:
 
 - A Game Client UI that can run either as a website, desktop client or iPad app.
 
-- An AI Agent Framework that makes it possible to replace a player with a custom
-  AI agent.
+- An API that is AI friendly, making it possible to replace a player with a 
+  custom AI agent.
 
-- A replay adapter that can convert any FUMBBL Replay into an equivalent Jervis
+- A replay adapter that can convert any FUMBBL replay into an equivalent Jervis
   game. This makes it possible to use already existing replays to train AI 
   agents.
 
-The project is still very much work-in-progress. 
+The project is still very much work-in-progress.
 
-The project is primarily written in Kotlin (Multiplatform) targeting WASM and 
-Desktop targets.
-
+The project is written in Kotlin Multiplatform primarily focusing on WASM (Web) 
+and Desktop targets. The target is to have a faithful adaption of the core Blood 
+Bowl rules as well as any expansions.
 
 ## Disclaimer
 
@@ -34,7 +35,7 @@ project is in no way official and is not endorsed by Games Workshop Limited.
 
 ## Developer Releases
 
-Test builds are created on every successful push to `main`.
+Test builds are created on every successful push to the `main` branch.
 
 * The HTML version can be found here: https://jervis.ilios.dk. It is built
   using WASM, so will only work on the latest browsers. Specifically, it does
@@ -44,10 +45,10 @@ Test builds are created on every successful push to `main`.
 * Desktop client installers for Windows, MacOS and Linux can be found here:
   https://jervis.ilios.dk/download/.
 
-* No test builds for iPad is currently being created. Instead these must be
+* No test builds for iPad is currently being created. Instead, these must be
   built from source.
 
-No guarantees are given for them.
+No stability guarantees are given for them.
 
 
 ## How To Build
@@ -72,8 +73,8 @@ A local WASM client can be started using:
 ```
 
 The iPad version can be built and installed by using Xcode. Use the project file
-found here `modules/iosApp/iosApp.xcodeproj`. You will need to supply your own 
-signature under "Signing & Capabilities".
+found here [`modules/iosApp/iosApp.xcodeproj`](modules/iosApp/iosApp.xcodeproj). 
+You will need to supply your own signature under "Signing & Capabilities".
 
 
 ## Repository Structure
@@ -139,6 +140,9 @@ by using this gradle command:
 This task will clone the FFB repository, take the resource folder and 
 flatten it so it is usable by Compose Multiplatform and then finally moving it
 into place in the project so it is ready for immediate use.
+
+See https://youtrack.jetbrains.com/issue/CMP-4196 for more details on why
+this is needed.
 
 Team Roster logos have been copied manually from https://fumbbl.com/p/createteam
 
