@@ -34,10 +34,10 @@ import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_mummy
 import com.jervisffb.jervis_ui.generated.resources.roster_logo_dwarf
 import com.jervisffb.jervis_ui.generated.resources.roster_logo_gnome
-import com.jervisffb.ui.screen.p2p.host.BoxHeader
 import com.jervisffb.ui.screen.JervisScreen
 import com.jervisffb.ui.screen.MenuScreenWithSidebarAndTitle
 import com.jervisffb.ui.screen.TopbarButton
+import com.jervisffb.ui.screen.p2p.host.BoxHeader
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.utils.JervisButton
 import com.jervisffb.ui.view.utils.TitleBorder
@@ -60,7 +60,7 @@ fun FumbblePage(menuViewModel: MenuViewModel, viewModel: FumbblScreenModel, modi
     FumbblLoginDialog(viewModel)
     MenuScreenWithSidebarAndTitle(
         menuViewModel,
-        title = "FUMBBL",
+        title = "FUMBBL (Static)",
         icon = Res.drawable.frontpage_mummy,
         topMenuLeftContent = {
 
