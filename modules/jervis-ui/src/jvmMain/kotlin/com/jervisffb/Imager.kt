@@ -7,9 +7,6 @@ import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.utils.createDefaultGameState
-import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.App
 import com.jervisffb.ui.viewmodel.MenuViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -50,30 +47,30 @@ object Imager {
         }
     }
 
-    /**
-     * Take a screenshot of a specific screen.
-     */
-    fun dummyAppScreenshot(
-        width: Int,
-        height: Int,
-    ): BufferedImage {
-        return renderScreenshot(width, height) {
-            val rules = StandardBB2020Rules
-            val state = createDefaultGameState(rules)
-            val actionRequestChannel =
-                Channel<Pair<GameEngineController, List<GameActionDescriptor>>>(
-                    capacity = 1,
-                    onBufferOverflow = BufferOverflow.SUSPEND,
-                )
-            val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
-            val actionProvider = { controller: GameEngineController, availableActions: List<GameActionDescriptor> ->
-                createRandomAction(state, availableActions)
-            }
-//            val controller = GameController(rules, state, actionProvider)
-            val controller = GameEngineController(state)
-            App(MenuViewModel()) // controller, actionRequestChannel, actionSelectedChannel)
-        }
-    }
+//    /**
+//     * Take a screenshot of a specific screen.
+//     */
+//    fun dummyAppScreenshot(
+//        width: Int,
+//        height: Int,
+//    ): BufferedImage {
+//        return renderScreenshot(width, height) {
+//            val rules = StandardBB2020Rules()
+//            val state = createDefaultGameState(rules)
+//            val actionRequestChannel =
+//                Channel<Pair<GameEngineController, List<GameActionDescriptor>>>(
+//                    capacity = 1,
+//                    onBufferOverflow = BufferOverflow.SUSPEND,
+//                )
+//            val actionSelectedChannel = Channel<GameAction>(1, onBufferOverflow = BufferOverflow.SUSPEND)
+//            val actionProvider = { controller: GameEngineController, availableActions: List<GameActionDescriptor> ->
+//                createRandomAction(state, availableActions)
+//            }
+////            val controller = GameController(rules, state, actionProvider)
+//            val controller = GameEngineController(state)
+//            App(MenuViewModel()) // controller, actionRequestChannel, actionSelectedChannel)
+//        }
+//    }
 
     /**
      * Generic render function. Unfortunately it does not look it is possible to use

@@ -9,12 +9,7 @@ import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
-import com.jervisffb.engine.rules.bb2020.roster.CHAOS_DWARF_TEAM
-import com.jervisffb.engine.rules.bb2020.roster.ELVEN_UNION_TEAM
-import com.jervisffb.engine.rules.bb2020.roster.HUMAN_TEAM
-import com.jervisffb.engine.rules.bb2020.roster.KHORNE_TEAM
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
-import com.jervisffb.engine.rules.bb2020.roster.SKAVEN_TEAM
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
@@ -22,6 +17,11 @@ import com.jervisffb.engine.rules.bb2020.skills.Tackle
 import com.jervisffb.engine.rules.bb2020.skills.Wrestle
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.fumbbl.net.model.SpecialRule
+import com.jervisffb.resources.CHAOS_DWARF_TEAM
+import com.jervisffb.resources.ELVEN_UNION_TEAM
+import com.jervisffb.resources.HUMAN_TEAM
+import com.jervisffb.resources.KHORNE_TEAM
+import com.jervisffb.resources.SKAVEN_TEAM
 
 typealias FumbblGame = com.jervisffb.fumbbl.net.model.Game
 typealias FumbblTeam = com.jervisffb.fumbbl.net.model.Team

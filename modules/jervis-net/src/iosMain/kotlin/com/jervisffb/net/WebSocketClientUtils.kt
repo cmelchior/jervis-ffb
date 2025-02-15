@@ -1,10 +1,10 @@
 package com.jervisffb.net
 
-import io.ktor.websocket.WebSocketSession
+import io.ktor.websocket.DefaultWebSocketSession
 
 actual fun startEmbeddedServer(
     server: LightServer,
-    newConnectionHandler: suspend (WebSocketSession) -> Unit,
+    newConnectionHandler: suspend (DefaultWebSocketSession, GameId) -> Unit,
 ): Any {
     TODO()
 }

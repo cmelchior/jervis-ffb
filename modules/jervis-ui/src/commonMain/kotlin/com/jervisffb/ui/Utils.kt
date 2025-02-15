@@ -18,7 +18,20 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.bb2020.skills.SideStep
+import com.jervisffb.engine.teamBuilder
 import com.jervisffb.jervis_ui.generated.resources.Res
+import com.jervisffb.resources.HUMAN_BLITZER
+import com.jervisffb.resources.HUMAN_CATCHER
+import com.jervisffb.resources.HUMAN_LINEMAN
+import com.jervisffb.resources.HUMAN_TEAM
+import com.jervisffb.resources.HUMAN_THROWER
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.skia.FilterBlurMode
 import org.jetbrains.skia.Image
@@ -139,3 +152,25 @@ fun Modifier.dropShadow(
     }
 )
 
+fun createDefaultHomeTeam(): Team {
+    return teamBuilder(StandardBB2020Rules(), HUMAN_TEAM) {
+        coach = Coach(CoachId("home-coach"), "HomeCoach")
+        name = "HomeTeam"
+        addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), HUMAN_LINEMAN)
+        addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), HUMAN_LINEMAN)
+        addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), HUMAN_LINEMAN)
+        addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), HUMAN_LINEMAN)
+        addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HUMAN_THROWER, listOf(SideStep()))
+        addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HUMAN_CATCHER, listOf(SideStep()))
+        addPlayer(PlayerId("H7"), "Catcher-7-H", PlayerNo(7), HUMAN_CATCHER)
+        addPlayer(PlayerId("H8"), "Blitzer-8-H", PlayerNo(8), HUMAN_BLITZER)
+        addPlayer(PlayerId("H9"), "Blitzer-9-H", PlayerNo(9), HUMAN_BLITZER)
+        addPlayer(PlayerId("H10"), "Blitzer-10-H", PlayerNo(10), HUMAN_BLITZER)
+        addPlayer(PlayerId("H11"), "Blitzer-11-H", PlayerNo(11), HUMAN_BLITZER)
+        addPlayer(PlayerId("H12"), "Lineman-12-H", PlayerNo(12), HUMAN_LINEMAN)
+        reRolls = 4
+        apothecaries = 1
+        dedicatedFans = 1
+        teamValue = 1_000_000
+    }
+}

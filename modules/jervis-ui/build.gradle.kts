@@ -45,12 +45,14 @@ kotlin {
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
+                outputPath = null
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
                         add(projectDirPath)
                     }
                 }
+                progressReporter
             }
         }
         binaries.executable()
@@ -62,6 +64,9 @@ kotlin {
                 implementation(project(":modules:platform-utils"))
                 implementation(project(":modules:fumbbl-net"))
                 implementation(project(":modules:jervis-engine"))
+                implementation(project(":modules:jervis-net"))
+                implementation(project(":modules:jervis-resources"))
+
 //                implementation("com.kmpalette:kmpalette-core:3.1.0")
 //                implementation("com.github.ajalt.colormath:colormath:3.6.1")
 //                implementation("com.github.ajalt.colormath:colormath-ext-jetpack-compose:3.6.1")
@@ -87,6 +92,7 @@ kotlin {
                 api(compose.preview)
                 implementation(compose.desktop.currentOs)
                 implementation(compose.desktop.uiTestJUnit4)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.10.1")
             }
         }
         val jvmTest by getting

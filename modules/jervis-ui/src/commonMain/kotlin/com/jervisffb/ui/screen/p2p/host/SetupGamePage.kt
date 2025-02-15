@@ -38,7 +38,7 @@ import com.jervisffb.ui.view.utils.TitleBorder
 import kotlinx.coroutines.launch
 
 @Composable
-fun GameSetupPage(screenModel: P2PServerScreenModel, modifier: Modifier, viewModel: P2PServerScreenModel) {
+fun SetupGamePage(screenModel: P2PServerScreenModel, modifier: Modifier, viewModel: P2PServerScreenModel) {
     val gameName by viewModel.gameName.collectAsState("")
     val gamePort by viewModel.port.collectAsState( null)
     val canCreateGame: Boolean by screenModel.canCreateGame.collectAsState(false)

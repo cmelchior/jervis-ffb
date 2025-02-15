@@ -3,7 +3,7 @@ package com.jervisffb.test.field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.utils.createDefaultGameState
+import com.jervisffb.test.utils.createDefaultGameState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class FieldCoordinateTests {
-    private val rules = StandardBB2020Rules
+    private val rules = StandardBB2020Rules()
     private lateinit var state: Game
 
     @BeforeTest

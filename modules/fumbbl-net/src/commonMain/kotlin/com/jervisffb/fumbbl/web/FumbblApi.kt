@@ -19,11 +19,6 @@ import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialize.JervisMetaData
 import com.jervisffb.engine.serialize.JervisTeamFile
-import com.jervisffb.engine.serialize.PlayerUiData
-import com.jervisffb.engine.serialize.RosterSpriteData
-import com.jervisffb.engine.serialize.SingleSprite
-import com.jervisffb.engine.serialize.SpriteSheet
-import com.jervisffb.engine.serialize.TeamSpriteData
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.fumbbl.web.api.AuthResult
 import com.jervisffb.fumbbl.web.api.CoachSearchResult
@@ -128,11 +123,8 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             val jervisTeam = convertToBB2020JervisTeam(jervisRoster, team)
             return JervisTeamFile(
                 metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-                roster = jervisRoster,
                 team = jervisTeam,
                 history = null,
-                rosterUiData = createRosterSpriteData(roster),
-                uiData = createTeamSpriteData(team),
             )
     }
 
@@ -162,39 +154,6 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
         val result = client.get("$BASE_URL/player/get/$playerId")
         val details = json.decodeFromString<PlayerDetails>(result.bodyAsText())
         return details
-    }
-
-    private suspend fun createTeamSpriteData(team: TeamDetails): TeamSpriteData {
-        val playerData = loadTeamPlayers(team)
-        return TeamSpriteData(
-            teamLogo = null, // How to get this?
-            players = playerData.associate {
-                Pair(
-                    PlayerId(it.id.toString()), PlayerUiData(
-                        sprite = SpriteSheet.fumbbl(it.icon),
-                        portrait = SingleSprite.fumbbl(it.portrait)
-                    )
-                )
-            }
-        )
-    }
-
-    private fun createRosterSpriteData(roster: RosterDetails): RosterSpriteData {
-        return RosterSpriteData(
-            rosterLogo = SingleSprite.fumbbl(roster.logos.value),
-            positions = roster.positions.associate {
-                Pair(
-                    PositionId(it.id),
-                    SingleSprite.fumbbl(it.icon)
-                )
-            },
-            portraits = roster.positions.associate {
-                Pair(
-                    PositionId(it.id),
-                    SingleSprite.fumbbl(it.portrait)
-                )
-            }
-        )
     }
 
     private fun mapToSkillFactory(skills: List<String>): List<SkillFactory> {
@@ -238,7 +197,9 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
                 armorValue = position.stats.AV,
                 skills = mapToSkillFactory(position.skills),
                 primary = mapToSkillCategory(position.normalSkills),
-                secondary = mapToSkillCategory(position.doubleSkills)
+                secondary = mapToSkillCategory(position.doubleSkills),
+                icon = null,
+                portrait = null,
             )
         }
 
@@ -260,14 +221,15 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             rerollCost = roster.rerollCost,
             allowApothecary = (roster.apothecary.equals("yes", ignoreCase = true)),
             specialRules = specialRules,
-            positions = positions
+            positions = positions,
+            rosterLogo = null,
         )
     }
 
     // Convert a FUMBBL Team Data into a Jervis Team
     private fun convertToBB2020JervisTeam(jervisRoster: BB2020Roster, team: TeamDetails): Team {
         if (team.ruleset != 4) throw IllegalStateException("Unsupported ruleset ${team.ruleset}") // 4 is BB2020
-        return teamBuilder(StandardBB2020Rules, jervisRoster) {
+        return teamBuilder(StandardBB2020Rules(), jervisRoster) {
             id = TeamId(team.id.toString())
             name = team.name
             teamValue = team.teamValue

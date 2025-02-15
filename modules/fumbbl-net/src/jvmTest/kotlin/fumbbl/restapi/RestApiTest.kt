@@ -20,7 +20,7 @@ class RestApiTest {
 
     @Test
     fun teamLoader() = runBlocking<Unit> {
-        val file = api.loadTeam(1187712, StandardBB2020Rules)
+        val file = api.loadTeam(1187712, StandardBB2020Rules())
         assertEquals(file.team.name, "Just Human Nothing More")
     }
 

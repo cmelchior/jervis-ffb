@@ -40,7 +40,7 @@ data class Replay(val file: Path) : GameMode
 class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
     fun start(navigator: Navigator, mode: GameMode) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = GameScreenModel(mode, menuViewModel)
+            val screenModel = GameScreenModel(null, null, mode, menuViewModel)
             screenModel.initialize()
             navigator.push(GameScreen(screenModel))
         }
@@ -48,9 +48,16 @@ class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
     fun loadGame(navigator: Navigator, file: Path) {
         menuViewModel.navigatorContext.launch {
-            val (controller, actions) = JervisSerialization.loadFromFile(file)
-            val runner = HotSeatGameRunner(controller.rules, controller.state.homeTeam, controller.state.awayTeam)
-            val screenModel = GameScreenModel(Manual, menuViewModel, runner, actions)
+            val data = JervisSerialization.loadFromFile(file)
+            val runner = HotSeatGameRunner(data.game.rules, data.homeTeam, data.awayTeam)
+            val screenModel = GameScreenModel(
+                null,
+                null,
+                Manual,
+                menuViewModel,
+                runner,
+                data.actions
+            )
             screenModel.initialize()
             navigator.push(GameScreen(screenModel))
         }

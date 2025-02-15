@@ -1,31 +1,42 @@
 package com.jervisffb.net
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.TeamId
-import com.jervisffb.engine.rules.BB2020Rules
+import com.jervisffb.engine.model.Spectator
+import com.jervisffb.engine.model.SpectatorId
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.net.handlers.ClientMessageHandler
 import com.jervisffb.net.handlers.InternalJoinHandler
 import com.jervisffb.net.handlers.LeaveGameHandler
 import com.jervisffb.net.handlers.StartGameHandler
+import com.jervisffb.net.handlers.TeamSelectedHandler
 import com.jervisffb.net.messages.ClientMessage
+import com.jervisffb.net.messages.GameState
 import com.jervisffb.net.messages.InternalJoinMessage
 import com.jervisffb.net.messages.JervisErrorCode
-import com.jervisffb.net.messages.JoinGameAsPlayerMessage
+import com.jervisffb.net.messages.JoinGameAsCoachMessage
 import com.jervisffb.net.messages.JoinGameAsSpectatorMessage
 import com.jervisffb.net.messages.JoinGameMessage
 import com.jervisffb.net.messages.LeaveGameMessage
+import com.jervisffb.net.messages.P2PClientState
+import com.jervisffb.net.messages.P2PHostState
+import com.jervisffb.net.messages.P2PTeamInfo
 import com.jervisffb.net.messages.ReceivedMessage
 import com.jervisffb.net.messages.ServerError
+import com.jervisffb.net.messages.SpectatorState
 import com.jervisffb.net.messages.StartGameMessage
+import com.jervisffb.net.messages.TeamSelectedMessage
 import com.jervisffb.net.serialize.jervisNetworkSerializer
 import com.jervisffb.utils.jervisLogger
 import io.ktor.utils.io.CancellationException
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -37,17 +48,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.encodeToString
-
-enum class GameState {
-    PLANNED, // Game was created, but no teams have joined yet.
-    JOINING, // Not all teams have joined yet.
-    STARTING, // Teams have joined, but haven't accepted starting yet.
-    ACTIVE, // Both teams have agreeded to start and the game is running.
-    FINISHED, // The game has finished
-//    UPLOADED,
-//    BACKED_UP,
-//    LOADING
-}
 
 
 /**
@@ -62,9 +62,12 @@ enum class GameState {
  */
 class GameSession(
     val server: LightServer,
+    val rules: Rules,
     val gameId: GameId, // Unique identifier for this Game. It is required to be unique across all games on the server
     val password: Password?, // Optional password for accessing the game. This is in addition to any user auth.
-    val playingTeams: List<TeamId>, // The teams in the game was predetermined up front. Only these teams can join as player clients.
+    // The teams in the game was predetermined up front. Only these teams can join as player clients. If this list is
+    // empty, any team can join. First team is treated as the home team
+    private val playingTeams: List<Team>,
     val testMode: Boolean
 ) {
 
@@ -72,12 +75,15 @@ class GameSession(
         val LOG = jervisLogger()
     }
 
+    private val sessionClosed = CompletableDeferred<Unit>()
+
     private val messageHandlers = mapOf(
         InternalJoinMessage::class to InternalJoinHandler(this),
 //        JoinGameAsPlayerMessage::class to JoinGameAsPlayerHandler(server),
 //        JoinGameAsSpectatorMessage::class to JoinGameAsSpectatorMessageHandler(server),
         StartGameMessage::class to StartGameHandler(this),
         LeaveGameMessage::class to LeaveGameHandler(this),
+        TeamSelectedMessage::class to TeamSelectedHandler(this)
 //        GameActionMessage::class to GameActionHandler(this),
     )
     val handler = CoroutineExceptionHandler { _, exception ->
@@ -86,63 +92,105 @@ class GameSession(
     private val scope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}") + Dispatchers.Default + handler)
 
     // All sessions associated with this game, post messages to this queue
-    // This ensures that we only update the game state
+    // This ensures that we only update the game state from a single thread
     private val incomingMessages = Channel<ReceivedMessage>(Channel.UNLIMITED)
-    val out = ServerCommunication(this, parallelizeSend = !testMode)
+    val out = ServerCommunication(this, scope, parallelizeSend = !testMode)
 
     var state: GameState = GameState.PLANNED
     private var plannedAt: Instant = Clock.System.now()
-    private val rules: Rules = BB2020Rules()
+
+    val coaches: MutableList<JoinedP2PCoach> = mutableListOf()
+    val spectators: MutableList<JoinedSpectator> = mutableListOf()
+    var hostState: P2PHostState = P2PHostState.START
+    var clientState: P2PClientState = P2PClientState.START
+    var spectatorState: SpectatorState = SpectatorState.START
+
+    val homeTeam: Team?
+        // For now, the Host is always the Home team
+        get() { return coaches.filterIsInstance<JoinedP2PHost>().firstOrNull()?.team }
+    val awayTeam: Team?
+        get() { return coaches.filterIsInstance<JoinedP2PClient>().firstOrNull()?.team }
+    val host: JoinedP2PHost?
+        get() { return coaches.filterIsInstance<JoinedP2PHost>().firstOrNull() }
+    val client: JoinedP2PClient?
+        get() { return coaches.filterIsInstance<JoinedP2PClient>().firstOrNull() }
+
     private var game: GameEngineController? = null
-    val players: MutableList<JoinedPlayerClient> = mutableListOf()
-    val spectators: MutableList<JoinedSpectatorClient> = mutableListOf()
 
     init {
         startSession()
     }
 
-    suspend fun addClient(connection: WebSocketSession, message: JoinGameMessage): JoinedClient {
+    suspend fun addClient(connection: JervisNetworkWebSocketConnection, message: JoinGameMessage): JoinedClient {
         var newClient: JoinedClient? = null
+        val mutex = CompletableDeferred<Unit>()
         val command = InternalJoinMessage(
             action = {
-                when (message) {
-                    is JoinGameAsPlayerMessage -> {
-                        val client = JoinedPlayerClient(
-                            connection = connection,
-                            username = message.username,
-                            team = message.team!!, // For now the team is required to be sent in the JoinGame command
-                            state = ClientState.ACCEPTING_GAME
-                        )
-                        newClient = client
-                        players.add(client)
-                        startClientHandler(client)
-                        out.sendPlayerJoined(client.username)
-                    }
+                try {
+                    when (message) {
+                        is JoinGameAsCoachMessage -> {
+                            val client = if (message.isHost) {
+                                JoinedP2PHost(
+                                    connection = connection,
+                                    coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName),
+                                    state = P2PHostState.JOIN_SERVER,
+                                    team = (message.team as P2PTeamInfo?)?.team
+                                )
+                            } else {
+                                JoinedP2PClient(
+                                    connection = connection,
+                                    coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName),
+                                    state = P2PClientState.JOIN_SERVER,
+                                    team = (message.team as P2PTeamInfo?)?.team
+                                )
+                            }
 
-                    is JoinGameAsSpectatorMessage -> {
-                        val client = JoinedSpectatorClient(
-                            connection = connection,
-                            username = message.username,
-                        )
-                        newClient = client
-                        spectators.add(client)
-                        startClientHandler(client)
-                        out.sendSpectatorJoined(client.username)
+                            // Send GameSync before adding the client. This way, both joining and current clients
+                            // have the same flow of state. Otherwise, the joining client would get a sync with itself
+                            // already present and then straight after receive a CoachJoin with itself again.
+                            out.sendGameStateSync(client, this)
+                            newClient = client
+                            coaches.add(client)
+                            startClientHandler(client)
+                            // For now, the host is always marked as the "Home Team"
+                            out.sendCoachJoined(client.coach, message.isHost)
+                            // Host is required to send team as part of join message. This is checked before coming here.
+                            client.team?.let { team ->
+                                out.sendTeamJoined(message.isHost, team)
+                            }
+                            if (message.isHost) {
+                                hostState = P2PHostState.WAIT_FOR_CLIENT
+                                out.sendHostStateUpdate(hostState)
+                            } else {
+                                clientState = P2PClientState.SELECT_TEAM
+                                out.sendClientStateUpdate(clientState)
+                            }
+                        }
+
+                        is JoinGameAsSpectatorMessage -> {
+                            val client = JoinedSpectator(
+                                connection = connection,
+                                spectator = Spectator(SpectatorId((spectators.size + 1).toString()), message.spectatorName),
+                            )
+                            newClient = client
+                            spectators.add(client)
+                            startClientHandler(client)
+                            out.sendSpectatorJoined(client.spectator)
+                            out.sendGameStateSync(client, this)
+                        }
                     }
-                }
-                when (players.size) {
-                    0, 1 -> state = GameState.JOINING
-                    2 -> {
-                        state = GameState.STARTING
-                        out.sendStartingGameRequest(gameId, players.map { it.team!! })
-                    }
+                } finally {
+                    mutex.complete(Unit)
                 }
             }
         )
 
-        // Handle initial Join message synchronously to prevent the WebSocketSession going out
+        // Block waiting for message to be processed. Needed to prevent WebSocketSession going out
         // of scope, which would close it.
-        handleMessage(ReceivedMessage(connection, command))
+        // If an exception is thrown, the mutex will still be released, but `newClient` will throw,
+        // this will be caught futher up and still resulting in the connection being closed.
+        incomingMessages.send(ReceivedMessage(connection, command))
+        mutex.await()
         return newClient!!
     }
 
@@ -201,7 +249,7 @@ class GameSession(
                 // restart.
                 shutdownGame(JervisExitCode.UNEXPECTED_ERROR, ex.stackTraceToString())
             }
-        } ?: out.sendError(message.connection, JervisErrorCode.PROTOCOL_ERROR, "No handler found for message: $clientMessage")
+        } ?: out.sendError(message.connection, message.message, JervisErrorCode.PROTOCOL_ERROR, "No handler found for message: $clientMessage")
     }
 
     private fun saveGameProgress(message: ReceivedMessage) {
@@ -210,20 +258,27 @@ class GameSession(
         // TODO Not implemented yet.
     }
 
-    fun removePlayer(player: JoinedClient) {
-        TODO()
+    suspend fun removeClient(client: JoinedClient) {
+        // What should the state be if a player leaves in the middle
+        coaches.remove(client)
+        when (client) {
+            is JoinedSpectator -> out.sendSpectatorLeft(client.spectator)
+            is JoinedP2PCoach -> out.sendCoachLeft(client.coach)
+        }
     }
 
     fun isReadyToStart(): Boolean {
-        return players.size == 2 && players.all { it.state == ClientState.READY }
+        return coaches.size == 2 && coaches.all { it.hasAcceptedGame }
     }
 
     private fun startSession() {
         scope.launch {
+            state = GameState.JOINING
             for (message in incomingMessages) {
                 handleMessage(message)
             }
         }.invokeOnCompletion {
+            sessionClosed.complete(Unit)
             if (it != null && it !is CancellationException) {
                 throw it
             }
@@ -231,7 +286,7 @@ class GameSession(
     }
 
     fun startGame() {
-        if (!players.all { it.state == ClientState.READY }) {
+        if (!coaches.all { it.hasAcceptedGame }) {
             throw IllegalStateException("Not all players are ready to start the game.")
         }
         if (state != GameState.STARTING) {
@@ -244,11 +299,10 @@ class GameSession(
         game = GameEngineController(
             Game(
                 rules,
-                players[0].team!!,
-                players[1].team!!,
+                coaches[0].team!!,
+                coaches[1].team!!,
                 Field(rules.fieldWidth, rules.fieldHeight),
             ),
-            server.diceRollGenerator
         ).also {
             it.startManualMode()
         }
@@ -259,18 +313,18 @@ class GameSession(
      * The session will attempt to process all queued up events before
      * fully stopping.
      *
-     * This method can be called outside the normal control (really?)
+     * This method can be called outside the normal control of handling messages.
      */
     suspend fun shutdownGame(exitCode: JervisExitCode, reason: String) {
         scope.cancel()
         incomingMessages.close()
-//        drainQueuedMessages(incomingMessages)
+        sessionClosed.await() // Allow incoming message queue to drain // drainQueuedMessages(incomingMessages)
 
         // TODO Send close in parallel
-        players.forEach {
+        coaches.toList().forEach {
             it.disconnect(exitCode, reason)
         }
-        spectators.forEach {
+        spectators.toList().forEach {
             it.disconnect(exitCode, reason)
         }
     }
@@ -289,11 +343,11 @@ class GameSession(
 
     fun containsSession(session: WebSocketSession): Boolean {
         // TODO Optimize this lookup?
-        return players.any { it.connection == session } || spectators.any { it.connection == session }
+        return coaches.any { it.connection == session } || spectators.any { it.connection == session }
     }
 
-    fun getPlayerClient(session: WebSocketSession): JoinedPlayerClient? {
-        return players.firstOrNull { it.connection == session }
+    fun getPlayerClient(session: WebSocketSession): JoinedP2PCoach? {
+        return coaches.firstOrNull { it.connection == session }
     }
 
     private fun <T: ClientMessage> getHandler(type: T): ClientMessageHandler<T>? {

@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.bb2020.roster
+package com.jervisffb.resources
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -7,7 +7,12 @@ import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.MUTATIONS
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.STRENGTH
+import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
+import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
+import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.skills.SureHands
+import com.jervisffb.engine.serialize.SingleSprite
+import com.jervisffb.engine.serialize.SpriteSheet
 import kotlinx.serialization.Serializable
 
 val SKAVEN_LINEMAN =
@@ -22,6 +27,9 @@ val SKAVEN_LINEMAN =
         emptyList(),
         listOf(GENERAL),
         listOf(AGILITY, MUTATIONS, STRENGTH),
+        SpriteSheet.embedded("$iconRootPath/skaven_lineman.png", 9),
+        SingleSprite.embedded("$portraitRootPath/skaven_lineman.png")
+
     )
 val SKAVEN_THROWER =
     BB2020Position(
@@ -35,6 +43,8 @@ val SKAVEN_THROWER =
         listOf(/* Pass, */ SureHands.Factory),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, MUTATIONS, STRENGTH),
+        SpriteSheet.embedded("$iconRootPath/skaven_thrower.png", 2),
+        SingleSprite.embedded("$portraitRootPath/skaven_thrower.png")
     )
 val GUTTER_RUNNER =
     BB2020Position(
@@ -48,6 +58,8 @@ val GUTTER_RUNNER =
         listOf(/* Dodge */),
         listOf(AGILITY, GENERAL),
         listOf(MUTATIONS, PASSING, STRENGTH),
+        SpriteSheet.embedded("$iconRootPath/skaven_gutterrunner.png", 4),
+        SingleSprite.embedded("$portraitRootPath/skaven_gutterrunner.png")
     )
 val SKAVEN_BLITZER =
     BB2020Position(
@@ -61,6 +73,8 @@ val SKAVEN_BLITZER =
         emptyList(/* Block */),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY, MUTATIONS, PASSING),
+        SpriteSheet.embedded("$iconRootPath/skaven_blitzer.png", 2),
+        SingleSprite.embedded("$portraitRootPath/skaven_blitzer.png")
     )
 val RAT_OGRE =
     BB2020Position(
@@ -74,6 +88,8 @@ val RAT_OGRE =
         listOf(/* AnimalSavagery, Frenzy, Loner(4), MightyBlow(1), PrehensileTail */),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL, MUTATIONS),
+        SpriteSheet.embedded("$iconRootPath/skaven_ratogre.png", 1),
+        SingleSprite.embedded("$portraitRootPath/skaven_ratogre.png")
     )
 
 // Page 116 in the rulebook
@@ -92,6 +108,6 @@ val SKAVEN_TEAM = BB2020Roster(
         GUTTER_RUNNER,
         SKAVEN_BLITZER,
         RAT_OGRE,
-    )
-
+    ),
+    rosterLogo = SingleSprite.embedded("roster/logo/roster_logo_skaven.png")
 )

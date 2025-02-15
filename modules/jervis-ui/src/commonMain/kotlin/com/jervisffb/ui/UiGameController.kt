@@ -103,7 +103,7 @@ class UiGameController(
             // that state.
             // TODO Error handling here?
             preloadedActions.forEach { preloadedAction ->
-                controller.handleAction(preloadedAction)
+                gameRunner.handleAction(preloadedAction)
             }
 
             // Run main game loop
@@ -113,7 +113,7 @@ class UiGameController(
                 // Read new model state
                 val state = controller.state
                 val delta = controller.getDelta()
-                val actions = controller.getAvailableActions()
+                val actions = gameRunner.getAvailableActions()
 
                 runPreUpdateAnimations()
 

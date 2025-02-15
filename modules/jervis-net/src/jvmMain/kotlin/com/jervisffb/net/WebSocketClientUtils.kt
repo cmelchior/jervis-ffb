@@ -10,13 +10,13 @@ import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
-import io.ktor.websocket.WebSocketSession
+import io.ktor.websocket.DefaultWebSocketSession
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 actual fun startEmbeddedServer(
     server: LightServer,
-    newConnectionHandler: suspend (WebSocketSession) -> Unit,
+    newConnectionHandler: suspend (DefaultWebSocketSession, GameId) -> Unit,
 ): Any {
     val platformServer = embeddedServer(Netty,8080) {
         install(WebSockets)
@@ -27,9 +27,10 @@ actual fun startEmbeddedServer(
             masking = false
         }
         routing {
-            webSocket("/game") {
+            webSocket("/{gameId}") {
+                val gameId = GameId(call.parameters["gameId"] ?: "")
                 try {
-                    newConnectionHandler(this)
+                    newConnectionHandler(this, gameId)
                 } catch (ex: Exception) {
                     // All known error cases should be handled inside newConnectionHandler,
                     // so if we get here, something has gone horribly wrong. Just close
@@ -46,6 +47,7 @@ actual fun startEmbeddedServer(
 
 actual fun stopEmbeddedServer(server: Any) {
     if (server is EmbeddedServer<*, *>) {
+            // TODO Unclear why the server always run the full shutdown grace + timeout. For now set it low to avoid having tests running forever.
             server.stop(
                 shutdownGracePeriod = 500,
                 shutdownTimeout = 500,

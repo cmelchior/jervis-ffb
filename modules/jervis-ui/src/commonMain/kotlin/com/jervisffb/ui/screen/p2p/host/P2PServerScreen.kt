@@ -68,7 +68,8 @@ data class TeamInfo(
     val teamRoster: String,
     val teamValue: Int,
     val rerolls: Int,
-    val logo: ImageBitmap
+    val logo: ImageBitmap,
+    val teamData: com.jervisffb.engine.model.Team?, // For now just keep a reference to the original team. Might change later if teams are loaded on the server
 )
 
 interface DropdownEntry {
@@ -230,7 +231,7 @@ fun PageContent(screenModel: P2PServerScreenModel) {
             state = pagerState,
         ) { page ->
             when (page) {
-                0 -> GameSetupPage(screenModel, Modifier, screenModel)
+                0 -> SetupGamePage(screenModel, Modifier, screenModel)
                 1 -> TeamSelectorPage(screenModel.selectTeamModel, { screenModel.teamSelectionDone() })
                 2 -> WaitForOpponentPage(viewModel = screenModel)
                 3 -> Box(modifier = Modifier.fillMaxSize()) {}

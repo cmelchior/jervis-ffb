@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.bb2020.roster
+package com.jervisffb.net.test.utils
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -6,6 +6,9 @@ import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.STRENGTH
+import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
+import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
+import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.skills.BoneHead
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.skills.Loner
@@ -28,6 +31,8 @@ val SKINK_RUNNER_LINEMEN =
         listOf(Dodge.Factory, Stunty.Factory),
         listOf(AGILITY),
         listOf(GENERAL, PASSING, STRENGTH),
+        null,
+        null
     )
 val CHAMELEON_SKINKS =
     BB2020Position(
@@ -41,6 +46,8 @@ val CHAMELEON_SKINKS =
         listOf(Dodge.Factory, /* On the Ball, Shadowing */ Stunty.Factory),
         listOf(AGILITY),
         listOf(GENERAL, PASSING, STRENGTH),
+        null,
+        null
     )
 val SAURUS_BLOCKERS =
     BB2020Position(
@@ -54,6 +61,8 @@ val SAURUS_BLOCKERS =
         emptyList(),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY),
+        null,
+        null
     )
 val KROXIGOR =
     BB2020Position(
@@ -74,6 +83,8 @@ val KROXIGOR =
         ),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL),
+        null,
+        null
     )
 
 /**
@@ -95,5 +106,6 @@ val LIZARDMEN_TEAM = BB2020Roster(
         CHAMELEON_SKINKS,
         SAURUS_BLOCKERS,
         KROXIGOR,
-    )
+    ),
+    rosterLogo = null
 )

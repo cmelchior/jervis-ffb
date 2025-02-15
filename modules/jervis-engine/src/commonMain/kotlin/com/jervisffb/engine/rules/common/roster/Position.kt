@@ -7,6 +7,8 @@ import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
+import com.jervisffb.engine.serialize.PlayerUiData
+import com.jervisffb.engine.serialize.SpriteSource
 
 interface Position {
     val id: PositionId
@@ -21,6 +23,8 @@ interface Position {
     val armorValue: Int
 
     val skills: List<SkillFactory>
+    val icon: SpriteSource?
+    val portrait: SpriteSource?
 
     fun createPlayer(
         rules: Rules,
@@ -28,5 +32,6 @@ interface Position {
         id: PlayerId,
         name: String,
         number: PlayerNo,
+        icon: PlayerUiData?
     ): Player
 }

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
  * Class responsible for handling and showing model dialogs.
  */
 class DialogsViewModel(private val uiState: UiGameController) {
-    val diceRollGenerator = uiState.gameRunner.controller.diceRollGenerator
+    val diceRollGenerator = uiState.gameRunner.diceGenerator
 
     fun buttonActionSelected(action: GameAction) {
         uiState.userSelectedAction(action)

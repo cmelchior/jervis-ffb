@@ -24,7 +24,6 @@ import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteLocation
 import com.jervisffb.engine.serialize.SpriteSheet
 import com.jervisffb.engine.serialize.SpriteSource
-import com.jervisffb.engine.serialize.TeamSpriteData
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block1d
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block2d
@@ -133,15 +132,15 @@ object IconFactory {
     // loading images in the middle of a Composable function quite a nightmare.
     // Instead we pre-load all dynamic resources up front. This will probably result in slightly
     // higher memory usage, but it will probably not be problematic.
-    suspend fun initialize(homeTeam: Team, homeUiData: TeamSpriteData, awayTeam: Team, awayUiData: TeamSpriteData): Boolean {
+    suspend fun initialize(homeTeam: Team, awayTeam: Team): Boolean {
         // TODO How to map player images?
         saveFileIntoCache("icons/cached/players/portraits/AnqiPanqi.png")
 
         FieldDetails.entries.forEach {
             saveFileIntoCache(it.resource)
         }
-        saveTeamPlayerImagesToCache(homeTeam, homeUiData)
-        saveTeamPlayerImagesToCache(awayTeam, awayUiData)
+        saveTeamPlayerImagesToCache(homeTeam)
+        saveTeamPlayerImagesToCache(awayTeam)
         return true
     }
 
@@ -177,14 +176,13 @@ object IconFactory {
         }
     }
 
-    private suspend fun createPlayerSprite(player: PlayerId, isHomeTeam: Boolean, uiData: TeamSpriteData): PlayerSprite {
-        val playerUiData = uiData.players[player]!!
-        val playerSprite = playerUiData.sprite ?: throw IllegalStateException("Cannot find sprite configured for: $player")
+    private suspend fun createPlayerSprite(player: Player, isHomeTeam: Boolean): PlayerSprite {
+        val playerSprite = player.icon?.sprite ?: throw IllegalStateException("Cannot find sprite configured for: $player")
         val image = when (playerSprite.type) {
             SpriteLocation.EMBEDDED -> loadImageFromResources(playerSprite.resource)
             SpriteLocation.URL -> loadImageFromNetwork(Url(playerSprite.resource))!! // TODO
         }
-        return when (val sprite = playerUiData.sprite) {
+        return when (val sprite = playerSprite) {
             is SingleSprite -> {
                 PlayerSprite(image, image)
             }
@@ -231,11 +229,11 @@ object IconFactory {
         }
     }
 
-    private suspend fun saveTeamPlayerImagesToCache(team: Team, uiData: TeamSpriteData) {
+    private suspend fun saveTeamPlayerImagesToCache(team: Team) {
         team.forEach { player ->
-            val playerSprite = createPlayerSprite(player.id, player.isOnHomeTeam(), uiData)
+            val playerSprite = createPlayerSprite(player, player.isOnHomeTeam())
             cachedPlayers[player] = playerSprite
-            val portrait = uiData.players[player.id]?.portrait ?: TODO()
+            val portrait = player?.icon?.portrait ?: TODO()
             val portraitImage = when (portrait.type) {
                 SpriteLocation.EMBEDDED -> loadImageFromResources(portrait.resource)
                 SpriteLocation.URL -> loadImageFromNetwork(Url(portrait.resource))

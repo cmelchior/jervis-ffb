@@ -17,8 +17,6 @@ fun main(args: Array<String>) {
     }
 }
 
-
-
 class GenerateRosterFiles {
     private val json = Json {
         prettyPrint = true

@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 
 class RulesTests {
 
-    val rules = StandardBB2020Rules
+    val rules = StandardBB2020Rules()
 
     @Test
     fun getSurroundingCoordinates_topLeftCorner_insideField() {

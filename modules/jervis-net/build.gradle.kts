@@ -48,6 +48,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
+                implementation(project(":modules:jervis-engine"))
                 implementation(kotlin("test"))
             }
         }

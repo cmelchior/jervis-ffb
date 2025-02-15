@@ -21,10 +21,10 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_ball
-import com.jervisffb.ui.screen.p2p.host.P2PServerScreen
-import com.jervisffb.ui.screen.p2p.host.P2PServerScreenModel
 import com.jervisffb.ui.screen.p2p.client.P2PClientScreen
 import com.jervisffb.ui.screen.p2p.client.P2PClientScreenModel
+import com.jervisffb.ui.screen.p2p.host.P2PServerScreen
+import com.jervisffb.ui.screen.p2p.host.P2PServerScreenModel
 import com.jervisffb.ui.view.MenuBox
 import com.jervisffb.ui.view.SplitMenuBox
 import com.jervisffb.ui.viewmodel.MenuViewModel
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
     fun startAiGame(navigator: Navigator, mode: GameMode) {
         GlobalScope.launch {
-            val screenModel = GameScreenModel(mode, menuViewModel)
+            val screenModel = GameScreenModel(null, null, mode, menuViewModel)
             screenModel.initialize()
             navigator.push(GameScreen(screenModel))
         }
@@ -42,7 +42,7 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
 
     fun startHotSeatGame(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = GameScreenModel(Manual, menuViewModel)
+            val screenModel = GameScreenModel(null, null, Manual, menuViewModel)
             screenModel.initialize()
             navigator.push(GameScreen(screenModel))
         }
@@ -57,7 +57,7 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
 
     fun startP2PClient(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = P2PClientScreenModel(menuViewModel)
+            val screenModel = P2PClientScreenModel(navigator, menuViewModel)
             navigator.push(P2PClientScreen(menuViewModel, screenModel))
         }
     }

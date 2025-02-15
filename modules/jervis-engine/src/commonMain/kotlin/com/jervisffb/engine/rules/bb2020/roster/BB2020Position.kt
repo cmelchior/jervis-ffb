@@ -9,6 +9,8 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.engine.serialize.PlayerUiData
+import com.jervisffb.engine.serialize.SpriteSource
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -27,6 +29,8 @@ data class BB2020Position(
     override val skills: List<SkillFactory>,
     val primary: List<BB2020SkillCategory>,
     val secondary: List<BB2020SkillCategory>,
+    override val icon: SpriteSource?,
+    override val portrait: SpriteSource?,
 ) : Position {
     override fun createPlayer(
         rules: Rules,
@@ -34,6 +38,7 @@ data class BB2020Position(
         id: PlayerId,
         name: String,
         number: PlayerNo,
+        iconData: PlayerUiData?
     ): Player {
         return Player(
             id,
@@ -42,7 +47,8 @@ data class BB2020Position(
             rules.strengthRange,
             rules.agilityRange,
             rules.passingRange,
-            rules.armorValueRange
+            rules.armorValueRange,
+            iconData
         ).apply {
             this.team = team
             this.name = name

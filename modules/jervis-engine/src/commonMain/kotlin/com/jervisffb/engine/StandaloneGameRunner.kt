@@ -5,36 +5,33 @@ import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.Rules
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
- * Top-level class for all game types. This class is responsible for the entire
- * game lifecycle, so depending on the game type, this could include any or all
- * of the following:
- * - Selecting coaches
- * - Selecting teams
- * - Waiting for players to connect
- * - Handle communication with
+ * Top-level class for running all game types. This class is responsible for
+ * sending actions in and out of the rules engine.
  *
  * Subclasses of this interface are considered the entry point for the model
  * layer in the MVVM architecture.
+ *
+ * TODO Right now the UI just uses this to interact with the controller. Is this abstraction needed?
  */
 interface GameRunner {
     val controller: GameEngineController
     val state: Game
     val rules: Rules
+    val diceGenerator: DiceRollGenerator
 
+    fun handleAction(action: GameAction)
     fun handleAction(id: GameActionId, action: GameAction)
     fun getAvailableActions(): ActionRequest
 
-
     // Chat
     // Combine System Logs + Game Logs
-
-
 }
 
 
@@ -72,6 +69,7 @@ data class GameStateUpdate(
     val nextActions: ActionRequest,
 )
 
+
 /**
  * Model class for Hotseat games, i.e., games where both teams are being
  * played on the same screen.
@@ -83,11 +81,13 @@ class HotSeatGameRunner(
 ) : GameRunner {
 
     override val controller: GameEngineController
-
     init {
         val game = Game(gameRules, homeTeam, awayTeam, Field.createForRuleset(gameRules))
-        controller = GameEngineController(game, diceGenerator = UnsafeRandomDiceGenerator())
+        controller = GameEngineController(game)
     }
+    override var state: Game = controller.state
+    override var rules: Rules = controller.rules
+    override val diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator()
 
     private val _mutableGameStateUpdates = MutableSharedFlow<GameStateUpdate>()
 
@@ -96,66 +96,20 @@ class HotSeatGameRunner(
         return _mutableGameStateUpdates
     }
 
-    override var state: Game = controller.state
-    override var rules: Rules = controller.rules
+
+    override fun handleAction(action: GameAction) {
+        controller.handleAction(action)
+    }
 
     override fun handleAction(id: GameActionId, action: GameAction) {
-        TODO("Not yet implemented")
+        TODO("Is this needed?")
     }
 
     override fun getAvailableActions(): ActionRequest {
-        TODO("Not yet implemented")
+        return controller.getAvailableActions()
     }
 }
 
-
-
-
 /**
  * Runner for a single standalone game.
- * A [GameRunner] encapsulates the entire lifecycle of a game, including the
- * lifecycle of clients, i.e.
  */
-//class StandaloneGameRunner : GameRunner {
-//
-//
-//
-//
-//
-//    fun gameState(): Flow<StateDelta> {
-//
-//    }
-//}
-
-
-
-//enum class ClientState {
-//    PENDING,
-//    CONNECTED,
-//    DISCONNECTED,
-//}
-//
-//class Client {
-//    var ping: Int?
-//    var state: ClientState
-//    var team: Team,
-//}
-
-
-
-class ServerGamRunner
-
-// Start Model
-    // Add
-
-
-class P2PClientGameRunner
-
-class P2PServerGameRunner
-
-class StandalonGameRunner {
-
-
-
-
-}

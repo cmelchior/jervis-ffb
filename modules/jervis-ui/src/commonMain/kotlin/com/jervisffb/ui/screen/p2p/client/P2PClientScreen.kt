@@ -1,6 +1,5 @@
 package com.jervisffb.ui.screen.p2p.client
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,20 +15,29 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
 import com.jervisffb.ui.screen.JervisScreen
 import com.jervisffb.ui.screen.MenuScreenWithSidebarAndTitle
 import com.jervisffb.ui.screen.SidebarEntry
+import com.jervisffb.ui.screen.p2p.StartGamePage
 import com.jervisffb.ui.screen.p2p.TeamSelectorPage
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.utils.paperBackgroundWithLine
 import com.jervisffb.ui.viewmodel.MenuViewModel
 
 class P2PClientScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PClientScreenModel) : Screen {
+    @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
+        LifecycleEffectOnce {
+            onDispose {
+                screenModel.onDispose()
+            }
+        }
         JervisScreen(menuViewModel) {
             MenuScreenWithSidebarAndTitle(
                 menuViewModel,
@@ -39,7 +47,7 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val scre
                 sidebarContent = {
                     val currentPage by screenModel.currentPage.collectAsState()
                     val onClick = { page: Int -> screenModel.goBackToPage(page) }
-                    val entries = listOf("1. Select Team", "2. Join Host", "3. Start Game")
+                    val entries = listOf("1. Join Host", "2. Select Team", "3. Start Game")
                     Column(
                         modifier = Modifier.paperBackgroundWithLine(JervisTheme.rulebookBlue)
                             .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 8.dp),
@@ -50,7 +58,12 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val scre
                             val selected = (index == currentPage)
                             val isPrevious = (index < currentPage)
                             val clickHandler: () -> Unit = if (isPrevious) ({ onClick(index) }) else ({ })
-                            SidebarEntry(entry, selected = selected, onClick = clickHandler)
+                            SidebarEntry(
+                                text = entry,
+                                onClick = clickHandler,
+                                selected = selected,
+                                enabled = selected || isPrevious,
+                            )
                         }
                         Spacer(modifier = Modifier.fillMaxHeight(0.20f))
                     }
@@ -79,19 +92,28 @@ private fun PageContent(screenModel: P2PClientScreenModel) {
             state = pagerState,
         ) { page ->
             when (page) {
-                0 -> TeamSelectorPage(
+                0 -> JoinHostScreen(
+                    viewModel = screenModel.joinHostModel,
+                    onJoin = {
+                        if (screenModel.lastValidPage >= 1) {
+                            screenModel.hostJoinedDone()
+                        } else {
+                            screenModel.joinHostModel.clientJoinGame()
+                        }
+                    },
+                    onCancel = { screenModel.joinHostModel.disconnectFromHost() },
+                )
+                1 -> TeamSelectorPage(
                     viewModel = screenModel.selectTeamModel,
                     onNext = { screenModel.teamSelectionDone() }
                 )
-                1 -> JoinHostScreen(
-                    viewModel = screenModel.joinHostModel,
-                    onCancel = { screenModel.clientRejectGame() },
-                    onJoin = { screenModel.clientAcceptGame() }
+                2 -> StartGamePage(
+                    viewModel = screenModel.acceptGameModel,
+                    onAcceptGame = { acceptedGame ->
+                        screenModel.userAcceptGame(acceptedGame)
+                    }
                 )
-//                0 -> //GameSetupPage(screenModel, Modifier, screenModel)
-//                1 -> TeamSelectorPage(Modifier, screenModel)
-//                2 -> WaitForOpponentPage(viewModel = screenModel)
-                else -> Box(modifier = Modifier.fillMaxSize()) {}
+                else -> error("Invalid page index: $page")
             }
         }
     }

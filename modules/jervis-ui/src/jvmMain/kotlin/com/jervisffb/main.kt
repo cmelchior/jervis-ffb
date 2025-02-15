@@ -47,31 +47,36 @@ fun main() {
 //        frame.isResizable = false
 //    }
     initApplication()
-    application {
-        val scale = 1.22f
-        val menuViewModel = MenuViewModel()
-        val windowState =
-            rememberWindowState(
-                size = (
-                    DpSize(pixelsToDp(145f + 782f + 145f), pixelsToDp(690f)) * scale) // Game content
-                    + DpSize(0.dp, pixelsToDp(28f)),  // Window decoration
-            )
-        Window(
-            onCloseRequest = ::exitApplication,
-            state = windowState,
-            onKeyEvent = { event ->
-                if (event.key == Key.Escape && event.type == KeyEventType.KeyDown) {
-                    BackNavigationHandler.execute()
-                    true
-                } else {
-                    false
-                }
-            },
-            title = "Jervis Fantasy Football"
-        ) {
-            WindowMenuBar(menuViewModel)
-            App(menuViewModel)
+    try {
+        application {
+            val scale = 1.22f
+            val menuViewModel = MenuViewModel()
+            val windowState =
+                rememberWindowState(
+                    size = (
+                        DpSize(pixelsToDp(145f + 782f + 145f), pixelsToDp(690f)) * scale) // Game content
+                        + DpSize(0.dp, pixelsToDp(28f)),  // Window decoration
+                )
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = windowState,
+                onKeyEvent = { event ->
+                    if (event.key == Key.Escape && event.type == KeyEventType.KeyDown) {
+                        BackNavigationHandler.execute()
+                        true
+                    } else {
+                        false
+                    }
+                },
+                title = "Jervis Fantasy Football"
+            ) {
+                WindowMenuBar(menuViewModel)
+                App(menuViewModel)
+            }
         }
+    } catch (ex: Throwable) {
+        println("Hello from outer catch")
     }
+
 }
 

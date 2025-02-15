@@ -35,6 +35,7 @@ kotlin {
             dependencies {
                 implementation(project(":modules:platform-utils"))
                 implementation(project(":modules:jervis-engine"))
+                implementation(project(":modules:jervis-resources")) // Only here to be able to swap FUMBBL rosters with default ones.
                 implementation(libs.coroutines)
                 implementation(libs.okio)
                 implementation(libs.kotlinx.datetime)

@@ -21,8 +21,6 @@ import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.reports.ReportAvailableActions
 import com.jervisffb.engine.reports.ReportHandleAction
 import com.jervisffb.engine.reports.SimpleLogEntry
-import com.jervisffb.engine.rng.DiceRollGenerator
-import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.serialize.JervisSerialization
@@ -40,10 +38,7 @@ data class RemoveEntry(val log: LogEntry) : ListEvent
  * has been agreed upon. This should be the responsibility of a specific
  * [GameRunner]
  */
-class GameEngineController(
-    state: Game,
-    diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator()
-) {
+class GameEngineController(state: Game) {
 
     // How is the GameController consuming actions. Once started, it poses
     // restrictions on the Controller is used.
@@ -58,7 +53,6 @@ class GameEngineController(
     var initialAwayTeamState: JsonElement? = null
 
     val logsEvents: Flow<ListEvent> = state.logChanges
-    val diceRollGenerator = diceGenerator
     val rules: Rules = state.rules
 
     // Track the entire "forward" history. In case of Undo's. The last delta

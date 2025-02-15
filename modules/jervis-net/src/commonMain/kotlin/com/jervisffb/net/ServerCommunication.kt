@@ -1,34 +1,85 @@
 package com.jervisffb.net
 
+import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.serialize.JervisTeamFile
+import com.jervisffb.net.messages.ClientMessage
+import com.jervisffb.net.messages.CoachJoinedMessage
+import com.jervisffb.net.messages.CoachLeftMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage
 import com.jervisffb.net.messages.GameReadyMessage
+import com.jervisffb.net.messages.GameStateSyncMessage
 import com.jervisffb.net.messages.JervisErrorCode
-import com.jervisffb.net.messages.PlayerJoinedMessage
+import com.jervisffb.net.messages.P2PClientState
+import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.ServerError
 import com.jervisffb.net.messages.ServerMessage
+import com.jervisffb.net.messages.SpectatorJoinedMessage
+import com.jervisffb.net.messages.SpectatorLeftMessage
 import com.jervisffb.net.messages.TeamData
+import com.jervisffb.net.messages.TeamJoinedMessage
+import com.jervisffb.net.messages.UpdateClientStateMessage
+import com.jervisffb.net.messages.UpdateHostStateMessage
 import com.jervisffb.net.serialize.jervisNetworkSerializer
+import com.jervisffb.utils.jervisLogger
+import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
-import io.ktor.websocket.WebSocketSession
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.encodeToString
 
 /**
- * Class wrapping the responsibility of sending messages from a game session to all connected clients
+ * Class wrapping the responsibility of sending messages from a server game
+ * session to all connected clients.
  */
 class ServerCommunication(
     private val session: GameSession,
+    private val scope: CoroutineScope,
     // If false, sending messages is done in order based on when a client connected. Recommended for testing
     // If true, sending messages to connected clients is done in parallel.
     private val parallelizeSend: Boolean = true
 ) {
-    suspend fun sendPlayerJoined(username: String) {
-        val msg = PlayerJoinedMessage(username)
+
+    companion object {
+        val LOG = jervisLogger()
+    }
+
+    suspend fun sendCoachJoined(coach: Coach, isHomeCoach: Boolean) {
+        val msg = CoachJoinedMessage(coach, isHomeCoach = isHomeCoach)
         sendAllConnections(msg)
     }
 
-    fun sendSpectatorJoined(username: String) {
-        TODO("Not yet implemented")
+    suspend fun sendCoachLeft(coach: Coach) {
+        val msg = CoachLeftMessage(coach)
+        sendAllConnections(msg)
+    }
+
+    suspend fun sendTeamJoined(isHomeTeam: Boolean, team: Team) {
+        val msg = TeamJoinedMessage(isHomeTeam, team)
+        sendAllConnections(msg)
+    }
+
+    suspend fun sendSpectatorJoined(spectator: Spectator) {
+        val msg = SpectatorJoinedMessage(spectator)
+        sendAllConnections(msg)
+    }
+
+    suspend fun sendSpectatorLeft(spectator: Spectator) {
+        val msg = SpectatorLeftMessage(spectator)
+        sendAllConnections(msg)
+    }
+
+    suspend fun sendGameStateSync(client: JoinedClient, session: GameSession) {
+        val msg = GameStateSyncMessage(
+            session.coaches.map { it.coach },
+            session.spectators.map { it.spectator },
+            session.hostState,
+            session.clientState,
+            session.spectatorState,
+            session.homeTeam,
+            session.awayTeam,
+        )
+        sendToConnection(client.connection, msg)
     }
 
     suspend fun sendStartingGameRequest(id: GameId, teams: List<Team>) {
@@ -40,7 +91,7 @@ class ServerCommunication(
                 teamValue = it.teamValue
             )
         })
-        sendAllPlayers(msg)
+        sendAllCoaches(msg)
     }
 
     suspend fun sendGamReady(id: GameId) {
@@ -48,36 +99,74 @@ class ServerCommunication(
         sendAllConnections(msg)
     }
 
-    suspend fun sendError(connection: WebSocketSession, errorCode: JervisErrorCode, message: String) {
+
+    suspend fun sendHostStateUpdate(newState: P2PHostState) {
+        val msg = UpdateHostStateMessage(newState)
+        sendToConnection(session.host!!.connection, msg)
+    }
+
+    suspend fun sendClientStateUpdate(newState: P2PClientState) {
+        val msg = UpdateClientStateMessage(newState)
+        sendToConnection(session.client!!.connection, msg)
+    }
+
+    suspend fun sendError(connection: JervisNetworkWebSocketConnection, inMessage: ClientMessage, errorCode: JervisErrorCode, message: String) {
+        LOG.w { "[Server] [${connection.username}:${inMessage::class.simpleName}] Sending error ($errorCode): $message" }
         val msg = ServerError(errorCode, message)
         sendToConnection(connection, msg)
     }
 
+    private suspend fun sendToConnection(connection: DefaultWebSocketSession, message: ServerMessage) {
+        LOG.i { "[Server] Sending to connection: $message" }
+        val jsonMessage = jervisNetworkSerializer.encodeToString(message)
+        try {
+            connection.send(Frame.Text(jsonMessage))
+        } catch (ex: Throwable) {
+            LOG.i { "[Server] Error sending message to connection: $ex" }
+        }
+    }
+
     private suspend fun sendAllConnections(message: ServerMessage) {
+        LOG.i { "[Server] Sending to all connections: $message" }
         val jsonMessage = jervisNetworkSerializer.encodeToString(message)
-        // TODO Send the messages in parallel, not sequentially
-        //  Check for parallelizeSend
-        session.players.forEach {
-//            println("Sending: $message to ${it.connection}")
-            it.connection.send(Frame.Text(jsonMessage))
-//            println("Sent: $message to ${it.connection}")
-        }
-        session.spectators.forEach {
-            it.connection.send(Frame.Text(jsonMessage))
+        sendToConnections(session.coaches + session.spectators, jsonMessage)
+    }
+
+    private suspend fun sendAllCoaches(message: ServerMessage) {
+        LOG.i { "[Server] Sending to all players: $message" }
+        val jsonMessage = jervisNetworkSerializer.encodeToString(message)
+        // Snapshot list, to prevent concurrent modifications
+        sendToConnections(session.coaches.toList(), jsonMessage)
+    }
+
+    private suspend fun sendToConnections(connections: List<JoinedClient>, jsonMessage: String) {
+        // Figure out how we can parallelize this, while also being able to send messages in parallel
+        // 1. A scope with a single thread pr. connection?
+        // 2. Somehow make it is possible group multiple messages?
+        // 3. Some sort of outgoing queue?
+        if (parallelizeSend) {
+            connections.forEach {
+//                scope.launch {
+                try {
+                    it.connection.send(Frame.Text(jsonMessage))
+                } catch (ex: Throwable) {
+                    LOG.i { "[Server] Error sending message to connection: $ex" }
+                }
+
+//                }
+            }
+        } else {
+//            scope.launch {
+                connections.forEach {
+                    try {
+                        it.connection.send(Frame.Text(jsonMessage))
+                    } catch (ex: Throwable) {
+                        LOG.i { "[Server] Error sending message to connection: $ex" }
+                    }
+
+                }
+//            }
         }
     }
 
-    private suspend fun sendAllPlayers(message: ServerMessage) {
-        val jsonMessage = jervisNetworkSerializer.encodeToString(message)
-        // TODO Send the messages in parallel, not sequentially
-        //  Check for parallelizeSend
-        session.players.forEach {
-            it.connection.send(Frame.Text(jsonMessage))
-        }
-    }
-
-    private suspend fun sendToConnection(connection: WebSocketSession, message: ServerMessage) {
-        val jsonMessage = jervisNetworkSerializer.encodeToString(message)
-        connection.send(Frame.Text(jsonMessage))
-    }
 }

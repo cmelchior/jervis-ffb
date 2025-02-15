@@ -30,8 +30,8 @@ import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
-import com.jervisffb.engine.utils.createDefaultGameState
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.createDefaultGameState
 import kotlin.test.BeforeTest
 
 /**
@@ -42,7 +42,7 @@ import kotlin.test.BeforeTest
  */
 abstract class JervisGameTest {
 
-    open val rules: BB2020Rules = StandardBB2020Rules
+    open val rules: BB2020Rules = StandardBB2020Rules()
     protected lateinit var state: Game
     protected lateinit var controller: GameEngineController
     protected lateinit var homeTeam: Team

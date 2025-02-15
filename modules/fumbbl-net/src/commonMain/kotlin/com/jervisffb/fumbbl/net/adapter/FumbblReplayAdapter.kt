@@ -1,12 +1,12 @@
 package com.jervisffb.fumbbl.net.adapter
 
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.fumbbl.net.FumbblFileReplayAdapter
 import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.api.commands.ServerCommandReplay
 import com.jervisffb.fumbbl.net.utils.FumbblGame
 import com.jervisffb.fumbbl.net.utils.fromFumbblState
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.utils.platformFileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -42,7 +42,7 @@ class FumbblReplayAdapter(private var replayFile: Path, private val checkCommand
         val commands: MutableList<ServerCommandReplay> = mutableListOf()
 
         adapter.start()
-        val rules = StandardBB2020Rules // How do we figure out which ruleset this game is uing?
+        val rules = StandardBB2020Rules() // How do we figure out which ruleset this game is uing?
         fumbblGame = adapter.getGame()
         jervisGame = Game.fromFumbblState(rules, fumbblGame)
         var isDone = false

@@ -1,19 +1,20 @@
 package com.jervisffb.net.handlers
 
 import com.jervisffb.net.GameSession
-import com.jervisffb.net.GameState
 import com.jervisffb.net.JervisExitCode
+import com.jervisffb.net.JervisNetworkWebSocketConnection
+import com.jervisffb.net.messages.GameState
 import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.LeaveGameMessage
-import io.ktor.websocket.WebSocketSession
 
 class LeaveGameHandler(override val session: GameSession) : ClientMessageHandler<LeaveGameMessage>() {
-    override suspend fun handleMessage(message: LeaveGameMessage, connection: WebSocketSession) {
+    override suspend fun handleMessage(message: LeaveGameMessage, connection: JervisNetworkWebSocketConnection) {
         when (session.state) {
             GameState.PLANNED,
             GameState.JOINING -> {
                 session.out.sendError(
                     connection,
+                    message,
                     JervisErrorCode.PROTOCOL_ERROR,
                     "A game in ${session.state} is in the wrong state to leave: $message"
                 )
@@ -33,6 +34,7 @@ class LeaveGameHandler(override val session: GameSession) : ClientMessageHandler
             GameState.FINISHED -> {
                 session.out.sendError(
                     connection,
+                    message,
                     JervisErrorCode.PROTOCOL_ERROR,
                     "Game '${session.gameId}' already finished: $message"
                 )

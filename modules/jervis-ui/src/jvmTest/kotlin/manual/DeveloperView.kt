@@ -43,14 +43,13 @@ import kotlin.math.exp
 import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.sin
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 
 class DeveloperViewTests() {
 
     @Test
-    @Ignore // Only run this manually
+//    @Ignore // Only run this manually
     fun main() {
         mainTeamTable()
     }

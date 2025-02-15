@@ -199,14 +199,17 @@ fun MenuSidebar(menuViewModel: MenuViewModel, sidebarContent: @Composable BoxSco
 }
 
 @Composable
-fun SidebarEntry(text: String, onClick: () -> Unit = {}, selected: Boolean = false) {
+fun SidebarEntry(text: String, onClick: () -> Unit = {}, selected: Boolean = false, enabled: Boolean = true) {
     val alpha = if (selected) 1f else 0f
-    val fontColor = if (selected) JervisTheme.rulebookOrange else JervisTheme.white
-
+    val fontColor = when {
+        !enabled -> JervisTheme.white.copy(alpha = 0.7f)
+        selected -> JervisTheme.rulebookOrange
+        else -> JervisTheme.white
+    }
     Column() {
         OrangeTitleBorder(alpha = alpha)
         Box(
-            modifier = Modifier.fillMaxWidth().height(36.dp).clickable { onClick() },
+            modifier = Modifier.fillMaxWidth().height(36.dp).let { if (enabled) it.clickable { onClick() } else it },
             contentAlignment = Alignment.CenterStart,
         ) {
             Text(
@@ -219,7 +222,6 @@ fun SidebarEntry(text: String, onClick: () -> Unit = {}, selected: Boolean = fal
         OrangeTitleBorder(alpha = alpha)
     }
 }
-
 
 @Composable
 fun TitleBarWithSidebar(modifier: Modifier, title: String) {

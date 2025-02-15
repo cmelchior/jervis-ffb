@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.jervisffb.engine.serialize.FILE_EXTENSION_TEAM_FILE
+import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisSerialization.jervisEngineModule
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.resources.StandaloneTeams
@@ -41,7 +42,8 @@ object CacheManager {
                 throw IllegalStateException("Could not find: $file")
             }
             val json = fileContent.map { Char(it.toInt()) }.toCharArray().concatToString()
-            jsonSerializer.decodeFromString<JervisTeamFile>(json)
+            val file = jsonSerializer.decodeFromString<JervisTeamFile>(json)
+            file.copy(team = JervisSerialization.fixTeamRefs(file.team))
         }
     }
 

@@ -9,7 +9,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.utils.createDefaultGameState
+import com.jervisffb.test.utils.createDefaultGameState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
@@ -20,7 +20,7 @@ import kotlin.test.assertTrue
  */
 class SetupTests {
 
-    private val rules = StandardBB2020Rules
+    private val rules = StandardBB2020Rules()
     private lateinit var state: Game
     private lateinit var controller: GameEngineController
 

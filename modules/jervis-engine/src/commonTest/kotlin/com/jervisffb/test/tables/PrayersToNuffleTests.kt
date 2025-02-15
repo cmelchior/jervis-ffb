@@ -32,7 +32,6 @@ import com.jervisffb.engine.rules.bb2020.skills.Pro
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.bb2020.tables.PrayerStatModifier
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
-import com.jervisffb.engine.utils.createDefaultGameState
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultFanFactor
@@ -44,6 +43,7 @@ import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.defaultWeather
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skipTurns
+import com.jervisffb.test.utils.createDefaultGameState
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test

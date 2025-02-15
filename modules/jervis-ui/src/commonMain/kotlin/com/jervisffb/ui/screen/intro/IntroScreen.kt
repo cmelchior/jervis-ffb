@@ -239,6 +239,8 @@ fun TitleHeader() {
     }
 }
 
+// Generates a "noise" shader that will introduce a paper-like quality to the background
+// Need to investigate something better, but this seems okay for a first draft.
 fun createGrayscaleNoiseShader(): Shader {
 
     // Create Noise

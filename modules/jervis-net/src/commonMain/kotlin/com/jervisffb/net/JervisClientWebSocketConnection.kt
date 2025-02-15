@@ -19,15 +19,12 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.encodeToString
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
+import okio.ProtocolException
 
 /**
  * Class for controlling the websocket connection to a Jervis Game Host or Server.
@@ -38,7 +35,7 @@ import kotlin.time.Duration.Companion.seconds
 class JervisClientWebSocketConnection(
     private val gameId: GameId,
     private val url: String = "ws://127.0.0.1:8080/game",
-
+    coachName: String,
 ) {
     companion object {
         val LOG = jervisLogger()
@@ -64,18 +61,40 @@ class JervisClientWebSocketConnection(
     val isActive: Boolean
         get() = session != null && !jervisCloseReason.isCompleted
 
+    /**
+     * Start the connection. This method should never throw. If an exception occurs,
+     * it should be reported back through [awaitDisconnect] with an appropriate
+     * close reason.
+     */
     fun start() {
         if (session != null) throw IllegalStateException("WebSocketClientConnection is already started.")
         val client = getHttpClient()
         jervisCloseReason = CompletableDeferred()
         scope.launch {
-            val session = client.webSocketSession(url).also {
-                this@JervisClientWebSocketConnection.session = it
+            try {
+                val session = client.webSocketSession(url).also {
+                    this@JervisClientWebSocketConnection.session = it
+                }
+                val job1 = launch { monitorDisconnect(session) }
+                val job2 = launch { monitorOutgoingClientMessages() }
+                val job3 = launch { monitorIncomingServerMessages(session) }
+                joinAll(job1, job2, job3)
+            } catch (ex: ProtocolException) {
+                // Unsure if ProtocolException is thrown in other cases than 404, so just to be sure
+                if (ex.message?.contains("404 Not Found") == true) {
+                    jervisCloseReason.complete(CloseReason(JervisExitCode.URL_NOT_FOUND.code, ex.message ?: ""))
+                } else {
+                    jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, ex.message ?: ""))
+                }
+                closeDone.complete(Unit)
+            } catch (ex: CancellationException) {
+                // These are special and should always propagate
+                throw ex
+            } catch (ex: Throwable) {
+                // Wrong use of ws/wss will end up here as an SSLException
+                jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, ex.message ?: ""))
+                closeDone.complete(Unit)
             }
-            val job1 = launch { monitorDisconnect(session) }
-            val job2 = launch { monitorOutgoingClientMessages() }
-            val job3 = launch { monitorIncomingServerMessages(session) }
-            joinAll(job1, job2, job3)
         }.invokeOnCompletion { error: Throwable? ->
             closeDone.complete(Unit)
             if (error != null && error !is CancellationException) {
@@ -119,6 +138,7 @@ class JervisClientWebSocketConnection(
         try {
             for (outMessage in outgoingChannel) {
                 val messageJson = jervisNetworkSerializer.encodeToString(outMessage)
+                LOG.i { "[Client] Sending message: $messageJson" }
                 session?.outgoing?.send(Frame.Text(messageJson))
             }
         } catch (ex: Throwable) {
@@ -148,31 +168,29 @@ class JervisClientWebSocketConnection(
         session?.incoming?.cancel()
         session?.close(exitCode, message)
         session = null
-        // No-op if already set by the server terminating the connection
+        // If the server terminated the connection, this is a no-op and close reason is already set.
         jervisCloseReason.complete(CloseReason(exitCode.code, message))
         incomingChannel.cancel(cause = CancellationException("Client is closing."))
         outgoingChannel.close()
         scope.cancel(cause = CancellationException("Client is closing."))
         closeDone.await()
-        jervisLogger().d { "Closing JervisClientWebSocketConnection: $this"  }
+        LOG.d { "[Client] Closing connection: $this"  }
     }
 
     suspend fun closeFromServer() {
         session = null
         incomingChannel.close()
         outgoingChannel.close()
-        jervisLogger().d { "JervisClientWebSocketConnection was closed due to a server disconnect: $this"  }
+        LOG.d { "[Client] Connection was closed due to a server disconnect: $this"  }
     }
 
-    suspend fun awaitDisconnect(timeout: Duration = 10.seconds): CloseReason {
-        return try {
-            withTimeout(timeout) {
-                val reason = jervisCloseReason.await()
-                reason
-            }
-        } catch (ex: TimeoutCancellationException) {
-            CloseReason(CloseReason.Codes.INTERNAL_ERROR.code, "Timeout waiting for disconnect: $timeout")
-        }
+    /**
+     * Wait for the connection to terminate.
+     *
+     * @param timeout how long to wait.
+     */
+    suspend fun awaitDisconnect(): CloseReason {
+        return jervisCloseReason.await()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

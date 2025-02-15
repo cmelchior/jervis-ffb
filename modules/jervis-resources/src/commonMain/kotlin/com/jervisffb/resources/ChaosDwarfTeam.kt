@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.bb2020.roster
+package com.jervisffb.resources
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -7,11 +7,17 @@ import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.MUTATIONS
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.STRENGTH
+import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
+import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
+import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.Sprint
 import com.jervisffb.engine.rules.bb2020.skills.SureFeet
 import com.jervisffb.engine.rules.bb2020.skills.Tackle
 import com.jervisffb.engine.rules.bb2020.skills.ThickSkull
+import com.jervisffb.engine.serialize.SingleSprite
+import com.jervisffb.engine.serialize.SpriteSheet
 import kotlinx.serialization.Serializable
 
 val HOBGOBLIN_LINEMEN =
@@ -26,6 +32,8 @@ val HOBGOBLIN_LINEMEN =
         emptyList(),
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
+        SpriteSheet.embedded("$iconRootPath/chaosdwarf_hobgoblinlineman.png", 10),
+        SingleSprite.embedded("$portraitRootPath/chaosdwarf_hobgoblinlineman.png")
     )
 val CHAOS_DWARF_BLOCKERS =
     BB2020Position(
@@ -39,6 +47,8 @@ val CHAOS_DWARF_BLOCKERS =
         listOf(Block.Factory, Tackle.Factory, ThickSkull.Factory),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY, MUTATIONS),
+        SpriteSheet.embedded("$iconRootPath/chaosdwarf_chaosdwarfblocker.png", 6),
+        SingleSprite.embedded("$portraitRootPath/chaosdwarf_chaosdwarfblocker.png")
     )
 val BULL_CENTAUR_BLITZERS =
     BB2020Position(
@@ -56,6 +66,8 @@ val BULL_CENTAUR_BLITZERS =
         ),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY),
+        SpriteSheet.embedded("$iconRootPath/chaosdwarf_bullcentaurblitzer.png", 2),
+        SingleSprite.embedded("$portraitRootPath/chaosdwarf_bullcentaurblitzer.png")
     )
 val ENSLAVED_MINOTAUR =
     BB2020Position(
@@ -69,6 +81,8 @@ val ENSLAVED_MINOTAUR =
         emptyList(),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
+        SpriteSheet.embedded("$iconRootPath/chaosdwarf_enslavedminotaur.png",1),
+        SingleSprite.embedded("$portraitRootPath/chaosdwarf_enslavedminotaur.png")
     )
 
 // See Teams of Legend: https://www.warhammer-community.com/wp-content/uploads/2020/11/lFZy1SIuNmWvxPj1.pdf
@@ -78,7 +92,7 @@ val CHAOS_DWARF_TEAM = BB2020Roster(
     name = "Chaos Dwarf",
     tier = 1,
     numberOfRerolls = 8,
-    rerollCost =  70_000,
+    rerollCost = 70_000,
     allowApothecary = true,
     // Only select one of Favoured of
     specialRules = listOf(
@@ -95,5 +109,6 @@ val CHAOS_DWARF_TEAM = BB2020Roster(
         CHAOS_DWARF_BLOCKERS,
         BULL_CENTAUR_BLITZERS,
         ENSLAVED_MINOTAUR,
-    )
+    ),
+    rosterLogo = SingleSprite.embedded("roster/logo/roster_logo_chaos_dwarf.png")
 )

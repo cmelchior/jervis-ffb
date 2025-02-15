@@ -23,6 +23,15 @@ val DUMMY_SESSION = object : WebSocketSession {
     override fun terminate() { /* No-op */ }
 }
 
+
+@Serializable
+sealed interface TeamInfo
+@Serializable
+data class P2PTeamInfo(val team: Team): TeamInfo
+@Serializable
+data class HostedTeamInfo(val teamId: TeamId): TeamInfo
+
+
 /**
  * Interface describing all messages sent from a Client to the Server.
  */
@@ -39,6 +48,10 @@ data class InternalJoinMessage(
 //    val joinMessage: JoinGameMessage
 ): InternalClientMessage
 
+// Last message before the server will shut down.
+data class InternalShutdownMessage(
+    val action: suspend () -> Unit,
+): InternalClientMessage
 
 @Serializable
 sealed interface JoinGameMessage: ClientMessage {
@@ -48,14 +61,14 @@ sealed interface JoinGameMessage: ClientMessage {
 }
 
 @Serializable
-data class JoinGameAsPlayerMessage(
+data class JoinGameAsCoachMessage(
     override val gameId: GameId,
     override val username: String,
     override val password: String?,
-    val team: Team? = null, // Standalone mode will send the entire team here
-    val teamId: TeamId? = null // Hosted mode will just send the teamId, and the server can then look up the team.
-): JoinGameMessage {
-}
+    val coachName: String,
+    val isHost: Boolean,
+    val team: TeamInfo? = null
+): JoinGameMessage
 
 // Join game with `gameId` as spectator. If it doesn't exist, return an error.
 @Serializable
@@ -66,11 +79,16 @@ data class JoinGameAsSpectatorMessage(
     val spectatorName: String,
 ): JoinGameMessage
 
+//
+@Serializable
+data class TeamSelectedMessage(
+    val team: TeamInfo,
+): ClientMessage
 
-// Client is accepting to start the game
+// Client responds whether to accept the game or not
 @Serializable
 data class StartGameMessage(
-    val id: GameId,
+    val startGame: Boolean,
 ): ClientMessage
 
 // Client is gracefully leaving the game.

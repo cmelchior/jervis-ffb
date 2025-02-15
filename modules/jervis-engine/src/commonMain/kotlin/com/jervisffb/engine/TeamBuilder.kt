@@ -4,6 +4,7 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.inducements.Apothecary
@@ -14,6 +15,9 @@ import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.engine.serialize.PlayerUiData
+import com.jervisffb.engine.serialize.SingleSprite
+import com.jervisffb.engine.serialize.SpriteSheet
 import kotlin.random.Random
 
 private data class PlayerData(
@@ -21,7 +25,9 @@ private data class PlayerData(
     val name: String,
     val number: PlayerNo,
     val type: Position,
-    val extraSkills: List<Skill> = emptyList())
+    val extraSkills: List<Skill> = emptyList(),
+    val icon: PlayerUiData? = null,
+)
 
 class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     private val players: MutableMap<PlayerNo, PlayerData> = mutableMapOf()
@@ -51,12 +57,15 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
             field = value
         }
 
+    // Track spriteIds so we can avoid re-using existing ones as much as possible
+    private val usedSprites = mutableMapOf<PositionId, Int>()
+
     fun addPlayer(
         id: PlayerId,
         name: String,
         number: PlayerNo,
         type: Position,
-        skills: List<Skill> = emptyList()
+        skills: List<Skill> = emptyList(),
     ) {
         if (players.containsKey(number)) {
             throw IllegalArgumentException("Player with number $number already exits: ${players[number]}")
@@ -65,7 +74,23 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
         if (players.values.count { it.type == type } == allowedOnTeam) {
             throw IllegalArgumentException("Max number of $type are already on the team.")
         }
-        players[number] = PlayerData(id, name, number, type, skills)
+        val playerIcon = createDefaultUiData(type)
+        players[number] = PlayerData(id, name, number, type, skills, playerIcon)
+    }
+
+    private fun createDefaultUiData(type: Position): PlayerUiData {
+        val playerSprite = when (val sprite = type.icon) {
+            is SingleSprite -> sprite
+            is SpriteSheet -> {
+                val index = usedSprites.getOrPut(type.id) { 0 }
+                usedSprites[type.id] = index + 1
+                sprite.copy(
+                    selectedIndex = index
+                )
+            }
+            null -> null
+        }
+        return PlayerUiData(playerSprite,type.portrait)
     }
 
     fun build(): Team {
@@ -77,7 +102,8 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
                     this@apply,
                     data.id,
                     data.name,
-                    data.number
+                    data.number,
+                    data.icon
                 ).also { player ->
                     player.extraSkills.addAll(data.extraSkills)
                 })

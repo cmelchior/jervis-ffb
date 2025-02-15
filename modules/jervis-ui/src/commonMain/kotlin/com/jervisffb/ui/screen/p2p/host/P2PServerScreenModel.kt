@@ -25,7 +25,8 @@ class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenMod
     val totalPages = 4
     val currentPage = MutableStateFlow(0)
     val selectTeamModel = TeamSelectorScreenModel(menuViewModel, { teamSelected ->
-        canCreateGame.value = teamSelected
+        selectedTeam.value = teamSelected
+        canCreateGame.value = (teamSelected != null)
     })
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
 

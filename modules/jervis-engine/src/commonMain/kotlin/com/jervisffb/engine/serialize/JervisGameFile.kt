@@ -1,8 +1,6 @@
 package com.jervisffb.engine.serialize
 
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.model.PlayerId
-import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.roster.Roster
@@ -51,19 +49,17 @@ data class JervisGameFile(
 @Serializable
 data class JervisTeamFile(
     val metadata: JervisMetaData,
-    val roster: Roster,
     val team: Team,
     val history: GameHistory?,
-    val rosterUiData: RosterSpriteData,
-    val uiData: TeamSpriteData,
-)
+) {
+    val roster: Roster = team.roster
+}
 
 // Format of a Jervis Roster File (.jrf)
 @Serializable
 data class JervisRosterFile(
     val metadata: JervisMetaData,
     val roster: Roster,
-    val uiData: RosterSpriteData,
 )
 
 // Just dummy for now. This needs to be fleshed out.
@@ -82,18 +78,18 @@ data class GameEntry(
     val awayScore: Int,
 )
 
-@Serializable
-data class TeamSpriteData(
-    val teamLogo: SpriteSource?, // Either team or roster logo
-    val players: Map<PlayerId, PlayerUiData>,
-)
+//@Serializable
+//data class TeamSpriteData(
+//    val teamLogo: SpriteSource?, // Either team or roster logo
+//    val players: Map<PlayerId, PlayerUiData>,
+//)
 
-@Serializable
-data class RosterSpriteData(
-    val rosterLogo: SpriteSource?,
-    val positions: Map<PositionId, SpriteSource>,
-    val portraits: Map<PositionId, SpriteSource>,
-)
+//@Serializable
+//data class RosterSpriteData(
+//    val rosterLogo: SpriteSource?,
+//    val positions: Map<PositionId, SpriteSource>,
+//    val portraits: Map<PositionId, SpriteSource>,
+//)
 
 enum class SpriteLocation {
     EMBEDDED,
@@ -117,6 +113,7 @@ sealed interface SpriteSource {
     val type: SpriteLocation
     val resource: String
 }
+
 @Serializable
 data class SingleSprite(
     override val type: SpriteLocation,
@@ -248,3 +245,15 @@ data class JervisGameData(
     val awayTeam: JsonElement,
     val actions: List<GameAction>,
 )
+
+/**
+ * Converts a [Team] into a [JervisTeamFile], but all UI data will be empty.
+ * This is mostly used for testing
+ */
+fun Team.createTeamFile(): JervisTeamFile {
+    return buildTeamFile {
+        metadata = JervisMetaData(FILE_FORMAT_VERSION)
+        team = this@createTeamFile
+        roster = this@createTeamFile.roster
+    }
+}

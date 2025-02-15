@@ -12,13 +12,13 @@ import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
+import com.jervisffb.engine.serialize.SpriteSource
 import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlin.jvm.JvmInline
 import kotlin.properties.Delegates
 
 class TeamHalfData(private val game: Game) {
@@ -140,6 +140,12 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, val coach
 
     var turnMarker by Delegates.observable(0) { prop, old, new ->
 //        game.gameFlow.safeTryEmit(game)
+    }
+
+    val teamLogo: SpriteSource? = null // Either team or roster logo
+
+    init {
+        notifyUpdate() // Make sure dogout is filled
     }
 
     // Must be called before using this class.

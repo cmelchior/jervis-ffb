@@ -9,7 +9,11 @@ import kotlin.jvm.JvmInline
 
 @Serializable
 @JvmInline
-value class CoachId(val id: String)
+value class CoachId(val value: String)
+
+@Serializable
+@JvmInline
+value class SpectatorId(val value: String)
 
 // ID that identities a single die
 // Used to track individual dice through rerolls

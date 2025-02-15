@@ -10,6 +10,7 @@ import com.jervisffb.engine.model.modifiers.TemporaryEffectType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -137,6 +138,7 @@ class Player(
     val passingRange: IntRange,
     @Serializable(with = IntRangeSerializer::class)
     val armourRange: IntRange,
+    val icon: PlayerUiData? = null
 ) : Observable<Player>() {
     @Transient
     lateinit var team: Team

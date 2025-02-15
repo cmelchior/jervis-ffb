@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.bb2020.roster
+package com.jervisffb.net.test.utils
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -6,6 +6,9 @@ import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.STRENGTH
+import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
+import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
+import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
@@ -28,6 +31,8 @@ val HUMAN_LINEMAN =
         emptyList(),
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
+        null,
+        null
     )
 val HUMAN_THROWER =
     BB2020Position(
@@ -41,6 +46,8 @@ val HUMAN_THROWER =
         listOf(/* Pass */ SureHands.Factory),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
+        null,
+        null
     )
 val HUMAN_CATCHER =
     BB2020Position(
@@ -54,6 +61,8 @@ val HUMAN_CATCHER =
         listOf(CatchSkill.Factory, Dodge.Factory),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
+        null,
+        null,
     )
 val HUMAN_BLITZER =
     BB2020Position(
@@ -67,6 +76,8 @@ val HUMAN_BLITZER =
         listOf(Block.Factory),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY, PASSING),
+        null,
+        null
     )
 val HALFLING_HOPEFUL =
     BB2020Position(
@@ -80,6 +91,8 @@ val HALFLING_HOPEFUL =
         emptyList(),
         listOf(AGILITY),
         listOf(GENERAL, STRENGTH),
+        null,
+        null
     )
 val OGRE =
     BB2020Position(
@@ -93,6 +106,8 @@ val OGRE =
         emptyList(),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL),
+        null,
+        null
     )
 
 val HUMAN_TEAM = BB2020Roster(
@@ -110,5 +125,6 @@ val HUMAN_TEAM = BB2020Roster(
         HUMAN_BLITZER,
         HALFLING_HOPEFUL,
         OGRE,
-    )
+    ),
+    rosterLogo = null
 )

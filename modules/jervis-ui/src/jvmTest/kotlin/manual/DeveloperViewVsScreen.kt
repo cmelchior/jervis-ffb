@@ -68,13 +68,13 @@ fun mainVs() =
         val windowState = rememberWindowState()
         Window(onCloseRequest = ::exitApplication, state = windowState) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Content()
+                TeamCard()
             }
         }
     }
 
 @Composable
-fun Content() {
+fun TeamCard() {
     val cornerShape = with(LocalDensity.current) { 16.dp.toPx() }
     val arrowWidth = with(LocalDensity.current) { 8.dp.toPx() }
     val arrowHeight = with(LocalDensity.current) { 12.dp.toPx() }

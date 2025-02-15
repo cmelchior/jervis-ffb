@@ -1,7 +1,7 @@
 package com.jervisffb.ui.screen.p2p
 
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.BB2020Rules
+import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.fumbbl.web.FumbblApi
 import com.jervisffb.ui.CacheManager
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
  */
 class TeamSelectorScreenModel(
     private val menuViewModel: MenuViewModel,
-    private val onTeamSelected: (Boolean) -> Unit
+    private val onTeamSelected: (TeamInfo?) -> Unit
 ) : JervisScreenModel {
 
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())
@@ -28,6 +28,10 @@ class TeamSelectorScreenModel(
 
     init {
         loadTeamList()
+    }
+
+    fun reset() {
+        selectedTeam.value = null
     }
 
     private fun loadTeamList() {
@@ -43,7 +47,7 @@ class TeamSelectorScreenModel(
 
     private suspend fun getTeamInfo(teamFile: JervisTeamFile, team: Team): TeamInfo {
         if (!IconFactory.hasLogo(team.id)) {
-            IconFactory.saveLogo(team.id, teamFile.uiData.teamLogo ?: teamFile.rosterUiData.rosterLogo!!)
+            IconFactory.saveLogo(team.id, teamFile.team.teamLogo ?: teamFile.roster.rosterLogo!!)
         }
         return TeamInfo(
             teamId = team.id,
@@ -52,26 +56,17 @@ class TeamSelectorScreenModel(
             teamValue = team.teamValue,
             rerolls = team.rerolls.size,
             logo = IconFactory.getLogo(team.id),
+            teamData = team
         )
     }
 
     fun setSelectedTeam(team: TeamInfo?) {
         if (team == null || selectedTeam.value == team) {
             selectedTeam.value = null
-            onTeamSelected(false)
+            onTeamSelected(null)
         } else {
             selectedTeam.value = team
-            onTeamSelected(true)
-        }
-    }
-
-    fun setTeam(team: TeamInfo?) {
-        if (team == null) {
-            selectedTeam.value = null
-            onTeamSelected(false)
-        } else {
-            selectedTeam.value = team
-            onTeamSelected(true)
+            onTeamSelected(team)
         }
     }
 
@@ -83,7 +78,7 @@ class TeamSelectorScreenModel(
         val team = teamId.toIntOrNull() ?: error("Do something here")
         menuViewModel.navigatorContext.launch {
             try {
-                val teamFile = FumbblApi().loadTeam(team, BB2020Rules())
+                val teamFile = FumbblApi().loadTeam(team, StandardBB2020Rules())
                 CacheManager.saveTeam(teamFile)
                 val teamInfo = getTeamInfo(teamFile, teamFile.team)
                 availableTeams.value = (availableTeams.value.filter { it.teamId != teamInfo.teamId } + teamInfo).sortedBy { it.teamName }
@@ -93,5 +88,4 @@ class TeamSelectorScreenModel(
             }
         }
     }
-
 }

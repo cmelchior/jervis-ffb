@@ -2,13 +2,13 @@ package com.jervisffb.engine.rules
 
 import kotlinx.serialization.Serializable
 
-open class BB2020Rules : Rules {
+abstract class BB2020Rules : Rules {
     override val name: String
         get() = "Blood Bowl 2020 Rules"
 }
 
 @Serializable
-object StandardBB2020Rules : BB2020Rules() {
+class StandardBB2020Rules : BB2020Rules() {
     override val name: String
         get() = "Blood Bowl 2020 Rules (Strict)"
 }
@@ -21,7 +21,7 @@ object StandardBB2020Rules : BB2020Rules() {
  * - Foul: Player is not selected when starting the action.
  */
 @Serializable
-object FumbblBB2020Rules : Rules {
+class FumbblBB2020Rules : BB2020Rules() {
     override val name: String
         get() = "Blood Bowl 2020 Rules (FUMBBL Compatible)"
 }

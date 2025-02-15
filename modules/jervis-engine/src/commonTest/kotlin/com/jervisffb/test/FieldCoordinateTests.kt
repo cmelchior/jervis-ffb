@@ -8,12 +8,12 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.roster.HUMAN_BLITZER
-import com.jervisffb.engine.rules.bb2020.roster.HUMAN_CATCHER
-import com.jervisffb.engine.rules.bb2020.roster.HUMAN_LINEMAN
-import com.jervisffb.engine.rules.bb2020.roster.HUMAN_TEAM
-import com.jervisffb.engine.rules.bb2020.roster.HUMAN_THROWER
 import com.jervisffb.engine.teamBuilder
+import com.jervisffb.test.utils.HUMAN_BLITZER
+import com.jervisffb.test.utils.HUMAN_CATCHER
+import com.jervisffb.test.utils.HUMAN_LINEMAN
+import com.jervisffb.test.utils.HUMAN_TEAM
+import com.jervisffb.test.utils.HUMAN_THROWER
 
 fun getDefaultTestSetup(rules: Rules): Game {
     val team1: Team =

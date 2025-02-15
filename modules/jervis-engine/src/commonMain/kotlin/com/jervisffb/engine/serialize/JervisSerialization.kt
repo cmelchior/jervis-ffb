@@ -65,6 +65,13 @@ import okio.Path
 import okio.buffer
 import okio.use
 
+data class GameFileData(
+    val homeTeam: Team,
+    val awayTeam: Team,
+    val game: GameEngineController,
+    val actions: List<GameAction>,
+)
+
 /**
  * Class encapsulating the the logic for serializing and deserializing a Jervis game file.
  */
@@ -159,7 +166,7 @@ object JervisSerialization {
         }
     }
 
-    suspend fun loadFromFile(file: Path): Pair<GameEngineController, List<GameAction>> {
+    suspend fun loadFromFile(file: Path): GameFileData {
         val fileContent =
             platformFileSystem.source(file).use { fileSource ->
                 fileSource.buffer().readUtf8()
@@ -174,7 +181,31 @@ object JervisSerialization {
         awayTeam.notifyDogoutChange()
         val state = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
         val controller = GameEngineController(state)
-        return Pair(controller, remapActionRefs(gameData.game.actions, state))
+        return GameFileData(homeTeam, awayTeam, controller, gameData.game.actions)
+//        return Pair(
+//            controller,
+//            remapActionRefs(gameData.game.actions, state)
+//        )
+    }
+
+    /**
+     * Make sure that all [Team] and [Game] references are set after deserializing a Team.
+     * Hopefully, this can be removed eventually, but it requires changes to the deserializer.
+     */
+    fun fixStateRefs(state: Game): Game {
+        state.homeTeam.forEach { it.team = state.homeTeam }
+        state.awayTeam.forEach { it.team = state.awayTeam }
+        state.homeTeam.setGameReference(state)
+        state.awayTeam.setGameReference(state)
+        state.homeTeam.notifyDogoutChange()
+        state.awayTeam.notifyDogoutChange()
+        return state
+    }
+
+    fun fixTeamRefs(team: Team): Team {
+        team.forEach { it.team = team }
+        team.notifyDogoutChange()
+        return team
     }
 
     // Remap object references like to Player in GameActions so they all point to the same instance
