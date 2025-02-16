@@ -19,7 +19,7 @@ import kotlin.random.Random
  * for controlling the entire flow of setting up and connecting players, up until
  * running the game.
  */
-class P2PServerScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
+class P2PHostScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
     // Which page are currently being shown
     val totalPages = 4

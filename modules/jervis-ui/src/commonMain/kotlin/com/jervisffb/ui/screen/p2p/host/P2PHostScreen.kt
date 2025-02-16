@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -58,8 +57,8 @@ import com.jervisffb.ui.isDigitsOnly
 import com.jervisffb.ui.screen.p2p.TeamSelectorPage
 import com.jervisffb.ui.screen.p2p.TeamSelectorScreenModel
 import com.jervisffb.ui.view.JervisTheme
+import com.jervisffb.ui.view.SidebarMenu
 import com.jervisffb.ui.view.utils.TitleBorder
-import com.jervisffb.ui.view.utils.paperBackgroundWithLine
 import com.jervisffb.ui.viewmodel.MenuViewModel
 
 data class TeamInfo(
@@ -117,7 +116,7 @@ data class UnusualBallEntry(
     override val available: Boolean,
 ): DropdownEntry
 
-class P2PServerScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PServerScreenModel) : Screen {
+class P2PServerScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PHostScreenModel) : Screen {
     @Composable
     override fun Content() {
         _root_ide_package_.com.jervisffb.ui.screen.JervisScreen(menuViewModel) {
@@ -128,26 +127,11 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
                 topMenuRightContent = null,
                 sidebarContent = {
                     val currentPage by screenModel.currentPage.collectAsState()
-                    val onClick = { page: Int -> screenModel.goBackToPage(page) }
-                    val entries = listOf("1. Configure Game", "2. Select Team", "3. Wait For Opponent", "4. Start Game")
-                    Column(
-                        modifier = Modifier.paperBackgroundWithLine(JervisTheme.rulebookBlue)
-                            .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 8.dp),
-                    ) {
-                        Spacer(modifier = Modifier.fillMaxHeight(0.2f))
-                        Spacer(modifier = Modifier.height(16.dp))
-                        entries.forEachIndexed { index, entry ->
-                            val selected = (index == currentPage)
-                            val isPrevious = (index < currentPage)
-                            val clickHandler: () -> Unit = if (isPrevious) ({ onClick(index) }) else ({ })
-                            _root_ide_package_.com.jervisffb.ui.screen.SidebarEntry(
-                                entry,
-                                selected = selected,
-                                onClick = clickHandler
-                            )
-                        }
-                        Spacer(modifier = Modifier.fillMaxHeight(0.20f))
-                    }
+                    SidebarMenu(
+                        entries = listOf("1. Configure Game", "2. Select Team", "3. Wait For Opponent", "4. Start Game"),
+                        currentPage = currentPage,
+                        onClick = { page: Int -> screenModel.goBackToPage(page) }
+                    )
                 }
             ) {
                 PageContent(screenModel)
@@ -215,7 +199,7 @@ fun LoadTeamDialog(
 }
 
 @Composable
-fun PageContent(screenModel: P2PServerScreenModel) {
+fun PageContent(screenModel: P2PHostScreenModel) {
     val currentPage by screenModel.currentPage.collectAsState()
     val pagerState = rememberPagerState(0) { screenModel.totalPages }
 
@@ -244,7 +228,7 @@ fun PageContent(screenModel: P2PServerScreenModel) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun StandardGameSetup(screenModel: P2PServerScreenModel) {
+fun StandardGameSetup(screenModel: P2PHostScreenModel) {
     Box(
         modifier = Modifier.fillMaxSize().padding(top = 16.dp),
         contentAlignment = Alignment.TopCenter

@@ -44,7 +44,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WaitForOpponentPage(viewModel: P2PServerScreenModel) {
+fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
     val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
     Box(
         modifier = Modifier.fillMaxSize(),

@@ -1,11 +1,8 @@
 package com.jervisffb.ui.screen.p2p.client
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -22,11 +19,9 @@ import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
 import com.jervisffb.ui.screen.JervisScreen
 import com.jervisffb.ui.screen.MenuScreenWithSidebarAndTitle
-import com.jervisffb.ui.screen.SidebarEntry
 import com.jervisffb.ui.screen.p2p.StartGamePage
 import com.jervisffb.ui.screen.p2p.TeamSelectorPage
-import com.jervisffb.ui.view.JervisTheme
-import com.jervisffb.ui.view.utils.paperBackgroundWithLine
+import com.jervisffb.ui.view.SidebarMenu
 import com.jervisffb.ui.viewmodel.MenuViewModel
 
 class P2PClientScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PClientScreenModel) : Screen {
@@ -46,27 +41,11 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val scre
                 topMenuRightContent = null,
                 sidebarContent = {
                     val currentPage by screenModel.currentPage.collectAsState()
-                    val onClick = { page: Int -> screenModel.goBackToPage(page) }
-                    val entries = listOf("1. Join Host", "2. Select Team", "3. Start Game")
-                    Column(
-                        modifier = Modifier.paperBackgroundWithLine(JervisTheme.rulebookBlue)
-                            .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 8.dp),
-                    ) {
-                        Spacer(modifier = Modifier.fillMaxHeight(0.2f))
-                        Spacer(modifier = Modifier.height(16.dp))
-                        entries.forEachIndexed { index, entry ->
-                            val selected = (index == currentPage)
-                            val isPrevious = (index < currentPage)
-                            val clickHandler: () -> Unit = if (isPrevious) ({ onClick(index) }) else ({ })
-                            SidebarEntry(
-                                text = entry,
-                                onClick = clickHandler,
-                                selected = selected,
-                                enabled = selected || isPrevious,
-                            )
-                        }
-                        Spacer(modifier = Modifier.fillMaxHeight(0.20f))
-                    }
+                    SidebarMenu(
+                        entries = listOf("1. Join Host", "2. Select Team", "3. Start Game"),
+                        currentPage = currentPage,
+                        onClick = { page: Int -> screenModel.goBackToPage(page) }
+                    )
                 }
             ) {
                 PageContent(screenModel)
