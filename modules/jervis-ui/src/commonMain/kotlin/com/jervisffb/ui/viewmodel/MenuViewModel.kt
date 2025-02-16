@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.ui.BackNavigationHandler
 import com.jervisffb.ui.UiGameController
+import com.jervisffb.utils.canBeHost
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +29,8 @@ enum class Feature {
 class MenuViewModel {
     var controller: GameEngineController? = null
     lateinit var uiState: UiGameController
+
+    val p2pHostAvaiable: Boolean = canBeHost()
 
     private val _showSettingsDialog = MutableStateFlow(false)
 

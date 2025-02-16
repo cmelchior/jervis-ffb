@@ -30,3 +30,6 @@ public actual fun openUrlInBrowser(url: String): Boolean {
         return false
     }
 }
+
+public actual fun canBeHost(): Boolean = true
+

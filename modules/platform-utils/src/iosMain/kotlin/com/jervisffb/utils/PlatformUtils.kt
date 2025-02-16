@@ -15,3 +15,5 @@ public actual fun getLocalIpAddress(): String {
 public actual fun openUrlInBrowser(url: String): Boolean {
     TODO()
 }
+
+public actual fun canBeHost(): Boolean = true

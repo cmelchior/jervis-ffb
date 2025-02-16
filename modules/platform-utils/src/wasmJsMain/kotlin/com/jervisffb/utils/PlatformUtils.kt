@@ -19,3 +19,4 @@ public actual fun openUrlInBrowser(url: String): Boolean {
     return true
 }
 
+public actual fun canBeHost(): Boolean = false

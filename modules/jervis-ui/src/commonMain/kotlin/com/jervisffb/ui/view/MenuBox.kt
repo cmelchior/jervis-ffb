@@ -68,6 +68,7 @@ fun RowScope.SplitMenuBox(
     onClickTop: () -> Unit,
     labelBottom: String,
     onClickBottom: () -> Unit,
+    p2pHostAvaiable: Boolean,
 ) {
 
     Column(
@@ -99,8 +100,15 @@ fun RowScope.SplitMenuBox(
             )
         }
         Spacer(modifier = Modifier.height(32.dp))
+
+        val bgColor = if (!p2pHostAvaiable) {
+            JervisTheme.rulebookDisabled
+        } else {
+            JervisTheme.rulebookBlue
+        }
+
         Box(
-            modifier = Modifier.background(color = JervisTheme.rulebookBlue).weight(1f).fillMaxSize().clickable { onClickBottom() },
+            modifier = Modifier.background(bgColor).weight(1f).fillMaxSize().let { if (p2pHostAvaiable) it.clickable { onClickBottom() } else it },
             contentAlignment = Alignment.BottomEnd,
         ) {
             Text(

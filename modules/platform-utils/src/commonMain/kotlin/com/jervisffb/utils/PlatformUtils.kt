@@ -21,3 +21,9 @@ public expect fun getLocalIpAddress(): String
  * In that case, any error is logged.
  */
 public expect fun openUrlInBrowser(url: String): Boolean
+
+/**
+ * Returns whether this platform is able to be a P2P Host, i.e., can set up
+ * a web server.
+ */
+public expect fun canBeHost(): Boolean

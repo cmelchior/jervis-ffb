@@ -87,6 +87,7 @@ fun Screen.StandaloneScreen(menuViewModel: MenuViewModel) {
                 onClickTop = { screenModel.startP2PClient(navigator) },
                 labelBottom = "P2P\nHost",
                 onClickBottom = { screenModel.startP2PServer(navigator) },
+                menuViewModel.p2pHostAvaiable,
             )
             MenuBox(
                 label = "Hotseat",
