@@ -117,7 +117,7 @@ private fun EnterHostDataContent(
         value = serverUrl,
         onValueChange = { viewModel.updateServerIp(it) },
         singleLine = true,
-        label = { Text("Server URL") },
+        label = { Text("IP Address") },
     )
     OutlinedTextField(
         modifier = Modifier.width(100.dp),

@@ -45,6 +45,7 @@ import com.jervisffb.ui.view.utils.TitleBorder
 @Composable
 fun TeamSelectorPage(
     viewModel: TeamSelectorScreenModel,
+    confirmTitle: String,
     onNext: () -> Unit,
 ) {
     val availableTeams by viewModel.availableTeams.collectAsState()
@@ -87,7 +88,7 @@ fun TeamSelectorPage(
                     showImportFumbblTeamDialog = !showImportFumbblTeamDialog
                 })
                 Spacer(modifier = Modifier.weight(1f))
-                JervisButton("NEXT", onClick = { onNext() }, enabled = (selectedTeam != null))
+                JervisButton(confirmTitle.uppercase(), onClick = { onNext() }, enabled = (selectedTeam != null))
             }
         }
     }

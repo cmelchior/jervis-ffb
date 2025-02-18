@@ -54,6 +54,7 @@ import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
 import com.jervisffb.ui.isDigitsOnly
+import com.jervisffb.ui.screen.p2p.StartGamePage
 import com.jervisffb.ui.screen.p2p.TeamSelectorPage
 import com.jervisffb.ui.screen.p2p.TeamSelectorScreenModel
 import com.jervisffb.ui.view.JervisTheme
@@ -215,10 +216,16 @@ fun PageContent(screenModel: P2PHostScreenModel) {
             state = pagerState,
         ) { page ->
             when (page) {
-                0 -> SetupGamePage(screenModel, Modifier, screenModel)
-                1 -> TeamSelectorPage(screenModel.selectTeamModel, { screenModel.teamSelectionDone() })
+                0 -> SetupGamePage(screenModel.setupGameModel, Modifier)
+                1 -> TeamSelectorPage(screenModel.selectTeamModel, "Start Server", { screenModel.teamSelectionDone() })
                 2 -> WaitForOpponentPage(viewModel = screenModel)
-                3 -> Box(modifier = Modifier.fillMaxSize()) {}
+                3 -> StartGamePage(
+                    screenModel.controller.homeTeam,
+                    screenModel.controller.awayTeam,
+                    onAcceptGame = { acceptedGame ->
+                        screenModel.userAcceptGame(acceptedGame)
+                    }
+                )
             }
         }
     }
@@ -228,7 +235,7 @@ fun PageContent(screenModel: P2PHostScreenModel) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun StandardGameSetup(screenModel: P2PHostScreenModel) {
+fun StandardGameSetup(screenModel: SetupGameScreenModel) {
     Box(
         modifier = Modifier.fillMaxSize().padding(top = 16.dp),
         contentAlignment = Alignment.TopCenter

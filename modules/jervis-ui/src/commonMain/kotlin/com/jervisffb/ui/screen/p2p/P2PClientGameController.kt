@@ -14,15 +14,11 @@ import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.SpectatorState
 import com.jervisffb.net.messages.TeamData
-import com.jervisffb.ui.createDefaultHomeTeam
 import com.jervisffb.ui.screen.p2p.host.TeamInfo
 import com.jervisffb.utils.jervisLogger
 import io.ktor.websocket.CloseReason
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 
 sealed interface ConnectionState
@@ -39,17 +35,20 @@ object Connected : ConnectionState
  * @see [com.jervisffb.engine.GameEngineController]
  * @see [com.jervisffb.ui.UiGameController]
  */
-class P2PClientGameController {
+class P2PClientGameController(private val isHost: Boolean = false) {
 
-    private val _state = MutableStateFlow(P2PClientState.START)
-    val state: StateFlow<P2PClientState> = _state
+    private val _clientState = MutableStateFlow(P2PClientState.START)
+    val clientState: StateFlow<P2PClientState> = _clientState
+
+    private val _hostState = MutableStateFlow(P2PHostState.START)
+    val hostState: StateFlow<P2PHostState> = _hostState
 
     private val _connectionState = MutableStateFlow<ConnectionState>(Disconnected(CloseReason(CloseReason.Codes.NORMAL, "")))
     private val connectionState: StateFlow<ConnectionState> = _connectionState
 
     private val connection: ClintNetworkManager = ClintNetworkManager(GameStateMessageHandler())
 
-    private val mockServerJob: Job
+//    private val mockServerJob: Job
     private var server: LightServer? = null
 
     // Track Coach/Team as they join
@@ -62,50 +61,24 @@ class P2PClientGameController {
     var runner: GameRunner? = null // Should be != null when state == RUN_GAME
 
     init {
-        // Start a test mock server, so we do not need to have two UI's running.
-        // Start server
-        mockServerJob = GlobalScope.launch {
-            server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
-            server?.start()
-
-            val host = ClintNetworkManager(object: AbstractClintNetworkMessageHandler() { })
-            host.addMessageHandler(object: ClientNetworkMessageHandler {
-                override fun onConnected() {}
-                override fun onConnecting() {}
-                override fun onDisconnected(reason: CloseReason) {}
-                override fun onTeamSelected(team: Team) {}
-                override fun onCoachJoined(coach: Coach, isHomeCoach: Boolean) {}
-                override fun onCoachLeft(coach: Coach) {}
-                override fun onSpectatorJoined(spectator: Spectator) {}
-                override fun onSpectatorLeft(spectator: Spectator) {}
-                override fun onClientStateChange(newState: P2PClientState) {}
-                override fun onHostStateChange(newState: P2PHostState) {
-                    GlobalScope.launch {
-                        when(newState) {
-                            P2PHostState.ACCEPT_GAME -> host.sendStartGame(true)
-                            else -> { }
-                        }
-                    }
-                }
-                override fun onSpectatorStateChange(newState: SpectatorState) {}
-                override fun onGameSync(message: GameStateSyncMessage) {}
-                override fun updateClientState(state: P2PClientState) {}
-                override fun onConfirmGameStart(message1: GameId, message: List<TeamData>) {}
-                override fun onGameReady(id: GameId) {}
-                override fun onServerError(errorCode: JervisErrorCode, message: String) {}
-                override fun onGameAction(action: GameAction) {}
-            })
-            host.connectAndJoinGame("ws://localhost:8080/test", GameId("test"), "Host", isHost = true, createDefaultHomeTeam())
+        if (isHost) {
+            updateHostState(P2PHostState.START_SERVER)
+        } else {
+            updateClientState(P2PClientState.JOIN_SERVER)
         }
-        updateClientState(P2PClientState.JOIN_SERVER)
     }
 
     // Connection failed -> wrong url
     // Connection success -> joinGame ->
-    suspend fun joinHost(gameUrl: String, coachName: String, gameId: GameId, handler: ClientNetworkMessageHandler, ) {
+    suspend fun joinHost(
+        gameUrl: String,
+        coachName: String,
+        gameId: GameId,
+        teamIfHost: Team?,
+        handler: ClientNetworkMessageHandler, ) {
 //        if (state != ClientState.SELECT_HOST) error("Unexpected state: $state")
         connection.addMessageHandler(handler)
-        connection.connectAndJoinGame(gameUrl, gameId, coachName, isHost = false, null)
+        connection.connectAndJoinGame(gameUrl, gameId, coachName, isHost = (teamIfHost != null), teamIfHost)
         // TODO How to update state when handler is coming from the outside?
     }
 
@@ -118,13 +91,17 @@ class P2PClientGameController {
     }
 
     fun updateClientState(newState: P2PClientState) {
-        _state.value = newState
+        _clientState.value = newState
+    }
+
+    fun updateHostState(newState: P2PHostState) {
+        _hostState.value = newState
     }
 
     suspend fun close() {
         updateClientState(P2PClientState.JOIN_SERVER)
         server?.stop()
-        mockServerJob.cancel()
+//        mockServerJob.cancel()
         connection.disconnect()
     }
 
@@ -146,7 +123,7 @@ class P2PClientGameController {
     }
 
     /**
-     * Class responsible for keeping the [state] variable up to date. This will be
+     * Class responsible for keeping the [clientState] variable up to date. This will be
      * called first, so all further handlers can assume that the "model" state is correct.
      *
      * Unexpected messages will be ignored, but logged as warning since the host should
@@ -162,17 +139,11 @@ class P2PClientGameController {
         override fun onDisconnected(reason: CloseReason) { _connectionState.value = Disconnected(reason) }
 
         // Game State
-        override fun onTeamSelected(team: Team) {
-            when (_state.value) {
-                P2PClientState.SELECT_TEAM -> {
-                    val isHomeTeam = (team.coach.id == homeCoach.value?.id)
-                    if (isHomeTeam) {
-                        homeTeam.value = team
-                    } else {
-                        awayTeam.value = team
-                    }
-                }
-                else -> LOG.w { "Received onTeamSelected event, but state is $state. Ignoring message." }
+        override fun onTeamSelected(team: Team, isHomeTeam: Boolean) {
+            if (isHomeTeam) {
+                homeTeam.value = team
+            } else {
+                awayTeam.value = team
             }
         }
 
@@ -212,11 +183,11 @@ class P2PClientGameController {
         }
 
         override fun onClientStateChange(newState: P2PClientState) {
-            _state.value = newState
+            _clientState.value = newState
         }
 
         override fun onHostStateChange(newState: P2PHostState) {
-            LOG.w { "Received onHostStateChange event, but this is a Client" }
+            _hostState.value = newState
         }
 
         override fun onSpectatorStateChange(newState: SpectatorState) {
@@ -230,11 +201,11 @@ class P2PClientGameController {
             awayCoach.value = message.coaches.getOrNull(1)
             homeTeam.value = message.homeTeam
             awayTeam.value = message.awayTeam
-            _state.value = message.clientState
+            _clientState.value = message.clientState
         }
 
         override fun updateClientState(state: P2PClientState) {
-            _state.value = state
+            _clientState.value = state
         }
 
         override fun onConfirmGameStart(message1: GameId, message: List<TeamData>) {

@@ -38,10 +38,11 @@ import com.jervisffb.ui.view.utils.TitleBorder
 import kotlinx.coroutines.launch
 
 @Composable
-fun SetupGamePage(screenModel: P2PHostScreenModel, modifier: Modifier, viewModel: P2PHostScreenModel) {
-    val gameName by viewModel.gameName.collectAsState("")
-    val gamePort by viewModel.port.collectAsState( null)
-    val canCreateGame: Boolean by screenModel.canCreateGame.collectAsState(false)
+fun SetupGamePage(screenModel: SetupGameScreenModel, modifier: Modifier) {
+    val coachName by screenModel.coachName.collectAsState("")
+    val gameName by screenModel.gameName.collectAsState("")
+    val gamePort by screenModel.port.collectAsState( null)
+    val isSetupValid: Boolean by screenModel.isSetupValid.collectAsState(false)
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -53,22 +54,34 @@ fun SetupGamePage(screenModel: P2PHostScreenModel, modifier: Modifier, viewModel
             ,
             verticalAlignment = Alignment.Top
         ) {
-            SettingsCard("Details", 300.dp) {
-                OutlinedTextField(
-                    value = gameName,
-                    onValueChange = { viewModel.setGameName(it) },
-                    label = { Text("Name") }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = gamePort?.toString() ?: "",
-                    onValueChange = { viewModel.setPort(it) },
-                    label = { Text("Port") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    keyboardActions = KeyboardActions {
+            Column {
+                SettingsCard("Coach", 300.dp) {
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = coachName,
+                        onValueChange = { screenModel.updateCoachName(it) },
+                        label = { Text("Coach name") }
+                    )
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+                SettingsCard("Game", 300.dp) {
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = gameName,
+                        onValueChange = { screenModel.setGameName(it) },
+                        label = { Text("Game Name") }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        modifier = Modifier.width(100.dp),
+                        value = gamePort?.toString() ?: "",
+                        onValueChange = { screenModel.setPort(it) },
+                        label = { Text("Port") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardActions = KeyboardActions {
 
-                    }
-                )
+                        }
+                    )
 //                Row(
 //                    verticalAlignment = Alignment.CenterVertically,
 //                ) {
@@ -76,8 +89,9 @@ fun SetupGamePage(screenModel: P2PHostScreenModel, modifier: Modifier, viewModel
 //                        text = "IP: 85.191.6.149"
 //                    )
 //                }
+                }
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(32.dp))
             Column(modifier = Modifier.fillMaxSize()) {
                 val pagerStateTop = rememberPagerState(0) { 5 }
                 val pagerStateBottom = rememberPagerState(0) { 4 }
@@ -190,7 +204,7 @@ fun SetupGamePage(screenModel: P2PHostScreenModel, modifier: Modifier, viewModel
             }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            JervisButton(text = "NEXT", onClick = { viewModel.gameSetupDone() })
+            JervisButton(text = "Next", enabled = isSetupValid, onClick = { screenModel.gameSetupDone() })
         }
     }
 }

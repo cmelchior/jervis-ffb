@@ -4,6 +4,10 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.fumbbl.web.FumbblApi
 import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.viewmodel.MenuViewModel
+import com.jervisffb.utils.PROP_CLIENT_ID
+import com.jervisffb.utils.PROP_CLIENT_SECRET
+import com.jervisffb.utils.PROP_COACH_NAME
+import com.jervisffb.utils.PROP_OAUTH_TOKEN
 import com.jervisffb.utils.isRegularFile
 import com.jervisffb.utils.openUrlInBrowser
 import com.jervisffb.utils.platformFileSystem
@@ -22,10 +26,6 @@ class FumbblScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel 
     // Url to page where the OAuth token can be created by the coach
     private val URL_COACH_PAGE = "https://fumbbl.com"
     private val URL_OAUTH = "https://fumbbl.com/p/oauth"
-    private val PROP_OAUTH_TOKEN = "fumbbl.oauth.token"
-    private val PROP_COACH_NAME = "fumbbl.client.name"
-    private val PROP_CLIENT_ID = "fumbbl.client.id"
-    private val PROP_CLIENT_SECRET = "fumbbl.client.secret"
 
     enum class LoginDialogAction {
         CANCEL,

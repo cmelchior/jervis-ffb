@@ -84,10 +84,12 @@ private fun PageContent(screenModel: P2PClientScreenModel) {
                 )
                 1 -> TeamSelectorPage(
                     viewModel = screenModel.selectTeamModel,
+                    confirmTitle = "Next",
                     onNext = { screenModel.teamSelectionDone() }
                 )
                 2 -> StartGamePage(
-                    viewModel = screenModel.acceptGameModel,
+                    screenModel.controller.homeTeam,
+                    screenModel.controller.awayTeam,
                     onAcceptGame = { acceptedGame ->
                         screenModel.userAcceptGame(acceptedGame)
                     }

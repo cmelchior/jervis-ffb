@@ -23,8 +23,8 @@ import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_ball
 import com.jervisffb.ui.screen.p2p.client.P2PClientScreen
 import com.jervisffb.ui.screen.p2p.client.P2PClientScreenModel
-import com.jervisffb.ui.screen.p2p.host.P2PServerScreen
 import com.jervisffb.ui.screen.p2p.host.P2PHostScreenModel
+import com.jervisffb.ui.screen.p2p.host.P2PServerScreen
 import com.jervisffb.ui.view.MenuBox
 import com.jervisffb.ui.view.SplitMenuBox
 import com.jervisffb.ui.viewmodel.MenuViewModel
@@ -50,7 +50,7 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
 
     fun startP2PServer(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = P2PHostScreenModel(menuViewModel)
+            val screenModel = P2PHostScreenModel(navigator, menuViewModel)
             navigator.push(P2PServerScreen(menuViewModel, screenModel))
         }
     }

@@ -39,7 +39,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
     val joinHostModel = JoinHostScreenModel(menuViewModel, this)
 
     // Page 2: Team selection
-    val selectTeamModel: TeamSelectorScreenModel = TeamSelectorScreenModel(menuViewModel) { teamSelected ->
+    val selectTeamModel: TeamSelectorScreenModel = TeamSelectorScreenModel(menuViewModel, { joinHostModel.getCoach()!! }) { teamSelected ->
         selectedTeam.value = teamSelected
         canCreateGame.value = (teamSelected != null)
     }
@@ -53,7 +53,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
 
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
-    val gameName = MutableStateFlow("Game#${Random.nextInt(10_000)}")
+    val gameName = MutableStateFlow("Game-${Random.nextInt(10_000)}")
     val port = MutableStateFlow<Int?>(8080)
     val canCreateGame = MutableStateFlow<Boolean>(false)
     val loadingTeams: MutableStateFlow<Boolean> = MutableStateFlow(true)
@@ -61,7 +61,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
     init {
         loadTeamList()
         menuViewModel.navigatorContext.launch {
-            controller.state.collect {
+            controller.clientState.collect {
                 // TODO We move state optimistically, so we probably need to check if things needs to be reset somehow.
                 when (it) {
                     P2PClientState.START -> { /* Do nothing */ }

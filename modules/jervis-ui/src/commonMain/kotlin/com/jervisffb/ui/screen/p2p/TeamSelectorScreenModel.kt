@@ -1,5 +1,6 @@
 package com.jervisffb.ui.screen.p2p
 
+import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.serialize.JervisTeamFile
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
  */
 class TeamSelectorScreenModel(
     private val menuViewModel: MenuViewModel,
+    private val getCoach: () -> Coach,
     private val onTeamSelected: (TeamInfo?) -> Unit
 ) : JervisScreenModel {
 
@@ -38,6 +40,7 @@ class TeamSelectorScreenModel(
         menuViewModel.navigatorContext.launch {
             CacheManager.loadTeams().map { teamFile ->
                 val team = teamFile.team
+                team.coach = getCoach()
                 getTeamInfo(teamFile, team)
             }.let {
                 availableTeams.value = it.sortedBy { it.teamName }

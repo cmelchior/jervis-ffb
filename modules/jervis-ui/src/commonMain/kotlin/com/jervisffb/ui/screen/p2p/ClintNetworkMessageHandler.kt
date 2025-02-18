@@ -55,7 +55,7 @@ interface ClientNetworkMessageHandler {
     fun onConnected()
     fun onConnecting()
     fun onDisconnected(reason: CloseReason)
-    fun onTeamSelected(team: Team)
+    fun onTeamSelected(team: Team, homeTeam: Boolean)
     fun onCoachJoined(coach: Coach, isHomeCoach: Boolean)
     // Coach left willingly, i.e., a proper leave message was sent
     // Unexpected disconnects are tracked by [
@@ -81,7 +81,7 @@ abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler 
     override fun onCoachLeft(coach: Coach) { }
     override fun onSpectatorJoined(specator: Spectator) { }
     override fun onSpectatorLeft(spectator: Spectator) { }
-    override fun onTeamSelected(team: Team) { }
+    override fun onTeamSelected(team: Team, homeTeam: Boolean) { }
     override fun onClientStateChange(newState: P2PClientState) { }
     override fun onHostStateChange(newState: P2PHostState) { }
     override fun onSpectatorStateChange(newState: SpectatorState) { }
@@ -169,7 +169,7 @@ class ClintNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
                 is CoachJoinedMessage -> messageHandler.onCoachJoined(message.coach, message.isHomeCoach)
                 is ServerError -> messageHandler.onServerError(message.errorCode, message.message)
                 is SyncGameActionMessage -> TODO()
-                is TeamJoinedMessage -> messageHandler.onTeamSelected(message.getTeam())
+                is TeamJoinedMessage -> messageHandler.onTeamSelected(message.getTeam(), message.isHomeTeam)
                 is CoachLeftMessage -> messageHandler.onCoachLeft(message.coach)
                 is SpectatorJoinedMessage -> TODO()
                 is SpectatorLeftMessage -> TODO()

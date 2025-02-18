@@ -68,7 +68,6 @@ enum class P2PHostState {
     JOIN_SERVER,
     WAIT_FOR_CLIENT,
     ACCEPT_GAME,
-    LOAD_RESOURCES,
     RUN_GAME,
     CLOSE_GAME,
     DONE

@@ -27,8 +27,9 @@ actual fun startEmbeddedServer(
             masking = false
         }
         routing {
-            webSocket("/{gameId}") {
-                val gameId = GameId(call.parameters["gameId"] ?: "")
+            webSocket("/joinGame") {
+                val id = call.request.queryParameters["id"] ?: throw IllegalArgumentException("Missing gameId parameter")
+                val gameId = GameId(id)
                 try {
                     newConnectionHandler(this, gameId)
                 } catch (ex: Exception) {

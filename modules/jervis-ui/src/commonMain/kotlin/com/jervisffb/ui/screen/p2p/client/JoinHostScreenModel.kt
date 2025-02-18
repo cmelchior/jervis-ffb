@@ -2,14 +2,19 @@ package com.jervisffb.ui.screen.p2p.client
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.net.GameId
+import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.screen.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.ui.viewmodel.MenuViewModel
+import com.jervisffb.utils.PROP_DEFAULT_COACH_NAME
 import io.ktor.http.Url
 import io.ktor.websocket.CloseReason
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /**
  * ViewModel class for the "Join Host" subpage. This is not a full screen,
@@ -45,10 +50,25 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
     fun joinError(): StateFlow<String> = _joinError
     fun coachName(): StateFlow<String> = _coachName
 
+    @OptIn(ExperimentalUuidApi::class)
+    fun getCoach(): Coach? {
+        val name = _coachName.value
+        return if (name.isNotBlank()) {
+            Coach(CoachId(Uuid.random().toString()), name)
+        } else {
+            null
+        }
+    }
+
     init {
+        menuViewModel.navigatorContext.launch {
+            PROPERTIES_MANAGER.getString(PROP_DEFAULT_COACH_NAME)?.let {
+                updateCoachName(it)
+            }
+        }
         // TODO Hide this behind Dev flag
-        updateGameUrl("ws://localhost:8080/test")
-        updateCoachName("TestClient")
+//        updateGameUrl("ws://localhost:8080/test")
+//        updateCoachName("TestClient")
     }
 
     fun updateCoachName(name: String) {
@@ -62,6 +82,8 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
         _gameUrl.value = gameUrl
         if (updateOtherFields) {
             updateGameUrlComponents(gameUrl)
+        } else {
+            checkForValidGameUrl()
         }
     }
 
@@ -91,15 +113,18 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
             val joiningUrl = gameUrl().value
             _joinMessage.value = "Joining $joiningUrl..."
             _joinState.value = JoinState.JOINING
+            val coachName = _coachName.value
+            PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_COACH_NAME, coachName)
             model.controller.joinHost(
                 gameUrl = joiningUrl,
-                coachName = _coachName.value,
+                coachName = coachName,
                 gameId = GameId(_gameId.value),
+                teamIfHost = null,
                 handler = object: AbstractClintNetworkMessageHandler() {
 
                     override fun onCoachJoined(coach: Coach, isHomeCoach: Boolean) {
                         _joinError.value = ""
-                        _joinMessage.value = "Joined ${_gameUrl.value} as ${_coachName.value}"
+                        _joinMessage.value = "Joined ${_gameUrl.value} as $coachName"
                         _joinState.value = JoinState.JOINED
                         model.hostJoinedDone()
                     }
@@ -133,9 +158,10 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
             updateServerIp(url.host, false)
             updatePort(url.port.toString(), false)
             // Unclear why first element is an empty string, just filter it for now
-            url.pathSegments
-                .singleOrNull { it.isNotBlank() }
-                ?.let { updateGameId(it, false) }
+            url.parameters.get("id")?.let {
+                updateGameId(it, false)
+            }
+            checkForValidGameUrl()
         } catch (_: IllegalArgumentException) {
             updateServerIp("", false)
             updatePort("", false)
@@ -145,7 +171,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
 
     // Subcomponents were updated independently. This will update the full gameUrl as well
     private fun updateGameUrlFromComponents() {
-        val newUrl = "ws://${_serverIp.value}:${_port.value}/${_gameId.value}"
+        val newUrl = "ws://${_serverIp.value}:${_port.value}/joinGame?id=${_gameId.value}"
         updateGameUrl(newUrl, false)
     }
 

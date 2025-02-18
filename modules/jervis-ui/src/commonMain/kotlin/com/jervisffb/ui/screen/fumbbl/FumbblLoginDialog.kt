@@ -235,7 +235,7 @@ private fun ColumnScope.LogInDialogContent(viewModel: FumbblScreenModel, dialogC
         )
         Spacer(modifier = Modifier.weight(1f))
         JervisButton(
-            text = "Create Login Token",
+            text = "Create Secret",
             onClick = { viewModel.loginDialogAction(LoginDialogAction.CREATE_TOKEN) },
             buttonColor = JervisTheme.rulebookBlue,
             textColor = buttonTextColor

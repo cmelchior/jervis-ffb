@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_copy
 import com.jervisffb.ui.view.JervisTheme
-import com.jervisffb.ui.view.utils.JervisButton
 import com.jervisffb.ui.view.utils.TitleBorder
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
@@ -45,6 +44,7 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
+    val url: String by viewModel.gameUrl.collectAsState()
     val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -56,7 +56,7 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     modifier = Modifier.weight(1f),
-                    value = "http://84.432.235.054:8080/joinGame?id=game4343",
+                    value = url,
                     onValueChange = { },
                     readOnly = true,
                     singleLine = true,
@@ -71,24 +71,18 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                         .clickable {  }
                     ,
                     contentAlignment = Alignment.Center,
-//                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
                 ) {
                         Image(
                             modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
                             colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
                             painter = painterResource(Res.drawable.icon_menu_copy),
                             contentDescription = "Copy URL",
-//                            contentScale = ContentScale.,
-
                         )
                     }
                 }
             }
-        Row(modifier = Modifier.fillMaxWidth().align(Alignment.BottomEnd), horizontalArrangement = Arrangement.Start) {
-            Spacer(modifier = Modifier.weight(1f))
-            JervisButton("Cancel Game", onClick = { viewModel.userAcceptGame(false) }, enabled = (selectedTeam != null))
-            Spacer(modifier = Modifier.width(16.dp))
-            JervisButton("Start Game", onClick = { viewModel.userAcceptGame(true) }, enabled = (selectedTeam != null))
+        Row(modifier = Modifier.fillMaxWidth().align(Alignment.BottomEnd), horizontalArrangement = Arrangement.End) {
+            // Buttons
         }
     }
 

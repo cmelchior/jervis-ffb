@@ -38,16 +38,18 @@ import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.TeamTable
 import com.jervisffb.ui.view.utils.JervisButton
 import com.jervisffb.ui.view.utils.TitleBorder
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun StartGamePage(
-    viewModel: StartGameScreenModel,
+    homeTeam: StateFlow<Team?>,
+    awayTeam: StateFlow<Team?>,
     onAcceptGame: (Boolean) -> Unit,
 ) {
-    val homeTeam: Team? by viewModel.homeTeam.collectAsState()
-    val awayTeam: Team? by viewModel.awayTeam.collectAsState()
+    val homeTeam: Team? by homeTeam.collectAsState()
+    val awayTeam: Team? by awayTeam.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
