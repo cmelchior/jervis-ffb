@@ -10,11 +10,15 @@ import com.jervisffb.engine.model.SpectatorId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.net.handlers.ClientMessageHandler
+import com.jervisffb.net.handlers.GameActionHandler
+import com.jervisffb.net.handlers.GameStartedHandler
 import com.jervisffb.net.handlers.InternalJoinHandler
 import com.jervisffb.net.handlers.LeaveGameHandler
 import com.jervisffb.net.handlers.StartGameHandler
 import com.jervisffb.net.handlers.TeamSelectedHandler
 import com.jervisffb.net.messages.ClientMessage
+import com.jervisffb.net.messages.GameActionMessage
+import com.jervisffb.net.messages.GameStartedMessage
 import com.jervisffb.net.messages.GameState
 import com.jervisffb.net.messages.InternalJoinMessage
 import com.jervisffb.net.messages.JervisErrorCode
@@ -83,8 +87,9 @@ class GameSession(
 //        JoinGameAsSpectatorMessage::class to JoinGameAsSpectatorMessageHandler(server),
         StartGameMessage::class to StartGameHandler(this),
         LeaveGameMessage::class to LeaveGameHandler(this),
-        TeamSelectedMessage::class to TeamSelectedHandler(this)
-//        GameActionMessage::class to GameActionHandler(this),
+        TeamSelectedMessage::class to TeamSelectedHandler(this),
+        GameActionMessage::class to GameActionHandler(this),
+        GameStartedMessage::class to GameStartedHandler(this)
     )
     val handler = CoroutineExceptionHandler { _, exception ->
         println("GameSession threw an exception: $exception")
@@ -115,7 +120,7 @@ class GameSession(
     val client: JoinedP2PClient?
         get() { return coaches.filterIsInstance<JoinedP2PClient>().firstOrNull() }
 
-    private var game: GameEngineController? = null
+    var game: GameEngineController? = null
 
     init {
         startSession()
@@ -275,6 +280,7 @@ class GameSession(
         scope.launch {
             state = GameState.JOINING
             for (message in incomingMessages) {
+                LOG.d { "Received message from ${message.connection.username}: $message" }
                 handleMessage(message)
             }
         }.invokeOnCompletion {

@@ -5,10 +5,16 @@ import com.jervisffb.engine.RemoveEntry
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.ui.UiGameController
+import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class LogViewModel(val uiState: UiGameController) {
+
+    companion object {
+        val LOG = jervisLogger()
+    }
+
     val showDebugLogs: Boolean = true
     val state = uiState.state
     val controller = uiState.gameRunner.controller
@@ -34,7 +40,7 @@ class LogViewModel(val uiState: UiGameController) {
         }
     val logs: Flow<List<LogEntry>> =
         controller.logsEvents.map {
-            println(it)
+            LOG.d { it.toString() }
             when (it) {
                 is AddEntry -> {
                     if (it.log.category != LogCategory.STATE_MACHINE) {

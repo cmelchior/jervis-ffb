@@ -18,6 +18,9 @@ class TeamSelectedHandler(override val session: GameSession) : ClientMessageHand
             session.out.sendError(connection, message, JervisErrorCode.PROTOCOL_ERROR, "Connection is not allowed to select a team.")
             return
         } else {
+            // TODO This is a temp fix for getting the correct team refs. Should probably be done by serialization instead.
+            team.forEach { it.team = team }
+            team.notifyDogoutChange()
             client.team = team
         }
 

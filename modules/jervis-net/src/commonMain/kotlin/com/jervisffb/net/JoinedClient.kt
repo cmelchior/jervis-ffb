@@ -34,6 +34,7 @@ sealed class JoinedP2PCoach: JoinedClient() {
     abstract val coach: Coach
     abstract var team: Team?
     var hasAcceptedGame: Boolean = false
+    var hasStartedGame: Boolean = false
 }
 
 // Joined a P2P game as a Client

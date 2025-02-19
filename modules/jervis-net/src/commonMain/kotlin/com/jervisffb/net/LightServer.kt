@@ -22,6 +22,7 @@ class LightServer(
     private val websocketServer = PlatformWebSocketServer(this)
 
     init {
+        // A add pre-determined game (created by the Host setting up the server)
         val session = GameSession(
             this,
             StandardBB2020Rules(),

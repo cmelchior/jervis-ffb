@@ -1,6 +1,5 @@
 package com.jervisffb.ui.screen.p2p
 
-import com.jervisffb.engine.GameRunner
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Spectator
@@ -35,8 +34,11 @@ object Connected : ConnectionState
  * @see [com.jervisffb.engine.GameEngineController]
  * @see [com.jervisffb.ui.UiGameController]
  */
-class P2PClientGameController(private val isHost: Boolean = false) {
+class P2PClientGameController(
+    private val isHost: Boolean = false
+) {
 
+    var lastServerActionIndex: Int = -1
     private val _clientState = MutableStateFlow(P2PClientState.START)
     val clientState: StateFlow<P2PClientState> = _clientState
 
@@ -51,6 +53,8 @@ class P2PClientGameController(private val isHost: Boolean = false) {
 //    private val mockServerJob: Job
     private var server: LightServer? = null
 
+    private var gameId: GameId? = null
+
     // Track Coach/Team as they join
     val homeCoach: MutableStateFlow<Coach?> = MutableStateFlow(null)
     val awayCoach: MutableStateFlow<Coach?> = MutableStateFlow(null)
@@ -58,7 +62,7 @@ class P2PClientGameController(private val isHost: Boolean = false) {
     val awayTeam: MutableStateFlow<Team?> = MutableStateFlow(null)
     val spectators = mutableListOf<Spectator>()
 
-    var runner: GameRunner? = null // Should be != null when state == RUN_GAME
+    var runner: UiGameRunner? = null // Should be != null when state == RUN_GAME
 
     init {
         if (isHost) {
@@ -76,6 +80,7 @@ class P2PClientGameController(private val isHost: Boolean = false) {
         gameId: GameId,
         teamIfHost: Team?,
         handler: ClientNetworkMessageHandler, ) {
+        this.gameId = gameId
 //        if (state != ClientState.SELECT_HOST) error("Unexpected state: $state")
         connection.addMessageHandler(handler)
         connection.connectAndJoinGame(gameUrl, gameId, coachName, isHost = (teamIfHost != null), teamIfHost)
@@ -118,8 +123,12 @@ class P2PClientGameController(private val isHost: Boolean = false) {
         }
     }
 
-    suspend fun sendActionToServer(action: GameAction) {
-        connection.sendClientAction(action)
+    suspend fun sendActionToServer(index: Int, action: GameAction) {
+        connection.sendClientAction(index, action)
+    }
+
+    suspend fun sendGameStarted() {
+        connection.sendGameStarted(this.gameId!!)
     }
 
     /**
@@ -220,13 +229,15 @@ class P2PClientGameController(private val isHost: Boolean = false) {
             LOG.e { "Received onServerError event [$errorCode]: $message" }
         }
 
-        override fun onGameAction(action: GameAction) {
+        override fun onGameAction(serverIndex: Int, action: GameAction) {
             // TODO How to recover from errors here. It probably means the client and server
             //  got out of Sync. So one suggestion could be to show an error dialog saying\
             //  Inconsistent state and then a button that asks the server for its state and then
             //  reinitialize everything. For now we just log it
             try {
-                runner?.handleAction(action)
+                lastServerActionIndex = serverIndex
+                runner?.actionProvider?.userActionSelected(action) ?: error("Runner is null. Cannot handle ($serverIndex): $action")
+//                runner?.handleAction(action)
             } catch (e: InvalidActionException) {
                 LOG.e(e) { "Error handling game action: $action" }
             }

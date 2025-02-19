@@ -34,6 +34,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.UiGameSnapshot
+import com.jervisffb.ui.screen.TeamActionMode
 import com.jervisffb.ui.state.decorators.DeselectPlayerDecorator
 import com.jervisffb.ui.state.decorators.EndActionDecorator
 import com.jervisffb.ui.state.decorators.FieldActionDecorator
@@ -62,7 +63,8 @@ data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenAc
  */
 class ManualActionProvider(
     private val uiState: UiGameController,
-    private val menuViewModel: MenuViewModel
+    private val menuViewModel: MenuViewModel,
+    private val actionMode: TeamActionMode
 ): UiActionProvider() {
 
     private lateinit var controller: GameEngineController
@@ -132,15 +134,22 @@ class ManualActionProvider(
 
     override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
         if (queuedActions.isNotEmpty()) return
-
         // TODO What to do here when it is the other team having its turn.
         //  The behavior will depend on the game being a HotSeat vs. Client/Server
-        addDialogDecorators(state, actions)
+        val showActionDecorators = when (actionMode) {
+            TeamActionMode.HOME_TEAM -> actions.team?.id == controller.state.homeTeam.id
+            TeamActionMode.AWAY_TEAM -> actions.team?.id == controller.state.awayTeam.id
+            TeamActionMode.ALL_TEAMS -> true
+            TeamActionMode.NONE -> false
+        }
+        if (showActionDecorators) {
+            addDialogDecorators(state, actions)
 
-        // If a dialog is being shown, we do not want to enable any other kind of input until
-        // the dialog has been resolved.
-        if (state.dialogInput == null) {
-            addNonDialogActionDecorators(state, actions)
+            // If a dialog is being shown, we do not want to enable any other kind of input until
+            // the dialog has been resolved.
+            if (state.dialogInput == null) {
+                addNonDialogActionDecorators(state, actions)
+            }
         }
     }
 

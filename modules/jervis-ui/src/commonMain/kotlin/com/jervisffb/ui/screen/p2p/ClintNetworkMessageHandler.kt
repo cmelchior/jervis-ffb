@@ -14,6 +14,7 @@ import com.jervisffb.net.messages.ConfirmGameStartMessage
 import com.jervisffb.net.messages.GameActionMessage
 import com.jervisffb.net.messages.GameNotFoundMessage
 import com.jervisffb.net.messages.GameReadyMessage
+import com.jervisffb.net.messages.GameStartedMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
 import com.jervisffb.net.messages.HostedTeamInfo
 import com.jervisffb.net.messages.JervisErrorCode
@@ -70,7 +71,7 @@ interface ClientNetworkMessageHandler {
     fun onConfirmGameStart(id: GameId, teams: List<TeamData>)
     fun onGameReady(id: GameId)
     fun onServerError(errorCode: JervisErrorCode, message: String)
-    fun onGameAction(action: GameAction)
+    fun onGameAction(serverIndex: Int, action: GameAction)
 }
 
 abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler {
@@ -90,7 +91,7 @@ abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler 
     override fun onConfirmGameStart(id: GameId, teams: List<TeamData>) { }
     override fun onGameReady(id: GameId) { }
     override fun onServerError(errorCode: JervisErrorCode, message: String) { }
-    override fun onGameAction(action: GameAction) { }
+    override fun onGameAction(serverIndex: Int, action: GameAction) { }
 }
 
 /**
@@ -143,6 +144,7 @@ class ClintNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         scope.launch {
             var message: ServerMessage? = null
             while (connection?.receiveOrNull().also { message = it } != null) {
+                LOG.d { "[Client] Received message: $message" }
                 handleMessage(message)
             }
         }
@@ -168,7 +170,6 @@ class ClintNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
                 is GameReadyMessage -> messageHandler.onGameReady(message.gameId)
                 is CoachJoinedMessage -> messageHandler.onCoachJoined(message.coach, message.isHomeCoach)
                 is ServerError -> messageHandler.onServerError(message.errorCode, message.message)
-                is SyncGameActionMessage -> TODO()
                 is TeamJoinedMessage -> messageHandler.onTeamSelected(message.getTeam(), message.isHomeTeam)
                 is CoachLeftMessage -> messageHandler.onCoachLeft(message.coach)
                 is SpectatorJoinedMessage -> TODO()
@@ -178,6 +179,7 @@ class ClintNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
                 is UpdateHostStateMessage -> messageHandler.onHostStateChange(message.state)
                 is UpdateSpectatorStateMessage -> messageHandler.onSpectatorStateChange(message.state)
                 is GameStateSyncMessage -> messageHandler.onGameSync(message)
+                is SyncGameActionMessage -> messageHandler.onGameAction(message.serverIndex, message.action)
                 null -> TODO()
             }
         }
@@ -213,8 +215,13 @@ class ClintNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         send(msg)
     }
 
-    suspend fun sendClientAction(action: GameAction) {
-        val msg = GameActionMessage(action)
+    suspend fun sendClientAction(index: Int, action: GameAction) {
+        val msg = GameActionMessage(index, action)
+        send(msg)
+    }
+
+    suspend fun sendGameStarted(id: GameId) {
+        val msg = GameStartedMessage(id)
         send(msg)
     }
 

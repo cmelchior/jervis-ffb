@@ -11,6 +11,7 @@ import com.jervisffb.ui.icons.IconFactory
 import com.jervisffb.ui.screen.GameScreen
 import com.jervisffb.ui.screen.GameScreenModel
 import com.jervisffb.ui.screen.Manual
+import com.jervisffb.ui.screen.TeamActionMode
 import com.jervisffb.ui.screen.p2p.P2PClientGameController
 import com.jervisffb.ui.screen.p2p.StartGameScreenModel
 import com.jervisffb.ui.screen.p2p.TeamSelectorScreenModel
@@ -76,18 +77,27 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                     }
                     P2PClientState.RUN_GAME -> {
                         val runner = SingleTeamNetworkGameRunner(
+                            controller.awayTeam.value!!,
                             controller
-                        ) { clientAction ->
-                            menuViewModel.navigatorContext.launch {
-                                controller.sendActionToServer(clientAction)
+                        ) { clientIndex, clientAction ->
+                            println("User action: $clientIndex > ${controller.lastServerActionIndex}")
+                            if (clientIndex > controller.lastServerActionIndex) {
+                                menuViewModel.navigatorContext.launch {
+                                    controller.sendActionToServer(clientIndex, clientAction)
+                                }
                             }
                         }
                         val model = GameScreenModel(
                             null,
                             null,
-                            mode = Manual,
+                            mode = Manual(TeamActionMode.AWAY_TEAM),
                             menuViewModel = menuViewModel,
-                            injectedGameRunner = runner
+                            injectedGameRunner = runner,
+                            onEngineInitialized = {
+                                menuViewModel.navigatorContext.launch {
+                                    controller.sendGameStarted()
+                                }
+                            }
                         )
                         controller.runner = runner
                         navigator.push(GameScreen(model))

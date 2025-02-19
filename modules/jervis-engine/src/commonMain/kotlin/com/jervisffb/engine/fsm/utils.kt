@@ -14,6 +14,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.InvalidActionException
 
 /**
  * Check that not only verify the game action type, but also the value.
@@ -78,7 +79,7 @@ inline fun <reified T : GameAction> ActionNode.checkType(
     if (userAction is T) {
         return function(userAction)
     } else {
-        throw IllegalArgumentException("Action (${action::class}) is not of the expected type: ${T::class}")
+        throw InvalidActionException("Action (${action::class}) is not of the expected type: ${T::class}")
     }
 }
 
@@ -89,11 +90,11 @@ inline fun <reified D1 : DieResult> ActionNode.checkDiceRoll(
     when (action) {
         is DiceRollResults -> {
             if (action.rolls.size != 1) {
-                throw IllegalArgumentException("Expected 1 dice rolls, got ${action.rolls.size}")
+                throw InvalidActionException("Expected 1 dice rolls, got ${action.rolls.size}")
             }
             val first: DieResult = action.rolls.first()
             if (first !is D1) {
-                throw IllegalArgumentException("Expected first roll to be ${D1::class}, but was ${first::class}")
+                throw InvalidActionException("Expected first roll to be ${D1::class}, but was ${first::class}")
             }
             return function(first)
         }
@@ -101,7 +102,7 @@ inline fun <reified D1 : DieResult> ActionNode.checkDiceRoll(
             return function(action)
         }
         else -> {
-            throw IllegalArgumentException(
+            throw InvalidActionException(
                 "Action (${action::class}) is not of the expected type: ${DiceRollResults::class}",
             )
         }
@@ -137,14 +138,14 @@ inline fun <reified D1 : DieResult, reified D2 : DieResult> ActionNode.checkDice
         val first: DieResult = action.rolls[0]
         val second: DieResult = action.rolls[1]
         if (first !is D1) {
-            throw IllegalArgumentException("Expected first roll to be ${D1::class}, but was ${first::class}")
+            throw InvalidActionException("Expected first roll to be ${D1::class}, but was ${first::class}")
         }
         if (second !is D2) {
-            throw IllegalArgumentException("Expected first roll to be ${D1::class}, but was ${second::class}")
+            throw InvalidActionException("Expected first roll to be ${D1::class}, but was ${second::class}")
         }
         return function(first, second)
     } else {
-        throw IllegalArgumentException(
+        throw InvalidActionException(
             "Action (${action::class}) is not of the expected type: ${DiceRollResults::class}",
         )
     }
@@ -157,14 +158,14 @@ inline fun <reified D1 : DieResult> ActionNode.checkDiceRollList(
     if (action is DiceRollResults) {
         val first = action.rolls.first()
         if (first !is D1) {
-            throw IllegalArgumentException("Expected first roll to be ${D1::class}, but was ${first::class}")
+            throw InvalidActionException("Expected first roll to be ${D1::class}, but was ${first::class}")
         }
         @Suppress("UNCHECKED_CAST")
         return function(action.rolls as List<D1>)
     } else if (action is D1) {
         return function(listOf(action))
     } else {
-        throw IllegalArgumentException(
+        throw InvalidActionException(
             "Action (${action::class}) is not of the expected type: ${DiceRollResults::class}",
         )
     }

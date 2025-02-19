@@ -1,9 +1,9 @@
 package com.jervisffb.net
 
+import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.net.messages.ClientMessage
 import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.CoachLeftMessage
@@ -17,6 +17,7 @@ import com.jervisffb.net.messages.ServerError
 import com.jervisffb.net.messages.ServerMessage
 import com.jervisffb.net.messages.SpectatorJoinedMessage
 import com.jervisffb.net.messages.SpectatorLeftMessage
+import com.jervisffb.net.messages.SyncGameActionMessage
 import com.jervisffb.net.messages.TeamData
 import com.jervisffb.net.messages.TeamJoinedMessage
 import com.jervisffb.net.messages.UpdateClientStateMessage
@@ -132,6 +133,16 @@ class ServerCommunication(
         sendToConnections(session.coaches + session.spectators, jsonMessage)
     }
 
+    private suspend fun sendToAllOtherConnections(sender: JoinedClient?, message: ServerMessage) {
+        LOG.i { "[Server] Sending to all other connections from ${sender?.connection?.username}: $message" }
+        val jsonMessage = jervisNetworkSerializer.encodeToString(message)
+        val otherClients = if (sender != null) {
+            session.coaches.filter { it.connection != sender.connection } + session.spectators.filter { it.connection != sender.connection }
+        } else {
+            session.coaches + session.spectators
+        }
+        sendToConnections(otherClients, jsonMessage)
+    }
     private suspend fun sendAllCoaches(message: ServerMessage) {
         LOG.i { "[Server] Sending to all players: $message" }
         val jsonMessage = jervisNetworkSerializer.encodeToString(message)
@@ -167,6 +178,13 @@ class ServerCommunication(
                 }
 //            }
         }
+    }
+
+    // A Game action was sent to the server and processed sucecssfully, it should now be sent to all other connected
+    // clients so they can update their local game model.
+    suspend fun sendGameActionSync(sender: JoinedClient?, index: Int, action: GameAction) {
+        val message = SyncGameActionMessage(index, action)
+        sendToAllOtherConnections(sender, message)
     }
 
 }

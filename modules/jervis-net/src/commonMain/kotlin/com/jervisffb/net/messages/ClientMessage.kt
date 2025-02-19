@@ -97,8 +97,19 @@ data class LeaveGameMessage(
     val id: GameId,
 ): ClientMessage
 
+// Tell the server that the client has started its game engine and can start receiving events
+@Serializable
+data class GameStartedMessage(val id: GameId): ClientMessage
+
+/**
+ * This action has been selected and processed successfully on the server.
+ *
+ * @param clientIndex the id of the [com.jervisffb.engine.GameDelta] in the client model, that was created from the [action].
+ * @param action the action processed at the given index.
+ */
 @Serializable
 data class GameActionMessage(
+    val clientIndex: Int,
     val action: GameAction,
 ): ClientMessage
 

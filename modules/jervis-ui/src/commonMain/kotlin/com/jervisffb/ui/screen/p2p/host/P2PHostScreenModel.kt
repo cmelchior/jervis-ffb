@@ -8,6 +8,7 @@ import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.ui.screen.GameScreen
 import com.jervisffb.ui.screen.GameScreenModel
 import com.jervisffb.ui.screen.Manual
+import com.jervisffb.ui.screen.TeamActionMode
 import com.jervisffb.ui.screen.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.ui.screen.p2p.P2PClientGameController
 import com.jervisffb.ui.screen.p2p.StartGameScreenModel
@@ -50,7 +51,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     // Page 4: Accept game
     val acceptGameModel = StartGameScreenModel(controller, menuViewModel)
 
-
+    private var gameScreenModel: GameScreenModel? = null
 
     val validGameSetup = MutableStateFlow(true)
     val validTeamSelection = MutableStateFlow(false)
@@ -76,21 +77,30 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                     }
                     P2PHostState.RUN_GAME -> {
                         val runner = SingleTeamNetworkGameRunner(
+                            controller.homeTeam.value!!,
                             controller
-                        ) { clientAction ->
-                            menuViewModel.navigatorContext.launch {
-                                controller.sendActionToServer(clientAction)
+                        ) { clientIndex, clientAction ->
+                            println("User action: $clientIndex > ${controller.lastServerActionIndex}")
+                            if (clientIndex > controller.lastServerActionIndex) {
+                                menuViewModel.navigatorContext.launch {
+                                    controller.sendActionToServer(clientIndex, clientAction)
+                                }
                             }
                         }
-                        val model = GameScreenModel(
+                        gameScreenModel = GameScreenModel(
                             null,
                             null,
-                            mode = Manual,
+                            mode = Manual(TeamActionMode.HOME_TEAM),
                             menuViewModel = menuViewModel,
-                            injectedGameRunner = runner
+                            injectedGameRunner = runner,
+                            onEngineInitialized = {
+                                menuViewModel.navigatorContext.launch {
+                                    controller.sendGameStarted()
+                                }
+                            }
                         )
                         controller.runner = runner
-                        navigator.push(GameScreen(model))
+                        navigator.push(GameScreen(gameScreenModel!!))
                         // lastValidPage = 2
                     }
                     P2PHostState.CLOSE_GAME -> {}

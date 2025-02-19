@@ -138,9 +138,14 @@ data class TeamJoinedMessage(val isHomeTeam: Boolean, private val team: Team): S
 @Serializable
 data class GameNotFoundMessage(val gameId: String): ServerMessage
 
-// Send to all cl
+/**
+ * Send this to all clients to notify them about a new game action that has been processed by the server.
+ *
+ * @param serverIndex the id of the [com.jervisffb.engine.GameDelta] in the server model, that was created from the [action].
+ * @param action the action to send
+ */
 @Serializable
-data class SyncGameActionMessage(val action: GameAction): ServerMessage
+data class SyncGameActionMessage(val serverIndex: Int, val action: GameAction): ServerMessage
 
 @Serializable
 data class TeamData(
@@ -164,6 +169,7 @@ enum class JervisErrorCode(val code: Short) {
     INVALID_TEAM(2), // Team is not allowed to join the given game
     READ_MESSAGE_ERROR(3), // It wasn't possible to read an incoming message (for some reason)
     PROTOCOL_ERROR(4), // The message could not be accepted due to some invariant being broken
+    INVALID_GAME_ACTION(5), // The action sent wasn't legal and should be reverted
 }
 
 @Serializable

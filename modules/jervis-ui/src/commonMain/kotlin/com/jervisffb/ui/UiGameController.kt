@@ -96,7 +96,9 @@ class UiGameController(
         gameScope.launch {
 
             // We need to start the Rules Engine first.
-            controller.startManualMode()
+//            if (controller.actionMode != GameEngineController.ActionMode.NOT_STARTED) {
+                controller.startManualMode()
+//            }
 
             // Pre-loaded actions are used to fast-forward to an initial state.
             // We do this before starting the main loop so the UI start from
@@ -133,7 +135,7 @@ class UiGameController(
 
                 // TODO Just changing the existing uiState might not trigger recomposition correctly
                 //  We need an efficient way to copy the old one.
-                actionProvider.decorateAvailableActions(newUiState, controller.getAvailableActions())
+                actionProvider.decorateAvailableActions(newUiState, actions)
                 lastUiState = newUiState
                 _uiStateFlow.emit(newUiState)
 
@@ -153,7 +155,7 @@ class UiGameController(
                 // Last, send action to the Rules Engine for processing.
                 // This will start the next iteration of the game loop.
                 // TODO Add error handling here. What to do for invalid actions?
-                controller.handleAction(userAction)
+                gameRunner.handleAction(userAction)
             }
         }.invokeOnCompletion {
             if (it != null && it !is CancellationException) {

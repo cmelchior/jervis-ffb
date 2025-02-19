@@ -22,8 +22,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.jervisffb.engine.HotSeatGameRunner
-import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.ui.view.filePicker
 import com.jervisffb.ui.viewmodel.MenuViewModel
 import com.jervisffb.utils.isRegularFile
@@ -32,9 +30,17 @@ import kotlinx.coroutines.launch
 import okio.Path
 import okio.Path.Companion.toPath
 
+// Which teams should be allowed to create actions this client
+enum class TeamActionMode {
+    HOME_TEAM,
+    AWAY_TEAM,
+    ALL_TEAMS,
+    NONE,
+}
+
 sealed interface GameMode
 data object Random : GameMode
-data object Manual : GameMode
+data class Manual(val actionMode: TeamActionMode) : GameMode
 data class Replay(val file: Path) : GameMode
 
 class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
@@ -48,18 +54,19 @@ class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
     fun loadGame(navigator: Navigator, file: Path) {
         menuViewModel.navigatorContext.launch {
-            val data = JervisSerialization.loadFromFile(file)
-            val runner = HotSeatGameRunner(data.game.rules, data.homeTeam, data.awayTeam)
-            val screenModel = GameScreenModel(
-                null,
-                null,
-                Manual,
-                menuViewModel,
-                runner,
-                data.actions
-            )
-            screenModel.initialize()
-            navigator.push(GameScreen(screenModel))
+            TODO()
+//            val data = JervisSerialization.loadFromFile(file)
+//            val runner = HotSeatGameRunner(data.game.rules, data.homeTeam, data.awayTeam)
+//            val screenModel = GameScreenModel(
+//                null,
+//                null,
+//                Manual,
+//                menuViewModel,
+//                runner,
+//                data.actions
+//            )
+//            screenModel.initialize()
+//            navigator.push(GameScreen(screenModel))
         }
     }
 
@@ -89,7 +96,7 @@ class DevScreen(private val menuViewModel: MenuViewModel, screenModel: DevScreen
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Button(onClick = {
-                screenModel.start(navigator, Manual)
+                screenModel.start(navigator, Manual(TeamActionMode.ALL_TEAMS))
             }) {
                 Text(
                     text = "Start game with manual actions",

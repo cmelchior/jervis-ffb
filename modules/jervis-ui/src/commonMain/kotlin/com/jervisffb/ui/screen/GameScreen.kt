@@ -4,8 +4,6 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import com.jervisffb.engine.GameRunner
-import com.jervisffb.engine.HotSeatGameRunner
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
@@ -15,6 +13,7 @@ import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.resources.StandaloneTeams
 import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.icons.IconFactory
+import com.jervisffb.ui.screen.p2p.UiGameRunner
 import com.jervisffb.ui.state.ManualActionProvider
 import com.jervisffb.ui.state.RandomActionProvider
 import com.jervisffb.ui.state.ReplayActionProvider
@@ -39,14 +38,15 @@ class GameScreenModel(
     var awayTeam: Team?,
     val mode: GameMode,
     val menuViewModel: MenuViewModel,
-    private val injectedGameRunner: GameRunner? = null,
+    private val injectedGameRunner: UiGameRunner? = null,
     private val actions: List<GameAction> = emptyList(),
+    private val onEngineInitialized: () -> Unit = { },
 ) : ScreenModel {
 
     val hoverPlayerFlow = MutableSharedFlow<Player?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     lateinit var uiState: UiGameController
-    val gameRunner: GameRunner
+    val gameRunner: UiGameRunner
     var fumbbl: FumbblReplayAdapter? = null
     val rules: BB2020Rules = StandardBB2020Rules()
 
@@ -56,11 +56,12 @@ class GameScreenModel(
             fumbbl = null
         } else {
             when (mode) {
-                Manual -> {
+                is Manual -> {
                     fumbbl = null
                     homeTeam = StandaloneTeams.defaultTeams["human-starter-team.jrt"]!!.team
                     awayTeam = StandaloneTeams.defaultTeams["lizardmen-starter-team.jrt"]!!.team
-                    this.gameRunner = HotSeatGameRunner(rules, homeTeam!!, awayTeam!!)
+                    TODO()
+//                    this.gameRunner = HotSeatGameRunner(rules, homeTeam!!, awayTeam!!)
                 }
 //
 //                Random -> {
@@ -93,16 +94,21 @@ class GameScreenModel(
         uiState = UiGameController(mode, gameRunner, menuViewModel, actions)
         val uiActionFactory =
             when (mode) {
-                Manual -> ManualActionProvider(uiState, menuViewModel)
+                is Manual -> ManualActionProvider(uiState, menuViewModel, mode.actionMode)
                 Random -> RandomActionProvider(uiState)
                 is Replay -> ReplayActionProvider(uiState, fumbbl)
             }
-
         // Setup references and start action listener
         menuViewModel.uiState = uiState
+        gameRunner.actionProvider = uiActionFactory
         uiState.startGameEventLoop(uiActionFactory)
+        onEngineInitialized()
         _loadingMessages.value = ""
         _isLoaded.value = true
+    }
+
+    fun handleServerAction(action: GameAction) {
+        uiState.actionProvider.userActionSelected(action)
     }
 }
 

@@ -1,10 +1,32 @@
 package com.jervisffb.engine.utils
 
+import com.jervisffb.engine.ActionRequest
+import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.ContinueWhenReady
+import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.EndActionWhenReady
+import com.jervisffb.engine.actions.EndSetupWhenReady
+import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.RollDice
+import com.jervisffb.engine.actions.SelectBlockType
+import com.jervisffb.engine.actions.SelectCoinSide
+import com.jervisffb.engine.actions.SelectDicePoolResult
+import com.jervisffb.engine.actions.SelectDirection
+import com.jervisffb.engine.actions.SelectDogout
+import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectInducement
+import com.jervisffb.engine.actions.SelectMoveType
+import com.jervisffb.engine.actions.SelectNoReroll
+import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.actions.SelectPlayerAction
+import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.actions.SelectSkill
+import com.jervisffb.engine.actions.TossCoin
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.modifiers.DiceModifier
@@ -18,6 +40,43 @@ import com.jervisffb.engine.rules.bb2020.skills.Skill
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.jvm.JvmName
+
+// Returns true, if any of the action descriptors require using randomness, i.e., something
+// that is outside a coaches control
+fun ActionRequest.containsActionWithRandomBehavior(): Boolean {
+    val randomActions = actions.map {
+        when (it) {
+            CancelWhenReady -> false
+            ConfirmWhenReady -> false
+            ContinueWhenReady -> false
+            is DeselectPlayer -> false
+            EndActionWhenReady -> false
+            EndSetupWhenReady -> false
+            EndTurnWhenReady -> false
+            is RollDice -> true
+            is SelectBlockType -> false
+            SelectCoinSide -> false
+            is SelectDicePoolResult -> false
+            is SelectDirection -> false
+            SelectDogout -> false
+            is SelectFieldLocation -> false
+            is SelectInducement -> false
+            is SelectMoveType -> false
+            is SelectNoReroll -> false
+            is SelectPlayer -> false
+            is SelectPlayerAction -> false
+            is SelectRandomPlayers -> true
+            is SelectRerollOption -> false
+            is SelectSkill -> false
+            TossCoin -> true
+        }
+    }
+    if (randomActions.contains(true) && randomActions.contains(false)) {
+        // Unclear if this is actually the case, so just catch it for now
+        throw IllegalStateException("Random behavior is mixed in the action descriptors.")
+    }
+    return randomActions.any { it  == true }
+}
 
 fun createRandomAction(
     state: Game,

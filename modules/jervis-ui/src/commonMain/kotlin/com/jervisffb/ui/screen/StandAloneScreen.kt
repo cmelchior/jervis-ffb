@@ -42,7 +42,7 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
 
     fun startHotSeatGame(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = GameScreenModel(null, null, Manual, menuViewModel)
+            val screenModel = GameScreenModel(null, null, Manual(TeamActionMode.ALL_TEAMS), menuViewModel)
             screenModel.initialize()
             navigator.push(GameScreen(screenModel))
         }
