@@ -15,8 +15,7 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
     override suspend fun handleMessage(message: GameActionMessage, connection: JervisNetworkWebSocketConnection) {
         val game = session.game
         if (game == null) {
-            session.out.sendError(connection, message, JervisErrorCode.INVALID_GAME_ACTION, "Game is not initialized.")
-            session.out.sendError(connection, message, JervisErrorCode.PROTOCOL_ERROR, "Game is not initialized.")
+            session.out.sendError(connection, message, JervisErrorCode.INVALID_GAME_ACTION, "Game is not initialized yet. Please wait for the GameStarted event to be sent.")
             return
         }
         try {

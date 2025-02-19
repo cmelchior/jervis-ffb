@@ -50,9 +50,9 @@ class P2PNetworkTests {
         val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
 
-        val conn1 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/test", "host")
+        val conn1 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")
         conn1.start()
-        val conn2 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/test", "client")
+        val conn2 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "client")
         conn2.start()
 
         // Host Joins
@@ -153,7 +153,7 @@ class P2PNetworkTests {
         val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
         try {
-            val conn = JervisClientWebSocketConnection("test".gameId, "ws://localhost:8080/test", "host")
+            val conn = JervisClientWebSocketConnection("test".gameId, "ws://localhost:8080/joinGame?id=test", "host")
             conn.start()
             conn.close()
             assertEquals(JervisExitCode.CLIENT_CLOSING.code, conn.getCloseReason()?.code)
@@ -169,7 +169,7 @@ class P2PNetworkTests {
         val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
         val client = getHttpClient()
-        val session = client.webSocketSession("ws://localhost:8080/test")
+        val session = client.webSocketSession("ws://localhost:8080/joinGame?id=test")
         try {
             session.send(Frame.Text("Hello World"))
             val closeReason = session.closeReason.await()
@@ -188,7 +188,7 @@ class P2PNetworkTests {
     fun sendingWrongInitialMessageTerminatesConnection() = runBlocking {
         val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
-        val conn = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/test", "host")
+        val conn = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")
         conn.start()
         try {
             // Sending a message that is not a JoinAs* message.
@@ -208,7 +208,7 @@ class P2PNetworkTests {
     fun sendingWrongGameIdTerminatesConnection() = runBlocking {
         val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
-        val conn = JervisClientWebSocketConnection(GameId("wrongGameId"), "ws://localhost:8080/wrongGameId", "host")
+        val conn = JervisClientWebSocketConnection(GameId("wrongGameId"), "ws://localhost:8080/joinGame?id=wrongGameId", "host")
         conn.start()
         try {
             withTimeout(5.seconds) {
@@ -232,9 +232,9 @@ class P2PNetworkTests {
         val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
         server.start()
 
-        val conn1 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/test", "host")
+        val conn1 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")
         conn1.start()
-        val conn2 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/test", "host")
+        val conn2 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")
         conn2.start()
 
         // Host Joins
@@ -273,9 +273,9 @@ class P2PNetworkTests {
         consumeServerMessage<UpdateClientStateMessage>(conn2)
 
         // Host sends message not supported at this point (it should be team selection)
-        conn1.send(GameActionMessage(Continue))
+        conn1.send(GameActionMessage(100, Continue))
         checkServerMessage<ServerError>(conn1) {
-            assertEquals(JervisErrorCode.PROTOCOL_ERROR, it.errorCode)
+            assertEquals(JervisErrorCode.INVALID_GAME_ACTION, it.errorCode)
         }
 
         // Host selects team
@@ -307,6 +307,12 @@ class P2PNetworkTests {
     fun serverSendsLatestGameSessionStateOnReconnect() {
         // TODO
     }
+
+    @Test
+    fun serverSendsRevertGameActionClientIfWrong() {
+        // TODO
+    }
+
 
     private suspend inline fun <reified T> checkServerMessage(connection: JervisClientWebSocketConnection, assertFunc: (T) -> Unit) {
         val serverMessage = connection.receiveOrNull()
