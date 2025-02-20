@@ -49,7 +49,7 @@ import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.roster_logo_dark_elf
 import com.jervisffb.jervis_ui.generated.resources.roster_logo_elven_union
-import com.jervisffb.ui.view.JervisTheme
+import com.jervisffb.ui.game.view.JervisTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.Point
 import org.junit.Ignore

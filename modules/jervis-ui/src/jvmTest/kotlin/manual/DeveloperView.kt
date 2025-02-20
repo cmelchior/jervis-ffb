@@ -35,7 +35,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.roster_logo_chaos_chosen
-import com.jervisffb.ui.view.JervisTheme
+import com.jervisffb.ui.game.view.JervisTheme
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.PI
 import kotlin.math.cos

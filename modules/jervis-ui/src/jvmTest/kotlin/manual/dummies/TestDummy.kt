@@ -5,16 +5,16 @@ import com.jervisffb.engine.HotSeatGameRunner
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.test.createDefaultGameState
 import com.jervisffb.ui.game.UiGameController
-import com.jervisffb.ui.screen.GameScreenModel
-import com.jervisffb.ui.screen.Manual
-import com.jervisffb.ui.screen.TeamActionMode
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
+import com.jervisffb.ui.menu.GameScreenModel
+import com.jervisffb.ui.menu.Manual
+import com.jervisffb.ui.menu.TeamActionMode
 
 object TestDummy {
     val menuViewModel = MenuViewModel()
-    val gameModel = GameScreenModel(null, null,Manual(TeamActionMode.ALL_TEAMS), menuViewModel)
+    val gameModel = GameScreenModel(null, null, Manual(TeamActionMode.ALL_TEAMS), menuViewModel)
     val state = createDefaultGameState(StandardBB2020Rules())
     val controller = GameEngineController(state)
     val runner = HotSeatGameRunner(controller.rules, state.homeTeam, state.awayTeam)

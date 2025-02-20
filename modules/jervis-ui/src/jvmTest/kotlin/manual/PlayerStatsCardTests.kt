@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.jervisffb.ui.view.Field
-import com.jervisffb.ui.view.Sidebar
+import com.jervisffb.ui.game.view.Field
+import com.jervisffb.ui.game.view.Sidebar
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import manual.dummies.TestDummy

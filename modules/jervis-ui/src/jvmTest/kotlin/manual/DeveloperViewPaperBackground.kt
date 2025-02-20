@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.jervisffb.ui.view.JervisTheme
+import com.jervisffb.ui.game.view.JervisTheme
 import org.intellij.lang.annotations.Language
 import org.jetbrains.skia.ColorFilter
 import org.jetbrains.skia.ColorMatrix
