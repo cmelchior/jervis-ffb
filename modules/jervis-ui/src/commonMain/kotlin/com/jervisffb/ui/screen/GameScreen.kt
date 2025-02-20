@@ -13,7 +13,7 @@ import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.resources.StandaloneTeams
 import com.jervisffb.ui.UiGameController
 import com.jervisffb.ui.icons.IconFactory
-import com.jervisffb.ui.screen.p2p.UiGameRunner
+import com.jervisffb.ui.screen.UiGameRunner
 import com.jervisffb.ui.state.ManualActionProvider
 import com.jervisffb.ui.state.RandomActionProvider
 import com.jervisffb.ui.state.ReplayActionProvider

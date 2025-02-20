@@ -1,4 +1,4 @@
-package com.jervisffb.ui.screen.p2p
+package com.jervisffb.ui.screen.components.teamselector
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,7 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
-import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -36,21 +35,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.isDigitsOnly
 import com.jervisffb.ui.screen.p2p.host.TeamInfo
 import com.jervisffb.ui.view.JervisTheme
-import com.jervisffb.ui.view.utils.JervisButton
 import com.jervisffb.ui.view.utils.TitleBorder
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TeamSelectorPage(
-    viewModel: TeamSelectorScreenModel,
-    confirmTitle: String,
-    onNext: () -> Unit,
+fun TeamSelectorComponent(
+    viewModel: TeamSelectorComponentModel,
 ) {
     val availableTeams by viewModel.availableTeams.collectAsState()
     var showImportFumbblTeamDialog by remember { mutableStateOf(false) }
@@ -81,18 +76,6 @@ fun TeamSelectorPage(
 
                         )
                 }
-            }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                Spacer(modifier = Modifier.width(60.dp))
-                JervisButton(text = "Load from file", onClick = {
-                    showLoadTeamFromFileDialog = !showLoadTeamFromFileDialog
-                })
-                Spacer(modifier = Modifier.width(16.dp))
-                JervisButton(text = "Import from FUMBBL", onClick = {
-                    showImportFumbblTeamDialog = !showImportFumbblTeamDialog
-                })
-                Spacer(modifier = Modifier.weight(1f))
-                JervisButton(confirmTitle.uppercase(), onClick = { onNext() }, enabled = (selectedTeam != null))
             }
         }
     }
@@ -187,55 +170,8 @@ fun RowScope.TeamCard(
 }
 
 @Composable
-fun RowScope.TeamCardV0(
-    name: String,
-    teamValue: Int,
-    rerolls: Int,
-    logo: ImageBitmap,
-    isSelected: Boolean = false,
-    emptyTeam: Boolean = false,
-    onClick: (() -> Unit)?
-) {
-    Card(
-        modifier = Modifier
-            .width(300.dp)
-            .let { if (onClick != null) it.clickable(!emptyTeam, onClick = onClick) else it }
-        ,
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(8.dp)) {
-                    val adjustedTv = teamValue / 1_000
-                    Text(text = "$adjustedTv K", fontSize = 14.sp)
-                    Text("$rerolls RR")
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Image(
-                    modifier = Modifier.padding(8.dp),
-                    bitmap = logo,
-                    contentDescription = null,
-                    contentScale = ContentScale.Inside,
-                )
-            }
-            Row (
-                modifier = Modifier.background(if (isSelected) JervisTheme.accentTeamColor else JervisTheme.awayTeamColor),
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 10.dp),
-                    textAlign = TextAlign.Start,
-                    text = name,
-                    color = JervisTheme.accentContentBackgroundColor,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun LoadTeamDialog(
-    viewModel: TeamSelectorScreenModel,
+    viewModel: TeamSelectorComponentModel,
     onCloseRequest: () -> Unit
 ) {
     var inputText by remember { mutableStateOf("") }
@@ -290,3 +226,4 @@ fun LoadTeamDialog(
         }
     )
 }
+

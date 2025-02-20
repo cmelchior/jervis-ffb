@@ -11,7 +11,7 @@ import com.jervisffb.ui.screen.Manual
 import com.jervisffb.ui.screen.TeamActionMode
 import com.jervisffb.ui.screen.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.ui.screen.p2p.P2PClientGameController
-import com.jervisffb.ui.screen.p2p.StartGameScreenModel
+import com.jervisffb.ui.screen.p2p.StartP2PGameScreenModel
 import com.jervisffb.ui.screen.p2p.TeamSelectorScreenModel
 import com.jervisffb.ui.screen.p2p.client.SingleTeamNetworkGameRunner
 import com.jervisffb.ui.viewmodel.MenuViewModel
@@ -49,7 +49,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
 
 
     // Page 4: Accept game
-    val acceptGameModel = StartGameScreenModel(controller, menuViewModel)
+    val acceptGameModel = StartP2PGameScreenModel(controller, menuViewModel)
 
     private var gameScreenModel: GameScreenModel? = null
 
@@ -80,7 +80,6 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                             controller.homeTeam.value!!,
                             controller
                         ) { clientIndex, clientAction ->
-                            println("User action: $clientIndex > ${controller.lastServerActionIndex}")
                             if (clientIndex > controller.lastServerActionIndex) {
                                 menuViewModel.navigatorContext.launch {
                                     controller.sendActionToServer(clientIndex, clientAction)

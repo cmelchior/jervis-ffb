@@ -1,4 +1,4 @@
-package com.jervisffb.ui.screen.p2p.client
+package com.jervisffb.ui.screen.hotseat
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,37 +12,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
-import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
 import com.jervisffb.ui.screen.JervisScreen
 import com.jervisffb.ui.screen.MenuScreenWithSidebarAndTitle
-import com.jervisffb.ui.screen.p2p.StartP2PGamePage
-import com.jervisffb.ui.screen.p2p.TeamSelectorPage
 import com.jervisffb.ui.view.SidebarMenu
 import com.jervisffb.ui.viewmodel.MenuViewModel
+import kotlinx.coroutines.flow.map
 
-class P2PClientScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PClientScreenModel) : Screen {
-    @OptIn(ExperimentalVoyagerApi::class)
+class HotseatScreen(private val menuViewModel: MenuViewModel, private val screenModel: HotseatScreenModel) : Screen {
     @Composable
     override fun Content() {
-        LifecycleEffectOnce {
-            onDispose {
-                screenModel.onDispose()
-            }
-        }
         JervisScreen(menuViewModel) {
             MenuScreenWithSidebarAndTitle(
                 menuViewModel,
-                title = "Peer-to-Peer Game",
+                title = "Hotseat Game",
                 icon = Res.drawable.frontpage_wall_player,
                 topMenuRightContent = null,
                 sidebarContent = {
                     val currentPage by screenModel.currentPage.collectAsState()
                     SidebarMenu(
-                        entries = listOf("1. Join Host", "2. Select Team", "3. Start Game"),
+                        entries = listOf("1. Configure Game", "2. Home Team", "3. Away Team", "4. Start Game"),
                         currentPage = currentPage,
                         onClick = { page: Int -> screenModel.goBackToPage(page) }
                     )
@@ -55,7 +46,7 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val scre
 }
 
 @Composable
-private fun PageContent(screenModel: P2PClientScreenModel) {
+fun PageContent(screenModel: HotseatScreenModel) {
     val currentPage by screenModel.currentPage.collectAsState()
     val pagerState = rememberPagerState(0) { screenModel.totalPages }
 
@@ -71,30 +62,16 @@ private fun PageContent(screenModel: P2PClientScreenModel) {
             state = pagerState,
         ) { page ->
             when (page) {
-                0 -> JoinHostScreen(
-                    viewModel = screenModel.joinHostModel,
-                    onJoin = {
-                        if (screenModel.lastValidPage >= 1) {
-                            screenModel.hostJoinedDone()
-                        } else {
-                            screenModel.joinHostModel.clientJoinGame()
-                        }
-                    },
-                    onCancel = { screenModel.joinHostModel.disconnectFromHost() },
-                )
-                1 -> TeamSelectorPage(
-                    viewModel = screenModel.selectTeamModel,
-                    confirmTitle = "Next",
-                    onNext = { screenModel.teamSelectionDone() }
-                )
-                2 -> StartP2PGamePage(
-                    screenModel.controller.homeTeam,
-                    screenModel.controller.awayTeam,
+                0 -> SetupHotseatGamePage(screenModel.setupGameModel, Modifier)
+                1 -> SelectHotseatTeamScreen(screenModel.selectHomeTeamModel)
+                2 -> SelectHotseatTeamScreen(screenModel.selectAwayTeamModel)
+                3 -> StartHotseatGamePage(
+                    screenModel.selectedHomeTeam.map { it?.teamData },
+                    screenModel.selectedAwayTeam.map { it?.teamData },
                     onAcceptGame = { acceptedGame ->
-                        screenModel.userAcceptGame(acceptedGame)
+                        screenModel.startGame()
                     }
                 )
-                else -> error("Invalid page index: $page")
             }
         }
     }

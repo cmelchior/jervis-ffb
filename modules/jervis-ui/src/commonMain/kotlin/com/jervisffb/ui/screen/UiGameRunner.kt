@@ -1,4 +1,4 @@
-package com.jervisffb.ui.screen.p2p
+package com.jervisffb.ui.screen
 
 import com.jervisffb.engine.GameRunner
 import com.jervisffb.ui.state.UiActionProvider

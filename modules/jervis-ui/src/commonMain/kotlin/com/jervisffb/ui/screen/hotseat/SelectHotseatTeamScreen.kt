@@ -1,4 +1,4 @@
-package com.jervisffb.ui.screen.p2p
+package com.jervisffb.ui.screen.hotseat
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -17,11 +16,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.RadioButton
+import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -40,64 +41,96 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.isDigitsOnly
-import com.jervisffb.ui.screen.p2p.host.TeamInfo
+import com.jervisffb.ui.screen.components.teamselector.TeamSelectorComponent
+import com.jervisffb.ui.screen.p2p.TeamSelectorScreenModel
+import com.jervisffb.ui.screen.p2p.host.SettingsCard
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.utils.JervisButton
 import com.jervisffb.ui.view.utils.TitleBorder
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TeamSelectorPage(
-    viewModel: TeamSelectorScreenModel,
-    confirmTitle: String,
-    onNext: () -> Unit,
+fun SelectHotseatTeamScreen(
+    viewModel: SelectHotseatTeamScreenModel,
 ) {
-    val availableTeams by viewModel.availableTeams.collectAsState()
-    var showImportFumbblTeamDialog by remember { mutableStateOf(false) }
-    var showLoadTeamFromFileDialog by remember { mutableStateOf(false) }
-    val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
+    val coachName by viewModel.coachName.collectAsState()
+    val isValidTeamSelection by viewModel.isValidTeamSelection.collectAsState(false)
+    val playerType by viewModel.playerType.collectAsState()
+    val aiPlayers by viewModel.aiPlayers.collectAsState()
+    val selectedAiPlayer by viewModel.selectedAiPlayer.collectAsState()
+    val playerTypeOptions = listOf(
+        "Human" to PlayerType.HUMAN,
+        "Computer" to PlayerType.COMPUTER,
+    )
+
     Column(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
+                .weight(1f)
+            ,
+            verticalAlignment = Alignment.Top
         ) {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                availableTeams.forEach { team ->
-                    TeamCard(
-                        name = team.teamName,
-                        teamValue = team.teamValue,
-                        rerolls = team.rerolls,
-                        isSelected = (selectedTeam?.teamId == team.teamId),
-                        logo = team.logo,
-                        onClick = { viewModel.setSelectedTeam(team) },
-
-                        )
+            Column {
+                SettingsCard("Coach", 300.dp) {
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = coachName,
+                        onValueChange = { viewModel.updateCoachName(it) },
+                        label = { Text("Coach name") }
+                    )
+                    PlayerTypeSelector(playerTypeOptions, playerType, onChoice = { type: PlayerType -> viewModel.updatePlayerType(type)} )
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+                if (playerType == PlayerType.COMPUTER) {
+                    SettingsCard("Select AI", 300.dp) {
+                        aiPlayers.forEach { ai ->
+                            JervisButton(
+                                text = ai.name,
+                                onClick = {
+                                   viewModel.updateSelectedAiPlayer(ai)
+                                },
+                                buttonColor = if (selectedAiPlayer == ai) JervisTheme.rulebookRed else JervisTheme.rulebookBlue)
+                        }
+                    }
                 }
             }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                Spacer(modifier = Modifier.width(60.dp))
-                JervisButton(text = "Load from file", onClick = {
-                    showLoadTeamFromFileDialog = !showLoadTeamFromFileDialog
-                })
-                Spacer(modifier = Modifier.width(16.dp))
-                JervisButton(text = "Import from FUMBBL", onClick = {
-                    showImportFumbblTeamDialog = !showImportFumbblTeamDialog
-                })
-                Spacer(modifier = Modifier.weight(1f))
-                JervisButton(confirmTitle.uppercase(), onClick = { onNext() }, enabled = (selectedTeam != null))
-            }
+            Spacer(modifier = Modifier.width(32.dp))
+            TeamSelectorComponent(viewModel.teamSelectorModel)
+        }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            JervisButton(text = "Next", enabled = isValidTeamSelection, onClick = { viewModel.teamSelectionDone() })
         }
     }
-    if (showImportFumbblTeamDialog) {
-        LoadTeamDialog(viewModel, onCloseRequest = { showImportFumbblTeamDialog = false })
+}
+
+@Composable
+fun PlayerTypeSelector(options: List<Pair<String, PlayerType>>, selectedType: PlayerType, onChoice: (PlayerType) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        options.forEach { (title, value) ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clickable { onChoice(value) }
+                    .padding(end = 12.dp)
+            ) {
+                RadioButton(
+                    selected = (value == selectedType),
+                    onClick = { onChoice(value) },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = JervisTheme.rulebookRed,
+                        unselectedColor = JervisTheme.contentTextColor.copy(alpha = 0.6f),
+                        disabledColor = Color.LightGray.copy(alpha = ContentAlpha.disabled)
+                    )
+                )
+                Text(
+                    text = title,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+        }
     }
 }
 

@@ -21,6 +21,8 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_ball
+import com.jervisffb.ui.screen.hotseat.HotseatScreen
+import com.jervisffb.ui.screen.hotseat.HotseatScreenModel
 import com.jervisffb.ui.screen.p2p.client.P2PClientScreen
 import com.jervisffb.ui.screen.p2p.client.P2PClientScreenModel
 import com.jervisffb.ui.screen.p2p.host.P2PHostScreenModel
@@ -42,9 +44,8 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
 
     fun startHotSeatGame(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = GameScreenModel(null, null, Manual(TeamActionMode.ALL_TEAMS), menuViewModel)
-            screenModel.initialize()
-            navigator.push(GameScreen(screenModel))
+            val screenModel = HotseatScreenModel(navigator, menuViewModel)
+            navigator.push(HotseatScreen(menuViewModel, screenModel))
         }
     }
 
@@ -93,10 +94,10 @@ fun Screen.StandaloneScreen(menuViewModel: MenuViewModel) {
                 label = "Hotseat",
                 onClick = { screenModel.startHotSeatGame(navigator) },
             )
-            MenuBox(
-                label = "vs AI",
-                onClick = { /* */ },
-            )
+//            MenuBox(
+//                label = "vs AI",
+//                onClick = { /* */ },
+//            )
             MenuBox(
                 label = "Replay",
                 onClick = { /* */ },

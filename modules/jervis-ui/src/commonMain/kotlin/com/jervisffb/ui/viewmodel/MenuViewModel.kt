@@ -74,11 +74,12 @@ class MenuViewModel {
     }
 
     fun loadSetup(id: String) {
-        val team = controller!!.state.getContext<SetupTeamContext>().team
+        val game = controller ?: error("No game controller was found")
+        val team = game.state.getContext<SetupTeamContext>().team
         val setupActions = Setups.setups[id]!!.flatMap { (playerNo, fieldCoordinate) ->
             listOf(
                 PlayerSelected(team[playerNo].id),
-                if (team.isAwayTeam()) FieldSquareSelected(fieldCoordinate.swapX(controller!!.rules)) else FieldSquareSelected(fieldCoordinate)
+                if (team.isAwayTeam()) FieldSquareSelected(fieldCoordinate.swapX(game.rules)) else FieldSquareSelected(fieldCoordinate)
             )
         }
         uiState.userSelectedMultipleActions(setupActions, delayEvent = false)

@@ -1,11 +1,8 @@
 package com.jervisffb.ui.screen.p2p.host
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,27 +12,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Switch
-import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,10 +34,8 @@ import com.jervisffb.engine.rules.bb2020.tables.KickOffTable
 import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
-import com.jervisffb.ui.isDigitsOnly
-import com.jervisffb.ui.screen.p2p.StartGamePage
+import com.jervisffb.ui.screen.p2p.StartP2PGamePage
 import com.jervisffb.ui.screen.p2p.TeamSelectorPage
-import com.jervisffb.ui.screen.p2p.TeamSelectorScreenModel
 import com.jervisffb.ui.view.JervisTheme
 import com.jervisffb.ui.view.SidebarMenu
 import com.jervisffb.ui.view.utils.TitleBorder
@@ -142,64 +121,6 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
 }
 
 @Composable
-fun LoadTeamDialog(
-    viewModel: TeamSelectorScreenModel,
-    onCloseRequest: () -> Unit
-) {
-    var inputText by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-    println("Show LoadTeamDialog")
-    AlertDialog(
-        onDismissRequest = { /* Do nothing */ },
-        title = { Text("Import FUMBBL Team") },
-        text = {
-            Column {
-                Text("Enter the team ID (found in the team URL):")
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = inputText,
-                    onValueChange = { inputText = it },
-                    isError = !inputText.isDigitsOnly(),
-                    placeholder = { Text("Team ID") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (error?.isNotBlank() == true) {
-                    Text(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp), text = error!!, color = Color.Red)
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    isLoading = true
-                    viewModel.loadTeamFromNetwork(
-                        inputText,
-                        onSuccess = {
-                            isLoading = false
-                            onCloseRequest()
-                        },
-                        onError = { msg ->
-                            isLoading = false
-                            error = msg
-                        },
-                    )
-                },
-                enabled = !isLoading && inputText.isNotBlank() && inputText.isDigitsOnly()
-            ) {
-                Text(if (isLoading) "Downloading..." else "Import Team")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onCloseRequest) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-@Composable
 fun PageContent(screenModel: P2PHostScreenModel) {
     val currentPage by screenModel.currentPage.collectAsState()
     val pagerState = rememberPagerState(0) { screenModel.totalPages }
@@ -219,7 +140,7 @@ fun PageContent(screenModel: P2PHostScreenModel) {
                 0 -> SetupGamePage(screenModel.setupGameModel, Modifier)
                 1 -> TeamSelectorPage(screenModel.selectTeamModel, "Start Server", { screenModel.teamSelectionDone() })
                 2 -> WaitForOpponentPage(viewModel = screenModel)
-                3 -> StartGamePage(
+                3 -> StartP2PGamePage(
                     screenModel.controller.homeTeam,
                     screenModel.controller.awayTeam,
                     onAcceptGame = { acceptedGame ->
@@ -230,108 +151,6 @@ fun PageContent(screenModel: P2PHostScreenModel) {
         }
     }
 }
-
-
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun StandardGameSetup(screenModel: SetupGameScreenModel) {
-    Box(
-        modifier = Modifier.fillMaxSize().padding(top = 16.dp),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        Row(horizontalArrangement = Arrangement.Center) {
-            Column(
-                modifier = Modifier.weight(1f).padding(16.dp).wrapContentSize().verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                ExposedDropdownMenuWithSections<WeatherTableEntry>("Weather Table", screenModel.weatherTables) {
-                    screenModel.setWeatherTable(it)
-                }
-                ExposedDropdownMenuWithSections<PitchEntry>("Pitch", screenModel.pitches) {
-                    screenModel.setPitch(it)
-                }
-                ExposedDropdownMenuWithSections<DropdownEntry>("Stadia of the Old World", screenModel.stadia) {
-                    // Do nothing
-                }
-            }
-            Column(
-                modifier = Modifier.weight(1f).padding(16.dp).wrapContentSize().verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                ExposedDropdownMenuWithSections<KickOffTableEntry>("Kick-off Table", screenModel.kickOffTables) {
-                    screenModel.setKickOffTable(it)
-                }
-                ExposedDropdownMenuWithSections<UnusualBallEntry>("Ball", screenModel.unusualBallList) {
-                    screenModel.setUnusualBall(it)
-                }
-                SimpleSwitch("Match Events", false) {
-
-                }
-            }
-        }
-
-
-    }
-}
-
-@Composable
-fun SimpleSwitch(label: String, isSelected: Boolean, onSelected: (Boolean) -> Unit) {
-    var isOn by remember { mutableStateOf(isSelected) }
-    Row(modifier = Modifier.width(TextFieldDefaults.MinWidth), verticalAlignment = Alignment.CenterVertically) {
-        Text(text = label)
-        Spacer(modifier = Modifier.weight(1f))
-        Switch(
-            checked = isOn, // Current state
-            onCheckedChange = { isOn = it } // Update state when toggled
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun <T> ExposedDropdownMenuWithSections(
-    title: String,
-    entries: List<Pair<String, List<DropdownEntry>>>,
-    onSelected: (T) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(entries.first().second.first()) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-    ) {
-        OutlinedTextField(
-            modifier = Modifier.padding(bottom = 8.dp),
-            value = selectedOption.name,
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(title) },
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            entries.forEachIndexed { index, (sectionTitle, items) ->
-                DropdownHeader(sectionTitle.uppercase())
-                items.forEach { item ->
-                    DropdownMenuItem(
-                        onClick = {
-                            selectedOption = item
-                            expanded = false
-                        }
-                    ) {
-                        Text(item.name)
-                    }
-                }
-                if (index < entries.lastIndex) {
-                    Divider()
-                }
-            }
-        }
-    }
-}
-
 
 @Composable
 fun SettingsCard(title: String, width: Dp, content: @Composable () -> Unit) {
@@ -360,17 +179,4 @@ fun ColumnScope.BoxHeader(text: String, color: Color = JervisTheme.rulebookRed) 
         )
     }
     TitleBorder(color)
-}
-
-@Composable
-fun DropdownHeader(text: String) {
-    Text(
-        modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
-        text = text,
-        style = MaterialTheme.typography.body1.copy(
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Gray
-        ),
-    )
 }
