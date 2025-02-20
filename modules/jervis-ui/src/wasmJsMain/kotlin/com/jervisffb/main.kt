@@ -3,9 +3,9 @@ package com.jervisffb
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import com.jervisffb.ui.App
-import com.jervisffb.ui.BackNavigationHandler
-import com.jervisffb.ui.initApplication
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.initApplication
+import com.jervisffb.ui.menu.BackNavigationHandler
 import kotlinx.browser.document
 import kotlinx.browser.window
 
