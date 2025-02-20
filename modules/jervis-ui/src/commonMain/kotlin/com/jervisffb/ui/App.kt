@@ -5,9 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
-import com.jervisffb.ui.screen.intro.IntroScreen
-import com.jervisffb.ui.view.JervisTheme
-import com.jervisffb.ui.viewmodel.MenuViewModel
+import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.menu.BackNavigationHandler
+import com.jervisffb.ui.menu.OnBackPress
+import com.jervisffb.ui.menu.intro.IntroScreen
 import com.jervisffb.utils.FileManager
 import com.jervisffb.utils.PropertiesManager
 import com.jervisffb.utils.jervisLogger

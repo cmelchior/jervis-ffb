@@ -9,10 +9,10 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
-import com.jervisffb.ui.view.filePicker
-import com.jervisffb.ui.viewmodel.Feature
-import com.jervisffb.ui.viewmodel.MenuViewModel
-import com.jervisffb.ui.viewmodel.Setups
+import com.jervisffb.ui.game.view.filePicker
+import com.jervisffb.ui.game.viewmodel.Feature
+import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.game.viewmodel.Setups
 import okio.Path
 
 @Composable

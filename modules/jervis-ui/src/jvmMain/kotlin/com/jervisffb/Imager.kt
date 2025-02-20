@@ -8,7 +8,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.model.Game
 import com.jervisffb.ui.App
-import com.jervisffb.ui.viewmodel.MenuViewModel
+import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skia.Data

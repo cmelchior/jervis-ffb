@@ -13,7 +13,8 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.view.Field
 import com.jervisffb.ui.view.Sidebar
-import com.jervisffb.ui.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import manual.dummies.TestDummy
 import org.junit.Test
 import kotlin.test.Ignore
@@ -44,8 +45,8 @@ class PlayerStatsCardTests {
 
 @Composable
 private fun PlayerStatsContent(
-    leftDugout: com.jervisffb.ui.viewmodel.SidebarViewModel,
-    rightDugout: com.jervisffb.ui.viewmodel.SidebarViewModel,
+    leftDugout: SidebarViewModel,
+    rightDugout: SidebarViewModel,
     field: FieldViewModel,
 ) {
     Row(

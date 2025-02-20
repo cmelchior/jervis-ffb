@@ -10,10 +10,10 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.App
-import com.jervisffb.ui.BackNavigationHandler
+import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.initApplication
+import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.pixelsToDp
-import com.jervisffb.ui.viewmodel.MenuViewModel
 
 
 fun main() {

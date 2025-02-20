@@ -4,12 +4,13 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.HotSeatGameRunner
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.test.createDefaultGameState
-import com.jervisffb.ui.UiGameController
+import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.screen.GameScreenModel
 import com.jervisffb.ui.screen.Manual
 import com.jervisffb.ui.screen.TeamActionMode
-import com.jervisffb.ui.viewmodel.FieldViewModel
-import com.jervisffb.ui.viewmodel.MenuViewModel
+import com.jervisffb.ui.game.viewmodel.FieldViewModel
+import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 
 object TestDummy {
     val menuViewModel = MenuViewModel()
@@ -20,14 +21,14 @@ object TestDummy {
     val uiController = UiGameController(Manual(TeamActionMode.ALL_TEAMS), runner, menuViewModel, emptyList())
     val fieldVieModel by lazy { FieldViewModel(uiController, gameModel.hoverPlayerFlow) }
     val leftSidebar by lazy {
-        com.jervisffb.ui.viewmodel.SidebarViewModel(
+        SidebarViewModel(
             uiController,
             state.homeTeam,
             gameModel.hoverPlayerFlow
         )
     }
     val rightSidebar by lazy {
-        com.jervisffb.ui.viewmodel.SidebarViewModel(
+        SidebarViewModel(
             uiController,
             state.awayTeam,
             gameModel.hoverPlayerFlow
