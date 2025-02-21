@@ -49,9 +49,10 @@ data class Replay(val file: Path) : GameMode
 class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
     fun start(navigator: Navigator, mode: GameMode) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = GameScreenModel(null, null, mode, menuViewModel)
-            screenModel.initialize()
-            navigator.push(GameScreen(screenModel))
+            TODO()
+//            val screenModel = GameScreenModel(null, null, mode, menuViewModel)
+//            screenModel.initialize()
+//            navigator.push(GameScreen(screenModel))
         }
     }
 

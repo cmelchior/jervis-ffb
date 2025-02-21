@@ -31,19 +31,11 @@ import com.jervisffb.ui.menu.p2p.client.P2PClientScreen
 import com.jervisffb.ui.menu.p2p.client.P2PClientScreenModel
 import com.jervisffb.ui.menu.p2p.host.P2PHostScreenModel
 import com.jervisffb.ui.menu.p2p.host.P2PServerScreen
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.InternalResourceApi
 
 class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
-    fun startAiGame(navigator: Navigator, mode: GameMode) {
-        GlobalScope.launch {
-            val screenModel = GameScreenModel(null, null, mode, menuViewModel)
-            screenModel.initialize()
-            navigator.push(GameScreen(screenModel))
-        }
-    }
 
     fun startHotSeatGame(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {

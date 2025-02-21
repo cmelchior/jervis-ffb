@@ -3,7 +3,6 @@ package com.jervisffb.ui.game.runner
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -12,7 +11,6 @@ import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.ui.game.state.UiActionProvider
-import com.jervisffb.ui.game.runner.UiGameRunner
 
 /**
  * Runner class for Stand-alone games that are run fully on the client.
@@ -42,9 +40,6 @@ class LocalGameRunner(
         onClientAction(clientIndex, action)
     }
 
-    override fun handleAction(id: GameActionId, action: GameAction) {
-        TODO()
-    }
     override fun getAvailableActions(): ActionRequest {
         val actions = controller.getAvailableActions()
         return actions

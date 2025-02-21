@@ -32,7 +32,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
-import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.state.decorators.DeselectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
@@ -62,7 +61,6 @@ data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenAc
  * that can be sent to the [GameEngineController].
  */
 class ManualActionProvider(
-    private val uiState: UiGameController,
     private val menuViewModel: MenuViewModel,
     private val actionMode: TeamActionMode
 ): UiActionProvider() {
@@ -137,7 +135,7 @@ class ManualActionProvider(
         // TODO What to do here when it is the other team having its turn.
         //  The behavior will depend on the game being a HotSeat vs. Client/Server
         val showActionDecorators = when (actionMode) {
-            TeamActionMode.HOME_TEAM -> actions.team?.id == controller.state.homeTeam.id
+            TeamActionMode.HOME_TEAM -> actions.team == null || actions.team?.id == controller.state.homeTeam.id
             TeamActionMode.AWAY_TEAM -> actions.team?.id == controller.state.awayTeam.id
             TeamActionMode.ALL_TEAMS -> true
             TeamActionMode.NONE -> false

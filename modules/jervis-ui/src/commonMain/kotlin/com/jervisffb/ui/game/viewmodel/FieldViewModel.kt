@@ -85,7 +85,7 @@ class FieldViewModel(
 
                     // Create the action triggered if clicking the mouse-over field.
                     val action = {
-                        val actionProvider = (uiState.actionProvider as ManualActionProvider)
+                        val actionProvider = (uiState.currentActionProvider as ManualActionProvider)
 
 
                         fun getQueuedActionsForPath(): QueuedActionsResult {

@@ -6,6 +6,7 @@ import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.ui.game.runner.SingleTeamNetworkGameRunner
+import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameScreen
 import com.jervisffb.ui.menu.GameScreenModel
@@ -86,12 +87,21 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                                 }
                             }
                         }
+
+                        val homeTeam = controller.homeTeam.value ?: error("Home team is not selected")
+                        val homeActionProvider = ManualActionProvider(menuViewModel, TeamActionMode.HOME_TEAM)
+
+                        val awayTeam = controller.awayTeam.value ?: error("Away team is not selected")
+                        val awayActionProvider = ManualActionProvider(menuViewModel, TeamActionMode.HOME_TEAM)
+
                         gameScreenModel = GameScreenModel(
-                            null,
-                            null,
+                            homeTeam,
+                            homeActionProvider,
+                            awayTeam,
+                            awayActionProvider,
                             mode = Manual(TeamActionMode.HOME_TEAM),
                             menuViewModel = menuViewModel,
-                            injectedGameRunner = runner,
+                            gameRunner = runner,
                             onEngineInitialized = {
                                 menuViewModel.navigatorContext.launch {
                                     controller.sendGameStarted()

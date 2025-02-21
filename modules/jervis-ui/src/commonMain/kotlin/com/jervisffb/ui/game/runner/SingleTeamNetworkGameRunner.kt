@@ -3,7 +3,6 @@ package com.jervisffb.ui.game.runner
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
-import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -49,13 +48,6 @@ class SingleTeamNetworkGameRunner(
         onClientAction(clientIndex, action)
     }
 
-    fun handleNetworkAction(action: GameAction) {
-        controller.handleAction(action)
-    }
-
-    override fun handleAction(id: GameActionId, action: GameAction) {
-        TODO()
-    }
     override fun getAvailableActions(): ActionRequest {
         val actions = controller.getAvailableActions()
 

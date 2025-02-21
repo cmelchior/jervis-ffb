@@ -14,13 +14,12 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.utils.createRandomAction
-import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class RandomActionProvider(private val uiState: UiGameController): UiActionProvider() {
+class RandomActionProvider(): UiActionProvider() {
 
     private var job: Job? = null
     private var paused = false
@@ -60,7 +59,7 @@ class RandomActionProvider(private val uiState: UiGameController): UiActionProvi
         job = actionScope.launch {
             while (!paused) {
                 val (controller, request) = actionRequestChannel.receive()
-                if (!useManualAutomatedActions(uiState)) {
+                if (!useManualAutomatedActions(controller)) {
                     val selectedAction = createRandomAction(controller.state, request.actions)
                     delay(50)
                     actionSelectedChannel.send(selectedAction)
@@ -77,15 +76,15 @@ class RandomActionProvider(private val uiState: UiGameController): UiActionProvi
         }
     }
 
-    private suspend fun useManualAutomatedActions(uiController: UiGameController): Boolean {
-        val state = uiController.state
-        val stack = uiController.state.stack
+    private suspend fun useManualAutomatedActions(controller: GameEngineController): Boolean {
+        val state = controller.state
+        val stack = controller.state.stack
         if (stack.peepOrNull()?.procedure == SetupTeam && stack.peepOrNull()?.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
             val context = state.getContext<SetupTeamContext>()
             if (context.team.isHomeTeam()) {
-                handleManualHomeKickingSetup(uiController.gameRunner.controller)
+                handleManualHomeKickingSetup(controller)
             } else {
-                handleManualAwayKickingSetup(uiController.gameRunner.controller)
+                handleManualAwayKickingSetup(controller)
             }
             actionRequestChannel.receive()
             actionSelectedChannel.send(EndSetup)

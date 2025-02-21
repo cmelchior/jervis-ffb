@@ -3,7 +3,6 @@ package com.jervisffb.ui.game
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.GameRunner
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
@@ -22,6 +21,7 @@ import com.jervisffb.ui.game.animations.AnimationFactory
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.model.UiPlayer
+import com.jervisffb.ui.game.runner.UiGameRunner
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameMode
@@ -40,24 +40,27 @@ import kotlinx.coroutines.launch
  * This class is the main entry point for holding the UI game state. It acts
  * as the main ViewModel in MVVM.
  *
- * It responsible for acting as a bridge towards [GameEngineController],
+ * It is responsible for acting as a bridge towards [GameEngineController],
  * which means it should consume all events from there as well as being the only one
  * to send UI actions back to it.
  *
- * This way, we can intercept events and states in both directions and map them
+ * This way, we can intercept events and states in both directions and convert them,
  * so they are suitable for being consumed by the UI.
  */
 class UiGameController(
     private val mode: GameMode,
-    val gameRunner: GameRunner,
+    val gameRunner: UiGameRunner,
+    private val homeActionProvider: UiActionProvider,
+    private val awayActionProvider: UiActionProvider,
     private val menuViewModel: MenuViewModel,
     private val preloadedActions: List<GameAction>
 ) {
     // Reference to the current rules engine state of the game
     // DO NOT modify the state on this end.
-    val state: Game = gameRunner.state ?: error("UI requires state and rules to be set")
-    val rules: Rules = gameRunner.rules ?: error("UI requires state and rules to be set")
-    lateinit var actionProvider: UiActionProvider
+    val state: Game = gameRunner.state
+    val rules: Rules = gameRunner.rules
+
+    var currentActionProvider: UiActionProvider = homeActionProvider
 
     // Persistent UI decorations that needs to be stored across frames
     val uiDecorations = UiGameDecorations()
@@ -90,8 +93,7 @@ class UiGameController(
      * TODO How to handle interruptions, i.e. players accidentally leaving and
      *  rejoining.
      */
-    fun startGameEventLoop(uiActionFactory: UiActionProvider) {
-        this.actionProvider = uiActionFactory
+    fun startGameEventLoop() {
         val controller = gameRunner.controller
         gameScope.launch {
 
@@ -124,8 +126,17 @@ class UiGameController(
 
                 // TODO Run Sound Decorators
 
+                // Select the appropriate action provider. If no team is chosen to provide it,
+                // we just defer to the home team.
+                currentActionProvider = if (actions.team?.isAwayTeam() == true) {
+                    awayActionProvider
+                } else {
+                    homeActionProvider
+                }
+                gameRunner.actionProvider = currentActionProvider
+
                 // Update UI State based on latest model state
-                actionProvider.prepareForNextAction(controller)
+                currentActionProvider.prepareForNextAction(controller)
                 var newUiState = createNewUiSnapshot(state, actions, delta, lastUiState)
                 _uiStateFlow.emit(newUiState)
 
@@ -135,18 +146,18 @@ class UiGameController(
 
                 // TODO Just changing the existing uiState might not trigger recomposition correctly
                 //  We need an efficient way to copy the old one.
-                actionProvider.decorateAvailableActions(newUiState, actions)
+                currentActionProvider.decorateAvailableActions(newUiState, actions)
                 lastUiState = newUiState
                 _uiStateFlow.emit(newUiState)
 
                 // Wait for the system to produce the next action, this can either be
                 // automatically generated or come from the UI. Here we do not care where
                 // it comes from.
-                val userAction = actionProvider.getAction()
+                val userAction = currentActionProvider.getAction()
 
                 // After an action was selected, all decorators to modify
                 // the UI while the action is being processed.
-                actionProvider.decorateSelectedAction(newUiState, userAction)
+                currentActionProvider.decorateSelectedAction(newUiState, userAction)
                 _uiStateFlow.emit(newUiState)
 
                 // Then run any animations triggered by the action (but before the state is updated)
@@ -297,10 +308,12 @@ class UiGameController(
         )
     }
 
-    fun userSelectedAction(action: GameAction) { actionProvider.userActionSelected(action)}
+    fun userSelectedAction(action: GameAction) {
+        currentActionProvider.userActionSelected(action)
+    }
 
     fun userSelectedMultipleActions(actions: List<GameAction>, delayEvent: Boolean = true) {
-        actionProvider.userMultipleActionsSelected(actions, delayEvent)
+        currentActionProvider.userMultipleActionsSelected(actions, delayEvent)
     }
 
     fun notifyAnimationDone() {

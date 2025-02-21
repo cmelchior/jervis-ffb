@@ -17,7 +17,12 @@ class RandomActionsControllerViewModel(
     screenModel: GameScreenModel,
 ) {
 
-    private val actionProvider: RandomActionProvider = uiState.actionProvider as RandomActionProvider
+    init {
+        // Need to convert this to a Random AI Player
+        TODO()
+    }
+
+    private val actionProvider: RandomActionProvider = uiState.currentActionProvider as RandomActionProvider
 
     fun startActions() {
         actionProvider.startActionProvider()
