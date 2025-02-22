@@ -19,15 +19,21 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class RandomActionProvider(): UiActionProvider() {
+class RandomActionProvider(override val team: Team, val controller: GameEngineController): UiActionProvider() {
 
     private var job: Job? = null
     private var paused = false
-    private lateinit var controller: GameEngineController
     private lateinit var actions: ActionRequest
 
+    override fun startHandler() {
+        // Do nothing
+    }
+
+    override fun syncAction(action1: Team?, action: GameAction) {
+        // Do nothing
+    }
+
     override fun prepareForNextAction(controller: GameEngineController) {
-        this.controller = controller
         this.actions = controller.getAvailableActions()
     }
 

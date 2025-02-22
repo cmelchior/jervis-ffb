@@ -24,6 +24,7 @@ import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.JsonElement
 
@@ -39,6 +40,10 @@ data class RemoveEntry(val log: LogEntry) : ListEvent
  * [GameRunner]
  */
 class GameEngineController(state: Game) {
+
+    companion object {
+        val LOG = jervisLogger()
+    }
 
     // How is the GameController consuming actions. Once started, it poses
     // restrictions on the Controller is used.
@@ -96,6 +101,7 @@ class GameEngineController(state: Game) {
      * is thrown.
      */
     fun handleAction(action: GameAction) {
+        LOG.i("[Game-XX] Handling action: $action")
         if (actionMode != ActionMode.MANUAL && actionMode != ActionMode.TEST) {
             error("Invalid action mode: $actionMode. Must be ActionMode.MANUAL or ActionMode.TEST.")
         }

@@ -2,6 +2,7 @@ package com.jervisffb.net.messages
 
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.serialize.JervisSerialization
@@ -145,7 +146,7 @@ data class GameNotFoundMessage(val gameId: String): ServerMessage
  * @param action the action to send
  */
 @Serializable
-data class SyncGameActionMessage(val serverIndex: Int, val action: GameAction): ServerMessage
+data class SyncGameActionMessage(val producer: CoachId, val serverIndex: Int, val action: GameAction): ServerMessage
 
 @Serializable
 data class TeamData(

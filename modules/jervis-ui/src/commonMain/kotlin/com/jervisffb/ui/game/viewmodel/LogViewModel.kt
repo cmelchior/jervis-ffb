@@ -17,7 +17,7 @@ class LogViewModel(val uiState: UiGameController) {
 
     val showDebugLogs: Boolean = true
     val state = uiState.state
-    val controller = uiState.gameRunner.controller
+    val controller = uiState.gameController
     val logsCache = mutableListOf<LogEntry>()
     val debugLogsCache = mutableListOf<LogEntry>()
     val debugLogs: Flow<List<LogEntry>> =

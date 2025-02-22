@@ -2,6 +2,7 @@ package com.jervisffb.net
 
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.net.messages.ClientMessage
@@ -180,10 +181,10 @@ class ServerCommunication(
         }
     }
 
-    // A Game action was sent to the server and processed sucecssfully, it should now be sent to all other connected
+    // A Game action was sent to the server and processed successfully, it should now be sent to all other connected
     // clients so they can update their local game model.
-    suspend fun sendGameActionSync(sender: JoinedClient?, index: Int, action: GameAction) {
-        val message = SyncGameActionMessage(index, action)
+    suspend fun sendGameActionSync(sender: JoinedP2PCoach?, producer: CoachId, index: Int, action: GameAction) {
+        val message = SyncGameActionMessage(producer, index, action)
         sendToAllOtherConnections(sender, message)
     }
 

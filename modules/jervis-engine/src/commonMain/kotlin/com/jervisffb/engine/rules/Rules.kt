@@ -19,15 +19,15 @@ import com.jervisffb.engine.rules.bb2020.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyTable
 import com.jervisffb.engine.rules.bb2020.tables.InjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.StandardKickOffEventTable
 import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.RandomDirectionTemplate
 import com.jervisffb.engine.rules.bb2020.tables.RangeRuler
+import com.jervisffb.engine.rules.bb2020.tables.StandardKickOffEventTable
+import com.jervisffb.engine.rules.bb2020.tables.StandardWeatherTable
 import com.jervisffb.engine.rules.bb2020.tables.StuntyInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.ThrowInPosition
 import com.jervisffb.engine.rules.bb2020.tables.ThrowInTemplate
-import com.jervisffb.engine.rules.bb2020.tables.StandardWeatherTable
 import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -317,18 +317,6 @@ interface Rules {
             }
             .toSet()
         return result
-
-
-
-//        return (pushee.location as FieldCoordinate).getSurroundingCoordinates(this, includeOutOfBounds = true)
-//            .toSet() // Remove multiple instances of OUT_OF_BOUNDS
-//            .map {
-//                Pair(it, it.realDistanceTo(start))
-//            }
-//            .sortedBy { it.second }
-//            .subList(0, 3)
-//            .map { it.first }
-//            .toSet()
     }
 
     /**

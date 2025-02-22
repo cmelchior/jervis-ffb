@@ -21,6 +21,7 @@ class TeamSelectedHandler(override val session: GameSession) : ClientMessageHand
             // TODO This is a temp fix for getting the correct team refs. Should probably be done by serialization instead.
             team.forEach { it.team = team }
             team.notifyDogoutChange()
+            team.coach = client.coach
             client.team = team
         }
 

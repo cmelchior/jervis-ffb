@@ -2,9 +2,9 @@ package com.jervisffb.ui.menu.p2p
 
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.GameStateSyncMessage
@@ -13,7 +13,6 @@ import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.SpectatorState
 import com.jervisffb.net.messages.TeamData
-import com.jervisffb.ui.game.runner.UiGameRunner
 import com.jervisffb.ui.menu.p2p.host.TeamInfo
 import com.jervisffb.utils.jervisLogger
 import io.ktor.websocket.CloseReason
@@ -49,7 +48,7 @@ class P2PClientGameController(
     private val _connectionState = MutableStateFlow<ConnectionState>(Disconnected(CloseReason(CloseReason.Codes.NORMAL, "")))
     private val connectionState: StateFlow<ConnectionState> = _connectionState
 
-    private val connection: ClintNetworkManager = ClintNetworkManager(GameStateMessageHandler())
+    val connection: ClientNetworkManager = ClientNetworkManager(GameStateMessageHandler())
 
 //    private val mockServerJob: Job
     private var server: LightServer? = null
@@ -63,7 +62,7 @@ class P2PClientGameController(
     val awayTeam: MutableStateFlow<Team?> = MutableStateFlow(null)
     val spectators = mutableListOf<Spectator>()
 
-    var runner: UiGameRunner? = null // Should be != null when state == RUN_GAME
+//    var runner: UiGameRunner? = null // Should be != null when state == RUN_GAME
 
     init {
         if (isHost) {
@@ -132,6 +131,10 @@ class P2PClientGameController(
         connection.sendGameStarted(this.gameId!!)
     }
 
+    fun addMessageHandler(handler: ClientNetworkMessageHandler) {
+        connection.addMessageHandler(handler)
+    }
+
     /**
      * Class responsible for keeping the [clientState] variable up to date. This will be
      * called first, so all further handlers can assume that the "model" state is correct.
@@ -151,8 +154,10 @@ class P2PClientGameController(
         // Game State
         override fun onTeamSelected(team: Team, isHomeTeam: Boolean) {
             if (isHomeTeam) {
+                team.coach = homeCoach.value!!
                 homeTeam.value = team
             } else {
+                team.coach = awayCoach.value!!
                 awayTeam.value = team
             }
         }
@@ -230,18 +235,18 @@ class P2PClientGameController(
             LOG.e { "Received onServerError event [$errorCode]: $message" }
         }
 
-        override fun onGameAction(serverIndex: Int, action: GameAction) {
-            // TODO How to recover from errors here. It probably means the client and server
-            //  got out of Sync. So one suggestion could be to show an error dialog saying\
-            //  Inconsistent state and then a button that asks the server for its state and then
-            //  reinitialize everything. For now we just log it
-            try {
-                lastServerActionIndex = serverIndex
-                runner?.actionProvider?.userActionSelected(action) ?: error("Runner is null. Cannot handle ($serverIndex): $action")
-//                runner?.handleAction(action)
-            } catch (e: InvalidActionException) {
-                LOG.e(e) { "Error handling game action: $action" }
-            }
+        override fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction) {
+//            // TODO How to recover from errors here. It probably means the client and server
+//            //  got out of Sync. So one suggestion could be to show an error dialog saying\
+//            //  Inconsistent state and then a button that asks the server for its state and then
+//            //  reinitialize everything. For now we just log it
+//            try {
+//                lastServerActionIndex = serverIndex
+//                runner?.actionProvider?.userActionSelected(action) ?: error("Runner is null. Cannot handle ($serverIndex): $action")
+////                runner?.handleAction(action)
+//            } catch (e: InvalidActionException) {
+//                LOG.e(e) { "Error handling game action: $action" }
+//            }
         }
     }
 }

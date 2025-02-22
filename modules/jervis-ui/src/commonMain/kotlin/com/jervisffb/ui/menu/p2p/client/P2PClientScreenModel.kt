@@ -3,13 +3,17 @@ package com.jervisffb.ui.menu.p2p.client
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.Navigator
+import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.model.Field
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.IconFactory
-import com.jervisffb.ui.game.runner.SingleTeamNetworkGameRunner
-import com.jervisffb.ui.game.state.ManualActionProvider
+import com.jervisffb.ui.game.state.NetworkActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameScreen
 import com.jervisffb.ui.menu.GameScreenModel
@@ -78,39 +82,43 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                         currentPage.value = 2
                     }
                     P2PClientState.RUN_GAME -> {
-                        val runner = SingleTeamNetworkGameRunner(
-                            controller.awayTeam.value!!,
-                            controller
-                        ) { clientIndex, clientAction ->
-                            println("User action: $clientIndex > ${controller.lastServerActionIndex}")
-                            if (clientIndex > controller.lastServerActionIndex) {
-                                menuViewModel.navigatorContext.launch {
-                                    controller.sendActionToServer(clientIndex, clientAction)
-                                }
-                            }
-                        }
 
-                        val homeTeam = controller.homeTeam.value ?: error("Home team is not selected")
-                        val homeActionProvider = ManualActionProvider(menuViewModel, TeamActionMode.HOME_TEAM)
+                        val rules = StandardBB2020Rules()
+                        val homeTeam = JervisSerialization.fixTeamRefs(controller.homeTeam.value!!)
+                        homeTeam.coach = controller.homeCoach.value!!
+                        val awayTeam = JervisSerialization.fixTeamRefs(controller.awayTeam.value!!)
+                        awayTeam.coach = controller.awayCoach.value!!
+                        val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
+                        val gameController = GameEngineController(game)
 
-                        val awayTeam = controller.awayTeam.value ?: error("Away team is not selected")
-                        val awayActionProvider = ManualActionProvider(menuViewModel, TeamActionMode.HOME_TEAM)
-
+                        val homeActionProvider = NetworkActionProvider(
+                            gameController.state.homeTeam,
+                            gameController,
+                            menuViewModel,
+                            controller,
+                            TeamActionMode.AWAY_TEAM
+                        )
+                        val awayActionProvider = NetworkActionProvider(
+                            gameController.state.awayTeam,
+                            gameController,
+                            menuViewModel,
+                            controller,
+                            TeamActionMode.AWAY_TEAM
+                        )
                         val model = GameScreenModel(
-                            homeTeam,
+                            gameController,
+                            gameController.state.homeTeam,
                             homeActionProvider,
-                            awayTeam,
+                            gameController.state.awayTeam,
                             awayActionProvider,
                             mode = Manual(TeamActionMode.AWAY_TEAM),
                             menuViewModel = menuViewModel,
-                            gameRunner = runner,
-                            onEngineInitialized = {
-                                menuViewModel.navigatorContext.launch {
-                                    controller.sendGameStarted()
-                                }
+                        ) {
+                            menuViewModel.controller = gameController
+                            menuViewModel.navigatorContext.launch {
+                                controller.sendGameStarted()
                             }
-                        )
-                        controller.runner = runner
+                        }
                         navigator.push(GameScreen(model))
                         lastValidPage = 2
                     }

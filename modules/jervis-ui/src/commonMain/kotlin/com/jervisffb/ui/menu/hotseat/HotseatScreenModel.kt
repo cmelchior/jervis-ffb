@@ -2,7 +2,12 @@ package com.jervisffb.ui.menu.hotseat
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.navigator.Navigator
-import com.jervisffb.ui.game.runner.LocalGameRunner
+import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.Field
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -84,40 +89,46 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
     fun startGame() {
         // TODO If one of the teams are controlled by an AI, we should probably modify the UI and treat it as a remote client,
         // ie., not show UI controls for it.
-
         val homeTeam = selectedHomeTeam.value?.teamData ?: error("Home team is not selected")
-        val homeActionProvider = when (selectHomeTeamModel.playerType.value) {
-            PlayerType.HUMAN -> ManualActionProvider(menuViewModel, TeamActionMode.HOME_TEAM,)
-            PlayerType.COMPUTER -> RandomActionProvider().also { it.startActionProvider() }
-        }
-
         val awayTeam = selectedAwayTeam.value?.teamData ?: error("Away team is not selected")
-        val awayActionProvider = when (selectAwayTeamModel.playerType.value) {
-            PlayerType.HUMAN -> ManualActionProvider(menuViewModel, TeamActionMode.AWAY_TEAM)
-            PlayerType.COMPUTER -> RandomActionProvider().also { it.startActionProvider() }
+
+        val rules = StandardBB2020Rules()
+        homeTeam.coach = Coach(CoachId("1"), selectHomeTeamModel.coachName.value)
+        awayTeam.coach = Coach(CoachId("2"), selectAwayTeamModel.coachName.value)
+        val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
+        val gameController = GameEngineController(game)
+
+        val homeActionProvider = when (selectHomeTeamModel.playerType.value) {
+            PlayerType.HUMAN -> ManualActionProvider(
+                gameController.state.homeTeam,
+                gameController,
+                menuViewModel,
+                TeamActionMode.HOME_TEAM,
+            )
+            PlayerType.COMPUTER -> RandomActionProvider(homeTeam, gameController).also { it.startActionProvider() }
         }
 
-        val runner = LocalGameRunner(
-            homeTeam,
-            awayTeam,
-        ) { clientIndex, clientAction ->
-            // TODO If AI, send the action to the AI controller
-//            if (clientIndex > controller.lastServerActionIndex) {
-//                menuViewModel.navigatorContext.launch {
-//                    controller.sendActionToServer(clientIndex, clientAction)
-//                }
-//            }
+        val awayActionProvider = when (selectAwayTeamModel.playerType.value) {
+            PlayerType.HUMAN -> ManualActionProvider(
+                gameController.state.awayTeam,
+                gameController,
+                menuViewModel,
+                TeamActionMode.AWAY_TEAM,
+            )
+            PlayerType.COMPUTER -> RandomActionProvider(awayTeam, gameController).also { it.startActionProvider() }
         }
+
+
         val model = GameScreenModel(
-            homeTeam,
+            gameController,
+            gameController.state.homeTeam,
             homeActionProvider,
-            awayTeam,
+            gameController.state.awayTeam,
             awayActionProvider,
             mode = Manual(TeamActionMode.ALL_TEAMS),
             menuViewModel = menuViewModel,
-            gameRunner = runner,
             onEngineInitialized = {
-                menuViewModel.controller = runner.controller
+                menuViewModel.controller = gameController
                 menuViewModel.navigatorContext.launch {
                     // TODO Send to AI controller?
                     // controller.sendGameStarted()

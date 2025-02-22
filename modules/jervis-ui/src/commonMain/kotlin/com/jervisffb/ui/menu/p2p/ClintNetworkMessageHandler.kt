@@ -2,6 +2,7 @@ package com.jervisffb.ui.menu.p2p
 
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.net.GameId
@@ -72,7 +73,7 @@ interface ClientNetworkMessageHandler {
     fun onConfirmGameStart(id: GameId, teams: List<TeamData>)
     fun onGameReady(id: GameId)
     fun onServerError(errorCode: JervisErrorCode, message: String)
-    fun onGameAction(serverIndex: Int, action: GameAction)
+    fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction)
 }
 
 abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler {
@@ -92,7 +93,7 @@ abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler 
     override fun onConfirmGameStart(id: GameId, teams: List<TeamData>) { }
     override fun onGameReady(id: GameId) { }
     override fun onServerError(errorCode: JervisErrorCode, message: String) { }
-    override fun onGameAction(serverIndex: Int, action: GameAction) { }
+    override fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction) { }
 }
 
 /**
@@ -100,7 +101,7 @@ abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler 
  * This class should be responsible for mapping high-level APIs to the correct
  * web socket messages and vice versa.
  */
-class ClintNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
+class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
 
     companion object {
         val LOG = jervisLogger()
@@ -180,7 +181,7 @@ class ClintNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
                 is UpdateHostStateMessage -> messageHandler.onHostStateChange(message.state)
                 is UpdateSpectatorStateMessage -> messageHandler.onSpectatorStateChange(message.state)
                 is GameStateSyncMessage -> messageHandler.onGameSync(message)
-                is SyncGameActionMessage -> messageHandler.onGameAction(message.serverIndex, message.action)
+                is SyncGameActionMessage -> messageHandler.onGameAction(message.producer, message.serverIndex, message.action)
                 null -> TODO()
             }
         }

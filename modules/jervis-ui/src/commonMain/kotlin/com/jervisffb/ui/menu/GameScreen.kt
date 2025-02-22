@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
@@ -12,7 +13,6 @@ import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
-import com.jervisffb.ui.game.runner.UiGameRunner
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.LoadingScreen
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
@@ -30,13 +30,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class GameScreenModel(
+    private val gameController: GameEngineController,
     val homeTeam: Team,
     private val homeTeamActionProvider: UiActionProvider,
     var awayTeam: Team,
     private val awayTeamActionProvider: UiActionProvider,
     val mode: GameMode,
+//    val gameRunner: UiGameRunner,
     val menuViewModel: MenuViewModel,
-    val gameRunner: UiGameRunner,
     private val actions: List<GameAction> = emptyList(),
     private val onEngineInitialized: () -> Unit = { },
 ) : ScreenModel {
@@ -87,7 +88,7 @@ class GameScreenModel(
      */
     suspend fun initialize() {
         _loadingMessages.value = "Initializing icons..."
-        IconFactory.initialize(gameRunner.state.homeTeam, gameRunner.state.awayTeam)
+        IconFactory.initialize(homeTeam, awayTeam)
 //        val homeActionProvider =
 //            when (mode) {
 //                is Manual -> ManualActionProvider(menuViewModel, mode.actionMode)
@@ -101,11 +102,15 @@ class GameScreenModel(
 //                Random -> TODO() // RandomActionProvider(uiState)
 //                is Replay -> TODO() // ReplayActionProvider(uiState, fumbbl)
 //            }
-        uiState = UiGameController(mode, gameRunner, homeTeamActionProvider, awayTeamActionProvider, menuViewModel, actions)
+        uiState = UiGameController(
+            gameController,
+            homeTeamActionProvider,
+            awayTeamActionProvider,
+            menuViewModel,
+            actions)
 
         // Setup references and start action listener
         menuViewModel.uiState = uiState
-        gameRunner.actionProvider = homeTeamActionProvider
         uiState.startGameEventLoop()
         onEngineInitialized()
         _loadingMessages.value = ""
@@ -115,7 +120,6 @@ class GameScreenModel(
 
 class GameScreen(val screenModel: GameScreenModel) : Screen {
     override val key: ScreenKey = "GameScreen"
-    val runner = screenModel.gameRunner
 
     @Composable
     override fun Content() {
@@ -127,12 +131,12 @@ class GameScreen(val screenModel: GameScreenModel) : Screen {
                 ),
                 SidebarViewModel(
                     screenModel.uiState,
-                    runner.state!!.homeTeam,
+                    screenModel.homeTeam,
                     screenModel.hoverPlayerFlow
                 ),
                 SidebarViewModel(
                     screenModel.uiState,
-                    runner.state!!.awayTeam,
+                    screenModel.awayTeam,
                     screenModel.hoverPlayerFlow
                 ),
                 GameStatusViewModel(screenModel.uiState),

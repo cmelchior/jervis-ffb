@@ -19,10 +19,15 @@ class GameStartedHandler(override val session: GameSession) : ClientMessageHandl
             it.hasStartedGame = true
             if (session.coaches.all { it.hasStartedGame}) {
                 val game = session.game!!
-                while (game.getAvailableActions().containsActionWithRandomBehavior()) {
-                    val action = createRandomAction(game.state, game.getAvailableActions())
+
+                var availableActions = game.getAvailableActions()
+                while (availableActions.containsActionWithRandomBehavior()) {
+                    val action = createRandomAction(game.state, availableActions)
                     game.handleAction(action)
-                    session.out.sendGameActionSync(sender = null, session.game?.history?.last()?.id!!, action = action)
+                    // If no producer, we just set it to the Home Team
+                    val producer = session.coaches.firstOrNull { it.coach == availableActions.team?.coach } ?: session.coaches.first()
+                    session.out.sendGameActionSync(sender = null, producer.coach.id,session.game?.history?.last()?.id!!, action = action)
+                    availableActions = game.getAvailableActions()
                 }
             }
         } ?: session.out.sendError(connection, message,JervisErrorCode.PROTOCOL_ERROR, "Spectator clients cannot start games: $message")

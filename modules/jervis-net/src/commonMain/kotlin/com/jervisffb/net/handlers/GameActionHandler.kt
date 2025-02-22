@@ -21,14 +21,19 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
         try {
             val game = session.game!!
             game.handleAction(message.action)
-            session.out.sendGameActionSync(sender = session.getPlayerClient(connection)!!, session.game?.history?.last()?.id!!, action = message.action)
+            val sender = session.getPlayerClient(connection)!!
+            session.out.sendGameActionSync(sender = sender, sender.coach.id, session.game?.history?.last()?.id!!, action = message.action)
 
             // If the Game is set up, so the server handle all random actions, we should now roll forward creating them here.
             // TODO Add a ServerConfiguration that holds this choice
-            while (game.getAvailableActions().containsActionWithRandomBehavior()) {
-                val action = createRandomAction(game.state, game.getAvailableActions())
+            var availableActions = game.getAvailableActions()
+            while (availableActions.containsActionWithRandomBehavior()) {
+                val action = createRandomAction(game.state, availableActions)
                 game.handleAction(action)
-                session.out.sendGameActionSync(sender = null, session.game?.history?.last()?.id!!, action = action)
+                // If no producer, we just set it to the Home Team
+                val producer = session.coaches.firstOrNull { it.coach == availableActions.team?.coach } ?: session.coaches.first()
+                session.out.sendGameActionSync(sender = null, producer.coach.id, session.game?.history?.last()?.id!!, action = action)
+                availableActions = game.getAvailableActions()
             }
         } catch (e: Exception) {
             session.out.sendError(connection, message, JervisErrorCode.INVALID_GAME_ACTION, e.stackTraceToString())

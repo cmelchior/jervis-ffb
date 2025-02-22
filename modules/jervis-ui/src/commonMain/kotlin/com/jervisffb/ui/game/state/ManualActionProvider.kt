@@ -26,12 +26,15 @@ import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
+import com.jervisffb.engine.utils.containsActionWithRandomBehavior
+import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.state.decorators.DeselectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
@@ -60,13 +63,15 @@ data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenAc
  * Class responsible for enhancing the UI, so it is able to create a [GameAction]
  * that can be sent to the [GameEngineController].
  */
-class ManualActionProvider(
+open class ManualActionProvider(
+    override val team: Team,
+    protected val game: GameEngineController,
     private val menuViewModel: MenuViewModel,
-    private val actionMode: TeamActionMode
+    private val clientMode: TeamActionMode
 ): UiActionProvider() {
 
     private lateinit var controller: GameEngineController
-    private lateinit var actions: ActionRequest
+    private lateinit var availableActions: ActionRequest
 
     // If set, it contains an action that should automatically be sent on the next call to getAction()
     var automatedAction: GameAction? = null
@@ -106,9 +111,17 @@ class ManualActionProvider(
         return fieldActionDecorators[type] as? FieldActionDecorator<GameActionDescriptor>
     }
 
+    override fun startHandler() {
+        // Do nothing. We are sharing the controller with the main UiGameController
+    }
+
+    override fun syncAction(action1: Team?, action: GameAction) {
+        // Do nothing. We are sharing the controller with the main UiGameController
+    }
+
     override fun prepareForNextAction(controller: GameEngineController) {
         this.controller = controller
-        this.actions = controller.getAvailableActions()
+        this.availableActions = controller.getAvailableActions()
 
         // If the UI has registered any queued action generators, we run them first before
         // trying to find other automated actions.
@@ -123,7 +136,7 @@ class ManualActionProvider(
         }
 
         // We only want to check for other automated settings if no queued up actions exists.
-        // This also means that anyone quing up actions, most queue up all intermediate actions
+        // This also means that anyone queuing up actions, most queue up all intermediate actions
         // as well.
         if (queuedActions.isEmpty()) {
             automatedAction = calculateAutomaticResponse(controller, controller.getAvailableActions().actions)
@@ -131,14 +144,18 @@ class ManualActionProvider(
     }
 
     override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
+        availableActions = actions
         if (queuedActions.isNotEmpty()) return
         // TODO What to do here when it is the other team having its turn.
         //  The behavior will depend on the game being a HotSeat vs. Client/Server
-        val showActionDecorators = when (actionMode) {
+        var showActionDecorators = when (clientMode) {
             TeamActionMode.HOME_TEAM -> actions.team == null || actions.team?.id == controller.state.homeTeam.id
             TeamActionMode.AWAY_TEAM -> actions.team?.id == controller.state.awayTeam.id
             TeamActionMode.ALL_TEAMS -> true
-            TeamActionMode.NONE -> false
+        }
+        // TODO Move to a ServerConfiguration kind of thing
+        if (actions.containsActionWithRandomBehavior()) {
+            showActionDecorators = false
         }
         if (showActionDecorators) {
             addDialogDecorators(state, actions)
@@ -156,7 +173,6 @@ class ManualActionProvider(
     }
 
     override suspend fun getAction(): GameAction {
-
         // Empty queued data if present
         if (queuedActions.isNotEmpty()) {
             val action = queuedActions.removeFirst()
@@ -168,6 +184,11 @@ class ManualActionProvider(
             return action
         }
         delayBetweenActions = false
+
+        // Hide this behind a server parameter
+        if (availableActions.containsActionWithRandomBehavior()) {
+            return createRandomAction(game.state, availableActions)
+        }
 
         // Otherwise empty automated response
         // otherwise wait for response

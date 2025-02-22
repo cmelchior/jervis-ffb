@@ -28,6 +28,7 @@ import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -64,6 +65,7 @@ object PickupRoll : Procedure() {
                 )
                 return compositeCommandOf(
                     SetContext(updatedContext),
+                    ReportDiceRoll(DiceRollType.PICKUP, d6),
                     GotoNode(ChooseReRollSource),
                 )
             }
@@ -142,6 +144,7 @@ object PickupRoll : Procedure() {
                 )
                 compositeCommandOf(
                     SetContext(updatedContext),
+                    ReportDiceRoll(DiceRollType.PICKUP, d6),
                     ExitProcedure(),
                 )
             }

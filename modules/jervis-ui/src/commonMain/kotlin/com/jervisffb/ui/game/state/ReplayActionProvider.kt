@@ -3,23 +3,31 @@ package com.jervisffb.ui.game.state
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.model.Team
 import com.jervisffb.fumbbl.net.adapter.CalculatedJervisAction
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.fumbbl.net.adapter.JervisAction
 import com.jervisffb.fumbbl.net.adapter.OptionalJervisAction
-import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class ReplayActionProvider(private val uiState: UiGameController, private val fumbbl: FumbblReplayAdapter?): UiActionProvider() {
+class ReplayActionProvider(override val team: Team, private val fumbbl: FumbblReplayAdapter?): UiActionProvider() {
 
     private var job: Job? = null
     private var paused = false
     private lateinit var controller: GameEngineController
     private lateinit var actions: ActionRequest
     var started = false
+
+    override fun startHandler() {
+        TODO("Not yet implemented. Figure out how this works")
+    }
+
+    override fun syncAction(action1: Team?, action: GameAction) {
+        TODO("Not yet implemented. Figure out how this works")
+    }
 
 
     override fun prepareForNextAction(controller: GameEngineController) {

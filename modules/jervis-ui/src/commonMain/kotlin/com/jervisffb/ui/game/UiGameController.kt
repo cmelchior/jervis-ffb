@@ -14,6 +14,8 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rng.DiceRollGenerator
+import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayer
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
@@ -21,10 +23,8 @@ import com.jervisffb.ui.game.animations.AnimationFactory
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.model.UiPlayer
-import com.jervisffb.ui.game.runner.UiGameRunner
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
-import com.jervisffb.ui.menu.GameMode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -48,8 +48,7 @@ import kotlinx.coroutines.launch
  * so they are suitable for being consumed by the UI.
  */
 class UiGameController(
-    private val mode: GameMode,
-    val gameRunner: UiGameRunner,
+    val gameController: GameEngineController,
     private val homeActionProvider: UiActionProvider,
     private val awayActionProvider: UiActionProvider,
     private val menuViewModel: MenuViewModel,
@@ -57,8 +56,10 @@ class UiGameController(
 ) {
     // Reference to the current rules engine state of the game
     // DO NOT modify the state on this end.
-    val state: Game = gameRunner.state
-    val rules: Rules = gameRunner.rules
+    val state: Game = gameController.state
+    val rules: Rules = gameController.rules
+    val diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator() // Used by UI to create random results. Should this be somewhere else?
+
 
     var currentActionProvider: UiActionProvider = homeActionProvider
 
@@ -94,12 +95,19 @@ class UiGameController(
      *  rejoining.
      */
     fun startGameEventLoop() {
-        val controller = gameRunner.controller
+        val controller = gameController
+
+        // We need to start the Rules Engine first.
+        // Do this outside the coroutine to ensure that `startHandler` is called correctly
+        // when setting up everything.
+        controller.startManualMode()
+        homeActionProvider.startHandler()
+        awayActionProvider.startHandler()
+
         gameScope.launch {
 
-            // We need to start the Rules Engine first.
 //            if (controller.actionMode != GameEngineController.ActionMode.NOT_STARTED) {
-                controller.startManualMode()
+
 //            }
 
             // Pre-loaded actions are used to fast-forward to an initial state.
@@ -107,7 +115,10 @@ class UiGameController(
             // that state.
             // TODO Error handling here?
             preloadedActions.forEach { preloadedAction ->
-                gameRunner.handleAction(preloadedAction)
+                gameController.handleAction(preloadedAction)
+                // TODO DO not send them to both teams, you risk sending to the same backing controller
+                homeActionProvider.syncAction(null, preloadedAction)
+                awayActionProvider.syncAction(null, preloadedAction)
             }
 
             // Run main game loop
@@ -117,7 +128,7 @@ class UiGameController(
                 // Read new model state
                 val state = controller.state
                 val delta = controller.getDelta()
-                val actions = gameRunner.getAvailableActions()
+                val actions = controller.getAvailableActions()
 
                 runPreUpdateAnimations()
 
@@ -133,7 +144,6 @@ class UiGameController(
                 } else {
                     homeActionProvider
                 }
-                gameRunner.actionProvider = currentActionProvider
 
                 // Update UI State based on latest model state
                 currentActionProvider.prepareForNextAction(controller)
@@ -154,6 +164,7 @@ class UiGameController(
                 // automatically generated or come from the UI. Here we do not care where
                 // it comes from.
                 val userAction = currentActionProvider.getAction()
+                println("TEST: Received user action: $userAction")
 
                 // After an action was selected, all decorators to modify
                 // the UI while the action is being processed.
@@ -166,7 +177,10 @@ class UiGameController(
                 // Last, send action to the Rules Engine for processing.
                 // This will start the next iteration of the game loop.
                 // TODO Add error handling here. What to do for invalid actions?
-                gameRunner.handleAction(userAction)
+                gameController.handleAction(userAction)
+                if (actions.team?.isAwayTeam() == true) {}
+                homeActionProvider.syncAction(actions.team, userAction)
+                awayActionProvider.syncAction(actions.team, userAction)
             }
         }.invokeOnCompletion {
             if (it != null && it !is CancellationException) {
@@ -176,7 +190,7 @@ class UiGameController(
     }
 
     private suspend fun runPreUpdateAnimations() {
-        if (!gameRunner.controller.lastActionWasUndo()) {
+        if (!gameController.lastActionWasUndo()) {
             val animation = AnimationFactory.getPreUpdateAnimation(state)
             if (animation != null) {
                 _animationFlow.emit(animation)
@@ -186,7 +200,7 @@ class UiGameController(
     }
 
     private suspend fun runPostUpdateAnimations() {
-        if (!gameRunner.controller.lastActionWasUndo()) {
+        if (!gameController.lastActionWasUndo()) {
             val animation = AnimationFactory.getFrameAnimation(state, rules)
             if (animation != null) {
                 _animationFlow.emit(animation)
@@ -196,7 +210,7 @@ class UiGameController(
     }
 
     private suspend fun runPostActionAnimations(action: GameAction) {
-        if (!gameRunner.controller.lastActionWasUndo()) {
+        if (!gameController.lastActionWasUndo()) {
             val animation = AnimationFactory.getPostActionAnimation(state, action)
             if (animation != null) {
                 _animationFlow.emit(animation)

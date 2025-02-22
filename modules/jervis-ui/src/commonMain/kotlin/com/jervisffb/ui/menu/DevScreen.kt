@@ -38,7 +38,6 @@ enum class TeamActionMode {
     HOME_TEAM,
     AWAY_TEAM,
     ALL_TEAMS,
-    NONE,
 }
 
 sealed interface GameMode
