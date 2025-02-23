@@ -13,7 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class ReplayActionProvider(override val team: Team, private val fumbbl: FumbblReplayAdapter?): UiActionProvider() {
+class ReplayActionProvider(private val fumbbl: FumbblReplayAdapter?): UiActionProvider() {
 
     private var job: Job? = null
     private var paused = false
@@ -25,12 +25,12 @@ class ReplayActionProvider(override val team: Team, private val fumbbl: FumbblRe
         TODO("Not yet implemented. Figure out how this works")
     }
 
-    override fun syncAction(action1: Team?, action: GameAction) {
+    override fun actionHandled(action1: Team?, action: GameAction) {
         TODO("Not yet implemented. Figure out how this works")
     }
 
 
-    override fun prepareForNextAction(controller: GameEngineController) {
+    override fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
         this.controller = controller
         this.actions = controller.getAvailableActions()
     }
@@ -56,6 +56,10 @@ class ReplayActionProvider(override val team: Team, private val fumbbl: FumbblRe
 
     override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
         TODO("Not yet supported")
+    }
+
+    override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {
+        // Do nothing
     }
 
     fun startActionProvider() {

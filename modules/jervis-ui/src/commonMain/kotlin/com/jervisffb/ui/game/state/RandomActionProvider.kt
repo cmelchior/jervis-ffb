@@ -19,7 +19,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class RandomActionProvider(override val team: Team, val controller: GameEngineController): UiActionProvider() {
+class RandomActionProvider(val controller: GameEngineController): UiActionProvider() {
 
     private var job: Job? = null
     private var paused = false
@@ -29,11 +29,11 @@ class RandomActionProvider(override val team: Team, val controller: GameEngineCo
         // Do nothing
     }
 
-    override fun syncAction(action1: Team?, action: GameAction) {
+    override fun actionHandled(action1: Team?, action: GameAction) {
         // Do nothing
     }
 
-    override fun prepareForNextAction(controller: GameEngineController) {
+    override fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
         this.actions = controller.getAvailableActions()
     }
 
@@ -58,6 +58,10 @@ class RandomActionProvider(override val team: Team, val controller: GameEngineCo
 
     override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
         TODO("Not yet supported")
+    }
+
+    override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {
+        TODO("Not yet implemented")
     }
 
     fun startActionProvider() {

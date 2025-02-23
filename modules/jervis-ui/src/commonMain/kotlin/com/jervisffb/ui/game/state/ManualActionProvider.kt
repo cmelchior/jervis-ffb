@@ -2,6 +2,7 @@ package com.jervisffb.ui.game.state
 
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
@@ -34,7 +35,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
-import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.state.decorators.DeselectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
@@ -53,24 +53,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
-typealias QueuedActionsGenerator = (GameEngineController) -> QueuedActionsResult?
-
-data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenActions: Boolean = false) {
-    constructor(action: GameAction, delayEvent: Boolean = false): this(listOf(action), delayEvent)
-}
-
 /**
- * Class responsible for enhancing the UI, so it is able to create a [GameAction]
- * that can be sent to the [GameEngineController].
+ * Class responsible for enhancing the UI, so it is able to create a [GameAction].
+ *
+ * See [com.jervisffb.ui.game.UiGameController.startGameEventLoop]
  */
 open class ManualActionProvider(
-    override val team: Team,
     protected val game: GameEngineController,
     private val menuViewModel: MenuViewModel,
-    private val clientMode: TeamActionMode
+    private val clientMode: TeamActionMode,
+    private val gameSettings: GameSettings
 ): UiActionProvider() {
 
-    private lateinit var controller: GameEngineController
     private lateinit var availableActions: ActionRequest
 
     // If set, it contains an action that should automatically be sent on the next call to getAction()
@@ -115,12 +109,11 @@ open class ManualActionProvider(
         // Do nothing. We are sharing the controller with the main UiGameController
     }
 
-    override fun syncAction(action1: Team?, action: GameAction) {
+    override fun actionHandled(team: Team?, action: GameAction) {
         // Do nothing. We are sharing the controller with the main UiGameController
     }
 
-    override fun prepareForNextAction(controller: GameEngineController) {
-        this.controller = controller
+    override fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
         this.availableActions = controller.getAvailableActions()
 
         // If the UI has registered any queued action generators, we run them first before
@@ -149,14 +142,17 @@ open class ManualActionProvider(
         // TODO What to do here when it is the other team having its turn.
         //  The behavior will depend on the game being a HotSeat vs. Client/Server
         var showActionDecorators = when (clientMode) {
-            TeamActionMode.HOME_TEAM -> actions.team == null || actions.team?.id == controller.state.homeTeam.id
-            TeamActionMode.AWAY_TEAM -> actions.team?.id == controller.state.awayTeam.id
+            TeamActionMode.HOME_TEAM -> actions.team == null || actions.team?.id == game.state.homeTeam.id
+            TeamActionMode.AWAY_TEAM -> actions.team?.id == game.state.awayTeam.id
             TeamActionMode.ALL_TEAMS -> true
         }
-        // TODO Move to a ServerConfiguration kind of thing
-        if (actions.containsActionWithRandomBehavior()) {
+
+        // If the available actions are random, we only want to show controls for the UI if configured so.
+        // This is mostly a developer or custom play setting and not something commonly used for normal games.
+        if (actions.containsActionWithRandomBehavior() && !gameSettings.userSelectedDiceRolls) {
             showActionDecorators = false
         }
+
         if (showActionDecorators) {
             addDialogDecorators(state, actions)
 
@@ -185,11 +181,6 @@ open class ManualActionProvider(
         }
         delayBetweenActions = false
 
-        // Hide this behind a server parameter
-        if (availableActions.containsActionWithRandomBehavior()) {
-            return createRandomAction(game.state, availableActions)
-        }
-
         // Otherwise empty automated response
         // otherwise wait for response
         return automatedAction?.let { action ->
@@ -199,8 +190,8 @@ open class ManualActionProvider(
     }
 
     override fun userActionSelected(action: GameAction) {
-        actionScope.launch {
-            actionSelectedChannel.send(action)
+        if (actionSelectedChannel.trySend(action).isFailure) {
+            error("Unable to send action to channel. Is the channel closed?")
         }
     }
 
@@ -221,7 +212,7 @@ open class ManualActionProvider(
      */
     private fun addDialogDecorators(state: UiGameSnapshot, actions: ActionRequest) {
         val dialogData = DialogFactory.createDialogIfPossible(
-            controller,
+            game,
             actions,
             { actionDescriptors-> mapUnknownAction(actionDescriptors.actions) }
         )
@@ -252,7 +243,7 @@ open class ManualActionProvider(
             }
         }
 
-        // Choosing whether or not to showing the context menu is a bit complicated.
+        // Choosing whether to showing the context menu is a bit complicated.
         // So we cannot decide this until all available actions have been processed.
         // But we employ the rule that if one of the actions is a "main" action, it means
         // the player was just selected, and we should show the context menu up front.
@@ -371,14 +362,14 @@ open class ManualActionProvider(
     /**
      * Allow the UI to register a queued action generator, that will run at a
      * later stage. This is useful if the UI wants to generate a chain of actions, but some
-     * of the intermediate action are unknown.
+     * of the intermediate actions are unknown.
      *
-     * E.g. when standing up to move, the coach might (or might not) have to
+     * E.g., when standing up to move, the coach might (or might not) have to
      * roll for Negatraits or just Standing Up, before being allowed to move.
      * In this case, we will register an action generator that only trigger
      * once the player can actually move.
      */
-    fun registerQueuedActionGenerator(function: QueuedActionsGenerator) {
+    override fun registerQueuedActionGenerator(function: QueuedActionsGenerator) {
         queuedActionsGeneratorFuncs.add(function)
     }
 }

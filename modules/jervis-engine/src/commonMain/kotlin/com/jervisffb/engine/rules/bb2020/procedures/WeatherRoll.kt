@@ -1,12 +1,13 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetWeather
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -19,7 +20,6 @@ import com.jervisffb.engine.reports.ReportWeatherResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.tables.Weather
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * This procedure controls rolling for the weather as described on
@@ -31,7 +31,7 @@ object WeatherRoll : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollWeatherDice : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team? = null // TODO Is this always true, e.g. if called from Kick-off Event
+        override fun actionOwner(state: Game, rules: Rules): Team? = state.activeTeam // TODO Is this always true, e.g. if called from Kick-off Event
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Each coach should role a dice, but just treat this as a single dice roll here

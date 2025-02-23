@@ -12,7 +12,6 @@ import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiFieldSquare
-import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -85,7 +84,7 @@ class FieldViewModel(
 
                     // Create the action triggered if clicking the mouse-over field.
                     val action = {
-                        val actionProvider = (uiState.currentActionProvider as ManualActionProvider)
+                        val actionProvider = (uiState.actionProvider)
 
 
                         fun getQueuedActionsForPath(): QueuedActionsResult {

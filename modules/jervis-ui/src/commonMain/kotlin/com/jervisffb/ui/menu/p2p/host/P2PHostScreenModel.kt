@@ -3,6 +3,7 @@ package com.jervisffb.ui.menu.p2p.host
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.StandardBB2020Rules
@@ -10,7 +11,8 @@ import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.P2PHostState
-import com.jervisffb.ui.game.state.NetworkActionProvider
+import com.jervisffb.ui.game.state.ManualActionProvider
+import com.jervisffb.ui.game.state.P2PActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameScreen
 import com.jervisffb.ui.menu.GameScreenModel
@@ -89,27 +91,32 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
                         val gameController = GameEngineController(game)
 
-                        val homeActionProvider = NetworkActionProvider(
-                            gameController.state.homeTeam,
+                        val homeActionProvider = ManualActionProvider(
                             gameController,
                             menuViewModel,
-                            controller,
-                            TeamActionMode.HOME_TEAM
+                            TeamActionMode.HOME_TEAM,
+                            GameSettings(userSelectedDiceRolls = false),
                         )
-                        val awayActionProvider = NetworkActionProvider(
-                            gameController.state.awayTeam,
+                        val awayActionProvider = ManualActionProvider(
                             gameController,
                             menuViewModel,
-                            controller,
-                            TeamActionMode.HOME_TEAM
+                            TeamActionMode.HOME_TEAM,
+                            GameSettings(userSelectedDiceRolls = false),
+                        )
+
+                        val actionProvider = P2PActionProvider(
+                            gameController,
+                            GameSettings(userSelectedDiceRolls = false),
+                            homeActionProvider,
+                            awayActionProvider,
+                            controller
                         )
 
                         gameScreenModel = GameScreenModel(
                             gameController = gameController,
                             gameController.state.homeTeam,
-                            homeActionProvider,
                             gameController.state.awayTeam,
-                            awayActionProvider,
+                            actionProvider,
                             mode = Manual(TeamActionMode.HOME_TEAM),
                             menuViewModel = menuViewModel
                         ) {

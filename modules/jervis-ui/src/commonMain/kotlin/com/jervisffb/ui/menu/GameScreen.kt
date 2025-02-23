@@ -32,11 +32,9 @@ import kotlinx.coroutines.flow.StateFlow
 class GameScreenModel(
     private val gameController: GameEngineController,
     val homeTeam: Team,
-    private val homeTeamActionProvider: UiActionProvider,
     var awayTeam: Team,
-    private val awayTeamActionProvider: UiActionProvider,
+    val actionProvider: UiActionProvider,
     val mode: GameMode,
-//    val gameRunner: UiGameRunner,
     val menuViewModel: MenuViewModel,
     private val actions: List<GameAction> = emptyList(),
     private val onEngineInitialized: () -> Unit = { },
@@ -104,8 +102,7 @@ class GameScreenModel(
 //            }
         uiState = UiGameController(
             gameController,
-            homeTeamActionProvider,
-            awayTeamActionProvider,
+            actionProvider,
             menuViewModel,
             actions)
 

@@ -40,7 +40,6 @@ class TeamSelectorScreenModel(
         menuViewModel.navigatorContext.launch {
             CacheManager.loadTeams().map { teamFile ->
                 val team = teamFile.team
-                team.coach = getCoach()
                 getTeamInfo(teamFile, team)
             }.let {
                 availableTeams.value = it.sortedBy { it.teamName }
@@ -65,9 +64,11 @@ class TeamSelectorScreenModel(
 
     fun setSelectedTeam(team: TeamInfo?) {
         if (team == null || selectedTeam.value == team) {
+
             selectedTeam.value = null
             onTeamSelected(null)
         } else {
+            team.teamData?.coach = getCoach()
             selectedTeam.value = team
             onTeamSelected(team)
         }

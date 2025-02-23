@@ -1,7 +1,7 @@
 package com.jervisffb.ui.game.viewmodel
 
 import com.jervisffb.ui.game.UiGameController
-import com.jervisffb.ui.game.state.RandomActionProvider
+import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.menu.GameScreenModel
 
 /**
@@ -22,13 +22,15 @@ class RandomActionsControllerViewModel(
         TODO()
     }
 
-    private val actionProvider: RandomActionProvider = uiState.currentActionProvider as RandomActionProvider
+    private val actionProvider: UiActionProvider = uiState.actionProvider
 
     fun startActions() {
-        actionProvider.startActionProvider()
+        TODO("FIgure out how to start the random action provider")
+        // actionProvider.startActionProvider()
     }
 
     fun pauseActions() {
-        actionProvider.pauseActionProvider()
+        TODO("FIgure out how to pause the random action provider")
+        // actionProvider.pauseActionProvider()
     }
 }

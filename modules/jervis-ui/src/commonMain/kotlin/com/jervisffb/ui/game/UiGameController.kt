@@ -3,6 +3,7 @@ package com.jervisffb.ui.game
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
@@ -12,6 +13,7 @@ import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rng.DiceRollGenerator
@@ -23,6 +25,7 @@ import com.jervisffb.ui.game.animations.AnimationFactory
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.model.UiPlayer
+import com.jervisffb.ui.game.state.QueuedActionsGenerator
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import kotlinx.coroutines.CancellationException
@@ -35,6 +38,78 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+
+// For games fully controlled locally. This means rules concerning timers
+// are handled here.
+class LocalActionProvider(
+    private val engine: GameEngineController,
+    private val settings: GameSettings,
+    private val homeProvider: UiActionProvider,
+    private val awayProvider: UiActionProvider,
+): UiActionProvider() {
+
+    private var currentProvider = homeProvider
+
+    private var actionJob: Job? = null
+
+    override fun startHandler() {
+        homeProvider.startHandler()
+        awayProvider.startHandler()
+    }
+
+    override fun actionHandled(team: Team?, action: GameAction) {
+        homeProvider.actionHandled(team, action)
+        awayProvider.actionHandled(team, action)
+    }
+
+    override fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
+        currentProvider = if (actions.team?.isAwayTeam() == true) {
+            awayProvider
+        } else {
+            homeProvider
+        }
+    }
+
+    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
+        currentProvider.decorateAvailableActions(state, actions)
+    }
+
+    override fun decorateSelectedAction(state: UiGameSnapshot, action: GameAction) {
+        currentProvider.decorateSelectedAction(state, action)
+    }
+
+    override suspend fun getAction(): GameAction {
+        // Figure out how settings for this work
+        // Figure out logging
+//        actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
+//            delay(5.seconds)
+//            val action = createRandomAction(controller.state, actions)
+//            userActionSelected(action)
+//        }
+
+        // TODO How to handle dice rolls
+//                // Hide this behind a server parameter
+//        if (!gameSettings.userSelectedDiceRolls && availableActions.containsActionWithRandomBehavior()) {
+//            return createRandomAction(game.state, availableActions)
+//        }
+
+        return currentProvider.getAction().also {
+            actionJob?.cancel()
+        }
+    }
+
+    override fun userActionSelected(action: GameAction) {
+        currentProvider.userActionSelected(action)
+    }
+
+    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
+        currentProvider.userMultipleActionsSelected(actions, delayEvent)
+    }
+
+    override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {
+        currentProvider.registerQueuedActionGenerator(generator)
+    }
+}
 
 /**
  * This class is the main entry point for holding the UI game state. It acts
@@ -49,8 +124,7 @@ import kotlinx.coroutines.launch
  */
 class UiGameController(
     val gameController: GameEngineController,
-    private val homeActionProvider: UiActionProvider,
-    private val awayActionProvider: UiActionProvider,
+    val actionProvider: UiActionProvider,
     private val menuViewModel: MenuViewModel,
     private val preloadedActions: List<GameAction>
 ) {
@@ -59,9 +133,6 @@ class UiGameController(
     val state: Game = gameController.state
     val rules: Rules = gameController.rules
     val diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator() // Used by UI to create random results. Should this be somewhere else?
-
-
-    var currentActionProvider: UiActionProvider = homeActionProvider
 
     // Persistent UI decorations that needs to be stored across frames
     val uiDecorations = UiGameDecorations()
@@ -101,14 +172,9 @@ class UiGameController(
         // Do this outside the coroutine to ensure that `startHandler` is called correctly
         // when setting up everything.
         controller.startManualMode()
-        homeActionProvider.startHandler()
-        awayActionProvider.startHandler()
+        actionProvider.startHandler()
 
         gameScope.launch {
-
-//            if (controller.actionMode != GameEngineController.ActionMode.NOT_STARTED) {
-
-//            }
 
             // Pre-loaded actions are used to fast-forward to an initial state.
             // We do this before starting the main loop so the UI start from
@@ -116,9 +182,7 @@ class UiGameController(
             // TODO Error handling here?
             preloadedActions.forEach { preloadedAction ->
                 gameController.handleAction(preloadedAction)
-                // TODO DO not send them to both teams, you risk sending to the same backing controller
-                homeActionProvider.syncAction(null, preloadedAction)
-                awayActionProvider.syncAction(null, preloadedAction)
+                actionProvider.actionHandled(null, preloadedAction)
             }
 
             // Run main game loop
@@ -137,16 +201,8 @@ class UiGameController(
 
                 // TODO Run Sound Decorators
 
-                // Select the appropriate action provider. If no team is chosen to provide it,
-                // we just defer to the home team.
-                currentActionProvider = if (actions.team?.isAwayTeam() == true) {
-                    awayActionProvider
-                } else {
-                    homeActionProvider
-                }
-
                 // Update UI State based on latest model state
-                currentActionProvider.prepareForNextAction(controller)
+                actionProvider.prepareForNextAction(controller, actions)
                 var newUiState = createNewUiSnapshot(state, actions, delta, lastUiState)
                 _uiStateFlow.emit(newUiState)
 
@@ -156,19 +212,20 @@ class UiGameController(
 
                 // TODO Just changing the existing uiState might not trigger recomposition correctly
                 //  We need an efficient way to copy the old one.
-                currentActionProvider.decorateAvailableActions(newUiState, actions)
+                actionProvider.decorateAvailableActions(newUiState, actions)
                 lastUiState = newUiState
                 _uiStateFlow.emit(newUiState)
 
                 // Wait for the system to produce the next action, this can either be
                 // automatically generated or come from the UI. Here we do not care where
                 // it comes from.
-                val userAction = currentActionProvider.getAction()
+
+                val userAction = actionProvider.getAction()
                 println("TEST: Received user action: $userAction")
 
                 // After an action was selected, all decorators to modify
                 // the UI while the action is being processed.
-                currentActionProvider.decorateSelectedAction(newUiState, userAction)
+                actionProvider.decorateSelectedAction(newUiState, userAction)
                 _uiStateFlow.emit(newUiState)
 
                 // Then run any animations triggered by the action (but before the state is updated)
@@ -178,9 +235,7 @@ class UiGameController(
                 // This will start the next iteration of the game loop.
                 // TODO Add error handling here. What to do for invalid actions?
                 gameController.handleAction(userAction)
-                if (actions.team?.isAwayTeam() == true) {}
-                homeActionProvider.syncAction(actions.team, userAction)
-                awayActionProvider.syncAction(actions.team, userAction)
+                actionProvider.actionHandled(actions.team, userAction)
             }
         }.invokeOnCompletion {
             if (it != null && it !is CancellationException) {
@@ -323,11 +378,11 @@ class UiGameController(
     }
 
     fun userSelectedAction(action: GameAction) {
-        currentActionProvider.userActionSelected(action)
+        actionProvider.userActionSelected(action)
     }
 
     fun userSelectedMultipleActions(actions: List<GameAction>, delayEvent: Boolean = true) {
-        currentActionProvider.userMultipleActionsSelected(actions, delayEvent)
+        actionProvider.userMultipleActionsSelected(actions, delayEvent)
     }
 
     fun notifyAnimationDone() {

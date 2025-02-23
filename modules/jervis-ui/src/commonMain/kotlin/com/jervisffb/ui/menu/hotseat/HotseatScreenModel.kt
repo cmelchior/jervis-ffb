@@ -3,11 +3,13 @@ package com.jervisffb.ui.menu.hotseat
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.ui.game.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -100,31 +102,36 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
 
         val homeActionProvider = when (selectHomeTeamModel.playerType.value) {
             PlayerType.HUMAN -> ManualActionProvider(
-                gameController.state.homeTeam,
                 gameController,
                 menuViewModel,
                 TeamActionMode.HOME_TEAM,
+                GameSettings(userSelectedDiceRolls = true),
             )
-            PlayerType.COMPUTER -> RandomActionProvider(homeTeam, gameController).also { it.startActionProvider() }
+            PlayerType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
         }
 
         val awayActionProvider = when (selectAwayTeamModel.playerType.value) {
             PlayerType.HUMAN -> ManualActionProvider(
-                gameController.state.awayTeam,
                 gameController,
                 menuViewModel,
                 TeamActionMode.AWAY_TEAM,
+                GameSettings(userSelectedDiceRolls = true),
             )
-            PlayerType.COMPUTER -> RandomActionProvider(awayTeam, gameController).also { it.startActionProvider() }
+            PlayerType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
         }
 
+        val actionProvider = LocalActionProvider(
+            gameController,
+            GameSettings(userSelectedDiceRolls = true),
+            homeActionProvider,
+            awayActionProvider
+        )
 
         val model = GameScreenModel(
             gameController,
             gameController.state.homeTeam,
-            homeActionProvider,
             gameController.state.awayTeam,
-            awayActionProvider,
+            actionProvider,
             mode = Manual(TeamActionMode.ALL_TEAMS),
             menuViewModel = menuViewModel,
             onEngineInitialized = {

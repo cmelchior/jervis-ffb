@@ -7,7 +7,7 @@ import com.jervisffb.net.GameId
 import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
-import com.jervisffb.utils.PROP_DEFAULT_COACH_NAME
+import com.jervisffb.utils.PROP_DEFAULT_CLIENT_COACH_NAME
 import io.ktor.http.Url
 import io.ktor.websocket.CloseReason
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,7 +62,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
 
     init {
         menuViewModel.navigatorContext.launch {
-            PROPERTIES_MANAGER.getString(PROP_DEFAULT_COACH_NAME)?.let {
+            PROPERTIES_MANAGER.getString(PROP_DEFAULT_CLIENT_COACH_NAME)?.let {
                 updateCoachName(it)
             }
         }
@@ -114,7 +114,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
             _joinMessage.value = "Joining $joiningUrl..."
             _joinState.value = JoinState.JOINING
             val coachName = _coachName.value
-            PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_COACH_NAME, coachName)
+            PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_CLIENT_COACH_NAME, coachName)
             model.controller.joinHost(
                 gameUrl = joiningUrl,
                 coachName = coachName,

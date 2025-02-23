@@ -16,8 +16,8 @@ object TestDummy {
     val menuViewModel = MenuViewModel()
     val state = createDefaultGameState(StandardBB2020Rules())
     val controller = GameEngineController(state)
-    val homeActionProvider = ManualActionProvider(state.homeTeam, controller, menuViewModel, TeamActionMode.HOME_TEAM)
-    val awayActionProvider = ManualActionProvider(state.awayTeam, controller, menuViewModel, TeamActionMode.AWAY_TEAM)
+    val homeActionProvider = ManualActionProvider(state.homeTeam, controller, menuViewModel, TeamActionMode.HOME_TEAM, gameSettings)
+    val awayActionProvider = ManualActionProvider(state.awayTeam, controller, menuViewModel, TeamActionMode.AWAY_TEAM, gameSettings)
 
     val gameModel = GameScreenModel(
         controller,

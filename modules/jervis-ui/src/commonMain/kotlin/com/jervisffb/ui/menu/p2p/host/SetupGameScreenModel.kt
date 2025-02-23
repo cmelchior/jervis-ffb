@@ -6,7 +6,7 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.setup.SetupGameComponentModel
-import com.jervisffb.utils.PROP_DEFAULT_COACH_NAME
+import com.jervisffb.utils.PROP_DEFAULT_HOST_COACH_NAME
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -34,7 +34,7 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
         setGameName("Game-${Random.nextInt(10_000)}")
         setPort(8080.toString())
         menuViewModel.navigatorContext.launch {
-            PROPERTIES_MANAGER.getString(PROP_DEFAULT_COACH_NAME)?.let {
+            PROPERTIES_MANAGER.getString(PROP_DEFAULT_HOST_COACH_NAME)?.let {
                 updateCoachName(it)
             }
         }
@@ -84,7 +84,7 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
 
     fun gameSetupDone() {
         menuViewModel.navigatorContext.launch {
-            PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_COACH_NAME, coachName.value)
+            PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_HOST_COACH_NAME, coachName.value)
         }
         parentModel.gameSetupDone()
     }
