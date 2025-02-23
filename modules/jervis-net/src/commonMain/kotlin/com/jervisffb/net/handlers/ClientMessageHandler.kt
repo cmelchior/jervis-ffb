@@ -6,6 +6,6 @@ import com.jervisffb.net.messages.ClientMessage
 
 abstract class ClientMessageHandler<T: ClientMessage> {
     protected abstract val session: GameSession
-    abstract suspend fun handleMessage(message: T, connection: JervisNetworkWebSocketConnection)
+    abstract suspend fun handleMessage(message: T, connection: JervisNetworkWebSocketConnection?)
 
 }

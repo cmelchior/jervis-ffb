@@ -8,7 +8,7 @@ import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.LeaveGameMessage
 
 class LeaveGameHandler(override val session: GameSession) : ClientMessageHandler<LeaveGameMessage>() {
-    override suspend fun handleMessage(message: LeaveGameMessage, connection: JervisNetworkWebSocketConnection) {
+    override suspend fun handleMessage(message: LeaveGameMessage, connection: JervisNetworkWebSocketConnection?) {
         when (session.state) {
             GameState.PLANNED,
             GameState.JOINING -> {
@@ -22,6 +22,7 @@ class LeaveGameHandler(override val session: GameSession) : ClientMessageHandler
             GameState.STARTING -> {
                 // If a player doesn't accept the game. Destroy the game session completely and disconnect all
                 // players. (Should we allow the declining player to select another team instead?)
+                if (connection == null) error("Missing connection for message: $message")
                 val coachName = session.getPlayerClient(connection)?.team?.coach ?: "<unknown>"
                 session.shutdownGame(
                     JervisExitCode.GAME_NOT_ACCEPTED,

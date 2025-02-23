@@ -1,6 +1,7 @@
 package com.jervisffb.net
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Field
@@ -12,6 +13,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.net.handlers.ClientMessageHandler
 import com.jervisffb.net.handlers.GameActionHandler
 import com.jervisffb.net.handlers.GameStartedHandler
+import com.jervisffb.net.handlers.InternalGameActionMessageHandler
 import com.jervisffb.net.handlers.InternalJoinHandler
 import com.jervisffb.net.handlers.LeaveGameHandler
 import com.jervisffb.net.handlers.StartGameHandler
@@ -20,6 +22,8 @@ import com.jervisffb.net.messages.ClientMessage
 import com.jervisffb.net.messages.GameActionMessage
 import com.jervisffb.net.messages.GameStartedMessage
 import com.jervisffb.net.messages.GameState
+import com.jervisffb.net.messages.InternalClientMessage
+import com.jervisffb.net.messages.InternalGameActionMessage
 import com.jervisffb.net.messages.InternalJoinMessage
 import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.JoinGameAsCoachMessage
@@ -67,6 +71,7 @@ import kotlinx.serialization.encodeToString
 class GameSession(
     val server: LightServer,
     val rules: Rules,
+    val gameSettings: GameSettings,
     val gameId: GameId, // Unique identifier for this Game. It is required to be unique across all games on the server
     val password: Password?, // Optional password for accessing the game. This is in addition to any user auth.
     // The teams in the game was predetermined up front. Only these teams can join as player clients. If this list is
@@ -89,12 +94,15 @@ class GameSession(
         LeaveGameMessage::class to LeaveGameHandler(this),
         TeamSelectedMessage::class to TeamSelectedHandler(this),
         GameActionMessage::class to GameActionHandler(this),
-        GameStartedMessage::class to GameStartedHandler(this)
+        GameStartedMessage::class to GameStartedHandler(this),
+        InternalGameActionMessage::class to InternalGameActionMessageHandler(this)
     )
     val handler = CoroutineExceptionHandler { _, exception ->
         println("GameSession threw an exception: $exception")
     }
-    private val scope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}") + Dispatchers.Default + handler)
+
+    // TODO Should probably be single-threaded
+    val scope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}") + Dispatchers.Default + handler)
 
     // All sessions associated with this game, post messages to this queue
     // This ensures that we only update the game state from a single thread
@@ -199,6 +207,10 @@ class GameSession(
         return newClient!!
     }
 
+    suspend fun sendInternalMessage(connection: JervisNetworkWebSocketConnection?, message: InternalClientMessage) {
+        incomingMessages.send(ReceivedMessage(connection, message))
+    }
+
     private fun startClientHandler(client: JoinedClient) {
         // Launch a coroutine that consumes all messages from the client and
         // put them on the shared message queue for this game session.
@@ -280,7 +292,7 @@ class GameSession(
         scope.launch {
             state = GameState.JOINING
             for (message in incomingMessages) {
-                LOG.d { "Received message from ${message.connection.username}: $message" }
+                LOG.d { "Received message from ${message.connection?.username}: $message" }
                 handleMessage(message)
             }
         }.invokeOnCompletion {

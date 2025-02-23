@@ -21,6 +21,8 @@ import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayer
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
+import com.jervisffb.engine.utils.InvalidActionException
+import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.animations.AnimationFactory
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiFieldSquare
@@ -28,13 +30,16 @@ import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.state.QueuedActionsGenerator
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -81,11 +86,12 @@ class LocalActionProvider(
     override suspend fun getAction(): GameAction {
         // Figure out how settings for this work
         // Figure out logging
-//        actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
-//            delay(5.seconds)
-//            val action = createRandomAction(controller.state, actions)
-//            userActionSelected(action)
-//        }
+        val provider = currentProvider
+        actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
+            delay(settings.timerSettings.turnLimitSeconds)
+            val action = createRandomAction(engine.state, engine.getAvailableActions())
+            provider.userActionSelected(action)
+        }
 
         // TODO How to handle dice rolls
 //                // Hide this behind a server parameter
@@ -93,7 +99,7 @@ class LocalActionProvider(
 //            return createRandomAction(game.state, availableActions)
 //        }
 
-        return currentProvider.getAction().also {
+        return provider.getAction().also {
             actionJob?.cancel()
         }
     }
@@ -128,6 +134,11 @@ class UiGameController(
     private val menuViewModel: MenuViewModel,
     private val preloadedActions: List<GameAction>
 ) {
+
+    companion object {
+        private val LOG = jervisLogger()
+    }
+
     // Reference to the current rules engine state of the game
     // DO NOT modify the state on this end.
     val state: Game = gameController.state
@@ -221,7 +232,6 @@ class UiGameController(
                 // it comes from.
 
                 val userAction = actionProvider.getAction()
-                println("TEST: Received user action: $userAction")
 
                 // After an action was selected, all decorators to modify
                 // the UI while the action is being processed.
@@ -234,8 +244,12 @@ class UiGameController(
                 // Last, send action to the Rules Engine for processing.
                 // This will start the next iteration of the game loop.
                 // TODO Add error handling here. What to do for invalid actions?
-                gameController.handleAction(userAction)
-                actionProvider.actionHandled(actions.team, userAction)
+                try {
+                    gameController.handleAction(userAction)
+                    actionProvider.actionHandled(actions.team, userAction)
+                } catch (ex: InvalidActionException) {
+                    LOG.e { "Invalid action selected: ${ex.message}" }
+                }
             }
         }.invokeOnCompletion {
             if (it != null && it !is CancellationException) {

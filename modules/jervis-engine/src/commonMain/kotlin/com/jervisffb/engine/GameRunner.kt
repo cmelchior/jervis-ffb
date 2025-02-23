@@ -5,6 +5,8 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Top-level class for running all game types. This class is responsible for
@@ -50,7 +52,7 @@ interface GameRunner {
 
 data class TimerSettings(
     val turnTimerEnabled: Boolean, // If enabled,
-    val turnTimerSeconds: Int = 4 * 60,
+    val turnLimitSeconds: Duration = 5.seconds,
 )
 
 /**
@@ -58,6 +60,7 @@ data class TimerSettings(
  */
 data class GameSettings(
     val gameRules: Rules = StandardBB2020Rules(),
-    val userSelectedDiceRolls: Boolean = false // Are random events done remotely or on the host
+    val timerSettings: TimerSettings = TimerSettings(turnTimerEnabled = true),
+    val clientSelectedDiceRolls: Boolean = false // Are random events done remotely or on the host
 //    val timers: TimerSettings
 )

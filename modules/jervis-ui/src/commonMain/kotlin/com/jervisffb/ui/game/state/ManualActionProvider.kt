@@ -149,7 +149,7 @@ open class ManualActionProvider(
 
         // If the available actions are random, we only want to show controls for the UI if configured so.
         // This is mostly a developer or custom play setting and not something commonly used for normal games.
-        if (actions.containsActionWithRandomBehavior() && !gameSettings.userSelectedDiceRolls) {
+        if (actions.containsActionWithRandomBehavior() && !gameSettings.clientSelectedDiceRolls) {
             showActionDecorators = false
         }
 

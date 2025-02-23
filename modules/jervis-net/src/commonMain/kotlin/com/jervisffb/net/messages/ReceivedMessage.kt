@@ -7,6 +7,6 @@ import com.jervisffb.net.JervisNetworkWebSocketConnection
  * processing. This allows the rest of the server to track the origin.
  */
 data class ReceivedMessage(
-    val connection: JervisNetworkWebSocketConnection,
+    val connection: JervisNetworkWebSocketConnection?,
     val message: ClientMessage,
 )

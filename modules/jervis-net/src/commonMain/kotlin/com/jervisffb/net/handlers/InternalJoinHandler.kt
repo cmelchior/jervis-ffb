@@ -8,7 +8,7 @@ import com.jervisffb.net.messages.JervisErrorCode
 class InternalJoinHandler(
     override val session: GameSession
 ) : ClientMessageHandler<InternalJoinMessage>() {
-    override suspend fun handleMessage(message: InternalJoinMessage, connection: JervisNetworkWebSocketConnection) {
+    override suspend fun handleMessage(message: InternalJoinMessage, connection: JervisNetworkWebSocketConnection?) {
         try {
             message.action()
         } catch (e: Exception) {

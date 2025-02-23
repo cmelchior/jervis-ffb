@@ -1,5 +1,6 @@
 package com.jervisffb.net
 
+import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
@@ -26,6 +27,7 @@ class LightServer(
         val session = GameSession(
             this,
             StandardBB2020Rules(),
+            GameSettings(),
             GameId(gameName),
             null,
             listOf(hostTeam),

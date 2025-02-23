@@ -112,10 +112,14 @@ class ServerCommunication(
         sendToConnection(session.client!!.connection, msg)
     }
 
-    suspend fun sendError(connection: JervisNetworkWebSocketConnection, inMessage: ClientMessage, errorCode: JervisErrorCode, message: String) {
-        LOG.w { "[Server] [${connection.username}:${inMessage::class.simpleName}] Sending error ($errorCode): $message" }
+    suspend fun sendError(connection: JervisNetworkWebSocketConnection?, inMessage: ClientMessage, errorCode: JervisErrorCode, message: String) {
+        LOG.w { "[Server] [${connection?.username}:${inMessage::class.simpleName}] Sending error ($errorCode): $message" }
         val msg = ServerError(errorCode, message)
-        sendToConnection(connection, msg)
+        if (connection != null) {
+            sendToConnection(connection, msg)
+        } else {
+            sendAllConnections(msg)
+        }
     }
 
     private suspend fun sendToConnection(connection: DefaultWebSocketSession, message: ServerMessage) {

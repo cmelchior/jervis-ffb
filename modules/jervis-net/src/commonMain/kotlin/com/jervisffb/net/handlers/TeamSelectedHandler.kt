@@ -10,10 +10,10 @@ import com.jervisffb.net.messages.P2PTeamInfo
 import com.jervisffb.net.messages.TeamSelectedMessage
 
 class TeamSelectedHandler(override val session: GameSession) : ClientMessageHandler<TeamSelectedMessage>() {
-    override suspend fun handleMessage(message: TeamSelectedMessage, connection: JervisNetworkWebSocketConnection) {
+    override suspend fun handleMessage(message: TeamSelectedMessage, connection: JervisNetworkWebSocketConnection?) {
         // Save selected team for the given client
         val team = (message.team as P2PTeamInfo).team
-        val client = session.getPlayerClient(connection)
+        val client = connection?.let { session.getPlayerClient(it) }
         if (client == null) {
             session.out.sendError(connection, message, JervisErrorCode.PROTOCOL_ERROR, "Connection is not allowed to select a team.")
             return
