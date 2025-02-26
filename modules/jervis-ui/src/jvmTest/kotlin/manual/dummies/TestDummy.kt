@@ -19,7 +19,7 @@ object TestDummy {
     val menuViewModel = MenuViewModel()
     val state = createDefaultGameState(StandardBB2020Rules())
     val controller = GameEngineController(state)
-    val settings = GameSettings(timerSettings = TimerSettings(turnTimerEnabled = false), clientSelectedDiceRolls = true)
+    val settings = GameSettings(timerSettings = TimerSettings(timersEnabled = false), clientSelectedDiceRolls = true)
     val homeActionProvider = ManualActionProvider(controller, menuViewModel,TeamActionMode.HOME_TEAM, settings)
     val awayActionProvider = ManualActionProvider(controller, menuViewModel,  TeamActionMode.AWAY_TEAM, settings)
 

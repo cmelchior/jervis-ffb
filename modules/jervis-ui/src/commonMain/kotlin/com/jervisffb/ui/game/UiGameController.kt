@@ -39,7 +39,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -88,7 +87,8 @@ class LocalActionProvider(
         // Figure out logging
         val provider = currentProvider
         actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
-            delay(settings.timerSettings.turnLimitSeconds)
+             // TODO()
+            //            delay(settings.timerSettings.turnLimitSeconds)
             val action = createRandomAction(engine.state, engine.getAvailableActions())
             provider.userActionSelected(action)
         }

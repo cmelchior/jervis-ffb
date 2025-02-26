@@ -6,6 +6,7 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.setup.SetupGameComponentModel
+import com.jervisffb.ui.menu.components.setup.SetupTimersComponentModel
 import com.jervisffb.utils.PROP_DEFAULT_HOST_COACH_NAME
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +22,7 @@ import kotlin.uuid.Uuid
 class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val parentModel: P2PHostScreenModel) : ScreenModel {
 
     val setupGameScreenModel = SetupGameComponentModel(menuViewModel)
+    val setupTimersScreenModel = SetupTimersComponentModel(menuViewModel)
 
     val coachName = MutableStateFlow("")
     val gameName = MutableStateFlow("Game-${Random.nextInt(10_000)}")

@@ -1,0 +1,56 @@
+package com.jervisffb.ui.menu.components
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExposedDropdownMenuBox
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.jervisffb.ui.menu.p2p.host.DropdownEntry
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun <T: DropdownEntry> JervisDropDownMenu(
+    title: String,
+    entries: List<T>,
+    enabled: Boolean = true,
+    selectedEntry: T? = entries.firstOrNull(),
+    onSelected: (T) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+    ) {
+        OutlinedTextField(
+            modifier = Modifier.padding(bottom = 8.dp),
+            value = selectedEntry?.name ?: "",
+            onValueChange = { },
+            enabled = enabled,
+            readOnly = true,
+            label = { Text(title) },
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            entries.forEachIndexed { index, item ->
+                DropdownMenuItem(
+                    onClick = {
+                        expanded = false
+                        onSelected(item)
+                    }
+                ) {
+                    Text(item.name)
+                }
+            }
+        }
+    }
+}

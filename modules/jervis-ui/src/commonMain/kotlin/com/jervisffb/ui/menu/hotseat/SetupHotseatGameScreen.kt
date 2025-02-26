@@ -26,7 +26,7 @@ fun SetupHotseatGamePage(screenModel: SetupHotseatGameScreenModel, modifier: Mod
             ,
             verticalAlignment = Alignment.Top
         ) {
-            SetupGameComponent(screenModel.setupGameModel)
+            SetupGameComponent(screenModel.setupGameModel, screenModel.setupTimersModel)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             JervisButton(text = "Next", enabled = isSetupValid, onClick = { screenModel.gameSetupDone() })

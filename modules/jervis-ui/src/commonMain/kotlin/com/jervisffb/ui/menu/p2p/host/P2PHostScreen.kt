@@ -167,7 +167,15 @@ fun SettingsCard(title: String, width: Dp, content: @Composable () -> Unit) {
 }
 
 @Composable
-fun ColumnScope.BoxHeader(text: String, color: Color = JervisTheme.rulebookRed) {
+fun ColumnScope.BoxHeader(
+    text: String,
+    color: Color = JervisTheme.rulebookRed,
+    topPadding: Dp = 0.dp,
+    bottomPadding: Dp = 0.dp,
+) {
+    if (topPadding > 0.dp) {
+        Spacer(modifier = Modifier.height(topPadding))
+    }
     TitleBorder(color)
     Box(
         modifier = Modifier.height(36.dp),
@@ -182,4 +190,7 @@ fun ColumnScope.BoxHeader(text: String, color: Color = JervisTheme.rulebookRed) 
         )
     }
     TitleBorder(color)
+    if (bottomPadding > 0.dp) {
+        Spacer(modifier = Modifier.height(bottomPadding))
+    }
 }

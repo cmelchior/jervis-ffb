@@ -15,7 +15,6 @@ import com.jervisffb.net.messages.GameActionMessage
 import com.jervisffb.net.messages.InternalGameActionMessage
 import com.jervisffb.net.messages.JervisErrorCode
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
@@ -67,6 +66,17 @@ suspend fun handleAction(
     val sender = if (connection != null) session.getPlayerClient(connection) else null
     session.out.sendGameActionSync(sender = sender, producer, game.history.last().id, action = nextAction)
 
+    // TODO If start of turn, start the end-of-turn tracker
+
+
+    // TODO If non-active teams turn, start wait-for-action tracker.
+
+    // TODO How to handle if end-of-turn tracker triggers when waiting
+
+
+
+
+
     // If the Game is set up so the server handles all random actions, we should now roll forward creating them here.
     var availableActions = game.getAvailableActions()
     while (session.gameSettings.clientSelectedDiceRolls && availableActions.containsActionWithRandomBehavior()) {
@@ -80,10 +90,10 @@ suspend fun handleAction(
 
     // Last, before waiting for the next action, we set up any server timeouts
     // TODO Figure out exactly which timer to use
-    if (session.gameSettings.timerSettings.turnTimerEnabled) {
+    if (session.gameSettings.timerSettings.timersEnabled) {
         val nextIndex = game.history.last().id + 1
         session.scope.launch {
-            delay(session.gameSettings.timerSettings.turnLimitSeconds)
+            // delay(session.gameSettings.timerSettings.turnLimitSeconds)
             session.sendInternalMessage(connection, InternalGameActionMessage(nextIndex))
         }
     }
@@ -102,10 +112,10 @@ suspend fun rollForwardToUserAction(session: GameSession, game: GameEngineContro
 
     // Last, before waiting for the next action, we set up any server timeouts
     // TODO Figure out exactly which timer to use
-    if (session.gameSettings.timerSettings.turnTimerEnabled) {
+    if (session.gameSettings.timerSettings.timersEnabled) {
         val nextIndex = game.history.last().id + 1
         session.scope.launch {
-            delay(session.gameSettings.timerSettings.turnLimitSeconds)
+            // delay(session.gameSettings.timerSettings.turnLimitSeconds)
             println("TIMER: ${Clock.System.now()}.")
             // TODO Figure out how to select automated actions
             session.sendInternalMessage(connection, InternalGameActionMessage(nextIndex))

@@ -23,11 +23,11 @@ import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.setup.SetupGameComponent
 
 @Composable
-fun SetupGamePage(screenModel: SetupGameScreenModel, modifier: Modifier) {
-    val coachName by screenModel.coachName.collectAsState("")
-    val gameName by screenModel.gameName.collectAsState("")
-    val gamePort by screenModel.port.collectAsState( null)
-    val isSetupValid: Boolean by screenModel.isSetupValid.collectAsState(false)
+fun SetupGamePage(setupModel: SetupGameScreenModel, modifier: Modifier) {
+    val coachName by setupModel.coachName.collectAsState("")
+    val gameName by setupModel.gameName.collectAsState("")
+    val gamePort by setupModel.port.collectAsState( null)
+    val isSetupValid: Boolean by setupModel.isSetupValid.collectAsState(false)
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -44,7 +44,7 @@ fun SetupGamePage(screenModel: SetupGameScreenModel, modifier: Modifier) {
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = coachName,
-                        onValueChange = { screenModel.updateCoachName(it) },
+                        onValueChange = { setupModel.updateCoachName(it) },
                         label = { Text("Coach name") }
                     )
                 }
@@ -53,14 +53,14 @@ fun SetupGamePage(screenModel: SetupGameScreenModel, modifier: Modifier) {
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = gameName,
-                        onValueChange = { screenModel.setGameName(it) },
+                        onValueChange = { setupModel.setGameName(it) },
                         label = { Text("Game Name") }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         modifier = Modifier.width(100.dp),
                         value = gamePort?.toString() ?: "",
-                        onValueChange = { screenModel.setPort(it) },
+                        onValueChange = { setupModel.setPort(it) },
                         label = { Text("Port") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         keyboardActions = KeyboardActions {
@@ -70,10 +70,10 @@ fun SetupGamePage(screenModel: SetupGameScreenModel, modifier: Modifier) {
                 }
             }
             Spacer(modifier = Modifier.width(32.dp))
-            SetupGameComponent(screenModel.setupGameScreenModel)
+            SetupGameComponent(setupModel.setupGameScreenModel, setupModel.setupTimersScreenModel)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            JervisButton(text = "Next", enabled = isSetupValid, onClick = { screenModel.gameSetupDone() })
+            JervisButton(text = "Next", enabled = isSetupValid, onClick = { setupModel.gameSetupDone() })
         }
     }
 }

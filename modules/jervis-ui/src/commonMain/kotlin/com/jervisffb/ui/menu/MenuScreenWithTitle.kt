@@ -142,14 +142,15 @@ fun TitleBar(modifier: Modifier, title: String) {
         val angleDegrees = (angleRadians * 180 / PI).toFloat()
         val skewX = tan(-angleRadians)
         val skewY = 0.0f
-        val padding = 32.dp.toPx()
+        val paddingX = 32.dp.toPx()
+        val paddingY = 16.dp.toPx()
 
         drawContext.canvas.nativeCanvas.apply {
             save()
             translate(0f, size.height)
             rotate(-angleDegrees)
             skew(skewX.toFloat(), skewY.toFloat())
-            this.drawTextLine(TextLine.make(title, skiaFont), padding, -padding, nativePaint)
+            this.drawTextLine(TextLine.make(title, skiaFont), paddingX, -paddingY, nativePaint)
             restore()
         }
     }

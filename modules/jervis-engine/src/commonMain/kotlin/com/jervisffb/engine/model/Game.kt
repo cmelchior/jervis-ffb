@@ -79,7 +79,6 @@ class IdGenerator {
     }
 }
 
-
 /**
  * Entry point for tracking the state of a game of Blood Bowl.
  * It should only contain the static state and not enforce any rules.
