@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.ktor) apply false
     alias(libs.plugins.multiplatform) apply false
     alias(libs.plugins.serialization) apply false
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
 }
 
 allprojects {
@@ -84,6 +84,7 @@ rootProject.ext["gitHash"] = gitHash
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        version.set("1.5.0") // See https://github.com/pinterest/ktlint
         debug.set(true)
         verbose.set(true)
         filter {
