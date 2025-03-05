@@ -1,7 +1,6 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.test.ext.rollForward
 import kotlin.test.Ignore
 import kotlin.test.Test

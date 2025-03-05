@@ -19,11 +19,9 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
-import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportPickup
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.tables.Weather
 
 /**
