@@ -22,8 +22,8 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.jervisffb.ui.game.animations.PassAnimation
 import com.jervisffb.ui.asDp
+import com.jervisffb.ui.game.animations.PassAnimation
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import kotlin.time.Duration

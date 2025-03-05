@@ -2,15 +2,15 @@ package com.jervisffb.fumbbl.net.adapter.impl.blitz
 
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.model.ModelChangeId
 import com.jervisffb.fumbbl.net.model.change.GameSetDialogParameter
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 
 /**
  * Looks like this choice is hidden between a lot of other stuff.

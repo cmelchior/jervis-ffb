@@ -1,18 +1,18 @@
 package com.jervisffb.fumbbl.net.adapter.impl.block
 
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.model.ModelChangeId
 import com.jervisffb.fumbbl.net.model.PlayerAction
 import com.jervisffb.fumbbl.net.model.change.GameSetDefenderId
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerId
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
-import com.jervisffb.engine.rules.Rules
 
 object SelectBlockDefenderMapper: CommandActionMapper {
     override fun isApplicable(

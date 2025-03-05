@@ -1,9 +1,9 @@
 package com.jervisffb.fumbbl.net.api.commands
 
+import com.jervisffb.fumbbl.net.api.ClientMode
 import com.jervisffb.fumbbl.net.model.PlayerAction
 import com.jervisffb.fumbbl.net.model.ReRolledAction
 import com.jervisffb.fumbbl.net.model.change.PlayerId
-import com.jervisffb.fumbbl.net.api.ClientMode
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

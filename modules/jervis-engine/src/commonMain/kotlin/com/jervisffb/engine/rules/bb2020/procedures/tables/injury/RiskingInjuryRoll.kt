@@ -1,12 +1,12 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.injury
 
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ComputationNode
@@ -22,8 +22,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.inducements.Apothecary
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockContext
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockContext
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
 import com.jervisffb.engine.rules.bb2020.tables.InjuryResult
 import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryResult

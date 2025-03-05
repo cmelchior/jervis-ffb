@@ -1,14 +1,14 @@
 package com.jervisffb.fumbbl.net.adapter.impl.foul
 
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FumbblFoulAction
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
-import com.jervisffb.fumbbl.net.model.reports.FoulReport
 import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
+import com.jervisffb.fumbbl.net.model.reports.FoulReport
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FumbblFoulAction
 
 object SelectFoulTargetMapper: CommandActionMapper {
     override fun isApplicable(

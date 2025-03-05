@@ -3,19 +3,19 @@ package com.jervisffb.fumbbl.net.adapter.impl.block
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.BlockType
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.model.PlayerAction
 import com.jervisffb.fumbbl.net.model.reports.BlockReport
 import com.jervisffb.fumbbl.net.model.reports.BlockRollReport
 import com.jervisffb.fumbbl.net.model.reports.ReRollReport
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
-import com.jervisffb.engine.rules.BlockType
 
 object BlockRollMapper: CommandActionMapper {
     override fun isApplicable(

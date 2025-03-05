@@ -19,8 +19,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.PerfectPassin
 import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.Stiletto
 import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.ThrowARock
 import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.TreacherousTrapdoor
-import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.UnderScrutiny
+import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 // Consider: Do we really need this enum?

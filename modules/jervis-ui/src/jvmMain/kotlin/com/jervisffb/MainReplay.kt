@@ -1,9 +1,9 @@
 package com.jervisffb
 
 import androidx.compose.ui.window.application
-import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel

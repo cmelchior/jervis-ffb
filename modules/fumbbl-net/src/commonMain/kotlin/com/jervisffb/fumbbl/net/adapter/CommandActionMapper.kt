@@ -1,8 +1,8 @@
 package com.jervisffb.fumbbl.net.adapter
 
+import com.jervisffb.engine.model.Game
 import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
 
 // Modified CommandActionMapper Interface
 interface CommandActionMapper {

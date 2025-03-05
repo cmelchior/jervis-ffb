@@ -5,9 +5,9 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.inducements.MiscellaneousMayhem
 import com.jervisffb.engine.model.inducements.Timing
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducementContext
 import com.jervisffb.engine.rules.bb2020.procedures.inducements.dirtytricks.SpotTheSneakProcedure
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 
 // Miscellaneous Mayhem: Assassination Attempt - See Special Plays Card Pack

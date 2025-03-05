@@ -1,7 +1,7 @@
 package com.jervisffb.engine.fsm
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team

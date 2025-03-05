@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.injury
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Confirm
@@ -11,11 +10,13 @@ import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetApothecaryUsed
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -35,7 +36,6 @@ import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
 import com.jervisffb.engine.rules.bb2020.tables.InjuryResult
 import com.jervisffb.engine.utils.INVALID_ACTION
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Procedure for using an apothecary as described on page 62 in the rulebook.

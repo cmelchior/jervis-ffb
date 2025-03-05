@@ -1,12 +1,12 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetActiveTeam
 import com.jervisffb.engine.commands.SetDrive
 import com.jervisffb.engine.commands.SetHalf
 import com.jervisffb.engine.commands.SetKickingTeamAtHalfTime
 import com.jervisffb.engine.commands.SetTurnMarker
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node

@@ -3,14 +3,14 @@ package com.jervisffb.fumbbl.net.adapter.impl
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.bb2020.procedures.PickupRoll
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
-import com.jervisffb.fumbbl.net.model.reports.PickUpRollReport
 import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
+import com.jervisffb.fumbbl.net.model.reports.PickUpRollReport
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.PickupRoll
 
 object PickupRollMapper: CommandActionMapper {
     override fun isApplicable(

@@ -1,7 +1,7 @@
 package com.jervisffb.engine.commands
 
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.locations.FieldCoordinate
 
 class SetMoveStepTarget(private val from: FieldCoordinate, private val to: FieldCoordinate) : Command {
     private var originalTarget: Pair<FieldCoordinate, FieldCoordinate>? = null

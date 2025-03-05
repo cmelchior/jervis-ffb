@@ -1,17 +1,17 @@
 package com.jervisffb.fumbbl.net.adapter.impl
 
 import com.jervisffb.engine.actions.EndTurn
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.model.ModelChangeId
 import com.jervisffb.fumbbl.net.model.ReportId
 import com.jervisffb.fumbbl.net.model.reports.InjuryReport
 import com.jervisffb.fumbbl.net.model.reports.TurnEndReport
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 
 object EndTeamTurnMapper: CommandActionMapper {
     override fun isApplicable(

@@ -4,20 +4,20 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
-import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
-import com.jervisffb.fumbbl.net.adapter.add
-import com.jervisffb.fumbbl.net.model.reports.GoForItRollReport
-import com.jervisffb.fumbbl.net.model.reports.ReRollReport
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
-import com.jervisffb.fumbbl.net.utils.FumbblGame
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.RushRoll
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.bb2020.skills.SureFeet
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
+import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
+import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
+import com.jervisffb.fumbbl.net.model.reports.GoForItRollReport
+import com.jervisffb.fumbbl.net.model.reports.ReRollReport
+import com.jervisffb.fumbbl.net.utils.FumbblGame
 
 object RushRollMapper: CommandActionMapper {
     override fun isApplicable(

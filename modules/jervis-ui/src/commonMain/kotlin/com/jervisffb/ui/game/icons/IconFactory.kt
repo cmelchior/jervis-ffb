@@ -66,11 +66,11 @@ import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_6
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_blue
 import com.jervisffb.ui.CacheManager
+import com.jervisffb.ui.game.model.UiPlayer
+import com.jervisffb.ui.game.viewmodel.FieldDetails
 import com.jervisffb.ui.getSubImage
 import com.jervisffb.ui.loadFileAsImage
 import com.jervisffb.ui.loadImage
-import com.jervisffb.ui.game.model.UiPlayer
-import com.jervisffb.ui.game.viewmodel.FieldDetails
 import com.jervisffb.utils.getHttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.readBytes

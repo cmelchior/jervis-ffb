@@ -3,15 +3,15 @@ package com.jervisffb.fumbbl.net.adapter.impl
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.bb2020.procedures.CatchRoll
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.model.TurnMode
 import com.jervisffb.fumbbl.net.model.reports.CatchRollReport
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.CatchRoll
 
 object CatchRollMapper: CommandActionMapper {
     override fun isApplicable(

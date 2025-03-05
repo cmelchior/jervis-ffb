@@ -1,9 +1,9 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.weather
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectRandomPlayers
@@ -12,6 +12,7 @@ import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -29,7 +30,6 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportPlayerInjury
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
-import com.jervisffb.engine.commands.compositeCommandOf
 
 /**
  * Procedure for handling "Sweltering Heat" as described on page 37 in the

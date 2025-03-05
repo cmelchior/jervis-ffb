@@ -2,8 +2,8 @@ package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 
 class ReportKickResult(

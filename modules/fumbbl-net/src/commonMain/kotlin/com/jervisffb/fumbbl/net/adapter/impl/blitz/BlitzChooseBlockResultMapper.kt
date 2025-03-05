@@ -6,10 +6,16 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DicePoolChoice
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
 import com.jervisffb.fumbbl.net.adapter.addOptional
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.model.BlockResult.BOTH_DOWN
 import com.jervisffb.fumbbl.net.model.BlockResult.POW
 import com.jervisffb.fumbbl.net.model.BlockResult.POW_PUSHBACK
@@ -17,13 +23,7 @@ import com.jervisffb.fumbbl.net.model.BlockResult.PUSHBACK
 import com.jervisffb.fumbbl.net.model.BlockResult.SKULL
 import com.jervisffb.fumbbl.net.model.PlayerAction
 import com.jervisffb.fumbbl.net.model.reports.BlockChoiceReport
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 
 object BlitzChooseBlockResultMapper: CommandActionMapper {
     override fun isApplicable(

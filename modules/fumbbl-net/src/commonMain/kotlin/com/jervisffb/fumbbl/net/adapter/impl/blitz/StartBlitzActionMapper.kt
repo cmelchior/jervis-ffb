@@ -4,19 +4,19 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
-import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
-import com.jervisffb.fumbbl.net.adapter.add
-import com.jervisffb.fumbbl.net.model.change.ActingPlayerSetStandingUp
-import com.jervisffb.fumbbl.net.model.reports.PlayerActionReport
-import com.jervisffb.fumbbl.net.model.reports.SelectBlitzTargetReport
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
-import com.jervisffb.fumbbl.net.utils.FumbblGame
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayer
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
+import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
+import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
+import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
+import com.jervisffb.fumbbl.net.model.change.ActingPlayerSetStandingUp
+import com.jervisffb.fumbbl.net.model.reports.PlayerActionReport
+import com.jervisffb.fumbbl.net.model.reports.SelectBlitzTargetReport
+import com.jervisffb.fumbbl.net.utils.FumbblGame
 
 /**
  * FUMBBL does things in a slightly different order for blitzes than defined in the rulebook.

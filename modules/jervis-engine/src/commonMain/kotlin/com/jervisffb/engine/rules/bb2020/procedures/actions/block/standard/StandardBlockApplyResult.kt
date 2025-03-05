@@ -9,13 +9,13 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PlayerDown
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Pow
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushBack
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
-import com.jervisffb.engine.rules.Rules
 
 /**
  * Resolve the chosen block result.

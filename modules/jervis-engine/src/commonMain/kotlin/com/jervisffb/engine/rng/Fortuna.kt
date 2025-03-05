@@ -1,8 +1,5 @@
 package com.jervisffb.engine.rng
 
-import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.algorithms.symmetric.AES
-import dev.whyoleg.cryptography.operations.cipher.Cipher
 import com.jervisffb.engine.actions.D12Result
 import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.actions.D20Result
@@ -15,6 +12,9 @@ import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.utils.assert
+import dev.whyoleg.cryptography.CryptographyProvider
+import dev.whyoleg.cryptography.algorithms.symmetric.AES
+import dev.whyoleg.cryptography.operations.cipher.Cipher
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.experimental.xor

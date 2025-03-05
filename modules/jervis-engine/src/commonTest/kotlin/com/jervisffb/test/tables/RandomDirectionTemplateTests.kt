@@ -2,8 +2,8 @@ package com.jervisffb.test.tables
 
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
-import com.jervisffb.engine.rules.bb2020.tables.CornerThrowInPosition
 import com.jervisffb.engine.model.Direction
+import com.jervisffb.engine.rules.bb2020.tables.CornerThrowInPosition
 import com.jervisffb.engine.rules.bb2020.tables.RandomDirectionTemplate
 import kotlin.test.Test
 import kotlin.test.assertEquals

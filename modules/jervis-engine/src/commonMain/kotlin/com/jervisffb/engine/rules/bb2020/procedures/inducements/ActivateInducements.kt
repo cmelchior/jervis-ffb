@@ -1,9 +1,9 @@
 package com.jervisffb.engine.rules.bb2020.procedures.inducements
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectInducement
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.ActionNode

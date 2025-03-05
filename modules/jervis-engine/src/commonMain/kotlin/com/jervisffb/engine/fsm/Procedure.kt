@@ -1,7 +1,7 @@
 package com.jervisffb.engine.fsm
 
-import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.commands.fsm.RemoveCurrentProcedure
 import com.jervisffb.engine.model.Game

@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.inducements.miscellaneousmayhem
 
-import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
@@ -10,8 +10,8 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducementContext
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducementContext
 
 /**
  * Procedure handling the effect of using the "Assassination Attempt" Miscellaneous Mayhem card.

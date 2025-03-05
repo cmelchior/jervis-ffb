@@ -4,20 +4,20 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.DeviateRoll
+import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
+import com.jervisffb.engine.rules.bb2020.tables.RandomDirectionTemplate
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
+import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.model.ModelChangeId
 import com.jervisffb.fumbbl.net.model.TurnMode
 import com.jervisffb.fumbbl.net.model.reports.KickoffScatterReport
-import com.jervisffb.fumbbl.net.api.commands.ServerCommandModelSync
 import com.jervisffb.fumbbl.net.utils.FumbblCoordinate
 import com.jervisffb.fumbbl.net.utils.FumbblGame
-import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.DeviateRoll
-import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
-import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.tables.RandomDirectionTemplate
 
 /**
  * End setup and scatter ball
