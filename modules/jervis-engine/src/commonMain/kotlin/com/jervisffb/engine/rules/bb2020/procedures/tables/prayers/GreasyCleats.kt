@@ -52,10 +52,10 @@ object GreasyCleats : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when(action) {
                 Continue -> {
-                   compositeCommandOf(
-                       ReportGameProgress("No players are eligible to receive Greasy Cleats"),
-                       ExitProcedure()
-                   )
+                    compositeCommandOf(
+                        ReportGameProgress("No players are eligible to receive Greasy Cleats"),
+                        ExitProcedure()
+                    )
                 }
                 else -> {
                     checkTypeAndValue<PlayerSelected>(state, rules, action) {

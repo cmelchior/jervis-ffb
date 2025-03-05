@@ -139,8 +139,8 @@ class Game(
     fun endActionImmediately(): Boolean {
         return (
             isTurnOver() ||
-            hasConceeded != null ||
-            getContextOrNull<ActivatePlayerContext>()?.activationEndsImmediately == true
+                hasConceeded != null ||
+                getContextOrNull<ActivatePlayerContext>()?.activationEndsImmediately == true
         )
     }
 

@@ -15,7 +15,7 @@ data class PickupRollContext(
     val modifiers: List<DiceModifier> = emptyList(),
     val roll: D6DieRoll? = null,
     val isSuccess: Boolean = false,
-    ) : ProcedureContext {
+) : ProcedureContext {
     // The sum of modifiers
     fun diceModifier(): Int = modifiers.fold(0) { acc: Int, el: DiceModifier -> acc + el.modifier }
     val rerolled: Boolean

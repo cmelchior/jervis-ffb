@@ -178,12 +178,12 @@ fun calculateAvailableRerollsFor(
         emptyList()
     } else {
         val teamReroll = if (hasTeamRerolls && allowedToUseTeamReroll) {
-                listOf(
-                    DiceRerollOption(rules.getAvailableTeamReroll(team), listOf(roll))
-                )
-            } else {
-                emptyList()
-            }
+            listOf(
+                DiceRerollOption(rules.getAvailableTeamReroll(team), listOf(roll))
+            )
+        } else {
+            emptyList()
+        }
         skillRerolls + teamReroll
     }
 

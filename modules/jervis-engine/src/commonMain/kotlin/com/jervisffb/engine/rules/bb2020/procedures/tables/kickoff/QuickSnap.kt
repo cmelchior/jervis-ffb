@@ -151,9 +151,9 @@ object QuickSnap : Procedure() {
             val context = state.getContext<QuickSnapContext>()
             return SetContext(
                 MovePlayerIntoSquareContext(
-                player = context.currentPlayer!!,
-                target = context.target!!
-            )
+                    player = context.currentPlayer!!,
+                    target = context.target!!
+                )
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = MovePlayerIntoSquare

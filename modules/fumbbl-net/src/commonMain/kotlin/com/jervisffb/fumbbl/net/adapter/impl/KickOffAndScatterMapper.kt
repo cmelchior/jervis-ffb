@@ -31,8 +31,8 @@ object KickOffAndScatterMapper: CommandActionMapper {
     ): Boolean {
         return (
             game.turnMode == TurnMode.KICKOFF &&
-            command.firstChangeId() == ModelChangeId.FIELD_MODEL_SET_BALL_COORDINATE &&
-            command.reportList.size == 1 && command.firstReport() is KickoffScatterReport
+                command.firstChangeId() == ModelChangeId.FIELD_MODEL_SET_BALL_COORDINATE &&
+                command.reportList.size == 1 && command.firstReport() is KickoffScatterReport
         )
     }
 

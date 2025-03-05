@@ -51,9 +51,9 @@ object ChangingWeather : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return SetContext(
                 ScatterRollContext(
-                ball = state.singleBall(),
-                from = state.singleBall().location
-            )
+                    ball = state.singleBall(),
+                    from = state.singleBall().location
+                )
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter

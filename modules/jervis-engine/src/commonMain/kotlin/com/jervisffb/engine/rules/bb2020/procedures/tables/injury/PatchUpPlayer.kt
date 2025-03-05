@@ -232,7 +232,7 @@ object PatchUpPlayer: Procedure() {
                             SetPlayerState(player, com.jervisffb.engine.model.PlayerState.RESERVE),
                             SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut)
                         )
-                     }
+                    }
                     context.injuryResult == com.jervisffb.engine.rules.bb2020.tables.InjuryResult.KO && context.apothecaryUsed != null -> {
                         if (context.mode == com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode.PUSHED_INTO_CROWD) {
                             compositeCommandOf(

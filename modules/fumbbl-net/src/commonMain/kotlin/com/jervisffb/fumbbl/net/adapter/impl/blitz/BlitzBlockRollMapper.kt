@@ -24,8 +24,8 @@ object BlitzBlockRollMapper: CommandActionMapper {
     ): Boolean {
         return (
             game.actingPlayer.playerAction == PlayerAction.BLITZ &&
-            command.firstReport() is BlockReport
-            && command.sound == "block"
+                command.firstReport() is BlockReport
+                && command.sound == "block"
         )
     }
 

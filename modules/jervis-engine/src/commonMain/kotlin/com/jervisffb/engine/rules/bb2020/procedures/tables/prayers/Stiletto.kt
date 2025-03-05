@@ -55,10 +55,10 @@ object Stiletto : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 is Continue -> {
-                   compositeCommandOf(
-                       ReportGameProgress("No players are able to receive Stiletto"),
-                       ExitProcedure(),
-                   )
+                    compositeCommandOf(
+                        ReportGameProgress("No players are able to receive Stiletto"),
+                        ExitProcedure(),
+                    )
                 }
                 else -> {
                     checkTypeAndValue<PlayerSelected>(state, rules, action) {

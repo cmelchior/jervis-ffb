@@ -567,9 +567,9 @@ class RightBubbleShape(
             moveTo(0f, size.height / 2)
             repeat(steps) { step ->
 //                if (step > 0) {
-                    val x = step * stepSize
-                    val y = size.height / 2 + (Random.nextDouble(amplitude.toDouble()) * (if (step % 2 == 0) 1 else -1))
-                    lineTo(x, y.toFloat())
+                val x = step * stepSize
+                val y = size.height / 2 + (Random.nextDouble(amplitude.toDouble()) * (if (step % 2 == 0) 1 else -1))
+                lineTo(x, y.toFloat())
 //                } else if (step == steps - 1) {
 //                    val x = size.width
 //                    val y = size.height / 2

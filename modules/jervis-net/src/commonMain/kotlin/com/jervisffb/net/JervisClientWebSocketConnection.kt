@@ -118,13 +118,13 @@ class JervisClientWebSocketConnection(
     private suspend fun monitorIncomingServerMessages(session: DefaultClientWebSocketSession) {
         try {
             for (inMessage in session.incoming) {
-                    when (inMessage) {
-                        is Frame.Text -> {
-                            val serverMessage = jervisNetworkSerializer.decodeFromString<ServerMessage>(inMessage.readText())
-                            incomingChannel.send(serverMessage)
-                        }
-                        else -> TODO("Unsupported type: $inMessage")
+                when (inMessage) {
+                    is Frame.Text -> {
+                        val serverMessage = jervisNetworkSerializer.decodeFromString<ServerMessage>(inMessage.readText())
+                        incomingChannel.send(serverMessage)
                     }
+                    else -> TODO("Unsupported type: $inMessage")
+                }
             }
         } catch (ex: Throwable) {
             if (ex is CancellationException) throw ex

@@ -10,7 +10,7 @@ class PushbackModeSerializer : FumbblEnumSerializer<PushbackMode>(PushbackMode::
 enum class PushbackMode(
     override val id: String,
 ) : FumbblEnum {
-	REGULAR("regular"),
+    REGULAR("regular"),
     SIDE_STEP("sideStep"),
     GRAB("grab");
 }

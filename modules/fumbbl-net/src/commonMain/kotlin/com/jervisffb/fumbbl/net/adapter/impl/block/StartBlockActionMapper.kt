@@ -22,7 +22,7 @@ object StartBlockActionMapper: CommandActionMapper {
         val firstReport = command.firstReport()
         return (
             firstReport is PlayerActionReport &&
-            firstReport.playerAction == PlayerAction.BLOCK
+                firstReport.playerAction == PlayerAction.BLOCK
         )
     }
 

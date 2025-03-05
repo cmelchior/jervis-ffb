@@ -43,7 +43,7 @@ class ContextHolder {
         return if (context != null) {
             context as T
         } else {
-             null
+            null
         }
     }
 

@@ -31,7 +31,7 @@ object BlockChooseBlockResultMapper: CommandActionMapper {
     ): Boolean {
         return (
             game.actingPlayer.playerAction == PlayerAction.BLOCK &&
-            command.firstReport() is BlockChoiceReport
+                command.firstReport() is BlockChoiceReport
         )
     }
 

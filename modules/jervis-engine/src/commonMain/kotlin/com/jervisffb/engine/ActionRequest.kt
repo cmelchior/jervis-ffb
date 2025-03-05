@@ -39,7 +39,7 @@ data class ActionRequest(
     fun contains(type: MoveType): Boolean {
         val found = actions.firstOrNull {
             it is SelectMoveType }
-        ?.let { (it as SelectMoveType).types.contains(type) }
+            ?.let { (it as SelectMoveType).types.contains(type) }
         return found == true
     }
 }

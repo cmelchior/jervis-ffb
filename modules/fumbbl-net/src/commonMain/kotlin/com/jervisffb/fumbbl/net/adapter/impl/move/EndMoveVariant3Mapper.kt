@@ -24,8 +24,8 @@ object EndMoveVariant3Mapper: CommandActionMapper {
         // Active player is removed = Action ended
         return (
             setActivePlayer != null &&
-            setActivePlayer.value == null &&
-            game.actingPlayer.playerAction == PlayerAction.MOVE
+                setActivePlayer.value == null &&
+                game.actingPlayer.playerAction == PlayerAction.MOVE
         )
     }
 

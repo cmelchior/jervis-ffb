@@ -63,10 +63,10 @@ object BoneHeadRoll: Procedure() {
                 add(SetHasTackleZones(context.player, false))
                 add(
                     SetContext(activateContext.copy(
-                    rolledForNegaTrait = true,
-                    activationEndsImmediately = true,
-                    markActionAsUsed = true
-                ))
+                        rolledForNegaTrait = true,
+                        activationEndsImmediately = true,
+                        markActionAsUsed = true
+                    ))
                 )
             }
         }

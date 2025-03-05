@@ -19,8 +19,8 @@ object EndReceivingTeamSetupMapper: CommandActionMapper {
     ): Boolean {
         return (
             command.firstChangeId() == ModelChangeId.GAME_SET_HOME_PLAYING &&
-            command.lastChangeId() == ModelChangeId.GAME_SET_TURN_MODE &&
-            command.modelChangeList.last().value == TurnMode.KICKOFF
+                command.lastChangeId() == ModelChangeId.GAME_SET_TURN_MODE &&
+                command.modelChangeList.last().value == TurnMode.KICKOFF
         )
     }
 

@@ -23,7 +23,7 @@ class GenerateRosterFiles {
         useArrayPolymorphism = true
         serializersModule = SerializersModule {
             include(JervisSerialization.jervisEngineModule)
-         }
+        }
     }
 
     fun generate(cacheRoot: String) {

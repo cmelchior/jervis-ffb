@@ -25,10 +25,10 @@ object BlockRollMapper: CommandActionMapper {
     ): Boolean {
         return (
             game.actingPlayer.playerAction == PlayerAction.BLOCK &&
-            command.firstReport() is BlockReport &&
-            command.reportList.last() is BlockRollReport &&
-            command.reportList.first() !is ReRollReport &&
-            command.sound == "block"
+                command.firstReport() is BlockReport &&
+                command.reportList.last() is BlockRollReport &&
+                command.reportList.first() !is ReRollReport &&
+                command.sound == "block"
         )
     }
 

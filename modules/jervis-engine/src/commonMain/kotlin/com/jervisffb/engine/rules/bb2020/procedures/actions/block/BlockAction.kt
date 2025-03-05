@@ -163,10 +163,10 @@ object BlockAction : Procedure() {
                 BlockType.STANDARD -> {
                     SetContext(
                         BlockContext(
-                        context.attacker,
+                            context.attacker,
                             context.defender,
-                        isBlitzing = false
-                    )
+                            isBlitzing = false
+                        )
                     )
                 }
             }
@@ -225,10 +225,10 @@ object BlockAction : Procedure() {
             val hasFrenzy = context.attacker.isSkillAvailable<Frenzy>()
             val isNextToTarget = (
                 rules.isStanding(context.attacker) &&
-                rules.isStanding(context.defender) &&
-                context.attacker.coordinates
-                    .getSurroundingCoordinates(rules, distance = 1)
-                    .contains(context.defender.coordinates)
+                    rules.isStanding(context.defender) &&
+                    context.attacker.coordinates
+                        .getSurroundingCoordinates(rules, distance = 1)
+                        .contains(context.defender.coordinates)
             )
 
             return if (hasBlocked && hasFrenzy && isNextToTarget) {

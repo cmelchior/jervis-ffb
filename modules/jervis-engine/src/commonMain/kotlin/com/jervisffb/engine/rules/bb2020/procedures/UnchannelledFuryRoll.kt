@@ -63,10 +63,10 @@ object UnchannelledFuryRoll: Procedure() {
                 add(AddPlayerTemporaryEffect(context.player, com.jervisffb.engine.model.modifiers.TemporaryEffect.unchannelledFury()))
                 add(
                     SetContext(activateContext.copy(
-                    rolledForNegaTrait = true,
-                    activationEndsImmediately = true,
-                    markActionAsUsed = true
-                ))
+                        rolledForNegaTrait = true,
+                        activationEndsImmediately = true,
+                        markActionAsUsed = true
+                    ))
                 )
             }
         }

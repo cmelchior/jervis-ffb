@@ -42,7 +42,7 @@ fun RowScope.MenuBox(label: String, onClick: () -> Unit, enabled: Boolean = true
         modifier = modifier,
         contentAlignment = Alignment.BottomEnd,
 
-        ) {
+    ) {
         Text(
             modifier = Modifier.padding(16.dp),//.offset(y = 16.dp),
             text = label.uppercase(),

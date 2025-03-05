@@ -24,7 +24,7 @@ class GenerateTeamFiles {
         useArrayPolymorphism = true
         serializersModule = SerializersModule {
             include(JervisSerialization.jervisEngineModule)
-         }
+        }
     }
 
     fun generate(cacheRoot: String) {

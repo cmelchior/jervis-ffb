@@ -90,7 +90,7 @@ object ExtraTime : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val outOfTime = (
                 state.homeTeam.turnMarker == rules.turnsInExtraTime &&
-                state.awayTeam.turnMarker == rules.turnsInExtraTime
+                    state.awayTeam.turnMarker == rules.turnsInExtraTime
             )
             return when {
                 outOfTime && state.homeScore != state.awayScore -> {

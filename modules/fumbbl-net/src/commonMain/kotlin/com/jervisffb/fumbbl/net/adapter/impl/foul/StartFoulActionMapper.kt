@@ -23,7 +23,7 @@ object StartFoulActionMapper: CommandActionMapper {
         return (
             firstReport is PlayerActionReport &&
                 firstReport.playerAction == PlayerAction.FOUL_MOVE
-            )
+        )
     }
 
     override fun mapServerCommand(

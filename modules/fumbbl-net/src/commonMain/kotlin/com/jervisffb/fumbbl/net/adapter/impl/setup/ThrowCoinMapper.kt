@@ -21,7 +21,7 @@ object ThrowCoinMapper: CommandActionMapper {
     ): Boolean {
         return (
             command.firstChangeId() == ModelChangeId.GAME_SET_DIALOG_PARAMETER &&
-            command.reportList.firstOrNull() is CoinThrowReport
+                command.reportList.firstOrNull() is CoinThrowReport
         )
     }
 

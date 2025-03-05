@@ -20,7 +20,7 @@ object SelectToKickoffOrReceiveMapper: CommandActionMapper {
     ): Boolean {
         return (
             command.firstChangeId() == ModelChangeId.GAME_SET_DIALOG_PARAMETER &&
-            command.reportList.firstOrNull() is ReceiveChoiceReport
+                command.reportList.firstOrNull() is ReceiveChoiceReport
         )
     }
 

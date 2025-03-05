@@ -43,10 +43,10 @@ object EndPlayerTurn: CommandActionMapper {
                 // If the player hasn't blocked, it means they stopped the block early. So it needs
                 // to be manually canceled.
                 if (!fumbblGame.actingPlayer.hasBlocked) {
-                     newActions.add(
-                         action = EndAction, // (fumbblGame.actingPlayer.playerId!!.toJervisId()),
-                         expectedNode = BlockAction.SelectDefenderOrEndAction
-                     )
+                    newActions.add(
+                        action = EndAction, // (fumbblGame.actingPlayer.playerId!!.toJervisId()),
+                        expectedNode = BlockAction.SelectDefenderOrEndAction
+                    )
                 }
             }
 //            PlayerAction.BLITZ -> TODO()

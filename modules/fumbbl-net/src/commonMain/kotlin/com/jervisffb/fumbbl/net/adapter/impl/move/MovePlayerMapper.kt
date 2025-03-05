@@ -23,7 +23,7 @@ object MovePlayerMapper: CommandActionMapper {
     ): Boolean {
         return (
             game.actingPlayer.playerAction == PlayerAction.MOVE
-            && command.sound == "step"
+                && command.sound == "step"
         )
     }
 

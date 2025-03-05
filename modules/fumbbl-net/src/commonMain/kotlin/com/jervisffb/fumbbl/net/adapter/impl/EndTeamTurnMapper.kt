@@ -21,7 +21,7 @@ object EndTeamTurnMapper: CommandActionMapper {
     ): Boolean {
         val endOfTurnReport= (
             command.firstChangeId() == ModelChangeId.PLAYER_RESULT_SET_TURNS_PLAYED &&
-            command.reportList.singleOrNull()?.reportId == ReportId.TURN_END
+                command.reportList.singleOrNull()?.reportId == ReportId.TURN_END
         )
         if (endOfTurnReport) {
             if (processedCommands.size >= 7) {

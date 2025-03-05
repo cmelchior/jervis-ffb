@@ -154,8 +154,8 @@ data class RollDice(
                     Dice.BLOCK -> 6
                 }
                 acc * sides
+            }
         }
-    }
 
     override fun createRandom(): GameAction {
         return dice.map {

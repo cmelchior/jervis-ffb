@@ -282,108 +282,108 @@ private fun TeamTableWrapper(title: String = "") {
     val up = title.isNotBlank()
     Box(
         modifier = Modifier
-        .rotate(if (up) 0f else 180f)
-        .padding(bottom = 2.dp)
-        .height(50.dp)
-        .fillMaxSize()
-        .drawBehind {
-            // Height of the border near the edges (this is the minimum border border height)
-            val borderHeight = 5.dp.toPx()
-            val starCutoutWidth = 120.dp.toPx()
-            val bigStarRadius = 20.dp.toPx()
-            val smallStarRadius = 15.dp.toPx()
+            .rotate(if (up) 0f else 180f)
+            .padding(bottom = 2.dp)
+            .height(50.dp)
+            .fillMaxSize()
+            .drawBehind {
+                // Height of the border near the edges (this is the minimum border border height)
+                val borderHeight = 5.dp.toPx()
+                val starCutoutWidth = 120.dp.toPx()
+                val bigStarRadius = 20.dp.toPx()
+                val smallStarRadius = 15.dp.toPx()
 
-            // Create title and measure it, so we can correctly draw the surrounding elements
-            // around it. If no title is provided, a default width is used that is guaranteed
-            // to hold the 3 stars at the bottom.
-            val title = title.uppercase()
-            val textStyle = TextStyle(
-                color = JervisTheme.rulebookRed,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-            val textLayoutResult = textMeasurer.measure(
-                text = title,
-                style = textStyle,
-            )
-            val currentTitleWidth = if (up) textLayoutResult.size.width.toFloat() else starCutoutWidth
+                // Create title and measure it, so we can correctly draw the surrounding elements
+                // around it. If no title is provided, a default width is used that is guaranteed
+                // to hold the 3 stars at the bottom.
+                val title = title.uppercase()
+                val textStyle = TextStyle(
+                    color = JervisTheme.rulebookRed,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                val textLayoutResult = textMeasurer.measure(
+                    text = title,
+                    style = textStyle,
+                )
+                val currentTitleWidth = if (up) textLayoutResult.size.width.toFloat() else starCutoutWidth
 
-            val curveFunc = { x: Float ->
-                // We create a baseline gaussian distribution that is going to be
-                // clipped at a certain point for a given lenght of text.
-                // To get consistent curvature regardless of the length of the text,
-                // we calculate how much we need to shift the curve based on a the
-                // difference to the baseline. This means we need to shift the curve
-                // either left or right depending on if x is before or after the midpoint.
-                val baselineWidth = 156.dp.toPx()
-                val modifier = if (x <= size.width.toInt() / 2 ) -1 else 1
-                val xModified = x + modifier * (baselineWidth - currentTitleWidth)/2
+                val curveFunc = { x: Float ->
+                    // We create a baseline gaussian distribution that is going to be
+                    // clipped at a certain point for a given lenght of text.
+                    // To get consistent curvature regardless of the length of the text,
+                    // we calculate how much we need to shift the curve based on a the
+                    // difference to the baseline. This means we need to shift the curve
+                    // either left or right depending on if x is before or after the midpoint.
+                    val baselineWidth = 156.dp.toPx()
+                    val modifier = if (x <= size.width.toInt() / 2 ) -1 else 1
+                    val xModified = x + modifier * (baselineWidth - currentTitleWidth)/2
 
-                // Bell curve. See https://en.wikipedia.org/wiki/Gaussian_function
-                val a = 19.dp.toPx() // Height
-                val b = size.width / 2 // Center
-                val c = 125.dp.toPx() // Width / Std dev
-                a * exp(-(xModified - b).pow(2) / (2 * c.pow(2)))
-            }
-
-            val path = Path().apply {
-                moveTo(0f, size.height)
-                lineTo(0f, size.height - borderHeight)
-                for (x in 0 until size.width.toInt()) {
-                    lineTo(x.toFloat(), max(0f, size.height - borderHeight - curveFunc(x.toFloat())))
+                    // Bell curve. See https://en.wikipedia.org/wiki/Gaussian_function
+                    val a = 19.dp.toPx() // Height
+                    val b = size.width / 2 // Center
+                    val c = 125.dp.toPx() // Width / Std dev
+                    a * exp(-(xModified - b).pow(2) / (2 * c.pow(2)))
                 }
-                lineTo(size.width, size.height - borderHeight)
-                lineTo(size.width, size.height)
-                close()
-            }
 
-            drawPath(path, color = JervisTheme.rulebookBlue)
+                val path = Path().apply {
+                    moveTo(0f, size.height)
+                    lineTo(0f, size.height - borderHeight)
+                    for (x in 0 until size.width.toInt()) {
+                        lineTo(x.toFloat(), max(0f, size.height - borderHeight - curveFunc(x.toFloat())))
+                    }
+                    lineTo(size.width, size.height - borderHeight)
+                    lineTo(size.width, size.height)
+                    close()
+                }
 
-            // Remove center of curve, so there is rooom for the title text
-            val titlePadding = 20.dp.toPx()
-            val starWidth = currentTitleWidth + titlePadding
-            val cutoutPath = Path().apply {
-                moveTo(size.width/2 - starWidth/2, 0f)
-                lineTo(size.width/2 - starWidth/2, size.height - borderHeight)
-                lineTo(size.width/2 + starWidth/2, size.height - borderHeight)
-                lineTo(size.width/2 + starWidth/2, 0f)
-                close()
-            }
-            drawPath(
-                path = cutoutPath,
-                color = Color.Black,
-                blendMode = androidx.compose.ui.graphics.BlendMode.Clear
-            )
+                drawPath(path, color = JervisTheme.rulebookBlue)
 
-            if (up) {
-                // Draw Title if top wrapper
-                drawText(
-                    textLayoutResult = textLayoutResult,
-                    topLeft = Offset.Unspecified.copy(
-                        x = size.width / 2f - textLayoutResult.size.width / 2f,
-                        y = size.height - borderHeight - textLayoutResult.size.height
-                    ),
+                // Remove center of curve, so there is rooom for the title text
+                val titlePadding = 20.dp.toPx()
+                val starWidth = currentTitleWidth + titlePadding
+                val cutoutPath = Path().apply {
+                    moveTo(size.width/2 - starWidth/2, 0f)
+                    lineTo(size.width/2 - starWidth/2, size.height - borderHeight)
+                    lineTo(size.width/2 + starWidth/2, size.height - borderHeight)
+                    lineTo(size.width/2 + starWidth/2, 0f)
+                    close()
+                }
+                drawPath(
+                    path = cutoutPath,
+                    color = Color.Black,
+                    blendMode = androidx.compose.ui.graphics.BlendMode.Clear
                 )
-            } else {
-                // Draw 3 stars if bottom wrapper
-                drawStar(
-                    center = Offset(size.width * 0.5f, size.height * 0.4f),
-                    radius = bigStarRadius,
-                    color = JervisTheme.rulebookBlue,
-                )
-                drawStar(
-                    center = Offset(size.width * 0.5f - 42.dp.toPx(), size.height * 0.55f),
-                    radius = smallStarRadius,
-                    color = JervisTheme.rulebookBlue,
-                )
-                drawStar(
-                    center = Offset(size.width * 0.5f + 42.dp.toPx(), size.height * 0.55f),
-                    radius = smallStarRadius,
-                    color = JervisTheme.rulebookBlue,
-                )
-            }
-        },
+
+                if (up) {
+                    // Draw Title if top wrapper
+                    drawText(
+                        textLayoutResult = textLayoutResult,
+                        topLeft = Offset.Unspecified.copy(
+                            x = size.width / 2f - textLayoutResult.size.width / 2f,
+                            y = size.height - borderHeight - textLayoutResult.size.height
+                        ),
+                    )
+                } else {
+                    // Draw 3 stars if bottom wrapper
+                    drawStar(
+                        center = Offset(size.width * 0.5f, size.height * 0.4f),
+                        radius = bigStarRadius,
+                        color = JervisTheme.rulebookBlue,
+                    )
+                    drawStar(
+                        center = Offset(size.width * 0.5f - 42.dp.toPx(), size.height * 0.55f),
+                        radius = smallStarRadius,
+                        color = JervisTheme.rulebookBlue,
+                    )
+                    drawStar(
+                        center = Offset(size.width * 0.5f + 42.dp.toPx(), size.height * 0.55f),
+                        radius = smallStarRadius,
+                        color = JervisTheme.rulebookBlue,
+                    )
+                }
+            },
         contentAlignment = Alignment.Center,
     ) {
     }

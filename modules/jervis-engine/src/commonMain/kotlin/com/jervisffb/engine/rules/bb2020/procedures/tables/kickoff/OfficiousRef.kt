@@ -79,10 +79,10 @@ object OfficiousRef : Procedure() {
                     ReportGameProgress("${state.kickingTeam.name} rolled [ ${d6.value} + $fanFactor = $result ]"),
                     SetContext(
                         OfficiousRefContext(
-                        kickingTeamRoll = d6,
-                        kickingTeamFanFactor = fanFactor,
-                        kickingTeamResult = result
-                    )
+                            kickingTeamRoll = d6,
+                            kickingTeamFanFactor = fanFactor,
+                            kickingTeamResult = result
+                        )
                     ),
                     GotoNode(ReceivingTeamRollDie),
                 )

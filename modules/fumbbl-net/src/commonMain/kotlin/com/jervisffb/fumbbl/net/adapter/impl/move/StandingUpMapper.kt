@@ -27,7 +27,7 @@ object StandingUpMapper: CommandActionMapper {
     ): Boolean {
         return (
             command.firstReport() is PlayerActionReport &&
-            (command.firstReport() as PlayerActionReport).playerAction == PlayerAction.STAND_UP
+                (command.firstReport() as PlayerActionReport).playerAction == PlayerAction.STAND_UP
         )
     }
 

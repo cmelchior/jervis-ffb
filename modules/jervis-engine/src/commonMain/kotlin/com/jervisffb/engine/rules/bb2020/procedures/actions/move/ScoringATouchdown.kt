@@ -83,7 +83,7 @@ object ScoringATouchdown : Procedure() {
             )
         } else {
             RemoveContext<ScoringATouchDownContext>()
-    }
+        }
 
     }
     override fun isValid(state: Game, rules: Rules) {

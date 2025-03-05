@@ -101,9 +101,9 @@ object TheKickOffEvent : Procedure() {
             val ball = state.singleBall()
             return SetContext(
                 ScatterRollContext(
-                ball = ball,
-                from = ball.location,
-            )
+                    ball = ball,
+                    from = ball.location,
+                )
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter

@@ -150,7 +150,7 @@ private fun ColumnScope.LogOutDialogContent(
         Text(
             text = """
                     You are logged in as ${coachName}. Would you like to log out?
-                """.trimIndent(),
+            """.trimIndent(),
             color = textColor
         )
     }
@@ -216,7 +216,7 @@ private fun ColumnScope.LogInDialogContent(viewModel: FumbblScreenModel, dialogC
                     To log in to FUMBBL through the Jervis Client, you need to create an OAuth Application
                     on the FUMBBL website. Follow the link below, create a new application and copy 
                     "Client ID" and "Client Secret" back here.
-                """.trimIndent().replace("\n", ""),
+            """.trimIndent().replace("\n", ""),
             fontSize = 12.sp,
             color = textColor
         )

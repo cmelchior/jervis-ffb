@@ -108,7 +108,7 @@ fun MenuScreenWithSidebarAndTitle(
                 .padding(start = 282.dp)
                 .fillMaxSize()
                 .weight(1f)
-            , contentAlignment = Alignment.Center
+                , contentAlignment = Alignment.Center
             ) {
                 content()
             }

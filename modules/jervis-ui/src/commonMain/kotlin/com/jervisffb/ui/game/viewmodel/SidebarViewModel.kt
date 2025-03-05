@@ -45,17 +45,17 @@ class SidebarViewModel(
         hoverPlayerChannel.distinctUntilChanged { old, new ->
             old?.id == new?.id
         }
-        .filter { player ->
-            if (player == null) return@filter true
-            when (team.isHomeTeam()) {
-                true -> player.isOnAwayTeam() && player.location is DogOut
-                false -> !(player.isOnAwayTeam() && player.location is DogOut)
+            .filter { player ->
+                if (player == null) return@filter true
+                when (team.isHomeTeam()) {
+                    true -> player.isOnAwayTeam() && player.location is DogOut
+                    false -> !(player.isOnAwayTeam() && player.location is DogOut)
+                }
             }
-        }
-        .distinctUntilChanged { old, new -> old?.id == new?.id }
-        .map { player ->
-            player?.let { UiPlayerCard(it) }
-        }
+            .distinctUntilChanged { old, new -> old?.id == new?.id }
+            .map { player ->
+                player?.let { UiPlayerCard(it) }
+            }
 
     fun view(): StateFlow<SidebarView> = _view
 
@@ -81,7 +81,7 @@ class SidebarViewModel(
                         onHoverExit = { hoverExit() }
                     )
                 }
-        }
+            }
     }
 
     fun knockedOut(): Flow<List<UiPlayer>> = mapTo(PlayerState.KNOCKED_OUT, team.dogoutFlow)

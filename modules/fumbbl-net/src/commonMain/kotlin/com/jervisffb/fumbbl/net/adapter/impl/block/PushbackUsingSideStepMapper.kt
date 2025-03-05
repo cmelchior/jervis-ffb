@@ -35,7 +35,7 @@ object PushbackUsingSideStepMapper: CommandActionMapper {
         newActions: MutableList<JervisActionHolder>
     ) {
         val cmd = command.modelChangeList.first {
-           it is FieldModelRemovePushbackSquare && it.value.selected
+            it is FieldModelRemovePushbackSquare && it.value.selected
         } as FieldModelRemovePushbackSquare
         val target = cmd.value.coordinate
 

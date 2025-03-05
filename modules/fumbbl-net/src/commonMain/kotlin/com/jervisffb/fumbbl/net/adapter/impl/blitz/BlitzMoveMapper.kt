@@ -23,7 +23,7 @@ object BlitzMoveMapper: CommandActionMapper {
     ): Boolean {
         return (
             game.actingPlayer.playerAction == PlayerAction.BLITZ_MOVE
-            && command.sound == "step"
+                && command.sound == "step"
         )
     }
 

@@ -27,10 +27,10 @@ object SetupPlayerMapper: CommandActionMapper {
     ): Boolean {
         return (
             command.firstChangeId() == ModelChangeId.FIELD_MODEL_SET_PLAYER_STATE &&
-            command.modelChangeList.size == 2 &&
-            command.reportList.isEmpty() &&
-            command.modelChangeList[1].id == ModelChangeId.FIELD_MODEL_SET_PLAYER_COORDINATE &&
-            game.turnMode == TurnMode.SETUP
+                command.modelChangeList.size == 2 &&
+                command.reportList.isEmpty() &&
+                command.modelChangeList[1].id == ModelChangeId.FIELD_MODEL_SET_PLAYER_COORDINATE &&
+                game.turnMode == TurnMode.SETUP
         )
     }
 

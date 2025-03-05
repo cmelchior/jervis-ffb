@@ -28,10 +28,10 @@ object PushbackMapper: CommandActionMapper {
 
         return (
             !isUsingSideStep &&
-            command.modelChangeList.filterIsInstance<FieldModelRemovePushbackSquare>().count {
-                it.value.selected
-            } > 0 &&
-            command.reportList.isEmpty()
+                command.modelChangeList.filterIsInstance<FieldModelRemovePushbackSquare>().count {
+                    it.value.selected
+                } > 0 &&
+                command.reportList.isEmpty()
         )
     }
 
@@ -44,7 +44,7 @@ object PushbackMapper: CommandActionMapper {
         newActions: MutableList<JervisActionHolder>
     ) {
         val cmd = command.modelChangeList.first {
-           it is FieldModelRemovePushbackSquare && it.value.selected
+            it is FieldModelRemovePushbackSquare && it.value.selected
         } as FieldModelRemovePushbackSquare
         newActions.add(
             DirectionSelected(cmd.value.direction.transformToJervisDirection()),

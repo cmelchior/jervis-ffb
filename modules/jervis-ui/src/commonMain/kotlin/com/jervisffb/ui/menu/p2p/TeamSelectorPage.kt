@@ -79,7 +79,7 @@ fun TeamSelectorPage(
                         logo = team.logo,
                         onClick = { viewModel.setSelectedTeam(team) },
 
-                        )
+                    )
                 }
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {

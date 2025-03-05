@@ -21,7 +21,7 @@ object CatchRollMapper: CommandActionMapper {
     ): Boolean {
         return (
             command .firstChangeId() == null &&
-            command.reportList.reports.firstOrNull() is CatchRollReport
+                command.reportList.reports.firstOrNull() is CatchRollReport
         )
     }
 

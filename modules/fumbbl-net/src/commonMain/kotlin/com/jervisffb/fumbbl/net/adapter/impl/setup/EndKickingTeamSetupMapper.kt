@@ -22,7 +22,7 @@ object EndKickingTeamSetupMapper: CommandActionMapper {
 //            game.turnMode == TurnMode.SETUP &&
 //            command.modelChangeList.size == 3 &&
 //            command.modelChangeList.last() is GameSetTurnMode
-            (command.modelChangeList.lastOrNull()?.let { it is GameSetSetupOffense && it.value } ?: false)
+                (command.modelChangeList.lastOrNull()?.let { it is GameSetSetupOffense && it.value } ?: false)
         )
     }
 

@@ -127,8 +127,8 @@ object MultipleBlockAction: Procedure() {
         val activeContext = state.getContext<ActivatePlayerContext>()
         return SetContext(
             MultipleBlockContext(
-            attacker = activeContext.player
-        )
+                attacker = activeContext.player
+            )
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -160,8 +160,8 @@ object MultipleBlockAction: Procedure() {
                     .filter { state.field[it].isOccupied() }
                     .filter { state.field[it].player!!.let { player ->
                         player.team != attacker.team &&
-                        player != defender1 &&
-                        player != defender2
+                            player != defender1 &&
+                            player != defender2
                     }}
                     .map { SelectPlayer(state.field[it].player!!) }
 

@@ -19,7 +19,7 @@ object WeatherRollMapper: CommandActionMapper {
     ): Boolean {
         return (
             command .firstChangeId() == null &&
-            command.firstReport() is WeatherReport
+                command.firstReport() is WeatherReport
         )
     }
 

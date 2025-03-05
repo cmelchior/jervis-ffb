@@ -138,8 +138,8 @@ object PassStep: Procedure() {
                 SetBallLocation(ball, context.target!!),
                 SetContext(
                     ScatterRollContext(
-                    ball = ball,
-                    from = context.target)
+                        ball = ball,
+                        from = context.target)
                 )
             )
         }

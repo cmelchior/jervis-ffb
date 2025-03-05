@@ -87,7 +87,7 @@ class LocalActionProvider(
         // Figure out logging
         val provider = currentProvider
         actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
-             // TODO()
+            // TODO()
             //            delay(settings.timerSettings.turnLimitSeconds)
             val action = createRandomAction(engine.state, engine.getAvailableActions())
             provider.userActionSelected(action)

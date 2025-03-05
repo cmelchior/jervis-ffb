@@ -27,7 +27,7 @@ object StartMoveActionMapper: CommandActionMapper {
         val firstReport = command.firstReport()
         return (
             firstReport is PlayerActionReport &&
-            firstReport.playerAction == PlayerAction.MOVE
+                firstReport.playerAction == PlayerAction.MOVE
         )
     }
 

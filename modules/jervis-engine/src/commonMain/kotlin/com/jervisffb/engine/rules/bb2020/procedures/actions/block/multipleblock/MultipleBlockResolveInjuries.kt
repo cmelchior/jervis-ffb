@@ -95,9 +95,9 @@ object MultipleBlockResolveInjuries: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
             val injuryContext = when (context.activeDefender) {
-               0 -> context.defender1InjuryContext!!
-               1 -> context.defender2InjuryContext!!
-               else -> INVALID_GAME_STATE("Invalid active defender: ${context.activeDefender}")
+                0 -> context.defender1InjuryContext!!
+                1 -> context.defender2InjuryContext!!
+                else -> INVALID_GAME_STATE("Invalid active defender: ${context.activeDefender}")
             }
             return SetContext(injuryContext)
         }

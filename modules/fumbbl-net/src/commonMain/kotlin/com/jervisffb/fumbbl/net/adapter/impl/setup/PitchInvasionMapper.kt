@@ -22,8 +22,8 @@ object PitchInvasionMapper: CommandActionMapper {
     ): Boolean {
         return (
             command.firstChangeId() == ModelChangeId.FIELD_MODEL_SET_PLAYER_STATE &&
-            command.reportList.size == 1 &&
-            command.reportList.first() is KickoffPitchInvasionReport
+                command.reportList.size == 1 &&
+                command.reportList.first() is KickoffPitchInvasionReport
         )
     }
 

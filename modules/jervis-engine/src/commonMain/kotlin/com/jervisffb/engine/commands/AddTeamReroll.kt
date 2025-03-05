@@ -9,7 +9,7 @@ import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
  */
 class AddTeamReroll(private val team: Team, private val reroll: TeamReroll) : Command {
     override fun execute(state: Game) {
-            team.rerolls.add(reroll)
+        team.rerolls.add(reroll)
     }
 
     override fun undo(state: Game) {

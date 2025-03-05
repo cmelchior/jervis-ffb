@@ -65,9 +65,9 @@ object BothDown: Procedure() {
         val blockContext = state.getContext<BlockContext>()
         return SetContext(
             BothDownContext(
-            blockContext.attacker,
-            blockContext.defender,
-        )
+                blockContext.attacker,
+                blockContext.defender,
+            )
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {

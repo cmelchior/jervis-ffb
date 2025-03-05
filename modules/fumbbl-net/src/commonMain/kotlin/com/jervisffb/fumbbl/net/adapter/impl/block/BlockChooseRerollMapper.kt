@@ -31,7 +31,7 @@ object BlockChooseRerollMapper: CommandActionMapper {
                 command.reportList.firstOrNull() is ReRollReport &&
                 (command.firstReport() as ReRollReport).reRollSource == "Team ReRoll" &&
                 command.sound == "block"
-            )
+        )
     }
 
     override fun mapServerCommand(

@@ -19,7 +19,7 @@ class GiantLocation(val coordinates: MutableList<FieldCoordinate>): OnFieldLocat
     }
 
     override fun isInWideZone(rules: Rules): Boolean {
-         TODO()
+        TODO()
 //        return (0 until rules.wideZone).contains(y) ||
 //            (rules.fieldHeight - rules.wideZone until rules.fieldHeight).contains(y)
     }
@@ -85,7 +85,7 @@ class GiantLocation(val coordinates: MutableList<FieldCoordinate>): OnFieldLocat
         steps: Int,
     ): FieldCoordinate {
         TODO()
-    //        return create(x + (direction.xModifier * steps), y + (direction.yModifier * steps))
+        //        return create(x + (direction.xModifier * steps), y + (direction.yModifier * steps))
     }
 
     override fun toLogString(): String {

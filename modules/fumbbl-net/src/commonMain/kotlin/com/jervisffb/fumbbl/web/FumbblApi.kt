@@ -116,16 +116,16 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
         teamId: Int,
         rules: Rules,
     ): JervisTeamFile {
-            val team = loadTeamFromFumbbl(teamId)
-            val roster = loadRosterFromFumbbl(team.roster.id)
-            val players: Set<PlayerDetails> = loadTeamPlayers(team)
-            val jervisRoster = convertToBB2020JervisRoster(roster)
-            val jervisTeam = convertToBB2020JervisTeam(jervisRoster, team)
-            return JervisTeamFile(
-                metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-                team = jervisTeam,
-                history = null,
-            )
+        val team = loadTeamFromFumbbl(teamId)
+        val roster = loadRosterFromFumbbl(team.roster.id)
+        val players: Set<PlayerDetails> = loadTeamPlayers(team)
+        val jervisRoster = convertToBB2020JervisRoster(roster)
+        val jervisTeam = convertToBB2020JervisTeam(jervisRoster, team)
+        return JervisTeamFile(
+            metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
+            team = jervisTeam,
+            history = null,
+        )
     }
 
     private suspend fun loadRosterFromFumbbl(rosterId: Int): RosterDetails {

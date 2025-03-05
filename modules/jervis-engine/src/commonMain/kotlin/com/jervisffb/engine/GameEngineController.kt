@@ -216,10 +216,10 @@ class GameEngineController(state: Game) {
             !stack.isEmpty() &&
             (
                 stack.currentNode() is ComputationNode ||
-                stack.currentNode() is ParentNode ||
-                // Some action nodes only accept "Continue" events if all other options have been exhausted
-                // We want to roll over these as well.
-                stack.currentNode() is ActionNode && getAvailableActions().let { it.size == 1 && it.first() == ContinueWhenReady }
+                    stack.currentNode() is ParentNode ||
+                    // Some action nodes only accept "Continue" events if all other options have been exhausted
+                    // We want to roll over these as well.
+                    stack.currentNode() is ActionNode && getAvailableActions().let { it.size == 1 && it.first() == ContinueWhenReady }
             )
         ) {
             when (val currentNode: Node = stack.currentNode()) {

@@ -173,14 +173,14 @@ class ServerCommunication(
             }
         } else {
 //            scope.launch {
-                connections.forEach {
-                    try {
-                        it.connection.send(Frame.Text(jsonMessage))
-                    } catch (ex: Throwable) {
-                        LOG.i { "[Server] Error sending message to connection: $ex" }
-                    }
-
+            connections.forEach {
+                try {
+                    it.connection.send(Frame.Text(jsonMessage))
+                } catch (ex: Throwable) {
+                    LOG.i { "[Server] Error sending message to connection: $ex" }
                 }
+
+            }
 //            }
         }
     }

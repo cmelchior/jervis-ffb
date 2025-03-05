@@ -72,15 +72,15 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                     ,
                     contentAlignment = Alignment.Center,
                 ) {
-                        Image(
-                            modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
-                            colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
-                            painter = painterResource(Res.drawable.icon_menu_copy),
-                            contentDescription = "Copy URL",
-                        )
-                    }
+                    Image(
+                        modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
+                        colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
+                        painter = painterResource(Res.drawable.icon_menu_copy),
+                        contentDescription = "Copy URL",
+                    )
                 }
             }
+        }
         Row(modifier = Modifier.fillMaxWidth().align(Alignment.BottomEnd), horizontalArrangement = Arrangement.End) {
             // Buttons
         }

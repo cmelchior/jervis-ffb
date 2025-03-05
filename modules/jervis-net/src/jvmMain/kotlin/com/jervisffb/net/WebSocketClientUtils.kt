@@ -48,12 +48,12 @@ actual fun startEmbeddedServer(
 
 actual fun stopEmbeddedServer(server: Any) {
     if (server is EmbeddedServer<*, *>) {
-            // TODO Unclear why the server always run the full shutdown grace + timeout. For now set it low to avoid having tests running forever.
-            server.stop(
-                shutdownGracePeriod = 500,
-                shutdownTimeout = 500,
-                timeUnit = TimeUnit.MILLISECONDS,
-            )
+        // TODO Unclear why the server always run the full shutdown grace + timeout. For now set it low to avoid having tests running forever.
+        server.stop(
+            shutdownGracePeriod = 500,
+            shutdownTimeout = 500,
+            timeUnit = TimeUnit.MILLISECONDS,
+        )
         jervisLogger().i { "Embedded server stopped" }
     } else {
         throw IllegalArgumentException("Invalid server type: $server")

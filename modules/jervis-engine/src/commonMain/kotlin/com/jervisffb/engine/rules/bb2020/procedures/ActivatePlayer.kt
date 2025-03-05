@@ -381,7 +381,7 @@ object ActivatePlayer : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
             return if (context.player.hasTemporaryEffect(TemporaryEffectType.BLOOD_LUST)) {
-                   GotoNode(ResolveBloodLustAtEndOfActivation)
+                GotoNode(ResolveBloodLustAtEndOfActivation)
             } else {
                 return compositeCommandOf(
                     SetPlayerAvailability(state.activePlayer!!, if (context.markActionAsUsed || context.activationEndsImmediately) Availability.HAS_ACTIVATED else Availability.AVAILABLE),

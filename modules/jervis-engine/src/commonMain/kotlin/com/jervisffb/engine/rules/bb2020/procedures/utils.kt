@@ -167,9 +167,9 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
 
     return (
         removableStatModifiers +
-        removableSkills +
-        removableRerolls +
-        removablePrayers
+            removableSkills +
+            removableRerolls +
+            removablePrayers
     ).toTypedArray()
 }
 

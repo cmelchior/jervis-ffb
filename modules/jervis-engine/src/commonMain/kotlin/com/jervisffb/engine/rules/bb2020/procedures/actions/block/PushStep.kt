@@ -495,10 +495,10 @@ object PushStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val context = state.getContext<PushContext>()
             return SetContext(
-                    RiskingInjuryContext(
-                        player = context.pushChain.last().pushee,
-                        mode = RiskingInjuryMode.PUSHED_INTO_CROWD
-                    )
+                RiskingInjuryContext(
+                    player = context.pushChain.last().pushee,
+                    mode = RiskingInjuryMode.PUSHED_INTO_CROWD
+                )
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll

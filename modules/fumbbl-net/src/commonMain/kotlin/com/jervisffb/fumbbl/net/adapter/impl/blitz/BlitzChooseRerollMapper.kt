@@ -27,10 +27,10 @@ object BlitzChooseRerollMapper: CommandActionMapper {
     ): Boolean {
         return (
             (game.actingPlayer.playerAction == PlayerAction.BLITZ || game.actingPlayer.playerAction == PlayerAction.BLITZ_MOVE) &&
-            command.reportList.lastOrNull() is BlockRollReport &&
-            command.reportList.firstOrNull() is ReRollReport &&
-            (command.firstReport() as ReRollReport).reRollSource == "Team ReRoll" &&
-            command.sound == "block"
+                command.reportList.lastOrNull() is BlockRollReport &&
+                command.reportList.firstOrNull() is ReRollReport &&
+                (command.firstReport() as ReRollReport).reRollSource == "Team ReRoll" &&
+                command.sound == "block"
         )
     }
 

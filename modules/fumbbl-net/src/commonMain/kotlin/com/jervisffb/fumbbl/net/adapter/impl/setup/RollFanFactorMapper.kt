@@ -18,8 +18,8 @@ object RollFanFactorMapper: CommandActionMapper {
     ): Boolean {
         return (
             command.reportList.size == 2 &&
-            command.reportList.reports[0] is FanFactorReport &&
-            command.reportList.reports[1] is FanFactorReport
+                command.reportList.reports[0] is FanFactorReport &&
+                command.reportList.reports[1] is FanFactorReport
         )
     }
 

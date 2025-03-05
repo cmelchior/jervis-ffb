@@ -22,9 +22,9 @@ object SelectBlitzDefenderMapper: CommandActionMapper {
     ): Boolean {
         return (
             (game.actingPlayer.playerAction == PlayerAction.BLITZ || game.actingPlayer.playerAction == PlayerAction.BLITZ_MOVE) &&
-            command.reportList.isEmpty() &&
-            command.firstChangeId() == ModelChangeId.GAME_SET_DEFENDER_ID &&
-            (command.modelChangeList.first() as GameSetDefenderId).key != null
+                command.reportList.isEmpty() &&
+                command.firstChangeId() == ModelChangeId.GAME_SET_DEFENDER_ID &&
+                (command.modelChangeList.first() as GameSetDefenderId).key != null
         )
     }
 

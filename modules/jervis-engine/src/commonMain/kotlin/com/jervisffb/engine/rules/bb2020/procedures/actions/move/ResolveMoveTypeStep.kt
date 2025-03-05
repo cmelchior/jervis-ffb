@@ -81,8 +81,8 @@ object ResolveMoveTypeStep : Procedure() {
             val player = moveContext.player
             val pickupBall = (
                 player.isStanding(rules) &&
-                state.field[player.location as FieldCoordinate].balls.isNotEmpty() &&
-                state.field[player.location as FieldCoordinate].balls.all { it.state == BallState.ON_GROUND }
+                    state.field[player.location as FieldCoordinate].balls.isNotEmpty() &&
+                    state.field[player.location as FieldCoordinate].balls.all { it.state == BallState.ON_GROUND }
             )
 
             return if (pickupBall && !endNow) {

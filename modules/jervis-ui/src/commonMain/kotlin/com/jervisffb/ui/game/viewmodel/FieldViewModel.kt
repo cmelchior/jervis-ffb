@@ -119,7 +119,7 @@ class FieldViewModel(
                             // just queue up all pathfinder data directly.
                             actionProvider.userMultipleActionsSelected(getQueuedActionsForPath().actions)
                         }
-                   }
+                    }
 
                     // Annotate all fields with "Move Used" amount + add action on the square
                     // that is currently being hovered over.
@@ -151,10 +151,10 @@ class FieldViewModel(
         mouseEnter: FieldCoordinate?
     ): Boolean = (
         activePlayer != null &&
-        mouseEnter != null &&
-        activePlayer.coordinates != mouseEnter &&
-        activePlayer.movesLeft > 0 &&
-        rules.calculateMarks(game, activePlayer.team, activePlayer.coordinates) <= 0
+            mouseEnter != null &&
+            activePlayer.coordinates != mouseEnter &&
+            activePlayer.movesLeft > 0 &&
+            rules.calculateMarks(game, activePlayer.team, activePlayer.coordinates) <= 0
     )
 
     fun finishAnimation() {

@@ -68,10 +68,10 @@ class SetBallState private constructor(
         )
 
         fun outOfBounds(ball: Ball, exit: FieldCoordinate): Command = SetBallState(
-                ball = ball,
-                ballState = BallState.OUT_OF_BOUNDS,
-                exitLocation = exit,
-            )
+            ball = ball,
+            ballState = BallState.OUT_OF_BOUNDS,
+            exitLocation = exit,
+        )
 
         fun thrownIn(ball: Ball): Command = SetBallState(
             ball = ball,

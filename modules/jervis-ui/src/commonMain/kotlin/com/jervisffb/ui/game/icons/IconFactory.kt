@@ -154,7 +154,7 @@ object IconFactory {
                 PlayerSprite(image, image)
             }
             is SpriteSheet -> {
-                 extractSprites(image, sprite.variants, sprite.selectedIndex ?: 0, isHomeTeam)
+                extractSprites(image, sprite.variants, sprite.selectedIndex ?: 0, isHomeTeam)
             }
             null -> TODO()
         }

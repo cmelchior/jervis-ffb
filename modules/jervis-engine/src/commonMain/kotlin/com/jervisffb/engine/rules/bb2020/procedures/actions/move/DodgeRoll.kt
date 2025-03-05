@@ -98,7 +98,7 @@ import com.jervisffb.engine.utils.sum
  * Prehensile Tail. In this case, it doesn't matter since they are both "free", but in other
  * cases it might.
  */
- object DodgeRoll: Procedure() {
+object DodgeRoll: Procedure() {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -205,18 +205,18 @@ import com.jervisffb.engine.utils.sum
             val context = state.getContext<DodgeRollContext>()
             val player = context.player
             return when (action) {
-                    Confirm -> {
-                        val modifier = BreakTackleModifier(player.strength)
-                        compositeCommandOf(
-                            ReportSkillUsed(context.player, context.player.getSkill<BreakTackle>()),
-                            SetContext(context.copyAndAddModifier(modifier)),
-                            SetSkillUsed(player = player, skill = player.getSkill<BreakTackle>(), used = true),
-                            GotoNode(ChooseToUsePrehensileTail)
-                        )
-                    }
-                    Cancel,
-                    Continue -> GotoNode(ChooseToUsePrehensileTail)
-                    else -> INVALID_ACTION(action)
+                Confirm -> {
+                    val modifier = BreakTackleModifier(player.strength)
+                    compositeCommandOf(
+                        ReportSkillUsed(context.player, context.player.getSkill<BreakTackle>()),
+                        SetContext(context.copyAndAddModifier(modifier)),
+                        SetSkillUsed(player = player, skill = player.getSkill<BreakTackle>(), used = true),
+                        GotoNode(ChooseToUsePrehensileTail)
+                    )
+                }
+                Cancel,
+                Continue -> GotoNode(ChooseToUsePrehensileTail)
+                else -> INVALID_ACTION(action)
             }
         }
     }

@@ -19,7 +19,7 @@ object KickoffRollMapper: CommandActionMapper {
     ): Boolean {
         return (
             command .firstChangeId() == null &&
-            command.reportList.reports.firstOrNull() is KickoffResultReport
+                command.reportList.reports.firstOrNull() is KickoffResultReport
         )
     }
 

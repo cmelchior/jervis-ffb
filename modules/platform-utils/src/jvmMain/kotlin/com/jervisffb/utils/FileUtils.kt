@@ -80,4 +80,4 @@ actual class PropertiesManager actual constructor() {
             }
         }
     }
- }
+}

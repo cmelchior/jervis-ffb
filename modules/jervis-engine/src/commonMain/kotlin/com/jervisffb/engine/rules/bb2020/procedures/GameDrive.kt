@@ -95,10 +95,10 @@ object GameDrive : Procedure() {
             val inactiveTouchdownScored = (state.turnOver == TurnOver.INACTIVE_TEAM_TOUCHDOWN)
             val isOutOfTime = if (state.halfNo <= rules.halfsPrGame) {
                 state.homeTeam.turnMarker == rules.turnsPrHalf &&
-                state.awayTeam.turnMarker == rules.turnsPrHalf
+                    state.awayTeam.turnMarker == rules.turnsPrHalf
             } else {
                 state.homeTeam.turnMarker == rules.turnsInExtraTime &&
-                state.awayTeam.turnMarker == rules.turnsInExtraTime
+                    state.awayTeam.turnMarker == rules.turnsInExtraTime
             }
             val endDrive = activeGoalScored || isOutOfTime
             val swapTeams = !isOutOfTime && !activeGoalScored

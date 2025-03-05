@@ -159,7 +159,7 @@ object DialogFactory {
 
                 CatchRoll.ReRollDie,
                 is CatchRoll.RollDie,
-                    -> {
+                -> {
                     SingleChoiceInputDialog.createCatchBallDialog(
                         controller.state.getContext<CatchRollContext>().catchingPlayer,
                         D6Result.allOptions(),
@@ -237,7 +237,7 @@ object DialogFactory {
                 }
                 is PickupRoll.ReRollDie,
                 is PickupRoll.RollDie,
-                    -> {
+                -> {
                     SingleChoiceInputDialog.createPickupBallDialog(
                         controller.state.getContext<PickupRollContext>().player,
                         D6Result.allOptions(),

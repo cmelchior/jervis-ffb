@@ -104,9 +104,9 @@ object Bounce : Procedure() {
             val ball = state.currentBall()
             return SetContext(
                 ThrowInContext(
-                ball = ball,
-                outOfBoundsAt = ball.outOfBoundsAt!!,
-            )
+                    ball = ball,
+                    outOfBoundsAt = ball.outOfBoundsAt!!,
+                )
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowIn

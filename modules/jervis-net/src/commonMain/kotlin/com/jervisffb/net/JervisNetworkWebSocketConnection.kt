@@ -15,7 +15,7 @@ interface JervisWebSocketConnection: DefaultWebSocketSession {
  * It mostly exists so we can track the username owning the connection.
  */
 open class JervisNetworkWebSocketConnection(val username: String, connection: DefaultWebSocketSession)
-    : DefaultWebSocketSession by connection
+: DefaultWebSocketSession by connection
 
 
 /**

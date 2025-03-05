@@ -90,7 +90,7 @@ fun SelectHotseatTeamScreen(
                             JervisButton(
                                 text = ai.name,
                                 onClick = {
-                                   viewModel.updateSelectedAiPlayer(ai)
+                                    viewModel.updateSelectedAiPlayer(ai)
                                 },
                                 buttonColor = if (selectedAiPlayer == ai) JervisTheme.rulebookRed else JervisTheme.rulebookBlue)
                         }

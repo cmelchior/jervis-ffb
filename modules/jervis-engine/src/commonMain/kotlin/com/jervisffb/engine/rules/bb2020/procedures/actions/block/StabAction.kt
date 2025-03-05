@@ -84,10 +84,10 @@ object StabAction : Procedure() {
             val actionContext = state.getContext<BlockActionContext>()
             return SetContext(
                 BlockContext(
-                attacker = actionContext.attacker,
-                defender = actionContext.defender,
-                blockType = BlockType.STANDARD
-            )
+                    attacker = actionContext.attacker,
+                    defender = actionContext.defender,
+                    blockType = BlockType.STANDARD
+                )
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = StandardBlockStep

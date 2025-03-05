@@ -33,7 +33,7 @@ object BlitzChooseBlockResultMapper: CommandActionMapper {
     ): Boolean {
         return (
             game.actingPlayer.playerAction == PlayerAction.BLITZ &&
-            command.firstReport() is BlockChoiceReport
+                command.firstReport() is BlockChoiceReport
         )
     }
 

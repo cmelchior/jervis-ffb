@@ -72,7 +72,7 @@ import com.jervisffb.engine.utils.sum
  *
  * @see [StandardMoveStep.ResolveRush]
  */
- object RushRoll: Procedure() {
+object RushRoll: Procedure() {
     override val initialNode: Node = RollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         // Check for Rush modifiers

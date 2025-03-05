@@ -79,9 +79,9 @@ object DeviateRoll : Procedure() {
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.DEVIATE, listOf(d8, d6), showDiceType = true),
                     SetContext(context.copy(
-                            deviateRoll = listOf(d8, d6),
-                            landsAt = if (outOfBoundsAt == null) currentLocation else null,
-                            outOfBoundsAt = outOfBoundsAt,
+                        deviateRoll = listOf(d8, d6),
+                        landsAt = if (outOfBoundsAt == null) currentLocation else null,
+                        outOfBoundsAt = outOfBoundsAt,
                     )),
                     ExitProcedure()
                 )

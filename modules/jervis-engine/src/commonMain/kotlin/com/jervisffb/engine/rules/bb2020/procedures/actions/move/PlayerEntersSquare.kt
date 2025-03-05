@@ -92,7 +92,7 @@ object MovePlayerIntoSquare : Procedure() {
             val playerIsHoldingBall = (context.player.ball?.carriedBy == context.player)
             val ballOnTheGround = (
                 state.balls.size > 1 &&
-                state.field[context.target].balls.count { it.state == BallState.ON_GROUND } > 0
+                    state.field[context.target].balls.count { it.state == BallState.ON_GROUND } > 0
             )
             return if (playerIsHoldingBall && ballOnTheGround) {
                 GotoNode(ResolveBouncingBall)
@@ -124,7 +124,7 @@ object MovePlayerIntoSquare : Procedure() {
             val hasTrapdoor = state.field[context.target].hasTrapdoor
             val isTreacherous = (
                 state.homeTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR) ||
-                state.awayTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR)
+                    state.awayTeam.hasPrayer(PrayerToNuffle.TREACHEROUS_TRAPDOOR)
             )
             return if (hasTrapdoor && isTreacherous) {
                 GotoNode(RollForTrapdoor)
@@ -160,9 +160,9 @@ object MovePlayerIntoSquare : Procedure() {
                 SetPlayerState(context.player, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
                 SetContext(
                     RiskingInjuryContext(
-                    player = context.player,
-                    mode = RiskingInjuryMode.PUSHED_INTO_CROWD
-                )
+                        player = context.player,
+                        mode = RiskingInjuryMode.PUSHED_INTO_CROWD
+                    )
                 ),
                 ReportGameProgress("${context.player.name} fell through a trapdoor at ${context.target.toLogString()}")
             )

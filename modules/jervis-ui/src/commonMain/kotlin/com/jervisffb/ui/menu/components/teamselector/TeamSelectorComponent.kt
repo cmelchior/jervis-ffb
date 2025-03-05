@@ -74,7 +74,7 @@ fun TeamSelectorComponent(
                         logo = team.logo,
                         onClick = { viewModel.setSelectedTeam(team) },
 
-                        )
+                    )
                 }
             }
         }
