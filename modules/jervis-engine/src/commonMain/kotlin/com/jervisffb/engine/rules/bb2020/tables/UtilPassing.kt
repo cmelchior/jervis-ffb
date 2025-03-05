@@ -1,4 +1,4 @@
-//package com.jervisffb.rules.bb2020.tables
+package com.jervisffb.engine.rules.bb2020.tables
 //
 //import com.fumbbl.ffb.FieldCoordinate
 //import com.fumbbl.ffb.FieldCoordinateBounds
@@ -14,7 +14,7 @@
 //import kotlin.math.min
 //import kotlin.math.sqrt
 //
-//object UtilPassing {
+object UtilPassing {
 //    var RULER_WIDTH: Double = 1.74 // This looks wrong ... it should be 58/34 or 58/33.3875
 //
 //    fun findInterceptors(pGame: Game, pThrower: Player<*>?, pTargetCoordinate: FieldCoordinate?): Array<Player<*>> {
@@ -160,4 +160,4 @@
 //
 //        return eligibleCoordinates
 //    }
-//}
+}
