@@ -26,7 +26,7 @@ enum class ReleaseType {
     SNAPSHOT, DEV, PROD
 }
 
-val releaseType = when(properties["jervis.releaseType"]) {
+val releaseType = when (properties["jervis.releaseType"]) {
     "snapshot" -> ReleaseType.SNAPSHOT
     "dev" -> ReleaseType.DEV
     "prod" -> ReleaseType.PROD

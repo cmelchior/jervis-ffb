@@ -40,7 +40,7 @@ object RangeRuler {
         val lines = TEMPlATE.lines()
         ranges = Array(lines.size) { y: Int ->
             Array(lines.size) { x: Int ->
-                when(val type: Char? = lines[y].getOrNull(x * 2)) {
+                when (val type: Char? = lines[y].getOrNull(x * 2)) {
                     'T' -> Range.PASSING_PLAYER
                     'Q' -> Range.QUICK_PASS
                     'S' -> Range.SHORT_PASS

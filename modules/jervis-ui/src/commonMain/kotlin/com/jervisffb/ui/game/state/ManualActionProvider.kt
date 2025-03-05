@@ -119,7 +119,7 @@ open class ManualActionProvider(
         // If the UI has registered any queued action generators, we run them first before
         // trying to find other automated actions.
         val iter = queuedActionsGeneratorFuncs.iterator()
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             val result = iter.next()(controller)
             if (result != null) {
                 delayBetweenActions = result.delayBetweenActions

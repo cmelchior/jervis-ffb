@@ -152,7 +152,7 @@ object PickupRoll : Procedure() {
     }
 
     private fun isPickupSuccess(roll: D6Result, target: Int, modifiers: List<DiceModifier>): Boolean {
-        return when(roll.value) {
+        return when (roll.value) {
             1 -> false
             in 2..5 -> roll.value != 1 && (target <= roll.value + modifiers.sum())
             6 -> true

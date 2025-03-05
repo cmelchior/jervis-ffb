@@ -12,7 +12,7 @@ object BackNavigationHandler {
         callbacks.remove(onBackPress)
     }
     fun execute() {
-        for(callback in callbacks) {
+        for (callback in callbacks) {
             callback.onBackPressed()
         }
     }

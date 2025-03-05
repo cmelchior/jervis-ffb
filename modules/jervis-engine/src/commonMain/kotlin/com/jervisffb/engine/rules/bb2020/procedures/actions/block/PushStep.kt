@@ -214,7 +214,7 @@ object PushStep: Procedure() {
             val context = state.getContext<PushContext>()
             val hasJuggernaut = false // How to check?
             val canUseJuggernaut = !context.pushChain.last().usingJuggernaut
-            return when(hasJuggernaut && canUseJuggernaut) {
+            return when (hasJuggernaut && canUseJuggernaut) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }
@@ -247,7 +247,7 @@ object PushStep: Procedure() {
             val context = state.getContext<PushContext>()
             val hasStandFirm = false // How to check?
             val canUseStandFirm = !context.pushChain.last().usingJuggernaut
-            return when(hasStandFirm && canUseStandFirm) {
+            return when (hasStandFirm && canUseStandFirm) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }
@@ -278,7 +278,7 @@ object PushStep: Procedure() {
             val context = state.getContext<PushContext>()
             val hasGrab = false // How to check?
             val canUseGrab = true // TODO Is this true?
-            return when(hasGrab && canUseGrab) {
+            return when (hasGrab && canUseGrab) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }
@@ -312,7 +312,7 @@ object PushStep: Procedure() {
                 .getSurroundingCoordinates(rules)
                 .count { state.field[it].isUnoccupied() } > 0
             val canUseSidestep = !(context.usedGrab || context.usedStandFirm)
-            return when(hasSidestep && canUseSidestep) {
+            return when (hasSidestep && canUseSidestep) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }
@@ -343,7 +343,7 @@ object PushStep: Procedure() {
             val context = state.getContext<PushContext>().pushChain.last()
             val hasFend = false // How to check?
             val canUseFend = false // How?
-            return when(hasFend && canUseFend) {
+            return when (hasFend && canUseFend) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
             }
@@ -530,7 +530,7 @@ object PushStep: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
-            val actions = when(action) {
+            val actions = when (action) {
                 is Confirm -> arrayOf(
                     SetContext(context.copy(followsUp = true)),
                     SetPlayerLocation(context.firstPusher, context.pushChain.first().from)

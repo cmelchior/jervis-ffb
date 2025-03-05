@@ -7,7 +7,7 @@ class ReportDodgeResult(private val context: DodgeRollContext) : LogEntry() {
     override val message: String
         get() {
             return buildString {
-                when(context.isSuccess) {
+                when (context.isSuccess) {
                     true -> append("${context.player.name} successfully dodged")
                     false -> append("${context.player.name} crashed to the ground")
                 }

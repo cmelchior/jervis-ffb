@@ -254,7 +254,7 @@ class Player(
     }
 
     fun addStatModifier(modifier: StatModifier) {
-        when(modifier.type) {
+        when (modifier.type) {
             StatModifier.Type.AV -> armourModifiers.add(modifier)
             StatModifier.Type.MA -> moveModifiers.add(modifier)
             StatModifier.Type.PA -> passingModifiers.add(modifier)
@@ -267,7 +267,7 @@ class Player(
         // TODO We should start search from the end of array
         // It doesn't matter much, but will ensure that the list
         // stays more consistent across Do/Undo
-        val success = when(modifier.type) {
+        val success = when (modifier.type) {
             StatModifier.Type.AV -> armourModifiers.remove(modifier)
             StatModifier.Type.MA -> moveModifiers.remove(modifier)
             StatModifier.Type.PA -> passingModifiers.remove(modifier)

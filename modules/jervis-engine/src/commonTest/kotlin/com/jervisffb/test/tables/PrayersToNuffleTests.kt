@@ -86,7 +86,7 @@ class PrayersToNuffleTests: JervisGameTest() {
                 *defaultJourneyMen(),
                 *defaultInducements()
             )
-            when(rolls) {
+            when (rolls) {
                 0 -> assertEquals(DetermineKickingTeam.SelectCoinSide, controller.currentProcedure()!!.currentNode())
                 1 -> {
                     val context = state.getContext<PrayersToNuffleRollContext>()

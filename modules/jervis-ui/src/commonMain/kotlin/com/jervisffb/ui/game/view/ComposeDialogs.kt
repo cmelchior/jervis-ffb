@@ -103,7 +103,7 @@ fun MultipleSelectUserActionDialog(
                                         backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background,
                                     )
 
-                                when(it) {
+                                when (it) {
                                     is DBlockResult -> {
                                         val text = it.blockResult.name
                                         Button(

@@ -66,7 +66,7 @@ object ResolveMoveTypeStep : Procedure() {
 
     object ResolveMove : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return when(val moveType = state.getContext<MoveContext>().moveType) {
+            return when (val moveType = state.getContext<MoveContext>().moveType) {
                 MoveType.STANDARD -> StandardMoveStep
                 MoveType.STAND_UP -> StandingUpStep
                 MoveType.JUMP -> JumpStep

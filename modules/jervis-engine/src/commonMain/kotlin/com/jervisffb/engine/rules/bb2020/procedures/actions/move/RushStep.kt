@@ -45,7 +45,7 @@ object RushStep: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when(action) {
+            return when (action) {
                 is FieldSquareSelected -> {
                     val moveContext = state.getContext<MoveContext>()
                     val movingPlayer = moveContext.player

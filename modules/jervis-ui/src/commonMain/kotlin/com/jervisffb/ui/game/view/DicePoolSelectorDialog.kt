@@ -78,7 +78,7 @@ fun DicePoolSelectorDialog(
                                         backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background,
                                     )
 
-                                when(val diceResult = el.result) {
+                                when (val diceResult = el.result) {
                                     is DBlockResult -> {
                                         val text = diceResult.blockResult.name
                                         Button(

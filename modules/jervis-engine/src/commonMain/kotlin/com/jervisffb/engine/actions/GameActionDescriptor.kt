@@ -159,7 +159,7 @@ data class RollDice(
 
     override fun createRandom(): GameAction {
         return dice.map {
-            when(it) {
+            when (it) {
                 Dice.D2 -> D2Result.allOptions().random()
                 Dice.D3 -> D3Result.allOptions().random()
                 Dice.D4 -> D4Result.allOptions().random()

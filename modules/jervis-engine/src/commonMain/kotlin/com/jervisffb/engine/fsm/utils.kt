@@ -30,7 +30,7 @@ inline fun <reified T : GameAction> ActionNode.checkTypeAndValue(
     if (action is T) {
         val availableActions = node.getAvailableActions(state, rules)
         // Validate that an action descriptor exists with the provided value
-        when(action) {
+        when (action) {
             is FieldSquareSelected -> {
                 val hasActionDescriptor = node.getAvailableActions(state, rules)
                     .filterIsInstance<SelectFieldLocation>()

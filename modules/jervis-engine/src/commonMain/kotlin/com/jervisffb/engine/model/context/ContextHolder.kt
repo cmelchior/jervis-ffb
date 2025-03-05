@@ -22,21 +22,21 @@ class ContextHolder {
      * @return the old context, if it existed.
      */
     fun setContext(context: ProcedureContext, id: Int = 0): ProcedureContext? {
-        return when(id) {
+        return when (id) {
             0 -> contexts.put(context::class, context)
             else -> contextsWithIds.put(Pair(id, context::class), context)
         }
     }
 
     fun hasContext(contextClass: KClass<out ProcedureContext>, id: Int = 0): Boolean {
-        return when(id) {
+        return when (id) {
             0 -> contexts.containsKey(contextClass)
             else -> contextsWithIds.containsKey(Pair(id, contextClass))
         }
     }
 
     fun <T: ProcedureContext> getContext(type: KClass<T>, id: Int = 0): T? {
-        val context = when(id) {
+        val context = when (id) {
             0 -> contexts[type]
             else -> contextsWithIds[Pair(id, type)]
         }
@@ -48,7 +48,7 @@ class ContextHolder {
     }
 
     fun <T: ProcedureContext> remove(type: KClass<T>, id: Int = 0): T? {
-        return when(id) {
+        return when (id) {
             0 -> contexts.remove(type) as T?
             else -> contextsWithIds.remove(Pair(id, type)) as T?
         }

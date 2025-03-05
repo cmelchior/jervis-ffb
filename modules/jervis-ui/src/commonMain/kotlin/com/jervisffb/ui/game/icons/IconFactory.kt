@@ -274,7 +274,7 @@ object IconFactory {
 
     @Composable
     fun getSidebarBannerTop(isHomeTeam: Boolean): ImageBitmap {
-        return when(isHomeTeam) {
+        return when (isHomeTeam) {
             true -> imageResource(Res.drawable.icons_sidebar_background_player_detail_red)
             false -> imageResource(Res.drawable.icons_sidebar_background_player_detail_blue)
         }
@@ -282,7 +282,7 @@ object IconFactory {
 
     @Composable
     fun getSidebarBannerMiddle(isHomeTeam: Boolean): ImageBitmap {
-        return when(isHomeTeam) {
+        return when (isHomeTeam) {
             true -> imageResource(Res.drawable.icons_sidebar_background_turn_dice_status_red)
             false -> imageResource(Res.drawable.icons_sidebar_background_turn_dice_status_blue)
         }
@@ -290,7 +290,7 @@ object IconFactory {
 
     @Composable
     fun getSidebarBannerBottom(isHomeTeam: Boolean): ImageBitmap {
-        return when(isHomeTeam) {
+        return when (isHomeTeam) {
             true -> imageResource(Res.drawable.icons_sidebar_background_resource_red)
             false -> imageResource(Res.drawable.icons_sidebar_background_resource_blue)
         }

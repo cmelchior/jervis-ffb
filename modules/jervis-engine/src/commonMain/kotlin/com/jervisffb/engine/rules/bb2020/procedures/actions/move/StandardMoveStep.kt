@@ -70,7 +70,7 @@ object StandardMoveStep: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
-            return when(action) {
+            return when (action) {
                 // If the player has not moved, this will not use their action
                 EndAction -> ExitProcedure()
                 else -> checkTypeAndValue<FieldSquareSelected>(state, rules, action) {

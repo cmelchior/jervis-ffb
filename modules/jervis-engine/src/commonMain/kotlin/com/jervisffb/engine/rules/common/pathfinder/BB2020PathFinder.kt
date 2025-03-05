@@ -307,7 +307,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
         } else {
             try {
                 path.reversed().subList(0, maxMove.coerceAtMost(path.size))
-            } catch(ex: Throwable) {
+            } catch (ex: Throwable) {
                 println(ex)
                 TODO()
             }

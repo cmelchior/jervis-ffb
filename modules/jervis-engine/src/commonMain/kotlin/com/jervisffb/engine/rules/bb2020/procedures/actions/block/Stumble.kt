@@ -82,7 +82,7 @@ object Stumble: Procedure() {
             }
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val useTackle = when(action) {
+            val useTackle = when (action) {
                 Confirm -> true
                 Cancel,
                 Continue -> false
@@ -108,7 +108,7 @@ object Stumble: Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val useDodge = when(action) {
+            val useDodge = when (action) {
                 Confirm -> true
                 Cancel,
                 Continue -> false

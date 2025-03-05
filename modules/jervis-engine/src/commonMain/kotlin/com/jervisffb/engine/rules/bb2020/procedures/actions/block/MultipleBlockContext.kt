@@ -193,7 +193,7 @@ data class MultipleBlockContext(
      * Creates a [UseRerollContext] for currently active Multiple Block Action its reroll type
      */
     fun createRerollContext(state: Game, action: RerollOptionSelected): UseRerollContext {
-        return when(getActiveRerollType()) {
+        return when (getActiveRerollType()) {
             BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
             MULTIPLE_BLOCK -> TODO()
@@ -317,7 +317,7 @@ data class MultipleBlockContext(
             )
         }
 
-        return when(activeDefender) {
+        return when (activeDefender) {
             0 -> copy(roll1 = MultipleBlockDiceRoll(type, context))
             1 -> copy(roll2 = MultipleBlockDiceRoll(type, context))
             else -> throw IllegalArgumentException("Invalid active defender: $activeDefender")

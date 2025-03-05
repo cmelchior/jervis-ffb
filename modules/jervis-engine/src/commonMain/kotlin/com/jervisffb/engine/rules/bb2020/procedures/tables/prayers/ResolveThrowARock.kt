@@ -77,7 +77,7 @@ object ResolveThrowARock : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when(action) {
+            return when (action) {
                 is Continue -> ExitProcedure()
                 is PlayerSelected -> {
                     val context = state.getContext<ThrowARockContext>()

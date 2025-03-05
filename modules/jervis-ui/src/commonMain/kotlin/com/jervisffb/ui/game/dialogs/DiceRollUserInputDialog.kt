@@ -334,7 +334,7 @@ class DiceRollUserInputDialog(
 
         fun createUnknownDiceRoll(dicePool: RollDice): UserInputDialog {
             val dice= dicePool.dice.map {
-                when(it) {
+                when (it) {
                     Dice.D2 -> Pair(it, D2Result.allOptions())
                     Dice.D3 -> Pair(it, D3Result.allOptions())
                     Dice.D4 -> Pair(it, D4Result.allOptions())
