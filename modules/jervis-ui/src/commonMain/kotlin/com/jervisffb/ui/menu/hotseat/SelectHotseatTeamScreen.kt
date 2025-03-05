@@ -81,7 +81,7 @@ fun SelectHotseatTeamScreen(
                         onValueChange = { viewModel.updateCoachName(it) },
                         label = { Text("Coach name") }
                     )
-                    PlayerTypeSelector(playerTypeOptions, playerType, onChoice = { type: PlayerType -> viewModel.updatePlayerType(type)} )
+                    PlayerTypeSelector(playerTypeOptions, playerType, onChoice = { type: PlayerType -> viewModel.updatePlayerType(type)})
                 }
                 Spacer(modifier = Modifier.height(32.dp))
                 if (playerType == PlayerType.COMPUTER) {
@@ -153,7 +153,7 @@ fun RowScope.TeamCard(
         ,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Column (
+            Column(
                 modifier = Modifier.fillMaxWidth(), //.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 0.dp),
 //                verticalAlignment = Alignment.Top,
             ) {
@@ -250,7 +250,7 @@ fun RowScope.TeamCardV0(
                     contentScale = ContentScale.Inside,
                 )
             }
-            Row (
+            Row(
                 modifier = Modifier.background(if (isSelected) JervisTheme.accentTeamColor else JervisTheme.awayTeamColor),
                 verticalAlignment = Alignment.Bottom,
             ) {

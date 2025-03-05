@@ -13,7 +13,7 @@ class DeselectPlayerDecorator: FieldActionDecorator<DeselectPlayer> {
             val coordinate = player.location as FieldCoordinate
             snapshot.fieldSquares[coordinate] = snapshot.fieldSquares[coordinate]?.copy(
                 onMenuHidden = { actionProvider.userActionSelected(PlayerDeselected(player)) }
-            ) ?: error ("Could not find square: $coordinate")
+            ) ?: error("Could not find square: $coordinate")
         }
     }
 }

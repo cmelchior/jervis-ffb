@@ -79,7 +79,7 @@ class P2PClientGameController(
         coachName: String,
         gameId: GameId,
         teamIfHost: Team?,
-        handler: ClientNetworkMessageHandler, ) {
+        handler: ClientNetworkMessageHandler,) {
         this.gameId = gameId
 //        if (state != ClientState.SELECT_HOST) error("Unexpected state: $state")
         connection.addMessageHandler(handler)

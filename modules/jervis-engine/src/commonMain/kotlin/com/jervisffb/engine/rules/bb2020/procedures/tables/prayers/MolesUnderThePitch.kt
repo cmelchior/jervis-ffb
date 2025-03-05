@@ -30,7 +30,7 @@ object MolesUnderThePitch : Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PrayersToNuffleRollContext>()
             return compositeCommandOf(
-                SetContext(context.copy (resultApplied = true)),
+                SetContext(context.copy(resultApplied = true)),
                 ReportGameProgress("${context.team.name} released Moles Under the Pitch"),
                 ExitProcedure(),
             )

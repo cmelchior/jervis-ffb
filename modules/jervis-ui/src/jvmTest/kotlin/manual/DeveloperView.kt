@@ -317,7 +317,7 @@ private fun TeamTableWrapper(title: String = "") {
                     // difference to the baseline. This means we need to shift the curve
                     // either left or right depending on if x is before or after the midpoint.
                     val baselineWidth = 156.dp.toPx()
-                    val modifier = if (x <= size.width.toInt() / 2 ) -1 else 1
+                    val modifier = if (x <= size.width.toInt() / 2) -1 else 1
                     val xModified = x + modifier * (baselineWidth - currentTitleWidth)/2
 
                     // Bell curve. See https://en.wikipedia.org/wiki/Gaussian_function

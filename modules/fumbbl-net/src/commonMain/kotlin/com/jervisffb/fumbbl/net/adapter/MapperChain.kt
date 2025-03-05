@@ -18,7 +18,7 @@ class MapperChain constructor(jervisGame: Game, fumbblGame: FumbblGame, checkCom
     private val jervisGame: Game
     private val fumbblGame: FumbblGame
     private val checkCommands: Boolean
-    private val jervisGameController = GameEngineController( jervisGame)
+    private val jervisGameController = GameEngineController(jervisGame)
     private val mappers: List<CommandActionMapper>
 
     fun getMappersInPackage(): List<KClass<*>> {

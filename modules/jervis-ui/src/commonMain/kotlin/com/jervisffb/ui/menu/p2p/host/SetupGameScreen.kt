@@ -26,7 +26,7 @@ import com.jervisffb.ui.menu.components.setup.SetupGameComponent
 fun SetupGamePage(setupModel: SetupGameScreenModel, modifier: Modifier) {
     val coachName by setupModel.coachName.collectAsState("")
     val gameName by setupModel.gameName.collectAsState("")
-    val gamePort by setupModel.port.collectAsState( null)
+    val gamePort by setupModel.port.collectAsState(null)
     val isSetupValid: Boolean by setupModel.isSetupValid.collectAsState(false)
 
     Column(

@@ -29,7 +29,7 @@ import com.jervisffb.ui.game.view.utils.TitleBorder
  * Layout class for the "Join Host" panel.
  */
 @Composable
-fun JoinHostScreen(viewModel: JoinHostScreenModel, onJoin: () -> Unit, onCancel: () -> Unit, ) {
+fun JoinHostScreen(viewModel: JoinHostScreenModel, onJoin: () -> Unit, onCancel: () -> Unit,) {
     val gameUrl by viewModel.gameUrl().collectAsState()
     val serverUrl by viewModel.serverIp().collectAsState()
     val port by viewModel.port().collectAsState()

@@ -103,7 +103,7 @@ fun RowScope.TeamCard(
         ,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Column (
+            Column(
                 modifier = Modifier.fillMaxWidth(), //.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 0.dp),
 //                verticalAlignment = Alignment.Top,
             ) {

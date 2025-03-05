@@ -44,7 +44,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
             }
         }
 
-        Menu ("Automated Actions", mnemonic = 'A') {
+        Menu("Automated Actions", mnemonic = 'A') {
             CheckboxItem(
                 text = "Keep successful dice rolls",
                 checked = rerollSuccessfulActions,
@@ -79,7 +79,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
             )
         }
 
-        Menu ("Setups", mnemonic = 'S') {
+        Menu("Setups", mnemonic = 'S') {
             Menu("Defensive") {
                 Item(Setups.SETUP_3_4_4, onClick = { vm.loadSetup(Setups.SETUP_3_4_4) })
             }

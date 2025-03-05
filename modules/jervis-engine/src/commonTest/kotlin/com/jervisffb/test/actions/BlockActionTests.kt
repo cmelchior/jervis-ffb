@@ -169,7 +169,7 @@ class BlockActionTests: JervisGameTest() {
         assertEquals(2, context.roll.size)
         context.roll.forEach {
             assertEquals(6, it.rerolledResult?.value)
-            assertTrue(it.rerollSource is TeamReroll )
+            assertTrue(it.rerollSource is TeamReroll)
         }
     }
 
