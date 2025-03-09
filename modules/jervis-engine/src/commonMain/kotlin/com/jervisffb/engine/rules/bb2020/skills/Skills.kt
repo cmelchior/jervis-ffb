@@ -118,10 +118,11 @@ interface D6StandardSkillReroll : RerollSource {
 }
 
 /**
- * Interface for skills that provide a special action.
- * Note, for skills that replace blocks, they procedure being referenced is the Standalone
+ * Interface for skills that provide a special player action.
+ *
+ * Note, for skills that replace blocks, the procedure being referenced is the Standalone
  * variant. Special skills that can be used as part of a Multiple Block
- * are defined in [com.jervisffb.rules.bb2020.procedures.actions.block.MultipleBlockContext] and will
+ * are defined in [com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockContext] and will
  * be handled separately there.
  */
 interface SpecialActionProvider {
@@ -152,8 +153,7 @@ enum class Duration {
     PERMANENT, // The effect is a permanent change to the team.
 }
 
-@Serializable
-sealed interface Skill {
+interface Skill {
     // Unique identifier for this skill
     val skillId: String
     // Human readable name of this skill
@@ -182,16 +182,16 @@ sealed interface Skill {
 // TODO Not really liking this API. Is there a good way to serialize them?
 //  Also it doesn't look nice when naming the skill in the Position list
 //  Ideally this `listOf(SureHands)`, not `listOf(SureHands.Factory)`
-@Serializable
-sealed interface SkillFactory {
+interface SkillFactory {
     val value: Int?
     fun createSkill(isTemporary: Boolean = false, expiresAt: Duration = Duration.PERMANENT): Skill
 }
+
+interface PlayerSkillFactory: SkillFactory
 
 interface SkillCategory {
     val id: Long
     val description: String
 }
 
-@Serializable
-sealed interface BB2020Skill : Skill
+interface BB2020Skill : Skill

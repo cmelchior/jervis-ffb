@@ -1,15 +1,15 @@
 package com.jervisffb.engine.rules.bb2020.tables
 
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import kotlinx.serialization.Serializable
 import kotlin.math.abs
-
-
 
 /**
  * Range Ruler
  *
  * See page 48 in the rulebook.
  */
+@Serializable
 object RangeRuler {
 
     val maxDistance: Int = 13

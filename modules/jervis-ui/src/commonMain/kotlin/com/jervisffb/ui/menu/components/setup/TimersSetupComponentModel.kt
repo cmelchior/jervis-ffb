@@ -4,8 +4,10 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.GameLimitReachedBehaviour
 import com.jervisffb.engine.OutOfTimeBehaviour
 import com.jervisffb.engine.TimerSettings
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
-import com.jervisffb.ui.menu.p2p.host.DropdownEntry
+import com.jervisffb.ui.menu.utils.DropdownEntryWithValue
+import com.jervisffb.ui.menu.utils.InputFieldDataWithValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
@@ -18,89 +20,65 @@ enum class TimerPreset {
     CUSTOM,
 }
 
-data class TimerPresetEntry(
-    override val name: String,
-    val preset: TimerPreset,
-    override val available: Boolean = true
-): DropdownEntry
-
-data class OutOfTimeEntry(
-    override val name: String,
-    val value: OutOfTimeBehaviour,
-    override val available: Boolean = true
-): DropdownEntry
-
-data class GameLimitReachedEntry(
-    override val name: String,
-    val value: GameLimitReachedBehaviour,
-    override val available: Boolean = true
-): DropdownEntry
-
 val presets = listOf(
-    TimerPresetEntry("Hard Limit", TimerPreset.HARD_LIMIT),
-    TimerPresetEntry("Chess Clock", TimerPreset.CHESS_CLOCK),
-    TimerPresetEntry("BB Clock", TimerPreset.BB_CLOCK),
-    TimerPresetEntry("Custom", TimerPreset.CUSTOM, false),
+    DropdownEntryWithValue("Hard Limit", TimerPreset.HARD_LIMIT),
+    DropdownEntryWithValue("Chess Clock", TimerPreset.CHESS_CLOCK),
+    DropdownEntryWithValue("BB Clock", TimerPreset.BB_CLOCK),
+    DropdownEntryWithValue("Custom", TimerPreset.CUSTOM, false),
 )
 
 val outOfTimeEntries = listOf(
-    OutOfTimeEntry("None", OutOfTimeBehaviour.NONE),
-    OutOfTimeEntry("Show Warning", OutOfTimeBehaviour.SHOW_WARNING),
-    OutOfTimeEntry("Opponent Can Call Timeout", OutOfTimeBehaviour.OPPONENT_CALL_TIMEOUT),
-    OutOfTimeEntry("Automatic Timeout", OutOfTimeBehaviour.AUTOMATIC_TIMEOUT),
+    DropdownEntryWithValue("None", OutOfTimeBehaviour.NONE),
+    DropdownEntryWithValue("Show Warning", OutOfTimeBehaviour.SHOW_WARNING),
+    DropdownEntryWithValue("Opponent Can Call Timeout", OutOfTimeBehaviour.OPPONENT_CALL_TIMEOUT),
+    DropdownEntryWithValue("Automatic Timeout", OutOfTimeBehaviour.AUTOMATIC_TIMEOUT),
 )
 
 val gameLimitEntries = listOf(
-    GameLimitReachedEntry("None", GameLimitReachedBehaviour.NONE),
-    GameLimitReachedEntry("Only Roll over / Stand Up", GameLimitReachedBehaviour.ROLL_OVER_STAND_UP),
-    GameLimitReachedEntry("End New Turn Immediately", GameLimitReachedBehaviour.AUTOMATIC_END_TURN),
-    GameLimitReachedEntry("Forfeit Game", GameLimitReachedBehaviour.FORFEIT_GAME),
-)
-
-data class TimerSettingData<T>(
-    val label: String,
-    val value: String,
-    val underlyingValue: T?,
-    val isError: Boolean
+    DropdownEntryWithValue("None", GameLimitReachedBehaviour.NONE),
+    DropdownEntryWithValue("Only Roll over / Stand Up", GameLimitReachedBehaviour.ROLL_OVER_STAND_UP),
+    DropdownEntryWithValue("End New Turn Immediately", GameLimitReachedBehaviour.AUTOMATIC_END_TURN),
+    DropdownEntryWithValue("Forfeit Game", GameLimitReachedBehaviour.FORFEIT_GAME),
 )
 
 /**
  * View controller for the timers setup component. This component is responsible for all the UI control needed
  * to configure the timer settings for a game.
  */
-class SetupTimersComponentModel(private val menuViewModel: MenuViewModel) : ScreenModel {
+class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val menuViewModel: MenuViewModel) : ScreenModel {
 
+    var rulesBuilder = initialRulesBuilder
     val isSetupValid: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
     // Backing data (used to create timer setting)
-    val customPreset = presets.first { it.preset == TimerPreset.CUSTOM }
-    val selectedPresetData = MutableStateFlow(presets.first { it.preset == TimerPreset.BB_CLOCK })
+    val customPreset = presets.first { it.value == TimerPreset.CUSTOM }
+    val selectedPresetData = MutableStateFlow(presets.first { it.value == TimerPreset.BB_CLOCK })
     val outOfTimeLimitData = MutableStateFlow(outOfTimeEntries.first())
     val gameLimitReachedData = MutableStateFlow(gameLimitEntries.first())
 
     // UI Data
     val timersEnabled = MutableStateFlow(false)
-    val selectedPreset: StateFlow<TimerPresetEntry> = selectedPresetData
+    val selectedPreset: StateFlow<DropdownEntryWithValue<TimerPreset>> = selectedPresetData
 
-    val normalGameLimit: MutableStateFlow<TimerSettingData<Duration?>> = MutableStateFlow(TimerSettingData("Game Time", "", null, false))
-    val normalGameBuffer: MutableStateFlow<TimerSettingData<Duration>> = MutableStateFlow(TimerSettingData("Game Buffer", "", Duration.ZERO, false))
-    val overtimeExtraLimit: MutableStateFlow<TimerSettingData<Duration>> = MutableStateFlow(TimerSettingData("Extra Overtime Time", "", Duration.ZERO, false))
-    val overtimeExtraBuffer: MutableStateFlow<TimerSettingData<Duration>> = MutableStateFlow(TimerSettingData("Extra Overtime Buffer", "", Duration.ZERO, false))
+    val normalGameLimit: MutableStateFlow<InputFieldDataWithValue<Duration?>> = MutableStateFlow(InputFieldDataWithValue("Game Time", "", null, false))
+    val normalGameBuffer: MutableStateFlow<InputFieldDataWithValue<Duration>> = MutableStateFlow(InputFieldDataWithValue("Game Buffer", "", Duration.ZERO, false))
+    val overtimeExtraLimit: MutableStateFlow<InputFieldDataWithValue<Duration>> = MutableStateFlow(InputFieldDataWithValue("Extra Overtime Time", "", Duration.ZERO, false))
+    val overtimeExtraBuffer: MutableStateFlow<InputFieldDataWithValue<Duration>> = MutableStateFlow(InputFieldDataWithValue("Extra Overtime Buffer", "", Duration.ZERO, false))
 
-    val outOfTimeLimit: StateFlow<OutOfTimeEntry> = outOfTimeLimitData
-    val gameLimitReached: StateFlow<GameLimitReachedEntry> = gameLimitReachedData
+    val outOfTimeLimit: StateFlow<DropdownEntryWithValue<OutOfTimeBehaviour>> = outOfTimeLimitData
+    val gameLimitReached: StateFlow<DropdownEntryWithValue<GameLimitReachedBehaviour>> = gameLimitReachedData
 
     val setupUseBuffer = MutableStateFlow(false)
-    val setupFreeTime: MutableStateFlow<TimerSettingData<Duration>> = MutableStateFlow(TimerSettingData("Free Time", "", Duration.ZERO, false))
-    val setupMaxTime: MutableStateFlow<TimerSettingData<Duration?>> = MutableStateFlow(TimerSettingData("Max Time", "", null, false))
+    val setupFreeTime: MutableStateFlow<InputFieldDataWithValue<Duration>> = MutableStateFlow(InputFieldDataWithValue("Free Time", "", Duration.ZERO, false))
+    val setupMaxTime: MutableStateFlow<InputFieldDataWithValue<Duration?>> = MutableStateFlow(InputFieldDataWithValue("Max Time", "", null, false))
 
     val teamTurnUseBuffer = MutableStateFlow(false)
-    val teamTurnFreeTime: MutableStateFlow<TimerSettingData<Duration>> = MutableStateFlow(TimerSettingData("Free Time", "", Duration.ZERO, false))
-    val teamTurnMaxTime: MutableStateFlow<TimerSettingData<Duration?>> = MutableStateFlow(TimerSettingData("Max Time", "", null, false))
+    val teamTurnFreeTime: MutableStateFlow<InputFieldDataWithValue<Duration>> = MutableStateFlow(InputFieldDataWithValue("Free Time", "", Duration.ZERO, false))
+    val teamTurnMaxTime: MutableStateFlow<InputFieldDataWithValue<Duration?>> = MutableStateFlow(InputFieldDataWithValue("Max Time", "", null, false))
 
     val responseUseBuffer = MutableStateFlow(false)
-    val responseFreeTime: MutableStateFlow<TimerSettingData<Duration>> = MutableStateFlow(TimerSettingData("Free Time", "", Duration.ZERO, false))
-    val responseMaxTime: MutableStateFlow<TimerSettingData<Duration?>> = MutableStateFlow(TimerSettingData("Max Time", "", null, false))
+    val responseFreeTime: MutableStateFlow<InputFieldDataWithValue<Duration>> = MutableStateFlow(InputFieldDataWithValue("Free Time", "", Duration.ZERO, false))
+    val responseMaxTime: MutableStateFlow<InputFieldDataWithValue<Duration?>> = MutableStateFlow(InputFieldDataWithValue("Max Time", "", null, false))
 
     init {
         updatePreset(selectedPreset.value)
@@ -110,9 +88,9 @@ class SetupTimersComponentModel(private val menuViewModel: MenuViewModel) : Scre
         timersEnabled.value = enabled
     }
 
-    fun updatePreset(preset: TimerPresetEntry) {
+    fun updatePreset(preset: DropdownEntryWithValue<TimerPreset>) {
         selectedPresetData.value = preset
-        updatePreset(preset.preset)
+        updatePreset(preset.value)
     }
 
     fun updateNormalGameTimeLimit(value: String, updatePreset: Boolean = true) {
@@ -143,14 +121,14 @@ class SetupTimersComponentModel(private val menuViewModel: MenuViewModel) : Scre
         }
     }
 
-    fun updateGameLimitReachedBehaviour(behaviour: GameLimitReachedEntry, updatePreset: Boolean = true) {
+    fun updateGameLimitReachedBehaviour(behaviour: DropdownEntryWithValue<GameLimitReachedBehaviour>, updatePreset: Boolean = true) {
         gameLimitReachedData.value = behaviour
         if (updatePreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun updateOutOfTimeBehaviour(behaviour: OutOfTimeEntry, updatePreset: Boolean = true) {
+    fun updateOutOfTimeBehaviour(behaviour: DropdownEntryWithValue<OutOfTimeBehaviour>, updatePreset: Boolean = true) {
         outOfTimeLimitData.value = behaviour
         if (updatePreset) {
             selectedPresetData.value = customPreset
@@ -307,7 +285,7 @@ class SetupTimersComponentModel(private val menuViewModel: MenuViewModel) : Scre
         enabled: Boolean,
         nullDescription: String,
         label: String,
-        flow: MutableStateFlow<TimerSettingData<Duration?>>
+        flow: MutableStateFlow<InputFieldDataWithValue<Duration?>>
     ) {
         val normalizedValue: String = normalizeDurationString(value)
         val duration = parseDuration(normalizedValue)
@@ -325,7 +303,7 @@ class SetupTimersComponentModel(private val menuViewModel: MenuViewModel) : Scre
         }
         val labelWithValue = "$label ($labelDescription)"
 
-        val result = TimerSettingData<Duration?>(
+        val result = InputFieldDataWithValue<Duration?>(
             label = labelWithValue,
             value = value,
             underlyingValue = underlyingDuration,
@@ -335,7 +313,7 @@ class SetupTimersComponentModel(private val menuViewModel: MenuViewModel) : Scre
         isSetupValid.value = !result.isError
     }
 
-    private fun updateDurationEntry(value: String, label: String, flow: MutableStateFlow<TimerSettingData<Duration>>) {
+    private fun updateDurationEntry(value: String, label: String, flow: MutableStateFlow<InputFieldDataWithValue<Duration>>) {
         val normalizedValue: String = normalizeDurationString(value)
         val duration = parseDuration(normalizedValue)
         val underlyingDuration = duration.getOrNull()?.inWholeSeconds?.seconds ?: Duration.ZERO
@@ -347,7 +325,7 @@ class SetupTimersComponentModel(private val menuViewModel: MenuViewModel) : Scre
         }
         val labelWithValue = "$label ($labelDescription)"
 
-        val result = TimerSettingData(
+        val result = InputFieldDataWithValue(
             label = labelWithValue,
             value = value,
             underlyingValue = underlyingDuration,
@@ -360,5 +338,10 @@ class SetupTimersComponentModel(private val menuViewModel: MenuViewModel) : Scre
     private fun mapNullDuration(duration: Duration?): String {
         if (duration == null) return ""
         return duration.toString()
+    }
+
+    fun updateRulesBuilder(ruleBuilder: Rules.Builder) {
+        this.rulesBuilder = ruleBuilder
+        TODO()
     }
 }

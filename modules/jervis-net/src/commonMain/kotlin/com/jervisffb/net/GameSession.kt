@@ -9,7 +9,6 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.SpectatorId
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.net.handlers.ClientMessageHandler
 import com.jervisffb.net.handlers.GameActionHandler
 import com.jervisffb.net.handlers.GameStartedHandler
@@ -70,7 +69,6 @@ import kotlinx.serialization.encodeToString
  */
 class GameSession(
     val server: LightServer,
-    val rules: Rules,
     val gameSettings: GameSettings,
     val gameId: GameId, // Unique identifier for this Game. It is required to be unique across all games on the server
     val password: Password?, // Optional password for accessing the game. This is in addition to any user auth.
@@ -314,6 +312,7 @@ class GameSession(
             throw IllegalStateException("Game is already running.")
         }
         state = GameState.ACTIVE
+        val rules = gameSettings.gameRules
         game = GameEngineController(
             Game(
                 rules,

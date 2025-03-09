@@ -2,11 +2,12 @@ package com.jervisffb.engine.model.inducements.wizards
 
 import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.model.inducements.Timing
+import kotlinx.serialization.Serializable
 
 /**
  * Interface describing a Wizard that has been assigned to a team.
  * Its purpose is to track the usage of the Wizard during a game,
- * and now how/when to purchase it.
+ * and not how/when to purchase it.
  */
 interface Wizard {
     val type: WizardType
@@ -24,11 +25,12 @@ interface Wizard {
 }
 
 // See page 94 in the rulebook
+@Serializable
 class HirelingSportsWizard: Wizard {
     override val name: String get() = type.description
     override val type: WizardType = WizardType.HIRELING_SPORTS_WIZARD
     override val spells: List<Spell> = listOf(
-        Fireball(this),
-        Zap(this)
+        Fireball(/*this*/),
+        Zap(/*this*/)
     )
 }

@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import kotlinx.serialization.Serializable
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -25,6 +26,7 @@ enum class CornerThrowInPosition(val rotateDegrees: Int) {
  * Class representing the Random Direction Template.
  * See page 20 in the rulebook
  */
+@Serializable
 object RandomDirectionTemplate {
     // Order of numbers from top and clockwise around the template
 //    private val order = listOf(2, 3, 5, 8, 7, 6, 4, 1)

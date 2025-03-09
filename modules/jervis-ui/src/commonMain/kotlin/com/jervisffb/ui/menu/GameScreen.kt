@@ -8,8 +8,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.BB2020Rules
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
@@ -44,7 +43,7 @@ class GameScreenModel(
 
     lateinit var uiState: UiGameController
     var fumbbl: FumbblReplayAdapter? = null
-    val rules: BB2020Rules = StandardBB2020Rules()
+    val rules: Rules = gameController.rules
 
 //    init {
 //        if (injectedGameRunner != null) {

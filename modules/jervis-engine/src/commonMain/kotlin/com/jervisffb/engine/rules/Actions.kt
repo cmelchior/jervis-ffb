@@ -152,6 +152,7 @@ enum class BlockType {
 }
 
 
+@Serializable
 abstract class TeamActions {
     operator fun get(type: ActionType): PlayerAction {
         return when (type) {
@@ -175,6 +176,7 @@ abstract class TeamActions {
  * Define the standard set of actions that are available in the rules.
  * TODO What if these are modified by skills, events, cards or otherwise?
  */
+@Serializable
 class BB2020TeamActions : TeamActions() {
 
     private val actions: Map<PlayerStandardActionType, PlayerAction> = mapOf(

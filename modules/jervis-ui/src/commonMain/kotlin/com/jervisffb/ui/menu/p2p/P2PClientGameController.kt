@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.GameStateSyncMessage
@@ -13,7 +14,7 @@ import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.SpectatorState
 import com.jervisffb.net.messages.TeamData
-import com.jervisffb.ui.menu.p2p.host.TeamInfo
+import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.utils.jervisLogger
 import io.ktor.websocket.CloseReason
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,6 +57,7 @@ class P2PClientGameController(
     private var gameId: GameId? = null
 
     // Track Coach/Team as they join
+    var rules: Rules? = null
     val homeCoach: MutableStateFlow<Coach?> = MutableStateFlow(null)
     val awayCoach: MutableStateFlow<Coach?> = MutableStateFlow(null)
     val homeTeam: MutableStateFlow<Team?> = MutableStateFlow(null)
@@ -212,6 +214,7 @@ class P2PClientGameController(
         override fun onGameSync(message: GameStateSyncMessage) {
             // Should only be called right after a connection is established, so it should be safe
             // to just update all things directly.
+            rules = message.rules
             homeCoach.value = message.coaches.firstOrNull()
             awayCoach.value = message.coaches.getOrNull(1)
             homeTeam.value = message.homeTeam
@@ -223,8 +226,9 @@ class P2PClientGameController(
             _clientState.value = state
         }
 
-        override fun onConfirmGameStart(message1: GameId, message: List<TeamData>) {
+        override fun onConfirmGameStart(id: GameId, rules: Rules, teams: List<TeamData>) {
             // Wait for State change
+            this@P2PClientGameController.rules = rules
         }
 
         override fun onGameReady(id: GameId) {

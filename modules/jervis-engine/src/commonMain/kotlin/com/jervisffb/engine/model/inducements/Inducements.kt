@@ -2,15 +2,16 @@ package com.jervisffb.engine.model.inducements
 
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DummyProcedure
 import com.jervisffb.engine.rules.bb2020.skills.Duration
+import kotlinx.serialization.Serializable
 
 /**
  * Interface describing inducement effects like spells and special play cards;
  * that are optional to use during a game, i.e., they must be selected by the player.
  */
+@Serializable
 sealed interface InducementEffect {
     val name: String // Name of the effect
     var used: Boolean // Whether it has been used or not
@@ -22,7 +23,8 @@ sealed interface InducementEffect {
  * Interface describing spells owned by Wizards,
  */
 interface Spell: InducementEffect {
-    val wizard: Wizard
+    // This causes a circular reference crashing serialization
+    // val wizard: Wizard
 }
 
 /**

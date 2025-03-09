@@ -11,11 +11,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.jervisffb.ui.game.view.utils.JervisButton
-import com.jervisffb.ui.menu.components.setup.SetupGameComponent
+import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponent
 
 @Composable
 fun SetupHotseatGamePage(screenModel: SetupHotseatGameScreenModel, modifier: Modifier) {
-    val isSetupValid: Boolean by screenModel.isSetupValid.collectAsState(false)
+    val isSetupValid: Boolean by screenModel.gameConfigModel.isSetupValid.collectAsState(false)
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -26,7 +26,7 @@ fun SetupHotseatGamePage(screenModel: SetupHotseatGameScreenModel, modifier: Mod
             ,
             verticalAlignment = Alignment.Top
         ) {
-            SetupGameComponent(screenModel.setupGameModel, screenModel.setupTimersModel)
+            GameConfigurationContainerComponent(screenModel.gameConfigModel)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             JervisButton(text = "Next", enabled = isSetupValid, onClick = { screenModel.gameSetupDone() })

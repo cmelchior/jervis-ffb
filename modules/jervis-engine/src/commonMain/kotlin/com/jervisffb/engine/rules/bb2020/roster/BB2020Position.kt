@@ -3,6 +3,7 @@ package com.jervisffb.engine.rules.bb2020.roster
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
@@ -22,7 +23,7 @@ data class BB2020Position(
     override val shortHand: String,
     override val cost: Int,
     override val move: Int,
-    override val strenght: Int,
+    override val strength: Int,
     override val agility: Int,
     val passing: Int?,
     override var armorValue: Int,
@@ -38,26 +39,28 @@ data class BB2020Position(
         id: PlayerId,
         name: String,
         number: PlayerNo,
+        type: PlayerType,
         iconData: PlayerUiData?
     ): Player {
         return Player(
             id,
             this,
-            rules.moveRange,
-            rules.strengthRange,
-            rules.agilityRange,
-            rules.passingRange,
-            rules.armorValueRange,
-            iconData
+            iconData,
+            type
         ).apply {
             this.team = team
             this.name = name
             this.number = number
             baseMove = position.move
-            baseStrenght = position.strenght
+            move = position.move
+            baseStrength = position.strength
+            strength = position.strength
             baseAgility = position.agility
+            agility = position.agility
             basePassing = this@BB2020Position.passing
+            passing = this@BB2020Position.passing
             baseArmorValue = position.armorValue
+            armorValue = position.armorValue
             positionSkills = position.skills.map { it.createSkill() }.toMutableList()
         }
     }

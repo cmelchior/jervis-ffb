@@ -3,6 +3,7 @@ package com.jervisffb.engine.rules.common.roster
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
@@ -18,10 +19,9 @@ interface Position {
     val shortHand: String
     val cost: Int
     val move: Int
-    val strenght: Int
+    val strength: Int
     val agility: Int
     val armorValue: Int
-
     val skills: List<SkillFactory>
     val icon: SpriteSource?
     val portrait: SpriteSource?
@@ -32,6 +32,7 @@ interface Position {
         id: PlayerId,
         name: String,
         number: PlayerNo,
+        type: PlayerType,
         icon: PlayerUiData?
     ): Player
 }

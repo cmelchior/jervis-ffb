@@ -42,6 +42,7 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
 import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
 import com.jervisffb.ui.menu.TopbarButton
+import com.jervisffb.ui.menu.components.SmallHeader
 import com.jervisffb.ui.menu.p2p.host.BoxHeader
 import com.jervisffb.utils.openUrlInBrowser
 import org.jetbrains.compose.resources.painterResource
@@ -331,26 +332,12 @@ private fun ColumnScope.CurrentGames(viewModel: FumbblScreenModel) {
     // Figure out how the view model exposes this
 
     // Header
-    Text(
-        modifier = Modifier.fillMaxWidth().background(JervisTheme.rulebookRed).padding(4.dp),
-        text = "Competitive".uppercase(),
-        fontSize = 14.sp,
-        lineHeight = 1.0.em,
-        fontWeight = FontWeight.Medium,
-        color = JervisTheme.white,
-    )
+    SmallHeader("Competitive")
     GameStatusRow(textColor = JervisTheme.contentTextColor, backgroundColor = Color.Transparent)
     GameStatusRow(JervisTheme.contentTextColor, JervisTheme.rulebookPaperMediumDark)
 
     Spacer(modifier = Modifier.height(8.dp))
-    Text(
-        modifier = Modifier.fillMaxWidth().background(JervisTheme.rulebookRed).padding(4.dp),
-        text = "Blackbox".uppercase(),
-        fontSize = 14.sp,
-        lineHeight = 1.0.em,
-        fontWeight = FontWeight.Medium,
-        color = JervisTheme.white,
-    )
+    SmallHeader("Blackbox")
 }
 
 @Composable

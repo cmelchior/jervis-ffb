@@ -6,7 +6,6 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
@@ -18,10 +17,11 @@ import com.jervisffb.ui.menu.GameScreen
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
+import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.ui.menu.p2p.P2PClientGameController
+import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreenModel
 import com.jervisffb.ui.menu.p2p.StartP2PGameScreenModel
-import com.jervisffb.ui.menu.p2p.TeamSelectorScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -44,9 +44,14 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     val setupGameModel = SetupGameScreenModel(menuViewModel, this)
 
     // Page 2: Select team
-    val selectTeamModel = TeamSelectorScreenModel(menuViewModel, { setupGameModel.getCoach()!! }, { teamSelected ->
-        selectedTeam.value = teamSelected
-    })
+    val selectTeamModel = SelectP2PTeamScreenModel(
+        menuViewModel = menuViewModel,
+        getCoach = { setupGameModel.getCoach()!! },
+        onTeamSelected = { teamSelected ->
+            selectedTeam.value = teamSelected
+        },
+        getRules = { controller.rules ?: error("Rules are not loaded yet") }
+    )
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
     private val _gameUrl = MutableStateFlow("")
     val gameUrl: StateFlow<String> = _gameUrl
@@ -83,7 +88,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                         currentPage.value = 3
                     }
                     P2PHostState.RUN_GAME -> {
-                        val rules = StandardBB2020Rules()
+                        val rules = controller.rules!!
                         val homeTeam = JervisSerialization.fixTeamRefs(controller.homeTeam.value!!)
                         homeTeam.coach = controller.homeCoach.value!!
                         val awayTeam = JervisSerialization.fixTeamRefs(controller.awayTeam.value!!)
@@ -95,18 +100,18 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                             gameController,
                             menuViewModel,
                             TeamActionMode.HOME_TEAM,
-                            GameSettings(clientSelectedDiceRolls = false),
+                            GameSettings(gameRules = rules, clientSelectedDiceRolls = false),
                         )
                         val awayActionProvider = ManualActionProvider(
                             gameController,
                             menuViewModel,
                             TeamActionMode.HOME_TEAM,
-                            GameSettings(clientSelectedDiceRolls = false),
+                            GameSettings(gameRules = rules, clientSelectedDiceRolls = false),
                         )
 
                         val actionProvider = P2PActionProvider(
                             gameController,
-                            GameSettings(clientSelectedDiceRolls = false),
+                            GameSettings(gameRules = rules, clientSelectedDiceRolls = false),
                             homeActionProvider,
                             awayActionProvider,
                             controller
@@ -147,7 +152,8 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
 
     private fun startServer() {
         val team = selectedTeam.value?.teamData ?: error("Only on-client teams supported for now")
-        server = LightServer(team, setupGameModel.gameName.value, testMode = true)
+        val rules = setupGameModel.createRules()
+        server = LightServer(rules, team, setupGameModel.gameName.value, testMode = true)
         menuViewModel.navigatorContext.launch {
             server?.start()
             controller.joinHost(

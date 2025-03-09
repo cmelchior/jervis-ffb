@@ -12,7 +12,6 @@ import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.engine.utils.sum
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -108,11 +107,11 @@ value class PlayerNo(val value: Int) : Comparable<PlayerNo> {
 }
 
 fun Player.isOnHomeTeam(): Boolean {
-    return this.team.game.homeTeam == this.team
+    return this.team.isHomeTeam()
 }
 
 fun Player.isOnAwayTeam(): Boolean {
-    return this.team.game.awayTeam == this.team
+    return this.team.isAwayTeam()
 }
 
 enum class Availability {
@@ -126,22 +125,12 @@ enum class Availability {
 class Player(
     val id: PlayerId,
     val position: Position,
-    // Inject Ranges to avoid needing a Rules reference when accessing characteristics
-    // Slightly annoying, but I am not sure if there is a better way?
-    @Serializable(with = IntRangeSerializer::class)
-    private val moveRange: IntRange,
-    @Serializable(with = IntRangeSerializer::class)
-    val strengthRange: IntRange,
-    @Serializable(with = IntRangeSerializer::class)
-    val agilityRange: IntRange,
-    @Serializable(with = IntRangeSerializer::class)
-    val passingRange: IntRange,
-    @Serializable(with = IntRangeSerializer::class)
-    val armourRange: IntRange,
-    val icon: PlayerUiData? = null
+    val icon: PlayerUiData? = null,
+    val type: PlayerType
 ) : Observable<Player>() {
     @Transient
     lateinit var team: Team
+
     var location: Location = DogOut
         set(value) {
             val old = location
@@ -169,18 +158,33 @@ class Player(
     var isStalling: Boolean = false
     var name: String = ""
     var number: PlayerNo = PlayerNo(0)
+    // When updating `baseMove` and `moveModifiers`, `move` must also be updated.
+    // This requires knowledge about the rules so cannot be done in this class.
     var baseMove: Int = 0
     val moveModifiers = mutableListOf<StatModifier>()
+    var move: Int = 0
     var movesLeft: Int = 0
     var rushesLeft: Int = 0
-    var baseStrenght: Int = 0
+    // When updating `baseStrength` and `strengthModifiers`, `strength` must also be updated.
+    // This requires knowledge about the rules so cannot be done in this class.
+    var baseStrength: Int = 0
     val strengthModifiers = mutableListOf<StatModifier>()
+    var strength: Int = 0
+    // When updating `baseAgility` and `agilityModifiers`, `agility` must also be updated.
+    // This requires knowledge about the rules so cannot be done in this class.
     var baseAgility: Int = 0
     val agilityModifiers = mutableListOf<StatModifier>()
-    var basePassing: Int? = 0
+    var agility: Int = 0
+    // When updating `basePassing` and `passingModifiers`, `passing` must also be updated.
+    // This requires knowledge about the rules so cannot be done in this class.
+    var basePassing: Int? = null
     val passingModifiers = mutableListOf<StatModifier>()
+    var passing: Int? = null
+    // When updating `baseArmorValue` and `armourModifiers`, `armorValue` must also be updated.
+    // This requires knowledge about the rules so cannot be done in this class.
     var baseArmorValue: Int = 0
     val armourModifiers = mutableListOf<StatModifier>()
+    var armorValue: Int = 0
     // Some effects are hard to put into other buckets, like a player that failed a Blood Lust roll
     // or a player that was added to the pitch through Spot The Sneak. In these cases, we might want
     // to mark the player somehow. This is done through a TemporaryEffect
@@ -189,25 +193,7 @@ class Player(
     var positionSkills = position.skills.map { it.createSkill() }.toMutableList()
     val skills: List<Skill>
         get() = extraSkills + positionSkills // TODO This probably result in _a lot_ of copying. Find a way to optimize this
-    val move: Int
-        get() = (baseMove + moveModifiers.sum()).coerceIn(moveRange)
-    val strength: Int
-        get() = (baseStrenght + strengthModifiers.sum()).coerceIn(strengthRange)
-    val agility: Int
-        get() = (baseAgility + agilityModifiers.sum()).coerceIn(agilityRange)
-    val passing: Int?
-        get() {
-            // How to handle modifiers to `null`. I believe the start is then treated as 7+, but find reference
-            return if (basePassing == null && passingModifiers.isNotEmpty()) {
-                (7 + passingModifiers.sum()).coerceIn(passingRange)
-            } else if (basePassing != null && passingModifiers.isNotEmpty()) {
-                (basePassing!! + passingModifiers.sum()).coerceIn(passingRange)
-            } else {
-                basePassing
-            }
-        }
-    val armorValue: Int
-        get() = (baseArmorValue + armourModifiers.sum()).coerceIn(armourRange)
+
     var nigglingInjuries: Int = 0
     var missNextGame: Boolean = false
     var starPlayerPoints: Int = 0

@@ -11,6 +11,7 @@ class ReportEndingTurn(team: Team, turn: Int, turnOver: TurnOver?) : LogEntry() 
                 TurnOver.STANDARD -> "Turn $turn for ${team.name} ended due to a Turnover"
                 TurnOver.ACTIVE_TEAM_TOUCHDOWN -> "Turn $turn for ${team.name} ended due to a Touchdown"
                 TurnOver.INACTIVE_TEAM_TOUCHDOWN -> "Turn $turn for ${team.name} ended due to a Touchdown against them."
+                TurnOver.TIME_OUT -> TODO()
             }
             append(msg)
         } else {

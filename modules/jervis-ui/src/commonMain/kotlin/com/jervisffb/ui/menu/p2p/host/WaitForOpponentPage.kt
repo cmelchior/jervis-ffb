@@ -38,6 +38,7 @@ import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_copy
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.TitleBorder
+import com.jervisffb.ui.menu.components.TeamInfo
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 

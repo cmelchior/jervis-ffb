@@ -149,7 +149,7 @@ class BlockActionTests: JervisGameTest() {
     fun teamRerollRerollAllDice() {
         // Everyone is on LoS, so no assists
         val player = state.getPlayerById("A1".playerId)
-        player.baseStrenght = 4 // Give player 2D block
+        player.strength = 4 // Give player 2D block
         controller.rollForward(
             PlayerSelected(player.id),
             PlayerActionSelected(PlayerStandardActionType.BLOCK),

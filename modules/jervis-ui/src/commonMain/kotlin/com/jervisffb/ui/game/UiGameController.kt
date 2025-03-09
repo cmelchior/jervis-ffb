@@ -39,6 +39,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -83,22 +84,15 @@ class LocalActionProvider(
     }
 
     override suspend fun getAction(): GameAction {
-        // Figure out how settings for this work
-        // Figure out logging
         val provider = currentProvider
-        actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
-            // TODO()
-            //            delay(settings.timerSettings.turnLimitSeconds)
-            val action = createRandomAction(engine.state, engine.getAvailableActions())
-            provider.userActionSelected(action)
+        if (settings.timerSettings.timersEnabled) {
+            actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
+                // TODO Need to figure out if we are using setup / turn / response timers and track it correctly
+                delay(settings.timerSettings.turnMaxTime ?:settings.timerSettings.turnFreeTime)
+                val action = createRandomAction(engine.state, engine.getAvailableActions())
+                provider.userActionSelected(action)
+            }
         }
-
-        // TODO How to handle dice rolls
-//                // Hide this behind a server parameter
-//        if (!gameSettings.userSelectedDiceRolls && availableActions.containsActionWithRandomBehavior()) {
-//            return createRandomAction(game.state, availableActions)
-//        }
-
         return provider.getAction().also {
             actionJob?.cancel()
         }

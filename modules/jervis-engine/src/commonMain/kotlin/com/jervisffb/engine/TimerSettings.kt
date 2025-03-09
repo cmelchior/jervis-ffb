@@ -1,5 +1,6 @@
 package com.jervisffb.engine
 
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -25,6 +26,7 @@ enum class GameLimitReachedBehaviour {
  * by upper layers. For the UI, this is done through the appropriate `UiActionProvider`, and the server does it
  * through `GameActionHandlers`
  */
+@Serializable
 data class TimerSettings(
     val timersEnabled: Boolean = false,
 
@@ -48,6 +50,53 @@ data class TimerSettings(
     val outOfTurnResponseFreeTime: Duration = Duration.ZERO,
     val outOfTurnResponseMaxTime: Duration? = null,
 ) {
+
+    /**
+     * Returns this instance as a [Builder], making it easier to update.
+     */
+    fun toBuilder() = Builder(this)
+
+    /**
+     * Class making it easier to incrementally update timer settings, like through the UI.
+     */
+    class Builder(timerSettings: TimerSettings) {
+        var timersEnabled: Boolean = timerSettings.timersEnabled
+        var gameLimit: Duration? = timerSettings.gameLimit
+        var gameBuffer: Duration = timerSettings.gameBuffer
+        var extraOvertimeLimit: Duration = timerSettings.extraOvertimeLimit
+        var extraOvertimeBuffer: Duration = timerSettings.extraOvertimeBuffer
+        var outOfTimeBehaviour: OutOfTimeBehaviour = timerSettings.outOfTimeBehaviour
+        var gameLimitReached: GameLimitReachedBehaviour = timerSettings.gameLimitReached
+        var setupUseBuffer: Boolean = timerSettings.setupUseBuffer
+        var setupFreeTime: Duration = timerSettings.setupFreeTime
+        var setupMaxTime: Duration? = timerSettings.setupMaxTime
+        var turnUseBuffer: Boolean = timerSettings.turnUseBuffer
+        var turnFreeTime: Duration = timerSettings.turnFreeTime
+        var turnMaxTime: Duration? = timerSettings.turnMaxTime
+        var outOfTurnResponseUseBuffer: Boolean = timerSettings.outOfTurnResponseUseBuffer
+        var outOfTurnResponseFreeTime: Duration = timerSettings.outOfTurnResponseFreeTime
+        var outOfTurnResponseMaxTime: Duration? = timerSettings.outOfTurnResponseMaxTime
+
+        fun build() = TimerSettings(
+            timersEnabled,
+            gameLimit,
+            gameBuffer,
+            extraOvertimeLimit,
+            extraOvertimeBuffer,
+            outOfTimeBehaviour,
+            gameLimitReached,
+            setupUseBuffer,
+            setupFreeTime,
+            setupMaxTime,
+            turnUseBuffer,
+            turnFreeTime,
+            turnMaxTime,
+            outOfTurnResponseUseBuffer,
+            outOfTurnResponseFreeTime,
+            outOfTurnResponseMaxTime
+        )
+    }
+
     /**
      * Default configurations for common scenarios.
      */

@@ -8,7 +8,6 @@ import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.net.messages.P2PClientState
@@ -21,10 +20,10 @@ import com.jervisffb.ui.menu.GameScreen
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
+import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.ui.menu.p2p.P2PClientGameController
+import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreenModel
 import com.jervisffb.ui.menu.p2p.StartP2PGameScreenModel
-import com.jervisffb.ui.menu.p2p.TeamSelectorScreenModel
-import com.jervisffb.ui.menu.p2p.host.TeamInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -48,10 +47,15 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
     val joinHostModel = JoinHostScreenModel(menuViewModel, this)
 
     // Page 2: Team selection
-    val selectTeamModel: TeamSelectorScreenModel = TeamSelectorScreenModel(menuViewModel, { joinHostModel.getCoach()!! }) { teamSelected ->
-        selectedTeam.value = teamSelected
-        canCreateGame.value = (teamSelected != null)
-    }
+    val selectTeamModel: SelectP2PTeamScreenModel = SelectP2PTeamScreenModel(
+        menuViewModel = menuViewModel,
+        getCoach = { joinHostModel.getCoach()!! },
+        onTeamSelected = { teamSelected ->
+            selectedTeam.value = teamSelected
+            canCreateGame.value = (teamSelected != null)
+        },
+        getRules = { controller.rules ?: error("Rules are not loaded yet") }
+    )
 
     // Page 3: Accept game and load resources
     val acceptGameModel = StartP2PGameScreenModel(controller, menuViewModel)
@@ -84,8 +88,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                         currentPage.value = 2
                     }
                     P2PClientState.RUN_GAME -> {
-
-                        val rules = StandardBB2020Rules()
+                        val rules = controller.rules!!
                         val homeTeam = JervisSerialization.fixTeamRefs(controller.homeTeam.value!!)
                         homeTeam.coach = controller.homeCoach.value!!
                         val awayTeam = JervisSerialization.fixTeamRefs(controller.awayTeam.value!!)
@@ -97,18 +100,18 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                             gameController,
                             menuViewModel,
                             TeamActionMode.AWAY_TEAM,
-                            GameSettings(clientSelectedDiceRolls = false),
+                            GameSettings(gameRules = rules, clientSelectedDiceRolls = false),
                         )
                         val awayActionProvider = ManualActionProvider(
                             gameController,
                             menuViewModel,
                             TeamActionMode.AWAY_TEAM,
-                            GameSettings(clientSelectedDiceRolls = false),
+                            GameSettings(gameRules = rules, clientSelectedDiceRolls = false),
                         )
 
                         val actionProvider = P2PActionProvider(
                             gameController,
-                            GameSettings(clientSelectedDiceRolls = false),
+                            GameSettings(gameRules = rules, clientSelectedDiceRolls = false),
                             homeActionProvider,
                             awayActionProvider,
                             controller
@@ -223,7 +226,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                 selectedTeam.value = null
                 canCreateGame.value = false
                 joinHostModel.reset()
-                selectTeamModel.reset()
+                selectTeamModel.componentModel.reset()
                 acceptGameModel.reset()
                 lastValidPage = 0
                 currentPage.value = 0

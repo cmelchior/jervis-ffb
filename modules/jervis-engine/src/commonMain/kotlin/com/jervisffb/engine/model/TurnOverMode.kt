@@ -10,5 +10,7 @@ enum class TurnOver {
     ACTIVE_TEAM_TOUCHDOWN,
     // The inactive team scored a touch
     INACTIVE_TEAM_TOUCHDOWN,
+    // Active players turn timing out is not strictly a turn-over, but this is the
+    TIME_OUT,
 }
 

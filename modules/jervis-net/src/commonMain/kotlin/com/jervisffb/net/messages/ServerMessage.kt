@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.net.GameId
 import com.jervisffb.net.messages.P2PClientState.JOIN_SERVER
@@ -103,6 +104,7 @@ data class SpectatorLeftMessage(val spectator: Spectator): ServerMessage
 // Used to synchronize a client with the current server state
 @Serializable
 data class GameStateSyncMessage(
+    val rules: Rules,
     val coaches: List<Coach>,
     val spectators: List<Spectator>,
     val hostState: P2PHostState = P2PHostState.START,
@@ -158,7 +160,11 @@ data class TeamData(
 
 // Ask players to accept if they want to start the game with the provided teams.
 @Serializable
-data class ConfirmGameStartMessage(val gameId: GameId, val teams: List<TeamData>): ServerMessage
+data class ConfirmGameStartMessage(
+    val gameId: GameId, 
+    val rules: Rules, 
+    val teams: List<TeamData>
+): ServerMessage
 
 // Game was accepted by all parties and is starting
 @Serializable

@@ -20,7 +20,7 @@ class Loner(
     override val workWhenProne: Boolean = false
 
     @Serializable
-    data class Factory(override val value: Int): SkillFactory {
+    data class Factory(override val value: Int): PlayerSkillFactory {
         override fun createSkill(isTemporary: Boolean, expiresAt: Duration): Skill =
             Loner(value, isTemporary, expiresAt)
     }

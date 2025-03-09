@@ -39,7 +39,7 @@ class BreakTackleTests: JervisGameTest() {
             // Should be on LoS
             awayTeam[PlayerNo(1)].apply {
                 addSkill(BreakTackle())
-                baseStrenght = 4
+                strength = 4
             }
         }
         startDefaultGame()

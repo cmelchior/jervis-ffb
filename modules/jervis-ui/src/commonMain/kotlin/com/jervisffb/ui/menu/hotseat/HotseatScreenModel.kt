@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.ui.game.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
@@ -17,8 +17,8 @@ import com.jervisffb.ui.menu.GameScreen
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
+import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.ui.menu.components.starting.StartGameComponentModel
-import com.jervisffb.ui.menu.p2p.host.TeamInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -36,6 +36,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
 
     // Page 1: Setup Game
     val setupGameModel = SetupHotseatGameScreenModel(menuViewModel, this)
+    var rules: Rules? = null
 
     // Page 2: Select Home Team
     val selectHomeTeamModel: SelectHotseatTeamScreenModel = SelectHotseatTeamScreenModel(
@@ -71,6 +72,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
     fun gameSetupDone() {
         // Should anything be saved here?
         currentPage.value = 1
+        rules = setupGameModel.createRules()
     }
 
     fun homeTeamSelectionDone() {
@@ -94,35 +96,35 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         val homeTeam = selectedHomeTeam.value?.teamData ?: error("Home team is not selected")
         val awayTeam = selectedAwayTeam.value?.teamData ?: error("Away team is not selected")
 
-        val rules = StandardBB2020Rules()
+        val rules = setupGameModel.createRules()
         homeTeam.coach = Coach(CoachId("1"), selectHomeTeamModel.coachName.value)
         awayTeam.coach = Coach(CoachId("2"), selectAwayTeamModel.coachName.value)
         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game)
 
         val homeActionProvider = when (selectHomeTeamModel.playerType.value) {
-            PlayerType.HUMAN -> ManualActionProvider(
+            CoachType.HUMAN -> ManualActionProvider(
                 gameController,
                 menuViewModel,
                 TeamActionMode.HOME_TEAM,
-                GameSettings(clientSelectedDiceRolls = true),
+                GameSettings(gameRules = rules, clientSelectedDiceRolls = true),
             )
-            PlayerType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
+            CoachType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
         }
 
         val awayActionProvider = when (selectAwayTeamModel.playerType.value) {
-            PlayerType.HUMAN -> ManualActionProvider(
+            CoachType.HUMAN -> ManualActionProvider(
                 gameController,
                 menuViewModel,
                 TeamActionMode.AWAY_TEAM,
-                GameSettings(clientSelectedDiceRolls = true),
+                GameSettings(gameRules = rules, clientSelectedDiceRolls = true),
             )
-            PlayerType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
+            CoachType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
         }
 
         val actionProvider = LocalActionProvider(
             gameController,
-            GameSettings(clientSelectedDiceRolls = true),
+            GameSettings(gameRules = rules, clientSelectedDiceRolls = true),
             homeActionProvider,
             awayActionProvider
         )

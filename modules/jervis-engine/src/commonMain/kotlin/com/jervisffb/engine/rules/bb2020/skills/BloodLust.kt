@@ -24,7 +24,7 @@ class BloodLust(
     override val workWhenProne: Boolean = true
 
     @Serializable
-    class Factory(override val value: Int): SkillFactory {
+    class Factory(override val value: Int): PlayerSkillFactory {
         override fun createSkill(isTemporary: Boolean, expiresAt: Duration): Skill = BloodLust(value, isTemporary, expiresAt)
     }
 }

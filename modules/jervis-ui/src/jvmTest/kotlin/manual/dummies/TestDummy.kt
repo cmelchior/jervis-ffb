@@ -2,7 +2,6 @@ package manual.dummies
 
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
-import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.test.createDefaultGameState
 import com.jervisffb.ui.game.LocalActionProvider
@@ -19,7 +18,7 @@ object TestDummy {
     val menuViewModel = MenuViewModel()
     val state = createDefaultGameState(StandardBB2020Rules())
     val controller = GameEngineController(state)
-    val settings = GameSettings(timerSettings = TimerSettings(timersEnabled = false), clientSelectedDiceRolls = true)
+    val settings = GameSettings(StandardBB2020Rules())
     val homeActionProvider = ManualActionProvider(controller, menuViewModel,TeamActionMode.HOME_TEAM, settings)
     val awayActionProvider = ManualActionProvider(controller, menuViewModel,  TeamActionMode.AWAY_TEAM, settings)
 

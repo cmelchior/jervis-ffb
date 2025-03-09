@@ -1,10 +1,15 @@
 package com.jervisffb.engine.rules
 
+import com.jervisffb.engine.DEFAULT_INDUCEMENTS
+import com.jervisffb.engine.InducementSettings
+import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.IntRangeSerializer
+import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -14,11 +19,13 @@ import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyTable
 import com.jervisffb.engine.rules.bb2020.tables.InjuryTable
+import com.jervisffb.engine.rules.bb2020.tables.KickOffTable
 import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.RandomDirectionTemplate
@@ -28,11 +35,140 @@ import com.jervisffb.engine.rules.bb2020.tables.StandardWeatherTable
 import com.jervisffb.engine.rules.bb2020.tables.StuntyInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.ThrowInPosition
 import com.jervisffb.engine.rules.bb2020.tables.ThrowInTemplate
+import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
+import com.jervisffb.engine.rules.builder.BallSelectorRule
+import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.builder.FoulActionBehavior
+import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.KickingPlayerBehavior
+import com.jervisffb.engine.rules.builder.NoStadium
+import com.jervisffb.engine.rules.builder.StadiumRule
+import com.jervisffb.engine.rules.builder.StandardBall
+import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.sum
+import kotlinx.serialization.Serializable
 
-interface Rules {
+/**
+ * This class is responsible for tracking all the "static" rules related to a game of Blood Bowl, as well
+ * as helper methods for often asked questions. Concepts from the rulebook liked "Is a marked player" should
+ * generally be found in this  class, rather than a specific [Procedure].
+ *
+ * This class should only contain rules for running a game, not rules for building rosters.
+ *
+ * The idea is that this class shoul be able to represent all game types, but that hasn't been
+ * fully tested yet, e.g Dungeon Bowl has a very different view of what the field looks
+ * and behaves, so most likely some aspects needs to be redesigned.
+ *
+ * It is also a bit unclear how well this class trancends rulesets, i.e. between BB2016 and BB2020
+ */
+@Serializable
+open class Rules(
+    // Name of the rule set
+    open val name: String,
+    // What type of game is this ruleset intended for
+    open val gameType: GameType,
+
+    // Which timer settings are in place for this game
+    open val timers: TimerSettings = TimerSettings.Companion.BB_CLOCK,
+    // Which inducements are available in this game
+    open val inducements: InducementSettings = InducementSettings(DEFAULT_INDUCEMENTS),
+
+    // Characteristic limits
+    // See page 28 in the rulebook
+    @Serializable(IntRangeSerializer::class)
+    open val moveRange: IntRange = 1..9,
+    @Serializable(IntRangeSerializer::class)
+    open val strengthRange: IntRange = 1..8,
+    @Serializable(IntRangeSerializer::class)
+    open val agilityRange: IntRange = 1 .. 6,
+    @Serializable(IntRangeSerializer::class)
+    open val passingRange: IntRange = 1.. 6,
+    @Serializable(IntRangeSerializer::class)
+    open val armorValueRange: IntRange = 3 .. 11,
+
+    // Game length settings
+    open val halfsPrGame: Int = 2,
+    open val turnsPrHalf: Int = 8,
+    open val hasExtraTime: Boolean = false,
+    open val turnsInExtraTime: Int = 8,
+    open val hasShootoutInExtraTime: Boolean = true,
+
+    // Field (Defined as being horisontal with home team on the right, away team on the left)
+    // Total width of the field
+    open val fieldWidth: Int = 26,
+    // Total height of the field
+    open val fieldHeight: Int = 15,
+    // Height of the Wide Zone at the top and bottom of the field
+    open val wideZone: Int = 4,
+    // Width of the End Zone at each end of the field where the ball is scored.
+    open val endZone: Int = 1,
+    // X-coordinates for the line of scrimmage for the home team
+    open val lineOfScrimmageHome: Int = 12,
+    // X-coordinate for the line of scrimmage for the away team
+    open val lineOfScrimmageAway: Int = 13,
+    open val playersRequiredOnLineOfScrimmage: Int = 3,
+    open val maxPlayersInWideZone: Int = 2,
+    // Default max number of players on the field. Skills and effects might change this
+    open val maxPlayersOnField: Int  = 11,
+    // Blood Bowl 7
+    // Total width of the field
+//    val fieldWidth = 2
+//    val fieldHeight = 11
+//    val wideZone = 2
+//    val endZone = 1
+//    val lineOfScrimmage = 7
+
+
+    // Stadium / Pitch / Ball rules / Match Events
+    open val stadium: StadiumRule = NoStadium,
+    // How is the ball being used for the game selected
+    open val ballSelectorRule: BallSelectorRule = StandardBall,
+    // Which pitch is used for this game
+    open val pitchType: PitchType = PitchType.STANDARD,
+    // Match Events (See page XX)
+    open val matchEventsEnabled: Boolean = false,
+
+// Tables
+    open val kickOffEventTable: KickOffTable = StandardKickOffEventTable,
+    open val prayersToNuffleEnabled: Boolean = true,
+    open val prayersToNuffleTable: PrayersToNuffleTable = PrayersToNuffleTable,
+    open val weatherTable: WeatherTable = StandardWeatherTable,
+    open val injuryTable: InjuryTable = InjuryTable,
+    open val stuntyInjuryTable: StuntyInjuryTable = StuntyInjuryTable,
+    open val casualtyTable: CasualtyTable = CasualtyTable,
+    open val lastingInjuryTable: LastingInjuryTable = LastingInjuryTable,
+    open val argueTheCallTable: ArgueTheCallTable = ArgueTheCallTable,
+
+    // Templates
+    open val randomDirectionTemplate: RandomDirectionTemplate = RandomDirectionTemplate,
+    open val rangeRuler: RangeRuler = RangeRuler,
+
+    // Team Actions
+    open val teamActions: TeamActions = BB2020TeamActions(),
+    open val rushesPrAction: Int = 2,
+    open val allowMultipleTeamRerollsPrTurn: Boolean = true,
+    // Dice roll targets defined in the rulebook
+    open val standingUpTarget: Int = 4, // See page 44 in the rule book
+    open val moveRequiredForStandingUp: Int = 3,
+
+    // Behavior customization, .e.g. allow the rules to specify which Procedure should
+    // be used for certain aspects of the game
+    // Whether or not coaches are allowed to undo actions, and to what degree.
+    open val undoActionBehavior: UndoActionBehavior = UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS,
+    // Who is responsible for rolling dice or taking random actions.
+    open val diceRolls: DiceRollOwner = DiceRollOwner.ROLL_ON_SERVER,
+    // Probably need to replace this with a reference to the FoulProcedure
+    open val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.STRICT,
+    // Probably need to replace this with a reference to the KickProcedure
+    open val kickingPlayerBehavior: KickingPlayerBehavior = KickingPlayerBehavior.STRICT
+) {
+    // How are paths between locations on the field calculated. This can be rules specific,
+    // since it might involve the use of skills.
+    open val pathFinder: PathFinder = BB2020PathFinder()
+
     fun isValidSetup(state: Game, team: Team): Boolean {
         val isHomeTeam = team.isHomeTeam()
         val inReserve: List<Player> = team.filter { it.state == PlayerState.RESERVE && !it.location.isOnField(this) }
@@ -389,128 +525,136 @@ interface Rules {
         }
     }
 
-    val name: String
+    /**
+     * When either a `baseX` or `XModifiers` stat value has been updated, this method should also
+     * be called so the total player stat can be calculated correctly.
+     */
+    fun updatePlayerStat(player: Player, modifier: StatModifier) {
+        with(player) {
+            when (modifier.type) {
+                StatModifier.Type.AV -> armorValue = (baseArmorValue + armourModifiers.sum()).coerceIn(armorValueRange)
+                StatModifier.Type.MA -> move = (baseMove + moveModifiers.sum()).coerceIn(moveRange)
+                StatModifier.Type.PA -> {
+                    // How to handle modifiers to `null`. I believe the stat is then treated as 7+, but find reference
+                    val newPassing = if (basePassing == null && passingModifiers.isNotEmpty()) {
+                        (7 + passingModifiers.sum())
+                    } else if (basePassing != null && passingModifiers.isNotEmpty()) {
+                        (basePassing!! + passingModifiers.sum())
+                    } else {
+                        basePassing
+                    }
+                    passing = newPassing?.coerceIn(passingRange) ?: passing
+                }
+                StatModifier.Type.AG -> agility = (baseAgility + agilityModifiers.sum()).coerceIn(agilityRange)
+                StatModifier.Type.ST -> strength = (baseStrength + strengthModifiers.sum()).coerceIn(strengthRange)
+            }
+        }
+    }
 
-    // Characteristic limits
-    // See page 28 in the rulebook
-    val moveRange: IntRange
-        get() = 1..9
+    fun toBuilder(): Builder {
+        return Builder(this)
+    }
 
-    val strengthRange: IntRange
-        get() = 1..8
+    /**
+     *  Rules builder making it easier to create variants of
+     */
+    class Builder(rules: Rules) {
+        var name: String = rules.name
+        var gameType: GameType = rules.gameType
+        var timers: TimerSettings = rules.timers
+        var inducements: InducementSettings = rules.inducements
+        var moveRange: IntRange = rules.moveRange
+        var strengthRange: IntRange = rules.strengthRange
+        var agilityRange: IntRange = rules.agilityRange
+        var passingRange: IntRange = rules.passingRange
+        var armorValueRange: IntRange = rules.armorValueRange
+        var halfsPrGame: Int = rules.halfsPrGame
+        var turnsPrHalf: Int = rules.turnsPrHalf
+        var hasExtraTime: Boolean = rules.hasExtraTime
+        var turnsInExtraTime: Int = rules.turnsInExtraTime
+        var hasShootoutInExtraTime: Boolean = rules.hasShootoutInExtraTime
+        var fieldWidth: Int = rules.fieldWidth
+        var fieldHeight: Int = rules.fieldHeight
+        var wideZone: Int = rules.wideZone
+        var endZone: Int = rules.endZone
+        var lineOfScrimmageHome: Int = rules.lineOfScrimmageHome
+        var lineOfScrimmageAway: Int = rules.lineOfScrimmageAway
+        var playersRequiredOnLineOfScrimmage: Int = rules.playersRequiredOnLineOfScrimmage
+        var maxPlayersInWideZone: Int = rules.maxPlayersInWideZone
+        var maxPlayersOnField: Int = rules.maxPlayersOnField
+        var stadium: StadiumRule = rules.stadium
+        var ballSelectorRule: BallSelectorRule = rules.ballSelectorRule
+        var pitchType: PitchType = rules.pitchType
+        var matchEventsEnabled: Boolean = rules.matchEventsEnabled
+        var kickOffEventTable: KickOffTable = rules.kickOffEventTable
+        var prayersToNuffleEnabled: Boolean = rules.prayersToNuffleEnabled
+        var prayersToNuffleTable: PrayersToNuffleTable = rules.prayersToNuffleTable
+        var weatherTable: WeatherTable = rules.weatherTable
+        var injuryTable: InjuryTable = rules.injuryTable
+        var stuntyInjuryTable: StuntyInjuryTable = rules.stuntyInjuryTable
+        var casualtyTable: CasualtyTable = rules.casualtyTable
+        var lastingInjuryTable: LastingInjuryTable = rules.lastingInjuryTable
+        var argueTheCallTable: ArgueTheCallTable = rules.argueTheCallTable
+        var randomDirectionTemplate: RandomDirectionTemplate = rules.randomDirectionTemplate
+        var rangeRuler: RangeRuler = rules.rangeRuler
+        var teamActions: TeamActions = rules.teamActions
+        var rushesPrAction: Int = rules.rushesPrAction
+        var allowMultipleTeamRerollsPrTurn: Boolean = rules.allowMultipleTeamRerollsPrTurn
+        var standingUpTarget: Int = rules.standingUpTarget
+        var moveRequiredForStandingUp: Int = rules.moveRequiredForStandingUp
+        var undoActionBehavior: UndoActionBehavior = rules.undoActionBehavior
+        var diceRolls: DiceRollOwner = rules.diceRolls
+        var foulActionBehavior: FoulActionBehavior = rules.foulActionBehavior
+        var kickingPlayerBehavior: KickingPlayerBehavior = rules.kickingPlayerBehavior
 
-    val agilityRange: IntRange
-        get() = 1 .. 6
-
-    val passingRange: IntRange
-        get() = 1.. 6
-
-    val armorValueRange: IntRange
-        get() = 3 .. 11
-
-    val rushesPrAction: Int
-        get() = 2
-
-    // Game length setup
-
-    val halfsPrGame: Int
-        get() = 2
-
-    val turnsPrHalf: Int
-        get() = 8
-
-    val hasExtraTime: Boolean
-        get() = false
-
-    val turnsInExtraTime
-        get() = 8
-
-    // Field description
-
-    // Total width of the field
-    val fieldWidth: Int
-        get() = 26
-
-    // Total height of the field
-    val fieldHeight: Int
-        get() = 15
-
-    // Height of the Wide Zone at the top and bottom of the field
-    val wideZone: Int
-        get() = 4
-
-    // Width of the End Zone at each end of the field
-    val endZone: Int
-        get() = 1
-
-    // X-coordinates for the line of scrimmage for the home team
-    val lineOfScrimmageHome: Int
-        get() = 12
-
-    // X-coordinate for the line of scrimmage for the away team
-    val lineOfScrimmageAway: Int
-        get() = 13
-
-    val playersRequiredOnLineOfScrimmage: Int
-        get() = 3
-
-    val maxPlayersInWideZone: Int
-        get() = 2
-
-    val maxPlayersOnField: Int
-        get() = 11
-
-    val randomDirectionTemplate
-        get() = RandomDirectionTemplate
-
-    val kickOffEventTable
-        get() = StandardKickOffEventTable
-
-    val prayersToNuffleTable
-        get() = PrayersToNuffleTable
-
-    val weatherTable
-        get() = StandardWeatherTable
-
-    val injuryTable
-        get() = InjuryTable
-
-    val stuntyInjuryTable
-        get() = StuntyInjuryTable
-
-    val casualtyTable
-        get() = CasualtyTable
-
-    val lastingInjuryTable
-        get() = LastingInjuryTable
-
-    val argueTheCallTable
-        get() = ArgueTheCallTable
-
-    val rangeRuler
-        get() = RangeRuler
-
-    val teamActions: TeamActions
-        get() = BB2020TeamActions()
-
-    val allowMultipleTeamRerollsPrTurn: Boolean
-        get() = true
-
-    val pathFinder: PathFinder
-        get() = BB2020PathFinder(this)
-
-    // Blood Bowl 7
-    // Total width of the field
-//    val fieldWidth = 2
-//    val fieldHeight = 11
-//    val wideZone = 2
-//    val endZone = 1
-//    val lineOfScrimmage = 7
-
-    // Dice roll targets defined in the rulebook
-    val standingUpTarget
-        get() = 4 // See page 44
-
-    val moveRequiredForStandingUp
-        get() = 3
+        fun build() = Rules(
+            name,
+            gameType,
+            timers,
+            inducements,
+            moveRange,
+            strengthRange,
+            agilityRange,
+            passingRange,
+            armorValueRange,
+            halfsPrGame,
+            turnsPrHalf,
+            hasExtraTime,
+            turnsInExtraTime,
+            hasShootoutInExtraTime,
+            fieldWidth,
+            fieldHeight,
+            wideZone,
+            endZone,
+            lineOfScrimmageHome,
+            lineOfScrimmageAway,
+            playersRequiredOnLineOfScrimmage,
+            maxPlayersInWideZone,
+            maxPlayersOnField,
+            stadium,
+            ballSelectorRule,
+            pitchType,
+            matchEventsEnabled,
+            kickOffEventTable,
+            prayersToNuffleEnabled,
+            prayersToNuffleTable,
+            weatherTable,
+            injuryTable,
+            stuntyInjuryTable,
+            casualtyTable,
+            lastingInjuryTable,
+            argueTheCallTable,
+            randomDirectionTemplate,
+            rangeRuler,
+            teamActions,
+            rushesPrAction,
+            allowMultipleTeamRerollsPrTurn,
+            standingUpTarget,
+            moveRequiredForStandingUp,
+            undoActionBehavior,
+            diceRolls,
+            foulActionBehavior,
+            kickingPlayerBehavior
+        )
+    }
 }

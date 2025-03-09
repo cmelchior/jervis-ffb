@@ -81,7 +81,7 @@ class StandingUpTests: JervisGameTest() {
     @Test
     fun standingUpWithMoveTwoRequiresRoll() {
         val player = state.getPlayerById("A10".playerId)
-        player.baseMove = 2
+        player.move = 2
         player.movesLeft = 2
         controller.rollForward(
             PlayerSelected(player.id),
@@ -104,7 +104,7 @@ class StandingUpTests: JervisGameTest() {
 
         // Force player to roll to stand up
         val player = state.getPlayerById("A10".playerId)
-        player.baseMove = 2
+        player.move = 2
         player.movesLeft = 2
 
         // Just check normal actions for now

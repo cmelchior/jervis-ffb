@@ -1,5 +1,6 @@
 package com.jervisffb.net.test
 
+import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode
@@ -11,10 +12,12 @@ import kotlin.test.assertEquals
 
 class WebSocketClientConnectionTests {
 
+    val rules = StandardBB2020Rules()
+
     @Test
     fun closeMultipleTimes() = runBlocking {
         // Start server
-        val server = LightServer(createDefaultHomeTeam(), "test", testMode = true)
+        val server = LightServer(rules, createDefaultHomeTeam(), "test", testMode = true)
         server.start()
 
         val conn = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/game", "host")

@@ -1,5 +1,5 @@
 root = true
-# See https://pinterest.github.io/ktlint/0.49.1/rules/code-styles/
+# See https://pinterest.github.io/ktlint/1.5.0/rules/code-styles/
 [*.{kt,kts}]
 ktlint_code_style = ktlint_official
 ktlint_function_naming_ignore_when_annotated_with = Composable

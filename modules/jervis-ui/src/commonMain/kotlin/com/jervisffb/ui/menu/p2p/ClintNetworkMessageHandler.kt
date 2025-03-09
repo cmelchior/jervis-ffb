@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode
@@ -37,7 +38,7 @@ import com.jervisffb.net.messages.UpdateClientStateMessage
 import com.jervisffb.net.messages.UpdateHostStateMessage
 import com.jervisffb.net.messages.UpdateSpectatorStateMessage
 import com.jervisffb.net.messages.UserMessage
-import com.jervisffb.ui.menu.p2p.host.TeamInfo
+import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.utils.jervisLogger
 import io.ktor.websocket.CloseReason
 import kotlinx.coroutines.CoroutineName
@@ -70,7 +71,7 @@ interface ClientNetworkMessageHandler {
     fun onSpectatorStateChange(newState: SpectatorState)
     fun onGameSync(message: GameStateSyncMessage)
     fun updateClientState(state: P2PClientState)
-    fun onConfirmGameStart(id: GameId, teams: List<TeamData>)
+    fun onConfirmGameStart(id: GameId, rules: Rules, teams: List<TeamData>)
     fun onGameReady(id: GameId)
     fun onServerError(errorCode: JervisErrorCode, message: String)
     fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction)
@@ -90,7 +91,7 @@ abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler 
     override fun onSpectatorStateChange(newState: SpectatorState) { }
     override fun onGameSync(message: GameStateSyncMessage) { }
     override fun updateClientState(state: P2PClientState) { }
-    override fun onConfirmGameStart(id: GameId, teams: List<TeamData>) { }
+    override fun onConfirmGameStart(id: GameId, rules: Rules, teams: List<TeamData>) { }
     override fun onGameReady(id: GameId) { }
     override fun onServerError(errorCode: JervisErrorCode, message: String) { }
     override fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction) { }
@@ -167,7 +168,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         // Create a snapshot of the handlers, so they can be removed safely while iterating
         messageHandlers.toList().forEach { messageHandler ->
             when (message) {
-                is ConfirmGameStartMessage -> messageHandler.onConfirmGameStart(message.gameId, message.teams)
+                is ConfirmGameStartMessage -> messageHandler.onConfirmGameStart(message.gameId, message.rules, message.teams)
                 is GameNotFoundMessage -> TODO()
                 is GameReadyMessage -> messageHandler.onGameReady(message.gameId)
                 is CoachJoinedMessage -> messageHandler.onCoachJoined(message.coach, message.isHomeCoach)

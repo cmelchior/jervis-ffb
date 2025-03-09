@@ -3,14 +3,13 @@ package com.jervisffb.ui.menu.p2p.host
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
-import com.jervisffb.ui.menu.components.setup.SetupGameComponentModel
-import com.jervisffb.ui.menu.components.setup.SetupTimersComponentModel
+import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponentModel
 import com.jervisffb.utils.PROP_DEFAULT_HOST_COACH_NAME
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.uuid.ExperimentalUuidApi
@@ -21,17 +20,13 @@ import kotlin.uuid.Uuid
  */
 class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val parentModel: P2PHostScreenModel) : ScreenModel {
 
-    val setupGameScreenModel = SetupGameComponentModel(menuViewModel)
-    val setupTimersScreenModel = SetupTimersComponentModel(menuViewModel)
+    val gameSetupModel = GameConfigurationContainerComponentModel(menuViewModel)
 
     val coachName = MutableStateFlow("")
     val gameName = MutableStateFlow("Game-${Random.nextInt(10_000)}")
     val port = MutableStateFlow<Int?>(8080)
     private val validGameMetadata = MutableStateFlow(false)
-    val isSetupValid: Flow<Boolean> = combine(setupGameScreenModel.isSetupValid, validGameMetadata) {
-        isSetupValid, validGameMetadata -> isSetupValid && validGameMetadata
-    }
-
+    val isSetupValid: Flow<Boolean> = gameSetupModel.isSetupValid
     init {
         setGameName("Game-${Random.nextInt(10_000)}")
         setPort(8080.toString())
@@ -89,5 +84,9 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
             PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_HOST_COACH_NAME, coachName.value)
         }
         parentModel.gameSetupDone()
+    }
+
+    fun createRules(): Rules {
+        return gameSetupModel.createRules()
     }
 }

@@ -4,12 +4,13 @@ import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class LightServer(
+    rules: Rules,
     hostTeam: Team,
     gameName: String,
     testMode: Boolean = false, // If `true`, event handling is done in a deterministic manner
@@ -26,8 +27,7 @@ class LightServer(
         // A add pre-determined game (created by the Host setting up the server)
         val session = GameSession(
             this,
-            StandardBB2020Rules(),
-            GameSettings(),
+            GameSettings(rules),
             GameId(gameName),
             null,
             listOf(hostTeam),

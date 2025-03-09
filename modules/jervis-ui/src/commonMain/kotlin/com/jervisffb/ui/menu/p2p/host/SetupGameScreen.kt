@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.utils.JervisButton
-import com.jervisffb.ui.menu.components.setup.SetupGameComponent
+import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponent
 
 @Composable
 fun SetupGamePage(setupModel: SetupGameScreenModel, modifier: Modifier) {
@@ -70,7 +70,7 @@ fun SetupGamePage(setupModel: SetupGameScreenModel, modifier: Modifier) {
                 }
             }
             Spacer(modifier = Modifier.width(32.dp))
-            SetupGameComponent(setupModel.setupGameScreenModel, setupModel.setupTimersScreenModel)
+            GameConfigurationContainerComponent(setupModel.gameSetupModel)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             JervisButton(text = "Next", enabled = isSetupValid, onClick = { setupModel.gameSetupDone() })

@@ -20,19 +20,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import com.jervisffb.engine.model.BallType
-import com.jervisffb.engine.model.PitchType
-import com.jervisffb.engine.model.StadiumType
-import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.TeamId
-import com.jervisffb.engine.rules.bb2020.tables.KickOffTable
-import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
 import com.jervisffb.ui.game.view.JervisTheme
@@ -41,63 +33,13 @@ import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
 import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
+import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreen
 import com.jervisffb.ui.menu.p2p.StartP2PGamePage
-import com.jervisffb.ui.menu.p2p.TeamSelectorPage
-
-data class TeamInfo(
-    val teamId: TeamId,
-    val teamName: String,
-    val teamRoster: String,
-    val teamValue: Int,
-    val rerolls: Int,
-    val logo: ImageBitmap,
-    val teamData: Team?, // For now just keep a reference to the original team. Might change later if teams are loaded on the server
-)
 
 interface DropdownEntry {
     val name: String
     val available: Boolean
 }
-
-data class WeatherTableEntry(
-    override val name: String,
-    val table: WeatherTable,
-    override val available: Boolean,
-): DropdownEntry
-
-data class KickOffTableEntry(
-    override val name: String,
-    val table: KickOffTable,
-    override val available: Boolean,
-): DropdownEntry
-
-data class PitchEntry(
-    override val name: String,
-    val pitch: PitchType,
-    override val available: Boolean = false
-): DropdownEntry
-
-data class StadiumEntry(
-    override val name: String,
-    val stadium: StadiumRule,
-    override val available: Boolean = false
-): DropdownEntry
-
-interface UnusualBallRule
-data object NoUnusualBall: UnusualBallRule
-data object RollOnUnusualBallTable: UnusualBallRule
-data class SpecificUnusualBall(val type: BallType): UnusualBallRule
-
-interface StadiumRule
-data object NoStadium: StadiumRule
-data object RollForStadiumUsed: StadiumRule
-data class SpecificStadium(val type: StadiumType): StadiumRule
-
-data class UnusualBallEntry(
-    override val name: String,
-    val ball: UnusualBallRule,
-    override val available: Boolean,
-): DropdownEntry
 
 class P2PServerScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PHostScreenModel) : Screen {
     @Composable
@@ -141,7 +83,7 @@ fun PageContent(screenModel: P2PHostScreenModel) {
         ) { page ->
             when (page) {
                 0 -> SetupGamePage(screenModel.setupGameModel, Modifier)
-                1 -> TeamSelectorPage(screenModel.selectTeamModel, "Start Server", { screenModel.teamSelectionDone() })
+                1 -> SelectP2PTeamScreen(screenModel.selectTeamModel.componentModel, "Start Server", { screenModel.teamSelectionDone() })
                 2 -> WaitForOpponentPage(viewModel = screenModel)
                 3 -> StartP2PGamePage(
                     screenModel.controller.homeTeam,
@@ -178,7 +120,7 @@ fun ColumnScope.BoxHeader(
     }
     TitleBorder(color)
     Box(
-        modifier = Modifier.height(36.dp),
+        modifier = Modifier.height(36.dp).fillMaxWidth(),
         contentAlignment = Alignment.CenterStart,
     ) {
         Text(

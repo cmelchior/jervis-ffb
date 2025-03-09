@@ -2,10 +2,12 @@ package com.jervisffb.engine.rules.bb2020.tables
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlinx.serialization.Serializable
 
 /**
  * Class representing the Argue the Call table on page 61 in the rulebook.
  */
+@Serializable
 object ArgueTheCallTable {
     private val table: Map<Int, ArgueTheCallResult> =
         mapOf(

@@ -35,6 +35,7 @@ import com.jervisffb.engine.rules.bb2020.skills.Titchy
 import com.jervisffb.engine.rules.bb2020.skills.TwoHeads
 import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
 import com.jervisffb.engine.rules.bb2020.skills.Wrestle
+import com.jervisffb.engine.rules.bb2020.specialrules.SneakiestOfTheLot
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -90,6 +91,9 @@ enum class BB2020SkillCategory(override val id: Long, override val description: 
         Timmmber.Factory,
         Titchy.Factory,
         UnchannelledFury.Factory,
-    ));
+    )),
+    SPECIAL_RULES(7, "Special Rules", listOf(
+        SneakiestOfTheLot.Factory
+    ))
 }
 

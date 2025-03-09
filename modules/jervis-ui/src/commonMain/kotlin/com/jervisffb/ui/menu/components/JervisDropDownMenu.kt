@@ -1,5 +1,6 @@
 package com.jervisffb.ui.menu.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
@@ -21,6 +22,7 @@ fun <T: DropdownEntry> JervisDropDownMenu(
     title: String,
     entries: List<T>,
     enabled: Boolean = true,
+    modifier: Modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
     selectedEntry: T? = entries.firstOrNull(),
     onSelected: (T) -> Unit,
 ) {
@@ -30,7 +32,7 @@ fun <T: DropdownEntry> JervisDropDownMenu(
         onExpandedChange = { expanded = !expanded },
     ) {
         OutlinedTextField(
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = modifier,
             value = selectedEntry?.name ?: "",
             onValueChange = { },
             enabled = enabled,

@@ -22,6 +22,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.TreacherousTr
 import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.UnderScrutiny
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlinx.serialization.Serializable
 
 // Consider: Do we really need this enum?
 enum class PrayerStatModifier(
@@ -57,6 +58,7 @@ enum class PrayerToNuffle(override val description: String, override val procedu
 /**
  * Class representing the Prayers To Nuffle Table on page 39 in the rulebook.
  */
+@Serializable
 object PrayersToNuffleTable {
     private val table =
         mapOf(

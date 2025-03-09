@@ -4,6 +4,7 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
@@ -103,7 +104,8 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
                     data.id,
                     data.name,
                     data.number,
-                    data.icon
+                    PlayerType.STANDARD,
+                    data.icon,
                 ).also { player ->
                     player.extraSkills.addAll(data.extraSkills)
                 })

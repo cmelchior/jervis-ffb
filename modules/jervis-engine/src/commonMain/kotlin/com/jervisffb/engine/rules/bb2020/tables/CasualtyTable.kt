@@ -2,10 +2,12 @@ package com.jervisffb.engine.rules.bb2020.tables
 
 import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlinx.serialization.Serializable
 
 /**
  * Class representing the Injury Table on page 60 in the rulebook.
  */
+@Serializable
 object CasualtyTable {
     private val table: Map<Int, CasualtyResult> =
         mapOf(

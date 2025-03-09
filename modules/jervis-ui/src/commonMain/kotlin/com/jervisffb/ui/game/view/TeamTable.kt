@@ -87,7 +87,7 @@ fun TeamTable(width: Dp, team: Team, isOnHomeTeam: Boolean) {
                 player.move,
                 player.strength,
                 player.agility,
-                player.passing ,
+                player.passing,
                 player.armorValue,
                 listOf(player.positionSkills.map { it.name }, player.extraSkills.map { it.name }),
                 Pair(player.missNextGame, player.nigglingInjuries),

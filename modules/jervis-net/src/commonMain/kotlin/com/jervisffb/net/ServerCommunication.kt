@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.net.messages.ClientMessage
 import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.CoachLeftMessage
@@ -73,6 +74,7 @@ class ServerCommunication(
 
     suspend fun sendGameStateSync(client: JoinedClient, session: GameSession) {
         val msg = GameStateSyncMessage(
+            session.gameSettings.gameRules,
             session.coaches.map { it.coach },
             session.spectators.map { it.spectator },
             session.hostState,
@@ -84,8 +86,8 @@ class ServerCommunication(
         sendToConnection(client.connection, msg)
     }
 
-    suspend fun sendStartingGameRequest(id: GameId, teams: List<Team>) {
-        val msg = ConfirmGameStartMessage(id, teams.map {
+    suspend fun sendStartingGameRequest(id: GameId, rules: Rules, teams: List<Team>) {
+        val msg = ConfirmGameStartMessage(id, rules, teams.map {
             TeamData(
                 coach = it.coach.name,
                 teamName =  it.name,

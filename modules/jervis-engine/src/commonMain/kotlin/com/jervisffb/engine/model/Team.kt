@@ -126,9 +126,18 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach
     val specialPlayCards = mutableListOf<SpecialPlayCard>()
     val infamousCoachingStaff = mutableListOf<InfamousCoachingStaff>()
 
-    // Special team state that needs to be tracked for the given period
+    // Cyclic dependencies. Must be manually set when a Team is constructed
     @Transient
     lateinit var game: Game
+    @Transient
+    var teamIsHomeTeam: Boolean = false
+    @Transient
+    var teamIsAwayTeam: Boolean = false
+
+    // Temporary state. Currently transient because we assume that
+    // game state never needs to be deserialized directly, but is only
+    // created by running forward or backwards through all game actions
+    // This API probably needs to be redesigned
 
     @Transient
     lateinit var halfData: TeamHalfData
@@ -156,6 +165,8 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach
         driveData = TeamDriveData(game)
         turnData = TeamTurnData(game)
         this.game = game
+        teamIsHomeTeam = (game.homeTeam == this)
+        teamIsAwayTeam = (game.awayTeam == this)
     }
 
     fun otherTeam(): Team {

@@ -308,6 +308,7 @@ class PrayersToNuffleTests: JervisGameTest() {
     fun ironMan_onAV11() {
         val player = state.getPlayerById("A1".playerId)
         player.baseArmorValue = 11
+        player.armorValue = 11
         controller.rollForward(
             *defaultPregame(
                 prayersToNuffle = arrayOf(

@@ -1,5 +1,6 @@
 package com.jervisffb.resources
 
+import LIZARDMEN_TEAM
 import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialize.JervisMetaData
 import com.jervisffb.engine.serialize.JervisRosterFile

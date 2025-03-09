@@ -1,5 +1,3 @@
-package com.jervisffb.resources
-
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
@@ -19,6 +17,8 @@ import com.jervisffb.engine.rules.bb2020.skills.Stunty
 import com.jervisffb.engine.rules.bb2020.skills.ThickSkull
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.resources.iconRootPath
+import com.jervisffb.resources.portraitRootPath
 import kotlinx.serialization.Serializable
 
 val SKINK_RUNNER_LINEMEN =

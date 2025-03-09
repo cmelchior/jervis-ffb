@@ -27,11 +27,11 @@ import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.menu.components.JervisDropDownMenu
 import com.jervisffb.ui.menu.components.SimpleSwitch
-import com.jervisffb.ui.menu.p2p.host.BoxHeader
+import com.jervisffb.ui.menu.components.SmallHeader
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SetupTimersComponent(screenModel: SetupTimersComponentModel) {
+fun TimersSetupComponent(screenModel: SetupTimersComponentModel) {
     val timersEnabled by screenModel.timersEnabled.collectAsState()
     val selectedPreset by screenModel.selectedPreset.collectAsState()
 
@@ -78,7 +78,7 @@ fun SetupTimersComponent(screenModel: SetupTimersComponentModel) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
                     JervisDropDownMenu(
-                        title = "Presets",
+                        title = "Clock Presets",
                         enabled = timersEnabled,
                         selectedEntry = selectedPreset,
                         entries = presets
@@ -93,7 +93,7 @@ fun SetupTimersComponent(screenModel: SetupTimersComponentModel) {
                 Column(
                     modifier = Modifier.weight(1f).wrapContentSize()
                 ) {
-                    BoxHeader("Totals", bottomPadding = 16.dp)
+                    SmallHeader("Totals", bottomPadding = smallHeaderBottomPadding)
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = normalGameTimeSetting.value,
@@ -123,7 +123,7 @@ fun SetupTimersComponent(screenModel: SetupTimersComponentModel) {
                         enabled = timersEnabled,
                         label = { Text(overtimeExtraBuffer.label) },
                     )
-                    BoxHeader("Limit Behavior", topPadding = 32.dp, bottomPadding = 16.dp)
+                    SmallHeader("Limit Behavior", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
                     JervisDropDownMenu("Out-of-time", enabled = timersEnabled, selectedEntry = selectedOutOfTimeEntry, entries = outOfTimeEntries) {
                         screenModel.updateOutOfTimeBehaviour(it)
                     }
@@ -135,7 +135,7 @@ fun SetupTimersComponent(screenModel: SetupTimersComponentModel) {
                 Column(
                     modifier = Modifier.weight(1f).wrapContentSize()
                 ) {
-                    BoxHeader("Setup", bottomPadding = 16.dp)
+                    SmallHeader("Setup", bottomPadding = smallHeaderBottomPadding)
                     SimpleSwitch("Use buffer", isSelected = setupUseBuffer, isEnabled = timersEnabled) {
                         screenModel.updateSetupUseBuffer(it)
                     }
@@ -153,8 +153,8 @@ fun SetupTimersComponent(screenModel: SetupTimersComponentModel) {
                         enabled = timersEnabled && setupUseBuffer,
                         label = { Text(setupMaxTime.label) },
                     )
-                    BoxHeader("Team Turn", topPadding = 32.dp, bottomPadding = 16.dp)
-                    SimpleSwitch("Use buffer", teamTurnUseBuffer, isEnabled = timersEnabled) {
+                    SmallHeader("Team Turn", topPadding = smallHeaderTopPadding, bottomPadding = 8.dp)
+                    SimpleSwitch("Use Game Buffer", teamTurnUseBuffer, isEnabled = timersEnabled) {
                         screenModel.updateTeamTurnUseBuffer(it)
                     }
                     OutlinedTextField(
@@ -171,8 +171,8 @@ fun SetupTimersComponent(screenModel: SetupTimersComponentModel) {
                         enabled = timersEnabled && teamTurnUseBuffer,
                         label = { Text(teamTurnMaxTime.label) },
                     )
-                    BoxHeader("Out-of-turn Response", topPadding = 32.dp, bottomPadding = 16.dp)
-                    SimpleSwitch("Use buffer", responseUseBuffer, isEnabled = timersEnabled) {
+                    SmallHeader("Out-of-turn Response", topPadding = smallHeaderTopPadding, bottomPadding = 8.dp)
+                    SimpleSwitch("Use Game Buffer", responseUseBuffer, isEnabled = timersEnabled) {
                         screenModel.updateResponseUseBuffer(it)
                     }
                     OutlinedTextField(

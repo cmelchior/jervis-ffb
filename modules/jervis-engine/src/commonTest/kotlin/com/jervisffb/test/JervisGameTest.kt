@@ -53,12 +53,12 @@ abstract class JervisGameTest {
             // Should be on LoS
             homeTeam[PlayerNo(1)].apply {
                 addSkill(BreakTackle())
-                baseStrenght = 4
+                strength = 4
             }
             // Should be on LoS
             homeTeam[PlayerNo(2)].apply {
                 addSkill(BreakTackle())
-                baseStrenght = 5
+                strength = 5
             }
         }
         homeTeam = state.homeTeam

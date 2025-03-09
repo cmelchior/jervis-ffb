@@ -86,7 +86,6 @@ fun ColumnScope.StartGameComponent(
                             Text(
                                 text = title.uppercase(),
                                 fontWeight = FontWeight.Bold,
-//                                            fontFamily = JervisTheme.fontFamily(),
                                 color = fontColor,
                                 fontSize = 16.sp
                             )

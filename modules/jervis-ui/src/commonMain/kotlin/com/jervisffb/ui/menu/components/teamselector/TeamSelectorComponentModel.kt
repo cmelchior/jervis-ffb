@@ -2,14 +2,14 @@ package com.jervisffb.ui.menu.components.teamselector
 
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.fumbbl.web.FumbblApi
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreenModel
-import com.jervisffb.ui.menu.p2p.host.TeamInfo
+import com.jervisffb.ui.menu.components.TeamInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -20,7 +20,8 @@ import kotlinx.coroutines.launch
 class TeamSelectorComponentModel(
     private val menuViewModel: MenuViewModel,
     private val getCoach: () -> Coach,
-    private val onTeamSelected: (TeamInfo?) -> Unit
+    private val onTeamSelected: (TeamInfo?) -> Unit,
+    private val getRules: () -> Rules,
 ) : JervisScreenModel {
 
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())
@@ -39,7 +40,7 @@ class TeamSelectorComponentModel(
         menuViewModel.navigatorContext.launch {
             CacheManager.loadTeams().map { teamFile ->
                 val team = teamFile.team
-                team.coach = getCoach()
+                // team.coach = Coach(CoachId("Unknown", "TemporaryCoach"))
                 getTeamInfo(teamFile, team)
             }.let {
                 availableTeams.value = it.sortedBy { it.teamName }
@@ -80,7 +81,7 @@ class TeamSelectorComponentModel(
         val team = teamId.toIntOrNull() ?: error("Do something here")
         menuViewModel.navigatorContext.launch {
             try {
-                val teamFile = FumbblApi().loadTeam(team, StandardBB2020Rules())
+                val teamFile = FumbblApi().loadTeam(team, getRules())
                 CacheManager.saveTeam(teamFile)
                 val teamInfo = getTeamInfo(teamFile, teamFile.team)
                 availableTeams.value = (availableTeams.value.filter { it.teamId != teamInfo.teamId } + teamInfo).sortedBy { it.teamName }

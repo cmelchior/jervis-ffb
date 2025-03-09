@@ -10,12 +10,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.em
 
 @Composable
 fun SimpleSwitch(label: String, isSelected: Boolean, isEnabled: Boolean = true, onSelected: (Boolean) -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = label,
+            lineHeight = 1.0.em,
             color = if (isEnabled) LocalContentColor.current.copy(LocalContentAlpha.current) else LocalContentColor.current.copy(0.6f),
         )
         Spacer(modifier = Modifier.weight(1f))

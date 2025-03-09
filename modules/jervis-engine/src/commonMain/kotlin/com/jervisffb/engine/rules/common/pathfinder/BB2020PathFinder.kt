@@ -6,9 +6,11 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
+import kotlinx.serialization.Serializable
 import kotlin.math.abs
 
-class BB2020PathFinder(private val rules: Rules) : PathFinder {
+@Serializable
+class BB2020PathFinder() : PathFinder {
     class DebugInformation(
         val fieldView: Array<Array<Int>>,
         val openSet: PriorityQueue<AStarNode>,
@@ -78,7 +80,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
         maxMove: Int,
         includeDebugInfo: Boolean,
     ): PathFinder.SinglePathResult {
-        val fieldView: Array<Array<Int>> = prepareFieldView(state.field, state.activeTeam)
+        val fieldView: Array<Array<Int>> = prepareFieldView(state.rules,state.field, state.activeTeam)
         var pathState = listOf<FieldCoordinate>()
 
         // Locations to check. Use a priority queue to always start checking the most promising path.
@@ -98,7 +100,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
                 pathState = reconstructPath(cameFrom, currentLocation, maxMove)
                 break
             }
-            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1)
+            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(state.rules, 1)
             for (neighbor in neighbors) {
                 // We do not allow any path to go through a square that either contains Tackle Zones
                 // or the Ball (anything that might require a dice roll), but we allow the path
@@ -161,7 +163,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
         // - Int.MAX if the location is occupied
         // - i > 0 is the number of tackle zones.
         // - 0 = Field is safe to move to
-        val fieldView: Array<Array<Int>> = prepareFieldView(state.field, state.activeTeam)
+        val fieldView: Array<Array<Int>> = prepareFieldView(state.rules,state.field, state.activeTeam)
         // Calculated distances
         val distances = mutableMapOf<FieldCoordinate, Int>().withDefault { Int.MAX_VALUE }
         // Nodes being processed
@@ -174,7 +176,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
 
         while (!openSet.isEmpty) {
             val currentLocation: FieldCoordinate = openSet.poll()!!.point
-            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(rules, 1)
+            val neighbors: List<FieldCoordinate> = currentLocation.getSurroundingCoordinates(state.rules, 1)
             for (neighbor in neighbors) {
                 val neighborValue: Int = distances.getValue(neighbor)
 
@@ -253,6 +255,7 @@ class BB2020PathFinder(private val rules: Rules) : PathFinder {
     }
 
     private fun prepareFieldView(
+        rules: Rules,
         field: Field,
         movingTeam: Team,
     ): Array<Array<Int>> {

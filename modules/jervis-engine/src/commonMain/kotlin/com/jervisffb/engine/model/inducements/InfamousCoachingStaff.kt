@@ -5,7 +5,15 @@ import com.jervisffb.engine.rules.bb2020.roster.PlayerSpecialRule
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
 
+enum class InfamousCoachingStaffType {
+    JOSEF_BUGMAN,
+    KARI_COLDSTEEL,
+    PAPA_SKULLBONES
+}
+
+
 interface InfamousCoachingStaff {
+    val type: InfamousCoachingStaffType
     val name: String
     val specialRules: List<PlayerSpecialRule>
     val specialAbilities: List<InfamousCoachAbility>
@@ -16,6 +24,7 @@ interface InfamousCoachingStaff {
 }
 
 class JosefBugman: InfamousCoachingStaff {
+    override val type: InfamousCoachingStaffType = InfamousCoachingStaffType.JOSEF_BUGMAN
     override val name: String = "Josef Bugman"
     override val price: Int = 100_000
     override val specialRules = listOf(
@@ -27,6 +36,7 @@ class JosefBugman: InfamousCoachingStaff {
 
 // See page 15 in the Deathzone rulebook
 class KariColdsteel: InfamousCoachingStaff {
+    override val type: InfamousCoachingStaffType = InfamousCoachingStaffType.KARI_COLDSTEEL
     override val name: String = "Kari Coldsteel"
     override val price: Int = 50_000
     override val specialRules = listOf(
@@ -47,6 +57,7 @@ class KariColdsteel: InfamousCoachingStaff {
 
 // See page 16 in the Deathzone rulebook
 class PapaSkullbones: InfamousCoachingStaff {
+    override val type: InfamousCoachingStaffType = InfamousCoachingStaffType.PAPA_SKULLBONES
     override val name: String = "Papa Skullbones"
     override val price: Int = 80_000
     override val specialRules = listOf(PlayerSpecialRule.IF_YOU_WANT_THE_JOB_DONE)

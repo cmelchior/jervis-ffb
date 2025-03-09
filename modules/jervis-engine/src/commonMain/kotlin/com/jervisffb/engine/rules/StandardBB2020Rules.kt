@@ -1,16 +1,16 @@
 package com.jervisffb.engine.rules
 
+import com.jervisffb.engine.rules.builder.GameType
 import kotlinx.serialization.Serializable
 
-abstract class BB2020Rules : Rules {
-    override val name: String
-        get() = "Blood Bowl 2020 Rules"
+abstract class BB2020Rules : Rules(
+    name = "Blood Bowl 2020 Rules",
+    gameType = GameType.STANDARD
+) {
 }
-
 @Serializable
 class StandardBB2020Rules : BB2020Rules() {
-    override val name: String
-        get() = "Blood Bowl 2020 Rules (Strict)"
+    override val name: String = "Blood Bowl 2020 Rules (Strict)"
 }
 
 /**
@@ -19,6 +19,7 @@ class StandardBB2020Rules : BB2020Rules() {
  *
  * - KickOff: No need to select the kicking player
  * - Foul: Player is not selected when starting the action.
+ * - A more lenient timing system, so the opponent must time out each other.
  */
 @Serializable
 class FumbblBB2020Rules : BB2020Rules() {

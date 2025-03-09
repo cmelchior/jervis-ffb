@@ -1,5 +1,6 @@
 package com.jervisffb.ui.menu.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenuItem
@@ -22,21 +23,22 @@ import com.jervisffb.ui.menu.p2p.host.DropdownEntry
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun <T> ExposedDropdownMenuWithSections(
+fun <T: DropdownEntry> JervisDropdownMenuWithSections(
     title: String,
-    entries: List<Pair<String, List<DropdownEntry>>>,
+    entries: List<Pair<String, List<T>>>,
+    modifier: Modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+    selectedEntry: DropdownEntry? = null,
     onSelected: (T) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(entries.first().second.first()) }
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {
         OutlinedTextField(
-            modifier = Modifier.padding(bottom = 8.dp),
-            value = selectedOption.name,
-            onValueChange = { },
+            modifier = modifier,
+            value = selectedEntry?.name ?: "",
+            onValueChange = { /* Ignore */ },
             readOnly = true,
             label = { Text(title) },
         )
@@ -49,8 +51,8 @@ fun <T> ExposedDropdownMenuWithSections(
                 items.forEach { item ->
                     DropdownMenuItem(
                         onClick = {
-                            selectedOption = item
                             expanded = false
+                            onSelected(item)
                         }
                     ) {
                         Text(item.name)

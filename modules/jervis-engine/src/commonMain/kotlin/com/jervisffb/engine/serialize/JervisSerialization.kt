@@ -37,19 +37,66 @@ import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.inducements.BiasedReferee
+import com.jervisffb.engine.model.inducements.Spell
+import com.jervisffb.engine.model.inducements.StandardBiasedReferee
+import com.jervisffb.engine.model.inducements.wizards.Fireball
+import com.jervisffb.engine.model.inducements.wizards.HirelingSportsWizard
+import com.jervisffb.engine.model.inducements.wizards.Wizard
+import com.jervisffb.engine.model.inducements.wizards.Zap
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.FieldCoordinateImpl
 import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.model.locations.Location
+import com.jervisffb.engine.rules.BB2020TeamActions
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.TeamActions
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
+import com.jervisffb.engine.rules.bb2020.skills.AnimalSavagery
+import com.jervisffb.engine.rules.bb2020.skills.Block
+import com.jervisffb.engine.rules.bb2020.skills.BloodLust
+import com.jervisffb.engine.rules.bb2020.skills.BoneHead
+import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
+import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
+import com.jervisffb.engine.rules.bb2020.skills.DivingTackle
+import com.jervisffb.engine.rules.bb2020.skills.Dodge
+import com.jervisffb.engine.rules.bb2020.skills.Frenzy
+import com.jervisffb.engine.rules.bb2020.skills.Horns
+import com.jervisffb.engine.rules.bb2020.skills.Leap
+import com.jervisffb.engine.rules.bb2020.skills.Loner
+import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
+import com.jervisffb.engine.rules.bb2020.skills.MultipleBlock
+import com.jervisffb.engine.rules.bb2020.skills.Pass
+import com.jervisffb.engine.rules.bb2020.skills.PrehensileTail
+import com.jervisffb.engine.rules.bb2020.skills.Pro
+import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
+import com.jervisffb.engine.rules.bb2020.skills.ReallyStupid
+import com.jervisffb.engine.rules.bb2020.skills.Regeneration
+import com.jervisffb.engine.rules.bb2020.skills.SideStep
+import com.jervisffb.engine.rules.bb2020.skills.Skill
+import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
+import com.jervisffb.engine.rules.bb2020.skills.Sprint
+import com.jervisffb.engine.rules.bb2020.skills.Stab
+import com.jervisffb.engine.rules.bb2020.skills.Stunty
+import com.jervisffb.engine.rules.bb2020.skills.SureFeet
+import com.jervisffb.engine.rules.bb2020.skills.SureHands
+import com.jervisffb.engine.rules.bb2020.skills.Tackle
+import com.jervisffb.engine.rules.bb2020.skills.ThickSkull
+import com.jervisffb.engine.rules.bb2020.skills.Timmmber
+import com.jervisffb.engine.rules.bb2020.skills.Titchy
+import com.jervisffb.engine.rules.bb2020.skills.TwoHeads
+import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
+import com.jervisffb.engine.rules.bb2020.skills.Wrestle
+import com.jervisffb.engine.rules.bb2020.specialrules.SneakiestOfTheLot
+import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
+import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.utils.platformFileSystem
@@ -74,10 +121,93 @@ data class GameFileData(
 
 /**
  * Class encapsulating the the logic for serializing and deserializing a Jervis game file.
+ *
+ * TODO Pretty annoying to keep this up to date. Figure out if there is a way to automate this.
+ *  Perhaps a Gradle task that autogenerate it?
  */
 object JervisSerialization {
     val jervisEngineModule =
         SerializersModule {
+            polymorphic(Skill::class) {
+                // Skills
+                subclass(AnimalSavagery::class)
+                subclass(Block::class)
+                subclass(BloodLust::class)
+                subclass(BoneHead::class)
+                subclass(BreakTackle::class)
+                subclass(CatchSkill::class)
+                subclass(DivingTackle::class)
+                subclass(Dodge::class)
+                subclass(Frenzy::class)
+                subclass(Horns::class)
+                subclass(Leap::class)
+                subclass(Loner::class)
+                subclass(MightyBlow::class)
+                subclass(MultipleBlock::class)
+                subclass(Pass::class)
+                subclass(PrehensileTail::class)
+                subclass(Pro::class)
+                subclass(ProjectileVomit::class)
+                subclass(ReallyStupid::class)
+                subclass(Regeneration::class)
+                subclass(SideStep::class)
+                subclass(Sprint::class)
+                subclass(Stab::class)
+                subclass(Stunty::class)
+                subclass(SureFeet::class)
+                subclass(SureHands::class)
+                subclass(Tackle::class)
+                subclass(ThickSkull::class)
+                subclass(Timmmber::class)
+                subclass(Titchy::class)
+                subclass(TwoHeads::class)
+                subclass(Titchy::class)
+                subclass(UnchannelledFury::class)
+                subclass(Wrestle::class)
+
+                //Special Rules
+                subclass(SneakiestOfTheLot::class)
+            }
+            polymorphic(SkillFactory::class) {
+                // Player Skills
+                subclass(AnimalSavagery.Factory::class)
+                subclass(Block.Factory::class)
+                subclass(BloodLust.Factory::class)
+                subclass(BoneHead.Factory::class)
+                subclass(BreakTackle.Factory::class)
+                subclass(CatchSkill.Factory::class)
+                subclass(DivingTackle.Factory::class)
+                subclass(Dodge.Factory::class)
+                subclass(Frenzy.Factory::class)
+                subclass(Horns.Factory::class)
+                subclass(Leap.Factory::class)
+                subclass(Loner.Factory::class)
+                subclass(MightyBlow.Factory::class)
+                subclass(MultipleBlock.Factory::class)
+                subclass(Pass.Factory::class)
+                subclass(PrehensileTail.Factory::class)
+                subclass(Pro.Factory::class)
+                subclass(ProjectileVomit.Factory::class)
+                subclass(ReallyStupid.Factory::class)
+                subclass(Regeneration.Factory::class)
+                subclass(SideStep.Factory::class)
+                subclass(Sprint.Factory::class)
+                subclass(Stab.Factory::class)
+                subclass(Stunty.Factory::class)
+                subclass(SureFeet.Factory::class)
+                subclass(SureHands.Factory::class)
+                subclass(Tackle.Factory::class)
+                subclass(ThickSkull.Factory::class)
+                subclass(Timmmber.Factory::class)
+                subclass(Titchy.Factory::class)
+                subclass(TwoHeads.Factory::class)
+                subclass(Titchy.Factory::class)
+                subclass(UnchannelledFury.Factory::class)
+                subclass(Wrestle.Factory::class)
+
+                // Special Rules
+                subclass(SneakiestOfTheLot.Factory::class)
+            }
             polymorphic(Procedure::class) {
                 subclass(MoveAction::class)
                 subclass(BlitzAction::class)
@@ -134,6 +264,22 @@ object JervisSerialization {
                 subclass(PlayerSelected::class)
                 subclass(RandomPlayersSelected::class)
                 subclass(RerollOptionSelected::class)
+            }
+            polymorphic(Wizard::class) {
+                subclass(HirelingSportsWizard::class)
+            }
+            polymorphic(Spell::class) {
+                subclass(Fireball::class)
+                subclass(Zap::class)
+            }
+            polymorphic(BiasedReferee::class) {
+                subclass(StandardBiasedReferee::class)
+            }
+            polymorphic(TeamActions::class) {
+                subclass(BB2020TeamActions::class)
+            }
+            polymorphic(PathFinder::class) {
+                subclass(BB2020PathFinder::class)
             }
         }
 
@@ -195,7 +341,11 @@ object JervisSerialization {
     fun fixStateRefs(state: Game): Game {
         state.homeTeam.forEach { it.team = state.homeTeam }
         state.awayTeam.forEach { it.team = state.awayTeam }
+        state.homeTeam.teamIsHomeTeam = true
+        state.homeTeam.teamIsAwayTeam = false
         state.homeTeam.setGameReference(state)
+        state.awayTeam.teamIsHomeTeam = false
+        state.awayTeam.teamIsAwayTeam = true
         state.awayTeam.setGameReference(state)
         state.homeTeam.notifyDogoutChange()
         state.awayTeam.notifyDogoutChange()

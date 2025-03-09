@@ -19,7 +19,7 @@ class Tackle(
     override val workWhenProne: Boolean = false
 
     @Serializable
-    data object Factory: SkillFactory {
+    data object Factory: PlayerSkillFactory {
         override val value: Int? = null
         override fun createSkill(isTemporary: Boolean, expiresAt: Duration): Skill = Tackle(isTemporary, expiresAt)
     }

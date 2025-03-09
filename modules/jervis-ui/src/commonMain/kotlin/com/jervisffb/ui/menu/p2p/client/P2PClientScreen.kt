@@ -21,8 +21,8 @@ import com.jervisffb.ui.game.view.SidebarMenu
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
 import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
+import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreen
 import com.jervisffb.ui.menu.p2p.StartP2PGamePage
-import com.jervisffb.ui.menu.p2p.TeamSelectorPage
 
 class P2PClientScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PClientScreenModel) : Screen {
     @OptIn(ExperimentalVoyagerApi::class)
@@ -82,8 +82,8 @@ private fun PageContent(screenModel: P2PClientScreenModel) {
                     },
                     onCancel = { screenModel.joinHostModel.disconnectFromHost() },
                 )
-                1 -> TeamSelectorPage(
-                    viewModel = screenModel.selectTeamModel,
+                1 -> SelectP2PTeamScreen(
+                    viewModel = screenModel.selectTeamModel.componentModel,
                     confirmTitle = "Next",
                     onNext = { screenModel.teamSelectionDone() }
                 )
