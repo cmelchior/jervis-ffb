@@ -2,6 +2,8 @@ package com.jervisffb.ui.menu.hotseat
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponentModel
 
@@ -10,7 +12,11 @@ import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponen
  */
 class SetupHotseatGameScreenModel(private val menuViewModel: MenuViewModel, private val parentModel: HotseatScreenModel) : ScreenModel {
 
-    val gameConfigModel = GameConfigurationContainerComponentModel(menuViewModel)
+    val rules = StandardBB2020Rules().toBuilder().also {
+        // For now, let HotSeat games work as a "developer mode"
+        it.diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
+    }
+    val gameConfigModel = GameConfigurationContainerComponentModel(rules, menuViewModel)
 
     fun createRules(): Rules {
         return gameConfigModel.createRules()

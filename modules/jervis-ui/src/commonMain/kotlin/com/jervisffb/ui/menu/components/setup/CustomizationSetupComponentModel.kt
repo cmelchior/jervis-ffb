@@ -56,38 +56,53 @@ class CustomizationSetupComponentModel(initialRulesBuilder: Rules.Builder, priva
 
     fun updateFieldWidth(value: String) {
         updateIntEntry(value, fieldWidth)
+        rulesBuilder.fieldWidth = fieldWidth.value.underlyingValue ?: -1
     }
 
     fun updateFieldHeight(value: String) {
         updateIntEntry(value, fieldHeight)
+        rulesBuilder.fieldHeight = fieldHeight.value.underlyingValue ?: -1
     }
 
     fun updateMaxPlayersOnField(value: String) {
         updateIntEntry(value, maxPlayersOnField)
+        maxPlayersOnField.value.underlyingValue?.let {
+            rulesBuilder.maxPlayersOnField = it
+        }
     }
 
     fun updateHalfs(value: String) {
         updateIntEntry(value, halfs)
+        halfs.value.underlyingValue?.let {
+            rulesBuilder.halfsPrGame = it
+        }
     }
 
     fun updateTurnsPrHalf(value: String) {
         updateIntEntry(value, turnsPrHalf)
+        turnsPrHalf.value.underlyingValue?.let {
+            rulesBuilder.turnsPrHalf = it
+        }
     }
 
     fun updateDiceRollBehavior(value: DropdownEntryWithValue<DiceRollOwner>) {
         selectedDiceRollBehavior.value = value
+        rulesBuilder.diceRollsOwner = value.value
     }
 
     fun updateUndoActionBehavior(value: DropdownEntryWithValue<UndoActionBehavior>) {
         selectedUndoActionBehavior.value = value
+        rulesBuilder.undoActionBehavior = value.value
     }
 
     fun updateFoulActionBehavior(it: DropdownEntryWithValue<FoulActionBehavior>) {
         selectedFoulActionBehavior.value = it
+        rulesBuilder.foulActionBehavior = it.value
     }
 
     fun updateKickingPlayerBehavior(it: DropdownEntryWithValue<KickingPlayerBehavior>) {
         selectedKickingPlayerBehavior.value = it
+        rulesBuilder.kickingPlayerBehavior = it.value
     }
 
     private fun updateIntEntry(value: String, flow: MutableStateFlow<InputFieldDataWithValue<Int>>) {
@@ -106,6 +121,18 @@ class CustomizationSetupComponentModel(initialRulesBuilder: Rules.Builder, priva
 
     fun updateRulesBuilder(rulesBuilder: Rules.Builder) {
         this.rulesBuilder = rulesBuilder
-        TODO()
+
+        updateFieldWidth(rulesBuilder.fieldWidth.toString())
+        updateFieldHeight(rulesBuilder.fieldHeight.toString())
+        updateMaxPlayersOnField(rulesBuilder.maxPlayersOnField.toString())
+
+        updateHalfs(rulesBuilder.halfsPrGame.toString())
+        updateTurnsPrHalf(rulesBuilder.turnsPrHalf.toString())
+
+        updateDiceRollBehavior(diceRollEntries.first { it.value == rulesBuilder.diceRollsOwner })
+
+        updateUndoActionBehavior(undoActionsEntries.first { it.value == rulesBuilder.undoActionBehavior })
+        updateFoulActionBehavior(foulActionBehavior.first { it.value == rulesBuilder.foulActionBehavior })
+        updateKickingPlayerBehavior(kickingPlayerBehavior.first { it.value == rulesBuilder.kickingPlayerBehavior })
     }
 }

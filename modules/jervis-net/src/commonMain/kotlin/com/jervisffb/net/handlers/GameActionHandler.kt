@@ -75,7 +75,7 @@ suspend fun handleAction(
 
     // If the Game is set up so the server handles all random actions, we should now roll forward creating them here.
     var availableActions = game.getAvailableActions()
-    while (session.gameSettings.clientSelectedDiceRolls && availableActions.containsActionWithRandomBehavior()) {
+    while (!session.gameSettings.clientSelectedDiceRolls && availableActions.containsActionWithRandomBehavior()) {
         val action = createRandomAction(game.state, availableActions)
         game.handleAction(action)
         // If no producer, we just set it to the Home Team

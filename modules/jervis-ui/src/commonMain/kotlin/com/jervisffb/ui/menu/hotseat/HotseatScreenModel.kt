@@ -107,7 +107,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                 gameController,
                 menuViewModel,
                 TeamActionMode.HOME_TEAM,
-                GameSettings(gameRules = rules, clientSelectedDiceRolls = true),
+                GameSettings(gameRules = rules),
             )
             CoachType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
         }
@@ -117,14 +117,14 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                 gameController,
                 menuViewModel,
                 TeamActionMode.AWAY_TEAM,
-                GameSettings(gameRules = rules, clientSelectedDiceRolls = true),
+                GameSettings(gameRules = rules),
             )
             CoachType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
         }
 
         val actionProvider = LocalActionProvider(
             gameController,
-            GameSettings(gameRules = rules, clientSelectedDiceRolls = true),
+            GameSettings(gameRules = rules),
             homeActionProvider,
             awayActionProvider
         )

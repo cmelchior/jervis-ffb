@@ -159,7 +159,7 @@ open class Rules(
     // Whether or not coaches are allowed to undo actions, and to what degree.
     open val undoActionBehavior: UndoActionBehavior = UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS,
     // Who is responsible for rolling dice or taking random actions.
-    open val diceRolls: DiceRollOwner = DiceRollOwner.ROLL_ON_SERVER,
+    open val diceRollsOwner: DiceRollOwner = DiceRollOwner.ROLL_ON_SERVER,
     // Probably need to replace this with a reference to the FoulProcedure
     open val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.STRICT,
     // Probably need to replace this with a reference to the KickProcedure
@@ -603,7 +603,7 @@ open class Rules(
         var standingUpTarget: Int = rules.standingUpTarget
         var moveRequiredForStandingUp: Int = rules.moveRequiredForStandingUp
         var undoActionBehavior: UndoActionBehavior = rules.undoActionBehavior
-        var diceRolls: DiceRollOwner = rules.diceRolls
+        var diceRollsOwner: DiceRollOwner = rules.diceRollsOwner
         var foulActionBehavior: FoulActionBehavior = rules.foulActionBehavior
         var kickingPlayerBehavior: KickingPlayerBehavior = rules.kickingPlayerBehavior
 
@@ -652,7 +652,7 @@ open class Rules(
             standingUpTarget,
             moveRequiredForStandingUp,
             undoActionBehavior,
-            diceRolls,
+            diceRollsOwner,
             foulActionBehavior,
             kickingPlayerBehavior
         )

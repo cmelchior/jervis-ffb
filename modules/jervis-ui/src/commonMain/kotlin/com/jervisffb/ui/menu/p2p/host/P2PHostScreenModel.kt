@@ -100,18 +100,18 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                             gameController,
                             menuViewModel,
                             TeamActionMode.HOME_TEAM,
-                            GameSettings(gameRules = rules, clientSelectedDiceRolls = false),
+                            GameSettings(gameRules = rules),
                         )
                         val awayActionProvider = ManualActionProvider(
                             gameController,
                             menuViewModel,
                             TeamActionMode.HOME_TEAM,
-                            GameSettings(gameRules = rules, clientSelectedDiceRolls = false),
+                            GameSettings(gameRules = rules),
                         )
 
                         val actionProvider = P2PActionProvider(
                             gameController,
-                            GameSettings(gameRules = rules, clientSelectedDiceRolls = false),
+                            GameSettings(gameRules = rules),
                             homeActionProvider,
                             awayActionProvider,
                             controller

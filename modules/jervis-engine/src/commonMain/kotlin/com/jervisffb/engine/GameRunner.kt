@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.DiceRollOwner
 
 /**
  * Top-level class for running all game types. This class is responsible for
@@ -33,7 +34,8 @@ interface GameRunner {
  */
 data class GameSettings(
     val gameRules: Rules,
-    val clientSelectedDiceRolls: Boolean = false // Are random events done remotely or on the host
 ) {
+    // Are random events done on the client or inside the server
+    val clientSelectedDiceRolls: Boolean = (gameRules.diceRollsOwner == DiceRollOwner.ROLL_ON_CLIENT)
     val timerSettings = gameRules.timers
 }
