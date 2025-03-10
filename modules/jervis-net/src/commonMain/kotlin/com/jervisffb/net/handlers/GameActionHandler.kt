@@ -73,10 +73,6 @@ suspend fun handleAction(
 
     // TODO How to handle if end-of-turn tracker triggers when waiting
 
-
-
-
-
     // If the Game is set up so the server handles all random actions, we should now roll forward creating them here.
     var availableActions = game.getAvailableActions()
     while (session.gameSettings.clientSelectedDiceRolls && availableActions.containsActionWithRandomBehavior()) {

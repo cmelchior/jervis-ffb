@@ -561,8 +561,8 @@ open class Rules(
     class Builder(rules: Rules) {
         var name: String = rules.name
         var gameType: GameType = rules.gameType
-        var timers: TimerSettings = rules.timers
-        var inducements: InducementSettings = rules.inducements
+        var timers: TimerSettings.Builder = rules.timers.toBuilder()
+        var inducements: InducementSettings.Builder = rules.inducements.toBuilder()
         var moveRange: IntRange = rules.moveRange
         var strengthRange: IntRange = rules.strengthRange
         var agilityRange: IntRange = rules.agilityRange
@@ -610,8 +610,8 @@ open class Rules(
         fun build() = Rules(
             name,
             gameType,
-            timers,
-            inducements,
+            timers.build(),
+            inducements.build(),
             moveRange,
             strengthRange,
             agilityRange,

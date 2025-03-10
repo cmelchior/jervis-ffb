@@ -3,6 +3,7 @@ package com.jervisffb.ui.menu.components.setup
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.GameLimitReachedBehaviour
 import com.jervisffb.engine.OutOfTimeBehaviour
+import com.jervisffb.engine.TimerPreset
 import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -12,13 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-
-enum class TimerPreset {
-    HARD_LIMIT,
-    CHESS_CLOCK,
-    BB_CLOCK,
-    CUSTOM,
-}
 
 val presets = listOf(
     DropdownEntryWithValue("Hard Limit", TimerPreset.HARD_LIMIT),
@@ -81,11 +75,12 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
     val responseMaxTime: MutableStateFlow<InputFieldDataWithValue<Duration?>> = MutableStateFlow(InputFieldDataWithValue("Max Time", "", null, false))
 
     init {
-        updatePreset(selectedPreset.value)
+        updateRulesBuilder(rulesBuilder)
     }
 
     fun updateTimersEnabled(enabled: Boolean) {
         timersEnabled.value = enabled
+        rulesBuilder.timers.timersEnabled = enabled
     }
 
     fun updatePreset(preset: DropdownEntryWithValue<TimerPreset>) {
@@ -340,8 +335,28 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
         return duration.toString()
     }
 
-    fun updateRulesBuilder(ruleBuilder: Rules.Builder) {
-        this.rulesBuilder = ruleBuilder
-        TODO()
+    fun updateRulesBuilder(rules: Rules.Builder) {
+        this.rulesBuilder = rules
+        // Only set the preset dialog, do not attempt to update any data based on it as we
+        // want to use the timer settings from the rules builder.
+        selectedPresetData.value = presets.first { it.value == rules.timers.preset }
+        with(rules.timers) {
+            updateTimersEnabled(timersEnabled)
+            updateNormalGameTimeLimit(gameLimit?.toString() ?: "", updatePreset = false)
+            updateNormalGameBuffer(gameBuffer.toString(), updatePreset = false)
+            updateOvertimeExtraLimit(extraOvertimeLimit.toString(), updatePreset = false)
+            updateOvertimeExtraBuffer(extraOvertimeBuffer.toString(), updatePreset = false)
+            updateOutOfTimeBehaviour(outOfTimeEntries.first { it.value == outOfTimeBehaviour }, updatePreset = false)
+            updateGameLimitReachedBehaviour(gameLimitEntries.first { it.value == gameLimitReached }, updatePreset = false)
+            updateSetupUseBuffer(setupUseBuffer, updatePreset = false)
+            updateSetupFreeTime(setupFreeTime.toString(), updatePreset = false)
+            updateSetupMaxTime(setupMaxTime?.toString() ?: "", updatePreset = false)
+            updateTeamTurnUseBuffer(turnUseBuffer, updatePreset = false)
+            updateTeamTurnFreeTime(turnFreeTime.toString(), updatePreset = false)
+            updateTeamTurnMaxTime(turnMaxTime?.toString() ?: "", updatePreset = false)
+            updateResponseUseBuffer(outOfTurnResponseUseBuffer, updatePreset = false)
+            updateResponseFreeTime(outOfTurnResponseFreeTime.toString(), updatePreset = false)
+            updateResponseMaxTime(outOfTurnResponseMaxTime?.toString() ?: "", updatePreset = false)
+        }
     }
 }

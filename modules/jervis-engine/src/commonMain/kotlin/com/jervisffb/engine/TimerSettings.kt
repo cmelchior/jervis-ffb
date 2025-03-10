@@ -5,6 +5,13 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+enum class TimerPreset {
+    HARD_LIMIT,
+    CHESS_CLOCK,
+    BB_CLOCK,
+    CUSTOM,
+}
+
 enum class OutOfTimeBehaviour {
     NONE,
     SHOW_WARNING,
@@ -29,6 +36,7 @@ enum class GameLimitReachedBehaviour {
 @Serializable
 data class TimerSettings(
     val timersEnabled: Boolean = false,
+    val preset: TimerPreset = TimerPreset.BB_CLOCK,
 
     val gameLimit: Duration? = null,
     val gameBuffer: Duration = Duration.ZERO,
@@ -61,6 +69,7 @@ data class TimerSettings(
      */
     class Builder(timerSettings: TimerSettings) {
         var timersEnabled: Boolean = timerSettings.timersEnabled
+        var preset: TimerPreset = timerSettings.preset
         var gameLimit: Duration? = timerSettings.gameLimit
         var gameBuffer: Duration = timerSettings.gameBuffer
         var extraOvertimeLimit: Duration = timerSettings.extraOvertimeLimit
@@ -79,6 +88,7 @@ data class TimerSettings(
 
         fun build() = TimerSettings(
             timersEnabled,
+            preset,
             gameLimit,
             gameBuffer,
             extraOvertimeLimit,
@@ -103,6 +113,7 @@ data class TimerSettings(
     companion object {
         val HARD_LIMIT = TimerSettings(
             timersEnabled = true,
+            preset = TimerPreset.HARD_LIMIT,
 
             gameLimit = null,
             gameBuffer = 0.minutes,
@@ -126,6 +137,7 @@ data class TimerSettings(
         )
         val CHESS_CLOCK = TimerSettings(
             timersEnabled = true,
+            preset = TimerPreset.CHESS_CLOCK,
 
             gameLimit = null,
             gameBuffer = (16*4.5+4).minutes, // Chess clock set to 4.5 minutes pr. turn + 4 minutes of initial setup
@@ -150,6 +162,7 @@ data class TimerSettings(
         )
         val BB_CLOCK = TimerSettings(
             timersEnabled = true,
+            preset = TimerPreset.BB_CLOCK,
 
             gameLimit = null,
             gameBuffer = 15.minutes,
