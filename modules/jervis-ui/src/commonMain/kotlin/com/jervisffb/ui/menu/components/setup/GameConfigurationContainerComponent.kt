@@ -50,13 +50,20 @@ fun GameConfigurationContainerComponent(componentModel: GameConfigurationContain
                     divider = @Composable { /* None */ },
                 ) {
                     tabs.forEachIndexed { index, title ->
+                        val isEnabled = index < 2
                         val isSelected = (pagerStateTop.currentPage == index)
+                        val textColor = when {
+                            !isEnabled -> JervisTheme.rulebookRed.copy(alpha = 0.5f)
+                            isSelected -> JervisTheme.white
+                            else -> JervisTheme.rulebookRed
+                        }
                         Tab(
                             modifier = Modifier
                                 .background(
                                     if (isSelected) JervisTheme.rulebookRed else Color.Transparent,
                                 )
                             ,
+                            enabled = isEnabled, // Hard-code for now
                             selected = isSelected,
                             onClick = {
                                 coroutineScope.launch {
@@ -64,18 +71,13 @@ fun GameConfigurationContainerComponent(componentModel: GameConfigurationContain
                                 }
                             },
                             text = {
-                                val fontColor = if (isSelected) {
-                                    JervisTheme.white
-                                } else {
-                                    JervisTheme.rulebookRed
-                                }
                                 Text(
                                     /* modifier = Modifier.padding(horizontal = 8.dp), */
                                     text = title.uppercase(),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     fontWeight = FontWeight.Bold,
-                                    color = fontColor,
+                                    color = textColor,
                                     fontSize = 16.sp
                                 )
                             },
