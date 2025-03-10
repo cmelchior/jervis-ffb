@@ -9,11 +9,37 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
 /**
- * Internal representation of a Blood Bowl Field. It is laid horizontally,
- * with the home team on the left side and the away team on the right side.
+ * Internal representation of the Blood Bowl playing area. This representation
+ * is used across all game types: Standard, BB7, Dungeon Bowl and Gutter Bowl.
+ *
+ * Going outside the defined field is considered out-of-bounds. Add walls to
+ * all border squares to prevent this.
  *
  * Top-left has the coordinates [0, 0] and Bottom-right has the coordinates
  * [ fieldWidth - 1, fieldHeight - 1].
+ *
+ * Standard Blood Bowl / BB 7:
+ * - Field is laid out horizontally. With the home team on the left side and the
+ *   away team on the right side
+ *
+ * Dungeon Ball
+ * - The width/height defines the area where within rooms and corridors are placed.
+ *   The UI can easily define this after rooms have been placed by creating a
+ *   minimal bounding box.
+ * - Walls between two squares need to be added to both squares.
+ * - The model doesn't care about how to render the room layouts. So each square
+ *   defines its own "Tile Type" and leaves it up to the UI to figure out how to display it.
+ *   This is intended as we assume the user will either build the dungeon from the UI or use
+ *   a pre-build one, which should ensure that only "valid" dungeons, i.e. dungeons that can
+ *   be displayed are built.
+ * - To make it easier to send dungeon layouts to all parties, we probably need to add some
+ *   metadata to [Field]. Right now that is TBD.
+ *
+ * Gutter Bowl:
+ * - Field is laid out horizontally. With the home team on the left side and the
+ *   away team on the right side.
+ * - All squares on the border have a wall, preventing balls and players from going
+ *   out-of-bounds.
  */
 class Field(val width: Int, val height: Int) : Iterable<FieldSquare> {
     private val field: Array<Array<FieldSquare>> =
