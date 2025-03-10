@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Tab
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
@@ -20,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.game.view.JervisTheme
@@ -41,11 +41,11 @@ fun GameConfigurationContainerComponent(componentModel: GameConfigurationContain
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
                 TitleBorder()
-                ScrollableTabRow(
+                TabRow(
                     modifier = Modifier.fillMaxWidth().height(36.dp),
                     backgroundColor = Color.Transparent,
                     selectedTabIndex = pagerStateTop.currentPage,
-                    edgePadding = 0.dp,
+                    /* edgePadding = 0.dp, */
                     indicator = emptyIndicator,
                     divider = @Composable { /* None */ },
                 ) {
@@ -70,8 +70,10 @@ fun GameConfigurationContainerComponent(componentModel: GameConfigurationContain
                                     JervisTheme.rulebookRed
                                 }
                                 Text(
-                                    modifier = Modifier.padding(horizontal = 8.dp),
+                                    /* modifier = Modifier.padding(horizontal = 8.dp), */
                                     text = title.uppercase(),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
                                     fontWeight = FontWeight.Bold,
                                     color = fontColor,
                                     fontSize = 16.sp
