@@ -14,8 +14,8 @@ import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponent
 
 @Composable
-fun SetupHotseatGamePage(screenModel: SetupHotseatGameScreenModel, modifier: Modifier) {
-    val isSetupValid: Boolean by screenModel.gameConfigModel.isSetupValid.collectAsState(false)
+fun SetupHotseatGamePage(viewModel: SetupHotseatGameScreenModel, modifier: Modifier) {
+    val isSetupValid: Boolean by viewModel.gameConfigModel.isSetupValid.collectAsState(false)
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -26,10 +26,10 @@ fun SetupHotseatGamePage(screenModel: SetupHotseatGameScreenModel, modifier: Mod
             ,
             verticalAlignment = Alignment.Top
         ) {
-            GameConfigurationContainerComponent(screenModel.gameConfigModel)
+            GameConfigurationContainerComponent(viewModel.gameConfigModel)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            JervisButton(text = "Next", enabled = isSetupValid, onClick = { screenModel.gameSetupDone() })
+            JervisButton(text = "Next", enabled = isSetupValid, onClick = { viewModel.gameSetupDone() })
         }
     }
 }

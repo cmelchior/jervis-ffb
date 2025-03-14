@@ -47,11 +47,11 @@ import com.jervisffb.ui.menu.p2p.host.BoxHeader
 import com.jervisffb.utils.openUrlInBrowser
 import org.jetbrains.compose.resources.painterResource
 
-class FumbblScreen(private val menuViewModel: MenuViewModel, private val screenModel: FumbblScreenModel) : Screen {
+class FumbblScreen(private val menuViewModel: MenuViewModel, private val viewModel: FumbblScreenModel) : Screen {
     @Composable
     override fun Content() {
         JervisScreen(menuViewModel) {
-            FumbblePage(menuViewModel, screenModel, Modifier)
+            FumbblePage(menuViewModel, viewModel, Modifier)
         }
     }
 }

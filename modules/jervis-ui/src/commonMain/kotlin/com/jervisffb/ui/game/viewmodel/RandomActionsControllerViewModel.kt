@@ -14,7 +14,7 @@ import com.jervisffb.ui.menu.GameScreenModel
  */
 class RandomActionsControllerViewModel(
     uiState: UiGameController,
-    screenModel: GameScreenModel,
+    viewModel: GameScreenModel,
 ) {
 
     init {

@@ -49,10 +49,14 @@ data class Replay(val file: Path) : GameMode
 class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
     fun start(navigator: Navigator, mode: GameMode) {
         menuViewModel.navigatorContext.launch {
-            TODO()
-//            val screenModel = GameScreenModel(null, null, mode, menuViewModel)
-//            screenModel.initialize()
-//            navigator.push(GameScreen(screenModel))
+            val screenModel = GameScreenModel(
+                null,
+                null,
+                mode,
+                menuViewModel
+            )
+            screenModel.initialize()
+            navigator.push(GameScreen(screenModel))
         }
     }
 
@@ -89,7 +93,7 @@ class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 }
 
 
-class DevScreen(private val menuViewModel: MenuViewModel, screenModel: DevScreenModel) : Screen {
+class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenModel) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow

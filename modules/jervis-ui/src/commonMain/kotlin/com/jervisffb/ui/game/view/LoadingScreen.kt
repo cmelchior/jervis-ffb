@@ -13,14 +13,14 @@ import com.jervisffb.ui.menu.GameScreenModel
 
 @Composable
 fun LoadingScreen(
-    screenModel: GameScreenModel,
+    viewModel: GameScreenModel,
     content: @Composable () -> Unit,
 ) {
-    val loadingMessage: String by screenModel.loadingMessages.collectAsState()
-    val isLoaded: Boolean by screenModel.isLoaded.collectAsState()
+    val loadingMessage: String by viewModel.loadingMessages.collectAsState()
+    val isLoaded: Boolean by viewModel.isLoaded.collectAsState()
 
     LaunchedEffect(Unit) {
-        screenModel.initialize()
+        viewModel.initialize()
     }
 
     if (!isLoaded) {

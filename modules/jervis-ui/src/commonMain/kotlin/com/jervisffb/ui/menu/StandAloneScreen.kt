@@ -59,7 +59,7 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
     }
 }
 
-class StandAloneScreen(private val menuViewModel: MenuViewModel, screenModel: StandAloneScreenModel) : Screen {
+class StandAloneScreen(private val menuViewModel: MenuViewModel, viewModel: StandAloneScreenModel) : Screen {
     @Composable
     override fun Content() {
         JervisScreen(menuViewModel) {

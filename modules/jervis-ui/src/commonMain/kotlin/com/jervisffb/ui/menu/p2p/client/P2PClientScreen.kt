@@ -24,14 +24,14 @@ import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
 import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreen
 import com.jervisffb.ui.menu.p2p.StartP2PGamePage
 
-class P2PClientScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PClientScreenModel) : Screen {
+class P2PClientScreen(private val menuViewModel: MenuViewModel, private val viewModel: P2PClientScreenModel) : Screen {
     @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
-        val sidebarEntries = screenModel.sidebarEntries
+        val sidebarEntries = viewModel.sidebarEntries
         LifecycleEffectOnce {
             onDispose {
-                screenModel.onDispose()
+                viewModel.onDispose()
             }
         }
         JervisScreen(menuViewModel) {
@@ -41,23 +41,23 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val scre
                 icon = Res.drawable.frontpage_wall_player,
                 topMenuRightContent = null,
                 sidebarContent = {
-                    val currentPage by screenModel.currentPage.collectAsState()
+                    val currentPage by viewModel.currentPage.collectAsState()
                     SidebarMenu(
                         entries = sidebarEntries,
                         currentPage = currentPage,
                     )
                 }
             ) {
-                PageContent(screenModel)
+                PageContent(viewModel)
             }
         }
     }
 }
 
 @Composable
-private fun PageContent(screenModel: P2PClientScreenModel) {
-    val currentPage by screenModel.currentPage.collectAsState()
-    val pagerState = rememberPagerState(0) { screenModel.totalPages }
+private fun PageContent(viewModel: P2PClientScreenModel) {
+    val currentPage by viewModel.currentPage.collectAsState()
+    val pagerState = rememberPagerState(0) { viewModel.totalPages }
 
     // Animate going to a new page
     LaunchedEffect(currentPage) {
@@ -72,26 +72,26 @@ private fun PageContent(screenModel: P2PClientScreenModel) {
         ) { page ->
             when (page) {
                 0 -> JoinHostScreen(
-                    viewModel = screenModel.joinHostModel,
+                    viewModel = viewModel.joinHostModel,
                     onJoin = {
-                        if (screenModel.lastValidPage >= 1) {
-                            screenModel.hostJoinedDone()
+                        if (viewModel.lastValidPage >= 1) {
+                            viewModel.hostJoinedDone()
                         } else {
-                            screenModel.joinHostModel.clientJoinGame()
+                            viewModel.joinHostModel.clientJoinGame()
                         }
                     },
-                    onCancel = { screenModel.joinHostModel.disconnectFromHost() },
+                    onCancel = { viewModel.joinHostModel.disconnectFromHost() },
                 )
                 1 -> SelectP2PTeamScreen(
-                    viewModel = screenModel.selectTeamModel.componentModel,
+                    viewModel = viewModel.selectTeamModel.componentModel,
                     confirmTitle = "Next",
-                    onNext = { screenModel.teamSelectionDone() }
+                    onNext = { viewModel.teamSelectionDone() }
                 )
                 2 -> StartP2PGamePage(
-                    screenModel.controller.homeTeam,
-                    screenModel.controller.awayTeam,
+                    viewModel.controller.homeTeam,
+                    viewModel.controller.awayTeam,
                     onAcceptGame = { acceptedGame ->
-                        screenModel.userAcceptGame(acceptedGame)
+                        viewModel.userAcceptGame(acceptedGame)
                     }
                 )
                 else -> error("Invalid page index: $page")

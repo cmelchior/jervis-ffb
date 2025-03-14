@@ -74,7 +74,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     // Page 4: Accept game
     val acceptGameModel = StartP2PGameScreenModel(controller, menuViewModel)
 
-    private var gameScreenModel: GameScreenModel? = null
+    private var gameViewModel: GameScreenModel? = null
 
     init {
         val startEntries = listOf(
@@ -145,7 +145,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                             controller
                         )
 
-                        gameScreenModel = GameScreenModel(
+                        gameViewModel = GameScreenModel(
                             gameController = gameController,
                             gameController.state.homeTeam,
                             gameController.state.awayTeam,
@@ -158,7 +158,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                                 controller.sendGameStarted()
                             }
                         }
-                        navigator.push(GameScreen(gameScreenModel!!))
+                        navigator.push(GameScreen(gameViewModel!!))
                     }
                     P2PHostState.CLOSE_GAME -> {}
                     P2PHostState.DONE -> {}

@@ -26,21 +26,21 @@ import com.jervisffb.ui.menu.components.SmallHeader
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SetupRulesComponent(screenModel: RulesSetupComponentModel) {
+fun SetupRulesComponent(viewModel: RulesSetupComponentModel) {
 
     val scrollState = rememberScrollState()
 
-    val selectedWeatherTable by screenModel.selectedWeatherTable.collectAsState()
-    val selectedKickOffTable by screenModel.selectedKickOffTable.collectAsState()
+    val selectedWeatherTable by viewModel.selectedWeatherTable.collectAsState()
+    val selectedKickOffTable by viewModel.selectedKickOffTable.collectAsState()
 
-    val selectedPitchEntry by screenModel.selectedPitch.collectAsState()
-    val selectedUnusualBallEntry by screenModel.selectedUnusualBall.collectAsState()
+    val selectedPitchEntry by viewModel.selectedPitch.collectAsState()
+    val selectedUnusualBallEntry by viewModel.selectedUnusualBall.collectAsState()
 
-    val selectedStadia by screenModel.selectedStadium.collectAsState()
+    val selectedStadia by viewModel.selectedStadium.collectAsState()
 
-    val prayersToNuffleEnabled by screenModel.prayersToNuffle.collectAsState()
-    val matchEventsEnabled by screenModel.matchEvents.collectAsState()
-    val extraTimeEnabled by screenModel.extraTime.collectAsState()
+    val prayersToNuffleEnabled by viewModel.prayersToNuffle.collectAsState()
+    val matchEventsEnabled by viewModel.matchEvents.collectAsState()
+    val extraTimeEnabled by viewModel.extraTime.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize().padding(top = 16.dp),
@@ -77,26 +77,26 @@ fun SetupRulesComponent(screenModel: RulesSetupComponentModel) {
                     // BoxHeader("Tables", bottomPadding = 16.dp)
                     JervisDropdownMenuWithSections(
                         title = "Weather Table",
-                        entries = screenModel.weatherTables,
+                        entries = viewModel.weatherTables,
                         selectedEntry = selectedWeatherTable
                     ) {
-                        screenModel.updateWeatherTable(it)
+                        viewModel.updateWeatherTable(it)
                     }
                     JervisDropdownMenuWithSections(
                         title = "Kick-off Table",
-                        entries = screenModel.kickOffTables,
+                        entries = viewModel.kickOffTables,
                         selectedEntry = selectedKickOffTable
                     ) {
-                        screenModel.updateKickoffTable(it)
+                        viewModel.updateKickoffTable(it)
                     }
 
                     SmallHeader("Stadia", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
                     JervisDropdownMenuWithSections(
                         title = "Stadia of the Old World",
-                        entries = screenModel.stadia,
+                        entries = viewModel.stadia,
                         selectedEntry = selectedStadia
                     ) {
-                        screenModel.updateStadium(it)
+                        viewModel.updateStadium(it)
                     }
                 }
                 Spacer(modifier = Modifier.width(24.dp))
@@ -106,28 +106,28 @@ fun SetupRulesComponent(screenModel: RulesSetupComponentModel) {
                     SmallHeader("Pitch and Ball", bottomPadding = smallHeaderBottomPadding)
                     JervisDropdownMenuWithSections(
                         title = "Pitch",
-                        entries = screenModel.pitches,
+                        entries = viewModel.pitches,
                         selectedEntry = selectedPitchEntry,
                     ) {
-                        screenModel.updatePitch(it)
+                        viewModel.updatePitch(it)
                     }
                     JervisDropdownMenuWithSections(
                         title = "Ball",
-                        entries = screenModel.unusualBallList,
+                        entries = viewModel.unusualBallList,
                         selectedEntry = selectedUnusualBallEntry,
                     ) {
-                        screenModel.updateUnusualBall(it)
+                        viewModel.updateUnusualBall(it)
                     }
 
                     SmallHeader("Events", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
                     SimpleSwitch("Prayers To Nuffle", prayersToNuffleEnabled) {
-                        screenModel.updatePrayersToNuffle(it)
+                        viewModel.updatePrayersToNuffle(it)
                     }
                     SimpleSwitch("Match Events", matchEventsEnabled) {
-                        screenModel.updateMatchEvents(it)
+                        viewModel.updateMatchEvents(it)
                     }
                     SimpleSwitch("Extra Time", extraTimeEnabled) {
-                        screenModel.updateExtraTime(it)
+                        viewModel.updateExtraTime(it)
                     }
                 }
             }

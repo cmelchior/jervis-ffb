@@ -25,21 +25,21 @@ import com.jervisffb.ui.menu.components.SmallHeader
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CustomizationSetupComponent(screenModel: CustomizationSetupComponentModel) {
+fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
 
     val inputFieldModifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
 
-    val fieldWidth by screenModel.fieldWidth.collectAsState()
-    val fieldHeight by screenModel.fieldHeight.collectAsState()
-    val maxPlayersOnField by screenModel.maxPlayersOnField.collectAsState()
+    val fieldWidth by viewModel.fieldWidth.collectAsState()
+    val fieldHeight by viewModel.fieldHeight.collectAsState()
+    val maxPlayersOnField by viewModel.maxPlayersOnField.collectAsState()
 
-    val halfs by screenModel.halfs.collectAsState()
-    val turnsPrHalf by screenModel.turnsPrHalf.collectAsState()
+    val halfs by viewModel.halfs.collectAsState()
+    val turnsPrHalf by viewModel.turnsPrHalf.collectAsState()
 
-    val diceRollOwner by screenModel.selectedDiceRollBehavior.collectAsState()
-    val undoActionBehavior by screenModel.selectedUndoActionBehavior.collectAsState()
-    val foulActionBehavior by screenModel.selectedFoulActionBehavior.collectAsState()
-    val kickingPlayerBehavior by screenModel.selectedKickingPlayerBehavior.collectAsState()
+    val diceRollOwner by viewModel.selectedDiceRollBehavior.collectAsState()
+    val undoActionBehavior by viewModel.selectedUndoActionBehavior.collectAsState()
+    val foulActionBehavior by viewModel.selectedFoulActionBehavior.collectAsState()
+    val kickingPlayerBehavior by viewModel.selectedKickingPlayerBehavior.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize().padding(top = 16.dp),
@@ -59,21 +59,21 @@ fun CustomizationSetupComponent(screenModel: CustomizationSetupComponentModel) {
                     OutlinedTextField(
                         modifier = inputFieldModifier.width(40.dp),
                         value = fieldWidth.value,
-                        onValueChange = { screenModel.updateFieldWidth(it) },
+                        onValueChange = { viewModel.updateFieldWidth(it) },
                         enabled = true,
                         label = { Text(fieldWidth.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = fieldHeight.value,
-                        onValueChange = { screenModel.updateFieldHeight(it) },
+                        onValueChange = { viewModel.updateFieldHeight(it) },
                         enabled = true,
                         label = { Text(fieldHeight.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = maxPlayersOnField.value,
-                        onValueChange = { screenModel.updateMaxPlayersOnField(it) },
+                        onValueChange = { viewModel.updateMaxPlayersOnField(it) },
                         enabled = true,
                         label = { Text(maxPlayersOnField.label) },
                     )
@@ -81,14 +81,14 @@ fun CustomizationSetupComponent(screenModel: CustomizationSetupComponentModel) {
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = halfs.value,
-                        onValueChange = { screenModel.updateHalfs(it) },
+                        onValueChange = { viewModel.updateHalfs(it) },
                         enabled = true,
                         label = { Text(halfs.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = turnsPrHalf.value,
-                        onValueChange = { screenModel.updateTurnsPrHalf(it) },
+                        onValueChange = { viewModel.updateTurnsPrHalf(it) },
                         enabled = true,
                         label = { Text(turnsPrHalf.label) }
                     )
@@ -98,18 +98,18 @@ fun CustomizationSetupComponent(screenModel: CustomizationSetupComponentModel) {
                     modifier = Modifier.weight(1f).wrapContentSize()
                 ) {
                     SmallHeader("Randomness", bottomPadding = smallHeaderBottomPadding)
-                    JervisDropDownMenu("Dice Rolls", enabled = true, selectedEntry = diceRollOwner, entries = screenModel.diceRollEntries) {
-                        screenModel.updateDiceRollBehavior(it)
+                    JervisDropDownMenu("Dice Rolls", enabled = true, selectedEntry = diceRollOwner, entries = viewModel.diceRollEntries) {
+                        viewModel.updateDiceRollBehavior(it)
                     }
                     SmallHeader("Variants", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
-                    JervisDropDownMenu("Undo Actions", enabled = true, selectedEntry = undoActionBehavior, entries = screenModel.undoActionsEntries) {
-                        screenModel.updateUndoActionBehavior(it)
+                    JervisDropDownMenu("Undo Actions", enabled = true, selectedEntry = undoActionBehavior, entries = viewModel.undoActionsEntries) {
+                        viewModel.updateUndoActionBehavior(it)
                     }
-                    JervisDropDownMenu("Foul Action", enabled = true, selectedEntry = foulActionBehavior, entries = screenModel.foulActionBehavior) {
-                        screenModel.updateFoulActionBehavior(it)
+                    JervisDropDownMenu("Foul Action", enabled = true, selectedEntry = foulActionBehavior, entries = viewModel.foulActionBehavior) {
+                        viewModel.updateFoulActionBehavior(it)
                     }
-                    JervisDropDownMenu("Kicking Player", enabled = true, selectedEntry = kickingPlayerBehavior, entries = screenModel.kickingPlayerBehavior) {
-                        screenModel.updateKickingPlayerBehavior(it)
+                    JervisDropDownMenu("Kicking Player", enabled = true, selectedEntry = kickingPlayerBehavior, entries = viewModel.kickingPlayerBehavior) {
+                        viewModel.updateKickingPlayerBehavior(it)
                     }
                 }
             }

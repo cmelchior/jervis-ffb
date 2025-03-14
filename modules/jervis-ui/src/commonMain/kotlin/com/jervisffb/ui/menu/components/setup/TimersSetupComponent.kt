@@ -31,29 +31,29 @@ import com.jervisffb.ui.menu.components.SmallHeader
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TimersSetupComponent(screenModel: SetupTimersComponentModel) {
-    val timersEnabled by screenModel.timersEnabled.collectAsState()
-    val selectedPreset by screenModel.selectedPreset.collectAsState()
+fun TimersSetupComponent(viewModel: SetupTimersComponentModel) {
+    val timersEnabled by viewModel.timersEnabled.collectAsState()
+    val selectedPreset by viewModel.selectedPreset.collectAsState()
 
-    val normalGameTimeSetting by screenModel.normalGameLimit.collectAsState()
-    val normalGameBuffer by screenModel.normalGameBuffer.collectAsState()
-    val overtimeExtraLimit by screenModel.overtimeExtraLimit.collectAsState()
-    val overtimeExtraBuffer by screenModel.overtimeExtraBuffer.collectAsState()
+    val normalGameTimeSetting by viewModel.normalGameLimit.collectAsState()
+    val normalGameBuffer by viewModel.normalGameBuffer.collectAsState()
+    val overtimeExtraLimit by viewModel.overtimeExtraLimit.collectAsState()
+    val overtimeExtraBuffer by viewModel.overtimeExtraBuffer.collectAsState()
 
-    val selectedOutOfTimeEntry by screenModel.outOfTimeLimit.collectAsState()
-    val selectedGameLimitReachedEntry by screenModel.gameLimitReached.collectAsState()
+    val selectedOutOfTimeEntry by viewModel.outOfTimeLimit.collectAsState()
+    val selectedGameLimitReachedEntry by viewModel.gameLimitReached.collectAsState()
 
-    val setupUseBuffer by screenModel.setupUseBuffer.collectAsState()
-    val setupFreeTime by screenModel.setupFreeTime.collectAsState()
-    val setupMaxTime by screenModel.setupMaxTime.collectAsState()
+    val setupUseBuffer by viewModel.setupUseBuffer.collectAsState()
+    val setupFreeTime by viewModel.setupFreeTime.collectAsState()
+    val setupMaxTime by viewModel.setupMaxTime.collectAsState()
 
-    val teamTurnUseBuffer by screenModel.teamTurnUseBuffer.collectAsState()
-    val teamTurnFreeTime by screenModel.teamTurnFreeTime.collectAsState()
-    val teamTurnMaxTime by screenModel.teamTurnMaxTime.collectAsState()
+    val teamTurnUseBuffer by viewModel.teamTurnUseBuffer.collectAsState()
+    val teamTurnFreeTime by viewModel.teamTurnFreeTime.collectAsState()
+    val teamTurnMaxTime by viewModel.teamTurnMaxTime.collectAsState()
 
-    val responseUseBuffer by screenModel.responseUseBuffer.collectAsState()
-    val responseFreeTime by screenModel.responseFreeTime.collectAsState()
-    val responseMaxTime by screenModel.responseMaxTime.collectAsState()
+    val responseUseBuffer by viewModel.responseUseBuffer.collectAsState()
+    val responseFreeTime by viewModel.responseFreeTime.collectAsState()
+    val responseMaxTime by viewModel.responseMaxTime.collectAsState()
 
     val inputFieldModifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
 
@@ -72,7 +72,7 @@ fun TimersSetupComponent(screenModel: SetupTimersComponentModel) {
             ) {
                 Box(modifier = Modifier.weight(1f)) {
                     SimpleSwitch("Timers Enabled", timersEnabled) {
-                        screenModel.updateTimersEnabled(it)
+                        viewModel.updateTimersEnabled(it)
                     }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
@@ -83,7 +83,7 @@ fun TimersSetupComponent(screenModel: SetupTimersComponentModel) {
                         selectedEntry = selectedPreset,
                         entries = presets
                     ) {
-                        screenModel.updatePreset(it)
+                        viewModel.updatePreset(it)
                     }
                 }
             }
@@ -97,14 +97,14 @@ fun TimersSetupComponent(screenModel: SetupTimersComponentModel) {
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = normalGameTimeSetting.value,
-                        onValueChange = { screenModel.updateNormalGameTimeLimit(it) },
+                        onValueChange = { viewModel.updateNormalGameTimeLimit(it) },
                         enabled = timersEnabled,
                         label = { Text(normalGameTimeSetting.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = normalGameBuffer.value,
-                        onValueChange = { screenModel.updateNormalGameBuffer(it) },
+                        onValueChange = { viewModel.updateNormalGameBuffer(it) },
                         enabled = timersEnabled,
                         label = { Text(normalGameBuffer.label) },
                     )
@@ -112,23 +112,23 @@ fun TimersSetupComponent(screenModel: SetupTimersComponentModel) {
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = overtimeExtraLimit.value,
-                        onValueChange = { screenModel.updateOvertimeExtraLimit(it) },
+                        onValueChange = { viewModel.updateOvertimeExtraLimit(it) },
                         enabled = timersEnabled,
                         label = { Text(overtimeExtraLimit.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = overtimeExtraBuffer.value,
-                        onValueChange = { screenModel.updateOvertimeExtraBuffer(it) },
+                        onValueChange = { viewModel.updateOvertimeExtraBuffer(it) },
                         enabled = timersEnabled,
                         label = { Text(overtimeExtraBuffer.label) },
                     )
                     SmallHeader("Limit Behavior", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
                     JervisDropDownMenu("Out-of-time", enabled = timersEnabled, selectedEntry = selectedOutOfTimeEntry, entries = outOfTimeEntries) {
-                        screenModel.updateOutOfTimeBehaviour(it)
+                        viewModel.updateOutOfTimeBehaviour(it)
                     }
                     JervisDropDownMenu("Game Limit Reached", enabled = timersEnabled, selectedEntry = selectedGameLimitReachedEntry, entries = gameLimitEntries) {
-                        screenModel.updateGameLimitReachedBehaviour(it)
+                        viewModel.updateGameLimitReachedBehaviour(it)
                     }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
@@ -137,55 +137,55 @@ fun TimersSetupComponent(screenModel: SetupTimersComponentModel) {
                 ) {
                     SmallHeader("Setup", bottomPadding = smallHeaderBottomPadding)
                     SimpleSwitch("Use Game Buffer", isSelected = setupUseBuffer, isEnabled = timersEnabled) {
-                        screenModel.updateSetupUseBuffer(it)
+                        viewModel.updateSetupUseBuffer(it)
                     }
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = setupFreeTime.value,
-                        onValueChange = { screenModel.updateSetupFreeTime(it) },
+                        onValueChange = { viewModel.updateSetupFreeTime(it) },
                         enabled = timersEnabled,
                         label = { Text(setupFreeTime.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = setupMaxTime.value,
-                        onValueChange = { screenModel.updateSetupMaxTime(it) },
+                        onValueChange = { viewModel.updateSetupMaxTime(it) },
                         enabled = timersEnabled && setupUseBuffer,
                         label = { Text(setupMaxTime.label) },
                     )
                     SmallHeader("Team Turn", topPadding = smallHeaderTopPadding, bottomPadding = 8.dp)
                     SimpleSwitch("Use Game Buffer", teamTurnUseBuffer, isEnabled = timersEnabled) {
-                        screenModel.updateTeamTurnUseBuffer(it)
+                        viewModel.updateTeamTurnUseBuffer(it)
                     }
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = teamTurnFreeTime.value,
-                        onValueChange = { screenModel.updateTeamTurnFreeTime(it) },
+                        onValueChange = { viewModel.updateTeamTurnFreeTime(it) },
                         enabled = timersEnabled,
                         label = { Text(teamTurnFreeTime.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = teamTurnMaxTime.value,
-                        onValueChange = { screenModel.updateTeamTurnMaxTime(it) },
+                        onValueChange = { viewModel.updateTeamTurnMaxTime(it) },
                         enabled = timersEnabled && teamTurnUseBuffer,
                         label = { Text(teamTurnMaxTime.label) },
                     )
                     SmallHeader("Out-of-turn Response", topPadding = smallHeaderTopPadding, bottomPadding = 8.dp)
                     SimpleSwitch("Use Game Buffer", responseUseBuffer, isEnabled = timersEnabled) {
-                        screenModel.updateResponseUseBuffer(it)
+                        viewModel.updateResponseUseBuffer(it)
                     }
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = responseFreeTime.value,
-                        onValueChange = { screenModel.updateResponseFreeTime(it) },
+                        onValueChange = { viewModel.updateResponseFreeTime(it) },
                         enabled = timersEnabled,
                         label = { Text(responseFreeTime.label) },
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = responseMaxTime.value,
-                        onValueChange = { screenModel.updateResponseMaxTime(it) },
+                        onValueChange = { viewModel.updateResponseMaxTime(it) },
                         enabled = timersEnabled && responseUseBuffer,
                         label = { Text(responseMaxTime.label) },
                     )

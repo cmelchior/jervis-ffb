@@ -41,10 +41,10 @@ interface DropdownEntry {
     val available: Boolean
 }
 
-class P2PServerScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PHostScreenModel) : Screen {
+class P2PServerScreen(private val menuViewModel: MenuViewModel, private val viewModel: P2PHostScreenModel) : Screen {
     @Composable
     override fun Content() {
-        val sidebarEntries = screenModel.sidebarEntries
+        val sidebarEntries = viewModel.sidebarEntries
         JervisScreen(menuViewModel) {
             MenuScreenWithSidebarAndTitle(
                 menuViewModel,
@@ -52,23 +52,23 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
                 icon = Res.drawable.frontpage_wall_player,
                 topMenuRightContent = null,
                 sidebarContent = {
-                    val currentPage by screenModel.currentPage.collectAsState()
+                    val currentPage by viewModel.currentPage.collectAsState()
                     SidebarMenu(
                         entries = sidebarEntries,
                         currentPage = currentPage,
                     )
                 }
             ) {
-                PageContent(screenModel)
+                PageContent(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun PageContent(screenModel: P2PHostScreenModel) {
-    val currentPage by screenModel.currentPage.collectAsState()
-    val pagerState = rememberPagerState(0) { screenModel.totalPages }
+fun PageContent(viewModel: P2PHostScreenModel) {
+    val currentPage by viewModel.currentPage.collectAsState()
+    val pagerState = rememberPagerState(0) { viewModel.totalPages }
 
     // Animate going to a new page
     LaunchedEffect(currentPage) {
@@ -82,14 +82,14 @@ fun PageContent(screenModel: P2PHostScreenModel) {
             state = pagerState,
         ) { page ->
             when (page) {
-                0 -> SetupGamePage(screenModel.setupGameModel, Modifier)
-                1 -> SelectP2PTeamScreen(screenModel.selectTeamModel.componentModel, "Start Server", { screenModel.teamSelectionDone() })
-                2 -> WaitForOpponentPage(viewModel = screenModel)
+                0 -> SetupGamePage(viewModel.setupGameModel, Modifier)
+                1 -> SelectP2PTeamScreen(viewModel.selectTeamModel.componentModel, "Start Server", { viewModel.teamSelectionDone() })
+                2 -> WaitForOpponentPage(viewModel = viewModel)
                 3 -> StartP2PGamePage(
-                    screenModel.controller.homeTeam,
-                    screenModel.controller.awayTeam,
+                    viewModel.controller.homeTeam,
+                    viewModel.controller.awayTeam,
                     onAcceptGame = { acceptedGame ->
-                        screenModel.userAcceptGame(acceptedGame)
+                        viewModel.userAcceptGame(acceptedGame)
                     }
                 )
             }

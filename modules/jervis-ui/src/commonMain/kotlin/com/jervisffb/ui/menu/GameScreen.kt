@@ -114,33 +114,33 @@ class GameScreenModel(
     }
 }
 
-class GameScreen(val screenModel: GameScreenModel) : Screen {
+class GameScreen(val viewModel: GameScreenModel) : Screen {
     override val key: ScreenKey = "GameScreen"
 
     @Composable
     override fun Content() {
-        LoadingScreen(screenModel) {
+        LoadingScreen(viewModel) {
             com.jervisffb.ui.game.view.Screen(
                 FieldViewModel(
-                    screenModel.uiState,
-                    screenModel.hoverPlayerFlow,
+                    viewModel.uiState,
+                    viewModel.hoverPlayerFlow,
                 ),
                 SidebarViewModel(
-                    screenModel.uiState,
-                    screenModel.homeTeam,
-                    screenModel.hoverPlayerFlow
+                    viewModel.uiState,
+                    viewModel.homeTeam,
+                    viewModel.hoverPlayerFlow
                 ),
                 SidebarViewModel(
-                    screenModel.uiState,
-                    screenModel.awayTeam,
-                    screenModel.hoverPlayerFlow
+                    viewModel.uiState,
+                    viewModel.awayTeam,
+                    viewModel.hoverPlayerFlow
                 ),
-                GameStatusViewModel(screenModel.uiState),
-                if (screenModel.mode is Replay) ReplayControllerViewModel(screenModel.uiState, screenModel) else null,
-                if (screenModel.mode is Random) RandomActionsControllerViewModel(screenModel.uiState, screenModel) else null,
-                ActionSelectorViewModel(screenModel.uiState),
-                LogViewModel(screenModel.uiState),
-                DialogsViewModel(screenModel.uiState),
+                GameStatusViewModel(viewModel.uiState),
+                if (viewModel.mode is Replay) ReplayControllerViewModel(viewModel.uiState, viewModel) else null,
+                if (viewModel.mode is Random) RandomActionsControllerViewModel(viewModel.uiState, viewModel) else null,
+                ActionSelectorViewModel(viewModel.uiState),
+                LogViewModel(viewModel.uiState),
+                DialogsViewModel(viewModel.uiState),
             )
         }
     }

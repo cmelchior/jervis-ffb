@@ -21,10 +21,10 @@ import com.jervisffb.ui.menu.JervisScreen
 import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
 import kotlinx.coroutines.flow.map
 
-class HotseatScreen(private val menuViewModel: MenuViewModel, private val screenModel: HotseatScreenModel) : Screen {
+class HotseatScreen(private val menuViewModel: MenuViewModel, private val viewModel: HotseatScreenModel) : Screen {
     @Composable
     override fun Content() {
-        val sidebarEntries = screenModel.sidebarEntries
+        val sidebarEntries = viewModel.sidebarEntries
         JervisScreen(menuViewModel) {
             MenuScreenWithSidebarAndTitle(
                 menuViewModel,
@@ -32,7 +32,7 @@ class HotseatScreen(private val menuViewModel: MenuViewModel, private val screen
                 icon = Res.drawable.frontpage_wall_player,
                 topMenuRightContent = null,
                 sidebarContent = {
-                    val currentPage by screenModel.currentPage.collectAsState()
+                    val currentPage by viewModel.currentPage.collectAsState()
                     SidebarMenu(
                         entries = sidebarEntries,
                         currentPage = currentPage,
@@ -40,16 +40,16 @@ class HotseatScreen(private val menuViewModel: MenuViewModel, private val screen
                     )
                 }
             ) {
-                PageContent(screenModel)
+                PageContent(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun PageContent(screenModel: HotseatScreenModel) {
-    val currentPage by screenModel.currentPage.collectAsState()
-    val pagerState = rememberPagerState(0) { screenModel.totalPages }
+fun PageContent(viewModel: HotseatScreenModel) {
+    val currentPage by viewModel.currentPage.collectAsState()
+    val pagerState = rememberPagerState(0) { viewModel.totalPages }
 
     // Animate going to a new page
     LaunchedEffect(currentPage) {
@@ -63,14 +63,14 @@ fun PageContent(screenModel: HotseatScreenModel) {
             state = pagerState,
         ) { page ->
             when (page) {
-                0 -> SetupHotseatGamePage(screenModel.setupGameModel, Modifier)
-                1 -> SelectHotseatTeamScreen(screenModel.selectHomeTeamModel)
-                2 -> SelectHotseatTeamScreen(screenModel.selectAwayTeamModel)
+                0 -> SetupHotseatGamePage(viewModel.setupGameModel, Modifier)
+                1 -> SelectHotseatTeamScreen(viewModel.selectHomeTeamModel)
+                2 -> SelectHotseatTeamScreen(viewModel.selectAwayTeamModel)
                 3 -> StartHotseatGamePage(
-                    screenModel.selectedHomeTeam.map { it?.teamData },
-                    screenModel.selectedAwayTeam.map { it?.teamData },
+                    viewModel.selectedHomeTeam.map { it?.teamData },
+                    viewModel.selectedAwayTeam.map { it?.teamData },
                     onAcceptGame = { acceptedGame ->
-                        screenModel.startGame()
+                        viewModel.startGame()
                     }
                 )
             }

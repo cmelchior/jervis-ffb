@@ -31,10 +31,10 @@ import com.jervisffb.ui.menu.components.SmallHeader
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun InducementsSetupComponent(screenModel: InducementsSetupComponentModel) {
+fun InducementsSetupComponent(viewModel: InducementsSetupComponentModel) {
 
-    val rulebookInducements = screenModel.rulebookInducements
-    val deathZoneInducements = screenModel.deathZoneInducements
+    val rulebookInducements = viewModel.rulebookInducements
+    val deathZoneInducements = viewModel.deathZoneInducements
 
     Box(
         modifier = Modifier.fillMaxSize().padding(top = 16.dp),
@@ -49,14 +49,14 @@ fun InducementsSetupComponent(screenModel: InducementsSetupComponentModel) {
             Spacer(modifier = Modifier.height(8.dp))
             rulebookInducements.forEachIndexed { rowNo, inducement ->
                 InducementRow(rowNo, inducement, { enabled ->
-                    screenModel.updateStandardInducementEnabled(inducement.type, enabled)
+                    viewModel.updateStandardInducementEnabled(inducement.type, enabled)
                 })
             }
             SmallHeader("Death Zone", topPadding = smallHeaderTopPadding, bottomPadding = 0.dp)
             Spacer(modifier = Modifier.height(8.dp))
             deathZoneInducements.forEachIndexed { rowNo, inducement ->
                 InducementRow(rowNo, inducement) { enabled ->
-                    screenModel.updateDeathZoneInducementEnabled(inducement.type, enabled)
+                    viewModel.updateDeathZoneInducementEnabled(inducement.type, enabled)
                 }
             }
         }
