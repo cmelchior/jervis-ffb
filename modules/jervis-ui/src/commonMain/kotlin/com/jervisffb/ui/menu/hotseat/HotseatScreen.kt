@@ -36,7 +36,6 @@ class HotseatScreen(private val menuViewModel: MenuViewModel, private val viewMo
                     SidebarMenu(
                         entries = sidebarEntries,
                         currentPage = currentPage,
-                        // onClick = { page: Int -> screenModel.goBackToPage(page) }
                     )
                 }
             ) {

@@ -61,9 +61,8 @@ fun SetupRulesComponent(viewModel: RulesSetupComponentModel) {
                         title = "Rules Preset",
                         entries = presets,
                         enabled = true,
-                        // selectedEntry = selectedPreset,
                     ) {
-                        // screenModel.updatePreset(it)
+                        // viewModel.updatePreset(it)
                     }
                 }
             }

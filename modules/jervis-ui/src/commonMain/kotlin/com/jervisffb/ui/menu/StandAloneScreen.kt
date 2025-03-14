@@ -39,22 +39,22 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
 
     fun startHotSeatGame(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = HotseatScreenModel(navigator, menuViewModel)
-            navigator.push(HotseatScreen(menuViewModel, screenModel))
+            val viewModel = HotseatScreenModel(navigator, menuViewModel)
+            navigator.push(HotseatScreen(menuViewModel, viewModel))
         }
     }
 
     fun startP2PServer(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = P2PHostScreenModel(navigator, menuViewModel)
-            navigator.push(P2PServerScreen(menuViewModel, screenModel))
+            val viewModel = P2PHostScreenModel(navigator, menuViewModel)
+            navigator.push(P2PServerScreen(menuViewModel, viewModel))
         }
     }
 
     fun startP2PClient(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = P2PClientScreenModel(navigator, menuViewModel)
-            navigator.push(P2PClientScreen(menuViewModel, screenModel))
+            val viewModel = P2PClientScreenModel(navigator, menuViewModel)
+            navigator.push(P2PClientScreen(menuViewModel, viewModel))
         }
     }
 }
@@ -71,7 +71,7 @@ class StandAloneScreen(private val menuViewModel: MenuViewModel, viewModel: Stan
 @Composable
 fun Screen.StandaloneScreen(menuViewModel: MenuViewModel) {
     val navigator = LocalNavigator.currentOrThrow
-    val screenModel = rememberScreenModel { StandAloneScreenModel(menuViewModel) }
+    val viewModel = rememberScreenModel { StandAloneScreenModel(menuViewModel) }
     MenuScreenWithTitle(menuViewModel, "Standalone Games", Res.drawable.frontpage_ball) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).offset(y = -40.dp),
@@ -80,14 +80,14 @@ fun Screen.StandaloneScreen(menuViewModel: MenuViewModel) {
         ) {
             SplitMenuBox(
                 labelTop = "P2P\nClient",
-                onClickTop = { screenModel.startP2PClient(navigator) },
+                onClickTop = { viewModel.startP2PClient(navigator) },
                 labelBottom = "P2P\nHost",
-                onClickBottom = { screenModel.startP2PServer(navigator) },
+                onClickBottom = { viewModel.startP2PServer(navigator) },
                 menuViewModel.p2pHostAvaiable,
             )
             MenuBox(
                 label = "Hotseat",
-                onClick = { screenModel.startHotSeatGame(navigator) },
+                onClick = { viewModel.startHotSeatGame(navigator) },
             )
 //            MenuBox(
 //                label = "vs AI",

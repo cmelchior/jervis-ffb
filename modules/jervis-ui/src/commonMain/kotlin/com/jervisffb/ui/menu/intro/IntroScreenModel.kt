@@ -19,24 +19,24 @@ class IntroScreenModel(private val menuViewModel: MenuViewModel) : JervisScreenM
 
     fun gotoFumbblScreen(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = FumbblScreenModel(menuViewModel)
-            screenModel.initialize()
-            navigator.push(FumbblScreen(menuViewModel, screenModel))
+            val viewModel = FumbblScreenModel(menuViewModel)
+            viewModel.initialize()
+            navigator.push(FumbblScreen(menuViewModel, viewModel))
         }
     }
 
     fun gotoStandAloneScreen(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = StandAloneScreenModel(menuViewModel)
-            navigator.push(StandAloneScreen(menuViewModel, screenModel))
+            val viewModel = StandAloneScreenModel(menuViewModel)
+            navigator.push(StandAloneScreen(menuViewModel, viewModel))
         }
 
     }
 
     fun gotoDevModeScreen(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = DevScreenModel(menuViewModel)
-            navigator.push(DevScreen(menuViewModel, screenModel))
+            val viewModel = DevScreenModel(menuViewModel)
+            navigator.push(DevScreen(menuViewModel, viewModel))
         }
     }
 

@@ -79,7 +79,7 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
 @Composable
 private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
     val navigator = LocalNavigator.currentOrThrow
-    val screenModel = rememberScreenModel { IntroScreenModel(menuViewModel) }
+    val viewModel = rememberScreenModel { IntroScreenModel(menuViewModel) }
     MenuScreen {
         Row {
             Column(modifier = Modifier.fillMaxWidth(0.67f)) {
@@ -91,13 +91,13 @@ private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
                     Spacer(modifier = Modifier.weight(4f / 36f))
                     MenuBox(
                         label = "FUMBBL",
-                        onClick = { screenModel.gotoFumbblScreen(navigator) },
+                        onClick = { viewModel.gotoFumbblScreen(navigator) },
                         frontPage = true
                     )
                     Spacer(modifier = Modifier.weight(2f / 36f))
                     MenuBox(
                         label = "Standalone",
-                        onClick = { screenModel.gotoStandAloneScreen(navigator) },
+                        onClick = { viewModel.gotoStandAloneScreen(navigator) },
                         frontPage = true
                     )
                 }
@@ -107,7 +107,7 @@ private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
                         .padding(8.dp)
                 ) {
                     Text(
-                        text = screenModel.clientVersion,
+                        text = viewModel.clientVersion,
                         color = JervisTheme.contentTextColor,
                     )
                 }
@@ -126,7 +126,7 @@ private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
                     ) {
                         TopbarButton(
                             "Dev Mode",
-                            onClick = { screenModel.gotoDevModeScreen(navigator) })
+                            onClick = { viewModel.gotoDevModeScreen(navigator) })
                         TopbarButton(
                             Res.drawable.icon_menu_settings,
                             "Settings",

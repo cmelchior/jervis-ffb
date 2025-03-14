@@ -154,14 +154,14 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenMo
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel { DevScreenModel(menuViewModel) }
+        val viewModel = rememberScreenModel { DevScreenModel(menuViewModel) }
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Button(onClick = {
-                screenModel.startManualGame(navigator)
+                viewModel.startManualGame(navigator)
             }) {
                 Text(
                     text = "Start game with manual actions",
@@ -170,7 +170,7 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenMo
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                screenModel.startRandomGame(navigator)
+                viewModel.startRandomGame(navigator)
             }) {
                 Text(
                     text = "Start game with all random actions",
@@ -178,9 +178,9 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenMo
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            screenModel.availableReplayFiles.forEach { file ->
+            viewModel.availableReplayFiles.forEach { file ->
                 Button(onClick = {
-                    screenModel.start(navigator, Replay(file))
+                    viewModel.start(navigator, Replay(file))
                 }) {
                     Text(
                         text = "Start replay: ${file.name}",
