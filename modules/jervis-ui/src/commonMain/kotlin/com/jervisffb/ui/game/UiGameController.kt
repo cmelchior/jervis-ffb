@@ -44,8 +44,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
-// For games fully controlled locally. This means rules concerning timers
-// are handled here.
+// For games fully controlled locally. This wraps home and away providers.
+// Rules concerning timers are also handled here.
 class LocalActionProvider(
     private val engine: GameEngineController,
     private val settings: GameSettings,
@@ -73,6 +73,7 @@ class LocalActionProvider(
         } else {
             homeProvider
         }
+        currentProvider.prepareForNextAction(controller, actions)
     }
 
     override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {

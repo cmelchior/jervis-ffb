@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
+import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.D12Result
@@ -233,11 +234,11 @@ object JervisSerialization {
                 subclass(FieldCoordinateImpl::class)
             }
             polymorphic(GameAction::class) {
-                // polymorphic(DieResult::class) {
                 subclass(BlockTypeSelected::class)
                 subclass(Cancel::class)
                 subclass(CoinSideSelected::class)
                 subclass(CoinTossResult::class)
+                subclass(CompositeGameAction::class)
                 subclass(Confirm::class)
                 subclass(Continue::class)
                 subclass(D12Result::class)
@@ -312,26 +313,30 @@ object JervisSerialization {
         }
     }
 
-    suspend fun loadFromFile(file: Path): GameFileData {
-        val fileContent =
-            platformFileSystem.source(file).use { fileSource ->
-                fileSource.buffer().readUtf8()
-            }
-        val gameData = jsonFormat.decodeFromString<JervisGameFile>(fileContent)
-        val rules = gameData.configuration.rules
-        val homeTeam = jsonFormat.decodeFromJsonElement<Team>(gameData.game.homeTeam)
-        homeTeam.noToPlayer.values.forEach { it.team = homeTeam }
-        homeTeam.notifyDogoutChange()
-        val awayTeam = jsonFormat.decodeFromJsonElement<Team>(gameData.game.awayTeam)
-        awayTeam.noToPlayer.values.forEach { it.team = awayTeam }
-        awayTeam.notifyDogoutChange()
-        val state = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
-        val controller = GameEngineController(state)
-        return GameFileData(homeTeam, awayTeam, controller, gameData.game.actions)
-//        return Pair(
-//            controller,
-//            remapActionRefs(gameData.game.actions, state)
-//        )
+    /**
+     * Load a Jervis Game File and prepare the game state from it.
+     */
+    fun loadFromFile(file: Path): Result<GameFileData> {
+        try {
+            val fileContent =
+                platformFileSystem.source(file).use { fileSource ->
+                    fileSource.buffer().readUtf8()
+                }
+            val fileData = jsonFormat.decodeFromString<JervisGameFile>(fileContent)
+            val rules = fileData.configuration.rules
+            val homeTeam = jsonFormat.decodeFromJsonElement<Team>(fileData.game.homeTeam)
+            homeTeam.noToPlayer.values.forEach { it.team = homeTeam }
+            homeTeam.notifyDogoutChange()
+            val awayTeam = jsonFormat.decodeFromJsonElement<Team>(fileData.game.awayTeam)
+            awayTeam.noToPlayer.values.forEach { it.team = awayTeam }
+            awayTeam.notifyDogoutChange()
+            val state = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
+            val controller = GameEngineController(state)
+            val gameData = GameFileData(homeTeam, awayTeam, controller, fileData.game.actions)
+            return Result.success(gameData)
+        } catch (ex: Exception) {
+            return Result.failure(ex)
+        }
     }
 
     /**

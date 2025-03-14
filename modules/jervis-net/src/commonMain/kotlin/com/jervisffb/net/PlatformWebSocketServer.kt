@@ -96,7 +96,8 @@ class PlatformWebSocketServer(
         }
     }
 
-    // Check if the starting message has valid content. If not, an error will be sent back and the connection is closed
+    // Check if the starting message has valid format. If not, an error will be sent back and the connection is closed
+    // Checking valid players/teams is done in GameSession
     private suspend fun closeConnectionIfInvalidFormat(connection: DefaultWebSocketSession, message: ClientMessage): Boolean {
         val error = when (message) {
             is JoinGameAsCoachMessage -> {

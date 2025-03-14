@@ -30,10 +30,12 @@ interface GameRunner {
 }
 
 /**
- * Interface describing all the properties needed to control running a full game
+ * Class describing all the properties needed to control running a full game
  */
 data class GameSettings(
     val gameRules: Rules,
+    val initialActions: List<GameAction> = listOf(),
+    val isHotseatGame: Boolean = false,
 ) {
     // Are random events done on the client or inside the server
     val clientSelectedDiceRolls: Boolean = (gameRules.diceRollsOwner == DiceRollOwner.ROLL_ON_CLIENT)

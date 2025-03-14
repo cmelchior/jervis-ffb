@@ -136,7 +136,7 @@ fun TimersSetupComponent(screenModel: SetupTimersComponentModel) {
                     modifier = Modifier.weight(1f).wrapContentSize()
                 ) {
                     SmallHeader("Setup", bottomPadding = smallHeaderBottomPadding)
-                    SimpleSwitch("Use buffer", isSelected = setupUseBuffer, isEnabled = timersEnabled) {
+                    SimpleSwitch("Use Game Buffer", isSelected = setupUseBuffer, isEnabled = timersEnabled) {
                         screenModel.updateSetupUseBuffer(it)
                     }
                     OutlinedTextField(

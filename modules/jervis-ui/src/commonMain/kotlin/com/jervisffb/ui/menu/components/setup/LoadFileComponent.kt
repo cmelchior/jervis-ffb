@@ -1,11 +1,10 @@
-package com.jervisffb.ui.menu.p2p.host
+package com.jervisffb.ui.menu.components.setup
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -20,12 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,33 +30,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.icon_menu_copy
+import com.jervisffb.jervis_ui.generated.resources.icon_menu_folder
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.TitleBorder
-import com.jervisffb.ui.menu.components.TeamInfo
-import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
-    val url: String by viewModel.gameUrl.collectAsState()
-    val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
+fun LoadFileComponent(viewModel: LoadFileComponentModel) {
+    val filePath by viewModel.filePath.collectAsState()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         Column(modifier = Modifier.width(600.dp).padding(bottom = 100.dp)) {
-            WaitForOpponentHeader()
+            LoadFileHeader()
             Spacer(modifier = Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     modifier = Modifier.weight(1f),
-                    value = url,
-                    onValueChange = { },
+                    value = filePath,
+                    onValueChange = { /* Do nothing */ },
                     readOnly = true,
                     singleLine = true,
-                    label = { Text("Game URL") },
+                    label = { Text("Save File") },
                 )
                 Box(
                     modifier = Modifier
@@ -69,36 +61,24 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                         .size(48.dp)
                         .offset(x = 4.dp)
                         .clip(shape = RoundedCornerShape(4.dp))
-                        .clickable {  }
+                        .clickable { viewModel.openFileDialog() }
                     ,
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(
                         modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
                         colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
-                        painter = painterResource(Res.drawable.icon_menu_copy),
-                        contentDescription = "Copy URL",
+                        painter = painterResource(Res.drawable.icon_menu_folder),
+                        contentDescription = "Find Save File",
                     )
                 }
             }
-        }
-        Row(modifier = Modifier.fillMaxWidth().align(Alignment.BottomEnd), horizontalArrangement = Arrangement.End) {
-            // Buttons
         }
     }
 }
 
 @Composable
-private fun WaitForOpponentHeader(color: Color = JervisTheme.rulebookRed) {
-    var dotCount by remember { mutableStateOf(1) } // Track the number of dots (1 to 3)
-    LaunchedEffect(Unit) {
-        while (true) {
-            dotCount = (dotCount % 3) + 1
-            delay(500L)
-        }
-    }
-    val loadingText = "Waiting For Opponent" + ".".repeat(dotCount)
-
+private fun LoadFileHeader(color: Color = JervisTheme.rulebookRed) {
     TitleBorder(color)
     Box(
         modifier = Modifier.height(36.dp),
@@ -106,7 +86,7 @@ private fun WaitForOpponentHeader(color: Color = JervisTheme.rulebookRed) {
     ) {
         Text(
             modifier = Modifier.padding(bottom = 2.dp),
-            text = loadingText.uppercase(),
+            text = "Select Save File",
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             color = color

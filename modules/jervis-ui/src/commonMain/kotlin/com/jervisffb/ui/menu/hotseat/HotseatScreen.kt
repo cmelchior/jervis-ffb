@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.map
 class HotseatScreen(private val menuViewModel: MenuViewModel, private val screenModel: HotseatScreenModel) : Screen {
     @Composable
     override fun Content() {
+        val sidebarEntries = screenModel.sidebarEntries
         JervisScreen(menuViewModel) {
             MenuScreenWithSidebarAndTitle(
                 menuViewModel,
@@ -33,9 +34,9 @@ class HotseatScreen(private val menuViewModel: MenuViewModel, private val screen
                 sidebarContent = {
                     val currentPage by screenModel.currentPage.collectAsState()
                     SidebarMenu(
-                        entries = listOf("1. Configure Game", "2. Home Team", "3. Away Team", "4. Start Game"),
+                        entries = sidebarEntries,
                         currentPage = currentPage,
-                        onClick = { page: Int -> screenModel.goBackToPage(page) }
+                        // onClick = { page: Int -> screenModel.goBackToPage(page) }
                     )
                 }
             ) {

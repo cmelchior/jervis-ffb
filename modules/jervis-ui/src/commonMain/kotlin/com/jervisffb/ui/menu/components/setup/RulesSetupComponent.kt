@@ -58,7 +58,7 @@ fun SetupRulesComponent(screenModel: RulesSetupComponentModel) {
                 Spacer(modifier = Modifier.weight(1f))
                 Box(modifier = Modifier, contentAlignment = Alignment.CenterEnd) {
                     JervisDropDownMenu(
-                        title = "Rule Presets",
+                        title = "Rules Preset",
                         entries = presets,
                         enabled = true,
                         // selectedEntry = selectedPreset,

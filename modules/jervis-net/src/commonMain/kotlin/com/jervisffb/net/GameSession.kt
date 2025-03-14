@@ -72,10 +72,11 @@ class GameSession(
     val gameSettings: GameSettings,
     val gameId: GameId, // Unique identifier for this Game. It is required to be unique across all games on the server
     val password: Password?, // Optional password for accessing the game. This is in addition to any user auth.
-    // The teams in the game was predetermined up front. Only these teams can join as player clients. If this list is
-    // empty, any team can join. First team is treated as the home team
-    private val playingTeams: List<Team>,
-    val testMode: Boolean
+    val hostCoach: CoachId,
+    val hostTeam: Team,
+    val clientCoach: CoachId? = null,
+    val clientTeam: Team? = null,
+    val testMode: Boolean = false
 ) {
 
     companion object {
@@ -134,25 +135,32 @@ class GameSession(
 
     suspend fun addClient(connection: JervisNetworkWebSocketConnection, message: JoinGameMessage): JoinedClient {
         var newClient: JoinedClient? = null
+        var exit: Boolean = false
         val mutex = CompletableDeferred<Unit>()
         val command = InternalJoinMessage(
             action = {
                 try {
                     when (message) {
                         is JoinGameAsCoachMessage -> {
+                            // For now, host is always valid since they will join immediately after
+                            // the server is started, and we just assume the client is always valid as well
+                            // In the case of a game starting again, we ignore any teams sent and just
+                            // reuse the ones from the save game.
                             val client = if (message.isHost) {
+                                val homeTeam = if (gameSettings.initialActions.isNotEmpty()) hostTeam else (message.team as P2PTeamInfo?)?.team
                                 JoinedP2PHost(
                                     connection = connection,
                                     coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName),
                                     state = P2PHostState.JOIN_SERVER,
-                                    team = (message.team as P2PTeamInfo?)?.team
+                                    team = homeTeam
                                 )
                             } else {
+                                val awayTeam = if (gameSettings.initialActions.isNotEmpty()) clientTeam else (message.team as P2PTeamInfo?)?.team
                                 JoinedP2PClient(
                                     connection = connection,
                                     coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName),
                                     state = P2PClientState.JOIN_SERVER,
-                                    team = (message.team as P2PTeamInfo?)?.team
+                                    team = awayTeam
                                 )
                             }
 
@@ -173,8 +181,13 @@ class GameSession(
                                 hostState = P2PHostState.WAIT_FOR_CLIENT
                                 out.sendHostStateUpdate(hostState)
                             } else {
-                                clientState = P2PClientState.SELECT_TEAM
-                                out.sendClientStateUpdate(clientState)
+                                if (gameSettings.initialActions.isNotEmpty()) {
+                                    val msg = ReceivedMessage(connection, TeamSelectedMessage(P2PTeamInfo(clientTeam!!)))
+                                    incomingMessages.send(msg)
+                                } else {
+                                    clientState = P2PClientState.SELECT_TEAM
+                                    out.sendClientStateUpdate(clientState)
+                                }
                             }
                         }
 
@@ -320,6 +333,7 @@ class GameSession(
                 coaches[1].team!!,
                 Field(rules.fieldWidth, rules.fieldHeight),
             ),
+            gameSettings.initialActions
         ).also {
             it.startManualMode()
         }

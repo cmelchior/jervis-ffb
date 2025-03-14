@@ -1,5 +1,6 @@
 package com.jervisffb.net.test
 
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
@@ -17,7 +18,15 @@ class WebSocketClientConnectionTests {
     @Test
     fun closeMultipleTimes() = runBlocking {
         // Start server
-        val server = LightServer(rules, createDefaultHomeTeam(), "test", testMode = true)
+        val server = LightServer(
+            gameName = "testGame",
+            rules = rules,
+            hostCoach = CoachId("HomeCoachID"),
+            hostTeam = createDefaultHomeTeam(),
+            clientCoach = null,
+            clientTeam = null,
+            testMode = true
+        )
         server.start()
 
         val conn = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/game", "host")

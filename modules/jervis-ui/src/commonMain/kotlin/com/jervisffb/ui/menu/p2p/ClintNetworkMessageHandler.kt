@@ -71,7 +71,7 @@ interface ClientNetworkMessageHandler {
     fun onSpectatorStateChange(newState: SpectatorState)
     fun onGameSync(message: GameStateSyncMessage)
     fun updateClientState(state: P2PClientState)
-    fun onConfirmGameStart(id: GameId, rules: Rules, teams: List<TeamData>)
+    fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>)
     fun onGameReady(id: GameId)
     fun onServerError(errorCode: JervisErrorCode, message: String)
     fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction)
@@ -91,7 +91,7 @@ abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler 
     override fun onSpectatorStateChange(newState: SpectatorState) { }
     override fun onGameSync(message: GameStateSyncMessage) { }
     override fun updateClientState(state: P2PClientState) { }
-    override fun onConfirmGameStart(id: GameId, rules: Rules, teams: List<TeamData>) { }
+    override fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>) { }
     override fun onGameReady(id: GameId) { }
     override fun onServerError(errorCode: JervisErrorCode, message: String) { }
     override fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction) { }
@@ -168,7 +168,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         // Create a snapshot of the handlers, so they can be removed safely while iterating
         messageHandlers.toList().forEach { messageHandler ->
             when (message) {
-                is ConfirmGameStartMessage -> messageHandler.onConfirmGameStart(message.gameId, message.rules, message.teams)
+                is ConfirmGameStartMessage -> messageHandler.onConfirmGameStart(message.gameId, message.rules, message.initialActions, message.teams)
                 is GameNotFoundMessage -> TODO()
                 is GameReadyMessage -> messageHandler.onGameReady(message.gameId)
                 is CoachJoinedMessage -> messageHandler.onCoachJoined(message.coach, message.isHomeCoach)

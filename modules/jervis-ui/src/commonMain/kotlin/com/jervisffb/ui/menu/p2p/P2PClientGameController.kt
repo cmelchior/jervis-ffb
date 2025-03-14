@@ -58,6 +58,7 @@ class P2PClientGameController(
 
     // Track Coach/Team as they join
     var rules: Rules? = null
+    var initialActions: List<GameAction> = emptyList()
     val homeCoach: MutableStateFlow<Coach?> = MutableStateFlow(null)
     val awayCoach: MutableStateFlow<Coach?> = MutableStateFlow(null)
     val homeTeam: MutableStateFlow<Team?> = MutableStateFlow(null)
@@ -226,9 +227,10 @@ class P2PClientGameController(
             _clientState.value = state
         }
 
-        override fun onConfirmGameStart(id: GameId, rules: Rules, teams: List<TeamData>) {
+        override fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>) {
             // Wait for State change
             this@P2PClientGameController.rules = rules
+            this@P2PClientGameController.initialActions = initialActions
         }
 
         override fun onGameReady(id: GameId) {

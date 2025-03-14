@@ -41,10 +41,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.jvm.JvmName
 
+fun ActionRequest.containsActionWithRandomBehavior(): Boolean {
+    return this.actions.containsActionWithRandomBehavior()
+}
+
 // Returns true, if any of the action descriptors require using randomness, i.e., something
 // that is outside a coaches control
-fun ActionRequest.containsActionWithRandomBehavior(): Boolean {
-    val randomActions = actions.map {
+fun List<GameActionDescriptor>.containsActionWithRandomBehavior(): Boolean {
+    val randomActions = this.map {
         when (it) {
             CancelWhenReady -> false
             ConfirmWhenReady -> false

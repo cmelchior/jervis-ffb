@@ -86,15 +86,19 @@ class ServerCommunication(
         sendToConnection(client.connection, msg)
     }
 
-    suspend fun sendStartingGameRequest(id: GameId, rules: Rules, teams: List<Team>) {
-        val msg = ConfirmGameStartMessage(id, rules, teams.map {
-            TeamData(
-                coach = it.coach.name,
-                teamName =  it.name,
-                teamRoster = it.roster.name,
-                teamValue = it.teamValue
-            )
-        })
+    suspend fun sendStartingGameRequest(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<Team>) {
+        val msg = ConfirmGameStartMessage(
+            id,
+            rules,
+            initialActions,
+            teams.map {
+                TeamData(
+                    coach = it.coach.name,
+                    teamName =  it.name,
+                    teamRoster = it.roster.name,
+                    teamValue = it.teamValue
+                )
+            })
         sendAllCoaches(msg)
     }
 

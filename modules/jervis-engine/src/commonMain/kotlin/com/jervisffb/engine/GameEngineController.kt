@@ -38,8 +38,11 @@ data class RemoveEntry(val log: LogEntry) : ListEvent
  * This class should not be used until both teams have been identified and a ruleset
  * has been agreed upon. This should be the responsibility of a specific
  * [GameRunner]
+ *
+ * @param initialActions Actions to run as soon as the controller is started using [startManualMode]
+ * or [startTestMode]
  */
-class GameEngineController(state: Game) {
+class GameEngineController(state: Game, private val initialActions: List<GameAction> = emptyList()) {
 
     companion object {
         val LOG = jervisLogger()
@@ -139,7 +142,7 @@ class GameEngineController(state: Game) {
      * while (!controller.stack.isEmpty()) {
      *   val request = controller.getAvailableActions()
      *   val action = createAction(request)
-     *   controller.processAction(action)
+     *   controller.handleAction(action)
      * }
      * ```
      */
@@ -150,12 +153,18 @@ class GameEngineController(state: Game) {
         actionMode = ActionMode.MANUAL
         setupInitialStartingState()
         rollForwardToNextActionNode()
+        initialActions.forEach {
+            handleAction(it)
+        }
     }
 
     fun startTestMode(start: Procedure) {
         actionMode = ActionMode.TEST
         setupInitialStartingState(start)
         rollForwardToNextActionNode()
+        initialActions.forEach {
+            handleAction(it)
+        }
     }
 
     fun currentProcedure(): ProcedureState? = stack.peepOrNull()

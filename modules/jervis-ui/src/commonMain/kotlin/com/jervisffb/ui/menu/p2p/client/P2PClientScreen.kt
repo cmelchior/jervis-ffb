@@ -28,6 +28,7 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val scre
     @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
+        val sidebarEntries = screenModel.sidebarEntries
         LifecycleEffectOnce {
             onDispose {
                 screenModel.onDispose()
@@ -42,9 +43,8 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val scre
                 sidebarContent = {
                     val currentPage by screenModel.currentPage.collectAsState()
                     SidebarMenu(
-                        entries = listOf("1. Join Host", "2. Select Team", "3. Start Game"),
+                        entries = sidebarEntries,
                         currentPage = currentPage,
-                        onClick = { page: Int -> screenModel.goBackToPage(page) }
                     )
                 }
             ) {

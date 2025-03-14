@@ -44,6 +44,7 @@ interface DropdownEntry {
 class P2PServerScreen(private val menuViewModel: MenuViewModel, private val screenModel: P2PHostScreenModel) : Screen {
     @Composable
     override fun Content() {
+        val sidebarEntries = screenModel.sidebarEntries
         JervisScreen(menuViewModel) {
             MenuScreenWithSidebarAndTitle(
                 menuViewModel,
@@ -53,9 +54,8 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val scre
                 sidebarContent = {
                     val currentPage by screenModel.currentPage.collectAsState()
                     SidebarMenu(
-                        entries = listOf("1. Configure Game", "2. Select Team", "3. Wait For Opponent", "4. Start Game"),
+                        entries = sidebarEntries,
                         currentPage = currentPage,
-                        onClick = { page: Int -> screenModel.goBackToPage(page) }
                     )
                 }
             ) {

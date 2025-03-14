@@ -79,7 +79,7 @@ fun Screen.StandaloneScreen(menuViewModel: MenuViewModel) {
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             SplitMenuBox(
-                labelTop = "P2P\nJoin",
+                labelTop = "P2P\nClient",
                 onClickTop = { screenModel.startP2PClient(navigator) },
                 labelBottom = "P2P\nHost",
                 onClickBottom = { screenModel.startP2PServer(navigator) },

@@ -162,7 +162,8 @@ data class TeamData(
 @Serializable
 data class ConfirmGameStartMessage(
     val gameId: GameId, 
-    val rules: Rules, 
+    val rules: Rules,
+    val initialActions: List<GameAction>,
     val teams: List<TeamData>
 ): ServerMessage
 

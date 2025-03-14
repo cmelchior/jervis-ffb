@@ -1,6 +1,7 @@
 package com.jervisffb.net.test
 
 import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
@@ -46,11 +47,19 @@ import kotlin.time.Duration.Companion.seconds
 class P2PNetworkTests {
 
     val rules = StandardBB2020Rules()
+    val server = LightServer(
+        gameName = "test",
+        rules = rules,
+        hostCoach = CoachId("HomeCoachID"),
+        hostTeam = createDefaultHomeTeam(),
+        clientCoach = null,
+        clientTeam = null,
+        testMode = true
+    )
 
     @Test
     fun startP2PGame() = runBlocking {
         // Start server
-        val server = LightServer(rules, createDefaultHomeTeam(), "test", testMode = true)
         server.start()
 
         val conn1 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")
@@ -153,7 +162,6 @@ class P2PNetworkTests {
 
     @Test
     fun closeSessionWithoutSendingData() = runBlocking {
-        val server = LightServer(rules, createDefaultHomeTeam(), "test", testMode = true)
         server.start()
         try {
             val conn = JervisClientWebSocketConnection("test".gameId, "ws://localhost:8080/joinGame?id=test", "host")
@@ -169,7 +177,6 @@ class P2PNetworkTests {
     // Client connecting, we need to verify this case as well.
     @Test
     fun sendingUnsupportedMessageStopsConnection() = runBlocking {
-        val server = LightServer(rules, createDefaultHomeTeam(), "test", testMode = true)
         server.start()
         val client = getHttpClient()
         val session = client.webSocketSession("ws://localhost:8080/joinGame?id=test")
@@ -189,7 +196,6 @@ class P2PNetworkTests {
 
     @Test
     fun sendingWrongInitialMessageTerminatesConnection() = runBlocking {
-        val server = LightServer(rules, createDefaultHomeTeam(), "test", testMode = true)
         server.start()
         val conn = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")
         conn.start()
@@ -209,7 +215,6 @@ class P2PNetworkTests {
 
     @Test
     fun sendingWrongGameIdTerminatesConnection() = runBlocking {
-        val server = LightServer(rules, createDefaultHomeTeam(), "test", testMode = true)
         server.start()
         val conn = JervisClientWebSocketConnection(GameId("wrongGameId"), "ws://localhost:8080/joinGame?id=wrongGameId", "host")
         conn.start()
@@ -232,7 +237,6 @@ class P2PNetworkTests {
     @Test
     fun sendingWrongMessageAfterInitialJoinDoesNotTerminateSession() = runBlocking {
         // Start server
-        val server = LightServer(rules, createDefaultHomeTeam(), "test", testMode = true)
         server.start()
 
         val conn1 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")

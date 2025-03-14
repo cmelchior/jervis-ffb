@@ -33,7 +33,12 @@ class TeamSelectedHandler(override val session: GameSession) : ClientMessageHand
             0, 1 -> session.state = GameState.JOINING
             2 -> {
                 session.state = GameState.STARTING
-                session.out.sendStartingGameRequest(session.gameId, session.gameSettings.gameRules, session.coaches.map { it.team!! })
+                session.out.sendStartingGameRequest(
+                    session.gameId,
+                    session.gameSettings.gameRules,
+                    session.gameSettings.initialActions,
+                    session.coaches.map { it.team!! }
+                )
                 session.hostState = P2PHostState.ACCEPT_GAME
                 session.clientState = P2PClientState.ACCEPT_GAME
                 session.out.sendHostStateUpdate(session.hostState)

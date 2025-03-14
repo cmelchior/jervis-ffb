@@ -23,8 +23,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.jervisffb.ui.game.view.filePicker
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.utils.FilePickerType
+import com.jervisffb.ui.utils.filePicker
 import com.jervisffb.utils.isRegularFile
 import com.jervisffb.utils.platformFileSystem
 import kotlinx.coroutines.launch
@@ -118,6 +119,7 @@ class DevScreen(private val menuViewModel: MenuViewModel, screenModel: DevScreen
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
                 filePicker(
+                    FilePickerType.OPEN,
                     "Load Jervis game file",
                     null,
                     "Jervis game file (*.jrvs)",

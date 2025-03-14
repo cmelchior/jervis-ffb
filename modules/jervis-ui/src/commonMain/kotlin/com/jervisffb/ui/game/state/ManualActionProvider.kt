@@ -35,6 +35,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
+import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.state.decorators.DeselectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
@@ -295,6 +296,12 @@ open class ManualActionProvider(
         }
 
         val currentNode = controller.currentProcedure()?.currentNode()
+
+        // First, we check if we are playing Hotseat and the game is set to roll random
+        // actions on the "server". In this case, they are generated here.
+        if (!gameSettings.clientSelectedDiceRolls && gameSettings.isHotseatGame && actions.containsActionWithRandomBehavior()) {
+            return createRandomAction(controller.state, actions)
+        }
 
         // Do not reroll successful rolls that are considered "successful"
         if (menuViewModel.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) {

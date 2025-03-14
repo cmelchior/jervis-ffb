@@ -10,11 +10,11 @@ import kotlinx.serialization.json.JsonElement
 /**
  * We support 3 different kinds of save files in Jervis:
  *
- * 1. A game replay file (.jrg)
+ * 1. A game file. Can either be used as a replay or to restart a game (.jrg)
  * 2. A team file (.jrt)
  * 3. A roster file (.jrr)
  *
- * Each file is a plain json object defined by the data classes found in this
+ * Each file is a plain JSON object defined by the data classes found in this
  * file.
  *
  * The format of these files is allowed to change, but all of them _must_ have

@@ -60,7 +60,7 @@ things as they come up.
 - [ ] Experiment with an action system similar to BB3 (round action circle around player)
 - [ ] Think about an UI that can work across Desktop: 16:9 and iPad 4:3.
 - [ ] Is it worth exploring an isometric view (to make it more immersive)? 
-  - How feasible is it to use the current player graphics?
+      - [ ] How feasible is it to use the current player graphics?
 
 
 ## Known bugs
@@ -74,3 +74,6 @@ things as they come up.
   at com.jervisffb.engine.rules.Rules$DefaultImpls.throwIn(Rules.kt:141)
   at com.jervisffb.engine.rules.BB2020Rules.throwIn(StandardBB2020Rules.kt:5)
 - Hover over player in dugout during setup doesn't show stat card.
+- The UI flow for P2P Host/Client works in the happy case, but there are plenty of options 
+  for messing it up. Probably need to rethink the logic to make it easier to manage. Especially
+  when the other party jump back in the flow.

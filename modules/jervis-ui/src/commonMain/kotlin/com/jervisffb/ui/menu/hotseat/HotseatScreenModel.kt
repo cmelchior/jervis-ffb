@@ -1,5 +1,6 @@
 package com.jervisffb.ui.menu.hotseat
 
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.jervisffb.engine.GameEngineController
@@ -9,15 +10,19 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.serialize.GameFileData
 import com.jervisffb.ui.game.LocalActionProvider
+import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
+import com.jervisffb.ui.game.view.SidebarEntry
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameScreen
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.components.TeamInfo
+import com.jervisffb.ui.menu.components.setup.ConfigType
 import com.jervisffb.ui.menu.components.starting.StartGameComponentModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -30,12 +35,15 @@ import kotlinx.coroutines.launch
  */
 class HotseatScreenModel(private val navigator: Navigator, private val menuViewModel: MenuViewModel) : ScreenModel {
 
+    val sidebarEntries: SnapshotStateList<SidebarEntry> = SnapshotStateList()
+
     // Which page are currently being shown
     val totalPages = 4
     val currentPage = MutableStateFlow(0)
 
     // Page 1: Setup Game
     val setupGameModel = SetupHotseatGameScreenModel(menuViewModel, this)
+    var saveGameData: GameFileData? = null
     var rules: Rules? = null
 
     // Page 2: Select Home Team
@@ -69,23 +77,88 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
 
     private var gameScreenModel: GameScreenModel? = null
 
+    init {
+        val startEntries = listOf(
+            SidebarEntry(
+                name = "1. Configure Game",
+                enabled = true,
+                active = true,
+            ),
+            SidebarEntry(name = "2. Home Team"),
+            SidebarEntry(name = "3. Away Team"),
+            SidebarEntry(name = "4. Start Game")
+        )
+        sidebarEntries.addAll(startEntries)
+    }
+
     fun gameSetupDone() {
-        // Should anything be saved here?
-        currentPage.value = 1
-        rules = setupGameModel.createRules()
+        menuViewModel.navigatorContext.launch {
+            if (isLoadingGame()) {
+                saveGameData = setupGameModel.gameConfigModel.loadFileModel.gameFile ?: error("Game file is not loaded")
+                val homeTeam = saveGameData!!.homeTeam
+                val awayTeam = saveGameData!!.awayTeam
+                if (!IconFactory.hasLogo(homeTeam.id)) {
+                    IconFactory.saveLogo(homeTeam.id, homeTeam.teamLogo ?: homeTeam.roster.rosterLogo!!)
+                }
+                if (!IconFactory.hasLogo(awayTeam.id)) {
+                    IconFactory.saveLogo(awayTeam.id, awayTeam.teamLogo ?: awayTeam.roster.rosterLogo!!)
+                }
+                selectedHomeTeam.value = TeamInfo(
+                    teamId = homeTeam.id,
+                    teamName = homeTeam.name,
+                    teamRoster = homeTeam.roster.name,
+                    teamValue = homeTeam.teamValue,
+                    rerolls = homeTeam.rerolls.size,
+                    logo = IconFactory.getLogo(homeTeam.id),
+                    teamData = homeTeam
+                )
+                selectedAwayTeam.value = TeamInfo(
+                    teamId = awayTeam.id,
+                    teamName = awayTeam.name,
+                    teamRoster = awayTeam.roster.name,
+                    teamValue = awayTeam.teamValue,
+                    rerolls = awayTeam.rerolls.size,
+                    logo = IconFactory.getLogo(awayTeam.id),
+                    teamData = awayTeam
+                )
+                sidebarEntries[0] = sidebarEntries[0].copy(active = false, onClick = { goBackToPage(0) })
+                sidebarEntries[1] = sidebarEntries[1].copy(active = false, enabled = false, onClick = null)
+                sidebarEntries[2] = sidebarEntries[2].copy(active = false, enabled = false, onClick = null)
+                sidebarEntries[3] = sidebarEntries[3].copy(active = true, enabled = true, onClick = { startGame() })
+                currentPage.value = 3
+            } else {
+                rules = setupGameModel.createRules()
+                sidebarEntries[0] = sidebarEntries[0].copy(active = false, onClick = { goBackToPage(0) })
+                sidebarEntries[1] = sidebarEntries[1].copy(active = true, enabled = true, onClick = { homeTeamSelectionDone() })
+                currentPage.value = 1
+            }
+        }
+    }
+
+    private fun isLoadingGame(): Boolean {
+        val selectedGameTab = setupGameModel.gameConfigModel.selectedGameTab.value
+        return setupGameModel.gameConfigModel.tabs[selectedGameTab].type == ConfigType.FROM_FILE
     }
 
     fun homeTeamSelectionDone() {
+        sidebarEntries[1] = sidebarEntries[1].copy(enabled = true, active = false, onClick = { goBackToPage(1) })
+        sidebarEntries[2] = sidebarEntries[2].copy(enabled = true, active = true, onClick = null)
         currentPage.value = 2
     }
 
     fun awayTeamSelectionDone() {
+        sidebarEntries[2] = sidebarEntries[2].copy(enabled = true, active = false, onClick = { goBackToPage(2) })
+        sidebarEntries[3] = sidebarEntries[3].copy(enabled = true, active = true, onClick = null)
         currentPage.value = 3
     }
 
     fun goBackToPage(previousPage: Int) {
         if (previousPage >= currentPage.value) {
             error("It is only allowed to go back: $previousPage")
+        }
+        sidebarEntries[previousPage] = sidebarEntries[previousPage].copy(active = true, onClick = null)
+        for (index in previousPage + 1 .. currentPage.value) {
+            sidebarEntries[index] = sidebarEntries[index].copy(active = false, enabled = false, onClick = null)
         }
         currentPage.value = previousPage
     }
@@ -100,14 +173,14 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         homeTeam.coach = Coach(CoachId("1"), selectHomeTeamModel.coachName.value)
         awayTeam.coach = Coach(CoachId("2"), selectAwayTeamModel.coachName.value)
         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
-        val gameController = GameEngineController(game)
+        val gameController = GameEngineController(game, saveGameData?.actions ?: emptyList())
 
         val homeActionProvider = when (selectHomeTeamModel.playerType.value) {
             CoachType.HUMAN -> ManualActionProvider(
                 gameController,
                 menuViewModel,
                 TeamActionMode.HOME_TEAM,
-                GameSettings(gameRules = rules),
+                GameSettings(gameRules = rules, isHotseatGame = true),
             )
             CoachType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
         }
@@ -117,7 +190,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                 gameController,
                 menuViewModel,
                 TeamActionMode.AWAY_TEAM,
-                GameSettings(gameRules = rules),
+                GameSettings(gameRules = rules, isHotseatGame = true),
             )
             CoachType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
         }

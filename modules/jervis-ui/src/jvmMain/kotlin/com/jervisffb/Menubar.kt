@@ -9,10 +9,12 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
-import com.jervisffb.ui.game.view.filePicker
+import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
 import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.game.viewmodel.Setups
+import com.jervisffb.ui.utils.FilePickerType
+import com.jervisffb.ui.utils.filePicker
 import okio.Path
 
 @Composable
@@ -28,10 +30,11 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
         Menu("Developer Tools", mnemonic = 'D') {
             Item("Save Game", onClick = {
                 filePicker(
+                    type = FilePickerType.SAVE,
                     "Save File",
-                    "game.jrvs",
-                    "Jervis files",
-                    "jrvs",
+                    "game.$FILE_EXTENSION_GAME_FILE",
+                    "Jervis Game Files (.$FILE_EXTENSION_GAME_FILE)",
+                    FILE_EXTENSION_GAME_FILE,
                 ) { filePath: Path ->
                     vm.saveGameState(filePath)
                 }

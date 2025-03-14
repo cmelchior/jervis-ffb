@@ -1,5 +1,6 @@
 package com.jervisffb.ui.menu.p2p.client
 
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.Navigator
@@ -15,6 +16,7 @@ import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
+import com.jervisffb.ui.game.view.SidebarEntry
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameScreen
 import com.jervisffb.ui.menu.GameScreenModel
@@ -34,6 +36,8 @@ import kotlin.random.Random
  * until running the actual game.
  */
 class P2PClientScreenModel(private val navigator: Navigator, private val menuViewModel: MenuViewModel) : ScreenModel {
+
+    val sidebarEntries: SnapshotStateList<SidebarEntry> = SnapshotStateList()
 
     // Central controller for the entire game lifecycle
     val controller = P2PClientGameController()
@@ -72,6 +76,16 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
     val loadingTeams: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
     init {
+        val startEntries = listOf(
+            SidebarEntry(
+                name = "1. Join Host",
+                enabled = true,
+                active = true,
+            ),
+            SidebarEntry(name = "2. Select Team"),
+            SidebarEntry(name = "3. Start Game")
+        )
+        sidebarEntries.addAll(startEntries)
         loadTeamList()
         menuViewModel.navigatorContext.launch {
             controller.clientState.collect {
@@ -79,13 +93,16 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                 when (it) {
                     P2PClientState.START -> { /* Do nothing */ }
                     P2PClientState.JOIN_SERVER -> {
-                        currentPage.value = 0
+                        // Will we ever hit this?
+                        if (currentPage.value > 0) {
+                            goBackToPage(0)
+                        }
                     }
                     P2PClientState.SELECT_TEAM -> {
-                        currentPage.value = 1
+                        gotoNextPage(1)
                     }
                     P2PClientState.ACCEPT_GAME -> {
-                        currentPage.value = 2
+                        gotoNextPage(2)
                     }
                     P2PClientState.RUN_GAME -> {
                         val rules = controller.rules!!
@@ -94,7 +111,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                         val awayTeam = JervisSerialization.fixTeamRefs(controller.awayTeam.value!!)
                         awayTeam.coach = controller.awayCoach.value!!
                         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
-                        val gameController = GameEngineController(game)
+                        val gameController = GameEngineController(game, controller.initialActions)
 
                         val homeActionProvider = ManualActionProvider(
                             gameController,
@@ -196,23 +213,40 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
 
     fun hostJoinedDone() {
         // Move on from "Join Host" page
-        lastValidPage = 1
-        currentPage.value = 1
+        gotoNextPage(1)
     }
 
     fun teamSelectionDone() {
         val team = selectedTeam.value ?: error("Team is not selected")
         // Should anything be saved here
-        lastValidPage = 2
-        currentPage.value = 2
+        gotoNextPage(2)
         screenModelScope.launch {
             controller.teamSelected(team)
         }
     }
 
+    private fun gotoNextPage(nextPage: Int, skipPages: Boolean = false) {
+        if (nextPage == currentPage.value) return
+        // Disable intermediate pages (if needed)
+        val currentPage = currentPage.value
+        if (skipPages && nextPage > currentPage + 1) {
+            for (index in nextPage - 1 downTo currentPage) {
+                sidebarEntries[index] = sidebarEntries[index].copy(active = false, enabled = false, onClick = null)
+            }
+        }
+        sidebarEntries[currentPage] = sidebarEntries[currentPage].copy(enabled = true, active = false, onClick = { goBackToPage(currentPage) })
+        sidebarEntries[nextPage] = sidebarEntries[nextPage].copy(enabled = true, active = true, onClick = null)
+        this.currentPage.value = nextPage
+        lastValidPage = nextPage
+    }
+
     fun goBackToPage(previousPage: Int) {
         if (previousPage >= currentPage.value) {
             error("It is only allowed to go back: $previousPage")
+        }
+        sidebarEntries[previousPage] = sidebarEntries[previousPage].copy(active = true, onClick = null)
+        for (index in previousPage + 1 .. currentPage.value) {
+            sidebarEntries[index] = sidebarEntries[index].copy(active = false, enabled = false, onClick = null)
         }
         currentPage.value = previousPage
     }

@@ -14,9 +14,12 @@ import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,12 +30,12 @@ import com.jervisffb.ui.game.view.utils.TitleBorder
 import kotlinx.coroutines.launch
 
 @Composable
-fun GameConfigurationContainerComponent(componentModel: GameConfigurationContainerComponentModel) {
-    val pagerStateTop = rememberPagerState(0) { 5 }
-    val pagerStateBottom = rememberPagerState(0) { 4 }
-    val tabs = listOf("Continue From File", "Standard", "BB7", "Dungeon Bowl", "Gutter Bowl") // listOf("Standard", "BB7", "Dungeon Bowl", "Gutter Bowl", "From File")
-    val tabs2 = listOf("Rules", "Timers", "Inducements", "Customizations")
+fun GameConfigurationContainerComponent(viewModel: GameConfigurationContainerComponentModel) {
+    val tabs = viewModel.tabs
+    val selectedTab by viewModel.selectedGameTab.collectAsState()
+    val pagerState = rememberPagerState(0) { tabs[selectedTab].tabs.size }
     val coroutineScope = rememberCoroutineScope()
+    val showSetupTabs = tabs[selectedTab].showSetupTabs
 
     Column(modifier = Modifier.fillMaxSize()) {
         val emptyIndicator = @Composable { tabPositions: List<TabPosition> ->
@@ -42,16 +45,16 @@ fun GameConfigurationContainerComponent(componentModel: GameConfigurationContain
             Column(modifier = Modifier.fillMaxSize()) {
                 TitleBorder()
                 TabRow(
+                    selectedTabIndex = selectedTab,
                     modifier = Modifier.fillMaxWidth().height(36.dp),
                     backgroundColor = Color.Transparent,
-                    selectedTabIndex = pagerStateTop.currentPage,
                     /* edgePadding = 0.dp, */
                     indicator = emptyIndicator,
                     divider = @Composable { /* None */ },
                 ) {
-                    tabs.forEachIndexed { index, title ->
-                        val isEnabled = index < 2
-                        val isSelected = (pagerStateTop.currentPage == index)
+                    tabs.forEachIndexed { index, tab ->
+                        val isEnabled = tab.enabled
+                        val isSelected = (selectedTab == index)
                         val textColor = when {
                             !isEnabled -> JervisTheme.rulebookRed.copy(alpha = 0.5f)
                             isSelected -> JervisTheme.white
@@ -63,17 +66,13 @@ fun GameConfigurationContainerComponent(componentModel: GameConfigurationContain
                                     if (isSelected) JervisTheme.rulebookRed else Color.Transparent,
                                 )
                             ,
-                            enabled = isEnabled, // Hard-code for now
+                            enabled = isEnabled,
                             selected = isSelected,
-                            onClick = {
-                                coroutineScope.launch {
-                                    pagerStateTop.animateScrollToPage(index)
-                                }
-                            },
+                            onClick = { viewModel.updateSelectGameType(index) },
                             text = {
                                 Text(
                                     /* modifier = Modifier.padding(horizontal = 8.dp), */
-                                    text = title.uppercase(),
+                                    text = tab.tabName.uppercase(),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     fontWeight = FontWeight.Bold,
@@ -88,14 +87,14 @@ fun GameConfigurationContainerComponent(componentModel: GameConfigurationContain
                 }
                 TitleBorder()
                 TabRow(
-                    modifier = Modifier.fillMaxWidth().height(36.dp),
+                    selectedTabIndex = pagerState.currentPage,
+                    modifier = Modifier.fillMaxWidth().height(36.dp).alpha(if (showSetupTabs) 1f else 0f),
                     backgroundColor = Color.Transparent,
-                    indicator = emptyIndicator, //defaultIndicatorBottom,
+                    indicator = emptyIndicator,
                     divider = @Composable { /* None */ },
-                    selectedTabIndex = pagerStateBottom.currentPage
                 ) {
-                    tabs2.forEachIndexed { index, title ->
-                        val isSelected = (pagerStateBottom.currentPage == index)
+                    tabs[selectedTab].tabs.forEachIndexed { index, setupTab ->
+                        val isSelected = (pagerState.currentPage == index)
                         Tab(
                             modifier = Modifier
                                 .background(
@@ -104,7 +103,7 @@ fun GameConfigurationContainerComponent(componentModel: GameConfigurationContain
                             selected = isSelected,
                             onClick = {
                                 coroutineScope.launch {
-                                    pagerStateBottom.animateScrollToPage(index)
+                                    pagerState.animateScrollToPage(index)
                                 }
                             },
                             text = {
@@ -116,7 +115,7 @@ fun GameConfigurationContainerComponent(componentModel: GameConfigurationContain
                                 Text(
                                     modifier = Modifier.padding(horizontal = 8.dp),
                                     maxLines = 1,
-                                    text = title.uppercase(),
+                                    text = setupTab.name.uppercase(),
                                     fontWeight = FontWeight.Bold,
                                     color = fontColor,
                                     fontSize = 16.sp
@@ -127,17 +126,18 @@ fun GameConfigurationContainerComponent(componentModel: GameConfigurationContain
                         )
                     }
                 }
-                TitleBorder()
+                TitleBorder(alpha = (if (showSetupTabs) 1f else 0f))
                 HorizontalPager(
                     modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally),
-                    state = pagerStateBottom,
+                    state = pagerState,
                 ) { page ->
-                    when (page) {
-                        0 -> SetupRulesComponent(componentModel.rulesModel) // Rules
-                        1 -> TimersSetupComponent(componentModel.timersModel) // Timers
-                        2 -> InducementsSetupComponent(componentModel.inducementsModel) // Inducements
-                        3 -> CustomizationSetupComponent(componentModel.customizationsModel) // Rules
-                        else -> error("Unsupported page: $page")
+                    when (tabs[selectedTab].tabs[page].type) {
+                        SetupTabType.LOAD_FILE -> LoadFileComponent(viewModel.loadFileModel)
+                        SetupTabType.RULES -> SetupRulesComponent(viewModel.rulesModel)
+                        SetupTabType.MAP -> CustomizationSetupComponent(viewModel.customizationsModel)
+                        SetupTabType.TIMERS -> TimersSetupComponent(viewModel.timersModel)
+                        SetupTabType.INDUCEMENTS -> InducementsSetupComponent(viewModel.inducementsModel)
+                        SetupTabType.CUSTOMIZATIONS -> CustomizationSetupComponent(viewModel.customizationsModel)
                     }
                 }
             }
