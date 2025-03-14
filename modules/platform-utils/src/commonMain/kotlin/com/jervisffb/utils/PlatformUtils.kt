@@ -27,3 +27,13 @@ public expect fun openUrlInBrowser(url: String): Boolean
  * a web server.
  */
 public expect fun canBeHost(): Boolean
+
+/**
+ * A short string describing the build target.
+ */
+public expect fun getBuildType(): String
+
+/**
+ * Returns a string containing information about the current platform and runtime.
+ */
+public expect fun getPlatformDescription(): String

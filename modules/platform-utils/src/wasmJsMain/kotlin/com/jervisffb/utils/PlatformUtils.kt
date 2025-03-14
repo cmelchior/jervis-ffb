@@ -20,3 +20,12 @@ public actual fun openUrlInBrowser(url: String): Boolean {
 }
 
 public actual fun canBeHost(): Boolean = false
+
+public actual fun getBuildType(): String = "WASM"
+
+public actual fun getPlatformDescription(): String {
+    val userAgent = window.navigator.userAgent
+    return buildString {
+        appendLine("User Agent: $userAgent")
+    }
+}

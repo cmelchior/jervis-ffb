@@ -33,3 +33,19 @@ public actual fun openUrlInBrowser(url: String): Boolean {
 
 public actual fun canBeHost(): Boolean = true
 
+public actual fun getBuildType(): String = "JVM"
+
+public actual fun getPlatformDescription(): String {
+    val systemProps = listOf(
+        "OS Name" to System.getProperty("os.name"),
+        "OS Version" to System.getProperty("os.version"),
+        "OS Architecture" to System.getProperty("os.arch"),
+        "JVM Name" to System.getProperty("java.vm.name"),
+        "JVM Version" to System.getProperty("java.vm.version"),
+        "JVM Vendor" to System.getProperty("java.vendor"),
+        "Java Version" to System.getProperty("java.version")
+    )
+    return buildString {
+        systemProps.forEach { (key, value) -> appendLine("$key: $value") }
+    }
+}

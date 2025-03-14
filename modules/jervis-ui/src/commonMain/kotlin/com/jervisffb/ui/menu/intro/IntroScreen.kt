@@ -2,6 +2,7 @@ package com.jervisffb.ui.menu.intro
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +51,7 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
 import com.jervisffb.ui.menu.MenuScreen
 import com.jervisffb.ui.menu.TopbarButton
+import com.jervisffb.ui.menu.components.CreditDialog
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.skia.ColorFilter
 import org.jetbrains.skia.ColorMatrix
@@ -79,7 +81,7 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
 @Composable
 private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
     val navigator = LocalNavigator.currentOrThrow
-    val viewModel = rememberScreenModel { IntroScreenModel(menuViewModel) }
+    val viewModel = rememberScreenModel { IntroScreenModel(menuViewModel,) }
     MenuScreen {
         Row {
             Column(modifier = Modifier.fillMaxWidth(0.67f)) {
@@ -102,11 +104,10 @@ private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
                     )
                 }
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .padding(8.dp)
+                    modifier = Modifier.fillMaxWidth(0.5f)
                 ) {
                     Text(
+                        modifier = Modifier.clickable { viewModel.showCreditDialog(visible = true) }.padding(8.dp),
                         text = viewModel.clientVersion,
                         color = JervisTheme.contentTextColor,
                     )
@@ -160,6 +161,7 @@ private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
             }
         }
     }
+    CreditDialog(viewModel, viewModel.creditData)
 }
 
 @Composable
