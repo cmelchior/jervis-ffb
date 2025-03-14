@@ -23,9 +23,18 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.GameSettings
+import com.jervisffb.engine.model.Field
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.ui.createDefaultAwayTeam
+import com.jervisffb.ui.createDefaultHomeTeam
+import com.jervisffb.ui.game.LocalActionProvider
+import com.jervisffb.ui.game.state.ManualActionProvider
+import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
-import com.jervisffb.ui.utils.FilePickerType
-import com.jervisffb.ui.utils.filePicker
 import com.jervisffb.utils.isRegularFile
 import com.jervisffb.utils.platformFileSystem
 import kotlinx.coroutines.launch
@@ -49,35 +58,83 @@ data class Replay(val file: Path) : GameMode
 class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
     fun start(navigator: Navigator, mode: GameMode) {
         menuViewModel.navigatorContext.launch {
-            val screenModel = GameScreenModel(
-                null,
-                null,
-                mode,
-                menuViewModel
-            )
-            screenModel.initialize()
-            navigator.push(GameScreen(screenModel))
+            val viewModel = createDevHotseatScreenModel(menuViewModel)
+            navigator.push(GameScreen(viewModel))
         }
     }
 
-    fun loadGame(navigator: Navigator, file: Path) {
+    private fun createDevHotseatScreenModel(menuViewModel: MenuViewModel, randomActions: Boolean = false): GameScreenModel {
+        val homeTeam = createDefaultHomeTeam()
+        val awayTeam = createDefaultAwayTeam()
+        val rules = StandardBB2020Rules().toBuilder().run {
+            timers.timersEnabled = false
+            diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
+            build()
+        }
+        val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
+        val gameController = GameEngineController(game)
+        val gameSettings = GameSettings(gameRules = rules, isHotseatGame = true)
+        val homeActionProvider = when (randomActions) {
+            false -> {
+                ManualActionProvider(
+                    gameController,
+                    menuViewModel,
+                    TeamActionMode.HOME_TEAM,
+                    gameSettings,
+                )
+            }
+            true -> RandomActionProvider(gameController).also { it.startActionProvider() }
+        }
+        val awayActionProvider = when (randomActions) {
+            false -> {
+                ManualActionProvider(
+                    gameController,
+                    menuViewModel,
+                    TeamActionMode.AWAY_TEAM,
+                    gameSettings,
+                )
+            }
+            true -> RandomActionProvider(gameController).also { it.startActionProvider() }
+        }
+        val actionProvider = LocalActionProvider(
+            gameController,
+            gameSettings,
+            homeActionProvider,
+            awayActionProvider
+        )
+        return GameScreenModel(
+            gameController,
+            gameController.state.homeTeam,
+            gameController.state.awayTeam,
+            actionProvider,
+            mode = Manual(TeamActionMode.ALL_TEAMS),
+            menuViewModel = menuViewModel,
+            onEngineInitialized = {
+                menuViewModel.controller = gameController
+                menuViewModel.navigatorContext.launch {
+                    // TODO Send to AI controller?
+                    // controller.sendGameStarted()
+                }
+            }
+        )
+    }
+
+    // Starts a Dev Hotseat game with pre-determined teams, no timer and client rolls enabled
+    fun startManualGame(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            TODO()
-//            val data = JervisSerialization.loadFromFile(file)
-//            val runner = HotSeatGameRunner(data.game.rules, data.homeTeam, data.awayTeam)
-//            val screenModel = GameScreenModel(
-//                null,
-//                null,
-//                Manual,
-//                menuViewModel,
-//                runner,
-//                data.actions
-//            )
-//            screenModel.initialize()
-//            navigator.push(GameScreen(screenModel))
+            val viewModel = createDevHotseatScreenModel(menuViewModel)
+            navigator.push(GameScreen(viewModel))
         }
+
     }
 
+    // Starts a Hotseat game with pre-determined teams, no timer and client rolls enabled and all actions are random
+    fun startRandomGame(navigator: Navigator) {
+        menuViewModel.navigatorContext.launch {
+            val viewModel = createDevHotseatScreenModel(menuViewModel, randomActions = true)
+            navigator.push(GameScreen(viewModel))
+        }
+    }
 
     val availableReplayFiles: List<Path>
         get() {
@@ -104,7 +161,7 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenMo
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Button(onClick = {
-                screenModel.start(navigator, Manual(TeamActionMode.ALL_TEAMS))
+                screenModel.startManualGame(navigator)
             }) {
                 Text(
                     text = "Start game with manual actions",
@@ -113,31 +170,13 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenMo
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                screenModel.start(navigator, Random)
+                screenModel.startRandomGame(navigator)
             }) {
                 Text(
-                    text = "Start game with random actions",
+                    text = "Start game with all random actions",
                     modifier = Modifier.padding(16.dp),
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                filePicker(
-                    FilePickerType.OPEN,
-                    "Load Jervis game file",
-                    null,
-                    "Jervis game file (*.jrvs)",
-                    "jrvs",
-                ) { filePath ->
-                    screenModel.loadGame(navigator, filePath)
-                }
-            }) {
-                Text(
-                    text = "Load game",
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
-
             Spacer(modifier = Modifier.height(16.dp))
             screenModel.availableReplayFiles.forEach { file ->
                 Button(onClick = {

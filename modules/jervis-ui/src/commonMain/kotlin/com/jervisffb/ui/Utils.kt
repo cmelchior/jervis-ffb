@@ -1,5 +1,10 @@
 package com.jervisffb.ui
 
+import CHAMELEON_SKINKS
+import KROXIGOR
+import LIZARDMEN_TEAM
+import SAURUS_BLOCKERS
+import SKINK_RUNNER_LINEMEN
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -24,6 +29,7 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.bb2020.skills.SideStep
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.jervis_ui.generated.resources.Res
@@ -171,6 +177,27 @@ fun createDefaultHomeTeam(): Team {
         reRolls = 4
         apothecaries = 1
         dedicatedFans = 1
+        teamValue = 1_000_000
+    }
+}
+
+fun createDefaultAwayTeam(): Team {
+    return teamBuilder(StandardBB2020Rules(), LIZARDMEN_TEAM) {
+        coach = Coach(CoachId("away-coach"), "AwayCoach")
+        name = "AwayTeam"
+        addPlayer(PlayerId("A1"), "Kroxigor-1-A", PlayerNo(1), KROXIGOR)
+        addPlayer(PlayerId("A2"), "Saurus-2-A", PlayerNo(2), SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A3"), "Saurus-3-A", PlayerNo(3), SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A4"), "Saurus-4-A", PlayerNo(4), SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A5"), "Saurus-5-A", PlayerNo(5), SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A6"), "Saurus-6-A", PlayerNo(6), SAURUS_BLOCKERS, listOf(Frenzy()))
+        addPlayer(PlayerId("A7"), "Saurus-7-A", PlayerNo(7), SAURUS_BLOCKERS, listOf(Frenzy()))
+        addPlayer(PlayerId("A8"), "ChameleonSkink-8-A", PlayerNo(8), CHAMELEON_SKINKS)
+        addPlayer(PlayerId("A9"), "Skink-9-A", PlayerNo(9), SKINK_RUNNER_LINEMEN)
+        addPlayer(PlayerId("A10"), "Skink-10-A", PlayerNo(10), SKINK_RUNNER_LINEMEN)
+        addPlayer(PlayerId("A11"), "Skink-11-A", PlayerNo(11), SKINK_RUNNER_LINEMEN)
+        reRolls = 4
+        apothecaries = 1
         teamValue = 1_000_000
     }
 }
