@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
@@ -24,7 +23,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,17 +30,15 @@ import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_back
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
 import com.jervisffb.jervis_ui.generated.resources.menu_background
-import com.jervisffb.jervis_ui.generated.resources.trump_town_pro
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
+import com.jervisffb.ui.menu.intro.loadJervisFont
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.skia.Font
 import org.jetbrains.skia.TextLine
-import org.jetbrains.skia.Typeface
 import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.tan
@@ -99,11 +95,7 @@ fun MenuScreenWithTitle(
 @Composable
 fun TitleBar(modifier: Modifier, title: String) {
     val textMeasure = rememberTextMeasurer()
-    val loader = LocalFontLoader.current
-    val composeFont = org.jetbrains.compose.resources.Font(Res.font.trump_town_pro)
-    val typeface: Any = remember { loader.load(composeFont) }
-    val skiaFont = Font(typeface as Typeface)
-
+    val skiaFont = loadJervisFont()
     Canvas(modifier = modifier) {
         val grayscaleShader = createGrayscaleNoiseShader()
         val path = Path().apply {

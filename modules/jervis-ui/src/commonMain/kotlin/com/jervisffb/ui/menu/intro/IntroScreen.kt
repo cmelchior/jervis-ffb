@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -28,10 +28,11 @@ import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.platform.FontLoadResult
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,7 +44,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_orc
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
-import com.jervisffb.jervis_ui.generated.resources.trump_town_pro
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.MenuBox
 import com.jervisffb.ui.game.view.utils.OrangeTitleBorder
@@ -55,13 +55,12 @@ import com.jervisffb.ui.menu.components.CreditDialog
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.skia.ColorFilter
 import org.jetbrains.skia.ColorMatrix
-import org.jetbrains.skia.Font
 import org.jetbrains.skia.ISize
 import org.jetbrains.skia.TextLine
-import org.jetbrains.skia.Typeface
 import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.tan
+import org.jetbrains.skia.Font as SkiaFont
 
 /**
  * Layout class for the Main starting screen.
@@ -76,6 +75,17 @@ class IntroScreen(private val menuViewModel: MenuViewModel) : Screen {
             IntroPage(menuViewModel)
         }
     }
+}
+
+// Unclear if this is the correct way or how this behaves during recomposition
+@Composable
+fun loadJervisFont(): SkiaFont {
+    val fontResolver = LocalFontFamilyResolver.current
+    val resolvedFont: Any by fontResolver.resolve(JervisTheme.fontFamily())
+    if (resolvedFont !is FontLoadResult) TODO("Failed to load font: $resolvedFont")
+    return (resolvedFont as FontLoadResult).typeface?.let {
+        SkiaFont(it)
+    } ?: error("Failed to load type face: $resolvedFont")
 }
 
 @Composable
@@ -181,11 +191,7 @@ fun NewsEntry(header: String, body: String) {
 @Composable
 fun TitleHeader() {
     val textMeasure = rememberTextMeasurer()
-    val loader = LocalFontLoader.current
-    val composeFont = org.jetbrains.compose.resources.Font(Res.font.trump_town_pro)
-    val typeface: Any = remember { loader.load(composeFont) }
-    val skiaFont = Font(typeface as Typeface)
-
+    val skiaFont = loadJervisFont()
     Canvas(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.33f)) {
         val grayscaleShader = createGrayscaleNoiseShader()
         val path = Path().apply {
