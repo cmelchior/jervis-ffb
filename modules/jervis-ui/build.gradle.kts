@@ -23,7 +23,6 @@ buildConfig {
     buildConfigField("releaseVersion", rootProject.ext["publicVersion"] as String)
     buildConfigField("gitHash", rootProject.ext["gitHash"] as String)
     @Suppress("UNCHECKED_CAST")
-    println(rootProject.ext["gitHistory"] as String)
     buildConfigField("gitHistory", rootProject.ext["gitHistory"] as String)
 }
 
