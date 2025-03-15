@@ -2,7 +2,6 @@ package com.jervisffb.ui.menu.fumbbl
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +49,7 @@ import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
+import com.jervisffb.ui.game.view.utils.bannerBackground
 import com.jervisffb.ui.game.view.utils.paperBackground
 import org.jetbrains.compose.resources.painterResource
 
@@ -101,7 +101,7 @@ fun FumbblLoginDialog(viewModel: FumbblScreenModel) {
                     .width(130.dp)
                     .fillMaxHeight()
                     .padding(start = 24.dp)
-                    .background(dialogColor)
+                    .bannerBackground()
                 ) {
                     Image(
                         modifier = Modifier.fillMaxWidth().padding(24.dp),

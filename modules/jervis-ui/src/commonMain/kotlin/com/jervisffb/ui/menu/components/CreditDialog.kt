@@ -1,7 +1,6 @@
 package com.jervisffb.ui.menu.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +36,7 @@ import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
+import com.jervisffb.ui.game.view.utils.bannerBackground
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.menu.intro.CreditData
 import com.jervisffb.ui.menu.intro.IntroScreenModel
@@ -84,7 +84,8 @@ fun CreditDialog(viewModel: IntroScreenModel, creditData: CreditData) {
                     .width(130.dp)
                     .fillMaxHeight()
                     .padding(start = 24.dp)
-                    .background(dialogColor)
+                    .bannerBackground()
+
                 ) {
                     Text(
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
@@ -242,4 +243,3 @@ private fun RowScope.CreditText(text: String, textColor: Color) {
         fontWeight = FontWeight.Normal,
     )
 }
-
