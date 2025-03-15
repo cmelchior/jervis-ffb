@@ -40,6 +40,13 @@ val gitHash: String by lazy {
         .use { it.readText().trim() }
 }
 
+val gitHistory: String by lazy {
+    Runtime.getRuntime().exec(arrayOf("git", "--no-pager", "log", "-5", "--pretty=format:%at:%s"))
+        .inputStream
+        .bufferedReader()
+        .use { it.readText().trim() }
+}
+
 // Create Maven version
 private fun createMavenVersion(): String {
     val versionStr = properties["jervis.version"] as String
@@ -80,6 +87,8 @@ rootProject.ext["publicVersion"] = createProjectVersion()
 rootProject.ext["distributionVersion"] = createDistributionVersion()
 // Current short git hash
 rootProject.ext["gitHash"] = gitHash
+// History of last 5 commits
+rootProject.ext["gitHistory"] = gitHistory
 
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")

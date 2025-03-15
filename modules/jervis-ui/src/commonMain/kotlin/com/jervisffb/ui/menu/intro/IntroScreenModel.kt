@@ -16,6 +16,13 @@ import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
 
 /**
  * Display data for the Credit dialog
@@ -57,16 +64,27 @@ data class CreditData(
     val newIssueUrl: String = "https://github.com/cmelchior/jervis-ffb/issues/new"
 )
 
+data class NewsEntryData(
+    val timestamp: String,
+    val body: String,
+)
+
 /**
  * ViewModel class for the Main starting screen.
  */
 class IntroScreenModel(private val menuViewModel: MenuViewModel) : JervisScreenModel {
 
+    val news: List<NewsEntryData>
     private val _showCreditDialog = MutableStateFlow(false)
     val showCreditDialog: StateFlow<Boolean> = _showCreditDialog
     val creditData: CreditData
 
     init {
+        // Prepare Git History so it can be displayed on the News section
+        // It is formatted here because (for some reason) the BuildConfig plugin has problems
+        // doing it in Gradle
+        news = formatGitHistory()
+
         // Customize the create issue link, so it contains some basic information about the client
         val body = """
 <Describe the issue>
@@ -82,6 +100,25 @@ ${getPlatformDescription()}
         )
     }
 
+    private fun formatGitHistory(): List<NewsEntryData> {
+        val dateFormat = LocalDate.Format {
+            monthName(MonthNames.ENGLISH_ABBREVIATED)
+            char(' ')
+            dayOfMonth()
+            chars(", ")
+            year()
+        }
+
+        return BuildConfig.gitHistory.lines().map {
+            val epochTimestamp = it.substringBefore(":").toLong()
+            val timestamp = Instant.fromEpochSeconds(epochTimestamp)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date
+                .format(dateFormat)
+            val body = it.substringAfter(":").trim()
+            NewsEntryData(timestamp, body)
+        }
+    }
 
     fun showCreditDialog(visible: Boolean) {
         _showCreditDialog.value = visible

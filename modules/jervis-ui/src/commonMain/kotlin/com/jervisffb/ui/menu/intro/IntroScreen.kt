@@ -13,7 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -91,7 +92,7 @@ fun loadJervisFont(): SkiaFont {
 @Composable
 private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
     val navigator = LocalNavigator.currentOrThrow
-    val viewModel = rememberScreenModel { IntroScreenModel(menuViewModel,) }
+    val viewModel = rememberScreenModel { IntroScreenModel(menuViewModel) }
     MenuScreen {
         Row {
             Column(modifier = Modifier.fillMaxWidth(0.67f)) {
@@ -144,8 +145,10 @@ private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
                             onClick = { menuViewModel.openSettings(true) })
                     }
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp)
-                            .wrapContentHeight(align = Alignment.CenterVertically),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(16.dp)
                     ) {
                         OrangeTitleBorder()
                         Text(
@@ -157,8 +160,15 @@ private fun IntroScreen.IntroPage(menuViewModel: MenuViewModel) {
                         )
                         OrangeTitleBorder()
                         Spacer(modifier = Modifier.height(8.dp))
-                        NewsEntry("11-01-2025", "Lorem ipsum dolor sit amet")
-                        NewsEntry("11-01-2025", "Lorem ipsum dolor sit amet")
+                        Column(
+                            modifier = Modifier
+                                .fillMaxHeight(0.35f)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            viewModel.news.forEach { (timestamp: String, body: String) ->
+                                NewsEntry(timestamp, body)
+                            }
+                        }
                     }
 
                 }

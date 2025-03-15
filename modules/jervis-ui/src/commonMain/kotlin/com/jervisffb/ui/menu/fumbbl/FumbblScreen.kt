@@ -61,7 +61,7 @@ fun FumbblePage(menuViewModel: MenuViewModel, viewModel: FumbblScreenModel, modi
     FumbblLoginDialog(viewModel)
     MenuScreenWithSidebarAndTitle(
         menuViewModel,
-        title = "FUMBBL (Static)",
+        title = "FUMBBL (TODO)",
         icon = Res.drawable.frontpage_mummy,
         topMenuLeftContent = {
 
