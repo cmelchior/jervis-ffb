@@ -75,7 +75,7 @@ fun main() {
             }
         }
     } catch (ex: Throwable) {
-        println("Hello from outer catch")
+        // TODO Show crash dialog
     }
 }
 
