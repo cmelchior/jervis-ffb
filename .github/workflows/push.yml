@@ -52,6 +52,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          fetch-depth: 5  # We use this for the "News" section on the frontpage
           submodules: "recursive"
 
       - name: Setup Java
@@ -89,6 +90,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          fetch-depth: 5  # We use this for the "News" section on the frontpage
           submodules: "recursive"
 
       - name: Setup Java
@@ -126,6 +128,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          fetch-depth: 5  # We use this for the "News" section on the frontpage
           submodules: "recursive"
 
       - name: Setup Java
@@ -163,6 +166,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          fetch-depth: 5  # We use this for the "News" section on the frontpage
           submodules: "recursive"
 
       - name: Setup Java
