@@ -30,6 +30,7 @@ import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.state.QueuedActionsGenerator
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
@@ -124,6 +125,9 @@ class LocalActionProvider(
  * so they are suitable for being consumed by the UI.
  */
 class UiGameController(
+    // Which Teams are controlled through this UI controller.
+    // This mostly affects UNDO.
+    val uiMode: TeamActionMode,
     val gameController: GameEngineController,
     val actionProvider: UiActionProvider,
     private val menuViewModel: MenuViewModel,

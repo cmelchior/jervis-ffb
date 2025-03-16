@@ -5,6 +5,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.GameDeltaId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
@@ -24,13 +25,13 @@ class P2PActionProvider(
     companion object {
         val LOG = jervisLogger()
     }
-    var lastServerActionIndex: Int = -1
+    var lastServerActionIndex: GameDeltaId = GameDeltaId(-1)
 
     private var currentProvider = homeProvider
 
     override fun startHandler() {
         connection.addMessageHandler(object: AbstractClintNetworkMessageHandler() {
-            override fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction) {
+            override fun onGameAction(producer: CoachId, serverIndex: GameDeltaId, action: GameAction) {
                 lastServerActionIndex = serverIndex
                 if (producer == engine.state.homeTeam.coach.id) {
                     homeProvider.userActionSelected(action)
@@ -44,12 +45,12 @@ class P2PActionProvider(
     }
 
     override fun actionHandled(team: Team?, action: GameAction) {
-        val clientIndex = engine.history.last().id
+        val clientActionIndex = engine.currentActionIndex()
         // Should only send this if the event is truly from this client and not just a sync message
-        LOG.d("Handling action ($clientIndex > $lastServerActionIndex): $action")
-        if (clientIndex > lastServerActionIndex) {
+        LOG.d("Handling action ($clientActionIndex > $lastServerActionIndex): $action")
+        if (clientActionIndex > lastServerActionIndex) {
             actionScope.launch {
-                connection.sendActionToServer(clientIndex, action)
+                connection.sendActionToServer(clientActionIndex, action)
             }
         }
     }

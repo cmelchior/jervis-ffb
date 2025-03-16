@@ -1,6 +1,7 @@
 package com.jervisffb.net.messages
 
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.model.GameDeltaId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.net.GameId
@@ -49,7 +50,7 @@ data class InternalJoinMessage(
 ): InternalClientMessage
 
 data class InternalGameActionMessage(
-    val clientIndex: Int,
+    val clientIndex: GameDeltaId,
     val action: GameAction? = null,
 ): InternalClientMessage
 
@@ -114,7 +115,7 @@ data class GameStartedMessage(val id: GameId): ClientMessage
  */
 @Serializable
 data class GameActionMessage(
-    val clientIndex: Int,
+    val clientIndex: GameDeltaId,
     val action: GameAction,
 ): ClientMessage
 

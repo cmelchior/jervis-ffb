@@ -2,6 +2,7 @@ package com.jervisffb.net.test
 
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.GameDeltaId
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
@@ -280,7 +281,7 @@ class P2PNetworkTests {
         consumeServerMessage<UpdateClientStateMessage>(conn2)
 
         // Host sends message not supported at this point (it should be team selection)
-        conn1.send(GameActionMessage(100, Continue))
+        conn1.send(GameActionMessage(GameDeltaId(100), Continue))
         checkServerMessage<ServerError>(conn1) {
             assertEquals(JervisErrorCode.INVALID_GAME_ACTION, it.errorCode)
         }

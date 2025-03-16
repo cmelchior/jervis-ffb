@@ -16,6 +16,8 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.ProcedureStack
 import com.jervisffb.engine.fsm.ProcedureState
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.GameDeltaId
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.reports.ReportAvailableActions
@@ -23,7 +25,10 @@ import com.jervisffb.engine.reports.ReportHandleAction
 import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
+import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.isRandomAction
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.JsonElement
@@ -67,7 +72,8 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
     // is removed from history, reversed and put in `lastActionIfUndo`
     private val _history: MutableList<GameDelta> = mutableListOf()
     val history: List<GameDelta> = _history
-    private var deltaBuilder = DeltaBuilder(_history.size)
+    private var lastGameDeltaId: GameDeltaId = GameDeltaId(0)
+    private var deltaBuilder = DeltaBuilder(lastGameDeltaId + 1)
     val state: Game = state
     val stack: ProcedureStack = state.stack // Shortcut for accessing the stack
     var actionMode = ActionMode.NOT_STARTED
@@ -109,10 +115,12 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
             error("Invalid action mode: $actionMode. Must be ActionMode.MANUAL or ActionMode.TEST.")
         }
         if (action is Undo) {
-            undoLastAction()
-            state.idGenerator.restoreSnapshot()
+            if (isUndoAvailable(null)) {
+                undoLastAction()
+            } else {
+                throw INVALID_ACTION(Undo, "Undo is not available for the current game state or rule setup.")
+            }
         } else {
-            state.idGenerator.saveSnapshot()
             processForwardAction(action)
         }
     }
@@ -128,10 +136,10 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
      * rather than doing a full copy.
      *
      * If the last action was [Undo], this will return the reversed [GameDelta]
-     * of the last action being processed.
+     * of the action that was undone.
      */
     fun getDelta(): GameDelta {
-        return lastActionIfUndo ?: _history.lastOrNull() ?: GameDelta(0, emptyList())
+        return lastActionIfUndo ?: _history.lastOrNull() ?: GameDelta(id = GameDeltaId(0), steps = emptyList())
     }
 
     /**
@@ -171,35 +179,87 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
 
     fun currentNode(): Node? = currentProcedure()?.currentNode()
 
+    /**
+     * Returns `true` if it is possible to [Undo] the current game state, `false` if not.
+     *
+     * @param team The team wanting to Undo. If set, it is only possible to undo if the
+     * given team also created the game action.
+     */
+    fun isUndoAvailable(team: TeamId? = null): Boolean {
+        if (_history.isEmpty()) return false
+        if (rules.undoActionBehavior == UndoActionBehavior.NOT_ALLOWED) return false
+
+        // Since CompositeGameActions are split into separate GameDeltas, we only need
+        // to consider the first command for each delta to check it is a "random" action
+        if (
+            rules.undoActionBehavior == UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS
+            && history.last().steps.first().action.isRandomAction()
+        ) {
+            return false
+        }
+
+        // If a teamId is provided, only actions created by the same teamId can be
+        // undone.
+        if (team != null && history.last().owner != team) {
+            return false
+        }
+
+        return true
+    }
+
+    /**
+     * Returns the index of the last processed [GameAction]
+     * I.e., this can be seen as a "version number" of the engine as game action indexes
+     * are always incrementing, even when processing [Undo] actions.
+     */
+    fun currentActionIndex(): GameDeltaId {
+        return lastGameDeltaId
+    }
+
     private fun undoLastAction() {
         if (replayMode) {
             throw IllegalStateException(
                 "Controller is in replay mode. `revert` is only available in manual mode.",
             )
         }
+        // Note, we are not touching lastGameDeltaId, as it needs to be always incrementing
         if (_history.isEmpty()) return
         val delta = _history.removeLast().reverse()
         lastActionIfUndo = delta
         delta.steps.forEach { step ->
             step.commands.forEach { command -> command.undo(state) }
         }
+        // UNDO commands also increment the DeltaId counter
+        lastGameDeltaId = (lastGameDeltaId + 1)
     }
 
     private fun processForwardAction(userAction: GameAction) {
         lastActionIfUndo = null
-        deltaBuilder = DeltaBuilder(_history.size)
+        val actionOwner = currentNode().let { node ->
+            if (node is ActionNode) {
+                node.actionOwner(state, rules)?.id
+            } else {
+                null
+            }
+        }
+        val newDeltaId = (lastGameDeltaId + 1)
+        deltaBuilder = DeltaBuilder(newDeltaId, actionOwner)
         when (userAction) {
             is Undo -> error("Invalid action: $userAction")
-            is CompositeGameAction -> userAction.list.forEach { processSingleAction(it) }
-            else -> processSingleAction(userAction)
+            is CompositeGameAction -> userAction.list.forEach { processSingleAction(deltaBuilder, userAction) }
+            else -> processSingleAction(deltaBuilder, userAction)
         }
         val delta = deltaBuilder.build()
         _history.add(delta)
+        lastGameDeltaId = newDeltaId
     }
 
-    private fun processSingleAction(userAction: GameAction) {
+    private fun processSingleAction(deltaBuilder: DeltaBuilder, userAction: GameAction) {
         val currentProcedure = stack.peepOrNull()!!
-        deltaBuilder.beginAction(userAction, currentProcedure.procedure, currentProcedure.currentNode())
+        deltaBuilder.beginAction(
+            userAction,
+            currentProcedure.procedure,
+            currentProcedure.currentNode())
         logInternalEvent(ReportHandleAction(userAction))
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val command = currentNode.applyAction(userAction, state, rules)
@@ -315,6 +375,7 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
             throw IllegalStateException("Controller is not in replay mode.")
         }
     }
+
 
 //    fun forward(): Boolean {
 //        checkReplayMode()

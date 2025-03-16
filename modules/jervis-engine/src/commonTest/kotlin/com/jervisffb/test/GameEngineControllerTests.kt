@@ -1,0 +1,72 @@
+package com.jervisffb.test
+
+import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.ext.d3
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.bb2020.procedures.FullGame
+import com.jervisffb.engine.rules.builder.UndoActionBehavior
+import com.jervisffb.engine.utils.InvalidActionException
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+/**
+ * Controller tests that don't fit in a more specific category.
+ */
+class GameEngineControllerTests {
+
+    private lateinit var controller: GameEngineController
+
+    private fun createGameController(rules: Rules): GameEngineController {
+        val state = createDefaultGameState(rules)
+        controller = GameEngineController(state)
+        controller.startTestMode(FullGame)
+        return controller
+    }
+
+    @Test
+    fun undoIncrementDeltaId() {
+        val rules = StandardBB2020Rules().toBuilder().run {
+            undoActionBehavior = UndoActionBehavior.ALLOWED
+            build()
+        }
+        val controller = createGameController(rules)
+
+        // Verify that undoing actions keep incrementing the delta id
+        assertEquals(0, controller.currentActionIndex().value)
+        controller.handleAction(1.d3)
+        assertEquals(1, controller.currentActionIndex().value)
+        controller.handleAction(2.d3)
+        assertEquals(2, controller.currentActionIndex().value)
+        assertTrue(controller.isUndoAvailable(controller.state.awayTeam.id))
+        controller.handleAction(Undo)
+        assertEquals(3, controller.currentActionIndex().value)
+        controller.handleAction(Undo)
+        assertEquals(4, controller.currentActionIndex().value)
+        controller.handleAction(6.d3)
+        assertEquals(5, controller.currentActionIndex().value)
+    }
+
+    @Test
+    fun cannotUndoDiceRollsIfNotInEnabled() {
+        val rules = StandardBB2020Rules().toBuilder().run {
+            undoActionBehavior = UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS
+            build()
+        }
+        val controller = createGameController(rules)
+
+        // Verify that undoing actions keep incrementing the delta id
+        assertEquals(0, controller.currentActionIndex().value)
+        controller.handleAction(1.d3)
+        assertEquals(1, controller.currentActionIndex().value)
+        assertFalse(controller.isUndoAvailable(controller.state.homeTeam.id))
+        assertFailsWith<InvalidActionException> {
+            controller.handleAction(Undo)
+        }
+        assertEquals(1, controller.currentActionIndex().value)
+    }
+}

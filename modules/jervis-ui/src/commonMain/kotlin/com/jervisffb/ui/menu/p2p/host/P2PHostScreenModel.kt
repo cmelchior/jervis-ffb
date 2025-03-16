@@ -146,6 +146,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                         )
 
                         gameViewModel = GameScreenModel(
+                            TeamActionMode.HOME_TEAM,
                             gameController = gameController,
                             gameController.state.homeTeam,
                             gameController.state.awayTeam,

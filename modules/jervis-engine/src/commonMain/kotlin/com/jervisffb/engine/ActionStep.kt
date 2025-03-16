@@ -15,8 +15,8 @@ import com.jervisffb.engine.reports.LogEntry
  * all commands executed due to this are considered part of the current
  * [ActionStep]
  *
- * [CompositeGameAction]s will create an [ActionStep] for each action it
- * consists of.
+ * [com.jervisffb.engine.actions.CompositeGameAction]s will create an
+ * [ActionStep] for each action it consists of.
  */
 data class ActionStep(
     val action: GameAction,

@@ -1,16 +1,50 @@
 package com.jervisffb.engine.utils
 
 import com.jervisffb.engine.ActionRequest
+import com.jervisffb.engine.actions.BlockTypeSelected
+import com.jervisffb.engine.actions.CalculatedAction
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CancelWhenReady
+import com.jervisffb.engine.actions.CoinSideSelected
+import com.jervisffb.engine.actions.CoinTossResult
+import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
+import com.jervisffb.engine.actions.D12Result
+import com.jervisffb.engine.actions.D16Result
+import com.jervisffb.engine.actions.D20Result
+import com.jervisffb.engine.actions.D2Result
+import com.jervisffb.engine.actions.D3Result
+import com.jervisffb.engine.actions.D4Result
+import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DeselectPlayer
+import com.jervisffb.engine.actions.DicePoolResultsSelected
+import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.actions.DirectionSelected
+import com.jervisffb.engine.actions.DogoutSelected
+import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
+import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
+import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.EndTurnWhenReady
+import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.InducementSelected
+import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.PlayerActionSelected
+import com.jervisffb.engine.actions.PlayerDeselected
+import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.PlayerSubActionSelected
+import com.jervisffb.engine.actions.RandomPlayersSelected
+import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectCoinSide
@@ -26,7 +60,9 @@ import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.SelectSkill
+import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.TossCoin
+import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.modifiers.DiceModifier
@@ -81,6 +117,51 @@ fun List<GameActionDescriptor>.containsActionWithRandomBehavior(): Boolean {
     }
     return randomActions.any { it  == true }
 }
+
+/**
+ * Returns `true` if this action normally requires randomness to be generated.
+ */
+fun GameAction.isRandomAction(): Boolean {
+    return when (this) {
+        is BlockTypeSelected -> false
+        is CalculatedAction -> false // Is only used by tests
+        Cancel -> false
+        is CoinSideSelected -> false
+        is CoinTossResult -> true
+        is CompositeGameAction -> false // Composites should only contain deterministic actions
+        Confirm -> false
+        Continue -> false
+        is DicePoolResultsSelected -> false
+        is DiceRollResults -> true
+        is D12Result -> true
+        is D16Result -> true
+        is D20Result -> true
+        is D2Result -> true
+        is D3Result -> true
+        is D4Result -> true
+        is D6Result -> true
+        is D8Result ->  true
+        is DBlockResult -> true
+        is DirectionSelected -> false
+        DogoutSelected -> false
+        EndAction -> false
+        EndSetup -> false
+        EndTurn -> false
+        is FieldSquareSelected -> false
+        is InducementSelected -> false
+        is MoveTypeSelected -> false
+        is NoRerollSelected -> false
+        is PlayerActionSelected -> false
+        is PlayerDeselected -> false
+        is PlayerSelected -> false
+        is PlayerSubActionSelected -> false
+        is RandomPlayersSelected -> true
+        is RerollOptionSelected -> false
+        is SkillSelected -> false
+        Undo -> false
+    }
+}
+
 
 fun createRandomAction(
     state: Game,

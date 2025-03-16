@@ -30,6 +30,8 @@ class CalculatedAction(private val action: (Game, Rules) -> GameAction) : GameAc
 }
 
 // Group multiple actions together as one.
+// Note, the rules engine will treat them as individual actions. This means that when you Undo events
+// these actions can be undone individually.
 @Serializable
 data class CompositeGameAction(val list: List<GameAction>): GameAction {
     constructor(vararg actions: GameAction) : this(listOf(*actions))

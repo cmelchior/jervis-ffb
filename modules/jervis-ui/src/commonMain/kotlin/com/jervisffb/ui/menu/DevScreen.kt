@@ -29,6 +29,7 @@ import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.ui.createDefaultAwayTeam
 import com.jervisffb.ui.createDefaultHomeTeam
 import com.jervisffb.ui.game.LocalActionProvider
@@ -43,7 +44,7 @@ import okio.Path.Companion.toPath
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.InternalResourceApi
 
-// Which teams should be allowed to create actions this client
+// Which teams should be allowed to create actions on this client
 enum class TeamActionMode {
     HOME_TEAM,
     AWAY_TEAM,
@@ -69,6 +70,7 @@ class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
         val rules = StandardBB2020Rules().toBuilder().run {
             timers.timersEnabled = false
             diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
+            undoActionBehavior = UndoActionBehavior.ALLOWED
             build()
         }
         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
@@ -103,6 +105,7 @@ class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
             awayActionProvider
         )
         return GameScreenModel(
+            TeamActionMode.ALL_TEAMS,
             gameController,
             gameController.state.homeTeam,
             gameController.state.awayTeam,

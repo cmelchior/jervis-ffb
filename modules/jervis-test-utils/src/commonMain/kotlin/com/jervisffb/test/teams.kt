@@ -14,7 +14,7 @@ import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.BB2020Rules
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.bb2020.skills.SideStep
@@ -140,7 +140,7 @@ fun createDefaultHomeTeam(): Team {
     }
 }
 
-fun createDefaultGameState(rules: BB2020Rules, awayTeam: Team = humanTeamAway()): Game {
+fun createDefaultGameState(rules: Rules, awayTeam: Team = humanTeamAway()): Game {
     val field = Field.createForRuleset(rules)
     return Game(rules, createDefaultHomeTeam(), awayTeam, field)
 }

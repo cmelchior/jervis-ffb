@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.menu.BackNavigationHandler
+import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.canBeHost
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -61,7 +62,16 @@ class MenuViewModel {
     }
 
     fun undoAction() {
-        uiState.userSelectedAction(Undo)
+        val team = when (uiState.uiMode) {
+            TeamActionMode.HOME_TEAM -> uiState.state.homeTeam.id
+            TeamActionMode.AWAY_TEAM -> uiState.state.awayTeam.id
+            TeamActionMode.ALL_TEAMS -> null // No team restrictions when undoing on a Client controlling both teams
+        }
+        if (uiState.gameController.isUndoAvailable(team = team)) {
+            uiState.userSelectedAction(Undo)
+        } else {
+            // TODO Play "warning" sound
+        }
     }
 
     fun toggleFeature(rerollSuccessfulActions: Feature, enabled: Boolean) {

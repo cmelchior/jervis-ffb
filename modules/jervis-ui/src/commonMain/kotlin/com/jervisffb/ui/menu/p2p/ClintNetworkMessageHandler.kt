@@ -3,6 +3,7 @@ package com.jervisffb.ui.menu.p2p
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.GameDeltaId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
@@ -74,7 +75,7 @@ interface ClientNetworkMessageHandler {
     fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>)
     fun onGameReady(id: GameId)
     fun onServerError(errorCode: JervisErrorCode, message: String)
-    fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction)
+    fun onGameAction(producer: CoachId, serverIndex: GameDeltaId, action: GameAction)
 }
 
 abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler {
@@ -94,7 +95,7 @@ abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler 
     override fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>) { }
     override fun onGameReady(id: GameId) { }
     override fun onServerError(errorCode: JervisErrorCode, message: String) { }
-    override fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction) { }
+    override fun onGameAction(producer: CoachId, serverIndex: GameDeltaId, action: GameAction) { }
 }
 
 /**
@@ -218,7 +219,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         send(msg)
     }
 
-    suspend fun sendClientAction(index: Int, action: GameAction) {
+    suspend fun sendClientAction(index: GameDeltaId, action: GameAction) {
         val msg = GameActionMessage(index, action)
         send(msg)
     }

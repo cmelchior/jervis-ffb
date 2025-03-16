@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class GameScreenModel(
+    private val uiMode: TeamActionMode,
     private val gameController: GameEngineController,
     val homeTeam: Team,
     var awayTeam: Team,
@@ -100,6 +101,7 @@ class GameScreenModel(
 //                is Replay -> TODO() // ReplayActionProvider(uiState, fumbbl)
 //            }
         uiState = UiGameController(
+            uiMode,
             gameController,
             actionProvider,
             menuViewModel,

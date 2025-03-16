@@ -7,6 +7,8 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.CompositeCommand
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.GameDeltaId
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.reports.LogEntry
 
 /**
@@ -20,9 +22,10 @@ import com.jervisffb.engine.reports.LogEntry
  * These are captured as individual [ActionStep].
  */
 data class GameDelta(
-    val id: Int,
+    val id: GameDeltaId,
     val steps: List<ActionStep>,
-    // Game Delta is being reversed
+    val owner: TeamId? = null,
+    // Game Delta is being reversed. Used during when undoing deltas.
     val reversed: Boolean = false,
 ) {
     fun containsAction(action: GameAction): Boolean {
@@ -38,7 +41,8 @@ data class GameDelta(
     }
 
     /**
-     * Return a copy of this delta, but with all actions, commands reversed
+     * Return a copy of this delta, but with all actions, commands reversed. This is used
+     * when Undoing actions.
      */
     fun reverse(): GameDelta {
         return GameDelta(
@@ -46,12 +50,13 @@ data class GameDelta(
             steps = steps.reversed().map {
                 it.copy(commands = it.commands.reversed())
             },
+            owner = owner,
             reversed = true
         )
     }
 }
 
-internal class DeltaBuilder(val deltaId: Int) {
+internal class DeltaBuilder(val deltaId: GameDeltaId, val actionOwner: TeamId? = null) {
 
     private val steps = mutableListOf<ActionStep>()
 
@@ -63,7 +68,11 @@ internal class DeltaBuilder(val deltaId: Int) {
 
     // For now treat everything between public actions as one step, even if it might involve multiple node
     // transitions
-    fun beginAction(action: GameAction, procedure: Procedure, node: Node) {
+    fun beginAction(
+        action: GameAction,
+        procedure: Procedure,
+        node: Node
+    ) {
         currentAction = action
         currentProcedure = procedure
         currentNode = node
@@ -80,7 +89,10 @@ internal class DeltaBuilder(val deltaId: Int) {
 
     fun endAction() {
         val newStep = ActionStep(
-            currentAction!!, currentProcedure!!, currentNode!!, commands.toList()
+            currentAction!!,
+            currentProcedure!!,
+            currentNode!!,
+            commands.toList()
         )
         steps.add(newStep)
         currentAction = null
@@ -90,6 +102,6 @@ internal class DeltaBuilder(val deltaId: Int) {
     }
 
     fun build(): GameDelta {
-        return GameDelta(deltaId, steps)
+        return GameDelta(deltaId, steps, actionOwner)
     }
 }

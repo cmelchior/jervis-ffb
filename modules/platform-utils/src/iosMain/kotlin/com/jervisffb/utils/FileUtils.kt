@@ -45,7 +45,7 @@ actual class FileManager {
     actual suspend fun getFilesWithExtension(directory: String, extension: String): List<Path> {
         TODO()
     }
-    actual suspend fun getFile(path: String): Path? {
+    actual suspend fun getFile(path: String): ByteArray? {
         TODO()
     }
     actual suspend fun writeFile(dir: String, fileName: String, fileContent: ByteArray) {

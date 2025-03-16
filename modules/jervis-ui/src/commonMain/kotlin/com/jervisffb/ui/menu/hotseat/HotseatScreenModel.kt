@@ -203,6 +203,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         )
 
         val model = GameScreenModel(
+            TeamActionMode.ALL_TEAMS,
             gameController,
             gameController.state.homeTeam,
             gameController.state.awayTeam,

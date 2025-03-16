@@ -33,6 +33,7 @@ import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
+import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.FieldSquare
@@ -265,6 +266,7 @@ object JervisSerialization {
                 subclass(PlayerSelected::class)
                 subclass(RandomPlayersSelected::class)
                 subclass(RerollOptionSelected::class)
+                subclass(Undo::class)
             }
             polymorphic(Wizard::class) {
                 subclass(HirelingSportsWizard::class)

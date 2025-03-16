@@ -135,6 +135,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                         )
 
                         val model = GameScreenModel(
+                            TeamActionMode.AWAY_TEAM,
                             gameController,
                             gameController.state.homeTeam,
                             gameController.state.awayTeam,

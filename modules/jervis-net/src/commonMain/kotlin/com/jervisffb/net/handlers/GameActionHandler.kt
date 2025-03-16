@@ -29,9 +29,9 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
             return
         }
         try {
-
-            if (message.clientIndex != session.game?.history?.last()?.id!! + 1) {
-                error("Invalid clientIndex received. Expected ${session.game?.history?.last()?.id!! + 1}, but received ${message.clientIndex}.")
+            val expectedDeltaId = session.game!!.currentActionIndex() + 1
+            if (message.clientIndex != expectedDeltaId) {
+                error("Invalid clientIndex received. Expected $expectedDeltaId, but received ${message.clientIndex}.")
             }
             val coach = game.getAvailableActions().team?.coach ?: game.state.homeTeam.coach
             handleAction(session, game, coach.id, message.action, connection)
@@ -64,7 +64,7 @@ suspend fun handleAction(
 ) {
     game.handleAction(nextAction)
     val sender = if (connection != null) session.getPlayerClient(connection) else null
-    session.out.sendGameActionSync(sender = sender, producer, game.history.last().id, action = nextAction)
+    session.out.sendGameActionSync(sender = sender, producer, game.currentActionIndex(), action = nextAction)
 
     // TODO If start of turn, start the end-of-turn tracker
 
@@ -80,14 +80,14 @@ suspend fun handleAction(
         game.handleAction(action)
         // If no producer, we just set it to the Home Team
         val producer = session.coaches.firstOrNull { it.coach == availableActions.team?.coach } ?: session.coaches.first()
-        session.out.sendGameActionSync(sender = null, producer.coach.id, game.history.last().id, action = action)
+        session.out.sendGameActionSync(sender = null, producer.coach.id, game.currentActionIndex(), action = action)
         availableActions = game.getAvailableActions()
     }
 
     // Last, before waiting for the next action, we set up any server timeouts
     // TODO Figure out exactly which timer to use
     if (session.gameSettings.timerSettings.timersEnabled) {
-        val nextIndex = game.history.last().id + 1
+        val nextIndex = game.currentActionIndex() + 1
         session.scope.launch {
             // delay(session.gameSettings.timerSettings.turnLimitSeconds)
             session.sendInternalMessage(connection, InternalGameActionMessage(nextIndex))
@@ -102,14 +102,14 @@ suspend fun rollForwardToUserAction(session: GameSession, game: GameEngineContro
         game.handleAction(action)
         // If no producer, we just set it to the Home Team
         val producer = session.coaches.firstOrNull { it.coach == availableActions.team?.coach } ?: session.coaches.first()
-        session.out.sendGameActionSync(sender = null, producer.coach.id,session.game?.history?.last()?.id!!, action = action)
+        session.out.sendGameActionSync(sender = null, producer.coach.id,session.game?.currentActionIndex()!!, action = action)
         availableActions = game.getAvailableActions()
     }
 
     // Last, before waiting for the next action, we set up any server timeouts
     // TODO Figure out exactly which timer to use
     if (session.gameSettings.timerSettings.timersEnabled) {
-        val nextIndex = game.history.last().id + 1
+        val nextIndex = game.currentActionIndex() + 1
         session.scope.launch {
             // delay(session.gameSettings.timerSettings.turnLimitSeconds)
             println("TIMER: ${Clock.System.now()}.")

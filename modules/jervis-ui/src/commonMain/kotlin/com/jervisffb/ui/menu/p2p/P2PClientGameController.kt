@@ -3,6 +3,7 @@ package com.jervisffb.ui.menu.p2p
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.GameDeltaId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
@@ -126,7 +127,7 @@ class P2PClientGameController(
         }
     }
 
-    suspend fun sendActionToServer(index: Int, action: GameAction) {
+    suspend fun sendActionToServer(index: GameDeltaId, action: GameAction) {
         connection.sendClientAction(index, action)
     }
 
@@ -241,7 +242,7 @@ class P2PClientGameController(
             LOG.e { "Received onServerError event [$errorCode]: $message" }
         }
 
-        override fun onGameAction(producer: CoachId, serverIndex: Int, action: GameAction) {
+        override fun onGameAction(producer: CoachId, serverIndex: GameDeltaId, action: GameAction) {
 //            // TODO How to recover from errors here. It probably means the client and server
 //            //  got out of Sync. So one suggestion could be to show an error dialog saying\
 //            //  Inconsistent state and then a button that asks the server for its state and then

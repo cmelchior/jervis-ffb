@@ -36,9 +36,10 @@ import kotlin.properties.Delegates
  * [GameEngineController.handleAction] ensuring that all access to the generator
  * is thread-safe. As it is not thread-safe by itself.
  *
- * The generator is tied to a specific [Game] instance and will also undo
- * itself as part of undoing actions. This will ensure that the same
- * IDs will be generated across multiple machines.
+ * The generator is tied to a specific [Game] instance. Ids are always incremental
+ * even if actions are undone. This ensures that we all connected clients can
+ * agree on the sequence of events even with [com.jervisffb.engine.actions.Undo] in
+ * the mix.
  */
 class IdGenerator {
     private data class Snapshot(
@@ -48,12 +49,10 @@ class IdGenerator {
 
     private var diceId: Int = 0
     private var logId: Int = 0
-    private val snapshots: MutableList<Snapshot> = mutableListOf()
 
     fun reset() {
         diceId = 0
         logId = 0
-        snapshots.clear()
     }
 
     fun nextDiceId(): DieId {
@@ -62,20 +61,6 @@ class IdGenerator {
 
     fun nextLogId(): String {
         return (++logId).toString()
-    }
-
-    fun saveSnapshot() {
-        snapshots.add(Snapshot(diceId, logId))
-    }
-
-    fun restoreSnapshot() {
-        val (savedDiceId, savedLogId) = snapshots.removeLast()
-        diceId = savedDiceId
-        logId = savedLogId
-    }
-
-    fun removeLogId() {
-        logId -= 1
     }
 }
 
