@@ -42,6 +42,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.PlayerSubActionSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
+import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
@@ -88,6 +89,7 @@ fun ActionSelector(
                             is RerollOptionSelected -> action.option.toString()
                             is MoveTypeSelected -> action.moveType.toString()
                             Undo -> TODO()
+                            Revert -> TODO()
                             is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
                             is PlayerSubActionSelected -> action.action.toString()
                             is SkillSelected -> action.skill.toString()

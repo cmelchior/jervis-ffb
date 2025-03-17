@@ -3,7 +3,7 @@ package com.jervisffb.net.handlers
 import com.jervisffb.net.GameSession
 import com.jervisffb.net.JervisNetworkWebSocketConnection
 import com.jervisffb.net.messages.InternalJoinMessage
-import com.jervisffb.net.messages.JervisErrorCode
+import com.jervisffb.net.messages.UnknownServerError
 
 class InternalJoinHandler(
     override val session: GameSession
@@ -12,7 +12,7 @@ class InternalJoinHandler(
         try {
             message.action()
         } catch (e: Exception) {
-            session.out.sendError(connection,  message, JervisErrorCode.UNKNOWN_ERROR, e.message ?: "An unexpected error occurred.")
+            session.out.sendError(connection,  UnknownServerError(e.stackTraceToString()))
         }
     }
 }

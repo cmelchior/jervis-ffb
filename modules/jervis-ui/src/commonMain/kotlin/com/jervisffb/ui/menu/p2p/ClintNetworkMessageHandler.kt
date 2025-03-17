@@ -1,9 +1,9 @@
 package com.jervisffb.ui.menu.p2p
 
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
-import com.jervisffb.engine.model.GameDeltaId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
@@ -20,7 +20,6 @@ import com.jervisffb.net.messages.GameReadyMessage
 import com.jervisffb.net.messages.GameStartedMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
 import com.jervisffb.net.messages.HostedTeamInfo
-import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.JoinGameAsCoachMessage
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
@@ -74,8 +73,8 @@ interface ClientNetworkMessageHandler {
     fun updateClientState(state: P2PClientState)
     fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>)
     fun onGameReady(id: GameId)
-    fun onServerError(errorCode: JervisErrorCode, message: String)
-    fun onGameAction(producer: CoachId, serverIndex: GameDeltaId, action: GameAction)
+    fun onServerError(error: ServerError)
+    fun onGameAction(producer: CoachId, serverIndex: GameActionId, action: GameAction)
 }
 
 abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler {
@@ -94,8 +93,8 @@ abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler 
     override fun updateClientState(state: P2PClientState) { }
     override fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>) { }
     override fun onGameReady(id: GameId) { }
-    override fun onServerError(errorCode: JervisErrorCode, message: String) { }
-    override fun onGameAction(producer: CoachId, serverIndex: GameDeltaId, action: GameAction) { }
+    override fun onServerError(error: ServerError) { }
+    override fun onGameAction(producer: CoachId, serverIndex: GameActionId, action: GameAction) { }
 }
 
 /**
@@ -173,7 +172,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
                 is GameNotFoundMessage -> TODO()
                 is GameReadyMessage -> messageHandler.onGameReady(message.gameId)
                 is CoachJoinedMessage -> messageHandler.onCoachJoined(message.coach, message.isHomeCoach)
-                is ServerError -> messageHandler.onServerError(message.errorCode, message.message)
+                is ServerError -> messageHandler.onServerError(message)
                 is TeamJoinedMessage -> messageHandler.onTeamSelected(message.getTeam(), message.isHomeTeam)
                 is CoachLeftMessage -> messageHandler.onCoachLeft(message.coach)
                 is SpectatorJoinedMessage -> TODO()
@@ -219,7 +218,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         send(msg)
     }
 
-    suspend fun sendClientAction(index: GameDeltaId, action: GameAction) {
+    suspend fun sendClientAction(index: GameActionId, action: GameAction) {
         val msg = GameActionMessage(index, action)
         send(msg)
     }

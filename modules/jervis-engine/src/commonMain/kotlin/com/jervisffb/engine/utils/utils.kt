@@ -45,6 +45,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.PlayerSubActionSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
+import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectCoinSide
@@ -159,6 +160,7 @@ fun GameAction.isRandomAction(): Boolean {
         is RerollOptionSelected -> false
         is SkillSelected -> false
         Undo -> false
+        Revert -> false
     }
 }
 

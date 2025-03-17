@@ -17,10 +17,10 @@ import kotlin.jvm.JvmInline
 
 
 /**
- * These ID's uniquely identify [GameAction] that has been handled by the
- * [GameEngineController]. The IDs should be sequential. This means that looking
- * at the action history should have a list of actions ranging from 0 until
- * count(actions) - 1.
+ * These ID's uniquely identify a [GameAction] that has been handled by the
+ * [GameEngineController]. The IDs should always be increasing. This means that
+ * looking at the action history should have a list of action ids ranging from 1 until
+ * count(actions).
  *
  * This also makes it possible to reason about multiple events arriving
  * at the GameController. If it sees a GameAction with an ID that has already
@@ -29,7 +29,17 @@ import kotlin.jvm.JvmInline
  */
 @Serializable
 @JvmInline
-value class GameActionId(val value: Int)
+value class GameActionId(val value: Int) {
+    operator fun plus(increment: Int): GameActionId {
+        return GameActionId(value + increment)
+    }
+    operator fun minus(increment: Int): GameActionId {
+        return GameActionId(value - increment)
+    }
+    operator fun compareTo(other: GameActionId): Int {
+        return value.compareTo(other.value)
+    }
+}
 
 /**
  * Interface describing all legal [GameAction] events of a certain type that an

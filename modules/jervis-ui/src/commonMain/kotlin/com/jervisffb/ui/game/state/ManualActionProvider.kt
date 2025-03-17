@@ -75,7 +75,6 @@ open class ManualActionProvider(
     // sending anything else
     private var delayBetweenActions = false
     private val queuedActions = mutableListOf<GameAction>()
-
     private val queuedActionsGeneratorFuncs = mutableListOf<QueuedActionsGenerator>()
 
     val fieldActionDecorators = mapOf(
@@ -114,7 +113,7 @@ open class ManualActionProvider(
         // Do nothing. We are sharing the controller with the main UiGameController
     }
 
-    override fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
+    override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
         this.availableActions = controller.getAvailableActions()
 
         // If the UI has registered any queued action generators, we run them first before
@@ -131,7 +130,7 @@ open class ManualActionProvider(
 
         // We only want to check for other automated settings if no queued up actions exists.
         // This also means that anyone queuing up actions, most queue up all intermediate actions
-        // as well.
+        // as well. Even the ones that are normally automatically created.
         if (queuedActions.isEmpty()) {
             automatedAction = calculateAutomaticResponse(controller, controller.getAvailableActions().actions)
         }
@@ -170,6 +169,11 @@ open class ManualActionProvider(
     }
 
     override suspend fun getAction(): GameAction {
+        // When returning actions we resolve it with the following priority
+        // 1. All Queued actions
+        // 2. Then automated actions
+        // 3. Actions from the UI
+
         // Empty queued data if present
         if (queuedActions.isNotEmpty()) {
             val action = queuedActions.removeFirst()
@@ -183,7 +187,7 @@ open class ManualActionProvider(
         delayBetweenActions = false
 
         // Otherwise empty automated response
-        // otherwise wait for response
+        // And finally ask the UI
         return automatedAction?.let { action ->
             automatedAction = null
             action
@@ -378,6 +382,10 @@ open class ManualActionProvider(
      */
     override fun registerQueuedActionGenerator(function: QueuedActionsGenerator) {
         queuedActionsGeneratorFuncs.add(function)
+    }
+
+    override fun hasQueuedActions(): Boolean {
+        return queuedActions.isNotEmpty()
     }
 }
 

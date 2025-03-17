@@ -1,6 +1,7 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.rules.Rules
@@ -29,7 +30,7 @@ class GameEngineControllerTests {
     }
 
     @Test
-    fun undoIncrementDeltaId() {
+    fun undoIncrementActionId() {
         val rules = StandardBB2020Rules().toBuilder().run {
             undoActionBehavior = UndoActionBehavior.ALLOWED
             build()
@@ -68,5 +69,25 @@ class GameEngineControllerTests {
             controller.handleAction(Undo)
         }
         assertEquals(1, controller.currentActionIndex().value)
+    }
+
+    @Test
+    fun revertDecrementsActionId() {
+        val rules = StandardBB2020Rules().toBuilder().run {
+            undoActionBehavior = UndoActionBehavior.NOT_ALLOWED // Revert is always allowed
+            build()
+        }
+        val controller = createGameController(rules)
+
+        // Verify that reverting actions also decrement the action id
+        assertEquals(0, controller.currentActionIndex().value)
+        controller.handleAction(1.d3)
+        assertEquals(1, controller.currentActionIndex().value)
+        controller.handleAction(2.d3)
+        assertEquals(2, controller.currentActionIndex().value)
+        controller.handleAction(Revert)
+        assertEquals(1, controller.currentActionIndex().value)
+        controller.handleAction(Revert)
+        assertEquals(0, controller.currentActionIndex().value)
     }
 }

@@ -30,7 +30,7 @@ class ReplayActionProvider(private val fumbbl: FumbblReplayAdapter?): UiActionPr
     }
 
 
-    override fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
+    override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
         this.controller = controller
         this.actions = controller.getAvailableActions()
     }
@@ -60,6 +60,10 @@ class ReplayActionProvider(private val fumbbl: FumbblReplayAdapter?): UiActionPr
 
     override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {
         // Do nothing
+    }
+
+    override fun hasQueuedActions(): Boolean {
+        return false
     }
 
     fun startActionProvider() {

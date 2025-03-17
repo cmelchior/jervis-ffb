@@ -1,19 +1,17 @@
 package com.jervisffb.net
 
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
-import com.jervisffb.engine.model.GameDeltaId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.net.messages.ClientMessage
 import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.CoachLeftMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage
 import com.jervisffb.net.messages.GameReadyMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
-import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.ServerError
@@ -119,13 +117,12 @@ class ServerCommunication(
         sendToConnection(session.client!!.connection, msg)
     }
 
-    suspend fun sendError(connection: JervisNetworkWebSocketConnection?, inMessage: ClientMessage, errorCode: JervisErrorCode, message: String) {
-        LOG.w { "[Server] [${connection?.username}:${inMessage::class.simpleName}] Sending error ($errorCode): $message" }
-        val msg = ServerError(errorCode, message)
+    suspend fun sendError(connection: JervisNetworkWebSocketConnection?, errorMessage: ServerError) {
+        LOG.w { "[Server] [${connection?.username}] Sending error (${errorMessage.errorCode}): ${errorMessage.message}" }
         if (connection != null) {
-            sendToConnection(connection, msg)
+            sendToConnection(connection, errorMessage)
         } else {
-            sendAllConnections(msg)
+            sendAllConnections(errorMessage)
         }
     }
 
@@ -194,7 +191,7 @@ class ServerCommunication(
 
     // A Game action was sent to the server and processed successfully, it should now be sent to all other connected
     // clients so they can update their local game model.
-    suspend fun sendGameActionSync(sender: JoinedP2PCoach?, producer: CoachId, index: GameDeltaId, action: GameAction) {
+    suspend fun sendGameActionSync(sender: JoinedP2PCoach?, producer: CoachId, index: GameActionId, action: GameAction) {
         val message = SyncGameActionMessage(producer, index, action)
         sendToAllOtherConnections(sender, message)
     }

@@ -33,7 +33,7 @@ class RandomActionProvider(val controller: GameEngineController): UiActionProvid
         // Do nothing
     }
 
-    override fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
+    override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
         this.actions = controller.getAvailableActions()
     }
 
@@ -62,6 +62,10 @@ class RandomActionProvider(val controller: GameEngineController): UiActionProvid
 
     override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {
         TODO("Not yet implemented")
+    }
+
+    override fun hasQueuedActions(): Boolean {
+        return false
     }
 
     fun startActionProvider() {

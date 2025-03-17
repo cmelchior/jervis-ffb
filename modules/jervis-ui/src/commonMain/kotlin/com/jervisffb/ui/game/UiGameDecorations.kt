@@ -1,6 +1,6 @@
 package com.jervisffb.ui.game
 
-import com.jervisffb.engine.model.GameDeltaId
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
@@ -20,7 +20,7 @@ class UiGameDecorations {
     // State used to track UI decorators for things that are not tracked
     // in the rules engine layer.
     val bloodspots: MutableList<BloodSpot> = mutableListOf()
-    private val undostack: MutableMap<GameDeltaId, () -> Unit> = mutableMapOf()
+    private val undostack: MutableMap<GameActionId, () -> Unit> = mutableMapOf()
     private val blodspots: MutableMap<FieldCoordinate, BloodSpot> = mutableMapOf()
 
     private var usedMoveToStandUp: Int? = null
@@ -54,10 +54,10 @@ class UiGameDecorations {
         movesUsed.clear()
     }
 
-    fun registerUndo(deltaId: GameDeltaId, action: () -> Unit) {
+    fun registerUndo(deltaId: GameActionId, action: () -> Unit) {
         undostack[deltaId] = action
     }
-    fun undo(deltaId: GameDeltaId? = null) {
+    fun undo(deltaId: GameActionId? = null) {
         undostack[deltaId]?.invoke()
     }
 }

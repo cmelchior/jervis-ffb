@@ -37,8 +37,29 @@ data class CompositeGameAction(val list: List<GameAction>): GameAction {
     constructor(vararg actions: GameAction) : this(listOf(*actions))
 }
 
+/**
+ * Special action that will undo the previous user action (and associated
+ * side effects).
+ */
 @Serializable
 data object Undo : GameAction
+
+/**
+ * This action is a special variant of [Undo]. Similar to [Undo] it also
+ * reverts the last user action, but on top of this, it also decrements
+ * the last seen [GameActionId]. This means that after handling the Revert,
+ * there is no way to observe on the [com.jervisffb.engine.GameEngineController]
+ * that it was modified.
+ *
+ * Since we use the [GameActionId] to synchronize state between distributed
+ * clients, this action should be used with caution. Currently the only
+ * valid use case, is rewinding the game state based on errors from the server.
+ * E.g. if the client sends an action that is reverted by the server, the client
+ * needs to remove the action again, while making sure that its internal action
+ * id counter is the same as other clients.
+ */
+@Serializable
+data object Revert : GameAction
 
 @Serializable
 data object Continue : GameAction

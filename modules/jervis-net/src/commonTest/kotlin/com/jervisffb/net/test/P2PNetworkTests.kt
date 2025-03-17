@@ -1,9 +1,15 @@
 package com.jervisffb.net.test
 
 import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.GameActionId
+import com.jervisffb.engine.actions.Revert
+import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.ext.d3
+import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.model.CoachId
-import com.jervisffb.engine.model.GameDeltaId
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode
@@ -14,13 +20,17 @@ import com.jervisffb.net.messages.ConfirmGameStartMessage
 import com.jervisffb.net.messages.GameActionMessage
 import com.jervisffb.net.messages.GameReadyMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
+import com.jervisffb.net.messages.InvalidGameActionOwnerServerError
+import com.jervisffb.net.messages.InvalidGameActionTypeServerError
 import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.JoinGameAsCoachMessage
+import com.jervisffb.net.messages.OutOfOrderGameActionServerError
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.P2PTeamInfo
 import com.jervisffb.net.messages.ServerError
 import com.jervisffb.net.messages.StartGameMessage
+import com.jervisffb.net.messages.SyncGameActionMessage
 import com.jervisffb.net.messages.TeamJoinedMessage
 import com.jervisffb.net.messages.TeamSelectedMessage
 import com.jervisffb.net.messages.UpdateClientStateMessage
@@ -47,7 +57,12 @@ import kotlin.time.Duration.Companion.seconds
  */
 class P2PNetworkTests {
 
-    val rules = StandardBB2020Rules()
+    val rules = StandardBB2020Rules().toBuilder().run {
+        diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
+        undoActionBehavior = UndoActionBehavior.ALLOWED
+        timers.timersEnabled = false
+        build()
+    }
     val server = LightServer(
         gameName = "test",
         rules = rules,
@@ -281,9 +296,9 @@ class P2PNetworkTests {
         consumeServerMessage<UpdateClientStateMessage>(conn2)
 
         // Host sends message not supported at this point (it should be team selection)
-        conn1.send(GameActionMessage(GameDeltaId(100), Continue))
+        conn1.send(GameActionMessage(GameActionId(100), Continue))
         checkServerMessage<ServerError>(conn1) {
-            assertEquals(JervisErrorCode.INVALID_GAME_ACTION, it.errorCode)
+            assertEquals(JervisErrorCode.OUT_OF_ORDER_GAME_ACTION, it.errorCode)
         }
 
         // Host selects team
@@ -295,6 +310,80 @@ class P2PNetworkTests {
         conn2.close()
         server.stop()
     }
+
+
+    @Test
+    fun serverSendsErrorIfWrongClientSendsAction() {
+        startGame { homeConn, awayConn ->
+            // Home team is expected send a factor factor roll, but away team sends it instead.
+            // This should result in the server sending an error to Away team, but not change the
+            // server game state.
+            awayConn.send(GameActionMessage(GameActionId(1), 1.d3))
+            checkServerMessage<InvalidGameActionOwnerServerError>(awayConn) { errorMessage ->
+                assertEquals(GameActionId(1),  errorMessage.actionId)
+            }
+            homeConn.send(GameActionMessage(GameActionId(1), 1.d3))
+            checkServerMessage<SyncGameActionMessage>(awayConn) { message ->
+                assertEquals(GameActionId(1), message.serverIndex)
+            }
+        }
+    }
+
+    @Test
+    fun serverSendsErrorIfActionIsOutOfOrder() {
+        startGame { homeConn, awayConn ->
+            // The Home team is expected to send a fan factor roll, but we fake the action id to be
+            // too far in the future. The server should reject messages sending unexpected action ids.
+            homeConn.send(GameActionMessage(GameActionId(2), 1.d3))
+            checkServerMessage<OutOfOrderGameActionServerError>(homeConn) { errorMessage ->
+                assertEquals(GameActionId(2),  errorMessage.actionId)
+            }
+            homeConn.send(GameActionMessage(GameActionId(1), 1.d3))
+            checkServerMessage<SyncGameActionMessage>(awayConn) { message ->
+                assertEquals(GameActionId(1), message.serverIndex)
+            }
+        }
+    }
+
+    @Test
+    fun serverSendsErrorIfActionIsWrongType() {
+        startGame { homeConn, awayConn ->
+            // The Home team is expected to send a fan factor roll, but sends another event (but with the
+            // correct action id)
+            homeConn.send(GameActionMessage(GameActionId(1), 1.d6))
+            checkServerMessage<InvalidGameActionTypeServerError>(homeConn) { errorMessage ->
+                assertEquals(GameActionId(1),  errorMessage.actionId)
+            }
+            homeConn.send(GameActionMessage(GameActionId(1), 1.d3))
+            checkServerMessage<SyncGameActionMessage>(awayConn) { message ->
+                assertEquals(GameActionId(1), message.serverIndex)
+            }
+        }
+    }
+
+    @Test
+    fun serverNeverAcceptsRevertActions() {
+        startGame { homeConn, awayConn ->
+            // The Home team is expected to send a fan factor roll. But isn't allowed to "Revert" it
+            // on the server. Only "Undo" it.
+            homeConn.send(GameActionMessage(GameActionId(1), 1.d3))
+            consumeServerMessage<SyncGameActionMessage>(awayConn)
+            // Invalid action
+            homeConn.send(GameActionMessage(GameActionId(2), Revert))
+            checkServerMessage<InvalidGameActionTypeServerError>(homeConn) { errorMessage ->
+                assertEquals(GameActionId(2),  errorMessage.actionId)
+            }
+            // Since we are waiting on the Away coach, only this coach is allowed to undo (even though it undoes
+            // the home coaches roll)
+            awayConn.send(GameActionMessage(GameActionId(2), Undo))
+            consumeServerMessage<SyncGameActionMessage>(homeConn)
+            homeConn.send(GameActionMessage(GameActionId(3), 1.d3))
+            checkServerMessage<SyncGameActionMessage>(awayConn) { message ->
+                assertEquals(GameActionId(3), message.serverIndex)
+            }
+        }
+    }
+
 
     @Test
     fun serverTerminatesWithConnectedClients() {
@@ -316,9 +405,69 @@ class P2PNetworkTests {
         // TODO
     }
 
-    @Test
-    fun serverSendsRevertGameActionClientIfWrong() {
-        // TODO
+    // Helper method that starts a came and puts it at the "Waiting for first action" stage.
+    // Connections and server will be closed regardless if any exception is thrown.
+    private fun startGame(block: suspend (JervisClientWebSocketConnection, JervisClientWebSocketConnection) -> Unit) = runBlocking {
+        server.start()
+        val conn1 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")
+        conn1.start()
+        val conn2 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "client")
+        conn2.start()
+        val join1 = JoinGameAsCoachMessage(
+            GameId("test"),
+            "host",
+            null,
+            "host",
+            true,
+            P2PTeamInfo(createDefaultHomeTeam())
+        )
+        conn1.send(join1)
+        consumeServerMessage<GameStateSyncMessage>(conn1)
+        consumeServerMessage<CoachJoinedMessage>(conn1)
+        consumeServerMessage<TeamJoinedMessage>(conn1)
+        consumeServerMessage<UpdateHostStateMessage>(conn1)
+
+        // Client Joins
+        val join2 = JoinGameAsCoachMessage(
+            GameId("test"),
+            "client",
+            null,
+            "client",
+            false
+        )
+        conn2.send(join2)
+        consumeServerMessage<CoachJoinedMessage>(conn1)
+        consumeServerMessage<GameStateSyncMessage>(conn2)
+        consumeServerMessage<CoachJoinedMessage>(conn2)
+        consumeServerMessage<UpdateClientStateMessage>(conn2)
+
+        // Client selects team
+        conn2.send(TeamSelectedMessage(P2PTeamInfo(lizardMenAwayTeam())))
+        consumeServerMessage<TeamJoinedMessage>(conn1)
+        consumeServerMessage<TeamJoinedMessage>(conn2)
+
+        // Receive request to start game
+        consumeServerMessage<ConfirmGameStartMessage>(conn1)
+        consumeServerMessage<ConfirmGameStartMessage>(conn2)
+        consumeServerMessage<UpdateHostStateMessage>(conn1)
+        consumeServerMessage<UpdateClientStateMessage>(conn2)
+
+        // Confirm starting game
+        conn1.send(StartGameMessage(true))
+        conn2.send(StartGameMessage(true))
+
+        // Game is starting
+        consumeServerMessage<GameReadyMessage>(conn1)
+        consumeServerMessage<GameReadyMessage>(conn2)
+        consumeServerMessage<UpdateHostStateMessage>(conn1)
+        consumeServerMessage<UpdateClientStateMessage>(conn2)
+        try {
+            block(conn1, conn2)
+        } finally {
+            conn1.close()
+            conn2.close()
+            server.stop()
+        }
     }
 
 

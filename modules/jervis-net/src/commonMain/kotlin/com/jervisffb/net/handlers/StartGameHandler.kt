@@ -3,9 +3,9 @@ package com.jervisffb.net.handlers
 import com.jervisffb.net.GameSession
 import com.jervisffb.net.JervisNetworkWebSocketConnection
 import com.jervisffb.net.messages.GameState
-import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
+import com.jervisffb.net.messages.ProtocolErrorServerError
 import com.jervisffb.net.messages.StartGameMessage
 
 class StartGameHandler(override val session: GameSession) : ClientMessageHandler<StartGameMessage>() {
@@ -15,11 +15,17 @@ class StartGameHandler(override val session: GameSession) : ClientMessageHandler
         if (connection == null) error("Missing connection for message: $message")
         session.getPlayerClient(connection)?.let {
             if (it.hasAcceptedGame) {
-                session.out.sendError(connection, message, JervisErrorCode.PROTOCOL_ERROR, "Player has already accepted the game.")
+                session.out.sendError(
+                    connection,
+                    ProtocolErrorServerError("Player has already accepted the game."),
+                )
                 return@let
             }
             if (session.state != GameState.STARTING) {
-                session.out.sendError(connection, message, JervisErrorCode.PROTOCOL_ERROR, "Game are in a state that doesn't allow starting: ${session.state}.")
+                session.out.sendError(
+                    connection,
+                    ProtocolErrorServerError("Game are in a state that doesn't allow starting: ${session.state}."),
+                )
                 return@let
             }
             it.hasAcceptedGame = true
@@ -31,6 +37,9 @@ class StartGameHandler(override val session: GameSession) : ClientMessageHandler
                 session.out.sendHostStateUpdate(session.hostState)
                 session.out.sendClientStateUpdate(session.clientState)
             }
-        } ?: session.out.sendError(connection, message,JervisErrorCode.PROTOCOL_ERROR, "Spectator clients cannot start games: $message")
+        } ?: session.out.sendError(
+            connection,
+            ProtocolErrorServerError("Spectator clients cannot start games: $message"),
+        )
     }
 }

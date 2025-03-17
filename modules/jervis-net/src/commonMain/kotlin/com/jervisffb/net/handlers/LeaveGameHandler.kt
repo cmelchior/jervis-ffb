@@ -4,8 +4,8 @@ import com.jervisffb.net.GameSession
 import com.jervisffb.net.JervisExitCode
 import com.jervisffb.net.JervisNetworkWebSocketConnection
 import com.jervisffb.net.messages.GameState
-import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.LeaveGameMessage
+import com.jervisffb.net.messages.ProtocolErrorServerError
 
 class LeaveGameHandler(override val session: GameSession) : ClientMessageHandler<LeaveGameMessage>() {
     override suspend fun handleMessage(message: LeaveGameMessage, connection: JervisNetworkWebSocketConnection?) {
@@ -14,9 +14,7 @@ class LeaveGameHandler(override val session: GameSession) : ClientMessageHandler
             GameState.JOINING -> {
                 session.out.sendError(
                     connection,
-                    message,
-                    JervisErrorCode.PROTOCOL_ERROR,
-                    "A game in ${session.state} is in the wrong state to leave: $message"
+                    ProtocolErrorServerError("A game in ${session.state} is in the wrong state to leave: $message")
                 )
             }
             GameState.STARTING -> {
@@ -35,9 +33,7 @@ class LeaveGameHandler(override val session: GameSession) : ClientMessageHandler
             GameState.FINISHED -> {
                 session.out.sendError(
                     connection,
-                    message,
-                    JervisErrorCode.PROTOCOL_ERROR,
-                    "Game '${session.gameId}' already finished: $message"
+                    ProtocolErrorServerError("Game '${session.gameId}' already finished: $message")
                 )
             }
         }

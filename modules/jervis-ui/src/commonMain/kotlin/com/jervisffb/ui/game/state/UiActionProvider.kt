@@ -40,11 +40,12 @@ abstract class UiActionProvider {
     protected val actionRequestChannel = Channel<Pair<GameEngineController, ActionRequest>>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
     protected val actionSelectedChannel = Channel<GameAction>(capacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
 
-    abstract fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest)
+    abstract suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest)
     abstract fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest)
     abstract fun decorateSelectedAction(state: UiGameSnapshot, action: GameAction)
     abstract suspend fun getAction(): GameAction
     abstract fun userActionSelected(action: GameAction)
     abstract fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean = true)
     abstract fun registerQueuedActionGenerator(generator: QueuedActionsGenerator)
+    abstract fun hasQueuedActions(): Boolean
 }

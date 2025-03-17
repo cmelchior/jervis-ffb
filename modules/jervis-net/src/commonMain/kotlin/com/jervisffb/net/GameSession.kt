@@ -24,7 +24,6 @@ import com.jervisffb.net.messages.GameState
 import com.jervisffb.net.messages.InternalClientMessage
 import com.jervisffb.net.messages.InternalGameActionMessage
 import com.jervisffb.net.messages.InternalJoinMessage
-import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.JoinGameAsCoachMessage
 import com.jervisffb.net.messages.JoinGameAsSpectatorMessage
 import com.jervisffb.net.messages.JoinGameMessage
@@ -32,6 +31,8 @@ import com.jervisffb.net.messages.LeaveGameMessage
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.P2PTeamInfo
+import com.jervisffb.net.messages.ProtocolErrorServerError
+import com.jervisffb.net.messages.ReadMessageServerError
 import com.jervisffb.net.messages.ReceivedMessage
 import com.jervisffb.net.messages.ServerError
 import com.jervisffb.net.messages.SpectatorState
@@ -242,7 +243,7 @@ class GameSession(
                 } catch (ex: Throwable) {
                     if (ex is CancellationException) throw ex
                     println("Error: $ex")
-                    val error = ServerError(JervisErrorCode.READ_MESSAGE_ERROR, ex.stackTraceToString())
+                    val error = ReadMessageServerError(ex.stackTraceToString())
                     sendError(client, error)
                 }
             }
@@ -277,7 +278,7 @@ class GameSession(
                 // restart.
                 shutdownGame(JervisExitCode.UNEXPECTED_ERROR, ex.stackTraceToString())
             }
-        } ?: out.sendError(message.connection, message.message, JervisErrorCode.PROTOCOL_ERROR, "No handler found for message: $clientMessage")
+        } ?: out.sendError(message.connection, ProtocolErrorServerError("No handler found for message: $clientMessage"))
     }
 
     private fun saveGameProgress(message: ReceivedMessage) {

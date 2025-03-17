@@ -1,9 +1,9 @@
 package com.jervisffb.net.messages
 
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
-import com.jervisffb.engine.model.GameDeltaId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
@@ -149,7 +149,7 @@ data class GameNotFoundMessage(val gameId: String): ServerMessage
  * @param action the action to send
  */
 @Serializable
-data class SyncGameActionMessage(val producer: CoachId, val serverIndex: GameDeltaId, val action: GameAction): ServerMessage
+data class SyncGameActionMessage(val producer: CoachId, val serverIndex: GameActionId, val action: GameAction): ServerMessage
 
 @Serializable
 data class TeamData(
@@ -174,12 +174,76 @@ data class GameReadyMessage(val gameId: GameId): ServerMessage
 
 // Codes sent as part of `ServerErrorMessage` payloads.
 enum class JervisErrorCode(val code: Short) {
-    UNKNOWN_ERROR(1), // Catch-all error if a more specific error code could not be determined
-    INVALID_TEAM(2), // Team is not allowed to join the given game
+    // Catch-all error if a more specific error code could not be determined
+    UNKNOWN_ERROR(1),
+    // Team is not allowed to join the given game
+    INVALID_TEAM(2),
     READ_MESSAGE_ERROR(3), // It wasn't possible to read an incoming message (for some reason)
-    PROTOCOL_ERROR(4), // The message could not be accepted due to some invariant being broken
-    INVALID_GAME_ACTION(5), // The action sent wasn't legal and should be reverted
+    // The message could not be accepted due to some invariant being broken.
+    // Note, game actions have their own set of errors. This only applies to other aspects of the protocol.
+    PROTOCOL_ERROR(4),
+    // An action was sent with an unexpected clientIndex, suggesting client and server being out of sync
+    OUT_OF_ORDER_GAME_ACTION(5),
+    // action was rejected by the rules engine because it wasn't valid for the current node.
+    INVALID_GAME_ACTION_TYPE(6),
+    // The server rejected the game action because it was sent by the wrong client for the current node.
+    INVALID_GAME_ACTION_OWNER(7),
+}
+
+// Top-level interface for all server errors
+// Sending an error code in a sealed interface is a bit unnecessary, but it does make some checks
+// and output easier on the client.
+@Serializable
+sealed interface ServerError: ServerMessage {
+    val errorCode: JervisErrorCode
+    val message: String
 }
 
 @Serializable
-data class ServerError(val errorCode: JervisErrorCode, val message: String): ServerMessage
+sealed interface GameActionServerError: ServerError {
+    val actionId: GameActionId
+}
+
+@Serializable
+class UnknownServerError(override val message: String): ServerError {
+    override val errorCode = JervisErrorCode.UNKNOWN_ERROR
+}
+
+@Serializable
+class InvalidTeamServerError(override val message: String): ServerError {
+    override val errorCode = JervisErrorCode.INVALID_TEAM
+}
+
+@Serializable
+class ReadMessageServerError(override val message: String): ServerError {
+    override val errorCode = JervisErrorCode.READ_MESSAGE_ERROR
+}
+
+@Serializable
+class ProtocolErrorServerError(override val message: String): ServerError {
+    override val errorCode = JervisErrorCode.PROTOCOL_ERROR
+}
+
+@Serializable
+class OutOfOrderGameActionServerError(
+    override val actionId: GameActionId,
+    override val message: String,
+): GameActionServerError {
+    override val errorCode = JervisErrorCode.OUT_OF_ORDER_GAME_ACTION
+}
+
+@Serializable
+class InvalidGameActionTypeServerError(
+    override val actionId: GameActionId,
+    override val message: String,
+): GameActionServerError {
+    override val errorCode = JervisErrorCode.INVALID_GAME_ACTION_TYPE
+}
+
+@Serializable
+class InvalidGameActionOwnerServerError(
+    override val actionId: GameActionId,
+    override val message: String
+): GameActionServerError {
+    override val errorCode = JervisErrorCode.INVALID_GAME_ACTION_OWNER
+}

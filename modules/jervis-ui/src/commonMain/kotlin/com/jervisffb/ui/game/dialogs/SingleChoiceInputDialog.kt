@@ -28,6 +28,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.PlayerSubActionSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
+import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Direction
@@ -70,6 +71,7 @@ data class SingleChoiceInputDialog(
                 is NoRerollSelected -> "No reroll"
                 is RerollOptionSelected -> action.option.source.rerollDescription
                 Undo -> TODO()
+                Revert -> TODO()
                 is MoveTypeSelected -> action.moveType.toString()
                 is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
                 is PlayerSubActionSelected -> action.name

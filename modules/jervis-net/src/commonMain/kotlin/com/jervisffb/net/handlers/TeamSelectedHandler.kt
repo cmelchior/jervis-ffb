@@ -3,10 +3,10 @@ package com.jervisffb.net.handlers
 import com.jervisffb.net.GameSession
 import com.jervisffb.net.JervisNetworkWebSocketConnection
 import com.jervisffb.net.messages.GameState
-import com.jervisffb.net.messages.JervisErrorCode
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.P2PTeamInfo
+import com.jervisffb.net.messages.ProtocolErrorServerError
 import com.jervisffb.net.messages.TeamSelectedMessage
 
 class TeamSelectedHandler(override val session: GameSession) : ClientMessageHandler<TeamSelectedMessage>() {
@@ -15,7 +15,10 @@ class TeamSelectedHandler(override val session: GameSession) : ClientMessageHand
         val team = (message.team as P2PTeamInfo).team
         val client = connection?.let { session.getPlayerClient(it) }
         if (client == null) {
-            session.out.sendError(connection, message, JervisErrorCode.PROTOCOL_ERROR, "Connection is not allowed to select a team.")
+            session.out.sendError(
+                connection,
+                ProtocolErrorServerError("Connection is not allowed to select a team.")
+            )
             return
         } else {
             // TODO This is a temp fix for getting the correct team refs. Should probably be done by serialization instead.

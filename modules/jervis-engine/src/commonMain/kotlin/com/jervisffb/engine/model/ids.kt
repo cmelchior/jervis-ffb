@@ -44,14 +44,3 @@ value class RosterId(val id: String)
 @Serializable
 @JvmInline
 value class TeamId(val value: String = "")
-
-@Serializable
-@JvmInline
-value class GameDeltaId(val value: Int) {
-    operator fun plus(increment: Int): GameDeltaId {
-        return GameDeltaId(value + increment)
-    }
-    operator fun compareTo(other: GameDeltaId): Int {
-        return value.compareTo(other.value)
-    }
-}

@@ -3,11 +3,11 @@ package com.jervisffb.engine
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.CompositeCommand
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.model.GameDeltaId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.reports.LogEntry
 
@@ -22,7 +22,7 @@ import com.jervisffb.engine.reports.LogEntry
  * These are captured as individual [ActionStep].
  */
 data class GameDelta(
-    val id: GameDeltaId,
+    val id: GameActionId,
     val steps: List<ActionStep>,
     val owner: TeamId? = null,
     // Game Delta is being reversed. Used during when undoing deltas.
@@ -56,7 +56,7 @@ data class GameDelta(
     }
 }
 
-internal class DeltaBuilder(val deltaId: GameDeltaId, val actionOwner: TeamId? = null) {
+internal class DeltaBuilder(val actionId: GameActionId, val actionOwner: TeamId? = null) {
 
     private val steps = mutableListOf<ActionStep>()
 
@@ -102,6 +102,6 @@ internal class DeltaBuilder(val deltaId: GameDeltaId, val actionOwner: TeamId? =
     }
 
     fun build(): GameDelta {
-        return GameDelta(deltaId, steps, actionOwner)
+        return GameDelta(actionId, steps, actionOwner)
     }
 }

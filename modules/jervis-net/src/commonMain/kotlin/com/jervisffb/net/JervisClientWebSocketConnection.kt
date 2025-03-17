@@ -1,8 +1,7 @@
 package com.jervisffb.net
 
 import com.jervisffb.net.messages.ClientMessage
-import com.jervisffb.net.messages.JervisErrorCode
-import com.jervisffb.net.messages.ServerError
+import com.jervisffb.net.messages.ReadMessageServerError
 import com.jervisffb.net.messages.ServerMessage
 import com.jervisffb.net.serialize.jervisNetworkSerializer
 import com.jervisffb.utils.getHttpClient
@@ -128,7 +127,7 @@ class JervisClientWebSocketConnection(
             }
         } catch (ex: Throwable) {
             if (ex is CancellationException) throw ex
-            val error = ServerError(JervisErrorCode.READ_MESSAGE_ERROR, ex.stackTraceToString())
+            val error = ReadMessageServerError(ex.stackTraceToString())
             // TODO How to handle errors here?
             throw ex
         }

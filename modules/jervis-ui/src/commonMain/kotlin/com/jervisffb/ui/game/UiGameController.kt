@@ -32,10 +32,10 @@ import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
+import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -68,7 +68,7 @@ class LocalActionProvider(
         awayProvider.actionHandled(team, action)
     }
 
-    override fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
+    override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
         currentProvider = if (actions.team?.isAwayTeam() == true) {
             awayProvider
         } else {
@@ -111,6 +111,10 @@ class LocalActionProvider(
     override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {
         currentProvider.registerQueuedActionGenerator(generator)
     }
+
+    override fun hasQueuedActions(): Boolean {
+        return currentProvider.hasQueuedActions()
+    }
 }
 
 /**
@@ -147,8 +151,8 @@ class UiGameController(
     // Persistent UI decorations that needs to be stored across frames
     val uiDecorations = UiGameDecorations()
 
-    private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + Dispatchers.Default)
-    val gameScope = CoroutineScope(Job() + CoroutineName("GameLoopScope") + Dispatchers.Default)
+    private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + singleThreadDispatcher("AnimationScope"))
+    val gameScope = CoroutineScope(Job() + CoroutineName("GameLoopScope") + singleThreadDispatcher("GameLoopScope"))
 
     // Storing a reference to a UiGameSnap is generally a bad idea as it becomes invalid when the game loop
     // rolls over, but we only use the replay during setting up the UI. After that, we should have all consumers

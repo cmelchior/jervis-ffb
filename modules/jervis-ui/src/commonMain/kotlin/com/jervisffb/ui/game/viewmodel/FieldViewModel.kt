@@ -102,7 +102,7 @@ class FieldViewModel(
 
                         if (requiresStandingUp) {
                             // If the player is about to stand up, there is room for uncertainty
-                            // in which game actions to queue up, as the player might have to roll
+                            // in which game actions queue up, as the player might have to roll
                             // and reroll for it. In that case, we just stand up first, and queue
                             // up all move actions up until the player can actually move.
                             actionProvider.registerQueuedActionGenerator { controller ->
