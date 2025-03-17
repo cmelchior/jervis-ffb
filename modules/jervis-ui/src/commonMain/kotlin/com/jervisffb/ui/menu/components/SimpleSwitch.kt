@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,11 +20,11 @@ fun SimpleSwitch(label: String, isSelected: Boolean, isEnabled: Boolean = true, 
             color = if (isEnabled) LocalContentColor.current.copy(LocalContentAlpha.current) else LocalContentColor.current.copy(0.6f),
         )
         Spacer(modifier = Modifier.weight(1f))
-        Switch(
+        JervisSwitch(
             enabled = isEnabled,
             checked = isSelected,
-            onCheckedChange = {
-                onSelected(it)
+            onCheckedChange = { selected ->
+                onSelected(selected)
             }
         )
     }

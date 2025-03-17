@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.menu.components.JervisSwitch
 import com.jervisffb.ui.menu.components.SmallHeader
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -75,7 +75,7 @@ private fun ColumnScope.InducementRow(rowNo: Int, inducement: InducementData, on
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Box(modifier = Modifier.width(70.dp), contentAlignment = Alignment.CenterStart) {
-            Switch(
+            JervisSwitch(
                 enabled = true,
                 checked = inducement.enabled,
                 onCheckedChange = { onCheckChanged(it) }
