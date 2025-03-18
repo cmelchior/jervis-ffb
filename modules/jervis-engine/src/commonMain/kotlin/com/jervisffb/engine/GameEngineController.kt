@@ -259,7 +259,9 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
         deltaBuilder = DeltaBuilder(newDeltaId, actionOwner)
         when (userAction) {
             is Undo -> error("Invalid action: $userAction")
-            is CompositeGameAction -> userAction.list.forEach { processSingleAction(deltaBuilder, userAction) }
+            is CompositeGameAction -> userAction.list.forEach { actionElement ->
+                processSingleAction(deltaBuilder, actionElement)
+            }
             else -> processSingleAction(deltaBuilder, userAction)
         }
         val delta = deltaBuilder.build()
