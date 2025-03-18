@@ -37,6 +37,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
 import kotlin.math.min
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 /**
@@ -45,6 +46,7 @@ import kotlin.test.Test
 class ShaderTests() {
 
     @Test
+    @Ignore // This is only a manual test
     fun main() {
         app()
     }
