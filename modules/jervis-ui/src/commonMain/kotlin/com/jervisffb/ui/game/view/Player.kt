@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.FilterQuality
@@ -203,7 +204,7 @@ private fun PlayerImage(bitmap: ImageBitmap, isSelectable: Boolean, alpha: Float
                     withTransform({
                         scale(scale, scale, pivot = Offset.Zero)
                     }) {
-                        drawRect(brush = shaderBrush, topLeft = Offset.Zero, size = size)
+                        drawRect(brush = shaderBrush, topLeft = Offset.Zero, size = size, alpha = alpha)
                     }
                 }
             }
@@ -217,7 +218,7 @@ private fun PlayerImage(bitmap: ImageBitmap, isSelectable: Boolean, alpha: Float
             // allowing dynamic scaling. We probably need to play around with
             // this setting.
             filterQuality = FilterQuality.Low,
-            modifier = Modifier.matchParentSize()
+            modifier = Modifier.aspectRatio(1f).fillMaxSize().alpha(alpha)
         )
     }
 }

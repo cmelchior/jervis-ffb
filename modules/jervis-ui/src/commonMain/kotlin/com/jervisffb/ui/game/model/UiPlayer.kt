@@ -5,7 +5,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.isOnHomeTeam
 
-data class UiPlayer(
+class UiPlayer(
     val model: Player,
     var selectAction: (() -> Unit)? = null,
     var onHover: (() -> Unit)? = null,

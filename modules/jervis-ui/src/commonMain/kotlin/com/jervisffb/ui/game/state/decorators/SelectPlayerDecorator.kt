@@ -9,6 +9,7 @@ import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.calculateAssumedNoOfBlockDice
 
@@ -45,8 +46,8 @@ class SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
                     val square = snapshot.fieldSquares[playerLocation]
                     snapshot.fieldSquares[playerLocation] = square?.copy(
                         dice = dice,
-                        player = square.player?.copy(selectAction = selectedAction),
-                        onSelected = selectedAction,
+                        player = UiPlayer(square.player!!.model, selectedAction,square.player.onHover, square.player.onHoverExit),
+                        onSelected = selectedAction
                     ) ?: error("Unexpected player location : $playerLocation")
                 }
                 is GiantLocation -> TODO("Not supported right now")
