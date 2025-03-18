@@ -26,7 +26,6 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
     var autoEndPlayerAction by remember { mutableStateOf(vm.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTON)) }
     var selectBlockType by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTON)) }
     MenuBar {
-
         Menu("Developer Tools", mnemonic = 'D') {
             Item("Save Game", onClick = {
                 filePicker(
@@ -82,6 +81,8 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
             )
         }
 
+        // For now, we just ignore the command if it isn't legal, e.g. if it is the other team that is
+        // setting up. Should we instead try to disable these?
         Menu("Setups", mnemonic = 'S') {
             Menu("Defensive") {
                 Item(Setups.SETUP_3_4_4, onClick = { vm.loadSetup(Setups.SETUP_3_4_4) })

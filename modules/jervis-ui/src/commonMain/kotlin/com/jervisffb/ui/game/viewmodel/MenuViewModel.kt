@@ -84,6 +84,17 @@ class MenuViewModel {
     }
 
     fun loadSetup(id: String) {
+        val allowedTeam = when (uiState.uiMode) {
+            TeamActionMode.HOME_TEAM -> uiState.state.homeTeam.id
+            TeamActionMode.AWAY_TEAM -> uiState.state.awayTeam.id
+            TeamActionMode.ALL_TEAMS -> null // No team restrictions when undoing on a Client controlling both teams
+        }
+        if (allowedTeam != null && controller?.state?.activeTeam?.id == allowedTeam) {
+            // This client is not considered the "active" client, which means it isn't allowed
+            // to load setup formations
+            return
+        }
+
         val game = controller ?: error("No game controller was found")
         val team = game.state.getContext<SetupTeamContext>().team
         val setupActions = Setups.setups[id]!!.flatMap { (playerNo, fieldCoordinate) ->
