@@ -6,6 +6,8 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.isOnHomeTeam
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
@@ -68,9 +70,25 @@ object AnimationFactory {
         val catchOrBounce = (firstCatch || firstBounce) && stack.containsNode(TheKickOffEvent.ResolveBallLanding)
         val touchBack = stack.currentNode() == TheKickOffEvent.TouchBack
         if (catchOrBounce || touchBack) {
-            val from = state.kickingPlayer!!.location as OnFieldLocation
+            // The kicking player might no longer be on the field. For example, in the case of a Pitch Invasion
+            // or a Blitz. For now, we just decide to animate the ball from the center of the end-zone, but maybe
+            // some other solution would be funnier/better?
+            val from = when (val kickerLocation = state.kickingPlayer!!.location) {
+                is OnFieldLocation -> kickerLocation
+                else -> {
+                    if (state.kickingPlayer!!.isOnHomeTeam()) {
+                        val x = 0
+                        val y = state.rules.fieldHeight / 2
+                        FieldCoordinate(x, y)
+                    } else {
+                        val x = state.rules.fieldWidth - 1
+                        val y = state.rules.fieldHeight / 2
+                        FieldCoordinate(x, y)
+                    }
+                }
+            }
             var to = state.singleBall().location
-            var outOfBounds = false
+            val outOfBounds = false
             if (to.isOutOfBounds(rules)) {
                 to = state.singleBall().outOfBoundsAt!!
             }
