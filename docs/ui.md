@@ -84,3 +84,5 @@ things as they come up.
   it needs to roll and then immediately re-apply the dice roll.
 - It should not be possible for the non-active client to select setups. The server handles this fine
   now by reverting state, but should be disallowed at the UI level.
+- Player Active State (player icon) is not made in-active during a turnover where the player fell to 
+  the ground.

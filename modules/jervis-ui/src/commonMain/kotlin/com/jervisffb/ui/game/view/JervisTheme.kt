@@ -74,4 +74,12 @@ object JervisTheme {
 //    val fumbblBackground = Color(0xFFE8DDB5) // Color(0xFFE6E8E6)
 }
 
+fun Color.toSkiaColor(): Int {
+    val red = (red * 255).toInt()
+    val green = (green * 255).toInt()
+    val blue = (blue * 255).toInt()
+    return org.jetbrains.skia.Color.makeRGB(r = red, g = green, b = blue)
+}
+
+
 

@@ -153,6 +153,7 @@ private fun FieldSquare(
         mutableStateOf(when {
             square.onSelected != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
             square.selectableDirection != null || square.directionSelected != null -> Color.Transparent // Hide square color
+            square.player?.isSelectable == true -> Color.Transparent
             square.onSelected != null -> Color.Green.copy(alpha = 0.25f) // Fallback for active squares
             else -> Color.Transparent
         })

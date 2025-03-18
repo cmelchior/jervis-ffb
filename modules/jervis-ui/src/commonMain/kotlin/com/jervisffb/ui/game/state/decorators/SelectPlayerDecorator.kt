@@ -45,7 +45,8 @@ class SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
                     val square = snapshot.fieldSquares[playerLocation]
                     snapshot.fieldSquares[playerLocation] = square?.copy(
                         dice = dice,
-                        onSelected = selectedAction
+                        player = square.player?.copy(selectAction = selectedAction),
+                        onSelected = selectedAction,
                     ) ?: error("Unexpected player location : $playerLocation")
                 }
                 is GiantLocation -> TODO("Not supported right now")
