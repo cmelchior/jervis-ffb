@@ -46,9 +46,9 @@ Test builds are created on every successful push to the `main` branch.
   https://jervis.ilios.dk/download/.
 
 * No test builds for iPad is currently being created. Instead, these must be
-  built from source.
+  built from source. 
 
-No stability guarantees are given for them.
+No stability guarantees are given for developer releases.
 
 
 ## How To Build
@@ -56,7 +56,7 @@ No stability guarantees are given for them.
 Development requirements are:
 - Java 21
 - Git on the commandline
-- Xcode (if building for iPad)
+- Xcode 16.2 (if building for iPad)
 
 Note, this has only been tested on Mac, so things on Windows might be broken.
 
@@ -72,7 +72,7 @@ A local WASM client can be started using:
 ./gradlew :modules:jervis-ui:wasmJsBrowserDevelopmentRun
 ```
 
-The iPad version can be built and installed by using Xcode. Use the project file
+The iPad version can be built and installed using Xcode. Use the project file
 found here [`modules/iosApp/iosApp.xcodeproj`](modules/iosApp/iosApp.xcodeproj). 
 You will need to supply your own signature under "Signing & Capabilities".
 

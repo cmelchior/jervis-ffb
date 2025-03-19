@@ -11,8 +11,8 @@ import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.DefaultWebSocketSession
-import java.time.Duration
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 actual fun startEmbeddedServer(
     server: LightServer,
@@ -21,8 +21,8 @@ actual fun startEmbeddedServer(
     val platformServer = embeddedServer(Netty,8080) {
         install(WebSockets)
         {
-            pingPeriod = Duration.ofSeconds(15)
-            timeout = Duration.ofSeconds(15)
+            pingPeriod = 15.seconds
+            timeout = 15.seconds
             maxFrameSize = Long.MAX_VALUE
             masking = false
         }
