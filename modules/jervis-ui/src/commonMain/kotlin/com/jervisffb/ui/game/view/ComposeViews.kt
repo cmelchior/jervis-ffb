@@ -260,7 +260,7 @@ fun DebugLog(vm: LogViewModel) {
         items(items = listData, key = { item -> item.id }) {
             Text(
                 text = it.message,
-                softWrap = false,
+                softWrap = true,
                 lineHeight = if (it.message.lines().size > 1) 1.5.em else 1.0.em,
             )
         }
