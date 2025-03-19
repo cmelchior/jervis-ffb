@@ -85,6 +85,12 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
+                // Additional dependencies required fog .ogg support
+                // See https://github.com/finnkuusisto/TinySound/tree/master/lib
+                implementation("kuusisto.tinysound:tinysound:1.1.1")
+                implementation("javazoom.vorbisspi:vorbisspi:1.0.3")
+                implementation("com.jcraft:jorbis:0.0.17")
+                implementation("org.tritonus:tritonus_share:0.0.1")
                 implementation(compose.preview)
                 implementation(compose.desktop.currentOs)
                 implementation(compose.desktop.uiTestJUnit4)

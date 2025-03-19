@@ -77,7 +77,6 @@ object Imager {
      * Composables directly from Kotlin Notebook, so instead we need to add a helper
      * method for each use case.
      */
-    @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
     private fun renderScreenshot(
         width: Int,
         height: Int,

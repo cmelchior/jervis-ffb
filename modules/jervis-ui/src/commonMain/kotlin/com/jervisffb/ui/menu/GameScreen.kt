@@ -10,6 +10,8 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
+import com.jervisffb.ui.SoundEffect
+import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.state.UiActionProvider
@@ -87,6 +89,8 @@ class GameScreenModel(
     suspend fun initialize() {
         _loadingMessages.value = "Initializing icons..."
         IconFactory.initialize(homeTeam, awayTeam)
+        _loadingMessages.value = "Initializing sounds..."
+        SoundManager.initialize()
 //        val homeActionProvider =
 //            when (mode) {
 //                is Manual -> ManualActionProvider(menuViewModel, mode.actionMode)

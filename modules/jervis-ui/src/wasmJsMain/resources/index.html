@@ -8,6 +8,13 @@
     <meta name="keywords" content="blood bowl, fantasy football, jervis, blood, bowl, ffb, fumbbl, play, online, standalone, bb2020" >
     <meta name="author" content="Christian Melchior ">
     <link type="text/css" rel="stylesheet" href="styles.css">
+    <script>
+        // Work-around for Kotlin WASM not allowing dynamic js() functions.
+        function playSound(filePath) {
+            console.log("Playing: " + filePath);
+            new Audio(filePath).play();
+        }
+    </script>
     <script type="application/javascript" src="composeApp.js"></script>
     <style>
         #loading-screen {

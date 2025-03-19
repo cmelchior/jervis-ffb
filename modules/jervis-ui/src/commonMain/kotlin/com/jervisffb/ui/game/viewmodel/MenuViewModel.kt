@@ -9,6 +9,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.ui.SoundEffect
+import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.TeamActionMode
@@ -70,7 +72,7 @@ class MenuViewModel {
         if (uiState.gameController.isUndoAvailable(team = team)) {
             uiState.userSelectedAction(Undo)
         } else {
-            // TODO Play "warning" sound
+            SoundManager.play(SoundEffect.ERROR)
         }
     }
 
@@ -92,6 +94,7 @@ class MenuViewModel {
         if (allowedTeam != null && controller?.state?.activeTeam?.id == allowedTeam) {
             // This client is not considered the "active" client, which means it isn't allowed
             // to load setup formations
+            SoundManager.play(SoundEffect.ERROR)
             return
         }
 
