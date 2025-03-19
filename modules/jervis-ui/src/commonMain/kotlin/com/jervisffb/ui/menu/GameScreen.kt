@@ -10,7 +10,6 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
-import com.jervisffb.ui.SoundEffect
 import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
@@ -126,17 +125,19 @@ class GameScreen(val viewModel: GameScreenModel) : Screen {
     @Composable
     override fun Content() {
         LoadingScreen(viewModel) {
-            com.jervisffb.ui.game.view.Screen(
+            com.jervisffb.ui.game.view.GameScreen(
                 FieldViewModel(
                     viewModel.uiState,
                     viewModel.hoverPlayerFlow,
                 ),
                 SidebarViewModel(
+                    viewModel.menuViewModel,
                     viewModel.uiState,
                     viewModel.homeTeam,
                     viewModel.hoverPlayerFlow
                 ),
                 SidebarViewModel(
+                    viewModel.menuViewModel,
                     viewModel.uiState,
                     viewModel.awayTeam,
                     viewModel.hoverPlayerFlow

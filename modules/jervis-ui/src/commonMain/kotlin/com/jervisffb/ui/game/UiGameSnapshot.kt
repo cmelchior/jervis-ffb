@@ -9,6 +9,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.model.UiFieldSquare
+import com.jervisffb.ui.game.viewmodel.ButtonData
 
 /**
  * Class representing a snapshot of the current UI State as it should be shown for this "frame". This only
@@ -34,6 +35,11 @@ class UiGameSnapshot(
             }
         }
     }
+
+    // Actions associated with the Team, and not a particular player
+    // These gets rendered under the sidebar for each team
+    val homeTeamActions = mutableListOf<ButtonData>()
+    val awayTeamActions = mutableListOf<ButtonData>()
 
     // Attach actions to players found in the dogout
     val dogoutActions: MutableMap<PlayerId, () -> Unit> = mutableMapOf()

@@ -23,7 +23,7 @@ import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 
 
 @Composable
-fun Screen(
+fun GameScreen(
     field: FieldViewModel,
     leftDugout: SidebarViewModel,
     rightDugout: SidebarViewModel,

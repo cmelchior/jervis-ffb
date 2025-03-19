@@ -4,13 +4,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -35,9 +38,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayer
+import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.SidebarView
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import kotlinx.coroutines.flow.Flow
@@ -114,8 +119,12 @@ fun Sidebar(
             }
 
             // End Turn
-            Box {
-
+            Column(
+                modifier = Modifier,
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                SidebarButtons(vm.actionButtons())
             }
 
             // Rest of content
@@ -123,6 +132,20 @@ fun Sidebar(
 
             }
         }
+    }
+}
+
+// Area just below the Sidebar where we can show extra buttons like "End Turn", "End Setup"
+// or
+@Composable
+private fun ColumnScope.SidebarButtons(buttons: Flow<List<ButtonData>>) {
+    val buttons by buttons.collectAsState(emptyList())
+    buttons.forEach { button ->
+        LargeSidebarButton(
+            modifier = Modifier,
+            text = button.title,
+            onClick = button.onClick
+        )
     }
 }
 
@@ -139,7 +162,42 @@ fun SidebarButton(modifier: Modifier, text: String, onClick: () -> Unit) {
             contentDescription = "",
             contentScale = ContentScale.Fit,
         )
-        Text(text = text, maxLines = 1, fontSize = 10.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+        Text(
+            modifier = Modifier.padding(top = 2.dp), // Adjust to make it more center
+            text = text,
+            maxLines = 1,
+            lineHeight = 1.em,
+            textAlign = TextAlign.Center,
+            fontSize = 10.sp,
+            color = Color.Black,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun LargeSidebarButton(modifier: Modifier, text: String, onClick: () -> Unit) {
+    // TODO Add drop shadow to the top
+    Box(
+        modifier = modifier.aspectRatio(143f/30f),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            modifier = Modifier.fillMaxSize().clickable { onClick() },
+            painter = BitmapPainter(IconFactory.getLargeButton()),
+            contentDescription = "",
+            contentScale = ContentScale.Fit,
+        )
+        Text(
+            modifier = Modifier.padding(top = 2.dp), // Adjust to make it more center
+            text = text,
+            maxLines = 1,
+            lineHeight = 1.em,
+            textAlign = TextAlign.Center,
+            fontSize = 10.sp,
+            color = Color.Black,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 

@@ -26,12 +26,6 @@ Unfortunately, this version has been disabled by Homebrew, but we can still inst
 it that way using this guide: 
 https://stackoverflow.com/questions/73586208/can-you-install-disabled-homebrew-packages
 
-```shell
-
-
-```
-
-
 You need to run `HOMEBREW_NO_INSTALL_FROM_API=1 brew install mariadb@10.4` to 
 download the source before following the guide.
 
@@ -42,7 +36,8 @@ cd /opt/homebrew/opt/mariadb@10.4/scripts
 ./mysql_install_db
 ```
 
-Start the database (if you are not running it as as service that automatically start)
+Start the database (if you are not running it as a service that starts automatically)
+
 ```
 cd '/opt/homebrew/Cellar/mariadb@10.4/10.4.34' ; /opt/homebrew/Cellar/mariadb@10.4/10.4.34/bin/mysqld_safe --datadir='/opt/homebrew/var/mysql'
 ```

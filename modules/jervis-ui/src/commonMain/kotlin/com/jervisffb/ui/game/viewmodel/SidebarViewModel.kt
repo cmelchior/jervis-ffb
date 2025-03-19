@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isOnAwayTeam
 import com.jervisffb.engine.model.locations.DogOut
+import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
@@ -20,12 +21,18 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
+data class ButtonData(
+    val title: String,
+    val onClick: () -> Unit
+)
+
 enum class SidebarView {
     RESERVES,
     INJURIES,
 }
 
 class SidebarViewModel(
+    private val menuViewModel: MenuViewModel,
     private val uiState: UiGameController,
     val team: Team,
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
@@ -37,6 +44,29 @@ class SidebarViewModel(
     private val _view = MutableStateFlow(SidebarView.RESERVES)
     private val _reserveCount = MutableStateFlow<Int?>(null)
     private val _injuriesCount = MutableStateFlow<Int?>(null)
+    private val _buttons: Flow<MutableList<ButtonData>> = uiState.uiStateFlow.map { uiSnapshot ->
+        val buttons = mutableListOf<ButtonData>()
+
+        // Check if this team can "End Setup"
+        if (team.isHomeTeam()) {
+            buttons.addAll(uiSnapshot.homeTeamActions)
+        } else if (team.isAwayTeam()) {
+            buttons.addAll(uiSnapshot.awayTeamActions)
+        }
+
+        // Check if this team is during setup phase. For now we just hard-code a few examples
+        // This is mostly for WASM, iOS as JVM have a proper menu bar. This should be reworked
+        // once we add proper menu support on WASM/iOS.
+        // Also, consider moving this logic into decorators somehow
+        val setupKickingTeam = uiSnapshot.game.stack.containsNode(GameDrive.SetupKickingTeam) && uiSnapshot.game.kickingTeam == team
+        val setupReceivingTeam = uiSnapshot.game.stack.containsNode(GameDrive.SetupReceivingTeam) && uiSnapshot.game.receivingTeam == team
+        if (setupReceivingTeam || setupKickingTeam) {
+            Setups.setups.keys.forEach { setup ->
+                buttons.add(ButtonData(setup, onClick = { menuViewModel.loadSetup(setup)}))
+            }
+        }
+        buttons
+    }
 
     // Player being hovered over.
     // All of these will be shown on the away team location, except when hovering over
@@ -58,6 +88,8 @@ class SidebarViewModel(
             }
 
     fun view(): StateFlow<SidebarView> = _view
+
+    fun actionButtons(): Flow<List<ButtonData>> = _buttons
 
     fun reserveCount(): Flow<Int> = team.dogoutFlow.map {
         // Available players in the Dogout should only have this state
