@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -30,14 +32,18 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
+import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
+import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.createDefaultAwayTeam
 import com.jervisffb.ui.createDefaultHomeTeam
 import com.jervisffb.ui.game.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
+import com.jervisffb.ui.game.state.ReplayActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
-import com.jervisffb.utils.isRegularFile
-import com.jervisffb.utils.platformFileSystem
+import com.jervisffb.utils.APPLICATION_DIRECTORY
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import okio.Path
 import okio.Path.Companion.toPath
@@ -56,12 +62,28 @@ data object Random : GameMode
 data class Manual(val actionMode: TeamActionMode) : GameMode
 data class Replay(val file: Path) : GameMode
 
-class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
-    fun start(navigator: Navigator, mode: GameMode) {
+class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel {
+
+    fun startReplayGame(navigator: Navigator, mode: Replay) {
         menuViewModel.navigatorContext.launch {
-            val viewModel = createDevHotseatScreenModel(menuViewModel)
+            val viewModel = createReplayScreenModel(menuViewModel, mode.file)
             navigator.push(GameScreen(viewModel))
         }
+    }
+
+    private suspend fun createReplayScreenModel(menuViewModel: MenuViewModel, replayFile: Path): GameScreenModel {
+        val fumbbl = FumbblReplayAdapter(replayFile, checkCommandsWhenLoading = false)
+        fumbbl.loadCommands()
+        val gameController = GameEngineController(fumbbl.getGame())
+        return GameScreenModel(
+            uiMode = TeamActionMode.ALL_TEAMS,
+            gameController = gameController,
+            homeTeam = gameController.state.homeTeam,
+            awayTeam = gameController.state.awayTeam,
+            actionProvider = ReplayActionProvider(menuViewModel, fumbbl),
+            mode = Replay(replayFile),
+            menuViewModel = menuViewModel,
+        )
     }
 
     private fun createDevHotseatScreenModel(menuViewModel: MenuViewModel, randomActions: Boolean = false): GameScreenModel {
@@ -139,25 +161,24 @@ class DevScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel {
         }
     }
 
-    val availableReplayFiles: List<Path>
-        get() {
-            val dir = "/Users/christian.melchior/Private/jervis-ffb/replays-fumbbl".toPath()
-            return if (!platformFileSystem.exists(dir)) {
-                emptyList()
-            } else {
-                platformFileSystem.list(dir)
-                    .filter { it.isRegularFile }
-                    .filter { it.name.endsWith(".json") }
-            }
-        }
+    val availableReplayFiles: Flow<List<Pair<String, Path>>> = flow {
+        // TODO For now, turn the path into an absolute path so we work with the FumbbleReplayAdapter
+        //  This needs further refactoring
+        val replayFiles = CacheManager.getFumbleReplayFiles()
+        emit(replayFiles.map {
+            val absolutePath = "$APPLICATION_DIRECTORY/$it".toPath()
+            it.name to absolutePath
+        })
+    }
 }
 
-
-class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenModel) : Screen {
+class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenViewModel) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = rememberScreenModel { DevScreenModel(menuViewModel) }
+        val viewModel = rememberScreenModel { DevScreenViewModel(menuViewModel) }
+        val replayFiles by viewModel.availableReplayFiles.collectAsState(emptyList())
+
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -181,9 +202,9 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenMo
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            viewModel.availableReplayFiles.forEach { file ->
+            replayFiles.forEach { (name, file) ->
                 Button(onClick = {
-                    viewModel.start(navigator, Replay(file))
+                    viewModel.startReplayGame(navigator, Replay(file))
                 }) {
                     Text(
                         text = "Start replay: ${file.name}",

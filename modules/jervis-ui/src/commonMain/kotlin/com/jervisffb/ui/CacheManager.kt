@@ -10,8 +10,8 @@ import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.resources.StandaloneTeams
 import com.jervisffb.utils.FileManager
 import io.ktor.http.Url
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import okio.Path
 import org.jetbrains.skia.EncodedImageFormat
 import org.jetbrains.skia.Image
 
@@ -20,6 +20,7 @@ object CacheManager {
     val imageCacheRoot = "images"
     val teamsCacheRoot = "teams"
     val rosterCacheRoot = "rosters"
+    val fumbbleReplays = "fumbbl_replays"
 
     val fileManager = FileManager()
     val jsonSerializer = Json {
@@ -75,5 +76,22 @@ object CacheManager {
         val fileContent = jsonSerializer.encodeToString(file)
         val fileName = "team_${file.team.id.value}.$FILE_EXTENSION_TEAM_FILE"
         fileManager.writeFile(teamsCacheRoot, fileName, fileContent.encodeToByteArray())
+    }
+
+    /**
+     * Save a FUMBBL replay file to disk so we do not need to fetch it every time.
+     * @param gameId the game id on FUMBBL. Used to generate the filename.
+     */
+    suspend fun saveFumbblReplay(gameId: Int, fileContent: ByteArray) {
+        // TODO Figure out how to store replays, so we can also show the overview stats
+        //  quickly without being forced to read all the files.
+        //  Without a database, we could maybe store a summary in the settings file
+        //  and try not to get them out of sync.
+        val fileName = "replay_${gameId}.json"
+        fileManager.writeFile(fumbbleReplays, fileName, fileContent)
+    }
+
+    suspend fun getFumbleReplayFiles(): List<Path> {
+        return fileManager.getFilesWithExtension(fumbbleReplays, "json")
     }
 }

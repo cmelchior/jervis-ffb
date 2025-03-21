@@ -46,6 +46,7 @@ import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
+import com.jervisffb.ui.game.viewmodel.ReplayState
 
 // Theme
 val debugBorder = BorderStroke(2.dp, Color.Red)
@@ -108,13 +109,12 @@ fun SectionHeader(title: String) {
     }
 }
 
-
-
 @Composable
 fun ReplayCommandBar(
     vm: ReplayControllerViewModel,
     modifier: Modifier,
 ) {
+    val state by vm.state.collectAsState()
     Box(
         modifier =
             modifier
@@ -122,23 +122,17 @@ fun ReplayCommandBar(
                 .background(color = Color.Red),
     ) {
         Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(modifier = Modifier.weight(1f), onClick = { vm.enableReplay() }) {
-                Text("Start replay")
-            }
-            Button(modifier = Modifier.weight(1f), onClick = { vm.rewind() }) {
-                Text("Rewind")
-            }
-            Button(modifier = Modifier.weight(1f), onClick = { vm.back() }) {
-                Text("Back")
-            }
-            Button(modifier = Modifier.weight(1f), onClick = { vm.forward() }) {
-                Text("Forward")
-            }
-            Button(modifier = Modifier.weight(1f), onClick = { vm.stopReplay() }) {
-                Text("Stop replay")
-            }
-            Button(modifier = Modifier.weight(1f), onClick = { vm.start() }) {
-                Text("Start Game")
+            when (state) {
+                ReplayState.STARTED -> {
+                    Button(modifier = Modifier.weight(1f), onClick = { vm.pause() }) {
+                        Text("Pause Replay")
+                    }
+                }
+                ReplayState.PAUSED ->  {
+                    Button(modifier = Modifier.weight(1f), onClick = { vm.start() }) {
+                        Text("Start Replay")
+                    }
+                }
             }
         }
     }

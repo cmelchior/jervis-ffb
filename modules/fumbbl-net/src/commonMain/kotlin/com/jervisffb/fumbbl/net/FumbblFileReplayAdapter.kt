@@ -34,6 +34,8 @@ import okio.Path
  *
  * Note, this requires that the FUMBBL and Jervis Rules are set up the same way.
  *
+ * @param file For now, this only Must be an absolute path to a file on the filesystem. This must be refactored
+ * to be more generic.
  */
 class FumbblFileReplayAdapter(private val file: Path) : FumbblAdapter {
     private val scope = CoroutineScope(CoroutineName("FumbblFileReader") + Dispatchers.Default)

@@ -11,6 +11,7 @@ import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.model.UiPlayerCard
+import com.jervisffb.ui.game.state.ReplayActionProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +45,10 @@ class SidebarViewModel(
     private val _view = MutableStateFlow(SidebarView.RESERVES)
     private val _reserveCount = MutableStateFlow<Int?>(null)
     private val _injuriesCount = MutableStateFlow<Int?>(null)
-    private val _buttons: Flow<MutableList<ButtonData>> = uiState.uiStateFlow.map { uiSnapshot ->
+    private val _buttons: Flow<List<ButtonData>> = uiState.uiStateFlow.map { uiSnapshot ->
+        // TODO Find a better way to detect game mode
+        if (uiState.actionProvider is ReplayActionProvider) return@map emptyList()
+
         val buttons = mutableListOf<ButtonData>()
 
         // Check if this team can "End Setup"

@@ -15,6 +15,7 @@ import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.canBeHost
+import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -37,9 +38,11 @@ class MenuViewModel {
 
     private val _showSettingsDialog = MutableStateFlow(false)
 
-    val navigatorContext = CoroutineScope(CoroutineName("ScreenNavigator") + CoroutineExceptionHandler { _, exception ->
-        throw exception
-    })
+    val navigatorContext = CoroutineScope(
+        CoroutineName("ScreenNavigator")
+            + CoroutineExceptionHandler { _, exception -> throw exception }
+            + singleThreadDispatcher("menuScope")
+    )
 
     // Default values .. figure out a way to persist these
     private var features: MutableMap<Feature, Boolean> = mutableMapOf(

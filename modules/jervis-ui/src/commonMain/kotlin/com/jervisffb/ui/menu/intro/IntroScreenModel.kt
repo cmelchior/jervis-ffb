@@ -4,7 +4,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.jervisffb.ui.BuildConfig
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.DevScreen
-import com.jervisffb.ui.menu.DevScreenModel
+import com.jervisffb.ui.menu.DevScreenViewModel
 import com.jervisffb.ui.menu.JervisScreenModel
 import com.jervisffb.ui.menu.StandAloneScreen
 import com.jervisffb.ui.menu.StandAloneScreenModel
@@ -142,7 +142,7 @@ ${getPlatformDescription()}
 
     fun gotoDevModeScreen(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
-            val viewModel = DevScreenModel(menuViewModel)
+            val viewModel = DevScreenViewModel(menuViewModel)
             navigator.push(DevScreen(menuViewModel, viewModel))
         }
     }

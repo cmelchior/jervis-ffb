@@ -14,7 +14,7 @@ expect val APPLICATION_DIRECTORY: String
  * - iOS: TBD
  */
 expect class FileManager() {
-    // Will always return a relative path from the root of the Jervis folder
+    // Will always return a relative path from the root of the hidden Jervis folder
     suspend fun getFilesWithExtension(directory: String, extension: String): List<Path>
     suspend fun getFile(path: String): ByteArray?
     suspend fun writeFile(dir: String, fileName: String, fileContent: ByteArray)

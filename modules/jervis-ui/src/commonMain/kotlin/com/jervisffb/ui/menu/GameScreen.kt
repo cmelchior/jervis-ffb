@@ -46,37 +46,6 @@ class GameScreenModel(
     lateinit var uiState: UiGameController
     var fumbbl: FumbblReplayAdapter? = null
     val rules: Rules = gameController.rules
-
-//    init {
-//        if (injectedGameRunner != null) {
-//            this.gameRunner = injectedGameRunner
-//            fumbbl = null
-//        } else {
-//            TODO()
-//            when (mode) {
-//                is Manual -> {
-//                    fumbbl = null
-//                    homeTeam = StandaloneTeams.defaultTeams["human-starter-team.jrt"]!!.team
-//                    awayTeam = StandaloneTeams.defaultTeams["lizardmen-starter-team.jrt"]!!.team
-//                    TODO()
-//                    this.gameRunner = HotSeatGameRunner(rules, homeTeam!!, awayTeam!!)
-//                }
-//
-//                Random -> {
-//                    fumbbl = null
-//                    this.gameRunner = GameEngineController(createDefaultGameState(rules))
-//                }
-//
-//                is Replay -> {
-//                    fumbbl = FumbblReplayAdapter(mode.file, checkCommandsWhenLoading = false)
-//                    fumbbl!!.loadCommands()
-//                    this.gameRunner = GameEngineController(fumbbl!!.getGame())
-//                }
-//                else -> TODO()
-//            }
-//        }
-//    }
-
     val _loadingMessages = MutableStateFlow<String>("")
     val loadingMessages: StateFlow<String> = _loadingMessages
     val _isLoaded = MutableStateFlow<Boolean>(false)
@@ -90,19 +59,6 @@ class GameScreenModel(
         IconFactory.initialize(homeTeam, awayTeam)
         _loadingMessages.value = "Initializing sounds..."
         SoundManager.initialize()
-//        val homeActionProvider =
-//            when (mode) {
-//                is Manual -> ManualActionProvider(menuViewModel, mode.actionMode)
-//                Random -> TODO() // RandomActionProvider(uiState)
-//                is Replay -> TODO() // ReplayActionProvider(uiState, fumbbl)
-//            }
-//
-//        val awayActionProvider =
-//            when (mode) {
-//                is Manual -> ManualActionProvider(menuViewModel, mode.actionMode)
-//                Random -> TODO() // RandomActionProvider(uiState)
-//                is Replay -> TODO() // ReplayActionProvider(uiState, fumbbl)
-//            }
         uiState = UiGameController(
             uiMode,
             gameController,

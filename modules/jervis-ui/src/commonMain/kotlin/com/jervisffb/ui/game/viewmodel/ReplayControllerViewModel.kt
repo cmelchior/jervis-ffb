@@ -1,49 +1,38 @@
 package com.jervisffb.ui.game.viewmodel
 
 import com.jervisffb.ui.game.UiGameController
-import com.jervisffb.ui.game.state.UiActionProvider
+import com.jervisffb.ui.game.state.ReplayActionProvider
 import com.jervisffb.ui.menu.GameScreenModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+enum class ReplayState {
+    STARTED,
+    PAUSED,
+}
 
 // TODO Need to figure out what to do with this when the ui controller has multiple action providers
 class ReplayControllerViewModel(
     private val uiState: UiGameController,
     private val gameModel: GameScreenModel,
 ) {
-    private val actionProvider: UiActionProvider = uiState.actionProvider
-//    val controller = gameModel.gameRunner
+    private val _state = MutableStateFlow(ReplayState.PAUSED)
+    val state: StateFlow<ReplayState> = _state
 
-    fun startActions() {
-        TODO("FIgure out how to start the random action provider")
-        // actionProvider.startActionProvider()
-    }
-
-    fun pauseActions() {
-        TODO("FIgure out how to pause the random action provider")
-        // actionProvider.pauseActionProvider()
-    }
-
-    fun rewind() {
-//        while (controller.back()) { }
-    }
-
-    fun back() {
-//        controller.back()
-    }
-
-    fun forward() {
-//        controller.forward()
-    }
-
-    fun stopReplay() {
-        // controller.disableReplayMode()
-    }
-
-    fun enableReplay() {
-        // controller.enableReplayMode()
-    }
+    private val actionProvider = uiState.actionProvider as ReplayActionProvider
+    private var hasStarted = false
 
     fun start() {
-        TODO()
-        // actionProvider.startActionProvider()
+        _state.value = ReplayState.STARTED
+        if (hasStarted) {
+            actionProvider.pauseActionProvider()
+        }
+        actionProvider.startActionProvider()
+        hasStarted = true
+    }
+
+    fun pause() {
+        _state.value = ReplayState.PAUSED
+        actionProvider.pauseActionProvider()
     }
 }

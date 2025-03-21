@@ -11,20 +11,20 @@ import com.jervisffb.utils.platformFileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 
-// TODO This approach is ultimately broken. It isn't possible to extract actions
-//  from incomplete data. It looks like FUMBBL is sometimes sending the same
-//  data multiple times, so figuring out which to convert to actions is impossible
-//  without the context of the game.
-//
-// What else can we do
-// Whenever there is a request for action send current Node + actions to a method that will roll forward until it
-// finds what it needs... Counter: Will be tricky, some Fumbbl commands will create multiple actions, then they need to
-// stored somewhere and depleted (might be possible)
-//
-// Only other approach would be to replicate the state machine that FUMBBL use and update the FUMBBL metadata.
-// This will give us a full state to query. It might be more helpful if others want to convert a FUMBBL state into
-// something else as well...but will probably be more work. Hmm, maybe it is just porting the ModelChangeProcessor
-// which is just a lot of trivial code.
+/**
+ * Create an adapter that is able to load a FUMBBL replay file and convert it to an Jervis equivalent.
+ * This is very much work-in-progress, but it has been shown to be possible.
+ *
+ * We have taken the FUMBBL client model and converted to Kotlin. This means that we can also keep the FUMBBL
+ * state machine up to date, which makes it easier to figure out what is going on.
+ *
+ * BIG PROBLEM: How do we make sure that our duplicated Fumbbl Model stay up to date with changes to the FUMBBL
+ * code. Luckily there isn't many changes, so it might be possible?
+ *
+ * TODO Right now we only support loading files on the JVM. Figure out how to refactor this so we can use it both
+ *  for testing and across WASM and iOS. Should we move the CacheManager to platform-utils? Or move the file loading
+ *  out of this class?
+ */
 class FumbblReplayAdapter(private var replayFile: Path, private val checkCommandsWhenLoading: Boolean = false) {
 
     private lateinit var gameCommands: List<JervisActionHolder>

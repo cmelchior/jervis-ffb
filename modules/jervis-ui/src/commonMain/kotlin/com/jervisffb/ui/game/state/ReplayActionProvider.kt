@@ -9,26 +9,98 @@ import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.fumbbl.net.adapter.JervisAction
 import com.jervisffb.fumbbl.net.adapter.OptionalJervisAction
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
-class ReplayActionProvider(private val fumbbl: FumbblReplayAdapter?): UiActionProvider() {
+class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val fumbbl: FumbblReplayAdapter?): UiActionProvider() {
+
+    companion object {
+        val LOG = jervisLogger()
+    }
 
     private var job: Job? = null
     private var paused = false
     private lateinit var controller: GameEngineController
     private lateinit var actions: ActionRequest
     var started = false
+    private val pauseMutex = Mutex(locked = true)
 
     override fun startHandler() {
-        TODO("Not yet implemented. Figure out how this works")
+        if (started) return
+        started = true
+        var index = 0
+        val replayCommands = fumbbl?.getCommands()!!
+        paused = true
+        job = actionScope.launch {
+            while (index < replayCommands.size) {
+                pauseMutex.withLock {
+                    // We just use the event here as a trigger from the UI to find the next available action
+                    val ignore = actionRequestChannel.receive()
+                    var j = index
+                    var foundAction = false
+                    while (j < replayCommands.size && !foundAction) {
+                        val commandFromReplay = replayCommands[j]
+                        if (commandFromReplay !is OptionalJervisAction && commandFromReplay.expectedNode != controller.state.stack.currentNode()) {
+                            throw IllegalStateException(
+                                """
+                        Current node: ${controller.state.stack.currentNode()::class.qualifiedName}
+                        Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
+                        Action: ${
+                                    when (commandFromReplay) {
+                                        is CalculatedJervisAction ->
+                                            commandFromReplay.actionFunc(
+                                                controller.state,
+                                                controller.rules,
+                                            )
+
+                                        is JervisAction -> commandFromReplay.action
+                                        is OptionalJervisAction -> commandFromReplay.action
+                                    }
+                                }
+                                """.trimIndent(),
+                            )
+                        }
+                        when (commandFromReplay) {
+                            is CalculatedJervisAction -> {
+                                foundAction = true
+                                userActionSelected(commandFromReplay.actionFunc(controller.state, controller.rules))
+                            }
+                            is JervisAction -> {
+                                foundAction = true
+                                userActionSelected(commandFromReplay.action)
+                            }
+                            is OptionalJervisAction -> {
+                                if (controller.currentNode() == commandFromReplay.expectedNode) {
+                                    foundAction = true
+                                    userActionSelected(commandFromReplay.action)
+                                } else {
+                                    LOG.d {
+                                        """
+                                    Skipping Optional Action: ${commandFromReplay.action}
+                                    Current node: ${controller.state.stack.currentNode()::class.qualifiedName}
+                                    Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
+                                        """.trimIndent()
+                                    }
+                                    j++
+                                }
+                            }
+                        }
+                    }
+                    index = j + 1
+                    delay(100)
+                }
+            }
+        }
     }
 
-    override fun actionHandled(action1: Team?, action: GameAction) {
-        TODO("Not yet implemented. Figure out how this works")
+    override fun actionHandled(team: Team?, action: GameAction) {
+        // Do nothing
     }
-
 
     override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
         this.controller = controller
@@ -36,6 +108,7 @@ class ReplayActionProvider(private val fumbbl: FumbblReplayAdapter?): UiActionPr
     }
 
     override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
+        println("Decorating available actions for ReplayActionProvider")
         // Do nothing
     }
 
@@ -55,7 +128,7 @@ class ReplayActionProvider(private val fumbbl: FumbblReplayAdapter?): UiActionPr
     }
 
     override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
-        TODO("Not yet supported")
+        // Do nothing
     }
 
     override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {
@@ -67,54 +140,20 @@ class ReplayActionProvider(private val fumbbl: FumbblReplayAdapter?): UiActionPr
     }
 
     fun startActionProvider() {
-        if (started) return
-        started = true
-        var index = 0
-        val replayCommands = fumbbl?.getCommands()!!
-        paused = false
-        job = actionScope.launch {
-            while (!paused && index <= replayCommands.size) {
-                val ignore = actionRequestChannel.receive()
-                val commandFromReplay = replayCommands[index]
-                if (commandFromReplay !is OptionalJervisAction && commandFromReplay.expectedNode != controller.state.stack.currentNode()) {
-                    throw IllegalStateException(
-                        """
-                        Current node: ${controller.state.stack.currentNode()::class.qualifiedName}
-                        Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
-                        Action: ${
-                            when (commandFromReplay) {
-                                is CalculatedJervisAction ->
-                                    commandFromReplay.actionFunc(
-                                        controller.state,
-                                        controller.rules,
-                                    )
-                                is JervisAction -> commandFromReplay.action
-                                is OptionalJervisAction -> commandFromReplay.action
-                            }}
-                        """.trimIndent(),
-                    )
-                }
-                when (commandFromReplay) {
-                    is CalculatedJervisAction ->
-                        userActionSelected(commandFromReplay.actionFunc(controller.state, controller.rules))
-                    is JervisAction -> userActionSelected(commandFromReplay.action)
-                    is OptionalJervisAction -> {
-                        if (controller.currentNode() == commandFromReplay.expectedNode) {
-                            userActionSelected(commandFromReplay.action)
-                        }
-                    }
-                }
-                index += 1
-                delay(100)
+        menuViewModel.navigatorContext.launch {
+            if (paused) {
+                paused = false
+                pauseMutex.unlock() // Resume execution
             }
         }
     }
 
     fun pauseActionProvider() {
-        if (paused) {
-            startActionProvider()
-        } else {
-            paused = true
+        menuViewModel.navigatorContext.launch {
+            if (!paused) {
+                paused = true
+                pauseMutex.lock()
+            }
         }
     }
 }

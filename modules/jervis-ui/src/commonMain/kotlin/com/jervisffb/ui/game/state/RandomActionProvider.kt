@@ -29,7 +29,7 @@ class RandomActionProvider(val controller: GameEngineController): UiActionProvid
         // Do nothing
     }
 
-    override fun actionHandled(action1: Team?, action: GameAction) {
+    override fun actionHandled(team: Team?, action: GameAction) {
         // Do nothing
     }
 
@@ -79,14 +79,6 @@ class RandomActionProvider(val controller: GameEngineController): UiActionProvid
                     actionSelectedChannel.send(selectedAction)
                 }
             }
-        }
-    }
-
-    fun pauseActionProvider() {
-        if (paused) {
-            startActionProvider()
-        } else {
-            paused = true
         }
     }
 

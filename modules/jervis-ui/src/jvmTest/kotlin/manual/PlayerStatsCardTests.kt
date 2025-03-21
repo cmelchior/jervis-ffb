@@ -26,7 +26,6 @@ class PlayerStatsCardTests {
         val left = TestDummy.leftSidebar
         val right = TestDummy.rightSidebar
         val field = TestDummy.fieldVieModel
-//        TestDummy.state.notifyUpdate()
         TestDummy.state.awayTeam.notifyUpdate()
         TestDummy.state.homeTeam.notifyUpdate()
         TestDummy.state.awayTeam.notifyDogoutChange()
