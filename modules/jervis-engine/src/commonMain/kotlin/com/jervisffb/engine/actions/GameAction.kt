@@ -235,6 +235,10 @@ data class DBlockResult(override val value: Int) : DieResult() {
 @Serializable
 data class DicePoolChoice(val id: Int, val diceSelected: List<DieResult>)
 
+// TODO Is it safe to return DieResult from here? Shouldn't it be DieRoll instead?
+//  Otherwise there is no way to connect the result to the "exact" die, e.g. in case
+//  you are allowed to reroll multiple times and there are several die with the same
+//  value
 @Serializable
 data class DicePoolResultsSelected(val results: List<DicePoolChoice>): GameAction {
     fun singleResult(): DieResult = results.single().diceSelected.single()

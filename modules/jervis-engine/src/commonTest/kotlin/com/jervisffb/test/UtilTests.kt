@@ -1,6 +1,7 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.utils.allCombinations
+import com.jervisffb.engine.utils.cartesianProduct
 import com.jervisffb.engine.utils.combinations
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -43,6 +44,31 @@ class UtilTests {
         assertEquals(expectedCombinations.size, combinations.size)
         expectedCombinations.forEach {
             assertTrue(combinations.contains(it), "failed: $it")
+        }
+    }
+
+    @Test
+    fun testCartesianProduct() {
+        val input = listOf(
+            listOf(1, 2, 3),
+            listOf("a", "b", "c"),
+        )
+        val result = cartesianProduct(input, 1)
+        assertEquals(9, result.size)
+        val expectedCombinations = listOf(
+            listOf(1, "a"),
+            listOf(1, "b"),
+            listOf(1, "c"),
+            listOf(2, "a"),
+            listOf(2, "b"),
+            listOf(2, "c"),
+            listOf(3, "a"),
+            listOf(3, "b"),
+            listOf(3, "c"),
+        )
+        expectedCombinations.forEachIndexed { index, it ->
+            assertTrue(it.containsAll(result[index]), "failed at index: $index")
+            assertTrue(result[index].containsAll(it), "failed at index: $index")
         }
     }
 }

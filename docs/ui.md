@@ -84,3 +84,23 @@ things as they come up.
   it needs to roll and then immediately re-apply the dice roll.
 - It should not be possible for the non-active client to select setups. The server handles this fine
   now by reverting state, but should be disallowed at the UI level.
+- Detected while running random actions:
+  Exception in thread "GameLoopScope" java.lang.ArrayIndexOutOfBoundsException: Index -2147483648 out of bounds for length 26
+  at com.jervisffb.engine.model.Field.get(Field.kt:53)
+  at com.jervisffb.engine.rules.bb2020.procedures.UtilsKt.calculateMoveTypesAvailable(utils.kt:52)
+  at com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassAction$MoveOrPassOrEndAction.getAvailableActions(PassAction.kt:101)
+  at com.jervisffb.engine.GameEngineController.getAvailableActions(GameEngineController.kt:102)
+  at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:306)
+  at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:333)
+  at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:314)
+  at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:333)
+- Detected while running random actions:
+  Caused by: java.lang.ArrayIndexOutOfBoundsException: Index -2147483648 out of bounds for length 26
+  at com.jervisffb.engine.model.Field.get(Field.kt:53)
+  at com.jervisffb.engine.rules.bb2020.procedures.UtilsKt.calculateMoveTypesAvailable(utils.kt:52)
+  at com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction$SelectMoveType.getAvailableActions(MoveAction.kt:47)
+  at com.jervisffb.engine.GameEngineController.getAvailableActions(GameEngineController.kt:102)
+  at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:306)
+  at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:314)
+  at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:333)
+  at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:333)

@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
+import com.jervisffb.engine.utils.cartesianProduct
 import com.jervisffb.engine.utils.combinations
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
@@ -263,9 +264,13 @@ data class SelectFieldLocation(val squares: List<TargetSquare>) : GameActionDesc
 }
 
 /**
- * Select final result from 1 or more dice pools.
+ * Select a final result from 1 or more dice pools.
  *
- * We have multiple dice pools during Multiple Block.
+ * Currently, we only have "dice pools" when rolling Block dice, but
+ * this class has been generalized to any type of dice.
+ *
+ * We have multiple dice pools during "Multiple Block" as rolling both
+ * block dice happen "at the same time".
  */
 data class SelectDicePoolResult(
     val pools: List<DicePool<*, *>>
@@ -273,10 +278,20 @@ data class SelectDicePoolResult(
     override val size: Int = pools.size
     constructor(pool: DicePool<*, *>) : this(listOf(pool))
     override fun createRandom(): GameAction {
-        TODO("Not yet implemented")
+        return createAll().random()
     }
     override fun createAll(): List<GameAction> {
-        TODO("Not yet implemented")
+        // Each entry is all combinations inside the given pool.
+        // We need to find all combinations between all pools
+        val availableChoicesPrPool = pools.map { pool ->
+            val combinations = pool.dice.combinations(pool.selectDice)
+            combinations.map { randomChoice ->
+                DicePoolChoice(pool.id, randomChoice.toList().map { it.result })
+            }
+        }
+        return cartesianProduct(availableChoicesPrPool).map {
+            DicePoolResultsSelected(it)
+        }
     }
 }
 

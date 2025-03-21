@@ -295,7 +295,9 @@ fun <T> List<T>.allCombinations(): List<List<T>> {
 }
 
 /**
- * Return all combinations of [size] from the list.
+ * Return all combinations of the provided [size] from the list.
+ *
+ * @param size how many elements should be in the sublist. Must be <= list.size.
  */
 fun <T> List<T>.combinations(size: Int): List<Set<T>> {
     if (size == 0) return listOf(emptySet())
@@ -303,6 +305,24 @@ fun <T> List<T>.combinations(size: Int): List<Set<T>> {
 
     return this.withIndex().flatMap { (index, element) ->
         this.drop(index + 1).combinations(size - 1).map { setOf(element) + it }
+    }
+}
+
+/**
+ * Returns the cartesian product of a list of lists.
+ */
+fun <T> cartesianProduct(lists: List<List<T>>, n: Int = 1): List<List<T>> {
+    fun combinations(list: List<T>, n: Int): List<List<T>> {
+        if (n == 0) return listOf(emptyList())
+        if (list.size < n) return emptyList()
+        return list.indices.flatMap { i ->
+            combinations(list.drop(i + 1), n - 1).map { listOf(list[i]) + it }
+        }
+    }
+
+    val allCombinations = lists.map { combinations(it, n) }
+    return allCombinations.fold(listOf(listOf())) { acc, list ->
+        acc.flatMap { prefix -> list.map { element -> prefix + element } }
     }
 }
 
