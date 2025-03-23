@@ -87,7 +87,10 @@ class LocalActionProvider(
 
     override suspend fun getAction(): GameAction {
         val provider = currentProvider
-        if (settings.timerSettings.timersEnabled) {
+        // For now, disable timer actions as we need to implement timer infrastructure
+        // in the network protocol first
+        val timersEnabled = settings.timerSettings.timersEnabled && false
+        if (timersEnabled) {
             actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
                 // TODO Need to figure out if we are using setup / turn / response timers and track it correctly
                 delay(settings.timerSettings.turnMaxTime ?:settings.timerSettings.turnFreeTime)

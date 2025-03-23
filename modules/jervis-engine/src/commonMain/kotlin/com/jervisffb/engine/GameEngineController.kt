@@ -196,8 +196,10 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
         if (_history.isEmpty()) return false
         if (rules.undoActionBehavior == UndoActionBehavior.NOT_ALLOWED) return false
 
-        // Since CompositeGameActions are split into separate GameDeltas, we only need
-        // to consider the first command for each delta to check it is a "random" action
+        // Since CompositeGameActions are split into separate GameDeltas, it should be safe
+        // to just check the first action (Technically that is not the case, but we should
+        // never generate "random" actions in the middle of a Composite Action. These should
+        // always be "normal" actions.
         if (
             rules.undoActionBehavior == UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS
             && history.last().steps.first().action.isRandomAction()
