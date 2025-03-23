@@ -24,11 +24,16 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.utils.DropdownEntryWithValue
 import com.jervisffb.ui.menu.utils.findEntry
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * This component is responsible for all the UI control needed to configure the rules of a game.
  */
-class RulesSetupComponentModel(initialRulesBuilder: Rules.Builder, private val menuViewModel: MenuViewModel) : ScreenModel {
+class RulesSetupComponentModel(
+    initialRulesBuilder: Rules.Builder,
+    private val parent: GameConfigurationContainerComponentModel,
+    private val menuViewModel: MenuViewModel
+) : ScreenModel {
 
     var rulesBuilder = initialRulesBuilder
 
@@ -123,7 +128,8 @@ class RulesSetupComponentModel(initialRulesBuilder: Rules.Builder, private val m
     // Currently it isn't possible to put the rules section in an invalid state, but keep it here to keep
     // it future-proof.
     val isSetupValid = MutableStateFlow(true)
-
+    val availableRuleBases: StateFlow<List<DropdownEntryWithValue<Rules>>> = parent.availableRulesBase
+    val selectedRuleBase: StateFlow<DropdownEntryWithValue<Rules>?> = parent.selectedRulesBase
     val selectedWeatherTable = MutableStateFlow<DropdownEntryWithValue<WeatherTable>?>(null)
     val selectedKickOffTable = MutableStateFlow<DropdownEntryWithValue<KickOffTable>?>(null)
     val selectedUnusualBall = MutableStateFlow< DropdownEntryWithValue<BallSelectorRule>?>(null)
@@ -139,6 +145,12 @@ class RulesSetupComponentModel(initialRulesBuilder: Rules.Builder, private val m
         updateUnusualBall(unusualBallList.first().second.first())
         updatePitch(pitches.first().second.first())
         updateStadium(stadia.first().second.first())
+    }
+
+    fun updateRulesBase(entry: DropdownEntryWithValue<Rules>) {
+        // GameConfigurationContainerComponentModel will call back into this model and
+        // update whatever is relevant
+        parent.updateRulesBase(entry)
     }
 
     fun updateWeatherTable(entry: DropdownEntryWithValue<WeatherTable>) {

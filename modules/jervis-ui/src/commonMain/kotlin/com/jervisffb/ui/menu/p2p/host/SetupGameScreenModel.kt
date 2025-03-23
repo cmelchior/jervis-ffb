@@ -4,7 +4,6 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponentModel
@@ -20,9 +19,7 @@ import kotlin.uuid.Uuid
  * View model for controlling the "Setup Game" screen, that is the first step in the "P2P Host" flow.
  */
 class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val parentModel: P2PHostScreenModel) : ScreenModel {
-
-    val rules = StandardBB2020Rules().toBuilder()
-    val gameSetupModel = GameConfigurationContainerComponentModel(rules, menuViewModel)
+    val gameSetupModel = GameConfigurationContainerComponentModel(menuViewModel)
 
     val coachName = MutableStateFlow("")
     val gameName = MutableStateFlow("Game-${Random.nextInt(10_000)}")

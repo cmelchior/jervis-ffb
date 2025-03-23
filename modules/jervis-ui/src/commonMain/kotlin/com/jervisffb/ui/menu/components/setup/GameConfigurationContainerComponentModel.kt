@@ -1,8 +1,11 @@
 package com.jervisffb.ui.menu.components.setup
 
 import cafe.adriel.voyager.core.model.ScreenModel
+import com.jervisffb.engine.rules.FumbblBB2020Rules
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.menu.utils.DropdownEntryWithValue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,11 +41,16 @@ data class SetupTabDescription(
     val type: SetupTabType,
 )
 
+private val defaultRulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
+    DropdownEntryWithValue("Blood Bowl 2020 Rules (Strict)", StandardBB2020Rules()),
+    DropdownEntryWithValue("Fumbbl Compatible BB2020 Rules", FumbblBB2020Rules()),
+)
+
 /**
  * This component is the main responsible for coordinating all aspects of configuring the rules
  * for a game. This includes swi
  */
-class GameConfigurationContainerComponentModel(rulesBuilder: Rules.Builder, private val menuViewModel: MenuViewModel) : ScreenModel {
+class GameConfigurationContainerComponentModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
     val selectedGameTab: MutableStateFlow<Int> = MutableStateFlow(1)
 
@@ -109,11 +117,17 @@ class GameConfigurationContainerComponentModel(rulesBuilder: Rules.Builder, priv
         ),
     )
 
-    // TODO Changing between Fumbbl and Strict should toggle this
-    var rulesBuilder: Rules.Builder = rulesBuilder
+
+    // Expose which "Rules Base" is selected. While technically under the "Rules" component,
+    // all the other components also depends on this information, so keep the toggle here as well.
+    // We need to initialize the default values here to avoid some annoying lifecycle issues getting
+    // the rulesBuilder to all sub models.
+    val availableRulesBase = MutableStateFlow(defaultRulesBaseList)
+    val selectedRulesBase = MutableStateFlow(availableRulesBase.value.first())
+    var rulesBuilder: Rules.Builder = selectedRulesBase.value!!.value.toBuilder()
 
     // Component models responsible for configuring a new game
-    val rulesModel = RulesSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
+    val rulesModel = RulesSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, this, menuViewModel)
     val timersModel = SetupTimersComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
     val inducementsModel = InducementsSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
     val customizationsModel = CustomizationSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
@@ -144,6 +158,21 @@ class GameConfigurationContainerComponentModel(rulesBuilder: Rules.Builder, priv
         }
     }
 
+    init {
+        // TODO Add support for loading (and saving) custom rule sets
+    }
+
+    fun updateRulesBase(entry: DropdownEntryWithValue<Rules>) {
+        selectedRulesBase.value = entry
+        rulesBuilder = entry.value.toBuilder()
+        // LoadFileComponentModel does not care about preset updates, so is ignored here
+        rulesModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
+        timersModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
+        inducementsModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
+        customizationsModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
+    }
+
+
     fun updateSelectGameType(tabIndex: Int) {
         selectedGameTab.value = tabIndex
     }
@@ -153,14 +182,5 @@ class GameConfigurationContainerComponentModel(rulesBuilder: Rules.Builder, priv
      */
     fun createRules(): Rules {
         return this@GameConfigurationContainerComponentModel.rulesBuilder.build()
-    }
-
-    fun updateRulesPreset(rules: Rules.Builder) {
-        this@GameConfigurationContainerComponentModel.rulesBuilder = rules // Update to new
-        // LoadFileComponentModel does not care about preset updates, so is ignored here
-        rulesModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
-        timersModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
-        inducementsModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
-        customizationsModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
     }
 }

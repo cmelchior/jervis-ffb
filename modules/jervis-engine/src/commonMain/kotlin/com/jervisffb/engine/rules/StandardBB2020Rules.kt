@@ -1,6 +1,8 @@
 package com.jervisffb.engine.rules
 
+import com.jervisffb.engine.rules.builder.FoulActionBehavior
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.KickingPlayerBehavior
 import kotlinx.serialization.Serializable
 
 abstract class BB2020Rules : Rules(
@@ -25,4 +27,6 @@ class StandardBB2020Rules : BB2020Rules() {
 class FumbblBB2020Rules : BB2020Rules() {
     override val name: String
         get() = "Blood Bowl 2020 Rules (FUMBBL Compatible)"
+    override val kickingPlayerBehavior: KickingPlayerBehavior = KickingPlayerBehavior.FUMBBL
+    override val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.FUMBBL
 }

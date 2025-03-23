@@ -30,6 +30,9 @@ fun SetupRulesComponent(viewModel: RulesSetupComponentModel) {
 
     val scrollState = rememberScrollState()
 
+    val availableRuleBases by viewModel.availableRuleBases.collectAsState()
+    val selectedRuleBase by viewModel.selectedRuleBase.collectAsState()
+
     val selectedWeatherTable by viewModel.selectedWeatherTable.collectAsState()
     val selectedKickOffTable by viewModel.selectedKickOffTable.collectAsState()
 
@@ -58,11 +61,12 @@ fun SetupRulesComponent(viewModel: RulesSetupComponentModel) {
                 Spacer(modifier = Modifier.weight(1f))
                 Box(modifier = Modifier, contentAlignment = Alignment.CenterEnd) {
                     JervisDropDownMenu(
-                        title = "Rules Preset",
-                        entries = presets,
+                        title = "Rules Base",
+                        entries = availableRuleBases,
+                        selectedEntry = selectedRuleBase,
                         enabled = true,
                     ) {
-                        // viewModel.updatePreset(it)
+                        viewModel.updateRulesBase(it)
                     }
                 }
             }
