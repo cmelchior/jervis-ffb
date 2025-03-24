@@ -25,6 +25,10 @@ value class DieId(val id: String) {
     }
 }
 
+/**
+ * Unique identifier for a player.
+ * This must be unique across all players playing a game.
+ */
 @JvmInline
 @Serializable
 value class PlayerId(val value: String)

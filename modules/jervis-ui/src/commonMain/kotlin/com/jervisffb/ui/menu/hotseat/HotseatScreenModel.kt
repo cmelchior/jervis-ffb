@@ -51,13 +51,16 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         menuViewModel,
         this,
         {
+            selectHomeTeamModel.selectedTeam.value?.teamId?.let { teamSelectedByOtherCoach ->
+                selectAwayTeamModel.makeTeamUnavailable(teamSelectedByOtherCoach)
+            }
             selectedHomeTeam.value = selectHomeTeamModel.selectedTeam.value
             homeTeamSelectionDone()
         }
     )
     val selectedHomeTeam = MutableStateFlow<TeamInfo?>(null)
 
-    // Page 3: Select Home Team
+    // Page 3: Select Away Team
     val selectAwayTeamModel: SelectHotseatTeamScreenModel = SelectHotseatTeamScreenModel(
         menuViewModel,
         this,

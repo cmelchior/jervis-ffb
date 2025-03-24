@@ -1,6 +1,7 @@
 package com.jervisffb.ui.menu.p2p
 
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreenModel
@@ -24,4 +25,8 @@ class SelectP2PTeamScreenModel(
     private val getRules: () -> Rules,
 ) : JervisScreenModel {
     val componentModel = TeamSelectorComponentModel(menuViewModel, getCoach, onTeamSelected,  getRules)
+
+    fun markTeamUnavailable(team: TeamId) {
+        componentModel.makeTeamUnavailable(team)
+    }
 }

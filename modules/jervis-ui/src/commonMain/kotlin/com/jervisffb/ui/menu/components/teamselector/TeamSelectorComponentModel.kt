@@ -2,6 +2,7 @@ package com.jervisffb.ui.menu.components.teamselector
 
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.fumbbl.web.FumbblApi
@@ -24,6 +25,7 @@ class TeamSelectorComponentModel(
     private val getRules: () -> Rules,
 ) : JervisScreenModel {
 
+    var unavailableTeam = MutableStateFlow<TeamId?>(null)
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
     val loadingTeams: MutableStateFlow<Boolean> = MutableStateFlow(true)
@@ -90,5 +92,9 @@ class TeamSelectorComponentModel(
                 onError(e.message ?: "Unknown error")
             }
         }
+    }
+
+    fun makeTeamUnavailable(team: TeamId) {
+        unavailableTeam.value = team
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -32,32 +33,26 @@ fun RowScope.TeamCard(
     rerolls: Int,
     logo: ImageBitmap,
     isSelected: Boolean = false,
+    isEnabled: Boolean = true,
     emptyTeam: Boolean = false,
     onClick: (() -> Unit)?
 ) {
+    val borderWidth = if (isSelected || !isEnabled) 3.dp else 0.dp
+    val borderColor = if (isSelected || !isEnabled) JervisTheme.rulebookRed else Color.Transparent
     Box(
         modifier = Modifier
             .width(300.dp)
+            .alpha(if (isEnabled) 1f else 0.3f)
             .background(JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.5f))
-            .border(width = if (isSelected) 3.dp else 0.dp, color = if (isSelected) JervisTheme.rulebookRed else Color.Transparent)
-            .let { if (onClick != null) it.clickable(!emptyTeam, onClick = onClick) else it }
+            .border(width = borderWidth, color = borderColor)
+            .let { if (onClick != null && isEnabled) it.clickable(!emptyTeam, onClick = onClick) else it }
         ,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Column(
-                modifier = Modifier.fillMaxWidth(), //.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 0.dp),
-//                verticalAlignment = Alignment.Top,
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 val color = JervisTheme.rulebookRed
-//                val color = if (isSelected) JervisTheme.rulebookGreen else JervisTheme.rulebookRed
-//                Divider(
-//                    modifier = Modifier
-//                        .padding(bottom = 2.dp)
-//                        .wrapContentWidth()
-//                        .height(2.dp)
-//                    ,
-//                    color = JervisTheme.rulebookBlue,
-//                )
                 TitleBorder(color)
                 Box(
                     modifier = Modifier.fillMaxWidth().background(color),
@@ -68,21 +63,10 @@ fun RowScope.TeamCard(
                         text = name.uppercase(),
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
-//                        color = if (isSelected) JervisTheme.rulebookOrange else JervisTheme.white
                         color = JervisTheme.white
                     )
                 }
                 TitleBorder(color)
-//
-//
-//                BoxHeader(name, color = JervisTheme.rulebookRed)
-//                Text(
-//                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 10.dp),
-//                    textAlign = TextAlign.Start,
-//                    text = name,
-//                    color = JervisTheme.accentContentBackgroundColor,
-//                    fontWeight = FontWeight.Bold,
-//                )
             }
             Row(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 4.dp)) {
@@ -98,14 +82,6 @@ fun RowScope.TeamCard(
                     contentScale = ContentScale.Inside,
                 )
             }
-//            Divider(
-//                modifier = Modifier
-//                    .padding(top = 2.dp)
-//                    .wrapContentWidth()
-//                    .height(2.dp)
-//                ,
-//                color = JervisTheme.rulebookBlue,
-//            )
         }
     }
 }

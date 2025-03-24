@@ -99,6 +99,9 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                         }
                     }
                     P2PClientState.SELECT_TEAM -> {
+                        controller.homeTeam.value?.id?.let { teamSelectedByOtherCoach ->
+                            selectTeamModel.markTeamUnavailable(teamSelectedByOtherCoach)
+                        }
                         gotoNextPage(1)
                     }
                     P2PClientState.ACCEPT_GAME -> {

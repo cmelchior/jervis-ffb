@@ -3,6 +3,7 @@ package com.jervisffb.ui.menu.hotseat
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.TeamId
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.ui.menu.components.teamselector.TeamSelectorComponentModel
@@ -71,6 +72,10 @@ class SelectHotseatTeamScreenModel(
         },
         getRules = { parentModel.rules ?: error("Rules are not set") }
     )
+
+    fun makeTeamUnavailable(team: TeamId) {
+        teamSelectorModel.makeTeamUnavailable(team)
+    }
 
     fun updateCoachName(name: String) {
         coachName.value = name

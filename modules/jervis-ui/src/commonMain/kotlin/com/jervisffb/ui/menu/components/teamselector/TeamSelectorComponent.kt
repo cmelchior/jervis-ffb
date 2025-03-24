@@ -26,6 +26,7 @@ import com.jervisffb.ui.menu.components.TeamInfo
 fun TeamSelectorComponent(
     viewModel: TeamSelectorComponentModel,
 ) {
+    val unavailableTeam by viewModel.unavailableTeam.collectAsState()
     val availableTeams by viewModel.availableTeams.collectAsState()
     var showImportFumbblTeamDialog by remember { mutableStateOf(false) }
     var showLoadTeamFromFileDialog by remember { mutableStateOf(false) }
@@ -50,6 +51,7 @@ fun TeamSelectorComponent(
                         teamValue = team.teamValue,
                         rerolls = team.rerolls,
                         isSelected = (selectedTeam?.teamId == team.teamId),
+                        isEnabled = (team.teamId != unavailableTeam),
                         logo = team.logo,
                         onClick = { viewModel.setSelectedTeam(team) },
 

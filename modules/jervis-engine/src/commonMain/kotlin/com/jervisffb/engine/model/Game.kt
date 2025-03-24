@@ -80,6 +80,14 @@ class Game(
     val field: Field,
 ) {
     init {
+        // The Game State doesn't support the same team playing against itself.
+        // Mostly because we use playerIds to identify players on the UI.
+        // We could probably lift this restriction, but I suspect there is little
+        // need.
+        if (homeTeam.id == awayTeam.id) {
+            INVALID_GAME_STATE("Home and away teams cannot be the same: ${homeTeam.id}")
+        }
+
         // Setup circular references, making it easier to navigate
         // the object graph.
         homeTeam.setGameReference(this)

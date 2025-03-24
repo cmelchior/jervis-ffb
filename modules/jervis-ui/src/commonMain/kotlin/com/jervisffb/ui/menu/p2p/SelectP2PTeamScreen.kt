@@ -36,6 +36,7 @@ fun SelectP2PTeamScreen(
     confirmTitle: String,
     onNext: () -> Unit,
 ) {
+    val selectedTeamByOtherCoach by viewModel.unavailableTeam.collectAsState()
     val availableTeams by viewModel.availableTeams.collectAsState()
     var showImportFumbblTeamDialog by remember { mutableStateOf(false) }
     var showLoadTeamFromFileDialog by remember { mutableStateOf(false) }
@@ -60,6 +61,7 @@ fun SelectP2PTeamScreen(
                         teamValue = team.teamValue,
                         rerolls = team.rerolls,
                         isSelected = (selectedTeam?.teamId == team.teamId),
+                        isEnabled = (team.teamId != selectedTeamByOtherCoach),
                         logo = team.logo,
                         onClick = { viewModel.setSelectedTeam(team) },
 
