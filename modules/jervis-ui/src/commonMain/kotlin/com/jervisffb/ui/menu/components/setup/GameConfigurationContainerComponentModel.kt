@@ -4,6 +4,8 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.rules.FumbblBB2020Rules
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.utils.DropdownEntryWithValue
 import kotlinx.coroutines.flow.Flow
@@ -42,6 +44,11 @@ data class SetupTabDescription(
 )
 
 private val defaultRulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
+    DropdownEntryWithValue("Blood Bowl 2020 Rules (Dev Settings)", StandardBB2020Rules().toBuilder().run {
+        diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
+        undoActionBehavior = UndoActionBehavior.ALLOWED
+        build()
+    }),
     DropdownEntryWithValue("Blood Bowl 2020 Rules (Strict)", StandardBB2020Rules()),
     DropdownEntryWithValue("Fumbbl Compatible BB2020 Rules", FumbblBB2020Rules()),
 )
