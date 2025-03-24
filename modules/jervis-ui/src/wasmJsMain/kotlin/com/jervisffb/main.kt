@@ -11,6 +11,7 @@ import kotlinx.browser.window
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
+    val menuViewModel = MenuViewModel()
     try {
         clearLoadingScreen()
         initApplication()
@@ -18,9 +19,16 @@ fun main() {
             if (event.key == "Escape") {
                 BackNavigationHandler.execute()
             }
+            // TODO How to handle shortcuts in general here?
+            //  Should we capture all keybinds in the browser, and how do we
+            //  keep them in sync with the JVM keybinds? For now, just capture
+            //  Undo, which is by far the most important.
+            if ((event.ctrlKey || event.metaKey) && event.key.lowercase() == "z") {
+                event.preventDefault() // Stop propagating into browser Undo
+                menuViewModel.undoAction()
+            }
         }
         ComposeViewport(document.body!!) {
-            val menuViewModel = MenuViewModel()
             // WindowMenuBar(menuViewModel)
             App(menuViewModel)
         }
