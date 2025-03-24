@@ -123,7 +123,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(4.dp),
+                                .padding(6.dp),
                         horizontalArrangement = Arrangement.spacedBy(3.dp),
                     ) {
                         val model = player.model

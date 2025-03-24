@@ -11,10 +11,11 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,8 +23,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
@@ -37,6 +41,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -46,6 +51,8 @@ import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.SidebarView
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import kotlinx.coroutines.flow.Flow
+import org.jetbrains.skia.FilterBlurMode
+import org.jetbrains.skia.MaskFilter
 
 @Composable
 fun Sidebar(
@@ -206,35 +213,68 @@ fun StatBox(
     modifier: Modifier,
     title: String,
     value: String,
+    borderRadius: Dp = 4.dp,
+    glowColor: Color = Color.White.copy(alpha = 0.9f),
+    glowSize: Dp = 2.dp,
 ) {
     Box(
-        modifier = modifier.background(color = Color.White).border(1.dp, Color.Black),
+        modifier = modifier
+            .drawBehind {
+                val shape = RoundedCornerShape(borderRadius)
+                val outline = shape.createOutline(size, layoutDirection, this)
+                drawIntoCanvas { canvas ->
+                    canvas.drawOutline(
+                        outline,
+                        androidx.compose.ui.graphics.Paint().apply {
+                            color = glowColor
+                            this.asFrameworkPaint().maskFilter = MaskFilter.makeBlur(
+                                FilterBlurMode.NORMAL,
+                                sigma = glowSize.toPx(),
+                            )
+                        }
+                    )
+                }
+            }
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = modifier
+                .background(Color.White, RoundedCornerShape(borderRadius))
+                .border(2.dp, Color.Black, RoundedCornerShape(borderRadius))
+            ,
+        ) {
             Box(
                 modifier =
                     Modifier
-                        .weight(1f)
-                        .fillMaxSize()
-                        .background(color = Color.Black),
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.45f)
+                        .background(color = Color.Black, shape = RoundedCornerShape(topStart = borderRadius, topEnd = borderRadius))
+                ,
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = title,
-                    fontSize = 8.sp,
+                    fontSize = 9.sp,
+                    lineHeight = 1.em,
+                    maxLines = 1,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     textAlign = TextAlign.Center,
                 )
             }
             Box(
-                modifier = Modifier.weight(1f).fillMaxSize(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                ,
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    modifier = Modifier.fillMaxSize().wrapContentHeight(align = Alignment.CenterVertically),
+                    modifier = Modifier.padding(bottom = 2.dp),
                     text = value,
-                    fontSize = 10.sp,
+                    fontSize = 11.sp,
+                    lineHeight = 1.em,
+                    maxLines = 1,
                     fontWeight = FontWeight.Normal,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
