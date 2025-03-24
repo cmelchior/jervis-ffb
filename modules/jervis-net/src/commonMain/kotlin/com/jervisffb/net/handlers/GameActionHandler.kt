@@ -10,14 +10,11 @@ import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.net.GameSession
 import com.jervisffb.net.JervisNetworkWebSocketConnection
 import com.jervisffb.net.messages.GameActionMessage
-import com.jervisffb.net.messages.InternalGameActionMessage
 import com.jervisffb.net.messages.InvalidGameActionOwnerServerError
 import com.jervisffb.net.messages.InvalidGameActionTypeServerError
 import com.jervisffb.net.messages.OutOfOrderGameActionServerError
 import com.jervisffb.net.messages.UnknownServerError
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 
 class GameActionHandler(override val session: GameSession) : ClientMessageHandler<GameActionMessage>() {
 
@@ -114,7 +111,7 @@ suspend fun handleAction(
     var availableActions = game.getAvailableActions()
     // For now, disable timer actions on the server as we need to implement timer infrastructure
     // in the network protocol first
-    val serverDiceRolls = !session.gameSettings.clientSelectedDiceRolls && false
+    val serverDiceRolls = !session.gameSettings.clientSelectedDiceRolls
     while (serverDiceRolls && availableActions.containsActionWithRandomBehavior()) {
         val action = createRandomAction(game.state, availableActions)
         game.handleAction(action)
@@ -126,13 +123,13 @@ suspend fun handleAction(
 
     // Last, before waiting for the next action, we set up any server timeouts
     // TODO Figure out exactly which timer to use
-    if (session.gameSettings.timerSettings.timersEnabled) {
-        val nextIndex = game.currentActionIndex() + 1
-        session.scope.launch {
-            // delay(session.gameSettings.timerSettings.turnLimitSeconds)
-            session.sendInternalMessage(connection, InternalGameActionMessage(nextIndex))
-        }
-    }
+//    if (session.gameSettings.timerSettings.timersEnabled) {
+//        val nextIndex = game.currentActionIndex() + 1
+//        session.scope.launch {
+//            // delay(session.gameSettings.timerSettings.turnLimitSeconds)
+//            session.sendInternalMessage(connection, InternalGameActionMessage(nextIndex))
+//        }
+//    }
 }
 
 suspend fun rollForwardToUserAction(session: GameSession, game: GameEngineController, connection: JervisNetworkWebSocketConnection) {
@@ -148,14 +145,16 @@ suspend fun rollForwardToUserAction(session: GameSession, game: GameEngineContro
 
     // Last, before waiting for the next action, we set up any server timeouts
     // TODO Figure out exactly which timer to use
-    if (session.gameSettings.timerSettings.timersEnabled) {
-        val nextIndex = game.currentActionIndex() + 1
-        session.scope.launch {
-            // delay(session.gameSettings.timerSettings.turnLimitSeconds)
-            println("TIMER: ${Clock.System.now()}.")
-            // TODO Figure out how to select automated actions
-            session.sendInternalMessage(connection, InternalGameActionMessage(nextIndex))
-        }
-    }
+    // For now, disable timer actions on the server as we need to implement timer infrastructure
+    // in the network protocol first
+//    if (session.gameSettings.timerSettings.timersEnabled) {
+//        val nextIndex = game.currentActionIndex() + 1
+//        session.scope.launch {
+//            // delay(session.gameSettings.timerSettings.turnLimitSeconds)
+//            println("TIMER: ${Clock.System.now()}.")
+//            // TODO Figure out how to select automated actions
+//            session.sendInternalMessage(connection, InternalGameActionMessage(nextIndex))
+//        }
+//    }
 }
 
