@@ -104,3 +104,5 @@ things as they come up.
   at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:314)
   at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:333)
   at com.jervisffb.engine.GameEngineController.rollForwardToNextActionNode(GameEngineController.kt:333)
+- Saw "No player eligible for High Kick" even though there clearly was. Forgot to capture events leading up it. 
+  Try to reproduce.
