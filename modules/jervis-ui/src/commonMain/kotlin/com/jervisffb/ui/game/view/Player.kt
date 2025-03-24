@@ -22,6 +22,8 @@ import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayer
@@ -66,18 +68,18 @@ fun Player(
             player.selectAction!!()
         }
     }
-//    if (player.onHover != null) {
-//        playerModifier =
-//            playerModifier.onPointerEvent(eventType = PointerEventType.Enter) {
-//                player.onHover.invoke()
-//            }
-//    }
-//    if (player.onHoverExit != null) {
-//        playerModifier =
-//            playerModifier.onPointerEvent(eventType = PointerEventType.Exit) {
-//                player.onHoverExit.invoke()
-//            }
-//    }
+    if (player.onHover != null) {
+        playerModifier =
+            playerModifier.onPointerEvent(eventType = PointerEventType.Enter) {
+                player.onHover!!.invoke()
+            }
+    }
+    if (player.onHoverExit != null) {
+        playerModifier =
+            playerModifier.onPointerEvent(eventType = PointerEventType.Exit) {
+                player.onHoverExit!!.invoke()
+            }
+    }
 
     Box(modifier = playerModifier) {
         PlayerImage(
