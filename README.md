@@ -1,6 +1,6 @@
 <h1>
-  <img src="logo.svg" width="40" alt="Jervis Logo">
-  Jervis — A Fantasy Football Engine
+   Jervis — A Fantasy Football Engine
+   <img src="logo.svg" width="40" align="left" alt="Jervis Logo">
 </h1>
 
 <p align="center">
