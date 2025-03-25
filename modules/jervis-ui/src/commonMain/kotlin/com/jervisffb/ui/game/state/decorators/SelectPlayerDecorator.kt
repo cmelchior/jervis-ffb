@@ -46,6 +46,7 @@ class SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
                     val square = snapshot.fieldSquares[playerLocation]
                     snapshot.fieldSquares[playerLocation] = square?.copy(
                         dice = dice,
+                        // TODO square.player!! is sometimes `null` here :/
                         player = UiPlayer(square.player!!.model, selectedAction,square.player.onHover, square.player.onHoverExit),
                         onSelected = selectedAction
                     ) ?: error("Unexpected player location : $playerLocation")

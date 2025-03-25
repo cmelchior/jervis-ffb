@@ -82,8 +82,6 @@ things as they come up.
 - When selecting dice rolls on the server, it should not be possible to select "All" for UNDO.
   "All" doesn't work, since if you undo a dice roll, the server will register it is at a point where
   it needs to roll and then immediately re-apply the dice roll.
-- It should not be possible for the non-active client to select setups. The server handles this fine
-  now by reverting state, but should be disallowed at the UI level.
 
 - Detected while running random actions:
   Exception in thread "GameLoopScope" java.lang.ArrayIndexOutOfBoundsException: Index -2147483648 out of bounds for length 26
@@ -141,3 +139,6 @@ things as they come up.
   at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
   at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
   Suppressed: kotlinx.coroutines.internal.DiagnosticCoroutineContextException: [androidx.compose.ui.scene.ComposeContainer$DesktopCoroutineExceptionHandler@1e9d7ed0, androidx.compose.runtime.BroadcastFrameClock@5b8fadb6, StandaloneCoroutine{Cancelling}@284b31d8, FlushCoroutineDispatcher@59bf5aa7]
+
+- If a ball bounce over the center during kick-off and caught by a player there, it should still be returned to the 
+  the other team (I think, double check the rules)
