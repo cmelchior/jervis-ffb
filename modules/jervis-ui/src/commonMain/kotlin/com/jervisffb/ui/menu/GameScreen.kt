@@ -41,7 +41,7 @@ class GameScreenModel(
     private val onEngineInitialized: () -> Unit = { },
 ) : ScreenModel {
 
-    val hoverPlayerFlow = MutableSharedFlow<Player?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val hoverPlayerFlow = MutableSharedFlow<Player?>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     lateinit var uiState: UiGameController
     var fumbbl: FumbblReplayAdapter? = null
