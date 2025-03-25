@@ -39,6 +39,8 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 import org.jetbrains.skia.Color4f
 import org.jetbrains.skia.FilterBlurMode
 import org.jetbrains.skia.Font
@@ -47,23 +49,23 @@ import org.jetbrains.skia.PathMeasure
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.RSXform
 import org.jetbrains.skia.TextBlobBuilder
-import org.jetbrains.skia.Typeface
 
 /**
  * Credit https://github.com/kirill-grouchnikov/artemis/blob/418c9ed06e94e66d05bb1b0be9723c46a5d80cdc/src/main/kotlin/org/pushingpixels/artemis/samples/TextOnPathSamples.kt#L48
  *
- * Modified
+ * Modified to also support letter spacing.
  */
 fun DrawScope.drawTextOnPath(
     text: String,
     textSize: Dp,
-    font: Font = Font(Typeface.makeEmpty()), // TODO makeDefault was removed. What to replace it with?
+    font: Font,
     isEmboldened: Boolean = false,
     path: Path,
     offset: Offset,
     textAlign: TextAlign = TextAlign.Center,
     paint: Paint,
     shadow: Shadow? = null,
+    letterSpacing: TextUnit = 1.sp,
 ) {
     this.drawIntoCanvas {
         val nativeCanvas = it.nativeCanvas
@@ -76,6 +78,9 @@ fun DrawScope.drawTextOnPath(
         val glyphs = skiaFont.getStringGlyphs(text)
         val glyphWidths = skiaFont.getWidths(glyphs)
         val glyphPositions = skiaFont.getPositions(glyphs, Point(x = offset.x, y = offset.y))
+            .mapIndexed { index, point ->
+                Point(point.x + index * letterSpacing.toPx(), y = point.y)
+            }
 
         val pathMeasure = PathMeasure(path.asSkiaPath())
         // How long (in pixels) is our path

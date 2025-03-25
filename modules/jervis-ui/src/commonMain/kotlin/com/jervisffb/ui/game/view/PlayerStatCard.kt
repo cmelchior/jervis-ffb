@@ -20,11 +20,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayerCard
+import com.jervisffb.ui.menu.intro.loadJervisFont
 import kotlinx.coroutines.flow.Flow
 import org.pushingpixels.artemis.drawTextOnPath
 
@@ -39,6 +41,7 @@ import org.pushingpixels.artemis.drawTextOnPath
 @Composable
 fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
     val playerData by flow.collectAsState(null)
+    val font = loadJervisFont()
     playerData?.let { player ->
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -70,13 +73,17 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                     ) {
                         // Player name
                         Text(
-                            modifier = Modifier.padding(4.dp).fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            text = player.model.name ?: "",
+                            modifier = Modifier.padding(start = 8.dp, top = 12.dp, end = 4.dp, bottom = 4.dp).fillMaxWidth(),
+                            textAlign = TextAlign.Start,
+                            text = player.model.name,
+                            fontFamily = JervisTheme.fontFamily(),
+                            style = TextStyle.Default.copy(
+                                shadow = Shadow(Color.Black, Offset(2f, 2f), 2f),
+                            ),
                             color = Color.White,
                             maxLines = 1,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
+                            fontSize = 16.sp,
+                            letterSpacing = 1.sp,
                             overflow = TextOverflow.Ellipsis,
                         )
 
@@ -84,7 +91,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                         Row(
                             modifier =
                                 Modifier
-                                    .padding(start = 8.dp, end = 8.dp)
+                                    .padding(start = 24.dp, end = 8.dp)
                                     .fillMaxSize(),
                         ) {
                             Image(
@@ -94,25 +101,30 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                                 contentScale = ContentScale.Fit,
                             )
 
+                            val font = loadJervisFont()
                             androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
-                                // A path with three quad Bezier segments
+                                val fontSize = 14.sp
+                                val lineX = this.size.width - 8.dp.toPx()
                                 val path = androidx.compose.ui.graphics.Path()
-                                path.moveTo(this.size.width, this.size.height - 5)
-                                path.lineTo(size.width, 5f)
+                                path.moveTo(lineX, this.size.height - 6.dp.toPx())
+                                path.lineTo(lineX, 0.dp.toPx())
 
-                                val name = player.model.position.titleSingular.takeDot(10)
+                                val name = player.model.position.titleSingular
                                 drawTextOnPath(
                                     text = "$name #${player.model.number.value}",
-                                    textSize = 14.sp.toDp(),
-                                    isEmboldened = true,
+                                    textSize = fontSize.toDp(),
+                                    isEmboldened = false,
                                     path = path,
-                                    offset = Offset(0.dp.toPx(), 0.0f),
+                                    offset = Offset(0.dp.toPx(), 0.dp.toPx()),
                                     textAlign = TextAlign.Start,
                                     paint =
                                         Paint().also {
                                             it.color = Color.White
                                             it.style = PaintingStyle.Fill
                                         },
+                                    font = font,
+                                    letterSpacing = 1.sp,
+                                    shadow = Shadow(Color.Black, Offset(2f, 2f), 2f)
                                 )
                             }
                         }
