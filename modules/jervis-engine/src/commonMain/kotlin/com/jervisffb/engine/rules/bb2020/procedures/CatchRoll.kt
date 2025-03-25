@@ -140,6 +140,10 @@ object CatchRoll : Procedure() {
         target: Int,
         rollContext: CatchRollContext,
     ): Boolean {
-        return it.value != 1 && (target <= it.value + rollContext.modifiers.sum())
+        return when (it.value) {
+            1 -> false
+            6 -> true
+            else -> (target <= it.value + rollContext.modifiers.sum())
+        }
     }
 }
