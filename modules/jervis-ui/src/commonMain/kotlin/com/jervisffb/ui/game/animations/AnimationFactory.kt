@@ -65,11 +65,21 @@ object AnimationFactory {
         val stack = state.stack
 
         // Animate kick-off
-        val firstCatch = (stack.singleCurrentNode(CatchRoll.RollDie) && !stack.containsNode(Catch.CatchFailed))
+        // We want to animate the kick-off (ball flying) after the kick-off event has been resolved.
+        // This event is a bit complicated to track as we don't fully know what happens during the KickOff Event
+        val firstCatch = (
+            stack.singleCurrentNode(CatchRoll.RollDie)
+                && !stack.containsNode(Bounce.ResolveCatch)
+                && !stack.containsNode(Catch.CatchFailed)
+        )
         val firstBounce = (stack.singleCurrentNode(Bounce.RollDirection) && !stack.containsNode(Catch.CatchFailed))
-        val catchOrBounce = (firstCatch || firstBounce) && stack.containsNode(TheKickOffEvent.ResolveBallLanding)
+        val isResolvingLanding = stack.containsNode(TheKickOffEvent.ResolveBallLanding)
         val touchBack = stack.currentNode() == TheKickOffEvent.TouchBack
-        if (catchOrBounce || touchBack) {
+        if (
+            (firstCatch && !firstBounce && isResolvingLanding)
+            || (!firstCatch && firstBounce && isResolvingLanding)
+            || touchBack
+        ) {
             // The kicking player might no longer be on the field. For example, in the case of a Pitch Invasion
             // or a Blitz. For now, we just decide to animate the ball from the center of the end-zone, but maybe
             // some other solution would be funnier/better?

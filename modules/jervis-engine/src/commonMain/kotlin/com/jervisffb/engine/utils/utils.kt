@@ -164,11 +164,30 @@ fun GameAction.isRandomAction(): Boolean {
     }
 }
 
+/**
+ * Developer debugging utility. Makes it easier to inject dice rolls to get the behaviour you want.
+ * Should only be used when Dev Mode isn't enough to trigger the bug. Common use cases where
+ * this might be nice is debugging race conditions in the UI.
+ */
+val randomList = mutableListOf<GameAction>(
+//    1.d3, // Fan Factor roll (Home)
+//    1.d3, // Fan Factor roll (Away)
+//    DiceRollResults(3.d6, 4.d6), // Weather Roll
+//    CoinTossResult(Coin.HEAD), // Coin Toss
+//    DiceRollResults(2.d8, 1.d6), // Kick
+//    DiceRollResults(5.d6, 5.d6), // Kickoff event
+)
 
 fun createRandomAction(
     state: Game,
     availableActions: List<GameActionDescriptor>,
 ): GameAction {
+
+    // Hacky way to inject events. Should probably try to add some kind of Developer UI
+    // for this.
+    if (randomList.isNotEmpty()) {
+        return randomList.removeAt(0)
+    }
 
     // Select a random action but disallow certain ones
     var actionDesc: GameActionDescriptor? = null
