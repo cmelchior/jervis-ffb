@@ -1,4 +1,13 @@
-# Jervis — A Fantasy Football Engine
+<h1>
+  <img src="logo.svg" width="40" alt="Jervis Logo">
+  Jervis — A Fantasy Football Engine
+</h1>
+
+<p align="center">
+  <img src="screenshots/screenshot1.png" width="30%" />
+  <img src="screenshots/screenshot3.png" width="30%" />
+  <img src="screenshots/screenshot5.png" width="30%" />
+</p>
 
 This repository contains the source code for the Jervis project.
 
