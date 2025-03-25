@@ -63,21 +63,25 @@ fun BallAnimation(
 ) {
     var time by remember { mutableStateOf(0f) }
 
-    LaunchedEffect(Unit) {
-        // Scale duration so it just looks like real physics, but speed up.
-        // Scaling factor is just chosen through experimentation
+    // The stateCalculator should be unique for every new animation, so we can use that as a key.
+    LaunchedEffect(stateCalculator) {
+        // Scale duration so it looks like real physics, but speed up. It is chosen
+        // through experimentation.
         //
-        // Unclear why animateIntAsState doesn't work, so do this instead.
+        // Unclear why animateIntAsState doesn't work.
         // Probably I am just doing something wrong, but this also works.
-        val timeScalingFactor = 10
-        animate(
-            initialValue = 0.toFloat(),
-            targetValue = duration.inWholeMilliseconds.toFloat(),
-            animationSpec = tween(duration.inWholeMilliseconds.toInt() / timeScalingFactor, easing = LinearEasing),
-        ) { value, _ ->
-            time = value.toInt() / 1_000f // Convert back to seconds
+        try {
+            val timeScalingFactor = 10
+            animate(
+                initialValue = 0.toFloat(),
+                targetValue = duration.inWholeMilliseconds.toFloat(),
+                animationSpec = tween(duration.inWholeMilliseconds.toInt() / timeScalingFactor, easing = LinearEasing),
+            ) { value, _ ->
+                time = value.toInt() / 1_000f // Convert back to seconds
+            }
+        } finally {
+            animationDone()
         }
-        animationDone()
     }
 
     val ballState by remember(time) {

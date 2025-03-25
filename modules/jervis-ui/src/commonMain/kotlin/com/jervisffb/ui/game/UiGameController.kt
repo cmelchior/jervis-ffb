@@ -159,7 +159,7 @@ class UiGameController(
 
     // Storing a reference to a UiGameSnap is generally a bad idea as it becomes invalid when the game loop
     // rolls over, but we only use the replay during setting up the UI. After that, we should have all consumers
-    // set up correctly and the replay is not used.
+    // set up correctly and the `replay` is not used.
     private val _uiStateFlow = MutableSharedFlow<UiGameSnapshot>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
     val uiStateFlow: Flow<UiGameSnapshot> = _uiStateFlow
 

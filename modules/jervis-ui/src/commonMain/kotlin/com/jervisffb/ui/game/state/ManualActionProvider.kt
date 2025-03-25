@@ -52,6 +52,7 @@ import com.jervisffb.ui.game.view.DialogFactory
 import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
+import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
@@ -67,6 +68,10 @@ open class ManualActionProvider(
     private val clientMode: TeamActionMode,
     private val gameSettings: GameSettings
 ): UiActionProvider() {
+
+    companion object {
+        val LOG = jervisLogger()
+    }
 
     private lateinit var availableActions: ActionRequest
 
@@ -142,6 +147,8 @@ open class ManualActionProvider(
     override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
         availableActions = actions
         if (queuedActions.isNotEmpty()) return
+        if (automatedAction != null) return
+
         // TODO What to do here when it is the other team having its turn.
         //  The behavior will depend on the game being a HotSeat vs. Client/Server
         var showActionDecorators = when (clientMode) {
@@ -302,8 +309,6 @@ open class ManualActionProvider(
             return null
         }
 
-        val currentNode = controller.currentProcedure()?.currentNode()
-
         // First, we check if we are playing Hotseat and the game is set to roll random
         // actions on the "server". In this case, they are generated here.
         if (!gameSettings.clientSelectedDiceRolls && gameSettings.isHotseatGame && actions.containsActionWithRandomBehavior()) {
@@ -319,6 +324,7 @@ open class ManualActionProvider(
 
         // Randomly select a kicking player
         // TODO Should only do this if no-one has kick
+        val currentNode = controller.currentProcedure()?.currentNode()
         if (currentNode == TheKickOff.NominateKickingPlayer && menuViewModel.isFeatureEnabled(
                 Feature.SELECT_KICKING_PLAYER
             )) {
