@@ -2,6 +2,13 @@
 set -e
 STARTING_DIR=`pwd`
 HERE=$(dirname `realpath "$0"`)
-# TODO Test if file exists
-exec java -jar $HERE/tools/fumbblcli.jar "$@"
-cd "$STARTING_DIR""
+JAR_PATH="$HERE/tools/fumbblcli.jar"
+
+# Check if the jar file exists
+if [ ! -f "$JAR_PATH" ]; then
+  echo "Error: $JAR_PATH not found. Run './gradlew buildTools' first"
+  exit 1
+fi
+
+exec java -jar "$JAR_PATH" "$@"
+cd "$STARTING_DIR"
