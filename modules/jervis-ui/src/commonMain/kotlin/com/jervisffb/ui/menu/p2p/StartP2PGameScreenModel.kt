@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.StateFlow
  * ViewModel class for controlling the screen asking the user to accept the game.
  */
 class StartP2PGameScreenModel(
-    private val controller: P2PClientGameController,
+    private val networkAdapter: P2PClientNetworkAdapter,
     private val menuViewModel: MenuViewModel,
 ) : JervisScreenModel {
 
-    val homeTeam: StateFlow<Team?> = controller.homeTeam
-    val awayTeam: StateFlow<Team?> = controller.awayTeam
+    val homeTeam: StateFlow<Team?> = networkAdapter.homeTeam
+    val awayTeam: StateFlow<Team?> = networkAdapter.awayTeam
 
     fun reset() {
         // Nothing to reset

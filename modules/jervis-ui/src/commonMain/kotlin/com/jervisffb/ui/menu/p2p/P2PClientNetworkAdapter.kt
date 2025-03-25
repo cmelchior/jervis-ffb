@@ -34,7 +34,7 @@ data class Disconnected(val reason: CloseReason) : ConnectionState
 object Connecting : ConnectionState
 object Connected : ConnectionState
 
-/*
+/**
  * Game controller for a client joining a game as a Peer-to-Peer Client.
  *
  * This controller is responsible for the entire lifecycle of the game. Including
@@ -43,7 +43,7 @@ object Connected : ConnectionState
  * @see [com.jervisffb.engine.GameEngineController]
  * @see [com.jervisffb.ui.game.UiGameController]
  */
-class P2PClientGameController(
+class P2PClientNetworkAdapter(
     private val isHost: Boolean = false
 ) {
     private val _clientState = MutableStateFlow(P2PClientState.START)
@@ -230,8 +230,8 @@ class P2PClientGameController(
 
         override fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>) {
             // Wait for State change
-            this@P2PClientGameController.rules = rules
-            this@P2PClientGameController.initialActions = initialActions
+            this@P2PClientNetworkAdapter.rules = rules
+            this@P2PClientNetworkAdapter.initialActions = initialActions
         }
 
         override fun onGameReady(id: GameId) {

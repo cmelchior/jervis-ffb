@@ -26,7 +26,7 @@ import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.ui.menu.components.setup.ConfigType
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
-import com.jervisffb.ui.menu.p2p.P2PClientGameController
+import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
 import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreenModel
 import com.jervisffb.ui.menu.p2p.StartP2PGameScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +47,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     val currentPage = MutableStateFlow(0)
 
     // TODO Split out game creation
-    val controller = P2PClientGameController()
+    val networkAdapter = P2PClientNetworkAdapter()
 
     // Page 1: Setup Game
     val setupGameModel = SetupGameScreenModel(menuViewModel, this)
@@ -61,7 +61,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
         onTeamSelected = { teamSelected ->
             selectedTeam.value = teamSelected
         },
-        getRules = { controller.rules ?: error("Rules are not loaded yet") }
+        getRules = { networkAdapter.rules ?: error("Rules are not loaded yet") }
     )
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
     private val _gameUrl = MutableStateFlow("")
@@ -72,7 +72,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
 
 
     // Page 4: Accept game
-    val acceptGameModel = StartP2PGameScreenModel(controller, menuViewModel)
+    val acceptGameModel = StartP2PGameScreenModel(networkAdapter, menuViewModel)
 
     private var gameViewModel: GameScreenModel? = null
 
@@ -90,7 +90,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
         sidebarEntries.addAll(startEntries)
 
         menuViewModel.navigatorContext.launch {
-            controller.hostState.collect {
+            networkAdapter.hostState.collect {
                 // TODO We move state optimistically, so we probably need to check if things needs to be reset somehow.
                 when (it) {
                     P2PHostState.START -> { /* Do nothing */ }
@@ -116,13 +116,13 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                         gotoNextPage(3)
                     }
                     P2PHostState.RUN_GAME -> {
-                        val rules = controller.rules!!
-                        val homeTeam = JervisSerialization.fixTeamRefs(controller.homeTeam.value!!)
-                        homeTeam.coach = controller.homeCoach.value!!
-                        val awayTeam = JervisSerialization.fixTeamRefs(controller.awayTeam.value!!)
-                        awayTeam.coach = controller.awayCoach.value!!
+                        val rules = networkAdapter.rules!!
+                        val homeTeam = JervisSerialization.fixTeamRefs(networkAdapter.homeTeam.value!!)
+                        homeTeam.coach = networkAdapter.homeCoach.value!!
+                        val awayTeam = JervisSerialization.fixTeamRefs(networkAdapter.awayTeam.value!!)
+                        awayTeam.coach = networkAdapter.awayCoach.value!!
                         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
-                        val gameController = GameEngineController(game, controller.initialActions)
+                        val gameController = GameEngineController(game, networkAdapter.initialActions)
 
                         val homeActionProvider = ManualActionProvider(
                             gameController,
@@ -142,7 +142,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                             GameSettings(gameRules = rules),
                             homeActionProvider,
                             awayActionProvider,
-                            controller
+                            networkAdapter
                         )
 
                         gameViewModel = GameScreenModel(
@@ -156,7 +156,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                         ) {
                             menuViewModel.controller = gameController
                             menuViewModel.navigatorContext.launch {
-                                controller.sendGameStarted()
+                                networkAdapter.sendGameStarted()
                             }
                         }
                         navigator.push(GameScreen(gameViewModel!!))
@@ -235,14 +235,14 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
         }
         menuViewModel.navigatorContext.launch {
             server?.start()
-            controller.joinHost(
+            networkAdapter.joinHost(
                 gameUrl = "ws://127.0.0.1:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}",
                 coachName = setupGameModel.coachName.value,
                 gameId = GameId(setupGameModel.gameName.value),
                 teamIfHost = selectedTeam.value?.teamData ?: error("Missing team"),
                 handler = object: AbstractClintNetworkMessageHandler() { /* No op */ }
             )
-            controller.teamSelected(selectedTeam.value!!)
+            networkAdapter.teamSelected(selectedTeam.value!!)
         }
     }
 
@@ -273,9 +273,9 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     fun userAcceptGame(gameAccepted: Boolean) {
         menuViewModel.navigatorContext.launch {
             if (gameAccepted) {
-                controller.gameAccepted(gameAccepted)
+                networkAdapter.gameAccepted(gameAccepted)
             } else {
-                controller.gameAccepted(gameAccepted) // Server will terminate connection
+                networkAdapter.gameAccepted(gameAccepted) // Server will terminate connection
                 goBackToPage(0)
             }
         }

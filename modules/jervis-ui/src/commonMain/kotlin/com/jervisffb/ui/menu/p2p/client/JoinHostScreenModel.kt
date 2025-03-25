@@ -115,7 +115,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
             _joinState.value = JoinState.JOINING
             val coachName = _coachName.value
             PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_CLIENT_COACH_NAME, coachName)
-            model.controller.joinHost(
+            model.networkAdapter.joinHost(
                 gameUrl = joiningUrl,
                 coachName = coachName,
                 gameId = GameId(_gameId.value),
@@ -141,7 +141,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
 
     fun disconnectFromHost() {
         menuViewModel.navigatorContext.launch {
-            model.controller.disconnect(handler = object: AbstractClintNetworkMessageHandler() {
+            model.networkAdapter.disconnect(handler = object: AbstractClintNetworkMessageHandler() {
                 override fun onDisconnected(reason: CloseReason) { /* We already updated the UI */ }
             })
         }

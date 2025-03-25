@@ -12,7 +12,7 @@ import com.jervisffb.net.messages.GameActionServerError
 import com.jervisffb.net.messages.ServerError
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
-import com.jervisffb.ui.menu.p2p.P2PClientGameController
+import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
 import com.jervisffb.utils.jervisLogger
 import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +25,7 @@ class P2PActionProvider(
     private val settings: GameSettings,
     private val homeProvider: UiActionProvider,
     private val awayProvider: UiActionProvider,
-    private val connection: P2PClientGameController,
+    private val networkAdapter: P2PClientNetworkAdapter,
 ): UiActionProvider() {
 
     companion object {
@@ -45,7 +45,7 @@ class P2PActionProvider(
     private var currentProvider = homeProvider
 
     override fun startHandler() {
-        connection.addMessageHandler(object: AbstractClintNetworkMessageHandler() {
+        networkAdapter.addMessageHandler(object: AbstractClintNetworkMessageHandler() {
             override fun onGameAction(producer: CoachId, serverIndex: GameActionId, action: GameAction) {
                 lastServerActionIndex = serverIndex
                 if (producer == engine.state.homeTeam.coach.id) {
@@ -91,7 +91,7 @@ class P2PActionProvider(
         LOG.d("Handling action ($clientActionIndex > $lastServerActionIndex): $action")
         if (clientActionIndex > lastServerActionIndex) {
             actionScope.launch {
-                connection.sendActionToServer(clientActionIndex, action)
+                networkAdapter.sendActionToServer(clientActionIndex, action)
             }
         }
     }

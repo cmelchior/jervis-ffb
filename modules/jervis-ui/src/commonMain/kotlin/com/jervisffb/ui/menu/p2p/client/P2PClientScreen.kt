@@ -88,8 +88,8 @@ private fun PageContent(viewModel: P2PClientScreenModel) {
                     onNext = { viewModel.teamSelectionDone() }
                 )
                 2 -> StartP2PGamePage(
-                    viewModel.controller.homeTeam,
-                    viewModel.controller.awayTeam,
+                    viewModel.networkAdapter.homeTeam,
+                    viewModel.networkAdapter.awayTeam,
                     onAcceptGame = { acceptedGame ->
                         viewModel.userAcceptGame(acceptedGame)
                     }

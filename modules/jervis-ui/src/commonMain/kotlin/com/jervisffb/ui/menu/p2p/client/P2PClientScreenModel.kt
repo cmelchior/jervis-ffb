@@ -23,7 +23,7 @@ import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.components.TeamInfo
-import com.jervisffb.ui.menu.p2p.P2PClientGameController
+import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
 import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreenModel
 import com.jervisffb.ui.menu.p2p.StartP2PGameScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,8 +39,8 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
 
     val sidebarEntries: SnapshotStateList<SidebarEntry> = SnapshotStateList()
 
-    // Central controller for the entire game lifecycle
-    val controller = P2PClientGameController()
+    // Adapter responsible for mapping network events to events that can be handled by the UI
+    val networkAdapter = P2PClientNetworkAdapter()
 
     // Which page are currently being shown
     val totalPages = 3
@@ -58,11 +58,11 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
             selectedTeam.value = teamSelected
             canCreateGame.value = (teamSelected != null)
         },
-        getRules = { controller.rules ?: error("Rules are not loaded yet") }
+        getRules = { networkAdapter.rules ?: error("Rules are not loaded yet") }
     )
 
     // Page 3: Accept game and load resources
-    val acceptGameModel = StartP2PGameScreenModel(controller, menuViewModel)
+    val acceptGameModel = StartP2PGameScreenModel(networkAdapter, menuViewModel)
 
     val validGameSetup = MutableStateFlow(true)
     val validTeamSelection = MutableStateFlow(false)
@@ -88,7 +88,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
         sidebarEntries.addAll(startEntries)
         loadTeamList()
         menuViewModel.navigatorContext.launch {
-            controller.clientState.collect {
+            networkAdapter.clientState.collect {
                 // TODO We move state optimistically, so we probably need to check if things needs to be reset somehow.
                 when (it) {
                     P2PClientState.START -> { /* Do nothing */ }
@@ -99,7 +99,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                         }
                     }
                     P2PClientState.SELECT_TEAM -> {
-                        controller.homeTeam.value?.id?.let { teamSelectedByOtherCoach ->
+                        networkAdapter.homeTeam.value?.id?.let { teamSelectedByOtherCoach ->
                             selectTeamModel.markTeamUnavailable(teamSelectedByOtherCoach)
                         }
                         gotoNextPage(1)
@@ -108,13 +108,13 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                         gotoNextPage(2)
                     }
                     P2PClientState.RUN_GAME -> {
-                        val rules = controller.rules!!
-                        val homeTeam = JervisSerialization.fixTeamRefs(controller.homeTeam.value!!)
-                        homeTeam.coach = controller.homeCoach.value!!
-                        val awayTeam = JervisSerialization.fixTeamRefs(controller.awayTeam.value!!)
-                        awayTeam.coach = controller.awayCoach.value!!
+                        val rules = networkAdapter.rules!!
+                        val homeTeam = JervisSerialization.fixTeamRefs(networkAdapter.homeTeam.value!!)
+                        homeTeam.coach = networkAdapter.homeCoach.value!!
+                        val awayTeam = JervisSerialization.fixTeamRefs(networkAdapter.awayTeam.value!!)
+                        awayTeam.coach = networkAdapter.awayCoach.value!!
                         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
-                        val gameController = GameEngineController(game, controller.initialActions)
+                        val gameController = GameEngineController(game, networkAdapter.initialActions)
 
                         val homeActionProvider = ManualActionProvider(
                             gameController,
@@ -134,7 +134,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                             GameSettings(gameRules = rules),
                             homeActionProvider,
                             awayActionProvider,
-                            controller
+                            networkAdapter
                         )
 
                         val model = GameScreenModel(
@@ -148,7 +148,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                         ) {
                             menuViewModel.controller = gameController
                             menuViewModel.navigatorContext.launch {
-                                controller.sendGameStarted()
+                                networkAdapter.sendGameStarted()
                             }
                         }
                         navigator.push(GameScreen(model))
@@ -225,7 +225,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
         // Should anything be saved here
         gotoNextPage(2)
         screenModelScope.launch {
-            controller.teamSelected(team)
+            networkAdapter.teamSelected(team)
         }
     }
 
@@ -258,9 +258,9 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
     fun userAcceptGame(gameAccepted: Boolean) {
         menuViewModel.navigatorContext.launch {
             if (gameAccepted) {
-                controller.gameAccepted(gameAccepted)
+                networkAdapter.gameAccepted(gameAccepted)
             } else {
-                controller.gameAccepted(gameAccepted) // Server will terminate connection
+                networkAdapter.gameAccepted(gameAccepted) // Server will terminate connection
                 selectedTeam.value = null
                 canCreateGame.value = false
                 joinHostModel.reset()
@@ -274,7 +274,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
 
     override fun onDispose() {
         screenModelScope.launch {
-            controller.close()
+            networkAdapter.close()
         }
     }
 
