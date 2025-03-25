@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.menu.intro.loadJervisFont
@@ -50,7 +51,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
             contentAlignment = Alignment.TopStart
         ) {
             Image(
-                painter = BitmapPainter(IconFactory.getPlayerDetailOverlay()),
+                painter = BitmapPainter(IconFactory.getPlayerDetailOverlay(player.model.isOnHomeTeam())),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize(),

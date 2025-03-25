@@ -29,6 +29,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.menu.intro.loadJervisFont
 import org.intellij.lang.annotations.Language
 import org.jetbrains.skia.ColorFilter
 import org.jetbrains.skia.ColorMatrix
@@ -94,6 +95,7 @@ fun GrayscaleNoise(modifier: Modifier = Modifier) {
 // Recreate visuals from https://uxmisfit.com/2021/01/13/how-to-create-glassmorphic-card-ui-design/
 @Composable
 fun NoiseBackgroundExample() {
+    val font = loadJervisFont()
     Box(modifier = Modifier.fillMaxSize(1.0f).background(Color(0xFF03080D))) {
         @Language("GLSL")
         val compositeSksl = """
@@ -212,6 +214,7 @@ fun NoiseBackgroundExample() {
                 it.color = Color(0x80FFFFFF)
                 it.style = PaintingStyle.Fill
             },
+            font = font,
         )
 
     }
