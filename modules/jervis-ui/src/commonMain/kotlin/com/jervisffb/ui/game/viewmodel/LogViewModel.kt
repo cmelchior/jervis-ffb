@@ -40,7 +40,7 @@ class LogViewModel(val uiState: UiGameController) {
         }
     val logs: Flow<List<LogEntry>> =
         controller.logsEvents.map {
-            LOG.d { it.toString() }
+            LOG.v { it.toString() }
             when (it) {
                 is AddEntry -> {
                     if (it.log.category != LogCategory.STATE_MACHINE) {
