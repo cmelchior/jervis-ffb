@@ -108,7 +108,10 @@ object JumpStep : Procedure() {
                     .flatMap {
                         rules.getPushOptions(jumpingPlayer, it)
                             .filter { coords ->
-                                state.field[coords].isUnoccupied()
+                                // A jumping player can only jump to the same squares you would normally push the player
+                                // to. See page 45 in the rulebook.
+                                // This should be kept up to date with `calculateMoveTypesAvailable()`
+                                coords.isOnField(rules) && state.field[coords].isUnoccupied()
                             }
                     }
                     .map { TargetSquare.jump(it, needRush) }

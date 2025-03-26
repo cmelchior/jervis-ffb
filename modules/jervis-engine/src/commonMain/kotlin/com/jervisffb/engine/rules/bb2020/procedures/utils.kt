@@ -50,6 +50,7 @@ fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
         .any {
             // A jumping player can only jump to the same squares you would normally push the player
             // to. See page 45 in the rulebook.
+            // This should be kept up to date with `JumpStep`
             rules.getPushOptions(player, it).any { coords ->
                 coords.isOnField(rules) && state.field[coords].isUnoccupied()
             }
