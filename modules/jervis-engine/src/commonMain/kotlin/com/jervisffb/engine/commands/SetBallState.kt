@@ -106,7 +106,7 @@ class SetBallState private constructor(
         ball.carriedBy = originalCarriedBy
         ball.outOfBoundsAt = originalExit
         if (originalLocation != null) {
-            ball.location = originalLocation!!
+            SetBallLocation(ball, originalLocation!!).undo(state)
         }
         ball.notifyUpdate()
         ball.carriedBy?.notifyUpdate()

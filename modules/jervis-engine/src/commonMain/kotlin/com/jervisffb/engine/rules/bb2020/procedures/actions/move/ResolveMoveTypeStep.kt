@@ -19,6 +19,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.procedures.Pickup
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Procedure for handling a player moving "one step". "One step" is categorized as
@@ -109,10 +110,12 @@ object ResolveMoveTypeStep : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
             val ball = state.field[context.player.coordinates].balls.single()
+            if (ball.location != context.player.coordinates) {
+                INVALID_GAME_STATE("Ball ${ball.location} must be at ${context.player.coordinates}")
+            }
             return SetCurrentBall(ball)
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure =
-            Pickup
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetCurrentBall(null),
