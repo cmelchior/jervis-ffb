@@ -429,7 +429,11 @@ open class Rules(
      * Return all locations you can choose from when pushing a player.
      * This only returns the normal push options and doesn't take into
      * account skills or if the squares are occupied.
+     *
      * If that matters or not is up to the call of this method.
+     *
+     * If pushing a player OUT_OF_BOUNDS is possible, it will only be reported once
+     * as [FieldCoordinate.OUT_OF_BOUNDS].
      */
     fun getPushOptions(pusher: Player, pushee: Player): Set<FieldCoordinate> {
         val start: FieldCoordinate = pusher.location as? FieldCoordinate ?: throw IllegalStateException("Pusher must be on field.")
