@@ -77,6 +77,7 @@ tests covering the particular feature.
 - [ ] Touchbacks
   - [ ] End sequence as soon as ball goes over middle. I.e., not catch rolls etc.
   - [ ] Going out of bounds
+  - [ ] Go out of bounds / award to player that is then knocked down and ball bounce (bug)
 
 ## Game
 

@@ -274,9 +274,6 @@ open class Rules(
             } else if (from.y == fieldHeight - 1) {
                 ThrowInTemplate.roll(ThrowInPosition.BOTTOM, d3)
             } else {
-                // TODO Exception in thread "GameLoopScope" java.lang.IllegalArgumentException: Cannot determine position of: FieldCoordinateImpl(x=2147483647, y=2147483647)
-                //  at com.jervisffb.engine.rules.Rules.throwIn(Rules.kt:277)
-                //  at com.jervisffb.engine.rules.bb2020.procedures.ThrowIn$RollDirection.applyAction(ThrowIn.kt:63)
                 throw IllegalArgumentException("Cannot determine position of: $from")
             }
         }

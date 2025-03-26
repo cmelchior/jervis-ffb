@@ -57,7 +57,7 @@ class SetBallState private constructor(
             ball = ball,
             ballState = BallState.BOUNCING,
             carriedBy = null,
-            exitLocation = null
+            exitLocation = null,
         )
 
         fun scattered(ball: Ball): Command = SetBallState(

@@ -1,6 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.injury
 
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetCurrentBall
@@ -42,11 +43,13 @@ object KnockedDown: Procedure() {
     object RollForInjury: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val context = state.getContext<RiskingInjuryContext>()
-            return if (context.player.hasBall()) {
-                val ball = context.player.ball!!
+            val player = context.player
+            return if (player.hasBall()) {
+                val ball = player.ball!!
                 compositeCommandOf(
                     SetCurrentBall(ball),
-                    SetBallState.bouncing(ball)
+                    SetBallState.bouncing(ball),
+                    SetBallLocation(ball, player.coordinates),
                 )
             } else null
         }

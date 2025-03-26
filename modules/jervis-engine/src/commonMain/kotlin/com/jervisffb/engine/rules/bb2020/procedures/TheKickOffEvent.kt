@@ -124,8 +124,6 @@ object TheKickOffEvent : Procedure() {
             // If out-of-bounds, award touch back
             // If on an empty square, bounce
             // if landing on a player, they must/can(?) attempt to catch it
-            // TODO Ball lands again, and can either be caught, will bounce or result in a
-            //  touchback
             val ball = state.singleBall()
             val ballLocation: FieldCoordinate = ball.location
             val outOfBounds =
