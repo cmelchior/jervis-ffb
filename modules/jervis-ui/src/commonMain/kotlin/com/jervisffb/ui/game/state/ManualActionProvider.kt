@@ -65,7 +65,7 @@ import kotlin.reflect.KClass
 open class ManualActionProvider(
     protected val game: GameEngineController,
     private val menuViewModel: MenuViewModel,
-    private val clientMode: TeamActionMode,
+    private val clientMode: TeamActionMode, // Which teams are controlled by this game client
     private val gameSettings: GameSettings
 ): UiActionProvider() {
 

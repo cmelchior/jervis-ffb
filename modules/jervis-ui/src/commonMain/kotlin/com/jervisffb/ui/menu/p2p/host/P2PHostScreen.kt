@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.jervis_ui.generated.resources.Res
@@ -99,7 +100,7 @@ fun PageContent(viewModel: P2PHostScreenModel) {
 
 @Composable
 fun SettingsCard(title: String, width: Dp, content: @Composable () -> Unit) {
-    Box(modifier = Modifier.width(width).padding(bottom = 8.dp)) {
+    Box(modifier = Modifier.let { if (width.isSpecified) it.width(width) else it.fillMaxWidth() }.padding(bottom = 8.dp)) {
         Column(modifier = Modifier.wrapContentSize()/*.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)*/) {
             BoxHeader(title)
             Spacer(modifier = Modifier.height(16.dp))

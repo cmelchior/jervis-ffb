@@ -6,10 +6,12 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.menu.components.coach.CoachSetupComponentModel
 import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponentModel
 import com.jervisffb.utils.PROP_DEFAULT_HOST_COACH_NAME
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.uuid.ExperimentalUuidApi
@@ -19,26 +21,34 @@ import kotlin.uuid.Uuid
  * View model for controlling the "Setup Game" screen, that is the first step in the "P2P Host" flow.
  */
 class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val parentModel: P2PHostScreenModel) : ScreenModel {
-    val gameSetupModel = GameConfigurationContainerComponentModel(menuViewModel)
 
-    val coachName = MutableStateFlow("")
+    val gameSetupModel = GameConfigurationContainerComponentModel(menuViewModel)
+    val coachSetupModel = CoachSetupComponentModel(menuViewModel) {
+        checkValidSetup()
+    }
+
     val gameName = MutableStateFlow("Game-${Random.nextInt(10_000)}")
     val port = MutableStateFlow<Int?>(8080)
+
     private val validGameMetadata = MutableStateFlow(false)
     val isSetupValid: Flow<Boolean> = gameSetupModel.isSetupValid
+        .combine(validGameMetadata) { gameSetupValid, gameMetadataValid ->
+            gameSetupValid && gameMetadataValid
+        }
+
     init {
         setGameName("Game-${Random.nextInt(10_000)}")
         setPort(8080.toString())
         menuViewModel.navigatorContext.launch {
             PROPERTIES_MANAGER.getString(PROP_DEFAULT_HOST_COACH_NAME)?.let {
-                updateCoachName(it)
+                coachSetupModel.updateCoachName(it)
             }
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     fun getCoach(): Coach? {
-        val name = coachName.value
+        val name = getCoachName()
         return if (name.isNotBlank()) {
             Coach(CoachId(Uuid.random().toString()), name)
         } else {
@@ -60,15 +70,10 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
         TODO()
     }
 
-    fun updateCoachName(name: String) {
-        coachName.value = name
-        checkValidSetup()
-    }
-
     private fun checkValidSetup() {
         var isValid = true
         isValid = isValid && gameName.value.isNotBlank()
-        isValid = isValid && coachName.value.isNotBlank()
+        isValid = isValid && getCoachName().isNotBlank()
         isValid = isValid && (port.value.let {it != null && it in 1..65535 })
         validGameMetadata.value = isValid
     }
@@ -80,10 +85,12 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
 
     fun gameSetupDone() {
         menuViewModel.navigatorContext.launch {
-            PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_HOST_COACH_NAME, coachName.value)
+            PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_HOST_COACH_NAME, getCoachName())
         }
         parentModel.gameSetupDone()
     }
+
+    private fun getCoachName(): String = coachSetupModel.coachName.value
 
     fun createRules(): Rules {
         return gameSetupModel.createRules()

@@ -4,6 +4,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
@@ -58,7 +59,7 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
                     connection,
                     InvalidGameActionOwnerServerError(
                         message.clientIndex,
-                        "The server is currently waiting for an action by the other coach. Ignoring message with id: ${message.clientIndex}."
+                        "The server is currently waiting for an action by the other coach. Server state: ${session.game?.currentNode()}. Ignoring message with id: ${message.clientIndex}."
                     )
                 )
                 return
@@ -134,7 +135,10 @@ suspend fun handleAction(
 
 suspend fun rollForwardToUserAction(session: GameSession, game: GameEngineController, connection: JervisNetworkWebSocketConnection) {
     var availableActions = game.getAvailableActions()
-    while (availableActions.containsActionWithRandomBehavior()) {
+    while (
+        session.game?.state?.rules?.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER
+        && availableActions.containsActionWithRandomBehavior()
+    ) {
         val action = createRandomAction(game.state, availableActions)
         game.handleAction(action)
         // If no producer, we just set it to the Home Team

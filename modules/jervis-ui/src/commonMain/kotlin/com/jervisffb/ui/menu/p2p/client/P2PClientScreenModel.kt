@@ -16,6 +16,8 @@ import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
+import com.jervisffb.ui.game.state.RandomActionProvider
+import com.jervisffb.ui.game.state.RemoteActionProvider
 import com.jervisffb.ui.game.view.SidebarEntry
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameScreen
@@ -23,6 +25,7 @@ import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.components.TeamInfo
+import com.jervisffb.ui.menu.components.coach.CoachType
 import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
 import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreenModel
 import com.jervisffb.ui.menu.p2p.StartP2PGameScreenModel
@@ -116,18 +119,21 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
                         val gameController = GameEngineController(game, networkAdapter.initialActions)
 
-                        val homeActionProvider = ManualActionProvider(
-                            gameController,
-                            menuViewModel,
-                            TeamActionMode.AWAY_TEAM,
-                            GameSettings(gameRules = rules),
+                        val homeActionProvider = RemoteActionProvider(
+                            clientMode = TeamActionMode.AWAY_TEAM,
+                            controller = gameController,
                         )
-                        val awayActionProvider = ManualActionProvider(
-                            gameController,
-                            menuViewModel,
-                            TeamActionMode.AWAY_TEAM,
-                            GameSettings(gameRules = rules),
-                        )
+
+                        val awayActionProvider = when (joinHostModel.coachSetupModel.playerType.value) {
+                            CoachType.HUMAN -> ManualActionProvider(
+                                gameController,
+                                menuViewModel,
+                                TeamActionMode.AWAY_TEAM,
+                                GameSettings(gameRules = rules),
+                            )
+                            // For now, we only support the Random AI player, so create it directly
+                            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.AWAY_TEAM, gameController).also { it.startActionProvider() }
+                        }
 
                         val actionProvider = P2PActionProvider(
                             gameController,

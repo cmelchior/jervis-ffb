@@ -127,6 +127,7 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach
     val infamousCoachingStaff = mutableListOf<InfamousCoachingStaff>()
 
     // Cyclic dependencies. Must be manually set when a Team is constructed
+    // TODO Why do we have these and `isAwayTeam()`?
     @Transient
     lateinit var game: Game
     @Transient

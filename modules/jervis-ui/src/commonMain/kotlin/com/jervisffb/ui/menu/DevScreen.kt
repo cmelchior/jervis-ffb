@@ -107,7 +107,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
                     gameSettings,
                 )
             }
-            true -> RandomActionProvider(gameController).also { it.startActionProvider() }
+            true -> RandomActionProvider(TeamActionMode.HOME_TEAM, gameController).also { it.startActionProvider() }
         }
         val awayActionProvider = when (randomActions) {
             false -> {
@@ -118,7 +118,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
                     gameSettings,
                 )
             }
-            true -> RandomActionProvider(gameController).also { it.startActionProvider() }
+            true -> RandomActionProvider(TeamActionMode.AWAY_TEAM, gameController).also { it.startActionProvider() }
         }
         val actionProvider = LocalActionProvider(
             gameController,

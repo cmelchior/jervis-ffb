@@ -8,11 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Text
@@ -29,23 +27,16 @@ import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.LoadTeamDialog
+import com.jervisffb.ui.menu.components.coach.CoachSetupComponent
+import com.jervisffb.ui.menu.components.coach.CoachType
 import com.jervisffb.ui.menu.components.teamselector.TeamSelectorComponent
-import com.jervisffb.ui.menu.p2p.host.SettingsCard
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SelectHotseatTeamScreen(
     viewModel: SelectHotseatTeamScreenModel,
 ) {
-    val coachName by viewModel.coachName.collectAsState()
     val isValidTeamSelection by viewModel.isValidTeamSelection.collectAsState(false)
-    val playerType by viewModel.playerType.collectAsState()
-    val aiPlayers by viewModel.aiPlayers.collectAsState()
-    val selectedAiPlayer by viewModel.selectedAiPlayer.collectAsState()
-    val playerTypeOptions = listOf(
-        "Human" to CoachType.HUMAN,
-        "Computer" to CoachType.COMPUTER,
-    )
     var showImportFumbblTeamDialog by remember { mutableStateOf(false) }
     var showLoadTeamFromFileDialog by remember { mutableStateOf(false) }
 
@@ -60,28 +51,10 @@ fun SelectHotseatTeamScreen(
             verticalAlignment = Alignment.Top
         ) {
             Column {
-                SettingsCard("Coach", 300.dp) {
-                    OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = coachName,
-                        onValueChange = { viewModel.updateCoachName(it) },
-                        label = { Text("Coach name") }
-                    )
-                    PlayerTypeSelector(playerTypeOptions, playerType, onChoice = { type: CoachType -> viewModel.updatePlayerType(type)})
-                }
-                Spacer(modifier = Modifier.height(32.dp))
-                if (playerType == CoachType.COMPUTER) {
-                    SettingsCard("Select AI", 300.dp) {
-                        aiPlayers.forEach { ai ->
-                            JervisButton(
-                                text = ai.name,
-                                onClick = {
-                                    viewModel.updateSelectedAiPlayer(ai)
-                                },
-                                buttonColor = if (selectedAiPlayer == ai) JervisTheme.rulebookRed else JervisTheme.rulebookBlue)
-                        }
-                    }
-                }
+                CoachSetupComponent(
+                    viewModel.setupCoachModel,
+                    headerWidth = 300.dp,
+                )
             }
             Spacer(modifier = Modifier.width(32.dp))
             TeamSelectorComponent(viewModel.teamSelectorModel)

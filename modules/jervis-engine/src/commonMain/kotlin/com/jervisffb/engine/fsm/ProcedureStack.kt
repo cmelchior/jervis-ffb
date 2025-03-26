@@ -83,6 +83,8 @@ class ProcedureStack {
      * of the stack.
      */
     fun containsNode(node: Node): Boolean {
+        // TODO This can run into ConcurrentModification
+        //  at com.jervisffb.ui.game.viewmodel.SidebarViewModel$special$$inlined$map$1$2
         return history.any { procedure -> procedure.currentNode() == node }
     }
 

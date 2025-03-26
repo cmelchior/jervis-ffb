@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -19,11 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
+import com.jervisffb.ui.menu.components.coach.CoachSetupComponent
 
 /**
  * Layout class for the "Join Host" panel.
@@ -37,15 +41,15 @@ fun JoinHostScreen(viewModel: JoinHostScreenModel, onJoin: () -> Unit, onCancel:
     val joinState by viewModel.canJoin().collectAsState()
     val joiningMessage by viewModel.joinMessage().collectAsState()
     val joiningError by viewModel.joinError().collectAsState()
-    val coachName: String by viewModel.coachName().collectAsState()
+
     Box(
         modifier = Modifier.fillMaxSize().padding(top = 0.dp),
         contentAlignment = Alignment.TopCenter,
     ) {
-        Column(modifier = Modifier.width(600.dp)) {
+        Column(modifier = Modifier.width(600.dp).verticalScroll(rememberScrollState())) {
             when (joinState) {
                 JoinHostScreenModel.JoinState.INVALID_URL,
-                JoinHostScreenModel.JoinState.READY_JOIN -> EnterHostDataContent(gameUrl, viewModel, joiningError, serverUrl, port, gameId, coachName)
+                JoinHostScreenModel.JoinState.READY_JOIN -> EnterHostDataContent(gameUrl, viewModel, joiningError, serverUrl, port, gameId)
                 JoinHostScreenModel.JoinState.JOINING -> MessageContent("Joining Host", joiningMessage)
                 JoinHostScreenModel.JoinState.JOINED -> MessageContent("Joined Host", joiningMessage)
             }
@@ -80,16 +84,11 @@ private fun EnterHostDataContent(
     serverUrl: String,
     port: String,
     gameId: String,
-    coachName: String
 ) {
-    JoinHostHeader("Coach Information")
-    Spacer(modifier = Modifier.height(16.dp))
-    OutlinedTextField(
-        modifier = Modifier.width(300.dp),
-        value = coachName,
-        onValueChange = { viewModel.updateCoachName(it) },
-        singleLine = true,
-        label = { Text("Coach Name") },
+    CoachSetupComponent(
+        viewModel = viewModel.coachSetupModel,
+        headerWidth = Dp.Unspecified,
+        inputWidth = 300.dp
     )
     Spacer(modifier = Modifier.height(32.dp))
     JoinHostHeader("Host information")

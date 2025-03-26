@@ -22,6 +22,7 @@ import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.components.TeamInfo
+import com.jervisffb.ui.menu.components.coach.CoachType
 import com.jervisffb.ui.menu.components.setup.ConfigType
 import com.jervisffb.ui.menu.components.starting.StartGameComponentModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -173,29 +174,31 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         val awayTeam = selectedAwayTeam.value?.teamData ?: error("Away team is not selected")
 
         val rules = setupGameModel.createRules()
-        homeTeam.coach = Coach(CoachId("1"), selectHomeTeamModel.coachName.value)
-        awayTeam.coach = Coach(CoachId("2"), selectAwayTeamModel.coachName.value)
+        homeTeam.coach = Coach(CoachId("1"), selectHomeTeamModel.setupCoachModel.coachName.value)
+        awayTeam.coach = Coach(CoachId("2"), selectAwayTeamModel.setupCoachModel.coachName.value)
         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game, saveGameData?.actions ?: emptyList())
 
-        val homeActionProvider = when (selectHomeTeamModel.playerType.value) {
+        val homeActionProvider = when (selectHomeTeamModel.setupCoachModel.playerType.value) {
             CoachType.HUMAN -> ManualActionProvider(
                 gameController,
                 menuViewModel,
                 TeamActionMode.HOME_TEAM,
                 GameSettings(gameRules = rules, isHotseatGame = true),
             )
-            CoachType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
+            // For now, we only support the Random AI player, so create it directly
+            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.HOME_TEAM, gameController, true).also { it.startActionProvider() }
         }
 
-        val awayActionProvider = when (selectAwayTeamModel.playerType.value) {
+        val awayActionProvider = when (selectAwayTeamModel.setupCoachModel.playerType.value) {
             CoachType.HUMAN -> ManualActionProvider(
                 gameController,
                 menuViewModel,
                 TeamActionMode.AWAY_TEAM,
                 GameSettings(gameRules = rules, isHotseatGame = true),
             )
-            CoachType.COMPUTER -> RandomActionProvider(gameController).also { it.startActionProvider() }
+            // For now, we only support the Random AI player, so create it directly
+            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.AWAY_TEAM, gameController, true).also { it.startActionProvider() }
         }
 
         val actionProvider = LocalActionProvider(

@@ -6,6 +6,7 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.net.GameId
 import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.menu.components.coach.CoachSetupComponentModel
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.utils.PROP_DEFAULT_CLIENT_COACH_NAME
 import io.ktor.http.Url
@@ -32,6 +33,9 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
         JOINED, // Client has connected to the host
     }
 
+    val coachSetupModel = CoachSetupComponentModel(menuViewModel) { coachName ->
+        checkForValidGameUrl()
+    }
     private val _gameUrl = MutableStateFlow("")
     private val _serverIp = MutableStateFlow("")
     private val _port = MutableStateFlow("")
@@ -39,7 +43,6 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
     private val _joinState = MutableStateFlow(JoinState.INVALID_URL)
     private val _joinMessage = MutableStateFlow("")
     private val _joinError = MutableStateFlow("")
-    private val _coachName = MutableStateFlow("")
 
     fun gameUrl(): StateFlow<String> = _gameUrl
     fun serverIp(): StateFlow<String> = _serverIp
@@ -48,11 +51,10 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
     fun canJoin(): StateFlow<JoinState> = _joinState
     fun joinMessage(): StateFlow<String> = _joinMessage
     fun joinError(): StateFlow<String> = _joinError
-    fun coachName(): StateFlow<String> = _coachName
 
     @OptIn(ExperimentalUuidApi::class)
     fun getCoach(): Coach? {
-        val name = _coachName.value
+        val name = coachSetupModel.coachName.value
         return if (name.isNotBlank()) {
             Coach(CoachId(Uuid.random().toString()), name)
         } else {
@@ -63,18 +65,8 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
     init {
         menuViewModel.navigatorContext.launch {
             PROPERTIES_MANAGER.getString(PROP_DEFAULT_CLIENT_COACH_NAME)?.let {
-                updateCoachName(it)
+                coachSetupModel.updateCoachName(it)
             }
-        }
-        // TODO Hide this behind Dev flag
-//        updateGameUrl("ws://localhost:8080/test")
-//        updateCoachName("TestClient")
-    }
-
-    fun updateCoachName(name: String) {
-        _coachName.value = name
-        if (_coachName.value.isNotBlank()) {
-            checkForValidGameUrl()
         }
     }
 
@@ -113,7 +105,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
             val joiningUrl = gameUrl().value
             _joinMessage.value = "Joining $joiningUrl..."
             _joinState.value = JoinState.JOINING
-            val coachName = _coachName.value
+            val coachName = coachSetupModel.coachName.value
             PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_CLIENT_COACH_NAME, coachName)
             model.networkAdapter.joinHost(
                 gameUrl = joiningUrl,
@@ -185,7 +177,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
                 isValid = false
             }
         }
-        if (isValid && _coachName.value.isNotBlank()) {
+        if (isValid && coachSetupModel.coachName.value.isNotBlank()) {
             _joinState.value = JoinState.READY_JOIN
         } else {
             _joinState.value = JoinState.INVALID_URL

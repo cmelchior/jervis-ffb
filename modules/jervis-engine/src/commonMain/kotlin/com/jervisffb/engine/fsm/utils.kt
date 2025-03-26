@@ -61,7 +61,7 @@ inline fun <reified T : GameAction> ActionNode.checkTypeAndValue(
         }
         return function(action)
     } else {
-        INVALID_ACTION(action, "Action (${action::class}) is not of the expected type: ${T::class}")
+        INVALID_ACTION(action, "Action ($action) is not of the expected type: ${T::class}")
     }
 }
 
@@ -79,7 +79,7 @@ inline fun <reified T : GameAction> ActionNode.checkType(
     if (userAction is T) {
         return function(userAction)
     } else {
-        throw InvalidActionException("Action (${action::class}) is not of the expected type: ${T::class}")
+        throw InvalidActionException("Action ($action) is not of the expected type: ${T::class}")
     }
 }
 
@@ -103,7 +103,7 @@ inline fun <reified D1 : DieResult> ActionNode.checkDiceRoll(
         }
         else -> {
             throw InvalidActionException(
-                "Action (${action::class}) is not of the expected type: ${DiceRollResults::class}",
+                "Action ($action) is not of the expected type: ${DiceRollResults::class}",
             )
         }
     }
@@ -146,7 +146,7 @@ inline fun <reified D1 : DieResult, reified D2 : DieResult> ActionNode.checkDice
         return function(first, second)
     } else {
         throw InvalidActionException(
-            "Action (${action::class}) is not of the expected type: ${DiceRollResults::class}",
+            "Action ($action) is not of the expected type: ${DiceRollResults::class}",
         )
     }
 }
@@ -166,7 +166,7 @@ inline fun <reified D1 : DieResult> ActionNode.checkDiceRollList(
         return function(listOf(action))
     } else {
         throw InvalidActionException(
-            "Action (${action::class}) is not of the expected type: ${DiceRollResults::class}",
+            "Action ($action) is not of the expected type: ${DiceRollResults::class}",
         )
     }
 }

@@ -5,10 +5,10 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 
@@ -33,10 +33,15 @@ abstract class UiActionProvider {
         exception.printStackTrace()
     }
 
-    // TODO This should probably be single threaded, so we are guaranteed the order of actions
-    protected val actionScope = CoroutineScope(CoroutineName("ActionSelectorScope") + Dispatchers.Default + errorHandler)
+    // Must be single threaded so we can guarantee the order of events in it.
+    protected val actionScope = CoroutineScope(
+        CoroutineName("ActionSelectorScope")
+            + singleThreadDispatcher("ActionScope@${this::hashCode}")
+            + errorHandler
+    )
 
     // Used to communicate internally in the ActionProvider. Needed so we can decouple the lifecycle of things.
+    // Like the lifecycle of the GameLoop vs. the lifecycle of UI actions.
     protected val actionRequestChannel = Channel<Pair<GameEngineController, ActionRequest>>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
     protected val actionSelectedChannel = Channel<GameAction>(capacity = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.SUSPEND)
 

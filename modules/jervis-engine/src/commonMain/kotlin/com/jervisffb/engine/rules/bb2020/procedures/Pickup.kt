@@ -38,6 +38,9 @@ object Pickup : Procedure() {
         val ball = state.currentBall()
         // TODO java.lang.ArrayIndexOutOfBoundsException: Index 2147483647 out of bounds for length 26
         //  at com.jervisffb.engine.model.Field.get(Field.kt:27)
+        //  Exception in thread "GameLoopScope" java.lang.NullPointerException
+        //  at com.jervisffb.engine.rules.bb2020.procedures.Pickup.onEnterProcedure(Pickup.kt:41)
+        //  at com.jervisffb.engine.fsm.Procedure$EnterProcedureNode.apply(Procedure.kt:39)
         val pickupPlayer = state.field[ball.location].player!!
         val diceRollTarget = pickupPlayer.agility
         val modifiers = mutableListOf<DiceModifier>()

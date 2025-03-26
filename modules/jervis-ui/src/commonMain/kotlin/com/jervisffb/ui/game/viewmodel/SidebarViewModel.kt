@@ -12,6 +12,7 @@ import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.state.ReplayActionProvider
+import com.jervisffb.ui.menu.TeamActionMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,10 +62,15 @@ class SidebarViewModel(
         // Check if this team is during setup phase. For now we just hard-code a few examples
         // This is mostly for WASM, iOS as JVM have a proper menu bar. This should be reworked
         // once we add proper menu support on WASM/iOS.
-        // Also, consider moving this logic into decorators somehow
+        // Also, consider moving this logic into decorators somehow.
         val setupKickingTeam = uiSnapshot.game.stack.containsNode(GameDrive.SetupKickingTeam) && uiSnapshot.game.kickingTeam == team
         val setupReceivingTeam = uiSnapshot.game.stack.containsNode(GameDrive.SetupReceivingTeam) && uiSnapshot.game.receivingTeam == team
-        if (setupReceivingTeam || setupKickingTeam) {
+        val teamControlledByClient = when (uiState.uiMode) {
+            TeamActionMode.HOME_TEAM -> team.isHomeTeam()
+            TeamActionMode.AWAY_TEAM -> team.isAwayTeam()
+            TeamActionMode.ALL_TEAMS -> true
+        }
+        if ((setupReceivingTeam || setupKickingTeam) && teamControlledByClient) {
             Setups.setups.keys.forEach { setup ->
                 buttons.add(ButtonData(setup, onClick = { menuViewModel.loadSetup(setup)}))
             }

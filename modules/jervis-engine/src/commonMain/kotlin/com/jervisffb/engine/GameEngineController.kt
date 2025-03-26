@@ -111,7 +111,7 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
      * is thrown.
      */
     fun handleAction(action: GameAction) {
-        LOG.i("[Game-XX] Handling action (${currentActionIndex().value + 1}): $action")
+        LOG.i("[Game-${this.hashCode()}] Handling action (${currentActionIndex().value + 1}): $action")
         if (actionMode != ActionMode.MANUAL && actionMode != ActionMode.TEST) {
             error("Invalid action mode: $actionMode. Must be ActionMode.MANUAL or ActionMode.TEST.")
         }

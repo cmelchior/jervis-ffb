@@ -19,7 +19,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
-// For P2P Games, this means the server will be sending events if timers are hit
+// This UiActionProvider is the primary action provider for P2P games and are responsible for switching
+// between the local provider and the remote one (that is piping events from the server)
 class P2PActionProvider(
     private val engine: GameEngineController,
     private val settings: GameSettings,
@@ -47,6 +48,7 @@ class P2PActionProvider(
     override fun startHandler() {
         networkAdapter.addMessageHandler(object: AbstractClintNetworkMessageHandler() {
             override fun onGameAction(producer: CoachId, serverIndex: GameActionId, action: GameAction) {
+                // TODO Should this be moved into RemoteActionProvider somehow?
                 lastServerActionIndex = serverIndex
                 if (producer == engine.state.homeTeam.coach.id) {
                     homeProvider.userActionSelected(action)
@@ -86,9 +88,9 @@ class P2PActionProvider(
         if (handlingServerRevert) return
 
         val clientActionIndex = engine.currentActionIndex()
-        // Should only send this if the event is truly from this client and not just a
-        // sync message
-        LOG.d("Handling action ($clientActionIndex > $lastServerActionIndex): $action")
+        // Should only send this if the event is truly from this client and not just a sync message
+        // TODO lastServerActionIndex seems to be out of syn
+        LOG.d("Sending message to server ($clientActionIndex > $lastServerActionIndex): $action")
         if (clientActionIndex > lastServerActionIndex) {
             actionScope.launch {
                 networkAdapter.sendActionToServer(clientActionIndex, action)

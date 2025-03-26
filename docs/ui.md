@@ -65,9 +65,9 @@ things as they come up.
 
 ## Known bugs
 
-- Pass animation triggers multiple times when landing on player (catch) and catch fails.
 - Block against Kroxigor with 1 asssist 4 < 5 only rolls 1 dice
-- Can block from prone
+- Cannot select Block action from prone.
+- No pass animation is being triggered when Using the Pass action.
 - UI does not restore moved used indicators correctly when undo'ing across player actions.
 - Player with ball blocking across middle line drops ball that bounce, crash
   java.lang.IllegalArgumentException: Cannot determine position of: FieldCoordinateImpl(x=2147483647, y=2147483647)
@@ -77,8 +77,6 @@ things as they come up.
 - The UI flow for P2P Host/Client works in the happy case, but there are plenty of options 
   for messing it up. Probably need to rethink the logic to make it easier to manage. Especially
   when the other party jump back in the flow.
-- Other clients can call stored setups. Something in the event detector flow isn't correct. Both on the server
-  and in the UiActionProvider
 - When selecting dice rolls on the server, it should not be possible to select "All" for UNDO.
   "All" doesn't work, since if you undo a dice roll, the server will register it is at a point where
   it needs to roll and then immediately re-apply the dice roll.

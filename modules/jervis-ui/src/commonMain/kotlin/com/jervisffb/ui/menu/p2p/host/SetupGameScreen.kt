@@ -20,11 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.utils.JervisButton
+import com.jervisffb.ui.menu.components.coach.CoachSetupComponent
 import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponent
 
 @Composable
 fun SetupGamePage(setupModel: SetupGameScreenModel, modifier: Modifier) {
-    val coachName by setupModel.coachName.collectAsState("")
     val gameName by setupModel.gameName.collectAsState("")
     val gamePort by setupModel.port.collectAsState(null)
     val isSetupValid: Boolean by setupModel.isSetupValid.collectAsState(false)
@@ -40,14 +40,10 @@ fun SetupGamePage(setupModel: SetupGameScreenModel, modifier: Modifier) {
             verticalAlignment = Alignment.Top
         ) {
             Column {
-                SettingsCard("Coach", 300.dp) {
-                    OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = coachName,
-                        onValueChange = { setupModel.updateCoachName(it) },
-                        label = { Text("Coach name") }
-                    )
-                }
+                CoachSetupComponent(
+                    viewModel = setupModel.coachSetupModel,
+                    headerWidth = 300.dp,
+                )
                 Spacer(modifier = Modifier.height(32.dp))
                 SettingsCard("Game", 300.dp) {
                     OutlinedTextField(

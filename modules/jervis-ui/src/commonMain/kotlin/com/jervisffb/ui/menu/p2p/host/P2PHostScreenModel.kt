@@ -17,6 +17,8 @@ import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
+import com.jervisffb.ui.game.state.RandomActionProvider
+import com.jervisffb.ui.game.state.RemoteActionProvider
 import com.jervisffb.ui.game.view.SidebarEntry
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameScreen
@@ -24,6 +26,7 @@ import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.components.TeamInfo
+import com.jervisffb.ui.menu.components.coach.CoachType
 import com.jervisffb.ui.menu.components.setup.ConfigType
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
@@ -46,7 +49,6 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     val totalPages = 4
     val currentPage = MutableStateFlow(0)
 
-    // TODO Split out game creation
     val networkAdapter = P2PClientNetworkAdapter()
 
     // Page 1: Setup Game
@@ -69,7 +71,6 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     private var server: LightServer? = null
 
     // Page 3: Wait for opponent
-
 
     // Page 4: Accept game
     val acceptGameModel = StartP2PGameScreenModel(networkAdapter, menuViewModel)
@@ -124,17 +125,20 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
                         val gameController = GameEngineController(game, networkAdapter.initialActions)
 
-                        val homeActionProvider = ManualActionProvider(
-                            gameController,
-                            menuViewModel,
+                        val homeActionProvider = when (setupGameModel.coachSetupModel.playerType.value) {
+                            CoachType.HUMAN -> ManualActionProvider(
+                                gameController,
+                                menuViewModel,
+                                TeamActionMode.HOME_TEAM,
+                                GameSettings(gameRules = rules),
+                            )
+                            // For now, we only support the Random AI player, so create it directly
+                            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.HOME_TEAM, gameController).also { it.startActionProvider() }
+                        }
+
+                        val awayActionProvider = RemoteActionProvider(
                             TeamActionMode.HOME_TEAM,
-                            GameSettings(gameRules = rules),
-                        )
-                        val awayActionProvider = ManualActionProvider(
                             gameController,
-                            menuViewModel,
-                            TeamActionMode.HOME_TEAM,
-                            GameSettings(gameRules = rules),
                         )
 
                         val actionProvider = P2PActionProvider(
@@ -237,7 +241,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
             server?.start()
             networkAdapter.joinHost(
                 gameUrl = "ws://127.0.0.1:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}",
-                coachName = setupGameModel.coachName.value,
+                coachName = setupGameModel.coachSetupModel.coachName.value,
                 gameId = GameId(setupGameModel.gameName.value),
                 teamIfHost = selectedTeam.value?.teamData ?: error("Missing team"),
                 handler = object: AbstractClintNetworkMessageHandler() { /* No op */ }
