@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.playerNo
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
@@ -104,10 +105,14 @@ class MenuViewModel {
         val game = controller ?: error("No game controller was found")
         val team = game.state.getContext<SetupTeamContext>().team
         val setupActions = Setups.setups[id]!!.flatMap { (playerNo, fieldCoordinate) ->
-            listOf(
-                PlayerSelected(team[playerNo].id),
-                if (team.isAwayTeam()) FieldSquareSelected(fieldCoordinate.swapX(game.rules)) else FieldSquareSelected(fieldCoordinate)
-            )
+            if (team[playerNo].state == PlayerState.RESERVE) {
+                listOf(
+                    PlayerSelected(team[playerNo].id),
+                    if (team.isAwayTeam()) FieldSquareSelected(fieldCoordinate.swapX(game.rules)) else FieldSquareSelected(fieldCoordinate)
+                )
+            } else {
+                emptyList()
+            }
         }
         uiState.userSelectedMultipleActions(setupActions, delayEvent = false)
     }

@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -117,8 +118,9 @@ class RandomActionProvider(
         val state = controller.state
         val stack = controller.state.stack
 
-        // Use a pre-defined setup, because the chance of Random actions getting a correct setup
-        // are basically zero.
+        // Use a pre-defined setup, because the chance of random actions hitting a correct setup
+        // is basically zero.
+        // TODO This goes into an infinite loop if the setup is no longer valid. Figure out
         if (!stack.isEmpty() && stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
             val context = state.getContext<SetupTeamContext>()
             val compositeActions = mutableListOf<GameAction>()
@@ -142,17 +144,20 @@ class RandomActionProvider(
         val game: Game = controller.state
         val team = game.homeTeam
 
-        setupPlayer(team, compositeActions, PlayerNo(1), FieldCoordinate(12, 6))
-        setupPlayer(team, compositeActions, PlayerNo(2), FieldCoordinate(12, 7))
-        setupPlayer(team, compositeActions, PlayerNo(3), FieldCoordinate(12, 8))
-        setupPlayer(team, compositeActions, PlayerNo(4), FieldCoordinate(10, 1))
-        setupPlayer(team, compositeActions, PlayerNo(5), FieldCoordinate(10, 4))
-        setupPlayer(team, compositeActions, PlayerNo(6), FieldCoordinate(10, 10))
-        setupPlayer(team, compositeActions, PlayerNo(7), FieldCoordinate(10, 13))
-        setupPlayer(team, compositeActions, PlayerNo(8), FieldCoordinate(8, 1))
-        setupPlayer(team, compositeActions, PlayerNo(9), FieldCoordinate(8, 4))
-        setupPlayer(team, compositeActions, PlayerNo(10), FieldCoordinate(8, 10))
-        setupPlayer(team, compositeActions, PlayerNo(11), FieldCoordinate(8, 13))
+        val setup = listOf(
+            PlayerNo(1) to FieldCoordinate(12, 6),
+            PlayerNo(2) to FieldCoordinate(12, 7),
+            PlayerNo(3) to FieldCoordinate(12, 8),
+            PlayerNo(4) to FieldCoordinate(10, 1),
+            PlayerNo(5) to FieldCoordinate(10, 4),
+            PlayerNo(6) to FieldCoordinate(10, 10),
+            PlayerNo(7) to FieldCoordinate(10, 13),
+            PlayerNo(8) to FieldCoordinate(8, 1),
+            PlayerNo(9) to FieldCoordinate(8, 4),
+            PlayerNo(10) to FieldCoordinate(8, 10),
+            PlayerNo(11) to FieldCoordinate(8, 13),
+        )
+        setupTeam(team, compositeActions, setup)
     }
 
     private suspend fun handleManualAwayKickingSetup(
@@ -162,26 +167,41 @@ class RandomActionProvider(
         val game: Game = controller.state
         val team = game.awayTeam
 
-        setupPlayer(team, compositeActions, PlayerNo(1), FieldCoordinate(13, 6))
-        setupPlayer(team, compositeActions, PlayerNo(2), FieldCoordinate(13, 7))
-        setupPlayer(team, compositeActions, PlayerNo(3), FieldCoordinate(13, 8))
-        setupPlayer(team, compositeActions, PlayerNo(4), FieldCoordinate(15, 1))
-        setupPlayer(team, compositeActions, PlayerNo(5), FieldCoordinate(15, 4))
-        setupPlayer(team, compositeActions, PlayerNo(6), FieldCoordinate(15, 10))
-        setupPlayer(team, compositeActions, PlayerNo(7), FieldCoordinate(15, 13))
-        setupPlayer(team, compositeActions, PlayerNo(8), FieldCoordinate(17, 1))
-        setupPlayer(team, compositeActions, PlayerNo(9), FieldCoordinate(17, 4))
-        setupPlayer(team, compositeActions, PlayerNo(10), FieldCoordinate(17, 10))
-        setupPlayer(team, compositeActions, PlayerNo(11), FieldCoordinate(17, 13))
+        val setup = listOf(
+            PlayerNo(1) to FieldCoordinate(13, 6),
+            PlayerNo(2) to FieldCoordinate(13, 7),
+            PlayerNo(3) to FieldCoordinate(13, 8),
+            PlayerNo(4) to FieldCoordinate(15, 1),
+            PlayerNo(5) to FieldCoordinate(15, 4),
+            PlayerNo(6) to FieldCoordinate(15, 10),
+            PlayerNo(7) to FieldCoordinate(15, 13),
+            PlayerNo(8) to FieldCoordinate(17, 1),
+            PlayerNo(9) to FieldCoordinate(17, 4),
+            PlayerNo(10) to FieldCoordinate(17, 10),
+            PlayerNo(11) to FieldCoordinate(17, 13),
+        )
+        setupTeam(team, compositeActions, setup)
     }
 
-    private suspend fun setupPlayer(
-        team: Team,
-        compositeActions: MutableList<GameAction>,
-        playerNo: PlayerNo,
-        fieldCoordinate: FieldCoordinate,
-    ) {
-        compositeActions.add(PlayerSelected(team[playerNo]))
-        compositeActions.add(FieldSquareSelected(fieldCoordinate))
+    private fun setupTeam(team: Team, compositeActions: MutableList<GameAction>, setup: List<Pair<PlayerNo, FieldCoordinate>>) {
+        val playersTaken = mutableSetOf<PlayerNo>()
+        setup.forEach { (playerNo: PlayerNo, fieldCoordinate: FieldCoordinate) ->
+            // Prevent crashing if the player is no longer available
+            if (team[playerNo].state == PlayerState.RESERVE) {
+                playersTaken.add(playerNo)
+                compositeActions.add(PlayerSelected(team[playerNo]))
+                compositeActions.add(FieldSquareSelected(fieldCoordinate))
+            } else {
+                // If the suggested player wasn't available, try to find the next one
+                // Since we know that players 1-11 are supposed to be on the field.
+                team.firstOrNull {
+                    it.number.value > 11 && it.state == PlayerState.RESERVE && !playersTaken.contains(it.number)
+                }?.let { replacementPlayer ->
+                    playersTaken.add(replacementPlayer.number)
+                    compositeActions.add(PlayerSelected(team[replacementPlayer.number]))
+                    compositeActions.add(FieldSquareSelected(fieldCoordinate))
+                }
+            }
+        }
     }
 }
