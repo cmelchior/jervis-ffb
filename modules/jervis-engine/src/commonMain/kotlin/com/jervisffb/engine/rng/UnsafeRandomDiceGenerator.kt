@@ -20,8 +20,8 @@ import kotlin.random.Random
  * This is almost never random enough to model dice rolls in a game, so this class
  * should only be used for testing.
  */
-class UnsafeRandomDiceGenerator: DiceRollGenerator {
-    val random = Random.Default
+class UnsafeRandomDiceGenerator(seed: Long = Random.nextLong()): DiceRollGenerator {
+    val random = Random(seed)
 
     override fun rollDie(die: Dice): DieResult {
         return when (die) {

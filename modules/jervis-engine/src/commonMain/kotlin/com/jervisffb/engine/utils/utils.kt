@@ -77,6 +77,7 @@ import com.jervisffb.engine.rules.bb2020.skills.Skill
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.jvm.JvmName
+import kotlin.random.Random
 
 fun ActionRequest.containsActionWithRandomBehavior(): Boolean {
     return this.actions.containsActionWithRandomBehavior()
@@ -181,6 +182,7 @@ val randomList = mutableListOf<GameAction>(
 fun createRandomAction(
     state: Game,
     availableActions: List<GameActionDescriptor>,
+    random: Random = Random
 ): GameAction {
 
     // Hacky way to inject events. Should probably try to add some kind of Developer UI
@@ -193,13 +195,12 @@ fun createRandomAction(
     var actionDesc: GameActionDescriptor? = null
     val filtered = availableActions.filter { it != EndActionWhenReady }
     if (filtered.isEmpty()) {
-        actionDesc = availableActions.random()
+        actionDesc = availableActions.random(random)
     } else {
-        actionDesc = filtered.random()
+        actionDesc = filtered.random(random)
     }
 
-    return actionDesc.createRandom()
-
+    return actionDesc.createRandom(random)
 }
 
 const val enableAsserts = true

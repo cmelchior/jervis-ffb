@@ -44,6 +44,7 @@ class ProcedureStack {
      * to close down because there is no more work to do.
      */
     fun isEmpty(): Boolean = history.isEmpty()
+    fun isNotEmpty(): Boolean = !isEmpty()
 
     /**
      * Push an existing [ProcedureStack] to the stack. This makes it possible to push a

@@ -144,7 +144,7 @@ object TheKickOffEvent : Procedure() {
         var canCatch: Boolean = false
 
         override fun onEnterNode(state: Game, rules: Rules): Command? {
-            state.abortIfBallOutOfBounds = true // TODO Wrong way to do this
+            state.abortIfBallOutOfBounds = true // TODO Wrong way to do this. How then?
             val ballLocation = state.singleBall().location
             isFieldEmpty = state.field[ballLocation].player != null
             canCatch = state.field[ballLocation].player?.let { rules.canCatch(state, it) } ?: false

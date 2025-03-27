@@ -36,12 +36,12 @@ class Pro(
     override val rerollProcedure: Procedure = UseProReroll
 
     override fun canReroll(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
-        TODO("Not yet implemented")
+        return false
+        // TODO("Not yet implemented")
     }
 
     override fun calculateRerollOptions(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): List<DiceRerollOption> {
-
-
-        TODO("Not yet implemented")
+        return emptyList()
+        // TODO("Not yet implemented")
     }
 }

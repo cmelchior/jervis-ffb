@@ -15,6 +15,7 @@ import com.jervisffb.engine.utils.cartesianProduct
 import com.jervisffb.engine.utils.combinations
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
+import kotlin.random.Random
 
 
 /**
@@ -61,7 +62,7 @@ sealed interface GameActionDescriptor {
      * Creates a random game action from the pool of actions described by this
      * descriptor.
      */
-    fun createRandom(): GameAction
+    fun createRandom(random: Random = Random): GameAction
 
     /**
      * Generates all valid game actions represented by this descriptor.
@@ -72,49 +73,49 @@ sealed interface GameActionDescriptor {
 // "internal event" for continuing the game state
 data object ContinueWhenReady : GameActionDescriptor {
     override val size: Int = 1
-    override fun createRandom(): GameAction = Continue
+    override fun createRandom(random: Random): GameAction = Continue
     override fun createAll(): List<GameAction> = listOf(Continue)
 }
 
 // An generic action representing "Accept" or "Yes"
 data object ConfirmWhenReady : GameActionDescriptor {
     override val size: Int = 1
-    override fun createRandom(): GameAction = Confirm
+    override fun createRandom(random: Random): GameAction = Confirm
     override fun createAll(): List<GameAction> = listOf(Confirm)
 }
 
 // An generic action representing "Cancel" or "No"
 data object CancelWhenReady : GameActionDescriptor {
     override val size: Int = 1
-    override fun createRandom(): GameAction = Cancel
+    override fun createRandom(random: Random): GameAction = Cancel
     override fun createAll(): List<GameAction> = listOf(Cancel)
 }
 
 // Mark the setup phase as ended for a team
 data object EndSetupWhenReady : GameActionDescriptor {
     override val size: Int = 1
-    override fun createRandom(): GameAction = EndSetup
+    override fun createRandom(random: Random): GameAction = EndSetup
     override fun createAll(): List<GameAction> = listOf(EndSetup)
 }
 
 // Mark the turn as ended for a team
 data object EndTurnWhenReady : GameActionDescriptor {
     override val size: Int = 1
-    override fun createRandom(): GameAction = EndTurn
+    override fun createRandom(random: Random): GameAction = EndTurn
     override fun createAll(): List<GameAction> = listOf(EndTurn)
 }
 
 // Mark the current action for the active player as done.
 data object EndActionWhenReady : GameActionDescriptor {
     override val size: Int = 1
-    override fun createRandom(): GameAction = EndAction
+    override fun createRandom(random: Random): GameAction = EndAction
     override fun createAll(): List<GameAction> = listOf(EndAction)
 }
 
 // Action owner must select a coin side
 data object SelectCoinSide : GameActionDescriptor {
     override val size: Int = 2
-    override fun createRandom(): GameAction = CoinSideSelected.allOptions().random()
+    override fun createRandom(random: Random): GameAction = CoinSideSelected.allOptions().random(random)
     override fun createAll(): List<GameAction> = CoinSideSelected.allOptions()
 }
 
@@ -122,7 +123,7 @@ data class SelectSkill(
     val skills: List<SkillFactory>
 ) : GameActionDescriptor {
     override val size: Int = skills.size
-    override fun createRandom(): GameAction = SkillSelected(skills.random())
+    override fun createRandom(random: Random): GameAction = SkillSelected(skills.random(random))
     override fun createAll(): List<GameAction> = skills.map { SkillSelected(it) }
 }
 
@@ -131,7 +132,7 @@ data class SelectInducement(
     val id: List<String>
 ): GameActionDescriptor {
     override val size: Int = id.size
-    override fun createRandom(): GameAction {
+    override fun createRandom(random: Random): GameAction {
         TODO("Not yet implemented")
     }
     override fun createAll(): List<GameAction> {
@@ -141,7 +142,7 @@ data class SelectInducement(
 
 data object TossCoin : GameActionDescriptor {
     override val size: Int = 2
-    override fun createRandom(): GameAction = CoinTossResult.allOptions().random()
+    override fun createRandom(random: Random): GameAction = CoinTossResult.allOptions().random(random)
     override fun createAll(): List<GameAction> = CoinTossResult.allOptions()
 }
 
@@ -168,18 +169,18 @@ data class RollDice(
             }
         }
 
-    override fun createRandom(): GameAction {
+    override fun createRandom(random: Random): GameAction {
         return dice.map {
             when (it) {
-                Dice.D2 -> D2Result.allOptions().random()
-                Dice.D3 -> D3Result.allOptions().random()
-                Dice.D4 -> D4Result.allOptions().random()
-                Dice.D6 -> D6Result.allOptions().random()
-                Dice.D8 -> D8Result.allOptions().random()
-                Dice.D12 -> D12Result.allOptions().random()
-                Dice.D16 -> D16Result.allOptions().random()
-                Dice.D20 -> D20Result.allOptions().random()
-                Dice.BLOCK -> DBlockResult.allOptions().random()
+                Dice.D2 -> D2Result.allOptions().random(random)
+                Dice.D3 -> D3Result.allOptions().random(random)
+                Dice.D4 -> D4Result.allOptions().random(random)
+                Dice.D6 -> D6Result.allOptions().random(random)
+                Dice.D8 -> D8Result.allOptions().random(random)
+                Dice.D12 -> D12Result.allOptions().random(random)
+                Dice.D16 -> D16Result.allOptions().random(random)
+                Dice.D20 -> D20Result.allOptions().random(random)
+                Dice.BLOCK -> DBlockResult.allOptions().random(random)
             }
         }.let { diceRolls ->
             DiceRollResults(diceRolls)
@@ -195,7 +196,7 @@ data class SelectMoveType(
     val types: List<MoveType>
 ): GameActionDescriptor {
     override val size: Int = types.size
-    override fun createRandom(): GameAction = MoveTypeSelected(types.random())
+    override fun createRandom(random: Random): GameAction = MoveTypeSelected(types.random(random))
     override fun createAll(): List<GameAction> = types.map { MoveTypeSelected(it) }
 }
 
@@ -204,7 +205,7 @@ data class SelectDirection(
     val directions: List<Direction>
 ): GameActionDescriptor {
     override val size: Int = directions.size
-    override fun createRandom(): GameAction = DirectionSelected(directions.random())
+    override fun createRandom(random: Random): GameAction = DirectionSelected(directions.random(random))
     override fun createAll(): List<GameAction> = directions.map { DirectionSelected(it) }
 }
 
@@ -255,7 +256,7 @@ data class TargetSquare(
 
 data class SelectFieldLocation(val squares: List<TargetSquare>) : GameActionDescriptor {
     override val size: Int = squares.size
-    override fun createRandom(): GameAction = FieldSquareSelected(squares.random().coordinate)
+    override fun createRandom(random: Random): GameAction = FieldSquareSelected(squares.random(random).coordinate)
     override fun createAll(): List<GameAction> {
         return squares.map {
             FieldSquareSelected(it.coordinate)
@@ -277,8 +278,8 @@ data class SelectDicePoolResult(
 ): GameActionDescriptor {
     override val size: Int = pools.size
     constructor(pool: DicePool<*, *>) : this(listOf(pool))
-    override fun createRandom(): GameAction {
-        return createAll().random()
+    override fun createRandom(random: Random): GameAction {
+        return createAll().random(random)
     }
     override fun createAll(): List<GameAction> {
         // Each entry is all combinations inside the given pool.
@@ -297,7 +298,7 @@ data class SelectDicePoolResult(
 
 data object SelectDogout : GameActionDescriptor {
     override val size: Int = 1
-    override fun createRandom(): GameAction = DogoutSelected
+    override fun createRandom(random: Random): GameAction = DogoutSelected
     override fun createAll(): List<GameAction> = listOf(DogoutSelected)
 }
 
@@ -306,7 +307,7 @@ data class SelectPlayer(
 ) : GameActionDescriptor {
     constructor(player: Player): this(listOf(player.id))
     override val size: Int = players.size
-    override fun createRandom(): GameAction = PlayerSelected(players.random())
+    override fun createRandom(random: Random): GameAction = PlayerSelected(players.random(random))
     override fun createAll(): List<GameAction> = players.map { PlayerSelected(it) }
 }
 
@@ -315,7 +316,7 @@ data class DeselectPlayer(
 ) : GameActionDescriptor {
     constructor(player: Player): this(listOf(player))
     override val size: Int = players.size
-    override fun createRandom(): GameAction = PlayerDeselected(players.random())
+    override fun createRandom(random: Random): GameAction = PlayerDeselected(players.random(random))
     override fun createAll(): List<GameAction> = players.map { PlayerDeselected(it) }
 }
 
@@ -324,7 +325,7 @@ data class SelectPlayerAction(
 ) : GameActionDescriptor {
     constructor(action: PlayerAction): this(listOf(action))
     override val size: Int = actions.size
-    override fun createRandom(): GameAction = PlayerActionSelected(actions.random().type)
+    override fun createRandom(random: Random): GameAction = PlayerActionSelected(actions.random(random).type)
     override fun createAll(): List<GameAction> = actions.map { PlayerActionSelected(it.type) }
 }
 
@@ -332,7 +333,7 @@ data class SelectBlockType(
     val types: List<BlockType>
 ): GameActionDescriptor {
     override val size: Int = types.size
-    override fun createRandom(): GameAction = BlockTypeSelected(types.random())
+    override fun createRandom(random: Random): GameAction = BlockTypeSelected(types.random(random))
     override fun createAll(): List<GameAction> = types.map { BlockTypeSelected(it) }
 }
 
@@ -348,8 +349,8 @@ data class SelectRandomPlayers(
             }
             return results
         }
-    override fun createRandom(): GameAction {
-        return RandomPlayersSelected(players.shuffled().subList(0, count))
+    override fun createRandom(random: Random): GameAction {
+        return RandomPlayersSelected(players.shuffled(random).subList(0, count))
     }
     override fun createAll(): List<GameAction> {
         return players.combinations(count).map { players ->
@@ -366,7 +367,7 @@ data class SelectRerollOption(
     val dicePoolId: Int = 0,
 ) : GameActionDescriptor {
     override val size: Int = options.size
-    override fun createRandom(): GameAction = RerollOptionSelected(options.random(), dicePoolId)
+    override fun createRandom(random: Random): GameAction = RerollOptionSelected(options.random(random), dicePoolId)
     override fun createAll(): List<GameAction> {
         return options.map {
             RerollOptionSelected(it, dicePoolId)
@@ -388,6 +389,6 @@ data class SelectNoReroll(
     val dicePoolId: Int = 0,
 ) : GameActionDescriptor {
     override val size: Int = 1
-    override fun createRandom(): GameAction = NoRerollSelected(dicePoolId)
+    override fun createRandom(random: Random): GameAction = NoRerollSelected(dicePoolId)
     override fun createAll(): List<GameAction> = listOf(NoRerollSelected(dicePoolId))
 }

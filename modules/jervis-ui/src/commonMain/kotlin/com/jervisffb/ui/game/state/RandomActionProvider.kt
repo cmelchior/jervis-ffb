@@ -145,17 +145,17 @@ class RandomActionProvider(
         val team = game.homeTeam
 
         val setup = listOf(
-            PlayerNo(1) to FieldCoordinate(12, 6),
-            PlayerNo(2) to FieldCoordinate(12, 7),
-            PlayerNo(3) to FieldCoordinate(12, 8),
-            PlayerNo(4) to FieldCoordinate(10, 1),
-            PlayerNo(5) to FieldCoordinate(10, 4),
-            PlayerNo(6) to FieldCoordinate(10, 10),
-            PlayerNo(7) to FieldCoordinate(10, 13),
-            PlayerNo(8) to FieldCoordinate(8, 1),
-            PlayerNo(9) to FieldCoordinate(8, 4),
-            PlayerNo(10) to FieldCoordinate(8, 10),
-            PlayerNo(11) to FieldCoordinate(8, 13),
+            FieldCoordinate(12, 6),
+            FieldCoordinate(12, 7),
+            FieldCoordinate(12, 8),
+            FieldCoordinate(10, 1),
+            FieldCoordinate(10, 4),
+            FieldCoordinate(10, 10),
+            FieldCoordinate(10, 13),
+            FieldCoordinate(8, 1),
+            FieldCoordinate(8, 4),
+            FieldCoordinate(8, 10),
+            FieldCoordinate(8, 13),
         )
         setupTeam(team, compositeActions, setup)
     }
@@ -168,39 +168,36 @@ class RandomActionProvider(
         val team = game.awayTeam
 
         val setup = listOf(
-            PlayerNo(1) to FieldCoordinate(13, 6),
-            PlayerNo(2) to FieldCoordinate(13, 7),
-            PlayerNo(3) to FieldCoordinate(13, 8),
-            PlayerNo(4) to FieldCoordinate(15, 1),
-            PlayerNo(5) to FieldCoordinate(15, 4),
-            PlayerNo(6) to FieldCoordinate(15, 10),
-            PlayerNo(7) to FieldCoordinate(15, 13),
-            PlayerNo(8) to FieldCoordinate(17, 1),
-            PlayerNo(9) to FieldCoordinate(17, 4),
-            PlayerNo(10) to FieldCoordinate(17, 10),
-            PlayerNo(11) to FieldCoordinate(17, 13),
+            FieldCoordinate(13, 6),
+            FieldCoordinate(13, 7),
+            FieldCoordinate(13, 8),
+            FieldCoordinate(15, 1),
+            FieldCoordinate(15, 4),
+            FieldCoordinate(15, 10),
+            FieldCoordinate(15, 13),
+            FieldCoordinate(17, 1),
+            FieldCoordinate(17, 4),
+            FieldCoordinate(17, 10),
+            FieldCoordinate(17, 13),
         )
+
         setupTeam(team, compositeActions, setup)
     }
 
-    private fun setupTeam(team: Team, compositeActions: MutableList<GameAction>, setup: List<Pair<PlayerNo, FieldCoordinate>>) {
+    /**
+     * @param setup should be in prioritized order (i.e. players at LoS first). If there are not enough eligible players
+     * the last spots will not be filled
+     */
+    private fun setupTeam(team: Team, compositeActions: MutableList<GameAction>, setup: List<FieldCoordinate>) {
         val playersTaken = mutableSetOf<PlayerNo>()
-        setup.forEach { (playerNo: PlayerNo, fieldCoordinate: FieldCoordinate) ->
-            // Prevent crashing if the player is no longer available
-            if (team[playerNo].state == PlayerState.RESERVE) {
-                playersTaken.add(playerNo)
-                compositeActions.add(PlayerSelected(team[playerNo]))
+
+        setup.forEach { fieldCoordinate: FieldCoordinate ->
+            team.firstOrNull {
+                it.state == PlayerState.RESERVE && !playersTaken.contains(it.number)
+            }?.let { replacementPlayer ->
+                playersTaken.add(replacementPlayer.number)
+                compositeActions.add(PlayerSelected(team[replacementPlayer.number]))
                 compositeActions.add(FieldSquareSelected(fieldCoordinate))
-            } else {
-                // If the suggested player wasn't available, try to find the next one
-                // Since we know that players 1-11 are supposed to be on the field.
-                team.firstOrNull {
-                    it.number.value > 11 && it.state == PlayerState.RESERVE && !playersTaken.contains(it.number)
-                }?.let { replacementPlayer ->
-                    playersTaken.add(replacementPlayer.number)
-                    compositeActions.add(PlayerSelected(team[replacementPlayer.number]))
-                    compositeActions.add(FieldSquareSelected(fieldCoordinate))
-                }
             }
         }
     }
