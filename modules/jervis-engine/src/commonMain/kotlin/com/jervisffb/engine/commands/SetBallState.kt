@@ -93,7 +93,7 @@ class SetBallState private constructor(
             it.state = ballState
             it.carriedBy = carriedBy
             if (carriedBy != null) {
-                it.location = FieldCoordinate.UNKNOWN
+                SetBallLocation(it, FieldCoordinate.UNKNOWN).execute(state)
             }
             it.outOfBoundsAt = exitLocation
             it.notifyUpdate()

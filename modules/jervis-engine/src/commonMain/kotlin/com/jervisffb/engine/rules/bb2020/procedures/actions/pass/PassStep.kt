@@ -84,11 +84,12 @@ object PassStep: Procedure() {
                         val context = state.getContext<PassContext>()
                         val distance = rules.rangeRuler.measure(context.thrower.coordinates, it.coordinate)
                         val ball = context.thrower.ball!!
+                        val newLocation = it.coordinate
                         compositeCommandOf(
                             ReportPassResult(context),
-                            SetContext(context.copy(target = it.coordinate, range = distance)),
+                            SetContext(context.copy(target = newLocation, range = distance)),
                             SetBallState.accurateThrow(ball), // Until proven otherwise. Should we invent a new type?
-                            SetBallLocation(ball, it.coordinate),
+                            SetBallLocation(ball, newLocation),
                             GotoNode(TestForAccuracy)
                         )
                     }
