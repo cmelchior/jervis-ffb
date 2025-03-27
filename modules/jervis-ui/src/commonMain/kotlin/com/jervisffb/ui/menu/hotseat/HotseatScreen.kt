@@ -60,6 +60,7 @@ fun PageContent(viewModel: HotseatScreenModel) {
             modifier = Modifier.fillMaxWidth().weight(1f),
             userScrollEnabled = false,
             state = pagerState,
+            beyondViewportPageCount = 5,
         ) { page ->
             when (page) {
                 0 -> SetupHotseatGamePage(viewModel.setupGameModel, Modifier)

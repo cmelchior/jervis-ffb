@@ -130,6 +130,7 @@ fun GameConfigurationContainerComponent(viewModel: GameConfigurationContainerCom
                 HorizontalPager(
                     modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally),
                     state = pagerState,
+                    beyondViewportPageCount = 5,
                 ) { page ->
                     when (tabs[selectedTab].tabs[page].type) {
                         SetupTabType.LOAD_FILE -> LoadFileComponent(viewModel.loadFileModel)

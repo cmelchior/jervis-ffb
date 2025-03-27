@@ -99,6 +99,7 @@ fun ColumnScope.StartGameComponent(
             HorizontalPager(
                 modifier = Modifier.fillMaxSize(),
                 state = pagerStateTop,
+                beyondViewportPageCount = 5
             ) { page ->
                 when (page) {
                     0 -> TeamData(homeTeam, true)

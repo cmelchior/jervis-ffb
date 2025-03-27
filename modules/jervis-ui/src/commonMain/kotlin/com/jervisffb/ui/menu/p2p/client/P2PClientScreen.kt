@@ -69,6 +69,7 @@ private fun PageContent(viewModel: P2PClientScreenModel) {
             modifier = Modifier.fillMaxWidth().weight(1f),
             userScrollEnabled = false,
             state = pagerState,
+            beyondViewportPageCount = 5,
         ) { page ->
             when (page) {
                 0 -> JoinHostScreen(

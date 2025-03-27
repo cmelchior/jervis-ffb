@@ -81,6 +81,7 @@ fun PageContent(viewModel: P2PHostScreenModel) {
             modifier = Modifier.fillMaxWidth().weight(1f),
             userScrollEnabled = false,
             state = pagerState,
+            beyondViewportPageCount = 5,
         ) { page ->
             when (page) {
                 0 -> SetupGamePage(viewModel.setupGameModel, Modifier)
