@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -104,7 +105,8 @@ private fun FrontpageScreen.PageContent(menuViewModel: MenuViewModel) {
     MenuScreen {
         Row {
             Column(modifier = Modifier.fillMaxWidth(0.67f).fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
-                Box(modifier = Modifier.weight(34f/36f), contentAlignment = Alignment.TopStart) {
+                BoxWithConstraints(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopStart) {
+                    val max= maxHeight
                     TitleHeader("JERVIS", "Fantasy Football")
                     // It is a bit unclear exactly how the menu boxes should change and scale depending on
                     // screen size, for now they are wrapped in a box because it makes it easier to modify
@@ -112,20 +114,23 @@ private fun FrontpageScreen.PageContent(menuViewModel: MenuViewModel) {
 
                     // `contentAlignment` here doesn't do much except in extrem cases where it prevents
                     // the menu from going into the top banner.
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Row(modifier = Modifier) {
-                            Spacer(modifier = Modifier.weight(4f/36f))
+                    Column(modifier = Modifier.height(max - 48.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(
+                            modifier = Modifier.fillMaxSize(0.95f),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            Spacer(modifier = Modifier.fillMaxWidth(0.1f))
                             Column(
-                                modifier = Modifier.aspectRatio(1f).weight(30f/36f).fillMaxSize(0.9f).aspectRatio(1f),
+                                modifier = Modifier.aspectRatio(1f),
                             ) {
                                 FrontpageMenu(viewModel, navigator)
                             }
-                            Spacer(modifier = Modifier.weight(2f/36f))
                         }
                     }
                 }
                 Row(
-                    modifier = Modifier.weight(2f/36f).fillMaxWidth(0.5f),
+                    modifier = Modifier.height(48.dp),
                     verticalAlignment = Alignment.Bottom,
                 ) {
                     Text(
