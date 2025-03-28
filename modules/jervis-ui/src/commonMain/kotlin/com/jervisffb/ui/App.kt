@@ -9,7 +9,7 @@ import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.OnBackPress
-import com.jervisffb.ui.menu.intro.IntroScreen
+import com.jervisffb.ui.menu.intro.FrontpageScreen
 import com.jervisffb.utils.FileManager
 import com.jervisffb.utils.PropertiesManager
 import com.jervisffb.utils.jervisLogger
@@ -50,7 +50,7 @@ fun MyAppTheme(content: @Composable () -> Unit) {
 fun App(menuViewModel: MenuViewModel) {
     MyAppTheme {
         Navigator(
-            screen = IntroScreen(menuViewModel),
+            screen = FrontpageScreen(menuViewModel),
             onBackPressed = {
                 BackNavigationHandler.execute()
                 true

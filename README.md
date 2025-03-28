@@ -5,7 +5,7 @@
 
 <p align="center">
   <img src="screenshots/screenshot1.png" width="30%" />
-  <img src="screenshots/screenshot3.png" width="30%" />
+  <img src="screenshots/screenshot2.png" width="30%" />
   <img src="screenshots/screenshot5.png" width="30%" />
 </p>
 

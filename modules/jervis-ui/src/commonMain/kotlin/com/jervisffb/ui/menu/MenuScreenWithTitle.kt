@@ -11,13 +11,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
@@ -27,17 +25,15 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
+import com.jervisffb.jervis_ui.generated.resources.frontpage_treeman
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_back
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
-import com.jervisffb.jervis_ui.generated.resources.menu_background
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.TextLine
 import kotlin.math.PI
 import kotlin.math.atan
@@ -47,7 +43,6 @@ import kotlin.math.tan
 fun MenuScreenWithTitle(
     menuViewModel: MenuViewModel,
     title: String,
-    icon: DrawableResource,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -57,14 +52,6 @@ fun MenuScreenWithTitle(
         ,
         contentAlignment = Alignment.TopStart,
     ) {
-        Image(
-            modifier = Modifier.fillMaxSize(),
-            bitmap = imageResource(Res.drawable.menu_background),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(JervisTheme.rulebookPaper, BlendMode.Color),
-            alpha = 0.075f
-        )
         Column(modifier = Modifier.fillMaxSize()) {
             Box {
                 TitleBar(Modifier.fillMaxHeight(0.20f).fillMaxWidth(), title = title)
@@ -80,12 +67,13 @@ fun MenuScreenWithTitle(
                 content()
             }
             Row(modifier = Modifier.height(48.dp).fillMaxWidth().paperBackground(JervisTheme.rulebookRed)) {
-
+                // Red bar at the bottom of the screen
             }
         }
+
         Image(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp).size(150.dp),
-            painter = painterResource(icon),
+            modifier = Modifier.align(Alignment.BottomEnd).fillMaxWidth(0.35f).offset(x = -30.dp, y = 30.dp),
+            bitmap = imageResource(Res.drawable.frontpage_treeman),
             contentDescription = null,
             contentScale = ContentScale.FillWidth,
         )
@@ -93,7 +81,7 @@ fun MenuScreenWithTitle(
 }
 
 @Composable
-fun TitleBar(modifier: Modifier, title: String) {
+private fun TitleBar(modifier: Modifier, title: String) {
     val textMeasure = rememberTextMeasurer()
     val skiaFont = loadJervisFont()
     Canvas(modifier = modifier) {
@@ -129,7 +117,8 @@ fun TitleBar(modifier: Modifier, title: String) {
         // TODO Need to figure out exactly how to scale the text, so it
         //  looks "nice" in more situations
         val scale = 1.0f
-        skiaFont.size = (70 * scale).sp.toPx()
+        val fontSize = 90
+        skiaFont.size = (fontSize * scale).sp.toPx()
         val angleRadians = atan((size.height - (size.height * (160f/280f))) / size.width)
         val angleDegrees = (angleRadians * 180 / PI).toFloat()
         val skewX = tan(-angleRadians)

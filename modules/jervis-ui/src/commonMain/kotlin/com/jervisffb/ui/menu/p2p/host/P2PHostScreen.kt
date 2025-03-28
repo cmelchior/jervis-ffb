@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
+import com.jervisffb.jervis_ui.generated.resources.frontpage_orc
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.SidebarMenu
 import com.jervisffb.ui.game.view.utils.TitleBorder
@@ -50,7 +50,7 @@ class P2PServerScreen(private val menuViewModel: MenuViewModel, private val view
             MenuScreenWithSidebarAndTitle(
                 menuViewModel,
                 title = "Peer-to-Peer Game",
-                icon = Res.drawable.frontpage_wall_player,
+                icon = Res.drawable.frontpage_orc,
                 topMenuRightContent = null,
                 sidebarContent = {
                     val currentPage by viewModel.currentPage.collectAsState()

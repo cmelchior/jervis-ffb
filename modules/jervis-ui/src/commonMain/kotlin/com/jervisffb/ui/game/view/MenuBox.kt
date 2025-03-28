@@ -63,70 +63,111 @@ fun RowScope.MenuBox(label: String, onClick: () -> Unit, enabled: Boolean = true
 }
 
 @Composable
-fun RowScope.SplitMenuBox(
-    labelTop: String,
-    onClickTop: () -> Unit,
-    labelBottom: String,
-    onClickBottom: () -> Unit,
-    p2pHostAvaiable: Boolean,
-) {
+fun RowScope.
+    SplitMenuBox(
+        labelTop: String,
+        onClickTop: (() -> Unit)?,
+        labelMiddle: String,
+        onClickMiddle: () -> Unit,
+        labelBottom: String? = null,
+        onClickBottom: (() -> Unit)? = null,
+        p2pHostAvaiable: Boolean,
+        aspectRatio: Float = 0.67f,
+    ) {
 
     Column(
         modifier = Modifier
-            .padding(16.dp)
+//            .padding(16.dp)
             .fillMaxHeight(0.9f)
             .weight(9f/36f,  false)
             .aspectRatio(1f)
     ) {
-        Box(
-            modifier = Modifier.background(color = JervisTheme.rulebookBlue).weight(1f).fillMaxSize().clickable { onClickTop() },
-            contentAlignment = Alignment.BottomEnd,
-        ) {
-            Text(
-                modifier = Modifier.padding(16.dp),
-                text = labelTop.uppercase(),
-                textAlign = TextAlign.End,
-                maxLines = 2,
-                color = JervisTheme.buttonTextColor,
-                fontWeight = FontWeight.Bold,
-                fontSize = 32.sp,
-                style = LocalTextStyle.current.copy(
-                    lineHeight = 1.0.em,
-                    lineHeightStyle = LineHeightStyle(
-                        alignment = LineHeightStyle.Alignment.Bottom,
-                        trim = LineHeightStyle.Trim.LastLineBottom
+        Column(modifier = Modifier.aspectRatio(aspectRatio).fillMaxSize()) {
+            val topBgColor = if (onClickTop == null) {
+                JervisTheme.rulebookDisabled
+            } else {
+                JervisTheme.rulebookBlue
+            }
+            Box(
+                modifier = Modifier.background(color = topBgColor).weight(1f).fillMaxSize().let { if (onClickTop != null) it.clickable { onClickTop() } else it },
+                contentAlignment = Alignment.BottomEnd,
+            ) {
+                Text(
+                    modifier = Modifier.padding(16.dp),
+                    text = labelTop.uppercase(),
+                    textAlign = TextAlign.End,
+                    maxLines = 2,
+                    color = JervisTheme.buttonTextColor,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 32.sp,
+                    style = LocalTextStyle.current.copy(
+                        lineHeight = 1.0.em,
+                        lineHeightStyle = LineHeightStyle(
+                            alignment = LineHeightStyle.Alignment.Bottom,
+                            trim = LineHeightStyle.Trim.LastLineBottom
+                        ),
                     ),
-                ),
-            )
-        }
-        Spacer(modifier = Modifier.height(32.dp))
+                )
+            }
+            Spacer(modifier = Modifier.height(32.dp))
 
-        val bgColor = if (!p2pHostAvaiable) {
-            JervisTheme.rulebookDisabled
-        } else {
-            JervisTheme.rulebookBlue
-        }
+            val bgColor = if (!p2pHostAvaiable) {
+                JervisTheme.rulebookDisabled
+            } else {
+                JervisTheme.rulebookBlue
+            }
 
-        Box(
-            modifier = Modifier.background(bgColor).weight(1f).fillMaxSize().let { if (p2pHostAvaiable) it.clickable { onClickBottom() } else it },
-            contentAlignment = Alignment.BottomEnd,
-        ) {
-            Text(
-                modifier = Modifier.padding(16.dp),
-                text = labelBottom.uppercase(),
-                textAlign = TextAlign.End,
-                maxLines = 2,
-                color = JervisTheme.buttonTextColor,
-                fontWeight = FontWeight.Bold,
-                fontSize = 32.sp,
-                style = LocalTextStyle.current.copy(
-                    lineHeight = 1.0.em,
-                    lineHeightStyle = LineHeightStyle(
-                        alignment = LineHeightStyle.Alignment.Bottom,
-                        trim = LineHeightStyle.Trim.LastLineBottom
+            Box(
+                modifier = Modifier.background(bgColor).weight(1f).fillMaxSize().let { if (p2pHostAvaiable) it.clickable { onClickMiddle() } else it },
+                contentAlignment = Alignment.BottomEnd,
+            ) {
+                Text(
+                    modifier = Modifier.padding(16.dp),
+                    text = labelMiddle.uppercase(),
+                    textAlign = TextAlign.End,
+                    maxLines = 2,
+                    color = JervisTheme.buttonTextColor,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 32.sp,
+                    style = LocalTextStyle.current.copy(
+                        lineHeight = 1.0.em,
+                        lineHeightStyle = LineHeightStyle(
+                            alignment = LineHeightStyle.Alignment.Bottom,
+                            trim = LineHeightStyle.Trim.LastLineBottom
+                        ),
                     ),
-                ),
-            )
+                )
+            }
+
+            if (labelBottom != null) {
+                val bgColor = if (onClickBottom == null) {
+                    JervisTheme.rulebookDisabled
+                } else {
+                    JervisTheme.rulebookBlue
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+                Box(
+                    modifier = Modifier.background(bgColor).weight(1f).fillMaxSize().let { if (onClickBottom != null) it.clickable { onClickBottom() } else it },
+                    contentAlignment = Alignment.BottomEnd,
+                ) {
+                    Text(
+                        modifier = Modifier.padding(16.dp),
+                        text = labelBottom.uppercase(),
+                        textAlign = TextAlign.End,
+                        maxLines = 2,
+                        color = JervisTheme.buttonTextColor,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 32.sp,
+                        style = LocalTextStyle.current.copy(
+                            lineHeight = 1.0.em,
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Bottom,
+                                trim = LineHeightStyle.Trim.LastLineBottom
+                            ),
+                        ),
+                    )
+                }
+            }
         }
     }
 }

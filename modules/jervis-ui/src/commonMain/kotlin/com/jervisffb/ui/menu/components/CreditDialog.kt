@@ -39,7 +39,7 @@ import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.view.utils.bannerBackground
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.menu.intro.CreditData
-import com.jervisffb.ui.menu.intro.IntroScreenModel
+import com.jervisffb.ui.menu.intro.FrontpageScreenModel
 import com.jervisffb.utils.openUrlInBrowser
 
 /**
@@ -50,7 +50,7 @@ import com.jervisffb.utils.openUrlInBrowser
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun CreditDialog(viewModel: IntroScreenModel, creditData: CreditData) {
+fun CreditDialog(viewModel: FrontpageScreenModel, creditData: CreditData) {
     val showDialog: Boolean by viewModel.showCreditDialog.collectAsState()
     val dialogColor = JervisTheme.rulebookRed
     val textColor = JervisTheme.contentTextColor

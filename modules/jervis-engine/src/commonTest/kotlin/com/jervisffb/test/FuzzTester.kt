@@ -43,7 +43,7 @@ class FuzzTester {
             try {
                 while (controller.stack.isNotEmpty()) {
                     val availableActions = controller.getAvailableActions()
-                    val userAction = getSetupAction(controller) ?:createRandomAction(state, availableActions.actions, random)
+                    val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
                     controller.handleAction(userAction)
                 }
             } catch (e: Exception) {

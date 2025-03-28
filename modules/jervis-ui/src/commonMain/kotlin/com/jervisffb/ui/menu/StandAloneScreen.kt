@@ -6,10 +6,12 @@
 package com.jervisffb.ui.menu
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,8 +22,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.frontpage_ball
 import com.jervisffb.ui.game.view.MenuBox
 import com.jervisffb.ui.game.view.SplitMenuBox
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -72,32 +72,32 @@ class StandAloneScreen(private val menuViewModel: MenuViewModel, viewModel: Stan
 fun Screen.StandaloneScreen(menuViewModel: MenuViewModel) {
     val navigator = LocalNavigator.currentOrThrow
     val viewModel = rememberScreenModel { StandAloneScreenModel(menuViewModel) }
-    MenuScreenWithTitle(menuViewModel, "Standalone Games", Res.drawable.frontpage_ball) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).offset(y = -40.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            SplitMenuBox(
-                labelTop = "P2P\nClient",
-                onClickTop = { viewModel.startP2PClient(navigator) },
-                labelBottom = "P2P\nHost",
-                onClickBottom = { viewModel.startP2PServer(navigator) },
-                menuViewModel.p2pHostAvaiable,
-            )
-            MenuBox(
-                label = "Hotseat",
-                onClick = { viewModel.startHotSeatGame(navigator) },
-            )
-//            MenuBox(
-//                label = "vs AI",
-//                onClick = { /* */ },
-//            )
-            MenuBox(
-                label = "Replay",
-                onClick = { /* */ },
-                enabled = false
-            )
+    MenuScreenWithTitle(menuViewModel, "Standalone Games") {
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Row(
+                modifier = Modifier.fillMaxWidth(0.62f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                MenuBox(
+                    label = "Hotseat",
+                    onClick = { viewModel.startHotSeatGame(navigator) },
+                    frontPage = true
+                )
+                Spacer(modifier = Modifier.width(32.dp))
+                SplitMenuBox(
+                    labelTop = "P2P\nClient",
+                    onClickTop = { viewModel.startP2PClient(navigator) },
+                    labelMiddle = "P2P\nHost",
+                    onClickMiddle = { viewModel.startP2PServer(navigator) },
+                    labelBottom = "Replay",
+                    onClickBottom = null,
+                    menuViewModel.p2pHostAvaiable,
+                )
+            }
+            Box(modifier = Modifier.fillMaxWidth(0.70f)) {
+
+            }
         }
     }
 }
