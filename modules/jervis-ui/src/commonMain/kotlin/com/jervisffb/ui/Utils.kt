@@ -98,7 +98,7 @@ fun ImageBitmap.getSubImage(x: Int, y: Int, width: Int, height: Int): ImageBitma
 }
 
 
-fun Modifier.debugBorder(): Modifier = this.border(1.dp, Color.Cyan)
+fun Modifier.debugBorder(color: Color = Color.Cyan): Modifier = this.border(1.dp, color)
 
 fun Modifier.coloredShadow(
     color: Color,
