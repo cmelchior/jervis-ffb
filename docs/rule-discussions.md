@@ -1,7 +1,8 @@
 # Rule Discussions
 
 This file contains interesting discussions about rule ambiguities and how the rules should be
-interpreted.
+interpreted. All of these are not implemented yet. This is just a list of things to keep an eye
+out for during development.
 
 1. Chainsaw vs. Mighty Blow: https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=33049
    You cannot use MB _against_ the player that has Chainsaw
@@ -150,10 +151,14 @@ interpreted.
     Right now it looks like the interpretation is that if you fail the rush, you end up
     in the jumping square.
 
-# Differences compared to the rules as written
+
+# Rule Ambiguities and differences compared to the rules as written
+
+This section describes how rules with an element of ambiguity are implemented as well as the rationale behind 
+doing it.
 
 1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 
-   this choice always come after the roll. There is no valid reason for asking it before, and asking
+   this choice always comes after the roll. There is no valid reason for asking it before, and asking
    both before and after would create a lot of noise. The exception being Diving Tackle, where 
    there could be reasons for choosing it both before and after.
 
@@ -167,7 +172,7 @@ interpreted.
    is virtually zero.
 
 4. (Page 42) Order of events in End-of-Turn is not well-defined, e.g., it is unclear if Special Play 
-    Cards like Assassination Attempt trigger before or after Throw a Rock and when temporary skills
+    Cards like "Assassination Attempt" trigger before or after "Throw a Rock" and when temporary skills
     or abilities are removed.
 
     For now, we choose the (somewhat arbitrary) order:
@@ -197,7 +202,7 @@ interpreted.
     bounce. This solves all the questions above as well as increases the "awesome"-factor if
     it actually succeeds since it prevents the turn-over.
    
-6. When using Multiple Block, it is unclear what "Both Block actions are performed simultaneously"
+6. (Page 80) When using "Multiple Block", it is unclear what "Both Block actions are performed simultaneously"
    means exactly. I.e., does this also apply to injury rolls? 
 
    I am mostly leaning towards "No". The reason being that "Risking Injury" (page 60) is described as 
@@ -205,5 +210,5 @@ interpreted.
    (Designer's FAQ). This indicates that the action ends with a player being Knocked Down.
 
    For that reason, while Multiple Block injuries are collected in an "Injury Pool". We fully
-   resolve each injury from there, letting the attacking player choose the order. 
-   (This is also easier to implement)
+   resolve each injury from there, letting the attacking player choose the order (this is also easier
+   to implement).

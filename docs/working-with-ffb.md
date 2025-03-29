@@ -50,23 +50,43 @@ mysql
 CREATE DATABASE ffblocal;
 ```
 
+### Changes to .ini files
+
+Modify [client.ini](https://github.com/christerk/ffb/blob/master/ffb-client/src/main/resources/client.ini#L4)
+so it is defined as a local server:
+
+```
+server.host=localhost
+server.port=2224
+```
+
+(TODO Verify this, not 100% sure it is needed)
+Replace the icon id number with the url to icons in 
+[icons.ini](https://github.com/christerk/ffb/blob/master/ffb-client/src/main/resources/icons.ini):
+
+```
+// All entries must be replaced to look like this
+http\://localhost\:2224/icons/pitches/fumbblcup.zip=pitches/fumbblcup.zip
+```
+
+
 ### Setup FUMBBL User
 
 This can be done by adding an entry in `com.fumbbl.ffb.server.db.DbInitializer`.
 
-Use any coach name. What you set the password to, depends on how you login. 
+Use any coach name. What you set the password to depend on how you log in. 
 
 But if you are using the login dialog inside the FFB client, you need to store
 the MD5-encoded password. You can use https://www.md5hashgenerator.com/ to 
 calculate the value.
 
-If you login using the `-auth` client option, you can use any non-empty string,
-and just reuse that in the commandline
+If you login using the commandline with the `-auth` client option, you can use any non-empty 
+string, and reuse that in the commandline.
 
 ### Custom Teams and Rosters
 
-In order to make teams available to the coach, there needs
-to be a file in `/ffb-server/teams` and a matching roster in `/ffb-server/teams`
+To make teams available to the coach, there needs to be a file in `/ffb-server/teams` and a 
+matching roster in `/ffb-server/teams`
 
 Requirements are that the `<coach></coach>` entry matches the coach name. The 
 file name does not matter.
@@ -98,7 +118,5 @@ the roster XML format. It looks like the definition of icons has changed.
 
 - You can start a `test:X` match using the same coach login, but it requires 
   two different teams.
-
-
 
 

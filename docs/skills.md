@@ -1,6 +1,6 @@
 # Skills
 
-This document list all skills known in the Blood Bowl 2020 Ruleset and wether or not they are implemented
+This document lists all skills known in the Blood Bowl 2020 Ruleset and whether they are implemented
 in Jervis. If a skill was introduced after the BB2020 base rules, a reference to its source is provided.
 
 Skills marked with * are mandatory.
