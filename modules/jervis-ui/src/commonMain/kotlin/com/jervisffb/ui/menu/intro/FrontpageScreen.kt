@@ -195,10 +195,11 @@ private fun FrontpageScreen.PageContent(menuViewModel: MenuViewModel) {
             contentAlignment = Alignment.BottomEnd
         ) {
             Image(
-                modifier = Modifier.fillMaxWidth(0.30f).offset(x = -25.dp, y = 25.dp),
+                modifier = Modifier.fillMaxHeight(0.63f).fillMaxWidth(0.3f).offset(x = -25.dp, y = 25.dp),
                 bitmap = imageResource(Res.drawable.frontpage_orc),
                 contentDescription = null,
-                contentScale = ContentScale.FillWidth,
+                alignment = Alignment.BottomEnd,
+                contentScale = ContentScale.Fit,
             )
         }
     }
