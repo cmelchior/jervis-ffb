@@ -12,6 +12,7 @@ import com.jervisffb.ui.menu.fumbbl.FumbblScreen
 import com.jervisffb.ui.menu.fumbbl.FumbblScreenModel
 import com.jervisffb.utils.getBuildType
 import com.jervisffb.utils.getPlatformDescription
+import com.jervisffb.utils.jervisLogger
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -74,6 +75,10 @@ data class NewsEntryData(
  */
 class FrontpageScreenModel(private val menuViewModel: MenuViewModel) : JervisScreenModel {
 
+    companion object {
+        private val LOG = jervisLogger()
+    }
+
     val news: List<NewsEntryData>
     private val _showCreditDialog = MutableStateFlow(false)
     val showCreditDialog: StateFlow<Boolean> = _showCreditDialog
@@ -101,6 +106,8 @@ ${getPlatformDescription()}
     }
 
     private fun formatGitHistory(): List<NewsEntryData> {
+        if (BuildConfig.gitHistory.isBlank()) return emptyList()
+
         val dateFormat = LocalDate.Format {
             monthName(MonthNames.ENGLISH_ABBREVIATED)
             char(' ')
@@ -109,14 +116,19 @@ ${getPlatformDescription()}
             year()
         }
 
-        return BuildConfig.gitHistory.lines().map {
-            val epochTimestamp = it.substringBefore(":").toLong()
-            val timestamp = Instant.fromEpochSeconds(epochTimestamp)
-                .toLocalDateTime(TimeZone.currentSystemDefault())
-                .date
-                .format(dateFormat)
-            val body = it.substringAfter(":").trim()
-            NewsEntryData(timestamp, body)
+        try {
+            return BuildConfig.gitHistory.lines().map {
+                val epochTimestamp = it.substringBefore(":").toLong()
+                val timestamp = Instant.fromEpochSeconds(epochTimestamp)
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .date
+                    .format(dateFormat)
+                val body = it.substringAfter(":").trim()
+                NewsEntryData(timestamp, body)
+            }
+        } catch (e: Exception) {
+            LOG.w { "Unable to parse Git History: $e" }
+            return emptyList()
         }
     }
 
