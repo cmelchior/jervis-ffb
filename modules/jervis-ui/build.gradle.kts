@@ -125,6 +125,31 @@ compose.desktop {
             // androidx.datastore requires sun.misc.Unsafe
             // See https://github.com/JetBrains/compose-multiplatform/issues/2686#issuecomment-1413429842
             modules("jdk.unsupported")
+
+            macOS {
+                bundleID = "com.jervisffb"
+                iconFile.set(rootProject.file("icons/jervis.icns"))
+                val providers = project.providers
+                signing {
+                    sign.set(true)
+                    identity.set(providers.environmentVariable("JERVIS_MACOS_SIGNING_IDENTITY"))
+                    // keychain.set(providers.environmentVariable("JERVIS_MACOS_KEYCHAIN")
+                }
+                notarization {
+                    appleID.set(providers.environmentVariable("JERVIS_MACOS_NOTARIZATION_APPLE_ID"))
+                    password.set(providers.environmentVariable("JERVIS_MACOS_NOTARIZATION_PASSWORD"))
+                    teamID.set(providers.environmentVariable("JERVIS_MACOS_NOTARIZATION_TEAM_ID"))
+                }
+            }
+
+            windows {
+                iconFile.set(rootProject.file("icons/jervis.ico"))
+                upgradeUuid = providers.environmentVariable("JERVIS_WINDOWS_PACKAGE_GUID").toString()
+                menuGroup = "Jervis Fantasy Football"
+                dirChooser = true
+                perUserInstall = true
+                shortcut = true
+            }
         }
 
         // See https://youtrack.jetbrains.com/issue/CMP-4216

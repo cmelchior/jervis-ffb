@@ -31,7 +31,7 @@ import kotlinx.datetime.toLocalDateTime
 data class CreditData(
     val title: String = "Jervis Fantasy Football",
     val mainDeveloper: String = "Ilios",
-    val mainDeveloperDescription: String = "Pushing bits and trying to interpret the rulebook.",
+    val mainDeveloperDescription: String = "",
     val clientVersion: String = BuildConfig.releaseVersion,
     val gitCommit: String = BuildConfig.gitHash,
     val fumbblDevelopers: List<String> = listOf(
