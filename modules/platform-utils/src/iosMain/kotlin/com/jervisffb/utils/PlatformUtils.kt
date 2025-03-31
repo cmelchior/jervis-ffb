@@ -28,3 +28,8 @@ public actual fun getPlatformDescription(): String {
         appendLine("System Version: ${UIDevice.currentDevice.systemVersion}")
     }
 }
+
+public actual fun initializePlatform() {
+    // Do nothing
+}
+

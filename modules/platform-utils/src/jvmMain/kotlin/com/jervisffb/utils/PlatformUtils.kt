@@ -1,6 +1,9 @@
 package com.jervisffb.utils
 
 import java.awt.Desktop
+import java.io.File
+import java.io.OutputStream
+import java.io.PrintStream
 import java.net.URI
 
 public actual fun threadId(): ULong {
@@ -48,4 +51,40 @@ public actual fun getPlatformDescription(): String {
     return buildString {
         systemProps.forEach { (key, value) -> appendLine("$key: $value") }
     }
+}
+
+
+/**
+ * Helper class, so we can split log output between a persistent file and normal
+ * StdOut. This is relevant on e.g. MacOS.
+ */
+class TeeOutputStream(
+    private val system: OutputStream,
+    private val file: OutputStream
+) : OutputStream() {
+
+    override fun write(b: Int) {
+        system.write(b)
+        this.file.write(b)
+    }
+
+    override fun flush() {
+        system.flush()
+        file.flush()
+    }
+
+    override fun close() {
+        system.close()
+        file.close()
+    }
+}
+
+public actual fun initializePlatform() {
+    // To be sure that logs are not just silently ignored we save them to a file on disk.
+    // This is relevant on e.g. MacOS. The file will be reused every time the application
+    // is opened, so space should not be a big concern.
+    val logFile = File("$APPLICATION_DIRECTORY/log.txt")
+    val teeOut = PrintStream(TeeOutputStream(System.out, logFile.outputStream().buffered()), true)
+    System.setOut(teeOut)
+    System.setErr(teeOut)
 }

@@ -37,3 +37,8 @@ public expect fun getBuildType(): String
  * Returns a string containing information about the current platform and runtime.
  */
 public expect fun getPlatformDescription(): String
+
+/**
+ * Run initializing logic that is platform-specific, like logging.
+ */
+public expect fun initializePlatform()

@@ -29,3 +29,9 @@ public actual fun getPlatformDescription(): String {
         appendLine("User Agent: $userAgent")
     }
 }
+
+public actual fun initializePlatform() {
+    // Do nothing
+}
+
+
