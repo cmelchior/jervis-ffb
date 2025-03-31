@@ -213,7 +213,7 @@ private fun ColumnScope.LogInDialogContent(viewModel: FumbblScreenModel, dialogC
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = """
-                    To log in to FUMBBL through the Jervis Client, you need to create an OAuth Application
+                    To log in to FUMBBL through the Jervis Client, you need to create an OAuth Application 
                     on the FUMBBL website. Follow the link below, create a new application and copy 
                     "Client ID" and "Client Secret" back here.
             """.trimIndent().replace("\n", ""),

@@ -137,7 +137,7 @@ private fun ColumnScope.CreditDialogContent(
         Spacer(modifier = Modifier.height(16.dp))
         Row {
             CreditLabel(
-                "Main Developer:",
+                "Creator:",
                 data.mainDeveloperDescription,
                 textColor
             )
