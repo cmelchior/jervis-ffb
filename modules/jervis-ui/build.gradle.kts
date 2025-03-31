@@ -119,8 +119,12 @@ compose.desktop {
         // for request to customize the UI
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Test app"
+            packageName = "Jervis Fantasy Football"
             packageVersion = rootProject.ext["distributionVersion"] as String
+
+            // androidx.datastore requires sun.misc.Unsafe
+            // See https://github.com/JetBrains/compose-multiplatform/issues/2686#issuecomment-1413429842
+            modules("jdk.unsupported")
         }
 
         // See https://youtrack.jetbrains.com/issue/CMP-4216
