@@ -58,6 +58,12 @@ The installer is found at:
 modules\jervis-ui\build\compose\binaries\main-release\msi\Jervis Fantasy Football-X.Y.Z.msi
 ```
 
+## Linux
+
+Right now, the installer is just a best-guess effort. It hasn't been tested yet.
+
+
+
 ## WASM
 
 `index.html` and associated resources are located in [modules/jervis-ui/src/wasmJsMain/resources](../modules/jervis-ui/src/wasmJsMain/resources).

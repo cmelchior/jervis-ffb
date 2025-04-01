@@ -149,6 +149,16 @@ compose.desktop {
                 perUserInstall = true
                 shortcut = true
             }
+
+            linux {
+                iconFile.set(rootProject.file("icons/logo.svg"))
+                packageName = "jervis-ffb"
+                debMaintainer = "christianmelchior@gmail.com"
+                // appRelease = "1" - Not currently used. Need to figure out how to increment this if used
+                appCategory = "Game"
+                rpmLicenseType = "Apache-2.0"
+                menuGroup = "Jervis Fantasy Football"
+            }
         }
 
         // See https://youtrack.jetbrains.com/issue/CMP-4216

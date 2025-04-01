@@ -68,7 +68,7 @@ private fun createProjectVersion(): String {
 }
 
 // Create version used when creating distribution packages.
-// See https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/Native_distributions_and_local_execution/README.md
+// See https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-native-distribution.html#specifying-distribution-properties
 // for restrictions on these.
 private fun createDistributionVersion(): String {
     val versionStr = properties["jervis.version"] as String
