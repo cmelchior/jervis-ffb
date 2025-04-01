@@ -12,6 +12,7 @@ import com.jervisffb.ui.menu.OnBackPress
 import com.jervisffb.ui.menu.intro.FrontpageScreen
 import com.jervisffb.utils.FileManager
 import com.jervisffb.utils.PropertiesManager
+import com.jervisffb.utils.initializePlatform
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -21,6 +22,9 @@ val FILE_MANAGER = FileManager()
 val PROPERTIES_MANAGER = PropertiesManager()
 
 fun initApplication() {
+
+    initializePlatform()
+
     @OptIn(DelicateCoroutinesApi::class)
     GlobalScope.launch {
         if (PROPERTIES_MANAGER.getBoolean("initialized") != true) {
