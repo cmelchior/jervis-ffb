@@ -25,3 +25,16 @@ modules/jervis-ui/build/compose/binaries/main/dmg/Jervis Fantasy Football-X.Y.Z.
 ## Windows
 
 Iconsets (.ico) are created from [logo.svg](../logo.svg) using [Image2Icon](https://apps.apple.com/us/app/image2icon-make-your-icons/id992115977?mt=12&ls=1).
+
+Requires: WiX Toolset 3.11+ (64-bit)
+Download: https://wixtoolset.org/releases/
+
+Build package using:
+```
+gradlew packageReleaseDistributionForCurrentOS
+```
+
+The installer is found at:
+```
+modules\jervis-ui\build\compose\binaries\main-release\msi\Jervis Fantasy Football-X.Y.Z.msi
+```

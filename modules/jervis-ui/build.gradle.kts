@@ -118,33 +118,32 @@ compose.desktop {
         // See https://youtrack.jetbrains.com/issue/CMP-7048/Missing-customization-options-for-About-dialog-on-MacOS
         // for request to customize the UI
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             packageName = "Jervis Fantasy Football"
             packageVersion = rootProject.ext["distributionVersion"] as String
 
             // androidx.datastore requires sun.misc.Unsafe
             // See https://github.com/JetBrains/compose-multiplatform/issues/2686#issuecomment-1413429842
             modules("jdk.unsupported")
-
+            val providers = project.providers
             macOS {
                 bundleID = "com.jervisffb"
                 iconFile.set(rootProject.file("icons/jervis.icns"))
-                val providers = project.providers
                 signing {
                     sign.set(true)
-                    identity.set(providers.environmentVariable("JERVIS_MACOS_SIGNING_IDENTITY"))
-                    // keychain.set(providers.environmentVariable("JERVIS_MACOS_KEYCHAIN")
+                    identity.set(providers.environmentVariable("JERVIS_MACOS_SIGNING_IDENTITY").getOrElse(""))
+                    // keychain.set(providers.environmentVariable("JERVIS_MACOS_KEYCHAIN").getOrElse("")
                 }
                 notarization {
-                    appleID.set(providers.environmentVariable("JERVIS_MACOS_NOTARIZATION_APPLE_ID"))
-                    password.set(providers.environmentVariable("JERVIS_MACOS_NOTARIZATION_PASSWORD"))
-                    teamID.set(providers.environmentVariable("JERVIS_MACOS_NOTARIZATION_TEAM_ID"))
+                    appleID.set(providers.environmentVariable("JERVIS_MACOS_NOTARIZATION_APPLE_ID").getOrElse(""))
+                    password.set(providers.environmentVariable("JERVIS_MACOS_NOTARIZATION_PASSWORD").getOrElse(""))
+                    teamID.set(providers.environmentVariable("JERVIS_MACOS_NOTARIZATION_TEAM_ID").getOrElse(""))
                 }
             }
 
             windows {
                 iconFile.set(rootProject.file("icons/jervis.ico"))
-                upgradeUuid = providers.environmentVariable("JERVIS_WINDOWS_PACKAGE_GUID").toString()
+                upgradeUuid = providers.environmentVariable("JERVIS_WINDOWS_PACKAGE_GUID").getOrElse("")
                 menuGroup = "Jervis Fantasy Football"
                 dirChooser = true
                 perUserInstall = true
