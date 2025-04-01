@@ -1,6 +1,6 @@
 <h1>
    Jervis — A Fantasy Football Engine
-   <img src="logo.svg" width="40" align="left" alt="Jervis Logo">
+   <img src="icons/logo.svg" width="40" align="left" alt="Jervis Logo">
 </h1>
 
 <p align="center">
@@ -18,7 +18,7 @@ Workshop.
 This includes:
  
 - A standalone rules engine for the 2020 version of Blood Bowl. This engine 
-  can be hooked into any UI framework or AI agents.
+  can be hooked into any UI framework or AI agent.
 
 - A Game Client UI that can run either as a website, desktop client or iPad app.
 
@@ -29,11 +29,12 @@ This includes:
   game. This makes it possible to use already existing replays to train AI 
   agents.
 
-The project is still very much work-in-progress.
-
 The project is written in Kotlin Multiplatform primarily focusing on WASM (Web) 
-and Desktop targets. The target is to have a faithful adaption of the core Blood 
+and Desktop (JVM). The target is to have a faithful adaption of the core Blood 
 Bowl rules as well as any expansions.
+
+**The project is work-in-progress, so things might differ from what is described here.**
+
 
 ## Disclaimer
 
@@ -47,14 +48,14 @@ project is in no way official and is not endorsed by Games Workshop Limited.
 Test builds are created on every successful push to the `main` branch.
 
 * The HTML version can be found here: https://jervis.ilios.dk. It is built
-  using WASM, so will only work on the latest browsers. Specifically, it does
-  not work on Safari. Read here for more info: 
+  using WASM, so will only work on the latest browsers. Specifically, it only
+  works on the latest versions of Safari. Read here for more info: 
   https://kotlinlang.org/docs/wasm-troubleshooting.html#browser-versions
 
-* Desktop client installers for Windows, MacOS and Linux can be found here:
+* Desktop client installers for Windows, macOS and Linux can be found here:
   https://jervis.ilios.dk/download/.
 
-* No test builds for iPad is currently being created. Instead, these must be
+* No test build for iPad is currently being created. Instead, this must be
   built from source. 
 
 No stability guarantees are given for developer releases.
@@ -67,12 +68,12 @@ Development requirements are:
 - Git on the commandline
 - Xcode 16.2 (if building for iPad)
 
-Note, this has only been tested on Mac, so things on Windows might be broken.
+Note, this has only been tested on Mac and Windows, so things on Linux might be broken.
 
 A local desktop game client can be started using:
 
 ```shell
-./gradlew :modules:jervis-ui:jvmRun -DmainClass=com.jervisffb.MainKt
+./gradlew :modules:jervis-ui:run
 ```
 
 A local WASM client can be started using:
@@ -91,53 +92,64 @@ You will need to supply your own signature under "Signing & Capabilities".
 This repository is structured in the following way:
 
 - `modules/`: The main entry point for all code. See the section below.
-- `docs/`: Contains more fine-grained docs about various aspects of the project.
-- `tools/`: Contains commandline tools used by the project.
-- `Debug-FantasyFootballClient/`: Contains a modified FUMBBL Client that can
-  be used to introspect FUMMBL network traffic. See 
-  [the documentation](modules/fumbbl-cli/README.md) for more details.
+- `docs/`: Contains more fine-grained docs about the progress on various aspects
+  of the project.
+- `tools/`: Contains helper tools for the project that are either commandline or
+  Kotlin Notebooks.
+- `mavenRepo/`: contains some packages that are not available on Maven Central.
+  Artifacts here are used to build parts of the project.
+- `screenshots/`: Contains screenshots from the game UI.
+- `icons/`: Contains project logos used by various platforms.
+- `Debug-FantasyFootballClient/`: It is empty as a default, but by using
+  [`fumbble-cli`](./fumbbl-cli) it might contain a modified version of the FUMBBL
+  Client that can be used to inspect the FUMMBL network traffic. See
+  [the documentation](modules/fumbbl-cli/README.md) for more details. Note, this
+  has not been tested for a while and since the FFB Client is now open source,
+  it is also less relevant, as you can just run the real client instead. See
+  [How to run FFB locally](./docs/working-with-ffb.md).
 
 ### Modules Structure
 
 The `modules/` subfolder is the main entry point for the project and consists 
 of the following modules:
 
-- `fumbbl-cli`: Small commandline tool for either downloading the FUMBBL Client 
+- `fumbbl-cli`: Small commandline tool for downloading the FUMBBL Client 
   and modifying it, so all websocket traffic is sent to the console or 
   download a replay for further analysis. Note, the last functionality should only 
-  be used sparingly and for testing as it taxes the server too much if used in 
-  bulk. 
+  be used sparingly as it taxes the FUMBBL server too much if used in bulk. 
 
 - `fumbbl-net`: Network code and classes for communicating with the FUMBBL 
    server as well as adapters for converting a FUMBBL game into a Jervis
    equivalent.
 
+ - `iosApp`: This contains the XCode project needed to build the Jervis iPad
+   app. This needs to be opened and run from XCode. It will automatically
+   build all required dependencies from the project.
+
 - `jervis-engine`: This contains a full model of the Blood Bowl rules and 
-  contains the logic for running a game.
+  the logic for running a game.
 
 - `jervis-net`: This contains the infrastructure to create and communicate with
    a light-weight Game Server that is only used to play a single game.
 
-- `jervis-ui`: An UI for driving a game of Blood Bowl. It has been largely 
-  copied from the FUMBBL Client UI. 
-
-- `jervis-resources`: This contains icons and the logic for loading them as well
-   as default rosters/teams.
-
 - `jervis-test-utils`: Contains test setups used across multiple modules.
   This is a work-around for https://youtrack.jetbrains.com/issue/KT-35073.
 
-- `replay-analyzer`: This module is intended for processing and analyzing the
-   JSON content of a FUMBBL replay file.
+- `jervis-ui`: An UI for driving a game of Blood Bowl. It has been largely 
+  copied from the FUMBBL Client UI. 
 
-- `platform-utils`: All helper methods that might require platform-specific
-  APIs are placed here. E.g., Filesystem access, setting up networking and 
-  reflection.
+- `platform-utils`: All helper methods that requires platform-specific
+  APIs are placed here. This includes things like filesystem access, setting up 
+  networking and reflection.
+
+- `replay-analyzer`: This module is a helper for processing and converting the
+   JSON content of a FUMBBL replay file into something that Jervis can process.
 
 ### UI Resources
 
-The Jervis Client is heavily inspired by FUMBBL and borrows all (almost) of
-its assets from there. All rights and credits go to their respective authors.
+The Jervis Client is heavily inspired by [FUMBBL](https://github.com/christerk/ffb) 
+and borrows many of its assets from there. All rights and credits go to 
+their respective authors.
 
 It is possible to sync the latest FUMBBL resource with the Jervis project
 by using this gradle command:
