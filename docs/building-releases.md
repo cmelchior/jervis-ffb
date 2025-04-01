@@ -23,6 +23,8 @@ export JERVIS_MACOS_NOTARIZATION_PASSWORD="<APPLE_PASSWORD>"
 export JERVIS_MACOS_NOTARIZATION_TEAM_ID="<TEAM_ID>"
 ```
 
+TODO Add description of `releaseType`
+
 ## MacOS 
 
 Follow https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/Signing_and_notarization_on_macOS/README.md
@@ -50,18 +52,27 @@ Download: https://wixtoolset.org/releases/
 
 Build package using:
 ```
-gradlew packageReleaseDistributionForCurrentOS
+gradlew packageReleaseExe -P"jervis.releaseType=dev"
 ```
 
 The installer is found at:
 ```
-modules\jervis-ui\build\compose\binaries\main-release\msi\Jervis Fantasy Football-X.Y.Z.msi
+modules\jervis-ui\build\compose\binaries\main-release\msi\Jervis Fantasy Football-X.Y.Z.exe
 ```
 
 ## Linux
 
 Right now, the installer is just a best-guess effort. It hasn't been tested yet.
 
+Create installer using:
+```
+./gradlew packageReleaseDeb -Pjervis.releaseType=dev
+```
+
+The installer is found at:
+```
+modules/jervis-ui/build/compose/binaries/main-release/deb/
+```
 
 
 ## WASM

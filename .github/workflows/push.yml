@@ -42,6 +42,8 @@ jobs:
   build-windows-desktop:
     runs-on: windows-latest
     needs: [ run-tests ]
+    env:
+      JERVIS_WINDOWS_PACKAGE_GUID: ${{ secrets.JERVIS_WINDOWS_PACKAGE_GUID }}
     if: |
       always() && 
       !cancelled() && 
@@ -67,19 +69,29 @@ jobs:
           cache-read-only: false
 
       - name: Build Installer for Windows
-        run: ./gradlew packageReleaseMsi -P"jervis.releaseType=dev"
+        run: ./gradlew packageReleaseExe -P"jervis.releaseType=dev"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: app-windows
-          path: ./modules/jervis-ui/build/compose/binaries/main-release/msi/*
+          path: ./modules/jervis-ui/build/compose/binaries/main-release/exe/*
           if-no-files-found: error
           retention-days: 1
 
+  # See https://docs.github.com/en/actions/use-cases-and-examples/deploying/installing-an-apple-certificate-on-macos-runners-for-xcode-development
+  # See https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-native-distribution.html#macos-specific-configuration
   build-macos-desktop:
     runs-on: macos-latest
     needs: [ run-tests ]
+    env:
+      JERVIS_MACOS_BUILD_CERTIFICATE_BASE64: ${{ secrets.JERVIS_MACOS_BUILD_CERTIFICATE_BASE64 }}
+      JERVIS_MACOS_BUILD_CERTIFICATE_PASSWORD: ${{ secrets.JERVIS_MACOS_BUILD_CERTIFICATE_PASSWORD }}
+      JERVIS_MACOS_TEMP_KEYCHAIN_PASSWORD: ${{ secrets.JERVIS_MACOS_TEMP_KEYCHAIN_PASSWORD }}
+      JERVIS_MACOS_SIGNING_ID: ${{ secrets.JERVIS_MACOS_SIGNING_ID }}
+      JERVIS_MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.JERVIS_MACOS_NOTARIZATION_APPLE_ID }}
+      JERVIS_MACOS_NOTARIZATION_PASSWORD: ${{ secrets.JERVIS_MACOS_NOTARIZATION_PASSWORD }}
+      JERVIS_MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.JERVIS_MACOS_NOTARIZATION_TEAM_ID }}
     if: |
       always() && 
       !cancelled() && 
@@ -87,6 +99,24 @@ jobs:
       !contains(needs.*.result, 'cancelled')
 
     steps:
+      - name: Import code-signing certificate
+        run: |
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Import certificate and from secrets
+          echo -n "$JERVIS_MACOS_BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+
+          # Create temporary keychain
+          security create-keychain -p "$JERVIS_MACOS_TEMP_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$JERVIS_MACOS_TEMP_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$JERVIS_MACOS_BUILD_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -k "$JERVIS_MACOS_TEMP_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -105,7 +135,7 @@ jobs:
           cache-read-only: false
 
       - name: Build Installer for MacOS
-        run: ./gradlew packageReleaseDmg -Pjervis.releaseType=dev
+        run: ./gradlew notarizeReleaseDmg -Pjervis.releaseType=dev
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
