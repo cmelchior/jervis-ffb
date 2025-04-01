@@ -16,7 +16,7 @@ import okio.use
 import java.io.File
 
 actual val platformFileSystem: FileSystem = FileSystem.SYSTEM
-actual val APPLICATION_DIRECTORY: String = "${System.getProperty("user.home")}/.jervis"
+actual val APPLICATION_DIRECTORY: String = "${System.getProperty("user.home")}${File.separator}.jervis"
 
 actual class FileManager {
 
@@ -24,7 +24,7 @@ actual class FileManager {
         val dirPath = "$APPLICATION_DIRECTORY/$directory".toPath()
         return platformFileSystem.listOrNull(dirPath)
             ?.filter { it.name.endsWith(extension) }
-            ?.map { it.toString().substringAfter("$APPLICATION_DIRECTORY/") }
+            ?.map { it.toString().substringAfter("$APPLICATION_DIRECTORY${File.separator}") }
             ?.map { it.toPath() }
             ?: emptyList()
     }
