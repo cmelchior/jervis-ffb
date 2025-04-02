@@ -16,7 +16,7 @@ import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.frontpage_griff
+import com.jervisffb.jervis_ui.generated.resources.frontpage_elf_vs_skeleton
 import com.jervisffb.ui.game.view.SidebarMenu
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
@@ -38,7 +38,7 @@ class P2PClientScreen(private val menuViewModel: MenuViewModel, private val view
             MenuScreenWithSidebarAndTitle(
                 menuViewModel,
                 title = "Peer-to-Peer Game",
-                icon = Res.drawable.frontpage_griff,
+                icon = Res.drawable.frontpage_elf_vs_skeleton,
                 topMenuRightContent = null,
                 sidebarContent = {
                     val currentPage by viewModel.currentPage.collectAsState()

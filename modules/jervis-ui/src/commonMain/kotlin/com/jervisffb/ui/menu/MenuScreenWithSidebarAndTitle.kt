@@ -44,7 +44,6 @@ import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_elf_vs_skeleton
 import com.jervisffb.jervis_ui.generated.resources.frontpage_griff
 import com.jervisffb.jervis_ui.generated.resources.frontpage_mummy
-import com.jervisffb.jervis_ui.generated.resources.frontpage_orc
 import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_back
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
@@ -121,13 +120,13 @@ fun MenuScreenWithSidebarAndTitle(
         when (icon) {
             Res.drawable.frontpage_griff -> {
                 Image(
-                    modifier = Modifier.align(Alignment.BottomStart).width(330.dp).offset(x = 0.dp, y = 0.dp).scale(scaleX = -1f, scaleY = 1f),
+                    modifier = Modifier.align(Alignment.BottomStart).width(330.dp).offset(x = -10.dp, y = 0.dp).scale(scaleX = 1f, scaleY = 1f),
                     painter = painterResource(Res.drawable.frontpage_griff),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
                 )
             }
-            Res.drawable.frontpage_orc -> {
+            Res.drawable.frontpage_elf_vs_skeleton -> {
                 Image(
                     modifier = Modifier.align(Alignment.BottomStart).width(330.dp).offset(x = 10.dp, y = 10.dp),
                     painter = painterResource(Res.drawable.frontpage_elf_vs_skeleton),
@@ -137,7 +136,7 @@ fun MenuScreenWithSidebarAndTitle(
             }
             Res.drawable.frontpage_wall_player -> {
                 Image(
-                    modifier = Modifier.align(Alignment.BottomStart).width(400.dp).offset(x = -5.dp, y = 30.dp),
+                    modifier = Modifier.align(Alignment.BottomStart).width(420.dp).offset(x = 0.dp, y = 20.dp),
                     painter = painterResource(Res.drawable.frontpage_wall_player),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
@@ -145,7 +144,7 @@ fun MenuScreenWithSidebarAndTitle(
             }
             Res.drawable.frontpage_mummy -> {
                 Image(
-                    modifier = Modifier.align(Alignment.BottomStart).width(380.dp).offset(x = 0.dp /*-40.dp*/, y = 0.dp /*15.dp*/),
+                    modifier = Modifier.align(Alignment.BottomStart).width(340.dp).offset(x = -0.dp /*-40.dp*/, y = 0.dp /*15.dp*/),
                     painter = painterResource(Res.drawable.frontpage_mummy),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,

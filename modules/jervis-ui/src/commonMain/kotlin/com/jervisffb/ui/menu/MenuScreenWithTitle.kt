@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
@@ -25,7 +26,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.frontpage_treeman
+import com.jervisffb.jervis_ui.generated.resources.frontpage_krox
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_back
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
 import com.jervisffb.ui.game.view.JervisTheme
@@ -72,8 +73,8 @@ fun MenuScreenWithTitle(
         }
 
         Image(
-            modifier = Modifier.align(Alignment.BottomEnd).fillMaxWidth(0.35f).offset(x = -30.dp, y = 30.dp),
-            bitmap = imageResource(Res.drawable.frontpage_treeman),
+            modifier = Modifier.align(Alignment.BottomEnd).fillMaxWidth(0.35f).offset(x = -50.dp, y = 0.dp).scale(1f,1f),
+            bitmap = imageResource(Res.drawable.frontpage_krox),
             contentDescription = null,
             contentScale = ContentScale.FillWidth,
         )
