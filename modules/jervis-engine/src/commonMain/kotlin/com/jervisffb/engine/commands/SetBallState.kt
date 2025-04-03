@@ -16,6 +16,9 @@ class SetBallState private constructor(
     private var originalCarriedBy: Player? = null
     private var originalExit: FieldCoordinate? = null
     private var originalLocation: FieldCoordinate? = null
+    // We need to store a reference to this on `execute` so we use the same
+    // instance on `undo`.
+    private var originalSetLocationCommand: SetBallLocation? = null
 
     companion object {
         fun accurateThrow(ball: Ball): Command = SetBallState(
@@ -84,16 +87,18 @@ class SetBallState private constructor(
     override fun execute(state: Game) {
         val ball: Ball = ball
         ball.let {
+            // Store original values for the ball
             this.originalState = it.state
             this.originalCarriedBy = it.carriedBy
             this.originalExit = it.outOfBoundsAt
             this.originalLocation = it.location
-        }
-        ball.let {
+
+            // Move ball to its new state
             it.state = ballState
             it.carriedBy = carriedBy
             if (carriedBy != null) {
-                SetBallLocation(it, FieldCoordinate.UNKNOWN).execute(state)
+                originalSetLocationCommand = SetBallLocation(it, FieldCoordinate.UNKNOWN)
+                originalSetLocationCommand?.execute(state)
             }
             it.outOfBoundsAt = exitLocation
             it.notifyUpdate()
@@ -102,12 +107,10 @@ class SetBallState private constructor(
     }
 
     override fun undo(state: Game) {
-        ball.state = originalState
-        ball.carriedBy = originalCarriedBy
         ball.outOfBoundsAt = originalExit
-        if (originalLocation != null) {
-            SetBallLocation(ball, originalLocation!!).undo(state)
-        }
+        originalSetLocationCommand?.undo(state)
+        ball.carriedBy = originalCarriedBy
+        ball.state = originalState
         ball.notifyUpdate()
         ball.carriedBy?.notifyUpdate()
     }
