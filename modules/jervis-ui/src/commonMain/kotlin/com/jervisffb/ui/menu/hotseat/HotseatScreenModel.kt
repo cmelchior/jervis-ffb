@@ -224,6 +224,6 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                 }
             }
         )
-        navigator.push(GameScreen(model))
+        navigator.push(GameScreen(menuViewModel, model))
     }
 }

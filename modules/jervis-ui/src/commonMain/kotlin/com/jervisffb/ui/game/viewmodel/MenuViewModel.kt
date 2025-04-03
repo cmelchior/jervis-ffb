@@ -10,13 +10,18 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.ui.BuildConfig
 import com.jervisffb.ui.SoundEffect
 import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.TeamActionMode
+import com.jervisffb.ui.menu.intro.CreditData
 import com.jervisffb.utils.canBeHost
+import com.jervisffb.utils.getBuildType
+import com.jervisffb.utils.getPlatformDescription
 import com.jervisffb.utils.singleThreadDispatcher
+import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -38,12 +43,38 @@ class MenuViewModel {
     val p2pHostAvaiable: Boolean = canBeHost()
 
     private val _showSettingsDialog = MutableStateFlow(false)
+    private val _showDialogDialog = MutableStateFlow(false)
+    val isAboutDialogVisible: StateFlow<Boolean> = _showDialogDialog
+    val creditData: CreditData
 
     val navigatorContext = CoroutineScope(
         CoroutineName("ScreenNavigator")
             + CoroutineExceptionHandler { _, exception -> throw exception }
             + singleThreadDispatcher("menuScope")
     )
+
+    init {
+        // Customize the create issue link, so it contains some basic information about the client
+        // Formatting is weird because `getPlatformDescription` returns a multiline text that doesn't
+        // follow the same indentation as the rest of the text.
+        val body = """
+<Describe the issue>
+
+-----
+**Client Information (${getBuildType()})**
+Jervis Client Version: ${BuildConfig.releaseVersion}
+Git Commit: ${BuildConfig.gitHash}
+${getPlatformDescription()}
+        """.trimIndent().encodeURLParameter()
+
+        creditData = CreditData(
+            newIssueUrl = "https://github.com/cmelchior/jervis-ffb/issues/new?body=$body&labels=user"
+        )
+    }
+
+    fun showAboutDialog(visible: Boolean) {
+        _showDialogDialog.value = visible
+    }
 
     // Default values .. figure out a way to persist these
     private var features: MutableMap<Feature, Boolean> = mutableMapOf(

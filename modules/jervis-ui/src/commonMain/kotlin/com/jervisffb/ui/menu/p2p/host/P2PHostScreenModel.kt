@@ -163,7 +163,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                                 networkAdapter.sendGameStarted()
                             }
                         }
-                        navigator.push(GameScreen(gameViewModel!!))
+                        navigator.push(GameScreen(menuViewModel, gameViewModel!!))
                     }
                     P2PHostState.CLOSE_GAME -> {}
                     P2PHostState.DONE -> {}

@@ -10,12 +10,7 @@ import com.jervisffb.ui.menu.StandAloneScreen
 import com.jervisffb.ui.menu.StandAloneScreenModel
 import com.jervisffb.ui.menu.fumbbl.FumbblScreen
 import com.jervisffb.ui.menu.fumbbl.FumbblScreenModel
-import com.jervisffb.utils.getBuildType
-import com.jervisffb.utils.getPlatformDescription
 import com.jervisffb.utils.jervisLogger
-import io.ktor.http.encodeURLParameter
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -80,29 +75,12 @@ class FrontpageScreenModel(private val menuViewModel: MenuViewModel) : JervisScr
     }
 
     val news: List<NewsEntryData>
-    private val _showCreditDialog = MutableStateFlow(false)
-    val showCreditDialog: StateFlow<Boolean> = _showCreditDialog
-    val creditData: CreditData
 
     init {
         // Prepare Git History so it can be displayed on the News section
         // It is formatted here because (for some reason) the BuildConfig plugin has problems
         // doing it in Gradle
         news = formatGitHistory()
-
-        // Customize the create issue link, so it contains some basic information about the client
-        val body = """
-<Describe the issue>
-
------
-**Client Information (${getBuildType()})**
-Jervis Client Version: ${BuildConfig.releaseVersion}
-Git Commit: ${BuildConfig.gitHash}
-${getPlatformDescription()}
-        """.trimIndent().encodeURLParameter()
-        creditData = CreditData(
-            newIssueUrl = "https://github.com/cmelchior/jervis-ffb/issues/new?body=$body&labels=user"
-        )
     }
 
     private fun formatGitHistory(): List<NewsEntryData> {
@@ -130,10 +108,6 @@ ${getPlatformDescription()}
             LOG.w { "Unable to parse Git History: $e" }
             return emptyList()
         }
-    }
-
-    fun showCreditDialog(visible: Boolean) {
-        _showCreditDialog.value = visible
     }
 
     fun gotoFumbblScreen(navigator: Navigator) {

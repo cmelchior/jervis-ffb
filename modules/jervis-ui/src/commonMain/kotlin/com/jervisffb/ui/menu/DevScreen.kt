@@ -67,7 +67,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
     fun startReplayGame(navigator: Navigator, mode: Replay) {
         menuViewModel.navigatorContext.launch {
             val viewModel = createReplayScreenModel(menuViewModel, mode.file)
-            navigator.push(GameScreen(viewModel))
+            navigator.push(GameScreen(menuViewModel, viewModel))
         }
     }
 
@@ -148,7 +148,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
     fun startManualGame(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
             val viewModel = createDevHotseatScreenModel(menuViewModel)
-            navigator.push(GameScreen(viewModel))
+            navigator.push(GameScreen(menuViewModel, viewModel))
         }
 
     }
@@ -157,7 +157,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
     fun startRandomGame(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
             val viewModel = createDevHotseatScreenModel(menuViewModel, randomActions = true)
-            navigator.push(GameScreen(viewModel))
+            navigator.push(GameScreen(menuViewModel, viewModel))
         }
     }
 

@@ -1,5 +1,10 @@
 package com.jervisffb
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -14,6 +19,9 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.initApplication
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.pixelsToDp
+import java.awt.Desktop
+import java.awt.desktop.AboutEvent
+import java.awt.desktop.AboutHandler
 
 
 fun main() {
@@ -49,8 +57,18 @@ fun main() {
     initApplication()
     try {
         application {
-            val scale = 1.22f
             val menuViewModel = MenuViewModel()
+            var showAbout by remember { mutableStateOf(false) }
+            LaunchedEffect(Unit) {
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().setAboutHandler(object : AboutHandler {
+                        override fun handleAbout(e: AboutEvent?) {
+                            menuViewModel.showAboutDialog(true)
+                        }
+                    })
+                }
+            }
+            val scale = 1.22f
             val windowState =
                 rememberWindowState(
                     size = (

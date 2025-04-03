@@ -1,4 +1,4 @@
-package com.jervisffb.ui.menu.components
+package com.jervisffb.ui.menu.components.settings
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -23,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -38,27 +36,23 @@ import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.view.utils.bannerBackground
 import com.jervisffb.ui.game.view.utils.paperBackground
-import com.jervisffb.ui.menu.intro.CreditData
-import com.jervisffb.ui.menu.intro.FrontpageScreenModel
-import com.jervisffb.utils.openUrlInBrowser
+import com.jervisffb.ui.game.viewmodel.MenuViewModel
 
 /**
- * Credit/Version dialog shown when the version from the front page is pressed.
- *
- * Should probably try to unify this and [com.jervisffb.ui.menu.fumbbl.FumbblLoginDialog]
- * into a shared dialog. Create a few more dialogs to get a feel for what needs to differ.
+ * Handles Settings Dialog. This is just a place holder for now.
+ * I suspect a dialog is not big enough for the things that ends up going in here, we
+ * probably need to create a seperate screen for it.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun CreditDialog(viewModel: FrontpageScreenModel, creditData: CreditData) {
-    val showDialog: Boolean by viewModel.showCreditDialog.collectAsState()
+fun SettingsDialogComponent(viewModel: MenuViewModel) {
+    val visible: Boolean by viewModel.showSettingsDialog().collectAsState()
+    if (!visible) return
+
     val dialogColor = JervisTheme.rulebookRed
     val textColor = JervisTheme.contentTextColor
 
-    if (!showDialog) return
-
     Dialog(
-        onDismissRequest = { viewModel.showCreditDialog(false) },
+        onDismissRequest = { viewModel.openSettings(false) },
         properties = DialogProperties(
             usePlatformDefaultWidth = false
         ),
@@ -66,8 +60,8 @@ fun CreditDialog(viewModel: FrontpageScreenModel, creditData: CreditData) {
         Surface(
             elevation = 8.dp,
             modifier = Modifier
-                .width(850.dp)
-                .defaultMinSize(minHeight = 200.dp, minWidth = 850.dp)
+                .width(650.dp)
+                .defaultMinSize(minHeight = 200.dp, minWidth = 650.dp)
                 .paperBackground(color = JervisTheme.rulebookPaper)
             ,
             shape = MaterialTheme.shapes.medium,
@@ -89,7 +83,7 @@ fun CreditDialog(viewModel: FrontpageScreenModel, creditData: CreditData) {
                 ) {
                     Text(
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                        text = "J",
+                        text = "",
                         fontFamily = JervisTheme.fontFamily(),
                         color = JervisTheme.white,
                         textAlign = TextAlign.Center,
@@ -101,16 +95,12 @@ fun CreditDialog(viewModel: FrontpageScreenModel, creditData: CreditData) {
                     .padding(start  = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp)
                     .wrapContentHeight()
                 ) {
-                    CreditDialogContent(
+                    SettingsDialogContent(
                         dialogColor,
                         textColor,
-                        creditData,
                         onCancel = {
-                            viewModel.showCreditDialog(false)
+                            viewModel.openSettings(false)
                         },
-                        reportIssue = { url ->
-                            openUrlInBrowser(url)
-                        }
                     )
                 }
             }
@@ -119,84 +109,36 @@ fun CreditDialog(viewModel: FrontpageScreenModel, creditData: CreditData) {
 }
 
 @Composable
-private fun ColumnScope.CreditDialogContent(
+private fun ColumnScope.SettingsDialogContent(
     dialogColor: Color,
     textColor: Color,
-    data: CreditData,
     onCancel: () -> Unit = {},
-    reportIssue: (String) -> Unit = {},
 ) {
-    CreditDialogHeader(data.title, dialogColor)
+    SettingsDialogHeader("Settings", dialogColor)
     TitleBorder(dialogColor)
-    Column(modifier = Modifier.weight(1f).padding(top = 8.dp)) {
-        Row {
-            CreditLabel("Version:", "", textColor)
-            Spacer(modifier = Modifier.width(8.dp))
-            CreditText("${data.clientVersion} (${data.gitCommit})", textColor)
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Row {
-            CreditLabel(
-                "Creator:",
-                data.mainDeveloperDescription,
-                textColor
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            CreditText(
-                data.mainDeveloper,
-                textColor
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Row {
-            CreditLabel(
-                "FUMBBL Credits:",
-                data.fumbblDevelopersDescription.replace("\n" , ""),
-                textColor
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            CreditText(
-                data.fumbblDevelopers.joinToString(", "),
-                textColor
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Row {
-            CreditLabel(
-                "Disclaimer:",
-                "",
-                textColor
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            CreditText(
-                "Blood Bowl is a trademark of Games Workshop Limited, used without permission, used without intent to infringe, or in opposition to their copyright. This project is in no way official and is not endorsed by Games Workshop Limited.",
-                textColor
-            )
-        }
+    Box(
+        modifier = Modifier.weight(1f).padding(top = 8.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text("Not implemented yet", color = textColor)
     }
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End
     ) {
+        Spacer(modifier = Modifier.weight(1f))
         JervisButton(
             text = "Close",
             onClick = { onCancel() },
             buttonColor = JervisTheme.rulebookBlue,
             textColor = buttonTextColor
         )
-        Spacer(modifier = Modifier.weight(1f))
-        JervisButton(
-            text = "Report Issue",
-            onClick = { reportIssue(data.newIssueUrl) },
-            buttonColor = JervisTheme.rulebookBlue,
-            textColor = buttonTextColor,
-        )
     }
 }
 
 @Composable
-private fun ColumnScope.CreditDialogHeader(title: String, dialogColor: Color) {
+private fun ColumnScope.SettingsDialogHeader(title: String, dialogColor: Color) {
     Box(
         modifier = Modifier.height(36.dp),
         contentAlignment = Alignment.CenterStart,
@@ -209,37 +151,4 @@ private fun ColumnScope.CreditDialogHeader(title: String, dialogColor: Color) {
             color = dialogColor
         )
     }
-}
-
-@Composable
-private fun RowScope.CreditLabel(label: String, description: String, textColor: Color) {
-    Column(modifier = Modifier.weight(1.5f)) {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = label,
-            color = textColor,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-        )
-        if (description.isNotEmpty()) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = description,
-                fontSize = 12.sp,
-                color = textColor,
-                fontWeight = FontWeight.Normal,
-            )
-        }
-    }
-}
-
-@Composable
-private fun RowScope.CreditText(text: String, textColor: Color) {
-    Text(
-        modifier = Modifier.weight(2f),
-        text = text,
-        fontSize = 14.sp,
-        color = textColor,
-        fontWeight = FontWeight.Normal,
-    )
 }

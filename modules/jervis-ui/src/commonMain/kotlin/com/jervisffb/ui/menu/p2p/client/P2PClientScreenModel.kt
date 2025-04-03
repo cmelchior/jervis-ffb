@@ -157,7 +157,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                                 networkAdapter.sendGameStarted()
                             }
                         }
-                        navigator.push(GameScreen(model))
+                        navigator.push(GameScreen(menuViewModel, model))
                         lastValidPage = 2
                     }
                     P2PClientState.CLOSE_GAME -> {}
