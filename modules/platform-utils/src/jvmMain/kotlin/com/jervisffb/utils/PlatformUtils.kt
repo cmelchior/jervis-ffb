@@ -84,6 +84,7 @@ public actual fun initializePlatform() {
     // This is relevant on e.g. MacOS. The file will be reused every time the application
     // is opened, so space should not be a big concern.
     val logFile = File("$APPLICATION_DIRECTORY${File.separator}log.txt")
+    logFile.parentFile.mkdirs()
     val teeOut = PrintStream(TeeOutputStream(System.out, logFile.outputStream().buffered()), true)
     System.setOut(teeOut)
     System.setErr(teeOut)

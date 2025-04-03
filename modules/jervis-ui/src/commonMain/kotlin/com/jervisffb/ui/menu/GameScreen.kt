@@ -1,6 +1,7 @@
 package com.jervisffb.ui.menu
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.ImageBitmap
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -11,6 +12,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.ui.SoundManager
+import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.state.UiActionProvider
@@ -28,6 +30,17 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+
+// Wrapper used to contain data needed to contain team specfic information
+// for the loading screen. Team icons are treated seperately as they might
+// be slower to load.
+data class LoadingTeamInfo(
+    val teamName: String,
+    val coachName: String,
+    val race: String,
+    val teamValue: String
+)
 
 class GameScreenModel(
     private val uiMode: TeamActionMode,
@@ -50,7 +63,31 @@ class GameScreenModel(
     val loadingMessages: StateFlow<String> = _loadingMessages
     val _isLoaded = MutableStateFlow<Boolean>(false)
     val isLoaded: StateFlow<Boolean> = _isLoaded
+    val homeTeamIcon: MutableStateFlow<ImageBitmap?> = MutableStateFlow(null)
+    val homeTeamData: LoadingTeamInfo
+    val awayTeamIcon: MutableStateFlow<ImageBitmap?> = MutableStateFlow(null)
+    val awayTeamData: LoadingTeamInfo
 
+    init {
+        menuViewModel.navigatorContext.launch {
+            homeTeamIcon.value = IconFactory.loadRosterIcon(homeTeam.id, homeTeam.teamLogo ?: homeTeam.roster.rosterLogo)
+        }
+        menuViewModel.navigatorContext.launch {
+            awayTeamIcon.value = IconFactory.loadRosterIcon(awayTeam.id, awayTeam.teamLogo ?: awayTeam.roster.rosterLogo)
+        }
+        homeTeamData = LoadingTeamInfo(
+            homeTeam.name,
+            homeTeam.coach.name,
+            homeTeam.roster.name,
+            formatCurrency(homeTeam.teamValue)
+        )
+        awayTeamData = LoadingTeamInfo(
+            awayTeam.name,
+            awayTeam.coach.name,
+            awayTeam.roster.name,
+            formatCurrency(awayTeam.teamValue)
+        )
+    }
     /**
      * Initialize icons
      */
@@ -70,7 +107,7 @@ class GameScreenModel(
         menuViewModel.uiState = uiState
         uiState.startGameEventLoop()
         onEngineInitialized()
-        _loadingMessages.value = ""
+        _loadingMessages.value = "Starting Game"
         _isLoaded.value = true
     }
 }
