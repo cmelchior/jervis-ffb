@@ -3,11 +3,9 @@ package com.jervisffb.ui.menu.components.teamselector
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,28 +33,23 @@ fun SelectTeamComponent(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+        LazyVerticalGrid(
+            columns = GridCells.FixedSize(300.dp),
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                availableTeams.forEach { team ->
-                    TeamCard(
-                        name = team.teamName,
-                        teamValue = team.teamValue,
-                        rerolls = team.rerolls,
-                        isSelected = (selectedTeam?.teamId == team.teamId),
-                        isEnabled = (team.teamId != unavailableTeam),
-                        logo = team.logo,
-                        onClick = { viewModel.setSelectedTeam(team) },
-
-                    )
-                }
+            items(availableTeams.size) { index ->
+                val team = availableTeams[index]
+                TeamCard(
+                    name = team.teamName,
+                    teamValue = team.teamValue,
+                    rerolls = team.rerolls,
+                    isSelected = (selectedTeam?.teamId == team.teamId),
+                    isEnabled = (team.teamId != unavailableTeam),
+                    logo = team.logo,
+                    onClick = { viewModel.setSelectedTeam(team) },
+                )
             }
         }
     }

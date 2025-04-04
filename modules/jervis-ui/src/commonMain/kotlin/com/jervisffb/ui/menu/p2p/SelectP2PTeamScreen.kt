@@ -1,16 +1,14 @@
 package com.jervisffb.ui.menu.p2p
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.LoadTeamDialog
-import com.jervisffb.ui.menu.components.TeamCard
 import com.jervisffb.ui.menu.components.TeamInfo
+import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponent
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
 
 /**
@@ -46,43 +44,23 @@ fun SelectP2PTeamScreen(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                availableTeams.forEach { team ->
-                    TeamCard(
-                        name = team.teamName,
-                        teamValue = team.teamValue,
-                        rerolls = team.rerolls,
-                        isSelected = (selectedTeam?.teamId == team.teamId),
-                        isEnabled = (team.teamId != selectedTeamByOtherCoach),
-                        logo = team.logo,
-                        onClick = { viewModel.setSelectedTeam(team) },
+        Box(modifier = Modifier.weight(1f).fillMaxSize()) {
+            SelectTeamComponent(viewModel)
+        }
 
-                    )
-                }
-            }
-            // This row is mirrored between here and SelectHotseatTeamScreen. The reason being that
-            // it is hard to capture the buttons inside the same component due to how the layout is structured.
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                Spacer(modifier = Modifier.width(if (isHost) 40.dp else 60.dp)) // Move the first button out from the sidebar image
-                JervisButton(text = "Load from file", onClick = {
-                    showLoadTeamFromFileDialog = !showLoadTeamFromFileDialog
-                })
-                Spacer(modifier = Modifier.width(16.dp))
-                JervisButton(text = "Import from FUMBBL", onClick = {
-                    showImportFumbblTeamDialog = !showImportFumbblTeamDialog
-                })
-                Spacer(modifier = Modifier.weight(1f))
-                JervisButton(confirmTitle.uppercase(), onClick = { onNext() }, enabled = (selectedTeam != null))
-            }
+        // This row is mirrored between here and SelectHotseatTeamScreen. The reason being that
+        // it is hard to capture the buttons inside the same component due to how the layout is structured.
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+            Spacer(modifier = Modifier.width(if (isHost) 40.dp else 60.dp)) // Move the first button out from the sidebar image
+            JervisButton(text = "Load from file", onClick = {
+                showLoadTeamFromFileDialog = !showLoadTeamFromFileDialog
+            })
+            Spacer(modifier = Modifier.width(16.dp))
+            JervisButton(text = "Import from FUMBBL", onClick = {
+                showImportFumbblTeamDialog = !showImportFumbblTeamDialog
+            })
+            Spacer(modifier = Modifier.weight(1f))
+            JervisButton(confirmTitle.uppercase(), onClick = { onNext() }, enabled = (selectedTeam != null))
         }
     }
     if (showImportFumbblTeamDialog) {
