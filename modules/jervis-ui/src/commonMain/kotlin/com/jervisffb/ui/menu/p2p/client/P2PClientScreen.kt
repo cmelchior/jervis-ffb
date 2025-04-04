@@ -85,6 +85,7 @@ private fun PageContent(viewModel: P2PClientScreenModel) {
                 )
                 1 -> SelectP2PTeamScreen(
                     viewModel = viewModel.selectTeamModel.componentModel,
+                    isHost = false,
                     confirmTitle = "Next",
                     onNext = { viewModel.teamSelectionDone() }
                 )

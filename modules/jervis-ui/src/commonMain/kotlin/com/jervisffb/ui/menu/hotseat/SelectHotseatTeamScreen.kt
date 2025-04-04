@@ -62,7 +62,7 @@ fun SelectHotseatTeamScreen(
         // This row is mirrored between here and SelectHotseatTeamScreen. The reason being that
         // it is hard to capture the buttons inside the same component due to how the layout is structured.
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-            Spacer(modifier = Modifier.width(60.dp))
+            Spacer(modifier = Modifier.width(140.dp)) // Move the first button out from the sidebar image
             JervisButton(text = "Load from file", onClick = {
                 showLoadTeamFromFileDialog = !showLoadTeamFromFileDialog
             })

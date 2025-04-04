@@ -33,6 +33,7 @@ import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
 @Composable
 fun SelectP2PTeamScreen(
     viewModel: SelectTeamComponentModel,
+    isHost: Boolean, // Only used to shift the row buttons. There is probably a better way to do this.
     confirmTitle: String,
     onNext: () -> Unit,
 ) {
@@ -71,7 +72,7 @@ fun SelectP2PTeamScreen(
             // This row is mirrored between here and SelectHotseatTeamScreen. The reason being that
             // it is hard to capture the buttons inside the same component due to how the layout is structured.
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                Spacer(modifier = Modifier.width(60.dp))
+                Spacer(modifier = Modifier.width(if (isHost) 40.dp else 60.dp)) // Move the first button out from the sidebar image
                 JervisButton(text = "Load from file", onClick = {
                     showLoadTeamFromFileDialog = !showLoadTeamFromFileDialog
                 })

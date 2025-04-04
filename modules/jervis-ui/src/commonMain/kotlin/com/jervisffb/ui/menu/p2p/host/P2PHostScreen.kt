@@ -85,7 +85,7 @@ fun PageContent(viewModel: P2PHostScreenModel) {
         ) { page ->
             when (page) {
                 0 -> SetupGamePage(viewModel.setupGameModel, Modifier)
-                1 -> SelectP2PTeamScreen(viewModel.selectTeamModel.componentModel, "Start Server", { viewModel.teamSelectionDone() })
+                1 -> SelectP2PTeamScreen(viewModel.selectTeamModel.componentModel, true, "Start Server", { viewModel.teamSelectionDone() })
                 2 -> WaitForOpponentPage(viewModel = viewModel)
                 3 -> StartP2PGamePage(
                     viewModel.networkAdapter.homeTeam,
