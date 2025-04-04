@@ -99,6 +99,7 @@ class Game(
     val idGenerator = IdGenerator()
 
     // Track all current active procedures.
+    @Transient
     val stack = ProcedureStack()
 
     // Track all logs related to the game state, this includes

@@ -10,6 +10,7 @@ abstract class BB2020Rules : Rules(
     gameType = GameType.STANDARD
 ) {
 }
+
 @Serializable
 class StandardBB2020Rules : BB2020Rules() {
     override val name: String = "Blood Bowl 2020 Rules (Strict)"

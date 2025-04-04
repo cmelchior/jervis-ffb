@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.DieId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
+import kotlinx.serialization.Serializable
 
 /**
  * Interface allowing us to track a single die all the way from rolling it
@@ -23,6 +24,7 @@ sealed interface DieRoll<D : DieResult> {
 /**
  * Wrap a single Block die roll. This makes it possible to track it all the way from being rolled to its final result
  */
+@Serializable
 data class BlockDieRoll(
     override val id: DieId,
     override val originalRoll: DBlockResult,
@@ -36,6 +38,7 @@ data class BlockDieRoll(
 /**
  * Wrap a single D6 die roll. This makes it possible to track it all the way from being rolled to its final result.
  */
+@Serializable
 data class D6DieRoll(
     override val id: DieId,
     override val originalRoll: D6Result,
