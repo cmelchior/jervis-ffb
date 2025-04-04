@@ -69,7 +69,9 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                         .size(48.dp)
                         .offset(x = 4.dp)
                         .clip(shape = RoundedCornerShape(4.dp))
-                        .clickable {  }
+                        .clickable {
+                            viewModel.copyUrlToClipboard(url)
+                        }
                     ,
                     contentAlignment = Alignment.Center,
                 ) {

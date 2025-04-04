@@ -33,6 +33,7 @@ import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
 import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreenModel
 import com.jervisffb.ui.menu.p2p.StartP2PGameScreenModel
+import com.jervisffb.utils.copyToClipboard
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -287,5 +288,9 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                 goBackToPage(0)
             }
         }
+    }
+
+    fun copyUrlToClipboard(url: String) {
+        copyToClipboard(url)
     }
 }

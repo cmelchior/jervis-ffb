@@ -1,6 +1,8 @@
 package com.jervisffb.utils
 
 import java.awt.Desktop
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.io.File
 import java.io.OutputStream
 import java.io.PrintStream
@@ -88,4 +90,10 @@ public actual fun initializePlatform() {
     val teeOut = PrintStream(TeeOutputStream(System.out, logFile.outputStream().buffered()), true)
     System.setOut(teeOut)
     System.setErr(teeOut)
+}
+
+public actual fun copyToClipboard(text: String) {
+    val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+    val selection = StringSelection(text)
+    clipboard.setContents(selection, null)
 }

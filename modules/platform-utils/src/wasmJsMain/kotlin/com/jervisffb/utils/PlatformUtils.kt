@@ -34,4 +34,6 @@ public actual fun initializePlatform() {
     // Do nothing
 }
 
-
+public actual fun copyToClipboard(text: String) {
+    window.navigator.clipboard.writeText(text)
+}

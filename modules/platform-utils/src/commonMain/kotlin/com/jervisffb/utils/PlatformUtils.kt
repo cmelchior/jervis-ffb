@@ -42,3 +42,8 @@ public expect fun getPlatformDescription(): String
  * Run initializing logic that is platform-specific, like logging.
  */
 public expect fun initializePlatform()
+
+/**
+ * Copies a piece of text to the system clipboard.
+ */
+public expect fun copyToClipboard(text: String)

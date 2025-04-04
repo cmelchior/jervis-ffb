@@ -1,5 +1,7 @@
 package com.jervisffb.utils
+
 import platform.UIKit.UIDevice
+import platform.UIKit.UIPasteboard
 
 public actual fun threadId(): ULong {
     return 0uL // TODO Figure out how to get it here
@@ -31,5 +33,9 @@ public actual fun getPlatformDescription(): String {
 
 public actual fun initializePlatform() {
     // Do nothing
+}
+
+public actual fun copyToClipboard(text: String) {
+    UIPasteboard.generalPasteboard.string = text
 }
 
