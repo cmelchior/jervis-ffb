@@ -38,6 +38,7 @@ class FumbblScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel 
     private var api: FumbblApi? = null
 
     // Internal tracking of UI state
+    private val _showReplayDialog = MutableStateFlow<Boolean>(false)
     private val _coachName = MutableStateFlow("")
     private val _clientId = MutableStateFlow("")
     private val _clientSecret = MutableStateFlow("")
@@ -47,6 +48,7 @@ class FumbblScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel 
     private val _isLoggedIn = MutableStateFlow<Boolean>(false)
 
     // State flows for the UI state
+    fun isReplayDialogVisible(): StateFlow<Boolean> = _showReplayDialog
     fun showLoginDialog(): StateFlow<Boolean> = _showLoginDialog
     fun loginError(): StateFlow<String?> = _loginError
     fun loginButtonAvailable(): StateFlow<Boolean> = _loginButtonAvailable
@@ -172,6 +174,10 @@ class FumbblScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel 
 
     fun getCoachUrl(): String {
         return "$URL_COACH_PAGE/~${_coachName.value}"
+    }
+
+    fun openReplayDialog(show: Boolean) {
+        _showReplayDialog.value = show
     }
 
     val availableReplayFiles: List<Path>
