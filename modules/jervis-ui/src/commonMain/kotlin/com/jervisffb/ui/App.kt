@@ -11,6 +11,8 @@ import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.OnBackPress
 import com.jervisffb.ui.menu.intro.FrontpageScreen
 import com.jervisffb.utils.FileManager
+import com.jervisffb.utils.PROP_INITIALIZED
+import com.jervisffb.utils.PROP_INITIALIZED_VERSION
 import com.jervisffb.utils.PropertiesManager
 import com.jervisffb.utils.initializePlatform
 import com.jervisffb.utils.jervisLogger
@@ -27,10 +29,17 @@ fun initApplication() {
 
     @OptIn(DelicateCoroutinesApi::class)
     GlobalScope.launch {
-        if (PROPERTIES_MANAGER.getBoolean("initialized") != true) {
-            jervisLogger().i { "initializing application" }
+        // For now, we re-initialize default teams for every new version. This is done because
+        //  we are still iterating on the fileformat and serialization format. Once these are
+        // stablized, we should probably avoid this.
+        val clientReleaseVersion = BuildConfig.releaseVersion
+        val isClientInitialized = PROPERTIES_MANAGER.getBoolean(PROP_INITIALIZED) ?: false
+        val initializedVersion = PROPERTIES_MANAGER.getString(PROP_INITIALIZED_VERSION)
+        if (!isClientInitialized || initializedVersion != clientReleaseVersion) {
+            jervisLogger().i { "Initializing application: $clientReleaseVersion" }
             CacheManager.createInitialTeamFiles()
-            PROPERTIES_MANAGER.setProperty("initialized", true)
+            PROPERTIES_MANAGER.setProperty(PROP_INITIALIZED, true)
+            PROPERTIES_MANAGER.setProperty(PROP_INITIALIZED_VERSION, clientReleaseVersion)
         } else {
             jervisLogger().i { "Application already initialized. Skipping." }
         }
