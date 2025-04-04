@@ -12,7 +12,7 @@ import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
-import com.jervisffb.engine.serialize.SpriteSource
+import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -153,7 +153,9 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach
 //        game.gameFlow.safeTryEmit(game)
     }
 
-    val teamLogo: SpriteSource? = null // Either team or roster logo
+    // TODO Add support for custom team logos that are different from
+    //  the roster logo.
+    val teamLogo: RosterLogo? = null
 
     init {
         notifyUpdate() // Make sure dogout is filled

@@ -15,8 +15,10 @@ data class AiPlayer(
 )
 
 /**
- * View controller for the "Coach" and "AI sections of setting up both Hotseat and P2P Games.
+ * View controller for the "Coach" and "AI" sections of setting up both Hotseat and
+ * P2P Games.
  *
+ * @see [CoachSetupComponent]
  */
 class CoachSetupComponentModel(
     private val menuViewModel: MenuViewModel,

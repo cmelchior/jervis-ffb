@@ -7,7 +7,7 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.ui.menu.components.coach.CoachSetupComponentModel
-import com.jervisffb.ui.menu.components.teamselector.TeamSelectorComponentModel
+import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -27,7 +27,7 @@ class SelectHotseatTeamScreenModel(
         selectedTeam != null && coachName.isNotBlank()
     }
 
-    val teamSelectorModel = TeamSelectorComponentModel(
+    val teamSelectorModel = SelectTeamComponentModel(
         menuViewModel,
         { Coach(CoachId("1"), "Home Coach") },
         { teamSelected ->

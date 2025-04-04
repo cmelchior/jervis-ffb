@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2020.skills.Pass
 import com.jervisffb.engine.rules.bb2020.skills.SideStep
+import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
 import kotlinx.serialization.Serializable
@@ -91,5 +92,8 @@ val ELVEN_UNION_TEAM = BB2020Roster(
         ELVEN_CATCHER,
         ELVEN_BLITZER
     ),
-    rosterLogo = SingleSprite.embedded("roster/logo/roster_logo_elven_union.png")
+    logo = RosterLogo(
+        large = SingleSprite.embedded("roster/logo/roster_logo_elven_union.png"),
+        small = SingleSprite.embedded("roster/logo/roster_logo_elven_union.png")
+    )
 )

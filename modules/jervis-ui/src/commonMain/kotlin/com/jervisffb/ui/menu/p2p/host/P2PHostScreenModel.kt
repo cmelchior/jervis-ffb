@@ -15,6 +15,7 @@ import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
@@ -174,19 +175,22 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
 
     fun gameSetupDone() {
         menuViewModel.navigatorContext.launch {
+            val logoSize = LogoSize.SMALL
             if (isLoadingGame()) {
                 saveGameData = setupGameModel.gameSetupModel.loadFileModel.gameFile ?: error("Game file is not loaded")
                 val homeTeam = saveGameData!!.homeTeam
-                if (!IconFactory.hasLogo(homeTeam.id)) {
-                    IconFactory.saveLogo(homeTeam.id, homeTeam.teamLogo ?: homeTeam.roster.rosterLogo!!)
-                }
+                val homeTeamLogo = IconFactory.loadRosterIcon(
+                    homeTeam.id,
+                    homeTeam.teamLogo ?: homeTeam.roster.logo,
+                    logoSize
+                )
                 selectedTeam.value = TeamInfo(
                     teamId = homeTeam.id,
                     teamName = homeTeam.name,
                     teamRoster = homeTeam.roster.name,
                     teamValue = homeTeam.teamValue,
                     rerolls = homeTeam.rerolls.size,
-                    logo = IconFactory.getLogo(homeTeam.id),
+                    logo = homeTeamLogo,
                     teamData = homeTeam
                 )
                 teamSelectionDone(gotoNextPage = false)

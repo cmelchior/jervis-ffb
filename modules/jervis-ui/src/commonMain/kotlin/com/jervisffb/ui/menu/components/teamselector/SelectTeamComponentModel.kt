@@ -8,6 +8,7 @@ import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.fumbbl.web.FumbblApi
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreenModel
 import com.jervisffb.ui.menu.components.TeamInfo
@@ -17,8 +18,10 @@ import kotlinx.coroutines.launch
 /**
  * View controller for the team selector component. This component is responsible for all the UI control needed
  * to select and import a team for a game.
+ *
+ * @see [SelectTeamComponent]
  */
-class TeamSelectorComponentModel(
+class SelectTeamComponentModel(
     private val menuViewModel: MenuViewModel,
     private val getCoach: () -> Coach,
     private val onTeamSelected: (TeamInfo?) -> Unit,
@@ -51,16 +54,18 @@ class TeamSelectorComponentModel(
     }
 
     private suspend fun getTeamInfo(teamFile: JervisTeamFile, team: Team): TeamInfo {
-        if (!IconFactory.hasLogo(team.id)) {
-            IconFactory.saveLogo(team.id, teamFile.team.teamLogo ?: teamFile.roster.rosterLogo!!)
-        }
+        val logo = IconFactory.loadRosterIcon(
+            team.id,
+            teamFile.team.teamLogo ?: teamFile.roster.logo,
+            LogoSize.SMALL,
+        )
         return TeamInfo(
             teamId = team.id,
             teamName = team.name,
             teamRoster = team.roster.name,
             teamValue = team.teamValue,
             rerolls = team.rerolls.size,
-            logo = IconFactory.getLogo(team.id),
+            logo = logo,
             teamData = team
         )
     }

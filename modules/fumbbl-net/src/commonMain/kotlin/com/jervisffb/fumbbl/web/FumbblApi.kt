@@ -19,6 +19,7 @@ import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialize.JervisMetaData
 import com.jervisffb.engine.serialize.JervisTeamFile
+import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.fumbbl.web.api.AuthResult
 import com.jervisffb.fumbbl.web.api.CoachSearchResult
@@ -222,7 +223,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             allowApothecary = (roster.apothecary.equals("yes", ignoreCase = true)),
             specialRules = specialRules,
             positions = positions,
-            rosterLogo = null,
+            logo = RosterLogo.NONE,
         )
     }
 

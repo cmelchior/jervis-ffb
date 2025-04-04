@@ -5,12 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -47,9 +49,10 @@ import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
-import com.jervisffb.engine.serialize.SpriteSource
+import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.icons.LogoSize
 import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.cos
@@ -108,7 +111,7 @@ fun TeamTable(width: Dp, team: Team, isOnHomeTeam: Boolean) {
             team.treasury,
             team.teamValue,
             team.currentTeamValue,
-            team.teamLogo ?: team.roster.rosterLogo
+            team.teamLogo ?: team.roster.logo
         )
         TeamTableWrapper()
     }
@@ -139,11 +142,11 @@ private fun TeamInfoSection(
     treasury: Int,
     teamValue: Int,
     currentTeamValue: Int,
-    icon: SpriteSource?,
+    icon: RosterLogo,
 ) {
     val scope = rememberCoroutineScope()
 
-    Row(modifier = Modifier.background(JervisTheme.rulebookPaperMediumDark)) {
+    Row(modifier = Modifier.height(IntrinsicSize.Min).background(JervisTheme.rulebookPaperMediumDark)) {
         Column(
             modifier = Modifier.weight(1f).padding(4.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -158,15 +161,24 @@ private fun TeamInfoSection(
         var teamIcon: ImageBitmap? by remember { mutableStateOf(null) }
         LaunchedEffect(icon) {
             scope.launch {
-                teamIcon = IconFactory.loadRosterIcon(team, icon)
+                teamIcon = IconFactory.loadRosterIcon(team, icon, LogoSize.SMALL)
             }
         }
-        Box(modifier = Modifier.align(Alignment.CenterVertically).background(JervisTheme.rulebookPaperMediumDark).padding(end = 16.dp)) {
+        Box(
+            modifier = Modifier
+                .size(135.dp)
+                .align(Alignment.CenterVertically)
+                .background(JervisTheme.rulebookPaperMediumDark)
+                .padding(end = 16.dp)
+            ,
+            contentAlignment = Alignment.Center,
+        ) {
             if (teamIcon != null) {
                 Image(
+                    modifier = Modifier.fillMaxSize(),
                     bitmap = teamIcon!!,
                     contentDescription = "",
-                    contentScale = ContentScale.FillHeight,
+                    contentScale = ContentScale.Fit,
                 )
             }
         }

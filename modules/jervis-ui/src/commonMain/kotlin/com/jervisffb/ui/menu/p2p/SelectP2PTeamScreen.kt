@@ -24,7 +24,7 @@ import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.LoadTeamDialog
 import com.jervisffb.ui.menu.components.TeamCard
 import com.jervisffb.ui.menu.components.TeamInfo
-import com.jervisffb.ui.menu.components.teamselector.TeamSelectorComponentModel
+import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
 
 /**
  * The Team selector "tab" when creating P2P Host or P2P Client games.
@@ -32,7 +32,7 @@ import com.jervisffb.ui.menu.components.teamselector.TeamSelectorComponentModel
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SelectP2PTeamScreen(
-    viewModel: TeamSelectorComponentModel,
+    viewModel: SelectTeamComponentModel,
     confirmTitle: String,
     onNext: () -> Unit,
 ) {

@@ -78,24 +78,20 @@ data class GameEntry(
     val awayScore: Int,
 )
 
-//@Serializable
-//data class TeamSpriteData(
-//    val teamLogo: SpriteSource?, // Either team or roster logo
-//    val players: Map<PlayerId, PlayerUiData>,
-//)
-
-//@Serializable
-//data class RosterSpriteData(
-//    val rosterLogo: SpriteSource?,
-//    val positions: Map<PositionId, SpriteSource>,
-//    val portraits: Map<PositionId, SpriteSource>,
-//)
+@Serializable
+data class RosterLogo(
+    val large: SingleSprite?, // Should be an image 600x600px
+    val small: SingleSprite?, // Should be an image 200x200px
+) {
+    companion object {
+        val NONE: RosterLogo = RosterLogo(null, null)
+    }
+}
 
 enum class SpriteLocation {
     EMBEDDED,
     URL
 }
-
 
 fun normalizeFumbblIconPath(path: String): String {
     var relativePath = path
@@ -120,10 +116,10 @@ data class SingleSprite(
     override val resource: String,
 ): SpriteSource {
     companion object {
-        fun embedded(path: String): SpriteSource {
+        fun embedded(path: String): SingleSprite {
             return SingleSprite(SpriteLocation.EMBEDDED, path)
         }
-        fun url(url: String): SpriteSource {
+        fun url(url: String): SingleSprite {
             return SingleSprite(SpriteLocation.URL, url)
         }
         fun fumbbl(path: String): SingleSprite {
@@ -141,13 +137,13 @@ data class SpriteSheet(
     val selectedIndex: Int? = null, // If
 ): SpriteSource {
     companion object {
-        fun embedded(path: String, variants: Int, selectedIndex: Int? = null): SpriteSource {
+        fun embedded(path: String, variants: Int, selectedIndex: Int? = null): SpriteSheet {
             return SpriteSheet(SpriteLocation.EMBEDDED, path, variants, selectedIndex)
         }
-        fun url(path: String, variants: Int, selectedIndex: Int? = null): SpriteSource {
+        fun url(path: String, variants: Int, selectedIndex: Int? = null): SpriteSheet {
             return SpriteSheet(SpriteLocation.URL, path, variants, selectedIndex)
         }
-        fun fumbbl(path: String, variants: Int? = null, selectedIndex: Int? = null): SpriteSource {
+        fun fumbbl(path: String, variants: Int? = null, selectedIndex: Int? = null): SpriteSheet {
             val relativePath = normalizeFumbblIconPath(path)
             return SpriteSheet(SpriteLocation.URL, "https://fumbbl.com/$relativePath", variants, selectedIndex)
         }
@@ -170,65 +166,6 @@ data class PositionSpriteSheetUiData(
     val variants: Int,
 ): PositionUiData
 
-
-
-//@Serializable
-//sealed interface SpriteSource
-//
-//// Sprites shipped as part of the Client.
-//// The path is relative to the internal `composeResources/files` directory
-//@Serializable
-//data class EmbeddedSpriteSource(
-//    val resourcePath: String,
-//) : SpriteSource
-//
-//
-//
-//
-//
-//@Serializable
-//sealed interface PlayerSpriteSheetSource: SpriteSource {
-//    val variants: Int // Number of different variants
-//    val index: Int // Selected row
-//}
-//
-//// Sprite sheets are expected to look like the FUMBBL sprite sheets, i.e.,
-//// One player variant pr row.
-//// Each row contains 4 players: 0: Home/Inactive, 1: Home/Active,
-//// 2: Away/Inactive, 3: Away/Active.
-//@Serializable
-//data class EmbeddedPlayerSpriteSource(
-//    val resourcePath: String,
-//    override val variants: Int, // Number of different variants
-//    override val index: Int, // Selected row
-//) : PlayerSpriteSheetSource
-//
-//@Serializable
-//data class HttpPlayerSpriteSource(
-//    val url: String,
-//    override val variants: Int, // Number of different variants
-//    override val index: Int, // Selected row
-//) : PlayerSpriteSheetSource {
-//    companion object {
-//        fun fumbblSprite(relativePath: String): HttpSpriteSource {
-//            return HttpSpriteSource("https://fumbbl.com/$relativePath")
-//        }
-//    }
-//}
-//
-//// Sprites are fetched over the network and cached.
-//// Once cached the sprites are fetched from there. Updated sprites
-//// should have a new URL
-//@Serializable
-//data class HttpSpriteSource(
-//    val url: String,
-//): SpriteSource {
-//    companion object {
-//        fun fumbblSprite(relativePath: String): HttpSpriteSource {
-//            return HttpSpriteSource("https://fumbbl.com/$relativePath")
-//        }
-//    }
-//}
 
 // Class encapsulating all rules, teams and other game configurations that are user defined.
 @Serializable

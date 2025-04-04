@@ -15,6 +15,7 @@ import com.jervisffb.engine.rules.bb2020.skills.MultipleBlock
 import com.jervisffb.engine.rules.bb2020.skills.PrehensileTail
 import com.jervisffb.engine.rules.bb2020.skills.Stunty
 import com.jervisffb.engine.rules.bb2020.skills.ThickSkull
+import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
 import com.jervisffb.resources.iconRootPath
@@ -109,5 +110,8 @@ val LIZARDMEN_TEAM = BB2020Roster(
         SAURUS_BLOCKERS,
         KROXIGOR,
     ),
-    rosterLogo = SingleSprite.embedded("roster/logo/roster_logo_lizardmen.png")
+    logo = RosterLogo(
+        large = SingleSprite.embedded("roster/logo/roster_logo_jervis_lizardmen_large.png"),
+        small = SingleSprite.embedded("roster/logo/roster_logo_jervis_lizardmen_small.png")
+    )
 )

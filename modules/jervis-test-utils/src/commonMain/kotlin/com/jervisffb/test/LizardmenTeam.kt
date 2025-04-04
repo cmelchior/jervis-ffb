@@ -17,6 +17,7 @@ import com.jervisffb.engine.rules.bb2020.skills.MultipleBlock
 import com.jervisffb.engine.rules.bb2020.skills.PrehensileTail
 import com.jervisffb.engine.rules.bb2020.skills.Stunty
 import com.jervisffb.engine.rules.bb2020.skills.ThickSkull
+import com.jervisffb.engine.serialize.RosterLogo
 
 val SKINK_RUNNER_LINEMEN =
     BB2020Position(
@@ -105,5 +106,5 @@ val LIZARDMEN_TEAM = BB2020Roster(
         SAURUS_BLOCKERS,
         KROXIGOR,
     ),
-    rosterLogo = null
+    logo = RosterLogo.NONE
 )

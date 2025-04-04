@@ -16,6 +16,7 @@ import com.jervisffb.engine.rules.bb2020.skills.Sprint
 import com.jervisffb.engine.rules.bb2020.skills.SureFeet
 import com.jervisffb.engine.rules.bb2020.skills.Tackle
 import com.jervisffb.engine.rules.bb2020.skills.ThickSkull
+import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
 import kotlinx.serialization.Serializable
@@ -110,5 +111,8 @@ val CHAOS_DWARF_TEAM = BB2020Roster(
         BULL_CENTAUR_BLITZERS,
         ENSLAVED_MINOTAUR,
     ),
-    rosterLogo = SingleSprite.embedded("roster/logo/roster_logo_chaos_dwarf.png")
+    logo = RosterLogo(
+        large = SingleSprite.embedded("roster/logo/roster_logo_chaos_dwarf.png"),
+        small = SingleSprite.embedded("roster/logo/roster_logo_chaos_dwarf.png")
+    )
 )

@@ -23,8 +23,8 @@ import com.jervisffb.ui.menu.components.TeamInfo
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TeamSelectorComponent(
-    viewModel: TeamSelectorComponentModel,
+fun SelectTeamComponent(
+    viewModel: SelectTeamComponentModel,
 ) {
     val unavailableTeam by viewModel.unavailableTeam.collectAsState()
     val availableTeams by viewModel.availableTeams.collectAsState()

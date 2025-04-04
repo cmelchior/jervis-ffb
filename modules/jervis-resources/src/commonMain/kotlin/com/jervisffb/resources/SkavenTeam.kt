@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.skills.SureHands
+import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
 import kotlinx.serialization.Serializable
@@ -109,5 +110,8 @@ val SKAVEN_TEAM = BB2020Roster(
         SKAVEN_BLITZER,
         RAT_OGRE,
     ),
-    rosterLogo = SingleSprite.embedded("roster/logo/roster_logo_skaven.png")
+    logo = RosterLogo(
+        large = SingleSprite.embedded("roster/logo/roster_logo_jervis_skaven_large.png"),
+        small = SingleSprite.embedded("roster/logo/roster_logo_jervis_skaven_small.png")
+    )
 )

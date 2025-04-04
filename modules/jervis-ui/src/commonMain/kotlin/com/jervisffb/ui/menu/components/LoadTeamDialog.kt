@@ -18,11 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.isDigitsOnly
-import com.jervisffb.ui.menu.components.teamselector.TeamSelectorComponentModel
+import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
 
 @Composable
 fun LoadTeamDialog(
-    viewModel: TeamSelectorComponentModel,
+    viewModel: SelectTeamComponentModel,
     onCloseRequest: () -> Unit
 ) {
     var inputText by remember { mutableStateOf("") }

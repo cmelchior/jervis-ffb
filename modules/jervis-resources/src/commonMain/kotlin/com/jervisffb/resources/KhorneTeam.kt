@@ -15,6 +15,7 @@ import com.jervisffb.engine.rules.bb2020.skills.Horns
 import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
 import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
+import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
 
@@ -100,5 +101,8 @@ val KHORNE_TEAM = BB2020Roster(
         BLOODSEEKERS,
         BLOODSPAWN,
     ),
-    rosterLogo = SingleSprite.embedded("roster/logo/roster_logo_khorne.png")
+    logo = RosterLogo(
+        large = SingleSprite.embedded("roster/logo/roster_logo_jervis_khorne_large.png"),
+        small = SingleSprite.embedded("roster/logo/roster_logo_jervis_khorne_small.png")
+    )
 )

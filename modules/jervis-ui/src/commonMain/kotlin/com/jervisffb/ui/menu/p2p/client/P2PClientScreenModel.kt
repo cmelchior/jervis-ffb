@@ -14,6 +14,7 @@ import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
@@ -179,16 +180,19 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
     }
 
     private suspend fun getTeamInfo(teamFile: JervisTeamFile, team: Team): TeamInfo {
-        if (!IconFactory.hasLogo(team.id)) {
-            IconFactory.saveLogo(team.id, teamFile.team.teamLogo ?: teamFile.roster.rosterLogo!!)
-        }
+        val logoSize = LogoSize.SMALL
+        val teamLogo = IconFactory.loadRosterIcon(
+            team.id,
+            teamFile.team.teamLogo ?: teamFile.roster.logo,
+            logoSize
+        )
         return TeamInfo(
             teamId = team.id,
             teamName = team.name,
             teamRoster = team.roster.name,
             teamValue = team.teamValue,
             rerolls = team.rerolls.size,
-            logo = IconFactory.getLogo(team.id),
+            logo = teamLogo,
             teamData = team
         )
     }

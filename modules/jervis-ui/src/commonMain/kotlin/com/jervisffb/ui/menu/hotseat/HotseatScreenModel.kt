@@ -13,6 +13,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.GameFileData
 import com.jervisffb.ui.game.LocalActionProvider
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.view.SidebarEntry
@@ -96,24 +97,29 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
     }
 
     fun gameSetupDone() {
+        val logoSize = LogoSize.LARGE
         menuViewModel.navigatorContext.launch {
             if (isLoadingGame()) {
                 saveGameData = setupGameModel.gameConfigModel.loadFileModel.gameFile ?: error("Game file is not loaded")
                 val homeTeam = saveGameData!!.homeTeam
                 val awayTeam = saveGameData!!.awayTeam
-                if (!IconFactory.hasLogo(homeTeam.id)) {
-                    IconFactory.saveLogo(homeTeam.id, homeTeam.teamLogo ?: homeTeam.roster.rosterLogo!!)
-                }
-                if (!IconFactory.hasLogo(awayTeam.id)) {
-                    IconFactory.saveLogo(awayTeam.id, awayTeam.teamLogo ?: awayTeam.roster.rosterLogo!!)
-                }
+                val homeTeamLogo = IconFactory.loadRosterIcon(
+                    homeTeam.id,
+                    homeTeam.teamLogo ?: homeTeam.roster.logo,
+                    logoSize
+                )
+                val awayTeamLogo = IconFactory.loadRosterIcon(
+                    awayTeam.id,
+                    awayTeam.teamLogo ?: awayTeam.roster.logo,
+                    logoSize
+                )
                 selectedHomeTeam.value = TeamInfo(
                     teamId = homeTeam.id,
                     teamName = homeTeam.name,
                     teamRoster = homeTeam.roster.name,
                     teamValue = homeTeam.teamValue,
                     rerolls = homeTeam.rerolls.size,
-                    logo = IconFactory.getLogo(homeTeam.id),
+                    logo = homeTeamLogo,
                     teamData = homeTeam
                 )
                 selectedAwayTeam.value = TeamInfo(
@@ -122,7 +128,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                     teamRoster = awayTeam.roster.name,
                     teamValue = awayTeam.teamValue,
                     rerolls = awayTeam.rerolls.size,
-                    logo = IconFactory.getLogo(awayTeam.id),
+                    logo = awayTeamLogo,
                     teamData = awayTeam
                 )
                 sidebarEntries[0] = sidebarEntries[0].copy(active = false, onClick = { goBackToPage(0) })

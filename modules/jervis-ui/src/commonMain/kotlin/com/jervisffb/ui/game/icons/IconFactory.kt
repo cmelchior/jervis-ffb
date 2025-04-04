@@ -20,6 +20,7 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.Roster
+import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteLocation
 import com.jervisffb.engine.serialize.SpriteSheet
@@ -82,11 +83,30 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.skia.Image
 
+/**
+ * Logo size options for the team/roster logos.
+ */
+enum class LogoSize {
+    LARGE, // 600x600px
+    SMALL // 200x200px
+}
+
+/**
+ * Wrapper around extracted image data for a single player position
+ * in the two positions supported.
+ */
 data class PlayerSprite(
     val default: ImageBitmap,
     val active: ImageBitmap,
 )
 
+/**
+ * Main class responsible for handling all a logic around fetching and storing
+ * graphic assets.
+ *
+ * A lot of the methods in here are `suspend` functions due to how WASM loads
+ * resources.
+ */
 object IconFactory {
     private val iconHeight = 40
     private val iconWidth = 40
@@ -94,7 +114,8 @@ object IconFactory {
     // Map from resource "path" to loaded in-memory image
     private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
     private val cachedPortraits: MutableMap<PlayerId, ImageBitmap> = mutableMapOf()
-    private val cachedLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
+    private val cachedLargeLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
+    private val cachedSmallLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
 
     private val httpClient = getHttpClient()
 
@@ -158,7 +179,6 @@ object IconFactory {
             is SpriteSheet -> {
                 extractSprites(image, sprite.variants, sprite.selectedIndex ?: 0, isHomeTeam)
             }
-            null -> TODO()
         }
     }
 
@@ -363,20 +383,32 @@ object IconFactory {
         }
     }
 
-    fun hasLogo(id: TeamId): Boolean {
-        return cachedLogos.contains(id)
+    fun hasLogo(id: TeamId, size: LogoSize): Boolean {
+        return when (size) {
+            LogoSize.LARGE -> cachedLargeLogos.contains(id)
+            LogoSize.SMALL -> cachedSmallLogos.contains(id)
+        }
     }
 
-    suspend fun saveLogo(id: TeamId, logo: SpriteSource) {
+    suspend fun saveLogo(id: TeamId, logo: SpriteSource, size: LogoSize) {
         val image = when (logo.type) {
             SpriteLocation.EMBEDDED -> loadImageFromResources(logo.resource)
             SpriteLocation.URL -> loadImageFromNetwork(Url(logo.resource))
         }
-        cachedLogos[id] = image ?: error("Could not find: ${logo.resource}")
+        when (size) {
+            LogoSize.LARGE -> cachedLargeLogos[id] = image ?: error("Could not find: ${logo.resource}")
+            LogoSize.SMALL -> cachedSmallLogos[id] = image ?: error("Could not find: ${logo.resource}")
+        }
     }
 
-    fun getLogo(id: TeamId): ImageBitmap {
-        return cachedLogos[id]!!
+    /**
+     * Returns the logo for the given team and size or throws an exception if the logo is not found.
+     */
+    fun getLogo(id: TeamId, size: LogoSize): ImageBitmap {
+        return when (size) {
+            LogoSize.LARGE -> cachedLargeLogos[id] ?: error("Could not find: $id")
+            LogoSize.SMALL -> cachedSmallLogos[id] ?: error("Could not find: $id")
+        }
     }
 
     suspend fun loadPlayerSprite(player: Player, isOnHomeTeam: Boolean): PlayerSprite? {
@@ -399,9 +431,24 @@ object IconFactory {
         return sprite
     }
 
-    suspend fun loadRosterIcon(team: TeamId, logo: SpriteSource?): ImageBitmap? {
+    /**
+     * Load a logo for the given team and size based on the [RosterLogo] configuration.
+     */
+    suspend fun loadRosterIcon(team: TeamId, logo: RosterLogo, size: LogoSize): ImageBitmap {
+        val sprite = when (size) {
+            LogoSize.LARGE -> logo.large ?: error("Could not find large logo: $logo")
+            LogoSize.SMALL -> logo.small ?: error("Could not find small logo: $logo")
+        }
+        saveLogo(team, sprite, size)
+        return getLogo(team, size)
+    }
+
+    /**
+     * Load a logo directly. Normally the overload with [RosterLogo] should be used instead.
+     */
+    suspend fun loadRosterIcon(team: TeamId, logo: SpriteSource?, size: LogoSize): ImageBitmap? {
         if (logo == null) return null
-        saveLogo(team, logo)
-        return getLogo(team)
+        saveLogo(team, logo, size)
+        return getLogo(team, size)
     }
 }

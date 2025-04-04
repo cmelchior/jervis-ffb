@@ -12,6 +12,7 @@ import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -58,10 +59,18 @@ class GameScreenModel(
 
     init {
         menuViewModel.navigatorContext.launch {
-            homeTeamIcon.value = IconFactory.loadRosterIcon(homeTeam.id, homeTeam.teamLogo ?: homeTeam.roster.rosterLogo)
+            homeTeamIcon.value = IconFactory.loadRosterIcon(
+                homeTeam.id,
+                homeTeam.teamLogo ?: homeTeam.roster.logo,
+                LogoSize.LARGE
+            )
         }
         menuViewModel.navigatorContext.launch {
-            awayTeamIcon.value = IconFactory.loadRosterIcon(awayTeam.id, awayTeam.teamLogo ?: awayTeam.roster.rosterLogo)
+            awayTeamIcon.value = IconFactory.loadRosterIcon(
+                awayTeam.id,
+                awayTeam.teamLogo ?: awayTeam.roster.logo,
+                LogoSize.LARGE
+            )
         }
         homeTeamData = LoadingTeamInfo(
             homeTeam.name,

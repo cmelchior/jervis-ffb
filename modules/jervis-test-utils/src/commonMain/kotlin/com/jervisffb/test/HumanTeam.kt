@@ -13,6 +13,7 @@ import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.skills.SureHands
+import com.jervisffb.engine.serialize.RosterLogo
 
 /**
  * Human Teams
@@ -126,5 +127,5 @@ val HUMAN_TEAM = BB2020Roster(
         HALFLING_HOPEFUL,
         OGRE,
     ),
-    rosterLogo = null
+    logo = RosterLogo.NONE
 )

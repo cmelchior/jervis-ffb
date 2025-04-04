@@ -29,7 +29,7 @@ import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.LoadTeamDialog
 import com.jervisffb.ui.menu.components.coach.CoachSetupComponent
 import com.jervisffb.ui.menu.components.coach.CoachType
-import com.jervisffb.ui.menu.components.teamselector.TeamSelectorComponent
+import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponent
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -57,7 +57,7 @@ fun SelectHotseatTeamScreen(
                 )
             }
             Spacer(modifier = Modifier.width(32.dp))
-            TeamSelectorComponent(viewModel.teamSelectorModel)
+            SelectTeamComponent(viewModel.teamSelectorModel)
         }
         // This row is mirrored between here and SelectHotseatTeamScreen. The reason being that
         // it is hard to capture the buttons inside the same component due to how the layout is structured.

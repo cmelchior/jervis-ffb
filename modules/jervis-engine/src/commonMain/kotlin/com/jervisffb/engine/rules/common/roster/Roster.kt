@@ -2,7 +2,7 @@ package com.jervisffb.engine.rules.common.roster
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.serialize.SpriteSource
+import com.jervisffb.engine.serialize.RosterLogo
 
 interface Race {
     val id: Long
@@ -16,6 +16,6 @@ interface Roster {
     val rerollCost: Int
     val allowApothecary: Boolean
     val positions: List<Position>
-    val rosterLogo: SpriteSource?
+    val logo: RosterLogo
     operator fun get(id: PositionId): Position = positions.first { it.id == id }
 }

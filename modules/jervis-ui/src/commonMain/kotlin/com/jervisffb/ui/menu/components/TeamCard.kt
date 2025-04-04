@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.TitleBorder
 
@@ -42,6 +43,7 @@ fun RowScope.TeamCard(
     Box(
         modifier = Modifier
             .width(300.dp)
+            //.height(150.dp)
             .alpha(if (isEnabled) 1f else 0.3f)
             .background(JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.5f))
             .border(width = borderWidth, color = borderColor)
@@ -70,13 +72,20 @@ fun RowScope.TeamCard(
             }
             Row(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 4.dp)) {
-                    val adjustedTv = teamValue / 1_000
-                    Text(text = "$adjustedTv K", color = JervisTheme.contentTextColor)
-                    Text("$rerolls RR", color = JervisTheme.contentTextColor)
+                    Text(
+                        text = formatCurrency(teamValue),
+                        fontSize = 14.sp,
+                        color = JervisTheme.contentTextColor
+                    )
+                    Text(
+                        text = "$rerolls RR",
+                        fontSize = 14.sp,
+                        color = JervisTheme.contentTextColor
+                    )
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Image(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(4.dp),
                     bitmap = logo,
                     contentDescription = null,
                     contentScale = ContentScale.Inside,
