@@ -64,7 +64,7 @@ class GameConfigurationContainerComponentModel(private val menuViewModel: MenuVi
     // Configure the tab layout
     val tabs = listOf(
         GameTab(
-            tabName = "Continue From File",
+            tabName = "Save File",
             type = ConfigType.FROM_FILE,
             enabled = true,
             showSetupTabs = false,
