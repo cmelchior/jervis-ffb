@@ -24,6 +24,7 @@ import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.BadHabitsContext
 import com.jervisffb.engine.model.context.assertContext
@@ -33,7 +34,7 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
-import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -109,6 +110,7 @@ object BadHabits : Procedure() {
                                 ReportGameProgress("${player.name} received Loner (2+)"),
                                 AddPlayerSkill(player,
                                     Loner(
+                                        SkillId("${player.id.value}-Loner"),
                                         2,
                                         isTemporary = true,
                                         expiresAt = Duration.END_OF_DRIVE

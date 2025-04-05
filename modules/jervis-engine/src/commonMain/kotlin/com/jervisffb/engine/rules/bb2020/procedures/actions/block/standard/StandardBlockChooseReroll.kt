@@ -25,7 +25,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
-import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.utils.INVALID_ACTION

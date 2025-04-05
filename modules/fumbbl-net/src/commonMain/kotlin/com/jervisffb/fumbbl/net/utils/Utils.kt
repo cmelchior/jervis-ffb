@@ -94,10 +94,10 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
             }
             val skills = fumbblPlayer.skillValuesMap.map {
                 when (it.key) {
-                    "Block" -> Block()
-                    "Dodge" -> Dodge()
-                    "Tackle" -> Tackle()
-                    "Wrestle" -> Wrestle()
+                    "Block" -> Block.Factory
+                    "Dodge" -> Dodge.Factory
+                    "Tackle" -> Tackle.Factory
+                    "Wrestle" -> Wrestle.Factory
                     "Extra Arms",
                     "Brawler",
                     "Sneaky Git",

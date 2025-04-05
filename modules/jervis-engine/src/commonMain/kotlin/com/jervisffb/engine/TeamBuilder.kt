@@ -15,6 +15,7 @@ import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.bb2020.skills.Skill
+import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.serialize.SingleSprite
@@ -26,7 +27,7 @@ private data class PlayerData(
     val name: String,
     val number: PlayerNo,
     val type: Position,
-    val extraSkills: List<Skill> = emptyList(),
+    val extraSkills: List<SkillFactory> = emptyList(),
     val icon: PlayerUiData? = null,
 )
 
@@ -66,7 +67,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
         name: String,
         number: PlayerNo,
         type: Position,
-        skills: List<Skill> = emptyList(),
+        skills: List<SkillFactory> = emptyList(),
     ) {
         if (players.containsKey(number)) {
             throw IllegalArgumentException("Player with number $number already exits: ${players[number]}")
@@ -107,7 +108,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
                     PlayerType.STANDARD,
                     data.icon,
                 ).also { player ->
-                    player.extraSkills.addAll(data.extraSkills)
+                    player.extraSkills.addAll(data.extraSkills.map { it.createSkill(player) })
                 })
             }
             this.rerolls.addAll((0 ..<this@TeamBuilder.reRolls).map {

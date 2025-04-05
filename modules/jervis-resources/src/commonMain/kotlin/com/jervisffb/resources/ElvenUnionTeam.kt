@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2020.skills.Pass
-import com.jervisffb.engine.rules.bb2020.skills.SideStep
+import com.jervisffb.engine.rules.bb2020.skills.Sidestep
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
@@ -70,7 +70,7 @@ val ELVEN_BLITZER =
         "B",
         115_000,
         7, 3, 2, 3, 9,
-        listOf(Block.Factory, SideStep.Factory),
+        listOf(Block.Factory, Sidestep.Factory),
         listOf(GENERAL, GENERAL),
         listOf(AGILITY, PASSING),
         SpriteSheet.embedded("$iconRootPath/elvenunion_blitzer.png", 2),

@@ -27,10 +27,11 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
-import com.jervisffb.engine.rules.bb2020.skills.SideStep
+import com.jervisffb.engine.rules.bb2020.skills.Sidestep
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.resources.HUMAN_BLITZER
@@ -166,8 +167,8 @@ fun createDefaultHomeTeam(): Team {
         addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), HUMAN_LINEMAN)
         addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), HUMAN_LINEMAN)
         addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), HUMAN_LINEMAN)
-        addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HUMAN_THROWER, listOf(SideStep()))
-        addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HUMAN_CATCHER, listOf(SideStep()))
+        addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HUMAN_THROWER, listOf(Sidestep.Factory))
+        addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HUMAN_CATCHER, listOf(Sidestep.Factory))
         addPlayer(PlayerId("H7"), "Catcher-7-H", PlayerNo(7), HUMAN_CATCHER)
         addPlayer(PlayerId("H8"), "Blitzer-8-H", PlayerNo(8), HUMAN_BLITZER)
         addPlayer(PlayerId("H9"), "Blitzer-9-H", PlayerNo(9), HUMAN_BLITZER)
@@ -190,8 +191,8 @@ fun createDefaultAwayTeam(): Team {
         addPlayer(PlayerId("A3"), "Saurus-3-A", PlayerNo(3), SAURUS_BLOCKERS)
         addPlayer(PlayerId("A4"), "Saurus-4-A", PlayerNo(4), SAURUS_BLOCKERS)
         addPlayer(PlayerId("A5"), "Saurus-5-A", PlayerNo(5), SAURUS_BLOCKERS)
-        addPlayer(PlayerId("A6"), "Saurus-6-A", PlayerNo(6), SAURUS_BLOCKERS, listOf(Frenzy()))
-        addPlayer(PlayerId("A7"), "Saurus-7-A", PlayerNo(7), SAURUS_BLOCKERS, listOf(Frenzy()))
+        addPlayer(PlayerId("A6"), "Saurus-6-A", PlayerNo(6), SAURUS_BLOCKERS, listOf(Frenzy.Factory))
+        addPlayer(PlayerId("A7"), "Saurus-7-A", PlayerNo(7), SAURUS_BLOCKERS, listOf(Frenzy.Factory))
         addPlayer(PlayerId("A8"), "ChameleonSkink-8-A", PlayerNo(8), CHAMELEON_SKINKS)
         addPlayer(PlayerId("A9"), "Skink-9-A", PlayerNo(9), SKINK_RUNNER_LINEMEN)
         addPlayer(PlayerId("A10"), "Skink-10-A", PlayerNo(10), SKINK_RUNNER_LINEMEN)

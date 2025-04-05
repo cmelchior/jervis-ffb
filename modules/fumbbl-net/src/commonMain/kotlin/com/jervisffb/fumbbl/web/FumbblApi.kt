@@ -1,9 +1,12 @@
 package com.jervisffb.fumbbl.web
 
+import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.model.Team
@@ -27,6 +30,7 @@ import com.jervisffb.fumbbl.web.api.CurrentMatchResult
 import com.jervisffb.fumbbl.web.api.PlayerDetails
 import com.jervisffb.fumbbl.web.api.RosterDetails
 import com.jervisffb.fumbbl.web.api.TeamDetails
+import com.jervisffb.resources.HUMAN_BLITZER
 import com.jervisffb.utils.getHttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -160,10 +164,11 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
     private fun mapToSkillFactory(skills: List<String>): List<SkillFactory> {
         // We should probably hard code all the FUMBBL titles instead of hoping the nams are the same.
         // Also, this is allocating way too many objects.
+        val fakePlayer = Player("".playerId, HUMAN_BLITZER, null, PlayerType.STANDARD)
         return skills.mapNotNull { fumbblSkill ->
             BB2020SkillCategory.entries.flatMap { it.skills }
                 .firstOrNull {
-                    it.createSkill().name == fumbblSkill
+                    it.createSkill(fakePlayer).name == fumbblSkill
                 } // ?: throw IllegalStateException("Unsupported skill $fumbblSkill")
         }
     }

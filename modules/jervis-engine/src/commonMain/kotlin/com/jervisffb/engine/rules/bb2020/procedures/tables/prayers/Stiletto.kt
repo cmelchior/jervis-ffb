@@ -65,11 +65,9 @@ object Stiletto : Procedure() {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
                         return compositeCommandOf(
-                            AddPlayerSkill(player,
-                                Stab(
-                                    isTemporary = true,
-                                    expiresAt = Duration.END_OF_DRIVE
-                                )
+                            AddPlayerSkill(
+                                player,
+                                Stab.Factory.createSkill(player, isTemporary = true, expiresAt = Duration.END_OF_DRIVE)
                             ),
                             SetContext(context.copy(resultApplied = true)),
                             ReportGameProgress("${player.name} received Stiletto"),

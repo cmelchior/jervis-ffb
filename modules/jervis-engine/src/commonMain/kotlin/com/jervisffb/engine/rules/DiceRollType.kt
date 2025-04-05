@@ -1,5 +1,8 @@
-package com.jervisffb.engine.rules.bb2020.skills
+package com.jervisffb.engine.rules
 
+/**
+ * Enumerate all the dice roll types available in Blood Bowl
+ */
 enum class DiceRollType {
     ACCURACY, // For passing
     ARMOUR,

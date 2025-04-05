@@ -1,6 +1,6 @@
 package com.jervisffb.engine.model.context
 
-import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 
 /**

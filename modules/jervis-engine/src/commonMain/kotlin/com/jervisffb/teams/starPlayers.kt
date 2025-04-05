@@ -5,7 +5,7 @@ import com.jervisffb.engine.rules.bb2020.roster.BB2020StarPlayer
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.skills.Loner
-import com.jervisffb.engine.rules.bb2020.skills.SideStep
+import com.jervisffb.engine.rules.bb2020.skills.Sidestep
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.bb2020.skills.Stunty
 import com.jervisffb.engine.serialize.SingleSprite
@@ -22,7 +22,7 @@ val THE_BLACK_GOBBO = BB2020StarPlayer(
         // DisturbingPrecense.Factory,
         Dodge.Factory,
         Loner.Factory(3),
-        SideStep.Factory,
+        Sidestep.Factory,
         // SneakyGit.Factory,
         Stab.Factory,
         Stunty.Factory

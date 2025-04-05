@@ -27,7 +27,7 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRoll
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
-import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
+import com.jervisffb.engine.rules.DiceRollType
 
 data class CheeringFansContext(
     val kickingTeamRoll: D6Result,

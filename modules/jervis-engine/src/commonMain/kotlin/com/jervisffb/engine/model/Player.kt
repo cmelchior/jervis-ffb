@@ -128,6 +128,7 @@ class Player(
     val icon: PlayerUiData? = null,
     val type: PlayerType
 ) : Observable<Player>() {
+
     @Transient
     lateinit var team: Team
 
@@ -190,7 +191,7 @@ class Player(
     // to mark the player somehow. This is done through a TemporaryEffect
     val temporaryEffects = mutableListOf<TemporaryEffect>()
     val extraSkills = mutableListOf<Skill>()
-    var positionSkills = position.skills.map { it.createSkill() }.toMutableList()
+    var positionSkills = position.skills.map { it.createSkill(this) }.toMutableList()
     val skills: List<Skill>
         get() = extraSkills + positionSkills // TODO This probably result in _a lot_ of copying. Find a way to optimize this
 

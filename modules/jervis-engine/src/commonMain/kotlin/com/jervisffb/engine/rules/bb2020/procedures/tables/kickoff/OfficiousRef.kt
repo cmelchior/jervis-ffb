@@ -32,7 +32,7 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
+import com.jervisffb.engine.rules.DiceRollType
 
 data class OfficiousRefContext(
     val kickingTeamRoll: D6Result,

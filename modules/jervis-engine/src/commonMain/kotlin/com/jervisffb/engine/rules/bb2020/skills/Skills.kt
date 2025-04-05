@@ -3,12 +3,15 @@ package com.jervisffb.engine.rules.bb2020.skills
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
-import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.UseStandardSkillReroll
 import com.jervisffb.engine.rules.bb2020.procedures.UseTeamReroll
 import kotlinx.serialization.Serializable
+import kotlin.random.Random
 
 @Serializable
 sealed interface TeamReroll : RerollSource {
@@ -61,9 +64,9 @@ class LeaderTeamReroll(val player: Player) : TeamReroll {
 }
 
 @Serializable
-class BrilliantCoachingReroll(val team: Team) : TeamReroll {
+class BrilliantCoachingReroll(val teamId: TeamId) : TeamReroll {
     override val id: RerollSourceId =
-        RerollSourceId("brilliant-coaching-${team.id.value}")
+        RerollSourceId("brilliant-coaching-${teamId.value}")
     override val carryOverIntoOvertime: Boolean = false
     override val duration = Duration.END_OF_DRIVE
     override val rerollResetAt: Duration =
@@ -74,7 +77,7 @@ class BrilliantCoachingReroll(val team: Team) : TeamReroll {
 
 // Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {
-    val id: RerollSourceId // Unique identifier for this reroll. Should only be unique within a single team.
+    val id: RerollSourceId // Unique identifier for this reroll. Should be unique across both teams.
     val rerollResetAt: Duration
     val rerollDescription: String
     var rerollUsed: Boolean
@@ -153,9 +156,13 @@ enum class Duration {
     PERMANENT, // The effect is a permanent change to the team.
 }
 
+/**
+ * This interface represents player Skills. Since these skills are stateful
+ * they are required to have a [skillId] that is unique across the entire game.
+ */
 interface Skill {
     // Unique identifier for this skill
-    val skillId: String
+    val skillId: SkillId
     // Human readable name of this skill
     val name: String
     // Whether this skill is compulsory to use
@@ -164,7 +171,8 @@ interface Skill {
     // If the skill is always available, this should always be false.
     // Note, this specifically does not apply to a "reroll" part of a skill.
     var used: Boolean
-    // Represents any value in brackes, like Might Blow(1+) or Loner(4+). It is up to the context to correctly interpret this value
+    // Represents any value in brackes, like Might Blow(1+) or Loner(4+). It is up to the context to correctly
+    // interpret this value
     val value: Int?
     // When the `used` state reset back to `false`?
     val resetAt: Duration
@@ -176,6 +184,7 @@ interface Skill {
     val workWhenProne: Boolean
     // Whether this skill is temporary
     val isTemporary: Boolean
+    // If the skill is temporary, this defines when the skill expires and is removed
     val expiresAt: Duration
 }
 
@@ -184,7 +193,11 @@ interface Skill {
 //  Ideally this `listOf(SureHands)`, not `listOf(SureHands.Factory)`
 interface SkillFactory {
     val value: Int?
-    fun createSkill(isTemporary: Boolean = false, expiresAt: Duration = Duration.PERMANENT): Skill
+    fun createSkill(
+        player: Player,
+        isTemporary: Boolean = false,
+        expiresAt: Duration = Duration.PERMANENT
+    ): Skill
 }
 
 interface PlayerSkillFactory: SkillFactory

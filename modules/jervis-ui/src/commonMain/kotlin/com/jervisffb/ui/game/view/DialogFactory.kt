@@ -65,7 +65,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.BadHabits
 import com.jervisffb.engine.rules.bb2020.procedures.tables.weather.SwelteringHeat
 import com.jervisffb.engine.rules.bb2020.skills.Block
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
-import com.jervisffb.engine.rules.bb2020.skills.SideStep
+import com.jervisffb.engine.rules.bb2020.skills.Sidestep
 import com.jervisffb.engine.rules.bb2020.skills.Tackle
 import com.jervisffb.ui.game.dialogs.DiceRollUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
@@ -258,7 +258,7 @@ object DialogFactory {
                     val player = controller.state.getContext<PushContext>().pushee()
                     SingleChoiceInputDialog.createUseSkillDialog(
                         player,
-                        player.getSkill<SideStep>()
+                        player.getSkill<Sidestep>()
                     )
                 }
 

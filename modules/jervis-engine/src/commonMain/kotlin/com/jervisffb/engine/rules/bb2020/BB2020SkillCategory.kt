@@ -20,7 +20,7 @@ import com.jervisffb.engine.rules.bb2020.skills.Pro
 import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2020.skills.ReallyStupid
 import com.jervisffb.engine.rules.bb2020.skills.Regeneration
-import com.jervisffb.engine.rules.bb2020.skills.SideStep
+import com.jervisffb.engine.rules.bb2020.skills.Sidestep
 import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.rules.bb2020.skills.Sprint
@@ -49,7 +49,7 @@ enum class BB2020SkillCategory(override val id: Long, override val description: 
         /* JumpUp.Factory */
         Leap.Factory,
         /* SafePairOfHands.Factory */
-        SideStep.Factory,
+        Sidestep.Factory,
         /* SneakyGit.Factory */
         Sprint.Factory,
         SureFeet.Factory,

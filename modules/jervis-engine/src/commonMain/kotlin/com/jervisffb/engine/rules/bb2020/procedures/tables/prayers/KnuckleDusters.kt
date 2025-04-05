@@ -16,6 +16,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -68,10 +69,11 @@ object KnuckleDusters : Procedure() {
                         compositeCommandOf(
                             AddPlayerSkill(player,
                                 MightyBlow(
-                                    value = 1,
-                                    isTemporary = true,
-                                    expiresAt = Duration.END_OF_DRIVE
-                                )
+                                        skillId = SkillId("${player.id.value}-MightyBlow"),
+                                        value = 1,
+                                        isTemporary = true,
+                                        expiresAt = Duration.END_OF_DRIVE
+                                    )
                             ),
                             ReportGameProgress("${player.name} received Knuckle Dusters"),
                             ExitProcedure(),

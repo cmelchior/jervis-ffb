@@ -61,7 +61,7 @@ data class BB2020Position(
             passing = this@BB2020Position.passing
             baseArmorValue = position.armorValue
             armorValue = position.armorValue
-            positionSkills = position.skills.map { it.createSkill() }.toMutableList()
+            positionSkills = position.skills.map { it.createSkill(this) }.toMutableList()
         }
     }
 

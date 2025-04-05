@@ -1,17 +1,20 @@
 package com.jervisffb.engine.rules.bb2020.skills
 
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
+import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import kotlinx.serialization.Serializable
 
 @Serializable
 class Dodge(
+    override val skillId: SkillId,
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill, D6StandardSkillReroll {
-    override val skillId: String = "dodge-skill"
-    override val id: RerollSourceId = RerollSourceId("dodge-reroll")
+    override val id: RerollSourceId = RerollSourceId("${skillId.value}-reroll")
     override val name: String = "Dodge"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
@@ -32,7 +35,16 @@ class Dodge(
     @Serializable
     data object Factory: PlayerSkillFactory {
         override val value: Int? = null
-        override fun createSkill(isTemporary: Boolean, expiresAt: Duration): Skill =
-            Dodge(isTemporary, expiresAt)
+        override fun createSkill(
+            player: Player,
+            isTemporary: Boolean,
+            expiresAt: Duration
+        ): Skill {
+            return Dodge(
+                SkillId("${player.id.value}-Dodge"),
+                isTemporary,
+                expiresAt
+            )
+        }
     }
 }

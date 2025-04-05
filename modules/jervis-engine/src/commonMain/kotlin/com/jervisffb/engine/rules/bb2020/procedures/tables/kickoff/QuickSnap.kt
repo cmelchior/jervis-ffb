@@ -35,7 +35,7 @@ import com.jervisffb.engine.reports.ReportQuickSnapResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquareContext
-import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
+import com.jervisffb.engine.rules.DiceRollType
 
 data class QuickSnapContext(
     val roll: D3Result,

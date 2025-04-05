@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.skills
 
+import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
 import kotlinx.serialization.Serializable
 
@@ -10,14 +12,14 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 class Horns(
+    override val skillId: SkillId,
     override val isTemporary: Boolean = false,
     override val expiresAt: Duration = Duration.PERMANENT
 ) : BB2020Skill {
-    override val skillId: String = "horns-skill"
     override val name: String = "Horns"
     override val compulsory: Boolean = false
-    override val resetAt: Duration =
-        Duration.PERMANENT // Does this ever counts as "used". Probably not since it works every time.
+    // Does this ever counts as "used". Probably not since it works every time.
+    override val resetAt: Duration = Duration.PERMANENT
     override val category: SkillCategory = BB2020SkillCategory.MUTATIONS
     override var used: Boolean = false
     override val value: Int? = null
@@ -27,7 +29,16 @@ class Horns(
     @Serializable
     data object Factory: PlayerSkillFactory {
         override val value: Int? = null
-        override fun createSkill(isTemporary: Boolean, expiresAt: Duration): Skill =
-            Horns(isTemporary, expiresAt)
+        override fun createSkill(
+            player: Player,
+            isTemporary: Boolean,
+            expiresAt: Duration
+        ): Skill {
+            return Horns(
+                SkillId("${player.id.value}-Horns"),
+                isTemporary,
+                expiresAt
+            )
+        }
     }
 }

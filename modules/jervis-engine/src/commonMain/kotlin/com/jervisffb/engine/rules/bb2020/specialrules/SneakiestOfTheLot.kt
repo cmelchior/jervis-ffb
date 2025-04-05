@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.specialrules
 
+import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Skill
@@ -12,10 +14,11 @@ import kotlinx.serialization.Serializable
  * See rulebook page 129.
  */
 @Serializable
-class SneakiestOfTheLot() : BB2020SpecialRule {
+class SneakiestOfTheLot(
+    override val skillId: SkillId
+) : BB2020SpecialRule {
     override val isTemporary: Boolean = false
     override val expiresAt: Duration = Duration.PERMANENT
-    override val skillId: String = "sneakiest-of-the-lot-special-rule"
     override val name: String = "Sneakiest of the Lot"
     override val compulsory: Boolean = true
     override val resetAt: Duration = Duration.END_OF_TURN
@@ -28,6 +31,14 @@ class SneakiestOfTheLot() : BB2020SpecialRule {
     @Serializable
     data object Factory: SpecialRuleFactory {
         override val value: Int? = null
-        override fun createSkill(isTemporary: Boolean, expiresAt: Duration): Skill = SneakiestOfTheLot()
+        override fun createSkill(
+            player: Player,
+            isTemporary: Boolean,
+            expiresAt: Duration
+        ): Skill {
+            return SneakiestOfTheLot(
+                SkillId("${player.id}-SneakiestOfTheLot"),
+            )
+        }
     }
 }

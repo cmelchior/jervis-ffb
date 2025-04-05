@@ -29,7 +29,7 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportPlayerInjury
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
+import com.jervisffb.engine.rules.DiceRollType
 
 /**
  * Procedure for handling "Sweltering Heat" as described on page 37 in the

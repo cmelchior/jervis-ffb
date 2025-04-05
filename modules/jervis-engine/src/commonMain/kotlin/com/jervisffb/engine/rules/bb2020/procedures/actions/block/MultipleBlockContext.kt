@@ -23,7 +23,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.Stand
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.bb2020.skills.DiceRollType
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

@@ -37,9 +37,21 @@ value class PlayerId(val value: String)
 @JvmInline
 value class PositionId(val id: String)
 
+/**
+ * Unique identifier for a [RerollSource]. This must be unique across
+ * the entire game.
+ */
 @Serializable
 @JvmInline
 value class RerollSourceId(val id: String)
+
+/**
+ * Unique identifier for a player [Skill]. This must be unique across
+ * the entire game.
+ */
+@Serializable
+@JvmInline
+value class SkillId(val value: String)
 
 @Serializable
 @JvmInline
