@@ -40,7 +40,7 @@ class InternalGameActionMessageHandler(override val session: GameSession) : Clie
 
         // If the action wasn't pre-selected, create one now.
         // TODO Figure out how to do this
-        val nextAction = createRandomAction(game.state, game.getAvailableActions())
+        val nextAction = createRandomAction(game.state, game.getAvailableActions(), session.random)
         handleAction(session, game, coach.id, nextAction, null)
     }
 }

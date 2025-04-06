@@ -24,10 +24,13 @@ import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 class RandomActionProvider(
     val clientMode: TeamActionMode,
     val controller: GameEngineController,
+    val delay: Duration = 50.milliseconds,
     val isServer: Boolean = false // For local games, if this is set. This provider will also generate "server-only" events
 ): UiActionProvider() {
 
@@ -106,7 +109,7 @@ class RandomActionProvider(
                 if (teamActionHandledHere && (!actionHandledOnServer || isServer)) {
                     if (!useManualAutomatedActions(controller)) {
                         val selectedAction = createRandomAction(controller.state, request.actions)
-                        delay(50)
+                        delay(delay.inWholeMilliseconds)
                         actionSelectedChannel.send(selectedAction)
                     }
                 }

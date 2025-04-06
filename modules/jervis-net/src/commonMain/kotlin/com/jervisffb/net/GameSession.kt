@@ -9,6 +9,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.SpectatorId
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.net.handlers.ClientMessageHandler
 import com.jervisffb.net.handlers.GameActionHandler
 import com.jervisffb.net.handlers.GameStartedHandler
@@ -40,6 +41,7 @@ import com.jervisffb.net.messages.StartGameMessage
 import com.jervisffb.net.messages.TeamSelectedMessage
 import com.jervisffb.net.serialize.jervisNetworkSerializer
 import com.jervisffb.utils.jervisLogger
+import com.jervisffb.utils.singleThreadDispatcher
 import io.ktor.utils.io.CancellationException
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
@@ -48,13 +50,13 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlin.random.Random
 
 
 /**
@@ -76,7 +78,8 @@ class GameSession(
     val hostTeam: Team,
     val clientCoach: CoachId? = null,
     val clientTeam: Team? = null,
-    val testMode: Boolean = false
+    val testMode: Boolean = false,
+    val random: Random = Random.Default,
 ) {
 
     companion object {
@@ -100,8 +103,11 @@ class GameSession(
         println("GameSession threw an exception: $exception")
     }
 
-    // TODO Should probably be single-threaded
-    val scope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}") + Dispatchers.Default + handler)
+    // Is single-threaded so control exactly how messages go in and out.
+    // This is required so we do not accidentially start handling incoming
+    // messages out of order.
+    // Hmm, that is not true. Input is being synchronized elsewhere...test it
+    val scope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}") + singleThreadDispatcher("GameSessionScope") + handler)
 
     // All sessions associated with this game, post messages to this queue
     // This ensures that we only update the game state from a single thread
@@ -147,7 +153,9 @@ class GameSession(
                             // In the case of a game starting again, we ignore any teams sent and just
                             // reuse the ones from the save game.
                             val client = if (message.isHost) {
-                                val homeTeam = if (gameSettings.initialActions.isNotEmpty()) hostTeam else (message.team as P2PTeamInfo?)?.team
+                                val homeTeam = if (gameSettings.initialActions.isNotEmpty()) hostTeam else (message.team as P2PTeamInfo?)?.team?.also {
+                                    JervisSerialization.fixTeamRefs(it)
+                                }
                                 JoinedP2PHost(
                                     connection = connection,
                                     coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName),
@@ -155,7 +163,9 @@ class GameSession(
                                     team = homeTeam
                                 )
                             } else {
-                                val awayTeam = if (gameSettings.initialActions.isNotEmpty()) clientTeam else (message.team as P2PTeamInfo?)?.team
+                                val awayTeam = if (gameSettings.initialActions.isNotEmpty()) clientTeam else (message.team as P2PTeamInfo?)?.team?.also {
+                                    JervisSerialization.fixTeamRefs(it)
+                                }
                                 JoinedP2PClient(
                                     connection = connection,
                                     coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName),
@@ -231,6 +241,7 @@ class GameSession(
                     when (message) {
                         is Frame.Text -> {
                             val clientMessage = jervisNetworkSerializer.decodeFromString<ClientMessage>(message.readText())
+                            LOG.i { "[Server] [${client.connection.username}] Received message: $clientMessage" }
                             incomingMessages.send(ReceivedMessage(client.connection, clientMessage))
                         }
 //                    is Frame.Binary -> TODO()
@@ -241,7 +252,7 @@ class GameSession(
                     }
                 } catch (ex: Throwable) {
                     if (ex is CancellationException) throw ex
-                    println("Error: $ex")
+                    LOG.e { ex.stackTraceToString() }
                     val error = ReadMessageServerError(ex.stackTraceToString())
                     sendError(client, error)
                 }
@@ -303,7 +314,7 @@ class GameSession(
         scope.launch {
             state = GameState.JOINING
             for (message in incomingMessages) {
-                LOG.d { "Received message from ${message.connection?.username}: $message" }
+                LOG.d { "[Server] [${message.connection?.username}] Handle message: $message" }
                 handleMessage(message)
             }
         }.invokeOnCompletion {

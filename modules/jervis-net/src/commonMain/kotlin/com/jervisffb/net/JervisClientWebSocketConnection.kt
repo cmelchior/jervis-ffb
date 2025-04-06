@@ -34,7 +34,7 @@ import okio.ProtocolException
 class JervisClientWebSocketConnection(
     private val gameId: GameId,
     private val url: String = "ws://127.0.0.1:8080/game",
-    coachName: String,
+    private val coachName: String,
 ) {
     companion object {
         val LOG = jervisLogger()
@@ -137,7 +137,7 @@ class JervisClientWebSocketConnection(
         try {
             for (outMessage in outgoingChannel) {
                 val messageJson = jervisNetworkSerializer.encodeToString(outMessage)
-                LOG.i { "[Client] Sending message: $messageJson" }
+                LOG.i { "[Client-$coachName] Sending message: $messageJson" }
                 session?.outgoing?.send(Frame.Text(messageJson))
             }
         } catch (ex: Throwable) {

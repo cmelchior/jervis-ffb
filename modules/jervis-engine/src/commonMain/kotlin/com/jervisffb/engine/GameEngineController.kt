@@ -225,6 +225,10 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
         return lastGameActionId
     }
 
+    fun nextActionIndex(): GameActionId {
+        return lastGameActionId + 1
+    }
+
     private fun undoLastAction(revertActionId: Boolean) {
         if (replayMode) {
             throw IllegalStateException(

@@ -31,6 +31,7 @@ import kotlin.test.fail
  **/
 @Ignore // Comment out to run
 class FuzzTester {
+
     @Test
     fun runRandomGames() {
         val games = 100

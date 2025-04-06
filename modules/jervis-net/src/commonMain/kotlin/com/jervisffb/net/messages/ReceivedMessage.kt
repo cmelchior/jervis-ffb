@@ -9,4 +9,10 @@ import com.jervisffb.net.JervisNetworkWebSocketConnection
 data class ReceivedMessage(
     val connection: JervisNetworkWebSocketConnection?,
     val message: ClientMessage,
-)
+) {
+    val userName: String = connection?.username ?: "<unknown>"
+
+    override fun toString(): String {
+        return "ReceivedMessage(connection=${userName}, message=$message)"
+    }
+}

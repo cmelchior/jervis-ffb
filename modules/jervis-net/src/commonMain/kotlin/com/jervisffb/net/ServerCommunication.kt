@@ -28,7 +28,6 @@ import com.jervisffb.utils.jervisLogger
 import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.serialization.encodeToString
 
 /**
  * Class wrapping the responsibility of sending messages from a server game
@@ -101,7 +100,7 @@ class ServerCommunication(
         sendAllCoaches(msg)
     }
 
-    suspend fun sendGamReady(id: GameId) {
+    suspend fun sendGameReady(id: GameId) {
         val msg = GameReadyMessage(id)
         sendAllConnections(msg)
     }

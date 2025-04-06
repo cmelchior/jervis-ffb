@@ -31,7 +31,7 @@ class StartGameHandler(override val session: GameSession) : ClientMessageHandler
             it.hasAcceptedGame = true
             if (session.isReadyToStart()) {
                 session.startGame()
-                session.out.sendGamReady(session.gameId)
+                session.out.sendGameReady(session.gameId)
                 session.hostState = P2PHostState.RUN_GAME
                 session.clientState = P2PClientState.RUN_GAME
                 session.out.sendHostStateUpdate(session.hostState)

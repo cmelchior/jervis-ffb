@@ -129,6 +129,22 @@ points into the classes defining the protocol.
 
 <TODO Ad a more detailed description of the protocol>
 
+### Starting a game (Host)
+
+--> JoinGameAsHost
+<-- GameStateSync
+<-- CoachJoined (Host)
+<-- TeamJoined (Host Team)
+<-- UpdateHostState
+<-- CoachJoined (Client)
+<-- TeamJoined (Client Team)
+<-- ConfirmGameStart
+<-- UpdateHostState
+--> StartGame
+<-- GameReady
+<-- UpdateHostState
+--> GameStarted
+
 
 ## Limitations
 

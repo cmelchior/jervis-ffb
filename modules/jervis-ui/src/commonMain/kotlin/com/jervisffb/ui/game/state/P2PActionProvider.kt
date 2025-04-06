@@ -50,10 +50,10 @@ class P2PActionProvider(
             override fun onGameAction(producer: CoachId, serverIndex: GameActionId, action: GameAction) {
                 // TODO Should this be moved into RemoteActionProvider somehow?
                 lastServerActionIndex = serverIndex
-                if (producer == engine.state.homeTeam.coach.id) {
-                    homeProvider.userActionSelected(action)
-                } else {
+                if (producer == engine.state.awayTeam.coach.id) { // TODO Is this check always correct?
                     awayProvider.userActionSelected(action)
+                } else {
+                    homeProvider.userActionSelected(action)
                 }
             }
 
@@ -135,8 +135,10 @@ class P2PActionProvider(
     override suspend fun getAction(): GameAction {
         if (handlingServerRevert) {
             val action = queuedServerActions.removeFirst()
+            LOG.i { "Handling revert: $handlingServerRevert -> $action" }
             return action
         } else {
+            LOG.i { "GetAction($currentProvider)" }
             return currentProvider.getAction()
         }
     }

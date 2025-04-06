@@ -10,6 +10,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 /**
  * This class represents the server used in P2P scenarios and will be started and controlled
@@ -24,6 +25,7 @@ class LightServer(
     clientTeam: Team? = null, // If set, only this client team can join
     initialActions: List<GameAction> = emptyList(),
     testMode: Boolean = false, // If `true`, event handling is done in a deterministic manner
+    random: Random = Random.Default,
 ) {
     companion object {
         val LOG = jervisLogger()
@@ -45,6 +47,7 @@ class LightServer(
             clientCoach,
             clientTeam,
             testMode,
+            random
         )
         gameCache.safeAddGame(session)
     }
