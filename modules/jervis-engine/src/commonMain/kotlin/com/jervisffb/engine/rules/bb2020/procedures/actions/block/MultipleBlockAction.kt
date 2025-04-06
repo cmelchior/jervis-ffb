@@ -246,10 +246,11 @@ object MultipleBlockAction: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val attacker = state.getContext<MultipleBlockContext>().attacker
+            val defender = state.getContext<MultipleBlockContext>().getActiveDefender() ?: INVALID_GAME_STATE("No active defender: ${state.getContext<MultipleBlockContext>()}")
             val availableBlockTypes = BlockAction.getAvailableBlockType(attacker, true)
             return listOf(
                 SelectBlockType(availableBlockTypes),
-                DeselectPlayer(attacker)
+                DeselectPlayer(defender),
             )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -257,7 +258,9 @@ object MultipleBlockAction: Procedure() {
             return when (action) {
                 is PlayerDeselected -> {
                     val player = action.getPlayer(state)
-                    if (player != context.getActiveDefender()) INVALID_ACTION(action)
+                    if (player != context.getActiveDefender()) {
+                        INVALID_ACTION(action, "Player is not the active defender: ${player.id} vs. ${context.getActiveDefender()?.id}")
+                    }
                     compositeCommandOf(
                         SetContext(context.copyAndUnsetDefender(player)),
                         GotoNode(SelectDefenderOrAbortActionOrContinueBlock)
