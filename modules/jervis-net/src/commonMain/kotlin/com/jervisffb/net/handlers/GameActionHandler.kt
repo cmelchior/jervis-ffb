@@ -15,7 +15,9 @@ import com.jervisffb.net.messages.InvalidGameActionOwnerServerError
 import com.jervisffb.net.messages.InvalidGameActionTypeServerError
 import com.jervisffb.net.messages.OutOfOrderGameActionServerError
 import com.jervisffb.net.messages.UnknownServerError
+import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
+import kotlin.uuid.Uuid.Companion.random
 
 class GameActionHandler(override val session: GameSession) : ClientMessageHandler<GameActionMessage>() {
 
@@ -78,9 +80,10 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
             val coach = game.getAvailableActions().team?.coach ?: game.state.homeTeam.coach
             handleAction(session, game, coach.id, message.action, connection)
         } catch (ex: InvalidActionException) {
+            val errorMessage = "Server state: [currentNode=${game.currentNode()}, actionIndex=${message.clientIndex}\n${ex.stackTraceToString()}"
             session.out.sendError(
                 connection,
-                InvalidGameActionTypeServerError(message.clientIndex, ex.stackTraceToString()),
+                InvalidGameActionTypeServerError(message.clientIndex, errorMessage),
             )
         } catch (ex: Exception) {
             session.out.sendError(
@@ -90,6 +93,8 @@ class GameActionHandler(override val session: GameSession) : ClientMessageHandle
         }
     }
 }
+
+private val LOG = jervisLogger()
 
 suspend fun handleAction(
     session: GameSession,
@@ -114,7 +119,7 @@ suspend fun handleAction(
     // in the network protocol first
     val serverDiceRolls = !session.gameSettings.clientSelectedDiceRolls
     while (serverDiceRolls && availableActions.containsActionWithRandomBehavior()) {
-        val action = createRandomAction(game.state, availableActions)
+        val action = createRandomAction(game.state, availableActions, session.random)
         game.handleAction(action)
         // If no producer, we just set it to the Home Team
         val producer = session.coaches.firstOrNull { it.coach == availableActions.team?.coach } ?: session.coaches.first()
@@ -139,7 +144,7 @@ suspend fun rollForwardToUserAction(session: GameSession, game: GameEngineContro
         session.game?.state?.rules?.diceRollsOwner == DiceRollOwner.ROLL_ON_SERVER
         && availableActions.containsActionWithRandomBehavior()
     ) {
-        val action = createRandomAction(game.state, availableActions)
+        val action = createRandomAction(game.state, availableActions, session.random)
         game.handleAction(action)
         // If no producer, we just set it to the Home Team
         val producer = session.coaches.firstOrNull { it.coach == availableActions.team?.coach } ?: session.coaches.first()

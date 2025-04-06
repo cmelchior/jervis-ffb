@@ -96,6 +96,7 @@ class Game(
 
     companion object
 
+    @Transient
     val idGenerator = IdGenerator()
 
     // Track all current active procedures.
@@ -238,6 +239,10 @@ class Game(
         return homeTeam.firstOrNull { it.id == id } ?: awayTeam.firstOrNull { it.id == id } ?: INVALID_GAME_STATE("Player with $id not found")
     }
 
+    /**
+     * Returns the [RerollSource] for a given [RerollSourceId]. If not found an
+     * [InvalidGameStateException] is thrown
+     */
     fun getRerollSourceById(id: RerollSourceId): RerollSource {
         // Optimize this
         return homeTeam.rerolls.firstOrNull { it.id == id }

@@ -1,5 +1,6 @@
 package com.jervisffb.utils
 
+import co.touchlab.kermit.LogWriter
 import kotlinx.browser.window
 
 public actual fun threadId(): ULong {
@@ -32,6 +33,10 @@ public actual fun getPlatformDescription(): String {
 
 public actual fun initializePlatform() {
     // Do nothing
+}
+
+public actual fun getPlatformLogWriter(): LogWriter? {
+    return null // Unclear if we want to do anything on Web?
 }
 
 public actual fun copyToClipboard(text: String) {

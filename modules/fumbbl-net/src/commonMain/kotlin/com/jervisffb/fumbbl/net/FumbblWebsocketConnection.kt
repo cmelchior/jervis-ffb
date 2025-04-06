@@ -3,6 +3,7 @@ package com.jervisffb.fumbbl.net
 import com.jervisffb.fumbbl.net.api.commands.ClientCommand
 import com.jervisffb.fumbbl.net.api.commands.ServerCommand
 import com.jervisffb.utils.getHttpClient
+import com.jervisffb.utils.jervisLogger
 import io.ktor.client.plugins.websocket.receiveDeserialized
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.plugins.websocket.webSocket
@@ -20,6 +21,11 @@ import kotlinx.coroutines.launch
  * to know which messages to send and receive.
  */
 class FumbblWebsocketConnection() {
+
+    companion object {
+        val LOG = jervisLogger()
+    }
+
     private val scope = CoroutineScope(CoroutineName("FumbblWebsocket"))
 
     // Messages sent from the server. Users of this class
@@ -42,20 +48,20 @@ class FumbblWebsocketConnection() {
                 launch {
                     while (this.isActive) {
                         val outgoingMessage: ClientCommand = this@FumbblWebsocketConnection.outgoing.receive()
-                        println("Sending: $outgoingMessage")
+                        LOG.i { "[Server] Sending: $outgoingMessage" }
                         sendSerialized<ClientCommand>(outgoingMessage)
                     }
                 }
                 launch {
                     while (this.isActive) {
                         val incomingMessage: ServerCommand = receiveDeserialized<ServerCommand>()
-                        println("Received: $incomingMessage")
+                        LOG.i { "[Server] Received: $incomingMessage" }
                         this@FumbblWebsocketConnection.incoming.send(incomingMessage)
                     }
                 }
                 launch {
                     val closing: CloseReason? = closeReason.await()
-                    println("Closing websocket: ${closing?.toString() ?: "null"}")
+                    LOG.i { "Closing websocket: ${closing?.toString() ?: "null"}" }
                 }
             }
         }

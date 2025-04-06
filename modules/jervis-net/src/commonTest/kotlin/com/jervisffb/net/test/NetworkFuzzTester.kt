@@ -1,6 +1,5 @@
 package com.jervisffb.net.test
 
-import co.touchlab.kermit.Logger.Companion.e
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.EndSetup

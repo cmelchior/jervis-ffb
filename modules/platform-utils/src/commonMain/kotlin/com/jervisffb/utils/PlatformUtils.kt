@@ -1,5 +1,7 @@
 package com.jervisffb.utils
 
+import co.touchlab.kermit.LogWriter
+
 /**
  * Return the current thread id.
  */
@@ -42,6 +44,12 @@ public expect fun getPlatformDescription(): String
  * Run initializing logic that is platform-specific, like logging.
  */
 public expect fun initializePlatform()
+
+/**
+ * Returns a platform specfic LogWriter that will be appended
+ * to all loggers.
+ */
+public expect fun getPlatformLogWriter(): LogWriter?
 
 /**
  * Copies a piece of text to the system clipboard.

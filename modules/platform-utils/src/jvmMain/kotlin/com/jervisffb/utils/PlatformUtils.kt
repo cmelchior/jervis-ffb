@@ -1,11 +1,15 @@
 package com.jervisffb.utils
 
+import co.touchlab.kermit.LogWriter
+import co.touchlab.kermit.Severity
+import kotlinx.datetime.Clock
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.io.File
+import java.io.FileWriter
 import java.io.OutputStream
-import java.io.PrintStream
+import java.io.PrintWriter
 import java.net.URI
 
 public actual fun threadId(): ULong {
@@ -67,7 +71,17 @@ class TeeOutputStream(
 
     override fun write(b: Int) {
         system.write(b)
-        this.file.write(b)
+        file.write(b)
+    }
+
+    override fun write(b: ByteArray?) {
+        system.write(b)
+        file.write(b)
+    }
+
+    override fun write(b: ByteArray?, off: Int, len: Int) {
+        system.write(b, off, len)
+        file.write(b, off, len)
     }
 
     override fun flush() {
@@ -82,15 +96,29 @@ class TeeOutputStream(
 }
 
 public actual fun initializePlatform() {
+    val applicationDir = File(APPLICATION_DIRECTORY)
+    applicationDir.mkdirs()
+}
+
+public actual fun getPlatformLogWriter(): LogWriter? {
     // To be sure that logs are not just silently ignored we save them to a file on disk.
     // This is relevant on e.g. MacOS. The file will be reused every time the application
     // is opened, so space should not be a big concern.
-    val logFile = File("$APPLICATION_DIRECTORY${File.separator}log.txt")
-    logFile.parentFile.mkdirs()
-    val teeOut = PrintStream(TeeOutputStream(System.out, logFile.outputStream().buffered()), true)
-    System.setOut(teeOut)
-    System.setErr(teeOut)
+    return object: LogWriter() {
+        private val writer: PrintWriter
+        init {
+            val logFile = File("$APPLICATION_DIRECTORY${File.separator}log.txt")
+            logFile.parentFile.mkdirs()
+            writer = PrintWriter(FileWriter(logFile, true))
+        }
+        override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
+            val throwableMsg = if (throwable == null) "" else "\n${throwable.stackTraceToString()}"
+            writer.println("${Clock.System.now().toString()} ${severity.name}: $message$throwableMsg")
+            writer.flush()
+        }
+    }
 }
+
 
 public actual fun copyToClipboard(text: String) {
     val clipboard = Toolkit.getDefaultToolkit().systemClipboard

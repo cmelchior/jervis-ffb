@@ -147,7 +147,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         scope.launch {
             var message: ServerMessage? = null
             while (connection?.receiveOrNull().also { message = it } != null) {
-                LOG.d { "[Client] Received message: $message" }
+                LOG.d { "[Client-${coachName}] Received message: $message" }
                 handleMessage(message)
             }
         }

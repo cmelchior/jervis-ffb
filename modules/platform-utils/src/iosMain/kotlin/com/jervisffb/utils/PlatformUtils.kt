@@ -1,5 +1,6 @@
 package com.jervisffb.utils
 
+import co.touchlab.kermit.LogWriter
 import platform.UIKit.UIDevice
 import platform.UIKit.UIPasteboard
 
@@ -33,6 +34,10 @@ public actual fun getPlatformDescription(): String {
 
 public actual fun initializePlatform() {
     // Do nothing
+}
+
+public actual fun getPlatformLogWriter(): LogWriter? {
+    return null // Unclear if we want to do anything on iOS?
 }
 
 public actual fun copyToClipboard(text: String) {

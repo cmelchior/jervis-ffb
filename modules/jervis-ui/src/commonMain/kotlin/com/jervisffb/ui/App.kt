@@ -24,8 +24,8 @@ val FILE_MANAGER = FileManager()
 val PROPERTIES_MANAGER = PropertiesManager()
 
 fun initApplication() {
-
     initializePlatform()
+    val LOG = jervisLogger()
 
     @OptIn(DelicateCoroutinesApi::class)
     GlobalScope.launch {
@@ -36,12 +36,12 @@ fun initApplication() {
         val isClientInitialized = PROPERTIES_MANAGER.getBoolean(PROP_INITIALIZED) ?: false
         val initializedVersion = PROPERTIES_MANAGER.getString(PROP_INITIALIZED_VERSION)
         if (!isClientInitialized || initializedVersion != clientReleaseVersion) {
-            jervisLogger().i { "Initializing application: $clientReleaseVersion" }
+            LOG.i { "Initializing application: $clientReleaseVersion" }
             CacheManager.createInitialTeamFiles()
             PROPERTIES_MANAGER.setProperty(PROP_INITIALIZED, true)
             PROPERTIES_MANAGER.setProperty(PROP_INITIALIZED_VERSION, clientReleaseVersion)
         } else {
-            jervisLogger().i { "Application already initialized. Skipping." }
+            LOG.i { "Application already initialized. Skipping." }
         }
     }
 }
