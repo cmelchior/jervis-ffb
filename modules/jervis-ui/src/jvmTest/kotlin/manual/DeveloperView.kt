@@ -13,12 +13,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.ContentScale
@@ -33,8 +39,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.roster_logo_chaos_chosen
+import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.PI
@@ -173,6 +182,11 @@ private fun TeamInfoSection(
     treasury: Int,
     teamValue: Int
 ) {
+    var logo: ImageBitmap? by remember { mutableStateOf(null) }
+    LaunchedEffect(Unit) {
+        logo = IconFactory.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("roster/logo/roster_logo_chaos_chosen.png"), LogoSize.SMALL)
+    }
+
     Row(modifier = Modifier.background(JervisTheme.rulebookPaperMediumDark)) {
         Column(
             modifier = Modifier.weight(1f).padding(4.dp),
@@ -185,11 +199,13 @@ private fun TeamInfoSection(
             TeamDataRow("Current Team Value", "900 K", "Apothecary", if (apothecary > 0) "Yes" else "No")
         }
         Box(modifier = Modifier.align(Alignment.CenterVertically).background(JervisTheme.rulebookPaperMediumDark).padding(end = 16.dp)) {
-            Image(
-                painter = painterResource(Res.drawable.roster_logo_chaos_chosen),
-                contentDescription = "",
-                contentScale = ContentScale.FillHeight,
-            )
+            logo?.let {
+                Image(
+                    bitmap = it,
+                    contentDescription = "",
+                    contentScale = ContentScale.FillHeight,
+                )
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,9 +47,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.roster_logo_dark_elf
-import com.jervisffb.jervis_ui.generated.resources.roster_logo_elven_union
+import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.Point
@@ -75,6 +78,14 @@ fun mainVs() =
 
 @Composable
 fun TeamCard() {
+
+    var darkElfLogo: ImageBitmap? by remember { mutableStateOf(null) }
+    var elvenUnionLogo: ImageBitmap? by remember { mutableStateOf(null) }
+    LaunchedEffect(Unit) {
+        darkElfLogo = IconFactory.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("roster/logo/roster_logo_dark_elf.png"), LogoSize.SMALL)
+        darkElfLogo = IconFactory.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("roster/logo/roster_logo_elven_union.png"), LogoSize.SMALL)
+    }
+
     val cornerShape = with(LocalDensity.current) { 16.dp.toPx() }
     val arrowWidth = with(LocalDensity.current) { 8.dp.toPx() }
     val arrowHeight = with(LocalDensity.current) { 12.dp.toPx() }
@@ -205,12 +216,14 @@ fun TeamCard() {
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Box(modifier = Modifier.wrapContentSize()) {
-                                    Image(
-                                        modifier = Modifier.width(192.dp),
-                                        painter = painterResource(Res.drawable.roster_logo_dark_elf),
-                                        contentScale = ContentScale.FillWidth,
-                                        contentDescription = null,
-                                    )
+                                    darkElfLogo?.let {
+                                        Image(
+                                            modifier = Modifier.width(192.dp),
+                                            bitmap = it,
+                                            contentScale = ContentScale.FillWidth,
+                                            contentDescription = null,
+                                        )
+                                    }
                                 }
                                 Text(
                                     text = "Dark Elf Starter #1",
@@ -261,12 +274,14 @@ fun TeamCard() {
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Box(modifier = Modifier.wrapContentSize()) {
-                                    Image(
-                                        modifier = Modifier.width(192.dp),
-                                        painter = painterResource(Res.drawable.roster_logo_elven_union),
-                                        contentScale = ContentScale.FillWidth,
-                                        contentDescription = null,
-                                    )
+                                    elvenUnionLogo?.let {
+                                        Image(
+                                            modifier = Modifier.width(192.dp),
+                                            bitmap = it,
+                                            contentScale = ContentScale.FillWidth,
+                                            contentDescription = null,
+                                        )
+                                    }
                                 }
                                 Text(
                                     text = "Elven Union Starter #1",
