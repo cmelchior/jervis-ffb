@@ -48,6 +48,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.random.Random
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.seconds
@@ -58,7 +59,7 @@ import kotlin.time.Duration.Companion.seconds
  *
  * For now, this class has to be run manually.
  **/
-//@Ignore // Comment out to run
+@Ignore // Comment out to run
 class NetworkFuzzTester {
 
     @Test

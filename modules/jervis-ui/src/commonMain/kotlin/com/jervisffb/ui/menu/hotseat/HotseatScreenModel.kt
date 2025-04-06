@@ -193,7 +193,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                 GameSettings(gameRules = rules, isHotseatGame = true),
             )
             // For now, we only support the Random AI player, so create it directly
-            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.HOME_TEAM, gameController, true).also { it.startActionProvider() }
+            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.HOME_TEAM, gameController, isServer = true).also { it.startActionProvider() }
         }
 
         val awayActionProvider = when (selectAwayTeamModel.setupCoachModel.playerType.value) {
@@ -204,7 +204,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                 GameSettings(gameRules = rules, isHotseatGame = true),
             )
             // For now, we only support the Random AI player, so create it directly
-            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.AWAY_TEAM, gameController, true).also { it.startActionProvider() }
+            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.AWAY_TEAM, gameController, isServer = true).also { it.startActionProvider() }
         }
 
         val actionProvider = LocalActionProvider(

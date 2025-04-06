@@ -79,7 +79,7 @@ class BreakTackleTests: JervisGameTest() {
                 val context = state.getContext<DodgeRollContext>()
                 val roll = context.roll!!
                 val reroll = context.player.team.availableRerolls.first()
-                RerollOptionSelected(DiceRerollOption(reroll, listOf(roll)))
+                RerollOptionSelected(DiceRerollOption(reroll.id, listOf(roll)))
             },
             DiceRollResults(2.d6), // Dodge roll, should now succeed
         )

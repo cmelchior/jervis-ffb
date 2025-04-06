@@ -3,10 +3,6 @@ package com.jervisffb.engine.model
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.engine.utils.safeTryEmit
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 
 /**
  * Internal representation of the Blood Bowl playing area. This representation
@@ -88,14 +84,6 @@ class Field(val width: Int, val height: Int) : Iterable<FieldSquare> {
             }
         }
     }
-
-    fun notifyFieldChange() {
-        // TODO Snapshot the field?
-        _fieldState.safeTryEmit(this)
-    }
-
-    private val _fieldState = MutableSharedFlow<Field>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
-    val fieldFlow: SharedFlow<Field> = _fieldState
 
     companion object {
         fun createForRuleset(rules: Rules): Field = Field(rules.fieldWidth, rules.fieldHeight)

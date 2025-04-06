@@ -150,7 +150,7 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach
     lateinit var turnData: TeamTurnData
 
     var turnMarker by Delegates.observable(0) { prop, old, new ->
-//        game.gameFlow.safeTryEmit(game)
+        // Do nothing
     }
 
     // TODO Add support for custom team logos that are different from

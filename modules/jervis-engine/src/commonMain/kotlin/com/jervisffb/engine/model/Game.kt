@@ -22,6 +22,7 @@ import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.serialization.Transient
 import kotlin.properties.Delegates
 
 // TODO Just keep it as a singleton until we explore the requirements further.
@@ -42,11 +43,6 @@ import kotlin.properties.Delegates
  * the mix.
  */
 class IdGenerator {
-    private data class Snapshot(
-        val diceId: Int,
-        val logId: Int,
-    )
-
     private var diceId: Int = 0
     private var logId: Int = 0
 
@@ -116,10 +112,10 @@ class Game(
     // Game progress
     var abortIfBallOutOfBounds: Boolean = false
     var halfNo by Delegates.observable(0) { prop, old, new ->
-//        gameFlow.safeTryEmit(this)
+        // Do nothing
     }
     var driveNo by Delegates.observable(0) { prop, old, new ->
-//        gameFlow.safeTryEmit(this)
+        // Do nothing
     }
 
     // Global state properties
@@ -251,9 +247,6 @@ class Game(
             ?: awayTeam.flatMap { it.skills.filterIsInstance<RerollSource>() }.firstOrNull { skill-> skill.id == id }
             ?: INVALID_GAME_STATE("Reroll $id could not be found")
     }
-
-//    @Transient
-//    val gameFlow = MutableSharedFlow<Game>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     fun currentProcedure(): ProcedureState? = stack.peepOrNull()
 
