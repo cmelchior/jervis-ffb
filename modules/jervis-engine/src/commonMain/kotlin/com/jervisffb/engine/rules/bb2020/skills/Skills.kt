@@ -1,6 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.skills
 
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.SkillId
@@ -11,7 +12,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.UseStandardSkillReroll
 import com.jervisffb.engine.rules.bb2020.procedures.UseTeamReroll
 import kotlinx.serialization.Serializable
-import kotlin.random.Random
 
 @Serializable
 sealed interface TeamReroll : RerollSource {
@@ -35,7 +35,7 @@ sealed interface TeamReroll : RerollSource {
         value: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): List<DiceRerollOption> {
-        return listOf(DiceRerollOption(this, value))
+        return listOf(DiceRerollOption(this.id, value))
     }
 }
 
@@ -64,8 +64,7 @@ class BrilliantCoachingReroll(val teamId: TeamId) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-brilliant-coaching")
     override val carryOverIntoOvertime: Boolean = false
     override val duration = Duration.END_OF_DRIVE
-    override val rerollResetAt: Duration =
-        Duration.END_OF_HALF
+    override val rerollResetAt: Duration = Duration.END_OF_HALF
     override val rerollDescription: String = "Team Reroll (Brilliant Coaching)"
     override var rerollUsed: Boolean = false
 }
@@ -111,7 +110,7 @@ interface D6StandardSkillReroll : RerollSource {
     ): List<DiceRerollOption> {
         // For standard skills
         if (value.size != 1) error("Unsupported number of dice: ${value.joinToString()}")
-        return listOf(DiceRerollOption(this, value))
+        return listOf(DiceRerollOption(this.id, value))
     }
 }
 
@@ -130,10 +129,15 @@ interface SpecialActionProvider {
 
 @Serializable
 data class DiceRerollOption(
-    val source: RerollSource,
+    val rerollId: RerollSourceId,
     val dice: List<DieRoll<*>>,
 ) {
-    constructor(source: RerollSource, dieRoll: DieRoll<*>): this(source, listOf(dieRoll))
+    constructor(rerollId: RerollSourceId, dieRoll: DieRoll<*>): this(rerollId, listOf(dieRoll))
+    constructor(source: RerollSource, dieRoll: DieRoll<*>): this(source.id, listOf(dieRoll))
+
+    fun getRerollSource(game: Game): RerollSource {
+        return game.getRerollSourceById(rerollId)
+    }
 }
 
 // When does the "used" state reset?

@@ -27,7 +27,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.rules.bb2020.skills.Pro
-import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 
 /**
  * Procedure for handling the Prayer to Nuffle "Blessed Statue of Nuffle" as described on page 39

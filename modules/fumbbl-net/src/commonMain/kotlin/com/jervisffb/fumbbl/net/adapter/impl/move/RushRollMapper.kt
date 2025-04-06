@@ -52,8 +52,8 @@ object RushRollMapper: CommandActionMapper {
                         .first { it is SelectRerollOption }
                         .let { it as SelectRerollOption }
                     val selectedOption = when (fumbblSource) {
-                        "Team ReRoll" -> rerollOptions.options.first { it.source is RegularTeamReroll }
-                        "Sure Feet" -> rerollOptions.options.first { it.source is SureFeet }
+                        "Team ReRoll" -> rerollOptions.options.first { it.getRerollSource(state) is RegularTeamReroll }
+                        "Sure Feet" -> rerollOptions.options.first { it.getRerollSource(state) is SureFeet }
                         else -> INVALID_GAME_STATE("No matching reroll: $rerollOptions")
                     }
                     RerollOptionSelected(selectedOption)

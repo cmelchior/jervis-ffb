@@ -69,11 +69,11 @@ object KnuckleDusters : Procedure() {
                         compositeCommandOf(
                             AddPlayerSkill(player,
                                 MightyBlow(
-                                        skillId = SkillId("${player.id.value}-MightyBlow"),
-                                        value = 1,
-                                        isTemporary = true,
-                                        expiresAt = Duration.END_OF_DRIVE
-                                    )
+                                    skillId = SkillId("${player.id.value}-MightyBlow"),
+                                    value = 1,
+                                    isTemporary = true,
+                                    expiresAt = Duration.END_OF_DRIVE
+                                )
                             ),
                             ReportGameProgress("${player.name} received Knuckle Dusters"),
                             ExitProcedure(),

@@ -159,7 +159,7 @@ class BlockActionTests: JervisGameTest() {
             CalculatedAction { _, _ ->
                 controller.getAvailableActions().filterIsInstance<SelectRerollOption>()
                     .first().options
-                    .first { it.source is TeamReroll }
+                    .first { it.getRerollSource(state) is TeamReroll }
                     .let { RerollOptionSelected(it) }
             },
             DiceRollResults(6.dblock, 6.dblock),

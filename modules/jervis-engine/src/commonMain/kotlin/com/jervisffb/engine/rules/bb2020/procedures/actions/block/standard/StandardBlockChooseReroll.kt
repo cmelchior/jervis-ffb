@@ -21,11 +21,11 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
-import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -100,12 +100,11 @@ object StandardBlockChooseReroll: Procedure() {
         return if (availableSkills.isEmpty() && (!hasTeamRerolls || !allowedToUseTeamReroll)) {
             emptyList()
         } else {
-            val teamRerolls = if (hasTeamRerolls && allowedToUseTeamReroll) {
+            val teamRerolls: List<DiceRerollOption> = if (hasTeamRerolls && allowedToUseTeamReroll) {
                 listOf(
                     DiceRerollOption(
-                        rules.getAvailableTeamReroll(
-                            team
-                        ), diceRoll
+                        rules.getAvailableTeamReroll(team).id,
+                        diceRoll
                     )
                 )
             } else {

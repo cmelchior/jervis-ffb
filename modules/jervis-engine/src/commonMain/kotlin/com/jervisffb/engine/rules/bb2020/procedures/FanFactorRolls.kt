@@ -18,8 +18,8 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportFanFactor
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.DiceRollType
+import com.jervisffb.engine.rules.Rules
 
 /**
  * This procedure controls rolling for "The Fans" as described on page

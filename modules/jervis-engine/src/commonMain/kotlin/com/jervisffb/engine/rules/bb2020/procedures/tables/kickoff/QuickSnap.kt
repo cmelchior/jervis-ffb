@@ -32,10 +32,10 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportQuickSnapResult
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquareContext
-import com.jervisffb.engine.rules.DiceRollType
 
 data class QuickSnapContext(
     val roll: D3Result,

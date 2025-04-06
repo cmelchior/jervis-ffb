@@ -32,6 +32,7 @@ import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Direction
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
@@ -50,7 +51,7 @@ data class SingleChoiceInputDialog(
     override var owner: Team? = null,
 ) : UserInputDialog {
     companion object {
-        private fun getDescription(action: GameAction): String {
+        private fun getDescription(state: Game, action: GameAction): String {
             return when (action) {
                 Confirm -> "Confirm"
                 Continue -> "Continue"
@@ -69,7 +70,7 @@ data class SingleChoiceInputDialog(
                 is CoinTossResult -> action.result.name
                 is RandomPlayersSelected -> "Random players: $action"
                 is NoRerollSelected -> "No reroll"
-                is RerollOptionSelected -> action.option.source.rerollDescription
+                is RerollOptionSelected -> action.option.getRerollSource(state).rerollDescription
                 Undo -> TODO()
                 Revert -> TODO()
                 is MoveTypeSelected -> action.moveType.toString()
@@ -88,8 +89,14 @@ data class SingleChoiceInputDialog(
             title: String,
             message: String,
             actions: List<GameAction>,
+            state: Game
         ): SingleChoiceInputDialog {
-            return SingleChoiceInputDialog(null, title, message, actions.map { Pair(it, getDescription(it)) })
+            return SingleChoiceInputDialog(
+                null,
+                title,
+                message,
+                actions.map { Pair(it, getDescription(state, it)) }
+            )
         }
 
         private fun createWithDescription(
@@ -107,13 +114,18 @@ data class SingleChoiceInputDialog(
             title = "Call Coin Toss Outcome",
             message = "${team.name} must select a side of the coin",
             actions = actions,
+            state = team.game
         )
 
-        fun createTossDialog(actions: List<GameAction>): SingleChoiceInputDialog =
+        fun createTossDialog(
+            state: Game,
+            actions: List<GameAction>)
+        : SingleChoiceInputDialog =
             create(
                 title = "Coin Toss",
                 message = "Flip coin into the air",
                 actions = actions,
+                state = state
             )
 
         fun createChooseToKickoffDialog(
@@ -131,6 +143,7 @@ data class SingleChoiceInputDialog(
                 title = "Invalid Setup",
                 message = "Invalid setup, please try again",
                 actions = listOf(Confirm),
+                state = team.game
             )
 
         fun createCatchBallDialog(
@@ -141,6 +154,7 @@ data class SingleChoiceInputDialog(
                 title = "Catch Ball",
                 message = "Roll D6 for ${player.name}",
                 actions = actions,
+                state = player.team.game
             )
 
         fun createPickupBallDialog(
@@ -151,9 +165,11 @@ data class SingleChoiceInputDialog(
                 title = "Pickup Ball",
                 message = "Roll D6 for ${player.name}",
                 actions = actions,
+                state = player.team.game
             )
 
         fun createCatchRerollDialog(
+            state: Game,
             actions: List<GameAction>,
         ): SingleChoiceInputDialog {
             val message = "Reroll catching the ball?"
@@ -161,10 +177,12 @@ data class SingleChoiceInputDialog(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
+                state = state
             )
         }
 
         fun createPickupRerollDialog(
+            state: Game,
             actions: List<GameAction>,
         ): SingleChoiceInputDialog {
             val message = "<Insert result of rolling D6>"
@@ -172,16 +190,19 @@ data class SingleChoiceInputDialog(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
+                state = state
             )
         }
 
         fun createChooseBlockResultOrReroll(
+            state: Game,
             actions: List<GameAction>): SingleChoiceInputDialog {
             val message = "Choose result of block"
             return create(
                 title = "Choose Reroll or Result",
                 message = message,
                 actions = actions,
+                state = state,
             )
         }
 
@@ -242,21 +263,29 @@ data class SingleChoiceInputDialog(
             )
         }
 
-        fun createRushRerollDialog(actions: List<GameAction>): SingleChoiceInputDialog {
+        fun createRushRerollDialog(
+            state: Game,
+            actions: List<GameAction>
+        ): SingleChoiceInputDialog {
             val message = "Reroll Rush?"
             return create(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
+                state = state,
             )
         }
 
-        fun createDodgeRerollDialog(actions: List<GameAction>): SingleChoiceInputDialog {
+        fun createDodgeRerollDialog(
+            state: Game,
+            actions: List<GameAction>
+        ): SingleChoiceInputDialog {
             val message = "Reroll Dodge?"
             return create(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
+                state = state
             )
         }
     }

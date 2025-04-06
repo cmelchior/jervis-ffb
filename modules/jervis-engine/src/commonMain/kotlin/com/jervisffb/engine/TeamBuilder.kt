@@ -14,7 +14,6 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
-import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.serialize.PlayerUiData

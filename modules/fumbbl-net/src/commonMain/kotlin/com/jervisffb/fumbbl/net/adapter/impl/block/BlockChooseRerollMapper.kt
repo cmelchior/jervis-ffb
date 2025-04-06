@@ -51,11 +51,11 @@ object BlockChooseRerollMapper: CommandActionMapper {
             action = { state: Game, rules: Rules ->
                 StandardBlockChooseReroll.ReRollSourceOrAcceptRoll.getAvailableActions(state, rules)
                     .first { it is SelectRerollOption }
-                    .let { (it as SelectRerollOption).options.first { option -> option.source is RegularTeamReroll } }
+                    .let { (it as SelectRerollOption).options.first { option -> option.getRerollSource(state) is RegularTeamReroll } }
                     .let { option ->
                         RerollOptionSelected(
                             DiceRerollOption(
-                                option.source,
+                                option.rerollId,
                                 option.dice
                             )
                         )

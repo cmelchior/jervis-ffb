@@ -30,8 +30,8 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.reports.ReportPitchInvasionRoll
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.DiceRollType
+import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 data class PitchInvasionContext(

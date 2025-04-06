@@ -44,13 +44,13 @@ data class SetupTabDescription(
 )
 
 private val defaultRulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
+    DropdownEntryWithValue("Blood Bowl 2020 Rules (Strict)", StandardBB2020Rules()),
+    DropdownEntryWithValue("Fumbbl Compatible BB2020 Rules", FumbblBB2020Rules()),
     DropdownEntryWithValue("Blood Bowl 2020 Rules (Dev Settings)", StandardBB2020Rules().toBuilder().run {
         diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
         undoActionBehavior = UndoActionBehavior.ALLOWED
         build()
     }),
-    DropdownEntryWithValue("Blood Bowl 2020 Rules (Strict)", StandardBB2020Rules()),
-    DropdownEntryWithValue("Fumbbl Compatible BB2020 Rules", FumbblBB2020Rules()),
 )
 
 /**

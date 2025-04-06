@@ -68,10 +68,10 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
-import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.Skill
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -287,7 +287,7 @@ fun calculateAvailableRerollsFor(
     } else {
         val teamReroll = if (hasTeamRerolls && allowedToUseTeamReroll) {
             listOf(
-                DiceRerollOption(rules.getAvailableTeamReroll(team), listOf(roll))
+                DiceRerollOption(rules.getAvailableTeamReroll(team).id, listOf(roll))
             )
         } else {
             emptyList()

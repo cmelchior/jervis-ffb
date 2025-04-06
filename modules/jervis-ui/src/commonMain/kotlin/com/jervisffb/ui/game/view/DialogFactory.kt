@@ -106,6 +106,7 @@ object DialogFactory {
 
                 is StandardBlockChooseReroll.ReRollSourceOrAcceptRoll -> {
                     SingleChoiceInputDialog.createChooseBlockResultOrReroll(
+                        state = controller.state,
                         mapUnknownActions(controller.getAvailableActions()),
                     )
                 }
@@ -153,6 +154,7 @@ object DialogFactory {
 
                 is CatchRoll.ChooseReRollSource -> {
                     SingleChoiceInputDialog.createCatchRerollDialog(
+                        state = controller.state,
                         mapUnknownActions(controller.getAvailableActions()),
                     )
                 }
@@ -184,7 +186,9 @@ object DialogFactory {
                 }
 
                 is DetermineKickingTeam.CoinToss -> {
-                    SingleChoiceInputDialog.createTossDialog(CoinTossResult.allOptions())
+                    SingleChoiceInputDialog.createTossDialog(
+                        state = controller.state,
+                        CoinTossResult.allOptions())
                 }
 
                 is DetermineKickingTeam.SelectCoinSide -> {
@@ -212,6 +216,7 @@ object DialogFactory {
 
                 is DodgeRoll.ChooseReRollSource -> {
                     SingleChoiceInputDialog.createDodgeRerollDialog(
+                        state = controller.state,
                         mapUnknownActions(controller.getAvailableActions()),
                     )
                 }
@@ -232,6 +237,7 @@ object DialogFactory {
 
                 is PickupRoll.ChooseReRollSource -> {
                     SingleChoiceInputDialog.createPickupRerollDialog(
+                        state = controller.state,
                         mapUnknownActions(controller.getAvailableActions()),
                     )
                 }
@@ -291,6 +297,7 @@ object DialogFactory {
 
                 is RushRoll.ChooseReRollSource -> {
                     SingleChoiceInputDialog.createRushRerollDialog(
+                        state = controller.state,
                         mapUnknownActions(controller.getAvailableActions()),
                     )
                 }

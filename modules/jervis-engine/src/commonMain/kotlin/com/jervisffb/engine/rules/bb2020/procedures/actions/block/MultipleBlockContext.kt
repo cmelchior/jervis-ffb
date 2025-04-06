@@ -17,13 +17,13 @@ import com.jervisffb.engine.rules.BlockType.MULTIPLE_BLOCK
 import com.jervisffb.engine.rules.BlockType.PROJECTILE_VOMIT
 import com.jervisffb.engine.rules.BlockType.STAB
 import com.jervisffb.engine.rules.BlockType.STANDARD
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

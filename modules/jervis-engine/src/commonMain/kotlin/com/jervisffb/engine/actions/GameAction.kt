@@ -298,7 +298,7 @@ data class FieldSquareSelected(val coordinate: FieldCoordinate) : GameAction {
 data class RandomPlayersSelected(val players: List<PlayerId>) : GameAction {
     fun getPlayers(state: Game): List<Player> {
         return players.map {
-            state.getPlayerById(it) ?: error("No player with id $it")
+            state.getPlayerById(it)
         }
     }
 }
@@ -306,8 +306,7 @@ data class RandomPlayersSelected(val players: List<PlayerId>) : GameAction {
 @Serializable
 data class RerollOptionSelected(val option: DiceRerollOption, val dicePoolId: Int = 0) : GameAction {
     fun getRerollSource(state: Game): RerollSource {
-        return option.source
-//        return state.getRerollSourceById(option.source)
+        return state.getRerollSourceById(option.rerollId)
     }
 }
 
