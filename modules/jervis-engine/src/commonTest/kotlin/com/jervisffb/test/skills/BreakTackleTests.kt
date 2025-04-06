@@ -38,7 +38,7 @@ class BreakTackleTests: JervisGameTest() {
         state.apply {
             // Should be on LoS
             awayTeam[PlayerNo(1)].apply {
-                addSkill(BreakTackle())
+                addSkill(BreakTackle.Factory)
                 strength = 4
             }
         }

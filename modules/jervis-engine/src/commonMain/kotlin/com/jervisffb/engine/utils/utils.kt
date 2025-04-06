@@ -71,6 +71,7 @@ import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
+import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.Skill
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -185,12 +186,13 @@ fun createRandomAction(
 ): GameAction {
 
     // Hacky way to inject events. Should probably try to add some kind of Developer UI
-    // for this.
+    // for this. See the `randomList` above` this function.
     if (randomList.isNotEmpty()) {
         return randomList.removeAt(0)
     }
 
-    // Select a random action but disallow certain ones
+    // Select a random action but disallow certain ones:
+    // - EndAction: Do not call this to prevent a player stopping their turn too soon
     var actionDesc: GameActionDescriptor? = null
     val filtered = availableActions.filter { it != EndActionWhenReady }
     if (filtered.isEmpty()) {

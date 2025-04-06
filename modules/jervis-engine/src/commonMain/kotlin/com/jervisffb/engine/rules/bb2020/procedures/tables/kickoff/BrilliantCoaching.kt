@@ -82,10 +82,10 @@ object BrilliantCoaching : Procedure() {
             return compositeCommandOf(
                 when {
                     kickingResult > receivingResult -> AddTeamReroll(state.kickingTeam,
-                        BrilliantCoachingReroll(state.kickingTeam)
+                        BrilliantCoachingReroll(state.kickingTeam.id)
                     )
                     kickingResult < receivingResult -> AddTeamReroll(state.receivingTeam,
-                        BrilliantCoachingReroll(state.receivingTeam)
+                        BrilliantCoachingReroll(state.receivingTeam.id)
                     )
                     kickingResult == receivingResult -> null
                     else -> INVALID_GAME_STATE("Unknown case when resolving brilliant coaching: $kickingResult, $receivingResult")

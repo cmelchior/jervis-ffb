@@ -9,6 +9,7 @@ import com.jervisffb.engine.model.modifiers.TemporaryEffect
 import com.jervisffb.engine.model.modifiers.TemporaryEffectType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Skill
+import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -202,6 +203,10 @@ class Player(
     val ball: Ball?
         get() = team.game.balls.firstOrNull { it.carriedBy == this }
     var cost: Int = 0
+
+    fun addSkill(skill: SkillFactory) {
+        extraSkills.add(skill.createSkill(this))
+    }
 
     fun addSkill(skill: Skill) {
         extraSkills.add(skill)

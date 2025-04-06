@@ -112,9 +112,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
                 })
             }
             this.rerolls.addAll((0 ..<this@TeamBuilder.reRolls).map {
-                RegularTeamReroll(
-                    it
-                )
+                RegularTeamReroll(id, it)
             })
             this.teamApothecaries.addAll((0 until this@TeamBuilder.apothecaries).map { Apothecary(false, ApothecaryType.STANDARD) })
             this.teamCheerleaders = this@TeamBuilder.cheerLeaders

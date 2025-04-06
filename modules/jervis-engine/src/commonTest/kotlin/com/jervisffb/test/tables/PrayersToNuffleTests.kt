@@ -137,7 +137,7 @@ class PrayersToNuffleTests: JervisGameTest() {
         )
 
         // Put player on home team on the ground so they can be fouled
-        homeTeam[1.playerNo]!!.state = PlayerState.PRONE
+        homeTeam[1.playerNo].state = PlayerState.PRONE
         assertTrue(awayTeam.hasPrayer(PrayerToNuffle.FRIENDS_WITH_THE_REF))
 
         // Foul player and roll 5 to trigger the prayer
@@ -220,8 +220,8 @@ class PrayersToNuffleTests: JervisGameTest() {
         awayTeam.forEachIndexed { i, it ->
             when (i) {
                 0 -> it.state = PlayerState.KNOCKED_OUT
-                1 -> it.addSkill(Stab())
-                else -> it.addSkill(Loner(2))
+                1 -> it.addSkill(Stab.Factory)
+                else -> it.addSkill(Loner.Factory(2))
             }
         }
         controller.rollForward(
@@ -287,7 +287,7 @@ class PrayersToNuffleTests: JervisGameTest() {
             when (i) {
                 // Should it not be available to players that already have AV11?
                 0 -> it.state = PlayerState.KNOCKED_OUT
-                else -> it.addSkill(Loner(2))
+                else -> it.addSkill(Loner.Factory(2))
             }
         }
         controller.rollForward(
@@ -383,8 +383,8 @@ class PrayersToNuffleTests: JervisGameTest() {
             when (i) {
                 // Should it not be available to players that already have AV11?
                 0 -> it.state = PlayerState.KNOCKED_OUT
-                1 -> it.addSkill(MightyBlow(2))
-                else -> it.addSkill(Loner(2))
+                1 -> it.addSkill(MightyBlow.Factory(2))
+                else -> it.addSkill(Loner.Factory(2))
             }
         }
         controller.rollForward(
@@ -462,7 +462,7 @@ class PrayersToNuffleTests: JervisGameTest() {
         // Give everyone except 1 loner, so when you roll 3 on the prayer
         // Only 1 can be selected
         homeTeam.forEachIndexed { i, it ->
-            if (i > 0) it.addSkill(Loner(4))
+            if (i > 0) it.addSkill(Loner.Factory(4))
         }
         controller.rollForward(
             *defaultPregame(
@@ -485,7 +485,7 @@ class PrayersToNuffleTests: JervisGameTest() {
         homeTeam.forEachIndexed { i, it ->
             when (i) {
                 0 -> it.state = PlayerState.KNOCKED_OUT
-                else -> it.addSkill(Loner(4))
+                else -> it.addSkill(Loner.Factory(4))
             }
         }
         controller.rollForward(
@@ -613,8 +613,8 @@ class PrayersToNuffleTests: JervisGameTest() {
         awayTeam.forEachIndexed { i, player ->
             when (i) {
                 0 -> player.state = PlayerState.KNOCKED_OUT
-                1 -> player.addSkill(Pro(isTemporary = false))
-                else -> player.addSkill(Loner(2))
+                1 -> player.addSkill(Pro.Factory)
+                else -> player.addSkill(Loner.Factory(2))
             }
         }
         controller.rollForward(

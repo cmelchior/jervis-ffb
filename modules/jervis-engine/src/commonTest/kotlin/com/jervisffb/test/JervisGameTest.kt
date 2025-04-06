@@ -23,6 +23,7 @@ import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerStandardActionType
@@ -56,12 +57,12 @@ abstract class JervisGameTest {
         state = createDefaultGameState(rules).apply {
             // Should be on LoS
             homeTeam[PlayerNo(1)].apply {
-                addSkill(BreakTackle())
+                addSkill(BreakTackle(SkillId("${id.value}-BreakTackle")))
                 strength = 4
             }
             // Should be on LoS
             homeTeam[PlayerNo(2)].apply {
-                addSkill(BreakTackle())
+                addSkill(BreakTackle(SkillId("${id.value}-BreakTackle")))
                 strength = 5
             }
         }

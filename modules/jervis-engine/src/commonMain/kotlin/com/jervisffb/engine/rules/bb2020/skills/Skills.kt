@@ -40,33 +40,28 @@ sealed interface TeamReroll : RerollSource {
 }
 
 @Serializable
-class RegularTeamReroll(val index: Int) : TeamReroll {
-    override val id: RerollSourceId =
-        RerollSourceId("team-reroll-$index")
+class RegularTeamReroll(val teamId: TeamId, val index: Int) : TeamReroll {
+    override val id: RerollSourceId = RerollSourceId("${teamId.value}-reroll-$index")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.PERMANENT
-    override val rerollResetAt: Duration =
-        Duration.END_OF_HALF
+    override val rerollResetAt: Duration = Duration.END_OF_HALF
     override val rerollDescription: String = "Team reroll"
     override var rerollUsed: Boolean = false
 }
 
 @Serializable
 class LeaderTeamReroll(val player: Player) : TeamReroll {
-    override val id: RerollSourceId =
-        RerollSourceId("leader-${player.id.value}")
+    override val id: RerollSourceId = RerollSourceId("${player.id.value}-leader")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.SPECIAL
-    override val rerollResetAt: Duration =
-        Duration.END_OF_HALF
+    override val rerollResetAt: Duration = Duration.END_OF_HALF
     override val rerollDescription: String = "Team reroll (Leader)"
     override var rerollUsed: Boolean = false
 }
 
 @Serializable
 class BrilliantCoachingReroll(val teamId: TeamId) : TeamReroll {
-    override val id: RerollSourceId =
-        RerollSourceId("brilliant-coaching-${teamId.value}")
+    override val id: RerollSourceId = RerollSourceId("${teamId.value}-brilliant-coaching")
     override val carryOverIntoOvertime: Boolean = false
     override val duration = Duration.END_OF_DRIVE
     override val rerollResetAt: Duration =

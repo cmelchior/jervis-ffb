@@ -12,6 +12,7 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
+import com.jervisffb.engine.ext.skillId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BlockType
@@ -57,9 +58,9 @@ class BlockTests: JervisGameTest() {
     @Test
     fun bothDown_withBlock() {
         val attacker = state.getPlayerById("A1".playerId)
-        attacker.extraSkills.add(Block())
+        attacker.extraSkills.add(Block("${attacker.id.value}-Block".skillId))
         val defender = state.getPlayerById("H1".playerId)
-        defender.extraSkills.add(Block())
+        defender.extraSkills.add(Block("${attacker.id.value}-Block".skillId))
         controller.rollForward(
             PlayerSelected(attacker.id),
             PlayerActionSelected(PlayerStandardActionType.BLOCK),
@@ -80,9 +81,9 @@ class BlockTests: JervisGameTest() {
     @Test
     fun bothDown_usingBlockIsOptional() {
         val attacker = state.getPlayerById("A1".playerId)
-        attacker.extraSkills.add(Block())
+        attacker.extraSkills.add(Block("${attacker.id.value}-Block".skillId))
         val defender = state.getPlayerById("H1".playerId)
-        defender.extraSkills.add(Block())
+        defender.extraSkills.add(Block("${defender.id.value}-Block".skillId))
         controller.rollForward(
             PlayerSelected(attacker.id),
             PlayerActionSelected(PlayerStandardActionType.BLOCK),

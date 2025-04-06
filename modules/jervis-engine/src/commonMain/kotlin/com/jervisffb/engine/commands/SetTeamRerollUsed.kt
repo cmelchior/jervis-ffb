@@ -6,16 +6,12 @@ import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 class SetTeamRerollUsed(private val source: RerollSource) : Command {
     private var original: Boolean = false
 
-    override fun execute(
-        state: Game,
-    ) {
+    override fun execute(state: Game,) {
         original = source.rerollUsed
         source.rerollUsed = true
     }
 
-    override fun undo(
-        state: Game,
-    ) {
+    override fun undo(state: Game) {
         source.rerollUsed = original
     }
 }
