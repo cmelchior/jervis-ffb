@@ -42,3 +42,7 @@ public actual fun getPlatformLogWriter(): LogWriter? {
 public actual fun copyToClipboard(text: String) {
     window.navigator.clipboard.writeText(text)
 }
+
+public actual fun triggerGC() {
+    // Do nothing
+}

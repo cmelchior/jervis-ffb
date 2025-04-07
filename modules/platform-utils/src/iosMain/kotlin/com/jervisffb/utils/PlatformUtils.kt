@@ -44,3 +44,7 @@ public actual fun copyToClipboard(text: String) {
     UIPasteboard.generalPasteboard.string = text
 }
 
+public actual fun triggerGC() {
+    // Do nothing
+}
+

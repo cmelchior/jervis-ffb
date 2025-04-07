@@ -55,3 +55,9 @@ public expect fun getPlatformLogWriter(): LogWriter?
  * Copies a piece of text to the system clipboard.
  */
 public expect fun copyToClipboard(text: String)
+
+/**
+ * On systems with a GC, this call does a best-effort attempt at triggering
+ * it
+ */
+public expect fun triggerGC()

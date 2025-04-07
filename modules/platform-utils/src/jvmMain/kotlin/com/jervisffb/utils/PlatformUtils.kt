@@ -125,3 +125,10 @@ public actual fun copyToClipboard(text: String) {
     val selection = StringSelection(text)
     clipboard.setContents(selection, null)
 }
+
+public actual fun triggerGC() {
+    // There is no guarantee this will actually do anything, so this is
+    // just best-effort.
+    System.gc()
+    System.runFinalization()
+}
