@@ -303,7 +303,7 @@ class UiGameController(
         updatePersistentUiDecorations(state, delta, uiDecorations)
 
         // Re-render the entire field. This feels a bit like overkill, but making it more granular
-        // is going to be painful, and it doesn't look like there is a performance problem doing it.
+        // is going to be challenging, and it doesn't look like there is a performance problem doing it.
         val squares: MutableMap<FieldCoordinate, UiFieldSquare> = mutableMapOf<FieldCoordinate, UiFieldSquare>().apply {
             (0 until rules.fieldWidth).forEach { x ->
                 (0 until rules.fieldHeight).forEach { y ->
@@ -386,15 +386,14 @@ class UiGameController(
                 }
         }
 
-        return UiFieldSquare(
-            square,
-            isBallOnGround,
-            isBallExiting,
-            square.player?.hasBall() == true,
-            uiPlayer,
-            moveUsed = uiDecorations.getMoveUsedOrNull(coordinate),
-            directionSelected = directionSelected
-        )
+        return UiFieldSquare(square).apply {
+            this.isBallOnGround = isBallOnGround
+            this.isBallExiting = isBallExiting
+            this.isBallCarried = (square.player?.hasBall() == true)
+            this.player = uiPlayer
+            this.moveUsed = uiDecorations.getMoveUsedOrNull(coordinate)
+            this.directionSelected = directionSelected
+        }
     }
 
     fun userSelectedAction(action: GameAction) {

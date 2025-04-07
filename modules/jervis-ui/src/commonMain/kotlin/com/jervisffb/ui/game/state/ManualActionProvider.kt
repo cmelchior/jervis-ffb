@@ -267,9 +267,9 @@ open class ManualActionProvider(
         state.activePlayer?.location?.let { activePlayerLocation ->
             val square = snapshot.fieldSquares[activePlayerLocation]
             if (square != null && square.contextMenuOptions.isNotEmpty() && square.contextMenuOptions.count { it.title == "End action" } == 0) {
-                snapshot.fieldSquares[activePlayerLocation as FieldCoordinate] = square.copy(
+                snapshot.fieldSquares[activePlayerLocation as FieldCoordinate]?.apply {
                     showContextMenu = true
-                )
+                }
             }
         }
 

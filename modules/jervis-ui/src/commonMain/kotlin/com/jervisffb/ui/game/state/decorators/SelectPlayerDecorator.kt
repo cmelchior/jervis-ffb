@@ -44,12 +44,13 @@ class SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
                 }
                 is FieldCoordinate -> {
                     val square = snapshot.fieldSquares[playerLocation]
-                    snapshot.fieldSquares[playerLocation] = square?.copy(
-                        dice = dice,
+                    snapshot.fieldSquares[playerLocation]?.apply {
+                        this.dice = dice
                         // TODO square.player!! is sometimes `null` here :/
-                        player = UiPlayer(square.player!!.model, selectedAction,square.player.onHover, square.player.onHoverExit),
+                        val oldPlayer = this.player ?: error("No player found for $playerLocation")
+                        this.player = UiPlayer(oldPlayer.model, selectedAction, oldPlayer.onHover, oldPlayer.onHoverExit)
                         onSelected = selectedAction
-                    ) ?: error("Unexpected player location : $playerLocation")
+                    } ?: error("Unexpected player location : $playerLocation")
                 }
                 is GiantLocation -> TODO("Not supported right now")
             }

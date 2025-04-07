@@ -12,12 +12,10 @@ class SelectFieldLocationDecorator: FieldActionDecorator<SelectFieldLocation> {
             val selectedAction = {
                 actionProvider.userActionSelected(FieldSquareSelected(squareData.coordinate))
             }
-            val square = snapshot.fieldSquares[squareData.coordinate]
-            snapshot.fieldSquares[squareData.coordinate] = square?.copy(
-                onSelected = selectedAction,
+            snapshot.fieldSquares[squareData.coordinate]?.apply {
+                onSelected = selectedAction
                 requiresRoll = (squareData.requiresRush || squareData.requiresDodge || squareData.requiresJump)
-            ) ?: error("Unexpected location : ${squareData.coordinate}")
-
+            } ?: error("Unexpected location : ${squareData.coordinate}")
         }
     }
 }

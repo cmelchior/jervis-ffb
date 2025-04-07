@@ -16,9 +16,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -147,48 +145,41 @@ private fun FieldSquare(
     vm: FieldViewModel,
     square: UiFieldSquare,
 ) {
-    var showPopup: Boolean by remember(square) { mutableStateOf(square.showContextMenu) }
-
-    val bgColor by remember(square) {
-        mutableStateOf(when {
-            square.onSelected != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
-            square.selectableDirection != null || square.directionSelected != null -> Color.Transparent // Hide square color
-            square.player?.isSelectable == true -> Color.Transparent
-            square.onSelected != null -> Color.Green.copy(alpha = 0.25f) // Fallback for active squares
-            else -> Color.Transparent
-        })
+    val bgColor = when {
+        square.onSelected != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
+        square.selectableDirection != null || square.directionSelected != null -> Color.Transparent // Hide square color
+        square.player?.isSelectable == true -> Color.Transparent
+        square.onSelected != null -> Color.Green.copy(alpha = 0.25f) // Fallback for active squares
+        else -> Color.Transparent
     }
 
-    val boxWrapperModifier = remember(square) {
-        val modifier = boxModifier
-            .fillMaxSize()
-            .background(color = bgColor)
-            .onPointerEvent(PointerEventType.Enter) {
-                vm.hoverOver(FieldCoordinate(width, height))
-            }
+    val modifier = boxModifier
+        .fillMaxSize()
+        .background(color = bgColor)
+        .onPointerEvent(PointerEventType.Enter) {
+            vm.hoverOver(FieldCoordinate(width, height))
+        }
 
+    val boxWrapperModifier =
         if (square.contextMenuOptions.isNotEmpty() || square.onSelected != null || square.hoverAction != null) {
             modifier.clickable {
-                showPopup = !showPopup
+                square.showContextMenu = !square.showContextMenu
                 if (square.hoverAction != null) {
-                    square.hoverAction()
-                } else {
-                    square.onSelected?.let {
-                        it()
-                    }
+                    square.hoverAction!!()
+                } else if (square.onSelected != null) {
+                    square.onSelected!!()
                 }
             }
         } else {
             modifier
         }
-    }
 
     Box(modifier = boxWrapperModifier) {
-        if (showPopup) {
+        if (square.showContextMenu) {
             ContextPopupMenu(
-                hidePopup = { dimissed ->
-                    showPopup = false
-                    if (dimissed)  {
+                hidePopup = { dismissed ->
+                    square.showContextMenu = false
+                    if (dismissed)  {
                         square.onMenuHidden?.let {
                             it()
                         }

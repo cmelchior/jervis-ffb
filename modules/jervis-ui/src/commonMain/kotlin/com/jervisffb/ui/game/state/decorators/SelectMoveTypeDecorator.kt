@@ -80,8 +80,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                 activeLocation.getSurroundingCoordinates(state.rules, 1, includeOutOfBounds = false)
                     .filter { state.field[it].isUnoccupied() }
                     .forEach { loc ->
-                        val square = snapshot.fieldSquares[loc]
-                        snapshot.fieldSquares[loc] = square?.copy(
+                        snapshot.fieldSquares[loc]?.apply {
                             onSelected = {
                                 actionProvider.userActionSelected(
                                     CompositeGameAction(
@@ -91,9 +90,9 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                                         )
                                     )
                                 )
-                            },
+                            }
                             requiresRoll = requiresDodge || requiresRush
-                        ) ?: error("Could not find square: $loc")
+                        } ?: error("Could not find square: $loc")
                     }
             }
 
@@ -154,7 +153,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
             .filter { state.field[it].isUnoccupied() }
             .forEach { loc ->
                 val square = snapshot.fieldSquares[loc]
-                snapshot.fieldSquares[loc] = square?.copy(
+                snapshot.fieldSquares[loc]?.apply {
                     onSelected = {
                         actionProvider.registerQueuedActionGenerator { controller ->
                             val availableActions = controller.getAvailableActions()
@@ -170,9 +169,9 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                             }
                         }
                         actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP))
-                    },
+                    }
                     requiresRoll = true
-                ) ?: error("Could not find square: $loc")
+                } ?: error("Could not find square: $loc")
             }
     }
 }

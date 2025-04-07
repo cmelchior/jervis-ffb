@@ -11,9 +11,9 @@ class DeselectPlayerDecorator: FieldActionDecorator<DeselectPlayer> {
     override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: DeselectPlayer) {
         descriptor.players.forEach { player ->
             val coordinate = player.location as FieldCoordinate
-            snapshot.fieldSquares[coordinate] = snapshot.fieldSquares[coordinate]?.copy(
-                onMenuHidden = { actionProvider.userActionSelected(PlayerDeselected(player)) }
-            ) ?: error("Could not find square: $coordinate")
+            snapshot.fieldSquares[coordinate]?.apply {
+                this.onMenuHidden = { actionProvider.userActionSelected(PlayerDeselected(player)) }
+            } ?: error("Could not find square: $coordinate")
         }
     }
 }

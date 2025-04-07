@@ -133,10 +133,10 @@ class FieldViewModel(
                             else -> currentMovesLeft + index + 1 + standingUpModifier
                         }
 
-                        uiSnapshot.fieldSquares[pathSquare] = currentSquareData.copy(
-                            futureMoveValue = shownMoveValue,
+                        uiSnapshot.fieldSquares[pathSquare]?.apply {
+                            futureMoveValue = shownMoveValue
                             hoverAction = if (currentSquareData.model.coordinates == mouseEnter) action else null
-                        )
+                        }
                     }
                 }
             }

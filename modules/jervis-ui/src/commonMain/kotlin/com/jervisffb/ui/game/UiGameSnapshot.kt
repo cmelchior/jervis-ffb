@@ -26,12 +26,13 @@ class UiGameSnapshot(
 ) {
     fun clearHoverData() {
         // Clear the hover data, only update squares that actually changed
-        fieldSquares.entries.forEach {
-            if (it.value.futureMoveValue != null) {
-                fieldSquares[it.key] = it.value.copy(
-                    futureMoveValue = null,
-                    hoverAction = null,
-                )
+        fieldSquares.entries.forEach { fieldSquare ->
+            val square: UiFieldSquare = fieldSquare.value
+            if (square.futureMoveValue != null) {
+                square.apply {
+                    futureMoveValue = null
+                    hoverAction = null
+                }
             }
         }
     }
