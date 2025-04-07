@@ -256,7 +256,16 @@ data class TargetSquare(
 
 data class SelectFieldLocation(val squares: List<TargetSquare>) : GameActionDescriptor {
     override val size: Int = squares.size
-    override fun createRandom(random: Random): GameAction = FieldSquareSelected(squares.random(random).coordinate)
+    init {
+        if (squares.isEmpty()) {
+            throw IllegalArgumentException("SelectFieldLocation must contain at least one target")
+        }
+    }
+    override fun createRandom(random: Random): GameAction {
+        val target = squares.random(random).coordinate
+        return FieldSquareSelected(target)
+    }
+
     override fun createAll(): List<GameAction> {
         return squares.map {
             FieldSquareSelected(it.coordinate)

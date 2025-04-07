@@ -87,8 +87,13 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
                 player.coordinates.getSurroundingCoordinates(rules)
                     .filter { state.field[it].isUnoccupied() }
                     .map { TargetSquare.move(it, player.movesLeft <= 0, requiresDodge) }
-                    .let { SelectFieldLocation(it) }
-                    .let { listOf(it) }
+                    .let { targets ->
+                        if (targets.isEmpty()) {
+                            emptyList()
+                        } else {
+                            listOf(SelectFieldLocation(targets))
+                        }
+                    }
             } else {
                 emptyList()
             }
