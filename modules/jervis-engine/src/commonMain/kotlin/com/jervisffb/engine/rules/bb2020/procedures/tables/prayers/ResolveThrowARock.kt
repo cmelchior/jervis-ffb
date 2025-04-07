@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.prayers
 
+import com.jervisffb.engine.actions.Cancel
+import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.D6Result
@@ -31,7 +33,6 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
@@ -64,7 +65,7 @@ object ResolveThrowARock : Procedure() {
     }
 
     object SelectPlayer: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam.otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<ThrowARockContext>()
             return if (context.stallingPlayers.isEmpty()) {
@@ -72,13 +73,13 @@ object ResolveThrowARock : Procedure() {
             } else {
                 context.stallingPlayers.map {
                     SelectPlayer(it)
-                }
+                } + CancelWhenReady // Opt to not throw a rock
             }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is Continue -> ExitProcedure()
+                is Continue, Cancel -> ExitProcedure()
                 is PlayerSelected -> {
                     val context = state.getContext<ThrowARockContext>()
                     val updatedContext = context.copy(

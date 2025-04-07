@@ -52,6 +52,7 @@ tests covering the particular feature.
   - [ ] Necessary Violence
   - [ ] Fouling Frenzy
   - [ ] Throw a Rock
+    - [ ] Choise is optional
   - [ ] Under Scrutiny
   - [ ] Intensive Training
 
