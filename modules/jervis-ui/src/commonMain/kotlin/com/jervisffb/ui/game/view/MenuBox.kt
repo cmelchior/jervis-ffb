@@ -14,8 +14,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -62,6 +69,7 @@ fun RowScope.MenuBox(label: String, onClick: () -> Unit, enabled: Boolean = true
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RowScope.
     SplitMenuBox(
@@ -71,13 +79,14 @@ fun RowScope.
         onClickMiddle: () -> Unit,
         labelBottom: String? = null,
         onClickBottom: (() -> Unit)? = null,
-        p2pHostAvaiable: Boolean,
+        p2pHostAvailable: Boolean,
         aspectRatio: Float = 0.67f,
     ) {
 
+    var hostLabel by remember { mutableStateOf(labelMiddle) }
+
     Column(
         modifier = Modifier
-//            .padding(16.dp)
             .fillMaxHeight(0.9f)
             .weight(9f/36f,  false)
             .aspectRatio(1f)
@@ -111,19 +120,34 @@ fun RowScope.
             }
             Spacer(modifier = Modifier.height(32.dp))
 
-            val bgColor = if (!p2pHostAvaiable) {
+            val bgColor = if (!p2pHostAvailable) {
                 JervisTheme.rulebookDisabled
             } else {
                 JervisTheme.rulebookBlue
             }
 
             Box(
-                modifier = Modifier.background(bgColor).weight(1f).fillMaxSize().let { if (p2pHostAvaiable) it.clickable { onClickMiddle() } else it },
+                modifier = Modifier
+                    .background(bgColor)
+                    .weight(1f)
+                    .fillMaxSize()
+                    .onPointerEvent(PointerEventType.Enter) {
+                        if (!p2pHostAvailable) {
+                            hostLabel = "Requires\nDesktop/iOS Client"
+                        }
+                    }
+                    .onPointerEvent(PointerEventType.Exit) {
+                        if (!p2pHostAvailable) {
+                            hostLabel = labelMiddle
+                        }
+                    }
+                    .let { if (p2pHostAvailable) it.clickable { onClickMiddle() } else it }
+                ,
                 contentAlignment = Alignment.BottomEnd,
             ) {
                 Text(
                     modifier = Modifier.padding(16.dp),
-                    text = labelMiddle.uppercase(),
+                    text = hostLabel.uppercase(),
                     textAlign = TextAlign.End,
                     maxLines = 2,
                     color = JervisTheme.buttonTextColor,

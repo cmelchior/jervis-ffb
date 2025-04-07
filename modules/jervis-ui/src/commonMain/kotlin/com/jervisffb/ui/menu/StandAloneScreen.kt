@@ -29,8 +29,8 @@ import com.jervisffb.ui.menu.hotseat.HotseatScreen
 import com.jervisffb.ui.menu.hotseat.HotseatScreenModel
 import com.jervisffb.ui.menu.p2p.client.P2PClientScreen
 import com.jervisffb.ui.menu.p2p.client.P2PClientScreenModel
-import com.jervisffb.ui.menu.p2p.host.P2PHostScreenModel
 import com.jervisffb.ui.menu.p2p.host.P2PHostScreen
+import com.jervisffb.ui.menu.p2p.host.P2PHostScreenModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.InternalResourceApi
