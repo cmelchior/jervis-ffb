@@ -109,6 +109,11 @@ public actual fun getPlatformLogWriter(): LogWriter? {
         init {
             val logFile = File("$APPLICATION_DIRECTORY${File.separator}log.txt")
             logFile.parentFile.mkdirs()
+            try {
+                logFile.delete()
+            } catch (ex: SecurityException) {
+                // Ignore
+            }
             writer = PrintWriter(FileWriter(logFile, true))
         }
         override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
