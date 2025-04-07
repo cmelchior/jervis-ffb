@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -44,7 +45,7 @@ fun GameScreen(
             Field(field, Modifier.aspectRatio(field.aspectRatio))
             GameStatus(gameStatusController, modifier = Modifier.aspectRatio(782f/32f).fillMaxSize())
             // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
-            Row(modifier = Modifier.fillMaxSize()) {
+            Row(modifier = Modifier.fillMaxSize().background(Color.White)) {
                 LogViewer(logs, modifier = Modifier.weight(1f).fillMaxSize())
                 Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))
                 Column(modifier = Modifier.weight(1f).fillMaxSize()) {
