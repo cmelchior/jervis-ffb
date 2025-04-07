@@ -40,6 +40,7 @@ import com.jervisffb.ui.game.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.state.ReplayActionProvider
+import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.utils.APPLICATION_DIRECTORY
 import kotlinx.coroutines.flow.Flow
@@ -180,7 +181,7 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenVi
         val replayFiles by viewModel.availableReplayFiles.collectAsState(emptyList())
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().paperBackground(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
