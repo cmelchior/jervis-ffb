@@ -42,7 +42,7 @@ interface DropdownEntry {
     val available: Boolean
 }
 
-class P2PServerScreen(private val menuViewModel: MenuViewModel, private val viewModel: P2PHostScreenModel) : Screen {
+class P2PHostScreen(private val menuViewModel: MenuViewModel, private val viewModel: P2PHostScreenModel) : Screen {
     @Composable
     override fun Content() {
         val sidebarEntries = viewModel.sidebarEntries

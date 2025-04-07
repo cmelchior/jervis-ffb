@@ -30,7 +30,7 @@ import com.jervisffb.ui.menu.hotseat.HotseatScreenModel
 import com.jervisffb.ui.menu.p2p.client.P2PClientScreen
 import com.jervisffb.ui.menu.p2p.client.P2PClientScreenModel
 import com.jervisffb.ui.menu.p2p.host.P2PHostScreenModel
-import com.jervisffb.ui.menu.p2p.host.P2PServerScreen
+import com.jervisffb.ui.menu.p2p.host.P2PHostScreen
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.InternalResourceApi
@@ -47,7 +47,7 @@ class StandAloneScreenModel(private val menuViewModel: MenuViewModel) : ScreenMo
     fun startP2PServer(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
             val viewModel = P2PHostScreenModel(navigator, menuViewModel)
-            navigator.push(P2PServerScreen(menuViewModel, viewModel))
+            navigator.push(P2PHostScreen(menuViewModel, viewModel))
         }
     }
 
