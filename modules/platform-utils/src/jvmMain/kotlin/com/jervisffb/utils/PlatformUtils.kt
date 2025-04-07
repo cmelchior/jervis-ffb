@@ -2,6 +2,9 @@ package com.jervisffb.utils
 
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.http.isSuccess
 import kotlinx.datetime.Clock
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -10,18 +13,34 @@ import java.io.File
 import java.io.FileWriter
 import java.io.OutputStream
 import java.io.PrintWriter
+import java.net.Inet4Address
+import java.net.NetworkInterface
 import java.net.URI
 
 public actual fun threadId(): ULong {
     return Thread.currentThread().id.toULong()
 }
 
-public actual fun getPublicIp(): String {
-    TODO()
+public actual suspend fun getPublicIpAddress(): String? {
+    try {
+        getHttpClient().use { client ->
+            val response = client.get("https://api.ipify.org")
+            return if (response.status.isSuccess()) {
+                response.body<String>()
+            } else {
+                null
+            }
+        }
+    } catch (ex: Exception) {
+        return null
+    }
 }
 
-public actual fun getLocalIpAddress(): String {
-    TODO()
+public actual suspend fun getLocalIpAddress(): String {
+    return NetworkInterface.getNetworkInterfaces().toList()
+        .flatMap { it.inetAddresses.toList() }
+        .firstOrNull { it is Inet4Address && !it.isLoopbackAddress }
+        ?.hostAddress ?: "127.0.0.1"
 }
 
 public actual fun openUrlInBrowser(url: String): Boolean {

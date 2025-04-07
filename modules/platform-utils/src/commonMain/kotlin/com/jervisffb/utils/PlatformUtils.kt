@@ -8,14 +8,17 @@ import co.touchlab.kermit.LogWriter
 public expect fun threadId(): ULong
 
 /**
- * Returns the public IP address of this machine
+ * Returns the public IP address of this machine or `null` if it wasn't
+ * possible to acquire it.
+ *
+ * An exception is thrown on platforms that don't support this at all.
  */
-public expect fun getPublicIp(): String
+public expect suspend fun getPublicIpAddress(): String?
 
 /**
- * Returns the IP address of this machine on the local network
+ * Returns the IP address of this machine on the local network.
  */
-public expect fun getLocalIpAddress(): String
+public expect suspend fun getLocalIpAddress(): String
 
 /**
  * Open a URL in a new tab in a System browser.

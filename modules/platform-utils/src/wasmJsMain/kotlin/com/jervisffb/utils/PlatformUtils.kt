@@ -7,12 +7,12 @@ public actual fun threadId(): ULong {
     return 0uL // TODO Figure out how to get it here
 }
 
-public actual fun getPublicIp(): String {
-    TODO()
+public actual suspend fun getPublicIpAddress(): String? {
+    error("Not supported on WASM")
 }
 
-public actual fun getLocalIpAddress(): String {
-    TODO()
+public actual suspend fun getLocalIpAddress(): String {
+    error("Not supported on WASM")
 }
 
 public actual fun openUrlInBrowser(url: String): Boolean {

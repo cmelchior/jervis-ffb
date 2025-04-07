@@ -34,6 +34,8 @@ import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
 import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreenModel
 import com.jervisffb.ui.menu.p2p.StartP2PGameScreenModel
 import com.jervisffb.utils.copyToClipboard
+import com.jervisffb.utils.getLocalIpAddress
+import com.jervisffb.utils.getPublicIpAddress
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -68,8 +70,11 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
         getRules = { networkAdapter.rules ?: error("Rules are not loaded yet") }
     )
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
-    private val _gameUrl = MutableStateFlow("")
-    val gameUrl: StateFlow<String> = _gameUrl
+    private val _globalGameUrl = MutableStateFlow("")
+    val globalUrl: StateFlow<String> = _globalGameUrl
+    private val _localGameUrl = MutableStateFlow("")
+    val localUrl: StateFlow<String> = _localGameUrl
+    val globalGameUrlError = MutableStateFlow<String?>(null)
     private var server: LightServer? = null
 
     // Page 3: Wait for opponent
@@ -209,7 +214,17 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     }
 
     fun teamSelectionDone(gotoNextPage: Boolean = true) {
-        _gameUrl.value = "ws://127.0.0.1:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
+        _globalGameUrl.value = "Fetching..."
+        _localGameUrl.value = "Fetching..."
+        menuViewModel.navigatorContext.launch {
+            val localIp = getLocalIpAddress()
+            _localGameUrl.value = "ws://$localIp:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
+            val publicIp = getPublicIpAddress()
+            if (publicIp == null) {
+                globalGameUrlError.value = "Unable to get IP address. Goto https://api.ipify.org to see your public IP address"
+            }
+            _globalGameUrl.value = "ws://$publicIp:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
+        }
         startServer()
         if (gotoNextPage) {
             gotoNextPage(2)

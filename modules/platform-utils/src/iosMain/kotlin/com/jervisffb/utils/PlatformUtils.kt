@@ -1,6 +1,9 @@
 package com.jervisffb.utils
 
 import co.touchlab.kermit.LogWriter
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.http.isSuccess
 import platform.UIKit.UIDevice
 import platform.UIKit.UIPasteboard
 
@@ -8,12 +11,24 @@ public actual fun threadId(): ULong {
     return 0uL // TODO Figure out how to get it here
 }
 
-public actual fun getPublicIp(): String {
-    TODO()
+public actual suspend fun getPublicIpAddress(): String? {
+    try {
+        getHttpClient().use { client ->
+            val response = client.get("https://api.ipify.org")
+            return if (response.status.isSuccess()) {
+                response.body<String>()
+            } else {
+                null
+            }
+        }
+    } catch (ex: Exception) {
+        return null
+    }
 }
 
-public actual fun getLocalIpAddress(): String {
-    TODO()
+public actual suspend fun getLocalIpAddress(): String {
+    // This isn't correct, but let's fix it later.
+    return "127.0.0.1"
 }
 
 public actual fun openUrlInBrowser(url: String): Boolean {

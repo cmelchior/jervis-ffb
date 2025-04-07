@@ -38,15 +38,15 @@ import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_copy
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.TitleBorder
-import com.jervisffb.ui.menu.components.TeamInfo
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
-    val url: String by viewModel.gameUrl.collectAsState()
-    val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
+    val globalUrl: String by viewModel.globalUrl.collectAsState()
+    val localUrl: String by viewModel.localUrl.collectAsState()
+    val globalUrlError by viewModel.globalGameUrlError.collectAsState()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -57,11 +57,12 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     modifier = Modifier.weight(1f),
-                    value = url,
+                    value = globalUrlError ?: globalUrl,
                     onValueChange = { },
                     readOnly = true,
+                    isError = globalUrlError != null,
                     singleLine = true,
-                    label = { Text("Game URL") },
+                    label = { Text("Game URL (Global URL)") },
                 )
                 Box(
                     modifier = Modifier
@@ -70,7 +71,7 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                         .offset(x = 4.dp)
                         .clip(shape = RoundedCornerShape(4.dp))
                         .clickable {
-                            viewModel.copyUrlToClipboard(url)
+                            viewModel.copyUrlToClipboard(globalUrl)
                         }
                     ,
                     contentAlignment = Alignment.Center,
@@ -82,6 +83,41 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                         contentDescription = "Copy URL",
                     )
                 }
+            }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    value = localUrl,
+                    onValueChange = { },
+                    readOnly = true,
+                    singleLine = true,
+                    label = { Text("Game URL (Local Network URL)") },
+                )
+                Box(
+                    modifier = Modifier
+                        .padding(start = 4.dp, top = 16.dp, bottom = 8.dp)
+                        .size(48.dp)
+                        .offset(x = 4.dp)
+                        .clip(shape = RoundedCornerShape(4.dp))
+                        .clickable {
+                            viewModel.copyUrlToClipboard(localUrl)
+                        }
+                    ,
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(
+                        modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
+                        colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
+                        painter = painterResource(Res.drawable.icon_menu_copy),
+                        contentDescription = "Copy URL",
+                    )
+                }
+            }
+            Row(Modifier.fillMaxWidth().padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Depending on where your opponent is connecting from, send them one of the two URLs above. Note that network setups can be tricky, so it's possible neither will work. If that happens… well, you're on your own. Sorry!",
+                    color = JervisTheme.contentTextColor,
+                )
             }
         }
         Row(modifier = Modifier.fillMaxWidth().align(Alignment.BottomEnd), horizontalArrangement = Arrangement.End) {
