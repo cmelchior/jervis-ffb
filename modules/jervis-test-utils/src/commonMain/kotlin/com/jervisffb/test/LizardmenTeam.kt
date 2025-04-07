@@ -77,9 +77,8 @@ val KROXIGOR =
             BoneHead.Factory,
             Loner.Factory(4),
             MightyBlow.Factory(1),
-            ThickSkull.Factory,
             PrehensileTail.Factory,
-            MultipleBlock.Factory
+            ThickSkull.Factory,
         ),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL),
