@@ -95,7 +95,7 @@ object ThrowIn : Procedure() {
                     val start = ballPosition
                     ballPosition = start.move(direction, 1)
                     if (ballPosition.isOutOfBounds(rules)) {
-                        outOfBoundsAt = ballPosition
+                        outOfBoundsAt = start
                         break
                     }
                 }
