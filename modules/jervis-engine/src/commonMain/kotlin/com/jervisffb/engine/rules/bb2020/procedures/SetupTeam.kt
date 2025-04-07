@@ -59,10 +59,14 @@ object SetupTeam : Procedure() {
                     val inReserve = (it.location == DogOut && it.state == PlayerState.RESERVE)
                     val onField = (it.location is FieldCoordinate && it.state == PlayerState.STANDING)
                     inReserve || onField
-                }.map {
-                    SelectPlayer(it)
+                }.let { players ->
+                    if (players.isNotEmpty()) {
+                        SelectPlayer(players.map { it.id })
+                    } else {
+                        null
+                    }
                 }
-            return availablePlayers + EndSetupWhenReady
+            return listOfNotNull(availablePlayers, EndSetupWhenReady)
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {

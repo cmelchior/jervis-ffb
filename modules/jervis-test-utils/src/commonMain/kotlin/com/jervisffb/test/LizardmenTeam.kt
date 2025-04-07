@@ -13,7 +13,6 @@ import com.jervisffb.engine.rules.bb2020.skills.BoneHead
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
-import com.jervisffb.engine.rules.bb2020.skills.MultipleBlock
 import com.jervisffb.engine.rules.bb2020.skills.PrehensileTail
 import com.jervisffb.engine.rules.bb2020.skills.Stunty
 import com.jervisffb.engine.rules.bb2020.skills.ThickSkull

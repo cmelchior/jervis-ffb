@@ -10,8 +10,10 @@ import com.jervisffb.engine.commands.RemovePlayerStatModifier
 import com.jervisffb.engine.commands.RemovePlayerTemporaryEffect
 import com.jervisffb.engine.commands.RemovePrayersToNuffle
 import com.jervisffb.engine.commands.RemoveTeamReroll
+import com.jervisffb.engine.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetPlayerRushesLeft
 import com.jervisffb.engine.commands.SetSpecialPlayCardActive
+import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -122,6 +124,13 @@ fun getSetPlayerRushesCommand(rules: Rules, player: Player): Command {
 fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Duration): Array<Command> {
     val teams = listOf(state.homeTeam, state.awayTeam)
 
+    // Reset availability. It isn't clear if this is the best place to do this?
+    val availableStatus = teams.flatMap { team ->
+        team.map { player ->
+            SetPlayerAvailability(player, Availability.AVAILABLE)
+        }
+    }
+
     // Find all temporary player stat characteristics modifiers
     val removableStatModifiers = teams.flatMap { team ->
         team.flatMap { player ->
@@ -174,10 +183,12 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
     }
 
     return (
-        removableStatModifiers +
-            removableSkills +
-            removableRerolls +
-            removablePrayers
+        availableStatus
+            + removableStatModifiers
+            + removableSkills
+            + removableRerolls
+            + removablePrayers
+            + specialPlayCards
     ).toTypedArray()
 }
 

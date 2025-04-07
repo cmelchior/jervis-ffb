@@ -7,10 +7,11 @@ import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
@@ -120,14 +121,15 @@ class FuzzTester {
     }
 
     private fun setupTeam(team: Team, compositeActions: MutableList<GameAction>, setup: List<FieldCoordinate>) {
-        val playersTaken = mutableSetOf<PlayerNo>()
+        val playersTaken = mutableSetOf<PlayerId>()
 
         setup.forEach { fieldCoordinate: FieldCoordinate ->
             team.firstOrNull {
-                it.state == PlayerState.RESERVE && !playersTaken.contains(it.number)
-            }?.let { replacementPlayer ->
-                playersTaken.add(replacementPlayer.number)
-                compositeActions.add(PlayerSelected(team[replacementPlayer.number]))
+                val inReserve = (it.location == DogOut && it.state == PlayerState.RESERVE)
+                inReserve && !playersTaken.contains(it.id)
+            }?.let { selectedPlayer ->
+                playersTaken.add(selectedPlayer.id)
+                compositeActions.add(PlayerSelected(team[selectedPlayer.number]))
                 compositeActions.add(FieldSquareSelected(fieldCoordinate))
             }
         }

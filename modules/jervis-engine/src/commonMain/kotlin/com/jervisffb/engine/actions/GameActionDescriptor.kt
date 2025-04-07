@@ -316,7 +316,15 @@ data class SelectPlayer(
 ) : GameActionDescriptor {
     constructor(player: Player): this(listOf(player.id))
     override val size: Int = players.size
-    override fun createRandom(random: Random): GameAction = PlayerSelected(players.random(random))
+    init {
+        if (players.isEmpty()) {
+            throw IllegalArgumentException("SelectPlayer must contain at least one player")
+        }
+    }
+    override fun createRandom(random: Random): GameAction {
+        val selectedPlayer = players.random(random)
+        return PlayerSelected(selectedPlayer)
+    }
     override fun createAll(): List<GameAction> = players.map { PlayerSelected(it) }
 }
 
