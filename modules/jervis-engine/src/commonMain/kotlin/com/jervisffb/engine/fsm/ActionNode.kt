@@ -42,7 +42,7 @@ abstract class ActionNode : Node {
      * [GameAction] to this node.
      *
      * Warning: It is up to implementers of this method to also modify the [Procedure] state in order
-     * to progress the [ProcedureStack]. The most common ways of doing this are through
+     * to progress the [MutableProcedureStack]. The most common ways of doing this are through
      * [com.jervisffb.engine.commands.fsm.GotoNode] or [com.jervisffb.engine.commands.fsm.ExitProcedure]
      * commands. Failing to do this will result in the FSM not progressing and just appear stuck.
      */

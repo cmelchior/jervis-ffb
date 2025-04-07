@@ -5,10 +5,10 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.ListEvent
 import com.jervisffb.engine.RemoveEntry
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.MutableProcedureStack
+import com.jervisffb.engine.fsm.MutableProcedureState
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.ProcedureStack
-import com.jervisffb.engine.fsm.ProcedureState
 import com.jervisffb.engine.model.context.ContextHolder
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.getContextOrNull
@@ -97,7 +97,7 @@ class Game(
 
     // Track all current active procedures.
     @Transient
-    val stack = ProcedureStack()
+    val stack = MutableProcedureStack()
 
     // Track all logs related to the game state, this includes
     // game progress as well as meta data debug events like procedure
@@ -248,17 +248,17 @@ class Game(
             ?: INVALID_GAME_STATE("Reroll $id could not be found")
     }
 
-    fun currentProcedure(): ProcedureState? = stack.peepOrNull()
+    fun currentProcedure(): MutableProcedureState? = stack.peepOrNull()
 
     fun addProcedure(procedure: Procedure) {
         stack.pushProcedure(procedure)
     }
 
-    fun addProcedure(procedure: ProcedureState) {
+    fun addProcedure(procedure: MutableProcedureState) {
         stack.pushProcedure(procedure)
     }
 
-    fun removeProcedure(): ProcedureState {
+    fun removeProcedure(): MutableProcedureState {
         return stack.popProcedure()
     }
 

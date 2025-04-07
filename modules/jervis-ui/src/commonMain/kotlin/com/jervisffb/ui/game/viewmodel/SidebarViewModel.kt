@@ -63,8 +63,8 @@ class SidebarViewModel(
         // This is mostly for WASM, iOS as JVM have a proper menu bar. This should be reworked
         // once we add proper menu support on WASM/iOS.
         // Also, consider moving this logic into decorators somehow.
-        val setupKickingTeam = uiSnapshot.game.stack.containsNode(GameDrive.SetupKickingTeam) && uiSnapshot.game.kickingTeam == team
-        val setupReceivingTeam = uiSnapshot.game.stack.containsNode(GameDrive.SetupReceivingTeam) && uiSnapshot.game.receivingTeam == team
+        val setupKickingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupKickingTeam) && uiSnapshot.game.kickingTeam == team
+        val setupReceivingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupReceivingTeam) && uiSnapshot.game.receivingTeam == team
         val teamControlledByClient = when (uiState.uiMode) {
             TeamActionMode.HOME_TEAM -> team.isHomeTeam()
             TeamActionMode.AWAY_TEAM -> team.isAwayTeam()

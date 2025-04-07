@@ -224,8 +224,8 @@ class UiGameController(
                 _uiStateFlow.emit(newUiState)
 
                 // Detect animations and run them after updating the UI, but before making it ready
-                // for the next set of actions
-                runPostUpdateAnimations()
+                // for creating the user actions
+                runPostUpdateAnimations(newUiState)
 
                 // TODO Just changing the existing uiState might not trigger recomposition correctly
                 //  We need an efficient way to copy the old one.
@@ -236,16 +236,15 @@ class UiGameController(
                 // Wait for the system to produce the next action, this can either be
                 // automatically generated or come from the UI. Here we do not care where
                 // it comes from.
-
                 val userAction = actionProvider.getAction()
 
-                // After an action was selected, all decorators to modify
+                // After an action was selected, run all decorators that modify
                 // the UI while the action is being processed.
                 actionProvider.decorateSelectedAction(newUiState, userAction)
                 _uiStateFlow.emit(newUiState)
 
                 // Then run any animations triggered by the action (but before the state is updated)
-                runPostActionAnimations(userAction)
+                runPostActionAnimations(newUiState, userAction)
 
                 // Last, send action to the Rules Engine for processing.
                 // This will start the next iteration of the game loop.
@@ -274,9 +273,9 @@ class UiGameController(
         }
     }
 
-    private suspend fun runPostUpdateAnimations() {
+    private suspend fun runPostUpdateAnimations(snapshot: UiGameSnapshot) {
         if (!gameController.lastActionWasUndo()) {
-            val animation = AnimationFactory.getFrameAnimation(state, rules)
+            val animation = AnimationFactory.getFrameAnimation(snapshot, rules)
             if (animation != null) {
                 _animationFlow.emit(animation)
                 animationDone.receive()
@@ -284,9 +283,9 @@ class UiGameController(
         }
     }
 
-    private suspend fun runPostActionAnimations(action: GameAction) {
+    private suspend fun runPostActionAnimations(snapshot: UiGameSnapshot, action: GameAction) {
         if (!gameController.lastActionWasUndo()) {
-            val animation = AnimationFactory.getPostActionAnimation(state, action)
+            val animation = AnimationFactory.getPostActionAnimation(snapshot.game, action)
             if (animation != null) {
                 _animationFlow.emit(animation)
                 animationDone.receive()
@@ -313,7 +312,7 @@ class UiGameController(
             }
         }
 
-        return UiGameSnapshot(state, actions, squares)
+        return UiGameSnapshot(state, state.stack.createSnapshot(), actions, squares)
     }
 
     private fun updatePersistentUiDecorations(state: Game, delta: GameDelta, uiDecorations: UiGameDecorations) {

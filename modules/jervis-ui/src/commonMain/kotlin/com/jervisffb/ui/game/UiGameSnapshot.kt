@@ -2,6 +2,7 @@ package com.jervisffb.ui.game
 
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.fsm.ProcedureStack
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
@@ -21,6 +22,7 @@ import com.jervisffb.ui.game.viewmodel.ButtonData
  */
 class UiGameSnapshot(
     val game: Game,
+    val stack: ProcedureStack,
     var actionsRequest: ActionRequest,
     val fieldSquares: MutableMap<FieldCoordinate, UiFieldSquare>,
 ) {

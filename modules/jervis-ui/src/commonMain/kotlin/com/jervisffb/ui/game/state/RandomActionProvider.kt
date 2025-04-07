@@ -119,7 +119,7 @@ class RandomActionProvider(
 
     private suspend fun useManualAutomatedActions(controller: GameEngineController): Boolean {
         val state = controller.state
-        val stack = controller.state.stack
+        val stack = controller.stack
 
         // Use a pre-defined setup, because the chance of random actions hitting a correct setup
         // is basically zero.

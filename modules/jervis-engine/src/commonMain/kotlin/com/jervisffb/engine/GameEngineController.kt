@@ -12,11 +12,11 @@ import com.jervisffb.engine.commands.EnterProcedure
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.ComputationNode
+import com.jervisffb.engine.fsm.MutableProcedureStack
+import com.jervisffb.engine.fsm.MutableProcedureState
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.ProcedureStack
-import com.jervisffb.engine.fsm.ProcedureState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.reports.LogCategory
@@ -84,7 +84,7 @@ class GameEngineController(
     private var lastGameActionId: GameActionId = GameActionId(0)
     private var deltaBuilder = DeltaBuilder(lastGameActionId + 1)
     val state: Game = state
-    val stack: ProcedureStack = state.stack // Shortcut for accessing the stack
+    val stack: MutableProcedureStack = state.stack // Shortcut for accessing the stack
     var actionMode = ActionMode.NOT_STARTED
     private var isStarted: Boolean = false
     private var replayMode: Boolean = false
@@ -195,7 +195,7 @@ class GameEngineController(
         }
     }
 
-    fun currentProcedure(): ProcedureState? = stack.peepOrNull()
+    fun currentProcedure(): MutableProcedureState? = stack.peepOrNull()
 
     fun currentNode(): Node? = currentProcedure()?.currentNode()
 
