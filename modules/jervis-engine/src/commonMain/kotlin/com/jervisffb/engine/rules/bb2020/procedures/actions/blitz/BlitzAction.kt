@@ -354,9 +354,11 @@ object BlitzAction : Procedure() {
             // and the attacker has frenzy and was able to follow up, a
             // second block is thrown
             val hasFrenzy = context.attacker.isSkillAvailable<Frenzy>()
-            val isNextToTarget = rules.isStanding(context.defender!!) && context.attacker.coordinates
-                .getSurroundingCoordinates(rules, distance = 1)
-                .contains(context.defender.coordinates)
+            val isNextToTarget = rules.isStanding(context.defender!!)
+                && rules.isStanding(context.attacker)
+                && context.attacker.coordinates
+                    .getSurroundingCoordinates(rules, distance = 1)
+                    .contains(context.defender.coordinates)
 
             return if (state.isTurnOver()) {
                 return compositeCommandOf(
