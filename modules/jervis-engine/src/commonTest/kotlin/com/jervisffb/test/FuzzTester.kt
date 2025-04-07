@@ -40,7 +40,7 @@ class FuzzTester {
             val random = Random(seed)
             val state = createDefaultGameState(StandardBB2020Rules())
             val controller = GameEngineController(state)
-            controller.startManualMode()
+            controller.startManualMode(logAvailableActions = false)
             try {
                 while (controller.stack.isNotEmpty()) {
                     val availableActions = controller.getAvailableActions()

@@ -48,7 +48,10 @@ data class RemoveEntry(val log: LogEntry) : ListEvent
  * @param initialActions Actions to run as soon as the controller is started using [startManualMode]
  * or [startTestMode]
  */
-class GameEngineController(state: Game, private val initialActions: List<GameAction> = emptyList()) {
+class GameEngineController(
+    state: Game,
+    private val initialActions: List<GameAction> = emptyList()
+) {
 
     companion object {
         val LOG = jervisLogger()
@@ -66,6 +69,11 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
     var initialHomeTeamState: JsonElement? = null
     var initialAwayTeamState: JsonElement? = null
 
+    // If `true`, a log entry will be created in `state.logs` for the next legally available actions.
+    // This is nice for debugging, but it is a relatively costly operation, especially when selecting
+    // field squares. So when running many games quickly, like during fuzz testing or AI training,
+    // setting this to false can improve memory pressure and overall performance.
+    var logAvailableActions: Boolean = true
     val logsEvents: Flow<ListEvent> = state.logChanges
     val rules: Rules = state.rules
 
@@ -160,11 +168,15 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
      *   controller.handleAction(action)
      * }
      * ```
+     *
+     * @param logAvailableActions If `true`, the available actions after processing
+     * a user action will be logged as a log entry in [Game.logs].
      */
-    fun startManualMode() {
+    fun startManualMode(logAvailableActions: Boolean = true) {
         if (actionMode != ActionMode.NOT_STARTED) {
             error("Controller already started: $actionMode")
         }
+        this.logAvailableActions = logAvailableActions
         actionMode = ActionMode.MANUAL
         setupInitialStartingState()
         rollForwardToNextActionNode()
@@ -173,8 +185,9 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
         }
     }
 
-    fun startTestMode(start: Procedure) {
+    fun startTestMode(start: Procedure, logAvailableActions: Boolean = true) {
         actionMode = ActionMode.TEST
+        this.logAvailableActions = logAvailableActions
         setupInitialStartingState(start)
         rollForwardToNextActionNode()
         initialActions.forEach {
@@ -286,7 +299,9 @@ class GameEngineController(state: Game, private val initialActions: List<GameAct
         val command = currentNode.applyAction(userAction, state, rules)
         executeCommand(command)
         rollForwardToNextActionNode()
-        logInternalEvent(ReportAvailableActions(getAvailableActions()))
+        if (logAvailableActions) {
+            logInternalEvent(ReportAvailableActions(getAvailableActions()))
+        }
         deltaBuilder.endAction()
     }
 

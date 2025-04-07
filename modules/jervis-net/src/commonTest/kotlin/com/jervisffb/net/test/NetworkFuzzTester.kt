@@ -201,7 +201,7 @@ class NetworkFuzzTester {
         // Setup Game state and start local game loop
         val game = Game(hostRules, hostHomeTeam, hostAwayTeam, Field.createForRuleset(hostRules))
         val controller = GameEngineController(game)
-        controller.startManualMode()
+        controller.startManualMode(logAvailableActions = false)
         conn.send(GameStartedMessage(gameId))
 
         // Run game
@@ -237,7 +237,7 @@ class NetworkFuzzTester {
         // Setup Game state and start local game loop
         val game = Game(clientRules, clientHomeTeam, clientAwayTeam, Field.createForRuleset(clientRules))
         val controller = GameEngineController(game)
-        controller.startManualMode()
+        controller.startManualMode(logAvailableActions = false)
         conn.send(GameStartedMessage(gameId))
 
         // Run game loop
