@@ -4,6 +4,8 @@ import co.touchlab.kermit.LogWriter
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.isSuccess
+import platform.Foundation.NSURL
+import platform.UIKit.UIApplication
 import platform.UIKit.UIDevice
 import platform.UIKit.UIPasteboard
 
@@ -32,7 +34,8 @@ public actual suspend fun getLocalIpAddress(): String {
 }
 
 public actual fun openUrlInBrowser(url: String): Boolean {
-    TODO()
+    val nsUrl = NSURL.URLWithString(url) ?: return false
+    return UIApplication.sharedApplication.openURL(nsUrl)
 }
 
 public actual fun canBeHost(): Boolean = true
