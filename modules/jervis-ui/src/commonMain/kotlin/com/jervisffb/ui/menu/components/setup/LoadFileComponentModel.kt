@@ -38,7 +38,7 @@ class LoadFileComponentModel(initialRulesBuilder: Rules.Builder, private val men
                         isSetupValid.value = true
                     }
                     .onFailure { error ->
-                        fileError.value = error.message ?: "Unknown error reading file."
+                        fileError.value = "Error reading file - ${error.message}" ?: "Unknown error reading file."
                     }
             }
         }

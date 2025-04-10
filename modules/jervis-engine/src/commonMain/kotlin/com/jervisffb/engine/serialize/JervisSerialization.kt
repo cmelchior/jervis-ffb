@@ -2,6 +2,7 @@ package com.jervisffb.engine.serialize
 
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -72,55 +73,17 @@ object JervisSerialization {
                 }
             val fileData = jsonFormat.decodeFromString<JervisGameFile>(fileContent)
             val rules = fileData.configuration.rules
-            val homeTeam = jsonFormat.decodeFromJsonElement<Team>(fileData.game.homeTeam)
-            homeTeam.noToPlayer.values.forEach { it.team = homeTeam }
-            homeTeam.notifyDogoutChange()
-            val awayTeam = jsonFormat.decodeFromJsonElement<Team>(fileData.game.awayTeam)
-            awayTeam.noToPlayer.values.forEach { it.team = awayTeam }
-            awayTeam.notifyDogoutChange()
+            val unknownCoach = Coach.UNKNOWN
+            val serializedHomeTeam = jsonFormat.decodeFromJsonElement<SerializedTeam>(fileData.game.homeTeam)
+            val homeTeam = SerializedTeam.deserialize(rules, serializedHomeTeam, unknownCoach)
+            val serializedAwayTeam = jsonFormat.decodeFromJsonElement<SerializedTeam>(fileData.game.awayTeam)
+            val awayTeam = SerializedTeam.deserialize(rules, serializedAwayTeam, unknownCoach)
             val state = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
             val controller = GameEngineController(state)
             val gameData = GameFileData(homeTeam, awayTeam, controller, fileData.game.actions)
             return Result.success(gameData)
         } catch (ex: Exception) {
             return Result.failure(ex)
-        }
-    }
-
-    /**
-     * Make sure that all [Team] and [Game] references are set after deserializing a Team.
-     * Hopefully, this can be removed eventually, but it requires changes to the deserializer.
-     */
-    fun fixStateRefs(state: Game): Game {
-        state.homeTeam.forEach { it.team = state.homeTeam }
-        state.awayTeam.forEach { it.team = state.awayTeam }
-        state.homeTeam.teamIsHomeTeam = true
-        state.homeTeam.teamIsAwayTeam = false
-        state.homeTeam.setGameReference(state)
-        state.awayTeam.teamIsHomeTeam = false
-        state.awayTeam.teamIsAwayTeam = true
-        state.awayTeam.setGameReference(state)
-        state.homeTeam.notifyDogoutChange()
-        state.awayTeam.notifyDogoutChange()
-        return state
-    }
-
-    // Remap object references like to Player in GameActions so they all point to the same instance
-    private fun remapActionRefs(
-        actions: List<GameAction>,
-        state: Game,
-    ): List<GameAction> {
-        return actions.map { action ->
-            when (action) {
-//                is PlayerSelected -> {
-//                    val isHomeTeam = state.homeTeam.firstOrNull { it.id == action.player.id } != null
-//                    val playerNo = action.player.number
-//                    val team = if (isHomeTeam) state.homeTeam else state.awayTeam
-//                    val player = team[playerNo]!!
-//                    PlayerSelected(player)
-//                }
-                else -> action
-            }
         }
     }
 }

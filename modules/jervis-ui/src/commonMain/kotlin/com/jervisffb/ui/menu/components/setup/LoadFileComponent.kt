@@ -39,6 +39,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun LoadFileComponent(viewModel: LoadFileComponentModel) {
     val filePath by viewModel.filePath.collectAsState()
+    val loadErrror by viewModel.fileError.collectAsState()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -70,6 +71,15 @@ fun LoadFileComponent(viewModel: LoadFileComponentModel) {
                         colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
                         painter = painterResource(Res.drawable.icon_menu_folder),
                         contentDescription = "Find Save File",
+                    )
+                }
+            }
+            if (loadErrror != null) {
+                Row(Modifier.fillMaxWidth().padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = loadErrror,
+                        color = JervisTheme.rulebookRed,
+                        fontSize = 14.sp,
                     )
                 }
             }
