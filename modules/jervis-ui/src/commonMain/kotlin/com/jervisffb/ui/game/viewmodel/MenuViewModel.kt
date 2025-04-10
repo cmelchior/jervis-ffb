@@ -20,6 +20,7 @@ import com.jervisffb.ui.menu.intro.CreditData
 import com.jervisffb.utils.canBeHost
 import com.jervisffb.utils.getBuildType
 import com.jervisffb.utils.getPlatformDescription
+import com.jervisffb.utils.jervisLogger
 import com.jervisffb.utils.singleThreadDispatcher
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -37,6 +38,10 @@ enum class Feature {
 }
 
 class MenuViewModel {
+    companion object {
+        val LOG = jervisLogger()
+    }
+
     var controller: GameEngineController? = null
     lateinit var uiState: UiGameController
 
@@ -57,16 +62,17 @@ class MenuViewModel {
         // Customize the create issue link, so it contains some basic information about the client
         // Formatting is weird because `getPlatformDescription` returns a multiline text that doesn't
         // follow the same indentation as the rest of the text.
-        val body = """
-<Describe the issue>
+        val body = buildString {
+            appendLine("""
+                <Describe the issue>
 
------
-**Client Information (${getBuildType()})**
-Jervis Client Version: ${BuildConfig.releaseVersion}
-Git Commit: ${BuildConfig.gitHash}
-${getPlatformDescription()}
-        """.trimIndent().encodeURLParameter()
-
+                -----
+                **Client Information (${getBuildType()})**
+                Jervis Client Version: ${BuildConfig.releaseVersion}
+                Git Commit: ${BuildConfig.gitHash}
+            """.trimIndent())
+            appendLine(getPlatformDescription())
+        }.encodeURLParameter()
         creditData = CreditData(
             newIssueUrl = "https://github.com/cmelchior/jervis-ffb/issues/new?body=$body&labels=user"
         )
@@ -121,20 +127,28 @@ ${getPlatformDescription()}
     }
 
     fun loadSetup(id: String) {
+        if (controller == null) {
+            // It shouldn't be possible to call "Load Setup" with out a game controller,
+            // but just in case it happens.
+            LOG.w { "Load Setup called before game was started." }
+            SoundManager.play(SoundEffect.ERROR)
+            return
+        }
+
         val allowedTeam = when (uiState.uiMode) {
             TeamActionMode.HOME_TEAM -> uiState.state.homeTeam.id
             TeamActionMode.AWAY_TEAM -> uiState.state.awayTeam.id
             TeamActionMode.ALL_TEAMS -> null // No team restrictions when undoing on a Client controlling both teams
         }
-        if (allowedTeam != null && controller?.state?.activeTeam?.id == allowedTeam) {
+        val game = controller ?: error("No game controller was found")
+        val team = game.state.getContext<SetupTeamContext>().team
+        if (allowedTeam != null && allowedTeam != team.id) {
             // This client is not considered the "active" client, which means it isn't allowed
             // to load setup formations
             SoundManager.play(SoundEffect.ERROR)
             return
         }
 
-        val game = controller ?: error("No game controller was found")
-        val team = game.state.getContext<SetupTeamContext>().team
         val setupActions = Setups.setups[id]!!.flatMap { (playerNo, fieldCoordinate) ->
             if (team[playerNo].state == PlayerState.RESERVE) {
                 listOf(
