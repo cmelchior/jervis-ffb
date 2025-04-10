@@ -211,7 +211,7 @@ enum class SkillType(val description: String) {
     // Passing
     ACCURATE("Accurate"),
     CANNONEER("Cannoneer"),
-    CLOUD_BUSTER("Cloud Buster"),
+    CLOUD_BURSTER("Cloud Burster"),
     DUMP_OFF("Dump-off"),
     FUMBLEROOSKIE("Fumblerooskie"),
     HAIL_MARY_PASS("Hail Mary Pass"),

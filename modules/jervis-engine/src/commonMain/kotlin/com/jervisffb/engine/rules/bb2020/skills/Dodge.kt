@@ -11,7 +11,7 @@ class Dodge(
     override val category: SkillCategory = SkillCategory.AGILITY,
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2020Skill, D6StandardSkillReroll {
-    override val type: SkillType = SkillType.ANIMAL_SAVAGERY
+    override val type: SkillType = SkillType.DODGE
     override val value: Int? = null
     override val skillId: SkillId = type.id()
     override val name: String = type.description

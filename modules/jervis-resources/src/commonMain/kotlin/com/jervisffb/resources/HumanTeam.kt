@@ -10,6 +10,18 @@ import com.jervisffb.engine.rules.bb2020.skills.SkillCategory.GENERAL
 import com.jervisffb.engine.rules.bb2020.skills.SkillCategory.PASSING
 import com.jervisffb.engine.rules.bb2020.skills.SkillCategory.STRENGTH
 import com.jervisffb.engine.rules.bb2020.skills.SkillType
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.CATCH
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.BLOCK
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.DODGE
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.PASS
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.SURE_HANDS
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.BONE_HEAD
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.LONER
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.MIGHTY_BLOW
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.THICK_SKULL
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.THROW_TEAMMATE
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.RIGHT_STUFF
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.STUNTY
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
@@ -44,7 +56,10 @@ val HUMAN_THROWER =
         "T",
         80_000,
         6, 3, 3, 2, 9,
-        listOf(/* Pass */ SkillType.SURE_HANDS.id()),
+        listOf(
+            PASS.id(),
+            SURE_HANDS.id()
+        ),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
         SpriteSheet.embedded("$iconRootPath/human_thrower.png",2),
@@ -59,7 +74,10 @@ val HUMAN_CATCHER =
         "C",
         65_000,
         8, 2, 3, 5, 8,
-        listOf(SkillType.CATCH.id(), SkillType.DODGE.id()),
+        listOf(
+            CATCH.id(),
+            DODGE.id()
+        ),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
         SpriteSheet.embedded("$iconRootPath/human_catcher.png", 4),
@@ -74,7 +92,7 @@ val HUMAN_BLITZER =
         "B",
         85_000,
         7, 3, 3, 4, 9,
-        listOf(SkillType.BLOCK.id()),
+        listOf(BLOCK.id()),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY, PASSING),
         SpriteSheet.embedded("$iconRootPath/human_blitzer.png", 4),
@@ -89,7 +107,11 @@ val HALFLING_HOPEFUL =
         "H",
         30_000,
         5, 2, 3, 4, 7,
-        emptyList(),
+        listOf(
+            DODGE.id(),
+            RIGHT_STUFF.id(),
+            STUNTY.id()
+        ),
         listOf(AGILITY),
         listOf(GENERAL, STRENGTH),
         SpriteSheet.embedded("$iconRootPath/human_halflinghopeful.png", 8),
@@ -104,7 +126,13 @@ val OGRE =
         "O",
         140_000,
         5, 5, 4, 5, 10,
-        emptyList(),
+        listOf(
+            BONE_HEAD.id(),
+            LONER.id(4),
+            MIGHTY_BLOW.id(1),
+            THICK_SKULL.id(),
+            THROW_TEAMMATE.id()
+        ),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL),
         SpriteSheet.embedded("$iconRootPath/human_ogre.png", 8),

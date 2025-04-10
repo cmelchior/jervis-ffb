@@ -401,7 +401,7 @@ class BB2020SkillSettings: SkillSettings() {
                     // TODO()
                     // }
                 }
-                SkillType.CLOUD_BUSTER -> {
+                SkillType.CLOUD_BURSTER -> {
                     // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
                     // TODO()
                     // }

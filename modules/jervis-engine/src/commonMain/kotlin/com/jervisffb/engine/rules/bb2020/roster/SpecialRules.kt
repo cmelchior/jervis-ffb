@@ -10,7 +10,7 @@ sealed interface SpecialRules {
 @Serializable
 enum class RegionalSpecialRule(override val description: String) : SpecialRules {
     BADLANDS_BRAWL("Badlands Brawl"),
-    ELVEN_KINGDOM_LEAGUE("Elven Kingdom League"),
+    ELVEN_KINGDOMS_LEAGUE("Elven Kingdoms League"),
     HAFLING_THIMBLE_CUP("Hafling Thimble Cup"),
     LUSTRIAN_SUPERLEAGUE("Lustrian Superleague"),
     OLD_WORLD_CLASSIC("Old World Classic"),

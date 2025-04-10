@@ -45,7 +45,7 @@ class KariColdsteel: InfamousCoachingStaff {
     override fun isAvailable(team: Team): Boolean {
         return team.roster.specialRules.intersect(
             listOf(
-                RegionalSpecialRule.ELVEN_KINGDOM_LEAGUE,
+                RegionalSpecialRule.ELVEN_KINGDOMS_LEAGUE,
                 RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE,
                 RegionalSpecialRule.OLD_WORLD_CLASSIC,
                 RegionalSpecialRule.WORLDS_EDGE_SUPERLEAGUE
