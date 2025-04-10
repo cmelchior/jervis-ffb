@@ -6,9 +6,8 @@ import com.jervisffb.engine.model.inducements.JosefBugman
 import com.jervisffb.engine.model.inducements.StandardBiasedReferee
 import com.jervisffb.engine.model.inducements.wizards.HirelingSportsWizard
 import com.jervisffb.engine.model.inducements.wizards.Wizard
-import com.jervisffb.engine.rules.bb2020.roster.BB2020StarPlayer
-import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
+import com.jervisffb.engine.rules.bb2020.roster.StarPlayerPosition
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
 import com.jervisffb.teams.THE_BLACK_GOBBO
 import kotlinx.serialization.Serializable
@@ -276,7 +275,7 @@ data class StarPlayersInducement(
             1,
             THE_BLACK_GOBBO.cost,
             enabled = true,
-            requirements = listOf(RegionalSpecialRule.BADLANDS_BRAWL, RegionalSpecialRule.UNDERWORLD_CHALLENGE),
+            requirements = THE_BLACK_GOBBO.playsFor,
 
         ),
     )
@@ -299,9 +298,12 @@ data class StarPlayersInducement(
     }
 }
 
+/**
+ * Class wrapping the details for a single Star Player inducement.
+ */
 @Serializable
 data class StarPlayerInducement(
-    val starPlayer: BB2020StarPlayer,
+    val starPlayer: StarPlayerPosition,
     val max: Int,
     val price: Int?,
     val enabled: Boolean,
@@ -313,7 +315,7 @@ data class StarPlayerInducement(
     fun toBuilder() = Builder(this)
 
     class Builder(inducement: StarPlayerInducement) {
-        val starPlayer: BB2020StarPlayer = inducement.starPlayer
+        val starPlayer: StarPlayerPosition = inducement.starPlayer
         var max: Int = inducement.max
         var price: Int? = inducement.price
         var enabled: Boolean = inducement.enabled

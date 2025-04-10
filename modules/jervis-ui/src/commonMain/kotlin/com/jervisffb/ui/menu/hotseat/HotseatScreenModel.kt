@@ -138,6 +138,8 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                 currentPage.value = 3
             } else {
                 rules = setupGameModel.createRules()
+                selectHomeTeamModel.initializeTeamSelector(rules!!)
+                selectAwayTeamModel.initializeTeamSelector(rules!!)
                 sidebarEntries[0] = sidebarEntries[0].copy(active = false, onClick = { goBackToPage(0) })
                 sidebarEntries[1] = sidebarEntries[1].copy(active = true, enabled = true, onClick = { homeTeamSelectionDone() })
                 currentPage.value = 1

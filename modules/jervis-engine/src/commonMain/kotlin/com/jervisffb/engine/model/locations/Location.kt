@@ -2,14 +2,12 @@ package com.jervisffb.engine.model.locations
 
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.tables.CornerThrowInPosition
-import kotlinx.serialization.Serializable
 
 /**
  * Interface representing the abstract idea of a location. This can either
  * represent somewhere on or off the field, a players location or something
  * else that would have a place on a real Blood Bowl board.
  */
-@Serializable
 sealed interface Location {
     fun isOnLineOfScrimmage(rules: Rules): Boolean
     fun isInWideZone(rules: Rules): Boolean

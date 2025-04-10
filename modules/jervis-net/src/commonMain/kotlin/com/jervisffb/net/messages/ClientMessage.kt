@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.GameId
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketExtension
@@ -28,7 +29,9 @@ val DUMMY_SESSION = object : WebSocketSession {
 @Serializable
 sealed interface TeamInfo
 @Serializable
-data class P2PTeamInfo(val team: Team): TeamInfo
+data class P2PTeamInfo(val team: SerializedTeam): TeamInfo {
+    constructor(team: Team) : this(SerializedTeam.serialize(team))
+}
 @Serializable
 data class HostedTeamInfo(val teamId: TeamId): TeamInfo
 

@@ -1,10 +1,12 @@
 package com.jervisffb.ui.menu.components.teamselector
 
 import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.JervisTeamFile
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.fumbbl.web.FumbblApi
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.IconFactory
@@ -25,27 +27,29 @@ class SelectTeamComponentModel(
     private val menuViewModel: MenuViewModel,
     private val getCoach: () -> Coach,
     private val onTeamSelected: (TeamInfo?) -> Unit,
-    private val getRules: () -> Rules,
 ) : JervisScreenModel {
 
     var unavailableTeam = MutableStateFlow<TeamId?>(null)
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
     val loadingTeams: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    var rules: Rules? = null
 
-    init {
-        loadTeamList()
+    fun initialize(rules: Rules) {
+        this.rules = rules
+        loadTeamList(rules)
     }
 
     fun reset() {
         selectedTeam.value = null
     }
 
-    private fun loadTeamList() {
+    private fun loadTeamList(rules: Rules) {
         menuViewModel.navigatorContext.launch {
             CacheManager.loadTeams().map { teamFile ->
-                val team = teamFile.team
-                // team.coach = Coach(CoachId("Unknown", "TemporaryCoach"))
+                val teamData = teamFile.team
+                val unknownCoach = Coach(CoachId("Unknown"), "TemporaryCoach")
+                val team = SerializedTeam.deserialize(rules, teamData, unknownCoach)
                 getTeamInfo(teamFile, team)
             }.let {
                 availableTeams.value = it.sortedBy { it.teamName }
@@ -85,12 +89,15 @@ class SelectTeamComponentModel(
         onSuccess: () -> Unit,
         onError: (String) -> Unit,
     ) {
-        val team = teamId.toIntOrNull() ?: error("Do something here")
+        val teamId = teamId.toIntOrNull() ?: error("Do something here")
         menuViewModel.navigatorContext.launch {
             try {
-                val teamFile = FumbblApi().loadTeam(team, getRules())
+                val rules = rules!!
+                val teamFile = FumbblApi().loadTeam(teamId, rules)
                 CacheManager.saveTeam(teamFile)
-                val teamInfo = getTeamInfo(teamFile, teamFile.team)
+                val unknownCoach = Coach(CoachId("Unknown"), "TemporaryCoach")
+                val team = SerializedTeam.deserialize(rules, teamFile.team, unknownCoach)
+                val teamInfo = getTeamInfo(teamFile, team)
                 availableTeams.value = (availableTeams.value.filter { it.teamId != teamInfo.teamId } + teamInfo).sortedBy { it.teamName }
                 onSuccess()
             } catch (e: Exception) {

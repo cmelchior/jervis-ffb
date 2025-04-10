@@ -39,7 +39,8 @@ object JervisSerialization {
         }
 
     fun createTeamSnapshot(team: Team): JsonElement {
-        return jsonFormat.encodeToJsonElement(team)
+        val serializedTeam = SerializedTeam.serialize(team)
+        return jsonFormat.encodeToJsonElement(serializedTeam)
     }
 
     fun saveToFile(
@@ -102,12 +103,6 @@ object JervisSerialization {
         state.homeTeam.notifyDogoutChange()
         state.awayTeam.notifyDogoutChange()
         return state
-    }
-
-    fun fixTeamRefs(team: Team): Team {
-        team.forEach { it.team = team }
-        team.notifyDogoutChange()
-        return team
     }
 
     // Remap object references like to Player in GameActions so they all point to the same instance

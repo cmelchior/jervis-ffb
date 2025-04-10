@@ -6,13 +6,13 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.ActionType
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
-import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
@@ -283,11 +283,10 @@ data object DogoutSelected : GameAction
 data class DirectionSelected(val direction: Direction) : GameAction
 
 @Serializable
-data class FieldSquareSelected(val coordinate: FieldCoordinate) : GameAction {
-    constructor(x: Int, y: Int) : this(FieldCoordinate(x, y))
+data class FieldSquareSelected(val x: Int, val y: Int) : GameAction {
+    constructor(coordinate: FieldCoordinate): this(coordinate.x, coordinate.y)
 
-    val x: Int = coordinate.x
-    val y: Int = coordinate.y
+    val coordinate: FieldCoordinate = FieldCoordinate(x, y)
 
     override fun toString(): String {
         return "${this::class.simpleName}[$x, $y]"
@@ -317,7 +316,7 @@ data class NoRerollSelected(val dicePoolId: Int = 0) : GameAction
 data class MoveTypeSelected(val moveType: MoveType) : GameAction
 
 @Serializable
-data class SkillSelected(val skill: SkillFactory): GameAction
+data class SkillSelected(val skill: SkillId): GameAction
 
 @Serializable
 data class InducementSelected(val name: String): GameAction

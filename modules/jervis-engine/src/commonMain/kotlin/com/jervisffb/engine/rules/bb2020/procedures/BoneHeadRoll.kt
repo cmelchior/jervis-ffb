@@ -150,7 +150,7 @@ object BoneHeadRoll: Procedure() {
                 val rollResultContext = state.getContext<BoneHeadRollContext>()
                 val isSuccess = calculateSuccess(d6)
                 val rollContext = rollResultContext.copy(
-                    roll = rollResultContext.roll.copy(
+                    roll = rollResultContext.roll.copyReroll(
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),

@@ -9,10 +9,8 @@ import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.net.messages.P2PClientState
-import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -62,7 +60,6 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
             selectedTeam.value = teamSelected
             canCreateGame.value = (teamSelected != null)
         },
-        getRules = { networkAdapter.rules ?: error("Rules are not loaded yet") }
     )
 
     // Page 3: Accept game and load resources
@@ -90,7 +87,6 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
             SidebarEntry(name = "3. Start Game")
         )
         sidebarEntries.addAll(startEntries)
-        loadTeamList()
         menuViewModel.navigatorContext.launch {
             networkAdapter.clientState.collect {
                 // TODO We move state optimistically, so we probably need to check if things needs to be reset somehow.
@@ -113,9 +109,9 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
                     }
                     P2PClientState.RUN_GAME -> {
                         val rules = networkAdapter.rules!!
-                        val homeTeam = JervisSerialization.fixTeamRefs(networkAdapter.homeTeam.value!!)
+                        val homeTeam = networkAdapter.homeTeam.value!!
                         homeTeam.coach = networkAdapter.homeCoach.value!!
-                        val awayTeam = JervisSerialization.fixTeamRefs(networkAdapter.awayTeam.value!!)
+                        val awayTeam = networkAdapter.awayTeam.value!!
                         awayTeam.coach = networkAdapter.awayCoach.value!!
                         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
                         val gameController = GameEngineController(game, networkAdapter.initialActions)
@@ -168,17 +164,6 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
         }
     }
 
-    private fun loadTeamList() {
-        menuViewModel.navigatorContext.launch {
-            CacheManager.loadTeams().map { teamFile ->
-                val team = teamFile.team
-                getTeamInfo(teamFile, team)
-            }.let {
-                availableTeams.value = it.sortedBy { it.teamName }
-            }
-        }
-    }
-
     private suspend fun getTeamInfo(teamFile: JervisTeamFile, team: Team): TeamInfo {
         val logoSize = LogoSize.SMALL
         val teamLogo = IconFactory.loadRosterIcon(
@@ -226,6 +211,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
     }
 
     fun hostJoinedDone() {
+        selectTeamModel.initializeTeamList(networkAdapter.rules!!)
         // Move on from "Join Host" page
         gotoNextPage(1)
     }

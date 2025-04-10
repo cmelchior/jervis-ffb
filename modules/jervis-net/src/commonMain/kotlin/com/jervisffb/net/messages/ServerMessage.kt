@@ -5,9 +5,8 @@ import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
-import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.GameId
 import com.jervisffb.net.messages.P2PClientState.JOIN_SERVER
 import com.jervisffb.net.messages.P2PHostState.JOIN_SERVER
@@ -111,8 +110,8 @@ data class GameStateSyncMessage(
     val hostState: P2PHostState = P2PHostState.START,
     val clientState: P2PClientState = P2PClientState.START,
     val spectatorState: SpectatorState = SpectatorState.START,
-    val homeTeam: Team?,
-    val awayTeam: Team?,
+    val homeTeam: SerializedTeam?,
+    val awayTeam: SerializedTeam?,
     // Chat history,
     // Action history,
 ): ServerMessage
@@ -133,10 +132,9 @@ data class UpdateSpectatorStateMessage(val state: SpectatorState): ServerMessage
 data class UserMessage(val username: String): ServerMessage
 
 @Serializable
-data class TeamJoinedMessage(val isHomeTeam: Boolean, private val team: Team): ServerMessage {
-    fun getTeam() = JervisSerialization.fixTeamRefs(team)
+data class TeamJoinedMessage(val isHomeTeam: Boolean, private val team: SerializedTeam, private val coach: Coach): ServerMessage {
+    fun getTeam(rules: Rules) = SerializedTeam.deserialize(rules,team, coach)
 }
-
 
 // Response to JoinGameAs* if the server cannot find a game with that Id
 @Serializable

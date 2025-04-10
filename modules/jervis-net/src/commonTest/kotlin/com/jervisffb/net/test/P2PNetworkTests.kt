@@ -67,7 +67,7 @@ class P2PNetworkTests {
         gameName = "test",
         rules = rules,
         hostCoach = CoachId("HomeCoachID"),
-        hostTeam = createDefaultHomeTeam(),
+        hostTeam = createDefaultHomeTeam(rules),
         clientCoach = null,
         clientTeam = null,
         testMode = true
@@ -90,7 +90,7 @@ class P2PNetworkTests {
             null,
             "host",
             true,
-            P2PTeamInfo(createDefaultHomeTeam())
+            P2PTeamInfo(createDefaultHomeTeam(rules))
         )
         conn1.send(join1)
         consumeServerMessage<GameStateSyncMessage>(conn1)
@@ -98,7 +98,7 @@ class P2PNetworkTests {
             assertEquals("host", it.coach.name)
         }
         checkServerMessage<TeamJoinedMessage>(conn1) {
-            assertEquals("HomeTeam", it.getTeam().name)
+            assertEquals("HomeTeam", it.getTeam(rules).name)
         }
         checkServerMessage<UpdateHostStateMessage>(conn1) {
             assertEquals(P2PHostState.WAIT_FOR_CLIENT, it.state)
@@ -125,14 +125,14 @@ class P2PNetworkTests {
         }
 
         // Client selects team
-        conn2.send(TeamSelectedMessage(P2PTeamInfo(lizardMenAwayTeam())))
+        conn2.send(TeamSelectedMessage(P2PTeamInfo(lizardMenAwayTeam(rules))))
         checkServerMessage<TeamJoinedMessage>(conn1) {
             assertFalse(it.isHomeTeam)
-            assertEquals("AwayTeam", it.getTeam().name)
+            assertEquals("AwayTeam", it.getTeam(rules).name)
         }
         checkServerMessage<TeamJoinedMessage>(conn2) {
             assertFalse(it.isHomeTeam)
-            assertEquals("AwayTeam", it.getTeam().name)
+            assertEquals("AwayTeam", it.getTeam(rules).name)
         }
 
         // Receive request to start game
@@ -267,7 +267,7 @@ class P2PNetworkTests {
             null,
             "host",
             true,
-            P2PTeamInfo(createDefaultHomeTeam())
+            P2PTeamInfo(createDefaultHomeTeam(rules))
         )
         conn1.send(join1)
         consumeServerMessage<GameStateSyncMessage>(conn1)
@@ -302,7 +302,7 @@ class P2PNetworkTests {
         }
 
         // Host selects team
-        conn1.send(TeamSelectedMessage(P2PTeamInfo(createDefaultHomeTeam())))
+        conn1.send(TeamSelectedMessage(P2PTeamInfo(createDefaultHomeTeam(rules))))
         consumeServerMessage<TeamJoinedMessage>(conn1)
         consumeServerMessage<TeamJoinedMessage>(conn2)
 
@@ -419,7 +419,7 @@ class P2PNetworkTests {
             null,
             "host",
             true,
-            P2PTeamInfo(createDefaultHomeTeam())
+            P2PTeamInfo(createDefaultHomeTeam(rules))
         )
         conn1.send(join1)
         consumeServerMessage<GameStateSyncMessage>(conn1)
@@ -442,7 +442,7 @@ class P2PNetworkTests {
         consumeServerMessage<UpdateClientStateMessage>(conn2)
 
         // Client selects team
-        conn2.send(TeamSelectedMessage(P2PTeamInfo(lizardMenAwayTeam())))
+        conn2.send(TeamSelectedMessage(P2PTeamInfo(lizardMenAwayTeam(rules))))
         consumeServerMessage<TeamJoinedMessage>(conn1)
         consumeServerMessage<TeamJoinedMessage>(conn2)
 

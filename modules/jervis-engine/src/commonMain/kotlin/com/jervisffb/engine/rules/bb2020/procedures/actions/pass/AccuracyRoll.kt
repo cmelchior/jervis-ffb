@@ -55,11 +55,7 @@ object AccuracyRoll: Procedure() {
     object RollDice : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PassContext>().thrower.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> = listOf(RollDice(Dice.D6))
-        override fun applyAction(
-            action: GameAction,
-            state: Game,
-            rules: Rules,
-        ): Command {
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D6Result>(action) { d6 ->
                 val updatedContext = updatePassContext(state, rules, d6, false)
                 return compositeCommandOf(
@@ -183,7 +179,7 @@ object AccuracyRoll: Procedure() {
 
         return if (reroll) {
             context.copy(
-                passingRoll = context.passingRoll!!.copy(
+                passingRoll = context.passingRoll!!.copyReroll(
                     rerollSource = state.rerollContext!!.source,
                     rerolledResult = d6
                 ),

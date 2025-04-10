@@ -106,7 +106,7 @@ fun TeamTable(width: Dp, team: Team, isOnHomeTeam: Boolean) {
             team.rerolls.size,
             team.dedicatedFans,
             team.assistantCoaches,
-            team.cheerLeaders,
+            team.cheerleaders,
             team.apothecaries,
             team.treasury,
             team.teamValue,

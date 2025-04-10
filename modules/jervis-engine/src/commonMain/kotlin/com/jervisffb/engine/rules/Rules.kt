@@ -12,6 +12,7 @@ import com.jervisffb.engine.model.IntRangeSerializer
 import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.FieldCoordinate.Companion.OUT_OF_BOUNDS
@@ -20,7 +21,11 @@ import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
+import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
+import com.jervisffb.engine.rules.bb2020.SkillSettings
+import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
+import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.rules.bb2020.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyTable
@@ -163,7 +168,9 @@ open class Rules(
     // Probably need to replace this with a reference to the FoulProcedure
     open val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.STRICT,
     // Probably need to replace this with a reference to the KickProcedure
-    open val kickingPlayerBehavior: KickingPlayerBehavior = KickingPlayerBehavior.STRICT
+    open val kickingPlayerBehavior: KickingPlayerBehavior = KickingPlayerBehavior.STRICT,
+    // Configure skills available, their behaviour and which category they belong to.
+    open val skillSettings: SkillSettings = BB2020SkillSettings(),
 ) {
     // How are paths between locations on the field calculated. This can be rules specific,
     // since it might involve the use of skills.
@@ -555,9 +562,18 @@ open class Rules(
         }
     }
 
+    /**
+     * Skills might change subtly between rule versions, for that reason, we need a single place to lookup
+     * skill definitions from their id (since we might want to support teams across multiple rulesets).
+     */
+    fun createSkill(player: Player, skill: SkillId, expiresAt: Duration = Duration.PERMANENT): Skill {
+        return skillSettings.createSkill(player, skill, expiresAt)
+    }
+
     fun toBuilder(): Builder {
         return Builder(this)
     }
+
 
     /**
      *  Rules builder making it easier to create variants of

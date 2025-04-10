@@ -22,7 +22,7 @@ class WebSocketClientConnectionTests {
             gameName = "testGame",
             rules = rules,
             hostCoach = CoachId("HomeCoachID"),
-            hostTeam = createDefaultHomeTeam(),
+            hostTeam = createDefaultHomeTeam(rules),
             clientCoach = null,
             clientTeam = null,
             testMode = true

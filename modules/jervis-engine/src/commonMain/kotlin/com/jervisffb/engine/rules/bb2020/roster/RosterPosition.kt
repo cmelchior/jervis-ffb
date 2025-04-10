@@ -5,17 +5,17 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
-import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.serialize.SpriteSource
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BB2020Position(
+data class RosterPosition(
     override val id: PositionId,
     override val quantity: Int,
     override val title: String,
@@ -25,14 +25,16 @@ data class BB2020Position(
     override val move: Int,
     override val strength: Int,
     override val agility: Int,
-    val passing: Int?,
+    override val passing: Int?,
     override var armorValue: Int,
-    override val skills: List<SkillFactory>,
-    val primary: List<BB2020SkillCategory>,
-    val secondary: List<BB2020SkillCategory>,
+    override val skills: List<SkillId>,
+    override val primary: List<SkillCategory>,
+    override val secondary: List<SkillCategory>,
     override val icon: SpriteSource?,
     override val portrait: SpriteSource?,
 ) : Position {
+    override val playsFor: List<RegionalSpecialRule> = emptyList()
+
     override fun createPlayer(
         rules: Rules,
         team: Team,
@@ -40,12 +42,13 @@ data class BB2020Position(
         name: String,
         number: PlayerNo,
         type: PlayerType,
-        iconData: PlayerUiData?
+        icon: PlayerUiData?
     ): Player {
         return Player(
+            rules,
             id,
             this,
-            iconData,
+            icon,
             type
         ).apply {
             this.team = team
@@ -57,11 +60,11 @@ data class BB2020Position(
             strength = position.strength
             baseAgility = position.agility
             agility = position.agility
-            basePassing = this@BB2020Position.passing
-            passing = this@BB2020Position.passing
+            basePassing = this@RosterPosition.passing
+            passing = this@RosterPosition.passing
             baseArmorValue = position.armorValue
             armorValue = position.armorValue
-            positionSkills = position.skills.map { it.createSkill(this) }.toMutableList()
+            positionSkills = position.skills.map { rules.createSkill(this, it) }.toMutableList()
         }
     }
 

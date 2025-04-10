@@ -7,7 +7,6 @@ import com.jervisffb.engine.model.field.SquareSubstrateType
 import com.jervisffb.engine.model.field.SquareType
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
-import kotlinx.serialization.Serializable
 
 /**
  * This class represents a square on the [Field].
@@ -44,7 +43,6 @@ import kotlinx.serialization.Serializable
  * to ensure that these invariants are not broken. This should allow us to model a wider
  * variety of cases.
  */
-@Serializable
 class FieldSquare(
     val coordinates: FieldCoordinate
 ) : Observable<FieldSquare>(), FieldCoordinate by coordinates {

@@ -3,7 +3,6 @@ package com.jervisffb.engine.model.locations
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.tables.CornerThrowInPosition
-import kotlinx.serialization.Serializable
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
@@ -232,5 +231,4 @@ interface FieldCoordinate: OnFieldLocation {
     }
 }
 
-@Serializable
 data class FieldCoordinateImpl(override val x: Int, override val y: Int) : FieldCoordinate

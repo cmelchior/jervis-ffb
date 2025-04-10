@@ -2,17 +2,14 @@ package com.jervisffb.resources
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.STRENGTH
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
-import com.jervisffb.engine.rules.bb2020.skills.Block
-import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
-import com.jervisffb.engine.rules.bb2020.skills.Dodge
-import com.jervisffb.engine.rules.bb2020.skills.SureHands
+import com.jervisffb.engine.rules.bb2020.roster.RosterPosition
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory.AGILITY
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory.GENERAL
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory.PASSING
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory.STRENGTH
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
@@ -23,7 +20,7 @@ import com.jervisffb.engine.serialize.SpriteSheet
  * See page 116 in the rulebook.
  */
 val HUMAN_LINEMAN =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-lineman"),
         16,
         "Human Lineman",
@@ -39,7 +36,7 @@ val HUMAN_LINEMAN =
 
     )
 val HUMAN_THROWER =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-thrower"),
         2,
         "Throwers",
@@ -47,14 +44,14 @@ val HUMAN_THROWER =
         "T",
         80_000,
         6, 3, 3, 2, 9,
-        listOf(/* Pass */ SureHands.Factory),
+        listOf(/* Pass */ SkillType.SURE_HANDS.id()),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
         SpriteSheet.embedded("$iconRootPath/human_thrower.png",2),
         SingleSprite.embedded("$portraitRootPath/human_thrower.png")
     )
 val HUMAN_CATCHER =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-catcher"),
         4,
         "Catchers",
@@ -62,14 +59,14 @@ val HUMAN_CATCHER =
         "C",
         65_000,
         8, 2, 3, 5, 8,
-        listOf(CatchSkill.Factory, Dodge.Factory),
+        listOf(SkillType.CATCH.id(), SkillType.DODGE.id()),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
         SpriteSheet.embedded("$iconRootPath/human_catcher.png", 4),
         SingleSprite.embedded("$portraitRootPath/human_catcher.png")
     )
 val HUMAN_BLITZER =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-blitzer"),
         4,
         "Blitzers",
@@ -77,14 +74,14 @@ val HUMAN_BLITZER =
         "B",
         85_000,
         7, 3, 3, 4, 9,
-        listOf(Block.Factory),
+        listOf(SkillType.BLOCK.id()),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY, PASSING),
         SpriteSheet.embedded("$iconRootPath/human_blitzer.png", 4),
         SingleSprite.embedded("$portraitRootPath/human_blitzer.png")
     )
 val HALFLING_HOPEFUL =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-hafling-hopeful"),
         3,
         "Halfling Hopefuls",
@@ -99,7 +96,7 @@ val HALFLING_HOPEFUL =
         SingleSprite.embedded("$portraitRootPath/human_halflinghopeful.png")
     )
 val OGRE =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-ogre"),
         1,
         "Ogre",

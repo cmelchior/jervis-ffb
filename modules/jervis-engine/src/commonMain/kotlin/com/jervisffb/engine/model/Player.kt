@@ -9,7 +9,7 @@ import com.jervisffb.engine.model.modifiers.TemporaryEffect
 import com.jervisffb.engine.model.modifiers.TemporaryEffectType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Skill
-import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -122,17 +122,14 @@ enum class Availability {
     UNAVAILABLE, // Unavailable for this turn
 }
 
-@Serializable
 class Player(
+    rules: Rules,
     val id: PlayerId,
     val position: Position,
     val icon: PlayerUiData? = null,
     val type: PlayerType
 ) : Observable<Player>() {
-
-    @Transient
     lateinit var team: Team
-
     var location: Location = DogOut
         set(value) {
             val old = location
@@ -192,7 +189,7 @@ class Player(
     // to mark the player somehow. This is done through a TemporaryEffect
     val temporaryEffects = mutableListOf<TemporaryEffect>()
     val extraSkills = mutableListOf<Skill>()
-    var positionSkills = position.skills.map { it.createSkill(this) }.toMutableList()
+    var positionSkills = position.skills.map { rules.createSkill(this, it) }.toMutableList()
     val skills: List<Skill>
         get() = extraSkills + positionSkills // TODO This probably result in _a lot_ of copying. Find a way to optimize this
 
@@ -200,15 +197,26 @@ class Player(
     var missNextGame: Boolean = false
     var starPlayerPoints: Int = 0
     var level: PlayerLevel = PlayerLevel.ROOKIE
-    val ball: Ball?
-        get() = team.game.balls.firstOrNull { it.carriedBy == this }
     var cost: Int = 0
 
-    fun addSkill(skill: SkillFactory) {
-        extraSkills.add(skill.createSkill(this))
+
+    val ball: Ball?
+        get() = team.game.balls.firstOrNull { it.carriedBy == this }
+
+    fun addSkill(skill: SkillType) {
+        val skill = team.game.rules.createSkill(this, skill.id(null))
+        extraSkills.add(skill)
+    }
+
+    fun addSkill(skill: SkillId) {
+        val skill = team.game.rules.createSkill(this, skill)
+        extraSkills.add(skill)
     }
 
     fun addSkill(skill: Skill) {
+        if (skill.player != this) {
+            throw IllegalArgumentException("Skill $skill is not owned by ${this.id}: ${skill.player.id}")
+        }
         extraSkills.add(skill)
     }
 
@@ -290,7 +298,6 @@ inline fun <reified T: Skill> Player.isSkillAvailable(): Boolean {
         if (!hasTackleZones && !skill.workWithoutTackleZones) {
             return@let false
         }
-
         // TODO Is a Stunned player considered Prone or are they completely separate?
         if ((state == PlayerState.PRONE || state == PlayerState.STUNNED || state == PlayerState.STUNNED_OWN_TURN) && !skill.workWhenProne) {
             return@let false

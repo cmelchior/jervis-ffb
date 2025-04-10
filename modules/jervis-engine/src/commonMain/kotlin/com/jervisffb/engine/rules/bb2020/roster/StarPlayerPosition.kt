@@ -5,9 +5,10 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.PlayerSkillFactory
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.serialize.SpriteSource
@@ -19,9 +20,8 @@ import kotlinx.serialization.Serializable
  * as well as being able to track changes to them, e.g. through Special Play cards
  * or other things that add temporary affects to players
  */
-
 @Serializable
-class BB2020StarPlayer(
+class StarPlayerPosition(
     override val id: PositionId,
     override val title: String,
     override val shortHand: String,
@@ -29,15 +29,17 @@ class BB2020StarPlayer(
     override val move: Int,
     override val strength: Int,
     override val agility: Int,
-    val passing: Int?,
+    override val passing: Int?,
     override var armorValue: Int,
-    override val skills: List<PlayerSkillFactory>,
-    val playsFor: List<RegionalSpecialRule>,
+    override val skills: List<SkillId>,
+    override val playsFor: List<RegionalSpecialRule>,
     override val icon: SpriteSource?,
     override val portrait: SpriteSource?,
 ): Position {
     override val quantity: Int = 1
     override val titleSingular: String = title
+    override val primary: List<SkillCategory> = emptyList()
+    override val secondary: List<SkillCategory> = emptyList()
 
     override fun createPlayer(
         rules: Rules,
@@ -48,7 +50,6 @@ class BB2020StarPlayer(
         type: PlayerType,
         icon: PlayerUiData?
     ): Player {
-
         TODO("Not yet implemented")
     }
 }

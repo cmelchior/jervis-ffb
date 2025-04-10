@@ -88,14 +88,14 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
     }
 
     private fun createDevHotseatScreenModel(menuViewModel: MenuViewModel, randomActions: Boolean = false): GameScreenModel {
-        val homeTeam = createDefaultHomeTeam()
-        val awayTeam = createDefaultAwayTeam()
         val rules = StandardBB2020Rules().toBuilder().run {
             timers.timersEnabled = false
             diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
             undoActionBehavior = UndoActionBehavior.ALLOWED
             build()
         }
+        val homeTeam = createDefaultHomeTeam(rules)
+        val awayTeam = createDefaultAwayTeam(rules)
         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game)
         val gameSettings = GameSettings(gameRules = rules, isHotseatGame = true)

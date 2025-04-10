@@ -70,10 +70,10 @@ object StandardBlockRerollDice: Procedure() {
                 val rerollContext = state.rerollContext!!
                 val blockContext = state.getContext<BlockContext>()
                 val updatedRoll = blockContext.roll.mapIndexed { i, blockRoll: BlockDieRoll ->
-                    blockRoll.also {
-                        it.rerollSource = rerollContext.source
-                        it.rerolledResult = rerolls[i] // TODO This requires that the rerolls are in the same order. Is that acceptable?
-                    }
+                    blockRoll.copyReroll(
+                        rerollSource = rerollContext.source,
+                        rerolledResult = rerolls[i] // TODO This requires that the rerolls are in the same order. Is that acceptable?
+                    )
                 }
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BLOCK, rerolls),

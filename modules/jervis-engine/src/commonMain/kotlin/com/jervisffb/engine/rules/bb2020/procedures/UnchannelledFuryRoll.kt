@@ -150,7 +150,7 @@ object UnchannelledFuryRoll: Procedure() {
                 val rollResultContext = state.getContext<UnchannelledFuryRollContext>()
                 val isSuccess = calculateSuccess(activateContext, d6)
                 val rollContext = rollResultContext.copy(
-                    roll = rollResultContext.roll.copy(
+                    roll = rollResultContext.roll.copyReroll(
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),

@@ -27,6 +27,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.rules.bb2020.skills.Pro
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 
 /**
  * Procedure for handling the Prayer to Nuffle "Blessed Statue of Nuffle" as described on page 39
@@ -69,7 +70,7 @@ object BlessedStatueOfNuffle : Procedure() {
                         compositeCommandOf(
                             AddPlayerSkill(
                                 player,
-                                Pro.Factory.createSkill(player, true, Duration.END_OF_GAME)
+                                rules.createSkill(player, SkillType.PRO.id(), Duration.END_OF_GAME)
                             ),
                             SetContext(context.copy(resultApplied = true)),
                             ReportGameProgress("${player.name} received Blessed Statue of Nuffle (Pro)"),

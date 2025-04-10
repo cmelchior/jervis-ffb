@@ -28,7 +28,6 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Loner
 
@@ -69,13 +68,15 @@ object IntensiveTraining : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<IntensiveTrainingContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<IntensiveTrainingContext>()
-            return listOf(SelectSkill(skills = (context.player.position as BB2020Position).primary.flatMap { it.skills }))
+            return listOf(SelectSkill(skills = context.player.position.primary.flatMap {
+                rules.skillSettings.getAvailableSkills(it)
+            }))
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkTypeAndValue<SkillSelected>(state, rules, action) {
                 val context = state.getContext<IntensiveTrainingContext>()
-                val skill = it.skill.createSkill(context.player, isTemporary = true, expiresAt = Duration.END_OF_GAME)
+                val skill = rules.createSkill(context.player, it.skill, expiresAt = Duration.END_OF_GAME)
                 return compositeCommandOf(
                     AddPlayerSkill(context.player, skill),
                     ReportGameProgress("${context.player.name} receives ${skill.name} due to Intensive Training"),

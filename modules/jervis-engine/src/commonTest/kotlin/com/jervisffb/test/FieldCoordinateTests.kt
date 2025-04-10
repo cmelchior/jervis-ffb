@@ -26,7 +26,7 @@ fun getDefaultTestSetup(rules: Rules): Game {
             addPlayer(PlayerId("H9"), "Blitzer-2", PlayerNo(9), HUMAN_BLITZER)
             addPlayer(PlayerId("H10"), "Blitzer-3", PlayerNo(10), HUMAN_BLITZER)
             addPlayer(PlayerId("H11"), "Blitzer-4", PlayerNo(11), HUMAN_BLITZER)
-            reRolls = 4
+            rerolls = 4
             apothecaries = 1
         }
     val p1 = team1

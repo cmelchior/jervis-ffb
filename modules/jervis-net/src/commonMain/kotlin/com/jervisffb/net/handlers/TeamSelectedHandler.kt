@@ -1,5 +1,6 @@
 package com.jervisffb.net.handlers
 
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.GameSession
 import com.jervisffb.net.JervisNetworkWebSocketConnection
 import com.jervisffb.net.messages.GameState
@@ -22,14 +23,15 @@ class TeamSelectedHandler(override val session: GameSession) : ClientMessageHand
             return
         } else {
             // TODO This is a temp fix for getting the correct team refs. Should probably be done by serialization instead.
-            team.forEach { it.team = team }
-            team.notifyDogoutChange()
-            team.coach = client.coach
-            client.team = team
+            client.team = SerializedTeam.deserialize(session.gameSettings.gameRules, team, client.coach)
+//            team.forEach { it.team = team }
+//            team.notifyDogoutChange()
+//            team.coach = client.coach
+//            client.team = team
         }
 
         val isHomeTeam = (client == session.host)
-        session.out.sendTeamJoined(isHomeTeam, team)
+        session.out.sendTeamJoined(isHomeTeam, team, client.coach)
 
         // Check if all players have selected their teams, in that case continue with accepting the game
         when (session.coaches.count { it.team != null}) {

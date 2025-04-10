@@ -3,26 +3,23 @@ package com.jervisffb.fumbbl.web
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
-import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.bb2020.roster.RosterPosition
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
-import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
 import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialize.JervisMetaData
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.engine.serialize.RosterLogo
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.fumbbl.web.api.AuthResult
 import com.jervisffb.fumbbl.web.api.CoachSearchResult
@@ -30,7 +27,6 @@ import com.jervisffb.fumbbl.web.api.CurrentMatchResult
 import com.jervisffb.fumbbl.web.api.PlayerDetails
 import com.jervisffb.fumbbl.web.api.RosterDetails
 import com.jervisffb.fumbbl.web.api.TeamDetails
-import com.jervisffb.resources.HUMAN_BLITZER
 import com.jervisffb.utils.getHttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -124,8 +120,8 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
         val team = loadTeamFromFumbbl(teamId)
         val roster = loadRosterFromFumbbl(team.roster.id)
         val players: Set<PlayerDetails> = loadTeamPlayers(team)
-        val jervisRoster = convertToBB2020JervisRoster(roster)
-        val jervisTeam = convertToBB2020JervisTeam(jervisRoster, team)
+        val jervisRoster = convertToBB2020JervisRoster(rules, roster)
+        val jervisTeam = convertToBB2020JervisTeam(rules, jervisRoster, team)
         return JervisTeamFile(
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
             team = jervisTeam,
@@ -161,35 +157,32 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
         return details
     }
 
-    private fun mapToSkillFactory(skills: List<String>): List<SkillFactory> {
+    // Map FUMBBL Skill Names to Jervis SkillId's
+    private fun mapToSkillId(rules: Rules, skills: List<String>): List<SkillId> {
         // We should probably hard code all the FUMBBL titles instead of hoping the nams are the same.
-        // Also, this is allocating way too many objects.
-        val fakePlayer = Player("".playerId, HUMAN_BLITZER, null, PlayerType.STANDARD)
-        return skills.mapNotNull { fumbblSkill ->
-            BB2020SkillCategory.entries.flatMap { it.skills }
-                .firstOrNull {
-                    it.createSkill(fakePlayer).name == fumbblSkill
-                } // ?: throw IllegalStateException("Unsupported skill $fumbblSkill")
+        // But for now, lets just do it this way because it is easier
+        return skills.mapNotNull { skillName ->
+            rules.skillSettings.getSkillId(skillName) // ?: throw IllegalStateException("Unsupported skill $fumbblSkill")
         }
     }
 
-    private fun mapToSkillCategory(categories: List<String>): List<BB2020SkillCategory> {
+    private fun mapToSkillCategory(categories: List<String>): List<SkillCategory> {
         return categories.map {
             when (it) {
-                "P" -> BB2020SkillCategory.PASSING
-                "A" -> BB2020SkillCategory.AGILITY
-                "G" -> BB2020SkillCategory.GENERAL
-                "S" -> BB2020SkillCategory.STRENGTH
-                "M" -> BB2020SkillCategory.MUTATIONS
-                "T" -> BB2020SkillCategory.TRAITS
+                "P" -> SkillCategory.PASSING
+                "A" -> SkillCategory.AGILITY
+                "G" -> SkillCategory.GENERAL
+                "S" -> SkillCategory.STRENGTH
+                "M" -> SkillCategory.MUTATIONS
+                "T" -> SkillCategory.TRAITS
                 else -> throw IllegalStateException("Unsupported skill category: $it")
             }
         }
     }
 
-    private fun convertToBB2020JervisRoster(roster: RosterDetails): BB2020Roster {
-        val positions: List<BB2020Position> = roster.positions.map { position ->
-            BB2020Position(
+    private fun convertToBB2020JervisRoster(rules: Rules, roster: RosterDetails): BB2020Roster {
+        val positions: List<RosterPosition> = roster.positions.map { position ->
+            RosterPosition(
                 id = PositionId(position.id),
                 quantity = position.quantity,
                 title = position.type, // API doesn't return the "group" title, only the singular title
@@ -201,7 +194,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
                 agility = position.stats.AG,
                 passing = position.stats.PA,
                 armorValue = position.stats.AV,
-                skills = mapToSkillFactory(position.skills),
+                skills = mapToSkillId(rules, position.skills),
                 primary = mapToSkillCategory(position.normalSkills),
                 secondary = mapToSkillCategory(position.doubleSkills),
                 icon = null,
@@ -233,16 +226,16 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
     }
 
     // Convert a FUMBBL Team Data into a Jervis Team
-    private fun convertToBB2020JervisTeam(jervisRoster: BB2020Roster, team: TeamDetails): Team {
+    private fun convertToBB2020JervisTeam(rules: Rules, jervisRoster: BB2020Roster, team: TeamDetails): SerializedTeam {
         if (team.ruleset != 4) throw IllegalStateException("Unsupported ruleset ${team.ruleset}") // 4 is BB2020
-        return teamBuilder(StandardBB2020Rules(), jervisRoster) {
+        val team = teamBuilder(rules, jervisRoster) {
             id = TeamId(team.id.toString())
             name = team.name
             teamValue = team.teamValue
             coach = Coach(CoachId(team.coach.id.toString()), team.coach.name)
-            reRolls = team.rerolls
+            rerolls = team.rerolls
             fanFactor = team.fanFactor
-            cheerLeaders = team.cheerleaders
+            cheerleaders = team.cheerleaders
             assistentCoaches = team.assistantCoaches
             apothecaries = if (team.apothecary.equals("yes", ignoreCase = true)) 1 else 0
             team.players.forEach { player ->
@@ -253,12 +246,15 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
                 addPlayer(id, name, number, position)
             }
         }
+
+        // TODO Convert directly to SerializedTeam
+        return SerializedTeam.serialize(team)
     }
 
     private fun getBB2020Position(
         jervisRoster: BB2020Roster,
         position: PositionId,
-    ): BB2020Position {
+    ): RosterPosition {
         return jervisRoster.positions.firstOrNull {
             it.id  == position
         } ?: error("Unsupported position $position in ${jervisRoster.name}")

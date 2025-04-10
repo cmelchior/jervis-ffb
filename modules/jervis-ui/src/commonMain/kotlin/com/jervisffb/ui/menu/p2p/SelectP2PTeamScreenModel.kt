@@ -22,9 +22,12 @@ class SelectP2PTeamScreenModel(
     private val menuViewModel: MenuViewModel,
     private val getCoach: () -> Coach,
     private val onTeamSelected: (TeamInfo?) -> Unit,
-    private val getRules: () -> Rules,
 ) : JervisScreenModel {
-    val componentModel = SelectTeamComponentModel(menuViewModel, getCoach, onTeamSelected,  getRules)
+    val componentModel = SelectTeamComponentModel(menuViewModel, getCoach, onTeamSelected)
+
+    fun initializeTeamList(rules: Rules) {
+        componentModel.initialize(rules)
+    }
 
     fun markTeamUnavailable(team: TeamId) {
         componentModel.makeTeamUnavailable(team)

@@ -136,7 +136,7 @@ object PickupRoll : Procedure() {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val context = state.getContext<PickupRollContext>()
                 val updatedContext = context.copy(
-                    roll = context.roll!!.copy(
+                    roll = context.roll!!.copyReroll(
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),

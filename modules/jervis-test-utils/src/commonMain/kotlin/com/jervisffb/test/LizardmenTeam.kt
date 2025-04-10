@@ -2,24 +2,15 @@ package com.jervisffb.test
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.STRENGTH
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
-import com.jervisffb.engine.rules.bb2020.skills.BoneHead
-import com.jervisffb.engine.rules.bb2020.skills.Dodge
-import com.jervisffb.engine.rules.bb2020.skills.Loner
-import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
-import com.jervisffb.engine.rules.bb2020.skills.PrehensileTail
-import com.jervisffb.engine.rules.bb2020.skills.Stunty
-import com.jervisffb.engine.rules.bb2020.skills.ThickSkull
+import com.jervisffb.engine.rules.bb2020.roster.RosterPosition
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.serialize.RosterLogo
 
 val SKINK_RUNNER_LINEMEN =
-    BB2020Position(
+    RosterPosition(
         PositionId("lizardmen-skink-runner-lineman"),
         12,
         "Skink Runner Linemen",
@@ -27,14 +18,14 @@ val SKINK_RUNNER_LINEMEN =
         "Sk",
         60_000,
         8, 2, 3, 4, 8,
-        listOf(Dodge.Factory, Stunty.Factory),
-        listOf(AGILITY),
-        listOf(GENERAL, PASSING, STRENGTH),
+        listOf(SkillType.DODGE.id(), SkillType.STUNTY.id()),
+        listOf(SkillCategory.AGILITY),
+        listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
         null,
         null
     )
 val CHAMELEON_SKINKS =
-    BB2020Position(
+    RosterPosition(
         PositionId("lizardmen-chameleon-skink"),
         2,
         "Chameleon Skinks",
@@ -42,14 +33,14 @@ val CHAMELEON_SKINKS =
         "Cs",
         70_000,
         7, 2, 3, 3, 8,
-        listOf(Dodge.Factory, /* On the Ball, Shadowing */ Stunty.Factory),
-        listOf(AGILITY),
-        listOf(GENERAL, PASSING, STRENGTH),
+        listOf(SkillType.DODGE.id(), /* On the Ball, Shadowing */ SkillType.STUNTY.id()),
+        listOf(SkillCategory.AGILITY),
+        listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
         null,
         null
     )
 val SAURUS_BLOCKERS =
-    BB2020Position(
+    RosterPosition(
         PositionId("lizardmen-saurus-blocker"),
         6,
         "Saurus Blockers",
@@ -58,13 +49,13 @@ val SAURUS_BLOCKERS =
         85_000,
         6, 4, 5, 6, 10,
         emptyList(),
-        listOf(GENERAL, STRENGTH),
-        listOf(AGILITY),
+        listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY),
         null,
         null
     )
 val KROXIGOR =
-    BB2020Position(
+    RosterPosition(
         PositionId("lizardmen-kroxigor"),
         1,
         "Kroxigor",
@@ -73,14 +64,14 @@ val KROXIGOR =
         140_000,
         6, 5, 5, null, 10,
         listOf(
-            BoneHead.Factory,
-            Loner.Factory(4),
-            MightyBlow.Factory(1),
-            PrehensileTail.Factory,
-            ThickSkull.Factory,
+            SkillType.BONE_HEAD.id(),
+            SkillType.LONER.id(4),
+            SkillType.MIGHTY_BLOW.id(1),
+            SkillType.PREHENSILE_TAIL.id(),
+            SkillType.THICK_SKULL.id()
         ),
-        listOf(STRENGTH),
-        listOf(AGILITY, GENERAL),
+        listOf(SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         null,
         null
     )

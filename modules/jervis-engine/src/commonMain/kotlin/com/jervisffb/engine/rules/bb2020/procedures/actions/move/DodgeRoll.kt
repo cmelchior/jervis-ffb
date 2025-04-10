@@ -415,7 +415,7 @@ object DodgeRoll: Procedure() {
                 val dodgeContext = state.getContext<DodgeRollContext>()
                 val rerollContext = state.rerollContext!!
                 val rerolledDodgeRoll = dodgeContext.copy(
-                    roll = dodgeContext.roll!!.copy(
+                    roll = dodgeContext.roll!!.copyReroll(
                         rerollSource = rerollContext.source,
                         rerolledResult = d6,
                     )

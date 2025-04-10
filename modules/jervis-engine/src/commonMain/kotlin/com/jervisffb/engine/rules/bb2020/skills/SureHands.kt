@@ -4,23 +4,21 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
-import kotlinx.serialization.Serializable
 
-@Serializable
 class SureHands(
-    override val skillId: SkillId,
-    override val isTemporary: Boolean = false,
-    override val expiresAt: Duration = Duration.PERMANENT
+    override val player: Player,
+    override val category: SkillCategory = SkillCategory.GENERAL,
+    override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2020Skill, D6StandardSkillReroll {
-    override val id: RerollSourceId = RerollSourceId("${skillId.value}-reroll")
-    override val name: String = "Sure Hands"
+    override val type: SkillType = SkillType.SURE_HANDS
+    override val value: Int? = null
+    override val skillId: SkillId = type.id(value)
+    override val name: String = type.description
+    override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.value}-reroll")
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
-    override val category: SkillCategory = BB2020SkillCategory.GENERAL
     override var used: Boolean = false
-    override val value: Int? = null
     override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = false
 
@@ -35,21 +33,5 @@ class SureHands(
         wasSuccess: Boolean?,
     ): Boolean {
         return type == DiceRollType.PICKUP
-    }
-
-    @Serializable
-    data object Factory: PlayerSkillFactory {
-        override val value: Int? = null
-        override fun createSkill(
-            player: Player,
-            isTemporary: Boolean,
-            expiresAt: Duration
-        ): Skill {
-            return SureHands(
-                SkillId("${player.id.value}-SureHands"),
-                isTemporary,
-                expiresAt
-            )
-        }
     }
 }

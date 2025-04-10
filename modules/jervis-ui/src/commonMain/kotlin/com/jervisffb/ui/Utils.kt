@@ -28,9 +28,9 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.rules.bb2020.skills.Frenzy
-import com.jervisffb.engine.rules.bb2020.skills.Sidestep
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.FRENZY
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.SIDESTEP
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.resources.HUMAN_BLITZER
@@ -158,31 +158,31 @@ fun Modifier.dropShadow(
     }
 )
 
-fun createDefaultHomeTeam(): Team {
-    return teamBuilder(StandardBB2020Rules(), HUMAN_TEAM) {
+fun createDefaultHomeTeam(rules: Rules): Team {
+    return teamBuilder(rules, HUMAN_TEAM) {
         coach = Coach(CoachId("home-coach"), "HomeCoach")
         name = "HomeTeam"
         addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), HUMAN_LINEMAN)
         addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), HUMAN_LINEMAN)
         addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), HUMAN_LINEMAN)
         addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), HUMAN_LINEMAN)
-        addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HUMAN_THROWER, listOf(Sidestep.Factory))
-        addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HUMAN_CATCHER, listOf(Sidestep.Factory))
+        addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HUMAN_THROWER, listOf(SIDESTEP.id()))
+        addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HUMAN_CATCHER, listOf(SIDESTEP.id()))
         addPlayer(PlayerId("H7"), "Catcher-7-H", PlayerNo(7), HUMAN_CATCHER)
         addPlayer(PlayerId("H8"), "Blitzer-8-H", PlayerNo(8), HUMAN_BLITZER)
         addPlayer(PlayerId("H9"), "Blitzer-9-H", PlayerNo(9), HUMAN_BLITZER)
         addPlayer(PlayerId("H10"), "Blitzer-10-H", PlayerNo(10), HUMAN_BLITZER)
         addPlayer(PlayerId("H11"), "Blitzer-11-H", PlayerNo(11), HUMAN_BLITZER)
         addPlayer(PlayerId("H12"), "Lineman-12-H", PlayerNo(12), HUMAN_LINEMAN)
-        reRolls = 4
+        rerolls = 4
         apothecaries = 1
         dedicatedFans = 1
         teamValue = 1_000_000
     }
 }
 
-fun createDefaultAwayTeam(): Team {
-    return teamBuilder(StandardBB2020Rules(), LIZARDMEN_TEAM) {
+fun createDefaultAwayTeam(rules: Rules): Team {
+    return teamBuilder(rules, LIZARDMEN_TEAM) {
         coach = Coach(CoachId("away-coach"), "AwayCoach")
         name = "AwayTeam"
         addPlayer(PlayerId("A1"), "Kroxigor-1-A", PlayerNo(1), KROXIGOR)
@@ -190,13 +190,13 @@ fun createDefaultAwayTeam(): Team {
         addPlayer(PlayerId("A3"), "Saurus-3-A", PlayerNo(3), SAURUS_BLOCKERS)
         addPlayer(PlayerId("A4"), "Saurus-4-A", PlayerNo(4), SAURUS_BLOCKERS)
         addPlayer(PlayerId("A5"), "Saurus-5-A", PlayerNo(5), SAURUS_BLOCKERS)
-        addPlayer(PlayerId("A6"), "Saurus-6-A", PlayerNo(6), SAURUS_BLOCKERS, listOf(Frenzy.Factory))
-        addPlayer(PlayerId("A7"), "Saurus-7-A", PlayerNo(7), SAURUS_BLOCKERS, listOf(Frenzy.Factory))
+        addPlayer(PlayerId("A6"), "Saurus-6-A", PlayerNo(6), SAURUS_BLOCKERS, listOf(FRENZY.id()))
+        addPlayer(PlayerId("A7"), "Saurus-7-A", PlayerNo(7), SAURUS_BLOCKERS, listOf(FRENZY.id()))
         addPlayer(PlayerId("A8"), "ChameleonSkink-8-A", PlayerNo(8), CHAMELEON_SKINKS)
         addPlayer(PlayerId("A9"), "Skink-9-A", PlayerNo(9), SKINK_RUNNER_LINEMEN)
         addPlayer(PlayerId("A10"), "Skink-10-A", PlayerNo(10), SKINK_RUNNER_LINEMEN)
         addPlayer(PlayerId("A11"), "Skink-11-A", PlayerNo(11), SKINK_RUNNER_LINEMEN)
-        reRolls = 4
+        rerolls = 4
         apothecaries = 1
         teamValue = 1_000_000
     }

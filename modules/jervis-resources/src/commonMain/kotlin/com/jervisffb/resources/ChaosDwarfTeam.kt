@@ -2,27 +2,23 @@ package com.jervisffb.resources
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.MUTATIONS
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.STRENGTH
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.bb2020.roster.RosterPosition
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
-import com.jervisffb.engine.rules.bb2020.skills.Block
-import com.jervisffb.engine.rules.bb2020.skills.Sprint
-import com.jervisffb.engine.rules.bb2020.skills.SureFeet
-import com.jervisffb.engine.rules.bb2020.skills.Tackle
-import com.jervisffb.engine.rules.bb2020.skills.ThickSkull
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.BLOCK
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.SPRINT
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.SURE_FEET
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.TACKLE
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.THICK_SKULL
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
 import kotlinx.serialization.Serializable
 
 val HOBGOBLIN_LINEMEN =
-    BB2020Position(
+    RosterPosition(
         PositionId("chaos-dwarf-hobgoblin-lineman"),
         16,
         "Hobgoblin Linemen",
@@ -31,13 +27,13 @@ val HOBGOBLIN_LINEMEN =
         40_000,
         6, 3, 3, 4, 8,
         emptyList(),
-        listOf(GENERAL),
-        listOf(AGILITY, STRENGTH),
+        listOf(SkillCategory.GENERAL),
+        listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
         SpriteSheet.embedded("$iconRootPath/chaosdwarf_hobgoblinlineman.png", 10),
         SingleSprite.embedded("$portraitRootPath/chaosdwarf_hobgoblinlineman.png")
     )
 val CHAOS_DWARF_BLOCKERS =
-    BB2020Position(
+    RosterPosition(
         PositionId("chaos-dwarf-chaos-dwarf-blocker"),
         6,
         "Chaos Dwarf Blockers",
@@ -45,14 +41,14 @@ val CHAOS_DWARF_BLOCKERS =
         "Cd",
         70_000,
         4, 3, 4, 6, 10,
-        listOf(Block.Factory, Tackle.Factory, ThickSkull.Factory),
-        listOf(GENERAL, STRENGTH),
-        listOf(AGILITY, MUTATIONS),
+        listOf(BLOCK.id(), TACKLE.id(), THICK_SKULL.id()),
+        listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS),
         SpriteSheet.embedded("$iconRootPath/chaosdwarf_chaosdwarfblocker.png", 6),
         SingleSprite.embedded("$portraitRootPath/chaosdwarf_chaosdwarfblocker.png")
     )
 val BULL_CENTAUR_BLITZERS =
-    BB2020Position(
+    RosterPosition(
         PositionId("chaos-dwarf-bull-centaur-blitzer"),
         2,
         "Bull Centaur Blitzers",
@@ -61,17 +57,17 @@ val BULL_CENTAUR_BLITZERS =
         130_000,
         6, 4, 4, 6, 10,
         listOf(
-            Sprint.Factory,
-            SureFeet.Factory,
-            ThickSkull.Factory
+            SPRINT.id(),
+            SURE_FEET.id(),
+            THICK_SKULL.id(),
         ),
-        listOf(GENERAL, STRENGTH),
-        listOf(AGILITY),
+        listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY),
         SpriteSheet.embedded("$iconRootPath/chaosdwarf_bullcentaurblitzer.png", 2),
         SingleSprite.embedded("$portraitRootPath/chaosdwarf_bullcentaurblitzer.png")
     )
 val ENSLAVED_MINOTAUR =
-    BB2020Position(
+    RosterPosition(
         PositionId("chaos-dwarf-enslaved-minotaur"),
         1,
         "Enslaved Minotaur",
@@ -80,8 +76,8 @@ val ENSLAVED_MINOTAUR =
         150_000,
         5, 5, 4, 0, 9,
         emptyList(),
-        listOf(AGILITY, GENERAL),
-        listOf(STRENGTH, PASSING),
+        listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        listOf(SkillCategory.STRENGTH, SkillCategory.PASSING),
         SpriteSheet.embedded("$iconRootPath/chaosdwarf_enslavedminotaur.png",1),
         SingleSprite.embedded("$portraitRootPath/chaosdwarf_enslavedminotaur.png")
     )

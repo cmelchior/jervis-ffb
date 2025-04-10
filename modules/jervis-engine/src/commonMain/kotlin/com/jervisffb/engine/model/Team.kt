@@ -17,8 +17,6 @@ import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlin.properties.Delegates
 
 class TeamHalfData(private val game: Game) {
@@ -74,7 +72,6 @@ class TeamTurnData(private val game: Game) {
     val availableSpecialActions = mutableMapOf<PlayerSpecialActionType, Int>()
 }
 
-@Serializable
 class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach: Coach) : Collection<Player>, Observable<Team>() {
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
@@ -87,7 +84,7 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach
     fun getApothecaries(): List<Apothecary> = teamApothecaries + tempApothecaries
 
     // Track cheerleaders
-    val cheerLeaders: Int
+    val cheerleaders: Int
         get() = teamCheerleaders + tempCheerleaders
     var teamCheerleaders: Int = 0 // 0-12
     var tempCheerleaders: Int = 0 // 0-4
@@ -128,25 +125,16 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach
 
     // Cyclic dependencies. Must be manually set when a Team is constructed
     // TODO Why do we have these and `isAwayTeam()`?
-    @Transient
     lateinit var game: Game
-    @Transient
     var teamIsHomeTeam: Boolean = false
-    @Transient
     var teamIsAwayTeam: Boolean = false
 
     // Temporary state. Currently transient because we assume that
     // game state never needs to be deserialized directly, but is only
     // created by running forward or backwards through all game actions
     // This API probably needs to be redesigned
-
-    @Transient
     lateinit var halfData: TeamHalfData
-
-    @Transient
     lateinit var driveData: TeamDriveData
-
-    @Transient
     lateinit var turnData: TeamTurnData
 
     var turnMarker by Delegates.observable(0) { prop, old, new ->
@@ -155,7 +143,7 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach
 
     // TODO Add support for custom team logos that are different from
     //  the roster logo.
-    val teamLogo: RosterLogo? = null
+    var teamLogo: RosterLogo? = null
 
     init {
         notifyUpdate() // Make sure dogout is filled
@@ -211,10 +199,8 @@ class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach
         _dogoutState.safeTryEmit(playersInDogout)
     }
 
-    @Transient
     private val _dogoutState =
         MutableSharedFlow<List<Player>>(replay = 1, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
 
-    @Transient
     val dogoutFlow: SharedFlow<List<Player>> = _dogoutState
 }

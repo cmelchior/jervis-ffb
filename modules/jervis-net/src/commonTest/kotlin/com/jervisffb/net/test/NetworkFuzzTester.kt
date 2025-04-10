@@ -20,7 +20,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.net.GameId
@@ -64,8 +64,9 @@ class NetworkFuzzTester {
 
     @Test
     fun runRandomNextworkGame() {
-        repeat(100) { gameNo ->
-            val seed = -504331697750405371//Random.nextLong()
+        val games = 100
+        repeat(games) { gameNo ->
+            val seed = Random.nextLong()
             try {
                 runRandomGame(seed)
             } catch (ex: Throwable) {
@@ -86,7 +87,7 @@ class NetworkFuzzTester {
             gameName = "test",
             rules = rules,
             hostCoach = CoachId("HomeCoachID"),
-            hostTeam = createDefaultHomeTeam(),
+            hostTeam = createDefaultHomeTeam(rules),
             clientCoach = null,
             clientTeam = null,
             testMode = true,
@@ -113,7 +114,7 @@ class NetworkFuzzTester {
             null,
             "host",
             true,
-            P2PTeamInfo(createDefaultHomeTeam())
+            P2PTeamInfo(createDefaultHomeTeam(rules))
         )
         conn1.send(join1)
         checkServerMessage<GameStateSyncMessage>(conn1) {
@@ -121,7 +122,7 @@ class NetworkFuzzTester {
         }
         consumeServerMessage<CoachJoinedMessage>(conn1)
         checkServerMessage<TeamJoinedMessage>(conn1) {
-            hostHomeTeam = it.getTeam()
+            hostHomeTeam = it.getTeam(rules)
         }
         consumeServerMessage<UpdateHostStateMessage>(conn1)
 
@@ -139,19 +140,20 @@ class NetworkFuzzTester {
         conn2.send(join2)
         consumeServerMessage<CoachJoinedMessage>(conn1)
         checkServerMessage<GameStateSyncMessage>(conn2) {
+            val homeTeamCoach = it.coaches.first()
             clientRules = it.rules
-            clientHomeTeam = it.homeTeam?.also { JervisSerialization.fixTeamRefs(it) }
+            clientHomeTeam = it.homeTeam?.let { teamData -> SerializedTeam.deserialize(clientRules, teamData, homeTeamCoach) }
         }
         consumeServerMessage<CoachJoinedMessage>(conn2)
         consumeServerMessage<UpdateClientStateMessage>(conn2)
 
         // Client selects team
-        conn2.send(TeamSelectedMessage(P2PTeamInfo(lizardMenAwayTeam())))
+        conn2.send(TeamSelectedMessage(P2PTeamInfo(lizardMenAwayTeam(rules))))
         checkServerMessage<TeamJoinedMessage>(conn1) {
-            hostAwayTeam = it.getTeam()
+            hostAwayTeam = it.getTeam(hostRules!!)
         }
         checkServerMessage<TeamJoinedMessage>(conn2) {
-            clientAwayTeam = it.getTeam()
+            clientAwayTeam = it.getTeam(clientRules!!)
         }
 
         // Receive request to start game

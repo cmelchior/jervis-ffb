@@ -49,7 +49,7 @@ data class JervisGameFile(
 @Serializable
 data class JervisTeamFile(
     val metadata: JervisMetaData,
-    val team: Team,
+    val team: SerializedTeam,
     val history: GameHistory?,
 ) {
     val roster: Roster = team.roster

@@ -17,7 +17,7 @@ class JervisTeamFileBuilder {
     fun build(): JervisTeamFile {
         return JervisTeamFile(
             metadata!!,
-            team!!,
+            SerializedTeam.serialize(team!!),
             history,
         )
     }

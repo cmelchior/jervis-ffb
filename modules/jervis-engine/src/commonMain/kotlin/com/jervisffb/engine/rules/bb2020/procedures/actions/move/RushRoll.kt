@@ -185,7 +185,7 @@ object RushRoll: Procedure() {
                 val rushContext = state.getContext<RushRollContext>()
                 val rerollContext = state.rerollContext!!
                 val rerollResult = rushContext.copy(
-                    roll = rushContext.roll!!.copy(
+                    roll = rushContext.roll!!.copyReroll(
                         rerollSource = rerollContext.source,
                         rerolledResult = d6,
                     ),

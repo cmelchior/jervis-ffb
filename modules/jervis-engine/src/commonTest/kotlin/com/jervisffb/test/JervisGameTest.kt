@@ -23,14 +23,13 @@ import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
-import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
-import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.test.ext.rollForward
 import kotlin.test.BeforeTest
@@ -57,12 +56,12 @@ abstract class JervisGameTest {
         state = createDefaultGameState(rules).apply {
             // Should be on LoS
             homeTeam[PlayerNo(1)].apply {
-                addSkill(BreakTackle(SkillId("${id.value}-BreakTackle")))
+                addSkill(SkillType.BREAK_TACKLE.id())
                 strength = 4
             }
             // Should be on LoS
             homeTeam[PlayerNo(2)].apply {
-                addSkill(BreakTackle(SkillId("${id.value}-BreakTackle")))
+                addSkill(SkillType.BREAK_TACKLE.id())
                 strength = 5
             }
         }

@@ -2,17 +2,11 @@ package com.jervisffb.test
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.STRENGTH
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
-import com.jervisffb.engine.rules.bb2020.skills.Block
-import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
-import com.jervisffb.engine.rules.bb2020.skills.Dodge
-import com.jervisffb.engine.rules.bb2020.skills.SureHands
+import com.jervisffb.engine.rules.bb2020.roster.RosterPosition
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.serialize.RosterLogo
 
 /**
@@ -21,7 +15,7 @@ import com.jervisffb.engine.serialize.RosterLogo
  * See page 116 in the rulebook.
  */
 val HUMAN_LINEMAN =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-lineman"),
         16,
         "Human Lineman",
@@ -30,13 +24,13 @@ val HUMAN_LINEMAN =
         50_000,
         6, 3, 3, 4, 9,
         emptyList(),
-        listOf(GENERAL),
-        listOf(AGILITY, STRENGTH),
+        listOf(SkillCategory.GENERAL),
+        listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
         null,
         null
     )
 val HUMAN_THROWER =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-thrower"),
         2,
         "Throwers",
@@ -44,14 +38,14 @@ val HUMAN_THROWER =
         "T",
         80_000,
         6, 3, 3, 2, 9,
-        listOf(/* Pass */ SureHands.Factory),
-        listOf(GENERAL, PASSING),
-        listOf(AGILITY, STRENGTH),
+        listOf(/* Pass */ SkillType.SURE_HANDS.id()),
+        listOf(SkillCategory.GENERAL, SkillCategory.PASSING),
+        listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
         null,
         null
     )
 val HUMAN_CATCHER =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-catcher"),
         4,
         "Catchers",
@@ -59,14 +53,14 @@ val HUMAN_CATCHER =
         "C",
         65_000,
         8, 2, 3, 5, 8,
-        listOf(CatchSkill.Factory, Dodge.Factory),
-        listOf(AGILITY, GENERAL),
-        listOf(STRENGTH, PASSING),
+        listOf(SkillType.CATCH.id(), SkillType.DODGE.id()),
+        listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        listOf(SkillCategory.STRENGTH, SkillCategory.PASSING),
         null,
         null,
     )
 val HUMAN_BLITZER =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-blitzer"),
         4,
         "Blitzers",
@@ -74,14 +68,14 @@ val HUMAN_BLITZER =
         "B",
         85_000,
         7, 3, 3, 4, 9,
-        listOf(Block.Factory),
-        listOf(GENERAL, STRENGTH),
-        listOf(AGILITY, PASSING),
+        listOf(SkillType.BLOCK.id()),
+        listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
         null,
         null
     )
 val HALFLING_HOPEFUL =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-hafling-hopeful"),
         3,
         "Halfling Hopefuls",
@@ -90,13 +84,13 @@ val HALFLING_HOPEFUL =
         30_000,
         5, 2, 3, 4, 7,
         emptyList(),
-        listOf(AGILITY),
-        listOf(GENERAL, STRENGTH),
+        listOf(SkillCategory.AGILITY),
+        listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         null,
         null
     )
 val OGRE =
-    BB2020Position(
+    RosterPosition(
         PositionId("human-ogre"),
         1,
         "Ogre",
@@ -105,8 +99,8 @@ val OGRE =
         140_000,
         5, 5, 4, 5, 10,
         emptyList(),
-        listOf(STRENGTH),
-        listOf(AGILITY, GENERAL),
+        listOf(SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         null,
         null
     )

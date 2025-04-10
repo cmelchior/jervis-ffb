@@ -24,7 +24,6 @@ import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.BadHabitsContext
 import com.jervisffb.engine.model.context.assertContext
@@ -37,6 +36,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Loner
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import kotlin.math.min
 
@@ -108,11 +108,11 @@ object BadHabits : Procedure() {
                         val addLonerCommands = it.getPlayers(state).flatMap { player ->
                             listOf(
                                 ReportGameProgress("${player.name} received Loner (2+)"),
-                                AddPlayerSkill(player,
-                                    Loner(
-                                        SkillId("${player.id.value}-Loner"),
-                                        2,
-                                        isTemporary = true,
+                                AddPlayerSkill(
+                                    player = player,
+                                    skill = rules.createSkill(
+                                        player = player,
+                                        skill = SkillType.LONER.id(2),
                                         expiresAt = Duration.END_OF_DRIVE
                                     )
                                 )

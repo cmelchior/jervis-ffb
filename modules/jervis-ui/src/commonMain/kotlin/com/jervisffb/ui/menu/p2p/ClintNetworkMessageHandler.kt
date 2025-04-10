@@ -7,6 +7,7 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode
@@ -83,7 +84,7 @@ abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler 
     override fun onDisconnected(reason: CloseReason) { }
     override fun onCoachJoined(coach: Coach, isHomeCoach: Boolean) { }
     override fun onCoachLeft(coach: Coach) { }
-    override fun onSpectatorJoined(specator: Spectator) { }
+    override fun onSpectatorJoined(spectator: Spectator) { }
     override fun onSpectatorLeft(spectator: Spectator) { }
     override fun onTeamSelected(team: Team, homeTeam: Boolean) { }
     override fun onClientStateChange(newState: P2PClientState) { }
@@ -108,6 +109,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         val LOG = jervisLogger()
     }
 
+    private var rules: Rules? = null
     private var currentState: ConnectionState = Disconnected(CloseReason(CloseReason.Codes.NORMAL, ""))
     private val scope = CoroutineScope(CoroutineName("ClintNetworkMessageHandler"))
     private var connection: JervisClientWebSocketConnection? = null
@@ -115,13 +117,14 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
 
     suspend fun connectAndJoinGame(gameUrl: String, id: GameId, coachName: String, isHost: Boolean, team: Team?) {
         startConnection(gameUrl, id, coachName)
+        val teamData = team?.let { SerializedTeam.serialize(it) }
         send(JoinGameAsCoachMessage(
             gameId = id,
             username = coachName,
             password = "",
             coachName = coachName,
             isHost = isHost,
-            team = if (team != null) P2PTeamInfo(team) else null
+            team = teamData?.let {P2PTeamInfo(it) }
         ))
     }
 
@@ -129,7 +132,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
         val teamInfo = if (team.teamData == null) {
             HostedTeamInfo(team.teamId)
         } else {
-            P2PTeamInfo(team.teamData)
+            P2PTeamInfo(SerializedTeam.serialize(team.teamData))
         }
         send(TeamSelectedMessage(teamInfo))
     }
@@ -173,7 +176,10 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
                 is GameReadyMessage -> messageHandler.onGameReady(message.gameId)
                 is CoachJoinedMessage -> messageHandler.onCoachJoined(message.coach, message.isHomeCoach)
                 is ServerError -> messageHandler.onServerError(message)
-                is TeamJoinedMessage -> messageHandler.onTeamSelected(message.getTeam(), message.isHomeTeam)
+                is TeamJoinedMessage -> {
+                    val gameRules = rules ?: throw IllegalStateException("Rules have not been sent by the server yet.")
+                    messageHandler.onTeamSelected(message.getTeam(gameRules), message.isHomeTeam)
+                }
                 is CoachLeftMessage -> messageHandler.onCoachLeft(message.coach)
                 is SpectatorJoinedMessage -> TODO()
                 is SpectatorLeftMessage -> TODO()
@@ -181,7 +187,10 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
                 is UpdateClientStateMessage -> messageHandler.updateClientState(message.state)
                 is UpdateHostStateMessage -> messageHandler.onHostStateChange(message.state)
                 is UpdateSpectatorStateMessage -> messageHandler.onSpectatorStateChange(message.state)
-                is GameStateSyncMessage -> messageHandler.onGameSync(message)
+                is GameStateSyncMessage -> {
+                    rules = message.rules
+                    messageHandler.onGameSync(message)
+                }
                 is SyncGameActionMessage -> messageHandler.onGameAction(message.producer, message.serverIndex, message.action)
                 null -> TODO()
             }

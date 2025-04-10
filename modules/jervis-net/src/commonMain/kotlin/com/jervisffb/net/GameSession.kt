@@ -9,7 +9,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.SpectatorId
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.handlers.ClientMessageHandler
 import com.jervisffb.net.handlers.GameActionHandler
 import com.jervisffb.net.handlers.GameStartedHandler
@@ -152,23 +152,33 @@ class GameSession(
                             // the server is started, and we just assume the client is always valid as well
                             // In the case of a game starting again, we ignore any teams sent and just
                             // reuse the ones from the save game.
+                            val coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName)
                             val client = if (message.isHost) {
-                                val homeTeam = if (gameSettings.initialActions.isNotEmpty()) hostTeam else (message.team as P2PTeamInfo?)?.team?.also {
-                                    JervisSerialization.fixTeamRefs(it)
+                                val homeTeam: Team? = if (gameSettings.initialActions.isNotEmpty()) {
+                                    hostTeam
+                                } else {
+                                    (message.team as P2PTeamInfo?)?.team?.let {
+                                        SerializedTeam.deserialize(gameSettings.gameRules, it, coach)
+                                    }
                                 }
                                 JoinedP2PHost(
                                     connection = connection,
-                                    coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName),
+                                    coach = coach,
                                     state = P2PHostState.JOIN_SERVER,
                                     team = homeTeam
                                 )
                             } else {
-                                val awayTeam = if (gameSettings.initialActions.isNotEmpty()) clientTeam else (message.team as P2PTeamInfo?)?.team?.also {
-                                    JervisSerialization.fixTeamRefs(it)
+                                val coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName)
+                                val awayTeam: Team? = if (gameSettings.initialActions.isNotEmpty()) {
+                                    clientTeam
+                                } else {
+                                    (message.team as P2PTeamInfo?)?.team?.let {
+                                        SerializedTeam.deserialize(gameSettings.gameRules, it, coach)
+                                    }
                                 }
                                 JoinedP2PClient(
                                     connection = connection,
-                                    coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName),
+                                    coach = coach,
                                     state = P2PClientState.JOIN_SERVER,
                                     team = awayTeam
                                 )
@@ -192,7 +202,8 @@ class GameSession(
                                 out.sendHostStateUpdate(hostState)
                             } else {
                                 if (gameSettings.initialActions.isNotEmpty()) {
-                                    val msg = ReceivedMessage(connection, TeamSelectedMessage(P2PTeamInfo(clientTeam!!)))
+                                    val serializedTeam = SerializedTeam.serialize(clientTeam!!)
+                                    val msg = ReceivedMessage(connection, TeamSelectedMessage(P2PTeamInfo(serializedTeam)))
                                     incomingMessages.send(msg)
                                 } else {
                                     clientState = P2PClientState.SELECT_TEAM

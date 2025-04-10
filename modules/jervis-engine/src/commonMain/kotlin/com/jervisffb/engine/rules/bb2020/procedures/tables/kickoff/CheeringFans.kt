@@ -81,8 +81,8 @@ object CheeringFans : Procedure() {
     object ResolveCheeringFans : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<CheeringFansContext>()
-            val kickingTeamResult = context.kickingTeamRoll.value + state.kickingTeam.cheerLeaders
-            val receivingTeamResult = context.receivingTeamRoll!!.value + state.receivingTeam.cheerLeaders
+            val kickingTeamResult = context.kickingTeamRoll.value + state.kickingTeam.cheerleaders
+            val receivingTeamResult = context.receivingTeamRoll!!.value + state.receivingTeam.cheerleaders
             return when {
                 kickingTeamResult == receivingTeamResult -> {
                     compositeCommandOf(
@@ -90,9 +90,9 @@ object CheeringFans : Procedure() {
                             state.kickingTeam,
                             state.receivingTeam,
                             context.kickingTeamRoll,
-                            state.kickingTeam.cheerLeaders,
+                            state.kickingTeam.cheerleaders,
                             context.receivingTeamRoll,
-                            state.receivingTeam.cheerLeaders,
+                            state.receivingTeam.cheerleaders,
                         ),
                         ExitProcedure(),
                     )
@@ -103,9 +103,9 @@ object CheeringFans : Procedure() {
                             state.kickingTeam,
                             state.receivingTeam,
                             context.kickingTeamRoll,
-                            state.kickingTeam.cheerLeaders,
+                            state.kickingTeam.cheerleaders,
                             context.receivingTeamRoll,
-                            state.receivingTeam.cheerLeaders,
+                            state.receivingTeam.cheerleaders,
                         ),
                         SetContext(state.getContext<CheeringFansContext>().copy(winner = state.kickingTeam)),
                         GotoNode(WinnerRollsOnPrayersToNuffle),
@@ -117,9 +117,9 @@ object CheeringFans : Procedure() {
                             state.kickingTeam,
                             state.receivingTeam,
                             context.kickingTeamRoll,
-                            state.kickingTeam.cheerLeaders,
+                            state.kickingTeam.cheerleaders,
                             context.receivingTeamRoll,
-                            state.receivingTeam.cheerLeaders,
+                            state.receivingTeam.cheerleaders,
                         ),
                         SetContext(state.getContext<CheeringFansContext>().copy(winner = state.receivingTeam)),
                         GotoNode(WinnerRollsOnPrayersToNuffle),

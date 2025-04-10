@@ -2,25 +2,21 @@ package com.jervisffb.resources
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.MUTATIONS
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.STRENGTH
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
+import com.jervisffb.engine.rules.bb2020.roster.RosterPosition
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
-import com.jervisffb.engine.rules.bb2020.skills.Frenzy
-import com.jervisffb.engine.rules.bb2020.skills.Horns
-import com.jervisffb.engine.rules.bb2020.skills.Loner
-import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
-import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.FRENZY
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.HORNS
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.LONER
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.UNCHANNELLED_FURY
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
 
 val BLOODBORN_MARAUDER_LINEMEN =
-    BB2020Position(
+    RosterPosition(
         PositionId("khorne-bloodborn-marauder-lineman"),
         16,
         "Bloodborn Marauder Linemen",
@@ -28,14 +24,14 @@ val BLOODBORN_MARAUDER_LINEMEN =
         "L",
         50_000,
         6, 3, 3, 4, 8,
-        listOf(Frenzy.Factory),
-        listOf(GENERAL, MUTATIONS),
-        listOf(AGILITY, STRENGTH),
+        listOf(FRENZY.id()),
+        listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS),
+        listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
         SpriteSheet.embedded("$iconRootPath/khorne_bloodbornmarauderlineman.png",7),
         SingleSprite.embedded("$portraitRootPath/khorne_bloodbornmarauderlineman.png")
     )
 val KHORNGORS =
-    BB2020Position(
+    RosterPosition(
         PositionId("khorne-khorngor"),
         4,
         "Khorngors",
@@ -43,14 +39,14 @@ val KHORNGORS =
         "K",
         70_000,
         6, 3, 4, 4, 9,
-        listOf(Horns.Factory /*, Juggernaut */),
-        listOf(GENERAL, MUTATIONS, STRENGTH),
-        listOf(AGILITY, PASSING),
+        listOf(HORNS.id() /*, Juggernaut */),
+        listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
         SpriteSheet.embedded("$iconRootPath/khorne_khorngor.png",4),
         SingleSprite.embedded("$portraitRootPath/khorne_khorngor.png")
     )
 val BLOODSEEKERS =
-    BB2020Position(
+    RosterPosition(
         PositionId("khorne-bloodseeker"),
         4,
         "Bloodseekers",
@@ -58,14 +54,14 @@ val BLOODSEEKERS =
         "Bs",
         110_000,
         5, 4, 4, 6, 10,
-        listOf(Frenzy.Factory),
-        listOf(GENERAL, MUTATIONS, STRENGTH),
-        listOf(AGILITY),
+        listOf(FRENZY.id()),
+        listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY),
         SpriteSheet.embedded("$iconRootPath/khorne_bloodseeker.png", 4),
         SingleSprite.embedded("$portraitRootPath/khorne_bloodseeker.png")
     )
 val BLOODSPAWN =
-    BB2020Position(
+    RosterPosition(
         PositionId("khorne-bloodspawn"),
         1,
         "Bloodspawn",
@@ -75,13 +71,13 @@ val BLOODSPAWN =
         5, 5, 4, null, 9,
         listOf(
             // Claws
-            Frenzy.Factory,
-            Loner.Factory(4),
-            MightyBlow.Factory(1),
-            UnchannelledFury.Factory
+            FRENZY.id(),
+            LONER.id(4),
+            SkillType.MIGHTY_BLOW.id(1),
+            UNCHANNELLED_FURY.id()
         ),
-        listOf(MUTATIONS, STRENGTH),
-        listOf(AGILITY, GENERAL),
+        listOf(SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         SpriteSheet.embedded("$iconRootPath/khorne_bloodspawn.png", 1),
         SingleSprite.embedded("$portraitRootPath/khorne_bloodspawn.png")
     )

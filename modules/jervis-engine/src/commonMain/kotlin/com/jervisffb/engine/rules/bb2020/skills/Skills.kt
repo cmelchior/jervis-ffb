@@ -3,6 +3,7 @@ package com.jervisffb.engine.rules.bb2020.skills
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.TeamId
@@ -13,7 +14,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.UseStandardSkillReroll
 import com.jervisffb.engine.rules.bb2020.procedures.UseTeamReroll
 import kotlinx.serialization.Serializable
 
-@Serializable
 sealed interface TeamReroll : RerollSource {
     val carryOverIntoOvertime: Boolean
     // When is this reroll removed from the Team, regardless of it being used or not
@@ -39,7 +39,6 @@ sealed interface TeamReroll : RerollSource {
     }
 }
 
-@Serializable
 class RegularTeamReroll(val teamId: TeamId, val index: Int) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-reroll-$index")
     override val carryOverIntoOvertime: Boolean = true
@@ -49,9 +48,8 @@ class RegularTeamReroll(val teamId: TeamId, val index: Int) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
-@Serializable
-class LeaderTeamReroll(val player: Player) : TeamReroll {
-    override val id: RerollSourceId = RerollSourceId("${player.id.value}-leader")
+class LeaderTeamReroll(val player: PlayerId) : TeamReroll {
+    override val id: RerollSourceId = RerollSourceId("${player.value}-leader")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.SPECIAL
     override val rerollResetAt: Duration = Duration.END_OF_HALF
@@ -59,7 +57,6 @@ class LeaderTeamReroll(val player: Player) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
-@Serializable
 class BrilliantCoachingReroll(val teamId: TeamId) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-brilliant-coaching")
     override val carryOverIntoOvertime: Boolean = false
@@ -156,12 +153,162 @@ enum class Duration {
 }
 
 /**
+ * This enum enumerate all known skills across all rulesets.
+ *
+ * It is mostly a work-around so we can easily detect when a new skill is added so
+ * we remember to update all locations.
+ *
+ * Skills with values are still only identified by their name here.
+ * The unique combintation of a type and value is defined by [SkillId].
+ * These can be created by calling [SkillType.id].
+ **
+ * @see com.jervisffb.engine.rules.bb2020.SkillSettings
+ */
+@Serializable
+enum class SkillType(val description: String) {
+    // Agility
+    CATCH("Catch"),
+    DIVING_CATCH("Diving Catch"),
+    DIVING_TACKLE("Diving Tackle"),
+    DODGE("Dodge"),
+    DEFENSIVE("Defensive"),
+    JUMP_UP("Jump Up"),
+    LEAP("Leap"),
+    SAFE_PAIR_OF_HANDS("Safe Pair of Hands"),
+    SIDESTEP("Sidestep"),
+    SNEAKY_GIT("Sneaky Git"),
+    SPRINT("Sprint"),
+    SURE_FEET("Sure Feet"),
+
+    // General
+    BLOCK("Block"),
+    DAUNTLESS("Dauntless"),
+    DIRTY_PLAYER("Dirty Player"),
+    FEND("Fend"),
+    FRENZY("Frenzy"),
+    KICK("Kick"),
+    PRO("Pro"),
+    SHADOWING("Shadowing"),
+    STRIP_BALL("Strip ball"),
+    SURE_HANDS("Sure Hands"),
+    TACKLE("Tackle"),
+    WRESTLE("Wrestle"),
+
+    // Mutations
+    BIG_HAND("Big Hand"),
+    CLAWS("Claws"),
+    DISTURBING_PRECENSE("Disturbing Precence"),
+    EXTRA_ARMS("Extra Arms"),
+    FOUL_APPEREANCE("Full Appereance"),
+    HORNS("Horns"),
+    IRON_HARD_SKIN("Iron Hard Skin"),
+    MONSTROUS_MOUTH("Monstrous Mouth"),
+    PREHENSILE_TAIL("Prehensile Tail"),
+    TENTACLE("Tentacle"),
+    TWO_HEADS("Two Heads"),
+    VERY_LONG_LEGS("Very Long Legs"),
+
+    // Passing
+    ACCURATE("Accurate"),
+    CANNONEER("Cannoneer"),
+    CLOUD_BUSTER("Cloud Buster"),
+    DUMP_OFF("Dump-off"),
+    FUMBLEROOSKIE("Fumblerooskie"),
+    HAIL_MARY_PASS("Hail Mary Pass"),
+    LEADER("Leader"),
+    NERVES_OF_STEEL("Nerves of Steel"),
+    ON_THE_BALL("On the Ball"),
+    PASS("Pass"),
+    RUNNING_PASS("Running Pass"),
+    SAFE_PASS("Safe Pass"),
+
+    // Strength
+    ARM_BAR("Arm Bar"),
+    BRAWLER("Brawler"),
+    BREAK_TACKLE("Break Tackle"),
+    GRAB("Grab"),
+    GUARD("Guard"),
+    JUGGERNAUT("Juggernaut"),
+    MIGHTY_BLOW("Mighty Blow"),
+    MULTIPLE_BLOCK("Multiple Block"),
+    PILE_DRIVER("Pile Driver"),
+    STAND_FIRM("Stand Firm"),
+    STRONG_ARM("Strong Arm"),
+    THICK_SKULL("Thick Skull"),
+
+    // Traits
+    ANIMAL_SAVAGERY("Animal Savagery"),
+    ANIMOSITY("Animosity"),
+    ALWAYS_HUNGY("Always Hungy"),
+    BALL_AND_CHAIN("Ball & Chain"),
+    BOMBARDIER("Bombardier"),
+    BONE_HEAD("Bone Head"),
+    BLOOD_LUST("Blood Lust"), // Reference missing
+    BREATHE_FIRE("Breathe Fire"), // Reference missing
+    CHAINSAW("Chainsaw"),
+    DECAY("Decay"),
+    HYPNOTIC_GAZE("Hypnotic Gaze"),
+    KICK_TEAMMATE("Kick Team-mate"),
+    LONER("Loner"),
+    NO_HANDS("No Hands"),
+    PLAGUE_RIDDEN("Plague Ridden"),
+    POGO_STICK("Pojo Stick"),
+    PROJECTILE_VOMIT("Projectile Vomit"),
+    REALLY_STUPID("Really Stupid"),
+    REGENERATION("Regeneration"),
+    RIGHT_STUFF("Right Stuff"),
+    SECRET_WEAPON("Secret Wapon"),
+    STAB("Stab"),
+    STUNTY("Stunty"),
+    SWARMING("Swarming"),
+    SWOOP("Swoop"),
+    TAKE_ROOT("Take Root"),
+    TITCHY("Titchy"),
+    TIMMMBER("Timmm-ber!"),
+    THROW_TEAMMATE("Throw Team-mate"),
+    UNCHANNELLED_FURY("Unchannelled Fury"),
+
+    // Special Rules (Star Players)
+    SNEAKIEST_OF_THE_LOT("Sneakiest of the Lot");
+
+    /**
+     * Creates an identifier for a skill type including its value.
+     * This is a way we can uniquely identify the abstract idea of a
+     * a skill within a ruleset, without associating it with a player
+     * or the specific ruleset.
+     *
+     * I.e. "Pro" might mean different things depending on the ruleset,
+     * but the identifier remain the same.
+     *
+     * This method is specifically designed to be used by rosters as it
+     * makes it possible to define rosters while still sharing them
+     * between different rulesets.
+     *
+     * Design note: The naming of this method is intentionally kept short
+     * to make skill lists in rosters more readable
+     */
+    fun id(value: Int? = null): SkillId = SkillId(this, value)
+}
+
+/**
  * This interface represents player Skills. Since these skills are stateful
  * they are required to have a [skillId] that is unique across the entire game.
  */
 interface Skill {
-    // Unique identifier for this skill
+    // The player this skill is assigne to
+    val player: Player
+    // Unique identifier for the skill
+    // The same skill across multiple players have the same id,
+    // so use `player.id + skillId` to uniquely identify a skill
     val skillId: SkillId
+    // Skill type, effectively the same as checking the KClass, but enums
+    // make it easier to enumerate all options.
+    val type: SkillType
+    // Represents any value in brackes, like Might Blow(1+) or Loner(4+). It is up to the context to correctly
+    // interpret this value
+    val value: Int?
+    // Which category does this skill belong to?
+    val category: SkillCategory
     // Human readable name of this skill
     val name: String
     // Whether this skill is compulsory to use
@@ -170,40 +317,31 @@ interface Skill {
     // If the skill is always available, this should always be false.
     // Note, this specifically does not apply to a "reroll" part of a skill.
     var used: Boolean
-    // Represents any value in brackes, like Might Blow(1+) or Loner(4+). It is up to the context to correctly
-    // interpret this value
-    val value: Int?
     // When the `used` state reset back to `false`?
     val resetAt: Duration
-    // Which category does this skill belong to?
-    val category: SkillCategory
     // Whether this skill works when the player has lost its tackle zones
     val workWithoutTackleZones: Boolean
     // Whether this skill works when the player is prone or stunned
     val workWhenProne: Boolean
-    // Whether this skill is temporary
-    val isTemporary: Boolean
     // If the skill is temporary, this defines when the skill expires and is removed
     val expiresAt: Duration
+    // Whether this skill is temporary (removed at latest and end of game) or not
+    val isTemporary: Boolean
+        get() = (expiresAt != Duration.PERMANENT)
 }
 
-// TODO Not really liking this API. Is there a good way to serialize them?
-//  Also it doesn't look nice when naming the skill in the Position list
-//  Ideally this `listOf(SureHands)`, not `listOf(SureHands.Factory)`
-interface SkillFactory {
-    val value: Int?
-    fun createSkill(
-        player: Player,
-        isTemporary: Boolean = false,
-        expiresAt: Duration = Duration.PERMANENT
-    ): Skill
+/**
+ * All Skill Categories across all rulesets. Whether or not they are supported
+ * is defined by the relevant [com.jervisffb.engine.rules.bb2020.SkillSettings]
+ */
+enum class SkillCategory(val description: String) {
+    AGILITY("Agility"),
+    GENERAL("General"),
+    MUTATIONS("Mutations"),
+    PASSING("Passing"),
+    STRENGTH("Strength"),
+    TRAITS("Traits"),
+    SPECIAL_RULES("Special Rules"),
 }
 
-interface PlayerSkillFactory: SkillFactory
-
-interface SkillCategory {
-    val id: Long
-    val description: String
-}
-
-interface BB2020Skill : Skill
+sealed interface BB2020Skill : Skill

@@ -10,7 +10,6 @@ import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.GameFileData
-import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.P2PHostState
@@ -67,7 +66,6 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
         onTeamSelected = { teamSelected ->
             selectedTeam.value = teamSelected
         },
-        getRules = { networkAdapter.rules ?: error("Rules are not loaded yet") }
     )
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
     private val _globalGameUrl = MutableStateFlow("")
@@ -125,9 +123,9 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                     }
                     P2PHostState.RUN_GAME -> {
                         val rules = networkAdapter.rules!!
-                        val homeTeam = JervisSerialization.fixTeamRefs(networkAdapter.homeTeam.value!!)
+                        val homeTeam = networkAdapter.homeTeam.value!!
                         homeTeam.coach = networkAdapter.homeCoach.value!!
-                        val awayTeam = JervisSerialization.fixTeamRefs(networkAdapter.awayTeam.value!!)
+                        val awayTeam = networkAdapter.awayTeam.value!!
                         awayTeam.coach = networkAdapter.awayCoach.value!!
                         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
                         val gameController = GameEngineController(game, networkAdapter.initialActions)
@@ -203,6 +201,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                 gotoNextPage(2, skipPages = true)
             } else {
                 rules = setupGameModel.createRules()
+                selectTeamModel.initializeTeamList(rules!!)
                 gotoNextPage(1)
             }
         }

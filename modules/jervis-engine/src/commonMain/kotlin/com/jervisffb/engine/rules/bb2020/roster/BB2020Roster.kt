@@ -14,6 +14,6 @@ data class BB2020Roster(
     override val rerollCost: Int,
     override val allowApothecary: Boolean,
     val specialRules: List<SpecialRules>,
-    override val positions: List<BB2020Position>,
+    override val positions: List<RosterPosition>,
     override val logo: RosterLogo,
 ) : Roster

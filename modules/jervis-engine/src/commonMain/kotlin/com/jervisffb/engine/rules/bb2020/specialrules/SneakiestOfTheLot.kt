@@ -2,43 +2,28 @@ package com.jervisffb.engine.rules.bb2020.specialrules
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory
 import com.jervisffb.engine.rules.bb2020.skills.Duration
-import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
-import kotlinx.serialization.Serializable
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 
 /**
  * Representation of the Sneakiest of the Lot special rule.
  *
  * See rulebook page 129.
  */
-@Serializable
 class SneakiestOfTheLot(
-    override val skillId: SkillId
+    override val player: Player,
+    override val category: SkillCategory = SkillCategory.SPECIAL_RULES,
+    override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2020SpecialRule {
-    override val isTemporary: Boolean = false
-    override val expiresAt: Duration = Duration.PERMANENT
-    override val name: String = "Sneakiest of the Lot"
+    override val type: SkillType = SkillType.SNEAKIEST_OF_THE_LOT
+    override val value: Int? = null
+    override val skillId: SkillId = type.id(value)
+    override val name: String = type.description
     override val compulsory: Boolean = true
     override val resetAt: Duration = Duration.END_OF_TURN
-    override val category: SkillCategory = BB2020SkillCategory.SPECIAL_RULES
     override var used: Boolean = false
-    override val value: Int? = null
+        get() = TODO("Not yet implemented")
     override val workWithoutTackleZones: Boolean = true
     override val workWhenProne: Boolean = true
-
-    @Serializable
-    data object Factory: SpecialRuleFactory {
-        override val value: Int? = null
-        override fun createSkill(
-            player: Player,
-            isTemporary: Boolean,
-            expiresAt: Duration
-        ): Skill {
-            return SneakiestOfTheLot(
-                SkillId("${player.id}-SneakiestOfTheLot"),
-            )
-        }
-    }
 }

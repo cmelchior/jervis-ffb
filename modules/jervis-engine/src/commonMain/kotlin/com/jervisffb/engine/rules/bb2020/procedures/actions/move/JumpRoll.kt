@@ -120,7 +120,7 @@ object JumpRoll : Procedure() {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val rollContext = state.getContext<JumpRollContext>()
                 val rerollResult = rollContext.copy(
-                    roll = rollContext.roll!!.copy(
+                    roll = rollContext.roll!!.copyReroll(
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),

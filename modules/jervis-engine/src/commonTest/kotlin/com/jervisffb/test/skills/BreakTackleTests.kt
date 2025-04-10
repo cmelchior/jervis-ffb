@@ -19,6 +19,7 @@ import com.jervisffb.engine.model.modifiers.BreakTackleModifier
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.ext.rollForward
 import kotlin.test.BeforeTest
@@ -38,7 +39,7 @@ class BreakTackleTests: JervisGameTest() {
         state.apply {
             // Should be on LoS
             awayTeam[PlayerNo(1)].apply {
-                addSkill(BreakTackle.Factory)
+                addSkill(SkillType.BREAK_TACKLE.id())
                 strength = 4
             }
         }

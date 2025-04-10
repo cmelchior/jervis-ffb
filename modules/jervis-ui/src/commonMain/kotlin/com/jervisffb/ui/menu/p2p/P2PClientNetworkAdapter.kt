@@ -7,6 +7,7 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.messages.GameStateSyncMessage
@@ -156,10 +157,10 @@ class P2PClientNetworkAdapter(
         override fun onDisconnected(reason: CloseReason) { _connectionState.value = Disconnected(reason) }
 
         // Game State
-        override fun onTeamSelected(team: Team, isHomeTeam: Boolean) {
-            if (isHomeTeam) {
+        override fun onTeamSelected(team: Team, homeTeam: Boolean) {
+            if (homeTeam) {
                 team.coach = homeCoach.value!!
-                homeTeam.value = team
+                this@P2PClientNetworkAdapter.homeTeam.value = team
             } else {
                 team.coach = awayCoach.value!!
                 awayTeam.value = team
@@ -219,8 +220,8 @@ class P2PClientNetworkAdapter(
             rules = message.rules
             homeCoach.value = message.coaches.firstOrNull()
             awayCoach.value = message.coaches.getOrNull(1)
-            homeTeam.value = message.homeTeam
-            awayTeam.value = message.awayTeam
+            homeTeam.value = message.homeTeam?.let { SerializedTeam.deserialize(message.rules, it, homeCoach.value!!) }
+            awayTeam.value = message.awayTeam?.let { SerializedTeam.deserialize(message.rules, it, awayCoach.value!!) }
             _clientState.value = message.clientState
         }
 

@@ -7,6 +7,7 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.CoachLeftMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage
@@ -56,7 +57,12 @@ class ServerCommunication(
     }
 
     suspend fun sendTeamJoined(isHomeTeam: Boolean, team: Team) {
-        val msg = TeamJoinedMessage(isHomeTeam, team)
+        val msg = TeamJoinedMessage(isHomeTeam, SerializedTeam.serialize(team), team.coach)
+        sendAllConnections(msg)
+    }
+
+    suspend fun sendTeamJoined(isHomeTeam: Boolean, team: SerializedTeam, coach: Coach) {
+        val msg = TeamJoinedMessage(isHomeTeam, team, coach)
         sendAllConnections(msg)
     }
 
@@ -78,8 +84,8 @@ class ServerCommunication(
             session.hostState,
             session.clientState,
             session.spectatorState,
-            session.homeTeam,
-            session.awayTeam,
+            session.homeTeam?.let { SerializedTeam.serialize(it) },
+            session.awayTeam?.let { SerializedTeam.serialize(it) },
         )
         sendToConnection(client.connection, msg)
     }

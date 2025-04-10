@@ -6,17 +6,20 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.inducements.Apothecary
 import com.jervisffb.engine.model.inducements.ApothecaryType
+import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
+import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
-import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.serialize.PlayerUiData
+import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
 import kotlin.random.Random
@@ -26,7 +29,8 @@ private data class PlayerData(
     val name: String,
     val number: PlayerNo,
     val type: Position,
-    val extraSkills: List<SkillFactory> = emptyList(),
+    val extraSkills: List<SkillId> = emptyList(),
+    val statModifiers: List<StatModifier>,
     val icon: PlayerUiData? = null,
 )
 
@@ -35,21 +39,22 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     var id: TeamId = TeamId("team-${Random.nextLong()}")
     var coach: Coach = Coach(CoachId("jervis-coach"), "Jervis")
     var name: String = ""
-    var reRolls: Int = 0
+    var rerolls: Int = 0
         set(value) {
             if (roster.numberOfRerolls < value || value < 0) {
                 throw IllegalArgumentException("This team only allows ${roster.numberOfRerolls}, not $value")
             }
             field = value
         }
-    var cheerLeaders: Int = 0
+    var cheerleaders: Int = 0
     var assistentCoaches: Int = 0
     var fanFactor: Int = 0
     var teamValue: Int = 0
+    var currentTeamValue: Int = 0
     var treasury: Int = 0
     var dedicatedFans: Int = 0
     val specialRules = mutableListOf<SpecialRules>()
-
+    var teamLogo: RosterLogo? = null
     var apothecaries: Int = 0
         set(value) {
             if (!roster.allowApothecary && value > 0) {
@@ -66,7 +71,8 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
         name: String,
         number: PlayerNo,
         type: Position,
-        skills: List<SkillFactory> = emptyList(),
+        skills: List<SkillId> = emptyList(),
+        statModifiers: List<StatModifier> = emptyList(),
     ) {
         if (players.containsKey(number)) {
             throw IllegalArgumentException("Player with number $number already exits: ${players[number]}")
@@ -76,7 +82,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
             throw IllegalArgumentException("Max number of $type are already on the team.")
         }
         val playerIcon = createDefaultUiData(type)
-        players[number] = PlayerData(id, name, number, type, skills, playerIcon)
+        players[number] = PlayerData(id, name, number, type, skills, statModifiers, playerIcon)
     }
 
     private fun createDefaultUiData(type: Position): PlayerUiData {
@@ -95,7 +101,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     }
 
     fun build(): Team {
-        return Team(id, name, roster, coach!!).apply {
+        return Team(id, name, roster, coach).apply {
             this@TeamBuilder.players.forEach {
                 val data: PlayerData = it.value
                 add(data.type.createPlayer(
@@ -107,17 +113,28 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
                     PlayerType.STANDARD,
                     data.icon,
                 ).also { player ->
-                    player.extraSkills.addAll(data.extraSkills.map { it.createSkill(player) })
+                    player.extraSkills.addAll(data.extraSkills.map { rules.createSkill(player, it, Duration.PERMANENT) })
+                    data.statModifiers.forEach {
+                        when (it.type) {
+                            StatModifier.Type.AV -> player.armourModifiers.add(it)
+                            StatModifier.Type.MA -> player.moveModifiers.add(it)
+                            StatModifier.Type.PA -> player.passingModifiers.add(it)
+                            StatModifier.Type.AG -> player.agilityModifiers.add(it)
+                            StatModifier.Type.ST -> player.strengthModifiers.add(it)
+                        }
+                    }
                 })
             }
-            this.rerolls.addAll((0 ..<this@TeamBuilder.reRolls).map {
+            this.rerolls.addAll((0 ..<this@TeamBuilder.rerolls).map {
                 RegularTeamReroll(id, it)
             })
             this.teamApothecaries.addAll((0 until this@TeamBuilder.apothecaries).map { Apothecary(false, ApothecaryType.STANDARD) })
-            this.teamCheerleaders = this@TeamBuilder.cheerLeaders
+            this.teamCheerleaders = this@TeamBuilder.cheerleaders
             this.teamAssistentCoaches = this@TeamBuilder.assistentCoaches
             this.dedicatedFans = this@TeamBuilder.dedicatedFans
             this.teamValue = this@TeamBuilder.teamValue
+            this.currentTeamValue = this@TeamBuilder.currentTeamValue
+            this.teamLogo = this@TeamBuilder.teamLogo
             notifyDogoutChange()
         }
     }

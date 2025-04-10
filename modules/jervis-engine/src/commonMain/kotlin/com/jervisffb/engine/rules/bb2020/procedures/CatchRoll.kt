@@ -121,7 +121,7 @@ object CatchRoll : Procedure() {
                 val catchRollContext = state.getContext<CatchRollContext>()
                 val target = catchRollContext.catchingPlayer.agility + catchRollContext.modifiers.sum()
                 val rerollResult = catchRollContext.copy(
-                    roll = catchRollContext.roll!!.copy(
+                    roll = catchRollContext.roll!!.copyReroll(
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),

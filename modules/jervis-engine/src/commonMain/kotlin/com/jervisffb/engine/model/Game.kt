@@ -22,7 +22,6 @@ import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.serialization.Transient
 import kotlin.properties.Delegates
 
 // TODO Just keep it as a singleton until we explore the requirements further.
@@ -92,11 +91,9 @@ class Game(
 
     companion object
 
-    @Transient
     val idGenerator = IdGenerator()
 
     // Track all current active procedures.
-    @Transient
     val stack = MutableProcedureStack()
 
     // Track all logs related to the game state, this includes

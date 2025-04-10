@@ -11,10 +11,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
-import com.jervisffb.engine.rules.bb2020.skills.Block
-import com.jervisffb.engine.rules.bb2020.skills.Dodge
-import com.jervisffb.engine.rules.bb2020.skills.Tackle
-import com.jervisffb.engine.rules.bb2020.skills.Wrestle
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.fumbbl.net.model.SpecialRule
 import com.jervisffb.resources.CHAOS_DWARF_TEAM
@@ -52,9 +49,9 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
         // val race Something we care about?
         // val baseIconPath: String, // This is relevant for the UI model. Figure out how to include this
         // val logoUrl: String?, // This is relevant for the UI model. Figure out how to include this
-        this.reRolls = team.reRolls
+        this.rerolls = team.reRolls
         this.apothecaries = team.apothecaries
-        this.cheerLeaders = team.cheerleaders
+        this.cheerleaders = team.cheerleaders
         this.assistentCoaches = team.assistantCoaches
         this.fanFactor = team.fanFactor
         this.teamValue = team.teamValue
@@ -93,11 +90,12 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
                 )
             }
             val skills = fumbblPlayer.skillValuesMap.map {
+                // TODO Should we attempt to automate this, rather than doing a manual conversion?
                 when (it.key) {
-                    "Block" -> Block.Factory
-                    "Dodge" -> Dodge.Factory
-                    "Tackle" -> Tackle.Factory
-                    "Wrestle" -> Wrestle.Factory
+                    "Block" -> SkillType.BLOCK.id()
+                    "Dodge" -> SkillType.DODGE.id()
+                    "Tackle" -> SkillType.TACKLE.id()
+                    "Wrestle" -> SkillType.WRESTLE.id()
                     "Extra Arms",
                     "Brawler",
                     "Sneaky Git",

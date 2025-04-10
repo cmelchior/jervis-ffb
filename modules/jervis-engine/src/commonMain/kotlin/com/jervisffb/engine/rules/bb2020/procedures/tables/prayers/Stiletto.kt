@@ -26,6 +26,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Loner
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 
 /**
@@ -66,8 +67,12 @@ object Stiletto : Procedure() {
                         val player = it.getPlayer(state)
                         return compositeCommandOf(
                             AddPlayerSkill(
-                                player,
-                                Stab.Factory.createSkill(player, isTemporary = true, expiresAt = Duration.END_OF_DRIVE)
+                                player = player,
+                                skill = rules.createSkill(
+                                    player = player,
+                                    skill = SkillType.STAB.id(),
+                                    expiresAt = Duration.END_OF_DRIVE
+                                )
                             ),
                             SetContext(context.copy(resultApplied = true)),
                             ReportGameProgress("${player.name} received Stiletto"),

@@ -2,22 +2,26 @@ package com.jervisffb.resources
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.AGILITY
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.GENERAL
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.MUTATIONS
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.PASSING
-import com.jervisffb.engine.rules.bb2020.BB2020SkillCategory.STRENGTH
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Position
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
-import com.jervisffb.engine.rules.bb2020.skills.SureHands
+import com.jervisffb.engine.rules.bb2020.roster.RosterPosition
+import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.ANIMAL_SAVAGERY
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.BLOCK
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.DODGE
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.FRENZY
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.LONER
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.MIGHTY_BLOW
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.PASS
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.PREHENSILE_TAIL
+import com.jervisffb.engine.rules.bb2020.skills.SkillType.SURE_HANDS
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
 import kotlinx.serialization.Serializable
 
 val SKAVEN_LINEMAN =
-    BB2020Position(
+    RosterPosition(
         PositionId("skaven-lineman"),
         16,
         "Skaven Clanrat Linemen",
@@ -26,14 +30,14 @@ val SKAVEN_LINEMAN =
         50_000,
         7, 3, 3, 4, 8,
         emptyList(),
-        listOf(GENERAL),
-        listOf(AGILITY, MUTATIONS, STRENGTH),
+        listOf(SkillCategory.GENERAL),
+        listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         SpriteSheet.embedded("$iconRootPath/skaven_lineman.png", 9),
         SingleSprite.embedded("$portraitRootPath/skaven_lineman.png")
 
     )
 val SKAVEN_THROWER =
-    BB2020Position(
+    RosterPosition(
         PositionId("skaven-thrower"),
         2,
         "Throwers",
@@ -41,14 +45,14 @@ val SKAVEN_THROWER =
         "T",
         85_000,
         7, 3, 3, 2, 8,
-        listOf(/* Pass, */ SureHands.Factory),
-        listOf(GENERAL, PASSING),
-        listOf(AGILITY, MUTATIONS, STRENGTH),
+        listOf(PASS.id(), SURE_HANDS.id()),
+        listOf(SkillCategory.GENERAL, SkillCategory.PASSING),
+        listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         SpriteSheet.embedded("$iconRootPath/skaven_thrower.png", 2),
         SingleSprite.embedded("$portraitRootPath/skaven_thrower.png")
     )
 val GUTTER_RUNNER =
-    BB2020Position(
+    RosterPosition(
         PositionId("skaven-gutter-runner"),
         4,
         "Gutter Runners",
@@ -56,14 +60,14 @@ val GUTTER_RUNNER =
         "Gr",
         85_000,
         9, 2, 2, 4, 8,
-        listOf(/* Dodge */),
-        listOf(AGILITY, GENERAL),
-        listOf(MUTATIONS, PASSING, STRENGTH),
+        listOf(DODGE.id()),
+        listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        listOf(SkillCategory.MUTATIONS, SkillCategory.PASSING, SkillCategory.STRENGTH),
         SpriteSheet.embedded("$iconRootPath/skaven_gutterrunner.png", 4),
         SingleSprite.embedded("$portraitRootPath/skaven_gutterrunner.png")
     )
 val SKAVEN_BLITZER =
-    BB2020Position(
+    RosterPosition(
         PositionId("skaven-blitzer"),
         4,
         "Blitzers",
@@ -71,14 +75,14 @@ val SKAVEN_BLITZER =
         "B",
         90_000,
         7, 3, 3, 5, 9,
-        emptyList(/* Block */),
-        listOf(GENERAL, STRENGTH),
-        listOf(AGILITY, MUTATIONS, PASSING),
+        listOf(BLOCK.id()),
+        listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.PASSING),
         SpriteSheet.embedded("$iconRootPath/skaven_blitzer.png", 2),
         SingleSprite.embedded("$portraitRootPath/skaven_blitzer.png")
     )
 val RAT_OGRE =
-    BB2020Position(
+    RosterPosition(
         PositionId("skaven-rat-ogre"),
         1,
         "Rat Ogre",
@@ -86,9 +90,15 @@ val RAT_OGRE =
         "Ros",
         150_000,
         6, 5, 4, null, 9,
-        listOf(/* AnimalSavagery, Frenzy, Loner(4), MightyBlow(1), PrehensileTail */),
-        listOf(STRENGTH),
-        listOf(AGILITY, GENERAL, MUTATIONS),
+        listOf(
+            ANIMAL_SAVAGERY.id(),
+            FRENZY.id(),
+            LONER.id(4),
+            MIGHTY_BLOW.id(1),
+            PREHENSILE_TAIL.id()
+        ),
+        listOf(SkillCategory.STRENGTH),
+        listOf(SkillCategory.AGILITY, SkillCategory.GENERAL, SkillCategory.MUTATIONS),
         SpriteSheet.embedded("$iconRootPath/skaven_ratogre.png", 1),
         SingleSprite.embedded("$portraitRootPath/skaven_ratogre.png")
     )

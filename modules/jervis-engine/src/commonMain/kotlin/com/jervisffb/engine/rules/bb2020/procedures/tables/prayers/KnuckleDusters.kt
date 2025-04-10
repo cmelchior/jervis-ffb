@@ -16,7 +16,6 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -27,6 +26,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
+import com.jervisffb.engine.rules.bb2020.skills.SkillType
 
 /**
  * Procedure for handling the Prayer to Nuffle "Knuckle Dusters" as described on page 39
@@ -67,13 +67,13 @@ object KnuckleDusters : Procedure() {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
                         compositeCommandOf(
-                            AddPlayerSkill(player,
-                                MightyBlow(
-                                    skillId = SkillId("${player.id.value}-MightyBlow"),
-                                    value = 1,
-                                    isTemporary = true,
+                            AddPlayerSkill(
+                                player = player,
+                                skill = rules.createSkill(
+                                    player = player,
+                                    skill = SkillType.MIGHTY_BLOW.id(1),
                                     expiresAt = Duration.END_OF_DRIVE
-                                )
+                                ),
                             ),
                             ReportGameProgress("${player.name} received Knuckle Dusters"),
                             ExitProcedure(),

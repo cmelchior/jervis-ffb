@@ -14,11 +14,12 @@ import com.jervisffb.engine.teamBuilder
 // List of default starter team rosters
 // This is primarely usd by Standalone Mode
 object StandaloneTeams {
+    private val rules = StandardBB2020Rules()
     val defaultTeams = mapOf(
         "human-starter-team.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = HUMAN_TEAM
-            team = teamBuilder(StandardBB2020Rules(), HUMAN_TEAM) {
+            team = teamBuilder(rules, HUMAN_TEAM) {
                 name = "Human Starter Team #1"
                 addPlayer(PlayerId("Hu1"), "Ogre-1", PlayerNo(1), OGRE)
                 addPlayer(PlayerId("Hu2"), "Blitzer-2", PlayerNo(2), HUMAN_BLITZER)
@@ -31,7 +32,7 @@ object StandaloneTeams {
                 addPlayer(PlayerId("Hu9"), "Lineman-9", PlayerNo(9), HUMAN_LINEMAN)
                 addPlayer(PlayerId("Hu10"), "Lineman-10", PlayerNo(10), HUMAN_LINEMAN)
                 addPlayer(PlayerId("Hu11"), "Lineman-11", PlayerNo(11), HUMAN_LINEMAN)
-                reRolls = 3
+                rerolls = 3
                 apothecaries = 0
                 dedicatedFans = 1
                 teamValue = 1_000_000
@@ -42,7 +43,7 @@ object StandaloneTeams {
         "lizardmen-starter-team.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = LIZARDMEN_TEAM
-            team = teamBuilder(StandardBB2020Rules(), LIZARDMEN_TEAM) {
+            team = teamBuilder(rules, LIZARDMEN_TEAM) {
                 name = "Lizardmen Starter Team #1"
                 addPlayer(PlayerId("Li1"), "Skink-1", PlayerNo(1), SKINK_RUNNER_LINEMEN)
                 addPlayer(PlayerId("Li2"), "Skink-2", PlayerNo(2), SKINK_RUNNER_LINEMEN)
@@ -55,7 +56,7 @@ object StandaloneTeams {
                 addPlayer(PlayerId("Li9"), "Saurus-9", PlayerNo(9), SAURUS_BLOCKERS)
                 addPlayer(PlayerId("Li10"), "Saurus-10", PlayerNo(10), SAURUS_BLOCKERS)
                 addPlayer(PlayerId("Li11"), "Saurus-11", PlayerNo(11), SAURUS_BLOCKERS)
-                reRolls = 2
+                rerolls = 2
                 apothecaries = 1
                 dedicatedFans = 0
                 teamValue = 1_000_000
@@ -66,7 +67,7 @@ object StandaloneTeams {
         "skaven-starter-team.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = SKAVEN_TEAM
-            team = teamBuilder(StandardBB2020Rules(), SKAVEN_TEAM) {
+            team = teamBuilder(rules, SKAVEN_TEAM) {
                 name = "Skaven Starter Team #1"
                 addPlayer(PlayerId("Sk1"), "Blitzer-1", PlayerNo(1), SKAVEN_BLITZER)
                 addPlayer(PlayerId("Sk2"), "Blitzer-2", PlayerNo(2), SKAVEN_BLITZER)
@@ -79,7 +80,7 @@ object StandaloneTeams {
                 addPlayer(PlayerId("Sk9"), "Lineman-9", PlayerNo(9), SKAVEN_LINEMAN)
                 addPlayer(PlayerId("Sk10"), "Lineman-10", PlayerNo(10), SKAVEN_LINEMAN)
                 addPlayer(PlayerId("Sk11"), "Lineman-11", PlayerNo(11), SKAVEN_LINEMAN)
-                reRolls = 3
+                rerolls = 3
                 apothecaries = 1
                 dedicatedFans = 0
                 teamValue = 970_000
@@ -90,7 +91,7 @@ object StandaloneTeams {
         "khorne-starter-team.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
             roster = KHORNE_TEAM
-            team = teamBuilder(StandardBB2020Rules(), KHORNE_TEAM) {
+            team = teamBuilder(rules, KHORNE_TEAM) {
                 name = "Khorne Starter Team #1"
                 addPlayer(PlayerId("Kh1"), "Lineman-1", PlayerNo(1), BLOODBORN_MARAUDER_LINEMEN)
                 addPlayer(PlayerId("Kh2"), "Lineman-2", PlayerNo(2), BLOODBORN_MARAUDER_LINEMEN)
@@ -103,7 +104,7 @@ object StandaloneTeams {
                 addPlayer(PlayerId("Kh9"), "Bloodseeker-9", PlayerNo(9), BLOODSEEKERS)
                 addPlayer(PlayerId("Kh10"), "Bloodseeker-10", PlayerNo(10), BLOODSEEKERS)
                 addPlayer(PlayerId("Kh11"), "Bloodspawn-11", PlayerNo(11), BLOODSPAWN)
-                reRolls = 3
+                rerolls = 3
                 apothecaries = 0
                 dedicatedFans = 0
                 teamValue = 1_000_000
@@ -113,26 +114,3 @@ object StandaloneTeams {
     )
 
 }
-//
-//fun createDefaultUiData(): SpriteSource {
-//    val usedSprites = mutableMapOf<PositionId, Int>()
-//    return this.associate {
-//        val playerSprite = when (val sprite = rosterData.positions[it.position.id]) {
-//            is SingleSprite -> sprite
-//            is SpriteSheet -> {
-//                val index = usedSprites.getOrPut(it.position.id) { 0 }
-//                usedSprites[it.position.id] = index + 1
-//                sprite.copy(
-//                    selectedIndex = index
-//                )
-//            }
-//            null -> TODO("Add fallback sprites")
-//        }
-//        Pair(
-//            it.id, PlayerUiData(
-//                playerSprite,
-//                rosterData.portraits[it.position.id]
-//            )
-//        )
-//    }
-//}

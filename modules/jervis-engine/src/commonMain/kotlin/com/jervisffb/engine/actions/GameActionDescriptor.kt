@@ -5,12 +5,12 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
-import com.jervisffb.engine.rules.bb2020.skills.SkillFactory
 import com.jervisffb.engine.utils.cartesianProduct
 import com.jervisffb.engine.utils.combinations
 import kotlinx.serialization.Serializable
@@ -120,7 +120,7 @@ data object SelectCoinSide : GameActionDescriptor {
 }
 
 data class SelectSkill(
-    val skills: List<SkillFactory>
+    val skills: List<SkillId>
 ) : GameActionDescriptor {
     override val size: Int = skills.size
     override fun createRandom(random: Random): GameAction = SkillSelected(skills.random(random))
