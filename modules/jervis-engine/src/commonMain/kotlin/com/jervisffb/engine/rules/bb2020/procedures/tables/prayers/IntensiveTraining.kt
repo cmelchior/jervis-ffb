@@ -46,10 +46,10 @@ object IntensiveTraining : Procedure() {
     override fun isValid(state: Game, rules: Rules) = state.assertContext<PrayersToNuffleRollContext>()
 
     object SelectPlayer : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team? = null
+        override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<PrayersToNuffleRollContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return state.activeTeam
-                .filter { it.state == PlayerState.STANDING }
+            return state.getContext<PrayersToNuffleRollContext>().team
+                .filter {it.state == PlayerState.RESERVE }
                 .filter { !it.hasSkill<Loner>() }
                 .map { SelectPlayer(it) }
         }
