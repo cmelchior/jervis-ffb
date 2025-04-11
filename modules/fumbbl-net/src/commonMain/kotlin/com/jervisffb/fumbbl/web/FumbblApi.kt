@@ -235,10 +235,10 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
     private fun convertRosterSpecialRules(specialRules: List<com.jervisffb.fumbbl.web.api.SpecialRule>): List<SpecialRules> {
         return specialRules.map { fumbblRule ->
             val regionalSpecialRule = RegionalSpecialRule.entries.firstOrNull {
-                it.description == fumbblRule.name
+                it.description == fumbblRule.option ?: fumbblRule.name
             }
             val teamSpecialRule = TeamSpecialRule.entries.firstOrNull {
-                it.description == fumbblRule.name
+                it.description == fumbblRule.option ?: fumbblRule.name
             }
             regionalSpecialRule ?: teamSpecialRule ?: throw IllegalStateException("Unsupported special rule: $fumbblRule")
         }

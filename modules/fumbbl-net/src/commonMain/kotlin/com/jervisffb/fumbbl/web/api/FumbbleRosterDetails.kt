@@ -56,9 +56,9 @@ public data class Logos(
 public data class SpecialRule(
     public val id: String,
     public val name: String,
-//    public val options: Any?,
-//    public val option: Any?,
-//    public val filter: Any?,
+    // public val options: Any?,
+    public val option: String? // If "options" have data, this contains the selected value.
+    // public val filter: Any?,
 )
 
 @Serializable
