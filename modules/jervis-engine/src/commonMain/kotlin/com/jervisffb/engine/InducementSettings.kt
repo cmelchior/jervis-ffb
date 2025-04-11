@@ -25,7 +25,7 @@ val DEFAULT_INDUCEMENTS = mapOf<InducementType, Inducement<*>>(
     InducementType.EXTRA_TEAM_TRAINING to SimpleInducement(InducementType.EXTRA_TEAM_TRAINING, "Extra Team Training", 8, 100_000, true),
     InducementType.BRIBE to SimpleInducement(InducementType.BRIBE, "Bribe", 3, 100_000, true), // Half price for Bribery and Corruption
     InducementType.WANDERING_APOTHECARY to SimpleInducement(InducementType.WANDERING_APOTHECARY, "Wandering Apothecaries", 2, 100_000, true),
-    InducementType.MORTUARY_ASSISTANT to SimpleInducement(InducementType.MORTUARY_ASSISTANT, "Mortuary Assistant", 1, 100_000, true, requirements = listOf(RegionalSpecialRule.SYLVIAN_SPOTLIGHT)),
+    InducementType.MORTUARY_ASSISTANT to SimpleInducement(InducementType.MORTUARY_ASSISTANT, "Mortuary Assistant", 1, 100_000, true, requirements = listOf(RegionalSpecialRule.SYLVANIAN_SPOTLIGHT)),
     InducementType.PLAGUE_DOCTOR to SimpleInducement(InducementType.PLAGUE_DOCTOR, "Plague Doctor", 1, 100_000, true, requirements = listOf(TeamSpecialRule.FAVOURED_OF_NURGLE)),
     InducementType.RIOTOUS_ROOKIE to SimpleInducement(InducementType.RIOTOUS_ROOKIE, "Riotous Rookies", 1, 100_000, true, requirements = listOf(TeamSpecialRule.LOW_COST_LINEMEN)),
     InducementType.HALFLING_MASTER_CHEF to SimpleInducement(InducementType.HALFLING_MASTER_CHEF, "Hafling Master Chef", 1, 300_000, true, modifier = listOf(Pair(RegionalSpecialRule.HAFLING_THIMBLE_CUP, 1/3f))),

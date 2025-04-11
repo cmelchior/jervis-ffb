@@ -73,7 +73,7 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
                     SpecialRule.LUSTRIAN_SUPERLEAGUE -> RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE
                     SpecialRule.MASTERS_OF_UNDEATH -> TeamSpecialRule.MASTERS_OF_UNDEATH
                     SpecialRule.OLD_WORLD_CLASSIC -> RegionalSpecialRule.OLD_WORLD_CLASSIC
-                    SpecialRule.SYLVANIAN_SPOTLIGHT -> RegionalSpecialRule.SYLVIAN_SPOTLIGHT
+                    SpecialRule.SYLVANIAN_SPOTLIGHT -> RegionalSpecialRule.SYLVANIAN_SPOTLIGHT
                     SpecialRule.UNDERWORLD_CHALLENGE -> RegionalSpecialRule.UNDERWORLD_CHALLENGE
                     SpecialRule.WORLDS_EDGE_SUPERLEAGUE -> RegionalSpecialRule.WORLDS_EDGE_SUPERLEAGUE
                 }

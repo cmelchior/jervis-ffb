@@ -14,7 +14,7 @@ enum class RegionalSpecialRule(override val description: String) : SpecialRules 
     HAFLING_THIMBLE_CUP("Hafling Thimble Cup"),
     LUSTRIAN_SUPERLEAGUE("Lustrian Superleague"),
     OLD_WORLD_CLASSIC("Old World Classic"),
-    SYLVIAN_SPOTLIGHT("Sylvan Spolight"),
+    SYLVANIAN_SPOTLIGHT("Sylvanian Spotlight"),
     UNDERWORLD_CHALLENGE("Underworld Challenge"),
     WORLDS_EDGE_SUPERLEAGUE("Worlds Edge Superleague")
 }
