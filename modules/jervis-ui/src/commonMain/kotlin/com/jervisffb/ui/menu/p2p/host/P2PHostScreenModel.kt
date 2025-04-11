@@ -121,53 +121,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                         gotoNextPage(3)
                     }
                     P2PHostState.RUN_GAME -> {
-                        val rules = networkAdapter.rules!!
-                        val homeTeam = networkAdapter.homeTeam.value!!
-                        homeTeam.coach = networkAdapter.homeCoach.value!!
-                        val awayTeam = networkAdapter.awayTeam.value!!
-                        awayTeam.coach = networkAdapter.awayCoach.value!!
-                        val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
-                        val gameController = GameEngineController(game, networkAdapter.initialActions)
-
-                        val homeActionProvider = when (setupGameModel.coachSetupModel.playerType.value) {
-                            CoachType.HUMAN -> ManualActionProvider(
-                                gameController,
-                                menuViewModel,
-                                TeamActionMode.HOME_TEAM,
-                                GameSettings(gameRules = rules),
-                            )
-                            // For now, we only support the Random AI player, so create it directly
-                            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.HOME_TEAM, gameController).also { it.startActionProvider() }
-                        }
-
-                        val awayActionProvider = RemoteActionProvider(
-                            TeamActionMode.HOME_TEAM,
-                            gameController,
-                        )
-
-                        val actionProvider = P2PActionProvider(
-                            gameController,
-                            GameSettings(gameRules = rules),
-                            homeActionProvider,
-                            awayActionProvider,
-                            networkAdapter
-                        )
-
-                        gameViewModel = GameScreenModel(
-                            TeamActionMode.HOME_TEAM,
-                            gameController = gameController,
-                            gameController.state.homeTeam,
-                            gameController.state.awayTeam,
-                            actionProvider,
-                            mode = Manual(TeamActionMode.HOME_TEAM),
-                            menuViewModel = menuViewModel
-                        ) {
-                            menuViewModel.controller = gameController
-                            menuViewModel.navigatorContext.launch {
-                                networkAdapter.sendGameStarted()
-                            }
-                        }
-                        navigator.push(GameScreen(menuViewModel, gameViewModel!!))
+                        gameViewModel!!.gameAcceptedByAllPlayers()
                     }
                     P2PHostState.CLOSE_GAME -> {}
                     P2PHostState.DONE -> {}
@@ -294,13 +248,65 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
 
     fun userAcceptGame(gameAccepted: Boolean) {
         menuViewModel.navigatorContext.launch {
-            if (gameAccepted) {
-                networkAdapter.gameAccepted(gameAccepted)
-            } else {
-                networkAdapter.gameAccepted(gameAccepted) // Server will terminate connection
+            networkAdapter.gameAccepted(gameAccepted)
+            if (!gameAccepted) {
                 goBackToPage(0)
+            } else {
+                initializeGameModel()
             }
         }
+    }
+
+    private fun initializeGameModel() {
+        val rules = networkAdapter.rules!!
+        val homeTeam = networkAdapter.homeTeam.value!!
+        homeTeam.coach = networkAdapter.homeCoach.value!!
+        val awayTeam = networkAdapter.awayTeam.value!!
+        awayTeam.coach = networkAdapter.awayCoach.value!!
+        val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
+        val gameController = GameEngineController(game, networkAdapter.initialActions)
+
+        val homeActionProvider = when (setupGameModel.coachSetupModel.playerType.value) {
+            CoachType.HUMAN -> ManualActionProvider(
+                gameController,
+                menuViewModel,
+                TeamActionMode.HOME_TEAM,
+                GameSettings(gameRules = rules),
+            )
+            // For now, we only support the Random AI player, so create it directly
+            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.HOME_TEAM, gameController).also { it.startActionProvider() }
+        }
+
+        val awayActionProvider = RemoteActionProvider(
+            TeamActionMode.HOME_TEAM,
+            gameController,
+        )
+
+        val actionProvider = P2PActionProvider(
+            gameController,
+            GameSettings(gameRules = rules),
+            homeActionProvider,
+            awayActionProvider,
+            networkAdapter
+        )
+
+        gameViewModel = GameScreenModel(
+            TeamActionMode.HOME_TEAM,
+            gameController = gameController,
+            gameController.state.homeTeam,
+            gameController.state.awayTeam,
+            actionProvider,
+            mode = Manual(TeamActionMode.HOME_TEAM),
+            menuViewModel = menuViewModel
+        ) {
+            menuViewModel.controller = gameController
+            menuViewModel.navigatorContext.launch {
+                networkAdapter.sendGameStarted()
+            }
+        }.also {
+            it.waitForOpponent()
+        }
+        navigator.push(GameScreen(menuViewModel, gameViewModel!!))
     }
 
     fun copyUrlToClipboard(url: String) {

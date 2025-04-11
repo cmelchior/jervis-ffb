@@ -56,12 +56,15 @@ fun LoadingScreen(
     viewModel: GameScreenModel,
     content: @Composable () -> Unit,
 ) {
-    // TODO Should this be a non-zero value? Might be nice for games, but annoying for DX
+    // TODO Should this be a non-zero value? Might be nice for real games, but annoying for DX
     val minimumLoadingTime = 0.seconds
+    val isReadyToStart by viewModel.isReadyToStartGame.collectAsState()
     var showGameScreen by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        viewModel.initialize()
+    if (isReadyToStart) {
+        LaunchedEffect(Unit) {
+            viewModel.initialize()
+        }
     }
     LaunchedEffect(Unit) {
         val startTime = Clock.System.now()

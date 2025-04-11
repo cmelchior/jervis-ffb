@@ -48,6 +48,8 @@ class GameScreenModel(
     lateinit var uiState: UiGameController
     var fumbbl: FumbblReplayAdapter? = null
     val rules: Rules = gameController.rules
+    // `false` until both teams have accepted the game
+    val isReadyToStartGame = MutableStateFlow(false)
     val _loadingMessages = MutableStateFlow<String>("")
     val loadingMessages: StateFlow<String> = _loadingMessages
     val _isLoaded = MutableStateFlow<Boolean>(false)
@@ -85,8 +87,29 @@ class GameScreenModel(
             formatCurrency(awayTeam.teamValue)
         )
     }
+
     /**
-     * Initialize icons
+     * If the loaading screen is used for a P2P Game, calling this method will displ
+     */
+    fun waitForOpponent() {
+        val waitMessage = when (uiMode) {
+            TeamActionMode.HOME_TEAM -> "Waiting for ${awayTeam.name}"
+            TeamActionMode.AWAY_TEAM -> "Waiting for ${homeTeam.name}"
+            TeamActionMode.ALL_TEAMS -> "" // Should not be called in Hotseat games
+        }
+        _loadingMessages.value = waitMessage
+    }
+
+    /**
+     * Must be called when both players have accepted the game.
+     * This will start loading game assets after which the game is started.
+     */
+    fun gameAcceptedByAllPlayers() {
+        isReadyToStartGame.value = true
+    }
+
+    /**
+     * Initialize game icons and other assets.
      */
     suspend fun initialize() {
         _loadingMessages.value = "Initializing icons..."
@@ -100,8 +123,6 @@ class GameScreenModel(
             menuViewModel,
             actions
         )
-
-        // Setup references and start action listener
         menuViewModel.uiState = uiState
         uiState.startGameEventLoop()
         onEngineInitialized()

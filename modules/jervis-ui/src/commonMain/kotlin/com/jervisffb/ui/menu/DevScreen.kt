@@ -84,7 +84,9 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
             actionProvider = ReplayActionProvider(menuViewModel, fumbbl),
             mode = Replay(replayFile),
             menuViewModel = menuViewModel,
-        )
+        ).also {
+            it.gameAcceptedByAllPlayers()
+        }
     }
 
     private fun createDevHotseatScreenModel(menuViewModel: MenuViewModel, randomActions: Boolean = false): GameScreenModel {
@@ -142,7 +144,9 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
                     // controller.sendGameStarted()
                 }
             }
-        )
+        ).also {
+            it.gameAcceptedByAllPlayers()
+        }
     }
 
     // Starts a Dev Hotseat game with pre-determined teams, no timer and client rolls enabled
