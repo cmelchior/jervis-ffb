@@ -83,6 +83,6 @@ data class RosterPositionStats(
     val MA: Int,
     val ST: Int,
     val AG: Int,
-    val PA: Int,
+    val PA: Int?,
     val AV: Int,
 )
