@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 // Mappings for https://fumbbl.com/api/player/get/<id>
 
 @Serializable
-data class PlayerDetails(
+data class FumbblePlayerDetails(
     val id: Int,
     val teamId: Int,
     val status: String,

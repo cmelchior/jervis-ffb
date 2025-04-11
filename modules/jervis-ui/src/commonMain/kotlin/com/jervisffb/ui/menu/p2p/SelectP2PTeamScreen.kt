@@ -19,7 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.utils.JervisButton
-import com.jervisffb.ui.menu.components.LoadTeamDialog
+import com.jervisffb.ui.menu.components.ImportTeamFromFumbblDialog
+import com.jervisffb.ui.menu.components.LoadTeamFromFileDialog
 import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponent
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
@@ -64,6 +65,9 @@ fun SelectP2PTeamScreen(
         }
     }
     if (showImportFumbblTeamDialog) {
-        LoadTeamDialog(viewModel, onCloseRequest = { showImportFumbblTeamDialog = false })
+        ImportTeamFromFumbblDialog(viewModel, onCloseRequest = { showImportFumbblTeamDialog = false })
+    }
+    if (showLoadTeamFromFileDialog) {
+        LoadTeamFromFileDialog(viewModel, onCloseRequest = { showLoadTeamFromFileDialog = false })
     }
 }

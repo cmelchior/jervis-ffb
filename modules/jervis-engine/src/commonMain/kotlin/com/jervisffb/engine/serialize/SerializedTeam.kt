@@ -8,6 +8,7 @@ import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.teamBuilder
+import com.jervisffb.utils.jervisLogger
 import kotlinx.serialization.Serializable
 
 /**
@@ -36,6 +37,8 @@ class SerializedTeam(
     val teamLogo: RosterLogo?
 ) {
     companion object {
+        val LOG = jervisLogger()
+
         fun serialize(team: Team): SerializedTeam {
             return SerializedTeam(
                 team.id,
@@ -69,8 +72,11 @@ class SerializedTeam(
                         playerData.name,
                         playerData.number,
                         teamData.roster[playerData.position],
-                        playerData.extraSkills.map {
-                            rules.skillSettings.getSkillId(it) ?: error("No skill registered for id: ${it}")
+                        playerData.extraSkills.mapNotNull {
+                            // TODO For now, we just ignore skills we do not support
+                            rules.skillSettings.getSkillId(it).also {
+                                LOG.d { "Could not find skill for: '$it'"}
+                            }
                         },
                         playerData.statModifiers,
                     )

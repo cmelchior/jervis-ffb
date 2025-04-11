@@ -1,4 +1,4 @@
-package fumbbl.net.auth
+package fumbbl.net
 
 import com.jervisffb.fumbbl.net.FumbblWebsocketConnection
 import kotlinx.coroutines.delay

@@ -1,4 +1,4 @@
-package fumbbl.net.auth
+package fumbbl.net
 
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.StandardBB2020Rules

@@ -26,7 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.JervisButton
-import com.jervisffb.ui.menu.components.LoadTeamDialog
+import com.jervisffb.ui.menu.components.ImportTeamFromFumbblDialog
+import com.jervisffb.ui.menu.components.LoadTeamFromFileDialog
 import com.jervisffb.ui.menu.components.coach.CoachSetupComponent
 import com.jervisffb.ui.menu.components.coach.CoachType
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponent
@@ -75,7 +76,10 @@ fun SelectHotseatTeamScreen(
         }
     }
     if (showImportFumbblTeamDialog) {
-        LoadTeamDialog(viewModel.teamSelectorModel, onCloseRequest = { showImportFumbblTeamDialog = false })
+        ImportTeamFromFumbblDialog(viewModel.teamSelectorModel, onCloseRequest = { showImportFumbblTeamDialog = false })
+    }
+    if (showLoadTeamFromFileDialog) {
+        LoadTeamFromFileDialog(viewModel.teamSelectorModel, onCloseRequest = { showLoadTeamFromFileDialog = false })
     }
 }
 

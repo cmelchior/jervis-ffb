@@ -133,8 +133,10 @@ data class SingleSprite(
 data class SpriteSheet(
     override val type: SpriteLocation,
     override val resource: String,
-    val variants: Int? = null, // How many variants in the spritesheet. If `null` we need to calculate it
-    val selectedIndex: Int? = null, // If
+    // How many variants in the spritesheet. If `null` we need to calculate it after fetching the sheet
+    val variants: Int? = null,
+    // Which entry in the sheet to use. If `null`, one will be automatically selected
+    val selectedIndex: Int? = null,
 ): SpriteSource {
     companion object {
         fun embedded(path: String, variants: Int, selectedIndex: Int? = null): SpriteSheet {

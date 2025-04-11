@@ -574,7 +574,6 @@ open class Rules(
         return Builder(this)
     }
 
-
     /**
      *  Rules builder making it easier to create variants of
      */

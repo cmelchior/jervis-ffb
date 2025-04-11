@@ -22,6 +22,8 @@ import kotlinx.serialization.Serializable
  * skill factories, but we will cross that bridge when needed.
  *
  * This class represents the player state before starting a game.
+ *
+ * A players stats is defined by "positionStats + statModifiers"
  */
 @Serializable
 class SerializedPlayer(
@@ -30,13 +32,10 @@ class SerializedPlayer(
     var number: PlayerNo,
     val position: PositionId,
     val type: PlayerType,
-    val move: Int,
-    val strength: Int,
-    val agility: Int,
-    val passing: Int?,
-    val armorValue: Int,
     val statModifiers: List<StatModifier>,
-    val extraSkills: List<String>, // Extra skills on top of position skills. Only identified by name
+    // Extra skills on top of positional skills.
+    // String = SkillId.toPrettyString()
+    val extraSkills: List<String>,
     val nigglingInjuries: Int,
     val missNextGame: Boolean,
     val starPlayerPoints: Int,
@@ -52,11 +51,6 @@ class SerializedPlayer(
                 player.number,
                 player.position.id,
                 player.type,
-                player.baseMove,
-                player.baseStrength,
-                player.baseAgility,
-                player.basePassing,
-                player.baseArmorValue,
                 player.moveModifiers.filter { it.expiresAt == Duration.PERMANENT }
                     + player.strengthModifiers.filter { it.expiresAt == Duration.PERMANENT }
                     + player.agilityModifiers.filter { it.expiresAt == Duration.PERMANENT }

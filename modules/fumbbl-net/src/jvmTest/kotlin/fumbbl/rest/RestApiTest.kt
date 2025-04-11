@@ -1,6 +1,8 @@
-package fumbbl.restapi
+package fumbbl.rest
 
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.model.Coach
+import com.jervisffb.engine.rules.FumbblBB2020Rules
+import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.fumbbl.web.FumbblApi
 import kotlinx.coroutines.runBlocking
 import kotlin.test.BeforeTest
@@ -20,8 +22,10 @@ class RestApiTest {
 
     @Test
     fun teamLoader() = runBlocking<Unit> {
-        val file = api.loadTeam(1187712, StandardBB2020Rules())
-        assertEquals(file.team.name, "Just Human Nothing More")
+        val rules = FumbblBB2020Rules()
+        val file = api.loadTeam(1187712, rules)
+        val team = SerializedTeam.deserialize(rules, file.team, Coach.UNKNOWN)
+        assertEquals(team.name, "Just Human Nothing More")
     }
 
     @Test

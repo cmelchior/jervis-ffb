@@ -1,0 +1,47 @@
+{
+  "id":16502221,
+  "teamId":1187712,
+  "status":"Active",
+  "number":7,
+  "name":"Tristan Rifkind",
+  "position":{
+    "id":37761,
+    "name":"Catcher"
+  },
+  "gender":"male",
+  "stats":{
+    "ma":8,
+    "st":2,
+    "ag":3,
+    "pa":5,
+    "av":8
+  },
+  "portrait":"\/i\/318834",
+  "icon":"\/i\/645253",
+  "statistics":{
+    "spp":86,
+    "completions":0,
+    "touchdowns":18,
+    "interceptions":0,
+    "casualties":2,
+    "mvp":7,
+    "passing":0,
+    "rushing":206,
+    "blocks":28,
+    "fouls":0,
+    "games":32
+  },
+  "skills":[
+    "Catch",
+    "Dodge",
+    "Block",
+    "Side Step",
+    "Sprint",
+    "Sure Feet",
+    "Jump Up"
+  ],
+  "injuries":[
+    "Gouged Eye (MNG)",
+    "Gouged Eye (MNG)"
+  ]
+}

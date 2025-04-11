@@ -2,9 +2,10 @@ package com.jervisffb.fumbbl.web.api
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
-public data class TeamDetails(
+public data class FumbbleTeamDetails(
     public val id: Int,
     public val coach: Coach,
     public val roster: Roster,
@@ -24,7 +25,11 @@ public data class TeamDetails(
     public val cheerleaders: Int,
     public val apothecary: String,
     public val record: Record,
-    public val specialRules: SpecialRules,
+    // This can be both an Array (if no rules) and an object if it has special rules.
+    // But when it is an object, it is the object keys that define the name of the Special
+    // Rule. Rather than trying to handle the mapping here, we just expose the underlying
+    // JSON and handle it later.
+    public val specialRules: JsonElement,
     public val seasonInfo: SeasonInfo,
     public val tvLimit: Int,
     public val options: Options,
@@ -79,6 +84,11 @@ public data class Cas(
     public val against: Int,
 )
 
+// It looks like special rules has the option for futher customization.
+// It is a bit unclear what it is used for. For now, we only care about
+// the keys anyway. Actually, the Special Rules are read from the Roster
+// right now. It is a bit unclear if the Team Special Rules could differ
+// from these?
 @Serializable
 public data class SpecialRules(
     @SerialName("Old World Classic")
@@ -150,14 +160,14 @@ public data class Player(
     public val number: Int,
     public val status: Int,
     public val name: String,
-    public val gender: String,
+    public val gender: String?,
     public val hasBio: Boolean,
     public val position: String,
     public val positionId: Int,
     public val record: Record2,
     public val skillStatus: SkillStatus,
     public val injuries: String,
-    public val skills: List<String>,
+    public val skills: List<String?>,
     public val skillCosts: List<Int>,
     public val refundable: Boolean,
 )
@@ -181,8 +191,8 @@ public data class Record2(
 
 @Serializable
 public data class SkillStatus(
-    public val status: String,
-    public val maxLimit: Int,
-    public val tier: Int,
+    public val status: String?,
+    public val maxLimit: Int?,
+    public val tier: Int?,
     // public val numRewards: Any?,
 )

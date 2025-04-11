@@ -53,7 +53,19 @@ value class RerollSourceId(val id: String)
  * id
  */
 @Serializable
-data class SkillId(val type: SkillType, val value: Int?)
+data class SkillId(val type: SkillType, val value: Int?) {
+    fun toPrettyString(): String {
+        // Convert to slightly nicer looking string.
+        // Skills with value do not look 100% correct, e.g. "Might Blow(1)"
+        // But it should be good enough, since this is mostly used for serialization.
+        return buildString {
+            append(type)
+            if (value != null) {
+                append("($value)")
+            }
+        }
+    }
+}
 
 @Serializable
 @JvmInline

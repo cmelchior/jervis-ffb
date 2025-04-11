@@ -1,5 +1,6 @@
 package com.jervisffb.ui.menu.components.teamselector
 
+import co.touchlab.kermit.Logger.Companion.e
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Team
@@ -14,6 +15,7 @@ import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreenModel
 import com.jervisffb.ui.menu.components.TeamInfo
+import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -28,6 +30,10 @@ class SelectTeamComponentModel(
     private val getCoach: () -> Coach,
     private val onTeamSelected: (TeamInfo?) -> Unit,
 ) : JervisScreenModel {
+
+    companion object {
+        val LOG = jervisLogger()
+    }
 
     var unavailableTeam = MutableStateFlow<TeamId?>(null)
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())
@@ -89,19 +95,28 @@ class SelectTeamComponentModel(
         onSuccess: () -> Unit,
         onError: (String) -> Unit,
     ) {
-        val teamId = teamId.toIntOrNull() ?: error("Do something here")
+        val teamId = teamId.toLongOrNull()
+        if (teamId == null) {
+            onError("Team ID does not look like a valid number")
+            return
+        }
         menuViewModel.navigatorContext.launch {
             try {
                 val rules = rules!!
                 val teamFile = FumbblApi().loadTeam(teamId, rules)
                 CacheManager.saveTeam(teamFile)
-                val unknownCoach = Coach(CoachId("Unknown"), "TemporaryCoach")
-                val team = SerializedTeam.deserialize(rules, teamFile.team, unknownCoach)
+                val team = SerializedTeam.deserialize(rules, teamFile.team, Coach.UNKNOWN)
                 val teamInfo = getTeamInfo(teamFile, team)
                 availableTeams.value = (availableTeams.value.filter { it.teamId != teamInfo.teamId } + teamInfo).sortedBy { it.teamName }
                 onSuccess()
             } catch (e: Exception) {
-                onError(e.message ?: "Unknown error")
+                LOG.w { "Failed to load team:\n${e.stackTraceToString()}" }
+                val errorMessage = if (e.message != null) {
+                    "Could not load team - ${e.message}"
+                } else {
+                    "Could not load team due to an unknown error: ${e.stackTraceToString()}"
+                }
+                onError(errorMessage)
             }
         }
     }

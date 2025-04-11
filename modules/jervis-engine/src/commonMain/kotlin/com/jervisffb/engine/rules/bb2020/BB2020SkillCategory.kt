@@ -108,21 +108,18 @@ abstract class SkillSettings {
     private val regex = "(^[a-zA-Z\\- ]+)\\s*(\\(([\\-+]\\d+|\\d+\\+)\\))?$".toRegex()
 
     /**
-     * Converts a string to the appropriate [SkillId], or throws an exception if that particular
-     * skill is not supported by this ruleset
+     * Converts a string to the appropriate [SkillId], or return `null` if the skill name could not be mapped
+     * to a supported skill in this ruleset.
      */
     fun getSkillId(skillName: String): SkillId? {
         // Split name into name an value with a sign, e.g. `+1` or `-1`
-        val match = regex.matchEntire(skillName)?.let { match ->
+        return regex.matchEntire(skillName)?.let { match ->
             val name = match.groups[1]?.value?.trim() ?: error("Failed to find skill name in string: $skillName")
             val value = match.groups[3]?.value?.replace("+", "")?.replace("-", "")?.toInt()
-            return SkillType.entries.find { it.description == name }?.let { skillType ->
-                if (!skillCache.containsKey(skillType)) {
-                    return null
-                }
+            skillCache.keys.firstOrNull { it.description == name }?.let { skillType ->
                 SkillId(skillType, value)
-            } ?: error("Failed to match skill name in list of skills: $skillName")
-        } ?: throw IllegalArgumentException("Jervis does not support this kind of skill name: '$skillName'")
+            }
+        }
     }
 
     /**
@@ -153,7 +150,17 @@ abstract class SkillSettings {
         skill: SkillId,
         expiresAt: Duration
     ): Skill {
-        return skillCache[skill.type]?.createSkill(player, skill.value, expiresAt) ?: error("Cannot find skill factory for skill: ${skill.type}")
+        // If a SkillFactory is created with a default value, we allow parsing in SkillIds
+        // with a `null` value. In which case, they will just fall back to the default.
+        // The reason for this is mostly compatibility with FUMBBL which seems to be using
+        // both skills like "Mighty Blow" or "Mighty Blow (+1)", depending on how old
+        // the roster is.
+        val factory = skillCache[skill.type] ?: error("Cannot find skill factory for skill: ${skill.type}")
+        return if (factory.defaultSkillId.value != null && skill.value == null) {
+            factory.createDefaultSkill(player, expiresAt)
+        } else {
+            factory.createSkill(player, skill.value, expiresAt)
+        }
     }
 
     /**

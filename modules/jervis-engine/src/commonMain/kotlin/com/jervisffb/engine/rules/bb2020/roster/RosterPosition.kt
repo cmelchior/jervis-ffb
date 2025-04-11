@@ -64,7 +64,14 @@ data class RosterPosition(
             passing = this@RosterPosition.passing
             baseArmorValue = position.armorValue
             armorValue = position.armorValue
-            positionSkills = position.skills.map { rules.createSkill(this, it) }.toMutableList()
+            positionSkills = position.skills.mapNotNull { skill ->
+                // TODO For now we just ignore skills not supported
+                if (rules.skillSettings.isSkillSupported(skill.type)) {
+                    rules.createSkill(this, skill)
+                } else {
+                    null
+                }
+            }.toMutableList()
         }
     }
 

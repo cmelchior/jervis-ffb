@@ -189,7 +189,14 @@ class Player(
     // to mark the player somehow. This is done through a TemporaryEffect
     val temporaryEffects = mutableListOf<TemporaryEffect>()
     val extraSkills = mutableListOf<Skill>()
-    var positionSkills = position.skills.map { rules.createSkill(this, it) }.toMutableList()
+    var positionSkills = position.skills.mapNotNull {
+        // TODO For now, just ignore skills that are not supported
+        if (rules.skillSettings.isSkillSupported(it.type)) {
+            rules.createSkill(this, it)
+        } else {
+            null
+        }
+    }.toMutableList()
     val skills: List<Skill>
         get() = extraSkills + positionSkills // TODO This probably result in _a lot_ of copying. Find a way to optimize this
 

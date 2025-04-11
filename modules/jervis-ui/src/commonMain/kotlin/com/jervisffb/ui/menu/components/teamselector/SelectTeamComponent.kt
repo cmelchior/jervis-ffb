@@ -9,13 +9,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.jervisffb.ui.menu.components.LoadTeamDialog
 import com.jervisffb.ui.menu.components.TeamCard
 import com.jervisffb.ui.menu.components.TeamInfo
 
@@ -26,8 +22,6 @@ fun SelectTeamComponent(
 ) {
     val unavailableTeam by viewModel.unavailableTeam.collectAsState()
     val availableTeams by viewModel.availableTeams.collectAsState()
-    var showImportFumbblTeamDialog by remember { mutableStateOf(false) }
-    var showLoadTeamFromFileDialog by remember { mutableStateOf(false) }
     val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -52,8 +46,5 @@ fun SelectTeamComponent(
                 )
             }
         }
-    }
-    if (showImportFumbblTeamDialog) {
-        LoadTeamDialog(viewModel, onCloseRequest = { showImportFumbblTeamDialog = false })
     }
 }

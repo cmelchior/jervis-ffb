@@ -6,6 +6,7 @@ import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -90,18 +91,7 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
                 )
             }
             val skills = fumbblPlayer.skillValuesMap.map {
-                // TODO Should we attempt to automate this, rather than doing a manual conversion?
-                when (it.key) {
-                    "Block" -> SkillType.BLOCK.id()
-                    "Dodge" -> SkillType.DODGE.id()
-                    "Tackle" -> SkillType.TACKLE.id()
-                    "Wrestle" -> SkillType.WRESTLE.id()
-                    "Extra Arms",
-                    "Brawler",
-                    "Sneaky Git",
-                    "Leader" -> null // TODO
-                    else -> TODO("Unsupported skill: $it")
-                }
+                convertFumbblSkillToSkillId(rules, it.key)
             }.filterNotNull()
 
             addPlayer(
@@ -132,3 +122,20 @@ private fun extractField(field: FumbblField): Field {
     // TODO Extract more information when we know what to fetch
     return Field(width = 26, height = 15)
 }
+
+/**
+ * Map FUMBBL Skill Names to Jervis [SkillId]s.
+ * Return `null` if the name could not be mapped or if the skill isn't supported
+ * by the ruletset.
+ */
+fun convertFumbblSkillToSkillId(rules: Rules, skillName: String): SkillId? {
+    // We should probably hard code all the FUMBBL titles instead of hoping the names are the same.
+    // But for now, we just do it in the few places with known problems and hope for the best.
+    val normalizedSkillName = when (skillName) {
+        "Side Step" -> SkillType.SIDESTEP.description
+        else -> skillName
+    }
+    return rules.skillSettings.getSkillId(normalizedSkillName)
+}
+
+

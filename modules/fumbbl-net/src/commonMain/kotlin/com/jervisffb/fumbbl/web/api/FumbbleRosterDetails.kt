@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 // Mappings for https://fumbbl.com/api/roster/get/<id>
 
 @Serializable
-public data class RosterDetails(
+public data class FumbbleRosterDetails(
     public val id: String,
     public val ownerRuleset: String,
     public val name: String,
@@ -26,7 +26,7 @@ public data class RosterDetails(
     public val pitch: String,
     public val specialRules: List<SpecialRule>,
     // public val stars: List<Any?>,
-    public val positions: List<RosterPosition>,
+    public val positions: List<FumbbleRosterPosition>,
 )
 
 @Serializable
@@ -39,17 +39,17 @@ public data class RosterStats(
 @Serializable
 public data class Logos(
     @SerialName("192")
-    public val `value`: String,
+    public val size192: String,
     @SerialName("128")
-    public val value1: String,
+    public val size128: String,
     @SerialName("96")
-    public val value2: String,
+    public val size96: String,
     @SerialName("64")
-    public val value3: String,
+    public val size64: String,
     @SerialName("48")
-    public val value4: String,
+    public val size48: String,
     @SerialName("32")
-    public val value5: String,
+    public val size32: String,
 )
 
 @Serializable
@@ -62,10 +62,10 @@ public data class SpecialRule(
 )
 
 @Serializable
-public data class RosterPosition(
+public data class FumbbleRosterPosition(
     public val id: String,
     public val type: String,
-    public val gender: String,
+    public val gender: String?,
     public val title: String,
     public val quantity: Int,
     public val iconLetter: String,
