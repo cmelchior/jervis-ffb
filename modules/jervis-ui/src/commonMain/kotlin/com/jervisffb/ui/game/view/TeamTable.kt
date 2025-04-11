@@ -80,7 +80,7 @@ fun TeamTable(width: Dp, team: Team, isOnHomeTeam: Boolean) {
     Column(modifier = Modifier.width(width).background(Color.Transparent)) {
         TeamTableWrapper(team.name)
         TeamTableHeader()
-        team.forEachIndexed { index, player ->
+        team.sortedBy { it.number.value}.forEachIndexed { index, player ->
             TeamTableRow(
                 isOnHomeTeam = isOnHomeTeam,
                 rowNo = index,
