@@ -63,10 +63,9 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     val selectTeamModel = SelectP2PTeamScreenModel(
         menuViewModel = menuViewModel,
         getCoach = { setupGameModel.getCoach()!! },
-        onTeamSelected = { teamSelected ->
-            selectedTeam.value = teamSelected
-        },
-    )
+    ) { teamSelected ->
+        selectedTeam.value = teamSelected
+    }
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
     private val _globalGameUrl = MutableStateFlow("")
     val globalUrl: StateFlow<String> = _globalGameUrl

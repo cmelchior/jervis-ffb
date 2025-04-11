@@ -56,11 +56,10 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
     val selectTeamModel: SelectP2PTeamScreenModel = SelectP2PTeamScreenModel(
         menuViewModel = menuViewModel,
         getCoach = { joinHostModel.getCoach()!! },
-        onTeamSelected = { teamSelected ->
-            selectedTeam.value = teamSelected
-            canCreateGame.value = (teamSelected != null)
-        },
-    )
+    ) { teamSelected ->
+        selectedTeam.value = teamSelected
+        canCreateGame.value = (teamSelected != null)
+    }
 
     // Page 3: Accept game and load resources
     val acceptGameModel = StartP2PGameScreenModel(networkAdapter, menuViewModel)

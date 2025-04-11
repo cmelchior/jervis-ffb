@@ -1,6 +1,5 @@
 package com.jervisffb.ui.menu.components.teamselector
 
-import co.touchlab.kermit.Logger.Companion.e
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Team
@@ -29,6 +28,7 @@ class SelectTeamComponentModel(
     private val menuViewModel: MenuViewModel,
     private val getCoach: () -> Coach,
     private val onTeamSelected: (TeamInfo?) -> Unit,
+    private val onTeamImported: (TeamInfo) -> Unit = { _ -> /* Do nothing */ },
 ) : JervisScreenModel {
 
     companion object {
@@ -58,6 +58,7 @@ class SelectTeamComponentModel(
                 val team = SerializedTeam.deserialize(rules, teamData, unknownCoach)
                 getTeamInfo(teamFile, team)
             }.let {
+                // TODO Fix race condition with addNewTime
                 availableTeams.value = it.sortedBy { it.teamName }
             }
         }
@@ -107,7 +108,8 @@ class SelectTeamComponentModel(
                 CacheManager.saveTeam(teamFile)
                 val team = SerializedTeam.deserialize(rules, teamFile.team, Coach.UNKNOWN)
                 val teamInfo = getTeamInfo(teamFile, team)
-                availableTeams.value = (availableTeams.value.filter { it.teamId != teamInfo.teamId } + teamInfo).sortedBy { it.teamName }
+                addNewTeam(teamInfo)
+                onTeamImported(teamInfo)
                 onSuccess()
             } catch (e: Exception) {
                 LOG.w { "Failed to load team:\n${e.stackTraceToString()}" }
@@ -123,5 +125,9 @@ class SelectTeamComponentModel(
 
     fun makeTeamUnavailable(team: TeamId) {
         unavailableTeam.value = team
+    }
+
+    fun addNewTeam(teamInfo: TeamInfo) {
+        availableTeams.value = (availableTeams.value.filter { it.teamId != teamInfo.teamId } + teamInfo).sortedBy { it.teamName }
     }
 }

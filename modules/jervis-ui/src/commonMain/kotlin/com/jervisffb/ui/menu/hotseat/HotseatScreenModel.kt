@@ -58,6 +58,9 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
             }
             selectedHomeTeam.value = selectHomeTeamModel.selectedTeam.value
             homeTeamSelectionDone()
+        },
+        onTeamImported = { teamInfo ->
+            selectAwayTeamModel.addNewTeam(teamInfo)
         }
     )
     val selectedHomeTeam = MutableStateFlow<TeamInfo?>(null)
@@ -69,6 +72,9 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         {
             selectedAwayTeam.value = selectAwayTeamModel.selectedTeam.value
             awayTeamSelectionDone()
+        },
+        onTeamImported = { teamInfo ->
+            selectHomeTeamModel.addNewTeam(teamInfo)
         }
     )
     val selectedAwayTeam = MutableStateFlow<TeamInfo?>(null)

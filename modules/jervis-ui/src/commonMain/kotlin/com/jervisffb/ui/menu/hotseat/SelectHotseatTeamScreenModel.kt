@@ -20,6 +20,7 @@ class SelectHotseatTeamScreenModel(
     private val menuViewModel: MenuViewModel,
     private val parentModel: HotseatScreenModel,
     private val onNextScreen: () -> Unit,
+    private val onTeamImported: (TeamInfo) -> Unit = { _ -> /* Do nothing */ } ,
 ) : ScreenModel {
 
     val setupCoachModel = CoachSetupComponentModel(menuViewModel)
@@ -34,6 +35,7 @@ class SelectHotseatTeamScreenModel(
         { teamSelected ->
             selectedTeam.value = teamSelected
         },
+        onTeamImported
     )
 
     fun initializeTeamSelector(rules: Rules) {
@@ -46,5 +48,9 @@ class SelectHotseatTeamScreenModel(
 
     fun teamSelectionDone() {
         onNextScreen()
+    }
+
+    fun addNewTeam(teamInfo: TeamInfo) {
+        teamSelectorModel.addNewTeam(teamInfo)
     }
 }
