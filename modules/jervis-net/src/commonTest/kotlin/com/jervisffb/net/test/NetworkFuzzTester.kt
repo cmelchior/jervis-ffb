@@ -27,6 +27,7 @@ import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.gameId
+import com.jervisffb.net.messages.AcceptGameMessage
 import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage
 import com.jervisffb.net.messages.GameActionMessage
@@ -35,7 +36,6 @@ import com.jervisffb.net.messages.GameStartedMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
 import com.jervisffb.net.messages.JoinGameAsCoachMessage
 import com.jervisffb.net.messages.P2PTeamInfo
-import com.jervisffb.net.messages.StartGameMessage
 import com.jervisffb.net.messages.SyncGameActionMessage
 import com.jervisffb.net.messages.TeamJoinedMessage
 import com.jervisffb.net.messages.TeamSelectedMessage
@@ -163,8 +163,8 @@ class NetworkFuzzTester {
         consumeServerMessage<UpdateClientStateMessage>(conn2)
 
         // Confirm starting game
-        conn1.send(StartGameMessage(true))
-        conn2.send(StartGameMessage(true))
+        conn1.send(AcceptGameMessage(true))
+        conn2.send(AcceptGameMessage(true))
 
         // Game is starting
         consumeServerMessage<GameReadyMessage>(conn1)

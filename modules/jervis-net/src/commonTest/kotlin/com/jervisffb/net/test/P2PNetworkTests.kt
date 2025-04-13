@@ -15,7 +15,9 @@ import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode
 import com.jervisffb.net.LightServer
 import com.jervisffb.net.gameId
+import com.jervisffb.net.messages.AcceptGameMessage
 import com.jervisffb.net.messages.CoachJoinedMessage
+import com.jervisffb.net.messages.CoachLeftMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage
 import com.jervisffb.net.messages.GameActionMessage
 import com.jervisffb.net.messages.GameReadyMessage
@@ -29,13 +31,13 @@ import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.P2PTeamInfo
 import com.jervisffb.net.messages.ServerError
-import com.jervisffb.net.messages.StartGameMessage
 import com.jervisffb.net.messages.SyncGameActionMessage
 import com.jervisffb.net.messages.TeamJoinedMessage
 import com.jervisffb.net.messages.TeamSelectedMessage
 import com.jervisffb.net.messages.UpdateClientStateMessage
 import com.jervisffb.net.messages.UpdateHostStateMessage
 import com.jervisffb.test.createDefaultHomeTeam
+import com.jervisffb.test.humanTeamAway
 import com.jervisffb.test.lizardMenAwayTeam
 import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.runBlocking
@@ -154,8 +156,8 @@ class P2PNetworkTests {
         }
 
         // Confirm starting game
-        conn1.send(StartGameMessage(true))
-        conn2.send(StartGameMessage(true))
+        conn1.send(AcceptGameMessage(true))
+        conn2.send(AcceptGameMessage(true))
 
         // Game is starting
         checkServerMessage<GameReadyMessage>(conn1) {
@@ -175,6 +177,109 @@ class P2PNetworkTests {
         conn2.close()
         server.stop()
     }
+
+
+    // Test for a Host starting a game, a Client joins, selects a team, regrets the choice
+    // and then submit another team that gets accepted
+    @Test
+    fun clientRejectsGame() = runBlocking {
+        // Start server
+        server.start()
+
+        val conn1 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")
+        conn1.start()
+        var conn2 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "client")
+        conn2.start()
+
+        hostAndClientSelectTeams(conn1, conn2)
+
+        // Client rejects the game
+        conn2.send(AcceptGameMessage(false))
+        conn2.awaitDisconnect().also {
+            assertEquals(JervisExitCode.GAME_NOT_ACCEPTED.code, it.code)
+        }
+        checkServerMessage<UpdateHostStateMessage>(conn1) {
+            assertEquals(P2PHostState.WAIT_FOR_CLIENT, it.state)
+        }
+        checkServerMessage<UpdateClientStateMessage>(conn2) {
+            assertEquals(P2PClientState.JOIN_SERVER, it.state)
+        }
+        conn2.close()
+        consumeServerMessage<CoachLeftMessage>(conn1)
+
+        // Client reconnects
+        conn2 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "client")
+        conn2.start()
+        val join2 = JoinGameAsCoachMessage(
+            GameId("test"),
+            "client",
+            null,
+            "client",
+            false
+        )
+        conn2.send(join2)
+        consumeServerMessage<CoachJoinedMessage>(conn1)
+        consumeServerMessage<GameStateSyncMessage>(conn2)
+        consumeServerMessage<CoachJoinedMessage>(conn2)
+        consumeServerMessage<UpdateClientStateMessage>(conn2)
+
+        // Client selects new team
+        conn2.send(TeamSelectedMessage(P2PTeamInfo(humanTeamAway(rules))))
+        consumeServerMessage<TeamJoinedMessage>(conn1)
+        consumeServerMessage<TeamJoinedMessage>(conn2)
+
+        // Receive request to start game
+        consumeServerMessage<ConfirmGameStartMessage>(conn1)
+        consumeServerMessage<ConfirmGameStartMessage>(conn2)
+        consumeServerMessage<UpdateHostStateMessage>(conn1)
+        consumeServerMessage<UpdateClientStateMessage>(conn2)
+
+        // Confirm starting game
+        conn1.send(AcceptGameMessage(true))
+        conn2.send(AcceptGameMessage(true))
+
+        // Game is starting
+        consumeServerMessage<GameReadyMessage>(conn1)
+        consumeServerMessage<GameReadyMessage>(conn2)
+        consumeServerMessage<UpdateHostStateMessage>(conn1)
+        consumeServerMessage<UpdateClientStateMessage>(conn2)
+
+        conn1.close()
+        conn2.close()
+        server.stop()
+    }
+
+    // Test a Host setting up a game, a Client joins and selects a team
+    // When we get to accepting the game, the Host rejects.
+    @Test
+    fun hostRejectsGame() = runBlocking {
+        // Start server
+        server.start()
+
+        val conn1 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "host")
+        conn1.start()
+        var conn2 = JervisClientWebSocketConnection(GameId("test"), "ws://localhost:8080/joinGame?id=test", "client")
+        conn2.start()
+
+        hostAndClientSelectTeams(conn1, conn2)
+
+        // Host rejects the game
+        conn1.send(AcceptGameMessage(false))
+        checkServerMessage<UpdateHostStateMessage>(conn1) {
+            assertEquals(P2PHostState.SETUP_GAME, it.state)
+        }
+        conn1.awaitDisconnect().also {
+            assertEquals(JervisExitCode.GAME_NOT_ACCEPTED.code, it.code)
+        }
+        conn2.awaitDisconnect().also {
+            assertEquals(JervisExitCode.GAME_NOT_ACCEPTED.code, it.code)
+        }
+
+        conn1.close()
+        conn2.close()
+        server.stop()
+    }
+
 
     @Test
     fun closeSessionWithoutSendingData() = runBlocking {
@@ -217,7 +322,7 @@ class P2PNetworkTests {
         conn.start()
         try {
             // Sending a message that is not a JoinAs* message.
-            conn.send(StartGameMessage(true))
+            conn.send(AcceptGameMessage(true))
             withTimeout(5.seconds) {
                 val closeReason = conn.awaitDisconnect()
                 assertEquals(JervisExitCode.WRONG_STARTING_MESSAGE.code, closeReason.code)
@@ -453,8 +558,8 @@ class P2PNetworkTests {
         consumeServerMessage<UpdateClientStateMessage>(conn2)
 
         // Confirm starting game
-        conn1.send(StartGameMessage(true))
-        conn2.send(StartGameMessage(true))
+        conn1.send(AcceptGameMessage(true))
+        conn2.send(AcceptGameMessage(true))
 
         // Game is starting
         consumeServerMessage<GameReadyMessage>(conn1)
@@ -469,4 +574,52 @@ class P2PNetworkTests {
             server.stop()
         }
     }
+
+    // Helper method that connects a Host and a Client and let
+    // them both choose teams. Making the server state machine ready to accept the game.
+    private suspend fun hostAndClientSelectTeams(
+        conn1: JervisClientWebSocketConnection,
+        conn2: JervisClientWebSocketConnection
+    ) {
+        // Host Joins
+        val join1 = JoinGameAsCoachMessage(
+            GameId("test"),
+            "host",
+            null,
+            "host",
+            true,
+            P2PTeamInfo(createDefaultHomeTeam(rules))
+        )
+        conn1.send(join1)
+        consumeServerMessage<GameStateSyncMessage>(conn1)
+        consumeServerMessage<CoachJoinedMessage>(conn1)
+        consumeServerMessage<TeamJoinedMessage>(conn1)
+        consumeServerMessage<UpdateHostStateMessage>(conn1)
+
+        // Client Joins
+        val join2 = JoinGameAsCoachMessage(
+            GameId("test"),
+            "client",
+            null,
+            "client",
+            false
+        )
+        conn2.send(join2)
+        consumeServerMessage<CoachJoinedMessage>(conn1)
+        consumeServerMessage<GameStateSyncMessage>(conn2)
+        consumeServerMessage<CoachJoinedMessage>(conn2)
+        consumeServerMessage<UpdateClientStateMessage>(conn2)
+
+        // Client selects team
+        conn2.send(TeamSelectedMessage(P2PTeamInfo(lizardMenAwayTeam(rules))))
+        consumeServerMessage<TeamJoinedMessage>(conn1)
+        consumeServerMessage<TeamJoinedMessage>(conn2)
+
+        // Receive request to start game
+        consumeServerMessage<ConfirmGameStartMessage>(conn1)
+        consumeServerMessage<ConfirmGameStartMessage>(conn2)
+        consumeServerMessage<UpdateHostStateMessage>(conn1)
+        consumeServerMessage<UpdateClientStateMessage>(conn2)
+    }
+
 }

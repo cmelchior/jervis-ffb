@@ -51,7 +51,7 @@ class PlatformWebSocketServer(
             // So when a websocket connection established, the first message is required to be a `JoinGameMessage` with a
             // `gameId` that exists. If not, the connection is terminated immediately. If the game exists, the websocket
             // session is added to the GameSession which takes over all responsibility from there.
-
+            var connectionUsername: String? = null
             try {
                 // For P2P games, the GameId is part of the URL. So for those cases, we
                 // can abort early without receiving any messages.
@@ -63,6 +63,7 @@ class PlatformWebSocketServer(
                     val clientMessage = jervisNetworkSerializer.decodeFromString<ClientMessage>(json)
                     if (!closeConnectionIfInvalidFormat(platformConnection, clientMessage)) {
                         val (gameId, username) = readGameAndUser(clientMessage)
+                        connectionUsername = username
                         val game = server.gameCache.getGame(gameId) ?: error("GameId not found: ${gameId?.value}")
                         val connection = JervisNetworkWebSocketConnection(username, platformConnection)
                         val clientConnection = game.addClient(connection, clientMessage as JoinGameMessage)
@@ -77,10 +78,10 @@ class PlatformWebSocketServer(
                 LOG.d("New connection closed before receiving first message: $platformConnection")
             } catch (ex: Throwable) {
                 if (ex is CancellationException) throw ex
-                LOG.i("Server Connection closed due to an error: $platformConnection")
+                LOG.i("[Server] Connection ($platformConnection) closed due to an error:\n${ex.stackTraceToString()}")
                 platformConnection.close(JervisExitCode.UNEXPECTED_ERROR, ex.stackTraceToString())
             }
-            LOG.d("[Server] Connection closed: $platformConnection")
+            LOG.d("[Server] Connection closed: ${connectionUsername ?: platformConnection}")
         }
         platformClient = startEmbeddedServer(
             this.server,

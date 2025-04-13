@@ -16,6 +16,7 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
+import com.jervisffb.ui.game.view.SideBarEntryState
 import com.jervisffb.ui.game.view.SidebarEntry
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameScreen
@@ -92,12 +93,12 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         val startEntries = listOf(
             SidebarEntry(
                 name = "1. Configure Game",
-                enabled = true,
-                active = true,
+                state = SideBarEntryState.ACTIVE,
+                onClick = { /* */ }
             ),
-            SidebarEntry(name = "2. Home Team"),
-            SidebarEntry(name = "3. Away Team"),
-            SidebarEntry(name = "4. Start Game")
+            SidebarEntry(name = "2. Home Team", onClick = { /* */ }),
+            SidebarEntry(name = "3. Away Team", onClick = { /* */ }),
+            SidebarEntry(name = "4. Start Game", onClick = { /* */ })
         )
         sidebarEntries.addAll(startEntries)
     }
@@ -137,17 +138,17 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                     logo = awayTeamLogo,
                     teamData = awayTeam
                 )
-                sidebarEntries[0] = sidebarEntries[0].copy(active = false, onClick = { goBackToPage(0) })
-                sidebarEntries[1] = sidebarEntries[1].copy(active = false, enabled = false, onClick = null)
-                sidebarEntries[2] = sidebarEntries[2].copy(active = false, enabled = false, onClick = null)
-                sidebarEntries[3] = sidebarEntries[3].copy(active = true, enabled = true, onClick = { startGame() })
+                sidebarEntries[0] = sidebarEntries[0].copy(state = SideBarEntryState.DONE_AVAILABLE, onClick = { goBackToPage(0) })
+                sidebarEntries[1] = sidebarEntries[1].copy(state = SideBarEntryState.NOT_READY)
+                sidebarEntries[2] = sidebarEntries[2].copy(state = SideBarEntryState.NOT_READY)
+                sidebarEntries[3] = sidebarEntries[3].copy(state = SideBarEntryState.ACTIVE, onClick = { startGame() })
                 currentPage.value = 3
             } else {
                 rules = setupGameModel.createRules()
                 selectHomeTeamModel.initializeTeamSelector(rules!!)
                 selectAwayTeamModel.initializeTeamSelector(rules!!)
-                sidebarEntries[0] = sidebarEntries[0].copy(active = false, onClick = { goBackToPage(0) })
-                sidebarEntries[1] = sidebarEntries[1].copy(active = true, enabled = true, onClick = { homeTeamSelectionDone() })
+                sidebarEntries[0] = sidebarEntries[0].copy(state = SideBarEntryState.DONE_AVAILABLE, onClick = { goBackToPage(0) })
+                sidebarEntries[1] = sidebarEntries[1].copy(state = SideBarEntryState.ACTIVE, onClick = { homeTeamSelectionDone() })
                 currentPage.value = 1
             }
         }
@@ -159,14 +160,14 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
     }
 
     fun homeTeamSelectionDone() {
-        sidebarEntries[1] = sidebarEntries[1].copy(enabled = true, active = false, onClick = { goBackToPage(1) })
-        sidebarEntries[2] = sidebarEntries[2].copy(enabled = true, active = true, onClick = null)
+        sidebarEntries[1] = sidebarEntries[1].copy(state = SideBarEntryState.DONE_AVAILABLE, onClick = { goBackToPage(1) })
+        sidebarEntries[2] = sidebarEntries[2].copy(state = SideBarEntryState.ACTIVE)
         currentPage.value = 2
     }
 
     fun awayTeamSelectionDone() {
-        sidebarEntries[2] = sidebarEntries[2].copy(enabled = true, active = false, onClick = { goBackToPage(2) })
-        sidebarEntries[3] = sidebarEntries[3].copy(enabled = true, active = true, onClick = null)
+        sidebarEntries[2] = sidebarEntries[2].copy(state = SideBarEntryState.DONE_AVAILABLE, onClick = { goBackToPage(2) })
+        sidebarEntries[3] = sidebarEntries[3].copy(state = SideBarEntryState.ACTIVE)
         currentPage.value = 3
     }
 
@@ -174,9 +175,9 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         if (previousPage >= currentPage.value) {
             error("It is only allowed to go back: $previousPage")
         }
-        sidebarEntries[previousPage] = sidebarEntries[previousPage].copy(active = true, onClick = null)
+        sidebarEntries[previousPage] = sidebarEntries[previousPage].copy(state = SideBarEntryState.ACTIVE)
         for (index in previousPage + 1 .. currentPage.value) {
-            sidebarEntries[index] = sidebarEntries[index].copy(active = false, enabled = false, onClick = null)
+            sidebarEntries[index] = sidebarEntries[index].copy(state = SideBarEntryState.NOT_READY)
         }
         currentPage.value = previousPage
     }

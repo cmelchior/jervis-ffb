@@ -19,6 +19,7 @@ import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.P2PActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.state.RemoteActionProvider
+import com.jervisffb.ui.game.view.SideBarEntryState
 import com.jervisffb.ui.game.view.SidebarEntry
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.GameScreen
@@ -35,6 +36,9 @@ import com.jervisffb.ui.menu.p2p.StartP2PGameScreenModel
 import com.jervisffb.utils.copyToClipboard
 import com.jervisffb.utils.getLocalIpAddress
 import com.jervisffb.utils.getPublicIpAddress
+import com.jervisffb.utils.jervisLogger
+import com.jervisffb.utils.singleThreadDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -45,6 +49,13 @@ import kotlinx.coroutines.launch
  * running the game.
  */
 class P2PHostScreenModel(private val navigator: Navigator, private val menuViewModel: MenuViewModel) : ScreenModel {
+
+    companion object {
+        val LOG = jervisLogger()
+    }
+
+    // Handles all state transitions
+    var workflow: Workflow = Workflow()
 
     val sidebarEntries: SnapshotStateList<SidebarEntry> = SnapshotStateList()
 
@@ -75,115 +86,40 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     private var server: LightServer? = null
 
     // Page 3: Wait for opponent
+    // No current model or state is exposed
 
     // Page 4: Accept game
     val acceptGameModel = StartP2PGameScreenModel(networkAdapter, menuViewModel)
 
+    // Page 5: Loading screen
     private var gameViewModel: GameScreenModel? = null
 
     init {
-        val startEntries = listOf(
-            SidebarEntry(
-                name = "1. Configure Game",
-                enabled = true,
-                active = true,
-            ),
-            SidebarEntry(name = "2. Select Team"),
-            SidebarEntry(name = "3. Wait For Opponent"),
-            SidebarEntry(name = "4. Start Game")
-        )
-        sidebarEntries.addAll(startEntries)
-
+        sidebarEntries.addAll(workflow.getStartingSidebarEntries())
+        // Start listening to state changes sent by the server
         menuViewModel.navigatorContext.launch {
-            networkAdapter.hostState.collect {
-                // TODO We move state optimistically, so we probably need to check if things needs to be reset somehow.
-                when (it) {
-                    P2PHostState.START -> { /* Do nothing */ }
-                    P2PHostState.SETUP_GAME -> {
-                        if (currentPage.value > 0) {
-                            goBackToPage(0)
-                        }
-                    }
-                    P2PHostState.SELECT_TEAM -> {
-                        TODO("Is this ever called")
-                        currentPage.value = 1
-                    }
-                    P2PHostState.START_SERVER -> {
-                        TODO("Is this ever called")
-                        currentPage.value = 2
-                    }
-                    P2PHostState.JOIN_SERVER -> { }
-                    P2PHostState.WAIT_FOR_CLIENT -> {
-                        gotoNextPage(2)
-                    }
-                    P2PHostState.ACCEPT_GAME -> {
-                        // Both teams have been chosen.
-                        gotoNextPage(3)
-                    }
-                    P2PHostState.RUN_GAME -> {
-                        gameViewModel!!.gameAcceptedByAllPlayers()
-                    }
-                    P2PHostState.CLOSE_GAME -> {}
-                    P2PHostState.DONE -> {}
-                }
+            networkAdapter.hostState.collect { newState ->
+                workflow.handleHostStateChange(newState)
             }
         }
     }
 
-    fun gameSetupDone() {
-        menuViewModel.navigatorContext.launch {
-            val logoSize = LogoSize.SMALL
-            if (isLoadingGame()) {
-                saveGameData = setupGameModel.gameSetupModel.loadFileModel.gameFile ?: error("Game file is not loaded")
-                val homeTeam = saveGameData!!.homeTeam
-                val homeTeamLogo = IconFactory.loadRosterIcon(
-                    homeTeam.id,
-                    homeTeam.teamLogo ?: homeTeam.roster.logo,
-                    logoSize
-                )
-                selectedTeam.value = TeamInfo(
-                    teamId = homeTeam.id,
-                    teamName = homeTeam.name,
-                    teamRoster = homeTeam.roster.name,
-                    teamValue = homeTeam.teamValue,
-                    rerolls = homeTeam.rerolls.size,
-                    logo = homeTeamLogo,
-                    teamData = homeTeam
-                )
-                teamSelectionDone(gotoNextPage = false)
-                gotoNextPage(2, skipPages = true)
-            } else {
-                rules = setupGameModel.createRules()
-                selectTeamModel.initializeTeamList(rules!!)
-                gotoNextPage(1)
-            }
+    // Called from the UI when pressing "Next" on the "Configure" screen
+    fun userAcceptedGameSetup() {
+        if (isLoadingGameFromFile()) {
+            workflow.handleHostStateChange(P2PHostState.WAIT_FOR_CLIENT)
+        } else {
+            workflow.handleHostStateChange(P2PHostState.SELECT_TEAM)
         }
     }
 
-    private fun isLoadingGame(): Boolean {
-        val selectedGameTab = setupGameModel.gameSetupModel.selectedGameTab.value
-        return setupGameModel.gameSetupModel.tabs[selectedGameTab].type == ConfigType.FROM_FILE
+    // Called from the UI when pressing "Next" on the "Select Team" screen
+    fun userAcceptedTeam() {
+        workflow.handleHostStateChange(P2PHostState.WAIT_FOR_CLIENT)
     }
 
-    fun teamSelectionDone(gotoNextPage: Boolean = true) {
-        _globalGameUrl.value = "Fetching..."
-        _localGameUrl.value = "Fetching..."
-        menuViewModel.navigatorContext.launch {
-            val localIp = getLocalIpAddress()
-            _localGameUrl.value = "ws://$localIp:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
-            val publicIp = getPublicIpAddress()
-            if (publicIp == null) {
-                globalGameUrlError.value = "Unable to get IP address. Goto https://api.ipify.org to see your public IP address"
-            }
-            _globalGameUrl.value = "ws://$publicIp:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
-        }
-        startServer()
-        if (gotoNextPage) {
-            gotoNextPage(2)
-        }
-    }
-
-    private fun startServer() {
+    // Starts the server on the Host and join it immediately
+    private suspend fun startServer() {
         val team = selectedTeam.value?.teamData ?: error("Only on-client teams supported for now")
         if (saveGameData != null) {
             val saveGame = saveGameData!!
@@ -209,52 +145,94 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
                 testMode = true
             )
         }
-        menuViewModel.navigatorContext.launch {
-            server?.start()
-            networkAdapter.joinHost(
-                gameUrl = "ws://127.0.0.1:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}",
-                coachName = setupGameModel.coachSetupModel.coachName.value,
-                gameId = GameId(setupGameModel.gameName.value),
-                teamIfHost = selectedTeam.value?.teamData ?: error("Missing team"),
-                handler = object: AbstractClintNetworkMessageHandler() { /* No op */ }
-            )
-            networkAdapter.teamSelected(selectedTeam.value!!)
-        }
-    }
-
-    fun goBackToPage(previousPage: Int) {
-        if (previousPage >= currentPage.value) {
-            error("It is only allowed to go back: $previousPage")
-        }
-        sidebarEntries[previousPage] = sidebarEntries[previousPage].copy(active = true, onClick = null)
-        for (index in previousPage + 1 .. currentPage.value) {
-            sidebarEntries[index] = sidebarEntries[index].copy(active = false, enabled = false, onClick = null)
-        }
-        currentPage.value = previousPage
-    }
-
-    private fun gotoNextPage(nextPage: Int, skipPages: Boolean = false) {
-        // Disable intermediate pages (if needed)
-        val currentPage = currentPage.value
-        if (skipPages && nextPage > currentPage + 1) {
-            for (index in nextPage - 1 downTo currentPage) {
-                sidebarEntries[index] = sidebarEntries[index].copy(active = false, enabled = false, onClick = null)
-            }
-        }
-        sidebarEntries[currentPage] = sidebarEntries[currentPage].copy(enabled = true, active = false, onClick = { goBackToPage(currentPage) })
-        sidebarEntries[nextPage] = sidebarEntries[nextPage].copy(enabled = true, active = true, onClick = null)
-        this.currentPage.value = nextPage
+        server?.start()
+        networkAdapter.joinHost(
+            gameUrl = "ws://127.0.0.1:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}",
+            coachName = setupGameModel.coachSetupModel.coachName.value,
+            gameId = GameId(setupGameModel.gameName.value),
+            teamIfHost = selectedTeam.value?.teamData ?: error("Missing team"),
+            handler = object : AbstractClintNetworkMessageHandler() { /* No op */ }
+        )
+        networkAdapter.teamSelected(selectedTeam.value!!)
     }
 
     fun userAcceptGame(gameAccepted: Boolean) {
         menuViewModel.navigatorContext.launch {
-            networkAdapter.gameAccepted(gameAccepted)
-            if (!gameAccepted) {
-                goBackToPage(0)
+            if (gameAccepted) {
+                workflow.handleHostStateChange(P2PHostState.ACCEPTED_GAME)
             } else {
-                initializeGameModel()
+                workflow.handleHostStateChange(P2PHostState.SELECT_TEAM)
             }
         }
+    }
+
+    fun userCopyUrlToClipboard(url: String) {
+        copyToClipboard(url)
+    }
+
+    // Returns `true` if the configuration is defining loading a save file rather than starting a new
+    // game. This effects the flow of the sidebar.
+    private fun isLoadingGameFromFile(): Boolean {
+        val selectedGameTab = setupGameModel.gameSetupModel.selectedGameTab.value
+        return setupGameModel.gameSetupModel.tabs[selectedGameTab].type == ConfigType.FROM_FILE
+    }
+
+    private fun gotoNextPage(nextPage: Int) {
+        // If next page is not the immediate next, we just automatically skip them
+        // and do not allow you go jump to them (but they are still marked as "done")
+        val currentPage = currentPage.value
+        val skipPages = (nextPage - currentPage > 1)
+        if (skipPages) {
+            for (index in nextPage - 1 downTo currentPage) {
+                sidebarEntries[index] = sidebarEntries[index].copy(state = SideBarEntryState.DONE_NOT_AVAILABLE)
+            }
+        }
+        sidebarEntries[currentPage] = sidebarEntries[currentPage].copy(state = SideBarEntryState.DONE_AVAILABLE)
+        sidebarEntries[nextPage] = sidebarEntries[nextPage].copy(state = SideBarEntryState.ACTIVE)
+        this.currentPage.value = nextPage
+    }
+
+    private fun goBackToPage(previousPage: Int) {
+        if (previousPage >= currentPage.value) {
+            error("It is only allowed to go back: $previousPage")
+        }
+        sidebarEntries[previousPage] = sidebarEntries[previousPage].copy(state = SideBarEntryState.ACTIVE)
+        for (index in previousPage + 1..currentPage.value) {
+            sidebarEntries[index] = sidebarEntries[index].copy(state = SideBarEntryState.NOT_READY)
+        }
+        currentPage.value = previousPage
+    }
+
+    private fun resetRulesSelection() {
+        saveGameData = null
+        rules = null
+    }
+
+    private fun resetTeamSelection() {
+        selectTeamModel.reset()
+        selectedTeam.value = null
+    }
+
+    private suspend fun resetServer() {
+        _globalGameUrl.value = ""
+        _localGameUrl.value = ""
+        globalGameUrlError.value = null
+        val oldServer = server
+        server = null
+        menuViewModel.backgroundContext.launch {
+            // TODO Do we need both of these? Probably this could be optimized.
+            // networkAdapter.sendServerClosed()
+            oldServer?.stop()
+        }
+    }
+
+    // Called in case the Host itself rejects the game
+    private suspend fun resetScreenModel(page: Int = 0) {
+        resetTeamSelection()
+        if (page == 0) {
+            resetRulesSelection()
+        }
+        resetServer()
     }
 
     private fun initializeGameModel() {
@@ -309,7 +287,205 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
         navigator.push(GameScreen(menuViewModel, gameViewModel!!))
     }
 
-    fun copyUrlToClipboard(url: String) {
-        copyToClipboard(url)
+    // Go from Configure -> Select Team
+    private fun prepareTeamSelection() {
+        rules = setupGameModel.createRules()
+        selectTeamModel.initializeTeamList(rules!!)
+    }
+
+    // Go from Configure -> Waiting for Opponent (due to selecting a save file)
+    // We can only get here if the load file is valid.
+    private suspend fun prepareSaveFile() {
+        saveGameData = setupGameModel.gameSetupModel.loadFileModel.gameFile ?: error("Game file is not loaded")
+        val homeTeam = saveGameData!!.homeTeam
+        val homeTeamLogo = IconFactory.loadRosterIcon(
+            homeTeam.id,
+            homeTeam.teamLogo ?: homeTeam.roster.logo,
+            LogoSize.SMALL
+        )
+        selectedTeam.value = TeamInfo(
+            teamId = homeTeam.id,
+            teamName = homeTeam.name,
+            teamRoster = homeTeam.roster.name,
+            teamValue = homeTeam.teamValue,
+            rerolls = homeTeam.rerolls.size,
+            logo = homeTeamLogo,
+            teamData = homeTeam
+        )
+    }
+
+    // Go into "Waiting for Opponent" screen from either "Setup" or "Select Team"
+    private suspend fun prepareWaitingForOpponent() {
+        _globalGameUrl.value = "Fetching..."
+        _localGameUrl.value = "Fetching..."
+        menuViewModel.backgroundContext.launch {
+            val localIp = getLocalIpAddress()
+            _localGameUrl.value = "ws://$localIp:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
+            val publicIp = getPublicIpAddress()
+            if (publicIp.isNullOrBlank()) {
+                globalGameUrlError.value = "Unable to get IP address. Goto https://api.ipify.org to see your public IP address"
+            }
+            _globalGameUrl.value = "ws://$publicIp:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}"
+        }
+        startServer()
+    }
+
+    // Handle all state transitions
+    inner class Workflow() {
+        // Must be single-threaded to serialize state updates
+        private val stateChangeScope = CoroutineScope(singleThreadDispatcher("HostScreenThread"))
+        private var currentState = P2PHostState.START
+        fun handleHostStateChange(newState: P2PHostState) {
+            stateChangeScope.launch {
+                LOG.d { "[P2PHostScreen] state change: $currentState -> $newState" }
+                if (newState == currentState) return@launch
+                when (currentState) {
+                    P2PHostState.START -> checkState(newState, P2PHostState.SETUP_GAME)
+                    P2PHostState.SETUP_GAME -> {
+                        // If Save File Game, move directly to Waiting for Opponent
+                        // If New Game, move to selecting a team
+                        when (newState) {
+                            P2PHostState.SELECT_TEAM -> {
+                                prepareTeamSelection()
+                                gotoNextPage(1)
+                            }
+                            P2PHostState.WAIT_FOR_CLIENT -> {
+                                prepareSaveFile()
+                                prepareWaitingForOpponent()
+                                gotoNextPage(2)
+                            }
+                            else -> unsupportedStateChange(newState)
+                        }
+                    }
+                    P2PHostState.SELECT_TEAM -> {
+                        when (newState) {
+                            P2PHostState.SETUP_GAME -> {
+                                resetTeamSelection()
+                                resetRulesSelection()
+                                goBackToPage(0)
+                            }
+                            P2PHostState.WAIT_FOR_CLIENT -> {
+                                prepareWaitingForOpponent()
+                                gotoNextPage(2)
+                            }
+                            else -> unsupportedStateChange(newState)
+                        }
+                    }
+                    P2PHostState.START_SERVER -> { /* Ignore, should just be a temporary state */ }
+                    P2PHostState.JOIN_SERVER -> error("Server state not supported: $currentState -> $newState")
+                    P2PHostState.WAIT_FOR_CLIENT -> {
+                        when (newState) {
+                            P2PHostState.SETUP_GAME -> {
+                                resetServer()
+                                resetTeamSelection()
+                                resetRulesSelection()
+                                goBackToPage(0)
+                            }
+                            P2PHostState.SELECT_TEAM -> {
+                                resetServer()
+                                resetTeamSelection()
+                                goBackToPage(1)
+                            }
+                            P2PHostState.ACCEPT_GAME -> {
+                                // Selected teams
+                                gotoNextPage(3)
+                            }
+                            else -> unsupportedStateChange(newState)
+                        }
+                    }
+                    P2PHostState.ACCEPT_GAME -> {
+                        when (newState) {
+                            P2PHostState.START -> TODO()
+                            P2PHostState.SETUP_GAME -> {
+                                networkAdapter.gameAccepted(false)
+                                resetServer()
+                                resetTeamSelection()
+                                resetRulesSelection()
+                                goBackToPage(0)
+                            }
+                            P2PHostState.SELECT_TEAM -> {
+                                resetServer()
+                                resetTeamSelection()
+                                goBackToPage(1)
+                            }
+                            P2PHostState.WAIT_FOR_CLIENT -> {
+                                // How to show Client rejection?
+                                goBackToPage(2)
+                            }
+                            P2PHostState.ACCEPT_GAME -> TODO()
+                            P2PHostState.ACCEPTED_GAME -> {
+                                networkAdapter.gameAccepted(true)
+                                initializeGameModel()
+                            }
+                            P2PHostState.RUN_GAME -> {
+                                // Should trigger next step on the loading screen
+                                gameViewModel?.gameAcceptedByAllPlayers() ?: error("GameViewModel game not available")
+                            }
+                            P2PHostState.CLOSE_GAME -> TODO()
+                            P2PHostState.DONE -> TODO()
+                            P2PHostState.START_SERVER -> TODO()
+                            P2PHostState.JOIN_SERVER -> TODO()
+                        }
+                    }
+                    P2PHostState.ACCEPTED_GAME -> {
+                        when (newState) {
+                            P2PHostState.WAIT_FOR_CLIENT -> {
+                                // Client rejected the game
+                                navigator.pop()
+                                goBackToPage(2)
+                            }
+                            P2PHostState.RUN_GAME -> {
+                                gameViewModel?.gameAcceptedByAllPlayers() ?: error("GameViewModel game not available")
+                            }
+                            else -> unsupportedStateChange(newState)
+                        }
+                    }
+                    P2PHostState.RUN_GAME -> TODO()
+                    P2PHostState.CLOSE_GAME -> TODO()
+                    P2PHostState.DONE -> { /* Ignore, no need to handle this */ }
+                }
+
+                // After preparing the UI, update the UI state
+                currentState = newState
+            }
+        }
+
+        fun getStartingSidebarEntries(): List<SidebarEntry> {
+            return listOf(
+                SidebarEntry(
+                    name = "1. Configure Game",
+                    state = SideBarEntryState.ACTIVE,
+                    onClick = { workflow.handleHostStateChange(P2PHostState.SETUP_GAME) },
+                ),
+                SidebarEntry(
+                    name = "2. Select Team",
+                    onClick = { workflow.handleHostStateChange(P2PHostState.SELECT_TEAM) },
+                ),
+                SidebarEntry(
+                    name = "3. Wait For Opponent",
+                    onClick = { workflow.handleHostStateChange(P2PHostState.WAIT_FOR_CLIENT) },
+                ),
+                SidebarEntry(
+                    name = "4. Start Game",
+                    onClick = { workflow.handleHostStateChange(P2PHostState.ACCEPT_GAME) },
+                )
+            )
+        }
+
+        private fun checkState(newState: P2PHostState, expectedState: P2PHostState) {
+            if (newState != expectedState) {
+                error("Unsupported state change: $currentState -> $newState")
+            }
+        }
+
+        private fun unsupportedStateChange(newState: P2PHostState) {
+            error("Unsupported state change (from file): $currentState -> $newState")
+        }
+    }
+
+    override fun onDispose() {
+        menuViewModel.backgroundContext.launch {
+            server?.stop()
+        }
     }
 }

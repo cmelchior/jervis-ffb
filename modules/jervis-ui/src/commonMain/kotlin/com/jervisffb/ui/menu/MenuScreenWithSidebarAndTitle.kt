@@ -48,6 +48,7 @@ import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_back
 import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.game.view.SideBarEntryState
 import com.jervisffb.ui.game.view.utils.OrangeTitleBorder
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -215,17 +216,18 @@ fun MenuSidebar(menuViewModel: MenuViewModel, sidebarContent: @Composable BoxSco
 }
 
 @Composable
-fun SidebarEntry(text: String, onClick: (() -> Unit)? = null, selected: Boolean = false, enabled: Boolean = true) {
-    val alpha = if (selected) 1f else 0f
-    val fontColor = when {
-        !enabled -> JervisTheme.white.copy(alpha = 0.7f)
-        selected -> JervisTheme.rulebookOrange
-        else -> JervisTheme.white
+fun SidebarEntry(text: String, state: SideBarEntryState, onClick: (() -> Unit)) {
+    val activeBarAlpha = if (state == SideBarEntryState.ACTIVE) 1f else 0f
+    val fontColor = when (state) {
+        SideBarEntryState.NOT_READY -> JervisTheme.white.copy(alpha = 0.7f)
+        SideBarEntryState.DONE_NOT_AVAILABLE -> JervisTheme.white
+        SideBarEntryState.DONE_AVAILABLE -> JervisTheme.white
+        SideBarEntryState.ACTIVE -> JervisTheme.rulebookOrange
     }
     Column() {
-        OrangeTitleBorder(alpha = alpha)
+        OrangeTitleBorder(alpha = activeBarAlpha)
         Box(
-            modifier = Modifier.fillMaxWidth().height(36.dp).let { if (enabled && onClick != null) it.clickable { onClick() } else it },
+            modifier = Modifier.fillMaxWidth().height(36.dp).let { if (state == SideBarEntryState.ACTIVE || state == SideBarEntryState.DONE_AVAILABLE) it.clickable { onClick() } else it },
             contentAlignment = Alignment.CenterStart,
         ) {
             Text(
@@ -235,7 +237,7 @@ fun SidebarEntry(text: String, onClick: (() -> Unit)? = null, selected: Boolean 
                 color = fontColor
             )
         }
-        OrangeTitleBorder(alpha = alpha)
+        OrangeTitleBorder(alpha = activeBarAlpha)
     }
 }
 

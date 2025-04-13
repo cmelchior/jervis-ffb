@@ -62,14 +62,6 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
         checkValidSetup()
     }
 
-    private fun getLocalIp(): String {
-        return "127.0.0.1"
-    }
-
-    private fun getPublicIp(): String {
-        TODO()
-    }
-
     private fun checkValidSetup() {
         var isValid = true
         isValid = isValid && gameName.value.isNotBlank()
@@ -87,7 +79,7 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
         menuViewModel.navigatorContext.launch {
             PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_HOST_COACH_NAME, getCoachName())
         }
-        parentModel.gameSetupDone()
+        parentModel.userAcceptedGameSetup()
     }
 
     private fun getCoachName(): String = coachSetupModel.coachName.value

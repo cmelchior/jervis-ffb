@@ -32,4 +32,8 @@ class SelectP2PTeamScreenModel(
     fun markTeamUnavailable(team: TeamId) {
         componentModel.makeTeamUnavailable(team)
     }
+
+    fun reset() {
+        componentModel.reset()
+    }
 }

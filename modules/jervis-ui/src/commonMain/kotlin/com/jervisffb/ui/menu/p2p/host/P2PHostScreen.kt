@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.frontpage_griff
@@ -43,8 +45,14 @@ interface DropdownEntry {
 }
 
 class P2PHostScreen(private val menuViewModel: MenuViewModel, private val viewModel: P2PHostScreenModel) : Screen {
+    @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
+        LifecycleEffectOnce {
+            onDispose {
+                viewModel.onDispose()
+            }
+        }
         val sidebarEntries = viewModel.sidebarEntries
         JervisScreen(menuViewModel) {
             MenuScreenWithSidebarAndTitle(
@@ -85,7 +93,7 @@ fun PageContent(viewModel: P2PHostScreenModel) {
         ) { page ->
             when (page) {
                 0 -> SetupGamePage(viewModel.setupGameModel, Modifier)
-                1 -> SelectP2PTeamScreen(viewModel.selectTeamModel.componentModel, true, "Start Server", { viewModel.teamSelectionDone() })
+                1 -> SelectP2PTeamScreen(viewModel.selectTeamModel.componentModel, true, "Start Server", { viewModel.userAcceptedTeam() })
                 2 -> WaitForOpponentPage(viewModel = viewModel)
                 3 -> StartP2PGamePage(
                     viewModel.networkAdapter.homeTeam,

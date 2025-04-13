@@ -57,7 +57,7 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     modifier = Modifier.weight(1f),
-                    value = globalUrlError ?: globalUrl,
+                    value = if (globalUrlError.isNullOrEmpty()) globalUrl else (globalUrlError ?: ""),
                     onValueChange = { },
                     readOnly = true,
                     isError = globalUrlError != null,
@@ -71,7 +71,7 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                         .offset(x = 4.dp)
                         .clip(shape = RoundedCornerShape(4.dp))
                         .clickable {
-                            viewModel.copyUrlToClipboard(globalUrl)
+                            viewModel.userCopyUrlToClipboard(globalUrl)
                         }
                     ,
                     contentAlignment = Alignment.Center,
@@ -100,7 +100,7 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                         .offset(x = 4.dp)
                         .clip(shape = RoundedCornerShape(4.dp))
                         .clickable {
-                            viewModel.copyUrlToClipboard(localUrl)
+                            viewModel.userCopyUrlToClipboard(localUrl)
                         }
                     ,
                     contentAlignment = Alignment.Center,

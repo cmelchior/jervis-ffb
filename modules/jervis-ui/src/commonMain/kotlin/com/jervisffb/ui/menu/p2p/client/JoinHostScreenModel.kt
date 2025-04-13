@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.net.GameId
+import com.jervisffb.net.JervisExitCode
 import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.coach.CoachSetupComponentModel
@@ -113,18 +114,27 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
                 gameId = GameId(_gameId.value),
                 teamIfHost = null,
                 handler = object: AbstractClintNetworkMessageHandler() {
-
                     override fun onCoachJoined(coach: Coach, isHomeCoach: Boolean) {
                         _joinError.value = ""
                         _joinMessage.value = "Joined ${_gameUrl.value} as $coachName"
                         _joinState.value = JoinState.JOINED
-                        model.hostJoinedDone()
+                        model.userJoinOrContinue()
                     }
-
                     override fun onDisconnected(reason: CloseReason) {
-                        _joinMessage.value = ""
-                        _joinError.value = "Failed to join [${reason.code}]: ${reason.message}"
-                        _joinState.value = JoinState.READY_JOIN
+                        val errorMsg = when (reason.code) {
+                            JervisExitCode.CLIENT_CLOSING.code -> "" // Not a real error
+                            JervisExitCode.SERVER_CLOSING.code -> "Host closed the server."
+                            JervisExitCode.GAME_NOT_ACCEPTED.code -> reason.message
+                            else -> "Failed to join host [${reason.code}]: ${reason.message}"
+                        }
+
+                        // We might already have reset optimistically
+                        println("${_joinState.value} -> ${_joinError.value}")
+                        if (_joinState.value != JoinState.READY_JOIN) {
+                            _joinMessage.value = ""
+                            _joinError.value = errorMsg
+                            _joinState.value = JoinState.READY_JOIN
+                        }
                     }
                 }
             )
@@ -132,9 +142,11 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
     }
 
     fun disconnectFromHost() {
-        menuViewModel.navigatorContext.launch {
+        menuViewModel.backgroundContext.launch {
             model.networkAdapter.disconnect(handler = object: AbstractClintNetworkMessageHandler() {
-                override fun onDisconnected(reason: CloseReason) { /* We already updated the UI */ }
+                override fun onDisconnected(reason: CloseReason) {
+                    /* We already updated the UI */
+                }
             })
         }
         // Optimistically leave connection. There is nothing we want from it anywway
@@ -184,9 +196,9 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
         }
     }
 
-    fun reset() {
+    fun reset(reason: String?) {
         _joinState.value = JoinState.READY_JOIN
         _joinMessage.value = ""
-        _joinError.value = ""
+        _joinError.value = reason ?: ""
     }
 }

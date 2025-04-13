@@ -12,11 +12,17 @@ import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.utils.paperBackgroundWithLine
 import com.jervisffb.ui.menu.SidebarEntry
 
+enum class SideBarEntryState {
+    NOT_READY, // Not available4
+    DONE_NOT_AVAILABLE, // Is "done"
+    DONE_AVAILABLE,
+    ACTIVE,
+}
+
 data class SidebarEntry(
     val name: String,
-    val enabled: Boolean = false,
-    val active: Boolean = false,
-    val onClick: (() -> Unit)? = null,
+    val state: SideBarEntryState = SideBarEntryState.NOT_READY,
+    val onClick: (() -> Unit),
 )
 
 @Composable
@@ -36,9 +42,8 @@ fun SidebarMenu(
             // val clickHandler: () -> Unit = if (isPrevious) ({ onClick(index) }) else ({ })
             SidebarEntry(
                 text = entry.name.uppercase(),
+                state = entry.state,
                 onClick = entry.onClick,
-                selected = entry.active,
-                enabled = entry.enabled // selected || isPrevious,
             )
         }
         Spacer(modifier = Modifier.fillMaxHeight(0.20f))

@@ -8,6 +8,7 @@ import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.jervisLogger
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.util.logging.error
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
@@ -20,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
@@ -80,6 +82,7 @@ class JervisClientWebSocketConnection(
                 joinAll(job1, job2, job3)
             } catch (ex: ProtocolException) {
                 // Unsure if ProtocolException is thrown in other cases than 404, so just to be sure
+                LOG.e { "[Server] ${ex.stackTraceToString()}" }
                 if (ex.message?.contains("404 Not Found") == true) {
                     jervisCloseReason.complete(CloseReason(JervisExitCode.URL_NOT_FOUND.code, ex.message ?: ""))
                 } else {
@@ -91,6 +94,7 @@ class JervisClientWebSocketConnection(
                 throw ex
             } catch (ex: Throwable) {
                 // Wrong use of ws/wss will end up here as an SSLException
+                LOG.e { "[Client-${coachName}] Unexpected error in running the WebSocket connection: ${ex.stackTraceToString()}" }
                 jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, ex.message ?: ""))
                 closeDone.complete(Unit)
             }
@@ -108,6 +112,7 @@ class JervisClientWebSocketConnection(
             jervisCloseReason.complete(reason)
         } catch (e: Exception) {
             if (e is CancellationException) throw e
+            LOG.e(e) { "Client disconnected unexpectedly:\n$e.stackTraceToString()" }
             jervisCloseReason.complete(CloseReason(JervisExitCode.UNEXPECTED_ERROR.code, e.stackTraceToString()))
         } finally {
             closeFromServer() // Also cleanup internal channels and scopes
@@ -122,9 +127,12 @@ class JervisClientWebSocketConnection(
                         val serverMessage = jervisNetworkSerializer.decodeFromString<ServerMessage>(inMessage.readText())
                         incomingChannel.send(serverMessage)
                     }
+
                     else -> TODO("Unsupported type: $inMessage")
                 }
             }
+        } catch (ex: ClosedSendChannelException) {
+            LOG.d { "Connection was closed. Cannot handle any more messages" }
         } catch (ex: Throwable) {
             if (ex is CancellationException) throw ex
             val error = ReadMessageServerError(ex.stackTraceToString())
@@ -139,6 +147,7 @@ class JervisClientWebSocketConnection(
                 val messageJson = jervisNetworkSerializer.encodeToString(outMessage)
                 LOG.i { "[Client-$coachName] Sending message: $messageJson" }
                 session?.outgoing?.send(Frame.Text(messageJson))
+                LOG.i { "[Client-$coachName] Sent message: $messageJson" }
             }
         } catch (ex: Throwable) {
             if (ex is CancellationException) throw ex
@@ -173,14 +182,14 @@ class JervisClientWebSocketConnection(
         outgoingChannel.close()
         scope.cancel(cause = CancellationException("Client is closing."))
         closeDone.await()
-        LOG.d { "[Client] Closing connection: $this"  }
+        LOG.d { "[Client-$coachName] Closing connection: $this"  }
     }
 
     suspend fun closeFromServer() {
         session = null
         incomingChannel.close()
         outgoingChannel.close()
-        LOG.d { "[Client] Connection was closed due to a server disconnect: $this"  }
+        LOG.d { "[Client-$coachName] Connection was closed due to a server disconnect: $this"  }
     }
 
     /**

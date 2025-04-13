@@ -47,15 +47,15 @@ object Connected : ConnectionState
 class P2PClientNetworkAdapter(
     private val isHost: Boolean = false
 ) {
-    private val _clientState = MutableStateFlow(P2PClientState.START)
+    private val _clientState = MutableStateFlow(P2PClientState.JOIN_SERVER)
     val clientState: StateFlow<P2PClientState> = _clientState
 
-    private val _hostState = MutableStateFlow(P2PHostState.START)
+    private val _hostState = MutableStateFlow(P2PHostState.SETUP_GAME)
     val hostState: StateFlow<P2PHostState> = _hostState
 
     private val _connectionState = MutableStateFlow<ConnectionState>(Disconnected(CloseReason(CloseReason.Codes.NORMAL, "")))
-    private val connectionState: StateFlow<ConnectionState> = _connectionState
-    val connection: ClientNetworkManager = ClientNetworkManager(GameStateMessageHandler())
+    val connectionState: StateFlow<ConnectionState> = _connectionState
+    val networManager: ClientNetworkManager = ClientNetworkManager(GameStateMessageHandler())
 
     private var server: LightServer? = null
     private var gameId: GameId? = null
@@ -87,17 +87,17 @@ class P2PClientNetworkAdapter(
         handler: ClientNetworkMessageHandler,) {
         this.gameId = gameId
 //        if (state != ClientState.SELECT_HOST) error("Unexpected state: $state")
-        connection.addMessageHandler(handler)
-        connection.connectAndJoinGame(gameUrl, gameId, coachName, isHost = (teamIfHost != null), teamIfHost)
+        networManager.addMessageHandler(handler)
+        networManager.connectAndJoinGame(gameUrl, gameId, coachName, isHost = (teamIfHost != null), teamIfHost)
         // TODO How to update state when handler is coming from the outside?
     }
 
     suspend fun teamSelected(team: TeamInfo) {
-        connection.sendTeamSelected(team)
+        networManager.sendTeamSelected(team)
     }
 
     fun cancelJoin() {
-        connection.cancelJoin()
+        networManager.cancelJoin()
     }
 
     fun updateClientState(newState: P2PClientState) {
@@ -112,32 +112,41 @@ class P2PClientNetworkAdapter(
         updateClientState(P2PClientState.JOIN_SERVER)
         server?.stop()
 //        mockServerJob.cancel()
-        connection.disconnect()
+        networManager.disconnect()
     }
 
     suspend fun disconnect(handler: AbstractClintNetworkMessageHandler) {
         updateClientState(P2PClientState.JOIN_SERVER)
-        connection.addMessageHandler(handler)
-        connection.disconnect()
+        networManager.addMessageHandler(handler)
+        networManager.disconnect()
     }
 
     suspend fun gameAccepted(accepted: Boolean) {
-        connection.sendStartGame(accepted)
-        if (!accepted) {
-            connection.disconnect()
-        }
+        networManager.sendStartGame(accepted)
+        // TODO The server will disconnect us, and doing this here
+        //  results in a race condition where the server never receives
+        //  the accepted result. This only happens if we reject twice.
+        //  Smells like a bug somewhere. Probably a bug with ClientNetworkManager
+        //  not being reset correctly.
+        // if (!accepted) {
+        //     connection.disconnect()
+        // }
     }
 
     suspend fun sendActionToServer(index: GameActionId, action: GameAction) {
-        connection.sendClientAction(index, action)
+        networManager.sendClientAction(index, action)
     }
 
     suspend fun sendGameStarted() {
-        connection.sendGameStarted(this.gameId!!)
+        networManager.sendGameStarted(this.gameId!!)
     }
 
     fun addMessageHandler(handler: ClientNetworkMessageHandler) {
-        connection.addMessageHandler(handler)
+        networManager.addMessageHandler(handler)
+    }
+
+    suspend fun sendServerClosed() {
+        networManager.sendCloseHostedServer()
     }
 
     /**
@@ -152,9 +161,18 @@ class P2PClientNetworkAdapter(
         private val LOG = jervisLogger()
 
         // Network state
-        override fun onConnected() { _connectionState.value = Connected }
-        override fun onConnecting() { _connectionState.value = Connecting }
-        override fun onDisconnected(reason: CloseReason) { _connectionState.value = Disconnected(reason) }
+        override fun onConnected() {
+            LOG.d { "onConnected" }
+            _connectionState.value = Connected
+        }
+        override fun onConnecting() {
+            LOG.d { "onConnecting" }
+            _connectionState.value = Connecting
+        }
+        override fun onDisconnected(reason: CloseReason) {
+            LOG.d { "onDisconnected: $reason" }
+            _connectionState.value = Disconnected(reason)
+        }
 
         // Game State
         override fun onTeamSelected(team: Team, homeTeam: Boolean) {
@@ -180,18 +198,12 @@ class P2PClientNetworkAdapter(
         }
 
         override fun onCoachLeft(coach: Coach) {
-            // Leaving after the game has started is not allowed unless the game
-            // as been conceeded
-//            when (state) {
-//                ClientState.RUN_GAME -> {
-//                    if (gameEngine?.state?.hasConceeded != null) {
-//
-//                    }
-//                }
-//                ClientState.CLOSE_GAME ->
-//            }
-//            if ()
-
+            // TODO Leaving after the game has started is not allowed unless the game
+            //  as been conceeded
+            when (coach.id) {
+                awayCoach.value?.id -> awayCoach.value = null
+                homeCoach.value?.id -> homeCoach.value = null
+            }
         }
 
         override fun onSpectatorJoined(spectator: Spectator) {

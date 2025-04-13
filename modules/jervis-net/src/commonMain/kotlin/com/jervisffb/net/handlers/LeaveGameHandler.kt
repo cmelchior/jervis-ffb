@@ -36,6 +36,10 @@ class LeaveGameHandler(override val session: GameSession) : ClientMessageHandler
                     ProtocolErrorServerError("Game '${session.gameId}' already finished: $message")
                 )
             }
+
+            GameState.CLOSING -> {
+                // Not sure what to do here?
+            }
         }
     }
 }

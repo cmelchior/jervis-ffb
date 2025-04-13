@@ -94,13 +94,33 @@ data class TeamSelectedMessage(
     val team: TeamInfo,
 ): ClientMessage
 
-// Client responds whether to accept the game or not
+
+/**
+ * If the Host regretted starting the game, they can close the server
+ * in a graceful way by sending this message. The server will then
+ * notify any connected clients before shutting down the server.
+ *
+ * This message is only legal while the game is in a Waiting stage
+ */
 @Serializable
-data class StartGameMessage(
+object CloseHostedServerMessage: ClientMessage
+
+/**
+ * When the Client is in [P2PClientState.ACCEPT_GAME], use
+ * this message to accept whether or not to actually start
+ * the game.
+ */
+@Serializable
+data class AcceptGameMessage(
     val startGame: Boolean,
 ): ClientMessage
 
-// Client is gracefully leaving the game.
+
+/**
+ * Client is gracefully leaving the game after it has been accepted.
+ * I.e. only use this after an [AcceptGameMessage] with `true` has
+ * been sent to the server.
+ */
 @Serializable
 data class LeaveGameMessage(
     val id: GameId,

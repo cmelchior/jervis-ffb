@@ -21,9 +21,9 @@ import com.jervisffb.utils.canBeHost
 import com.jervisffb.utils.getBuildType
 import com.jervisffb.utils.getPlatformDescription
 import com.jervisffb.utils.jervisLogger
+import com.jervisffb.utils.multiThreadDispatcher
 import com.jervisffb.utils.singleThreadDispatcher
 import io.ktor.http.encodeURLParameter
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,11 +52,10 @@ class MenuViewModel {
     val isAboutDialogVisible: StateFlow<Boolean> = _showDialogDialog
     val creditData: CreditData
 
-    val navigatorContext = CoroutineScope(
-        CoroutineName("ScreenNavigator")
-            + CoroutineExceptionHandler { _, exception -> throw exception }
-            + singleThreadDispatcher("menuScope")
-    )
+    // Scope for lauching tasks directly related to navigating the UI
+    val navigatorContext = CoroutineScope(CoroutineName("ScreenNavigator") + singleThreadDispatcher("menuThread"))
+    // Scope for launching background tasks for Menu actions
+    val backgroundContext = CoroutineScope(CoroutineName("ScreenBackground") + multiThreadDispatcher("menuBackgroundThread"))
 
     init {
         // Customize the create issue link, so it contains some basic information about the client

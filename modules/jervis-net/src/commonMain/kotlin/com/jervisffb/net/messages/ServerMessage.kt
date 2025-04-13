@@ -12,11 +12,18 @@ import com.jervisffb.net.messages.P2PClientState.JOIN_SERVER
 import com.jervisffb.net.messages.P2PHostState.JOIN_SERVER
 import kotlinx.serialization.Serializable
 
+/**
+ * Enum describing the high-level states a game can be in.
+ * Note, the the Client and Host has a lot of of sub-states between
+ * [GameState.JOINING] and [GameState.ACTIVE]. These are covered
+ * by [P2PClientState] and [P2PHostState].
+ */
 enum class GameState {
     PLANNED, // Game was created, but no teams have joined yet.
     JOINING, // Not all teams have joined yet.
     STARTING, // Teams have joined, but haven't accepted starting yet.
     ACTIVE, // Both teams have agreed to start and the game is running.
+    CLOSING, // The game is closing down. Either because of an error or because it is finished
     FINISHED, // The game has finished
 //    UPLOADED,
 //    BACKED_UP,
@@ -27,6 +34,9 @@ enum class GameState {
  * This enum represents the states for clients connecting to a hosted game.
  * In this mode, only one type of client exists since the game is fully
  * controlled by a server.
+ *
+ * Note: This enum is not used right now. This is only relevant if we ever
+ * implement a full game server.
  */
 @Serializable
 enum class HostedClientState {
@@ -49,6 +59,7 @@ enum class P2PClientState {
     JOIN_SERVER, // Client is waiting to connect to the server
     SELECT_TEAM, // Client is connected and has received rules / setup constraints. Both teams must now select teams
     ACCEPT_GAME, // Both coaches has selected their team and is waiting for each other to accept the game.
+    ACCEPTED_GAME, // Client has accepted game and is waiting for Host to respond
     RUN_GAME, // Game is running through the Game Engine, sending GameActions as needed.
     CLOSE_GAME, // Game is done and in the process of shutting down.
     DONE // Game is over and client is disconnecting or has disconnected.
@@ -63,15 +74,16 @@ enum class P2PClientState {
  */
 @Serializable
 enum class P2PHostState {
-    START,
+    START, // Starting state, will move away from this immediately
     SETUP_GAME,
     SELECT_TEAM,
-    START_SERVER,
-    JOIN_SERVER,
-    WAIT_FOR_CLIENT,
-    ACCEPT_GAME,
-    RUN_GAME,
-    CLOSE_GAME,
+    START_SERVER, // Host should start the server
+    JOIN_SERVER, // Only used on the serve, when it is waiting for the Host to connect
+    WAIT_FOR_CLIENT, // Host has started the server and is waiting for a Client to connect
+    ACCEPT_GAME, // Both Host and Client has selected teams and need to accept the game
+    ACCEPTED_GAME, // Host has accepted game and is waiting for Client to respond
+    RUN_GAME, // Game has been accepted by both Host and Client and is running
+    CLOSE_GAME, // Game is done and in the process of shutting down
     DONE
 }
 
@@ -119,10 +131,10 @@ data class GameStateSyncMessage(
 
 
 @Serializable
-data class UpdateClientStateMessage(val state: P2PClientState): ServerMessage
+data class UpdateClientStateMessage(val state: P2PClientState, val reason: String? = null): ServerMessage
 
 @Serializable
-data class UpdateHostStateMessage(val state: P2PHostState): ServerMessage
+data class UpdateHostStateMessage(val state: P2PHostState, val reason: String? = null): ServerMessage
 
 @Serializable
 data class UpdateSpectatorStateMessage(val state: SpectatorState): ServerMessage

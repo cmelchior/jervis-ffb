@@ -75,11 +75,7 @@ private fun PageContent(viewModel: P2PClientScreenModel) {
                 0 -> JoinHostScreen(
                     viewModel = viewModel.joinHostModel,
                     onJoin = {
-                        if (viewModel.lastValidPage >= 1) {
-                            viewModel.hostJoinedDone()
-                        } else {
-                            viewModel.joinHostModel.clientJoinGame()
-                        }
+                        viewModel.userJoinOrContinue()
                     },
                     onCancel = { viewModel.joinHostModel.disconnectFromHost() },
                 )

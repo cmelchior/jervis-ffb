@@ -112,14 +112,16 @@ class ServerCommunication(
     }
 
 
-    suspend fun sendHostStateUpdate(newState: P2PHostState) {
-        val msg = UpdateHostStateMessage(newState)
+    suspend fun sendHostStateUpdate(newState: P2PHostState, reason: String? = null) {
+        val msg = UpdateHostStateMessage(newState, reason)
         sendToConnection(session.host!!.connection, msg)
     }
 
-    suspend fun sendClientStateUpdate(newState: P2PClientState) {
-        val msg = UpdateClientStateMessage(newState)
-        sendToConnection(session.client!!.connection, msg)
+    suspend fun sendClientStateUpdate(newState: P2PClientState, reason: String? = null) {
+        val msg = UpdateClientStateMessage(newState, reason)
+        session.client?.connection?.let { connection ->
+            sendToConnection(connection, msg)
+        } ?: LOG.d { "Failed to send client state, becasue no client was found" }
     }
 
     suspend fun sendError(connection: JervisNetworkWebSocketConnection?, errorMessage: ServerError) {
@@ -188,7 +190,6 @@ class ServerCommunication(
                 } catch (ex: Throwable) {
                     LOG.i { "[Server] Error sending message to connection: $ex" }
                 }
-
             }
 //            }
         }

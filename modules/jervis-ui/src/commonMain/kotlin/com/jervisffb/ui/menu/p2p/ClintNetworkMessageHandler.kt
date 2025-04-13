@@ -11,7 +11,9 @@ import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode
+import com.jervisffb.net.messages.AcceptGameMessage
 import com.jervisffb.net.messages.ClientMessage
+import com.jervisffb.net.messages.CloseHostedServerMessage
 import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.CoachLeftMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage
@@ -30,7 +32,6 @@ import com.jervisffb.net.messages.ServerMessage
 import com.jervisffb.net.messages.SpectatorJoinedMessage
 import com.jervisffb.net.messages.SpectatorLeftMessage
 import com.jervisffb.net.messages.SpectatorState
-import com.jervisffb.net.messages.StartGameMessage
 import com.jervisffb.net.messages.SyncGameActionMessage
 import com.jervisffb.net.messages.TeamData
 import com.jervisffb.net.messages.TeamJoinedMessage
@@ -138,13 +139,14 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
     }
 
     private fun startConnection(gameUrl: String, id: GameId, coachName: String) {
+        LOG.d { "[Client-$coachName] Starting a new connection: $gameUrl" }
         connection = JervisClientWebSocketConnection(id, gameUrl, coachName).also {
             it.start()
             updateState(Connected)
         }
         scope.launch {
             val reason = connection!!.awaitDisconnect()
-            LOG.d { "[Client] Disconnected: $reason" }
+            LOG.d { "[Client-$coachName] Disconnected: $reason" }
             updateState(Disconnected(reason))
         }
         scope.launch {
@@ -223,7 +225,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
     }
 
     suspend fun sendStartGame(startGame: Boolean) {
-        val msg = StartGameMessage(startGame)
+        val msg = AcceptGameMessage(startGame)
         send(msg)
     }
 
@@ -234,6 +236,11 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
 
     suspend fun sendGameStarted(id: GameId) {
         val msg = GameStartedMessage(id)
+        send(msg)
+    }
+
+    suspend fun sendCloseHostedServer() {
+        val msg = CloseHostedServerMessage
         send(msg)
     }
 

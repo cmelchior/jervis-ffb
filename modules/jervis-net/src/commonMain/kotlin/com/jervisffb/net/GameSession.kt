@@ -10,15 +10,18 @@ import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.SpectatorId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.serialize.SerializedTeam
+import com.jervisffb.net.handlers.AcceptGameHandler
 import com.jervisffb.net.handlers.ClientMessageHandler
+import com.jervisffb.net.handlers.CloseHostedServerHandler
 import com.jervisffb.net.handlers.GameActionHandler
 import com.jervisffb.net.handlers.GameStartedHandler
 import com.jervisffb.net.handlers.InternalGameActionMessageHandler
 import com.jervisffb.net.handlers.InternalJoinHandler
 import com.jervisffb.net.handlers.LeaveGameHandler
-import com.jervisffb.net.handlers.StartGameHandler
 import com.jervisffb.net.handlers.TeamSelectedHandler
+import com.jervisffb.net.messages.AcceptGameMessage
 import com.jervisffb.net.messages.ClientMessage
+import com.jervisffb.net.messages.CloseHostedServerMessage
 import com.jervisffb.net.messages.GameActionMessage
 import com.jervisffb.net.messages.GameStartedMessage
 import com.jervisffb.net.messages.GameState
@@ -37,10 +40,10 @@ import com.jervisffb.net.messages.ReadMessageServerError
 import com.jervisffb.net.messages.ReceivedMessage
 import com.jervisffb.net.messages.ServerError
 import com.jervisffb.net.messages.SpectatorState
-import com.jervisffb.net.messages.StartGameMessage
 import com.jervisffb.net.messages.TeamSelectedMessage
 import com.jervisffb.net.serialize.jervisNetworkSerializer
 import com.jervisffb.utils.jervisLogger
+import com.jervisffb.utils.multiThreadDispatcher
 import com.jervisffb.utils.singleThreadDispatcher
 import io.ktor.utils.io.CancellationException
 import io.ktor.websocket.Frame
@@ -51,7 +54,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -92,7 +94,8 @@ class GameSession(
         InternalJoinMessage::class to InternalJoinHandler(this),
 //        JoinGameAsPlayerMessage::class to JoinGameAsPlayerHandler(server),
 //        JoinGameAsSpectatorMessage::class to JoinGameAsSpectatorMessageHandler(server),
-        StartGameMessage::class to StartGameHandler(this),
+        AcceptGameMessage::class to AcceptGameHandler(this),
+        CloseHostedServerMessage::class to CloseHostedServerHandler(this),
         LeaveGameMessage::class to LeaveGameHandler(this),
         TeamSelectedMessage::class to TeamSelectedHandler(this),
         GameActionMessage::class to GameActionHandler(this),
@@ -107,21 +110,22 @@ class GameSession(
     // This is required so we do not accidentially start handling incoming
     // messages out of order.
     // Hmm, that is not true. Input is being synchronized elsewhere...test it
-    val scope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}") + singleThreadDispatcher("GameSessionScope") + handler)
+    val networkScope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}[Network]") + multiThreadDispatcher("GameNetworkThread-${gameId.value}") + handler)
+    val gameEventScope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}[Network]") + singleThreadDispatcher("GameActionThread-${gameId.value}") + handler)
 
     // All sessions associated with this game, post messages to this queue
     // This ensures that we only update the game state from a single thread
     private val incomingMessages = Channel<ReceivedMessage>(Channel.UNLIMITED)
-    val out = ServerCommunication(this, scope, parallelizeSend = !testMode)
+    val out = ServerCommunication(this, networkScope, parallelizeSend = !testMode)
 
     var state: GameState = GameState.PLANNED
     private var plannedAt: Instant = Clock.System.now()
 
     val coaches: MutableList<JoinedP2PCoach> = mutableListOf()
     val spectators: MutableList<JoinedSpectator> = mutableListOf()
-    var hostState: P2PHostState = P2PHostState.START
-    var clientState: P2PClientState = P2PClientState.START
-    var spectatorState: SpectatorState = SpectatorState.START
+    var hostState: P2PHostState = P2PHostState.JOIN_SERVER
+    var clientState: P2PClientState = P2PClientState.SELECT_TEAM
+    var spectatorState: SpectatorState = SpectatorState.JOIN_HOST
 
     val homeTeam: Team?
         // For now, the Host is always the Home team
@@ -246,7 +250,7 @@ class GameSession(
     private fun startClientHandler(client: JoinedClient) {
         // Launch a coroutine that consumes all messages from the client and
         // put them on the shared message queue for this game session.
-        scope.launch {
+        gameEventScope.launch {
             for (message in client.connection.incoming) {
                 try {
                     when (message) {
@@ -290,6 +294,7 @@ class GameSession(
                 handler.handleMessage(clientMessage, message.connection)
                 saveGameProgress(message)
             } catch (ex: Throwable) {
+                LOG.e { "Unexpected error, stopping game:\n$ex. ${ex.stackTraceToString()}" }
                 if (ex is CancellationException) throw ex
                 // All known errors scenarios should have been handled through
                 // ServerCommunication.sendError(). So if we get here, it means
@@ -297,6 +302,7 @@ class GameSession(
                 // unhandled. To be on the safe side, we treat this as an
                 // unrecoverable error and shut down the game forcing a complete
                 // restart.
+                LOG.e { "Unexpected error, stopping game:\n$ex. ${ex.stackTraceToString()}" }
                 shutdownGame(JervisExitCode.UNEXPECTED_ERROR, ex.stackTraceToString())
             }
         } ?: out.sendError(message.connection, ProtocolErrorServerError("No handler found for message: $clientMessage"))
@@ -312,8 +318,16 @@ class GameSession(
         // What should the state be if a player leaves in the middle
         coaches.remove(client)
         when (client) {
-            is JoinedSpectator -> out.sendSpectatorLeft(client.spectator)
-            is JoinedP2PCoach -> out.sendCoachLeft(client.coach)
+            is JoinedSpectator -> {
+                out.sendSpectatorLeft(client.spectator)
+            }
+            is JoinedP2PCoach -> {
+                when (client) {
+                    is JoinedP2PClient -> clientState = P2PClientState.SELECT_TEAM
+                    is JoinedP2PHost -> hostState = P2PHostState.WAIT_FOR_CLIENT
+                }
+                out.sendCoachLeft(client.coach)
+            }
         }
     }
 
@@ -322,10 +336,9 @@ class GameSession(
     }
 
     private fun startSession() {
-        scope.launch {
+        gameEventScope.launch {
             state = GameState.JOINING
             for (message in incomingMessages) {
-                LOG.d { "[Server] [${message.connection?.username}] Handle message: $message" }
                 handleMessage(message)
             }
         }.invokeOnCompletion {
@@ -369,16 +382,21 @@ class GameSession(
      * This method can be called outside the normal control of handling messages.
      */
     suspend fun shutdownGame(exitCode: JervisExitCode, reason: String) {
-        scope.cancel()
-        incomingMessages.close()
-        sessionClosed.await() // Allow incoming message queue to drain // drainQueuedMessages(incomingMessages)
+        // If this runs in the eventActionScope it deadlocks
+        networkScope.launch {
+            LOG.i { "[Server] Shutting down game '${gameId.value}' ($exitCode): $reason"}
+            incomingMessages.close()
+            sessionClosed.join() // Allow incoming message queue to drain // drainQueuedMessages(incomingMessages)
 
-        // TODO Send close in parallel
-        coaches.toList().forEach {
-            it.disconnect(exitCode, reason)
-        }
-        spectators.toList().forEach {
-            it.disconnect(exitCode, reason)
+            // TODO Send close in parallel
+            coaches.toList().forEach {
+                LOG.i { "[Server] Disconnecting: ${it.connection.username}" }
+                it.disconnect(exitCode, reason)
+            }
+            spectators.toList().forEach {
+                LOG.i { "[Server] Disconnecting: ${it.connection.username}" }
+                it.disconnect(exitCode, reason)
+            }
         }
     }
 

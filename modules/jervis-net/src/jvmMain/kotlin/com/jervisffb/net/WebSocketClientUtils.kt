@@ -18,6 +18,7 @@ actual fun startEmbeddedServer(
     server: LightServer,
     newConnectionHandler: suspend (DefaultWebSocketSession, GameId) -> Unit,
 ): Any {
+    val LOG = jervisLogger()
     val platformServer = embeddedServer(Netty,8080) {
         install(WebSockets)
         {
@@ -36,6 +37,7 @@ actual fun startEmbeddedServer(
                     // All known error cases should be handled inside newConnectionHandler,
                     // so if we get here, something has gone horribly wrong. Just close
                     // the connection with as much info as we have.
+                    LOG.e { ex.stackTraceToString() }
                     this.close(JervisExitCode.UNEXPECTED_ERROR, ex.stackTraceToString())
                 }
             }
