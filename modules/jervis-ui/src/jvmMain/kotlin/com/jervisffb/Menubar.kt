@@ -9,13 +9,11 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
-import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
+import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.game.viewmodel.Setups
-import com.jervisffb.ui.utils.FilePickerType
-import com.jervisffb.ui.utils.filePicker
-import okio.Path
+import com.jervisffb.ui.utils.saveFile
 
 @Composable
 fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
@@ -28,15 +26,11 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
     MenuBar {
         Menu("Developer Tools", mnemonic = 'D') {
             Item("Save Game", onClick = {
-                filePicker(
-                    type = FilePickerType.SAVE,
-                    "Save File",
-                    "game.$FILE_EXTENSION_GAME_FILE",
-                    "Jervis Game Files (.$FILE_EXTENSION_GAME_FILE)",
-                    FILE_EXTENSION_GAME_FILE,
-                ) { filePath: Path ->
-                    vm.saveGameState(filePath)
-                }
+                saveFile(
+                    dialogTitle = "Save File",
+                    fileName = JervisSerialization.getGameFileName(vm.uiState.gameController),
+                    fileContent = vm.serializeGameState(),
+                )
             })
             Item(
                 text = "Undo Action",

@@ -1,13 +1,63 @@
 package com.jervisffb.ui.utils
 
+import com.jervisffb.utils.jervisLogger
+import com.jervisffb.utils.platformFileSystem
+import com.jervisffb.utils.readText
 import okio.Path
 import okio.Path.Companion.toPath
+import okio.buffer
+import okio.use
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.filechooser.FileView
 
-actual fun filePicker(
+actual fun readFile(
+    dialogTitle: String,
+    extensionFilterDescription: String,
+    extensionFilterFileType: String,
+    onLoad: (Path?, Result<String>) -> Unit,
+) {
+    filePicker(
+        FilePickerType.OPEN,
+        dialogTitle,
+        null,
+        extensionFilterDescription,
+        extensionFilterFileType
+    ) { path ->
+        try {
+            val result = Result.success(path.readText())
+            onLoad(path, result)
+        } catch (e: Exception) {
+            jervisLogger().w { "Failed to read file: $path" }
+            onLoad(path, Result.failure(e))
+        }
+    }
+}
+
+actual fun saveFile(
+    dialogTitle: String,
+    fileName: String,
+    fileContent: String,
+    extensionFilterDescription: String,
+    extensionFilterFileType: String
+) {
+    filePicker(
+        FilePickerType.SAVE,
+        dialogTitle,
+        fileName,
+        extensionFilterDescription,
+        extensionFilterFileType,
+    ) { file ->
+        platformFileSystem.sink(file).use { fileSink ->
+            fileSink.buffer().use {
+                it.writeUtf8(fileContent)
+            }
+        }
+    }
+}
+
+private fun filePicker(
     type: FilePickerType,
     dialogTitle: String,
     selectedFile: String?,

@@ -2,14 +2,24 @@ package com.jervisffb.ui.utils
 
 import okio.Path
 
-actual fun filePicker(
-    type: FilePickerType,
+actual fun saveFile(
     dialogTitle: String,
-    selectedFile: String?,
+    fileName: String,
+    fileContent: String,
+    extensionFilterDescription: String,
+    extensionFilterType: String
+) {
+    // TODO
+}
+
+actual fun readFile(
+    dialogTitle: String,
     extensionFilterDescription: String,
     extensionFilterFileType: String,
-    onFileSelected: (Path) -> Unit,
+    onLoad: (Path?, Result<String>) -> Unit,
 ) {
     // Do nothing for now.
     // Figure out how to open a file dialog on iOS
+    onLoad(null, Result.success(""))
 }
+

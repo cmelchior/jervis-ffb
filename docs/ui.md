@@ -63,3 +63,12 @@ things as they come up.
 - [ ] Think about an UI that can work across Desktop: 16:9 and iPad 4:3.
 - [ ] Is it worth exploring an isometric view (to make it more immersive)? 
       - [ ] How feasible is it to use the current player graphics?
+- [ ] Add support for downloading teams from TourPlay. They can be accessed using something like this.
+      All headers are required.
+
+```
+curl --location 'https://tourplay.net/api/rosters/44442' \
+--header 'Accept: application/json, text/plain, */*' \
+--header 'Referer: https://tourplay.net/en/blood-bowl/roster/44442' \
+--header 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
+```

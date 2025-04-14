@@ -6,8 +6,7 @@ import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
 import com.jervisffb.engine.serialize.GameFileData
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
-import com.jervisffb.ui.utils.FilePickerType
-import com.jervisffb.ui.utils.filePicker
+import com.jervisffb.ui.utils.readFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -23,22 +22,31 @@ class LoadFileComponentModel(initialRulesBuilder: Rules.Builder, private val men
     var gameFile: GameFileData? = null
 
     fun openFileDialog() {
-        filePicker(
-            type = FilePickerType.OPEN,
-            dialogTitle = "Select Save File",
-            selectedFile = null,
-            extensionFilterDescription = "Jervis Game Files (.${FILE_EXTENSION_GAME_FILE})",
-            extensionFilterFileType = FILE_EXTENSION_GAME_FILE
-        ) { path ->
-            filePath.value = path.toString()
-            menuViewModel.navigatorContext.launch {
-                JervisSerialization.loadFromFile(path)
-                    .onSuccess { gameFile ->
-                        this@LoadFileComponentModel.gameFile = gameFile
-                        isSetupValid.value = true
+        menuViewModel.navigatorContext.launch {
+            readFile(
+                extensionFilterDescription = "Jervis Game Files (.${FILE_EXTENSION_GAME_FILE})",
+                extensionFilterFileType = FILE_EXTENSION_GAME_FILE
+            ) { path, loadResult ->
+                println(path)
+                println(loadResult)
+                fileError.value = ""
+                filePath.value = if (path != null) path.toString() else ""
+                loadResult
+                    .onSuccess { fileContent ->
+                        // Just silently ignore `null` values as it indicates the dialog was closed
+                        if (path != null) {
+                            JervisSerialization.loadFromFileContent(fileContent)
+                                .onSuccess { gameFile ->
+                                    this@LoadFileComponentModel.gameFile = gameFile
+                                    isSetupValid.value = true
+                                }
+                                .onFailure { error ->
+                                    fileError.value = "Error reading file - ${error.message}"
+                                }
+                        }
                     }
                     .onFailure { error ->
-                        fileError.value = "Error reading file - ${error.message}" ?: "Unknown error reading file."
+                        fileError.value = "Error reading file - ${error.message}"
                     }
             }
         }

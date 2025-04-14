@@ -7,7 +7,8 @@ expect val platformFileSystem: FileSystem
 expect val APPLICATION_DIRECTORY: String
 
 /**
- * Low-level API for accessing files. This will differ based on the system:
+ * Low-level API for application specific files. This will differ based on the system:
+ * Accessing or saving files outside this directory is done through the [file]
  *
  * - JVM: Files are stored under a ~/.jervis folder.
  * - Wasm: Files are stored in IndexedDB.

@@ -44,6 +44,22 @@ object JervisSerialization {
         return jsonFormat.encodeToJsonElement(serializedTeam)
     }
 
+    fun getGameFileName(controller: GameEngineController): String {
+        val homeName = toValidFilename(controller.state.homeTeam.name)
+        val awayName = toValidFilename(controller.state.awayTeam.name)
+        return "game-$homeName-vs-$awayName.$FILE_EXTENSION_GAME_FILE"
+    }
+
+    fun serializeGameState(controller: GameEngineController): String {
+        val fileData =
+            JervisGameFile(
+                JervisMetaData(FILE_FORMAT_VERSION),
+                JervisConfiguration(controller.rules),
+                JervisGameData(controller.initialHomeTeamState!!, controller.initialAwayTeamState!!, controller.history.flatMap { it.steps.map { it.action }}),
+            )
+        return jsonFormat.encodeToString(fileData)
+    }
+
     fun saveToFile(
         controller: GameEngineController,
         file: Path,
@@ -62,16 +78,9 @@ object JervisSerialization {
         }
     }
 
-    /**
-     * Load a Jervis Game File and prepare the game state from it.
-     */
-    fun loadFromFile(file: Path): Result<GameFileData> {
+    fun loadFromFileContent(json: String): Result<GameFileData> {
         try {
-            val fileContent =
-                platformFileSystem.source(file).use { fileSource ->
-                    fileSource.buffer().readUtf8()
-                }
-            val fileData = jsonFormat.decodeFromString<JervisGameFile>(fileContent)
+            val fileData = jsonFormat.decodeFromString<JervisGameFile>(json)
             val rules = fileData.configuration.rules
             val unknownCoach = Coach.UNKNOWN
             val serializedHomeTeam = jsonFormat.decodeFromJsonElement<SerializedTeam>(fileData.game.homeTeam)
@@ -86,4 +95,27 @@ object JervisSerialization {
             return Result.failure(ex)
         }
     }
+
+    /**
+     * Load a Jervis Game File and prepare the game state from it.
+     */
+    fun loadFromFile(file: Path): Result<GameFileData> {
+        try {
+            val fileContent =
+                platformFileSystem.source(file).use { fileSource ->
+                    fileSource.buffer().readUtf8()
+                }
+            return loadFromFileContent(fileContent)
+        } catch (ex: Exception) {
+            return Result.failure(ex)
+        }
+    }
+
+    private fun toValidFilename(input: String): String {
+        return input
+            .lowercase()
+            .replace("\\s+".toRegex(), "_")
+            .replace("[^a-z0-9._-]".toRegex(), "")
+    }
+
 }

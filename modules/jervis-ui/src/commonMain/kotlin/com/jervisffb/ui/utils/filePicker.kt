@@ -1,5 +1,6 @@
 package com.jervisffb.ui.utils
 
+import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
 import okio.Path
 
 
@@ -8,11 +9,19 @@ enum class FilePickerType {
     SAVE,
 }
 
-expect fun filePicker(
-    type: FilePickerType,
+expect fun saveFile(
     dialogTitle: String,
-    selectedFile: String?,
-    extensionFilterDescription: String,
-    extensionFilterFileType: String,
-    onFileSelected: (Path) -> Unit,
+    fileName: String,
+    fileContent: String,
+    extensionFilterDescription: String = "Jervis Game Files (.${FILE_EXTENSION_GAME_FILE})",
+    extensionFilterFileType: String = FILE_EXTENSION_GAME_FILE
+)
+
+// Only support loading string files for now
+expect fun readFile(
+    dialogTitle: String = "Select Save File",
+    extensionFilterDescription: String = "Jervis Game Files (.${FILE_EXTENSION_GAME_FILE})",
+    extensionFilterFileType: String = FILE_EXTENSION_GAME_FILE,
+    // If `null` file load was canceled by the user
+    onLoad: (Path?, Result<String>) -> Unit,
 )

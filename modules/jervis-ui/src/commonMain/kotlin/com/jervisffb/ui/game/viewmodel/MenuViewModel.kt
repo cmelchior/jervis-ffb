@@ -99,6 +99,10 @@ class MenuViewModel {
 
     fun showSettingsDialog(): StateFlow<Boolean> = _showSettingsDialog
 
+    fun serializeGameState(): String {
+        return JervisSerialization.serializeGameState(controller!!)
+    }
+
     fun saveGameState(destination: Path) {
         JervisSerialization.saveToFile(controller!!, destination)
     }
