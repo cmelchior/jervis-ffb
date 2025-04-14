@@ -16,7 +16,6 @@ kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())
 
     jvm {
-        withJava()
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }

@@ -1,7 +1,10 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.serialization)
-    id("application")
 }
 
 group = "com.jervisffb"
@@ -11,16 +14,17 @@ repositories {
     mavenCentral()
 }
 
-application {
-    mainClass.set("com.jervisffb.analyzer.MainKt")
-}
 
 kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())
     jvm {
-        withJava()
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
+        }
+        binaries {
+            executable {
+                mainClass.set("com.jervisffb.replay.analyzer.ReplayAnalyzerKt")
+            }
         }
     }
 
