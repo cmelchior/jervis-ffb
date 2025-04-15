@@ -114,8 +114,7 @@ object TeamTurn : Procedure() {
     }
 
     object ActivatePlayer: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure =
-            com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayer
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayer
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<ActivatePlayerContext>(),
@@ -143,6 +142,12 @@ object TeamTurn : Procedure() {
                 .map { SetPlayerState(it, PlayerState.STUNNED) }
                 .toTypedArray()
 
+            // Reset Player availability. We mostly do this for UI purposes, so we should propably move towards
+            // removing this again. But we need to make sure that "Availability" is correctly defined before that.
+            // If we do not do this here, players will appear "grayed out" during the other players turn which
+            // looks odd.
+            val resetPlayerAvailabilityCommands = getResetPlayerAvailabilityCommands(state, rules)
+
             // It isn't well-defined in which order things happen at the end of the turn.
             // E.g. it is unclear if Special Play Cards like Assassination Attempt trigger before or
             // after Throw a Rock and when temporary skills or abilities are moved.
@@ -163,6 +168,7 @@ object TeamTurn : Procedure() {
             return compositeCommandOf(
                 *progressStunnedCommands,
                 *turnOverStunnedPlayersCommands,
+                *resetPlayerAvailabilityCommands,
                 *resetCommands,
                 nextNodeCommand
             )

@@ -115,11 +115,17 @@ fun Player.isOnAwayTeam(): Boolean {
     return this.team.isAwayTeam()
 }
 
+/**
+ * Describes the state of a players "availability" during their teams turn.
+ * Players should be marked [Availability.AVAILABLE] at the start of a team turn
+ * and then moved to other states as appropriate. E.g. they might move directly
+ * to [Availability.UNAVAILABLE] if they are stunned.
+ */
 enum class Availability {
     AVAILABLE, // Are available to be activated in this turn
     IS_ACTIVE, // Are currently active
     HAS_ACTIVATED, // Has already activated this turn
-    UNAVAILABLE, // Unavailable for this turn
+    UNAVAILABLE, // Unavailable for this turn, e.g. because they are stunned.
 }
 
 class Player(

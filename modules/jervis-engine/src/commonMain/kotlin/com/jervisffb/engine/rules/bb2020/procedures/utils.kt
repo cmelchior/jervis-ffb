@@ -117,19 +117,30 @@ fun getSetPlayerRushesCommand(rules: Rules, player: Player): Command {
     return SetPlayerRushesLeft(player, rushesPrAction)
 }
 
-/**
- * Returns all commands that reset temporary table results, stat and skill modifiers for the
- * current active team.
- */
-fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Duration): Array<Command> {
-    val teams = listOf(state.homeTeam, state.awayTeam)
 
-    // Reset availability. It isn't clear if this is the best place to do this?
+/**
+ * Reset the [Availability] for all players.
+ *
+ * Developer's Commentary:
+ * I am not 100% convinced this is the right approach. Availability is also reset at the beginning
+ * of a teams turn, but right now having players marked as UNAVAILABLE when a drive ends, also means
+ * they are rendered as not available during setup (since they haven't had a turn yet).
+ */
+fun getResetPlayerAvailabilityCommands(state: Game, rules: Rules): Array<Command> {
+    val teams = listOf(state.homeTeam, state.awayTeam)
     val availableStatus = teams.flatMap { team ->
         team.map { player ->
             SetPlayerAvailability(player, Availability.AVAILABLE)
         }
     }
+    return availableStatus.toTypedArray()
+}
+
+/**
+ * Returns all commands that reset temporary table results, stat and skill modifiers for all teams.
+ */
+fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Duration): Array<Command> {
+    val teams = listOf(state.homeTeam, state.awayTeam)
 
     // Find all temporary player stat characteristics modifiers
     val removableStatModifiers = teams.flatMap { team ->
@@ -183,8 +194,7 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
     }
 
     return (
-        availableStatus
-            + removableStatModifiers
+        removableStatModifiers
             + removableSkills
             + removableRerolls
             + removablePrayers

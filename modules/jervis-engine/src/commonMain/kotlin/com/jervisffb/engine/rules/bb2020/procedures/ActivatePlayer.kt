@@ -384,7 +384,13 @@ object ActivatePlayer : Procedure() {
                 GotoNode(ResolveBloodLustAtEndOfActivation)
             } else {
                 return compositeCommandOf(
-                    SetPlayerAvailability(state.activePlayer!!, if (context.markActionAsUsed || context.activationEndsImmediately) Availability.HAS_ACTIVATED else Availability.AVAILABLE),
+                    SetPlayerAvailability(
+                        player = state.activePlayer!!,
+                        availability = if (context.markActionAsUsed || context.activationEndsImmediately) {
+                            Availability.HAS_ACTIVATED
+                        } else {
+                            Availability.AVAILABLE
+                        }),
                     ExitProcedure()
                 )
             }

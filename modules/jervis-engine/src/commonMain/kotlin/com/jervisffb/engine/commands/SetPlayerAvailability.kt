@@ -7,9 +7,7 @@ import com.jervisffb.engine.model.Player
 class SetPlayerAvailability(private val player: Player, val availability: Availability) : Command {
     private lateinit var originalAvailability: Availability
 
-    override fun execute(
-        state: Game,
-    ) {
+    override fun execute(state: Game) {
         this.originalAvailability = player.available
         player.apply {
             available = availability
@@ -17,9 +15,7 @@ class SetPlayerAvailability(private val player: Player, val availability: Availa
         }
     }
 
-    override fun undo(
-        state: Game,
-    ) {
+    override fun undo(state: Game) {
         player.apply {
             available = originalAvailability
             notifyUpdate()
