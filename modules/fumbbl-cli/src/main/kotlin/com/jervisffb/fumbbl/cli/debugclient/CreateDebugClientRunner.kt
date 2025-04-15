@@ -1,4 +1,4 @@
-package com.jervisffb.fumbbl.netcli.debugclient
+package com.jervisffb.fumbbl.cli.debugclient
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp

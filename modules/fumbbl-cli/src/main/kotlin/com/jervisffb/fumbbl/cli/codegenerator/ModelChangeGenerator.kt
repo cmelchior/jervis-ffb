@@ -1,4 +1,4 @@
-package com.jervisffb.fumbbl.netcli.codegenerator
+package com.jervisffb.fumbbl.cli.codegenerator
 
 /**
  * Create the Kotlin Serializer class for Model Changes defined by

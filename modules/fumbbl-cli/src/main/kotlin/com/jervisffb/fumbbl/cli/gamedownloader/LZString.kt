@@ -1,4 +1,4 @@
-package com.jervisffb.fumbbl.netcli.gamedownloader
+package com.jervisffb.fumbbl.cli.gamedownloader
 
 internal class Data {
     var `val` = 0

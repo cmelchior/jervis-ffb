@@ -1,19 +1,26 @@
-package com.jervisffb.fumbbl.netcli
+package com.jervisffb.fumbbl.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
+import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import com.jervisffb.fumbbl.netcli.debugclient.CreateDebugClientRunner
-import com.jervisffb.fumbbl.netcli.gamedownloader.DownloadGameClient
+import com.jervisffb.fumbbl.cli.debugclient.CreateDebugClientRunner
+import com.jervisffb.fumbbl.cli.gamedownloader.DownloadGameRunner
 import java.io.File
 
 class FumbblCLI : CliktCommand() {
     override fun run() = Unit // Base command does not perform any actions
 }
 
-class PrepareDebugClient : CliktCommand(help = "Downloads and inject debug code into the FUMBBL client.") {
+class PrepareDebugClient : CliktCommand() {
+    override fun help(context: Context): String {
+        return "Downloads and inject debug code into the FUMBBL client."
+    }
+
     private val output: String? by option(help = "Optional path where JAR files should be saved").convert { it }
 
     override fun run() {
@@ -46,14 +53,14 @@ class PrepareDebugClient : CliktCommand(help = "Downloads and inject debug code 
     }
 }
 
-class DownloadGame : CliktCommand(
-    help =
-        "Download all the websocket data associated with a given game on FUMBBL. " +
-            "DO NOT use this to download bulk games as it stresses the game server,",
-) {
+class DownloadGame : CliktCommand() {
     private val gameId by option(help = "ID of the game to download").required()
     private val output: String? by option(help = "Optional path where game files should be saved").convert { it }
     private val pretty: Boolean? by option(help = "Pretty print JSON output (warning, this will make the file quite a bit larger)").convert { it.toBoolean() }
+
+    override fun help(context: Context): String {
+        return "Download all the websocket data associated with a given game on FUMBBL. DO NOT use this to download bulk games as it stresses the game server"
+    }
 
     override fun run() {
         echo("Downloading game: $gameId")
@@ -61,7 +68,7 @@ class DownloadGame : CliktCommand(
             output?.let {
                 File(it)
             } ?: getDefaultOutputLocation()
-        val runner = DownloadGameClient(pretty == true)
+        val runner = DownloadGameRunner(pretty == true)
         runner.run(gameId, output)
     }
 

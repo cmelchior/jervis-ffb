@@ -1,6 +1,6 @@
 package com.jervisffb.fumbbl.cli
 
-import com.jervisffb.fumbbl.netcli.debugclient.CreateDebugClientRunner
+import com.jervisffb.fumbbl.cli.debugclient.CreateDebugClientRunner
 import java.io.File
 import kotlin.test.Ignore
 import kotlin.test.Test
