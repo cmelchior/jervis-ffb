@@ -112,7 +112,7 @@ class CustomizationSetupComponentModel(initialRulesBuilder: Rules.Builder, priva
         val data = InputFieldDataWithValue(
             label = flow.value.label,
             value = value,
-            underlyingValue = flow.value.underlyingValue,
+            underlyingValue = underlyingValue,
             isError = isError
         )
         flow.value = data
