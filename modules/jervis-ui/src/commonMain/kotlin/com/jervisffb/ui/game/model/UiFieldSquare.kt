@@ -3,6 +3,7 @@ package com.jervisffb.ui.game.model
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.ui.game.view.ContextMenuOption
@@ -33,7 +34,7 @@ class UiFieldSquare(
     var onSelected: (() -> Unit)? by mutableStateOf(null) // Action if square is selected
     var onMenuHidden: (() -> Unit?)? by mutableStateOf(null) // Action if the context menu is hidden
     var showContextMenu: Boolean by mutableStateOf(false) // The context menu is automatically opened
-    var contextMenuOptions: MutableList<ContextMenuOption> by mutableStateOf(mutableListOf()) // The options inside the context menu
+    var contextMenuOptions: SnapshotStateList<ContextMenuOption> = SnapshotStateList() // The options inside the context menu
 
     fun isEmpty() = !isBallOnGround && player == null
 
