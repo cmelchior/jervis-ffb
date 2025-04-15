@@ -56,7 +56,9 @@ fun LoadingScreen(
     viewModel: GameScreenModel,
     content: @Composable () -> Unit,
 ) {
-    // TODO Should this be a non-zero value? Might be nice for real games, but annoying for DX
+    // TODO Should this be a non-zero value? If the load screen is really quick it
+    //  looks like the icons are not there. Might be nice for real games, but annoying
+    //  while developing.
     val minimumLoadingTime = 0.seconds
     val isReadyToStart by viewModel.isReadyToStartGame.collectAsState()
     var showGameScreen by remember { mutableStateOf(false) }

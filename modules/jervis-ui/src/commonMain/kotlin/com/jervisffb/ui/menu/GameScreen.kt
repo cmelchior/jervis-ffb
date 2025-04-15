@@ -116,7 +116,7 @@ fun ExitDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> Unit
     val isDone = viewModel.uiState.gameController.stack.isEmpty()
     val dialogText = when {
         isHotseat && isDone -> "Game is over. It is safe to exit the game."
-        isHotseat && !isDone -> "Game is not over. Exiting the game without saving it first means it is lost."
+        isHotseat && !isDone -> "Game is not over. If you exit the game before saving it, all progress is lost. Are you sure you want to exit?"
         isHost && isDone -> "Game is over. It is safe to exit the game."
         !isHost && isDone -> "Game is over. It is safe to exit the game."
         else -> "Game is not over. Are you sure you want to exit?"
@@ -137,7 +137,7 @@ fun ExitDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> Unit
         width = 650.dp,
         content = { textFieldColors, textColor ->
             Box(
-                modifier = Modifier.weight(1f).padding(top = 8.dp),
+                modifier = Modifier.weight(1f).padding(top = 8.dp, bottom = 24.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(dialogText, color = textColor)
