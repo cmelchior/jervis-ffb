@@ -88,18 +88,26 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             setBody("grant_type=client_credentials")
         }
         if (response.status.isSuccess()) {
-            authToken = json.decodeFromString(response.bodyAsText())
-            oauthToken = authToken?.accessToken
+            // Looks like FUMBBL returns 200 when login fails, so some extra checks is needed here :/
+            val body = response.bodyAsText()
+
+            // Check if coach name is valid
             coachId = getCoachId(coachName)
             if (coachId == null) {
-                authToken = null
-                oauthToken = null
-                coachId = null
-                throw IllegalStateException("Unable to find coach id for $coachName")
+                return Result.failure(IllegalStateException("Unable to find coach id for $coachName"))
             }
+
+            // Check if auth failed
+            if (body == """{"error":"Authorization failed"}""") {
+                return Result.failure(IllegalStateException("Authorization failed"))
+            }
+
+            // Otherwise we should be safe to parse the return value
+            authToken = json.decodeFromString(response.bodyAsText())
+            oauthToken = authToken?.accessToken
             authToken!!
         } else {
-            throw IllegalStateException("Authentication failed with status ${response.status}")
+            return Result.failure(IllegalStateException("Authorization failed with status: ${response.status}"))
         }
     }
 

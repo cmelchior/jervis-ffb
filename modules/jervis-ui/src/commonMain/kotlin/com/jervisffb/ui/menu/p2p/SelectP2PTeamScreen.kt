@@ -65,9 +65,9 @@ fun SelectP2PTeamScreen(
         }
     }
     if (showImportFumbblTeamDialog) {
-        ImportTeamFromFumbblDialog(viewModel, onCloseRequest = { showImportFumbblTeamDialog = false })
+        ImportTeamFromFumbblDialog(viewModel, onDismissRequest = { showImportFumbblTeamDialog = false })
     }
     if (showLoadTeamFromFileDialog) {
-        LoadTeamFromFileDialog(viewModel, onCloseRequest = { showLoadTeamFromFileDialog = false })
+        LoadTeamFromFileDialog(viewModel, onDismissRequest = { showLoadTeamFromFileDialog = false })
     }
 }

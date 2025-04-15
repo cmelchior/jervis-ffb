@@ -76,10 +76,10 @@ fun SelectHotseatTeamScreen(
         }
     }
     if (showImportFumbblTeamDialog) {
-        ImportTeamFromFumbblDialog(viewModel.teamSelectorModel, onCloseRequest = { showImportFumbblTeamDialog = false })
+        ImportTeamFromFumbblDialog(viewModel.teamSelectorModel, onDismissRequest = { showImportFumbblTeamDialog = false })
     }
     if (showLoadTeamFromFileDialog) {
-        LoadTeamFromFileDialog(viewModel.teamSelectorModel, onCloseRequest = { showLoadTeamFromFileDialog = false })
+        LoadTeamFromFileDialog(viewModel.teamSelectorModel, onDismissRequest = { showLoadTeamFromFileDialog = false })
     }
 }
 
