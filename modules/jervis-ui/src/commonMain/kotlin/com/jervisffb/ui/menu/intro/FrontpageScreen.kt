@@ -33,10 +33,12 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextPainter.paint
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.FontLoadResult
@@ -68,6 +70,10 @@ import org.jetbrains.skia.ISize
 import org.jetbrains.skia.TextLine
 import kotlin.math.PI
 import kotlin.math.atan
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sqrt
 import kotlin.math.tan
 import org.jetbrains.skia.Font as SkiaFont
 
@@ -301,6 +307,17 @@ fun TitleHeader(mainTitle: String, subTitle: String) {
             lineTo(0f, 0f)
             close()
         }
+
+        // Calculate the scale of the text.
+        // We do this by checking the width and height to get
+        // a sense of the triangle and then scale according to the
+        // smallest scale factor. There is probably a better way,
+        // but for now this seems to work okay-ish.
+        val lineWidth = sqrt(size.height.pow(2) + size.width.pow(2))
+        val scaleFromHeight = size.height / 385f
+        val scaleFromLength = lineWidth / 1600f
+        val scale = min(scaleFromHeight, scaleFromLength)
+
         // Background color
         drawPath(path = path, color = JervisTheme.rulebookRed)
         // Add Noise
@@ -322,10 +339,8 @@ fun TitleHeader(mainTitle: String, subTitle: String) {
         // Calculate how to place the text.
         // It should follow the red line, while skewing the
         // text so it is following the left border.
-        // TODO Need to figure out exactly how to scale the text, so it
-        //  looks "nice" in more situations
-        val scale = 1.3f
-        skiaFont.size = (70 * scale).sp.toPx()
+        val maxFontSize = 90f
+        skiaFont.size = ((min(70 * scale, maxFontSize))).sp.toPx()
         val line1 = mainTitle
         val line2 = subTitle
         val angleRadians = atan(size.height / size.width)
@@ -333,7 +348,7 @@ fun TitleHeader(mainTitle: String, subTitle: String) {
         val skewX = tan(-angleRadians)
         val skewY = 0.0f
         val padding = 32.dp.toPx()
-        val lineHeight = (88 * scale).dp.toPx()
+        val lineHeight = skiaFont.size * 1.3f
 
         drawContext.canvas.nativeCanvas.apply {
             save()
