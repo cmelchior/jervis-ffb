@@ -284,6 +284,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
         }.also {
             it.waitForOpponent()
         }
+        navigator.pop()
         navigator.push(GameScreen(menuViewModel, gameViewModel!!))
     }
 
@@ -485,7 +486,9 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
 
     override fun onDispose() {
         menuViewModel.backgroundContext.launch {
-            server?.stop()
+            if (networkAdapter.hostState.value != P2PHostState.RUN_GAME) {
+                server?.stop()
+            }
         }
     }
 }

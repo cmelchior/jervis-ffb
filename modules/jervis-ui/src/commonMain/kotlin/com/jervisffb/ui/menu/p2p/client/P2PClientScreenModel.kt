@@ -247,6 +247,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
         }.also {
             it.waitForOpponent()
         }
+        navigator.pop()
         navigator.push(GameScreen(menuViewModel, gameViewModel!!))
     }
 
@@ -277,7 +278,9 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
 
     override fun onDispose() {
         menuViewModel.backgroundContext.launch {
-            networkAdapter.close()
+            if (networkAdapter.clientState.value != P2PClientState.RUN_GAME) {
+                networkAdapter.close()
+            }
         }
     }
 

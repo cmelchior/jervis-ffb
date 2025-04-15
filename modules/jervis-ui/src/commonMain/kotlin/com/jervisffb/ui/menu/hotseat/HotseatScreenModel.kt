@@ -241,6 +241,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         ).also {
             it.gameAcceptedByAllPlayers()
         }
+        navigator.pop()
         navigator.push(GameScreen(menuViewModel, model))
     }
 }
