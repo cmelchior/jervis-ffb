@@ -22,6 +22,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
@@ -102,7 +103,9 @@ object BlockAction : Procedure() {
                 attacker.coordinates.getSurroundingCoordinates(rules)
                     .filter { state.field[it].isOccupied() }
                     .filter { state.field[it].player!!.team != attacker.team }
-                    .map { SelectPlayer(state.field[it].player!!) }
+                    .map { state.field[it].player!! }
+                    .filter { it.state == PlayerState.STANDING }
+                    .map { player -> SelectPlayer(player) }
 
             return end + eligibleDefenders
         }
