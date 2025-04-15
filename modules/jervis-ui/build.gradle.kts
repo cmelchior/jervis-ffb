@@ -130,7 +130,7 @@ compose.desktop {
             val providers = project.providers
             macOS {
                 bundleID = "com.jervisffb"
-                iconFile.set(rootProject.file("icons/logo.icns"))
+                iconFile.set(rootProject.file("logo/logo.icns"))
                 signing {
                     sign.set(true)
                     identity.set(providers.environmentVariable("JERVIS_MACOS_SIGNING_ID").getOrNull())
@@ -143,7 +143,7 @@ compose.desktop {
                 }
             }
             windows {
-                iconFile.set(rootProject.file("icons/logo.ico"))
+                iconFile.set(rootProject.file("logo/logo.ico"))
                 upgradeUuid = providers.environmentVariable("JERVIS_WINDOWS_PACKAGE_GUID").getOrNull()
                 menuGroup = "Jervis Fantasy Football"
                 dirChooser = true
@@ -151,7 +151,7 @@ compose.desktop {
                 shortcut = true
             }
             linux {
-                iconFile.set(rootProject.file("icons/logo.svg"))
+                iconFile.set(rootProject.file("logo/logo.svg"))
                 packageName = "jervis-ffb"
                 debMaintainer = "christianmelchior@gmail.com"
                 // appRelease = "1" - Not currently used. Need to figure out how to increment this if used
