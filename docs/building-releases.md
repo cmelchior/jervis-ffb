@@ -79,5 +79,5 @@ modules/jervis-ui/build/compose/binaries/main-release/deb/
 
 `index.html` and associated resources are located in [modules/jervis-ui/src/wasmJsMain/resources](../modules/jervis-ui/src/wasmJsMain/resources).
 
-[`favicon.svg`](../modules/jervis-ui/src/wasmJsMain/resources/favicon.svg) is [logo.svg](../icons/favicon.svg) that 
+[`favicon.svg`](../modules/jervis-ui/src/wasmJsMain/resources/favicon.svg) is [logo.svg](../logo/favicon.svg) that 
 has been copied.
