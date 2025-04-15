@@ -22,6 +22,7 @@ buildConfig {
     this.packageName("com.jervisffb.ui")
     buildConfigField("releaseVersion", rootProject.ext["publicVersion"] as String)
     buildConfigField("gitHash", rootProject.ext["gitHash"] as String)
+    buildConfigField("gitHashLong", rootProject.ext["gitHashLong"] as String)
     @Suppress("UNCHECKED_CAST")
     buildConfigField("gitHistory", rootProject.ext["gitHistory"] as String)
 }

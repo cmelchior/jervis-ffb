@@ -40,6 +40,13 @@ val gitHash: String by lazy {
         .use { it.readText().trim() }
 }
 
+val gitHashLong: String by lazy {
+    Runtime.getRuntime().exec(arrayOf("git", "rev-parse", "HEAD"))
+        .inputStream
+        .bufferedReader()
+        .use { it.readText().trim() }
+}
+
 val gitHistory: String by lazy {
     Runtime.getRuntime().exec(arrayOf("git", "--no-pager", "log", "-5", "--pretty=format:%at:%s"))
         .inputStream
@@ -87,6 +94,7 @@ rootProject.ext["publicVersion"] = createProjectVersion()
 rootProject.ext["distributionVersion"] = createDistributionVersion()
 // Current short git hash
 rootProject.ext["gitHash"] = gitHash
+rootProject.ext["gitHashLong"] = gitHashLong
 // History of last 5 commits
 rootProject.ext["gitHistory"] = gitHistory
 
