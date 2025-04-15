@@ -35,7 +35,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":modules:platform-utils"))
-                implementation("dev.whyoleg.cryptography:cryptography-core:0.3.1")
+                implementation(libs.cryptography.core)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.coroutines)
                 implementation(libs.jsonserialization)
@@ -50,13 +50,13 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("dev.whyoleg.cryptography:cryptography-provider-jdk:0.3.1")
+                implementation(libs.cryptography.provider.jdk)
             }
         }
         val jvmTest by getting
         val wasmJsMain by getting {
             dependencies {
-                implementation("dev.whyoleg.cryptography:cryptography-provider-webcrypto:0.3.1")
+                implementation(libs.cryptography.provider.webcrypto)
             }
         }
         val wasmJsTest by getting

@@ -12,7 +12,7 @@ plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.composeCompiler)
-    id("com.github.gmazzo.buildconfig") version "5.5.0"
+    alias(libs.plugins.buildconfig)
 }
 
 group = "com.jervisffb"
@@ -86,7 +86,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                // Additional dependencies required fog .ogg support
+                // Additional dependencies required for .ogg support
                 // See https://github.com/finnkuusisto/TinySound/tree/master/lib
                 implementation("kuusisto.tinysound:tinysound:1.1.1")
                 implementation("javazoom.vorbisspi:vorbisspi:1.0.3")

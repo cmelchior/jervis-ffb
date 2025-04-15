@@ -32,28 +32,29 @@ kotlin {
                 implementation(libs.okio.fake)
                 api(libs.jsonserialization)
                 api(libs.kermit)
-                api("io.ktor:ktor-client-core:$ktor")
-                api("io.ktor:ktor-client-logging:$ktor")
-                api("io.ktor:ktor-client-websockets:$ktor")
-                api("io.ktor:ktor-client-content-negotiation:$ktor")
-                api("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+                api(libs.ktor.client.core)
+                api(libs.ktor.client.logging)
+                api(libs.ktor.client.websockets)
+                api(libs.ktor.client.contentNegotiation)
+                api(libs.ktor.serialization.json)
             }
         }
 
         val jvmMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.10.1")
-                implementation("io.ktor:ktor-client-okhttp:$ktor")
-                implementation("org.reflections:reflections:0.10.2")
-                implementation("androidx.datastore:datastore-jvm:1.1.0")
-                implementation("androidx.datastore:datastore-preferences-jvm:1.1.0")
+                implementation(libs.coroutines.swing)
+                implementation(libs.ktor.client.okhttp)
+                implementation(libs.reflections)
+                implementation(libs.datastore)
+                implementation(libs.datastore.preferences)
             }
         }
 
         val wasmJsMain by getting {
             dependencies {
+                // Stored in mavenRepo for now
                 implementation("com.juul.indexeddb:core:main-SNAPSHOT")
-                implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3")
+                implementation(libs.kotlinx.browser)
             }
         }
 
@@ -66,7 +67,7 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
-                implementation("io.ktor:ktor-client-darwin:3.1.1")
+                implementation(libs.ktor.client.darwin)
             }
         }
     }

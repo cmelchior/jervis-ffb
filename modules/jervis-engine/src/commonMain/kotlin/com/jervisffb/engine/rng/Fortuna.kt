@@ -13,8 +13,8 @@ import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.utils.assert
 import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.algorithms.symmetric.AES
-import dev.whyoleg.cryptography.operations.cipher.Cipher
+import dev.whyoleg.cryptography.algorithms.AES
+import dev.whyoleg.cryptography.operations.Cipher
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.experimental.xor
@@ -162,7 +162,7 @@ class Fortuna: DiceRollGenerator {
     suspend fun rekeyGenerator(newKey: ByteArray) {
         lastRekeying = Clock.System.now()
         rekeyings++
-        cipher = algorithm.keyDecoder().decodeFrom(format = AES.Key.Format.RAW, input = newKey).cipher()
+        cipher = algorithm.keyDecoder().decodeFromByteArray(format = AES.Key.Format.RAW, bytes = newKey).cipher()
     }
 
     private fun generateRandomData() {

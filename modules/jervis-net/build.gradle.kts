@@ -36,11 +36,10 @@ kotlin {
             dependencies {
                 implementation(project(":modules:platform-utils"))
                 implementation(project(":modules:jervis-engine"))
-                implementation("io.ktor:ktor-client-core:$ktor")
-                implementation("io.ktor:ktor-client-logging:$ktor")
-                implementation("io.ktor:ktor-client-websockets:$ktor")
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.logging)
+                implementation(libs.ktor.client.websockets)
                 implementation(libs.coroutines)
-                // implementation(libs.coroutines.debug) This crashes with java.util.zip.ZipException: duplicate entry: META-INF/versions/9/module-info.class
                 implementation(libs.jsonserialization)
                 implementation(libs.okio)
                 implementation(libs.kotlinx.datetime)
@@ -55,11 +54,11 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-server-core-jvm:$$ktor")
-                implementation("io.ktor:ktor-server-websockets-jvm:$ktor")
-                implementation("io.ktor:ktor-server-content-negotiation:$ktor")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
-                implementation("io.ktor:ktor-server-netty-jvm:$ktor")
+                implementation(libs.ktor.server.core.jvm)
+                implementation(libs.ktor.server.websockets)
+                implementation(libs.ktor.server.contentNegotation)
+                implementation(libs.ktor.serialization.json)
+                implementation(libs.ktor.server.netty)
             }
         }
         val jvmTest by getting

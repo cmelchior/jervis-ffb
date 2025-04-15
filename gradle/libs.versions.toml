@@ -1,33 +1,65 @@
 [versions]
-kotlin = "2.1.20"
-ktor = "3.1.1"
-compose = "1.7.3"
-coroutines = "1.10.1"
-minimalJson = "0.9.5"
-javaAssist = "3.30.0-GA"
-serialization = "1.7.3"
-voyager = "1.1.0-beta03"
-datetimex = "0.6.2"
-okio = "3.10.2"
-jgit = "7.0.0.202409031743-r"
-atomicfu = "0.27.0"
-kermit = "2.0.5"
+atomicfu = "0.27.0" # https://github.com/Kotlin/kotlinx-atomicfu
+browser = "0.3" # https://github.com/Kotlin/kotlinx-browser
+buildconfig = "5.6.2" # https://github.com/gmazzo/gradle-buildconfig-plugin
+clikt = "5.0.3" # https://github.com/ajalt/clikt
+compose = "1.7.3" # https://github.com/JetBrains/compose-multiplatform
+coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines
+cryptography = "0.4.0" # https://github.com/whyoleg/cryptography-kotlin/releases/tag/0.4.0
+datastore = "1.1.4" # https://developer.android.com/jetpack/androidx/releases/datastore
+datetimex = "0.6.2" # https://github.com/Kotlin/kotlinx-datetime
+javaAssist = "3.30.2-GA" # https://github.com/jboss-javassist/javassist
+jgit = "7.2.0.202503040940-r" # https://github.com/eclipse-jgit/jgit
+kermit = "2.0.5" # https://github.com/touchlab/Kermit
+kotlin = "2.1.20" # https://github.com/JetBrains/kotlin
+ktor = "3.1.2" # https://github.com/ktorio/ktor
+minimalJson = "0.9.5" # https://github.com/ralfstx/minimal-json
+moshiKotlin = "1.15.2" # https://github.com/square/moshi
+okhttp3 = "4.12.0" # https://github.com/square/okhttp
+okio = "3.10.2" # https://github.com/square/okio
+reflections = "0.10.2" # https://github.com/ronmamo/reflections
+serialization = "1.8.1" # https://github.com/Kotlin/kotlinx.serialization
+voyager = "1.1.0-beta03" # https://github.com/adrielcafe/voyager
 
 [libraries]
+clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
 coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "coroutines"}
+coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
+cryptography-core = { group = "dev.whyoleg.cryptography", name = "cryptography-core", version.ref = "cryptography" }
+cryptography-provider-jdk = { group = "dev.whyoleg.cryptography", name = "cryptography-provider-jdk", version.ref = "cryptography" }
+cryptography-provider-webcrypto = { group = "dev.whyoleg.cryptography", name = "cryptography-provider-webcrypto", version.ref = "cryptography" }
+datastore = { group = "androidx.datastore", name = "datastore-jvm", version.ref = "datastore"}
+datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences-jvm", version.ref = "datastore"}
+jgit = { group = "org.eclipse.jgit", name = "org.eclipse.jgit", version.ref = "jgit" }
 jsonserialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+kermit  = { group = "co.touchlab", name = "kermit", version.ref = "kermit" }
+kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetimex" }
+kotlinx-browser = { group = "org.jetbrains.kotlinx", name = "kotlinx-browser", version.ref = "browser"}
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-server-contentNegotation = { group = "io.ktor", name = "ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-server-core-jvm = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-websockets = { group = "io.ktor", name = "ktor-server-websockets-jvm", version.ref = "ktor" }
+ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-client-contentNegotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-websockets = { group = "io.ktor", name = "ktor-client-websockets", version.ref = "ktor" }
+javaAssist = { group = "org.javassist", name = "javassist", version.ref = "javaAssist" }
+minimalJson = { group = "com.eclipsesource.minimal-json", name = "minimal-json", version.ref = "minimalJson"}
+moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshiKotlin" }
+okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp3" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 okio-fake = { group = "com.squareup.okio", name = "okio-fakefilesystem", version.ref = "okio" }
-kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetimex" }
-jgit = { group = "org.eclipse.jgit", name = "org.eclipse.jgit", version.ref = "jgit" }
-
+reflections = { group = "org.reflections", name = "reflections", version.ref = "reflections" }
+voyager-bottom-sheet-navigator = { group = "cafe.adriel.voyager", name = "voyager-bottom-sheet-navigator", version.ref = "voyager" }
 voyager-navigator = { group = "cafe.adriel.voyager", name = "voyager-navigator", version.ref = "voyager" }
 voyager-screenmodel = { group = "cafe.adriel.voyager", name = "voyager-screenmodel", version.ref = "voyager" }
-voyager-bottom-sheet-navigator = { group = "cafe.adriel.voyager", name = "voyager-bottom-sheet-navigator", version.ref = "voyager" }
 voyager-tab-navigator = { group = "cafe.adriel.voyager", name = "voyager-tab-navigator", version.ref = "voyager" }
 voyager-transitions = { group = "cafe.adriel.voyager", name = "voyager-transitions", version.ref = "voyager" }
-kermit  = { group = "co.touchlab", name = "kermit", version.ref = "kermit" }
 
 [plugins]
 jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -37,6 +69,7 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "atomicfu" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 
 [bundles]
 voyager = [ "voyager-navigator", "voyager-screenmodel", "voyager-bottom-sheet-navigator", "voyager-tab-navigator", "voyager-transitions" ]

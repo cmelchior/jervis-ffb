@@ -15,14 +15,14 @@ repositories {
 dependencies {
     implementation(project(":modules:platform-utils"))
     implementation(project(":modules:fumbbl-net"))
-    implementation("com.eclipsesource.minimal-json:minimal-json:${libs.versions.minimalJson.get()}")
-    implementation("com.github.ajalt.clikt:clikt:4.2.1")
-    implementation("org.javassist:javassist:${libs.versions.javaAssist.get()}")
-    implementation("io.ktor:ktor-client-okhttp:${libs.versions.ktor.get()}")
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${libs.versions.serialization.get()}")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${libs.versions.kotlin.get()}")
+    implementation(libs.clikt)
+    implementation(libs.minimalJson)
+    implementation(libs.javaAssist)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.okhttp3)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlin.test.junit)
 }
 
 application {
