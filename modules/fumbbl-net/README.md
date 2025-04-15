@@ -1,4 +1,4 @@
-# FUMBBL NET
+# FUMBBL Net
 
 This module contains the infrastructure to work with FUMBBL. This includes:
 

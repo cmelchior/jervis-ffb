@@ -17,10 +17,10 @@ Workshop.
 
 This includes:
  
-- A standalone rules engine for the 2020 version of Blood Bowl. This engine 
-  can be hooked into any UI framework or AI agent.
+- A standalone rules engine for the 2020 version of Blood Bowl. The engine 
+  is UI agnostic and can be hooked up into any UI Framework or AI Agent.
 
-- A Game Client UI that can run either as a website, desktop client or iPad app.
+- A Game Client UI that can run either as a website, iPad or Desktop app.
 
 - An API that is AI friendly, making it possible to replace a player with a 
   custom AI agent.
@@ -99,9 +99,9 @@ This repository is structured in the following way:
 - `mavenRepo/`: contains some packages that are not available on Maven Central.
   Artifacts here are used to build parts of the project.
 - `screenshots/`: Contains screenshots from the game UI.
-- `icons/`: Contains project logos used by various platforms.
-- `Debug-FantasyFootballClient/`: It is empty as a default, but by using
-  [`fumbble-cli`](./fumbbl-cli) it might contain a modified version of the FUMBBL
+- `logo/`: Contains project logos used by various platforms.
+- `Debug-FantasyFootballClient/`: It is empty as a default, but when using
+  [`fumbble-cli`](./fumbbl-cli) it can contain a modified version of the FUMBBL
   Client that can be used to inspect the FUMMBL network traffic. See
   [the documentation](modules/fumbbl-cli/README.md) for more details. Note, this
   has not been tested for a while and since the FFB Client is now open source,
@@ -122,28 +122,28 @@ of the following modules:
    server as well as adapters for converting a FUMBBL game into a Jervis
    equivalent.
 
- - `iosApp`: This contains the XCode project needed to build the Jervis iPad
+ - `iosApp`: The XCode project needed to build the Jervis iPad
    app. This needs to be opened and run from XCode. It will automatically
    build all required dependencies from the project.
 
-- `jervis-engine`: This contains a full model of the Blood Bowl rules and 
-  the logic for running a game.
+- `jervis-engine`: The full Blood Bowl game and rules model as well as logic
+  for running the game.
 
-- `jervis-net`: This contains the infrastructure to create and communicate with
-   a light-weight Game Server that is only used to play a single game.
+- `jervis-net`: The infrastructure to create and communicate with a light-weight 
+  Game Server that is only used to play a single game.
 
 - `jervis-test-utils`: Contains test setups used across multiple modules.
   This is a work-around for https://youtrack.jetbrains.com/issue/KT-35073.
 
-- `jervis-ui`: An UI for driving a game of Blood Bowl. It has been largely 
-  copied from the FUMBBL Client UI. 
+- `jervis-ui`: An UI for driving a game of Blood Bowl. It has in large parts
+   been inspired by the FUMBBL Client UI.
 
-- `platform-utils`: All helper methods that requires platform-specific
+- `platform-utils`: All helper methods that require platform-specific
   APIs are placed here. This includes things like filesystem access, setting up 
   networking and reflection.
 
-- `replay-analyzer`: This module is a helper for processing and converting the
-   JSON content of a FUMBBL replay file into something that Jervis can process.
+- `replay-analyzer`: A helper for processing and converting the JSON content of 
+   a FUMBBL replay file into something that Jervis can process.
 
 ### UI Resources
 

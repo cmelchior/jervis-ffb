@@ -1,4 +1,4 @@
-# JERVIS UI
+# Jervis UI
 
 This module contains the UI code for the Jervis Game Client.
 
