@@ -174,9 +174,11 @@ private fun LoadingScreen(viewModel: GameScreenModel) {
     val awayTeamIcon by viewModel.awayTeamIcon.collectAsState()
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        val shapeData = remember(maxWidth, maxHeight) {
+        val maxWidthPx = maxWidth.value * LocalDensity.current.density
+        val maxHeightPx = maxHeight.value * LocalDensity.current.density
+        val shapeData = remember(maxWidthPx, maxHeightPx) {
             createPathData(
-                boxSize = Size(maxWidth.value * 2, maxHeight.value * 2),
+                boxSize = Size(maxWidthPx, maxHeightPx),
                 dividerWidth = 75f,
             )
         }
