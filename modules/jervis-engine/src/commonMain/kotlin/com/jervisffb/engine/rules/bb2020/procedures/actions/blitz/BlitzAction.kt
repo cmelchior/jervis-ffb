@@ -141,9 +141,10 @@ object BlitzAction : Procedure() {
             // Find possible move types
             options.addIfNotNull(calculateMoveTypesAvailable(state, blitzer))
 
-            // Check if adjacent to target of the Blitz
+            // Check if the attacker is adjacent to the target of the Blitz and is able to Block them
             val hasMovesLeft = blitzer.movesLeft + blitzer.rushesLeft > 0
-            if (context.attacker.location.isAdjacent(rules, context.defender!!.location) && hasMovesLeft) {
+            val isStanding = rules.isStanding(blitzer)
+            if (context.attacker.location.isAdjacent(rules, context.defender!!.location) && hasMovesLeft && isStanding) {
                 options.add(SelectPlayer(context.defender))
             }
 
