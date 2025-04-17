@@ -165,12 +165,10 @@ into place in the project so it is ready for immediate use.
 See https://youtrack.jetbrains.com/issue/CMP-4196 for more details on why
 this is needed.
 
-Team Roster logos have been copied manually from https://fumbbl.com/p/createteam
-
 
 ## Why Jervis?
 
-As a homage to the original creator of Blood Bowl: Jervis Johnson. 
+As homage to the original creator of Blood Bowl: Jervis Johnson. 
 
 Also, it sounds similar to J.A.R.V.I.S, the A.I. from the Marvel Universe, so it 
 also a fun play on that pronunciation.

@@ -435,10 +435,9 @@ object IconFactory {
      * Load a logo for the given team and size based on the [RosterLogo] configuration.
      */
     suspend fun loadRosterIcon(team: TeamId, logo: RosterLogo, size: LogoSize): ImageBitmap {
-        // TODO If no logo is defined we need to have a placeholder
         val sprite = when (size) {
-            LogoSize.LARGE -> logo.large ?: error("Could not find large logo: $logo")
-            LogoSize.SMALL -> logo.small ?: error("Could not find small logo: $logo")
+            LogoSize.LARGE -> logo.large ?: SingleSprite.embedded("roster/logo/roster_logo_jervis_default_large.png")
+            LogoSize.SMALL -> logo.small ?: SingleSprite.embedded("roster/logo/roster_logo_jervis_default_small.png")
         }
         saveLogo(team, sprite, size)
         return getLogo(team, size)

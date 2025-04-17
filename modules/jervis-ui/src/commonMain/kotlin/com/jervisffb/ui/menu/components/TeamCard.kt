@@ -42,7 +42,6 @@ fun TeamCard(
     Box(
         modifier = Modifier
             .width(300.dp)
-            //.height(150.dp)
             .alpha(if (isEnabled) 1f else 0.3f)
             .background(JervisTheme.rulebookPaperMediumDark.copy(alpha = 0.5f))
             .border(width = borderWidth, color = borderColor)
@@ -84,7 +83,7 @@ fun TeamCard(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Image(
-                    modifier = Modifier.padding(4.dp),
+                    modifier = Modifier.padding(8.dp),
                     bitmap = logo,
                     contentDescription = null,
                     contentScale = ContentScale.Inside,

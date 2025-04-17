@@ -49,11 +49,11 @@ fun ColumnScope.GameStatusRowType4(textColor: Color = JervisTheme.contentTextCol
     val fontSize = 14.sp
     val spaceBetweenTeamAndCoach = 4.dp
 
-    var blackOrcLogo: ImageBitmap? by remember { mutableStateOf(null) }
+    var orc: ImageBitmap? by remember { mutableStateOf(null) }
     var amazonLogo: ImageBitmap? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        blackOrcLogo = IconFactory.loadRosterIcon(TeamId("gnome"), SingleSprite.embedded("roster/logo/roster_logo_jervis_black_orc_small.png"), LogoSize.SMALL)
+        orc = IconFactory.loadRosterIcon(TeamId("orc"), SingleSprite.embedded("roster/logo/roster_logo_jervis_orc_small.png"), LogoSize.SMALL)
         amazonLogo = IconFactory.loadRosterIcon(TeamId("gnome"), SingleSprite.embedded("roster/logo/roster_logo_jervis_amazon_small.png"), LogoSize.SMALL)
     }
     Row(
@@ -72,7 +72,7 @@ fun ColumnScope.GameStatusRowType4(textColor: Color = JervisTheme.contentTextCol
                     maxLines = 1
                 )
                 Text(
-                    text = "Black Orc",
+                    text = "Orc",
                     textAlign = TextAlign.End,
                     lineHeight = 1.0.em,
                     fontSize = 12.sp,
@@ -94,10 +94,10 @@ fun ColumnScope.GameStatusRowType4(textColor: Color = JervisTheme.contentTextCol
                 )
             }
             Box(modifier = Modifier.padding(horizontal = 16.dp), contentAlignment = Alignment.Center) {
-                if (blackOrcLogo != null) {
+                if (orc != null) {
                     Image(
                         modifier = Modifier.width(imageSize).height(imageSize).aspectRatio(1f),
-                        bitmap = blackOrcLogo!!,
+                        bitmap = orc!!,
                         contentDescription = "",
                         contentScale = ContentScale.FillWidth,
                     )
