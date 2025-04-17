@@ -21,7 +21,7 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 
 /**
- * Display data for the Credit dialog
+ * Display data for the About dialog.
  */
 data class CreditData(
     val title: String = "Jervis Fantasy Football",
@@ -54,10 +54,12 @@ data class CreditData(
     ),
     val fumbblDevelopersDescription: String = """
         This project is heavily inspired by the FUMBBL Client, and a lot of the graphics and 
-        sound assets are copied from there. All credits go the respective creators.
+        sound assets are borrowed from there. All credits go the respective creators, see the 
+        link below.
     """.trimIndent(),
     val projectUrl: String = "https://github.com/cmelchior/jervis-ffb",
-    val newIssueUrl: String = "https://github.com/cmelchior/jervis-ffb/issues/new"
+    val newIssueUrl: String = "https://github.com/cmelchior/jervis-ffb/issues/new",
+    val fumbblAttributionUrl: String = "https://fumbbl.com/p/attribution"
 )
 
 data class NewsEntryData(
@@ -66,7 +68,7 @@ data class NewsEntryData(
 )
 
 /**
- * ViewModel class for the Main starting screen.
+ * ViewModel class for the main starting screen.
  */
 class FrontpageScreenModel(private val menuViewModel: MenuViewModel) : JervisScreenModel {
 

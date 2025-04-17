@@ -74,6 +74,13 @@ fun AboutDialogComponent(viewModel: MenuViewModel) {
             )
             Spacer(modifier = Modifier.weight(1f))
             JervisButton(
+                text = "FUMBBL Credits",
+                onClick = { openUrlInBrowser(creditData.fumbblAttributionUrl) },
+                buttonColor = JervisTheme.rulebookBlue,
+                textColor = buttonTextColor,
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            JervisButton(
                 text = "Report Issue",
                 onClick = { openUrlInBrowser(creditData.newIssueUrl) },
                 buttonColor = JervisTheme.rulebookBlue,
