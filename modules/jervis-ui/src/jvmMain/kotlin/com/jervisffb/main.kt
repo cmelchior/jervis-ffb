@@ -1,8 +1,6 @@
 package com.jervisffb
 
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -17,10 +15,11 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.initApplication
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.pixelsToDp
+import com.jervisffb.utils.runBlocking
 import java.awt.Desktop
 
 
-fun main() {
+fun main() = runBlocking {
     try {
         initApplication()
         application {

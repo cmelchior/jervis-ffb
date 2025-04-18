@@ -16,33 +16,27 @@ import com.jervisffb.utils.PROP_INITIALIZED_VERSION
 import com.jervisffb.utils.PropertiesManager
 import com.jervisffb.utils.initializePlatform
 import com.jervisffb.utils.jervisLogger
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 val FILE_MANAGER = FileManager()
 val PROPERTIES_MANAGER = PropertiesManager()
 
-fun initApplication() {
+suspend fun initApplication() {
     initializePlatform()
     val LOG = jervisLogger()
 
-    @OptIn(DelicateCoroutinesApi::class)
-    GlobalScope.launch {
-        // For now, we re-initialize default teams for every new version. This is done because
-        //  we are still iterating on the fileformat and serialization format. Once these are
-        // stablized, we should probably avoid this.
-        val clientReleaseVersion = BuildConfig.releaseVersion
-        val isClientInitialized = PROPERTIES_MANAGER.getBoolean(PROP_INITIALIZED) ?: false
-        val initializedVersion = PROPERTIES_MANAGER.getString(PROP_INITIALIZED_VERSION)
-        if (!isClientInitialized || initializedVersion != clientReleaseVersion) {
-            LOG.i { "Initializing application: $clientReleaseVersion" }
-            CacheManager.createInitialTeamFiles()
-            PROPERTIES_MANAGER.setProperty(PROP_INITIALIZED, true)
-            PROPERTIES_MANAGER.setProperty(PROP_INITIALIZED_VERSION, clientReleaseVersion)
-        } else {
-            LOG.i { "Application already initialized. Skipping." }
-        }
+    // For now, we re-initialize the default teams for every new version. This is done because
+    //  we are still iterating on the fileformat and serialization format. Once these are
+    // stable, we should probably avoid this.
+    val clientReleaseVersion = BuildConfig.releaseVersion
+    val isClientInitialized = PROPERTIES_MANAGER.getBoolean(PROP_INITIALIZED) ?: false
+    val initializedVersion = PROPERTIES_MANAGER.getString(PROP_INITIALIZED_VERSION)
+    if (!isClientInitialized || initializedVersion != clientReleaseVersion) {
+        LOG.i { "Initializing application: $clientReleaseVersion" }
+        CacheManager.createInitialTeamFiles()
+        PROPERTIES_MANAGER.setProperty(PROP_INITIALIZED, true)
+        PROPERTIES_MANAGER.setProperty(PROP_INITIALIZED_VERSION, clientReleaseVersion)
+    } else {
+        LOG.i { "Application already initialized. Skipping." }
     }
 }
 

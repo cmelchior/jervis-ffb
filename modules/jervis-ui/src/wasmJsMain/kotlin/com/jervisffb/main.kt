@@ -10,11 +10,11 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 
 @OptIn(ExperimentalComposeUiApi::class)
-fun main() {
-    val menuViewModel = MenuViewModel()
+suspend fun main() {
     try {
-        clearLoadingScreen()
         initApplication()
+        val menuViewModel = MenuViewModel()
+        clearLoadingScreen()
         window.onkeydown = { event ->
             if (event.key == "Escape") {
                 BackNavigationHandler.execute()
@@ -39,6 +39,8 @@ fun main() {
     }
 }
 
+// Remove all the loading screen elements from the DOM.
+// They are defined directly inside `index.html`.
 private fun clearLoadingScreen() {
     document.body?.innerHTML = ""
 }
