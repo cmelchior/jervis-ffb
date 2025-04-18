@@ -1,75 +1,108 @@
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package com.jervisffb.utils
 
-import okio.FileHandle
-import okio.FileMetadata
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.flow.first
 import okio.FileSystem
 import okio.Path
-import okio.Sink
-import okio.Source
+import okio.Path.Companion.toPath
+import okio.buffer
+import okio.use
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSURL
+import platform.Foundation.NSUserDomainMask
 
 // TODO We are mostly using this for replay files. Probably this can be hidden behind some kind of better
 //  interface
-actual val platformFileSystem: FileSystem = object: FileSystem() {
-    override fun appendingSink(file: Path, mustExist: Boolean): Sink {
-        TODO("Not yet implemented")
-    }
-    override fun atomicMove(source: Path, target: Path) { /* Do nothing */ }
-    override fun canonicalize(path: Path): Path = path
-    override fun createDirectory(dir: Path, mustCreate: Boolean) { /* Do nothing */ }
-    override fun createSymlink(source: Path, target: Path) { /* Do nothing */ }
-    override fun delete(path: Path, mustExist: Boolean) { /* Do nothing */ }
-    override fun list(dir: Path): List<Path> = emptyList()
-    override fun listOrNull(dir: Path): List<Path>? = null
-    override fun metadataOrNull(path: Path): FileMetadata? = null
-
-    override fun openReadOnly(file: Path): FileHandle {
-        TODO("Not yet implemented")
-    }
-
-    override fun openReadWrite(file: Path, mustCreate: Boolean, mustExist: Boolean): FileHandle {
-        TODO("Not yet implemented")
-    }
-
-    override fun sink(file: Path, mustCreate: Boolean): Sink {
-        TODO("Not yet implemented")
-    }
-
-    override fun source(file: Path): Source {
-        TODO("Not yet implemented")
-    }
+actual val platformFileSystem: FileSystem = FileSystem.SYSTEM
+actual val APPLICATION_DIRECTORY: String by lazy {
+    NSSearchPathForDirectoriesInDomains(
+        NSDocumentDirectory,
+        NSUserDomainMask,
+        true
+    ).first() as String
 }
-actual val APPLICATION_DIRECTORY: String = "TODO"
 
 actual class FileManager {
 
     actual suspend fun getFilesWithExtension(directory: String, extension: String): List<Path> {
-        TODO()
+        val dirPath = "$APPLICATION_DIRECTORY/$directory".toPath()
+        return platformFileSystem.listOrNull(dirPath)
+            ?.filter { it.name.endsWith(extension) }
+            ?.map { it.toString().substringAfter("$APPLICATION_DIRECTORY/") }
+            ?.map { it.toPath() }
+            ?: emptyList()
     }
+
     actual suspend fun getFile(path: String): ByteArray? {
-        TODO()
+        val filePath = "$APPLICATION_DIRECTORY/$path".toPath()
+        return if (platformFileSystem.exists(filePath)) {
+            platformFileSystem.source(filePath).use { source ->
+                source.buffer().readByteArray()
+            }
+        } else {
+            null
+        }
     }
+
     actual suspend fun writeFile(dir: String, fileName: String, fileContent: ByteArray) {
-        TODO()
+        platformFileSystem.createDirectories("$APPLICATION_DIRECTORY/$dir".toPath())
+        platformFileSystem.write("$APPLICATION_DIRECTORY/$dir/$fileName".toPath()) {
+            write(fileContent)
+        }
     }
 }
 
 actual class PropertiesManager actual constructor() {
 
+    @OptIn(ExperimentalForeignApi::class)
+    private val store = PreferenceDataStoreFactory.createWithPath(
+        produceFile = {
+            val documentDirectory: NSURL = NSFileManager.defaultManager.URLForDirectory(
+                directory = NSDocumentDirectory,
+                inDomain = NSUserDomainMask,
+                appropriateForURL = null,
+                create = false,
+                error = null,
+            ) ?: error("Could not get document directory")
+            val dataStoreFileName = "settings.preferences_pb"
+            (documentDirectory.path + "/$dataStoreFileName").toPath()
+        }
+    )
+
     actual fun getSystemEnv(key: String): String {
-        TODO()
+        TODO("`getSystemEnv()` not yet implemented")
     }
 
     actual suspend fun getString(key: String): String? {
-        TODO()
+        return store.data.first()[stringPreferencesKey(key)]
     }
+
     actual suspend fun getBoolean(key: String): Boolean? {
-        TODO()
+        return store.data.first()[booleanPreferencesKey(key)]
     }
+
     actual suspend fun getInt(key: String): Int? {
-        TODO()
+        return store.data.first()[intPreferencesKey(key)]
     }
+
     actual suspend fun setProperty(key: String, value: Any?) {
-        TODO()
+        store.edit { props ->
+            when (value) {
+                is String -> props[stringPreferencesKey(key)] = value
+                is Boolean -> props[booleanPreferencesKey(key)] = value
+                is Int -> props[intPreferencesKey(key)] = value
+                else -> throw IllegalArgumentException("Unsupported value type: ${value?.let { it::class.simpleName }}")
+            }
+        }
     }
 }
 

@@ -7,7 +7,7 @@ actual fun saveFile(
     fileName: String,
     fileContent: String,
     extensionFilterDescription: String,
-    extensionFilterType: String
+    extensionFilterFileType: String,
 ) {
     // TODO
 }

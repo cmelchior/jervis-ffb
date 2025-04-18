@@ -28,8 +28,8 @@ coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines
 cryptography-core = { group = "dev.whyoleg.cryptography", name = "cryptography-core", version.ref = "cryptography" }
 cryptography-provider-jdk = { group = "dev.whyoleg.cryptography", name = "cryptography-provider-jdk", version.ref = "cryptography" }
 cryptography-provider-webcrypto = { group = "dev.whyoleg.cryptography", name = "cryptography-provider-webcrypto", version.ref = "cryptography" }
-datastore = { group = "androidx.datastore", name = "datastore-jvm", version.ref = "datastore"}
-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences-jvm", version.ref = "datastore"}
+datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore"}
+datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore"}
 jgit = { group = "org.eclipse.jgit", name = "org.eclipse.jgit", version.ref = "jgit" }
 jsonserialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 kermit  = { group = "co.touchlab", name = "kermit", version.ref = "kermit" }

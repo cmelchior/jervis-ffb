@@ -68,6 +68,8 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
                 implementation(libs.ktor.client.darwin)
+                implementation(libs.datastore)
+                implementation(libs.datastore.preferences)
             }
         }
     }

@@ -1,3 +1,5 @@
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package com.jervisffb.utils
 
 import Database
@@ -52,7 +54,6 @@ object DatabaseManager {
     }
 
 }
-
 
 // TODO We are mostly using this for replay files. Probably this can be hidden behind some kind of better
 //  interface
@@ -135,7 +136,7 @@ actual class FileManager {
 actual class PropertiesManager actual constructor() {
 
     actual fun getSystemEnv(key: String): String {
-        TODO()
+        TODO("`getSystemEnv` not implemented on WASM")
     }
 
     actual suspend fun getString(key: String): String? {
