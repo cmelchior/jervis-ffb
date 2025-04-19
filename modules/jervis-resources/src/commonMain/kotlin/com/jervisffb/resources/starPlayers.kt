@@ -28,8 +28,8 @@ val THE_BLACK_GOBBO =  StarPlayerPosition(
         STUNTY.id()
     ),
     listOf(RegionalSpecialRule.BADLANDS_BRAWL, RegionalSpecialRule.UNDERWORLD_CHALLENGE),
-    SpriteSheet.embedded("$iconRootPath/TheBlackGobbo.png",1),
-    SingleSprite.embedded("$portraitRootPath/TheBlackGobbo.png")
+    SpriteSheet.ini("$iconRootPath/TheBlackGobbo.png",1),
+    SingleSprite.ini("$portraitRootPath/TheBlackGobbo.png")
 )
 
 val STAR_PLAYERS = listOf(

@@ -147,23 +147,14 @@ of the following modules:
 
 ### UI Resources
 
-The Jervis Client is heavily inspired by [FUMBBL](https://github.com/christerk/ffb) 
-and borrows many of its assets from there. All rights and credits go to 
-their respective authors.
+The Jervis Client is heavily inspired by [FUMBBL](https://github.com/christerk/ffb)
+and borrows many of its assets from there. They are used with permission. All rights 
+and credits go to [their respective authors](https://fumbbl.com/p/attribution), and 
+they cannot be re-distributed without permission. 
 
-It is possible to sync the latest FUMBBL resource with the Jervis project
-by using this gradle command:
-
-```
-./gradlew updateFFBResources
-```
-
-This task will clone the FFB repository, take the resource folder and 
-flatten it so it is usable by Compose Multiplatform and then finally moving it
-into place in the project so it is ready for immediate use.
-
-See https://youtrack.jetbrains.com/issue/CMP-4196 for more details on why
-this is needed.
+If you are the author of any icons or other resources and don't want them used in this
+project, please contact christianmelchior at gmail dot com, and they will be removed
+immediately.
 
 
 ## Why Jervis?

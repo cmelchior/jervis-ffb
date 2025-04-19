@@ -41,12 +41,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.frontpage_elf_vs_skeleton
-import com.jervisffb.jervis_ui.generated.resources.frontpage_griff
-import com.jervisffb.jervis_ui.generated.resources.frontpage_mummy
-import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
-import com.jervisffb.jervis_ui.generated.resources.icon_menu_back
-import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
+import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_elf_vs_skeleton
+import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_griff
+import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_mummy
+import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_wall_player
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_back
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.SideBarEntryState
 import com.jervisffb.ui.game.view.utils.OrangeTitleBorder
@@ -102,7 +102,7 @@ fun MenuScreenWithSidebarAndTitle(
                     topMenuRightContent?.let {
                         it(this)
                     }
-                    TopbarButton(Res.drawable.icon_menu_settings, "Settings", onClick = { menuViewModel.openSettings(true) })
+                    TopbarButton(Res.drawable.jervis_icon_menu_settings, "Settings", onClick = { menuViewModel.openSettings(true) })
                 }
             }
             Box(modifier = Modifier
@@ -119,34 +119,34 @@ fun MenuScreenWithSidebarAndTitle(
         }
         MenuSidebar(menuViewModel, sidebarContent, topMenuLeftContent)
         when (icon) {
-            Res.drawable.frontpage_griff -> {
+            Res.drawable.jervis_frontpage_griff -> {
                 Image(
                     modifier = Modifier.align(Alignment.BottomStart).width(330.dp).offset(x = -10.dp, y = 0.dp).scale(scaleX = 1f, scaleY = 1f),
-                    painter = painterResource(Res.drawable.frontpage_griff),
+                    painter = painterResource(Res.drawable.jervis_frontpage_griff),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
                 )
             }
-            Res.drawable.frontpage_elf_vs_skeleton -> {
+            Res.drawable.jervis_frontpage_elf_vs_skeleton -> {
                 Image(
                     modifier = Modifier.align(Alignment.BottomStart).width(330.dp).offset(x = 10.dp, y = 10.dp),
-                    painter = painterResource(Res.drawable.frontpage_elf_vs_skeleton),
+                    painter = painterResource(Res.drawable.jervis_frontpage_elf_vs_skeleton),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
                 )
             }
-            Res.drawable.frontpage_wall_player -> {
+            Res.drawable.jervis_frontpage_wall_player -> {
                 Image(
                     modifier = Modifier.align(Alignment.BottomStart).width(420.dp).offset(x = 0.dp, y = 20.dp),
-                    painter = painterResource(Res.drawable.frontpage_wall_player),
+                    painter = painterResource(Res.drawable.jervis_frontpage_wall_player),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
                 )
             }
-            Res.drawable.frontpage_mummy -> {
+            Res.drawable.jervis_frontpage_mummy -> {
                 Image(
                     modifier = Modifier.align(Alignment.BottomStart).width(340.dp).offset(x = -0.dp /*-40.dp*/, y = 0.dp /*15.dp*/),
-                    painter = painterResource(Res.drawable.frontpage_mummy),
+                    painter = painterResource(Res.drawable.jervis_frontpage_mummy),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
                 )
@@ -209,7 +209,7 @@ fun MenuSidebar(menuViewModel: MenuViewModel, sidebarContent: @Composable BoxSco
     ) {
         sidebarContent()
         Row(modifier = Modifier.padding(start = 0.dp, top = 4.dp)) {
-            TopbarButton(Res.drawable.icon_menu_back, "Back", onClick = { menuViewModel.backToLastScreen() })
+            TopbarButton(Res.drawable.jervis_icon_menu_back, "Back", onClick = { menuViewModel.backToLastScreen() })
             topMenuLeftContent?.let { it(this) }
         }
     }

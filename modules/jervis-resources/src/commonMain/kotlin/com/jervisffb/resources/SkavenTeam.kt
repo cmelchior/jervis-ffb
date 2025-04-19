@@ -32,8 +32,8 @@ val SKAVEN_LINEMAN =
         emptyList(),
         listOf(SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
-        SpriteSheet.embedded("$iconRootPath/skaven_lineman.png", 9),
-        SingleSprite.embedded("$portraitRootPath/skaven_lineman.png")
+        SpriteSheet.ini("$iconRootPath/skaven_lineman.png", 9),
+        SingleSprite.ini("$portraitRootPath/skaven_lineman.png")
 
     )
 val SKAVEN_THROWER =
@@ -48,8 +48,8 @@ val SKAVEN_THROWER =
         listOf(PASS.id(), SURE_HANDS.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
-        SpriteSheet.embedded("$iconRootPath/skaven_thrower.png", 2),
-        SingleSprite.embedded("$portraitRootPath/skaven_thrower.png")
+        SpriteSheet.ini("$iconRootPath/skaven_thrower.png", 2),
+        SingleSprite.ini("$portraitRootPath/skaven_thrower.png")
     )
 val GUTTER_RUNNER =
     RosterPosition(
@@ -63,8 +63,8 @@ val GUTTER_RUNNER =
         listOf(DODGE.id()),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.MUTATIONS, SkillCategory.PASSING, SkillCategory.STRENGTH),
-        SpriteSheet.embedded("$iconRootPath/skaven_gutterrunner.png", 4),
-        SingleSprite.embedded("$portraitRootPath/skaven_gutterrunner.png")
+        SpriteSheet.ini("$iconRootPath/skaven_gutterrunner.png", 4),
+        SingleSprite.ini("$portraitRootPath/skaven_gutterrunner.png")
     )
 val SKAVEN_BLITZER =
     RosterPosition(
@@ -78,8 +78,8 @@ val SKAVEN_BLITZER =
         listOf(BLOCK.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.PASSING),
-        SpriteSheet.embedded("$iconRootPath/skaven_blitzer.png", 2),
-        SingleSprite.embedded("$portraitRootPath/skaven_blitzer.png")
+        SpriteSheet.ini("$iconRootPath/skaven_blitzer.png", 2),
+        SingleSprite.ini("$portraitRootPath/skaven_blitzer.png")
     )
 val RAT_OGRE =
     RosterPosition(
@@ -99,8 +99,8 @@ val RAT_OGRE =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL, SkillCategory.MUTATIONS),
-        SpriteSheet.embedded("$iconRootPath/skaven_ratogre.png", 1),
-        SingleSprite.embedded("$portraitRootPath/skaven_ratogre.png")
+        SpriteSheet.ini("$iconRootPath/skaven_ratogre.png", 1),
+        SingleSprite.ini("$portraitRootPath/skaven_ratogre.png")
     )
 
 // Page 116 in the rulebook
@@ -121,7 +121,7 @@ val SKAVEN_TEAM = BB2020Roster(
         RAT_OGRE,
     ),
     logo = RosterLogo(
-        large = SingleSprite.embedded("roster/logo/roster_logo_jervis_skaven_large.png"),
-        small = SingleSprite.embedded("roster/logo/roster_logo_jervis_skaven_small.png")
+        large = SingleSprite.embedded("jervis/roster/logo_skaven_large.png"),
+        small = SingleSprite.embedded("jervis/roster/logo_skaven_small.png")
     )
 )

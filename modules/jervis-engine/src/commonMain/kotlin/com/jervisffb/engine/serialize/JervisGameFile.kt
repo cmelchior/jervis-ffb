@@ -88,9 +88,16 @@ data class RosterLogo(
     }
 }
 
+/**
+ * Enum describing where a sprite is coming from.
+ */
 enum class SpriteLocation {
+    // The sprite is included in the application bundle and is under `composeResources`.
     EMBEDDED,
-    URL
+    // The sprite is hosted on a remote server.
+    URL,
+    // The sprite is provided by FUMBBL and its remote location is defined by its ini file.
+    FUMBBL_INI
 }
 
 fun normalizeFumbblIconPath(path: String): String {
@@ -116,15 +123,38 @@ data class SingleSprite(
     override val resource: String,
 ): SpriteSource {
     companion object {
+        /**
+         * Points to a sprite included in the application bundle.
+         * Path is relative from `/jervis-ui/src/commonMain/composeResources/files`.
+         */
         fun embedded(path: String): SingleSprite {
             return SingleSprite(SpriteLocation.EMBEDDED, path)
         }
+
+        /**
+         * Used for relative URLS like those provided by the FUMBBL Rest API. They normally
+         * look like just a number "123456" or "i/123456"
+         */
         fun url(url: String): SingleSprite {
             return SingleSprite(SpriteLocation.URL, url)
         }
+
+        /**
+         * Used for relative URLS like those provided by the FUMBBL Rest API. They normally
+         * look like just a number "123456" or "i/123456"
+         */
         fun fumbbl(path: String): SingleSprite {
             val relativePath = normalizeFumbblIconPath(path)
             return SingleSprite(SpriteLocation.URL, "https://fumbbl.com/$relativePath")
+        }
+
+        /**
+         * Used for paths defined by the FUMBBL `.ini` file. Entries in that look like this:
+         * `https\://cdn.fumbbl.com/i/318581=players/portraits/chaoschosen_minotaur.png` and it
+         * is the later that should be used here, e.g. `players/portraits/chaoschosen_minotaur.png`
+         */
+        fun ini(path: String): SingleSprite {
+            return SingleSprite(SpriteLocation.FUMBBL_INI, path)
         }
     }
 }
@@ -133,21 +163,46 @@ data class SingleSprite(
 data class SpriteSheet(
     override val type: SpriteLocation,
     override val resource: String,
-    // How many variants in the spritesheet. If `null` we need to calculate it after fetching the sheet
+    // How many variants in the spritesheet. If `null` we need to calculate it after fetching the sheet.
+    // The calculation is done based on the assumption that there are 4 player images per row.
     val variants: Int? = null,
     // Which entry in the sheet to use. If `null`, one will be automatically selected
     val selectedIndex: Int? = null,
 ): SpriteSource {
     companion object {
+
+        /**
+         * Points to a sprite included in the application bundle.
+         * Path is relative from `/jervis-ui/src/commonMain/composeResources/files`.
+         */
         fun embedded(path: String, variants: Int, selectedIndex: Int? = null): SpriteSheet {
             return SpriteSheet(SpriteLocation.EMBEDDED, path, variants, selectedIndex)
         }
-        fun url(path: String, variants: Int, selectedIndex: Int? = null): SpriteSheet {
+
+        /**
+         * Points to a sprite hosted on a remote server.
+         * Path should be a valid URL.
+         */
+        fun url(path: String, variants: Int? = null, selectedIndex: Int? = null): SpriteSheet {
             return SpriteSheet(SpriteLocation.URL, path, variants, selectedIndex)
         }
+
+        /**
+         * Used for relative URLS like those provided by the FUMBBL Rest API. They normally
+         * look like just a number "123456" or "i/123456"
+         */
         fun fumbbl(path: String, variants: Int? = null, selectedIndex: Int? = null): SpriteSheet {
             val relativePath = normalizeFumbblIconPath(path)
             return SpriteSheet(SpriteLocation.URL, "https://fumbbl.com/$relativePath", variants, selectedIndex)
+        }
+
+        /**
+         * Used for paths defined by the FUMBBL `.ini` file. Entries in that looks like this:
+         * `https\://cdn.fumbbl.com/i/318581=players/portraits/chaoschosen_minotaur.png` and it
+         * is the later that should be used here, e.g. `players/portraits/chaoschosen_minotaur.png`
+         */
+        fun ini(path: String, variants: Int? = null, selectedIndex: Int? = null): SpriteSheet {
+            return SpriteSheet(SpriteLocation.FUMBBL_INI, path, variants, selectedIndex)
         }
     }
 }

@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.icon_menu_folder
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_folder
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import org.jetbrains.compose.resources.painterResource
@@ -69,7 +69,7 @@ fun LoadFileComponent(viewModel: LoadFileComponentModel) {
                     Image(
                         modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
                         colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
-                        painter = painterResource(Res.drawable.icon_menu_folder),
+                        painter = painterResource(Res.drawable.jervis_icon_menu_folder),
                         contentDescription = "Find Save File",
                     )
                 }

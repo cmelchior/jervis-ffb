@@ -26,8 +26,8 @@ val ELVEN_LINEMAN =
         emptyList(),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.GENERAL),
-        SpriteSheet.embedded("$iconRootPath/elvenunion_lineman.png",8),
-        SingleSprite.embedded("$portraitRootPath/elvenunion_lineman.png")
+        SpriteSheet.ini("$iconRootPath/elvenunion_lineman.png",8),
+        SingleSprite.ini("$portraitRootPath/elvenunion_lineman.png")
     )
 val ELVEN_THROWER =
     RosterPosition(
@@ -41,8 +41,8 @@ val ELVEN_THROWER =
         listOf(PASS.id()),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL, SkillCategory.PASSING),
         listOf(SkillCategory.GENERAL),
-        SpriteSheet.embedded("$iconRootPath/elvenunion_thrower.png",2),
-        SingleSprite.embedded("$portraitRootPath/elvenunion_thrower.png")
+        SpriteSheet.ini("$iconRootPath/elvenunion_thrower.png",2),
+        SingleSprite.ini("$portraitRootPath/elvenunion_thrower.png")
     )
 val ELVEN_CATCHER =
     RosterPosition(
@@ -56,8 +56,8 @@ val ELVEN_CATCHER =
         listOf(CATCH.id(), /* Nerves Of Steel */),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.GENERAL),
-        SpriteSheet.embedded("$iconRootPath/elvenunion_catcher.png", 4),
-        SingleSprite.embedded("$portraitRootPath/elvenunion_catcher.png")
+        SpriteSheet.ini("$iconRootPath/elvenunion_catcher.png", 4),
+        SingleSprite.ini("$portraitRootPath/elvenunion_catcher.png")
     )
 val ELVEN_BLITZER =
     RosterPosition(
@@ -71,8 +71,8 @@ val ELVEN_BLITZER =
         listOf(BLOCK.id(), SkillType.SIDESTEP.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
-        SpriteSheet.embedded("$iconRootPath/elvenunion_blitzer.png", 2),
-        SingleSprite.embedded("$portraitRootPath/elvenunion_blitzer.png")
+        SpriteSheet.ini("$iconRootPath/elvenunion_blitzer.png", 2),
+        SingleSprite.ini("$portraitRootPath/elvenunion_blitzer.png")
     )
 
 @Serializable
@@ -90,8 +90,5 @@ val ELVEN_UNION_TEAM = BB2020Roster(
         ELVEN_CATCHER,
         ELVEN_BLITZER
     ),
-    logo = RosterLogo(
-        large = SingleSprite.embedded("roster/logo/roster_logo_elven_union.png"),
-        small = SingleSprite.embedded("roster/logo/roster_logo_elven_union.png")
-    )
+    logo = RosterLogo.NONE
 )

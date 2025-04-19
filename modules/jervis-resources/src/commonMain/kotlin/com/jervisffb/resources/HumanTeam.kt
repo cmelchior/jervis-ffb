@@ -42,8 +42,8 @@ val HUMAN_LINEMAN =
         emptyList(),
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
-        SpriteSheet.embedded("$iconRootPath/human_lineman.png",8),
-        SingleSprite.embedded("$portraitRootPath/human_lineman.png")
+        SpriteSheet.ini("$iconRootPath/human_lineman.png",8),
+        SingleSprite.ini("$portraitRootPath/human_lineman.png")
 
     )
 val HUMAN_THROWER =
@@ -61,8 +61,8 @@ val HUMAN_THROWER =
         ),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
-        SpriteSheet.embedded("$iconRootPath/human_thrower.png",2),
-        SingleSprite.embedded("$portraitRootPath/human_thrower.png")
+        SpriteSheet.ini("$iconRootPath/human_thrower.png",2),
+        SingleSprite.ini("$portraitRootPath/human_thrower.png")
     )
 val HUMAN_CATCHER =
     RosterPosition(
@@ -79,8 +79,8 @@ val HUMAN_CATCHER =
         ),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
-        SpriteSheet.embedded("$iconRootPath/human_catcher.png", 4),
-        SingleSprite.embedded("$portraitRootPath/human_catcher.png")
+        SpriteSheet.ini("$iconRootPath/human_catcher.png", 4),
+        SingleSprite.ini("$portraitRootPath/human_catcher.png")
     )
 val HUMAN_BLITZER =
     RosterPosition(
@@ -94,8 +94,8 @@ val HUMAN_BLITZER =
         listOf(BLOCK.id()),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY, PASSING),
-        SpriteSheet.embedded("$iconRootPath/human_blitzer.png", 4),
-        SingleSprite.embedded("$portraitRootPath/human_blitzer.png")
+        SpriteSheet.ini("$iconRootPath/human_blitzer.png", 4),
+        SingleSprite.ini("$portraitRootPath/human_blitzer.png")
     )
 val HALFLING_HOPEFUL =
     RosterPosition(
@@ -113,8 +113,8 @@ val HALFLING_HOPEFUL =
         ),
         listOf(AGILITY),
         listOf(GENERAL, STRENGTH),
-        SpriteSheet.embedded("$iconRootPath/human_halflinghopeful.png", 8),
-        SingleSprite.embedded("$portraitRootPath/human_halflinghopeful.png")
+        SpriteSheet.ini("$iconRootPath/human_halflinghopeful.png", 8),
+        SingleSprite.ini("$portraitRootPath/human_halflinghopeful.png")
     )
 val OGRE =
     RosterPosition(
@@ -134,8 +134,8 @@ val OGRE =
         ),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL),
-        SpriteSheet.embedded("$iconRootPath/human_ogre.png", 8),
-        SingleSprite.embedded("$portraitRootPath/human_ogre.png")
+        SpriteSheet.ini("$iconRootPath/human_ogre.png", 8),
+        SingleSprite.ini("$portraitRootPath/human_ogre.png")
     )
 
 val HUMAN_TEAM = BB2020Roster(
@@ -155,7 +155,7 @@ val HUMAN_TEAM = BB2020Roster(
         OGRE,
     ),
     logo = RosterLogo(
-        large = SingleSprite.embedded("roster/logo/roster_logo_jervis_human_large.png"),
-        small = SingleSprite.embedded("roster/logo/roster_logo_jervis_human_small.png")
+        large = SingleSprite.embedded("jervis/roster/logo_human_large.png"),
+        small = SingleSprite.embedded("jervis/roster/logo_human_small.png")
     )
 )

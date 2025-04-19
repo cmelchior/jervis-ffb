@@ -19,7 +19,7 @@ actual object SoundManager {
 
     actual suspend fun initialize() {
         SoundEffect.entries.forEach { soundEffect ->
-            val uri = Res.getUri("files/sounds/${soundEffect.fileName}")
+            val uri = Res.getUri("files/fumbbl/sounds/${soundEffect.fileName}")
             sounds[soundEffect] = uri
         }
     }

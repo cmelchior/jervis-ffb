@@ -26,9 +26,9 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.frontpage_krox
-import com.jervisffb.jervis_ui.generated.resources.icon_menu_back
-import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
+import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_krox
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_back
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -59,9 +59,9 @@ fun MenuScreenWithTitle(
                 Row(
                     modifier = Modifier.align(Alignment.TopStart).padding(start = 16.dp, top = 4.dp, end = 8.dp, bottom = 16.dp)
                 ) {
-                    TopbarButton(Res.drawable.icon_menu_back, "Back", onClick = { menuViewModel.backToLastScreen() })
+                    TopbarButton(Res.drawable.jervis_icon_menu_back, "Back", onClick = { menuViewModel.backToLastScreen() })
                     Spacer(modifier = Modifier.weight(1f))
-                    TopbarButton(Res.drawable.icon_menu_settings, "Settings", onClick = { menuViewModel.openSettings(true) })
+                    TopbarButton(Res.drawable.jervis_icon_menu_settings, "Settings", onClick = { menuViewModel.openSettings(true) })
                 }
             }
             Box(modifier = Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
@@ -74,7 +74,7 @@ fun MenuScreenWithTitle(
 
         Image(
             modifier = Modifier.align(Alignment.BottomEnd).fillMaxWidth(0.35f).offset(x = -50.dp, y = 0.dp).scale(1f,1f),
-            bitmap = imageResource(Res.drawable.frontpage_krox),
+            bitmap = imageResource(Res.drawable.jervis_frontpage_krox),
             contentDescription = null,
             contentScale = ContentScale.FillWidth,
         )

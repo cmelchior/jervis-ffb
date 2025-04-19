@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kuusisto.tinysound.Sound
 import kuusisto.tinysound.TinySound
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import java.io.File
+import java.net.URI
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object SoundManager {
@@ -22,8 +22,9 @@ actual object SoundManager {
         TinySound.init()
         TinySound.setGlobalVolume(0.5)
         SoundEffect.entries.forEach {soundEffect ->
-            val path = Res.getUri("files/sounds/${soundEffect.fileName}").removePrefix("file:")
-            val sound = TinySound.loadSound(File(path))
+            val path = Res.getUri("files/fumbbl/sounds/${soundEffect.fileName}")
+            val url = URI(path).toURL()
+            val sound = TinySound.loadSound(url)
             sounds[soundEffect] = sound
         }
     }
@@ -31,7 +32,7 @@ actual object SoundManager {
     @OptIn(DelicateCoroutinesApi::class)
     actual fun play(sound: SoundEffect) {
         GlobalScope.launch(Dispatchers.Unconfined) {
-            sounds[sound]!!.play()
+            sounds[sound]?.play() ?: error("SoundEffect not found: $sound")
             delay(sound.lengthMs.toLong())
         }
     }

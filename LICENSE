@@ -215,7 +215,16 @@ TABLE OF CONTENTS
 
 2. -- FFB Graphic and Sound Components ---------------------------------------
 
-   All graphic and sound files present in
+   Many graphic and sound files present in
    "/modules/jervis-ui/src/commonMain/composeResources" are copyright by the
    FFB project (https://github.com/christerk/ffb) and cannot be redistributed
    without explicit permission by https://github.com/christerk.
+
+   This includes the following:
+
+   - All images in "/modules/jervis-ui/src/commonMain/composeResources/drawable"
+     that does not start with "jervis_".
+   - All files in "/modules/jervis-ui/src/commonMain/composeResources/files/fumbbl".
+
+   All other assets are covered by the general Apache 2 License for the Jervis
+   project.

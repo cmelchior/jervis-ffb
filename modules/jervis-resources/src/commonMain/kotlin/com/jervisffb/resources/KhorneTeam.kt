@@ -27,8 +27,8 @@ val BLOODBORN_MARAUDER_LINEMEN =
         listOf(FRENZY.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
-        SpriteSheet.embedded("$iconRootPath/khorne_bloodbornmarauderlineman.png",7),
-        SingleSprite.embedded("$portraitRootPath/khorne_bloodbornmarauderlineman.png")
+        SpriteSheet.ini("$iconRootPath/khorne_bloodbornmarauderlineman.png",7),
+        SingleSprite.ini("$portraitRootPath/khorne_bloodbornmarauderlineman.png")
     )
 val KHORNGORS =
     RosterPosition(
@@ -42,8 +42,8 @@ val KHORNGORS =
         listOf(HORNS.id() /*, Juggernaut */),
         listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
-        SpriteSheet.embedded("$iconRootPath/khorne_khorngor.png",4),
-        SingleSprite.embedded("$portraitRootPath/khorne_khorngor.png")
+        SpriteSheet.ini("$iconRootPath/khorne_khorngor.png",4),
+        SingleSprite.ini("$portraitRootPath/khorne_khorngor.png")
     )
 val BLOODSEEKERS =
     RosterPosition(
@@ -57,8 +57,8 @@ val BLOODSEEKERS =
         listOf(FRENZY.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
-        SpriteSheet.embedded("$iconRootPath/khorne_bloodseeker.png", 4),
-        SingleSprite.embedded("$portraitRootPath/khorne_bloodseeker.png")
+        SpriteSheet.ini("$iconRootPath/khorne_bloodseeker.png", 4),
+        SingleSprite.ini("$portraitRootPath/khorne_bloodseeker.png")
     )
 val BLOODSPAWN =
     RosterPosition(
@@ -78,8 +78,8 @@ val BLOODSPAWN =
         ),
         listOf(SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
-        SpriteSheet.embedded("$iconRootPath/khorne_bloodspawn.png", 1),
-        SingleSprite.embedded("$portraitRootPath/khorne_bloodspawn.png")
+        SpriteSheet.ini("$iconRootPath/khorne_bloodspawn.png", 1),
+        SingleSprite.ini("$portraitRootPath/khorne_bloodspawn.png")
     )
 
 // See Spike! Journal Issue 13
@@ -98,7 +98,7 @@ val KHORNE_TEAM = BB2020Roster(
         BLOODSPAWN,
     ),
     logo = RosterLogo(
-        large = SingleSprite.embedded("roster/logo/roster_logo_jervis_khorne_large.png"),
-        small = SingleSprite.embedded("roster/logo/roster_logo_jervis_khorne_small.png")
+        large = SingleSprite.embedded("jervis/roster/logo_khorne_large.png"),
+        small = SingleSprite.embedded("jervis/roster/logo_khorne_small.png")
     )
 )

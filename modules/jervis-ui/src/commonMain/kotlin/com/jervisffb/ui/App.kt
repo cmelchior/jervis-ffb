@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
+import com.jervisffb.ui.game.icons.IconFactory.initializeFumbblMapping
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.BackNavigationHandler
@@ -23,6 +24,10 @@ val PROPERTIES_MANAGER = PropertiesManager()
 suspend fun initApplication() {
     initializePlatform()
     val LOG = jervisLogger()
+
+    // Populate FUMMBL image mapping, so `IconFactory` knows where to download
+    // images from.
+    initializeFumbblMapping()
 
     // For now, we re-initialize the default teams for every new version. This is done because
     //  we are still iterating on the fileformat and serialization format. Once these are

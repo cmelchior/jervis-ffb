@@ -33,12 +33,10 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextPainter.paint
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.FontLoadResult
@@ -55,8 +53,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.frontpage_orc
-import com.jervisffb.jervis_ui.generated.resources.icon_menu_settings
+import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_orc
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.OrangeTitleBorder
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -70,7 +68,6 @@ import org.jetbrains.skia.ISize
 import org.jetbrains.skia.TextLine
 import kotlin.math.PI
 import kotlin.math.atan
-import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -161,7 +158,7 @@ private fun FrontpageScreen.PageContent(menuViewModel: MenuViewModel) {
                             "Dev Mode",
                             onClick = { viewModel.gotoDevModeScreen(navigator) })
                         TopbarButton(
-                            Res.drawable.icon_menu_settings,
+                            Res.drawable.jervis_icon_menu_settings,
                             "Settings",
                             onClick = { menuViewModel.openSettings(true) })
                     }
@@ -201,7 +198,7 @@ private fun FrontpageScreen.PageContent(menuViewModel: MenuViewModel) {
         ) {
             Image(
                 modifier = Modifier.fillMaxHeight(0.63f).fillMaxWidth(0.3f).offset(x = -25.dp, y = 25.dp),
-                bitmap = imageResource(Res.drawable.frontpage_orc),
+                bitmap = imageResource(Res.drawable.jervis_frontpage_orc),
                 contentDescription = null,
                 alignment = Alignment.BottomEnd,
                 contentScale = ContentScale.Fit,

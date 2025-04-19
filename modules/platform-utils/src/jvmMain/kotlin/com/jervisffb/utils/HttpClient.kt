@@ -17,7 +17,7 @@ actual fun getHttpClient(): HttpClient {
     return HttpClient(OkHttp) {
         install(Logging) {
             logger = Logger.DEFAULT
-            level = LogLevel.ALL
+            level = LogLevel.NONE
         }
         // We should allow redirects for all types, not just GET and HEAD
         // See https://github.com/ktorio/ktor/issues/1793

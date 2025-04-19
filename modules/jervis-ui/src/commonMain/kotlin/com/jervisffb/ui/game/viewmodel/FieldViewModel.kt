@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 enum class FieldDetails(val resource: String, val description: String) {
-    NICE("icons/cached/pitches/default/nice.png", "Nice Weather"),
+    NICE("fumbbl/icons/cached/pitches/default/nice.png", "Nice Weather"),
 }
 
 /**

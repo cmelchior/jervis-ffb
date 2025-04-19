@@ -29,8 +29,8 @@ val HOBGOBLIN_LINEMEN =
         emptyList(),
         listOf(SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
-        SpriteSheet.embedded("$iconRootPath/chaosdwarf_hobgoblinlineman.png", 10),
-        SingleSprite.embedded("$portraitRootPath/chaosdwarf_hobgoblinlineman.png")
+        SpriteSheet.ini("$iconRootPath/chaosdwarf_hobgoblinlineman.png", 10),
+        SingleSprite.ini("$portraitRootPath/chaosdwarf_hobgoblinlineman.png")
     )
 val CHAOS_DWARF_BLOCKERS =
     RosterPosition(
@@ -44,8 +44,8 @@ val CHAOS_DWARF_BLOCKERS =
         listOf(BLOCK.id(), TACKLE.id(), THICK_SKULL.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS),
-        SpriteSheet.embedded("$iconRootPath/chaosdwarf_chaosdwarfblocker.png", 6),
-        SingleSprite.embedded("$portraitRootPath/chaosdwarf_chaosdwarfblocker.png")
+        SpriteSheet.ini("$iconRootPath/chaosdwarf_chaosdwarfblocker.png", 6),
+        SingleSprite.ini("$portraitRootPath/chaosdwarf_chaosdwarfblocker.png")
     )
 val BULL_CENTAUR_BLITZERS =
     RosterPosition(
@@ -63,8 +63,8 @@ val BULL_CENTAUR_BLITZERS =
         ),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
-        SpriteSheet.embedded("$iconRootPath/chaosdwarf_bullcentaurblitzer.png", 2),
-        SingleSprite.embedded("$portraitRootPath/chaosdwarf_bullcentaurblitzer.png")
+        SpriteSheet.ini("$iconRootPath/chaosdwarf_bullcentaurblitzer.png", 2),
+        SingleSprite.ini("$portraitRootPath/chaosdwarf_bullcentaurblitzer.png")
     )
 val ENSLAVED_MINOTAUR =
     RosterPosition(
@@ -78,8 +78,8 @@ val ENSLAVED_MINOTAUR =
         emptyList(),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.STRENGTH, SkillCategory.PASSING),
-        SpriteSheet.embedded("$iconRootPath/chaosdwarf_enslavedminotaur.png",1),
-        SingleSprite.embedded("$portraitRootPath/chaosdwarf_enslavedminotaur.png")
+        SpriteSheet.ini("$iconRootPath/chaosdwarf_enslavedminotaur.png",1),
+        SingleSprite.ini("$portraitRootPath/chaosdwarf_enslavedminotaur.png")
     )
 
 // See Teams of Legend: https://www.warhammer-community.com/wp-content/uploads/2020/11/lFZy1SIuNmWvxPj1.pdf
@@ -107,8 +107,5 @@ val CHAOS_DWARF_TEAM = BB2020Roster(
         BULL_CENTAUR_BLITZERS,
         ENSLAVED_MINOTAUR,
     ),
-    logo = RosterLogo(
-        large = SingleSprite.embedded("roster/logo/roster_logo_chaos_dwarf.png"),
-        small = SingleSprite.embedded("roster/logo/roster_logo_chaos_dwarf.png")
-    )
+    logo = RosterLogo.NONE
 )

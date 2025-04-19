@@ -128,18 +128,6 @@ tasks.register("buildTools") {
     dependsOn("copyClientDownloaderJar")
 }
 
-val subprojects = listOf(
-    "modules/fumbbl-cli",
-    "modules/fumbbl-net",
-    "modules/jervis-engine",
-    "modules/jervis-ui",
-    "modules/replay-analyzer",
-)
-
-fun taskName(subdir: String): String {
-    return subdir.split("/", "-").map { it.capitalize() }.joinToString(separator = "")
-}
-
 // Internal task for cloning or updating the FFB repo
 tasks.register<Exec>("cloneFFBRepo") {
     // Either clone the FFB codebase or update our clone if it was already cloned.
@@ -154,8 +142,28 @@ tasks.register<Exec>("cloneFFBRepo") {
     outputs.upToDateWhen { false }
 }
 
-// Internal task that will flatten the fumbble resource directory and move the
-// resulting files to a new temporary location
+// Internal tasks that will copy the FUMBBL `icons.ini` which contains the mapping between
+// local paths and their download location.
+tasks.register<Copy>("copyFFBIconsIni") {
+    description = "Update FUMBBL icon mapping"
+    group = "Jervis Tasks"
+    dependsOn("cloneFFBRepo")
+    val sourceFile = file("${layout.buildDirectory.get().asFile.absolutePath}/ffb-repo/ffb-client/src/main/resources-live/icons.ini")
+    val targetDir = file("${layout.projectDirectory.asFile.absolutePath}/modules/jervis-ui/src/commonMain/composeResources/files/fumbbl")
+    onlyIf {
+        if (!sourceFile.exists()) {
+            throw GradleException("Source file does not exist: ${sourceFile.absolutePath}")
+        }
+        true
+    }
+    from(sourceFile)
+    into(targetDir)
+}
+
+// Internal task that will flatten the FUMBBL resource directory and move the
+// relevant resulting files to a new temporary location (from where it can be
+// processed further). We do not want to include player icons and portraits as
+// their licensing status is unclear, so they can only be loaded at runtime.
 tasks.register<Copy>("flattenFFBResources") {
     dependsOn("cloneFFBRepo")
 
@@ -178,16 +186,21 @@ tasks.register<Copy>("flattenFFBResources") {
             // - drawable/: Images that need a static reference
             // - files/sounds: Sound files
             // - files/cached: All files under the "cached" folder.
-            //   This is player icons/images and are loaded dynamically
+            //   This also include player icons/portraits, but these must only be
+            //   loaded at runtime so are excluded.
             when {
                 this.relativePath.startsWith("sounds/") -> {
-                    this.path = "files/${this.path}"
+                    this.path = "files/fumbbl/${this.path}"
                 }
                 this.relativePath.startsWith("icons/cached") -> {
-                    this.path = "files/${this.path}"
+                    if (relativePath.startsWith("icons/cached/players")) {
+                        this.exclude()
+                    } else {
+                        this.path = "files/fumbbl/${this.path}"
+                    }
                 }
                 else -> {
-                    // Names are required to be flattened in order to generate accessors for them
+                    // Names are required to be flattened to generate accessors for them
                     val newFileName = this.relativePath.segments.joinToString("_")
                     this.path = "drawable/$newFileName"
                 }
@@ -195,7 +208,7 @@ tasks.register<Copy>("flattenFFBResources") {
         }
     }
 
-    // Make the task fail if the source directory does not exist
+    // Make sure the task fails if the source directory does not exist
     onlyIf {
         if (!sourceDir.exists()) {
             throw GradleException("Source directory does not exist: ${sourceDir.absolutePath}")
@@ -209,7 +222,7 @@ tasks.register<Copy>("flattenFFBResources") {
 tasks.register<Copy>("updateFFBResources") {
     description = "Update Jervis UI with latest version of FFB resources"
     group = "Jervis Tasks"
-    dependsOn("flattenFFBResources") // Make sure this runs after flattenFolder
+    dependsOn("flattenFFBResources", "copyFFBIconsIni")
 
     val tempDir = file("${layout.buildDirectory.get().asFile.absolutePath}/ffb-resources")
     val targetDir = file("${layout.projectDirectory.asFile.absolutePath}/modules/jervis-ui/src/commonMain/composeResources")

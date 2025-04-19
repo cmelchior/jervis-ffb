@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.frontpage_mummy
+import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_mummy
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
@@ -57,7 +57,7 @@ fun FumbblePage(menuViewModel: MenuViewModel, viewModel: FumbblScreenModel, modi
     MenuScreenWithSidebarAndTitle(
         menuViewModel,
         title = "FUMBBL (Static)",
-        icon = Res.drawable.frontpage_mummy,
+        icon = Res.drawable.jervis_frontpage_mummy,
         topMenuLeftContent = {
 
         },

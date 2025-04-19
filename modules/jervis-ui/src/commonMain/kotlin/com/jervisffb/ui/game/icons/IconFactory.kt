@@ -74,12 +74,19 @@ import com.jervisffb.ui.game.viewmodel.FieldDetails
 import com.jervisffb.ui.getSubImage
 import com.jervisffb.ui.loadFileAsImage
 import com.jervisffb.ui.loadImage
+import com.jervisffb.utils.canBeHost
 import com.jervisffb.utils.getHttpClient
+import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.statement.readBytes
+import io.ktor.http.ContentType
 import io.ktor.http.Url
+import io.ktor.http.encodeURLParameter
+import io.ktor.http.headers
 import io.ktor.http.isSuccess
+import okio.internal.commonToUtf8String
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.skia.Image
 
@@ -101,29 +108,47 @@ data class PlayerSprite(
 )
 
 /**
- * Main class responsible for handling all a logic around fetching and storing
+ * Main class responsible for handling all logic around fetching and storing
  * graphic assets.
  *
  * A lot of the methods in here are `suspend` functions due to how WASM loads
  * resources.
  */
 object IconFactory {
-    private val iconHeight = 40
-    private val iconWidth = 40
     private val cachedPlayers: MutableMap<Player, PlayerSprite> = mutableMapOf()
     // Map from resource "path" to loaded in-memory image
     private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
     private val cachedPortraits: MutableMap<PlayerId, ImageBitmap> = mutableMapOf()
     private val cachedLargeLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
     private val cachedSmallLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
+    // FUMBBL Mappings
+    private val fumbblCache = mutableMapOf<String, Url>()
 
     private val httpClient = getHttpClient()
 
+    /**
+     * Loads the fumbbl ini file and prepare the mapping between local paths
+     * and download URLs
+     */
+    @OptIn(ExperimentalResourceApi::class)
+    suspend fun initializeFumbblMapping() {
+        val fileContent = Res.readBytes("files/fumbbl/icons.ini")
+        val propertiesFile = fileContent.commonToUtf8String()
+        propertiesFile.lines().forEach { line ->
+            val parts = line.split("=")
+            if (parts.size == 2) {
+                val url = parts[0].replace("https\\", "https")
+                val path = parts[1]
+                fumbblCache[path] = Url(url)
+            }
+        }
+    }
+
     // Load all image resources used.
-    // It looks like we cannot lazy load them due to how Compose Resources work on WasmJS
+    // It looks like we cannot lazy-load them due to how Compose Resources work on WasmJS
     // `Res.readBytes` is suspendable and runBlocking doesn't work on wasmJs, which makes
     // loading images in the middle of a Composable function quite a nightmare.
-    // Instead we pre-load all dynamic resources up front. This will probably result in slightly
+    // Instead, we preload all dynamic resources up front. This will probably result in slightly
     // higher memory usage, but it will probably not be problematic.
     suspend fun initialize(homeTeam: Team, awayTeam: Team): Boolean {
         FieldDetails.entries.forEach {
@@ -170,7 +195,8 @@ object IconFactory {
         val playerSprite = player.icon?.sprite ?: throw IllegalStateException("Cannot find sprite configured for: $player")
         val image = when (playerSprite.type) {
             SpriteLocation.EMBEDDED -> loadImageFromResources(playerSprite.resource)
-            SpriteLocation.URL -> loadImageFromNetwork(Url(playerSprite.resource))!! // TODO
+            SpriteLocation.URL -> loadImageFromNetwork(Url(playerSprite.resource), false)!! // TODO Fallback image
+            SpriteLocation.FUMBBL_INI -> loadImageFromFumbblIni(playerSprite.resource)!! // TODO Fallback image
         }
         return when (val sprite = playerSprite) {
             is SingleSprite -> {
@@ -204,10 +230,25 @@ object IconFactory {
         }
     }
 
-    private suspend fun loadImageFromNetwork(url: Url): ImageBitmap? {
+    private suspend fun loadImageFromNetwork(url: Url, useProxy: Boolean): ImageBitmap? {
+        // User server proxy to bypass CORS restrictions but only on Web. JVM and iOS does not need this.
+        // Right now we are just using the "canBeHost()" as an easy way to check for the Web target.
+        // Probably need to find something better in the future.
+        val callUrl = if (useProxy && !canBeHost()) {
+            Url("https://jervis.ilios.dk/proxy.php?url=${url.toString().encodeURLParameter()}")
+        } else {
+            url
+        }
+
         val cachedImage = CacheManager.getCachedImage(url)
         if (cachedImage != null) return cachedImage
-        val result = httpClient.get(url)
+        val result = httpClient.get(callUrl) {
+            headers {
+                // In some cases, gifs are returned even though the path is a png. Problem?
+                accept(ContentType.Image.PNG)
+                accept(ContentType.Image.GIF)
+            }
+        }
         return if (result.status.isSuccess()) {
             val bytes = result.readBytes()
             val image = Image.makeFromEncoded(bytes).toComposeImageBitmap()
@@ -218,15 +259,22 @@ object IconFactory {
         }
     }
 
+    private suspend fun loadImageFromFumbblIni(path: String): ImageBitmap? {
+        val url = fumbblCache[path] ?: error("Path not found in ini file: $path")
+        // It looks like most images in the FUMBBL ini file are protected by CORS, so on
+        // web platforms we need to use a proxy to load them.
+        return loadImageFromNetwork(url, true)
+    }
+
     private suspend fun saveTeamPlayerImagesToCache(team: Team) {
         team.forEach { player ->
             val playerSprite = createPlayerSprite(player, player.isOnHomeTeam())
             cachedPlayers[player] = playerSprite
-            val portrait = player?.icon?.portrait ?: TODO()
+            val portrait = player.icon?.portrait ?: TODO()
             val portraitImage = when (portrait.type) {
                 SpriteLocation.EMBEDDED -> loadImageFromResources(portrait.resource)
-                SpriteLocation.URL -> loadImageFromNetwork(Url(portrait.resource))
-                null -> TODO()
+                SpriteLocation.URL -> loadImageFromNetwork(Url(portrait.resource), false)
+                SpriteLocation.FUMBBL_INI -> loadImageFromFumbblIni(portrait.resource)
             }
             cachedPortraits[player.id] = portraitImage!! // TODO Fix null value
         }
@@ -393,7 +441,8 @@ object IconFactory {
     suspend fun saveLogo(id: TeamId, logo: SpriteSource, size: LogoSize) {
         val image = when (logo.type) {
             SpriteLocation.EMBEDDED -> loadImageFromResources(logo.resource)
-            SpriteLocation.URL -> loadImageFromNetwork(Url(logo.resource))
+            SpriteLocation.URL -> loadImageFromNetwork(Url(logo.resource), false)
+            SpriteLocation.FUMBBL_INI -> loadImageFromFumbblIni(logo.resource)
         }
         when (size) {
             LogoSize.LARGE -> cachedLargeLogos[id] = image ?: error("Could not find: ${logo.resource}")
@@ -416,7 +465,8 @@ object IconFactory {
         val playerSprite = player.icon?.sprite!!
         val image = when (playerSprite.type) {
             SpriteLocation.EMBEDDED -> loadImageFromResources(playerSprite.resource)
-            SpriteLocation.URL -> loadImageFromNetwork(Url(playerSprite.resource))!! // TODO
+            SpriteLocation.URL -> loadImageFromNetwork(Url(playerSprite.resource), false) ?: error("Could not find: ${playerSprite.resource}") // TODO Fallback to something?
+            SpriteLocation.FUMBBL_INI -> loadImageFromFumbblIni(playerSprite.resource) ?: error("Could not find: ${playerSprite.resource}") // TODO Fallback to something?
         }
         val sprite = when (val sprite = playerSprite) {
             is SingleSprite -> {
@@ -425,7 +475,6 @@ object IconFactory {
             is SpriteSheet -> {
                 extractSprites(image, sprite.variants, sprite.selectedIndex ?: 0, isOnHomeTeam)
             }
-            null -> TODO()
         }
         cachedPlayers[player] = sprite
         return sprite

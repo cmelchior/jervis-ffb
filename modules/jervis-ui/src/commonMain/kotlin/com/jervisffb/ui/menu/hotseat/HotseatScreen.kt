@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.frontpage_wall_player
+import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_wall_player
 import com.jervisffb.ui.game.view.SidebarMenu
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
@@ -29,7 +29,7 @@ class HotseatScreen(private val menuViewModel: MenuViewModel, private val viewMo
             MenuScreenWithSidebarAndTitle(
                 menuViewModel,
                 title = "Hotseat Game",
-                icon = Res.drawable.frontpage_wall_player,
+                icon = Res.drawable.jervis_frontpage_wall_player,
                 topMenuRightContent = null,
                 sidebarContent = {
                     val currentPage by viewModel.currentPage.collectAsState()

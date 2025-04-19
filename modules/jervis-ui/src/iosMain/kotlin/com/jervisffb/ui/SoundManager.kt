@@ -19,7 +19,7 @@ actual object SoundManager {
 
     actual suspend fun initialize() {
         SoundEffect.entries.forEach { soundEffect ->
-            val soundBytes = Res.readBytes("files/sounds/${soundEffect.fileName}")
+            val soundBytes = Res.readBytes("files/fumbbl/sounds/${soundEffect.fileName}")
             val data = soundBytes.toNSData()
             sounds[soundEffect] = data
         }

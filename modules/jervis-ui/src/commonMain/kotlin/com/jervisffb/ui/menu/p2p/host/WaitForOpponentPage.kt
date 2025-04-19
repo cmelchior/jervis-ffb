@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.icon_menu_copy
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_copy
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import kotlinx.coroutines.delay
@@ -79,7 +79,7 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                     Image(
                         modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
                         colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
-                        painter = painterResource(Res.drawable.icon_menu_copy),
+                        painter = painterResource(Res.drawable.jervis_icon_menu_copy),
                         contentDescription = "Copy URL",
                     )
                 }
@@ -108,7 +108,7 @@ fun WaitForOpponentPage(viewModel: P2PHostScreenModel) {
                     Image(
                         modifier = Modifier.fillMaxSize(0.8f).aspectRatio(1f),
                         colorFilter = ColorFilter.tint(JervisTheme.rulebookRed) ,
-                        painter = painterResource(Res.drawable.icon_menu_copy),
+                        painter = painterResource(Res.drawable.jervis_icon_menu_copy),
                         contentDescription = "Copy URL",
                     )
                 }

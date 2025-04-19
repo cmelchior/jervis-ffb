@@ -31,8 +31,8 @@ val SKINK_RUNNER_LINEMEN =
         listOf(SkillType.DODGE.id(), STUNTY.id()),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
-        SpriteSheet.embedded("$iconRootPath/lizardmen_skinkrunnerlineman.png",6),
-        SingleSprite.embedded("$portraitRootPath/lizardmen_skinkrunner.png")
+        SpriteSheet.ini("$iconRootPath/lizardmen_skinkrunner.png",6),
+        SingleSprite.ini("$portraitRootPath/lizardmen_skinkrunner.png")
     )
 val CHAMELEON_SKINKS =
     RosterPosition(
@@ -46,8 +46,8 @@ val CHAMELEON_SKINKS =
         listOf(DODGE.id(), /* On the Ball, Shadowing */ SkillType.STUNTY.id()),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
-        SpriteSheet.embedded("$iconRootPath/lizardmen_chameleonskink.png",2),
-        SingleSprite.embedded("$portraitRootPath/lizardmen_chameleonskink.png")
+        SpriteSheet.ini("$iconRootPath/lizardmen_chameleonskink.png",2),
+        SingleSprite.ini("$portraitRootPath/lizardmen_chameleonskink.png")
     )
 val SAURUS_BLOCKERS =
     RosterPosition(
@@ -61,8 +61,8 @@ val SAURUS_BLOCKERS =
         emptyList(),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
-        SpriteSheet.embedded("$iconRootPath/lizardmen_saurusblocker.png",6),
-        SingleSprite.embedded("$portraitRootPath/lizardmen_saurusblocker.png")
+        SpriteSheet.ini("$iconRootPath/lizardmen_saurusblocker.png",6),
+        SingleSprite.ini("$portraitRootPath/lizardmen_saurusblocker.png")
     )
 val KROXIGOR =
     RosterPosition(
@@ -82,8 +82,8 @@ val KROXIGOR =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
-        SpriteSheet.embedded("$iconRootPath/lizardmen_kroxigor.png",1),
-        SingleSprite.embedded("$portraitRootPath/lizardmen_kroxigor.png")
+        SpriteSheet.ini("$iconRootPath/lizardmen_kroxigor.png",1),
+        SingleSprite.ini("$portraitRootPath/lizardmen_kroxigor.png")
     )
 
 /**
@@ -107,7 +107,7 @@ val LIZARDMEN_TEAM = BB2020Roster(
         KROXIGOR,
     ),
     logo = RosterLogo(
-        large = SingleSprite.embedded("roster/logo/roster_logo_jervis_lizardmen_large.png"),
-        small = SingleSprite.embedded("roster/logo/roster_logo_jervis_lizardmen_small.png")
+        large = SingleSprite.embedded("jervis/roster/logo_lizardmen_large.png"),
+        small = SingleSprite.embedded("jervis/roster/logo_lizardmen_small.png")
     )
 )
