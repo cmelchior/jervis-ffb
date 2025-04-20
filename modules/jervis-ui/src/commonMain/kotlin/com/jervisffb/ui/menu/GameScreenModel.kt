@@ -112,9 +112,9 @@ class GameScreenModel(
      * Initialize game icons and other assets.
      */
     suspend fun initialize() {
-        _loadingMessages.value = "Initializing icons..."
+        _loadingMessages.value = "Initializing icons"
         IconFactory.initialize(homeTeam, awayTeam)
-        _loadingMessages.value = "Initializing sounds..."
+        _loadingMessages.value = "Initializing sounds"
         SoundManager.initialize()
         uiState = UiGameController(
             uiMode,
@@ -126,7 +126,7 @@ class GameScreenModel(
         menuViewModel.uiState = uiState
         uiState.startGameEventLoop()
         onEngineInitialized()
-        _loadingMessages.value = "Starting Game"
+        _loadingMessages.value = "Starting game"
         _isLoaded.value = true
     }
 }

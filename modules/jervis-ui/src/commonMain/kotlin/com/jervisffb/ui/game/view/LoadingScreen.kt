@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -278,10 +277,10 @@ private fun LoadingScreen(viewModel: GameScreenModel) {
 
             // Invisible text to measure layout
             // Since we are not using monospace fonts, use some extra ...
-            // as "padding"
+            // as "padding" (find a better way to do this)
             var measuredPx by remember { mutableStateOf(0) }
             Text(
-                text = loadingMessage + "......",
+                text = loadingMessage + "........",
                 maxLines = 1,
                 style = MaterialTheme.typography.h3.copy(
                     color = Color.White,
