@@ -75,11 +75,6 @@ out for during development.
 11. How does Chain-pushes and Trapdoors interact? When does the player count as being "moved"?
     E.g. if Player A is pushed into Player B who is standing on a Trapdoor, 
 
-12. What happens if you cannot apply a Prayers To Nuffle result, e.g. because the entire team
-    has Loner? Designers Commentary for Lasting Injury indicates you reroll until you get
-    a viable result. But Prayers also says "May roll", indicating that it is optional, so not being
-    able to apply the result is okay.
-
 13. Can a player that already have AV 11 receive Iron Man from Prayers of Nuffle? It wil not work
     for sure, but can they still get it? And what happens if they cannot?
 
@@ -155,7 +150,7 @@ out for during development.
 # Rule Ambiguities and differences compared to the rules as written
 
 This section describes how rules with an element of ambiguity are implemented as well as the rationale behind 
-doing it.
+doing it. The page number reveres to the page in the rulebook unless otherwise specified.
 
 1. (Page 74) The rules make it optional to use a skill before or after a roll. In Jervis, if possible, 
    this choice always comes after the roll. There is no valid reason for asking it before, and asking
@@ -167,7 +162,7 @@ doing it.
 
 3. (Page 38) The Prayers to Nuffle Table
    It is unclear what happens if you roll a result that is not a duplicate, but cannot be
-   applied, e.g., because the entire team has Loner. For now, Jervis just treat the roll as 
+   applied, e.g., because the entire team has Loner. For now, Jervis just treats the roll as 
    wasted. Mostly because it is easier to implement, and the chance of this happening 
    is virtually zero.
 

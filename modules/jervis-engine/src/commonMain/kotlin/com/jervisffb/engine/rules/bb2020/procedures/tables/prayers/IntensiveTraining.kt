@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.tables.prayers
 
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
@@ -48,18 +50,31 @@ object IntensiveTraining : Procedure() {
     object SelectPlayer : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<PrayersToNuffleRollContext>().team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return state.getContext<PrayersToNuffleRollContext>().team
+            val availablePlayers = state.getContext<PrayersToNuffleRollContext>().team
                 .filter {it.state == PlayerState.RESERVE }
                 .filter { !it.hasSkill<Loner>() }
                 .map { SelectPlayer(it) }
+            return availablePlayers.ifEmpty {
+                listOf(ContinueWhenReady)
+            }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<PlayerSelected>(action) {
-                return compositeCommandOf(
-                    SetContext(IntensiveTrainingContext(it.getPlayer(state))),
-                    GotoNode(SelectSkill)
-                )
+            return when(action) {
+                is Continue -> {
+                    compositeCommandOf(
+                        ReportGameProgress("No players are able to receive Intensive Training"),
+                        ExitProcedure(),
+                    )
+                }
+                else -> {
+                    checkType<PlayerSelected>(action) {
+                        return compositeCommandOf(
+                            SetContext(IntensiveTrainingContext(it.getPlayer(state))),
+                            GotoNode(SelectSkill)
+                        )
+                    }
+                }
             }
         }
     }
