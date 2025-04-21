@@ -296,6 +296,7 @@ jobs:
             rm -rf ./jervis_new
             unzip ./jervis_upload/devbuilds.zip -d ./jervis_new
             cp ./jervis/.htaccess ./jervis_new
+            cp ./jervis/proxy.php ./jervis_new
             mv ./jervis ./jervis_old
             mv ./jervis_new ./jervis
             rm -rf ./jervis_old
