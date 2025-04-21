@@ -98,6 +98,7 @@ class InducementsSetupComponentModel(initialRulesBuilder: Rules.Builder, private
             deathZoneInducements.add(this[InducementType.MASTER_OF_BALLISTICS]!!.toDataObject())
             deathZoneInducements.add(this[InducementType.EXPANDED_MERCENARY_PLAYERS]!!.toDataObject())
             deathZoneInducements.add(this[InducementType.GIANT]!!.toDataObject())
+            deathZoneInducements.add(this[InducementType.DESPERATE_MEASURES]!!.toDataObject())
         }
     }
 }

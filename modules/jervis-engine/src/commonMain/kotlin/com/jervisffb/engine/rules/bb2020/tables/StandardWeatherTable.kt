@@ -4,14 +4,6 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Interface representing a Weather Table.
- */
-interface WeatherTable {
-    val name: String
-    fun roll(firstD6: D6Result, secondD6: D6Result): Weather
-}
-
-/**
  * Class representing the Weather Table on page 37 in the rulebook.
  */
 object StandardWeatherTable: WeatherTable {

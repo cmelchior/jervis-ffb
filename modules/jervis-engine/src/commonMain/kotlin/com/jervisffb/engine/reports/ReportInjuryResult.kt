@@ -20,6 +20,8 @@ class ReportInjuryResult(val context: RiskingInjuryContext) : LogEntry() {
                     }
                 }
                 InjuryResult.BADLY_HURT -> append("${context.player.name} was Badly Hurt")
+                InjuryResult.SERIOUSLY_HURT -> append("${context.player.name} was Seriously Hurt")
+                InjuryResult.DEAD -> append("${context.player.name} was killed DEAD!")
                 InjuryResult.CASUALTY -> {
                     val (casualtyResult, lastingInjuryResult) = if (context.isPartOfMultipleBlock) {
                         (context.casualtyResult!! to context.lastingInjuryResult)
@@ -28,7 +30,7 @@ class ReportInjuryResult(val context: RiskingInjuryContext) : LogEntry() {
                     }
                     when (casualtyResult) {
                         CasualtyResult.BADLY_HURT -> append("${context.player.name} was Badly Hurt")
-                        CasualtyResult.SERIOUS_HURT -> append("${context.player.name} was Serious Hurt")
+                        CasualtyResult.SERIOUSLY_HURT -> append("${context.player.name} was Seriously Hurt")
                         CasualtyResult.SERIOUS_INJURY -> append("${context.player.name} gained a Serious Injury")
                         CasualtyResult.LASTING_INJURY -> {
                             append("${context.player.name} got a Lasting Injury: ${lastingInjuryResult!!.description}")

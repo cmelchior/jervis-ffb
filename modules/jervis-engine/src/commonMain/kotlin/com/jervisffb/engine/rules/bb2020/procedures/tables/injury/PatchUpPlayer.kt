@@ -269,7 +269,7 @@ object PatchUpPlayer: Procedure() {
                                     SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut)
                                 }
                             }
-                            com.jervisffb.engine.rules.bb2020.tables.CasualtyResult.SERIOUS_HURT -> {
+                            com.jervisffb.engine.rules.bb2020.tables.CasualtyResult.SERIOUSLY_HURT -> {
                                 compositeCommandOf(
                                     SetMissNextGame(player, true),
                                     SetPlayerState(player, com.jervisffb.engine.model.PlayerState.SERIOUS_HURT),

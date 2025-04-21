@@ -36,7 +36,7 @@ class FuzzTester {
     @Test
     fun runRandomGames() {
         val games = 100
-        repeat(games) {gameNo ->
+        repeat(games) { gameNo ->
             val seed = Random.nextLong()
             val random = Random(seed)
             val state = createDefaultGameState(StandardBB2020Rules())

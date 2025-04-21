@@ -35,11 +35,14 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.KickOffEventContext
+import com.jervisffb.engine.rules.bb2020.tables.KickOffEvent
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 data class SolidDefenseContext(
     val roll: D3Result,
-    // Track all players moved, should be size <= roll + 3
+    // Track all players moved, should be size <= roll + 3/1
     val playersMoved: Set<Player> = emptySet(),
     // Current player being moved
     val currentPlayer: Player? = null,
@@ -48,6 +51,8 @@ data class SolidDefenseContext(
 /**
  * Procedure for handling the Kick-Off Event: "Solid Defense" as described on page 41
  * of the rulebook.
+ *
+ * Also supports the BB7 variant of the event, which is described on page 94 in Death Zone.
  */
 object SolidDefense : Procedure() {
     override val initialNode: Node = RollDie
@@ -62,10 +67,11 @@ object SolidDefense : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D3Result>(action) { d3 ->
+                val extraPlayerCount = getExtraPlayersCount(state)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SOLID_DEFENSE, d3),
                     SetContext(SolidDefenseContext(roll = d3)),
-                    ReportGameProgress("Solid Defense: ${state.kickingTeam.name} may move [${d3.value} + 3 = ${d3.value + 3}] players"),
+                    ReportGameProgress("Solid Defense: ${state.kickingTeam.name} may move [${d3.value} + $extraPlayerCount = ${d3.value + extraPlayerCount}] players"),
                     GotoNode(SelectPlayerOrEndSetup),
                 )
             }
@@ -75,10 +81,11 @@ object SolidDefense : Procedure() {
     object SelectPlayerOrEndSetup: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            // Max D3 + 3 players must be selected, including those in the playersMoved list.
-            // If player is not already in the playersMoved list, they must be open.
+            // Max D3 + 3/1 players must be selected, including those in the playersMoved list.
+            // If the player is not already in the playersMoved list, they must be open.
+            val extraPlayerCount = getExtraPlayersCount(state)
             val context = state.getContext<SolidDefenseContext>()
-            return if (context.playersMoved.size >= context.roll.value + 3) {
+            return if (context.playersMoved.size >= context.roll.value + extraPlayerCount) {
                 // Max number of players has already been moved. So only they can move now.
                 context.playersMoved.map { SelectPlayer(it) } + EndSetupWhenReady
             } else {
@@ -114,18 +121,9 @@ object SolidDefense : Procedure() {
             val context = state.getContext<SolidDefenseContext>()
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
-            val isHomeTeam = state.kickingTeam.isHomeTeam()
             val freeFields: List<TargetSquare> =
                 state.field
-                    .filter {
-                        // Only select from fields on teams half
-                        // TODO How does this generalize to BB7?
-                        if (isHomeTeam) {
-                            it.x < rules.fieldWidth / 2
-                        } else {
-                            it.x >= rules.fieldWidth / 2
-                        }
-                    }
+                    .filter {rules.isInSetupArea(state.kickingTeam, it) }
                     .filter { it.isUnoccupied() }
                     .map { TargetSquare.setup(it.coordinates) }
 
@@ -170,6 +168,19 @@ object SolidDefense : Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return GotoNode(SelectPlayerOrEndSetup)
+        }
+    }
+
+    //
+    // HELPER FUNCTIONS
+    //
+    private fun getExtraPlayersCount(state: Game): Int {
+        val context = state.getContext<KickOffEventContext>()
+        val type = context.result as? KickOffEvent ?: INVALID_GAME_STATE("Unexpected table result: ${context.result}")
+        return when (type) {
+            KickOffEvent.SOLID_DEFENSE -> 3
+            KickOffEvent.SOLID_DEFENSE_BB7 -> 1
+            else -> INVALID_GAME_STATE("Unsupported Kickoff Event: ${type.name}")
         }
     }
 }

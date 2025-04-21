@@ -13,6 +13,8 @@ import com.jervisffb.engine.rules.Rules
 /**
  * Procedure for handling the Kick-Off Event: "Blitz" as described on page 41
  * of the rulebook.
+ *
+ * Also supports the BB7 variant of the event, which is described on page 94 in Death Zone.
  */
 object Blitz : Procedure() {
     override val initialNode: Node = GiveBribe

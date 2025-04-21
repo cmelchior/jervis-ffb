@@ -7,6 +7,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.skills.Duration
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.utils.jervisLogger
 import kotlinx.serialization.Serializable
@@ -23,6 +24,7 @@ import kotlinx.serialization.Serializable
 class SerializedTeam(
     val id: TeamId,
     val name: String,
+    val type: GameType,
     val players: List<SerializedPlayer>,
     val roster: BB2020Roster,
     val rerolls: Int,
@@ -43,6 +45,7 @@ class SerializedTeam(
             return SerializedTeam(
                 team.id,
                 team.name,
+                team.type,
                 team.map { SerializedPlayer.serialize(it) },
                 team.roster,
                 team.rerolls.count { it.duration == Duration.PERMANENT },

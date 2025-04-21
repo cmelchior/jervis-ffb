@@ -68,15 +68,15 @@ class KickOffEventTests: JervisGameTest() {
     }
 
     @Test
-    fun timeOut_moveBack() {
+    fun timeOut_moveForward_lastChance() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup()
         )
 
         // Fake turn number after setup
-        state.kickingTeam.turnMarker = 8
-        state.receivingTeam.turnMarker = 7
+        state.kickingTeam.turnMarker = 5
+        state.receivingTeam.turnMarker = 5
         controller.rollForward(
             *defaultKickOffHomeTeam(
                 kickoffEvent = arrayOf(
@@ -84,10 +84,30 @@ class KickOffEventTests: JervisGameTest() {
                 )
             )
         )
-        assertEquals(7, state.kickingTeam.turnMarker)
+        assertEquals(6, state.kickingTeam.turnMarker)
         assertEquals(7, state.receivingTeam.turnMarker)
     }
 
+    @Test
+    fun timeOut_moveBack() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup()
+        )
+
+        // Fake turn number after setup
+        state.kickingTeam.turnMarker = 6
+        state.receivingTeam.turnMarker = 6
+        controller.rollForward(
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(1.d6, 2.d6), // Roll Time-out
+                )
+            )
+        )
+        assertEquals(5, state.kickingTeam.turnMarker)
+        assertEquals(6, state.receivingTeam.turnMarker)
+    }
 
     @Test
     fun solidDefense() {

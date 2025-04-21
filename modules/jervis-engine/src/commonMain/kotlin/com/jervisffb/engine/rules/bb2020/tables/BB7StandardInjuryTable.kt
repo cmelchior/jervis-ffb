@@ -5,10 +5,10 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 
 /**
- * Class representing the Stunty Injury Table on page 60 in the rulebook.
+ * Class representing the BB7 Injury Table on page 95 in the rulebook.
  */
 @Serializable
-object StuntyInjuryTable: InjuryTable() {
+object BB7StandardInjuryTable: InjuryTable() {
     private val table: Map<Int, InjuryResult> =
         mapOf(
             2 to InjuryResult.STUNNED,
@@ -16,21 +16,18 @@ object StuntyInjuryTable: InjuryTable() {
             4 to InjuryResult.STUNNED,
             5 to InjuryResult.STUNNED,
             6 to InjuryResult.STUNNED,
-            7 to InjuryResult.KO,
+            7 to InjuryResult.STUNNED,
             8 to InjuryResult.KO,
-            9 to InjuryResult.BADLY_HURT,
-            10 to InjuryResult.CASUALTY,
-            11 to InjuryResult.CASUALTY,
-            12 to InjuryResult.CASUALTY,
+            9 to InjuryResult.KO,
+            10 to InjuryResult.BADLY_HURT,
+            11 to InjuryResult.SERIOUSLY_HURT,
+            12 to InjuryResult.DEAD,
         )
 
-    /**
-     * Roll on the Stunty Injury table and return the result.
-     */
     override fun roll(
         firstD6: D6Result,
         secondD6: D6Result,
-        modifier: Int
+        modifier: Int,
     ): InjuryResult {
         val result = rollDices(firstD6, secondD6, modifier)
         return table[result] ?: INVALID_GAME_STATE("$result was not found in the Injury Table.")

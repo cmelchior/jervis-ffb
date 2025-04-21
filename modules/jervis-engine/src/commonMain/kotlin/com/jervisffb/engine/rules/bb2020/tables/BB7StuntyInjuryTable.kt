@@ -5,10 +5,10 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 
 /**
- * Class representing the Stunty Injury Table on page 60 in the rulebook.
+ * Class representing the Stunty Injury Table on page 95 in Death Zone.
  */
 @Serializable
-object StuntyInjuryTable: InjuryTable() {
+object BB7StuntyInjuryTable: InjuryTable() {
     private val table: Map<Int, InjuryResult> =
         mapOf(
             2 to InjuryResult.STUNNED,
@@ -19,9 +19,9 @@ object StuntyInjuryTable: InjuryTable() {
             7 to InjuryResult.KO,
             8 to InjuryResult.KO,
             9 to InjuryResult.BADLY_HURT,
-            10 to InjuryResult.CASUALTY,
-            11 to InjuryResult.CASUALTY,
-            12 to InjuryResult.CASUALTY,
+            10 to InjuryResult.BADLY_HURT,
+            11 to InjuryResult.SERIOUSLY_HURT,
+            12 to InjuryResult.DEAD,
         )
 
     /**

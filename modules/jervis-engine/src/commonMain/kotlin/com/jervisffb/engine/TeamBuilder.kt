@@ -17,6 +17,7 @@ import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.serialize.RosterLogo
@@ -39,6 +40,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     var id: TeamId = TeamId("team-${Random.nextLong()}")
     var coach: Coach = Coach(CoachId("jervis-coach"), "Jervis")
     var name: String = ""
+    var type: GameType = GameType.STANDARD
     var rerolls: Int = 0
         set(value) {
             if (roster.numberOfRerolls < value || value < 0) {
@@ -101,7 +103,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     }
 
     fun build(): Team {
-        return Team(id, name, roster, coach).apply {
+        return Team(id, name, type, roster, coach).apply {
             this@TeamBuilder.players.forEach {
                 val data: PlayerData = it.value
                 add(data.type.createPlayer(

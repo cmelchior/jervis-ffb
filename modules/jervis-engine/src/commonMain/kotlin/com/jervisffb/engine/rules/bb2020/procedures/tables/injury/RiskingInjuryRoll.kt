@@ -172,6 +172,18 @@ object RiskingInjuryRoll: Procedure() {
                         GotoNode(CheckApothecary),
                     )
                 }
+                InjuryResult.SERIOUSLY_HURT -> {
+                    compositeCommandOf(
+                        SetPlayerState(context.player, PlayerState.SERIOUS_HURT),
+                        GotoNode(CheckApothecary),
+                    )
+                }
+                InjuryResult.DEAD -> {
+                    compositeCommandOf(
+                        SetPlayerState(context.player, PlayerState.DEAD),
+                        GotoNode(CheckApothecary),
+                    )
+                }
                 InjuryResult.CASUALTY -> {
                     GotoNode(RollForCasualty)
                 }
@@ -190,7 +202,7 @@ object RiskingInjuryRoll: Procedure() {
                 CasualtyResult.BADLY_HURT -> {
                     SetPlayerState(context.player, PlayerState.BADLY_HURT)
                 }
-                CasualtyResult.SERIOUS_HURT -> {
+                CasualtyResult.SERIOUSLY_HURT -> {
                     SetPlayerState(context.player, PlayerState.SERIOUS_INJURY)
                 }
                 CasualtyResult.SERIOUS_INJURY -> {

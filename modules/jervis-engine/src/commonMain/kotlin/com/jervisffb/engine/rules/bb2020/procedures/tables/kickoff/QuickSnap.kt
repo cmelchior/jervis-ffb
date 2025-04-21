@@ -34,8 +34,11 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportQuickSnapResult
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.KickOffEventContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquareContext
+import com.jervisffb.engine.rules.bb2020.tables.KickOffEvent
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 data class QuickSnapContext(
     val roll: D3Result,
@@ -49,6 +52,8 @@ data class QuickSnapContext(
 /**
  * Procedure for handling the Kick-Off Event: "Quick Snap" as described on page 41
  * of the rulebook.
+ *
+ * Also supports the BB7 variant of the event, which is described on page 94 in Death Zone.
  */
 object QuickSnap : Procedure() {
     override val initialNode: Node = RollDie
@@ -62,10 +67,11 @@ object QuickSnap : Procedure() {
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D3Result>(action) { d3 ->
+                val extraPlayerCount = getExtraPlayersCount(state)
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.QUICK_SNAP, d3),
                     SetContext(QuickSnapContext(roll = d3)),
-                    ReportQuickSnapResult(state.receivingTeam, d3),
+                    ReportQuickSnapResult(state.receivingTeam, d3, extraPlayerCount),
                     GotoNode(SelectPlayerOrEndSetup),
                 )
             }
@@ -75,9 +81,10 @@ object QuickSnap : Procedure() {
     object SelectPlayerOrEndSetup: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            // Max D3 + 3 players must be selected, once a player has moved, it cannot move again
+            // Max D3 + 3/1 players must be selected, once a player has moved, it cannot move again
             val context = state.getContext<QuickSnapContext>()
-            return if (context.playersMoved.size >= context.roll.value + 3) {
+            val extraPlayerCount = getExtraPlayersCount(state)
+            return if (context.playersMoved.size >= context.roll.value + extraPlayerCount) {
                 listOf(EndSetupWhenReady)
             } else {
                 // Already moved players can no longer move, otherwise all open players are eligible.
@@ -174,6 +181,19 @@ object QuickSnap : Procedure() {
                     GotoNode(SelectPlayerOrEndSetup)
                 }
             )
+        }
+    }
+
+    //
+    // HELPER FUNCTIONS
+    //
+    private fun getExtraPlayersCount(state: Game): Int {
+        val context = state.getContext<KickOffEventContext>()
+        val type = context.result as? KickOffEvent ?: INVALID_GAME_STATE("Unexpected table result: ${context.result}")
+        return when (type) {
+            KickOffEvent.QUICK_SNAP -> 3
+            KickOffEvent.QUICK_SNAP_BB7 -> 1
+            else -> INVALID_GAME_STATE("Unsupported Kickoff Event: ${type.name}")
         }
     }
 }

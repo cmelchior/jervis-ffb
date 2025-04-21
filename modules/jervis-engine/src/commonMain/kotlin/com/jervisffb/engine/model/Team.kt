@@ -12,6 +12,7 @@ import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.channels.BufferOverflow
@@ -72,7 +73,13 @@ class TeamTurnData(private val game: Game) {
     val availableSpecialActions = mutableMapOf<PlayerSpecialActionType, Int>()
 }
 
-class Team(val id: TeamId, val name: String, val roster: BB2020Roster, var coach: Coach) : Collection<Player>, Observable<Team>() {
+class Team(
+    val id: TeamId,
+    val name: String,
+    val type: GameType,
+    val roster: BB2020Roster,
+    var coach: Coach
+) : Collection<Player>, Observable<Team>() {
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
     // Team staff

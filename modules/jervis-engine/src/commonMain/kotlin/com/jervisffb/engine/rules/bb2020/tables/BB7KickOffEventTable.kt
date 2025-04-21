@@ -6,19 +6,19 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 /**
  * Class representing the Kick-Off Event Table on page 41 in the rulebook.
  */
-object StandardKickOffEventTable: KickOffTable {
-    override val name: String = "Standard Kick-Off Table"
+object BB7KickOffEventTable: KickOffTable {
+    override val name: String = "BB7 Kick-Off Table"
     private val table =
         mapOf(
             2 to KickOffEvent.GET_THE_REF,
-            3 to KickOffEvent.TIME_OUT,
-            4 to KickOffEvent.SOLID_DEFENSE,
+            3 to KickOffEvent.TIME_OUT_BB7,
+            4 to KickOffEvent.SOLID_DEFENSE_BB7,
             5 to KickOffEvent.HIGH_KICK,
             6 to KickOffEvent.CHEERING_FANS,
             7 to KickOffEvent.BRILLIANT_COACHING,
             8 to KickOffEvent.CHANGING_WEATHER,
-            9 to KickOffEvent.QUICK_SNAP,
-            10 to KickOffEvent.BLITZ,
+            9 to KickOffEvent.QUICK_SNAP_BB7,
+            10 to KickOffEvent.BLITZ_BB7,
             11 to KickOffEvent.OFFICIOUS_REF,
             12 to KickOffEvent.PITCH_INVASION,
         )

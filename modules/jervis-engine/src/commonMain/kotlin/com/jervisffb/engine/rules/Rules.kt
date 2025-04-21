@@ -35,7 +35,9 @@ import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.RandomDirectionTemplate
 import com.jervisffb.engine.rules.bb2020.tables.RangeRuler
+import com.jervisffb.engine.rules.bb2020.tables.StandardInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.StandardKickOffEventTable
+import com.jervisffb.engine.rules.bb2020.tables.StandardPrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.StandardWeatherTable
 import com.jervisffb.engine.rules.bb2020.tables.StuntyInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.ThrowInPosition
@@ -59,15 +61,20 @@ import kotlinx.serialization.Serializable
 /**
  * This class is responsible for tracking all the "static" rules related to a game of Blood Bowl, as well
  * as helper methods for often asked questions. Concepts from the rulebook liked "Is a marked player" should
- * generally be found in this  class, rather than a specific [Procedure].
+ * generally be found in this class, rather than a specific [com.jervisffb.engine.fsm.Procedure].
  *
  * This class should only contain rules for running a game, not rules for building rosters.
  *
- * The idea is that this class shoul be able to represent all game types, but that hasn't been
- * fully tested yet, e.g Dungeon Bowl has a very different view of what the field looks
- * and behaves, so most likely some aspects needs to be redesigned.
+ * When defining field sizes, the "board" is assumed to be laid out vertically. I.e., from left to right
+ * with the home team always on the left and the away team always on the right. Coordinates start from
+ * the upper-left corner with (0,0).
  *
- * It is also a bit unclear how well this class trancends rulesets, i.e. between BB2016 and BB2020
+ * Developer's Commentary:
+ * The idea is that this class should be able to represent all game types, but that hasn't been
+ * fully tested yet, e.g., Dungeon Bowl has a very different view of what the field looks
+ * and behaves, so most likely some aspects need to be redesigned.
+ *
+ * It is also a bit unclear how well this class transcends ruleset, i.e., between BB2016 and BB2020
  */
 @Serializable
 open class Rules(
@@ -110,22 +117,14 @@ open class Rules(
     open val wideZone: Int = 4,
     // Width of the End Zone at each end of the field where the ball is scored.
     open val endZone: Int = 1,
-    // X-coordinates for the line of scrimmage for the home team
+    // X-coordinates for the line of scrimmage for the home team. It is zero-indexed.
     open val lineOfScrimmageHome: Int = 12,
-    // X-coordinate for the line of scrimmage for the away team
+    // X-coordinate for the line of scrimmage for the away team. It is zero-indexed.
     open val lineOfScrimmageAway: Int = 13,
     open val playersRequiredOnLineOfScrimmage: Int = 3,
     open val maxPlayersInWideZone: Int = 2,
     // Default max number of players on the field. Skills and effects might change this
     open val maxPlayersOnField: Int  = 11,
-    // Blood Bowl 7
-    // Total width of the field
-//    val fieldWidth = 2
-//    val fieldHeight = 11
-//    val wideZone = 2
-//    val endZone = 1
-//    val lineOfScrimmage = 7
-
 
     // Stadium / Pitch / Ball rules / Match Events
     open val stadium: StadiumRule = NoStadium,
@@ -139,10 +138,10 @@ open class Rules(
 // Tables
     open val kickOffEventTable: KickOffTable = StandardKickOffEventTable,
     open val prayersToNuffleEnabled: Boolean = true,
-    open val prayersToNuffleTable: PrayersToNuffleTable = PrayersToNuffleTable,
+    open val prayersToNuffleTable: PrayersToNuffleTable = StandardPrayersToNuffleTable,
     open val weatherTable: WeatherTable = StandardWeatherTable,
-    open val injuryTable: InjuryTable = InjuryTable,
-    open val stuntyInjuryTable: StuntyInjuryTable = StuntyInjuryTable,
+    open val injuryTable: InjuryTable = StandardInjuryTable,
+    open val stuntyInjuryTable: InjuryTable = StuntyInjuryTable,
     open val casualtyTable: CasualtyTable = CasualtyTable,
     open val lastingInjuryTable: LastingInjuryTable = LastingInjuryTable,
     open val argueTheCallTable: ArgueTheCallTable = ArgueTheCallTable,
@@ -161,7 +160,7 @@ open class Rules(
 
     // Behavior customization, .e.g. allow the rules to specify which Procedure should
     // be used for certain aspects of the game
-    // Whether or not coaches are allowed to undo actions, and to what degree.
+    // Whether coaches are allowed to undo actions, and to what degree.
     open val undoActionBehavior: UndoActionBehavior = UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS,
     // Who is responsible for rolling dice or taking random actions.
     open val diceRollsOwner: DiceRollOwner = DiceRollOwner.ROLL_ON_SERVER,
@@ -258,6 +257,14 @@ open class Rules(
         }
 
         return true
+    }
+
+    fun isInSetupArea(team: Team, location: FieldSquare): Boolean {
+        return if (team.isHomeTeam()) {
+            location.x <= lineOfScrimmageHome
+        } else {
+            location.x >= lineOfScrimmageAway
+        }
     }
 
     // Roll on the random direction template
@@ -610,7 +617,7 @@ open class Rules(
         var prayersToNuffleTable: PrayersToNuffleTable = rules.prayersToNuffleTable
         var weatherTable: WeatherTable = rules.weatherTable
         var injuryTable: InjuryTable = rules.injuryTable
-        var stuntyInjuryTable: StuntyInjuryTable = rules.stuntyInjuryTable
+        var stuntyInjuryTable: InjuryTable = rules.stuntyInjuryTable
         var casualtyTable: CasualtyTable = rules.casualtyTable
         var lastingInjuryTable: LastingInjuryTable = rules.lastingInjuryTable
         var argueTheCallTable: ArgueTheCallTable = rules.argueTheCallTable

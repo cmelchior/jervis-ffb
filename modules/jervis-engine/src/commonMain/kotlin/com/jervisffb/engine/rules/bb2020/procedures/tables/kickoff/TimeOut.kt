@@ -8,8 +8,10 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportTimeout
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.KickOffEventContext
 
 /**
  * Procedure for handling the Kick-Off Event: "Time-Out" as described on page 41
@@ -22,9 +24,14 @@ object TimeOut : Procedure() {
 
     object MoveTurnMarker : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<KickOffEventContext>()
             val kickingTurnNo = state.kickingTeam.turnMarker
             val receivingTurnNo = state.receivingTeam.turnMarker
-            return if (state.kickingTeam.turnMarker in 6..8) {
+            // Both Standard and BB7 define the exact range where a Time-Out trigger, but it generalizes
+            // to the last 3 turns, which we use instead since that allows us to support people creating
+            // custom rulesets with other lengths.
+            val range = rules.turnsPrHalf - 2 .. rules.turnsPrHalf
+            return if (state.kickingTeam.turnMarker in range) {
                 compositeCommandOf(
                     SetTurnMarker(state.kickingTeam, kickingTurnNo - 1),
                     SetTurnMarker(state.receivingTeam, receivingTurnNo - 1),

@@ -1,6 +1,9 @@
 package com.jervisffb.engine.rules.bb2020.tables
 
 import com.jervisffb.engine.actions.D16Result
+import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.actions.Dice
+import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.model.modifiers.StatModifier.Type
@@ -21,6 +24,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.ThrowARock
 import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.TreacherousTrapdoor
 import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.UnderScrutiny
 import com.jervisffb.engine.rules.bb2020.skills.Duration
+import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 
@@ -56,10 +60,24 @@ enum class PrayerToNuffle(override val description: String, override val procedu
 }
 
 /**
- * Class representing the Prayers To Nuffle Table on page 39 in the rulebook.
+ * Interface representing rolling on the Prayers To Nuffle Table.
+ *
+ * @param D which type of die to roll
+ */
+interface PrayersToNuffleTable {
+    val die: Dice // Which die is used to roll the table
+    /**
+     * Roll on the table. Should throw an [com.jervisffb.engine.utils.INVALID_ACTION]
+     * exception if the die does not match [die].
+     */
+    fun roll(die: DieResult): PrayerToNuffle
+}
+
+/**
+ * Class representing the standard Prayers To Nuffle Table on page 39 in the rulebook.
  */
 @Serializable
-object PrayersToNuffleTable {
+object StandardPrayersToNuffleTable: PrayersToNuffleTable {
     private val table =
         mapOf(
             1 to PrayerToNuffle.TREACHEROUS_TRAPDOOR,
@@ -80,10 +98,41 @@ object PrayersToNuffleTable {
             16 to PrayerToNuffle.INTENSIVE_TRAINING
         )
 
+    override val die: Dice = Dice.D16
+
     /**
      * Roll on the Prayers of Nuffle table and return the result.
      */
-    fun roll(d16: D16Result): PrayerToNuffle {
-        return table[d16.value] ?: INVALID_GAME_STATE("${d16.value} was not found in the Kick-Off Event Table.")
+    override fun roll(die: DieResult): PrayerToNuffle {
+        if (die !is D16Result) INVALID_ACTION(die, "Wrong die type: ${die::class}")
+        return table[die.value] ?: INVALID_GAME_STATE("${die.value} was not found in the Prayers To Nuffle table")
+    }
+}
+
+/**
+ * Class representing the standard Prayers To Nuffle Table on page 93 in the Death Zone rulebook.
+ */
+@Serializable
+object BB7PrayersToNuffleTable: PrayersToNuffleTable {
+    private val table =
+        mapOf(
+            1 to PrayerToNuffle.TREACHEROUS_TRAPDOOR,
+            2 to PrayerToNuffle.FRIENDS_WITH_THE_REF,
+            3 to PrayerToNuffle.STILETTO,
+            4 to PrayerToNuffle.IRON_MAN,
+            5 to PrayerToNuffle.KNUCKLE_DUSTERS,
+            6 to PrayerToNuffle.BAD_HABITS,
+            7 to PrayerToNuffle.GREASY_CLEATS,
+            8 to PrayerToNuffle.BLESSED_STATUE_OF_NUFFLE,
+        )
+
+    override val die: Dice = Dice.D8
+
+    /**
+     * Roll on the Prayers of Nuffle table and return the result.
+     */
+    override fun roll(die: DieResult): PrayerToNuffle {
+        if (die !is D8Result) INVALID_ACTION(die, "Wrong die type: ${die::class}")
+        return table[die.value] ?: INVALID_GAME_STATE("${die.value} was not found in the Prayers To Nuffle table")
     }
 }

@@ -1,7 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
 import com.jervisffb.engine.actions.D16Result
-import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
@@ -41,7 +40,7 @@ object PrayersToNuffleRoll : Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PrayersToNuffleRollContext>().team
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(RollDice(Dice.D16))
+            return listOf(RollDice(rules.prayersToNuffleTable.die))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D16Result>(action) { d16 ->

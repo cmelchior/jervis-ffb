@@ -15,7 +15,6 @@ import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
 import kotlinx.serialization.Serializable
 
 val DEFAULT_INDUCEMENTS = mapOf<InducementType, Inducement<*>>(
-
     // Standard Rules
     InducementType.TEMP_AGENCY_CHEERLEADER to SimpleInducement(InducementType.TEMP_AGENCY_CHEERLEADER, "Temp Agency Cheerleaders", 4, 20_000, true),
     InducementType.PART_TIME_ASSISTANT_COACH to SimpleInducement(InducementType.PART_TIME_ASSISTANT_COACH, "Part-time Assistant Coaches", 1, 20_000, true),
@@ -42,7 +41,8 @@ val DEFAULT_INDUCEMENTS = mapOf<InducementType, Inducement<*>>(
     InducementType.HALFLING_HOTPOT to SimpleInducement(InducementType.HALFLING_HOTPOT, "Halfing Hot Pot", 1, 80_000, true, requirements = listOf(RegionalSpecialRule.HAFLING_THIMBLE_CUP, RegionalSpecialRule.OLD_WORLD_CLASSIC), modifier = listOf(Pair(RegionalSpecialRule.HAFLING_THIMBLE_CUP, 0.75f))),
     InducementType.MASTER_OF_BALLISTICS to SimpleInducement(InducementType.MASTER_OF_BALLISTICS, "Master of Ballistics", 1, 40_000, true, requirements = listOf(RegionalSpecialRule.HAFLING_THIMBLE_CUP, RegionalSpecialRule.OLD_WORLD_CLASSIC), modifier = listOf(Pair(RegionalSpecialRule.HAFLING_THIMBLE_CUP, 0.75f))),
     InducementType.EXPANDED_MERCENARY_PLAYERS to ExpandedMercenaryInducements(enabled = false),
-    InducementType.GIANT to SimpleInducement(InducementType.GIANT, "Giant", 1, 400_000, true)
+    InducementType.GIANT to SimpleInducement(InducementType.GIANT, "Giant", 1, 400_000, true),
+    InducementType.DESPERATE_MEASURES to SimpleInducement(InducementType.DESPERATE_MEASURES, "Desperate Measures", 5, 50_000, false),
 )
 
 @Serializable
@@ -70,9 +70,7 @@ class InducementSettings(private val inducements: Map<InducementType, Inducement
             return InducementSettings(inducements)
         }
     }
-
 }
-
 
 
 

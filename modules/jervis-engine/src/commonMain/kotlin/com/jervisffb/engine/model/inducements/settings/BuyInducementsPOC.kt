@@ -48,7 +48,8 @@ enum class InducementType {
     HALFLING_HOTPOT,
     MASTER_OF_BALLISTICS,
     EXPANDED_MERCENARY_PLAYERS, // Contains a lot of sub options
-    GIANT
+    GIANT,
+    DESPERATE_MEASURES // Only available for BB7
 
     // Other extensions
     // ...

@@ -91,18 +91,9 @@ object SetupTeam : Procedure() {
             // Allow players to be placed on the kicking teams side. At this stage, the more
             // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
             val context = state.getContext<SetupTeamContext>()
-            val isHomeTeam = context.team.isHomeTeam()
             val freeFields: List<TargetSquare> =
                 state.field
-                    .filter {
-                        // Only select from fields on teams half
-                        // TODO How does this generalize to BB7?
-                        if (isHomeTeam) {
-                            it.x < rules.fieldWidth / 2
-                        } else {
-                            it.x >= rules.fieldWidth / 2
-                        }
-                    }
+                    .filter { rules.isInSetupArea(context.team, it) }
                     .filter { it.isUnoccupied() }
                     .map { TargetSquare.setup(it.coordinates) }
 
