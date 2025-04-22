@@ -53,8 +53,8 @@ fun ColumnScope.GameStatusRowType4(textColor: Color = JervisTheme.contentTextCol
     var amazonLogo: ImageBitmap? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        orc = IconFactory.loadRosterIcon(TeamId("orc"), SingleSprite.embedded("roster/logo/roster_logo_jervis_orc_small.png"), LogoSize.SMALL)
-        amazonLogo = IconFactory.loadRosterIcon(TeamId("gnome"), SingleSprite.embedded("roster/logo/roster_logo_jervis_amazon_small.png"), LogoSize.SMALL)
+        orc = IconFactory.loadRosterIcon(TeamId("orc"), SingleSprite.embedded("jervis/roster/logo_orc_small.png"), LogoSize.SMALL)
+        amazonLogo = IconFactory.loadRosterIcon(TeamId("gnome"), SingleSprite.embedded("jervis/roster/logo_amazon_small.png"), LogoSize.SMALL)
     }
     Row(
         modifier = Modifier.background(backgroundColor).padding(vertical = 8.dp),

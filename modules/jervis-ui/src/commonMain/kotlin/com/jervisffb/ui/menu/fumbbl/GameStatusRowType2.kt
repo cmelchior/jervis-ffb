@@ -53,8 +53,8 @@ fun ColumnScope.GameStatusRowType2(textColor: Color = JervisTheme.contentTextCol
     var vampireLogo: ImageBitmap? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        lizardmenLogo = IconFactory.loadRosterIcon(TeamId("lizardmen"), SingleSprite.embedded("roster/logo/roster_logo_jervis_lizardmen_small.png"), LogoSize.SMALL)
-        vampireLogo = IconFactory.loadRosterIcon(TeamId("vampire"), SingleSprite.embedded("roster/logo/roster_logo_jervis_vampires_small.png"), LogoSize.SMALL)
+        lizardmenLogo = IconFactory.loadRosterIcon(TeamId("lizardmen"), SingleSprite.embedded("jervis/roster/logo_lizardmen_small.png"), LogoSize.SMALL)
+        vampireLogo = IconFactory.loadRosterIcon(TeamId("vampire"), SingleSprite.embedded("jervis/roster/logo_vampires_small.png"), LogoSize.SMALL)
     }
     Row(
         modifier = Modifier.background(backgroundColor).padding(vertical = 8.dp),

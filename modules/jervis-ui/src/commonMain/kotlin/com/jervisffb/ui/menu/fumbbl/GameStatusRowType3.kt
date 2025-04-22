@@ -53,8 +53,8 @@ fun ColumnScope.GameStatusRowType3(textColor: Color = JervisTheme.contentTextCol
     var skavenLogo: ImageBitmap? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        khorneLogo = IconFactory.loadRosterIcon(TeamId("khorne"), SingleSprite.embedded("roster/logo/roster_logo_jervis_khorne_small.png"), LogoSize.SMALL)
-        skavenLogo = IconFactory.loadRosterIcon(TeamId("skaven"), SingleSprite.embedded("roster/logo/roster_logo_jervis_skaven_small.png"), LogoSize.SMALL)
+        khorneLogo = IconFactory.loadRosterIcon(TeamId("khorne"), SingleSprite.embedded("jervis/roster/logo_khorne_small.png"), LogoSize.SMALL)
+        skavenLogo = IconFactory.loadRosterIcon(TeamId("skaven"), SingleSprite.embedded("jervis/roster/logo_skaven_small.png"), LogoSize.SMALL)
     }
     Row(
         modifier = Modifier.background(backgroundColor).padding(vertical = 8.dp),

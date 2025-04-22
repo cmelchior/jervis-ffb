@@ -49,8 +49,8 @@ fun ColumnScope.GameStatusRowType1(textColor: Color = JervisTheme.contentTextCol
     var orcLogo: ImageBitmap? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        gnomeLogo = IconFactory.loadRosterIcon(TeamId("gnome"), SingleSprite.embedded("roster/logo/roster_logo_jervis_gnome_small.png"), LogoSize.SMALL)
-        orcLogo = IconFactory.loadRosterIcon(TeamId("orc"), SingleSprite.embedded("roster/logo/roster_logo_jervis_orc_small.png"), LogoSize.SMALL)
+        gnomeLogo = IconFactory.loadRosterIcon(TeamId("gnome"), SingleSprite.embedded("jervis/roster/logo_gnome_small.png"), LogoSize.SMALL)
+        orcLogo = IconFactory.loadRosterIcon(TeamId("orc"), SingleSprite.embedded("jervis/roster/logo_orc_small.png"), LogoSize.SMALL)
     }
     Row(
         modifier = Modifier.background(backgroundColor).padding(vertical = 8.dp),
