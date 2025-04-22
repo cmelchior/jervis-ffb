@@ -60,14 +60,14 @@ class GameScreenModel(
     val awayTeamData: LoadingTeamInfo
 
     init {
-        menuViewModel.navigatorContext.launch {
+        menuViewModel.backgroundContext.launch {
             homeTeamIcon.value = IconFactory.loadRosterIcon(
                 homeTeam.id,
                 homeTeam.teamLogo ?: homeTeam.roster.logo,
                 LogoSize.LARGE
             )
         }
-        menuViewModel.navigatorContext.launch {
+        menuViewModel.backgroundContext.launch {
             awayTeamIcon.value = IconFactory.loadRosterIcon(
                 awayTeam.id,
                 awayTeam.teamLogo ?: awayTeam.roster.logo,
