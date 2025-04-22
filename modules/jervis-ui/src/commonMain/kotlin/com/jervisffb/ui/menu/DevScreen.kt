@@ -29,12 +29,15 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.createDefaultAwayTeam
+import com.jervisffb.ui.createDefaultBB7AwayTeam
+import com.jervisffb.ui.createDefaultBB7HomeTeam
 import com.jervisffb.ui.createDefaultHomeTeam
 import com.jervisffb.ui.game.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
@@ -149,13 +152,73 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
         }
     }
 
+    private fun createDevHotseatBB7ScreenModel(menuViewModel: MenuViewModel, randomActions: Boolean = false): GameScreenModel {
+        val rules = BB72020Rules().toBuilder().run {
+            timers.timersEnabled = false
+            diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
+            undoActionBehavior = UndoActionBehavior.ALLOWED
+            build()
+        }
+        val homeTeam = createDefaultBB7HomeTeam(rules)
+        val awayTeam = createDefaultBB7AwayTeam(rules)
+        val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
+        val gameController = GameEngineController(game)
+        val gameSettings = GameSettings(gameRules = rules, isHotseatGame = true)
+        val homeActionProvider = when (randomActions) {
+            false -> {
+                ManualActionProvider(
+                    gameController,
+                    menuViewModel,
+                    TeamActionMode.HOME_TEAM,
+                    gameSettings,
+                )
+            }
+            true -> RandomActionProvider(TeamActionMode.HOME_TEAM, gameController).also { it.startActionProvider() }
+        }
+        val awayActionProvider = when (randomActions) {
+            false -> {
+                ManualActionProvider(
+                    gameController,
+                    menuViewModel,
+                    TeamActionMode.AWAY_TEAM,
+                    gameSettings,
+                )
+            }
+            true -> RandomActionProvider(TeamActionMode.AWAY_TEAM, gameController).also { it.startActionProvider() }
+        }
+        val actionProvider = LocalActionProvider(
+            gameController,
+            gameSettings,
+            homeActionProvider,
+            awayActionProvider
+        )
+        return GameScreenModel(
+            TeamActionMode.ALL_TEAMS,
+            gameController,
+            gameController.state.homeTeam,
+            gameController.state.awayTeam,
+            actionProvider,
+            mode = Manual(TeamActionMode.ALL_TEAMS),
+            menuViewModel = menuViewModel,
+            onEngineInitialized = {
+                menuViewModel.controller = gameController
+                menuViewModel.navigatorContext.launch {
+                    // TODO Send to AI controller?
+                    // controller.sendGameStarted()
+                }
+            }
+        ).also {
+            it.gameAcceptedByAllPlayers()
+        }
+    }
+
+
     // Starts a Dev Hotseat game with pre-determined teams, no timer and client rolls enabled
     fun startManualGame(navigator: Navigator) {
         menuViewModel.navigatorContext.launch {
             val viewModel = createDevHotseatScreenModel(menuViewModel)
             navigator.push(GameScreen(menuViewModel, viewModel))
         }
-
     }
 
     // Starts a Hotseat game with pre-determined teams, no timer and client rolls enabled and all actions are random
@@ -165,6 +228,15 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
             navigator.push(GameScreen(menuViewModel, viewModel))
         }
     }
+
+    // Starts a Dev Hotseat BB7 game with pre-determined teams, no timer and client rolls enabled
+    fun startManualBB7Game(navigator: Navigator) {
+        menuViewModel.navigatorContext.launch {
+            val viewModel = createDevHotseatBB7ScreenModel(menuViewModel)
+            navigator.push(GameScreen(menuViewModel, viewModel))
+        }
+    }
+
 
     val availableReplayFiles: Flow<List<Pair<String, Path>>> = flow {
         // TODO For now, turn the path into an absolute path so we work with the FumbbleReplayAdapter
@@ -193,7 +265,7 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenVi
                 viewModel.startManualGame(navigator)
             }) {
                 Text(
-                    text = "Start game with manual actions",
+                    text = "Start Standard game with manual actions",
                     modifier = Modifier.padding(16.dp),
                 )
             }
@@ -202,7 +274,16 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenVi
                 viewModel.startRandomGame(navigator)
             }) {
                 Text(
-                    text = "Start game with all random actions",
+                    text = "Start Standard game with all random actions",
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                viewModel.startManualBB7Game(navigator)
+            }) {
+                Text(
+                    text = "Start BB7 game with all manual actions",
                     modifier = Modifier.padding(16.dp),
                 )
             }

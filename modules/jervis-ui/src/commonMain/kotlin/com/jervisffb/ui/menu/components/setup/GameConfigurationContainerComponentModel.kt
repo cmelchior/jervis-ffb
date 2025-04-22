@@ -1,6 +1,7 @@
 package com.jervisffb.ui.menu.components.setup
 
 import cafe.adriel.voyager.core.model.ScreenModel
+import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.FumbblBB2020Rules
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
@@ -43,10 +44,19 @@ data class SetupTabDescription(
     val type: SetupTabType,
 )
 
-private val defaultRulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
+private val standardRulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
     DropdownEntryWithValue("Blood Bowl 2020 Rules (Strict)", StandardBB2020Rules()),
-    DropdownEntryWithValue("Fumbbl Compatible BB2020 Rules", FumbblBB2020Rules()),
+    DropdownEntryWithValue("Blood Bowl 2020 Rules (FUMBBL Compatible)", FumbblBB2020Rules()),
     DropdownEntryWithValue("Blood Bowl 2020 Rules (Dev Settings)", StandardBB2020Rules().toBuilder().run {
+        diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
+        undoActionBehavior = UndoActionBehavior.ALLOWED
+        build()
+    }),
+)
+
+private val bb7RulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
+    DropdownEntryWithValue("Blood Bowl Sevens 2020 Rules", BB72020Rules()),
+    DropdownEntryWithValue("Blood Bowl Sevens 2020 Rules (Dev Settings)", BB72020Rules().toBuilder().run {
         diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
         undoActionBehavior = UndoActionBehavior.ALLOWED
         build()
@@ -55,7 +65,7 @@ private val defaultRulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
 
 /**
  * This component is the main responsible for coordinating all aspects of configuring the rules
- * for a game. This includes swi
+ * for a game.
  */
 class GameConfigurationContainerComponentModel(private val menuViewModel: MenuViewModel) : ScreenModel {
 
@@ -87,7 +97,7 @@ class GameConfigurationContainerComponentModel(private val menuViewModel: MenuVi
         GameTab(
             tabName = "BB7",
             type = ConfigType.BB7,
-            enabled = false,
+            enabled = true,
             showSetupTabs = true,
             tabs = listOf(
                 SetupTabDescription("Rules", SetupTabType.RULES),
@@ -126,12 +136,12 @@ class GameConfigurationContainerComponentModel(private val menuViewModel: MenuVi
 
 
     // Expose which "Rules Base" is selected. While technically under the "Rules" component,
-    // all the other components also depends on this information, so keep the toggle here as well.
+    // all the other components also depend on this information, so keep the toggle here as well.
     // We need to initialize the default values here to avoid some annoying lifecycle issues getting
-    // the rulesBuilder to all sub models.
-    val availableRulesBase = MutableStateFlow(defaultRulesBaseList)
+    // the rulesBuilder to all submodels.
+    val availableRulesBase = MutableStateFlow(standardRulesBaseList)
     val selectedRulesBase = MutableStateFlow(availableRulesBase.value.first())
-    var rulesBuilder: Rules.Builder = selectedRulesBase.value!!.value.toBuilder()
+    var rulesBuilder: Rules.Builder = selectedRulesBase.value.value.toBuilder()
 
     // Component models responsible for configuring a new game
     val rulesModel = RulesSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, this, menuViewModel)
@@ -181,6 +191,19 @@ class GameConfigurationContainerComponentModel(private val menuViewModel: MenuVi
 
 
     fun updateSelectGameType(tabIndex: Int) {
+        when (tabs[tabIndex].type) {
+            ConfigType.FROM_FILE -> { /* Do nothing */ }
+            ConfigType.STANDARD -> {
+                availableRulesBase.value = standardRulesBaseList
+                updateRulesBase(availableRulesBase.value.first())
+            }
+            ConfigType.BB7 -> {
+                availableRulesBase.value = bb7RulesBaseList
+                updateRulesBase(availableRulesBase.value.first())
+            }
+            ConfigType.DUNGEON_BOWL -> TODO("DUNGEON_BOWL not supported yet")
+            ConfigType.GUTTER_BOWL -> TODO("GUTTER_BOWL not supported yet")
+        }
         selectedGameTab.value = tabIndex
     }
 

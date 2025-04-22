@@ -31,13 +31,23 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.SkillType.FRENZY
 import com.jervisffb.engine.rules.bb2020.skills.SkillType.SIDESTEP
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.jervis_ui.generated.resources.Res
+import com.jervisffb.resources.AMAZON_BLITZER
+import com.jervisffb.resources.AMAZON_BLOCKER
+import com.jervisffb.resources.AMAZON_LINEMAN
+import com.jervisffb.resources.AMAZON_TEAM
+import com.jervisffb.resources.BIG_UN_BLOCKERS
 import com.jervisffb.resources.HUMAN_BLITZER
 import com.jervisffb.resources.HUMAN_CATCHER
 import com.jervisffb.resources.HUMAN_LINEMAN
 import com.jervisffb.resources.HUMAN_TEAM
 import com.jervisffb.resources.HUMAN_THROWER
+import com.jervisffb.resources.ORC_BLITZER
+import com.jervisffb.resources.ORC_LINEMEN
+import com.jervisffb.resources.ORC_TEAM
+import com.jervisffb.resources.ORC_THROWER
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.skia.FilterBlurMode
 import org.jetbrains.skia.Image
@@ -199,6 +209,43 @@ fun createDefaultAwayTeam(rules: Rules): Team {
         rerolls = 4
         apothecaries = 1
         teamValue = 1_000_000
+    }
+}
+
+fun createDefaultBB7HomeTeam(rules: Rules): Team {
+    return teamBuilder(rules, AMAZON_TEAM) {
+        name = "Amazon Starter Team #1"
+        type = GameType.BB7
+        addPlayer(PlayerId("Am-bb7-1"), "Blitzer-1", PlayerNo(1), AMAZON_BLITZER)
+        addPlayer(PlayerId("Am-bb7-2"), "Blitzer-2", PlayerNo(2), AMAZON_BLITZER)
+        addPlayer(PlayerId("Am-bb7-3"), "Blocker-3", PlayerNo(3), AMAZON_BLOCKER)
+        addPlayer(PlayerId("Am-bb7-4"), "Blocker-4", PlayerNo(4), AMAZON_BLOCKER)
+        addPlayer(PlayerId("Am-bb7-5"), "Linewoman-5", PlayerNo(5), AMAZON_LINEMAN)
+        addPlayer(PlayerId("Am-bb7-6"), "Linewoman-6", PlayerNo(6), AMAZON_LINEMAN)
+        addPlayer(PlayerId("Am-bb7-7"), "Linewoman-7", PlayerNo(7), AMAZON_LINEMAN)
+        addPlayer(PlayerId("Am-bb7-8"), "Linewoman-8", PlayerNo(8), AMAZON_LINEMAN)
+        rerolls = 1
+        apothecaries = 0
+        dedicatedFans = 0
+        teamValue = 585_000
+    }
+}
+
+fun createDefaultBB7AwayTeam(rules: Rules): Team {
+    return teamBuilder(rules, ORC_TEAM) {
+        name = "Orc Starter Team #1"
+        type = GameType.BB7
+        addPlayer(PlayerId("Orc-bb7-1"), "Blitzer-1", PlayerNo(1), ORC_BLITZER)
+        addPlayer(PlayerId("Orc-bb7-2"), "Blitzer-2", PlayerNo(2), ORC_BLITZER)
+        addPlayer(PlayerId("Orc-bb7-3"), "Blocker-3", PlayerNo(3), BIG_UN_BLOCKERS)
+        addPlayer(PlayerId("Orc-bb7-4"), "Thrower-4", PlayerNo(4), ORC_THROWER)
+        addPlayer(PlayerId("Orc-bb7-5"), "Lineman-5", PlayerNo(5), ORC_LINEMEN)
+        addPlayer(PlayerId("Orc-bb7-6"), "Lineman-6", PlayerNo(6), ORC_LINEMEN)
+        addPlayer(PlayerId("Orc-bb7-7"), "Lineman-7", PlayerNo(7), ORC_LINEMEN)
+        rerolls = 1
+        apothecaries = 0
+        dedicatedFans = 0
+        teamValue = 585_000
     }
 }
 

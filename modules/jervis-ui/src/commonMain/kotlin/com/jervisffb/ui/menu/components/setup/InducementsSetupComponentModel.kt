@@ -73,6 +73,7 @@ class InducementsSetupComponentModel(initialRulesBuilder: Rules.Builder, private
         this.rulesBuilder = rulesBuilder
         builders = rulesBuilder.inducements
         with(builders!!) {
+            rulebookInducements.clear()
             rulebookInducements.add(this[InducementType.TEMP_AGENCY_CHEERLEADER]!!.toDataObject())
             rulebookInducements.add(this[InducementType.PART_TIME_ASSISTANT_COACH]!!.toDataObject())
             rulebookInducements.add(this[InducementType.WEATHER_MAGE]!!.toDataObject())
@@ -91,6 +92,7 @@ class InducementsSetupComponentModel(initialRulesBuilder: Rules.Builder, private
             rulebookInducements.add(this[InducementType.BIASED_REFEREE]!!.toDataObject())
 
             // Define inducements from DeathZone
+            deathZoneInducements.clear()
             deathZoneInducements.add(this[InducementType.WAAAGH_DRUMMER]!!.toDataObject())
             deathZoneInducements.add(this[InducementType.CAVORTING_NURGLINGS]!!.toDataObject())
             deathZoneInducements.add(this[InducementType.DWARFEN_RUNESMITH]!!.toDataObject())

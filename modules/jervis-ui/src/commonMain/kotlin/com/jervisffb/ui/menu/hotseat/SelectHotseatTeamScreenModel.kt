@@ -22,7 +22,8 @@ class SelectHotseatTeamScreenModel(
     private val onNextScreen: () -> Unit,
     private val onTeamImported: (TeamInfo) -> Unit = { _ -> /* Do nothing */ } ,
 ) : ScreenModel {
-
+    val rules: Rules?
+        get() = parentModel.rules
     val setupCoachModel = CoachSetupComponentModel(menuViewModel)
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
     val isValidTeamSelection: Flow<Boolean> = selectedTeam.combine(setupCoachModel.coachName) { selectedTeam, coachName ->

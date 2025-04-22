@@ -57,10 +57,12 @@ class SelectTeamComponentModel(
                 val unknownCoach = Coach(CoachId("Unknown"), "TemporaryCoach")
                 val team = SerializedTeam.deserialize(rules, teamData, unknownCoach)
                 getTeamInfo(teamFile, team)
-            }.let {
-                // TODO Fix race condition with addNewTime
-                availableTeams.value = it.sortedBy { it.teamName }
             }
+                .filter { it.type == rules.gameType }
+                .let {
+                    // TODO Fix race condition with addNewTime
+                    availableTeams.value = it.sortedBy { it.teamName }
+                }
         }
     }
 
@@ -73,6 +75,7 @@ class SelectTeamComponentModel(
         return TeamInfo(
             teamId = team.id,
             teamName = team.name,
+            type = team.type,
             teamRoster = team.roster.name,
             teamValue = team.teamValue,
             rerolls = team.rerolls.size,

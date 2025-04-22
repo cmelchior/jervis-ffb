@@ -123,6 +123,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                 selectedHomeTeam.value = TeamInfo(
                     teamId = homeTeam.id,
                     teamName = homeTeam.name,
+                    type = homeTeam.type,
                     teamRoster = homeTeam.roster.name,
                     teamValue = homeTeam.teamValue,
                     rerolls = homeTeam.rerolls.size,
@@ -132,6 +133,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                 selectedAwayTeam.value = TeamInfo(
                     teamId = awayTeam.id,
                     teamName = awayTeam.name,
+                    type = awayTeam.type,
                     teamRoster = awayTeam.roster.name,
                     teamValue = awayTeam.teamValue,
                     rerolls = awayTeam.rerolls.size,

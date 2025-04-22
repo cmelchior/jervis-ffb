@@ -197,9 +197,9 @@ enum class SkillType(val description: String) {
     // Mutations
     BIG_HAND("Big Hand"),
     CLAWS("Claws"),
-    DISTURBING_PRECENSE("Disturbing Precence"),
+    DISTURBING_PRESENCE("Disturbing Presence"),
     EXTRA_ARMS("Extra Arms"),
-    FOUL_APPEREANCE("Full Appereance"),
+    FOUL_APPEARANCE("Full Appearance"),
     HORNS("Horns"),
     IRON_HARD_SKIN("Iron Hard Skin"),
     MONSTROUS_MOUTH("Monstrous Mouth"),
@@ -239,7 +239,7 @@ enum class SkillType(val description: String) {
     // Traits
     ANIMAL_SAVAGERY("Animal Savagery"),
     ANIMOSITY("Animosity"),
-    ALWAYS_HUNGY("Always Hungy"),
+    ALWAYS_HUNGRY("Always Hungry"),
     BALL_AND_CHAIN("Ball & Chain"),
     BOMBARDIER("Bombardier"),
     BONE_HEAD("Bone Head"),
@@ -247,6 +247,7 @@ enum class SkillType(val description: String) {
     BREATHE_FIRE("Breathe Fire"), // Reference missing
     CHAINSAW("Chainsaw"),
     DECAY("Decay"),
+    HIT_AND_RUN("Hit and Run"),
     HYPNOTIC_GAZE("Hypnotic Gaze"),
     KICK_TEAMMATE("Kick Team-mate"),
     LONER("Loner"),
@@ -257,7 +258,7 @@ enum class SkillType(val description: String) {
     REALLY_STUPID("Really Stupid"),
     REGENERATION("Regeneration"),
     RIGHT_STUFF("Right Stuff"),
-    SECRET_WEAPON("Secret Wapon"),
+    SECRET_WEAPON("Secret Weapon"),
     STAB("Stab"),
     STUNTY("Stunty"),
     SWARMING("Swarming"),

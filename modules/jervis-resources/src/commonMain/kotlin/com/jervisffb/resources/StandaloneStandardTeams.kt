@@ -11,9 +11,9 @@ import com.jervisffb.engine.serialize.JervisMetaData
 import com.jervisffb.engine.serialize.buildTeamFile
 import com.jervisffb.engine.teamBuilder
 
-// List of default starter team rosters
-// This is primarely usd by Standalone Mode
-object StandaloneTeams {
+// The List of default starter team rosters
+// This is primarily used by Standalone Mode
+object StandaloneStandardTeams {
     private val rules = StandardBB2020Rules()
     val defaultTeams = mapOf(
         "human-starter-team.jrt" to buildTeamFile {

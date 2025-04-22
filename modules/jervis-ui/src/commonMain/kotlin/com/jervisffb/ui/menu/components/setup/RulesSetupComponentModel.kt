@@ -5,10 +5,22 @@ import com.jervisffb.engine.model.BallType
 import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.model.StadiumType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallTable
+import com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable
+import com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable
+import com.jervisffb.engine.rules.bb2020.tables.BB7StandardInjuryTable
+import com.jervisffb.engine.rules.bb2020.tables.BB7StuntyInjuryTable
+import com.jervisffb.engine.rules.bb2020.tables.CasualtyTable
+import com.jervisffb.engine.rules.bb2020.tables.InjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.KickOffTable
+import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryTable
+import com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.SpringWeatherTable
+import com.jervisffb.engine.rules.bb2020.tables.StandardInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.StandardKickOffEventTable
+import com.jervisffb.engine.rules.bb2020.tables.StandardPrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.StandardWeatherTable
+import com.jervisffb.engine.rules.bb2020.tables.StuntyInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.SummerWeatherTable
 import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
 import com.jervisffb.engine.rules.bb2020.tables.WinterWeatherTable
@@ -56,13 +68,61 @@ class RulesSetupComponentModel(
         )
     )
 
+    val prayersToNuffleTables = listOf<Pair<String, List<DropdownEntryWithValue<PrayersToNuffleTable>>>>(
+        "Rulebook" to listOf(
+            DropdownEntryWithValue("Standard", StandardPrayersToNuffleTable, true),
+        ),
+        "Death Zone" to listOf(
+            DropdownEntryWithValue("Blood Bowl Sevens", BB7PrayersToNuffleTable, true),
+        ),
+    )
+
     val kickOffTables = listOf<Pair<String, List<DropdownEntryWithValue<KickOffTable>>>>(
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard", StandardKickOffEventTable, true),
         ),
+        "Death Zone" to listOf(
+            DropdownEntryWithValue("Blood Bowl Sevens", BB7KickOffEventTable, true),
+        ),
         "Spike Magazine 15 (Amazons)" to listOf(
             DropdownEntryWithValue("Temple-City", StandardKickOffEventTable, false),
         )
+    )
+
+    val injuryTables = listOf<Pair<String, List<DropdownEntryWithValue<InjuryTable>>>>(
+        "Rulebook" to listOf(
+            DropdownEntryWithValue("Standard", StandardInjuryTable, true),
+        ),
+        "Death Zone" to listOf(
+            DropdownEntryWithValue("Blood Bowl Sevens", BB7StandardInjuryTable, true),
+        ),
+    )
+
+    val stuntyInjuryTables = listOf<Pair<String, List<DropdownEntryWithValue<InjuryTable>>>>(
+        "Rulebook" to listOf(
+            DropdownEntryWithValue("Standard", StuntyInjuryTable, true),
+        ),
+        "Death Zone" to listOf(
+            DropdownEntryWithValue("Blood Bowl Sevens", BB7StuntyInjuryTable, true),
+        ),
+    )
+
+    val casualtyTables = listOf<Pair<String, List<DropdownEntryWithValue<CasualtyTable>>>>(
+        "Rulebook" to listOf(
+            DropdownEntryWithValue("Standard", CasualtyTable, true),
+        ),
+    )
+
+    val lastingInjuryTables = listOf<Pair<String, List<DropdownEntryWithValue<LastingInjuryTable>>>>(
+        "Rulebook" to listOf(
+            DropdownEntryWithValue("Standard", LastingInjuryTable, true),
+        ),
+    )
+
+    val argueTheCallTables = listOf<Pair<String, List<DropdownEntryWithValue<ArgueTheCallTable>>>>(
+        "Rulebook" to listOf(
+            DropdownEntryWithValue("Standard", ArgueTheCallTable, true),
+        ),
     )
 
     val unusualBallList = listOf<Pair<String, List<DropdownEntryWithValue<BallSelectorRule>>>>(
@@ -131,7 +191,13 @@ class RulesSetupComponentModel(
     val availableRuleBases: StateFlow<List<DropdownEntryWithValue<Rules>>> = parent.availableRulesBase
     val selectedRuleBase: StateFlow<DropdownEntryWithValue<Rules>?> = parent.selectedRulesBase
     val selectedWeatherTable = MutableStateFlow<DropdownEntryWithValue<WeatherTable>?>(null)
+    val selectedPrayersToNuffleTable = MutableStateFlow<DropdownEntryWithValue<PrayersToNuffleTable>?>(null)
     val selectedKickOffTable = MutableStateFlow<DropdownEntryWithValue<KickOffTable>?>(null)
+    val selectedInjuryTable = MutableStateFlow<DropdownEntryWithValue<InjuryTable>?>(null)
+    val selectedStuntyInjuryTable = MutableStateFlow<DropdownEntryWithValue<InjuryTable>?>(null)
+    val selectedCasualtyTable = MutableStateFlow<DropdownEntryWithValue<CasualtyTable>?>(null)
+    val selectedLastingInjuryTable = MutableStateFlow<DropdownEntryWithValue<LastingInjuryTable>?>(null)
+    val selectedArgueTheCallTable = MutableStateFlow<DropdownEntryWithValue<ArgueTheCallTable>?>(null)
     val selectedUnusualBall = MutableStateFlow< DropdownEntryWithValue<BallSelectorRule>?>(null)
     val selectedPitch = MutableStateFlow<DropdownEntryWithValue<PitchType>?>(null)
     val selectedStadium = MutableStateFlow< DropdownEntryWithValue<StadiumRule>?>(null)
@@ -141,7 +207,13 @@ class RulesSetupComponentModel(
 
     init {
         updateWeatherTable(weatherTables.first().second.first())
+        updatePrayersToNuffleTable(prayersToNuffleTables.first().second.first())
         updateKickoffTable(kickOffTables.first().second.first())
+        updateInjuryTable(injuryTables.first().second.first())
+        updateStuntyInjuryTable(stuntyInjuryTables.first().second.first())
+        updateCasualtyTable(casualtyTables.first().second.first())
+        updateLastingInjuryTable(lastingInjuryTables.first().second.first())
+        updateArgueTheCallTable(argueTheCallTables.first().second.first())
         updateUnusualBall(unusualBallList.first().second.first())
         updatePitch(pitches.first().second.first())
         updateStadium(stadia.first().second.first())
@@ -158,9 +230,39 @@ class RulesSetupComponentModel(
         rulesBuilder.weatherTable = entry.value
     }
 
+    fun updatePrayersToNuffleTable(entry: DropdownEntryWithValue<PrayersToNuffleTable>) {
+        selectedPrayersToNuffleTable.value = entry
+        rulesBuilder.prayersToNuffleTable = entry.value
+    }
+
     fun updateKickoffTable(entry: DropdownEntryWithValue<KickOffTable>) {
         selectedKickOffTable.value = entry
         rulesBuilder.kickOffEventTable = entry.value
+    }
+
+    fun updateInjuryTable(entry: DropdownEntryWithValue<InjuryTable>) {
+        selectedInjuryTable.value = entry
+        rulesBuilder.injuryTable = entry.value
+    }
+
+    fun updateStuntyInjuryTable(entry: DropdownEntryWithValue<InjuryTable>) {
+        selectedStuntyInjuryTable.value = entry
+        rulesBuilder.stuntyInjuryTable = entry.value
+    }
+
+    fun updateCasualtyTable(entry: DropdownEntryWithValue<CasualtyTable>) {
+        selectedCasualtyTable.value = entry
+        rulesBuilder.casualtyTable = entry.value
+    }
+
+    fun updateLastingInjuryTable(entry: DropdownEntryWithValue<LastingInjuryTable>) {
+        selectedLastingInjuryTable.value = entry
+        rulesBuilder.lastingInjuryTable = entry.value
+    }
+
+    fun updateArgueTheCallTable(entry: DropdownEntryWithValue<ArgueTheCallTable>) {
+        selectedArgueTheCallTable.value = entry
+        rulesBuilder.argueTheCallTable = entry.value
     }
 
     fun updateUnusualBall(entry: DropdownEntryWithValue<BallSelectorRule>) {
@@ -197,7 +299,13 @@ class RulesSetupComponentModel(
     fun updateRulesBuilder(ruleBuilder: Rules.Builder) {
         rulesBuilder = ruleBuilder
         updateWeatherTable(weatherTables.findEntry(rulesBuilder.weatherTable))
+        updatePrayersToNuffleTable(prayersToNuffleTables.findEntry(rulesBuilder.prayersToNuffleTable))
         updateKickoffTable(kickOffTables.findEntry(rulesBuilder.kickOffEventTable))
+        updateInjuryTable(injuryTables.findEntry(rulesBuilder.injuryTable))
+        updateStuntyInjuryTable(stuntyInjuryTables.findEntry(rulesBuilder.stuntyInjuryTable))
+        updateCasualtyTable(casualtyTables.findEntry(rulesBuilder.casualtyTable))
+        updateLastingInjuryTable(lastingInjuryTables.findEntry(rulesBuilder.lastingInjuryTable))
+        updateArgueTheCallTable(argueTheCallTables.findEntry(rulesBuilder.argueTheCallTable))
         updateUnusualBall(unusualBallList.findEntry(rulesBuilder.ballSelectorRule))
         updatePitch(pitches.findEntry(rulesBuilder.pitchType))
         updateStadium(stadia.findEntry(rulesBuilder.stadium))

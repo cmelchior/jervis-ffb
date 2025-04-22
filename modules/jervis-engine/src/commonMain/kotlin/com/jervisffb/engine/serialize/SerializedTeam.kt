@@ -67,6 +67,7 @@ class SerializedTeam(
             return teamBuilder(rules, teamData.roster) {
                 id = teamData.id
                 name = teamData.name
+                type = teamData.type
                 this.coach = coach
 
                 teamData.players.forEach { playerData ->

@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.ImportTeamFromFumbblDialog
 import com.jervisffb.ui.menu.components.LoadTeamFromFileDialog
@@ -56,10 +57,12 @@ fun SelectP2PTeamScreen(
             JervisButton(text = "Load from file", onClick = {
                 showLoadTeamFromFileDialog = !showLoadTeamFromFileDialog
             })
-            Spacer(modifier = Modifier.width(16.dp))
-            JervisButton(text = "Import from FUMBBL", onClick = {
-                showImportFumbblTeamDialog = !showImportFumbblTeamDialog
-            })
+            if (viewModel.rules?.gameType == GameType.STANDARD) {
+                Spacer(modifier = Modifier.width(16.dp))
+                JervisButton(text = "Import from FUMBBL", onClick = {
+                    showImportFumbblTeamDialog = !showImportFumbblTeamDialog
+                })
+            }
             Spacer(modifier = Modifier.weight(1f))
             JervisButton(confirmTitle.uppercase(), onClick = { onNext() }, enabled = (selectedTeam != null))
         }

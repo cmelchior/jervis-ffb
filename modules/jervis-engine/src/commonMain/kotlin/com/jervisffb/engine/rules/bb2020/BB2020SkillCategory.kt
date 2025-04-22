@@ -202,7 +202,6 @@ class BB2020SkillSettings: SkillSettings() {
         addCategory(SkillCategory.SPECIAL_RULES)
         SkillType.entries.forEach { type ->
             when (type) {
-
                 //
                 // Agility Category
                 //
@@ -344,7 +343,7 @@ class BB2020SkillSettings: SkillSettings() {
                     // TODO()
                     // }
                 }
-                SkillType.DISTURBING_PRECENSE -> {
+                SkillType.DISTURBING_PRESENCE -> {
                     // addEntry(type, SkillCategory.MUTATIONS) { player, category, _ , expiresAt ->
                     // TODO()
                     // }
@@ -354,7 +353,7 @@ class BB2020SkillSettings: SkillSettings() {
                     // TODO()
                     // }
                 }
-                SkillType.FOUL_APPEREANCE -> {
+                SkillType.FOUL_APPEARANCE -> {
                     // addEntry(type, SkillCategory.MUTATIONS) { player, category, _ , expiresAt ->
                     // TODO()
                     // }
@@ -536,7 +535,7 @@ class BB2020SkillSettings: SkillSettings() {
                     // TODO()
                     // }
                 }
-                SkillType.ALWAYS_HUNGY -> {
+                SkillType.ALWAYS_HUNGRY -> {
                     // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
                     // TODO()
                     // }
@@ -572,6 +571,11 @@ class BB2020SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.DECAY -> {
+                    // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
+                    // TODO()
+                    // }
+                }
+                SkillType.HIT_AND_RUN -> {
                     // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
                     // TODO()
                     // }

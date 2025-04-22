@@ -122,6 +122,7 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
         return TeamInfo(
             teamId = team.id,
             teamName = team.name,
+            type = team.type,
             teamRoster = team.roster.name,
             teamValue = team.teamValue,
             rerolls = team.rerolls.size,

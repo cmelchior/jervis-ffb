@@ -34,7 +34,14 @@ fun SetupRulesComponent(viewModel: RulesSetupComponentModel) {
     val selectedRuleBase by viewModel.selectedRuleBase.collectAsState()
 
     val selectedWeatherTable by viewModel.selectedWeatherTable.collectAsState()
+    val selectedPrayersToNuffleTable by viewModel.selectedPrayersToNuffleTable.collectAsState()
+
     val selectedKickOffTable by viewModel.selectedKickOffTable.collectAsState()
+    val selectedInjuryTable by viewModel.selectedInjuryTable.collectAsState()
+    val selectedStuntyInjuryTable by viewModel.selectedInjuryTable.collectAsState()
+    val selectedCasualtyTable by viewModel.selectedCasualtyTable.collectAsState()
+    val selectedLastingInjuryTable by viewModel.selectedLastingInjuryTable.collectAsState()
+    val selectedArgueTheCallTable by viewModel.selectedArgueTheCallTable.collectAsState()
 
     val selectedPitchEntry by viewModel.selectedPitch.collectAsState()
     val selectedUnusualBallEntry by viewModel.selectedUnusualBall.collectAsState()
@@ -76,7 +83,7 @@ fun SetupRulesComponent(viewModel: RulesSetupComponentModel) {
                 Column(
                     modifier = Modifier.weight(1f).wrapContentSize()
                 ) {
-                    SmallHeader("Tables", bottomPadding = smallHeaderBottomPadding)
+                    SmallHeader("Pre-game Tables", bottomPadding = smallHeaderBottomPadding)
                     // BoxHeader("Tables", bottomPadding = 16.dp)
                     JervisDropdownMenuWithSections(
                         title = "Weather Table",
@@ -86,20 +93,55 @@ fun SetupRulesComponent(viewModel: RulesSetupComponentModel) {
                         viewModel.updateWeatherTable(it)
                     }
                     JervisDropdownMenuWithSections(
+                        title = "Prayers to Nuffle Table",
+                        entries = viewModel.prayersToNuffleTables,
+                        selectedEntry = selectedKickOffTable
+                    ) {
+                        viewModel.updatePrayersToNuffleTable(it)
+                    }
+
+                    SmallHeader("In-game Tables", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
+                    JervisDropdownMenuWithSections(
                         title = "Kick-off Table",
                         entries = viewModel.kickOffTables,
                         selectedEntry = selectedKickOffTable
                     ) {
                         viewModel.updateKickoffTable(it)
                     }
-
-                    SmallHeader("Stadia", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
                     JervisDropdownMenuWithSections(
-                        title = "Stadia of the Old World",
-                        entries = viewModel.stadia,
-                        selectedEntry = selectedStadia
+                        title = "Injury Table",
+                        entries = viewModel.injuryTables,
+                        selectedEntry = selectedInjuryTable
                     ) {
-                        viewModel.updateStadium(it)
+                        viewModel.updateInjuryTable(it)
+                    }
+                    JervisDropdownMenuWithSections(
+                        title = "Stunty Injury Table",
+                        entries = viewModel.stuntyInjuryTables,
+                        selectedEntry = selectedStuntyInjuryTable
+                    ) {
+                        viewModel.updateStuntyInjuryTable(it)
+                    }
+                    JervisDropdownMenuWithSections(
+                        title = "Casualty Table",
+                        entries = viewModel.casualtyTables,
+                        selectedEntry = selectedCasualtyTable,
+                    ) {
+                        viewModel.updateCasualtyTable(it)
+                    }
+                    JervisDropdownMenuWithSections(
+                        title = "Lasting Injury Table",
+                        entries = viewModel.lastingInjuryTables,
+                        selectedEntry = selectedLastingInjuryTable,
+                    ) {
+                        viewModel.updateLastingInjuryTable(it)
+                    }
+                    JervisDropdownMenuWithSections(
+                        title = "Argue the Call Table",
+                        entries = viewModel.argueTheCallTables,
+                        selectedEntry = selectedArgueTheCallTable,
+                    ) {
+                        viewModel.updateArgueTheCallTable(it)
                     }
                 }
                 Spacer(modifier = Modifier.width(24.dp))
@@ -120,6 +162,15 @@ fun SetupRulesComponent(viewModel: RulesSetupComponentModel) {
                         selectedEntry = selectedUnusualBallEntry,
                     ) {
                         viewModel.updateUnusualBall(it)
+                    }
+
+                    SmallHeader("Stadia", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
+                    JervisDropdownMenuWithSections(
+                        title = "Stadia of the Old World",
+                        entries = viewModel.stadia,
+                        selectedEntry = selectedStadia
+                    ) {
+                        viewModel.updateStadium(it)
                     }
 
                     SmallHeader("Events", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
