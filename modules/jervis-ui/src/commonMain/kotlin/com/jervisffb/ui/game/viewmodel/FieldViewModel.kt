@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.animations.JervisAnimation
@@ -20,8 +21,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
-enum class FieldDetails(val resource: String, val description: String) {
-    NICE("fumbbl/icons/cached/pitches/default/nice.png", "Nice Weather"),
+enum class FieldDetails(
+    val resource: String,
+    val description: String,
+    // Draw lines, dots and end zone markers (if false, it is assumed they are part of the image)
+    val drawFieldMarkers: Boolean
+) {
+    // Use a custom field for now as we need something that can be used for both Standard and BB7
+    // It would probably look better with custom fields, but this should be fine for now.
+    HEAT("jervis/pitch/default/heat.png", "Sweltering Heat", true),
+    SUNNY("jervis/pitch/default/sunny.png", "Very Sunny", true),
+    NICE("jervis/pitch/default/nice.png", "Perfect Conditions", true),
+    RAIN("jervis/pitch/default/rain.png", "Pouring Rain", true),
+    BLIZZARD("jervis/pitch/default/blizzard.png", "Blizzard", true),
 }
 
 /**
@@ -34,18 +46,25 @@ class FieldViewModel(
 ) {
     val rules = uiState.rules
     val game = uiState.state
-    val aspectRatio: Float = 782f / 452f
     val width = rules.fieldWidth
     val height = rules.fieldHeight
 
-    private val field = MutableStateFlow(FieldDetails.NICE)
+    val field = uiState.uiStateFlow.map { uiSnapshot ->
+        val weather = uiSnapshot.game.weather
+        when (weather) {
+            Weather.SWELTERING_HEAT -> FieldDetails.HEAT
+            Weather.VERY_SUNNY -> FieldDetails.SUNNY
+            Weather.PERFECT_CONDITIONS -> FieldDetails.NICE
+            Weather.POURING_RAIN -> FieldDetails.RAIN
+            Weather.BLIZZARD -> FieldDetails.BLIZZARD
+        }
+    }
+
     private val _highlights = MutableStateFlow<FieldCoordinate?>(null)
 
     // Track offsets of field squares (so we can use them to animate things between squares)
     var fieldOffset: LayoutCoordinates? = null
     val offsets: MutableMap<FieldCoordinate, LayoutCoordinates> = mutableMapOf()
-
-    fun field(): StateFlow<FieldDetails> = field
 
     fun observeAnimation(): Flow<Pair<UiGameController, JervisAnimation>?> {
         return uiState.animationFlow.map { if (it != null) Pair(uiState, it) else null }

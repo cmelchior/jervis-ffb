@@ -41,8 +41,11 @@ fun GameScreen(
         Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
             Sidebar(leftDugout, Modifier)
         }
-        Column(modifier = Modifier.weight(782f).align(Alignment.Top)) {
-            Field(field, Modifier.aspectRatio(field.aspectRatio))
+        Column(
+            modifier = Modifier.weight(782f).align(Alignment.Top),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Field(field)
             GameStatus(gameStatusController, modifier = Modifier.aspectRatio(782f/32f).fillMaxSize())
             // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
             Row(modifier = Modifier.fillMaxSize().background(Color.White)) {

@@ -193,7 +193,7 @@ tasks.register<Copy>("flattenFFBResources") {
                     this.path = "files/fumbbl/${this.path}"
                 }
                 this.relativePath.startsWith("icons/cached") -> {
-                    if (relativePath.startsWith("icons/cached/players")) {
+                    if (relativePath.startsWith("icons/cached/players") || relativePath.startsWith("icons/cached/pitches")) {
                         this.exclude()
                     } else {
                         this.path = "files/fumbbl/${this.path}"

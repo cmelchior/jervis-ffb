@@ -46,7 +46,12 @@ class CustomizationSetupComponentModel(initialRulesBuilder: Rules.Builder, priva
 
     val fieldWidth = MutableStateFlow(InputFieldDataWithValue("Field Width", rulesBuilder.fieldWidth.toString(), rulesBuilder.fieldWidth, isError = false))
     val fieldHeight = MutableStateFlow(InputFieldDataWithValue("Field Height", rulesBuilder.fieldHeight.toString(), rulesBuilder.fieldHeight, isError = false))
+    val endZone = MutableStateFlow(InputFieldDataWithValue("Endzone", rulesBuilder.endZone.toString(), rulesBuilder.endZone, isError = false))
+    val lineOfScrimmageHome = MutableStateFlow(InputFieldDataWithValue("Line of Scrimmage (Home)", rulesBuilder.lineOfScrimmageHome.toString(), rulesBuilder.lineOfScrimmageHome, isError = false))
+    val lineOfScrimmageAway = MutableStateFlow(InputFieldDataWithValue("Line of Scrimmage (Away)", rulesBuilder.lineOfScrimmageAway.toString(), rulesBuilder.lineOfScrimmageAway, isError = false))
+    val wideZone = MutableStateFlow(InputFieldDataWithValue("Wide Zone", rulesBuilder.wideZone.toString(), rulesBuilder.wideZone, isError = false))
     val maxPlayersOnField = MutableStateFlow(InputFieldDataWithValue("Max Players On Field", rulesBuilder.maxPlayersOnField.toString(), rulesBuilder.maxPlayersOnField, isError = false))
+    val maxPlayersInWideZone = MutableStateFlow(InputFieldDataWithValue("Max Players In Wide Zone", rulesBuilder.maxPlayersInWideZone.toString(), rulesBuilder.maxPlayersInWideZone, isError = false))
     val halfs = MutableStateFlow(InputFieldDataWithValue("Halfs Pr. Game", rulesBuilder.halfsPrGame.toString(), rulesBuilder.halfsPrGame, isError = false))
     val turnsPrHalf = MutableStateFlow(InputFieldDataWithValue("Turns Pr. Half", rulesBuilder.turnsPrHalf.toString(), rulesBuilder.turnsPrHalf, isError = false))
     val selectedDiceRollBehavior = MutableStateFlow(diceRollEntries.first { it.value == DiceRollOwner.ROLL_ON_SERVER })
@@ -64,10 +69,37 @@ class CustomizationSetupComponentModel(initialRulesBuilder: Rules.Builder, priva
         rulesBuilder.fieldHeight = fieldHeight.value.underlyingValue ?: -1
     }
 
+    fun updateEndZone(value: String) {
+        updateIntEntry(value, endZone)
+        rulesBuilder.endZone = endZone.value.underlyingValue ?: -1
+    }
+
+    fun updateLineOfScrimmageHome(value: String) {
+        updateIntEntry(value, lineOfScrimmageHome)
+        rulesBuilder.lineOfScrimmageHome = lineOfScrimmageHome.value.underlyingValue ?: -1
+    }
+
+    fun updateLineOfScrimmageAway(value: String) {
+        updateIntEntry(value, lineOfScrimmageAway)
+        rulesBuilder.lineOfScrimmageAway = lineOfScrimmageAway.value.underlyingValue ?: -1
+    }
+
+    fun updateWideZone(value: String) {
+        updateIntEntry(value, wideZone)
+        rulesBuilder.wideZone = wideZone.value.underlyingValue ?: -1
+    }
+
     fun updateMaxPlayersOnField(value: String) {
         updateIntEntry(value, maxPlayersOnField)
         maxPlayersOnField.value.underlyingValue?.let {
             rulesBuilder.maxPlayersOnField = it
+        }
+    }
+
+    fun updateMaxPlayersInWideZone(value: String) {
+        updateIntEntry(value, maxPlayersInWideZone)
+        maxPlayersInWideZone.value.underlyingValue?.let {
+            rulesBuilder.maxPlayersInWideZone = it
         }
     }
 

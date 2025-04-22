@@ -31,7 +31,13 @@ fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
 
     val fieldWidth by viewModel.fieldWidth.collectAsState()
     val fieldHeight by viewModel.fieldHeight.collectAsState()
+    val endZone by viewModel.endZone.collectAsState()
+    val lineOfScrimmageHome by viewModel.lineOfScrimmageHome.collectAsState()
+    val lineOfScrimmageAway by viewModel.lineOfScrimmageAway.collectAsState()
+    val wideZone by viewModel.wideZone.collectAsState()
+
     val maxPlayersOnField by viewModel.maxPlayersOnField.collectAsState()
+    val maxPlayersInWideZone by viewModel.maxPlayersInWideZone.collectAsState()
 
     val halfs by viewModel.halfs.collectAsState()
     val turnsPrHalf by viewModel.turnsPrHalf.collectAsState()
@@ -72,12 +78,52 @@ fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
                     )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
+                        value = lineOfScrimmageHome.value,
+                        onValueChange = { viewModel.updateLineOfScrimmageHome(it) },
+                        enabled = true,
+                        label = { Text(lineOfScrimmageHome.label) },
+                    )
+                    OutlinedTextField(
+                        modifier = inputFieldModifier,
+                        value = lineOfScrimmageAway.value,
+                        onValueChange = { viewModel.updateLineOfScrimmageAway(it) },
+                        enabled = true,
+                        label = { Text(lineOfScrimmageAway.label) },
+                    )
+                    OutlinedTextField(
+                        modifier = inputFieldModifier,
+                        value = wideZone.value,
+                        onValueChange = { viewModel.updateWideZone(it) },
+                        enabled = true,
+                        label = { Text(wideZone.label) },
+                    )
+                    OutlinedTextField(
+                        modifier = inputFieldModifier,
+                        value = endZone.value,
+                        onValueChange = { viewModel.updateEndZone(it) },
+                        enabled = true,
+                        label = { Text(endZone.label) },
+                    )
+                    OutlinedTextField(
+                        modifier = inputFieldModifier,
                         value = maxPlayersOnField.value,
                         onValueChange = { viewModel.updateMaxPlayersOnField(it) },
                         enabled = true,
                         label = { Text(maxPlayersOnField.label) },
                     )
-                    SmallHeader("Duration", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
+                    OutlinedTextField(
+                        modifier = inputFieldModifier,
+                        value = maxPlayersInWideZone.value,
+                        onValueChange = { viewModel.updateMaxPlayersInWideZone(it) },
+                        enabled = true,
+                        label = { Text(maxPlayersInWideZone.label) },
+                    )
+                }
+                Spacer(modifier = Modifier.width(24.dp))
+                Column(
+                    modifier = Modifier.weight(1f).wrapContentSize()
+                ) {
+                    SmallHeader("Duration", bottomPadding = smallHeaderBottomPadding)
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = halfs.value,
@@ -92,12 +138,8 @@ fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
                         enabled = true,
                         label = { Text(turnsPrHalf.label) }
                     )
-                }
-                Spacer(modifier = Modifier.width(24.dp))
-                Column(
-                    modifier = Modifier.weight(1f).wrapContentSize()
-                ) {
-                    SmallHeader("Randomness", bottomPadding = smallHeaderBottomPadding)
+
+                    SmallHeader("Randomness", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
                     JervisDropDownMenu("Dice Rolls", enabled = true, selectedEntry = diceRollOwner, entries = viewModel.diceRollEntries) {
                         viewModel.updateDiceRollBehavior(it)
                     }
