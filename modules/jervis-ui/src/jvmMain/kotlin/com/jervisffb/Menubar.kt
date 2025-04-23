@@ -1,6 +1,7 @@
 package com.jervisffb
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -9,6 +10,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -17,12 +19,17 @@ import com.jervisffb.ui.utils.saveFile
 
 @Composable
 fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
+
     var action by remember { mutableStateOf("Last action: None") }
     var isOpen by remember { mutableStateOf(true) }
+
     var rerollSuccessfulActions by remember { mutableStateOf(vm.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) }
     var selectKickingPlayer by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_KICKING_PLAYER)) }
     var autoEndPlayerAction by remember { mutableStateOf(vm.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTON)) }
     var selectBlockType by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTON)) }
+
+    val setupType: GameType? by vm.setupAvailable.collectAsState()
+
     MenuBar {
         Menu("Developer Tools", mnemonic = 'D') {
             Item("Save Game", onClick = {
@@ -77,13 +84,30 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
 
         // For now, we just ignore the command if it isn't legal, e.g. if it is the other team that is
         // setting up. Should we instead try to disable these?
-        Menu("Setups", mnemonic = 'S') {
-            Menu("Defensive") {
-                Item(Setups.SETUP_3_4_4, onClick = { vm.loadSetup(Setups.SETUP_3_4_4) })
+        when (setupType) {
+            GameType.STANDARD -> {
+                Menu("Setups", mnemonic = 'S') {
+                    Menu("Defensive") {
+                        Item(Setups.SETUP_3_4_4, onClick = { vm.loadSetup(Setups.SETUP_3_4_4) })
+                    }
+                    Menu("Offensive") {
+                        Item(Setups.SETUP_5_5_1, onClick = { vm.loadSetup(Setups.SETUP_5_5_1) })
+                    }
+                }
             }
-            Menu("Offensive") {
-                Item(Setups.SETUP_5_5_1, onClick = { vm.loadSetup(Setups.SETUP_5_5_1) })
+            GameType.BB7 -> {
+                Menu("Setups", mnemonic = 'S') {
+                    Menu("Defensive") {
+                        Item(Setups.SETUP_3_4, onClick = { vm.loadSetup(Setups.SETUP_3_4) })
+                    }
+                    Menu("Offensive") {
+                        Item(Setups.SETUP_5_2, onClick = { vm.loadSetup(Setups.SETUP_5_2) })
+                    }
+                }
             }
+            GameType.DUNGEON_BOWL -> TODO("Dungeon Bowl setups not yet implemented")
+            GameType.GUTTER_BOWL -> TODO("Gutter Bowl setups not yet implemented")
+            null -> { /* Hide setup menu */ }
         }
     }
 }

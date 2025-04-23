@@ -6,6 +6,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isOnAwayTeam
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
@@ -71,7 +72,13 @@ class SidebarViewModel(
             TeamActionMode.ALL_TEAMS -> true
         }
         if ((setupReceivingTeam || setupKickingTeam) && teamControlledByClient) {
-            Setups.setups.keys.forEach { setup ->
+            val availableSetups = when (uiState.rules.gameType) {
+                GameType.STANDARD -> Setups.standardSetups
+                GameType.BB7 -> Setups.sevensSetups
+                GameType.DUNGEON_BOWL -> TODO("Dungeon Bowl setups not implemented yet.")
+                GameType.GUTTER_BOWL -> TODO("Gutter Bowl setups not implemented yet.")
+            }
+            availableSetups.keys.forEach { setup ->
                 buttons.add(ButtonData(setup, onClick = { menuViewModel.loadSetup(setup)}))
             }
         }

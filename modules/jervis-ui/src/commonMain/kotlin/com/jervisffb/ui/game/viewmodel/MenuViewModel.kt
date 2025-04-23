@@ -8,12 +8,15 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.ui.BuildConfig
 import com.jervisffb.ui.SoundEffect
 import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.game.UiGameController
+import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.intro.CreditData
@@ -41,6 +44,9 @@ class MenuViewModel {
     companion object {
         val LOG = jervisLogger()
     }
+
+    // Expose a flow
+    val setupAvailable: MutableStateFlow<GameType?> = MutableStateFlow(null)
 
     var controller: GameEngineController? = null
     lateinit var uiState: UiGameController
@@ -152,7 +158,14 @@ class MenuViewModel {
             return
         }
 
-        val setupActions = Setups.setups[id]!!.flatMap { (playerNo, fieldCoordinate) ->
+        val availableSetups = when (game.rules.gameType) {
+            GameType.STANDARD -> Setups.standardSetups
+            GameType.BB7 -> Setups.sevensSetups
+            GameType.DUNGEON_BOWL -> TODO("Dungeon Bowl setups not yet implemented")
+            GameType.GUTTER_BOWL -> TODO("Gutter Bowl setups not yet implemented")
+        }
+
+        val setupActions = availableSetups[id]?.flatMap { (playerNo, fieldCoordinate) ->
             if (team[playerNo].state == PlayerState.RESERVE) {
                 listOf(
                     PlayerSelected(team[playerNo].id),
@@ -161,15 +174,41 @@ class MenuViewModel {
             } else {
                 emptyList()
             }
-        }
+        } ?: error("No setup found for id: $id")
         uiState.userSelectedMultipleActions(setupActions, delayEvent = false)
+    }
+
+    // Called by the UiGameController whenever a new snapshot is created. This can be used to determine
+    // which menu actions should be enabled/disabled.
+    fun updateUiState(uiSnapshot: UiGameSnapshot) {
+        // Enable/Disable Setup options
+        val setupKickingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupKickingTeam)
+        val setupReceivingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupReceivingTeam)
+        val teamControlledByClient = when (uiState.uiMode) {
+            TeamActionMode.HOME_TEAM -> setupKickingTeam && uiSnapshot.game.kickingTeam.isHomeTeam()
+            TeamActionMode.AWAY_TEAM -> setupReceivingTeam && uiSnapshot.game.receivingTeam.isHomeTeam()
+            TeamActionMode.ALL_TEAMS -> true
+        }
+        if ((setupReceivingTeam || setupKickingTeam) && teamControlledByClient) {
+            setupAvailable.value = uiState.rules.gameType
+        } else {
+            setupAvailable.value = null
+        }
     }
 }
 
+/**
+ * TODO These setups only work on "normal" Standard fields.
+ *  We should propably check if a custom field is valid for these.
+ */
 object Setups {
     const val SETUP_5_5_1: String = "5-5-1"
     const val SETUP_3_4_4: String = "3-4-4"
-    val setups = mutableMapOf(
+
+    const val SETUP_3_4: String = "3-4"
+    const val SETUP_5_2: String = "5-2"
+
+    val standardSetups = mutableMapOf(
 
         // Offensive
         SETUP_5_5_1 to mapOf(
@@ -199,6 +238,30 @@ object Setups {
             9.playerNo to FieldCoordinate(9, 4),
             10.playerNo to FieldCoordinate(9, 10),
             11.playerNo to FieldCoordinate(9, 13),
+        ),
+    )
+
+    val sevensSetups = mutableMapOf(
+        // Offensive
+        SETUP_5_2 to mapOf(
+            1.playerNo to FieldCoordinate(6, 2),
+            2.playerNo to FieldCoordinate(6, 4),
+            3.playerNo to FieldCoordinate(6, 5),
+            4.playerNo to FieldCoordinate(6, 6),
+            5.playerNo to FieldCoordinate(6, 8),
+            6.playerNo to FieldCoordinate(5, 1),
+            7.playerNo to FieldCoordinate(5, 9),
+        ),
+
+        // Defensive
+        SETUP_3_4 to mapOf(
+            1.playerNo to FieldCoordinate(6, 2),
+            2.playerNo to FieldCoordinate(6, 5),
+            3.playerNo to FieldCoordinate(6, 8),
+            4.playerNo to FieldCoordinate(5, 1),
+            5.playerNo to FieldCoordinate(5, 4),
+            6.playerNo to FieldCoordinate(5, 6),
+            7.playerNo to FieldCoordinate(5, 9),
         ),
     )
 }

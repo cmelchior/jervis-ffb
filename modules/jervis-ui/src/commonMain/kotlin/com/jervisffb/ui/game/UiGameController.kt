@@ -231,6 +231,7 @@ class UiGameController(
                 //  We need an efficient way to copy the old one.
                 actionProvider.decorateAvailableActions(newUiState, actions)
                 lastUiState = newUiState
+                menuViewModel.updateUiState(newUiState)
                 _uiStateFlow.emit(newUiState)
 
                 // Wait for the system to produce the next action, this can either be
