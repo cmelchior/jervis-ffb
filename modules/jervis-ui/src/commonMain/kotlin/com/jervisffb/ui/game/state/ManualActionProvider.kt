@@ -389,8 +389,8 @@ open class ManualActionProvider(
      * In this case, we will register an action generator that only trigger
      * once the player can actually move.
      */
-    override fun registerQueuedActionGenerator(function: QueuedActionsGenerator) {
-        queuedActionsGeneratorFuncs.add(function)
+    override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {
+        queuedActionsGeneratorFuncs.add(generator)
     }
 
     override fun hasQueuedActions(): Boolean {

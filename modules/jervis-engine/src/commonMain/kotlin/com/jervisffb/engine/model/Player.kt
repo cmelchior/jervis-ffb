@@ -16,7 +16,6 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.listSerialDescriptor
 import kotlinx.serialization.encoding.CompositeDecoder
@@ -134,16 +133,10 @@ class Player(
     val position: Position,
     val icon: PlayerUiData? = null,
     val type: PlayerType
-) : Observable<Player>() {
+) {
     lateinit var team: Team
     var location: Location = DogOut
-        set(value) {
-            val old = location
-            field = value
-            if ((old == DogOut && value != DogOut) || old != DogOut && value == DogOut) {
-                team.notifyDogoutChange()
-            }
-        }
+
     // Shortcut for getting a players coordinates. Only works for players currently on the the field
     // taking up a single square.
     val coordinates: FieldCoordinate
@@ -242,10 +235,6 @@ class Player(
 
     fun hasBall(): Boolean = (ball != null)
 
-    // Expose updates to this class as Flow
-    @Transient
-    val observePlayer = observeState
-
     override fun toString(): String {
         return "Player(id='${id.value}', name='$name', number=$number, position=$position)"
     }
@@ -256,14 +245,6 @@ class Player(
 
     inline fun <reified T: Skill> getSkillOrNull(): T? {
         return skills.filterIsInstance<T>().firstOrNull()
-    }
-
-    /**
-     * Returns `true` if the player is still standing on the field
-     */
-    @Deprecated("Move this Rules instead")
-    fun isStanding(rules: Rules): Boolean {
-        return rules.isStanding(this)
     }
 
     fun addStatModifier(modifier: StatModifier) {
@@ -315,9 +296,6 @@ inline fun <reified T: Skill> Player.isSkillAvailable(): Boolean {
         if ((state == PlayerState.PRONE || state == PlayerState.STUNNED || state == PlayerState.STUNNED_OWN_TURN) && !skill.workWhenProne) {
             return@let false
         }
-//        if (state != PlayerState.STANDING && state != PlayerState.PRONE && state == PlayerState.STUNNED) {
-//            return@let false
-//        }
         return !skill.used
     } ?: false
 }

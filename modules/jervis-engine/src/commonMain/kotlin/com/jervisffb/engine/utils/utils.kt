@@ -206,7 +206,9 @@ fun createRandomAction(
 
 const val enableAsserts = true
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun assert(condition: Boolean) {
+    @Suppress("SimplifyBooleanWithConstants")
     if (enableAsserts && !condition) {
         throw IllegalStateException("A invariant failed")
     }
@@ -224,10 +226,12 @@ class InvalidActionException(message: String) : RuntimeException(message)
 
 class InvalidGameStateException(message: String) : IllegalStateException(message)
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun INVALID_GAME_STATE(message: String = "Unexpected game state"): Nothing {
     throw InvalidGameStateException(message)
 }
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun INVALID_ACTION(action: GameAction, customMessage: String? = null): Nothing {
     throw InvalidActionException(customMessage?.let {
         customMessage

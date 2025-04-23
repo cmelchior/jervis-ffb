@@ -36,6 +36,7 @@ import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -91,6 +92,7 @@ class LocalActionProvider(
         // in the network protocol first
         val timersEnabled = settings.timerSettings.timersEnabled && false
         if (timersEnabled) {
+            @OptIn(DelicateCoroutinesApi::class)
             actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
                 // TODO Need to figure out if we are using setup / turn / response timers and track it correctly
                 delay(settings.timerSettings.turnMaxTime ?:settings.timerSettings.turnFreeTime)
@@ -167,7 +169,7 @@ class UiGameController(
     val animationFlow: Flow<JervisAnimation?> = _animationFlow
 
     // Channel used by the UI to indicate when the animation is done
-    val animationDone = Channel<Boolean>(capacity = Channel.Factory.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
+    val animationDone = Channel<Boolean>(capacity = Channel.RENDEZVOUS, onBufferOverflow = BufferOverflow.SUSPEND)
 
     /**
      * Start the main game loop.
@@ -220,7 +222,7 @@ class UiGameController(
 
                 // Update UI State based on latest model state
                 actionProvider.prepareForNextAction(controller, actions)
-                var newUiState = createNewUiSnapshot(state, actions, delta, lastUiState)
+                val newUiState = createNewUiSnapshot(state, actions, delta, lastUiState)
                 _uiStateFlow.emit(newUiState)
 
                 // Detect animations and run them after updating the UI, but before making it ready

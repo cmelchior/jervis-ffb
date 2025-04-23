@@ -14,11 +14,9 @@ class SetApothecaryUsed(
     override fun execute(state: Game) {
         originalValue = apothecary.used
         apothecary.used = used
-        team.notifyUpdate()
     }
 
     override fun undo(state: Game) {
         apothecary.used = originalValue
-        team.notifyUpdate()
     }
 }

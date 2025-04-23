@@ -78,7 +78,7 @@ import com.jervisffb.utils.canBeHost
 import com.jervisffb.utils.getHttpClient
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
-import io.ktor.client.statement.readBytes
+import io.ktor.client.statement.readRawBytes
 import io.ktor.http.ContentType
 import io.ktor.http.Url
 import io.ktor.http.encodeURLParameter
@@ -250,7 +250,7 @@ object IconFactory {
             }
         }
         return if (result.status.isSuccess()) {
-            val bytes = result.readBytes()
+            val bytes = result.readRawBytes()
             val image = Image.makeFromEncoded(bytes).toComposeImageBitmap()
             CacheManager.saveImage(url, image)
             image

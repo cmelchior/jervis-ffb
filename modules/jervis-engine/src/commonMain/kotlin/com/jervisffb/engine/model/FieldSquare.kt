@@ -44,7 +44,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
  */
 class FieldSquare(
     val coordinates: FieldCoordinate
-) : Observable<FieldSquare>(), FieldCoordinate by coordinates {
+): FieldCoordinate by coordinates {
     constructor(x: Int, y: Int) : this(FieldCoordinate(x, y))
     var player: Player? = null
     // Having multiple balls in the same field should just be a temporary state

@@ -17,7 +17,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "utils"
+        outputModuleName.set("test-utils")
         browser()
     }
 

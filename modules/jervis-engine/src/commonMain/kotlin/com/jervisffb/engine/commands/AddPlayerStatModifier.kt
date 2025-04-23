@@ -9,7 +9,6 @@ class AddPlayerStatModifier(private val player: Player, val modifier: StatModifi
         player.apply {
             addStatModifier(modifier)
             player.team.game.rules.updatePlayerStat(player, modifier)
-            notifyUpdate()
         }
     }
 
@@ -17,7 +16,6 @@ class AddPlayerStatModifier(private val player: Player, val modifier: StatModifi
         player.apply {
             removeStatModifier(modifier)
             player.team.game.rules.updatePlayerStat(player, modifier)
-            notifyUpdate()
         }
     }
 }

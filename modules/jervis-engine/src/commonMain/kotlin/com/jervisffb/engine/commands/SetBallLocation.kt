@@ -19,13 +19,11 @@ class SetBallLocation(val ball: Ball, val newLocation: FieldCoordinate) : Comman
         if (originalLocation.isOnField(rules)) {
             state.field[originalLocation].apply {
                 balls.remove(ball)
-                notifyUpdate()
             }
         }
         if (newLocation.isOnField(rules)) {
             state.field[newLocation].apply {
                 balls.add(ball)
-                notifyUpdate()
             }
         }
     }
@@ -35,13 +33,11 @@ class SetBallLocation(val ball: Ball, val newLocation: FieldCoordinate) : Comman
         if (newLocation.isOnField(rules)) {
             state.field[newLocation].apply {
                 balls.remove(this@SetBallLocation.ball)
-                notifyUpdate()
             }
         }
         if (originalLocation.isOnField(rules)) {
             state.field[originalLocation].apply {
                 balls.add(this@SetBallLocation.ball)
-                notifyUpdate()
             }
         }
         ball.location = originalLocation

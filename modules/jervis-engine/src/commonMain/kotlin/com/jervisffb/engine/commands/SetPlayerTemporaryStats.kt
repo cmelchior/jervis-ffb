@@ -16,14 +16,12 @@ class SetPlayerTemporaryStats(private val player: Player, private val movesLeft:
     override fun execute(state: Game) {
         player.apply {
             this@apply.movesLeft = this@SetPlayerTemporaryStats.movesLeft
-            notifyUpdate()
         }
     }
 
     override fun undo(state: Game) {
         player.apply {
             movesLeft = originalMovesLeft
-            notifyUpdate()
         }
     }
 }

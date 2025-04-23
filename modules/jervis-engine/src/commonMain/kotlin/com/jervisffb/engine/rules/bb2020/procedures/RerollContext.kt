@@ -27,6 +27,7 @@ sealed interface DieRoll<D : DieResult> {
  * Wrap a single Block die roll. This makes it possible to track it all the way from being rolled to its final result
  */
 @Serializable
+@ConsistentCopyVisibility
 data class BlockDieRoll private constructor(
     override val id: DieId,
     override val originalRoll: DBlockResult,
@@ -56,6 +57,7 @@ data class BlockDieRoll private constructor(
  * Wrap a single D6 die roll. This makes it possible to track it all the way from being rolled to its final result.
  */
 @Serializable
+@ConsistentCopyVisibility
 data class D6DieRoll private constructor(
     override val id: DieId,
     override val originalRoll: D6Result,

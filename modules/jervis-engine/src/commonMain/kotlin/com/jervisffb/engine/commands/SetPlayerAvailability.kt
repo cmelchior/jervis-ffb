@@ -11,14 +11,12 @@ class SetPlayerAvailability(private val player: Player, val availability: Availa
         this.originalAvailability = player.available
         player.apply {
             available = availability
-            notifyUpdate()
         }
     }
 
     override fun undo(state: Game) {
         player.apply {
             available = originalAvailability
-            notifyUpdate()
         }
     }
 }

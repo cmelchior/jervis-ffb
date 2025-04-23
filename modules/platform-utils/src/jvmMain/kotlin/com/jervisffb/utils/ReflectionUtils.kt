@@ -1,10 +1,11 @@
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package com.jervisffb.utils
 
 import org.reflections.Reflections
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object ReflectionUtils {
     actual fun <E: Any> getEnumConstants(kClass: KClass<E>): Array<E> {
         return kClass.java.enumConstants

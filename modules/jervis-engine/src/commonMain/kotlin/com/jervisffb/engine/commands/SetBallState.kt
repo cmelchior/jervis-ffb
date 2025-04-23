@@ -101,8 +101,6 @@ class SetBallState private constructor(
                 originalSetLocationCommand?.execute(state)
             }
             it.outOfBoundsAt = exitLocation
-            it.notifyUpdate()
-            originalCarriedBy?.notifyUpdate()
         }
     }
 
@@ -111,7 +109,5 @@ class SetBallState private constructor(
         originalSetLocationCommand?.undo(state)
         ball.carriedBy = originalCarriedBy
         ball.state = originalState
-        ball.notifyUpdate()
-        ball.carriedBy?.notifyUpdate()
     }
 }

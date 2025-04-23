@@ -1,6 +1,5 @@
 package com.jervisffb.fumbbl.net.model.reports
 
-import com.jervisffb.fumbbl.net.model.BlockResult
 import com.jervisffb.fumbbl.net.model.CatchModifier
 import com.jervisffb.fumbbl.net.model.Direction
 import com.jervisffb.fumbbl.net.model.FieldCoordinate
@@ -8,10 +7,12 @@ import com.jervisffb.fumbbl.net.model.PlayerAction
 import com.jervisffb.fumbbl.net.model.PushbackMode
 import com.jervisffb.fumbbl.net.model.ReportId
 import com.jervisffb.fumbbl.net.model.change.PlayerId
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("reportId")
 sealed interface Report {

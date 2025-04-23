@@ -13,11 +13,9 @@ class SetSkillUsed(private val player: Player, private val skill: Skill, val use
     override fun execute(state: Game) {
         this.originalUsed = skill.used
         skill.used = this@SetSkillUsed.used
-        player.notifyUpdate()
     }
 
     override fun undo(state: Game) {
         skill.used = originalUsed
-        player.notifyUpdate()
     }
 }

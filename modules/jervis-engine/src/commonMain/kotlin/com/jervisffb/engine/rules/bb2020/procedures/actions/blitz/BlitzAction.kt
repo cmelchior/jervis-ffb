@@ -197,7 +197,7 @@ object BlitzAction : Procedure() {
             val moveContext = state.getContext<MoveContext>()
             val blitzContext = state.getContext<BlitzActionContext>()
             val endNow = state.endActionImmediately()
-            return if (!blitzContext.attacker.isStanding(rules) && !endNow) {
+            return if (!rules.isStanding(blitzContext.attacker) && !endNow) {
                 compositeCommandOf(
                     if (moveContext.hasMoved) SetContext(blitzContext.copy(hasMoved = true)) else null,
                     RemoveContext<MoveContext>(),

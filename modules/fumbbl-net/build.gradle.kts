@@ -25,12 +25,11 @@ kotlin {
     iosSimulatorArm64()
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "fumbbl-net"
+        outputModuleName.set("fumbbl-net")
         browser()
     }
 
     sourceSets {
-        val ktor = libs.versions.ktor.get()
         val commonMain by getting {
             dependencies {
                 implementation(project(":modules:platform-utils"))

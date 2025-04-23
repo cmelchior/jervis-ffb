@@ -40,18 +40,6 @@ class SetPlayerLocation(val player: Player, val location: Location) : Command {
                 player = this@SetPlayerLocation.player
             }
         }
-
-        // Only run notifications after all changes are applied
-        if (oldLocation is FieldCoordinate && oldLocation != FieldCoordinate.UNKNOWN && oldLocation != FieldCoordinate.OUT_OF_BOUNDS) {
-            state.field[oldLocation].notifyUpdate()
-        }
-        player.notifyUpdate()
-        player.team.notifyDogoutChange()
-        player.location.let {
-            if (it is FieldCoordinate && location != FieldCoordinate.UNKNOWN && location != FieldCoordinate.OUT_OF_BOUNDS) {
-                state.field[it].notifyUpdate()
-            }
-        }
     }
 
     override fun undo(state: Game) {
@@ -65,17 +53,6 @@ class SetPlayerLocation(val player: Player, val location: Location) : Command {
         if (originalLoc is FieldCoordinate) {
             state.field[originalLoc].apply {
                 player = originalPlayerOnField
-            }
-        }
-        // Only run notifications after all changes are applied
-        if (location is FieldCoordinate) {
-            state.field[location].notifyUpdate()
-        }
-        player.notifyUpdate()
-        player.team.notifyDogoutChange()
-        originalLoc.let {
-            if (it is FieldCoordinate) {
-                state.field[it].notifyUpdate()
             }
         }
     }

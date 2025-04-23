@@ -1,10 +1,12 @@
 package com.jervisffb.fumbbl.net.api.commands
 
 import com.jervisffb.fumbbl.net.model.GameList
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("netCommandId")
 sealed interface ServerCommand : NetCommand {

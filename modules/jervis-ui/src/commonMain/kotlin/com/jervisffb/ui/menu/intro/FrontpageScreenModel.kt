@@ -54,8 +54,8 @@ data class CreditData(
     ),
     val fumbblDevelopersDescription: String = """
         This project is heavily inspired by the FUMBBL Client, and a lot of the graphics and 
-        sound assets are borrowed from there. All credits go the respective creators, see the 
-        link below.
+        sound assets are borrowed from there. All credits go to the respective creators, see 
+        the link below.
     """.trimIndent(),
     val projectUrl: String = "https://github.com/cmelchior/jervis-ffb",
     val newIssueUrl: String = "https://github.com/cmelchior/jervis-ffb/issues/new",

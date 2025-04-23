@@ -27,7 +27,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "jervis-engine"
+        outputModuleName.set("jervis-engine")
         browser()
     }
 

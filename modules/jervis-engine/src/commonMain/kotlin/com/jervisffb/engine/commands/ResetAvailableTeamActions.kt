@@ -43,7 +43,6 @@ class ResetAvailableTeamActions(
             it.availableSpecialActions.clear()
             it.availableSpecialActions.putAll(specialActions)
         }
-        team.notifyUpdate()
     }
 
     override fun undo(
@@ -59,6 +58,5 @@ class ResetAvailableTeamActions(
             it.availableSpecialActions.clear()
             it.availableSpecialActions.putAll(originalSpecialActions)
         }
-        team.notifyUpdate()
     }
 }

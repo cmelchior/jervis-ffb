@@ -45,7 +45,7 @@ fun AboutDialogComponent(viewModel: MenuViewModel) {
     val textColor = JervisTheme.contentTextColor
     if (!showDialog) return
     JervisDialog(
-        title = "About",
+        title = "About Jervis Fantasy Football",
         icon = {
             Text(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),

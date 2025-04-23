@@ -137,7 +137,6 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
             this.teamValue = this@TeamBuilder.teamValue
             this.currentTeamValue = this@TeamBuilder.currentTeamValue
             this.teamLogo = this@TeamBuilder.teamLogo
-            notifyDogoutChange()
         }
     }
 }

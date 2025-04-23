@@ -11,13 +11,11 @@ class SetCoachBanned(private val team: Team, private val banned: Boolean) : Comm
     ) {
         originalValue = team.coachBanned
         team.coachBanned = banned
-        team.notifyUpdate()
     }
 
     override fun undo(
         state: Game,
     ) {
         team.coachBanned = originalValue
-        team.notifyUpdate()
     }
 }

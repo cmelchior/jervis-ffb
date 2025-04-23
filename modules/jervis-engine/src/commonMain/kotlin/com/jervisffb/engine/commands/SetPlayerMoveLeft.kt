@@ -18,14 +18,12 @@ class SetPlayerMoveLeft(private val player: Player, val remainingMove: Int) : Co
         this.originalMove = player.movesLeft
         player.apply {
             movesLeft = remainingMove
-            notifyUpdate()
         }
     }
 
     override fun undo(state: Game) {
         player.apply {
             movesLeft = originalMove
-            notifyUpdate()
         }
     }
 }

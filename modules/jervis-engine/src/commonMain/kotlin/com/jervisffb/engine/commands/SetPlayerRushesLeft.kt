@@ -15,14 +15,12 @@ class SetPlayerRushesLeft(private val player: Player, val remainingRushes: Int) 
         this.originalRushes = player.rushesLeft
         player.apply {
             rushesLeft = remainingRushes
-            notifyUpdate()
         }
     }
 
     override fun undo(state: Game) {
         player.apply {
             rushesLeft = originalRushes
-            notifyUpdate()
         }
     }
 }

@@ -89,7 +89,7 @@ object QuickSnap : Procedure() {
             } else {
                 // Already moved players can no longer move, otherwise all open players are eligible.
                 val eligiblePlayers = state.receivingTeam
-                    .filter { it.isStanding(rules) }
+                    .filter { rules.isStanding(it) }
                     .filter { rules.isOpen(it) }
                     .toSet() - context.playersMoved.toSet()
                 eligiblePlayers.map { SelectPlayer(it) } + EndSetupWhenReady

@@ -38,12 +38,13 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "JervisUI"
+            freeCompilerArgs += "-Xbinary=bundleId=com.jervisffb"
             isStatic = true
         }
     }
 
     wasmJs {
-        moduleName = "jervis-ui"
+        outputModuleName.set("jervis-ui")
         browser {
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {

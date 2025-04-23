@@ -10,14 +10,12 @@ class SetHasTackleZones(private val player: Player, private val hasTackleZones: 
         originalValue = player.hasTackleZones
         player.apply {
             this.hasTackleZones = this@SetHasTackleZones.hasTackleZones
-            notifyUpdate()
         }
     }
 
     override fun undo(state: Game) {
         player.apply {
             this.hasTackleZones = originalValue
-            notifyUpdate()
         }
     }
 }

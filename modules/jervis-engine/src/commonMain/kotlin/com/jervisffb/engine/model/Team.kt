@@ -5,7 +5,6 @@ import com.jervisffb.engine.model.inducements.Bribe
 import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
 import com.jervisffb.engine.model.inducements.SpecialPlayCard
 import com.jervisffb.engine.model.inducements.wizards.Wizard
-import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -14,10 +13,6 @@ import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.RosterLogo
-import com.jervisffb.engine.utils.safeTryEmit
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlin.properties.Delegates
 
 class TeamHalfData(private val game: Game) {
@@ -79,7 +74,7 @@ class Team(
     val type: GameType,
     val roster: BB2020Roster,
     var coach: Coach
-) : Collection<Player>, Observable<Team>() {
+) : Collection<Player> {
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
     // Team staff
@@ -152,10 +147,6 @@ class Team(
     //  the roster logo.
     var teamLogo: RosterLogo? = null
 
-    init {
-        notifyUpdate() // Make sure dogout is filled
-    }
-
     // Must be called before using this class.
     // Used to break circular reference between Team and Game instances
     fun setGameReference(game: Game) {
@@ -200,14 +191,4 @@ class Team(
     fun hasPrayer(prayer: PrayerToNuffle): Boolean {
         return activePrayersToNuffle.contains(prayer)
     }
-
-    fun notifyDogoutChange() {
-        val playersInDogout = noToPlayer.values.filter { it.location == DogOut }
-        _dogoutState.safeTryEmit(playersInDogout)
-    }
-
-    private val _dogoutState =
-        MutableSharedFlow<List<Player>>(replay = 1, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
-
-    val dogoutFlow: SharedFlow<List<Player>> = _dogoutState
 }

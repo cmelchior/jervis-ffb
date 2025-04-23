@@ -9,14 +9,12 @@ class AddNigglingInjuries(val player: Player, val change: Int): Command {
         originalValue = player.nigglingInjuries
         player.apply {
             nigglingInjuries += change
-            notifyUpdate()
         }
     }
 
     override fun undo(state: Game) {
         player.apply {
             nigglingInjuries = originalValue
-            notifyUpdate()
         }
     }
 }

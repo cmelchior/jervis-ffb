@@ -135,7 +135,7 @@ object ThrowIn : Procedure() {
     object ResolveLandOnField : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             val ball = state.getContext<ThrowInContext>().ball
-            val isStandingPlayer = state.field[ball.location].player?.isStanding(rules)
+            val isStandingPlayer = state.field[ball.location].player?.let { rules.isStanding(it) }
             return if (isStandingPlayer == true) {
                 Catch
             } else {

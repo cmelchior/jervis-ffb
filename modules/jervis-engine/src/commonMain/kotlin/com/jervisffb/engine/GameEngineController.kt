@@ -380,46 +380,4 @@ class GameEngineController(
             )
         executeCommand(command)
     }
-
-    // TODO Figure out a better API for controlling Replay Mode.
-//    fun enableReplayMode() {
-//        this.replayMode = true
-//        this.replayIndex = commands.size
-//    }
-
-//    fun disableReplayMode() {
-//        checkReplayMode()
-//        while (forward()) { }
-//        this.replayMode = false
-//        this.replayIndex = -1
-//    }
-
-//    // Go backwards in the command history
-//    fun back(): Boolean {
-//        checkReplayMode()
-//        if (replayIndex == 0) {
-//            return false
-//        }
-//        replayIndex -= 1
-//        val undoCommand = commands[replayIndex]
-//        undoCommand.undo(state)
-//        return true
-//    }
-
-    private inline fun checkReplayMode() {
-        if (!replayMode) {
-            throw IllegalStateException("Controller is not in replay mode.")
-        }
-    }
-
-
-//    fun forward(): Boolean {
-//        checkReplayMode()
-//        if (replayIndex == commands.size) {
-//            return false
-//        }
-//        commands[replayIndex].execute(state)
-//        replayIndex += 1
-//        return true
-//    }
 }

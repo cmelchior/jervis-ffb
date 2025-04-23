@@ -11,8 +11,6 @@ class SetActivePlayer(private val player: Player?) : Command {
     ) {
         originalPlayer = state.activePlayer
         state.activePlayer = player
-        originalPlayer?.notifyUpdate()
-        state.activePlayer?.notifyUpdate()
     }
 
     override fun undo(
@@ -20,8 +18,6 @@ class SetActivePlayer(private val player: Player?) : Command {
     ) {
         val old = state.activePlayer
         state.activePlayer = null
-        old?.notifyUpdate()
         state.activePlayer = originalPlayer
-        state.activePlayer?.notifyUpdate()
     }
 }

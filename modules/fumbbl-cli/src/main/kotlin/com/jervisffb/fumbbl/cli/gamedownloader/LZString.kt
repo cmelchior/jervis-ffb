@@ -291,7 +291,7 @@ internal object LZString {
         while (power != java.lang.Double.valueOf(maxpower).toInt()) {
             val resb: Int = data.`val` and data.position
             data.position = data.position shr 1
-            if (data.position === 0) {
+            if (data.position == 0) {
                 data.position = 32768
                 data.`val` = data.string!![data.index++].code
             }
@@ -306,7 +306,7 @@ internal object LZString {
                 while (power != java.lang.Double.valueOf(maxpower).toInt()) {
                     val resb: Int = data.`val` and data.position
                     data.position = data.position shr 1
-                    if (data.position === 0) {
+                    if (data.position == 0) {
                         data.position = 32768
                         data.`val` = data.string!![data.index++].code
                     }
@@ -323,7 +323,7 @@ internal object LZString {
                 while (power != java.lang.Double.valueOf(maxpower).toInt()) {
                     val resb: Int = data.`val` and data.position
                     data.position = data.position shr 1
-                    if (data.position === 0) {
+                    if (data.position == 0) {
                         data.position = 32768
                         data.`val` = data.string!![data.index++].code
                     }
@@ -350,7 +350,7 @@ internal object LZString {
             while (power != java.lang.Double.valueOf(maxpower).toInt()) {
                 val resb: Int = data.`val` and data.position
                 data.position = data.position shr 1
-                if (data.position === 0) {
+                if (data.position == 0) {
                     data.position = 32768
                     data.`val` = data.string!![data.index++].code
                 }
@@ -366,7 +366,7 @@ internal object LZString {
                     while (power != java.lang.Double.valueOf(maxpower).toInt()) {
                         val resb: Int = data.`val` and data.position
                         data.position = data.position shr 1
-                        if (data.position === 0) {
+                        if (data.position == 0) {
                             data.position = 32768
                             data.`val` = data.string!![data.index++].code
                         }
@@ -387,7 +387,7 @@ internal object LZString {
                     while (power != java.lang.Double.valueOf(maxpower).toInt()) {
                         val resb: Int = data.`val` and data.position
                         data.position = data.position shr 1
-                        if (data.position === 0) {
+                        if (data.position == 0) {
                             data.position = 32768
                             data.`val` = data.string!![data.index++].code
                         }

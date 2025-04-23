@@ -12,7 +12,6 @@ class SetFanFactor(private val team: Team, private val fanFactor: Int) : Command
         originalValue = team.fanFactor
         team.apply {
             fanFactor = this@SetFanFactor.fanFactor
-            notifyUpdate()
         }
     }
 
@@ -21,7 +20,6 @@ class SetFanFactor(private val team: Team, private val fanFactor: Int) : Command
     ) {
         team.apply {
             fanFactor = originalValue
-            notifyUpdate()
         }
     }
 }

@@ -27,7 +27,6 @@ class SetPlayerState(
             if (this@SetPlayerState.hasTackleZones != null) {
                 this.hasTackleZones = this@SetPlayerState.hasTackleZones
             }
-            notifyUpdate()
         }
     }
 
@@ -37,7 +36,6 @@ class SetPlayerState(
                 this.hasTackleZones = originalHasTackleZones
             }
             this.state = originalState
-            notifyUpdate()
         }
     }
 }

@@ -131,7 +131,7 @@ object ThrowTeamMateAction : Procedure() {
             val context = state.getContext<ThrowTeamMateContext>()
             return if (state.endActionImmediately()) {
                 ExitProcedure()
-            } else if (!context.thrower.isStanding(rules)) {
+            } else if (!rules.isStanding(context.thrower)) {
                 compositeCommandOf(
                     SetTurnOver(TurnOver.STANDARD),
                     ExitProcedure()

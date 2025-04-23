@@ -10,13 +10,11 @@ class UseApothecary(private val team: Team, private val apothecary: Apothecary) 
     override fun execute(state: Game) {
         originalUsed = apothecary.used
         apothecary.used = true
-        team.notifyUpdate()
     }
 
     override fun undo(
         state: Game,
     ) {
         apothecary.used = false
-        team.notifyUpdate()
     }
 }

@@ -19,11 +19,9 @@ class SetSpecialActionSkillUsed(private val player: Player, private val skill: S
     override fun execute(state: Game) {
         this.originalUsed = (skill as SpecialActionProvider).isSpecialActionUsed
         skill.isSpecialActionUsed = this@SetSpecialActionSkillUsed.used
-        player.notifyUpdate()
     }
 
     override fun undo(state: Game) {
         (skill as SpecialActionProvider).isSpecialActionUsed = originalUsed
-        player.notifyUpdate()
     }
 }

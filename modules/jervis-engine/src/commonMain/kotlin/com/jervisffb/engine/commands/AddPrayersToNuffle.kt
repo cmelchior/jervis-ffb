@@ -7,11 +7,9 @@ import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
 class AddPrayersToNuffle(private val team: Team, val prayer: PrayerToNuffle) : Command {
     override fun execute(state: Game) {
         team.activePrayersToNuffle.add(prayer)
-        team.notifyUpdate()
     }
 
     override fun undo(state: Game) {
         team.activePrayersToNuffle.remove(prayer)
-        team.notifyUpdate()
     }
 }

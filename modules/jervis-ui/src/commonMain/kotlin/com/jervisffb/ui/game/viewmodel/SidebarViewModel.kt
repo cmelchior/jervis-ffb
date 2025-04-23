@@ -18,11 +18,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 
 data class ButtonData(
     val title: String,
@@ -41,12 +43,10 @@ class SidebarViewModel(
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
 ) {
 
-    // Image is 145f/430f, but we need to stretch to make it fit the field image.
+    // The image is 145f/430f, but we need to stretch to make it fit the field image.
     val aspectRatio: Float = 145f/430f // 152.42f / 452f
 
     private val _view = MutableStateFlow(SidebarView.RESERVES)
-    private val _reserveCount = MutableStateFlow<Int?>(null)
-    private val _injuriesCount = MutableStateFlow<Int?>(null)
     private val _buttons: Flow<List<ButtonData>> = uiState.uiStateFlow.map { uiSnapshot ->
         // TODO Find a better way to detect game mode
         if (uiState.actionProvider is ReplayActionProvider) return@map emptyList()
@@ -60,8 +60,8 @@ class SidebarViewModel(
             buttons.addAll(uiSnapshot.awayTeamActions)
         }
 
-        // Check if this team is during setup phase. For now we just hard-code a few examples
-        // This is mostly for WASM, iOS as JVM have a proper menu bar. This should be reworked
+        // Check if this team is during the setup phase. For now, we just hard-code a few examples
+        // This is mostly for WASM, iOS as JVM has a proper menu bar. This should be reworked
         // once we add proper menu support on WASM/iOS.
         // Also, consider moving this logic into decorators somehow.
         val setupKickingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupKickingTeam) && uiSnapshot.game.kickingTeam == team
@@ -84,6 +84,15 @@ class SidebarViewModel(
         }
         buttons
     }
+
+    // Expose Dogout information as a separate flow
+    private val dogoutFlow: SharedFlow<List<Player>> = uiState.uiStateFlow.map {
+        if (team.isHomeTeam()) {
+            it.game.homeTeam.filter { player -> player.location == DogOut }
+        } else {
+            it.game.awayTeam.filter { player -> player.location == DogOut }
+        }
+    }.shareIn(menuViewModel.backgroundContext, SharingStarted.Lazily)
 
     // Player being hovered over.
     // All of these will be shown on the away team location, except when hovering over
@@ -108,13 +117,13 @@ class SidebarViewModel(
 
     fun actionButtons(): Flow<List<ButtonData>> = _buttons
 
-    fun reserveCount(): Flow<Int> = team.dogoutFlow.map {
+    fun reserveCount(): Flow<Int> = dogoutFlow.map {
         // Available players in the Dogout should only have this state
-        it.count { it.state == PlayerState.RESERVE }
+        it.count { player -> player.state == PlayerState.RESERVE }
     }
 
     fun reserves(): Flow<List<UiPlayer>> {
-        return team.dogoutFlow
+        return dogoutFlow
             .map { players: List<Player> ->
                 players
                     .filter { it.state == PlayerState.RESERVE }
@@ -133,22 +142,22 @@ class SidebarViewModel(
             }
     }
 
-    fun knockedOut(): Flow<List<UiPlayer>> = mapTo(PlayerState.KNOCKED_OUT, team.dogoutFlow)
+    fun knockedOut(): Flow<List<UiPlayer>> = mapTo(PlayerState.KNOCKED_OUT, dogoutFlow)
 
-    fun badlyHurt(): Flow<List<UiPlayer>> = mapTo(PlayerState.BADLY_HURT, team.dogoutFlow)
+    fun badlyHurt(): Flow<List<UiPlayer>> = mapTo(PlayerState.BADLY_HURT, dogoutFlow)
 
-    fun seriousInjuries(): Flow<List<UiPlayer>> = mapTo(listOf(PlayerState.SERIOUSLY_HURT, PlayerState.SERIOUS_INJURY, PlayerState.LASTING_INJURY), team.dogoutFlow)
+    fun seriousInjuries(): Flow<List<UiPlayer>> = mapTo(listOf(PlayerState.SERIOUSLY_HURT, PlayerState.SERIOUS_INJURY, PlayerState.LASTING_INJURY), dogoutFlow)
 
-    fun dead(): Flow<List<UiPlayer>> = mapTo(PlayerState.DEAD, team.dogoutFlow)
+    fun dead(): Flow<List<UiPlayer>> = mapTo(PlayerState.DEAD, dogoutFlow)
 
-    fun banned(): Flow<List<UiPlayer>> = mapTo(PlayerState.BANNED, team.dogoutFlow)
+    fun banned(): Flow<List<UiPlayer>> = mapTo(PlayerState.BANNED, dogoutFlow)
 
-    fun special(): Flow<List<UiPlayer>> = mapTo(PlayerState.FAINTED, team.dogoutFlow)
+    fun special(): Flow<List<UiPlayer>> = mapTo(PlayerState.FAINTED, dogoutFlow)
 
-    fun injuriesCount(): Flow<Int> = team.dogoutFlow.map {
+    fun injuriesCount(): Flow<Int> = dogoutFlow.map {
         // Available players should be in RESERVE, all others should be treated
         // as some kind of injury.
-        it.count { it.state != PlayerState.RESERVE}
+        it.count { player -> player.state != PlayerState.RESERVE}
     }
 
     fun hoverOver(player: Player) {

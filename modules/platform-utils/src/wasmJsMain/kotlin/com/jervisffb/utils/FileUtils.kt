@@ -121,6 +121,7 @@ actual class FileManager {
         val db = DatabaseManager.getDatabase()
         return db.transaction(filesStore) {
             val store = objectStore(filesStore)
+            @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
             (store.get(IDBKey(path)) as WebFile?)?.content?.toByteArray()
         }
     }

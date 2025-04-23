@@ -2,7 +2,7 @@ package com.jervisffb.engine.model
 
 import com.jervisffb.engine.model.locations.FieldCoordinate
 
-class Ball : Observable<Ball>() {
+class Ball {
     var state: BallState = BallState.ON_GROUND
     var location: FieldCoordinate = FieldCoordinate.UNKNOWN
 
@@ -11,6 +11,4 @@ class Ball : Observable<Ball>() {
 
     // Only set if state = OUT_OF_BOUNDS
     var outOfBoundsAt: FieldCoordinate? = null
-
-    val observeBall = observeState
 }

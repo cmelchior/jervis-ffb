@@ -13,14 +13,12 @@ class SetMissNextGame(
         this.originalValue = player.missNextGame
         player.apply {
             missNextGame = this@SetMissNextGame.missNextGame
-            notifyUpdate()
         }
     }
 
     override fun undo(state: Game) {
         player.apply {
             missNextGame = originalValue
-            notifyUpdate()
         }
     }
 }

@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -18,12 +17,11 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "utils"
+        outputModuleName.set("utils")
         browser()
     }
 
     sourceSets {
-        val ktor = libs.versions.ktor.get()
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("reflect"))
@@ -72,11 +70,5 @@ kotlin {
                 implementation(libs.datastore.preferences)
             }
         }
-    }
-}
-
-tasks.withType<KotlinCompile<*>>().configureEach {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xwasm-use-new-exception-proposal")
     }
 }

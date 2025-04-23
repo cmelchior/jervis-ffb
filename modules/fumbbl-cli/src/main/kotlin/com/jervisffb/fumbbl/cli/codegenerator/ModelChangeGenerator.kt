@@ -1,5 +1,7 @@
 package com.jervisffb.fumbbl.cli.codegenerator
 
+import java.util.Locale
+
 /**
  * Create the Kotlin Serializer class for Model Changes defined by
  * the ModelChangeId enum class in the FUMBBL Client
@@ -262,7 +264,7 @@ class ModelChangeGenerator {
                         else -> "String?"
                     }
 
-                val className = stringName.capitalize()
+                val className = stringName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
                 println(
                     """
@@ -437,7 +439,7 @@ class ModelChangeGenerator {
             .map { str ->
                 val matchResult: MatchResult = pattern.matchEntire(str) ?: throw IllegalArgumentException("Didn't match: $str")
                 val (enumName, stringName) = matchResult.destructured
-                val className = stringName.capitalize()
+                val className = stringName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
                 println(
                     """

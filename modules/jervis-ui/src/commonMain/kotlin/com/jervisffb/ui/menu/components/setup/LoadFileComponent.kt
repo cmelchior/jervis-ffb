@@ -74,6 +74,7 @@ fun LoadFileComponent(viewModel: LoadFileComponentModel) {
                     )
                 }
             }
+            @Suppress("SENSELESS_COMPARISON")
             if (loadErrror != null) {
                 Row(Modifier.fillMaxWidth().padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(

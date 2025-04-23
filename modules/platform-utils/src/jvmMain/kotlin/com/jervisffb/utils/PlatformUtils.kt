@@ -18,6 +18,7 @@ import java.net.NetworkInterface
 import java.net.URI
 
 public actual fun threadId(): ULong {
+    @Suppress("DEPRECATION")
     return Thread.currentThread().id.toULong()
 }
 
@@ -152,7 +153,8 @@ public actual fun copyToClipboard(text: String) {
 
 public actual fun triggerGC() {
     // There is no guarantee this will actually do anything, so this is
-    // just best-effort.
+    // just a best-effort.
     System.gc()
+    @Suppress("DEPRECATION")
     System.runFinalization()
 }

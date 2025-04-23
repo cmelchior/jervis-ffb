@@ -41,13 +41,15 @@ class ContextHolder {
             else -> contextsWithIds[Pair(id, type)]
         }
         return if (context != null) {
-            context as T
+            @Suppress("UNCHECKED_CAST")
+            context as? T ?: error("Context of type ${context::class.simpleName} is not of expected type: ${type.simpleName}")
         } else {
             null
         }
     }
 
     fun <T: ProcedureContext> remove(type: KClass<T>, id: Int = 0): T? {
+        @Suppress("UNCHECKED_CAST")
         return when (id) {
             0 -> contexts.remove(type) as T?
             else -> contextsWithIds.remove(Pair(id, type)) as T?
@@ -77,7 +79,6 @@ inline fun <reified T: ProcedureContext> Game.getContext(id: Int = 0): T {
 inline fun <reified T: ProcedureContext> Game.getContextOrNull(id: Int = 0): T? {
     return this.contexts.getContext(T::class, id)
 }
-
 
 /**
  * Returns the [ProcedureContext] matching the given class, or throws
