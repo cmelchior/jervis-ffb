@@ -48,12 +48,12 @@ actual fun startEmbeddedServer(
     return platformServer
 }
 
-actual fun stopEmbeddedServer(server: Any) {
+actual fun stopEmbeddedServer(server: Any, immediately: Boolean) {
     if (server is EmbeddedServer<*, *>) {
         // TODO Unclear why the server always run the full shutdown grace + timeout. For now set it low to avoid having tests running forever.
         server.stop(
-            shutdownGracePeriod = 500,
-            shutdownTimeout = 500,
+            shutdownGracePeriod = if (immediately) 0 else 500,
+            shutdownTimeout = if (immediately) 0 else 500,
             timeUnit = TimeUnit.MILLISECONDS,
         )
         jervisLogger().i { "Embedded server stopped" }

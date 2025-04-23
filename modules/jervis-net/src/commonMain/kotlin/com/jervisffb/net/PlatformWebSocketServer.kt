@@ -120,7 +120,7 @@ class PlatformWebSocketServer(
         }
     }
 
-    fun stop() {
-        stopEmbeddedServer(platformClient)
+    fun stop(immediately: Boolean = false) {
+        stopEmbeddedServer(platformClient, immediately)
     }
 }

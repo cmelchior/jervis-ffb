@@ -31,6 +31,9 @@ import kotlin.test.fail
  * any crashes.
  *
  * For now, this class has to be run manually.
+ *
+ * Note: If running many tests, there will be a huge performance increase by
+ * raising the log level to `Assert` in [com.jervisffb.utils.jervisLogger]
  **/
 @Ignore // Comment out to run
 class FuzzTester {

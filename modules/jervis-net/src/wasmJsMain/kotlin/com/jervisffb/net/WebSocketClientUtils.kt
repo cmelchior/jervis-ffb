@@ -9,6 +9,6 @@ actual fun startEmbeddedServer(
     TODO()
 }
 
-actual fun stopEmbeddedServer(server: Any) {
+actual fun stopEmbeddedServer(server: Any, immediately: Boolean) {
     // Stop server
 }

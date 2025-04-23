@@ -59,6 +59,9 @@ import kotlin.time.Duration.Companion.seconds
  * finding race conditions and errors in the serialization.
  *
  * For now, this class has to be run manually.
+ *
+ * Note: If running many tests, there will be a huge performance increase by
+ * raising the log level to `Assert` in [com.jervisffb.utils.jervisLogger]
  **/
 @Ignore // Comment out to run
 class NetworkFuzzTester {
@@ -203,7 +206,7 @@ class NetworkFuzzTester {
 
         conn1.close()
         conn2.close()
-        server.stop()
+        server.stop(immediately = true)
     }
 
     private suspend fun runHost(
@@ -239,7 +242,6 @@ class NetworkFuzzTester {
                 }
             }
         }
-        println("[Host] Game Loop done")
     }
 
     private suspend fun runClient(
@@ -275,7 +277,6 @@ class NetworkFuzzTester {
                 }
             }
         }
-        println("[Client] Game Loop done")
     }
 
     private fun getSetupAction(controller: GameEngineController): GameAction?  {

@@ -59,12 +59,12 @@ class LightServer(
         websocketServer.start()
     }
 
-    suspend fun stop() {
+    suspend fun stop(immediately: Boolean = false) {
         // TODO Stopping the server in tests seems to deadlock, need to figure out why
         //  For now running shutting down on a separate thread seems to work
         withContext(Dispatchers.Default) {
             gameCache.shutdownAll()
-            websocketServer.stop()
+            websocketServer.stop(immediately)
         }
         LOG.i { "[Server] Server stopped" }
     }

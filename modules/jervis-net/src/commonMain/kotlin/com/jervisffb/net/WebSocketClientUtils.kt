@@ -8,4 +8,6 @@ expect fun startEmbeddedServer(
 ): Any
 
 // Stop the embedded server. Hide the type, because WASM doesn't support Ktor Engines
-expect fun stopEmbeddedServer(server: Any)
+// If `immediately` is true, we will attempt to stop the server as quickly as possible
+// without waiting for connections to terminate nicely.
+expect fun stopEmbeddedServer(server: Any, immediately: Boolean = false)
