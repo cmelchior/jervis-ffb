@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
-import com.jervisffb.engine.actions.D16Result
+import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
@@ -43,15 +43,15 @@ object PrayersToNuffleRoll : Procedure() {
             return listOf(RollDice(rules.prayersToNuffleTable.die))
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkType<D16Result>(action) { d16 ->
+            return checkType<DieResult>(action) { dieRoll ->
                 val context = state.getContext<PrayersToNuffleRollContext>()
-                val result: PrayerToNuffle = rules.prayersToNuffleTable.roll(d16)
+                val result: PrayerToNuffle = rules.prayersToNuffleTable.roll(dieRoll)
 
-                // Multiple instances of the same prayer is not allowed on the same team.
-                // Neither as inducement nor as a kick-off table result
+                // Multiple instances of the same prayer are not allowed on the same team.
+                // Neither as an inducement nor as a kick-off table result
                 if (context.team.activePrayersToNuffle.contains(result)) {
                     compositeCommandOf(
-                        ReportDiceRoll(DiceRollType.PRAYERS_TO_NUFFLE, d16),
+                        ReportDiceRoll(DiceRollType.PRAYERS_TO_NUFFLE, dieRoll),
                         GotoNode(RollDie)
                     )
                 } else {
@@ -61,7 +61,7 @@ object PrayersToNuffleRoll : Procedure() {
                             result = result,
                             resultApplied = false
                         )),
-                        ReportDiceRoll(DiceRollType.PRAYERS_TO_NUFFLE, d16),
+                        ReportDiceRoll(DiceRollType.PRAYERS_TO_NUFFLE, dieRoll),
                         GotoNode(ApplyTableResult),
                     )
                 }
@@ -74,7 +74,7 @@ object PrayersToNuffleRoll : Procedure() {
             return state.getContext<PrayersToNuffleRollContext>().result!!.procedure
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // Currently we do not grant another roll if the Prayer was not applied.
+            // Currently, we do not grant another roll if the Prayer was not applied.
             // In that case, the roll is "wasted". It is unclear if that is the correct
             // rule interpretation.
             val context = state.getContext<PrayersToNuffleRollContext>()
