@@ -182,48 +182,49 @@ private fun BoxScope.FieldMarkerLayer(
                         .weight(1f),
             ) {
                 repeat(rules.fieldWidth) { x ->
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .cornerSquares(
-                            1.dp,
-                            topLeft = (
-                                y > 0
-                                    && x > rules.endZone
-                                    && x < rules.fieldWidth - rules.endZone
-                                    && x != rules.lineOfScrimmageAway
-                                    && x != rules.lineOfScrimmageHome + 1
-                                    && y != rules.fieldHeight - rules.wideZone
-                                    && y != rules.wideZone
-                            ),
-                            topRight = (
-                                y > 0
-                                    && x < rules.fieldWidth - rules.endZone - 1
-                                    && x >= rules.endZone
-                                    && x != rules.lineOfScrimmageHome
-                                    && x != rules.lineOfScrimmageAway - 1
-                                    && y != rules.fieldHeight - rules.wideZone
-                                    && y != rules.wideZone
-                            ),
-                            bottomLeft = (
-                                y < rules.fieldHeight - 1
-                                    && x > rules.endZone
-                                    && x < rules.fieldWidth - rules.endZone
-                                    && x != rules.lineOfScrimmageAway
-                                    && x != rules.lineOfScrimmageHome + 1
-                                    && y != rules.fieldHeight - rules.wideZone - 1
-                                    && y != rules.wideZone - 1
-                            ),
-                            bottomRight = (
-                                y < rules.fieldHeight - 1
-                                    && x < rules.fieldWidth - rules.endZone - 1
-                                    && x >= rules.endZone
-                                    && x != rules.lineOfScrimmageHome
-                                    && x != rules.lineOfScrimmageAway - 1
-                                    && y != rules.fieldHeight - rules.wideZone - 1
-                                    && y != rules.wideZone - 1
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f)
+                            .cornerSquares(
+                                1.dp,
+                                topLeft = (
+                                    y > 0
+                                        && x > rules.endZone
+                                        && x < rules.fieldWidth - rules.endZone
+                                        && x != rules.lineOfScrimmageAway
+                                        && x != rules.lineOfScrimmageHome + 1
+                                        && y != rules.fieldHeight - rules.wideZone
+                                        && y != rules.wideZone
+                                ),
+                                topRight = (
+                                    y > 0
+                                        && x < rules.fieldWidth - rules.endZone - 1
+                                        && x >= rules.endZone
+                                        && x != rules.lineOfScrimmageHome
+                                        && x != rules.lineOfScrimmageAway - 1
+                                        && y != rules.fieldHeight - rules.wideZone
+                                        && y != rules.wideZone
+                                ),
+                                bottomLeft = (
+                                    y < rules.fieldHeight - 1
+                                        && x > rules.endZone
+                                        && x < rules.fieldWidth - rules.endZone
+                                        && x != rules.lineOfScrimmageAway
+                                        && x != rules.lineOfScrimmageHome + 1
+                                        && y != rules.fieldHeight - rules.wideZone - 1
+                                        && y != rules.wideZone - 1
+                                ),
+                                bottomRight = (
+                                    y < rules.fieldHeight - 1
+                                        && x < rules.fieldWidth - rules.endZone - 1
+                                        && x >= rules.endZone
+                                        && x != rules.lineOfScrimmageHome
+                                        && x != rules.lineOfScrimmageAway - 1
+                                        && y != rules.fieldHeight - rules.wideZone - 1
+                                        && y != rules.wideZone - 1
+                                )
                             )
-                        )
                     )
                 }
             }
@@ -232,7 +233,7 @@ private fun BoxScope.FieldMarkerLayer(
 
     // Draw "chalk lines"
     val chalkTexture = imageResource(Res.drawable.jervis_brush_chalk)
-    val imageBrush = remember {
+    val imageBrush = remember(chalkTexture) {
         ShaderBrush(
             shader = ImageShader(
                 image = chalkTexture,
