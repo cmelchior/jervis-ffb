@@ -27,6 +27,37 @@ buildConfig {
     buildConfigField("gitHistory", rootProject.ext["gitHistory"] as String)
 }
 
+// Generate an ` index.html ` file with a reference to the current version (defined by the git commit)
+// This way, we ensure the browser always loads the correct .wasm resource files. Before this, it
+// was possible for the browser to use a cached version of `composeApp.js` that referred to older
+// .wasm files that were no longer present. Which resulted in the page failing to load.
+val generateIndexHtml by tasks.registering {
+    val inputFile = file("$projectDir/src/wasmJsMain/template/index.html")
+    val outputDir = layout.buildDirectory.dir("generated/wasmJs")
+    val outputFile = outputDir.map { it.file("index.html") }
+
+    inputs.file(inputFile)
+    inputs.property("gitHashLong", rootProject.ext["gitHashLong"])
+    outputs.dir(outputDir)
+
+    onlyIf {
+        if (!inputFile.exists()) {
+            throw GradleException("Input file does not exist: ${inputFile.absolutePath}")
+        }
+        true
+    }
+
+    doLast {
+        val fileContent = inputFile
+            .readText()
+            .replace("%composeAppRef%", "composeApp-${rootProject.ext["gitHashLong"]}.js")
+        outputFile.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(fileContent)
+        }
+    }
+}
+
 kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())
     jvm()
@@ -48,10 +79,10 @@ kotlin {
         browser {
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
-                outputFileName = "composeApp.js"
+                outputFileName = "composeApp-${rootProject.ext["gitHashLong"] as String}.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
+                        // Serve sources to debug inside the browser
                         add(projectDirPath)
                     }
                 }
@@ -99,7 +130,9 @@ kotlin {
             }
         }
         val jvmTest by getting
-        val wasmJsMain by getting
+        val wasmJsMain by getting {
+            resources.srcDir(generateIndexHtml.map { it.outputs.files.singleFile })
+        }
         val iosX64Main by getting
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting

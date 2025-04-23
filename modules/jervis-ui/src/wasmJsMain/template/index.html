@@ -75,16 +75,28 @@
         </div>
     </div>
     <script>
-        const url = 'composeApp.js';
+        const url = `%composeAppRef%`;
         const progressFill = document.getElementById("progressFill");
         const statusDescription = document.getElementById("statusDescription");
         const statusValue = document.getElementById("statusValue");
         statusDescription.textContent = 'Loading';
         statusValue.textContent = '0%';
+
         function updateProgress(percent) {
             progressFill.style.width = `${percent}%`;
             statusValue.textContent = `${percent}%`;
         }
+
+        function showError(err) {
+            console.log(JSON.stringify(err));
+            statusValue.textContent = "";
+            if (err.message !== undefined && err.message !== '') {
+                statusDescription.textContent = `Error loading app: ${err.message}`;
+            } else {
+                statusDescription.textContent = `Error loading app`;
+            }
+        }
+
         fetch(url)
             .then(async (response) => {
                 if (!response.ok) {
@@ -119,7 +131,7 @@
                 // sure why. I am guessing unpacking resources, but it needs to be investigated.
                 if (simInterval) clearInterval(simInterval);
                 updateProgress(100);
-                var dots = 0;
+                let dots = 0;
                 statusDescription.textContent = 'Opening App';
                 const openingAnimation = setInterval(() => {
                     dots = (dots + 1) % 4;
@@ -127,20 +139,28 @@
                 }, 500);
                 statusValue.textContent = "";
 
-                // Now, load the app so relative URLs work (this is required as compose
-                // also reference other wasm files using relative urls)
+                // If WebAssembly fails to compile, it is most likely because there is a mismatch
+                // between caches and the server. We try to avoid this, but just in case, show a
+                // slightly better error message (rather than having the page fail silently).
+                window.addEventListener("error", (event) => {
+                    if (event.message.includes("WebAssembly") || event.message.includes("compile")) {
+                        clearInterval(openingAnimation);
+                        statusDescription.textContent = "New version detected. Please refresh the page.";
+                    }
+                });
+
+                // Now, load the app using <script> so relative URLs work. This is required as Compose
+                // also reference other wasm files using relative urls.
                 const script = document.createElement("script");
                 script.src = url;
-                script.onerror = (e) => {
+                script.onerror = (err) => {
                     clearInterval(openingAnimation);
-                    console.log('Failed to load composeApp.js: ' + e);
-                    statusDescription.textContent = `Error loading app: ${e.message}`;
+                    showError(err);
                 }
                 document.body.appendChild(script);
             })
             .catch((err) => {
-                statusDescription.textContent = `Error loading app: ${err.message}`;
-                statusValue.textContent = "";
+                showError(err);
             });
     </script>
 </body>
