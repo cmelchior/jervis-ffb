@@ -278,7 +278,7 @@ class DiceRollUserInputDialog(
                 message = "Roll ${rules.prayersToNuffleTable.die.name} to choose a prayer",
                 dice = listOf(diceOptions),
                 result = { rolls: DiceRollResults ->
-                    rules.prayersToNuffleTable.roll(rolls.first() as D16Result).description
+                    rules.prayersToNuffleTable.roll(rolls.first()).description
                 }
             )
         }
