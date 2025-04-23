@@ -36,6 +36,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
 import com.jervisffb.engine.rules.bb2020.tables.InjuryResult
 import com.jervisffb.engine.utils.INVALID_ACTION
+import kotlinx.serialization.Serializable
 
 /**
  * Procedure for using an apothecary as described on page 62 in the rulebook.
@@ -45,6 +46,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
  * This procedure has a lot of overlap with the [UseBB7Apothecary] procedure.
  * There might be a better way to keep them in sync; for now, it is a manual process.
  */
+@Serializable
 object UseBB11Apothecary: Procedure() {
     override val initialNode: Node = ChooseToUseApothecary
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null

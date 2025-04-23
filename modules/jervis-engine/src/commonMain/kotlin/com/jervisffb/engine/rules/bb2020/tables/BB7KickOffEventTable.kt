@@ -2,10 +2,12 @@ package com.jervisffb.engine.rules.bb2020.tables
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlinx.serialization.Serializable
 
 /**
  * Class representing the Kick-Off Event Table on page 41 in the rulebook.
  */
+@Serializable
 object BB7KickOffEventTable: KickOffTable {
     override val name: String = "BB7 Kick-Off Table"
     private val table =

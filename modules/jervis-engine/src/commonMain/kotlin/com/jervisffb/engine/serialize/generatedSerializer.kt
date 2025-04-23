@@ -65,6 +65,16 @@ val generatedJervisSerializerModule = SerializersModule {
             subclass(com.jervisffb.engine.actions.DBlockResult::class)
         }
     }
+    polymorphic(com.jervisffb.engine.rules.bb2020.tables.InjuryTable::class) {
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7StandardInjuryTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7StuntyInjuryTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.StandardInjuryTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.StuntyInjuryTable::class)
+    }
+    polymorphic(com.jervisffb.engine.rules.bb2020.tables.KickOffTable::class) {
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.StandardKickOffEventTable::class)
+    }
     polymorphic(com.jervisffb.engine.rules.common.pathfinder.PathFinder::class) {
         subclass(com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder::class)
     }
@@ -72,13 +82,19 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.rules.bb2020.roster.RosterPosition::class)
         subclass(com.jervisffb.engine.rules.bb2020.roster.StarPlayerPosition::class)
     }
+    polymorphic(com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable::class) {
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.StandardPrayersToNuffleTable::class)
+    }
     polymorphic(com.jervisffb.engine.rules.common.roster.Roster::class) {
         subclass(com.jervisffb.engine.rules.bb2020.roster.BB2020Roster::class)
     }
     polymorphic(com.jervisffb.engine.rules.Rules::class) {
+        subclass(com.jervisffb.engine.rules.BB72020Rules::class)
         subclass(com.jervisffb.engine.rules.FumbblBB2020Rules::class)
         subclass(com.jervisffb.engine.rules.StandardBB2020Rules::class)
         polymorphic(com.jervisffb.engine.rules.BB2020Rules::class) {
+            subclass(com.jervisffb.engine.rules.BB72020Rules::class)
             subclass(com.jervisffb.engine.rules.FumbblBB2020Rules::class)
             subclass(com.jervisffb.engine.rules.StandardBB2020Rules::class)
         }

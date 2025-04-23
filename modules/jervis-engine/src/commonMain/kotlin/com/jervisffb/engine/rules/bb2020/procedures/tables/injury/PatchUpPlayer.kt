@@ -62,7 +62,7 @@ object PatchUpPlayer: Procedure() {
 
     // Sub procedure responsible for choosing an apothecary (if any) and applying it
     object ChooseToUseApothecary: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.useApothecaryProcedure
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.useApothecaryBehavior.procedure
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(ChooseToUseRegeneration)
         }

@@ -19,6 +19,7 @@ import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
@@ -63,21 +64,34 @@ import kotlin.time.Duration.Companion.seconds
 class NetworkFuzzTester {
 
     @Test
-    fun runRandomNextworkGame() {
+    fun runRandomNetworkGames() {
         val games = 100
         repeat(games) { gameNo ->
             val seed = Random.nextLong()
             try {
-                runRandomGame(seed)
+                runRandomGame(seed, StandardBB2020Rules())
             } catch (ex: Throwable) {
                 fail("Game $gameNo (seed: $seed) crashed with exception:\n${ex.stackTraceToString()}")
             }
         }
     }
 
-    private fun runRandomGame(seed: Long) = runBlocking {
+    @Test
+    fun runRandomBB7NetworkGames() {
+        val games = 100
+        repeat(games) { gameNo ->
+            val seed = Random.nextLong()
+            try {
+                runRandomGame(seed, com.jervisffb.engine.rules.BB72020Rules())
+            } catch (ex: Throwable) {
+                fail("Game $gameNo (seed: $seed) crashed with exception:\n${ex.stackTraceToString()}")
+            }
+        }
+    }
+
+    private fun runRandomGame(seed: Long, rules: Rules) = runBlocking {
         val random = Random(seed)
-        val rules = StandardBB2020Rules().toBuilder().run {
+        val rules = rules.toBuilder().run {
             diceRollsOwner = DiceRollOwner.ROLL_ON_SERVER
             undoActionBehavior = UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS
             timers.timersEnabled = false
@@ -289,19 +303,31 @@ class NetworkFuzzTester {
         val game: Game = controller.state
         val team = game.homeTeam
 
-        val setup = listOf(
-            FieldCoordinate(12, 6),
-            FieldCoordinate(12, 7),
-            FieldCoordinate(12, 8),
-            FieldCoordinate(10, 1),
-            FieldCoordinate(10, 4),
-            FieldCoordinate(10, 10),
-            FieldCoordinate(10, 13),
-            FieldCoordinate(8, 1),
-            FieldCoordinate(8, 4),
-            FieldCoordinate(8, 10),
-            FieldCoordinate(8, 13),
-        )
+        val setup = when (game.rules.gameType) {
+            GameType.STANDARD -> listOf(
+                FieldCoordinate(12, 6),
+                FieldCoordinate(12, 7),
+                FieldCoordinate(12, 8),
+                FieldCoordinate(10, 1),
+                FieldCoordinate(10, 4),
+                FieldCoordinate(10, 10),
+                FieldCoordinate(10, 13),
+                FieldCoordinate(8, 1),
+                FieldCoordinate(8, 4),
+                FieldCoordinate(8, 10),
+                FieldCoordinate(8, 13),
+            )
+            GameType.BB7 -> listOf(
+                FieldCoordinate(6, 2),
+                FieldCoordinate(6, 5),
+                FieldCoordinate(6, 8),
+                FieldCoordinate(5, 1),
+                FieldCoordinate(5, 4),
+                FieldCoordinate(5, 6),
+                FieldCoordinate(5, 9),
+            )
+            else -> TODO("Game type not supported yet: ${game.rules.gameType}")
+        }
         setupTeam(team, compositeActions, setup)
     }
 
@@ -312,19 +338,31 @@ class NetworkFuzzTester {
         val game: Game = controller.state
         val team = game.awayTeam
 
-        val setup = listOf(
-            FieldCoordinate(13, 6),
-            FieldCoordinate(13, 7),
-            FieldCoordinate(13, 8),
-            FieldCoordinate(15, 1),
-            FieldCoordinate(15, 4),
-            FieldCoordinate(15, 10),
-            FieldCoordinate(15, 13),
-            FieldCoordinate(17, 1),
-            FieldCoordinate(17, 4),
-            FieldCoordinate(17, 10),
-            FieldCoordinate(17, 13),
-        )
+        val setup = when (game.rules.gameType) {
+            GameType.STANDARD -> listOf(
+                FieldCoordinate(13, 6),
+                FieldCoordinate(13, 7),
+                FieldCoordinate(13, 8),
+                FieldCoordinate(15, 1),
+                FieldCoordinate(15, 4),
+                FieldCoordinate(15, 10),
+                FieldCoordinate(15, 13),
+                FieldCoordinate(17, 1),
+                FieldCoordinate(17, 4),
+                FieldCoordinate(17, 10),
+                FieldCoordinate(17, 13),
+            )
+            GameType.BB7 -> listOf(
+                FieldCoordinate(13, 2),
+                FieldCoordinate(13, 5),
+                FieldCoordinate(13, 8),
+                FieldCoordinate(14, 1),
+                FieldCoordinate(14, 4),
+                FieldCoordinate(14, 6),
+                FieldCoordinate(14, 9),
+            )
+            else -> TODO("Game type not supported yet: ${game.rules.gameType}")
+        }
 
         setupTeam(team, compositeActions, setup)
     }
