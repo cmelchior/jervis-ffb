@@ -16,6 +16,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameSnapshot
@@ -147,19 +148,32 @@ class RandomActionProvider(
         val game: Game = controller.state
         val team = game.homeTeam
 
-        val setup = listOf(
-            FieldCoordinate(12, 6),
-            FieldCoordinate(12, 7),
-            FieldCoordinate(12, 8),
-            FieldCoordinate(10, 1),
-            FieldCoordinate(10, 4),
-            FieldCoordinate(10, 10),
-            FieldCoordinate(10, 13),
-            FieldCoordinate(8, 1),
-            FieldCoordinate(8, 4),
-            FieldCoordinate(8, 10),
-            FieldCoordinate(8, 13),
-        )
+        val setup = when (game.rules.gameType) {
+            GameType.STANDARD -> listOf(
+                FieldCoordinate(12, 6),
+                FieldCoordinate(12, 7),
+                FieldCoordinate(12, 8),
+                FieldCoordinate(10, 1),
+                FieldCoordinate(10, 4),
+                FieldCoordinate(10, 10),
+                FieldCoordinate(10, 13),
+                FieldCoordinate(8, 1),
+                FieldCoordinate(8, 4),
+                FieldCoordinate(8, 10),
+                FieldCoordinate(8, 13),
+            )
+            GameType.BB7 -> listOf(
+                FieldCoordinate(6, 2),
+                FieldCoordinate(6, 5),
+                FieldCoordinate(6, 8),
+                FieldCoordinate(5, 1),
+                FieldCoordinate(5, 4),
+                FieldCoordinate(5, 6),
+                FieldCoordinate(5, 9),
+            )
+            GameType.DUNGEON_BOWL -> TODO("Dungeon Bowl setup not yet implemented")
+            GameType.GUTTER_BOWL -> TODO("Gutter Bowl setup not yet implemented")
+        }
         setupTeam(team, compositeActions, setup)
     }
 
@@ -170,20 +184,32 @@ class RandomActionProvider(
         val game: Game = controller.state
         val team = game.awayTeam
 
-        val setup = listOf(
-            FieldCoordinate(13, 6),
-            FieldCoordinate(13, 7),
-            FieldCoordinate(13, 8),
-            FieldCoordinate(15, 1),
-            FieldCoordinate(15, 4),
-            FieldCoordinate(15, 10),
-            FieldCoordinate(15, 13),
-            FieldCoordinate(17, 1),
-            FieldCoordinate(17, 4),
-            FieldCoordinate(17, 10),
-            FieldCoordinate(17, 13),
-        )
-
+        val setup = when (game.rules.gameType) {
+            GameType.STANDARD -> listOf(
+                FieldCoordinate(13, 6),
+                FieldCoordinate(13, 7),
+                FieldCoordinate(13, 8),
+                FieldCoordinate(15, 1),
+                FieldCoordinate(15, 4),
+                FieldCoordinate(15, 10),
+                FieldCoordinate(15, 13),
+                FieldCoordinate(17, 1),
+                FieldCoordinate(17, 4),
+                FieldCoordinate(17, 10),
+                FieldCoordinate(17, 13),
+            )
+            GameType.BB7 -> listOf(
+                FieldCoordinate(13, 2),
+                FieldCoordinate(13, 5),
+                FieldCoordinate(13, 8),
+                FieldCoordinate(14, 1),
+                FieldCoordinate(14, 4),
+                FieldCoordinate(14, 6),
+                FieldCoordinate(14, 9),
+            )
+            GameType.DUNGEON_BOWL -> TODO("Dungeon Bowl setup not yet implemented")
+            GameType.GUTTER_BOWL -> TODO("Gutter Bowl setup not yet implemented")
+        }
         setupTeam(team, compositeActions, setup)
     }
 

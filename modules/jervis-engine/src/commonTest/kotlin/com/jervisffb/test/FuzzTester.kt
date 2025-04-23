@@ -13,9 +13,11 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
+import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.utils.createRandomAction
 import kotlin.random.Random
 import kotlin.test.Ignore
@@ -52,7 +54,27 @@ class FuzzTester {
                 fail("Game $gameNo (seed: $seed) crashed with exception:\n${e.stackTraceToString()}")
             }
         }
+    }
 
+    @Test
+    fun runRandomBB7Games() {
+        val games = 100
+        repeat(games) { gameNo ->
+            val seed = Random.nextLong()
+            val random = Random(seed)
+            val state = createDefaultGameState(BB72020Rules())
+            val controller = GameEngineController(state)
+            controller.startManualMode(logAvailableActions = false)
+            try {
+                while (controller.stack.isNotEmpty()) {
+                    val availableActions = controller.getAvailableActions()
+                    val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
+                    controller.handleAction(userAction)
+                }
+            } catch (e: Exception) {
+                fail("Game $gameNo (seed: $seed) crashed with exception:\n${e.stackTraceToString()}")
+            }
+        }
     }
 
     private fun getSetupAction(controller: GameEngineController): GameAction?  {
@@ -80,19 +102,31 @@ class FuzzTester {
         val game: Game = controller.state
         val team = game.homeTeam
 
-        val setup = listOf(
-            FieldCoordinate(12, 6),
-            FieldCoordinate(12, 7),
-            FieldCoordinate(12, 8),
-            FieldCoordinate(10, 1),
-            FieldCoordinate(10, 4),
-            FieldCoordinate(10, 10),
-            FieldCoordinate(10, 13),
-            FieldCoordinate(8, 1),
-            FieldCoordinate(8, 4),
-            FieldCoordinate(8, 10),
-            FieldCoordinate(8, 13),
-        )
+        val setup = when (game.rules.gameType) {
+            GameType.STANDARD -> listOf(
+                FieldCoordinate(12, 6),
+                FieldCoordinate(12, 7),
+                FieldCoordinate(12, 8),
+                FieldCoordinate(10, 1),
+                FieldCoordinate(10, 4),
+                FieldCoordinate(10, 10),
+                FieldCoordinate(10, 13),
+                FieldCoordinate(8, 1),
+                FieldCoordinate(8, 4),
+                FieldCoordinate(8, 10),
+                FieldCoordinate(8, 13),
+            )
+            GameType.BB7 -> listOf(
+                FieldCoordinate(6, 2),
+                FieldCoordinate(6, 5),
+                FieldCoordinate(6, 8),
+                FieldCoordinate(5, 1),
+                FieldCoordinate(5, 4),
+                FieldCoordinate(5, 6),
+                FieldCoordinate(5, 9),
+            )
+            else -> TODO("Game type not supported yet: ${game.rules.gameType}")
+        }
         setupTeam(team, compositeActions, setup)
     }
 
@@ -103,19 +137,31 @@ class FuzzTester {
         val game: Game = controller.state
         val team = game.awayTeam
 
-        val setup = listOf(
-            FieldCoordinate(13, 6),
-            FieldCoordinate(13, 7),
-            FieldCoordinate(13, 8),
-            FieldCoordinate(15, 1),
-            FieldCoordinate(15, 4),
-            FieldCoordinate(15, 10),
-            FieldCoordinate(15, 13),
-            FieldCoordinate(17, 1),
-            FieldCoordinate(17, 4),
-            FieldCoordinate(17, 10),
-            FieldCoordinate(17, 13),
-        )
+        val setup = when (game.rules.gameType) {
+            GameType.STANDARD -> listOf(
+                FieldCoordinate(13, 6),
+                FieldCoordinate(13, 7),
+                FieldCoordinate(13, 8),
+                FieldCoordinate(15, 1),
+                FieldCoordinate(15, 4),
+                FieldCoordinate(15, 10),
+                FieldCoordinate(15, 13),
+                FieldCoordinate(17, 1),
+                FieldCoordinate(17, 4),
+                FieldCoordinate(17, 10),
+                FieldCoordinate(17, 13),
+            )
+            GameType.BB7 -> listOf(
+                FieldCoordinate(13, 2),
+                FieldCoordinate(13, 5),
+                FieldCoordinate(13, 8),
+                FieldCoordinate(14, 1),
+                FieldCoordinate(14, 4),
+                FieldCoordinate(14, 6),
+                FieldCoordinate(14, 9),
+            )
+            else -> TODO("Game type not supported yet: ${game.rules.gameType}")
+        }
 
         setupTeam(team, compositeActions, setup)
     }
