@@ -146,6 +146,8 @@ out for during development.
     Right now it looks like the interpretation is that if you fail the rush, you end up
     in the jumping square.
 
+28. For Giants, it isn't well-defined how to interpret its location. E.g., during setup, is it considered
+    to be in the wide zone if part of it is in there, or does all of it need to be inside?
 
 # Rule Ambiguities and differences compared to the rules as written
 
@@ -207,3 +209,23 @@ doing it. The page number reveres to the page in the rulebook unless otherwise s
    For that reason, while Multiple Block injuries are collected in an "Injury Pool". We fully
    resolve each injury from there, letting the attacking player choose the order (this is also easier
    to implement).
+
+7. (Page 90 - Death Zone) The area between lines of scrimmage is not named by the rulebook. In Jervis,
+   this area is named "No Man's Land".
+
+8. (Page 94 - Death Zone) Exactly where you are allowed to place the ball for a kick is unclear.
+   The rulebook doesn't describe it at all, leaving it to the original rulebook. The problem is that
+   it uses the term "team's half", which has an ambiguous meaning in Blood Bowl Sevens.
+
+   Fortunately, the Designer's Commentary (May 2024) clarifies it a bit, allowing the ball to be 
+   placed "Center Field", but again, it is unclear exactly what that means. Since (technically)
+   "Center Field" runs the entire length of the field (and doesn't include the wide zone). Even if 
+   you assume it just talks about the area between the two lines of scrimmage, it still doesn't 
+   clarify if you can place it across the entire No Man's Land zone or only on the receiving teams half.
+
+   This means RAW, you can only place it on the receiving teams half. While RAI is probably the entire
+   No Man's Land zone. However, since the errata in the same FAQ specify that touchbacks only
+   occur if the ball goes over the kicking teams line of scrimmage, we use that as the strongest
+   argument that RAI is the correct interpretation.
+
+   This was also discussed here: https://www.reddit.com/r/bloodbowl/comments/18giy10/kickoff_and_touchback_in_sevens/

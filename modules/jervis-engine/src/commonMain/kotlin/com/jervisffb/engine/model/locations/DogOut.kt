@@ -9,6 +9,7 @@ data object DogOut : Location {
     override fun isInWideZone(rules: Rules): Boolean = false
     override fun isInEndZone(rules: Rules): Boolean = false
     override fun isInCenterField(rules: Rules): Boolean = false
+    override fun isInNoMansLand(rules: Rules): Boolean = false
     override fun isOnHomeSide(rules: Rules): Boolean = false
     override fun isOnAwaySide(rules: Rules): Boolean = false
     override fun isOnField(rules: Rules): Boolean = false

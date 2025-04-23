@@ -109,7 +109,7 @@ object TheKickOff : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Place the ball anywhere on the opposing teams side
             return state.field
-                .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
+                .filter { rules.canPlaceBallForKickoff(state.kickingTeam, it) }
                 .map { TargetSquare.kick(it.coordinates) }
                 .let { listOf(SelectFieldLocation(it)) }
         }
@@ -220,7 +220,7 @@ object TheFUMBBLKickOff : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Place the ball anywhere on the opposing teams side
             return state.field
-                .filter { it.isOnTeamHalf(state.receivingTeam, rules) }
+                .filter { rules.canPlaceBallForKickoff(state.kickingTeam, it) }
                 .map { TargetSquare.kick(it.coordinates) }
                 .let { listOf(SelectFieldLocation(it)) }
         }

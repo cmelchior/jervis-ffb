@@ -6,7 +6,6 @@ import com.jervisffb.engine.model.field.SquareEnvironmentalFeatureType
 import com.jervisffb.engine.model.field.SquareSubstrateType
 import com.jervisffb.engine.model.field.SquareType
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.Rules
 
 /**
  * This class represents a square on the [Field].
@@ -92,8 +91,4 @@ class FieldSquare(
 
     // Is field occupied as per the definition on page 44 in the rulebook.
     fun isOccupied(): Boolean = !isUnoccupied()
-
-    fun isOnTeamHalf(team: Team, rules: Rules): Boolean {
-        return if (team.isHomeTeam()) isOnHomeSide(rules) else isOnAwaySide(rules)
-    }
 }

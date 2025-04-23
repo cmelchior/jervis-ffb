@@ -33,7 +33,7 @@ interface FieldCoordinate: OnFieldLocation {
     }
 
     override fun isInEndZone(rules: Rules): Boolean {
-        return x == 0 || x == rules.fieldWidth - 1
+        return x < rules.endZone || x >= rules.fieldWidth - rules.endZone
     }
 
     override fun isInCenterField(rules: Rules): Boolean {
@@ -42,10 +42,16 @@ interface FieldCoordinate: OnFieldLocation {
         return xRange.contains(x) && yRange.contains(y)
     }
 
+    override fun isInNoMansLand(rules: Rules): Boolean {
+        return x > rules.lineOfScrimmageHome && x < rules.lineOfScrimmageAway
+    }
+
+    // "Home-side" is a bit vague and needs to be clarified
     override fun isOnHomeSide(rules: Rules): Boolean {
         return x < rules.fieldWidth / 2
     }
 
+    // "Away-side" is a bit vague and needs to be clarified
     override fun isOnAwaySide(rules: Rules): Boolean {
         return x >= rules.fieldWidth / 2
     }
@@ -63,7 +69,7 @@ interface FieldCoordinate: OnFieldLocation {
             x == 0 && y == 0 -> CornerThrowInPosition.TOP_LEFT
             x == 0 && y == rules.fieldHeight - 1 -> CornerThrowInPosition.BOTTOM_LEFT
             x == rules.fieldWidth -1 && y == 0 -> CornerThrowInPosition.TOP_RIGHT
-            x == rules.fieldWidth - 1 && y == rules.fieldHeight -1 -> CornerThrowInPosition.BOTTOM_RIGHT
+            x == rules.fieldWidth - 1 && y == rules.fieldHeight - 1 -> CornerThrowInPosition.BOTTOM_RIGHT
             else -> null
         }
     }

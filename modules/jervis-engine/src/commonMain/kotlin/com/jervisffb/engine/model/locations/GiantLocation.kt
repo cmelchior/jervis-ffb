@@ -34,6 +34,10 @@ class GiantLocation(val coordinates: MutableList<FieldCoordinate>): OnFieldLocat
 //        return xRange.contains(x) && yRange.contains(y)
     }
 
+    override fun isInNoMansLand(rules: Rules): Boolean {
+        TODO()
+    }
+
     override fun isOnHomeSide(rules: Rules): Boolean {
         TODO()
 //        return x < rules.fieldWidth / 2

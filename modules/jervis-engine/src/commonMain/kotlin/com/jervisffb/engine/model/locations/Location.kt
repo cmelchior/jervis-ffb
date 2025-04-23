@@ -13,6 +13,7 @@ sealed interface Location {
     fun isInWideZone(rules: Rules): Boolean
     fun isInEndZone(rules: Rules): Boolean
     fun isInCenterField(rules: Rules): Boolean
+    fun isInNoMansLand(rules: Rules): Boolean
     fun isOnHomeSide(rules: Rules): Boolean
     fun isOnAwaySide(rules: Rules): Boolean
     fun isOnField(rules: Rules): Boolean

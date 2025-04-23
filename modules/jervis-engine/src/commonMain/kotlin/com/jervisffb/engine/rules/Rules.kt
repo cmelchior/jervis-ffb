@@ -108,7 +108,8 @@ open class Rules(
     open val turnsInExtraTime: Int = 8,
     open val hasShootoutInExtraTime: Boolean = true,
 
-    // Field (Defined as being horisontal with home team on the right, away team on the left)
+    // Field (Defined as being horizontal with a home team on the right, away team on the left)
+
     // Total width of the field
     open val fieldWidth: Int = 26,
     // Total height of the field
@@ -121,7 +122,10 @@ open class Rules(
     open val lineOfScrimmageHome: Int = 12,
     // X-coordinate for the line of scrimmage for the away team. It is zero-indexed.
     open val lineOfScrimmageAway: Int = 13,
+    // During the setup, how many players must be placed on the Line of Scrimmage inside
+    // the Center Field.
     open val playersRequiredOnLineOfScrimmage: Int = 3,
+    // How many players are allowed in each wide zone during setup
     open val maxPlayersInWideZone: Int = 2,
     // Default max number of players on the field. Skills and effects might change this
     open val maxPlayersOnField: Int  = 11,
@@ -135,7 +139,7 @@ open class Rules(
     // Match Events (See page XX)
     open val matchEventsEnabled: Boolean = false,
 
-// Tables
+    // Tables
     open val kickOffEventTable: KickOffTable = StandardKickOffEventTable,
     open val prayersToNuffleEnabled: Boolean = true,
     open val prayersToNuffleTable: PrayersToNuffleTable = StandardPrayersToNuffleTable,
@@ -259,11 +263,32 @@ open class Rules(
         return true
     }
 
+    /**
+     * Returns whether the given location is in the valid setup area for a given team.
+     * While this is described as a bit different between Standard and BB7, it generalizes
+     * to the area up to the team's Line of Scrimmage.
+     */
     fun isInSetupArea(team: Team, location: FieldSquare): Boolean {
         return if (team.isHomeTeam()) {
             location.x <= lineOfScrimmageHome
         } else {
             location.x >= lineOfScrimmageAway
+        }
+    }
+
+    /**
+     * Returns whether a given location is valid for placing the ball during kick-off.
+     *
+     * For Standard and BB7, this generalizes to all locations _not_ in the area between
+     * the End Zone and kicking teams Line of Scrimmage. In particular, it allows you to
+     * place the ball in all of any configured "No Man's Land".
+     *
+     * This is in line with the Designer's Commentary, May 2024, page 10.
+     */
+    fun canPlaceBallForKickoff(kickingTeam: Team, location: FieldSquare): Boolean {
+        return when (kickingTeam.isHomeTeam()) {
+            true -> location.x > lineOfScrimmageHome
+            false -> location.x < lineOfScrimmageAway
         }
     }
 

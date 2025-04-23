@@ -98,12 +98,12 @@ object ScoringATouchdown : Procedure() {
             val context = state.getContext<ScoringATouchDownContext>()
             val player = context.player
             val isInEndZone = player.location.isInEndZone(rules)
-            val isOnOpponentSize = if (player.isOnHomeTeam()) {
+            val isOnOpponentSide = if (player.isOnHomeTeam()) {
                 player.location.isOnAwaySide(rules)
             } else {
                 player.location.isOnHomeSide(rules)
             }
-            return if (isInEndZone && isOnOpponentSize && player.hasBall()) {
+            return if (isInEndZone && isOnOpponentSide && player.hasBall()) {
                 compositeCommandOf(
                     SetContext(context.copy(isTouchdownScored = true)),
                     GotoNode(RollForBallClone)
