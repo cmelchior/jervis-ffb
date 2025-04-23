@@ -57,6 +57,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.InjuryRoll
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.LastingInjuryRoll
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.PatchUpPlayer
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.BrilliantCoaching
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.CheeringFans
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.OfficiousRef
@@ -235,6 +236,21 @@ object DialogFactory {
                     DiceRollUserInputDialog.createLastingInjuryRollDialog(rules, player)
                 }
 
+                is OfficiousRef.KickingTeamRollDie -> {
+                    DiceRollUserInputDialog.createOfficiousRefRollDialog(controller.state.kickingTeam)
+                }
+                is OfficiousRef.ReceivingTeamRollDie -> {
+                    DiceRollUserInputDialog.createOfficiousRefRollDialog(controller.state.kickingTeam)
+                }
+                is OfficiousRef.RollForReceivingTemSelectedPlayer -> {
+                    val context = controller.state.getContext<OfficiousRefContext>()
+                    DiceRollUserInputDialog.createOfficiousRefPlayerRollDialog(context.receivingTeamPlayerSelected!!)
+                }
+                is OfficiousRef.RollForKickingTeamSelectedPlayer -> {
+                    val context = controller.state.getContext<OfficiousRefContext>()
+                    DiceRollUserInputDialog.createOfficiousRefPlayerRollDialog(context.kickingTeamPlayerSelected!!)
+                }
+
                 is PickupRoll.ChooseReRollSource -> {
                     SingleChoiceInputDialog.createPickupRerollDialog(
                         state = controller.state,
@@ -347,19 +363,9 @@ object DialogFactory {
                     DiceRollUserInputDialog.createKickOffEventDialog(rules)
                 }
 
-                is OfficiousRef.KickingTeamRollDie -> {
-                    DiceRollUserInputDialog.createOfficiousRefRollDialog(controller.state.kickingTeam)
-                }
-                is OfficiousRef.ReceivingTeamRollDie -> {
-                    DiceRollUserInputDialog.createOfficiousRefRollDialog(controller.state.kickingTeam)
-                }
-                is OfficiousRef.RollForReceivingTemSelectedPlayer -> {
-                    val context = controller.state.getContext<OfficiousRefContext>()
-                    DiceRollUserInputDialog.createOfficiousRefPlayerRollDialog(context.receivingTeamPlayerSelected!!)
-                }
-                is OfficiousRef.RollForKickingTeamSelectedPlayer -> {
-                    val context = controller.state.getContext<OfficiousRefContext>()
-                    DiceRollUserInputDialog.createOfficiousRefPlayerRollDialog(context.kickingTeamPlayerSelected!!)
+                is UseBB7Apothecary.ApothecaryInjuryReroll -> {
+                    val player = controller.state.getContext<RiskingInjuryContext>().player
+                    DiceRollUserInputDialog.createApothecaryInjuryRollDialog(player)
                 }
 
                 else -> {

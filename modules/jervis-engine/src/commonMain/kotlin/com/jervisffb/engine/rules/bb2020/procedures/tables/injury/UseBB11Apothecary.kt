@@ -40,8 +40,12 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 /**
  * Procedure for using an apothecary as described on page 62 in the rulebook.
  * The result of using the apothecary is stored in [RiskingInjuryContext]
+ *
+ * Developer's Commentary:
+ * This procedure has a lot of overlap with the [UseBB7Apothecary] procedure.
+ * There might be a better way to keep them in sync; for now, it is a manual process.
  */
-object UseApothecary: Procedure() {
+object UseBB11Apothecary: Procedure() {
     override val initialNode: Node = ChooseToUseApothecary
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
@@ -50,6 +54,7 @@ object UseApothecary: Procedure() {
     }
 
     // TODO Change this to select the type of apothecary instead?
+    // TODO Apothecary can have restrictions on the kind of players it works on
     object ChooseToUseApothecary: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<RiskingInjuryContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {

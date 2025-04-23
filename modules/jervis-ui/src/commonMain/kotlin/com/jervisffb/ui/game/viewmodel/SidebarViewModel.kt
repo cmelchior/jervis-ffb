@@ -137,7 +137,7 @@ class SidebarViewModel(
 
     fun badlyHurt(): Flow<List<UiPlayer>> = mapTo(PlayerState.BADLY_HURT, team.dogoutFlow)
 
-    fun seriousInjuries(): Flow<List<UiPlayer>> = mapTo(listOf(PlayerState.SERIOUS_HURT, PlayerState.SERIOUS_INJURY, PlayerState.LASTING_INJURY), team.dogoutFlow)
+    fun seriousInjuries(): Flow<List<UiPlayer>> = mapTo(listOf(PlayerState.SERIOUSLY_HURT, PlayerState.SERIOUS_INJURY, PlayerState.LASTING_INJURY), team.dogoutFlow)
 
     fun dead(): Flow<List<UiPlayer>> = mapTo(PlayerState.DEAD, team.dogoutFlow)
 

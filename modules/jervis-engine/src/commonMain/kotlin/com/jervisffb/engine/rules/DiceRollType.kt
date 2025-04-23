@@ -7,6 +7,7 @@ enum class DiceRollType {
     ACCURACY, // For passing
     ARMOUR,
     BAD_HABITS,
+    BB7_APOTHECARY,
     BLOCK,
     BLITZ,
     BLOODLUST,

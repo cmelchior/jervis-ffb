@@ -225,9 +225,9 @@ fun createDefaultBB7HomeTeam(rules: Rules): Team {
         addPlayer(PlayerId("Am-bb7-7"), "Linewoman-7", PlayerNo(7), AMAZON_LINEMAN)
         addPlayer(PlayerId("Am-bb7-8"), "Linewoman-8", PlayerNo(8), AMAZON_LINEMAN)
         rerolls = 1
-        apothecaries = 0
+        apothecaries = 1
         dedicatedFans = 0
-        teamValue = 585_000
+        teamValue = 635_000
     }
 }
 

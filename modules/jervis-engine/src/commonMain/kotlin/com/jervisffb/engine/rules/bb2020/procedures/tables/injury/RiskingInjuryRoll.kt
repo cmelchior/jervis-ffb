@@ -56,20 +56,24 @@ data class RiskingInjuryContext(
 
     // Casualty roll
     val casualtyRoll: D16Result? = null,
-//    val casualtyModifiers: List<Skill> = emptyList(),
     val casualtyResult: CasualtyResult? = null,
     val lastingInjuryRoll: D6Result? = null,
-//    val lastingInjuryModifiers: List<DiceModifier> = listOf(),
     val lastingInjuryResult: LastingInjuryResult? = null,
 
-    // Apothecary + selecting final casualty result
+    // Apothecary + selecting a final casualty result
     val apothecaryUsed: Apothecary? = null,
+
+    // BB7 Apothecary roll
+    val apothecaryInjuryRoll: D6Result? = null,
+    val apothecaryInjuryRollSuccess: Boolean = false,
+
+    // BB11 Apothecary roll
     val apothecaryCasualtyRoll: D16Result? = null,
     val apothecaryCasualtyResult: CasualtyResult? = null,
     val apothecaryLastingInjuryRoll: D6Result? = null,
     val apothecaryLastingInjuryResult: LastingInjuryResult? = null,
 
-    // Store final result here
+    // Store final casualty rolls result here
     val finalCasualtyResult: CasualtyResult? = null,
     val finalLastingInjury: LastingInjuryResult? = null,
 
@@ -81,15 +85,15 @@ data class RiskingInjuryContext(
 ): ProcedureContext
 
 /**
- * Implement Armour and Injury Rolls as described on page 60-62 in the rulebook.
+ * Implement Armor and Injury Rolls as described on page 60-62 in the rulebook.
  * Note, the final injury result is not applied until [PatchUpPlayer.ApplyInjury]
  * is called. Up until then all context is stored in [RiskingInjuryContext].
  *
  * [RiskingInjuryContext] is not cleared when exiting this procedure.
  * The caller must do this.
  *
- * Also, specifically, this procedure does not control turn overs. It is up to the
- * caller of this procedure to determine if an injury is a turn over.
+ * Also, specifically, this procedure does not control turnovers. It is up to the
+ * caller of this procedure to determine if an injury is a turnover.
  */
 object RiskingInjuryRoll: Procedure() {
     override val initialNode: Node = DetermineStartingRoll
@@ -174,7 +178,7 @@ object RiskingInjuryRoll: Procedure() {
                 }
                 InjuryResult.SERIOUSLY_HURT -> {
                     compositeCommandOf(
-                        SetPlayerState(context.player, PlayerState.SERIOUS_HURT),
+                        SetPlayerState(context.player, PlayerState.SERIOUSLY_HURT),
                         GotoNode(CheckApothecary),
                     )
                 }

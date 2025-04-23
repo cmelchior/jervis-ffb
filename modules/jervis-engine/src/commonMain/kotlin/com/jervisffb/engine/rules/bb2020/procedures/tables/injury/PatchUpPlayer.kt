@@ -30,17 +30,21 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.inducements.ApothecaryType
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.reports.ReportApothecaryUsed
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportInjuryResult
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Regeneration
+import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
+import com.jervisffb.engine.rules.bb2020.tables.InjuryResult
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -58,7 +62,7 @@ object PatchUpPlayer: Procedure() {
 
     // Sub procedure responsible for choosing an apothecary (if any) and applying it
     object ChooseToUseApothecary: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = UseApothecary
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = rules.useApothecaryProcedure
         override fun onExitNode(state: Game, rules: Rules): Command {
             return GotoNode(ChooseToUseRegeneration)
         }
@@ -219,6 +223,8 @@ object PatchUpPlayer: Procedure() {
     /**
      * Take into accounts all injury rolls, apothecaries and regeneration results and
      * apply the result.
+     *
+     * BB11 and BB7 differs on which rolls the apothecary is used.
      */
     object ApplyInjury: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
@@ -233,8 +239,8 @@ object PatchUpPlayer: Procedure() {
                             SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut)
                         )
                     }
-                    context.injuryResult == com.jervisffb.engine.rules.bb2020.tables.InjuryResult.KO && context.apothecaryUsed != null -> {
-                        if (context.mode == com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode.PUSHED_INTO_CROWD) {
+                    context.injuryResult == InjuryResult.KO && context.apothecaryUsed != null -> {
+                        if (context.mode == RiskingInjuryMode.PUSHED_INTO_CROWD) {
                             compositeCommandOf(
                                 SetPlayerState(player, com.jervisffb.engine.model.PlayerState.RESERVE),
                                 SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut),
@@ -247,54 +253,78 @@ object PatchUpPlayer: Procedure() {
                             }
                         }
                     }
-                    context.injuryResult == com.jervisffb.engine.rules.bb2020.tables.InjuryResult.KO && context.apothecaryUsed == null -> {
+                    context.injuryResult == InjuryResult.KO && context.apothecaryUsed == null -> {
                         compositeCommandOf(
                             SetPlayerState(player, com.jervisffb.engine.model.PlayerState.KNOCKED_OUT),
                             SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut),
                         )
                     }
-                    context.injuryResult == com.jervisffb.engine.rules.bb2020.tables.InjuryResult.KO && context.apothecaryUsed != null -> {
+                    context.injuryResult == InjuryResult.KO && context.apothecaryUsed != null -> {
                         if (state.activeTeam == player.team) {
                             SetPlayerState(player, com.jervisffb.engine.model.PlayerState.STUNNED_OWN_TURN)
                         } else {
                             SetPlayerState(player, com.jervisffb.engine.model.PlayerState.STUNNED)
                         }
                     }
+
+                    // In rulesets where we do not use the Casualty Table, we just use the Injury result directly.
+                    (
+                        context.finalCasualtyResult == null && context.injuryResult == InjuryResult.BADLY_HURT
+                            || context.injuryResult == InjuryResult.SERIOUSLY_HURT
+                            || context.injuryResult == InjuryResult.DEAD
+                    ) -> {
+                        compositeCommandOf(
+                            SetPlayerLocation(player, DogOut),
+                            if (context.apothecaryUsed != null && context.apothecaryInjuryRollSuccess) {
+                                SetPlayerState(player, PlayerState.RESERVE)
+                            } else {
+                                val playerState = when (context.injuryResult) {
+                                    InjuryResult.BADLY_HURT -> PlayerState.BADLY_HURT
+                                    InjuryResult.SERIOUSLY_HURT -> PlayerState.SERIOUSLY_HURT
+                                    InjuryResult.DEAD -> PlayerState.DEAD
+                                    else -> INVALID_GAME_STATE("Unsupported injury result: $context")
+                                }
+                                SetPlayerState(player, playerState)
+                            }
+                        )
+                    }
+
+                    // In rulesets where the Casualty Table is used, handle them here (Standard)
                     context.finalCasualtyResult != null -> {
                         when (context.finalCasualtyResult) {
-                            com.jervisffb.engine.rules.bb2020.tables.CasualtyResult.BADLY_HURT -> {
+                            CasualtyResult.BADLY_HURT -> {
                                 if (context.apothecaryUsed != null) {
-                                    SetPlayerState(player, com.jervisffb.engine.model.PlayerState.RESERVE)
+                                    SetPlayerState(player, PlayerState.RESERVE)
                                 } else {
-                                    SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut)
+                                    SetPlayerLocation(player, DogOut)
                                 }
                             }
-                            com.jervisffb.engine.rules.bb2020.tables.CasualtyResult.SERIOUSLY_HURT -> {
+                            CasualtyResult.SERIOUSLY_HURT -> {
                                 compositeCommandOf(
                                     SetMissNextGame(player, true),
-                                    SetPlayerState(player, com.jervisffb.engine.model.PlayerState.SERIOUS_HURT),
-                                    SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut),
+                                    SetPlayerState(player, PlayerState.SERIOUSLY_HURT),
+                                    SetPlayerLocation(player, DogOut),
                                 )
                             }
-                            com.jervisffb.engine.rules.bb2020.tables.CasualtyResult.SERIOUS_INJURY -> {
+                            CasualtyResult.SERIOUS_INJURY -> {
                                 compositeCommandOf(
                                     SetMissNextGame(player, true),
                                     AddNigglingInjuries(player,1),
-                                    SetPlayerState(player, com.jervisffb.engine.model.PlayerState.SERIOUS_INJURY),
-                                    SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut),
+                                    SetPlayerState(player, PlayerState.SERIOUS_INJURY),
+                                    SetPlayerLocation(player, DogOut),
                                 )
                             }
-                            com.jervisffb.engine.rules.bb2020.tables.CasualtyResult.LASTING_INJURY -> {
+                            CasualtyResult.LASTING_INJURY -> {
                                 compositeCommandOf(
-                                    SetPlayerState(player, com.jervisffb.engine.model.PlayerState.LASTING_INJURY),
+                                    SetPlayerState(player, PlayerState.LASTING_INJURY),
                                     AddPlayerStatModifier(player, context.finalLastingInjury!!),
-                                    SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut),
+                                    SetPlayerLocation(player, DogOut),
                                 )
                             }
-                            com.jervisffb.engine.rules.bb2020.tables.CasualtyResult.DEAD -> {
+                            CasualtyResult.DEAD -> {
                                 compositeCommandOf(
-                                    SetPlayerState(player, com.jervisffb.engine.model.PlayerState.DEAD),
-                                    SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut),
+                                    SetPlayerState(player, PlayerState.DEAD),
+                                    SetPlayerLocation(player, DogOut),
                                 )
                             }
                         }

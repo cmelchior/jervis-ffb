@@ -337,6 +337,15 @@ class DiceRollUserInputDialog(
             )
         }
 
+        fun createApothecaryInjuryRollDialog(player: Player): UserInputDialog {
+            return DiceRollUserInputDialog(
+                title = "Patching-up Casualty",
+                message = "Roll D6 to see if the apothecary can patch up ${player.name}",
+                dice = listOf(Pair(Dice.D6, D6Result.allOptions())),
+                result = { _: DiceRollResults -> null }
+            )
+        }
+
         fun createUnknownDiceRoll(dicePool: RollDice): UserInputDialog {
             val dice= dicePool.dice.map {
                 when (it) {

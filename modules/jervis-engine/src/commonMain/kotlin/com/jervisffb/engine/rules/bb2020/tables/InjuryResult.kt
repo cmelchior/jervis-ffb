@@ -11,5 +11,6 @@ enum class InjuryResult(val title: String) {
     BADLY_HURT("Badly Hurt"),
     SERIOUSLY_HURT("Seriously Hurt"),
     DEAD("DEAD"),
+    // This requires a roll on the Casualty Table to determine the final result
     CASUALTY("Casualty"),
 }

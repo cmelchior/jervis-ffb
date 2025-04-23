@@ -5,6 +5,7 @@ import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
@@ -23,6 +24,7 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
 import com.jervisffb.engine.rules.bb2020.SkillSettings
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.UseBB11Apothecary
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.Skill
@@ -172,10 +174,15 @@ open class Rules(
     open val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.STRICT,
     // Probably need to replace this with a reference to the KickProcedure
     open val kickingPlayerBehavior: KickingPlayerBehavior = KickingPlayerBehavior.STRICT,
+    // Which procedure to use when deciding and using an apothecary.
+    // The rules differ between BB7 and Standard, but it is unclear if we want two different
+    // procedures for this, but as there are multiple differences (who they apply to + "Patching-up" section).
+    // Keep them separate for now.
+    open val useApothecaryProcedure: Procedure = UseBB11Apothecary,
     // Configure skills available, their behaviour and which category they belong to.
     open val skillSettings: SkillSettings = BB2020SkillSettings(),
 ) {
-    // How are paths between locations on the field calculated. This can be rules specific,
+    // Defines how the paths between locations on the field are calculated. This can be rules-specific,
     // since it might involve the use of skills.
     open val pathFinder: PathFinder = BB2020PathFinder()
 
@@ -657,6 +664,8 @@ open class Rules(
         var diceRollsOwner: DiceRollOwner = rules.diceRollsOwner
         var foulActionBehavior: FoulActionBehavior = rules.foulActionBehavior
         var kickingPlayerBehavior: KickingPlayerBehavior = rules.kickingPlayerBehavior
+        var useApothecaryProcedure: Procedure = rules.useApothecaryProcedure
+        var skillSettings: SkillSettings = rules.skillSettings
 
         fun build() = Rules(
             name,
@@ -705,7 +714,9 @@ open class Rules(
             undoActionBehavior,
             diceRollsOwner,
             foulActionBehavior,
-            kickingPlayerBehavior
+            kickingPlayerBehavior,
+            useApothecaryProcedure,
+            skillSettings
         )
     }
 }

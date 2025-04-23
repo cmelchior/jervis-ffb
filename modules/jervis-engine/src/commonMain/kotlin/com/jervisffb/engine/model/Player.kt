@@ -62,7 +62,7 @@ enum class PlayerState {
     KNOCKED_OUT,
     BADLY_HURT,
     LASTING_INJURY,
-    SERIOUS_HURT,
+    SERIOUSLY_HURT,
     SERIOUS_INJURY,
     DEAD,
     FAINTED, // From Sweltering Heat

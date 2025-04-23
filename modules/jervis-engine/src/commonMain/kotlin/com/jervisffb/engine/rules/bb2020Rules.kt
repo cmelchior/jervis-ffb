@@ -2,7 +2,9 @@ package com.jervisffb.engine.rules
 
 import com.jervisffb.engine.DEFAULT_INDUCEMENTS
 import com.jervisffb.engine.InducementSettings
+import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.inducements.settings.InducementType
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.UseBB7Apothecary
 import com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7StandardInjuryTable
@@ -72,6 +74,7 @@ class BB72020Rules : BB2020Rules() {
     override val injuryTable: InjuryTable = BB7StandardInjuryTable
     override val stuntyInjuryTable: InjuryTable = BB7StuntyInjuryTable
     override val prayersToNuffleTable: PrayersToNuffleTable = BB7PrayersToNuffleTable
+    override val useApothecaryProcedure: Procedure = UseBB7Apothecary
     override val inducements = InducementSettings(DEFAULT_INDUCEMENTS).toBuilder().run {
         InducementType.entries.forEach { type ->
             when (type) {
