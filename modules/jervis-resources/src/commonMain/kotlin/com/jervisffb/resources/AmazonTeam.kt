@@ -79,8 +79,8 @@ val AMAZON_BLITZER =
         ),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH),
-        SpriteSheet.ini("$iconRootPath/human_catcher.png", 4),
-        SingleSprite.ini("$portraitRootPath/human_catcher.png")
+        SpriteSheet.ini("$iconRootPath/amazon_piranhawarriorblitzer.png", 2),
+        SingleSprite.ini("$portraitRootPath/amazon_piranhawarriorblitzer.png")
     )
 val AMAZON_BLOCKER =
     RosterPosition(
