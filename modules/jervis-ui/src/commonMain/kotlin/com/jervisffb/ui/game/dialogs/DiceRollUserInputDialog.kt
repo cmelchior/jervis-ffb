@@ -268,10 +268,15 @@ class DiceRollUserInputDialog(
         }
 
         fun createPrayersToNuffleRollDialog(rules: Rules, rollsRemaining: Int): UserInputDialog {
+            val diceOptions = when (rules.prayersToNuffleTable.die) {
+                Dice.D8 -> Pair(Dice.D8, D8Result.allOptions())
+                Dice.D16 -> Pair(Dice.D16, D16Result.allOptions())
+                else -> error("Dice: ${rules.prayersToNuffleTable.die} not supported for Prayers to Nuffle")
+            }
             return DiceRollUserInputDialog(
                 title = "Prayer to Nuffle Roll ($rollsRemaining rolls)",
-                message = "Roll D16 to choose a prayer",
-                dice = listOf(Pair(Dice.D16, D16Result.allOptions())),
+                message = "Roll ${rules.prayersToNuffleTable.die.name} to choose a prayer",
+                dice = listOf(diceOptions),
                 result = { rolls: DiceRollResults ->
                     rules.prayersToNuffleTable.roll(rolls.first() as D16Result).description
                 }
