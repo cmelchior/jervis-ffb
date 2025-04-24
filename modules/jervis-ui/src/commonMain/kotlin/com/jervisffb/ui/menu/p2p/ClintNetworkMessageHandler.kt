@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
@@ -116,7 +117,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
     private var connection: JervisClientWebSocketConnection? = null
     private val messageHandlers: MutableList<ClientNetworkMessageHandler> = mutableListOf(initialNetworkHandler)
 
-    suspend fun connectAndJoinGame(gameUrl: String, id: GameId, coachName: String, isHost: Boolean, team: Team?) {
+    suspend fun connectAndJoinGame(gameUrl: String, id: GameId, coachName: String, coachType: CoachType, isHost: Boolean, team: Team?) {
         startConnection(gameUrl, id, coachName)
         val teamData = team?.let { SerializedTeam.serialize(it) }
         send(JoinGameAsCoachMessage(
@@ -124,6 +125,7 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
             username = coachName,
             password = "",
             coachName = coachName,
+            coachType = coachType,
             isHost = isHost,
             team = teamData?.let {P2PTeamInfo(it) }
         ))

@@ -24,13 +24,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.ImportTeamFromFumbblDialog
 import com.jervisffb.ui.menu.components.LoadTeamFromFileDialog
 import com.jervisffb.ui.menu.components.coach.CoachSetupComponent
-import com.jervisffb.ui.menu.components.coach.CoachType
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponent
 
 @OptIn(ExperimentalLayoutApi::class)

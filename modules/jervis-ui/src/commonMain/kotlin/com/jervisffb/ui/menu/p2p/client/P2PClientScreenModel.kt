@@ -6,6 +6,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.Navigator
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
+import com.jervisffb.engine.model.CoachType.COMPUTER
+import com.jervisffb.engine.model.CoachType.HUMAN
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -26,7 +28,6 @@ import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.components.TeamInfo
-import com.jervisffb.ui.menu.components.coach.CoachType
 import com.jervisffb.ui.menu.p2p.Connected
 import com.jervisffb.ui.menu.p2p.Connecting
 import com.jervisffb.ui.menu.p2p.Disconnected
@@ -213,15 +214,15 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
             controller = gameController,
         )
 
-        val awayActionProvider = when (joinHostModel.coachSetupModel.playerType.value) {
-            CoachType.HUMAN -> ManualActionProvider(
+        val awayActionProvider = when (joinHostModel.coachSetupModel.coachType.value) {
+            HUMAN -> ManualActionProvider(
                 gameController,
                 menuViewModel,
                 TeamActionMode.AWAY_TEAM,
                 GameSettings(gameRules = rules),
             )
             // For now, we only support the Random AI player, so create it directly
-            CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.AWAY_TEAM, gameController).also { it.startActionProvider() }
+            COMPUTER -> RandomActionProvider(TeamActionMode.AWAY_TEAM, gameController).also { it.startActionProvider() }
         }
 
         val actionProvider = P2PActionProvider(

@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerNo
@@ -130,6 +131,7 @@ class NetworkFuzzTester {
             "host",
             null,
             "host",
+            CoachType.HUMAN,
             true,
             P2PTeamInfo(createDefaultHomeTeam(rules))
         )
@@ -152,6 +154,7 @@ class NetworkFuzzTester {
             "client",
             null,
             "client",
+            CoachType.HUMAN,
             false
         )
         conn2.send(join2)

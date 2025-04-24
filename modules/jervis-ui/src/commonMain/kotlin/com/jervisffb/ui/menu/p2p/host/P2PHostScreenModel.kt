@@ -6,6 +6,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
@@ -27,7 +28,6 @@ import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.components.TeamInfo
-import com.jervisffb.ui.menu.components.coach.CoachType
 import com.jervisffb.ui.menu.components.setup.ConfigType
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
@@ -149,6 +149,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
         networkAdapter.joinHost(
             gameUrl = "ws://127.0.0.1:${setupGameModel.port.value}/joinGame?id=${setupGameModel.gameName.value}",
             coachName = setupGameModel.coachSetupModel.coachName.value,
+            coachType = setupGameModel.coachSetupModel.coachType.value,
             gameId = GameId(setupGameModel.gameName.value),
             teamIfHost = selectedTeam.value?.teamData ?: error("Missing team"),
             handler = object : AbstractClintNetworkMessageHandler() { /* No op */ }
@@ -244,7 +245,7 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game, networkAdapter.initialActions)
 
-        val homeActionProvider = when (setupGameModel.coachSetupModel.playerType.value) {
+        val homeActionProvider = when (setupGameModel.coachSetupModel.coachType.value) {
             CoachType.HUMAN -> ManualActionProvider(
                 gameController,
                 menuViewModel,

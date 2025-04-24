@@ -59,6 +59,8 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.random.Random
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 
 /**
@@ -156,7 +158,8 @@ class GameSession(
                             // the server is started, and we just assume the client is always valid as well
                             // In the case of a game starting again, we ignore any teams sent and just
                             // reuse the ones from the save game.
-                            val coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName)
+                            @OptIn(ExperimentalUuidApi::class)
+                            val coach = Coach(CoachId(Uuid.random().toHexString()), message.coachName, message.coachType)
                             val client = if (message.isHost) {
                                 val homeTeam: Team? = if (gameSettings.initialActions.isNotEmpty()) {
                                     hostTeam
@@ -172,7 +175,6 @@ class GameSession(
                                     team = homeTeam
                                 )
                             } else {
-                                val coach = Coach(CoachId((coaches.size + 1).toString()), message.coachName)
                                 val awayTeam: Team? = if (gameSettings.initialActions.isNotEmpty()) {
                                     clientTeam
                                 } else {

@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
@@ -82,13 +83,14 @@ class P2PClientNetworkAdapter(
     suspend fun joinHost(
         gameUrl: String,
         coachName: String,
+        coachType: CoachType,
         gameId: GameId,
         teamIfHost: Team?,
         handler: ClientNetworkMessageHandler,) {
         this.gameId = gameId
 //        if (state != ClientState.SELECT_HOST) error("Unexpected state: $state")
         networManager.addMessageHandler(handler)
-        networManager.connectAndJoinGame(gameUrl, gameId, coachName, isHost = (teamIfHost != null), teamIfHost)
+        networManager.connectAndJoinGame(gameUrl, gameId, coachName, coachType, isHost = (teamIfHost != null), teamIfHost)
         // TODO How to update state when handler is coming from the outside?
     }
 

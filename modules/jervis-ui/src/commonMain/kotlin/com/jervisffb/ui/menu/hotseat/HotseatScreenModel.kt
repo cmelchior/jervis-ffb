@@ -7,6 +7,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
@@ -24,7 +25,6 @@ import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.components.TeamInfo
-import com.jervisffb.ui.menu.components.coach.CoachType
 import com.jervisffb.ui.menu.components.setup.ConfigType
 import com.jervisffb.ui.menu.components.starting.StartGameComponentModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -191,12 +191,14 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         val awayTeam = selectedAwayTeam.value?.teamData ?: error("Away team is not selected")
 
         val rules = setupGameModel.createRules()
-        homeTeam.coach = Coach(CoachId("1"), selectHomeTeamModel.setupCoachModel.coachName.value)
-        awayTeam.coach = Coach(CoachId("2"), selectAwayTeamModel.setupCoachModel.coachName.value)
+        val homeCoachType = selectHomeTeamModel.setupCoachModel.coachType.value
+        val awayCoachType = selectAwayTeamModel.setupCoachModel.coachType.value
+        homeTeam.coach = Coach(CoachId("1"), selectHomeTeamModel.setupCoachModel.coachName.value, homeCoachType)
+        awayTeam.coach = Coach(CoachId("2"), selectAwayTeamModel.setupCoachModel.coachName.value, awayCoachType)
         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game, saveGameData?.actions ?: emptyList())
 
-        val homeActionProvider = when (selectHomeTeamModel.setupCoachModel.playerType.value) {
+        val homeActionProvider = when (homeCoachType) {
             CoachType.HUMAN -> ManualActionProvider(
                 gameController,
                 menuViewModel,
@@ -207,7 +209,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
             CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.HOME_TEAM, gameController, isServer = true).also { it.startActionProvider() }
         }
 
-        val awayActionProvider = when (selectAwayTeamModel.setupCoachModel.playerType.value) {
+        val awayActionProvider = when (awayCoachType) {
             CoachType.HUMAN -> ManualActionProvider(
                 gameController,
                 menuViewModel,

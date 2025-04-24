@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.hotseat.PlayerTypeSelector
@@ -27,9 +28,9 @@ fun CoachSetupComponent(
     inputWidth: Dp = Dp.Unspecified,
 ) {
     val coachName by viewModel.coachName.collectAsState("")
-    val playerType by viewModel.playerType.collectAsState()
+    val playerType by viewModel.coachType.collectAsState()
     val aiPlayers by viewModel.aiPlayers.collectAsState()
-    val selectedAiPlayer by viewModel.selectedAiPlayer.collectAsState()
+    val selectedAiPlayer: AiPlayer? by viewModel.selectedAiPlayer.collectAsState()
     val playerTypeOptions = listOf(
         "Human" to CoachType.HUMAN,
         "Computer" to CoachType.COMPUTER,

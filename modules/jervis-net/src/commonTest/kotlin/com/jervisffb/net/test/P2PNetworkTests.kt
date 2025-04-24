@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
@@ -91,6 +92,7 @@ class P2PNetworkTests {
             "host",
             null,
             "host",
+            CoachType.HUMAN,
             true,
             P2PTeamInfo(createDefaultHomeTeam(rules))
         )
@@ -112,6 +114,7 @@ class P2PNetworkTests {
             "client",
             null,
             "client",
+            CoachType.HUMAN,
             false
         )
         conn2.send(join2)
@@ -215,6 +218,7 @@ class P2PNetworkTests {
             "client",
             null,
             "client",
+            CoachType.HUMAN,
             false
         )
         conn2.send(join2)
@@ -371,6 +375,7 @@ class P2PNetworkTests {
             "host",
             null,
             "host",
+            CoachType.HUMAN,
             true,
             P2PTeamInfo(createDefaultHomeTeam(rules))
         )
@@ -388,6 +393,7 @@ class P2PNetworkTests {
             "client",
             null,
             "client",
+            CoachType.HUMAN,
             false
         )
         conn2.send(join2)
@@ -523,6 +529,7 @@ class P2PNetworkTests {
             "host",
             null,
             "host",
+            CoachType.HUMAN,
             true,
             P2PTeamInfo(createDefaultHomeTeam(rules))
         )
@@ -538,6 +545,7 @@ class P2PNetworkTests {
             "client",
             null,
             "client",
+            CoachType.HUMAN,
             false
         )
         conn2.send(join2)
@@ -587,6 +595,7 @@ class P2PNetworkTests {
             "host",
             null,
             "host",
+            CoachType.HUMAN,
             true,
             P2PTeamInfo(createDefaultHomeTeam(rules))
         )
@@ -602,6 +611,7 @@ class P2PNetworkTests {
             "client",
             null,
             "client",
+            CoachType.HUMAN,
             false
         )
         conn2.send(join2)

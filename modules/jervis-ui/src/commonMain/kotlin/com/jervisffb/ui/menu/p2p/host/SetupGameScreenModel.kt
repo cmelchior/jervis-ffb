@@ -3,6 +3,7 @@ package com.jervisffb.ui.menu.p2p.host
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.ui.PROPERTIES_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -50,7 +51,7 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
     fun getCoach(): Coach? {
         val name = getCoachName()
         return if (name.isNotBlank()) {
-            Coach(CoachId(Uuid.random().toString()), name)
+            Coach(CoachId(Uuid.random().toString()), name, getCoachType())
         } else {
             null
         }
@@ -83,6 +84,8 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
     }
 
     private fun getCoachName(): String = coachSetupModel.coachName.value
+
+    private fun getCoachType(): CoachType = coachSetupModel.coachType.value
 
     fun createRules(): Rules {
         return gameSetupModel.createRules()

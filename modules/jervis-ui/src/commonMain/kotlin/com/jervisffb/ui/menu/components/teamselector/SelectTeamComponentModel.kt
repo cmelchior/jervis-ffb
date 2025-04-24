@@ -89,7 +89,9 @@ class SelectTeamComponentModel(
             selectedTeam.value = null
             onTeamSelected(null)
         } else {
-            selectedTeam.value = team
+            selectedTeam.value = team.also {
+                it.teamData?.coach = getCoach()
+            }
             onTeamSelected(team)
         }
     }

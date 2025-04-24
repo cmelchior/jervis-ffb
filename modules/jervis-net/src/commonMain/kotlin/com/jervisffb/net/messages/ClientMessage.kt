@@ -2,6 +2,7 @@ package com.jervisffb.net.messages
 
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.serialize.SerializedTeam
@@ -75,6 +76,7 @@ data class JoinGameAsCoachMessage(
     override val username: String,
     override val password: String?,
     val coachName: String,
+    val coachType: CoachType,
     val isHost: Boolean,
     val team: TeamInfo? = null
 ): JoinGameMessage

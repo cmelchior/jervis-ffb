@@ -57,7 +57,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
     fun getCoach(): Coach? {
         val name = coachSetupModel.coachName.value
         return if (name.isNotBlank()) {
-            Coach(CoachId(Uuid.random().toString()), name)
+            Coach(CoachId(Uuid.random().toString()), name, coachSetupModel.coachType.value)
         } else {
             null
         }
@@ -107,10 +107,12 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
             _joinMessage.value = "Joining $joiningUrl..."
             _joinState.value = JoinState.JOINING
             val coachName = coachSetupModel.coachName.value
+            val coachType = coachSetupModel.coachType.value
             PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_CLIENT_COACH_NAME, coachName)
             model.networkAdapter.joinHost(
                 gameUrl = joiningUrl,
                 coachName = coachName,
+                coachType = coachType,
                 gameId = GameId(_gameId.value),
                 teamIfHost = null,
                 handler = object: AbstractClintNetworkMessageHandler() {
@@ -162,7 +164,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
             updateServerIp(url.host, false)
             updatePort(url.port.toString(), false)
             // Unclear why first element is an empty string, just filter it for now
-            url.parameters.get("id")?.let {
+            url.parameters["id"]?.let {
                 updateGameId(it, false)
             }
             checkForValidGameUrl()

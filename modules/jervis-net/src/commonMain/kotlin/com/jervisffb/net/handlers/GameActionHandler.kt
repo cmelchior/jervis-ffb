@@ -17,7 +17,6 @@ import com.jervisffb.net.messages.OutOfOrderGameActionServerError
 import com.jervisffb.net.messages.UnknownServerError
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
-import kotlin.uuid.Uuid.Companion.random
 
 class GameActionHandler(override val session: GameSession) : ClientMessageHandler<GameActionMessage>() {
 

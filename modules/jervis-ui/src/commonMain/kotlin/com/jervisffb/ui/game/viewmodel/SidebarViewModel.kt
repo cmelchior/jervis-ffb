@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.viewmodel
 
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
@@ -69,7 +70,7 @@ class SidebarViewModel(
             TeamActionMode.AWAY_TEAM -> team.isAwayTeam()
             TeamActionMode.ALL_TEAMS -> true
         }
-        if ((setupReceivingTeam || setupKickingTeam) && teamControlledByClient) {
+        if ((setupReceivingTeam || setupKickingTeam) && teamControlledByClient && team.coach.type == CoachType.HUMAN) {
             val availableSetups = Setups.getSetups(uiState.rules.gameType)
             availableSetups.forEach { setup ->
                 buttons.add(ButtonData(setup.name, onClick = { menuViewModel.loadSetup(setup)}))

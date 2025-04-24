@@ -1,14 +1,9 @@
 package com.jervisffb.ui.menu.components.coach
 
+import com.jervisffb.engine.model.CoachType
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
-
-
-enum class CoachType {
-    HUMAN,
-    COMPUTER
-}
 
 data class AiPlayer(
     val name: String,
@@ -55,7 +50,7 @@ class CoachSetupComponentModel(
     private val availableAiPlayers = listOf(
         AiPlayer("Random"),
     )
-    val playerType = MutableStateFlow(CoachType.HUMAN)
+    val coachType = MutableStateFlow(CoachType.HUMAN)
     val selectedAiPlayer = MutableStateFlow<AiPlayer?>(availableAiPlayers.random())
     val aiPlayers = MutableStateFlow(availableAiPlayers)
 
@@ -65,7 +60,7 @@ class CoachSetupComponentModel(
     }
 
     fun updatePlayerType(type: CoachType) {
-        playerType.value = type
+        coachType.value = type
     }
 
     fun updateSelectedAiPlayer(player: AiPlayer?) {

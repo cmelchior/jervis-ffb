@@ -12,6 +12,8 @@ import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /**
  * View model for controlling the "Select <Home/Away> Team" screen, that is the 2nd and 3rd step in the "Hotseat Game" flow.
@@ -30,9 +32,13 @@ class SelectHotseatTeamScreenModel(
         selectedTeam != null && coachName.isNotBlank()
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     val teamSelectorModel = SelectTeamComponentModel(
         menuViewModel,
-        { Coach(CoachId("1"), "Home Coach") },
+        {
+            val coach = Coach(CoachId(Uuid.random().toHexString()), setupCoachModel.coachName.value, setupCoachModel.coachType.value)
+            coach
+        },
         { teamSelected ->
             selectedTeam.value = teamSelected
         },
