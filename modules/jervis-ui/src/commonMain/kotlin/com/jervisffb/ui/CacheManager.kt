@@ -38,11 +38,8 @@ object CacheManager {
 
     suspend fun loadTeams(): List<JervisTeamFile> {
         return fileManager.getFilesWithExtension(teamsCacheRoot, FILE_EXTENSION_TEAM_FILE).map { file ->
-            val fileContent = fileManager.getFile(file.toString())
-            if (fileContent == null) {
-                throw IllegalStateException("Could not find: $file")
-            }
-            val json = fileContent.map { Char(it.toInt()) }.toCharArray().concatToString()
+            val fileContent = fileManager.getFile(file.toString()) ?: throw IllegalStateException("Could not find: $file")
+            val json = fileContent.decodeToString()
             val file = jsonSerializer.decodeFromString<JervisTeamFile>(json)
             file.copy(team = file.team)
         }
