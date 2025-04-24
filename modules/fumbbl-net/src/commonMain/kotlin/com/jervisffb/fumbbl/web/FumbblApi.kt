@@ -242,14 +242,20 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
     }
 
     private fun convertRosterSpecialRules(specialRules: List<com.jervisffb.fumbbl.web.api.SpecialRule>): List<SpecialRules> {
-        return specialRules.map { fumbblRule ->
+        return specialRules.mapNotNull { fumbblRule ->
             val regionalSpecialRule = RegionalSpecialRule.entries.firstOrNull {
-                it.description == fumbblRule.option ?: fumbblRule.name
+                it.description == (fumbblRule.option ?: fumbblRule.name)
             }
             val teamSpecialRule = TeamSpecialRule.entries.firstOrNull {
-                it.description == fumbblRule.option ?: fumbblRule.name
+                it.description == (fumbblRule.option ?: fumbblRule.name)
             }
-            regionalSpecialRule ?: teamSpecialRule ?: throw IllegalStateException("Unsupported special rule: $fumbblRule")
+            // For now we just ignore mappings we do not recognize. The way FUMBBL represents Special Rules is
+            // seems to be pretty complex, so need to understand the nuances better.
+            val rule = regionalSpecialRule ?: teamSpecialRule
+            if (rule == null) {
+                LOG.d { "Could not map special rule: $fumbblRule"  }
+            }
+            rule
         }
     }
 
