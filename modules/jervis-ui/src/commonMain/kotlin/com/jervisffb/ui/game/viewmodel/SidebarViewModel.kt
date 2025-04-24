@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -86,12 +85,13 @@ class SidebarViewModel(
     }
 
     // Expose Dogout information as a separate flow
-    private val dogoutFlow: SharedFlow<List<Player>> = uiState.uiStateFlow.map {
-        if (team.isHomeTeam()) {
+    private val dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<Player>>> = uiState.uiStateFlow.map {
+        val list = if (team.isHomeTeam()) {
             it.game.homeTeam.filter { player -> player.location == DogOut }
         } else {
             it.game.awayTeam.filter { player -> player.location == DogOut }
         }
+        Pair(it, list)
     }.shareIn(menuViewModel.backgroundContext, SharingStarted.Lazily)
 
     // Player being hovered over.
@@ -117,28 +117,30 @@ class SidebarViewModel(
 
     fun actionButtons(): Flow<List<ButtonData>> = _buttons
 
-    fun reserveCount(): Flow<Int> = dogoutFlow.map {
-        // Available players in the Dogout should only have this state
-        it.count { player -> player.state == PlayerState.RESERVE }
+    fun reserveCount(): Flow<Int> {
+        val map = dogoutFlow.map { (_, players) ->
+            // Available players in the Dogout should only have this state
+            players.count { player -> player.state == PlayerState.RESERVE }
+        }
+        return map
     }
 
     fun reserves(): Flow<List<UiPlayer>> {
         return dogoutFlow
-            .map { players: List<Player> ->
+            .map { (uiSnapshot, players) ->
+                val dogoutActions = uiSnapshot.dogoutActions
                 players
                     .filter { it.state == PlayerState.RESERVE }
                     .sortedBy { it.number }
-            }.combine(uiState.uiStateFlow) { players: List<Player>, uiState: UiGameSnapshot ->
-                val dogoutActions = uiState.dogoutActions
-                players.map {
-                    val playerAction = dogoutActions[it.id]
-                    UiPlayer(
-                        it,
-                        playerAction,
-                        onHover = { hoverOver(it) },
-                        onHoverExit = { hoverExit() }
-                    )
-                }
+                    .map {
+                        val playerAction = dogoutActions[it.id]
+                        UiPlayer(
+                            it,
+                            playerAction,
+                            onHover = { hoverOver(it) },
+                            onHoverExit = { hoverExit() }
+                        )
+                    }
             }
     }
 
@@ -154,10 +156,10 @@ class SidebarViewModel(
 
     fun special(): Flow<List<UiPlayer>> = mapTo(PlayerState.FAINTED, dogoutFlow)
 
-    fun injuriesCount(): Flow<Int> = dogoutFlow.map {
+    fun injuriesCount(): Flow<Int> = dogoutFlow.map { (_, players) ->
         // Available players should be in RESERVE, all others should be treated
         // as some kind of injury.
-        it.count { player -> player.state != PlayerState.RESERVE}
+        players.count { player -> player.state != PlayerState.RESERVE}
     }
 
     fun hoverOver(player: Player) {
@@ -176,15 +178,15 @@ class SidebarViewModel(
         _view.value = SidebarView.INJURIES
     }
 
-    private fun mapTo(states: List<PlayerState>, dogoutFlow: SharedFlow<List<Player>>): Flow<List<UiPlayer>> {
-        return dogoutFlow.map { players ->
+    private fun mapTo(states: List<PlayerState>, dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<Player>>>): Flow<List<UiPlayer>> {
+        return dogoutFlow.map { (_, players) ->
             players.filter { states.contains(it.state) }
         }.map { players ->
             players.map { UiPlayer(it, selectAction = null, onHover = { hoverOver(it) }, onHoverExit = { hoverExit() }) }
         }
     }
 
-    private fun mapTo(state: PlayerState, dogoutFlow: SharedFlow<List<Player>>): Flow<List<UiPlayer>> {
+    private fun mapTo(state: PlayerState, dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<Player>>>): Flow<List<UiPlayer>> {
         return mapTo(listOf(state), dogoutFlow)
     }
 }

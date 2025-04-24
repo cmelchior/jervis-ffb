@@ -328,7 +328,7 @@ object IconFactory {
         }
     }
 
-    fun getPlayerImage(player: PlayerId): ImageBitmap {
+    fun getPlayerPortrait(player: PlayerId): ImageBitmap {
         return cachedPortraits[player]!!
     }
 

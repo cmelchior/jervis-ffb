@@ -97,7 +97,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                         ) {
                             Image(
                                 modifier = Modifier.aspectRatio(95f / 147f).fillMaxSize(),
-                                painter = BitmapPainter(IconFactory.getPlayerImage(player.model.id)),
+                                painter = BitmapPainter(IconFactory.getPlayerPortrait(player.model.id)),
                                 contentDescription = "",
                                 contentScale = ContentScale.Fit,
                             )

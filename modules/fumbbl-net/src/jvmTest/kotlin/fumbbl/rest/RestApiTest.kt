@@ -24,7 +24,7 @@ class RestApiTest {
     fun teamLoader() = runBlocking<Unit> {
         val rules = FumbblBB2020Rules()
         // Use 1187712 for a team with advanced special rules setup
-        val file = api.loadTeam(1218380, rules)
+        val file = api.loadTeam(1187712, rules)
         val team = SerializedTeam.deserialize(rules, file.team, Coach.UNKNOWN)
         assertEquals(team.name, "Just Human Nothing More")
     }
