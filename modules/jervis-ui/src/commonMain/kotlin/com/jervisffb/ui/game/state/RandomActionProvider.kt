@@ -126,9 +126,9 @@ class RandomActionProvider(
         // is basically zero. The current random agent only understands the default board size,
         // so do not use it if the board size is different from the expected.
         // TODO Figure out a way to generate random, legal, setups that work across a variety of
-        // fields.
+        //  fields.
         val rules = state.rules
-        val isSupportedField = rules.fieldWidth == 26
+        val isBB11SupportedField = rules.fieldWidth == 26
             && rules.fieldHeight == 15
             && rules.lineOfScrimmageHome == 12
             && rules.lineOfScrimmageAway == 13
@@ -136,7 +136,15 @@ class RandomActionProvider(
             && rules.maxPlayersOnField == 11
             && rules.maxPlayersInWideZone == 2
 
-        if (isSupportedField && !stack.isEmpty() && stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+        val isBB7SupportedField = rules.fieldWidth == 20
+            && rules.fieldHeight == 11
+            && rules.lineOfScrimmageHome == 6
+            && rules.lineOfScrimmageAway == 13
+            && rules.playersRequiredOnLineOfScrimmage == 3
+            && rules.maxPlayersOnField == 7
+            && rules.maxPlayersInWideZone == 1
+
+        if ((isBB11SupportedField || isBB7SupportedField) && !stack.isEmpty() && stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
             val context = state.getContext<SetupTeamContext>()
             val compositeActions = mutableListOf<GameAction>()
             if (context.team.isHomeTeam()) {
