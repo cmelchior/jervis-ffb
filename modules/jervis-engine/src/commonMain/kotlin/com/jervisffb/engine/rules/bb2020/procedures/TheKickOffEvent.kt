@@ -126,10 +126,15 @@ object TheKickOffEvent : Procedure() {
             // if landing on a player, they must/can(?) attempt to catch it
             val ball = state.singleBall()
             val ballLocation: FieldCoordinate = ball.location
+
+            // According to Designer's Errata May 2024, it is only a touchback if a ball
+            // goes beyond the kicking teams Line of Scrimmage. This rule also generalizes
+            // to Standard board setups. In particular, the ball is allowed to land in any
+            // configured No Man's Land.
             val outOfBounds =
-                ball.state == BallState.OUT_OF_BOUNDS ||
-                    (state.kickingTeam.isHomeTeam() && ballLocation.isOnHomeSide(rules)) ||
-                    (state.kickingTeam.isAwayTeam() && ballLocation.isOnAwaySide(rules))
+                !ball.location.isOnField(rules)
+                    || (state.kickingTeam.isHomeTeam() && ballLocation.x <= rules.lineOfScrimmageHome)
+                    || (state.kickingTeam.isAwayTeam() && ballLocation.x >= rules.lineOfScrimmageAway)
             return if (outOfBounds) {
                 GotoNode(TouchBack)
             } else {
