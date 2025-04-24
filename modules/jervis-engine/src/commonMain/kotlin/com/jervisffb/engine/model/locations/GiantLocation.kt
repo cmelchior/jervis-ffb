@@ -237,12 +237,4 @@ class GiantLocation(val coordinates: MutableList<FieldCoordinate>): OnFieldLocat
 //            allCoordinates
 //        }
     }
-
-    // Swap the coordinates around the Y axis
-    // TODO Figure out exactly where/how it is best to do this
-    fun swapX(rules: Rules): FieldCoordinate {
-        TODO()
-//        rules.fieldWidth
-//        return create(rules.fieldWidth - x - 1, y)
-    }
 }

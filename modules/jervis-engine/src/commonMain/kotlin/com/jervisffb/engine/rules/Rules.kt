@@ -68,7 +68,8 @@ import kotlinx.serialization.Serializable
  *
  * When defining field sizes, the "board" is assumed to be laid out vertically. I.e., from left to right
  * with the home team always on the left and the away team always on the right. Coordinates start from
- * the upper-left corner with (0,0).
+ * the upper-left corner with (0,0). If the UI wants to represent things differently, it is responsible
+ * for swapping coordinates.
  *
  * Developer's Commentary:
  * The idea is that this class should be able to represent all game types, but that hasn't been
@@ -274,7 +275,7 @@ open class Rules(
      * While this is described as a bit different between Standard and BB7, it generalizes
      * to the area up to the team's Line of Scrimmage.
      */
-    fun isInSetupArea(team: Team, location: FieldSquare): Boolean {
+    fun isInSetupArea(team: Team, location: FieldCoordinate): Boolean {
         return if (team.isHomeTeam()) {
             location.x <= lineOfScrimmageHome
         } else {

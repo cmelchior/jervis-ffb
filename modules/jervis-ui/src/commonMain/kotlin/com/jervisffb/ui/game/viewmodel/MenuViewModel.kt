@@ -4,7 +4,6 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
-import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -12,7 +11,9 @@ import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.engine.serialize.JervisSetupFile
 import com.jervisffb.ui.BuildConfig
+import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.SoundEffect
 import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.game.UiGameController
@@ -135,7 +136,8 @@ class MenuViewModel {
         return !isUndoing && (features[feature] ?: false)
     }
 
-    fun loadSetup(id: String) {
+    fun loadSetup(setup: JervisSetupFile) {
+        if (setup.gameType == GameType.DUNGEON_BOWL) error("Dungeon Bowl Setups not supported yet")
         if (controller == null) {
             // It shouldn't be possible to call "Load Setup" with out a game controller,
             // but just in case it happens.
@@ -143,7 +145,6 @@ class MenuViewModel {
             SoundManager.play(SoundEffect.ERROR)
             return
         }
-
         val allowedTeam = when (uiState.uiMode) {
             TeamActionMode.HOME_TEAM -> uiState.state.homeTeam.id
             TeamActionMode.AWAY_TEAM -> uiState.state.awayTeam.id
@@ -158,23 +159,38 @@ class MenuViewModel {
             return
         }
 
-        val availableSetups = when (game.rules.gameType) {
-            GameType.STANDARD -> Setups.standardSetups
-            GameType.BB7 -> Setups.sevensSetups
-            GameType.DUNGEON_BOWL -> TODO("Dungeon Bowl setups not yet implemented")
-            GameType.GUTTER_BOWL -> TODO("Gutter Bowl setups not yet implemented")
-        }
+        val rules = game.rules
+        val setupActions = setup.formation.flatMap { (playerNo, relativeCoordinate) ->
+            // Ignore player setup if either player or coordinate is not valid
+            val playerAvailable = (
+                team.noToPlayer.contains(playerNo)
+                    && ((team[playerNo].state == PlayerState.RESERVE) || (team[playerNo].state == PlayerState.STANDING))
+            )
 
-        val setupActions = availableSetups[id]?.flatMap { (playerNo, fieldCoordinate) ->
-            if (team[playerNo].state == PlayerState.RESERVE) {
+            // Map to field coordinate
+            val fieldCoordinate = when (team.isHomeTeam()) {
+                true -> {
+                    val x = rules.lineOfScrimmageHome - relativeCoordinate.dist
+                    val y = relativeCoordinate.y
+                    FieldCoordinate(x, y)
+                }
+                false -> {
+                    val x = rules.lineOfScrimmageAway + relativeCoordinate.dist
+                    val y = relativeCoordinate.y
+                    FieldCoordinate(x, y)
+                }
+            }
+            val isValidCoordinate = rules.isInSetupArea(team, fieldCoordinate)
+
+            if (playerAvailable && isValidCoordinate) {
                 listOf(
                     PlayerSelected(team[playerNo].id),
-                    if (team.isAwayTeam()) FieldSquareSelected(fieldCoordinate.swapX(game.rules)) else FieldSquareSelected(fieldCoordinate)
+                    FieldSquareSelected(fieldCoordinate)
                 )
             } else {
                 emptyList()
             }
-        } ?: error("No setup found for id: $id")
+        }
         uiState.userSelectedMultipleActions(setupActions, delayEvent = false)
     }
 
@@ -198,72 +214,25 @@ class MenuViewModel {
 }
 
 /**
- * TODO These setups only work on "normal" Standard fields.
- *  We should propably check if a custom field is valid for these.
+ * Object responsible for managing team setups.
+ * For now, we only load Setup files once. You need to restart the application
+ * to re-fill the cache. This approach should probably be refactored at some
+ * point, but having setups in-memory makes them a lot faster to access
  */
 object Setups {
-    const val SETUP_5_5_1: String = "5-5-1"
-    const val SETUP_3_4_4: String = "3-4-4"
 
-    const val SETUP_3_4: String = "3-4"
-    const val SETUP_5_2: String = "5-2"
+    private val setups = mutableSetOf<JervisSetupFile>()
 
-    val standardSetups = mutableMapOf(
+    suspend fun initialize() {
+        val fileSetups = CacheManager.loadSetups()
+        this.setups.addAll(fileSetups)
+    }
 
-        // Offensive
-        SETUP_5_5_1 to mapOf(
-            2.playerNo to FieldCoordinate(12, 5),
-            3.playerNo to FieldCoordinate(12, 6),
-            1.playerNo to FieldCoordinate(12, 7),
-            4.playerNo to FieldCoordinate(12, 8),
-            5.playerNo to FieldCoordinate(12, 9),
-            6.playerNo to FieldCoordinate(11, 3),
-            7.playerNo to FieldCoordinate(11, 11),
-            8.playerNo to FieldCoordinate(11, 1),
-            9.playerNo to FieldCoordinate(11, 13),
-            10.playerNo to FieldCoordinate(8, 7),
-            11.playerNo to FieldCoordinate(3, 7),
-        ),
-
-        // Defensive
-        SETUP_3_4_4 to mapOf(
-            1.playerNo to FieldCoordinate(12, 6),
-            2.playerNo to FieldCoordinate(12, 7),
-            3.playerNo to FieldCoordinate(12, 8),
-            4.playerNo to FieldCoordinate(10, 1),
-            5.playerNo to FieldCoordinate(10, 4),
-            6.playerNo to FieldCoordinate(10, 10),
-            7.playerNo to FieldCoordinate(10, 13),
-            8.playerNo to FieldCoordinate(9, 1),
-            9.playerNo to FieldCoordinate(9, 4),
-            10.playerNo to FieldCoordinate(9, 10),
-            11.playerNo to FieldCoordinate(9, 13),
-        ),
-    )
-
-    val sevensSetups = mutableMapOf(
-        // Offensive
-        SETUP_5_2 to mapOf(
-            1.playerNo to FieldCoordinate(6, 2),
-            2.playerNo to FieldCoordinate(6, 4),
-            3.playerNo to FieldCoordinate(6, 5),
-            4.playerNo to FieldCoordinate(6, 6),
-            5.playerNo to FieldCoordinate(6, 8),
-            6.playerNo to FieldCoordinate(5, 1),
-            7.playerNo to FieldCoordinate(5, 9),
-        ),
-
-        // Defensive
-        SETUP_3_4 to mapOf(
-            1.playerNo to FieldCoordinate(6, 2),
-            2.playerNo to FieldCoordinate(6, 5),
-            3.playerNo to FieldCoordinate(6, 8),
-            4.playerNo to FieldCoordinate(5, 1),
-            5.playerNo to FieldCoordinate(5, 4),
-            6.playerNo to FieldCoordinate(5, 6),
-            7.playerNo to FieldCoordinate(5, 9),
-        ),
-    )
+    fun getSetups(type: GameType): List<JervisSetupFile> {
+        return setups
+            .filter { it.gameType == type }
+            .sortedBy { it.name }
+    }
 }
 
 

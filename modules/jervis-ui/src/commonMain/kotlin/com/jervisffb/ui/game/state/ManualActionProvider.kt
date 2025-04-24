@@ -211,6 +211,7 @@ open class ManualActionProvider(
     }
 
     override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
+        if (actions.isEmpty()) throw IllegalArgumentException("Action list must contain at least one action")
         // Store all events to be sent and sent the first one to be processed
         queuedActions.addAll(actions)
         delayBetweenActions = delayEvent

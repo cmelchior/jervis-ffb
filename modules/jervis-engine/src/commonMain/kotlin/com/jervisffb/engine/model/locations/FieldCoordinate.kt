@@ -221,13 +221,6 @@ interface FieldCoordinate: OnFieldLocation {
         }
     }
 
-    // Swap the coordinates around the Y axis
-    // TODO Figure out exactly where/how it is best to do this
-    fun swapX(rules: Rules): FieldCoordinate {
-        rules.fieldWidth
-        return create(rules.fieldWidth - x - 1, y)
-    }
-
     companion object {
         val UNKNOWN = create(Int.MAX_VALUE, Int.MAX_VALUE)
         val OUT_OF_BOUNDS = create(Int.MIN_VALUE, Int.MIN_VALUE)

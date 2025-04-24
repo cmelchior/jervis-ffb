@@ -74,3 +74,7 @@ value class RosterId(val id: String)
 @Serializable
 @JvmInline
 value class TeamId(val value: String = "")
+
+@Serializable
+@JvmInline
+value class SetupId(val value: String)

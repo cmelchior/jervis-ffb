@@ -123,9 +123,20 @@ class RandomActionProvider(
         val stack = controller.stack
 
         // Use a pre-defined setup, because the chance of random actions hitting a correct setup
-        // is basically zero.
-        // TODO This goes into an infinite loop if the setup is no longer valid. Figure out
-        if (!stack.isEmpty() && stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
+        // is basically zero. The current random agent only understands the default board size,
+        // so do not use it if the board size is different from the expected.
+        // TODO Figure out a way to generate random, legal, setups that work across a variety of
+        // fields.
+        val rules = state.rules
+        val isSupportedField = rules.fieldWidth == 26
+            && rules.fieldHeight == 15
+            && rules.lineOfScrimmageHome == 12
+            && rules.lineOfScrimmageAway == 13
+            && rules.playersRequiredOnLineOfScrimmage == 3
+            && rules.maxPlayersOnField == 11
+            && rules.maxPlayersInWideZone == 2
+
+        if (isSupportedField && !stack.isEmpty() && stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup) {
             val context = state.getContext<SetupTeamContext>()
             val compositeActions = mutableListOf<GameAction>()
             if (context.team.isHomeTeam()) {

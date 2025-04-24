@@ -8,6 +8,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.jervisffb.ui.game.icons.IconFactory.initializeFumbblMapping
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.game.viewmodel.Setups
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.OnBackPress
 import com.jervisffb.ui.menu.intro.FrontpageScreen
@@ -25,10 +26,6 @@ suspend fun initApplication() {
     initializePlatform()
     val LOG = jervisLogger()
 
-    // Populate FUMMBL image mapping, so `IconFactory` knows where to download
-    // images from.
-    initializeFumbblMapping()
-
     // For now, we re-initialize the default teams for every new version. This is done because
     //  we are still iterating on the fileformat and serialization format. Once these are
     // stable, we should probably avoid this.
@@ -38,11 +35,19 @@ suspend fun initApplication() {
     if (!isClientInitialized || initializedVersion != clientReleaseVersion) {
         LOG.i { "Initializing application: $clientReleaseVersion" }
         CacheManager.createInitialTeamFiles()
+        CacheManager.createInitialSetupFiles()
         PROPERTIES_MANAGER.setProperty(PROP_INITIALIZED, true)
         PROPERTIES_MANAGER.setProperty(PROP_INITIALIZED_VERSION, clientReleaseVersion)
     } else {
         LOG.i { "Application already initialized. Skipping." }
     }
+
+    // Populate FUMMBL image mapping, so `IconFactory` knows where to download
+    // images from.
+    initializeFumbblMapping()
+
+    // Initialize setup cache
+    Setups.initialize()
 }
 
 // Apply the custom theme

@@ -3,9 +3,12 @@ package com.jervisffb.ui
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import com.jervisffb.engine.serialize.FILE_EXTENSION_SETUP_FILE
 import com.jervisffb.engine.serialize.FILE_EXTENSION_TEAM_FILE
 import com.jervisffb.engine.serialize.JervisSerialization.jervisEngineModule
+import com.jervisffb.engine.serialize.JervisSetupFile
 import com.jervisffb.engine.serialize.JervisTeamFile
+import com.jervisffb.resources.DefaultSetups
 import com.jervisffb.resources.StandaloneBB7Teams
 import com.jervisffb.resources.StandaloneStandardTeams
 import com.jervisffb.utils.FileManager
@@ -21,6 +24,7 @@ object CacheManager {
     val teamsCacheRoot = "teams"
     val rosterCacheRoot = "rosters"
     val fumbbleReplays = "fumbbl_replays"
+    val setupsCacheRoot = "setups"
 
     val fileManager = FileManager()
     val jsonSerializer = Json {
@@ -36,12 +40,27 @@ object CacheManager {
         }
     }
 
+    suspend fun createInitialSetupFiles() {
+        (DefaultSetups.standardSetups + DefaultSetups.sevensSetups).forEach { (fileName, setupFile) ->
+            val json = jsonSerializer.encodeToString(setupFile).encodeToByteArray()
+            FILE_MANAGER.writeFile(setupsCacheRoot, fileName, json)
+        }
+    }
+
+    suspend fun loadSetups(): List<JervisSetupFile> {
+        return fileManager.getFilesWithExtension(setupsCacheRoot, FILE_EXTENSION_SETUP_FILE)
+            .map { file ->
+                val fileContent = fileManager.getFile(file.toString()) ?: throw IllegalStateException("Could not find: $file")
+                val json = fileContent.decodeToString()
+                jsonSerializer.decodeFromString<JervisSetupFile>(json)
+            }
+    }
+
     suspend fun loadTeams(): List<JervisTeamFile> {
         return fileManager.getFilesWithExtension(teamsCacheRoot, FILE_EXTENSION_TEAM_FILE).map { file ->
             val fileContent = fileManager.getFile(file.toString()) ?: throw IllegalStateException("Could not find: $file")
             val json = fileContent.decodeToString()
-            val file = jsonSerializer.decodeFromString<JervisTeamFile>(json)
-            file.copy(team = file.team)
+            jsonSerializer.decodeFromString<JervisTeamFile>(json)
         }
     }
 
