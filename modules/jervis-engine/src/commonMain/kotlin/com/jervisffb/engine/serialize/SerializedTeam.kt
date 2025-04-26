@@ -51,7 +51,7 @@ class SerializedTeam(
                 team.rerolls.count { it.duration == Duration.PERMANENT },
                 team.teamApothecaries.size,
                 team.teamCheerleaders,
-                team.teamAssistentCoaches,
+                team.teamAssistantCoaches,
                 team.treasury,
                 team.fanFactor,
                 team.teamValue,

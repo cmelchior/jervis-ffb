@@ -132,7 +132,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
             })
             this.teamApothecaries.addAll((0 until this@TeamBuilder.apothecaries).map { Apothecary(false, ApothecaryType.STANDARD) })
             this.teamCheerleaders = this@TeamBuilder.cheerleaders
-            this.teamAssistentCoaches = this@TeamBuilder.assistentCoaches
+            this.teamAssistantCoaches = this@TeamBuilder.assistentCoaches
             this.dedicatedFans = this@TeamBuilder.dedicatedFans
             this.teamValue = this@TeamBuilder.teamValue
             this.currentTeamValue = this@TeamBuilder.currentTeamValue

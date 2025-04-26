@@ -68,6 +68,15 @@ class TeamTurnData(private val game: Game) {
     val availableSpecialActions = mutableMapOf<PlayerSpecialActionType, Int>()
 }
 
+/**
+ * Class modeling all state related to a Team.
+ *
+ * This class is not aware of any rules. Which changes are legal are determined by the relevant
+ * [com.jervisffb.engine.fsm.Procedure].
+ *
+ * Also, most changes to this class should only happen through [com.jervisffb.engine.commands.Command]
+ * objects, since it guarantees we can safely revert them again.
+ */
 class Team(
     val id: TeamId,
     val name: String,
@@ -75,6 +84,8 @@ class Team(
     val roster: BB2020Roster,
     var coach: Coach
 ) : Collection<Player> {
+
+    // All players on the team
     val noToPlayer = mutableMapOf<PlayerNo, Player>()
 
     // Team staff
@@ -93,8 +104,8 @@ class Team(
 
     // Track assistant coaches
     val assistantCoaches: Int
-        get() = teamAssistentCoaches + tempAssistantCoaches
-    var teamAssistentCoaches: Int = 0
+        get() = teamAssistantCoaches + tempAssistantCoaches
+    var teamAssistantCoaches: Int = 0
     var tempAssistantCoaches: Int = 0
 
     // Treasury
@@ -108,6 +119,9 @@ class Team(
     var teamValue: Int = 0
     var currentTeamValue: Int = 0
     val specialRules = mutableListOf<SpecialRules>()
+    // This just tracks the prayer itself, and not any effects it might have
+    // caused. E.g., if Iron Man added the Mighty Blow skill to a player, a
+    // temporary skill was added to that player. Which is cleaned up separately.
     val activePrayersToNuffle = mutableSetOf<PrayerToNuffle>()
 
     // Reroll tracking
@@ -119,6 +133,9 @@ class Team(
         get() = availableRerolls.size
 
     // Inducements
+    // TODO We should probably also have a section for "permanent inducements"
+    //  While not in the rules, a lot of custom rulesets like NAF-style tournaments
+    //  have them.
     var bloodweiserKegs: Int = 0
     val bribes = mutableListOf<Bribe>()
     val wizards = mutableListOf<Wizard>()
@@ -138,10 +155,7 @@ class Team(
     lateinit var halfData: TeamHalfData
     lateinit var driveData: TeamDriveData
     lateinit var turnData: TeamTurnData
-
-    var turnMarker by Delegates.observable(0) { prop, old, new ->
-        // Do nothing
-    }
+    var turnMarker: Int = 0
 
     // TODO Add support for custom team logos that are different from
     //  the roster logo.
@@ -176,6 +190,7 @@ class Team(
     }
 
     operator fun get(playerNo: PlayerNo): Player = noToPlayer[playerNo] ?: throw IllegalArgumentException("Player $playerNo not found")
+    fun getOrNull(playerNo: PlayerNo): Player? = noToPlayer[playerNo]
 
     override val size: Int
         get() = noToPlayer.size
