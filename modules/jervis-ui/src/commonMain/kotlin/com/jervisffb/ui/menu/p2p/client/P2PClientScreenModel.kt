@@ -241,12 +241,18 @@ class P2PClientScreenModel(private val navigator: Navigator, private val menuVie
             actionProvider,
             mode = Manual(TeamActionMode.AWAY_TEAM),
             menuViewModel = menuViewModel,
-        ) {
-            menuViewModel.controller = gameController
-            menuViewModel.navigatorContext.launch {
-                networkAdapter.sendGameStarted()
+            onEngineInitialized = {
+                menuViewModel.controller = gameController
+                menuViewModel.navigatorContext.launch {
+                    networkAdapter.sendGameStarted()
+                }
+            },
+            onGameStopped = {
+                menuViewModel.backgroundContext.launch {
+                    networkAdapter.close()
+                }
             }
-        }.also {
+        ).also {
             it.waitForOpponent()
         }
         navigator.pop()

@@ -41,6 +41,7 @@ class GameScreenModel(
     val menuViewModel: MenuViewModel,
     private val actions: List<GameAction> = emptyList(),
     private val onEngineInitialized: () -> Unit = { },
+    private val onGameStopped: () -> Unit = { }
 ) : ScreenModel {
 
     val hoverPlayerFlow = MutableSharedFlow<Player?>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -128,5 +129,9 @@ class GameScreenModel(
         onEngineInitialized()
         _loadingMessages.value = "Starting game"
         _isLoaded.value = true
+    }
+
+    fun stopGame() {
+        onGameStopped()
     }
 }

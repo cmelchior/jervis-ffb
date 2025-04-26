@@ -276,13 +276,19 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
             gameController.state.awayTeam,
             actionProvider,
             mode = Manual(TeamActionMode.HOME_TEAM),
-            menuViewModel = menuViewModel
-        ) {
-            menuViewModel.controller = gameController
-            menuViewModel.navigatorContext.launch {
-                networkAdapter.sendGameStarted()
+            menuViewModel = menuViewModel,
+            onEngineInitialized = {
+                menuViewModel.controller = gameController
+                menuViewModel.navigatorContext.launch {
+                    networkAdapter.sendGameStarted()
+                }
+            },
+            onGameStopped = {
+                menuViewModel.backgroundContext.launch {
+                    server?.stop()
+                }
             }
-        }.also {
+        ).also {
             it.waitForOpponent()
         }
         navigator.pop()

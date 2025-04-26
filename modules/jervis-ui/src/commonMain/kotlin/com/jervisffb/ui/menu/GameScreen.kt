@@ -166,7 +166,10 @@ fun ExitDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> Unit
             Spacer(modifier = Modifier.width(16.dp))
             JervisButton(
                 text = "Exit",
-                onClick = { navigator.pop() },
+                onClick = {
+                    viewModel.stopGame()
+                    navigator.pop()
+                },
                 buttonColor = JervisTheme.rulebookBlue,
                 textColor = buttonTextColor
             )

@@ -131,7 +131,6 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
                         }
 
                         // We might already have reset optimistically
-                        println("${_joinState.value} -> ${_joinError.value}")
                         if (_joinState.value != JoinState.READY_JOIN) {
                             _joinMessage.value = ""
                             _joinError.value = errorMsg
