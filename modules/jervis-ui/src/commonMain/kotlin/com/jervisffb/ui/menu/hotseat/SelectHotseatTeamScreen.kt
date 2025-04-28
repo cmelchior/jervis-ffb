@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.jervisffb.engine.model.CoachType
-import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.ImportTeamFromFumbblDialog
@@ -68,12 +67,10 @@ fun SelectHotseatTeamScreen(
             JervisButton(text = "Load from file", onClick = {
                 showLoadTeamFromFileDialog = !showLoadTeamFromFileDialog
             })
-            if (viewModel.rules?.gameType == GameType.STANDARD) {
-                Spacer(modifier = Modifier.width(16.dp))
-                JervisButton(text = "Import from FUMBBL", onClick = {
-                    showImportFumbblTeamDialog = !showImportFumbblTeamDialog
-                })
-            }
+            Spacer(modifier = Modifier.width(16.dp))
+            JervisButton(text = "Import from FUMBBL", onClick = {
+                showImportFumbblTeamDialog = !showImportFumbblTeamDialog
+            })
             Spacer(modifier = Modifier.weight(1f))
             JervisButton("Next", onClick = { viewModel.teamSelectionDone() }, enabled = isValidTeamSelection)
         }

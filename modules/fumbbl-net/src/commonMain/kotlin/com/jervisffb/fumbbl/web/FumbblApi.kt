@@ -15,7 +15,6 @@ import com.jervisffb.engine.rules.bb2020.roster.RosterPosition
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
-import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialize.JervisMetaData
@@ -291,7 +290,9 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
         return SerializedTeam(
             id = TeamId(team.id.toString()),
             name = team.name,
-            type = GameType.STANDARD,
+            // Right now we just assume that the FUMBBL team matches the given game type
+            // We probably need to refine this later.
+            type = rules.gameType,
             players = team.players.map { player ->
                 val position = jervisRoster.get(PositionId(player.positionId.toString()))
                 SerializedPlayer(
