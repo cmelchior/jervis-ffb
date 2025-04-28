@@ -143,14 +143,26 @@
                 // between caches and the server. We try to avoid this, but just in case, show a
                 // slightly better error message (rather than having the page fail silently).
                 window.addEventListener("error", (event) => {
-                    if (event.message.includes("WebAssembly") || event.message.includes("compile")) {
+                    const message = event.message;
+                    if (message.includes("WebAssembly") || message.includes("compile")) {
                         clearInterval(openingAnimation);
                         statusDescription.textContent = "New version detected. Please refresh the page.";
+                    } else {
+                        console.error(message);
+                    }
+                });
+                window.addEventListener("unhandledrejection", (event) => {
+                    const message = event.reason?.message ?? "";
+                    if (message.includes("WebAssembly") || message.includes("compile")) {
+                        clearInterval(openingAnimation);
+                        statusDescription.textContent = "New version detected. Please refresh the page.";
+                    } else {
+                        console.error(message);
                     }
                 });
 
                 // Now, load the app using <script> so relative URLs work. This is required as Compose
-                // also reference other wasm files using relative urls.
+                // also references other wasm files using relative urls.
                 const script = document.createElement("script");
                 script.src = url;
                 script.onerror = (err) => {
