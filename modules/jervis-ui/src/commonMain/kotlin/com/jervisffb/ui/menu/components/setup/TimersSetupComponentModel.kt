@@ -75,7 +75,7 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
     val responseMaxTime: MutableStateFlow<InputFieldDataWithValue<Duration?>> = MutableStateFlow(InputFieldDataWithValue("Max Time", "", null, false))
 
     init {
-        updateRulesBuilder(rulesBuilder)
+        updateFromRulesBuilder(rulesBuilder)
     }
 
     fun updateTimersEnabled(enabled: Boolean) {
@@ -88,30 +88,38 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
         updatePreset(preset.value)
     }
 
-    fun updateNormalGameTimeLimit(value: String, updatePreset: Boolean = true) {
-        updateDurationWithNullEntry(value, true, "None", "Game Limit", normalGameLimit)
-        if (updatePreset) {
+    fun updateNormalGameTimeLimit(value: String, updateUiPreset: Boolean = true) {
+        updateDurationWithNullEntry(value, true, "None", "Game Limit", normalGameLimit) {
+            rulesBuilder.timers.gameLimit = it
+        }
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun updateNormalGameBuffer(value: String, updatePreset: Boolean = true) {
-        updateDurationEntry(value, "Game Buffer", normalGameBuffer)
-        if (updatePreset) {
+    fun updateNormalGameBuffer(value: String, updateUiPreset: Boolean = true) {
+        updateDurationEntry(value, "Game Buffer", normalGameBuffer) {
+            rulesBuilder.timers.gameBuffer = it
+        }
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun updateOvertimeExtraLimit(value: String, updatePreset: Boolean = true) {
-        updateDurationEntry(value,"Extra Overtime Game Time", overtimeExtraLimit)
-        if (updatePreset) {
+    fun updateOvertimeExtraLimit(value: String, updateUiPreset: Boolean = true) {
+        updateDurationEntry(value,"Extra Overtime Game Time", overtimeExtraLimit) {
+            rulesBuilder.timers.extraOvertimeLimit = it
+        }
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun updateOvertimeExtraBuffer(value: String, updatePreset: Boolean = true) {
-        updateDurationEntry(value, "Extra Overtime Buffer", overtimeExtraBuffer)
-        if (updatePreset) {
+    fun updateOvertimeExtraBuffer(value: String, updateUiPreset: Boolean = true) {
+        updateDurationEntry(value, "Extra Overtime Buffer", overtimeExtraBuffer) {
+            rulesBuilder.timers.extraOvertimeBuffer = it
+        }
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
@@ -130,97 +138,145 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
         }
     }
 
-    fun updateSetupUseBuffer(value: Boolean, updatePreset: Boolean = true) {
+    fun updateSetupUseBuffer(value: Boolean, updateUiPreset: Boolean = true) {
         setupUseBuffer.value = value
-        updateSetupMaxTime(if (value) setupMaxTime.value.value else "", updatePreset)
-        if (updatePreset) {
+        rulesBuilder.timers.setupUseBuffer = value
+        updateSetupFreeTime(setupFreeTime.value.value, updateUiPreset)
+        updateSetupMaxTime(if (value) setupMaxTime.value.value else "", updateUiPreset)
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun updateSetupFreeTime(value: String, updatePreset: Boolean = true) {
-        updateDurationEntry(value, "Free Time", setupFreeTime)
-        if (updatePreset) {
+    fun updateSetupFreeTime(value: String, updateUiPreset: Boolean = true) {
+        val label = when (setupUseBuffer.value) {
+            true -> "Free Time"
+            false -> "Action Time"
+        }
+        updateDurationEntry(value, label, setupFreeTime) {
+            rulesBuilder.timers.setupFreeTime = it
+        }
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun updateSetupMaxTime(value: String, updatePreset: Boolean = true) {
-        updateDurationWithNullEntry(value, setupUseBuffer.value, "Game Limit", "Max Time", setupMaxTime)
-        if (updatePreset) {
+    fun updateSetupMaxTime(value: String, updateUiPreset: Boolean = true) {
+        updateDurationWithNullEntry(
+            value,
+            setupUseBuffer.value,
+            "Game Limit",
+            "Max Time",
+            setupMaxTime
+        ) {
+            rulesBuilder.timers.setupMaxTime = it
+        }
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun updateTeamTurnUseBuffer(value: Boolean, updatePreset: Boolean = true) {
+    fun updateTeamTurnUseBuffer(value: Boolean, updateUiPreset: Boolean = true) {
         teamTurnUseBuffer.value = value
-        updateTeamTurnMaxTime(teamTurnMaxTime.value.value, updatePreset)
-        if (updatePreset) {
+        rulesBuilder.timers.turnUseBuffer = value
+        updateTeamTurnFreeTime(teamTurnFreeTime.value.value, updateUiPreset)
+        updateTeamTurnMaxTime(teamTurnMaxTime.value.value, updateUiPreset)
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
 
     fun updateTeamTurnFreeTime(value: String, updatePreset: Boolean = true) {
-        updateDurationEntry(value, "Free Time", teamTurnFreeTime)
+        val label = when (teamTurnUseBuffer.value) {
+            true -> "Free Time"
+            false -> "Action Time"
+        }
+        updateDurationEntry(value, label, teamTurnFreeTime) {
+            rulesBuilder.timers.turnFreeTime = it
+        }
         if (updatePreset) {
             selectedPresetData.value = customPreset
         }
     }
 
     fun updateTeamTurnMaxTime(value: String, updatePreset: Boolean = true) {
-        updateDurationWithNullEntry(value, teamTurnUseBuffer.value, "Game Limit", "Max Time", teamTurnMaxTime)
+        updateDurationWithNullEntry(
+            value,
+            teamTurnUseBuffer.value,
+            "Game Limit",
+            "Max Time",
+            teamTurnMaxTime
+        ) {
+            rulesBuilder.timers.turnMaxTime = it
+        }
         if (updatePreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun updateResponseUseBuffer(value: Boolean, updatePreset: Boolean = true) {
+    fun updateResponseUseBuffer(value: Boolean, updateUiPreset: Boolean = true) {
         responseUseBuffer.value = value
-        updateResponseMaxTime(responseMaxTime.value.value, updatePreset)
-        if (updatePreset) {
+        rulesBuilder.timers.outOfTurnResponseUseBuffer = value
+        updateResponseFreeTime(responseFreeTime.value.value, updateUiPreset)
+        updateResponseMaxTime(responseMaxTime.value.value, updateUiPreset)
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun updateResponseFreeTime(value: String, updatePreset: Boolean = true) {
-        updateDurationEntry(value, "Free Time", responseFreeTime)
-        if (updatePreset) {
+    fun updateResponseFreeTime(value: String, updateUiPreset: Boolean = true) {
+        val label = when (responseUseBuffer.value) {
+            true -> "Free Time"
+            false -> "Action Time"
+        }
+        updateDurationEntry(value, label, responseFreeTime) {
+            rulesBuilder.timers.outOfTurnResponseFreeTime = it
+        }
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun updateResponseMaxTime(value: String, updatePreset: Boolean = true) {
-        updateDurationWithNullEntry(value, responseUseBuffer.value, "Game Limit", "Max Time", responseMaxTime)
-        if (updatePreset) {
+    fun updateResponseMaxTime(value: String, updateUiPreset: Boolean = true) {
+        updateDurationWithNullEntry(
+            value,
+            responseUseBuffer.value,
+            "Game Limit",
+            "Max Time",
+            responseMaxTime
+        ) {
+            rulesBuilder.timers.outOfTurnResponseMaxTime = it
+        }
+        if (updateUiPreset) {
             selectedPresetData.value = customPreset
         }
     }
 
-    fun buildTimerSettings(): TimerSettings {
-        return TimerSettings(
-            timersEnabled = timersEnabled.value,
-
-            gameLimit = normalGameLimit.value.underlyingValue,
-            gameBuffer = normalGameBuffer.value.underlyingValue ?: Duration.ZERO,
-            extraOvertimeLimit = overtimeExtraLimit.value.underlyingValue ?: Duration.ZERO,
-            extraOvertimeBuffer =overtimeExtraBuffer.value.underlyingValue ?: Duration.ZERO,
-
-            outOfTimeBehaviour = outOfTimeLimitData.value.value,
-            gameLimitReached = gameLimitReached.value.value,
-
-            setupUseBuffer = setupUseBuffer.value,
-            setupFreeTime = setupFreeTime.value.underlyingValue ?: Duration.ZERO,
-            setupMaxTime = setupMaxTime.value.underlyingValue,
-
-            turnUseBuffer = teamTurnUseBuffer.value,
-            turnFreeTime = teamTurnFreeTime.value.underlyingValue ?: Duration.ZERO,
-            turnMaxTime = teamTurnMaxTime.value.underlyingValue,
-
-            outOfTurnResponseUseBuffer = responseUseBuffer.value,
-            outOfTurnResponseFreeTime = responseFreeTime.value.underlyingValue ?: Duration.ZERO,
-            outOfTurnResponseMaxTime = responseMaxTime.value.underlyingValue,
-        )
-    }
+//    fun buildTimerSettings(): TimerSettings {
+//        return TimerSettings(
+//            timersEnabled = timersEnabled.value,
+//
+//            gameLimit = normalGameLimit.value.underlyingValue,
+//            gameBuffer = normalGameBuffer.value.underlyingValue ?: Duration.ZERO,
+//            extraOvertimeLimit = overtimeExtraLimit.value.underlyingValue ?: Duration.ZERO,
+//            extraOvertimeBuffer =overtimeExtraBuffer.value.underlyingValue ?: Duration.ZERO,
+//
+//            outOfTimeBehaviour = outOfTimeLimitData.value.value,
+//            gameLimitReached = gameLimitReached.value.value,
+//
+//            setupUseBuffer = setupUseBuffer.value,
+//            setupFreeTime = setupFreeTime.value.underlyingValue ?: Duration.ZERO,
+//            setupMaxTime = setupMaxTime.value.underlyingValue,
+//
+//            turnUseBuffer = teamTurnUseBuffer.value,
+//            turnFreeTime = teamTurnFreeTime.value.underlyingValue ?: Duration.ZERO,
+//            turnMaxTime = teamTurnMaxTime.value.underlyingValue,
+//
+//            outOfTurnResponseUseBuffer = responseUseBuffer.value,
+//            outOfTurnResponseFreeTime = responseFreeTime.value.underlyingValue ?: Duration.ZERO,
+//            outOfTurnResponseMaxTime = responseMaxTime.value.underlyingValue,
+//        )
+//    }
 
     private fun updatePreset(preset: TimerPreset) {
         // If already selected preset is Custom, we should probably save it, so it can be restored if
@@ -231,29 +287,30 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
             TimerPreset.BB_CLOCK -> TimerSettings.BB_CLOCK
             TimerPreset.CUSTOM -> TimerSettings()
         }
+        rulesBuilder.timers = presetData.toBuilder()
         updatePreset(presetData)
     }
 
     private fun updatePreset(preset: TimerSettings) {
-        updateNormalGameTimeLimit(preset.gameLimit?.toString() ?: "", updatePreset = false)
-        updateNormalGameBuffer(preset.gameBuffer.toString(), updatePreset = false)
-        updateOvertimeExtraLimit(preset.extraOvertimeLimit.toString(), updatePreset = false)
-        updateOvertimeExtraBuffer(preset.extraOvertimeBuffer.toString(), updatePreset = false)
+        updateNormalGameTimeLimit(preset.gameLimit?.toString() ?: "", updateUiPreset = false)
+        updateNormalGameBuffer(preset.gameBuffer.toString(), updateUiPreset = false)
+        updateOvertimeExtraLimit(preset.extraOvertimeLimit.toString(), updateUiPreset = false)
+        updateOvertimeExtraBuffer(preset.extraOvertimeBuffer.toString(), updateUiPreset = false)
 
         updateOutOfTimeBehaviour(outOfTimeEntries.first { it.value == preset.outOfTimeBehaviour }, updatePreset = false)
         updateGameLimitReachedBehaviour(gameLimitEntries.first { it.value == preset.gameLimitReached }, updatePreset = false)
 
-        updateSetupUseBuffer(preset.setupUseBuffer, updatePreset = false)
-        updateSetupFreeTime(preset.setupFreeTime.toString(), updatePreset = false)
-        updateSetupMaxTime(preset.setupMaxTime?.toString() ?: "", updatePreset = false)
+        updateSetupUseBuffer(preset.setupUseBuffer, updateUiPreset = false)
+        updateSetupFreeTime(preset.setupFreeTime.toString(), updateUiPreset = false)
+        updateSetupMaxTime(preset.setupMaxTime?.toString() ?: "", updateUiPreset = false)
 
-        updateTeamTurnUseBuffer(preset.turnUseBuffer, updatePreset = false)
+        updateTeamTurnUseBuffer(preset.turnUseBuffer, updateUiPreset = false)
         updateTeamTurnFreeTime(preset.turnFreeTime.toString(), updatePreset = false)
         updateTeamTurnMaxTime(preset.turnMaxTime?.toString() ?: "", updatePreset = false)
 
-        updateResponseUseBuffer(preset.outOfTurnResponseUseBuffer, updatePreset = false)
-        updateResponseFreeTime(preset.outOfTurnResponseFreeTime.toString(), updatePreset = false)
-        updateResponseMaxTime(preset.outOfTurnResponseMaxTime?.toString() ?: "", updatePreset = false)
+        updateResponseUseBuffer(preset.outOfTurnResponseUseBuffer, updateUiPreset = false)
+        updateResponseFreeTime(preset.outOfTurnResponseFreeTime.toString(), updateUiPreset = false)
+        updateResponseMaxTime(preset.outOfTurnResponseMaxTime?.toString() ?: "", updateUiPreset = false)
     }
 
     private fun normalizeDurationString(value: String): String {
@@ -280,7 +337,8 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
         enabled: Boolean,
         nullDescription: String,
         label: String,
-        flow: MutableStateFlow<InputFieldDataWithValue<Duration?>>
+        flow: MutableStateFlow<InputFieldDataWithValue<Duration?>>,
+        onValueChange: (Duration?) -> Unit = { duration -> /* Do nothing */ }
     ) {
         val normalizedValue: String = normalizeDurationString(value)
         val duration = parseDuration(normalizedValue)
@@ -306,9 +364,15 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
         )
         flow.value = result
         isSetupValid.value = !result.isError
+        onValueChange(underlyingDuration)
     }
 
-    private fun updateDurationEntry(value: String, label: String, flow: MutableStateFlow<InputFieldDataWithValue<Duration>>) {
+    private fun updateDurationEntry(
+        value: String,
+        label: String,
+        flow: MutableStateFlow<InputFieldDataWithValue<Duration>>,
+        onValueChange: (Duration) -> Unit = { duration ->  }
+    ) {
         val normalizedValue: String = normalizeDurationString(value)
         val duration = parseDuration(normalizedValue)
         val underlyingDuration = duration.getOrNull()?.inWholeSeconds?.seconds ?: Duration.ZERO
@@ -328,6 +392,7 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
         )
         flow.value = result
         isSetupValid.value = !result.isError
+        onValueChange(underlyingDuration)
     }
 
     private fun mapNullDuration(duration: Duration?): String {
@@ -335,28 +400,29 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
         return duration.toString()
     }
 
-    fun updateRulesBuilder(rules: Rules.Builder) {
+    // Update configuration with data from the Rules.Builder
+    fun updateFromRulesBuilder(rules: Rules.Builder) {
         this.rulesBuilder = rules
         // Only set the preset dialog, do not attempt to update any data based on it as we
         // want to use the timer settings from the rules builder.
         selectedPresetData.value = presets.first { it.value == rules.timers.preset }
         with(rules.timers) {
             updateTimersEnabled(timersEnabled)
-            updateNormalGameTimeLimit(gameLimit?.toString() ?: "", updatePreset = false)
-            updateNormalGameBuffer(gameBuffer.toString(), updatePreset = false)
-            updateOvertimeExtraLimit(extraOvertimeLimit.toString(), updatePreset = false)
-            updateOvertimeExtraBuffer(extraOvertimeBuffer.toString(), updatePreset = false)
+            updateNormalGameTimeLimit(gameLimit?.toString() ?: "", updateUiPreset = false)
+            updateNormalGameBuffer(gameBuffer.toString(), updateUiPreset = false)
+            updateOvertimeExtraLimit(extraOvertimeLimit.toString(), updateUiPreset = false)
+            updateOvertimeExtraBuffer(extraOvertimeBuffer.toString(), updateUiPreset = false)
             updateOutOfTimeBehaviour(outOfTimeEntries.first { it.value == outOfTimeBehaviour }, updatePreset = false)
             updateGameLimitReachedBehaviour(gameLimitEntries.first { it.value == gameLimitReached }, updatePreset = false)
-            updateSetupUseBuffer(setupUseBuffer, updatePreset = false)
-            updateSetupFreeTime(setupFreeTime.toString(), updatePreset = false)
-            updateSetupMaxTime(setupMaxTime?.toString() ?: "", updatePreset = false)
-            updateTeamTurnUseBuffer(turnUseBuffer, updatePreset = false)
+            updateSetupUseBuffer(setupUseBuffer, updateUiPreset = false)
+            updateSetupFreeTime(setupFreeTime.toString(), updateUiPreset = false)
+            updateSetupMaxTime(setupMaxTime?.toString() ?: "", updateUiPreset = false)
+            updateTeamTurnUseBuffer(turnUseBuffer, updateUiPreset = false)
             updateTeamTurnFreeTime(turnFreeTime.toString(), updatePreset = false)
             updateTeamTurnMaxTime(turnMaxTime?.toString() ?: "", updatePreset = false)
-            updateResponseUseBuffer(outOfTurnResponseUseBuffer, updatePreset = false)
-            updateResponseFreeTime(outOfTurnResponseFreeTime.toString(), updatePreset = false)
-            updateResponseMaxTime(outOfTurnResponseMaxTime?.toString() ?: "", updatePreset = false)
+            updateResponseUseBuffer(outOfTurnResponseUseBuffer, updateUiPreset = false)
+            updateResponseFreeTime(outOfTurnResponseFreeTime.toString(), updateUiPreset = false)
+            updateResponseMaxTime(outOfTurnResponseMaxTime?.toString() ?: "", updateUiPreset = false)
         }
     }
 }

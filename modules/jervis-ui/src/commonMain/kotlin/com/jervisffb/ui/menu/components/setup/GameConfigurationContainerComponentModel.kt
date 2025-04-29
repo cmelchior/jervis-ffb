@@ -184,7 +184,7 @@ class GameConfigurationContainerComponentModel(private val menuViewModel: MenuVi
         rulesBuilder = entry.value.toBuilder()
         // LoadFileComponentModel does not care about preset updates, so is ignored here
         rulesModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
-        timersModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
+        timersModel.updateFromRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
         inducementsModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
         customizationsModel.updateRulesBuilder(this@GameConfigurationContainerComponentModel.rulesBuilder)
     }
