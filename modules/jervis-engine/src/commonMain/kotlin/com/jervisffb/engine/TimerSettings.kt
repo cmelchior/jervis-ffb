@@ -47,16 +47,16 @@ data class TimerSettings(
     val gameLimitReached: GameLimitReachedBehaviour = GameLimitReachedBehaviour.NONE,
 
     val setupUseBuffer: Boolean = false,
+    val setupActionTime: Duration? = null,
     val setupFreeTime: Duration = Duration.ZERO,
-    val setupMaxTime: Duration? = null, // How much time is allowed in total to be used before `outOfTime` is triggered
 
     val turnUseBuffer: Boolean = false,
+    val turnActionTime: Duration? = null,
     val turnFreeTime: Duration = Duration.ZERO,
-    val turnMaxTime: Duration? = null,
 
     val outOfTurnResponseUseBuffer: Boolean = false,
+    val outOfTurnResponseActionTime: Duration? = null,
     val outOfTurnResponseFreeTime: Duration = Duration.ZERO,
-    val outOfTurnResponseMaxTime: Duration? = null,
 ) {
 
     /**
@@ -77,14 +77,14 @@ data class TimerSettings(
         var outOfTimeBehaviour: OutOfTimeBehaviour = timerSettings.outOfTimeBehaviour
         var gameLimitReached: GameLimitReachedBehaviour = timerSettings.gameLimitReached
         var setupUseBuffer: Boolean = timerSettings.setupUseBuffer
+        var setupActionTime: Duration? = timerSettings.setupActionTime
         var setupFreeTime: Duration = timerSettings.setupFreeTime
-        var setupMaxTime: Duration? = timerSettings.setupMaxTime
         var turnUseBuffer: Boolean = timerSettings.turnUseBuffer
+        var turnActionTime: Duration? = timerSettings.turnActionTime
         var turnFreeTime: Duration = timerSettings.turnFreeTime
-        var turnMaxTime: Duration? = timerSettings.turnMaxTime
         var outOfTurnResponseUseBuffer: Boolean = timerSettings.outOfTurnResponseUseBuffer
+        var outOfTurnResponseActionTime: Duration? = timerSettings.outOfTurnResponseActionTime
         var outOfTurnResponseFreeTime: Duration = timerSettings.outOfTurnResponseFreeTime
-        var outOfTurnResponseMaxTime: Duration? = timerSettings.outOfTurnResponseMaxTime
 
         fun build() = TimerSettings(
             timersEnabled,
@@ -96,14 +96,14 @@ data class TimerSettings(
             outOfTimeBehaviour,
             gameLimitReached,
             setupUseBuffer,
+            setupActionTime,
             setupFreeTime,
-            setupMaxTime,
             turnUseBuffer,
+            turnActionTime,
             turnFreeTime,
-            turnMaxTime,
             outOfTurnResponseUseBuffer,
-            outOfTurnResponseFreeTime,
-            outOfTurnResponseMaxTime
+            outOfTurnResponseActionTime,
+            outOfTurnResponseFreeTime
         )
     }
 
@@ -124,16 +124,16 @@ data class TimerSettings(
             gameLimitReached = GameLimitReachedBehaviour.FORFEIT_GAME,
 
             setupUseBuffer = false,
-            setupFreeTime = 4.minutes,
-            setupMaxTime = null,
+            setupActionTime = 4.minutes,
+            setupFreeTime = Duration.ZERO,
 
             turnUseBuffer = false,
-            turnFreeTime = 4.minutes,
-            turnMaxTime = null,
+            turnActionTime = 4.minutes,
+            turnFreeTime = Duration.ZERO,
 
             outOfTurnResponseUseBuffer = false,
-            outOfTurnResponseFreeTime = 30.seconds,
-            outOfTurnResponseMaxTime = null,
+            outOfTurnResponseActionTime = 30.seconds,
+            outOfTurnResponseFreeTime = Duration.ZERO,
         )
         val CHESS_CLOCK = TimerSettings(
             timersEnabled = true,
@@ -148,16 +148,16 @@ data class TimerSettings(
             gameLimitReached = GameLimitReachedBehaviour.FORFEIT_GAME,
 
             setupUseBuffer = true,
-            setupFreeTime = 0.minutes,
-            setupMaxTime = null,
+            setupActionTime = null,
+            setupFreeTime = Duration.ZERO,
 
             turnUseBuffer = true,
-            turnFreeTime = 0.minutes,
-            turnMaxTime = null,
+            turnActionTime = null,
+            turnFreeTime = Duration.ZERO,
 
             outOfTurnResponseUseBuffer = true,
-            outOfTurnResponseFreeTime = 0.minutes,
-            outOfTurnResponseMaxTime = null,
+            outOfTurnResponseActionTime = null,
+            outOfTurnResponseFreeTime = Duration.ZERO,
 
         )
         val BB_CLOCK = TimerSettings(
@@ -173,16 +173,16 @@ data class TimerSettings(
             gameLimitReached = GameLimitReachedBehaviour.ROLL_OVER_STAND_UP,
 
             setupUseBuffer = true,
+            setupActionTime = 5.minutes,
             setupFreeTime = 3.minutes,
-            setupMaxTime = 5.minutes,
 
             turnUseBuffer = true,
+            turnActionTime = 5.minutes,
             turnFreeTime = 3.minutes,
-            turnMaxTime = 5.minutes,
 
             outOfTurnResponseUseBuffer = true,
+            outOfTurnResponseActionTime = 1.minutes,
             outOfTurnResponseFreeTime = 30.seconds,
-            outOfTurnResponseMaxTime = 1.minutes,
         )
     }
 }

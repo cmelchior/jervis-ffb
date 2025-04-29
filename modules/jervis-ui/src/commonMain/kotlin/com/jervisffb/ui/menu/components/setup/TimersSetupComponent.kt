@@ -44,16 +44,16 @@ fun TimersSetupComponent(viewModel: SetupTimersComponentModel) {
     val selectedGameLimitReachedEntry by viewModel.gameLimitReached.collectAsState()
 
     val setupUseBuffer by viewModel.setupUseBuffer.collectAsState()
-    val setupFreeTime by viewModel.setupFreeTime.collectAsState()
-    val setupMaxTime by viewModel.setupMaxTime.collectAsState()
+    val setupFreeTime by viewModel.setupActionTime.collectAsState()
+    val setupMaxTime by viewModel.setupFreeTime.collectAsState()
 
     val teamTurnUseBuffer by viewModel.teamTurnUseBuffer.collectAsState()
-    val teamTurnFreeTime by viewModel.teamTurnFreeTime.collectAsState()
-    val teamTurnMaxTime by viewModel.teamTurnMaxTime.collectAsState()
+    val teamTurnFreeTime by viewModel.teamTurnActionTime.collectAsState()
+    val teamTurnMaxTime by viewModel.teamTurnFreeTime.collectAsState()
 
     val responseUseBuffer by viewModel.responseUseBuffer.collectAsState()
-    val responseFreeTime by viewModel.responseFreeTime.collectAsState()
-    val responseMaxTime by viewModel.responseMaxTime.collectAsState()
+    val responseFreeTime by viewModel.responseActionTime.collectAsState()
+    val responseMaxTime by viewModel.responseFreeTime.collectAsState()
 
     val inputFieldModifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
 
@@ -142,17 +142,19 @@ fun TimersSetupComponent(viewModel: SetupTimersComponentModel) {
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = setupFreeTime.value,
-                        onValueChange = { viewModel.updateSetupFreeTime(it) },
+                        onValueChange = { viewModel.updateSetupActionTime(it) },
                         enabled = timersEnabled,
                         label = { Text(setupFreeTime.label) },
                     )
-                    OutlinedTextField(
-                        modifier = inputFieldModifier,
-                        value = setupMaxTime.value,
-                        onValueChange = { viewModel.updateSetupMaxTime(it) },
-                        enabled = timersEnabled && setupUseBuffer,
-                        label = { Text(setupMaxTime.label) },
-                    )
+                    if (setupUseBuffer) {
+                        OutlinedTextField(
+                            modifier = inputFieldModifier,
+                            value = setupMaxTime.value,
+                            onValueChange = { viewModel.updateSetupFreeTime(it) },
+                            enabled = timersEnabled && setupUseBuffer,
+                            label = { Text(setupMaxTime.label) },
+                        )
+                    }
                     SmallHeader("Team Turn", topPadding = smallHeaderTopPadding, bottomPadding = 8.dp)
                     SimpleSwitch("Use Game Buffer", teamTurnUseBuffer, isEnabled = timersEnabled) {
                         viewModel.updateTeamTurnUseBuffer(it)
@@ -160,17 +162,19 @@ fun TimersSetupComponent(viewModel: SetupTimersComponentModel) {
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = teamTurnFreeTime.value,
-                        onValueChange = { viewModel.updateTeamTurnFreeTime(it) },
+                        onValueChange = { viewModel.updateTeamTurnActionTime(it) },
                         enabled = timersEnabled,
                         label = { Text(teamTurnFreeTime.label) },
                     )
-                    OutlinedTextField(
-                        modifier = inputFieldModifier,
-                        value = teamTurnMaxTime.value,
-                        onValueChange = { viewModel.updateTeamTurnMaxTime(it) },
-                        enabled = timersEnabled && teamTurnUseBuffer,
-                        label = { Text(teamTurnMaxTime.label) },
-                    )
+                    if (teamTurnUseBuffer) {
+                        OutlinedTextField(
+                            modifier = inputFieldModifier,
+                            value = teamTurnMaxTime.value,
+                            onValueChange = { viewModel.updateTeamTurnFreeTime(it) },
+                            enabled = timersEnabled && teamTurnUseBuffer,
+                            label = { Text(teamTurnMaxTime.label) },
+                        )
+                    }
                     SmallHeader("Out-of-turn Response", topPadding = smallHeaderTopPadding, bottomPadding = 8.dp)
                     SimpleSwitch("Use Game Buffer", responseUseBuffer, isEnabled = timersEnabled) {
                         viewModel.updateResponseUseBuffer(it)
@@ -178,17 +182,19 @@ fun TimersSetupComponent(viewModel: SetupTimersComponentModel) {
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = responseFreeTime.value,
-                        onValueChange = { viewModel.updateResponseFreeTime(it) },
+                        onValueChange = { viewModel.updateResponseActionTime(it) },
                         enabled = timersEnabled,
                         label = { Text(responseFreeTime.label) },
                     )
-                    OutlinedTextField(
-                        modifier = inputFieldModifier,
-                        value = responseMaxTime.value,
-                        onValueChange = { viewModel.updateResponseMaxTime(it) },
-                        enabled = timersEnabled && responseUseBuffer,
-                        label = { Text(responseMaxTime.label) },
-                    )
+                    if (responseUseBuffer) {
+                        OutlinedTextField(
+                            modifier = inputFieldModifier,
+                            value = responseMaxTime.value,
+                            onValueChange = { viewModel.updateResponseFreeTime(it) },
+                            enabled = timersEnabled && responseUseBuffer,
+                            label = { Text(responseMaxTime.label) },
+                        )
+                    }
                 }
             }
         }

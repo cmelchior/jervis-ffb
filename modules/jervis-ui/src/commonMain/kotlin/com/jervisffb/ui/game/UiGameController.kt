@@ -41,7 +41,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -95,7 +94,7 @@ class LocalActionProvider(
             @OptIn(DelicateCoroutinesApi::class)
             actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
                 // TODO Need to figure out if we are using setup / turn / response timers and track it correctly
-                delay(settings.timerSettings.turnMaxTime ?:settings.timerSettings.turnFreeTime)
+                // delay(settings.timerSettings.turnFreeTime ?: settings.timerSettings.turnActionTime)
                 val action = createRandomAction(engine.state, engine.getAvailableActions())
                 provider.userActionSelected(action)
             }
