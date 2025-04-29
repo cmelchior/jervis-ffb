@@ -31,7 +31,7 @@ object NecessaryViolence : Procedure() {
             rules: Rules,
         ): Command {
             return compositeCommandOf(
-                ReportGameProgress("${state.activeTeam} receives Necessary Violence"),
+                ReportGameProgress("${state.activeTeamOrThrow()} receives Necessary Violence"),
                 ExitProcedure(),
             )
         }

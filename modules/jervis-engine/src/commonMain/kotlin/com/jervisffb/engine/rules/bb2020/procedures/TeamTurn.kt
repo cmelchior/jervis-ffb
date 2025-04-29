@@ -49,31 +49,31 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 object TeamTurn : Procedure() {
     override val initialNode: Node = SelectPlayerOrEndTurn
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
-        val turn = state.activeTeam.turnMarker + 1
+        val turn = state.activeTeamOrThrow().turnMarker + 1
         // TODO Check for stalling players at this point.
         // If any player is starting the turn with the ball, check if they are stalling
         // We also need to check for this whenever a player receives the ball during their
         // turn
         return compositeCommandOf(
             SetCanUseTeamRerolls(true),
-            SetTurnMarker(state.activeTeam, turn),
+            SetTurnMarker(state.activeTeamOrThrow(), turn),
             getResetTurnActionCommands(state, rules),
             *resetPlayerTemporaryStats(state, rules),
             *getResetAvailablePlayers(state, rules),
             *resetSkillsUsed(state, rules),
-            ReportStartingTurn(state.activeTeam, turn),
+            ReportStartingTurn(state.activeTeamOrThrow(), turn),
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         return compositeCommandOf(
             SetCanUseTeamRerolls(false),
-            ReportEndingTurn(state.activeTeam, state.activeTeam.turnMarker, state.turnOver),
+            ReportEndingTurn(state.activeTeamOrThrow(), state.activeTeamOrThrow().turnMarker, state.turnOver),
         )
     }
 
     object UseSpecialEffects: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetContext(ActivateInducementContext(state.activeTeam, Timing.END_OF_TURN))
+            return SetContext(ActivateInducementContext(state.activeTeamOrThrow(), Timing.END_OF_TURN))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ActivateInducements
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -91,7 +91,7 @@ object TeamTurn : Procedure() {
     // 5. Start on the action. Until the player moves or roll dice, it is still allowed to end the
     //    action without it counting as used.
     object SelectPlayerOrEndTurn : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.activeTeam
+        override fun actionOwner(state: Game, rules: Rules) = state.activeTeamOrThrow()
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(EndTurnWhenReady) + getAvailablePlayers(state, rules).map { SelectPlayer(it) }
@@ -132,12 +132,12 @@ object TeamTurn : Procedure() {
             // TODO Implement end-of-turn things
             //  - Players stunned at the beginning of the turn are now prone
 
-            val turnOverStunnedPlayersCommands = state.activeTeam
+            val turnOverStunnedPlayersCommands = state.activeTeamOrThrow()
                 .filter { it.state == PlayerState.STUNNED }
                 .map { SetPlayerState(it, PlayerState.PRONE) }
                 .toTypedArray()
 
-            val progressStunnedCommands = state.activeTeam
+            val progressStunnedCommands = state.activeTeamOrThrow()
                 .filter { it.state == PlayerState.STUNNED_OWN_TURN }
                 .map { SetPlayerState(it, PlayerState.STUNNED) }
                 .toTypedArray()
@@ -159,7 +159,7 @@ object TeamTurn : Procedure() {
             // - Temporary Skills/Characteristics are removed
             // - Stunned Players are now prone
             val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_TURN)
-            val nextNodeCommand = if (state.activeTeam.otherTeam().activePrayersToNuffle.contains(PrayerToNuffle.THROW_A_ROCK)) {
+            val nextNodeCommand = if (state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(PrayerToNuffle.THROW_A_ROCK)) {
                 GotoNode(CheckForThrowARock)
             } else {
                 ExitProcedure()
@@ -194,7 +194,7 @@ object TeamTurn : Procedure() {
         val foulActions = rules.teamActions.foul.availablePrTurn
         val specialActions = rules.teamActions.specialActions
         return ResetAvailableTeamActions(
-            state.activeTeam,
+            state.activeTeamOrThrow(),
             moveActions,
             passActions,
             handOffActions,
@@ -210,14 +210,14 @@ object TeamTurn : Procedure() {
     }
 
     private fun getAvailablePlayers(state: Game, rules: Rules): List<Player> {
-        return state.activeTeam
+        return state.activeTeamOrThrow()
             .filter { it.available == Availability.AVAILABLE } // Players that hasn't already been activated
             .filter { it.state == PlayerState.STANDING || it.state == PlayerState.PRONE } // Only Standing/Prone players
     }
 
     // Reset player stats back to start, this e.g. include moves
     private fun resetPlayerTemporaryStats(state: Game, rules: Rules): Array<Command> {
-        return state.activeTeam
+        return state.activeTeamOrThrow()
             .filter { it.location.isOnField(rules) }
             .map {
                 SetPlayerTemporaryStats(
@@ -229,7 +229,7 @@ object TeamTurn : Procedure() {
 
     // Reset player stats back to start, this e.g. include temporary skills
     private fun resetSkillsUsed(state: Game, rules: Rules): Array<Command> {
-        return state.activeTeam
+        return state.activeTeamOrThrow()
             .map {
                 val skillsThatReset = it.skills.filter {
                     skill -> skill.used  && skill.resetAt == Duration.END_OF_TURN
@@ -245,7 +245,7 @@ object TeamTurn : Procedure() {
 
     private fun getResetAvailablePlayers(state: Game, rules: Rules): Array<SetPlayerAvailability> {
         // TODO Is there anyone who should not be made available? I.e. Stunned players will be turned KO
-        return state.activeTeam.map {
+        return state.activeTeamOrThrow().map {
             if (it.location.isOnField(rules) && (it.state == PlayerState.STANDING || it.state == PlayerState.PRONE)) {
                 SetPlayerAvailability(it, Availability.AVAILABLE)
             } else {

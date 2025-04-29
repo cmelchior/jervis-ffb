@@ -2,7 +2,6 @@ package com.jervisffb.engine.rules.bb2020.procedures
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.ResetAvailableTeamRerolls
-import com.jervisffb.engine.commands.SetActiveTeam
 import com.jervisffb.engine.commands.SetDrive
 import com.jervisffb.engine.commands.SetHalf
 import com.jervisffb.engine.commands.SetKickingTeamAtHalfTime
@@ -33,7 +32,6 @@ object GameHalf : Procedure() {
             SetHalf(currentHalf),
             SetDrive(0),
             SetKickingTeamAtHalfTime(kickingTeam),
-            SetActiveTeam(kickingTeam.otherTeam()),
             ResetAvailableTeamRerolls(state.homeTeam),
             ResetAvailableTeamRerolls(state.awayTeam),
             SetTurnMarker(state.homeTeam, 0),

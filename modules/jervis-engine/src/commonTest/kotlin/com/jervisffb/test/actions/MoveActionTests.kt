@@ -46,11 +46,11 @@ class MoveActionTests: JervisGameTest() {
     fun endActionBeforeMovingDoesNotMarkPlayerAsActivated() {
         startMoveAction()
         val movingPlayer = state.getPlayerById("A8".playerId)
-        assertEquals(Int.MAX_VALUE, state.activeTeam.turnData.moveActions)
+        assertEquals(Int.MAX_VALUE, state.activeTeamOrThrow().turnData.moveActions)
         assertEquals(Availability.IS_ACTIVE, movingPlayer.available)
         controller.handleAction(EndAction)
         assertEquals(Availability.AVAILABLE, movingPlayer.available)
-        assertEquals(Int.MAX_VALUE, state.activeTeam.turnData.moveActions)
+        assertEquals(Int.MAX_VALUE, state.activeTeamOrThrow().turnData.moveActions)
     }
 
     @Test
@@ -58,11 +58,11 @@ class MoveActionTests: JervisGameTest() {
         val movingPlayer = state.getPlayerById("A8".playerId)
         movingPlayer.state = PlayerState.PRONE
         startMoveAction()
-        assertEquals(Int.MAX_VALUE, state.activeTeam.turnData.moveActions)
+        assertEquals(Int.MAX_VALUE, state.activeTeamOrThrow().turnData.moveActions)
         assertEquals(Availability.IS_ACTIVE, movingPlayer.available)
         controller.handleAction(EndAction)
         assertEquals(Availability.AVAILABLE, movingPlayer.available)
-        assertEquals(Int.MAX_VALUE, state.activeTeam.turnData.moveActions)
+        assertEquals(Int.MAX_VALUE, state.activeTeamOrThrow().turnData.moveActions)
     }
 
     @Test
@@ -72,7 +72,7 @@ class MoveActionTests: JervisGameTest() {
         controller.rollForward(*moveTo(14, 14))
         controller.handleAction(EndAction)
         assertEquals(Availability.HAS_ACTIVATED, movingPlayer.available)
-        assertEquals(Int.MAX_VALUE - 1, state.activeTeam.turnData.moveActions)
+        assertEquals(Int.MAX_VALUE - 1, state.activeTeamOrThrow().turnData.moveActions)
     }
 
     @Test

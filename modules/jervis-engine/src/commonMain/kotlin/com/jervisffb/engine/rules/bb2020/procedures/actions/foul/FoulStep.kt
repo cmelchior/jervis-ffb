@@ -110,7 +110,7 @@ object FoulStep: Procedure() {
     object DecideToArgueTheCall: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return if (state.activeTeam.coachBanned) {
+            return if (state.activeTeamOrThrow().coachBanned) {
                 // If the coach was already banned, they cannot argue the call again.
                 listOf(CancelWhenReady)
             } else {

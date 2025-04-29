@@ -163,19 +163,18 @@ class Game(
     var canUseTeamRerolls: Boolean = false
 
     // Active/Inactive indicates a teams "active turn".
+    // These terms are not applicable during the pre-game sequence, setup or
+    // post-game sequence.
     // See page 42 in the rulebook.
-    var activeTeam: Team = this.homeTeam
-        get() {
-            if (isDuringKickOff) INVALID_GAME_STATE("Active team does not exists during Kick-off.")
-            return field
-        }
+    var activeTeam: Team? = null
+    var inactiveTeam: Team? = null
 
-
-    var inactiveTeam: Team = this.awayTeam
-        get() {
-            if (isDuringKickOff) INVALID_GAME_STATE("Inactive team does not exists during Kick-off.")
-            return field
-        }
+    fun activeTeamOrThrow(): Team {
+        return activeTeam ?: error("No team is active")
+    }
+    fun inactiveTeamOrThrow(): Team {
+        return inactiveTeam ?: error("No team is inactive")
+    }
 
     // Kicking/Receiving team is decided during the pre-game sequence.
     // See page 38 in the rulebook.

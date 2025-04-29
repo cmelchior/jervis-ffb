@@ -246,7 +246,7 @@ object PatchUpPlayer: Procedure() {
                                 SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut),
                             )
                         } else {
-                            if (state.activeTeam == player.team) {
+                            if (state.activeTeamOrThrow() == player.team) {
                                 SetPlayerState(player, com.jervisffb.engine.model.PlayerState.STUNNED_OWN_TURN)
                             } else {
                                 SetPlayerState(player, com.jervisffb.engine.model.PlayerState.STUNNED)
@@ -260,7 +260,7 @@ object PatchUpPlayer: Procedure() {
                         )
                     }
                     context.injuryResult == InjuryResult.KO && context.apothecaryUsed != null -> {
-                        if (state.activeTeam == player.team) {
+                        if (state.activeTeamOrThrow() == player.team) {
                             SetPlayerState(player, com.jervisffb.engine.model.PlayerState.STUNNED_OWN_TURN)
                         } else {
                             SetPlayerState(player, com.jervisffb.engine.model.PlayerState.STUNNED)

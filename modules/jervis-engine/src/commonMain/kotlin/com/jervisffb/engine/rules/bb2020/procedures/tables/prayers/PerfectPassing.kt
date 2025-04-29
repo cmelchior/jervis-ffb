@@ -31,7 +31,7 @@ object PerfectPassing : Procedure() {
             rules: Rules,
         ): Command {
             return compositeCommandOf(
-                ReportGameProgress("${state.activeTeam} receives Perfect Passing"),
+                ReportGameProgress("${state.activeTeamOrThrow()} receives Perfect Passing"),
                 ExitProcedure(),
             )
         }

@@ -13,7 +13,6 @@ import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.RosterLogo
-import kotlin.properties.Delegates
 
 class TeamHalfData(private val game: Game) {
     var totalRerolls: Int = 0

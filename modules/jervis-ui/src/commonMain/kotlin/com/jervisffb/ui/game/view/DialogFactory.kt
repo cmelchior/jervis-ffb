@@ -28,6 +28,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRoll
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.procedures.Scatter
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
+import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.bb2020.procedures.WeatherRoll
@@ -323,7 +324,7 @@ object DialogFactory {
                 }
 
                 is SetupTeam.InformOfInvalidSetup -> {
-                    SingleChoiceInputDialog.createInvalidSetupDialog(controller.state.activeTeam)
+                    SingleChoiceInputDialog.createInvalidSetupDialog(controller.state.getContext<SetupTeamContext>().team)
                 }
 
                 is StandingUpRoll.RollDie,

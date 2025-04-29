@@ -148,7 +148,7 @@ object MultipleBlockAction: Procedure() {
      * it to the user.
      */
     object SelectDefenderOrAbortActionOrContinueBlock: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam
+        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeamOrThrow()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
             val attacker = context.attacker
@@ -243,7 +243,7 @@ object MultipleBlockAction: Procedure() {
      * which will remove the player as a target.
      */
     object SelectBlockTypeAgainstSelectedDefender: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam
+        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeamOrThrow()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val attacker = state.getContext<MultipleBlockContext>().attacker
             val defender = state.getContext<MultipleBlockContext>().getActiveDefender() ?: INVALID_GAME_STATE("No active defender: ${state.getContext<MultipleBlockContext>()}")
@@ -349,7 +349,7 @@ object MultipleBlockAction: Procedure() {
      * After choosing the final results, now choose which player to resolve first.
      */
     object SelectPlayerToResolve: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam
+        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeamOrThrow()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MultipleBlockContext>()
             return listOf(

@@ -81,6 +81,7 @@ object GameDrive : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 SetCurrentBall(null),
+                SetActiveTeam(state.receivingTeam),
                 GotoNode(Turn),
             )
         }
@@ -109,7 +110,7 @@ object GameDrive : Procedure() {
                 }
                 endDrive -> {
                     compositeCommandOf(
-                        SetActiveTeam(state.inactiveTeam),
+                        SetActiveTeam(null),
                         SetKickingTeam(state.receivingTeam),
                         SetTurnOver(null),
                         GotoNode(ResolveEndOfDrive)
@@ -117,7 +118,7 @@ object GameDrive : Procedure() {
                 }
                 swapTeams -> {
                     compositeCommandOf(
-                        SetActiveTeam(state.inactiveTeam),
+                        SetActiveTeam(state.inactiveTeamOrThrow()),
                         SetKickingTeam(state.receivingTeam),
                         SetTurnOver(null),
                         GotoNode(Turn)

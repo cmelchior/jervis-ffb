@@ -105,7 +105,7 @@ object ActivatePlayer : Procedure() {
             // of available actions. If an action was ended prematurely (either due
             // to a turnover or failing some roll), the action is always considered used.
             if (context.markActionAsUsed || state.endActionImmediately()) {
-                val activeTeam = state.activeTeam
+                val activeTeam = state.activeTeamOrThrow()
                 val markActionAsUsedCommand = when (val type = context.declaredAction!!.type) {
                     PlayerStandardActionType.MOVE -> SetAvailableActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerStandardActionType.MOVE)
                     PlayerStandardActionType.PASS -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.PASS)
@@ -189,7 +189,7 @@ object ActivatePlayer : Procedure() {
     }
 
     object DeclareActionOrDeselectPlayer : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules) = state.activeTeam
+        override fun actionOwner(state: Game, rules: Rules) = state.activeTeamOrThrow()
 
 //         Multiple Block (Not a special action, how to use this? )
 //         Ball & Chain (replace all other actions)

@@ -71,7 +71,7 @@ object ScoringATouchdown : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<ScoringATouchDownContext>()
         return if (context.isTouchdownScored) {
-            val turnover = if (context.player.team == state.activeTeam) {
+            val turnover = if (context.player.team == state.activeTeamOrThrow()) {
                 TurnOver.ACTIVE_TEAM_TOUCHDOWN
             } else {
                 TurnOver.INACTIVE_TEAM_TOUCHDOWN

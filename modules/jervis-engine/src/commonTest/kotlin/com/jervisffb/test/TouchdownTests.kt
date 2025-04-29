@@ -246,7 +246,7 @@ class TouchdownTests: JervisGameTest() {
             DiceRollResults(1.d6, 1.d6),
             2.d8, // Bounce
         )
-        assertEquals(homeTeam, state.activeTeam)
+        assertEquals(homeTeam, state.activeTeamOrThrow())
         assertEquals(0, state.awayScore)
         assertEquals(BallState.ON_GROUND, state.field[0, 2].balls.single().state)
     }
@@ -295,7 +295,7 @@ class TouchdownTests: JervisGameTest() {
             DiceRollResults(1.d6, 1.d6),
             2.d8, // Bounce
         )
-        assertEquals(homeTeam, state.activeTeam)
+        assertEquals(homeTeam, state.activeTeamOrThrow())
         assertEquals(0, state.awayScore)
         assertEquals(BallState.ON_GROUND, state.field[0, 2].balls.single().state)
     }

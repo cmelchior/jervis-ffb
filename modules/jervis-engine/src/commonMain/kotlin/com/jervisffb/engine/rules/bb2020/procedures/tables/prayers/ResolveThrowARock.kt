@@ -57,7 +57,7 @@ object ResolveThrowARock : Procedure() {
         // It is unclear if people in the DogOut can be hit by a Rock, for now we are
         // not checking for it, which means it would be allowed. But due to how
         // Stalling is defined, it will probably never happen.
-        val stallingPlayers = state.activeTeam.filter { it.isStalling && it.location.isOnField(rules) }
+        val stallingPlayers = state.activeTeamOrThrow().filter { it.isStalling && it.location.isOnField(rules) }
         return SetContext(ThrowARockContext(stallingPlayers = stallingPlayers))
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
@@ -65,7 +65,7 @@ object ResolveThrowARock : Procedure() {
     }
 
     object SelectPlayer: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeam.otherTeam()
+        override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeamOrThrow().otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<ThrowARockContext>()
             return if (context.stallingPlayers.isEmpty()) {
@@ -113,13 +113,13 @@ object ResolveThrowARock : Procedure() {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROW_A_ROCK, d6),
                         SetPlayerState(player, PlayerState.KNOCKED_DOWN, hasTackleZones = false),
-                        ReportGameProgress("${state.activeTeam} hit ${player.name} with a rock"),
+                        ReportGameProgress("${state.activeTeamOrThrow()} hit ${player.name} with a rock"),
                         GotoNode(ResolveInjuryByRock),
                     )
                 } else {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.THROW_A_ROCK, d6),
-                        ReportGameProgress("${state.activeTeam} ignores ${player.name}"),
+                        ReportGameProgress("${state.activeTeamOrThrow()} ignores ${player.name}"),
                         GotoNode(SelectPlayer),
                     )
                 }

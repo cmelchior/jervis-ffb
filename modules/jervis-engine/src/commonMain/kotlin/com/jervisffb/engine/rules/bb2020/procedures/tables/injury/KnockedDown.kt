@@ -30,7 +30,7 @@ object KnockedDown: Procedure() {
     override fun onEnterProcedure(state: Game, rules: Rules): Command?  = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<RiskingInjuryContext>()
-        return if (context.player.team == state.activeTeam) return SetTurnOver(TurnOver.STANDARD) else null
+        return if (context.player.team == state.activeTeamOrThrow()) return SetTurnOver(TurnOver.STANDARD) else null
     }
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<RiskingInjuryContext>()

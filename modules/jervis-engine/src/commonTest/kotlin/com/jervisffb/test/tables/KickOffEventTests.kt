@@ -128,7 +128,7 @@ class KickOffEventTests: JervisGameTest() {
         )
         assertEquals(FieldCoordinate(0, 5), state.getPlayerById("H6".playerId).location)
         assertEquals(FieldCoordinate(0, 6), state.getPlayerById("H7".playerId).location)
-        assertEquals(awayTeam, state.activeTeam)
+        assertEquals(awayTeam, state.activeTeamOrThrow())
     }
 
     @Test

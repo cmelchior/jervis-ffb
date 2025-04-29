@@ -31,8 +31,8 @@ object WeatherRoll : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
     object RollWeatherDice : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team? = state.activeTeam // TODO Is this always true, e.g. if called from Kick-off Event
-
+        // Technically, both coaches should roll a die, but for now, we just let the home coach do it.
+        override fun actionOwner(state: Game, rules: Rules): Team? = state.homeTeam
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Each coach should role a dice, but just treat this as a single dice roll here
             return listOf(RollDice(Dice.D6, Dice.D6))

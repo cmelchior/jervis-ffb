@@ -154,7 +154,7 @@ object RiskingInjuryRoll: Procedure() {
                     } else {
                         val player = context.player
                         compositeCommandOf(
-                            if (state.activeTeam == player.team) {
+                            if (state.activeTeamOrThrow() == player.team) {
                                 SetPlayerState(player, PlayerState.STUNNED_OWN_TURN, hasTackleZones = false)
                             } else {
                                 SetPlayerState(player, PlayerState.STUNNED, hasTackleZones = false)

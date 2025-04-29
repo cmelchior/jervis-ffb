@@ -531,7 +531,7 @@ open class Rules(
 
         return buildList {
             // Add any team actions that are available
-            state.activeTeam.turnData.let {
+            state.activeTeamOrThrow().turnData.let {
                 if (it.moveActions > 0) add(teamActions.move)
                 if (it.passActions > 0) add(teamActions.pass)
                 if (it.handOffActions > 0) add(teamActions.handOff)
@@ -567,7 +567,7 @@ open class Rules(
             player.skills.filterIsInstance<SpecialActionProvider>().forEach {
                 val type = it.specialAction
                 val isSkillActionUsed = it.isSpecialActionUsed
-                val isActionAvailable = state.activeTeam.turnData.availableSpecialActions[type]!! > 0
+                val isActionAvailable = state.activeTeamOrThrow().turnData.availableSpecialActions[type]!! > 0
                 if (!isSkillActionUsed && isActionAvailable) {
                     add(teamActions[type])
                 }

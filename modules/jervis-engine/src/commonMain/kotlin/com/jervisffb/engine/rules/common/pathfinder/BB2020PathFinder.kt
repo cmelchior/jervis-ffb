@@ -80,7 +80,7 @@ class BB2020PathFinder() : PathFinder {
         maxMove: Int,
         includeDebugInfo: Boolean,
     ): PathFinder.SinglePathResult {
-        val fieldView: Array<Array<Int>> = prepareFieldView(state.rules,state.field, state.activeTeam)
+        val fieldView: Array<Array<Int>> = prepareFieldView(state.rules,state.field, state.activeTeamOrThrow())
         var pathState = listOf<FieldCoordinate>()
 
         // Locations to check. Use a priority queue to always start checking the most promising path.
@@ -163,7 +163,7 @@ class BB2020PathFinder() : PathFinder {
         // - Int.MAX if the location is occupied
         // - i > 0 is the number of tackle zones.
         // - 0 = Field is safe to move to
-        val fieldView: Array<Array<Int>> = prepareFieldView(state.rules,state.field, state.activeTeam)
+        val fieldView: Array<Array<Int>> = prepareFieldView(state.rules,state.field, state.activeTeamOrThrow())
         // Calculated distances
         val distances = mutableMapOf<FieldCoordinate, Int>().withDefault { Int.MAX_VALUE }
         // Nodes being processed
