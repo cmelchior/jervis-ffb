@@ -4,6 +4,7 @@ browser = "0.3" # https://github.com/Kotlin/kotlinx-browser
 buildconfig = "5.6.2" # https://github.com/gmazzo/gradle-buildconfig-plugin
 clikt = "5.0.3" # https://github.com/ajalt/clikt
 compose = "1.7.3" # https://github.com/JetBrains/compose-multiplatform
+composeHotReload = "1.0.0-alpha09" # https://github.com/JetBrains/compose-hot-reload
 coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines
 cryptography = "0.4.0" # https://github.com/whyoleg/cryptography-kotlin/releases/tag/0.4.0
 datastore = "1.1.4" # https://developer.android.com/jetpack/androidx/releases/datastore
@@ -68,6 +69,7 @@ serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref 
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "atomicfu" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 

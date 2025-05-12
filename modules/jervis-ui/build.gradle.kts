@@ -4,6 +4,8 @@
 )
 
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.reload.ComposeHotRun
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
@@ -13,6 +15,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.buildconfig)
+    alias(libs.plugins.composeHotReload)
 }
 
 group = "com.jervisffb"
@@ -124,7 +127,7 @@ kotlin {
                 implementation("javazoom.vorbisspi:vorbisspi:1.0.3")
                 implementation("com.jcraft:jorbis:0.0.17")
                 implementation("org.tritonus:tritonus_share:0.0.1")
-                implementation(compose.preview)
+                implementation(compose.components.uiToolingPreview)
                 implementation(compose.desktop.currentOs)
                 implementation(compose.desktop.uiTestJUnit4)
             }
@@ -145,6 +148,14 @@ kotlin {
             }
         }
     }
+}
+
+// Required by https://github.com/JetBrains/compose-hot-reload?tab=readme-ov-file#enable-optimizenonskippinggroups
+composeCompiler {
+    featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
+}
+tasks.withType<ComposeHotRun>().configureEach {
+    mainClass.set("com.jervisffb.MainKt")
 }
 
 compose.desktop {
