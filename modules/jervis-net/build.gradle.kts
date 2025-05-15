@@ -7,7 +7,8 @@ plugins {
 }
 
 group = "com.jervisffb"
-version = rootProject.ext["mavenVersion"] as String
+@Suppress("UNCHECKED_CAST")
+version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
 
 repositories {
     mavenCentral()
@@ -26,12 +27,11 @@ kotlin {
     iosSimulatorArm64()
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "jervis-net"
+        outputModuleName.set("jervis-net")
         browser()
     }
 
     sourceSets {
-        val ktor = libs.versions.ktor.get()
         val commonMain by getting {
             dependencies {
                 implementation(project(":modules:platform-utils"))

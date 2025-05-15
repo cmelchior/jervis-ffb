@@ -1,3 +1,4 @@
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
@@ -33,43 +34,42 @@ val releaseType = when (properties["jervis.releaseType"]) {
     else -> ReleaseType.SNAPSHOT
 }
 
-val gitHash: String by lazy {
-    Runtime.getRuntime().exec(arrayOf("git", "rev-parse", "--short",  "HEAD"))
-        .inputStream
-        .bufferedReader()
-        .use { it.readText().trim() }
-}
+val gitHash: Provider<String> = providers.exec {
+    commandLine("git", "rev-parse", "--short",  "HEAD")
+}.standardOutput.asText.map { it.trim() }
 
-val gitHashLong: String by lazy {
-    Runtime.getRuntime().exec(arrayOf("git", "rev-parse", "HEAD"))
-        .inputStream
-        .bufferedReader()
-        .use { it.readText().trim() }
-}
+val gitHashLong: Provider<String> = providers.exec {
+    commandLine("git", "rev-parse",  "HEAD")
+}.standardOutput.asText.map { it.trim() }
 
-val gitHistory: String by lazy {
-    Runtime.getRuntime().exec(arrayOf("git", "--no-pager", "log", "-5", "--pretty=format:%at:%s"))
-        .inputStream
-        .bufferedReader()
-        .use { it.readText().trim() }
-}
+val gitHistory: Provider<String> = providers.exec {
+    commandLine("git", "--no-pager", "log", "-5", "--pretty=format:%at:%s")
+}.standardOutput.asText.map { it.trim() }
 
 // Create Maven version
-private fun createMavenVersion(): String {
-    val versionStr = properties["jervis.version"] as String
+private fun createMavenVersion(): Provider<String> {
+    val versionStr = providers.gradleProperty("jervis.version")
     return when (releaseType) {
-        ReleaseType.SNAPSHOT -> "$versionStr-SNAPSHOT"
-        ReleaseType.DEV -> "$versionStr-dev-$gitHash"
+        ReleaseType.SNAPSHOT -> versionStr.map { "$it-SNAPSHOT" }
+        ReleaseType.DEV -> {
+            gitHash.zip(versionStr) { gitHash, version ->
+                "$version-dev-$gitHash"
+            }
+        }
         ReleaseType.PROD -> versionStr
     }
 }
 
 // Create Public version (as visible inside the app)
-private fun createProjectVersion(): String {
-    val versionStr = properties["jervis.version"] as String
+private fun createProjectVersion(): Provider<String> {
+    val versionStr = providers.gradleProperty("jervis.version")
     return when (releaseType) {
-        ReleaseType.SNAPSHOT -> "$versionStr.dev.local"
-        ReleaseType.DEV -> "$versionStr.dev.$gitHash"
+        ReleaseType.SNAPSHOT -> versionStr.map { "$it.dev.local" }
+        ReleaseType.DEV -> {
+            gitHash.zip(versionStr) { gitHash, version ->
+                "$version.dev.$gitHash"
+            }
+        }
         ReleaseType.PROD -> versionStr
     }
 }
@@ -77,13 +77,15 @@ private fun createProjectVersion(): String {
 // Create version used when creating distribution packages.
 // See https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-native-distribution.html#specifying-distribution-properties
 // for restrictions on these.
-private fun createDistributionVersion(): String {
-    val versionStr = properties["jervis.version"] as String
-    return if (versionStr.startsWith("0.")) {
-        "1.0.0"
-    } else {
-        versionStr
-    }
+private fun createDistributionVersion(): Provider<String> {
+    return providers.gradleProperty("jervis.version")
+        .map {
+            if (it.startsWith("0.")) {
+                "1.0.0"
+            } else {
+                it
+            }
+        }
 }
 
 // Version number used for Maven Artifacts
@@ -100,7 +102,7 @@ rootProject.ext["gitHistory"] = gitHistory
 
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
-    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    configure<KtlintExtension> {
         version.set("1.5.0") // See https://github.com/pinterest/ktlint
         debug.set(true)
         verbose.set(true)

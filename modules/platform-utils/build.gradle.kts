@@ -5,7 +5,8 @@ plugins {
 }
 
 group = "com.jervisffb"
-version = "1.0-SNAPSHOT"
+@Suppress("UNCHECKED_CAST")
+version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
 
 kotlin {
     jvmToolchain((project.properties["java.version"] as String).toInt())

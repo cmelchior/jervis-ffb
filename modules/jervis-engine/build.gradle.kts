@@ -6,7 +6,8 @@ plugins {
 }
 
 group = "com.jervisffb"
-version = rootProject.ext["mavenVersion"] as String
+@Suppress("UNCHECKED_CAST")
+version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
 
 repositories {
     mavenCentral()

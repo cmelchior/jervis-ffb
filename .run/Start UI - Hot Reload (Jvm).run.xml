@@ -11,6 +11,7 @@
       <option name="taskNames">
         <list>
           <option value="jvmRunHot" />
+          <option value="--auto" />
         </list>
       </option>
       <option name="vmOptions" />

@@ -19,46 +19,49 @@ plugins {
 }
 
 group = "com.jervisffb"
-version = rootProject.ext["mavenVersion"] as String
+@Suppress("UNCHECKED_CAST")
+version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
 
+@Suppress("UNCHECKED_CAST")
 buildConfig {
     this.packageName("com.jervisffb.ui")
-    buildConfigField("releaseVersion", rootProject.ext["publicVersion"] as String)
-    buildConfigField("gitHash", rootProject.ext["gitHash"] as String)
-    buildConfigField("gitHashLong", rootProject.ext["gitHashLong"] as String)
-    @Suppress("UNCHECKED_CAST")
-    buildConfigField("gitHistory", rootProject.ext["gitHistory"] as String)
+    buildConfigField("releaseVersion", (rootProject.ext["publicVersion"] as Provider<String?>).get())
+    buildConfigField("gitHash", (rootProject.ext["gitHash"] as Provider<String>).get())
+    buildConfigField("gitHashLong", (rootProject.ext["gitHashLong"] as Provider<String>).get())
+    buildConfigField("gitHistory", (rootProject.ext["gitHistory"] as Provider<String>).get())
 }
 
-// Generate an ` index.html ` file with a reference to the current version (defined by the git commit)
-// This way, we ensure the browser always loads the correct .wasm resource files. Before this, it
+// Generate an `index.html` file with a reference to the current version (defined by the git commit)
+// This way; we ensure the browser always loads the correct .wasm resource files. Before this, it
 // was possible for the browser to use a cached version of `composeApp.js` that referred to older
 // .wasm files that were no longer present. Which resulted in the page failing to load.
-val generateIndexHtml by tasks.registering {
-    val inputFile = file("$projectDir/src/wasmJsMain/template/index.html")
-    val outputDir = layout.buildDirectory.dir("generated/wasmJs")
-    val outputFile = outputDir.map { it.file("index.html") }
 
-    inputs.file(inputFile)
-    inputs.property("gitHashLong", rootProject.ext["gitHashLong"])
-    outputs.dir(outputDir)
+// Create Abstract Task to enable support with Gradle Configuration Cache
+abstract class GenerateIndexHtmlTask : DefaultTask() {
+    @get:InputFile
+    abstract val inputFile: RegularFileProperty
 
-    onlyIf {
-        if (!inputFile.exists()) {
-            throw GradleException("Input file does not exist: ${inputFile.absolutePath}")
-        }
-        true
+    @get:Input
+    abstract val gitHash: Property<String>
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun generate() {
+        val content = inputFile.get().asFile.readText()
+        val modified = content.replace("%composeAppRef%", "composeApp-${gitHash.get()}.js")
+        val outFile = outputDir.file("index.html").get().asFile
+        outFile.parentFile.mkdirs()
+        outFile.writeText(modified)
     }
-
-    doLast {
-        val fileContent = inputFile
-            .readText()
-            .replace("%composeAppRef%", "composeApp-${rootProject.ext["gitHashLong"]}.js")
-        outputFile.get().asFile.apply {
-            parentFile.mkdirs()
-            writeText(fileContent)
-        }
-    }
+}
+@Suppress("UNCHECKED_CAST")
+val gitHashLong = rootProject.ext["gitHashLong"] as Provider<String>
+val generateIndexHtml = tasks.register<GenerateIndexHtmlTask>("generateIndexHtml") {
+    inputFile.set(layout.projectDirectory.file("src/wasmJsMain/template/index.html"))
+    outputDir.set(layout.buildDirectory.dir("generated/wasmJs"))
+    gitHash.set(gitHashLong)
 }
 
 kotlin {
@@ -81,8 +84,9 @@ kotlin {
         outputModuleName.set("jervis-ui")
         browser {
             val projectDirPath = project.projectDir.path
+            val fileName = gitHashLong.map {"composeApp-$it.js" }.get()
             commonWebpackConfig {
-                outputFileName = "composeApp-${rootProject.ext["gitHashLong"] as String}.js"
+                outputFileName = fileName
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside the browser
@@ -166,13 +170,12 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             packageName = "Jervis Fantasy Football"
-            packageVersion = rootProject.ext["distributionVersion"] as String
+            @Suppress("UNCHECKED_CAST")
+            packageVersion = (rootProject.ext["distributionVersion"] as Provider<String>).get()
 
             // androidx.datastore requires sun.misc.Unsafe
             // See https://github.com/JetBrains/compose-multiplatform/issues/2686#issuecomment-1413429842
             modules("jdk.unsupported")
-
-            val providers = project.providers
             macOS {
                 bundleID = "com.jervisffb"
                 iconFile.set(rootProject.file("logo/logo.icns"))

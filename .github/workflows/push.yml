@@ -135,7 +135,7 @@ jobs:
           cache-read-only: false
 
       - name: Build Installer for MacOS
-        run: ./gradlew notarizeReleaseDmg -Pjervis.releaseType=dev
+        run: ./gradlew notarizeReleaseDmg -Pjervis.releaseType=dev -Dorg.gradle.configuration-cache=false
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
