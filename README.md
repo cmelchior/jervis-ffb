@@ -18,20 +18,20 @@ Workshop.
 This includes:
  
 - A standalone rules engine for the 2020 version of Blood Bowl. The engine 
-  is UI agnostic and can be hooked up into any UI Framework or AI Agent.
+  is UI agnostic and can be used with any UI framework.
 
 - A Game Client UI that can run either as a website, iPad or Desktop app.
 
 - An API that is AI friendly, making it possible to replace a player with a 
-  custom AI agent.
+  custom AI agent or use in AI training.
 
 - A replay adapter that can convert any FUMBBL replay into an equivalent Jervis
   game. This makes it possible to use already existing replays to train AI 
   agents.
 
-The project is written in Kotlin Multiplatform primarily focusing on WASM (Web) 
-and Desktop (JVM). The target is to have a faithful adaption of the core Blood 
-Bowl rules as well as any expansions.
+The project is written in Kotlin Multiplatform primarily focusing on Web (using WASM)
+and Desktop (using a packaged JVM). The target is to have a faithful adaption of 
+the core Blood Bowl rules as well as any expansions.
 
 **The project is work-in-progress, so things might differ from what is described here.**
 
@@ -53,7 +53,7 @@ Test builds are created on every successful push to the `main` branch.
   https://kotlinlang.org/docs/wasm-troubleshooting.html#browser-versions
 
 * Desktop client installers for Windows, macOS and Linux can be found here:
-  https://jervis.ilios.dk/download/.
+  https://jervis.ilios.dk/download/. 
 
 * No test build for iPad is currently being created. Instead, this must be
   built from source. 
@@ -108,6 +108,7 @@ This repository is structured in the following way:
   it is also less relevant, as you can just run the real client instead. See
   [How to run FFB locally](./docs/working-with-ffb.md).
 
+
 ### Modules Structure
 
 The `modules/` subfolder is the main entry point for the project and consists 
@@ -145,6 +146,7 @@ of the following modules:
 - `replay-analyzer`: A helper for processing and converting the JSON content of 
    a FUMBBL replay file into something that Jervis can process.
 
+
 ### UI Resources
 
 The Jervis Client is heavily inspired by [FUMBBL](https://github.com/christerk/ffb)
@@ -159,10 +161,7 @@ immediately.
 
 ## Why Jervis?
 
-As homage to the original creator of Blood Bowl: Jervis Johnson. 
-
-Also, it sounds similar to J.A.R.V.I.S, the A.I. from the Marvel Universe, so it 
-also a fun play on that pronunciation.
+As homage to the original creator of Blood Bowl: [Jervis Johnson](https://en.wikipedia.org/wiki/Jervis_Johnson). 
 
 
 ## Other resources
