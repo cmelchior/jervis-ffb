@@ -58,7 +58,13 @@ tests covering the particular feature.
 
 ## Start of Drive
 
-- [ ] Setup
+- [x] Setup
+  - [x] Too many players on the field
+  - [x] Too few players on the field
+  - [x] Too many players in Wide Zones
+  - [x] 0 players available
+  - [x] Too few players on the LoS
+  - [x] If less than 3 players, all must be on LoS
 - [ ] Kick-off (Kicking player and target)
 - [x] The Kick-off Event
   - [x] Get the Ref
