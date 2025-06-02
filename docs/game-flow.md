@@ -1,8 +1,9 @@
 # Game Flow Implementation
 
-This document is used during development as a list tracker for things that needs
+This document is used during development as a list tracker for things that need 
 to be implemented. Things should only be marked as completed when they have unit 
-tests covering the particular feature.
+tests covering the particular feature. This document only covers the core game
+rules, skills are tracked separately in [skills.md](skills.md). 
 
 ## Pregame
 - [x] The Fans
@@ -65,7 +66,11 @@ tests covering the particular feature.
   - [x] 0 players available
   - [x] Too few players on the LoS
   - [x] If less than 3 players, all must be on LoS
-- [ ] Kick-off (Kicking player and target)
+- [x] Kick-off (Kicking player and target)
+  - [x] Default: Players not on LoS
+  - [x] 3 or less
+  - [x] All players on LoS
+  - [x] Place Kick: Only locations on the opponent side
 - [x] The Kick-off Event
   - [x] Get the Ref
   - [x] Time-out
@@ -78,13 +83,16 @@ tests covering the particular feature.
   - [ ] Blitz
   - [x] Officious Ref
   - [x] Pitch Invasion
-- [ ] What goes up, must come down
-  - [ ] Rerolls not available for catch
-  - [ ] Some skills are available (but it isn't a team turn)
-- [ ] Touchbacks
-  - [ ] End sequence as soon as ball goes over middle. I.e., not catch rolls etc.
-  - [ ] Going out of bounds
-  - [ ] Go out of bounds / award to player that is then knocked down and ball bounce (bug)
+- [x] What goes up, must come down
+  - [x] Land on Field
+  - [x] Lands on Player
+  - [x] Team rerolls not available for catch
+- [x] Touchbacks
+  - [x] Give to player
+  - [x] Give to prone player is all players are fallen over
+  - [x] End sequence as soon as ball goes over middle. I.e., not catch rolls etc.
+  - [x] Going out of bounds
+  - [x] Go out of bounds / award to player that is then knocked down and ball bounce (previous bug)
 
 ## Game
 
@@ -231,6 +239,11 @@ tests covering the particular feature.
 - Hand-off Action
 - Pass Action
 - Throw Team-mate Action
+
+## BB7
+
+- [ ] Place Kick (BB7): All locations not on kicking teams side.
+- [ ] Touchback ((BB7): Only happens when crossing back to kicker's side, not in No Man's Land.
 
 ## Game Timer
 

@@ -189,6 +189,7 @@ class Team(
     }
 
     operator fun get(playerNo: PlayerNo): Player = noToPlayer[playerNo] ?: throw IllegalArgumentException("Player $playerNo not found")
+    operator fun get(playerId: PlayerId): Player = noToPlayer.values.firstOrNull { it.id == playerId } ?: throw IllegalArgumentException("Player $playerId not found")
     fun getOrNull(playerNo: PlayerNo): Player? = noToPlayer[playerNo]
 
     override val size: Int

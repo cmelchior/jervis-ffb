@@ -137,7 +137,7 @@ class Player(
     lateinit var team: Team
     var location: Location = DogOut
 
-    // Shortcut for getting a players coordinates. Only works for players currently on the the field
+    // Shortcut for getting a players coordinates. Only works for players currently on the field
     // taking up a single square.
     val coordinates: FieldCoordinate
         get() {

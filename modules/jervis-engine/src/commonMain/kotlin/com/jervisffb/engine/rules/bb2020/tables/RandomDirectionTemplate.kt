@@ -28,8 +28,8 @@ enum class CornerThrowInPosition(val rotateDegrees: Int) {
  */
 @Serializable
 object RandomDirectionTemplate {
-    // Order of numbers from top and clockwise around the template
-//    private val order = listOf(2, 3, 5, 8, 7, 6, 4, 1)
+    // The numbers are aligned to match the physical template, so
+    // 1-2-3 at the top, 4-5 in the middle and 6-7-8 at the bottom.
     private val results =
         mapOf(
             1 to Direction(-1, -1),

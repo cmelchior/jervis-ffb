@@ -93,8 +93,7 @@ object Pickup : Procedure() {
     }
 
     object PickupFailed : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure =
-            Bounce
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 // If it was the active player that failed the pickup, it is a turnover

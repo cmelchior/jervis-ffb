@@ -9,6 +9,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
+import com.jervisffb.engine.commands.SetBallState.Companion.outOfBounds
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
@@ -54,12 +55,17 @@ object Bounce : Procedure() {
                 val direction: Direction = rules.direction(d8)
                 val ball = state.currentBall()
                 val newLocation: FieldCoordinate = ball.location.move(direction, 1)
-                val outOfBounds: Boolean = newLocation.isOutOfBounds(rules)
+
+                // Out of bounds is normally just outside the field, but during kick-off we need to
+                // consider the case where the ball bounces back to the kicking teams side.
+                val isDuringKickOff = state.stack.containsNode(GameDrive.KickOffEvent)
+                val isOnKickingTeamSide = if (state.kickingTeam.isHomeTeam()) newLocation.isOnHomeSide(rules) else newLocation.isOnAwaySide(rules)
+                val outOfBounds: Boolean = newLocation.isOutOfBounds(rules) || (isDuringKickOff && isOnKickingTeamSide)
+
                 val playerAtTarget: Player? = if (!outOfBounds) state.field[newLocation].player else null
+
                 val nextNode: Command =
                     if (outOfBounds) {
-                        // TODO Throw-in or trigger touchback
-                        // TODO For kick-offs, bouncing across the halfline is also considered out-of-bounds
                         compositeCommandOf(
                             SetBallState.outOfBounds(ball, ball.location),
                             if (state.abortIfBallOutOfBounds) {
@@ -82,7 +88,11 @@ object Bounce : Procedure() {
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BOUNCE, d8),
                     SetBallLocation(ball, newLocation),
-                    ReportBounce(newLocation, if (outOfBounds) ball.location else null),
+                    ReportBounce(
+                        bounceLocation = newLocation,
+                        outOfBoundsAt = if (outOfBounds) ball.location else null,
+                        crossedLineOfScrimmageDuringKickOff = (isDuringKickOff && isOnKickingTeamSide)
+                    ),
                     nextNode,
                 )
             }

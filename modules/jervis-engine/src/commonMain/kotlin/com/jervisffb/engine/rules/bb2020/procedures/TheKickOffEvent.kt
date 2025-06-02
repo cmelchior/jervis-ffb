@@ -10,6 +10,7 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemoveContext
+import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -24,6 +25,7 @@ import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
@@ -34,6 +36,7 @@ import com.jervisffb.engine.reports.ReportTouchback
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.tables.TableResult
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 data class KickOffEventContext(
     val roll: DiceRollResults,
@@ -49,7 +52,10 @@ data class KickOffEventContext(
 object TheKickOffEvent : Procedure() {
     override val initialNode: Node = RollForKickOffEvent
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        state.abortIfBallOutOfBounds = false
+        return null
+    }
 
     object RollForKickOffEvent : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
@@ -131,6 +137,7 @@ object TheKickOffEvent : Procedure() {
             // goes beyond the kicking teams Line of Scrimmage. This rule also generalizes
             // to Standard board setups. In particular, the ball is allowed to land in any
             // configured No Man's Land.
+            state.abortIfBallOutOfBounds = true // TODO Is there a better way to handle this?
             val outOfBounds =
                 !ball.location.isOnField(rules)
                     || (state.kickingTeam.isHomeTeam() && ballLocation.x <= rules.lineOfScrimmageHome)
@@ -149,11 +156,10 @@ object TheKickOffEvent : Procedure() {
         var canCatch: Boolean = false
 
         override fun onEnterNode(state: Game, rules: Rules): Command? {
-            state.abortIfBallOutOfBounds = true // TODO Wrong way to do this. How then?
             val ballLocation = state.singleBall().location
             isFieldEmpty = state.field[ballLocation].player != null
             canCatch = state.field[ballLocation].player?.let { rules.canCatch(state, it) } ?: false
-            // If field is empty or the player cannot catch the ball, the ball is now
+            // If the field is empty or the player cannot catch the ball, the ball is now
             // bouncing rather than deviating.
             return if (!canCatch) {
                 SetBallState.bouncing(state.singleBall())
@@ -167,7 +173,6 @@ object TheKickOffEvent : Procedure() {
         }
 
         override fun onExitNode(state: Game, rules: Rules): Command {
-            state.abortIfBallOutOfBounds = false
             return if (state.singleBall().state == BallState.OUT_OF_BOUNDS) {
                 GotoNode(TouchBack)
             } else {
@@ -178,21 +183,65 @@ object TheKickOffEvent : Procedure() {
 
     object TouchBack : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.receivingTeam
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            // TODO Handle no valid players, so it will bounce
-            return state.receivingTeam.filter {
-                it.hasTackleZones && it.state == PlayerState.STANDING && it.location.isOnField(rules)
-            }.map {
-                SelectPlayer(it)
+            // Prone / Stunned players can only be selected if no standing players are available.
+            // In that case, it will bounce from their square.
+            val standingPlayers = mutableListOf<Player>()
+            val pronePlayers = mutableListOf<Player>()
+            state.receivingTeam.forEach {
+                if (it.location.isOnField(rules)) {
+                    when (it.state) {
+                        PlayerState.PRONE, PlayerState.STUNNED -> {
+                            pronePlayers.add(it)
+                        }
+                        PlayerState.STANDING -> {
+                            standingPlayers.add(it)
+                        }
+                        else -> INVALID_GAME_STATE("Unsupported state: ${it.state}")
+                    }
+                }
+            }
+            return if (standingPlayers.isEmpty()) {
+                listOf(SelectPlayer.fromPlayers(pronePlayers))
+            } else {
+                listOf(SelectPlayer.fromPlayers(standingPlayers))
             }
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<PlayerSelected>(action) {
-                return compositeCommandOf(
-                    SetBallState.carried(state.singleBall(), it.getPlayer(state)),
-                    ReportTouchback(it.getPlayer(state)),
+                val player = it.getPlayer(state)
+                if (player.state == PlayerState.STANDING) {
+                    return compositeCommandOf(
+                        SetBallState.carried(state.singleBall(), player),
+                        ReportTouchback(player, pronePlayer = false),
+                        ExitProcedure(),
+                    )
+                } else {
+                    compositeCommandOf(
+                        // TODO Giant Support
+                        SetBallState.carried(state.singleBall(), player),
+                        SetBallLocation(state.singleBall(), player.coordinates),
+                        SetBallState.bouncing(state.singleBall()),
+                        ReportTouchback(player, pronePlayer = false),
+                        GotoNode(BounceFromPronePlayer)
+                    )
+                }
+            }
+        }
+    }
+
+    object BounceFromPronePlayer: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            return super.onEnterNode(state, rules)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // If ball went out of bounds, another touchback is awarded.
+            // "out-of-bounds" also covers crossing back over the LoS
+            return if (state.singleBall().state == BallState.OUT_OF_BOUNDS) {
+                GotoNode(TouchBack)
+            } else {
+                compositeCommandOf(
                     ExitProcedure(),
                 )
             }

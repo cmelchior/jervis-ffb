@@ -88,14 +88,14 @@ data object ConfirmWhenReady : GameActionDescriptor {
 data object CancelWhenReady : GameActionDescriptor {
     override val size: Int = 1
     override fun createRandom(random: Random): GameAction = Cancel
-    override fun createAll(): List<GameAction> = listOf(Cancel)
+    override fun createAll(): List<Cancel> = listOf(Cancel)
 }
 
 // Mark the setup phase as ended for a team
 data object EndSetupWhenReady : GameActionDescriptor {
     override val size: Int = 1
     override fun createRandom(random: Random): GameAction = EndSetup
-    override fun createAll(): List<GameAction> = listOf(EndSetup)
+    override fun createAll(): List<EndSetup> = listOf(EndSetup)
 }
 
 // Mark the turn as ended for a team
@@ -261,12 +261,12 @@ data class SelectFieldLocation(val squares: List<TargetSquare>) : GameActionDesc
             throw IllegalArgumentException("SelectFieldLocation must contain at least one target")
         }
     }
-    override fun createRandom(random: Random): GameAction {
+    override fun createRandom(random: Random): FieldSquareSelected {
         val target = squares.random(random).coordinate
         return FieldSquareSelected(target)
     }
 
-    override fun createAll(): List<GameAction> {
+    override fun createAll(): List<FieldSquareSelected> {
         return squares.map {
             FieldSquareSelected(it.coordinate)
         }
@@ -326,6 +326,12 @@ data class SelectPlayer(
         return PlayerSelected(selectedPlayer)
     }
     override fun createAll(): List<GameAction> = players.map { PlayerSelected(it) }
+
+    companion object {
+        fun fromPlayers(players: List<Player>): SelectPlayer {
+            return SelectPlayer(players.map { it.id })
+        }
+    }
 }
 
 data class DeselectPlayer(

@@ -19,6 +19,7 @@ import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
+import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerId
@@ -32,6 +33,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.test.ext.rollForward
+import kotlin.collections.flatMap
 import kotlin.test.BeforeTest
 
 /**
@@ -121,71 +123,76 @@ fun defaultPregame(
 )
 
 fun defaultSetup(homeFirst: Boolean = true): Array<GameAction> {
-    val homeTeam = listOf(
-        "H1" to FieldCoordinate(12, 5),
-        "H2" to FieldCoordinate(12, 6),
-        "H3" to FieldCoordinate(12, 7),
-        "H4" to FieldCoordinate(12, 8),
-        "H5" to FieldCoordinate(12, 9),
-        "H6" to FieldCoordinate(11, 1),
-        "H7" to FieldCoordinate(10, 1),
-        "H8" to FieldCoordinate(10, 13),
-        "H9" to FieldCoordinate(11, 13),
-        "H10" to FieldCoordinate(9, 7),
-        "H11" to FieldCoordinate(3, 7),
-    ).flatMap {
-        val playerId = PlayerId(it.first)
-        listOf(PlayerSelected(playerId), FieldSquareSelected(it.second))
-    }.toTypedArray()
-
-    val awayTeam = listOf(
-        "A1" to FieldCoordinate(13, 5),
-        "A2" to FieldCoordinate(13, 6),
-        "A3" to FieldCoordinate(13, 7),
-        "A4" to FieldCoordinate(13, 8),
-        "A5" to FieldCoordinate(13, 9),
-        "A6" to FieldCoordinate(14, 1),
-        "A7" to FieldCoordinate(15, 1),
-        "A8" to FieldCoordinate(15, 13),
-        "A9" to FieldCoordinate(14, 13),
-        "A10" to FieldCoordinate(16, 7),
-        "A11" to FieldCoordinate(22, 7),
-    ).flatMap {
-        val playerId = PlayerId(it.first)
-        listOf(PlayerSelected(playerId), FieldSquareSelected(it.second))
-    }.toTypedArray()
-
+    val homeTeam = defaultHomeSetup()
+    val awayTeam = defaultAwaySetup()
     return if (homeFirst) {
-        arrayOf(
-            *homeTeam,
-            EndSetup,
-            *awayTeam,
-            EndSetup,
-        )
+        arrayOf(*homeTeam, *awayTeam)
     } else {
-        arrayOf(
-            *awayTeam,
-            EndSetup,
-            *homeTeam,
-            EndSetup,
-        )
+        arrayOf(*awayTeam, *homeTeam)
     }
+}
 
+fun defaultHomeSetup(endSetup: Boolean = true): Array<GameAction> {
+    val setup = buildList {
+        add("H1".playerId to FieldCoordinate(12, 5))
+        add("H2".playerId to FieldCoordinate(12, 6))
+        add("H3".playerId to FieldCoordinate(12, 7))
+        add("H4".playerId to FieldCoordinate(12, 8))
+        add("H5".playerId to FieldCoordinate(12, 9))
+        add("H6".playerId to FieldCoordinate(11, 1))
+        add("H7".playerId to FieldCoordinate(10, 1))
+        add("H8".playerId to FieldCoordinate(10, 13))
+        add("H9".playerId to FieldCoordinate(11, 13))
+        add("H10".playerId to  FieldCoordinate(9, 7))
+        add("H11".playerId to  FieldCoordinate(3, 7))
+    }
+    return teamSetup(setup, endSetup)
+}
+
+fun defaultAwaySetup(endSetup: Boolean = true): Array<GameAction> {
+    val setup= listOf(
+        "A1".playerId to FieldCoordinate(13, 5),
+        "A2".playerId to FieldCoordinate(13, 6),
+        "A3".playerId to FieldCoordinate(13, 7),
+        "A4".playerId to FieldCoordinate(13, 8),
+        "A5".playerId to FieldCoordinate(13, 9),
+        "A6".playerId to FieldCoordinate(14, 1),
+        "A7".playerId to FieldCoordinate(15, 1),
+        "A8".playerId to FieldCoordinate(15, 13),
+        "A9".playerId to FieldCoordinate(14, 13),
+        "A10".playerId to FieldCoordinate(16, 7),
+        "A11".playerId to FieldCoordinate(22, 7),
+    )
+    return teamSetup(setup, endSetup)
+}
+
+fun teamSetup(vararg setup: Pair<PlayerId, FieldCoordinate>): Array<GameAction> {
+    return teamSetup(setup.toList())
+}
+
+fun teamSetup(setup: List<Pair<PlayerId, FieldCoordinate>>, endSetup: Boolean = true): Array<GameAction> {
+    return setup.flatMap {
+        val playerId = it.first
+        listOf(PlayerSelected(playerId), FieldSquareSelected(it.second))
+    }.let { list ->
+        (list + if (endSetup) EndSetup else null).filterNotNull().toTypedArray()
+    }
 }
 
 fun defaultKickOffEvent(): Array<GameAction> = arrayOf(
-    DiceRollResults(3.d6, 4.d6), // Roll on kick-off table, does nothing for now
+    DiceRollResults(3.d6, 4.d6), // Roll on kick-off table
     1.d6, // Brilliant coaching
     1.d6 // Brilliant coaching
 )
 
 fun defaultKickOffHomeTeam(
+    selectKicker: PlayerSelected = PlayerSelected(PlayerId("H8")), // Select Kicker
     placeKick: FieldSquareSelected = FieldSquareSelected(19, 7), // Center of Away Half,
     deviate: DiceRollResults = DiceRollResults(4.d8, 1.d6), // Land on [18,7]
     kickoffEvent: Array<GameAction> = defaultKickOffEvent(),
     bounce: D8Result? = 4.d8 // Bounce to [17,7]
 ) = arrayOf(
-    PlayerSelected(PlayerId("H8")), // Select Kicker
+    selectKicker,
     placeKick,
     deviate,
     *kickoffEvent,

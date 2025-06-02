@@ -50,30 +50,33 @@ object TheKickOff : Procedure() {
     object NominateKickingPlayer : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
 
+        // Used as accumulator in `fold`
         data class PlayersAvailableForKicking(
             var onLos: Int = 0,
-            var available: Int = 0,
+            var inCenterField: Int = 0,
             val playersOnLoS: MutableList<Player> = mutableListOf(),
-            val playersAvailable: MutableList<Player> = mutableListOf(),
+            val playersInCenterField: MutableList<Player> = mutableListOf(),
         )
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             // Nominate a player on the center field that should kick the ball
             // If all players are on the line of scrimmage or in the wide zone, a player on the
-            // line of scrimmage must be selected.
+            // center line of scrimmage must be selected.
             val players =
                 state.kickingTeam.fold(PlayersAvailableForKicking()) { acc, player ->
+                    val inDogOut = !player.location.isOnField(rules)
                     val onLoS = player.location.isOnLineOfScrimmage(rules)
-                    val available = !(onLoS || player.location.isInWideZone(rules))
-                    if (onLoS) {
+                    val inWideZone = player.location.isInWideZone(rules)
+                    val available = !(onLoS || inWideZone || inDogOut)
+                    if (onLoS && !inWideZone) {
                         acc.onLos += 1
                         acc.playersOnLoS.add(player)
                     }
-                    if (available) {
-                        acc.available += 1
-                        acc.playersAvailable.add(player)
+                    if (available && !inDogOut) {
+                        acc.inCenterField += 1
+                        acc.playersInCenterField.add(player)
                     }
-                    acc.available += if (available) 1 else 0
+                    acc.inCenterField += if (available) 1 else 0
                     if (onLoS) {
                         acc.playersOnLoS
                     }
@@ -81,8 +84,8 @@ object TheKickOff : Procedure() {
                 }
 
             val eligiblePlayers: List<PlayerId> =
-                if (players.available > 0) {
-                    players.playersAvailable.map { it.id }
+                if (players.inCenterField > 0) {
+                    players.playersInCenterField.map { it.id }
                 } else {
                     players.playersOnLoS.map { it.id }
                 }

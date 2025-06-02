@@ -215,7 +215,7 @@ data class D20Result(override val value: Int) : DieResult() {
     }
 }
 
-// This class is a bit annoying, it is treated as a special D6, where the result can be found in `blockResult`
+// This class is a bit annoying; it is treated as a special D6, where the result can be found in `blockResult`
 @Serializable
 data class DBlockResult(override val value: Int) : DieResult() {
     constructor() : this(Random.nextInt(1, 7)) // Fix issues with serialization not serializing `result`. Figure out why
@@ -239,9 +239,22 @@ data class DicePoolChoice(val id: Int, val diceSelected: List<DieResult>)
 //  Otherwise there is no way to connect the result to the "exact" die, e.g. in case
 //  you are allowed to reroll multiple times and there are several die with the same
 //  value
+/**
+ * We only use multiple results during "Multiple Block" where blocks happen at the same
+ * time, but this class has been generalized for all dice roll types.
+ */
 @Serializable
 data class DicePoolResultsSelected(val results: List<DicePoolChoice>): GameAction {
     fun singleResult(): DieResult = results.single().diceSelected.single()
+    companion object {
+        /**
+         * Factory method for easily creating the simple case, where there is only
+         * one dice pool with a single die.
+         */
+        fun fromSingleDice(die: DieResult): DicePoolResultsSelected {
+            return DicePoolResultsSelected(listOf(DicePoolChoice(0, listOf(die))))
+        }
+    }
 }
 
 @Serializable

@@ -4,6 +4,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 
 class Ball {
     var state: BallState = BallState.ON_GROUND
+    // TODO Giant Support
     var location: FieldCoordinate = FieldCoordinate.UNKNOWN
 
     // Only != null if CARRIED
