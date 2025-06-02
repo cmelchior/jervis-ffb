@@ -32,7 +32,7 @@ class SelectBlockTypeDecorator: FieldActionDecorator<SelectBlockType> {
                     snapshot.fieldSquares[activeLocation] = activeSquare.copyAddContextMenu(
                         item = ContextMenuOption(
                             "Block",
-                            { actionProvider.userActionSelected(BlockTypeSelected(BlockType.STANDARD)) },
+                            { actionProvider.userActionSelected(snapshot.nextActionId, BlockTypeSelected(BlockType.STANDARD)) },
                         ),
                         showContextMenu = true
                     )

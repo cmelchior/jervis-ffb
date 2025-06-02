@@ -33,12 +33,12 @@ import com.jervisffb.net.messages.AcceptGameMessage
 import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage
 import com.jervisffb.net.messages.GameActionMessage
+import com.jervisffb.net.messages.GameActionSyncMessage
 import com.jervisffb.net.messages.GameReadyMessage
 import com.jervisffb.net.messages.GameStartedMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
 import com.jervisffb.net.messages.JoinGameAsCoachMessage
 import com.jervisffb.net.messages.P2PTeamInfo
-import com.jervisffb.net.messages.SyncGameActionMessage
 import com.jervisffb.net.messages.TeamJoinedMessage
 import com.jervisffb.net.messages.TeamSelectedMessage
 import com.jervisffb.net.messages.UpdateClientStateMessage
@@ -236,7 +236,7 @@ class NetworkFuzzTester {
                 controller.handleAction(userAction)
                 conn.send(GameActionMessage(controller.currentActionIndex(), userAction))
             } else {
-                checkServerMessage<SyncGameActionMessage>(conn) {
+                checkServerMessage<GameActionSyncMessage>(conn) {
                     if (it.serverIndex != controller.currentActionIndex() + 1) {
                         fail("[Host] Received server message out of order. Expected ${controller.currentActionIndex() + 1}, got ${it.serverIndex}")
                     }
@@ -271,7 +271,7 @@ class NetworkFuzzTester {
                 controller.handleAction(userAction)
                 conn.send(GameActionMessage(controller.currentActionIndex(), userAction))
             } else {
-                checkServerMessage<SyncGameActionMessage>(conn) {
+                checkServerMessage<GameActionSyncMessage>(conn) {
                     if (it.serverIndex != controller.currentActionIndex() + 1) {
                         fail("[Host] Received server message out of order. Expected ${controller.currentActionIndex() + 1}, got ${it.serverIndex}")
                     }

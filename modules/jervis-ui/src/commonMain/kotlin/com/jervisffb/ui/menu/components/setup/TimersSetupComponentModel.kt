@@ -406,6 +406,9 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
         // want to use the timer settings from the rules builder.
         selectedPresetData.value = presets.first { it.value == rules.timers.preset }
         with(rules.timers) {
+            // updateSetupUseBuffer / updateTeamTurnUseBuffer / updateResponseUseBuffer
+            // Must be called after updating the action time / free time, otherwise
+            // it reset these values before they have a chance to be applied.
             updateTimersEnabled(timersEnabled)
             updateNormalGameTimeLimit(gameLimit?.toString() ?: "", updateUiPreset = false)
             updateNormalGameBuffer(gameBuffer.toString(), updateUiPreset = false)
@@ -413,15 +416,15 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
             updateOvertimeExtraBuffer(extraOvertimeBuffer.toString(), updateUiPreset = false)
             updateOutOfTimeBehaviour(outOfTimeEntries.first { it.value == outOfTimeBehaviour }, updatePreset = false)
             updateGameLimitReachedBehaviour(gameLimitEntries.first { it.value == gameLimitReached }, updatePreset = false)
-            updateSetupUseBuffer(setupUseBuffer, updateUiPreset = false)
             updateSetupActionTime(setupActionTime?.toString() ?: "", updateUiPreset = false)
             updateSetupFreeTime(setupFreeTime.toString(), updateUiPreset = false)
-            updateTeamTurnUseBuffer(turnUseBuffer, updateUiPreset = false)
+            updateSetupUseBuffer(setupUseBuffer, updateUiPreset = false)
             updateTeamTurnActionTime(turnActionTime?.toString() ?: "", updatePreset = false)
             updateTeamTurnFreeTime(turnFreeTime.toString(), updatePreset = false)
-            updateResponseUseBuffer(outOfTurnResponseUseBuffer, updateUiPreset = false)
+            updateTeamTurnUseBuffer(turnUseBuffer, updateUiPreset = false)
             updateResponseActionTime(outOfTurnResponseActionTime?.toString() ?: "", updateUiPreset = false)
             updateResponseFreeTime(outOfTurnResponseFreeTime.toString(), updateUiPreset = false)
+            updateResponseUseBuffer(outOfTurnResponseUseBuffer, updateUiPreset = false)
         }
     }
 }

@@ -1,13 +1,19 @@
 package com.jervisffb.ui.game.viewmodel
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
+import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.JervisSerialization
@@ -50,7 +56,7 @@ class MenuViewModel {
     val setupAvailable: MutableStateFlow<GameType?> = MutableStateFlow(null)
 
     var controller: GameEngineController? = null
-    lateinit var uiState: UiGameController
+    lateinit var uiController: UiGameController
 
     val p2pHostAvaiable: Boolean = canBeHost()
 
@@ -115,13 +121,13 @@ class MenuViewModel {
     }
 
     fun undoAction() {
-        val team = when (uiState.uiMode) {
-            TeamActionMode.HOME_TEAM -> uiState.state.homeTeam.id
-            TeamActionMode.AWAY_TEAM -> uiState.state.awayTeam.id
+        val team = when (uiController.uiMode) {
+            TeamActionMode.HOME_TEAM -> uiController.state.homeTeam.id
+            TeamActionMode.AWAY_TEAM -> uiController.state.awayTeam.id
             TeamActionMode.ALL_TEAMS -> null // No team restrictions when undoing on a Client controlling both teams
         }
-        if (uiState.gameController.isUndoAvailable(team = team)) {
-            uiState.userSelectedAction(Undo)
+        if (uiController.engineController.isUndoAvailable(team = team)) {
+            uiController.userSelectedAction(uiController.engineController.nextActionIndex(), Undo)
         } else {
             SoundManager.play(SoundEffect.ERROR)
         }
@@ -136,30 +142,47 @@ class MenuViewModel {
         return !isUndoing && (features[feature] ?: false)
     }
 
-    fun loadSetup(setup: JervisSetupFile) {
-        if (setup.gameType == GameType.DUNGEON_BOWL) error("Dungeon Bowl Setups not supported yet")
-        if (controller == null) {
-            // It shouldn't be possible to call "Load Setup" with out a game controller,
-            // but just in case it happens.
-            LOG.w { "Load Setup called before game was started." }
-            SoundManager.play(SoundEffect.ERROR)
-            return
+    // Attempt to load a setup, but this is called from outside the normal UI
+    // flow so there is a chance the game isn't in a state where it would accept it.
+    // If that is the case, just fail silently
+    // TODO This doesn't feel nice. Would be good to explore other options, but it
+    //  seems tricky :/
+    fun loadSetupOrFailSilently(setup: JervisSetupFile) {
+        // Right now, we just log errors during development. Need to figure out
+        // what the correct behavior should be.
+        try {
+            loadSetup(
+                uiController.engineController.nextActionIndex(),
+                setup,
+            )
+        } catch (ex: Exception) {
+            LOG.d { "Ignoring exception when loading setup: $ex" }
         }
-        val allowedTeam = when (uiState.uiMode) {
-            TeamActionMode.HOME_TEAM -> uiState.state.homeTeam.id
-            TeamActionMode.AWAY_TEAM -> uiState.state.awayTeam.id
+    }
+
+    /**
+     * Create a [CompositeGameAction] containing all the actions required to create a saved
+     * setup. Note, it is only valid to call this method if no player are currently selected.
+     */
+    fun loadSetup(nextActionId: GameActionId, setup: JervisSetupFile) {
+        val gameController = uiController.engineController
+        if (setup.gameType == GameType.DUNGEON_BOWL) error("Dungeon Bowl Setups not supported yet")
+        if (gameController.currentNode() != SetupTeam.PlacePlayer && gameController.currentNode() != SetupTeam.SelectPlayerOrEndSetup) {
+            error("Calling loadSetup from an invalid state: ${gameController.currentNode()}")
+        }
+        val allowedTeam = when (uiController.uiMode) {
+            TeamActionMode.HOME_TEAM -> uiController.state.homeTeam.id
+            TeamActionMode.AWAY_TEAM -> uiController.state.awayTeam.id
             TeamActionMode.ALL_TEAMS -> null // No team restrictions when undoing on a Client controlling both teams
         }
-        val game = controller ?: error("No game controller was found")
-        val team = game.state.getContext<SetupTeamContext>().team
+        val team = gameController.state.getContext<SetupTeamContext>().team
         if (allowedTeam != null && allowedTeam != team.id) {
             // This client is not considered the "active" client, which means it isn't allowed
             // to load setup formations
             SoundManager.play(SoundEffect.ERROR)
             return
         }
-
-        val rules = game.rules
+        val rules = gameController.rules
         val setupActions = setup.formation.flatMap { (playerNo, relativeCoordinate) ->
             // Ignore player setup if either player or coordinate is not valid
             val playerAvailable = (
@@ -191,7 +214,21 @@ class MenuViewModel {
                 emptyList()
             }
         }
-        uiState.userSelectedMultipleActions(setupActions, delayEvent = false)
+
+        // If a player was already selected, we deselect them, in order to run the full setup sequence
+        // from the start.
+        val setupAction = if (gameController.currentNode() == SetupTeam.PlacePlayer) {
+            val currentPlayer = gameController.state.getContext<SetupTeamContext>().currentPlayer!!
+            val squareSelected = when (val loc = currentPlayer.location) {
+                is FieldCoordinate -> FieldSquareSelected(loc.x, loc.y)
+                is DogOut -> DogoutSelected
+                is GiantLocation -> TODO("Giants not supported yet")
+            }
+            CompositeGameAction(listOf(squareSelected) + setupActions)
+        } else {
+            CompositeGameAction(setupActions)
+        }
+        uiController.userSelectedAction(nextActionId, setupAction)
     }
 
     // Called by the UiGameController whenever a new snapshot is created. This can be used to determine
@@ -200,13 +237,13 @@ class MenuViewModel {
         // Enable/Disable Setup options
         val setupKickingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupKickingTeam)
         val setupReceivingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupReceivingTeam)
-        val teamControlledByClient = when (uiState.uiMode) {
+        val teamControlledByClient = when (uiController.uiMode) {
             TeamActionMode.HOME_TEAM -> setupKickingTeam && uiSnapshot.game.kickingTeam.isHomeTeam()
             TeamActionMode.AWAY_TEAM -> setupReceivingTeam && uiSnapshot.game.receivingTeam.isHomeTeam()
             TeamActionMode.ALL_TEAMS -> true
         }
         if ((setupReceivingTeam || setupKickingTeam) && teamControlledByClient) {
-            setupAvailable.value = uiState.rules.gameType
+            setupAvailable.value = uiController.rules.gameType
         } else {
             setupAvailable.value = null
         }

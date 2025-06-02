@@ -489,6 +489,7 @@ object IconFactory {
             LogoSize.SMALL -> logo.small ?: SingleSprite.embedded("roster/logo/roster_logo_jervis_default_small.png")
         }
         saveLogo(team, sprite, size)
+        // TODO This crashed?
         return getLogo(team, size)
     }
 

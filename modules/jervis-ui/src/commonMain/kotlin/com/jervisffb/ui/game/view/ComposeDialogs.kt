@@ -54,7 +54,7 @@ fun UserActionDialog(
         confirmButton = {
             dialog.actionDescriptions.forEach { (action, description) ->
                 Button(
-                    onClick = { vm.buttonActionSelected(action) },
+                    onClick = { vm.buttonActionSelected(vm.nextActionId, action) },
                 ) {
                     Text(text = description)
                 }
@@ -141,7 +141,7 @@ fun MultipleSelectUserActionDialog(
                 Button(
                     onClick = {
                         showDialog = false
-                        vm.buttonActionSelected(result)
+                        vm.buttonActionSelected(vm.nextActionId, result)
                     },
                     enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
                 ) {

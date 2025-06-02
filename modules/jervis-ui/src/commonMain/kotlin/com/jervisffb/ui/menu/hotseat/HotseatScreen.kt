@@ -12,6 +12,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.screen.Screen
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_wall_player
@@ -22,8 +24,14 @@ import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
 import kotlinx.coroutines.flow.map
 
 class HotseatScreen(private val menuViewModel: MenuViewModel, private val viewModel: HotseatScreenModel) : Screen {
+    @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
+        LifecycleEffectOnce {
+            onDispose {
+                viewModel.onDispose()
+            }
+        }
         val sidebarEntries = viewModel.sidebarEntries
         JervisScreen(menuViewModel) {
             MenuScreenWithSidebarAndTitle(

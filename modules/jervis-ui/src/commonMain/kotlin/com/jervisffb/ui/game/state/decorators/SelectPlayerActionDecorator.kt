@@ -14,7 +14,7 @@ import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.state.ManualActionProvider
-import com.jervisffb.ui.game.state.QueuedActionsResult
+import com.jervisffb.ui.game.state.QueuedActions
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ContextMenuOption
 
@@ -41,12 +41,13 @@ class SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
                         val canMove = availableActions.contains(MoveType.STANDARD)
                         val canEndAction = availableActions.contains(EndAction)
                         if (canMove && canEndAction) {
-                            QueuedActionsResult(EndAction)
+                            QueuedActions(EndAction)
                         } else {
                             null
                         }
                     }
                     actionProvider.userActionSelected(
+                        snapshot.nextActionId,
                         CompositeGameAction(PlayerActionSelected(PlayerStandardActionType.MOVE), MoveTypeSelected(MoveType.STAND_UP))
                     )
                 }
@@ -82,7 +83,7 @@ class SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
                         }
                         ContextMenuOption(
                             title = name,
-                            command = { actionProvider.userActionSelected(PlayerActionSelected(it.type)) },
+                            command = { actionProvider.userActionSelected(snapshot.nextActionId, PlayerActionSelected(it.type)) },
                         )
                     },
                 )

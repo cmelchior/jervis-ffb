@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerNo
@@ -20,10 +21,12 @@ import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotTimerData
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -43,7 +46,7 @@ class RandomActionProvider(
     private var paused = false
     private lateinit var actions: ActionRequest
 
-    override fun startHandler() {
+    override fun startHandler(uiTimerData: MutableSharedFlow<UiSnapshotTimerData>) {
         // Do nothing
     }
 
@@ -63,18 +66,29 @@ class RandomActionProvider(
         // Do nothing
     }
 
-    override suspend fun getAction(): GameAction {
+    override suspend fun getAction(id: GameActionId): GeneratedAction {
         actionRequestChannel.send(Pair(controller, actions))
-        return actionSelectedChannel.receive()
+        var action: GeneratedAction? = null
+        while (action == null) {
+            val newAction = actionSelectedChannel.receive()
+            when {
+                newAction.id < id -> LOG.i { "[RandomProvider] Dropping outdated action (${newAction.id.value} < ${id.value}: ${newAction.action}" }
+                newAction.id > id -> error("Received future event. This should never happen (${newAction.id.value} > ${id.value}): ${newAction.action}")
+                else -> {
+                    action = newAction
+                }
+            }
+        }
+        return action
     }
 
-    override fun userActionSelected(action: GameAction) {
+    override fun userActionSelected(id: GameActionId, action: GameAction) {
         actionScope.launch {
-            actionSelectedChannel.send(action)
+            actionSelectedChannel.send(GeneratedAction(id, action))
         }
     }
 
-    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
+    override fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean) {
         TODO("Not yet supported")
     }
 
@@ -84,6 +98,10 @@ class RandomActionProvider(
 
     override fun hasQueuedActions(): Boolean {
         return false
+    }
+
+    override fun clearQueuedActions() {
+        // Do nothing
     }
 
     fun startActionProvider() {
@@ -98,7 +116,7 @@ class RandomActionProvider(
                 // First check if this UiActionProvider is responsible for the current team
                 val teamActionHandledHere = when (clientMode) {
                     TeamActionMode.HOME_TEAM -> true
-                    TeamActionMode.AWAY_TEAM -> request.team?.isAwayTeam() == true
+                    TeamActionMode.AWAY_TEAM -> request.team.isAwayTeam()
                     TeamActionMode.ALL_TEAMS -> true
                 }
 
@@ -111,7 +129,7 @@ class RandomActionProvider(
                     if (!useManualAutomatedActions(controller)) {
                         val selectedAction = createRandomAction(controller.state, request.actions)
                         delay(delay.inWholeMilliseconds)
-                        actionSelectedChannel.send(selectedAction)
+                        actionSelectedChannel.send(GeneratedAction(request.nextActionId, selectedAction))
                     }
                 }
             }
@@ -153,7 +171,7 @@ class RandomActionProvider(
                 handleManualAwayKickingSetup(controller, compositeActions)
             }
             compositeActions.add(EndSetup)
-            actionSelectedChannel.send(CompositeGameAction(compositeActions))
+            actionSelectedChannel.send(GeneratedAction(controller.nextActionIndex(), CompositeGameAction(compositeActions)))
             return true
         } else {
             return false

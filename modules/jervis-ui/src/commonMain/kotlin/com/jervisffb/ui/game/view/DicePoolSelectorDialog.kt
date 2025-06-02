@@ -122,7 +122,7 @@ fun DicePoolSelectorDialog(
                                 DicePoolChoice(el.second.id, listOf(selectedRoll.result))
                             }
                         )
-                        vm.buttonActionSelected(selectedResultsAction)
+                        vm.buttonActionSelected(vm.nextActionId, selectedResultsAction)
                     },
                     enabled = true // (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
                 ) {

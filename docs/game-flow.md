@@ -5,6 +5,76 @@ to be implemented. Things should only be marked as completed when they have unit
 tests covering the particular feature. This document only covers the core game
 rules, skills are tracked separately in [skills.md](skills.md). 
 
+## Game Phases
+
+The game engine is tracking the phases of the game as defined by the rulebook.
+Some of these are not defined by the rulebook, so some interpretation are needed,
+are are probly ope
+
+* Pre-game
+  1. The Fans
+     1. Home team rolls D3
+     2. Away team rolls D3
+  2. The Weather
+     1. Home tem rolls 2D6
+  3. Take On Journeymen
+     1. Home team decides
+     2. Away team decides
+  4. Inducements
+     1. High CTV Team buy inducements
+     2. Low CTV Team buy inducements
+  5. The Prayers To Nuffle Table
+     1. Underdog rolls as many times as needed
+  6. Determine Kicking Team
+     1. Away team selects coin side
+     2. Home team flips coin
+     3. Winner selects to kick or receive
+
+* Start of Drive
+  1. Set-up
+  2. The Kick-off
+      1. Kicker: Select position
+      2. Kicker: Deviate the ball
+  3. The Kick-off Event
+     1. Roll for Kick-off event
+     2. Execute Kick-off event
+     3. Ball lands
+
+* Team Turns
+  1. Start of Turn
+     1. Move Turn Marker
+     2. Special Play Cards
+  
+  2. Run turn
+     1. Select Player
+     2. Select Action (This will activate the player) (No-op activations are Move actions with a 0-move)
+     3. Nega-traits are cleared
+     4. Special Play Cards
+     4. Rodney's Catch of the Day
+     5. Roll for Nega-traits (Pro can be used because TZ was re-enabled in step 3)
+     7. If initiating action did not fail, Roll for appereance, dump-off (Pr. Designer's Commentary)
+     8. Execute action
+   
+   3. End Turn
+      1. Throw a Rock (Prayers to Nuffle)
+      2. Special Play Cards
+      3. Temporary Skills/Characteristics are removed
+      4. Players stunned at the beginning of the turn moved to prone
+
+* End of Drive
+  1. Deal with Secret Weapons
+  2. Recover Knocked-out Players
+  3. Drive Ends
+
+* Post-game Sequence
+  1. Record outcome and Winnings
+  2. Update Dedicated Fans
+  3. Player Advancements
+  4. Hiring, Firing and Temporarily Retiring
+  5. Expensive Mistakes
+  6. Prepare for Next Fixture
+
+  
 ## Pregame
 - [x] The Fans
 - [x] The Weather
@@ -290,6 +360,24 @@ Some alternatives:
 
 2. Allocated something like 3 minutes pr. turn + a pool to be used during the 
    opponents turn.
+
+### Timer Implementation
+
+All timer related activities are either handled by UiGameController or on the server,
+while the `OutOfTime` action is sent to `EngineGameController`, it only uses it to 
+log a game event. 
+
+- When a timer has run out, `Undo` should no longer be available. The reason is that
+  the semantics gets too messy, especially on HotSeat clients where you might cross
+  coach boundaries. This also neatly solves a potential issue with reporting out-of-time
+  as normal game events.
+
+- We want to maintain the core UI-loop when handling events. This is causing a few issues
+  for timers.
+
+  We need to track the timer state inside UiGameController. I see the following:
+
+  - Dete
 
 
 

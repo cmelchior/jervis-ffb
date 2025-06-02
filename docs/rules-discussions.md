@@ -4,6 +4,12 @@ This file contains interesting discussions about rule ambiguities and how the ru
 interpreted. All of these are not implemented yet. This is just a list of things to keep an eye
 out for during development. See [rules-faq.md](rules-faq.md) for rules that are already implemented.
 
+## Resources
+
+- https://fumbbl.com/help:Common+Rules+Queries
+- https://bbtactics.com/forum/threads/blood-bowl-2020-faq.14831/page-7
+- https://www.talkfantasyfootball.org/viewtopic.php?f=88&t=46340&p=817616#p817616
+
 ## Chainsaw vs. Mighty Blow
 https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=33049
 You cannot use MB _against_ the player that has Chainsaw
@@ -187,3 +193,7 @@ end up in the jumping square.
 For Giants, it isn't well-defined how to interpret its location. E.g., during 
 setup, is it considered to be in the wide zone if part of it is in there, or 
 does all of it need to be inside?
+
+## Knocked down and Prone
+Can a player be Knocked Down while already prone (resulting in rolling armour/injury)
+

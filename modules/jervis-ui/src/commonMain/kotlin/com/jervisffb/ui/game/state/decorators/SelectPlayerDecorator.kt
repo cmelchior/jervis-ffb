@@ -17,7 +17,7 @@ class SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
     override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectPlayer) {
         descriptor.players.forEach { player ->
             val selectedAction = {
-                actionProvider.userActionSelected(PlayerSelected(player))
+                actionProvider.userActionSelected(snapshot.nextActionId, PlayerSelected(player))
             }
 
             val playerLocation = state.getPlayerById(player).location

@@ -30,6 +30,7 @@ import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SkillSelected
+import com.jervisffb.engine.actions.OutOfTime
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
@@ -82,6 +83,7 @@ data class SingleChoiceInputDialog(
                 is BlockTypeSelected -> action.type.name
                 is DicePoolResultsSelected -> action.results.toString()
                 is DirectionSelected -> action.direction.toString()
+                OutOfTime -> "Timeout"
             }
         }
 

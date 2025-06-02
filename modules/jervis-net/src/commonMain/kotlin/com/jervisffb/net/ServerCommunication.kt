@@ -11,15 +11,16 @@ import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.CoachLeftMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage
+import com.jervisffb.net.messages.GameActionSyncMessage
 import com.jervisffb.net.messages.GameReadyMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
+import com.jervisffb.net.messages.GameTimerSyncMessage
 import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.ServerError
 import com.jervisffb.net.messages.ServerMessage
 import com.jervisffb.net.messages.SpectatorJoinedMessage
 import com.jervisffb.net.messages.SpectatorLeftMessage
-import com.jervisffb.net.messages.SyncGameActionMessage
 import com.jervisffb.net.messages.TeamData
 import com.jervisffb.net.messages.TeamJoinedMessage
 import com.jervisffb.net.messages.UpdateClientStateMessage
@@ -29,6 +30,7 @@ import com.jervisffb.utils.jervisLogger
 import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.datetime.Instant
 
 /**
  * Class wrapping the responsibility of sending messages from a server game
@@ -197,9 +199,28 @@ class ServerCommunication(
 
     // A Game action was sent to the server and processed successfully, it should now be sent to all other connected
     // clients so they can update their local game model.
-    suspend fun sendGameActionSync(sender: JoinedP2PCoach?, producer: CoachId, index: GameActionId, action: GameAction) {
-        val message = SyncGameActionMessage(producer, index, action)
+    suspend fun sendGameActionSync(
+        sender: JoinedP2PCoach?,
+        producer: CoachId,
+        index: GameActionId,
+        action: GameAction,
+    ) {
+        val message = GameActionSyncMessage(producer, index, action)
         sendToAllOtherConnections(sender, message)
+    }
+
+    // Update timer information on clients
+    suspend fun sendGameTimerSync(
+        producer: CoachId,
+        index: GameActionId,
+        expectedBy: Instant?
+    ) {
+        val message = GameTimerSyncMessage(
+            producer = producer,
+            serverIndex = index,
+            expectedBy = expectedBy
+        )
+        sendAllConnections(message)
     }
 
 }

@@ -24,6 +24,9 @@ enum class JervisExitCode(val code: Short) {
     NO_GAME_FOUND(4005), // No game with the given gameId exists.
     WRONG_STARTING_MESSAGE(4006), // The first message to /game wasn't a JoinGameMessage
     URL_NOT_FOUND(4007), // A 404 was thrown when trying to connect to the game url
+    // A client has sent too many game action messages that resulted in errors.
+    // We assume it is a client out of control and terminates the connection.
+    ERROR_LIMIT_REACHED(4008),
 }
 
 /**

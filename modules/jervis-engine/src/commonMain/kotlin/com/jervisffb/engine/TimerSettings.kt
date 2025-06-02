@@ -1,10 +1,18 @@
 package com.jervisffb.engine
 
+import com.jervisffb.engine.OutOfTimeBehaviour.SHOW_WARNING
+import com.jervisffb.engine.TimerPreset.CUSTOM
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Enum describing pre-defined types of Blood Bowl clocks.
+ *
+ * Any change to an existing clock should change its type
+ * to [CUSTOM].
+ */
 enum class TimerPreset {
     HARD_LIMIT,
     CHESS_CLOCK,
@@ -12,23 +20,54 @@ enum class TimerPreset {
     CUSTOM,
 }
 
+/**
+ * Enum describing what happens when a Coach reaches the "Max time" limit
+ * for a given action (but hasn't reached the Game Limit yet)
+ *
+ * Developer's Commentary:
+ * Currently, the game clock keeps ticking when Out-of-Time is hit. This is
+ * because we want to also accurately track the total game time. This means
+ * it is possible to reach "Out of Time" with a setting of [SHOW_WARNING], and
+ * then "Game Limit" if no action is taken.
+ */
 enum class OutOfTimeBehaviour {
+    // Nothing happens, the game just continues. TODO This should probably be rolled into SHOW_WARNING?
     NONE,
+    // A warning should be shown to the coach who needs to take the action, but
+    // otherwise nothing happens.
     SHOW_WARNING,
+    // A button should pop up for the opposing coach, which allows them to time
+    // the coach out. This is the current FUMBBL behavior.
     OPPONENT_CALL_TIMEOUT,
+    // An automatic time-out is called by the server as soon as the max limit
+    // is hit.
     AUTOMATIC_TIMEOUT
 }
 
+/**
+ * Enum describing what happens when a coach reaches the time allocated to them
+ * for the entire game.
+ */
 enum class GameLimitReachedBehaviour {
+    // A warning should be shown to the coach who has run out of time, but
+    // otherwise nothing happens.
     NONE,
+    // Knocked-down players will stand up (if they can, without rolling dice)
+    // Otherwise the turn end immediately, and no other actions are allowed.
     ROLL_OVER_STAND_UP,
+    // Stunned players will roll over, but otherwise the turn ends immediately
+    // without the coach being allowed any actions.
     AUTOMATIC_END_TURN,
+    // The coach who ran out of time will
     FORFEIT_GAME,
 }
 
 /**
  * This class describes which timer rules apply to a specific game (if any).
  *
+ * TODO: This is not true. I don't think the GameEngineController is the correct place since
+ *  in P2P Games we need to override user actions. This needs to happen either on the server
+ *  in the GameActionHandler or inside the `LocalActionProvider` (which is what drives HotSeat games)
  * Tracking used time is done inside the [GameEngineController], but reacting to time-outs is done
  * by upper layers. For the UI, this is done through the appropriate `UiActionProvider`, and the server does it
  * through `GameActionHandlers`
@@ -38,7 +77,11 @@ data class TimerSettings(
     val timersEnabled: Boolean = false,
     val preset: TimerPreset = TimerPreset.BB_CLOCK,
 
+    // Overall game limit. This counts all time used across all actions
     val gameLimit: Duration? = null,
+    // Overall game buffer. Only used for timers with "Use Buffer" enabled.
+    // It is used to cover the difference between "free time" and "action time"
+    //If no buffer is available, only "free time" is available.
     val gameBuffer: Duration = Duration.ZERO,
     val extraOvertimeLimit: Duration = Duration.ZERO, // Will be added to total limit if overtime is reached
     val extraOvertimeBuffer: Duration = Duration.ZERO, // Will be added to total buffer if overtime is reached
@@ -62,7 +105,9 @@ data class TimerSettings(
     /**
      * Returns this instance as a [Builder], making it easier to update.
      */
-    fun toBuilder() = Builder(this)
+    fun toBuilder(): Builder {
+        return Builder(this)
+    }
 
     /**
      * Class making it easier to incrementally update timer settings, like through the UI.

@@ -23,6 +23,7 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
 import com.jervisffb.engine.rules.bb2020.SkillSettings
+import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.Skill
@@ -86,7 +87,7 @@ open class Rules(
     open val gameType: GameType,
 
     // Which timer settings are in place for this game
-    open val timers: TimerSettings = TimerSettings.Companion.BB_CLOCK,
+    open val timers: TimerSettings = TimerSettings.BB_CLOCK,
     // Which inducements are available in this game
     open val inducements: InducementSettings = InducementSettings(DEFAULT_INDUCEMENTS),
 
@@ -185,6 +186,17 @@ open class Rules(
     // Defines how the paths between locations on the field are calculated. This can be rules-specific,
     // since it might involve the use of skills.
     open val pathFinder: PathFinder = BB2020PathFinder()
+
+    /**
+     * Returns `true` if the game is currently in a Setup phase.
+     *
+     * Thought: Should we encode the different phases as an enum instead?
+     * But then we have to find the correct trade-off between phases in such
+     * an enum vs. the flexibility of the rules engine.
+     */
+    fun isInSetupPhase(state: Game): Boolean {
+        return state.stack.containsProcedure(SetupTeam)
+    }
 
     fun isValidSetup(state: Game, team: Team): Boolean {
         val isHomeTeam = team.isHomeTeam()

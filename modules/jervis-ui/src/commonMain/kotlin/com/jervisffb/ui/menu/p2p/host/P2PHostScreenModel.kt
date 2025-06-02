@@ -493,6 +493,10 @@ class P2PHostScreenModel(private val navigator: Navigator, private val menuViewM
     }
 
     override fun onDispose() {
+        // We are popping this screen after adding the Game screen, so we need to
+        // check that we do not accidentially stop the server again.
+        // Stopping the server after the game is started is done in the "onGameStopped"
+        // callback.
         menuViewModel.backgroundContext.launch {
             if (networkAdapter.hostState.value != P2PHostState.RUN_GAME) {
                 server?.stop()

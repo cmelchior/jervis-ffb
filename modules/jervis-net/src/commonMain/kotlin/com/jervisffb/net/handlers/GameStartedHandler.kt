@@ -18,7 +18,7 @@ class GameStartedHandler(override val session: GameSession) : ClientMessageHandl
             it.hasStartedGame = true
             if (session.coaches.all { it.hasStartedGame}) {
                 val game = session.game!!
-                rollForwardToUserAction(session, game, connection)
+                rollForwardToUserAction(session, game)
             }
         } ?: session.out.sendError(connection, ProtocolErrorServerError("Spectator clients cannot start games: $message"))
     }

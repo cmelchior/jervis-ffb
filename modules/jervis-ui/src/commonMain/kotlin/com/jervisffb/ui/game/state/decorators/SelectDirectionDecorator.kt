@@ -13,7 +13,7 @@ class SelectDirectionDecorator: FieldActionDecorator<SelectDirection> {
         descriptor.directions.forEach { direction ->
             val square = snapshot.fieldSquares[origin.move(direction, 1)]
             snapshot.fieldSquares[origin.move(direction, 1)]?.apply {
-                onSelected = { actionProvider.userActionSelected(DirectionSelected(direction)) }
+                onSelected = { actionProvider.userActionSelected(snapshot.nextActionId, DirectionSelected(direction)) }
                 selectableDirection = direction
             } ?: error("Cannot find square: ${origin.move(direction, 1)}")
         }

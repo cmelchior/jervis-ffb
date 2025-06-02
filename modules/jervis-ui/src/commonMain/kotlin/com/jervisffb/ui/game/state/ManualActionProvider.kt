@@ -17,7 +17,7 @@ import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
-import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectDicePoolResult
@@ -38,6 +38,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.Stand
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotTimerData
 import com.jervisffb.ui.game.state.decorators.DeselectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
 import com.jervisffb.ui.game.state.decorators.EndSetupDecorator
@@ -54,6 +55,7 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
@@ -76,12 +78,12 @@ open class ManualActionProvider(
     private lateinit var availableActions: ActionRequest
 
     // If set, it contains an action that should automatically be sent on the next call to getAction()
-    var automatedAction: GameAction? = null
+    var automatedAction: GeneratedAction? = null
 
     // If a user selected multiple actions, they are all listed here. This queue should be emptied before
     // sending anything else
     private var delayBetweenActions = false
-    private val queuedActions = mutableListOf<GameAction>()
+    private val queuedActions = mutableListOf<GeneratedAction>()
     private val queuedActionsGeneratorFuncs = mutableListOf<QueuedActionsGenerator>()
 
     val fieldActionDecorators = mapOf(
@@ -113,7 +115,7 @@ open class ManualActionProvider(
         return fieldActionDecorators[type] as? FieldActionDecorator<GameActionDescriptor>
     }
 
-    override fun startHandler() {
+    override fun startHandler(uiTimerData: MutableSharedFlow<UiSnapshotTimerData>) {
         // Do nothing. We are sharing the controller with the main UiGameController
     }
 
@@ -127,11 +129,16 @@ open class ManualActionProvider(
         // If the UI has registered any queued action generators, we run them first before
         // trying to find other automated actions.
         val iter = queuedActionsGeneratorFuncs.iterator()
+        var actionId = actions.nextActionId
         while (iter.hasNext()) {
             val result = iter.next()(controller)
             if (result != null) {
                 delayBetweenActions = result.delayBetweenActions
-                queuedActions.addAll(result.actions)
+                queuedActions.addAll(result.actions.map {
+                    GeneratedAction(actionId, it).also {
+                        actionId += 1
+                    }
+                })
                 iter.remove()
             }
         }
@@ -140,20 +147,24 @@ open class ManualActionProvider(
         // This also means that anyone queuing up actions, most queue up all intermediate actions
         // as well. Even the ones that are normally automatically created.
         if (queuedActions.isEmpty()) {
-            automatedAction = calculateAutomaticResponse(controller, controller.getAvailableActions().actions)
+            calculateAutomaticResponse(controller, controller.getAvailableActions().actions)?.let {
+                automatedAction = GeneratedAction(actionId, it)
+            }
         }
     }
 
     override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
         availableActions = actions
+        // If we have automatic or queued actions up, we do not want to show any UI elements that could generate
+        // actions as they would either interrupt the queue or be illegal outright.
         if (queuedActions.isNotEmpty()) return
         if (automatedAction != null) return
 
         // TODO What to do here when it is the other team having its turn.
         //  The behavior will depend on the game being a HotSeat vs. Client/Server
         var showActionDecorators = when (clientMode) {
-            TeamActionMode.HOME_TEAM -> actions.team == null || actions.team?.id == game.state.homeTeam.id
-            TeamActionMode.AWAY_TEAM -> actions.team?.id == game.state.awayTeam.id
+            TeamActionMode.HOME_TEAM -> actions.team.id == game.state.homeTeam.id
+            TeamActionMode.AWAY_TEAM -> actions.team.id == game.state.awayTeam.id
             TeamActionMode.ALL_TEAMS -> true
         }
 
@@ -178,42 +189,87 @@ open class ManualActionProvider(
         // Do nothing (for now)
     }
 
-    override suspend fun getAction(): GameAction {
-        // When returning actions we resolve it with the following priority
+    override suspend fun getAction(id: GameActionId): GeneratedAction {
+        // When returning actions, we resolve it with the following priority
         // 1. All Queued actions
         // 2. Then automated actions
         // 3. Actions from the UI
 
-        // Empty queued data if present
+        // Drain queued data first, if present.
         if (queuedActions.isNotEmpty()) {
             val action = queuedActions.removeFirst()
             // Do not pause for flow-control events, only events that would appear "visible"
             // to the player
-            if (action !is MoveTypeSelected && delayBetweenActions) {
+            if (delayBetweenActions) {
                 delay(150)
             }
-            return action
+            when {
+                action.id < id -> {
+                    LOG.i { "[ManualProvider] Dropping outdated queued action(${action.id.value} < ${id.value}): $action" }
+                    // If the first item in the queue is out of order, then the rest is as well. So we should remove them.
+                    // Note, this assumes that we only try to enqueue one sequence at a time (which is probably a fair
+                    // assumption for now)
+                    queuedActions.clear()
+                }
+                action.id > id -> {
+                    error("[ManualProvider] Received future queued action. This should not be possible (${action.id.value} > ${id.value}): $action")
+                }
+                else -> return action
+            }
         }
         delayBetweenActions = false
 
-        // Otherwise empty automated response
-        // And finally ask the UI
-        return automatedAction?.let { action ->
+        // Otherwise, drain automated response
+        val autoAction =  automatedAction?.let { action ->
             automatedAction = null
-            action
-        } ?: actionSelectedChannel.receive()
+            when {
+                action.id < id -> {
+                    LOG.i { "[ManualProvider] Dropping outdated automated action(${action.id.value} < ${id.value}): $action" }
+                    null
+                }
+                action.id > id -> {
+                    error("[ManualProvider] Received future automated action. This should not be possible (${action.id.value} > ${id.value}): $action")
+                }
+                else -> action
+            }
+        }
+
+        // And finally ask the UI
+        val manualAction = if (autoAction == null) {
+            var selectedAction: GeneratedAction? = null
+            while (selectedAction == null) {
+                val newAction = actionSelectedChannel.receive()
+                when {
+                    newAction.id < id -> LOG.i { "[ManualProvider] Dropping outdated manual action (${newAction.id.value} < ${id.value}: ${newAction.action}" }
+                    newAction.id > id -> error("[ManualProvider] Received future manual event. This should never happen (${newAction.id.value} > ${id.value}): ${newAction.action}")
+                    else -> {
+                        selectedAction = newAction
+                    }
+                }
+            }
+            selectedAction
+        } else {
+            null
+        }
+
+        return autoAction ?: manualAction ?: error("Invariant when choosing actions was broken")
     }
 
-    override fun userActionSelected(action: GameAction) {
-        if (actionSelectedChannel.trySend(action).isFailure) {
+    override fun userActionSelected(id: GameActionId, action: GameAction) {
+        if (actionSelectedChannel.trySend(GeneratedAction(id, action)).isFailure) {
             error("Unable to send action to channel. Is the channel closed?")
         }
     }
 
-    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
+    override fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean) {
         if (actions.isEmpty()) throw IllegalArgumentException("Action list must contain at least one action")
         // Store all events to be sent and sent the first one to be processed
-        queuedActions.addAll(actions)
+        var actionId = startingId
+        queuedActions.addAll(actions.map {
+            GeneratedAction(actionId, it).also { action ->
+                actionId += 1
+            }
+        })
         delayBetweenActions = delayEvent
         actionScope.launch {
             val action = queuedActions.removeFirst()
@@ -396,6 +452,14 @@ open class ManualActionProvider(
 
     override fun hasQueuedActions(): Boolean {
         return queuedActions.isNotEmpty()
+    }
+
+    override fun clearQueuedActions() {
+        queuedActions.clear()
+        queuedActionsGeneratorFuncs.clear()
+        // This shouldn't be needed, since this is only set in `prepareForNextAction`
+        // and that method should not be called in case of time running out.
+        automatedAction = null
     }
 }
 

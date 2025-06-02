@@ -3,16 +3,19 @@ package com.jervisffb.ui.game.state
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.fumbbl.net.adapter.CalculatedJervisAction
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.fumbbl.net.adapter.JervisAction
 import com.jervisffb.fumbbl.net.adapter.OptionalJervisAction
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotTimerData
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -30,14 +33,16 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
     var started = false
     private val pauseMutex = Mutex(locked = true)
 
-    override fun startHandler() {
+    override fun startHandler(uiTimerData: MutableSharedFlow<UiSnapshotTimerData>) {
         if (started) return
         started = true
         var index = 0
         val replayCommands = fumbbl?.getCommands()!!
         paused = true
         job = actionScope.launch {
+            var actionId = controller.currentActionIndex()
             while (index < replayCommands.size) {
+                actionId += 1
                 pauseMutex.withLock {
                     // We just use the event here as a trigger from the UI to find the next available action
                     val ignore = actionRequestChannel.receive()
@@ -68,16 +73,16 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
                         when (commandFromReplay) {
                             is CalculatedJervisAction -> {
                                 foundAction = true
-                                userActionSelected(commandFromReplay.actionFunc(controller.state, controller.rules))
+                                userActionSelected(actionId, commandFromReplay.actionFunc(controller.state, controller.rules))
                             }
                             is JervisAction -> {
                                 foundAction = true
-                                userActionSelected(commandFromReplay.action)
+                                userActionSelected(actionId, commandFromReplay.action)
                             }
                             is OptionalJervisAction -> {
                                 if (controller.currentNode() == commandFromReplay.expectedNode) {
                                     foundAction = true
-                                    userActionSelected(commandFromReplay.action)
+                                    userActionSelected(actionId, commandFromReplay.action)
                                 } else {
                                     LOG.d {
                                         """
@@ -116,18 +121,29 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
         // Do nothing
     }
 
-    override suspend fun getAction(): GameAction {
+    override suspend fun getAction(id: GameActionId): GeneratedAction {
         actionRequestChannel.send(Pair(controller, actions))
-        return actionSelectedChannel.receive()
+        var action: GeneratedAction? = null
+        while (action == null) {
+            val newAction = actionSelectedChannel.receive()
+            when {
+                newAction.id < id -> LOG.i { "[ReplayActionProvider] Dropping outdated action (${newAction.id.value} < ${id.value}: ${newAction.action}" }
+                newAction.id > id -> error("Received future event. This should never happen (${newAction.id.value} > ${id.value}): ${newAction.action}")
+                else -> {
+                    action = newAction
+                }
+            }
+        }
+        return action
     }
 
-    override fun userActionSelected(action: GameAction) {
+    override fun userActionSelected(id: GameActionId, action: GameAction) {
         actionScope.launch {
-            actionSelectedChannel.send(action)
+            actionSelectedChannel.send(GeneratedAction(id, action))
         }
     }
 
-    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
+    override fun userMultipleActionsSelected(startingId: GameActionId, actions: List<GameAction>, delayEvent: Boolean) {
         // Do nothing
     }
 
@@ -137,6 +153,10 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
 
     override fun hasQueuedActions(): Boolean {
         return false
+    }
+
+    override fun clearQueuedActions() {
+        // Do nothing
     }
 
     fun startActionProvider() {

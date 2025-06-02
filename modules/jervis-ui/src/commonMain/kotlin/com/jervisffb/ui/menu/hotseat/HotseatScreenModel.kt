@@ -12,9 +12,9 @@ import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.GameFileData
-import com.jervisffb.ui.game.LocalActionProvider
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
+import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.view.SideBarEntryState
@@ -87,6 +87,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         menuViewModel
     )
 
+    private var actionProvider: LocalActionProvider? = null
     private var gameScreenModel: GameScreenModel? = null
 
     init {
@@ -220,7 +221,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
             CoachType.COMPUTER -> RandomActionProvider(TeamActionMode.AWAY_TEAM, gameController, isServer = true).also { it.startActionProvider() }
         }
 
-        val actionProvider = LocalActionProvider(
+        actionProvider = LocalActionProvider(
             gameController,
             GameSettings(gameRules = rules),
             homeActionProvider,
@@ -232,7 +233,7 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
             gameController,
             gameController.state.homeTeam,
             gameController.state.awayTeam,
-            actionProvider,
+            actionProvider!!,
             mode = Manual(TeamActionMode.ALL_TEAMS),
             menuViewModel = menuViewModel,
             onEngineInitialized = {
@@ -241,11 +242,18 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
                     // TODO Send to AI controller?
                     // controller.sendGameStarted()
                 }
+            },
+            onGameStopped = {
+                actionProvider?.onDispose()
             }
         ).also {
             it.gameAcceptedByAllPlayers()
         }
         navigator.pop()
         navigator.push(GameScreen(menuViewModel, model))
+    }
+
+    override fun onDispose() {
+        // Not called from Game Screen
     }
 }

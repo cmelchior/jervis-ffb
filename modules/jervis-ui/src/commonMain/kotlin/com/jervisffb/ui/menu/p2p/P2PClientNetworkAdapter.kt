@@ -3,7 +3,6 @@ package com.jervisffb.ui.menu.p2p
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Coach
-import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
@@ -11,7 +10,9 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.GameId
 import com.jervisffb.net.LightServer
+import com.jervisffb.net.messages.GameActionSyncMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
+import com.jervisffb.net.messages.GameTimerSyncMessage
 import com.jervisffb.net.messages.InvalidGameActionOwnerServerError
 import com.jervisffb.net.messages.InvalidGameActionTypeServerError
 import com.jervisffb.net.messages.InvalidTeamServerError
@@ -271,7 +272,11 @@ class P2PClientNetworkAdapter(
             }
         }
 
-        override fun onGameAction(producer: CoachId, serverIndex: GameActionId, action: GameAction) {
+        override fun onGameAction(serverAction: GameActionSyncMessage) {
+            // Do nothing here. This is handled in P2PActionActionProvider
+        }
+
+        override fun onTimerSync(serverAction: GameTimerSyncMessage) {
             // Do nothing here. This is handled in P2PActionActionProvider
         }
     }

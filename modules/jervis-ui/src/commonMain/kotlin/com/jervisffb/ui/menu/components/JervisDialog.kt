@@ -43,7 +43,6 @@ import com.jervisffb.ui.game.view.utils.paperBackground
  * This file contains Composables for creating Jervis themed dialogs
  */
 
-
 /**
  * Customizable Jervis dialog with title, icon, icon and button row.
  */

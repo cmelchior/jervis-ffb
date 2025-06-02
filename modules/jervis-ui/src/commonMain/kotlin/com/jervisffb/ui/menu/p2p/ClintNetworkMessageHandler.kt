@@ -3,7 +3,6 @@ package com.jervisffb.ui.menu.p2p
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.Coach
-import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.Team
@@ -19,10 +18,12 @@ import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.CoachLeftMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage
 import com.jervisffb.net.messages.GameActionMessage
+import com.jervisffb.net.messages.GameActionSyncMessage
 import com.jervisffb.net.messages.GameNotFoundMessage
 import com.jervisffb.net.messages.GameReadyMessage
 import com.jervisffb.net.messages.GameStartedMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
+import com.jervisffb.net.messages.GameTimerSyncMessage
 import com.jervisffb.net.messages.HostedTeamInfo
 import com.jervisffb.net.messages.JoinGameAsCoachMessage
 import com.jervisffb.net.messages.P2PClientState
@@ -33,7 +34,6 @@ import com.jervisffb.net.messages.ServerMessage
 import com.jervisffb.net.messages.SpectatorJoinedMessage
 import com.jervisffb.net.messages.SpectatorLeftMessage
 import com.jervisffb.net.messages.SpectatorState
-import com.jervisffb.net.messages.SyncGameActionMessage
 import com.jervisffb.net.messages.TeamData
 import com.jervisffb.net.messages.TeamJoinedMessage
 import com.jervisffb.net.messages.TeamSelectedMessage
@@ -77,7 +77,8 @@ interface ClientNetworkMessageHandler {
     fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>)
     fun onGameReady(id: GameId)
     fun onServerError(error: ServerError)
-    fun onGameAction(producer: CoachId, serverIndex: GameActionId, action: GameAction)
+    fun onGameAction(serverAction: GameActionSyncMessage)
+    fun onTimerSync(serverAction: GameTimerSyncMessage)
 }
 
 abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler {
@@ -97,7 +98,8 @@ abstract class AbstractClintNetworkMessageHandler : ClientNetworkMessageHandler 
     override fun onConfirmGameStart(id: GameId, rules: Rules, initialActions: List<GameAction>, teams: List<TeamData>) { }
     override fun onGameReady(id: GameId) { }
     override fun onServerError(error: ServerError) { }
-    override fun onGameAction(producer: CoachId, serverIndex: GameActionId, action: GameAction) { }
+    override fun onGameAction(serverAction: GameActionSyncMessage) { }
+    override fun onTimerSync(serverAction: GameTimerSyncMessage) { }
 }
 
 /**
@@ -195,7 +197,8 @@ class ClientNetworkManager(initialNetworkHandler: ClientNetworkMessageHandler) {
                     rules = message.rules
                     messageHandler.onGameSync(message)
                 }
-                is SyncGameActionMessage -> messageHandler.onGameAction(message.producer, message.serverIndex, message.action)
+                is GameActionSyncMessage -> messageHandler.onGameAction(message)
+                is GameTimerSyncMessage -> messageHandler.onTimerSync(message)
                 null -> TODO()
             }
         }

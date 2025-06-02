@@ -37,7 +37,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
             Item("Save Game", onClick = {
                 saveFile(
                     dialogTitle = "Save File",
-                    fileName = JervisSerialization.getGameFileName(vm.uiState.gameController),
+                    fileName = JervisSerialization.getGameFileName(vm.uiController.engineController),
                     fileContent = vm.serializeGameState(),
                 )
             })
@@ -84,7 +84,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
             )
         }
 
-        // For now, we just ignore the command if it isn't legal, e.g. if it is the other team that is
+        // For now, we just ignore the command if it isn't legal, e.g., if it is the other team that is
         // setting up. Should we instead try to disable these?
         var setups by remember { mutableStateOf<List<JervisSetupFile>>(emptyList()) }
         LaunchedEffect(setupType) {
@@ -93,7 +93,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
         if (setups.isNotEmpty()) {
             Menu("Setups", mnemonic = 'S') {
                 setups.forEach { setup ->
-                    Item(setup.name, onClick = { vm.loadSetup(setup) })
+                    Item(setup.name, onClick = { vm.loadSetupOrFailSilently(setup) })
                 }
             }
         }
