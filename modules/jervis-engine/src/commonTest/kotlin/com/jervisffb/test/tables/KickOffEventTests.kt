@@ -223,6 +223,8 @@ class KickOffEventTests: JervisGameTest() {
         assertEquals(BallState.CARRIED, state.getBall().state)
     }
 
+    // While probably not intended, the current wording of the rules allows a player
+    // moving under the ball on the kicking team side (if it deviated there)
     @Test
     fun highKick_acrossLoS() {
         controller.rollForward(
@@ -243,6 +245,9 @@ class KickOffEventTests: JervisGameTest() {
         assertFalse(player.hasBall())
         assertEquals(FieldCoordinate(11, 7), player.location)
         assertEquals(BallState.DEVIATING, state.getBall().state)
+        // Award player moved to the kicking side the ball
+        controller.rollForward(PlayerSelected("A10".playerId))
+        assertTrue(awayTeam["A10".playerId].hasBall())
     }
 
     @Test

@@ -76,6 +76,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Time-out
   - [x] Solid Defense
   - [x] High Kick
+    - [x] Allow moving player to kicking side
   - [x] Cheering Fans
   - [x] Brilliant Coaching
   - [x] Changing Weather

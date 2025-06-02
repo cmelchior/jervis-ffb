@@ -34,6 +34,22 @@ Since all of these aspects are undefined, the implementation always lets the
 last ball bounce. This solves all the questions above as well as increases the
 "awesome"-factor if it actually succeeds since it prevents the turn-over.
 
+### Page 41 - High Kick and Touchbacks
+Following the strict ordering of the rules, the Kick-Off Event is resolved
+before "What Goes Up, Must Come Down". This means that the touchback rule cannot
+yet be applied before High Kick is resolved. 
+
+No-where is it stated that the High Kick player cannot enter the opponent's 
+field (unlike for the "On the Ball" skill). So if the ball deviates back to the 
+kicking teams side, Jervis will allow a player on the receiving team to move 
+under the ball on the kicking teams side. 
+
+When the ball then lands during "What goes up, must come down", a touchback is 
+immediately triggered before the player moved can roll for catch. However, 
+because a touchback was triggered, the player can just be awarded the ball with 
+no rolls needed since the Touchback rule does not specify that the player has to
+be on the receiving side.
+
 ### Page 74 - When to choose skill usage
 The rules make it optional to use a skill before or after a roll. In Jervis, if 
 possible, this choice always comes after the roll. There is no valid reason for 
