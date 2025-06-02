@@ -14,7 +14,7 @@ import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.state.ManualActionProvider
-import com.jervisffb.ui.game.state.QueuedActionsResult
+import com.jervisffb.ui.game.state.QueuedActions
 import com.jervisffb.ui.game.view.ContextMenuOption
 
 class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
@@ -48,7 +48,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                 activeSquare.contextMenuOptions.add(
                     ContextMenuOption(
                         "Jump",
-                        { actionProvider.userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
+                        { actionProvider.userActionSelected(snapshot.nextActionId, MoveTypeSelected(MoveType.JUMP)) },
                     )
                 )
             }
@@ -57,7 +57,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                 activeSquare.contextMenuOptions.add(
                     ContextMenuOption(
                         "Leap",
-                        { actionProvider.userActionSelected(MoveTypeSelected(MoveType.LEAP)) },
+                        { actionProvider.userActionSelected(snapshot.nextActionId, MoveTypeSelected(MoveType.LEAP)) },
                     )
                 )
             }
@@ -83,6 +83,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                         snapshot.fieldSquares[loc]?.apply {
                             onSelected = {
                                 actionProvider.userActionSelected(
+                                    snapshot.nextActionId,
                                     CompositeGameAction(
                                         listOf(
                                             MoveTypeSelected(MoveType.STANDARD),
@@ -101,7 +102,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                 activeSquare.contextMenuOptions.add(
                     ContextMenuOption(
                         "Stand-Up",
-                        { actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP)) },
+                        { actionProvider.userActionSelected(snapshot.nextActionId, MoveTypeSelected(MoveType.STAND_UP)) },
                     )
                 )
                 addStandUpAndMoveOptions(actionProvider, state, player, activeLocation, snapshot)
@@ -163,12 +164,12 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                                     MoveTypeSelected(MoveType.STANDARD),
                                     FieldSquareSelected(loc)
                                 )
-                                QueuedActionsResult(action)
+                                QueuedActions(action)
                             } else {
                                 null
                             }
                         }
-                        actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP))
+                        actionProvider.userActionSelected(snapshot.nextActionId, MoveTypeSelected(MoveType.STAND_UP))
                     }
                     requiresRoll = true
                 } ?: error("Could not find square: $loc")

@@ -29,6 +29,12 @@ class CalculatedAction(private val action: (Game, Rules) -> GameAction) : GameAc
     }
 }
 
+/**
+ * Call "Out of Time". This is mostly relevant for the timer implementation, but it should also be passed
+ * to the rule engine, which will use it to restrict which actions are possible from that point on.
+ */
+data object OutOfTime: GameAction
+
 // Group multiple actions together as one.
 // Note, the rules engine will treat them as individual actions. This means that when you Undo events
 // these actions can be undone individually.

@@ -1,9 +1,9 @@
 package com.jervisffb.engine
 
-import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.fsm.ActionNode
@@ -16,7 +16,8 @@ import com.jervisffb.engine.model.Team
  * @see [GameEngineController.getAvailableActions]
  */
 data class ActionRequest(
-    val team: Team?,
+    val team: Team,
+    val nextActionId: GameActionId,
     val actions: List<GameActionDescriptor>
 ): List<GameActionDescriptor> by actions {
     val actionsCount = actions.sumOf { it.size } // TODO Should also count all sub actions
@@ -32,7 +33,7 @@ data class ActionRequest(
         }
     }
 
-    fun contains(action: EndAction): Boolean {
+    fun contains(action: GameAction): Boolean {
         return actions.contains(EndActionWhenReady)
     }
 

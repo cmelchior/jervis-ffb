@@ -118,7 +118,7 @@ object TeamTurn : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<ActivatePlayerContext>(),
-                if (state.turnOver != null) {
+                if (state.isTurnOver()) {
                     GotoNode(ResolveEndOfTurn)
                 } else {
                     GotoNode(SelectPlayerOrEndTurn)
@@ -153,11 +153,10 @@ object TeamTurn : Procedure() {
             // after Throw a Rock and when temporary skills or abilities are moved.
             //
             // For now we choose the (somewhat arbitrary) order:
-            //
             // - Prayers Of Nuffle (Throw a Rock)
             // - Special Play Cards
             // - Temporary Skills/Characteristics are removed
-            // - Stunned Players are now prone
+            // - Players stunned at the beginning of the turn a moved to prone
             val resetCommands = getResetTemporaryModifiersCommands(state, rules, Duration.END_OF_TURN)
             val nextNodeCommand = if (state.activeTeamOrThrow().otherTeam().activePrayersToNuffle.contains(PrayerToNuffle.THROW_A_ROCK)) {
                 GotoNode(CheckForThrowARock)

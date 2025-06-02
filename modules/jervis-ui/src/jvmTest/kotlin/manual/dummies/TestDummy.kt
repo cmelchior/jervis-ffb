@@ -4,8 +4,8 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.test.createDefaultGameState
-import com.jervisffb.ui.game.LocalActionProvider
 import com.jervisffb.ui.game.UiGameController
+import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.MenuViewModel

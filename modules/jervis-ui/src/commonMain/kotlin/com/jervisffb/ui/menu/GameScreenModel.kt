@@ -124,7 +124,7 @@ class GameScreenModel(
             menuViewModel,
             actions
         )
-        menuViewModel.uiState = uiState
+        menuViewModel.uiController = uiState
         uiState.startGameEventLoop()
         onEngineInitialized()
         _loadingMessages.value = "Starting game"

@@ -17,3 +17,5 @@ This file is just a temporary way to capture any bugs seen that I didn't have ti
   it needs to roll and then immediately re-apply the dice roll.
 - If a ball bounce over the center during kick-off and caught by a player there, it should still be returned to the
   the other team (I think, double check the rules)
+- During kickoff, if the ball is not caught and then bounces across the the LoS, no touch-back is awarded. This happened
+  on the LoS, where opponent player also failed to catch it.

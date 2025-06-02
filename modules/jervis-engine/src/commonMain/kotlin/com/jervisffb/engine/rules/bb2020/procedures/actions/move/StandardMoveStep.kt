@@ -97,7 +97,7 @@ object StandardMoveStep: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = MovePlayerIntoSquare
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return if (state.turnOver != null) {
+            return if (state.isTurnOver()) {
                 ExitProcedure() // Something went wrong when moving the player
             } else {
                 GotoNode(CheckIfRushingIsNeeded)

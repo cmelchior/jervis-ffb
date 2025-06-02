@@ -90,4 +90,19 @@ class GameEngineControllerTests {
         controller.handleAction(Revert)
         assertEquals(0, controller.currentActionIndex().value)
     }
+
+    @Test
+    fun timeOutActionOwnerIsOtherTeam() {
+
+    }
+
+    @Test
+    fun timeOutDuringTeamTurnSetsTurnOver() {
+
+    }
+
+    @Test
+    fun timeOutDuringOutOfTurnDoesNothing() {
+
+    }
 }

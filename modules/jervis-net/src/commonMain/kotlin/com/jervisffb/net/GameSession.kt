@@ -10,6 +10,7 @@ import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.model.SpectatorId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.serialize.SerializedTeam
+import com.jervisffb.engine.timer.TimerTracker
 import com.jervisffb.net.handlers.AcceptGameHandler
 import com.jervisffb.net.handlers.ClientMessageHandler
 import com.jervisffb.net.handlers.CloseHostedServerHandler
@@ -56,8 +57,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.random.Random
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -108,12 +107,13 @@ class GameSession(
         println("GameSession threw an exception: $exception")
     }
 
-    // Is single-threaded so control exactly how messages go in and out.
-    // This is required so we do not accidentially start handling incoming
-    // messages out of order.
-    // Hmm, that is not true. Input is being synchronized elsewhere...test it
+    // Scope for receiving and sending all network events
     val networkScope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}[Network]") + multiThreadDispatcher("GameNetworkThread-${gameId.value}") + handler)
-    val gameEventScope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}[Network]") + singleThreadDispatcher("GameActionThread-${gameId.value}") + handler)
+    // Scope for handling game actions and running the game loop
+    val gameEventScope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}[]") + singleThreadDispatcher("GameActionThread-${gameId.value}") + handler)
+    // Scope for handling background tasks that are running parallel with the game loop
+    // Right now, this is only timer tasks.
+    val backgroundTasksScope = CoroutineScope(Job() + CoroutineName("GameSession-${gameId.value}[Network]") + singleThreadDispatcher("GameActionThread-${gameId.value}") + handler)
 
     // All sessions associated with this game, post messages to this queue
     // This ensures that we only update the game state from a single thread
@@ -121,7 +121,7 @@ class GameSession(
     val out = ServerCommunication(this, networkScope, parallelizeSend = !testMode)
 
     var state: GameState = GameState.PLANNED
-    private var plannedAt: Instant = Clock.System.now()
+    val timer = TimerTracker(gameSettings.timerSettings, random)
 
     val coaches: MutableList<JoinedP2PCoach> = mutableListOf()
     val spectators: MutableList<JoinedSpectator> = mutableListOf()
@@ -252,7 +252,7 @@ class GameSession(
     private fun startClientHandler(client: JoinedClient) {
         // Launch a coroutine that consumes all messages from the client and
         // put them on the shared message queue for this game session.
-        gameEventScope.launch {
+        networkScope.launch {
             for (message in client.connection.incoming) {
                 try {
                     when (message) {

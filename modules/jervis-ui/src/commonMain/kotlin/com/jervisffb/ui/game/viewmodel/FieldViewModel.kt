@@ -13,7 +13,7 @@ import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.model.UiFieldSquare
-import com.jervisffb.ui.game.state.QueuedActionsResult
+import com.jervisffb.ui.game.state.QueuedActions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -106,16 +106,16 @@ class FieldViewModel(
                         val actionProvider = (uiState.actionProvider)
 
 
-                        fun getQueuedActionsForPath(): QueuedActionsResult {
+                        fun getQueuedActionsForPath(): QueuedActions {
                             val selectedSquares = path.map {
                                 CompositeGameAction(
                                     listOf(MoveTypeSelected(MoveType.STANDARD), FieldSquareSelected(it))
                                 )
                             }
                             return if (selectedSquares.size == 1) {
-                                QueuedActionsResult(selectedSquares.first())
+                                QueuedActions(selectedSquares.first())
                             } else {
-                                QueuedActionsResult(selectedSquares, true)
+                                QueuedActions(selectedSquares, true)
                             }
                         }
 
@@ -132,11 +132,11 @@ class FieldViewModel(
                                 }
                             }
                             // Trigger Stand-up
-                            actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP))
+                            actionProvider.userActionSelected(uiSnapshot.nextActionId, MoveTypeSelected(MoveType.STAND_UP))
                         } else {
                             // Nothing should prevent the player from moving straight away, so
                             // just queue up all pathfinder data directly.
-                            actionProvider.userMultipleActionsSelected(getQueuedActionsForPath().actions)
+                            actionProvider.userMultipleActionsSelected(uiSnapshot.nextActionId, getQueuedActionsForPath().actions)
                         }
                     }
 

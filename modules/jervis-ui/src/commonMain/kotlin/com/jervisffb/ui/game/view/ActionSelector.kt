@@ -33,6 +33,7 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.InducementSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
@@ -44,6 +45,7 @@ import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SkillSelected
+import com.jervisffb.engine.actions.OutOfTime
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 
@@ -52,7 +54,9 @@ fun ActionSelector(
     vm: ActionSelectorViewModel,
     modifier: Modifier,
 ) {
-    val inputs: List<GameAction> by vm.availableActions.collectAsState(emptyList())
+    val inputs: Pair<GameActionId, List<GameAction>> by vm.availableActions.collectAsState(
+        Pair(GameActionId(-1), emptyList())
+    )
     Column(modifier = modifier.padding(8.dp)) {
         Column(
             modifier =
@@ -61,11 +65,12 @@ fun ActionSelector(
                     .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            inputs.forEach { action ->
+            val (actionId, actions) = inputs
+            actions.forEach { action ->
                 Button(
                     modifier = Modifier.padding(0.dp),
                     contentPadding = PaddingValues(2.dp),
-                    onClick = { vm.actionSelected(action) },
+                    onClick = { vm.actionSelected(actionId, action) },
                 ) {
                     val text =
                         when (action) {
@@ -98,6 +103,7 @@ fun ActionSelector(
                             is CalculatedAction -> TODO("Should only be used in tests")
                             is DicePoolResultsSelected -> "Dice pool: $action"
                             is DirectionSelected -> "Direction: ${action.direction}"
+                            OutOfTime -> "Timeout"
                         }
                     Text(text, fontSize = 10.sp)
                 }

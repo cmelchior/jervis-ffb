@@ -13,14 +13,14 @@ class EndSetupDecorator() : FieldActionDecorator<EndSetupWhenReady> {
             snapshot.homeTeamActions.add(
                 ButtonData(
                     "End Setup",
-                    onClick = { actionProvider.userActionSelected(EndSetup) }
+                    onClick = { actionProvider.userActionSelected(snapshot.nextActionId, EndSetup) }
                 )
             )
         } else if (snapshot.actionsRequest.team?.isAwayTeam() == true) {
             snapshot.awayTeamActions.add(
                 ButtonData(
                     "End Setup",
-                    onClick = { actionProvider.userActionSelected(EndSetup) }
+                    onClick = { actionProvider.userActionSelected(snapshot.nextActionId, EndSetup) }
                 )
             )
         }

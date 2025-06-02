@@ -39,7 +39,7 @@ import com.jervisffb.ui.createDefaultAwayTeam
 import com.jervisffb.ui.createDefaultBB7AwayTeam
 import com.jervisffb.ui.createDefaultBB7HomeTeam
 import com.jervisffb.ui.createDefaultHomeTeam
-import com.jervisffb.ui.game.LocalActionProvider
+import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.state.ReplayActionProvider
@@ -94,7 +94,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
 
     private fun createDevHotseatScreenModel(menuViewModel: MenuViewModel, randomActions: Boolean = false): GameScreenModel {
         val rules = StandardBB2020Rules().toBuilder().run {
-            timers.timersEnabled = false
+            timers.timersEnabled = true
             diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
             undoActionBehavior = UndoActionBehavior.ALLOWED
             build()

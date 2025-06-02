@@ -113,7 +113,7 @@ fun ExitDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> Unit
     val navigator = LocalNavigator.currentOrThrow
     val isHotseat = viewModel.uiState.uiMode == TeamActionMode.ALL_TEAMS
     val isHost = viewModel.uiState.uiMode == TeamActionMode.HOME_TEAM
-    val isDone = viewModel.uiState.gameController.stack.isEmpty()
+    val isDone = viewModel.uiState.engineController.stack.isEmpty()
     val dialogText = when {
         isHotseat && isDone -> "Game is over. It is safe to exit the game."
         isHotseat && !isDone -> "Game is not over. If you exit the game before saving it, all progress is lost. Are you sure you want to exit?"
@@ -156,8 +156,8 @@ fun ExitDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> Unit
                 onClick = {
                     saveFile(
                         "Save Game",
-                        JervisSerialization.getGameFileName(viewModel.uiState.gameController),
-                        JervisSerialization.serializeGameState(viewModel.uiState.gameController),
+                        JervisSerialization.getGameFileName(viewModel.uiState.engineController),
+                        JervisSerialization.serializeGameState(viewModel.uiState.engineController),
                     )
                 },
                 buttonColor = JervisTheme.rulebookBlue,

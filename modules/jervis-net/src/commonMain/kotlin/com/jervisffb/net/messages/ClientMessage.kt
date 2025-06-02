@@ -55,7 +55,7 @@ data class InternalJoinMessage(
 
 data class InternalGameActionMessage(
     val clientIndex: GameActionId,
-    val action: GameAction? = null,
+    val action: GameAction,
 ): InternalClientMessage
 
 // Last message before the server will shut down.

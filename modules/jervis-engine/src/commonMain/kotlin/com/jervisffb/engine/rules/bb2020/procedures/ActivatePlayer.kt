@@ -67,6 +67,8 @@ data class ActivatePlayerContext(
 ): ProcedureContext
 
 /**
+ * TODO The order here has to be revisited
+ *
  * Procedure for activating a player and declaring their action as described on page 42 in the rulebook.
  *
  * The exact sequence for activating a player is not really clear in the rules. This is, e.g., a problem with regard

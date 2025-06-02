@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionId
+import com.jervisffb.engine.actions.OutOfTime
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.commands.Command
@@ -23,6 +24,7 @@ import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.reports.ReportAvailableActions
 import com.jervisffb.engine.reports.ReportHandleAction
+import com.jervisffb.engine.reports.ReportOutOfTime
 import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
@@ -39,11 +41,13 @@ data class AddEntry(val log: LogEntry) : ListEvent
 data class RemoveEntry(val log: LogEntry) : ListEvent
 
 /**
- * Main entry point for running a single game according to some predefined rules.
+ * The main entry point for running a single game according to some predefined rules.
  **
  * This class should not be used until both teams have been identified and a ruleset
  * has been agreed upon. This should be the responsibility of a specific
  * [GameRunner]
+ *
+ * Note: This class is _not_ threadsafe.
  *
  * @param initialActions Actions to run as soon as the controller is started using [startManualMode]
  * or [startTestMode]
@@ -81,7 +85,7 @@ class GameEngineController(
     // is removed from history, reversed and put in `lastActionIfUndo`
     private val _history: MutableList<GameDelta> = mutableListOf()
     val history: List<GameDelta> = _history
-    private var lastGameActionId: GameActionId = GameActionId(0)
+    private var lastGameActionId: GameActionId = GameActionId(value = 0, revertsSeen = 0)
     private var deltaBuilder = DeltaBuilder(lastGameActionId + 1)
     val state: Game = state
     val stack: MutableProcedureStack = state.stack // Shortcut for accessing the stack
@@ -92,6 +96,7 @@ class GameEngineController(
     private val isStopped = false
 
     // State for tracking Undo actions.
+    var revertsSeen: Int = 0
     var lastActionIfUndo: GameDelta? = null
     fun lastActionWasUndo(): Boolean {
         return lastActionIfUndo != null
@@ -102,13 +107,13 @@ class GameEngineController(
      * current [Node] as well as who is responsible for providing it.
      */
     fun getAvailableActions(): ActionRequest {
-        if (stack.isEmpty()) return ActionRequest(null, emptyList())
+        if (stack.isEmpty()) return ActionRequest(state.homeTeam, nextActionIndex(), emptyList())
         if (stack.currentNode() !is ActionNode) {
             throw IllegalStateException("State machine is not waiting at an ActionNode: ${stack.currentNode()}")
         }
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val actions = currentNode.getAvailableActions(state, rules)
-        return ActionRequest(currentNode.actionOwner(state, rules), actions)
+        return ActionRequest(currentNode.actionOwner(state, rules) ?: state.homeTeam, nextActionIndex(), actions)
     }
 
     /**
@@ -154,7 +159,7 @@ class GameEngineController(
      * of the action that was undone.
      */
     fun getDelta(): GameDelta {
-        return lastActionIfUndo ?: _history.lastOrNull() ?: GameDelta(id = GameActionId(0), steps = emptyList())
+        return lastActionIfUndo ?: _history.lastOrNull() ?: GameDelta(id = GameActionId(0, 0), steps = emptyList())
     }
 
     /**
@@ -255,11 +260,12 @@ class GameEngineController(
             step.commands.forEach { command -> command.undo(state) }
         }
 
-        // UNDO actions are "normal" commands that is synchronized across distributed clients, so will
+        // UNDO actions are "normal" commands. That is, synchronized across distributed clients, so will
         // also increment the action counter.
         // REVERT actions only happen on a single client, so instead decrement the counter, "hiding" the change.
         lastGameActionId = if (revertActionId) {
-            (lastGameActionId - 1)
+            revertsSeen += 1
+            GameActionId(lastGameActionId.value, revertsSeen)
         } else {
             (lastGameActionId + 1)
         }
@@ -269,7 +275,13 @@ class GameEngineController(
         lastActionIfUndo = null
         val actionOwner = currentNode().let { node ->
             if (node is ActionNode) {
-                node.actionOwner(state, rules)?.id
+                if (userAction is OutOfTime) {
+                    // We assume it is always the other team calling "Out of Time",
+                    // even though it could also be done automatically.
+                    node.actionOwner(state, rules)?.otherTeam()?.id
+                } else {
+                    node.actionOwner(state, rules)?.id
+                }
             } else {
                 null
             }
@@ -291,14 +303,38 @@ class GameEngineController(
     private fun processSingleAction(deltaBuilder: DeltaBuilder, userAction: GameAction) {
         val currentProcedure = stack.peepOrNull()!!
         deltaBuilder.beginAction(
-            userAction,
-            currentProcedure.procedure,
-            currentProcedure.currentNode())
+            action = userAction,
+            procedure = currentProcedure.procedure,
+            node = currentProcedure.currentNode()
+        )
         logInternalEvent(ReportHandleAction(userAction))
-        val currentNode: ActionNode = stack.currentNode() as ActionNode
-        val command = currentNode.applyAction(userAction, state, rules)
-        executeCommand(command)
-        rollForwardToNextActionNode()
+        val currentNode = stack.currentNode() as ActionNode
+        if (userAction is OutOfTime) {
+            // Out-of-time is handled "out-of-band", i.e., it can be called on any current node.
+            // The event doesn't impact the rule state since it isn't a well-defined concept
+            // there. Instead, it is a hint to upper layers to handle things differently, e.g.,
+            // the server might decide to handle events on behalf of the user.
+            // We still add a Report to the report list so the user is aware that something has
+            // changed.
+            // Developer's Commentary: In the first version of this, we also set TurnOver.OUT_OF_TIME
+            // but this state is only relevant for team turns and outOfTurn timeouts would not fit
+            // here either. It seemed like there was enough edge cases that this should be handled
+            // by upper layers. At least until other use cases show up.
+            if (state.rules.timers.outOfTimeBehaviour != OutOfTimeBehaviour.NONE) {
+                val command = compositeCommandOf(
+                    ReportOutOfTime(
+                        currentNode.actionOwner(state, rules)!!,
+                        currentNode.actionOwner(state, rules)!!.otherTeam(),
+                        state.rules.timers.outOfTimeBehaviour
+                    )
+                )
+                executeCommand(command)
+            }
+        } else {
+            val command = currentNode.applyAction(userAction, state, rules)
+            executeCommand(command)
+            rollForwardToNextActionNode()
+        }
         if (logAvailableActions) {
             logInternalEvent(ReportAvailableActions(getAvailableActions()))
         }

@@ -391,7 +391,7 @@ object MultipleBlockAction: Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
-            val isTurnOver = state.turnOver != null
+            val isTurnOver = state.isTurnOver()
             val nextDefender = when (context.activeDefender) {
                 0 -> 1
                 1 -> 0

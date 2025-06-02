@@ -35,6 +35,20 @@ sealed class JoinedP2PCoach: JoinedClient() {
     abstract var team: Team?
     var hasAcceptedGame: Boolean = false
     var hasStartedGame: Boolean = false
+    private val errorLimit = 50 // How many invalid game actions in turn do we need to see before we think the connection is gone rogue
+    private var errorsSeen = 0
+
+    fun trackErrorSent() {
+        errorsSeen++
+    }
+
+    fun resetErrorsSeen() {
+        errorsSeen = 0
+    }
+
+    fun errorLimitReached(): Boolean {
+        return errorsSeen > errorLimit
+    }
 }
 
 // Joined a P2P game as a Client

@@ -62,6 +62,7 @@ import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.actions.SelectSkill
 import com.jervisffb.engine.actions.SkillSelected
+import com.jervisffb.engine.actions.OutOfTime
 import com.jervisffb.engine.actions.TossCoin
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.Game
@@ -162,6 +163,7 @@ fun GameAction.isRandomAction(): Boolean {
         is SkillSelected -> false
         Undo -> false
         Revert -> false
+        OutOfTime -> false
     }
 }
 

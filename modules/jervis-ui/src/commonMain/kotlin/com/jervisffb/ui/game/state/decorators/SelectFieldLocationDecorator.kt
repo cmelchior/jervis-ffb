@@ -10,7 +10,7 @@ class SelectFieldLocationDecorator: FieldActionDecorator<SelectFieldLocation> {
     override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectFieldLocation) {
         descriptor.squares.forEach { squareData ->
             val selectedAction = {
-                actionProvider.userActionSelected(FieldSquareSelected(squareData.coordinate))
+                actionProvider.userActionSelected(snapshot.nextActionId, FieldSquareSelected(squareData.coordinate))
             }
             snapshot.fieldSquares[squareData.coordinate]?.apply {
                 onSelected = selectedAction

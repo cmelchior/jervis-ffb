@@ -48,6 +48,8 @@ import com.jervisffb.resources.ORC_BLITZER
 import com.jervisffb.resources.ORC_LINEMEN
 import com.jervisffb.resources.ORC_TEAM
 import com.jervisffb.resources.ORC_THROWER
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.skia.FilterBlurMode
 import org.jetbrains.skia.Image
@@ -255,4 +257,15 @@ fun createDefaultBB7AwayTeam(rules: Rules): Team {
 fun formatCurrency(value: Int): String {
     val prettyValue = (value/1000).toString().reversed().chunked(3).joinToString(".").reversed()
     return "${prettyValue}K"
+}
+
+fun <T> Flow<T>.filterWithPrevious(predicate: (prev: T, current: T) -> Boolean): Flow<T> = flow {
+    var previous: T? = null
+    collect { current ->
+        val prev = previous
+        previous = current
+        if (prev != null && predicate(prev, current)) {
+            emit(current)
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.jervisffb.ui.game.viewmodel
 
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.ui.game.UiGameController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -18,9 +19,9 @@ import kotlinx.coroutines.flow.map
 class ActionSelectorViewModel(
     private val uiState: UiGameController,
 ) {
-    val availableActions: Flow<List<GameAction>> = uiState.uiStateFlow.map { it.unknownActions }
+    val availableActions: Flow<Pair<GameActionId, List<GameAction>>> = uiState.uiStateFlow.map { it.nextActionId to it.unknownActions }
 
-    fun actionSelected(action: GameAction) {
-        uiState.userSelectedAction(action)
+    fun actionSelected(actionId: GameActionId, action: GameAction) {
+        uiState.userSelectedAction(actionId, action)
     }
 }

@@ -12,7 +12,7 @@ class DeselectPlayerDecorator: FieldActionDecorator<DeselectPlayer> {
         descriptor.players.forEach { player ->
             val coordinate = player.location as FieldCoordinate
             snapshot.fieldSquares[coordinate]?.apply {
-                this.onMenuHidden = { actionProvider.userActionSelected(PlayerDeselected(player)) }
+                this.onMenuHidden = { actionProvider.userActionSelected(snapshot.nextActionId, PlayerDeselected(player)) }
             } ?: error("Could not find square: $coordinate")
         }
     }

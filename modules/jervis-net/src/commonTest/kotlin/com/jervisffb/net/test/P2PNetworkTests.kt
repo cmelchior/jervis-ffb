@@ -21,6 +21,7 @@ import com.jervisffb.net.messages.CoachJoinedMessage
 import com.jervisffb.net.messages.CoachLeftMessage
 import com.jervisffb.net.messages.ConfirmGameStartMessage
 import com.jervisffb.net.messages.GameActionMessage
+import com.jervisffb.net.messages.GameActionSyncMessage
 import com.jervisffb.net.messages.GameReadyMessage
 import com.jervisffb.net.messages.GameStateSyncMessage
 import com.jervisffb.net.messages.InvalidGameActionOwnerServerError
@@ -32,7 +33,6 @@ import com.jervisffb.net.messages.P2PClientState
 import com.jervisffb.net.messages.P2PHostState
 import com.jervisffb.net.messages.P2PTeamInfo
 import com.jervisffb.net.messages.ServerError
-import com.jervisffb.net.messages.SyncGameActionMessage
 import com.jervisffb.net.messages.TeamJoinedMessage
 import com.jervisffb.net.messages.TeamSelectedMessage
 import com.jervisffb.net.messages.UpdateClientStateMessage
@@ -434,7 +434,7 @@ class P2PNetworkTests {
                 assertEquals(GameActionId(1),  errorMessage.actionId)
             }
             homeConn.send(GameActionMessage(GameActionId(1), 1.d3))
-            checkServerMessage<SyncGameActionMessage>(awayConn) { message ->
+            checkServerMessage<GameActionSyncMessage>(awayConn) { message ->
                 assertEquals(GameActionId(1), message.serverIndex)
             }
         }
@@ -450,7 +450,7 @@ class P2PNetworkTests {
                 assertEquals(GameActionId(2),  errorMessage.actionId)
             }
             homeConn.send(GameActionMessage(GameActionId(1), 1.d3))
-            checkServerMessage<SyncGameActionMessage>(awayConn) { message ->
+            checkServerMessage<GameActionSyncMessage>(awayConn) { message ->
                 assertEquals(GameActionId(1), message.serverIndex)
             }
         }
@@ -466,7 +466,7 @@ class P2PNetworkTests {
                 assertEquals(GameActionId(1),  errorMessage.actionId)
             }
             homeConn.send(GameActionMessage(GameActionId(1), 1.d3))
-            checkServerMessage<SyncGameActionMessage>(awayConn) { message ->
+            checkServerMessage<GameActionSyncMessage>(awayConn) { message ->
                 assertEquals(GameActionId(1), message.serverIndex)
             }
         }
@@ -478,7 +478,7 @@ class P2PNetworkTests {
             // The Home team is expected to send a fan factor roll. But isn't allowed to "Revert" it
             // on the server. Only "Undo" it.
             homeConn.send(GameActionMessage(GameActionId(1), 1.d3))
-            consumeServerMessage<SyncGameActionMessage>(awayConn)
+            consumeServerMessage<GameActionSyncMessage>(awayConn)
             // Invalid action
             homeConn.send(GameActionMessage(GameActionId(2), Revert))
             checkServerMessage<InvalidGameActionTypeServerError>(homeConn) { errorMessage ->
@@ -487,9 +487,9 @@ class P2PNetworkTests {
             // Since we are waiting on the Away coach, only this coach is allowed to undo (even though it undoes
             // the home coaches roll)
             awayConn.send(GameActionMessage(GameActionId(2), Undo))
-            consumeServerMessage<SyncGameActionMessage>(homeConn)
+            consumeServerMessage<GameActionSyncMessage>(homeConn)
             homeConn.send(GameActionMessage(GameActionId(3), 1.d3))
-            checkServerMessage<SyncGameActionMessage>(awayConn) { message ->
+            checkServerMessage<GameActionSyncMessage>(awayConn) { message ->
                 assertEquals(GameActionId(3), message.serverIndex)
             }
         }

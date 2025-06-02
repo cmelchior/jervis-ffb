@@ -14,34 +14,7 @@ import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.utils.cartesianProduct
 import com.jervisffb.engine.utils.combinations
 import kotlinx.serialization.Serializable
-import kotlin.jvm.JvmInline
 import kotlin.random.Random
-
-
-/**
- * These ID's uniquely identify a [GameAction] that has been handled by the
- * [GameEngineController]. The IDs should always be increasing. This means that
- * looking at the action history should have a list of action ids ranging from 1 until
- * count(actions).
- *
- * This also makes it possible to reason about multiple events arriving
- * at the GameController. If it sees a GameAction with an ID that has already
- * been processed, the next action with the same ID should be ignored (or throw
- * an error).
- */
-@Serializable
-@JvmInline
-value class GameActionId(val value: Int) {
-    operator fun plus(increment: Int): GameActionId {
-        return GameActionId(value + increment)
-    }
-    operator fun minus(increment: Int): GameActionId {
-        return GameActionId(value - increment)
-    }
-    operator fun compareTo(other: GameActionId): Int {
-        return value.compareTo(other.value)
-    }
-}
 
 /**
  * Interface describing all legal [GameAction] events of a certain type that an

@@ -10,6 +10,7 @@ import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.GameId
 import com.jervisffb.net.messages.P2PClientState.JOIN_SERVER
 import com.jervisffb.net.messages.P2PHostState.JOIN_SERVER
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 /**
@@ -128,8 +129,6 @@ data class GameStateSyncMessage(
     // Action history,
 ): ServerMessage
 
-
-
 @Serializable
 data class UpdateClientStateMessage(val state: P2PClientState, val reason: String? = null): ServerMessage
 
@@ -159,7 +158,27 @@ data class GameNotFoundMessage(val gameId: String): ServerMessage
  * @param action the action to send
  */
 @Serializable
-data class SyncGameActionMessage(val producer: CoachId, val serverIndex: GameActionId, val action: GameAction): ServerMessage
+data class GameActionSyncMessage(
+    val producer: CoachId,
+    val serverIndex: GameActionId,
+    val action: GameAction,
+): ServerMessage
+
+
+/**
+ * Sync the game timer with clients.
+ *
+ * It is a bit unclear exactly what we want to sync, so for now, we just sync
+ * the action timer.
+ */
+@Serializable
+data class GameTimerSyncMessage(
+    val producer: CoachId,
+    val serverIndex: GameActionId,
+    // At which point, the server needs the next action. If not received by then,
+    // the server will select one automatically.
+    val expectedBy: Instant?
+): ServerMessage
 
 @Serializable
 data class TeamData(

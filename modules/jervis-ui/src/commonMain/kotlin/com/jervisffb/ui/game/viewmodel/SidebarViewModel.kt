@@ -1,5 +1,8 @@
 package com.jervisffb.ui.game.viewmodel
 
+import com.jervisffb.engine.OutOfTimeBehaviour
+import com.jervisffb.engine.actions.GameActionId
+import com.jervisffb.engine.actions.OutOfTime
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -7,7 +10,9 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isOnAwayTeam
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
+import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.utils.safeTryEmit
+import com.jervisffb.ui.filterWithPrevious
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.model.UiPlayer
@@ -24,6 +29,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.datetime.Clock
+import kotlin.time.Duration
 
 data class ButtonData(
     val title: String,
@@ -34,6 +41,27 @@ enum class SidebarView {
     RESERVES,
     INJURIES,
 }
+
+enum class TimeExpiredBehavior {
+    CONTINUE_COUNTING,
+    STOP_AT_ZERO,
+    SHOW_TIMEOUT_MESSAGE,
+    HIDE_COUNTER
+}
+
+// Interface describing the states the "Active Player" indicator can be in
+// below each dugout
+sealed interface CreateActionIndicator {
+    val actionIndex: GameActionId
+}
+// Show nothing
+data class NoIndicator(override val actionIndex: GameActionId): CreateActionIndicator
+// Show coach as active with a timer countdown
+data class ShowTimer(override val actionIndex: GameActionId, val timeLeft: Duration, val timeExpiredBehavior: TimeExpiredBehavior): CreateActionIndicator
+// Show coach as active but with no timer information
+data class ShowActive(override val actionIndex: GameActionId): CreateActionIndicator
+// Show timeout button after timer has expired
+data class ShowTimeOutButton(override val actionIndex: GameActionId, val timeLeft: Duration): CreateActionIndicator
 
 class SidebarViewModel(
     private val menuViewModel: MenuViewModel,
@@ -65,15 +93,21 @@ class SidebarViewModel(
         // Also, consider moving this logic into decorators somehow.
         val setupKickingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupKickingTeam) && uiSnapshot.game.kickingTeam == team
         val setupReceivingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupReceivingTeam) && uiSnapshot.game.receivingTeam == team
+        val isSetupAvailable = uiSnapshot.stack.currentNode() == SetupTeam.SelectPlayerOrEndSetup || uiSnapshot.stack.currentNode() == SetupTeam.PlacePlayer
         val teamControlledByClient = when (uiState.uiMode) {
             TeamActionMode.HOME_TEAM -> team.isHomeTeam()
             TeamActionMode.AWAY_TEAM -> team.isAwayTeam()
             TeamActionMode.ALL_TEAMS -> true
         }
-        if ((setupReceivingTeam || setupKickingTeam) && teamControlledByClient && team.coach.type == CoachType.HUMAN) {
+        if (
+            isSetupAvailable
+            && (setupReceivingTeam || setupKickingTeam)
+            && teamControlledByClient
+            && team.coach.type == CoachType.HUMAN
+        ) {
             val availableSetups = Setups.getSetups(uiState.rules.gameType)
             availableSetups.forEach { setup ->
-                buttons.add(ButtonData(setup.name, onClick = { menuViewModel.loadSetup(setup)}))
+                buttons.add(ButtonData(setup.name, onClick = { menuViewModel.loadSetup(uiSnapshot.nextActionId, setup)}))
             }
         }
         buttons
@@ -88,6 +122,40 @@ class SidebarViewModel(
         }
         Pair(it, list)
     }.shareIn(menuViewModel.backgroundContext, SharingStarted.Lazily)
+
+    private val _actionIndicatorFlow: Flow<CreateActionIndicator> = uiState.uiTimerData.map {
+        val activeTeam = (team.id == it.actionTeam)
+        val showDuration  = (it.deadline != null)
+        val showTimeoutButton = (it.behavior == OutOfTimeBehaviour.OPPONENT_CALL_TIMEOUT && showDuration)
+        when {
+            activeTeam && showDuration -> {
+                val durationLeft = it.deadline - Clock.System.now()
+                val behavior = when (it.behavior) {
+                    OutOfTimeBehaviour.NONE -> TimeExpiredBehavior.HIDE_COUNTER
+                    OutOfTimeBehaviour.SHOW_WARNING -> TimeExpiredBehavior.CONTINUE_COUNTING
+                    OutOfTimeBehaviour.OPPONENT_CALL_TIMEOUT -> TimeExpiredBehavior.CONTINUE_COUNTING
+                    OutOfTimeBehaviour.AUTOMATIC_TIMEOUT -> TimeExpiredBehavior.SHOW_TIMEOUT_MESSAGE
+                }
+                ShowTimer(it.actionIndex, durationLeft, behavior)
+            }
+            activeTeam && !showDuration -> {
+                ShowActive(it.actionIndex)
+            }
+            !activeTeam && showTimeoutButton -> {
+                val durationLeft = (it.deadline - Clock.System.now())
+                ShowTimeOutButton(it.actionIndex, durationLeft)
+            }
+            else -> NoIndicator(it.actionIndex)
+        }
+    }.filterWithPrevious { el1, el2 ->
+        // Only notify the UI if the timer settings change.
+        // The UI is responsible for doing the countdown and switching to
+        // other labels itself. This prevents small delays in the timer, which
+        // was pretty noticeable if you watched the timer.
+        el1::class != el2::class
+    }
+
+    val createActionIndicatorFlow: Flow<CreateActionIndicator> = _actionIndicatorFlow
 
     // Player being hovered over.
     // All of these will be shown on the away team location, except when hovering over
@@ -183,5 +251,9 @@ class SidebarViewModel(
 
     private fun mapTo(state: PlayerState, dogoutFlow: SharedFlow<Pair<UiGameSnapshot, List<Player>>>): Flow<List<UiPlayer>> {
         return mapTo(listOf(state), dogoutFlow)
+    }
+
+    fun callTimeout(id: GameActionId) {
+        uiState.userSelectedAction(id, OutOfTime)
     }
 }

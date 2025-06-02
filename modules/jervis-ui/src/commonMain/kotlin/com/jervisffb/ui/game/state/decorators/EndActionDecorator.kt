@@ -15,7 +15,7 @@ class EndActionDecorator: FieldActionDecorator<EndActionWhenReady> {
             snapshot.fieldSquares[location] = squareData.copyAddContextMenu(
                 ContextMenuOption(
                     "End action",
-                    { actionProvider.userActionSelected(EndAction) },
+                    { actionProvider.userActionSelected(snapshot.nextActionId, EndAction) },
                 )
             )
         } ?: error("No active player")
