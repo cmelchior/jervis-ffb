@@ -4,7 +4,6 @@ This file is just a temporary way to capture any bugs seen that I didn't have ti
 
 ## Known bugs
 
-- Block against Kroxigor with 1 asssist 4 < 5 only rolls 1 dice
 - Cannot select Block action from prone.
 - No pass animation is being triggered when Using the Pass action.
 - Player with ball blocking across middle line drops ball that bounce, crash
@@ -15,5 +14,3 @@ This file is just a temporary way to capture any bugs seen that I didn't have ti
 - When selecting dice rolls on the server, it should not be possible to select "All" for UNDO.
   "All" doesn't work, since if you undo a dice roll, the server will register it is at a point where
   it needs to roll and then immediately re-apply the dice roll.
-- If a ball bounce over the center during kick-off and caught by a player there, it should still be returned to the
-  the other team (I think, double check the rules)
