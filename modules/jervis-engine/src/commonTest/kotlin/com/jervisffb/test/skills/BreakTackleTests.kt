@@ -19,7 +19,7 @@ import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.test.JervisGameTest
-import com.jervisffb.test.SelectTeamReroll
+import com.jervisffb.test.utils.SelectTeamReroll
 import com.jervisffb.test.ext.rollForward
 import kotlin.test.BeforeTest
 import kotlin.test.Test

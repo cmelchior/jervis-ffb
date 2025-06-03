@@ -1,4 +1,4 @@
-package com.jervisffb.test
+package com.jervisffb.test.utils
 
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.DicePoolChoice

@@ -23,7 +23,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.test.JervisGameTest
-import com.jervisffb.test.SelectSingleDieResult
+import com.jervisffb.test.utils.SelectSingleDieResult
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import kotlin.test.BeforeTest

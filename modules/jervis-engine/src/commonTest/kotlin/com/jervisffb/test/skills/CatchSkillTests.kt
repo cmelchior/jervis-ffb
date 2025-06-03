@@ -17,7 +17,7 @@ import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.test.JervisGameTest
-import com.jervisffb.test.SelectSkillReroll
+import com.jervisffb.test.utils.SelectSkillReroll
 import com.jervisffb.test.defaultAwaySetup
 import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffHomeTeam

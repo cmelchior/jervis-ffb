@@ -23,6 +23,7 @@ import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
 import com.jervisffb.test.ext.rollForward
+import com.jervisffb.test.utils.assertTypeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
