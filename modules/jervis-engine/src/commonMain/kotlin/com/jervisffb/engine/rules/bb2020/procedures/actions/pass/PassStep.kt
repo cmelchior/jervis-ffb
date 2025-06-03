@@ -39,6 +39,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.DeviateRoll
 import com.jervisffb.engine.rules.bb2020.procedures.DeviateRollContext
 import com.jervisffb.engine.rules.bb2020.procedures.Scatter
 import com.jervisffb.engine.rules.bb2020.procedures.ScatterRollContext
+import com.jervisffb.engine.rules.bb2020.procedures.TheKickOffEvent.ResolveBallLanding.canCatch
 import com.jervisffb.engine.rules.bb2020.procedures.ThrowIn
 import com.jervisffb.engine.rules.bb2020.procedures.ThrowInContext
 import com.jervisffb.engine.rules.bb2020.tables.Range
@@ -330,9 +331,7 @@ object PassStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
             val playerInSquare = state.field[ball.location].player
-            val playerIsHoldingBall = (playerInSquare?.ball != null)
-            val hasTackleZones = (playerInSquare?.hasTackleZones == true)
-            val canCatch = (playerInSquare != null && !playerIsHoldingBall && hasTackleZones)
+            val canCatch = playerInSquare?.let { rules.canCatch(state, it) } ?: false
             return if (!canCatch) {
                 SetBallState.bouncing(ball)
             } else {

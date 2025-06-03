@@ -139,10 +139,11 @@ rules, skills are tracked separately in [skills.md](skills.md).
 - [ ] Dodging (basic, no skills)
 - [ ] Deviating Ball
 - [ ] Scatter Ball
-- [ ] Bouncing Ball
-  - [ ] Move 1 square in random direction
-  - [ ] Bounce into another player must catch
-  - [ ] Bounce into prone/missing tz/stunned player will bounce again
+- [x] Bouncing Ball
+  - [x] Move 1 square in random direction
+  - [x] Bounce into another player must catch if possible
+  - [x] Bounce into prone/missing tz/stunned player will bounce again
+  - [x] Keep bouncing until coming to rest
 - [ ] Catch (basic no skills)
   - [ ] Accurate pass
   - [ ] Deflection into Interception

@@ -17,7 +17,6 @@ import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.test.JervisGameTest
-import com.jervisffb.test.utils.SelectSkillReroll
 import com.jervisffb.test.defaultAwaySetup
 import com.jervisffb.test.defaultHomeSetup
 import com.jervisffb.test.defaultKickOffHomeTeam
@@ -25,6 +24,7 @@ import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.setupPlayer
+import com.jervisffb.test.utils.SelectSkillReroll
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

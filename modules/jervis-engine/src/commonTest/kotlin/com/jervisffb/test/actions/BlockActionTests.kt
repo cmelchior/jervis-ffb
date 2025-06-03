@@ -26,10 +26,10 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.test.JervisGameTest
-import com.jervisffb.test.utils.SelectSingleDieResult
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skills.BlockTests
 import com.jervisffb.test.skills.DodgeTests
+import com.jervisffb.test.utils.SelectSingleDieResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

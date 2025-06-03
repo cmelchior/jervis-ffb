@@ -332,7 +332,11 @@ open class Rules(
         state: Game,
         player: Player,
     ): Boolean {
-        return player.hasTackleZones && player.state == PlayerState.STANDING && player.location.isOnField(this)
+        // TODO Probably need to account for difference between Bomb and Ball here
+        return player.hasTackleZones
+            && player.state == PlayerState.STANDING
+            && player.location.isOnField(this)
+            && !player.hasBall()
     }
 
     /**
