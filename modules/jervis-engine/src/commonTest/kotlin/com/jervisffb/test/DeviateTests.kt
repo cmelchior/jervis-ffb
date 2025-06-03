@@ -43,6 +43,7 @@ class DeviateTests: JervisGameTest() {
 
         // Check that we need to roll a random D8 + D6 to deviate
         assertEquals(BallState.DEVIATING, state.currentBall().state)
+        assertEquals(1, controller.getAvailableActions().size)
         controller.rollForward(
             DiceRollResults(5.d8, 5.d6), // Deviate ball in a random direction
             2.d8 // Bounce

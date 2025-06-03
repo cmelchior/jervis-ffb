@@ -37,6 +37,9 @@ class BounceTests: JervisGameTest() {
             *moveTo(17, 7), // Move into the ball
             1.d6, // Fail pickup
             NoRerollSelected(),
+        )
+        assertEquals(1, controller.getAvailableActions().size)
+        controller.rollForward(
             1.d8 // Bounce
         )
         // Just check a single direction

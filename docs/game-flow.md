@@ -144,11 +144,11 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Player in landing square must attempt to catch it
   - [x] Will bounce if player in landing square has no tackle zones or is prone/stunned
   - [x] Will bounce if landing square is empty
-- [ ] Scatter Ball
-  - [ ] 3xD8 in random direction, doesn't fully land before last roll
-  - [ ] Player in landing square must attempt to catch it
-  - [ ] Will bounce if player in landing square has no tackle zones or is prone/stunned
-  - [ ] Will bounce if landing square is empty
+- [x] Scatter Ball
+  - [x] 3xD8 in random direction, doesn't fully land before last roll
+  - [x] Player in landing square must attempt to catch it
+  - [x] Will bounce if player in landing square has no tackle zones or is prone/stunned
+  - [x] Will bounce if landing square is empty
 - [x] Bouncing Ball
   - [x] Move 1 square in random direction
   - [x] Bounce into another player must catch if possible

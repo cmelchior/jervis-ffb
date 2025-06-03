@@ -40,7 +40,10 @@ object ChangingWeather : Procedure() {
                 state.weather == Weather.PERFECT_CONDITIONS &&
                 state.singleBall().location.isOnField(rules)
             ) {
-                GotoNode(ScatterBall)
+                compositeCommandOf(
+                    SetBallState.scattered(state.singleBall()),
+                    GotoNode(ScatterBall)
+                )
             } else {
                 ExitProcedure()
             }
@@ -53,8 +56,7 @@ object ChangingWeather : Procedure() {
                 ScatterRollContext(
                     ball = state.singleBall(),
                     from = state.singleBall().location
-                )
-            )
+                ))
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter
         override fun onExitNode(state: Game, rules: Rules): Command {
@@ -69,7 +71,6 @@ object ChangingWeather : Procedure() {
                 )
             } else {
                 compositeCommandOf(
-                    SetBallState.scattered(ball),
                     SetBallLocation(ball, context.landsAt!!),
                     RemoveContext<ScatterRollContext>(),
                     ExitProcedure()
