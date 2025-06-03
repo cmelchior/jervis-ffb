@@ -7,7 +7,7 @@ enum class BallState {
     DEVIATING, // Ball is currently traveling from parser to catcher in the air but is deviating
     IN_AIR, // Ball is high in the air. It is not possible to catch it
     ON_GROUND, // Ball is on the ground and is catchable
-    OUT_OF_BOUNDS,
+    OUT_OF_BOUNDS, // Ball left the field.
     SCATTERED, // Ball is in the air and scattering
-    THROW_IN, //
+    THROW_IN, // Ball is in the process of being thrown in after going OUT_OF_BOUNDS
 }

@@ -26,6 +26,8 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Resolve a player attempting to catch the ball.
+ * This procedure assumes that the parent already checked if the cath is valid
+ * in the first place.
  */
 object Catch : Procedure() {
     override val initialNode: Node = RollToCatch
@@ -35,7 +37,6 @@ object Catch : Procedure() {
         val catchingPlayer = state.field[ball.location].player!!
         val diceRollTarget = catchingPlayer.agility
         val modifiers = mutableListOf<DiceModifier>()
-        // TODO A player already carrying a ball will always fail the catch
         // TODO Convert deflection into Intercept
         if (ball.state == BallState.BOUNCING) modifiers.add(CatchModifier.BOUNCING)
         if (ball.state == BallState.THROW_IN) modifiers.add(CatchModifier.THROW_IN)

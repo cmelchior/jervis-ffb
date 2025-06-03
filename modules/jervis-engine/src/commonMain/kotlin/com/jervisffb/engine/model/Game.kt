@@ -212,7 +212,8 @@ class Game(
     }
 
     /**
-     * Returns a reference to the current ball.
+     * Returns a reference to the current ball in play.
+     *
      * This method only works if one ball exists, otherwise an
      * exception is thrown.
      */

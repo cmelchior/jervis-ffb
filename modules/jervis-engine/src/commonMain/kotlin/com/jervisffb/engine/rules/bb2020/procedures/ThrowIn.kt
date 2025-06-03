@@ -20,6 +20,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.fsm.checkDiceRollList
 import com.jervisffb.engine.model.Ball
+import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -110,7 +111,6 @@ object ThrowIn : Procedure() {
                 } else {
                     compositeCommandOf(
                         SetContext(context.copy(distance = dice)),
-                        SetBallState.thrownIn(ball),
                         SetBallLocation(ball, ballPosition),
                         GotoNode(ResolveLandOnField)
                     )
@@ -133,10 +133,18 @@ object ThrowIn : Procedure() {
     }
 
     object ResolveLandOnField : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            val ball = state.getContext<ThrowInContext>().ball
+            val canCatch = state.field[ball.location].player?.let { rules.canCatch(state, it) } ?: false
+            return if (!canCatch) {
+                SetBallState.bouncing(ball)
+            } else {
+                null
+            }
+        }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
             val ball = state.getContext<ThrowInContext>().ball
-            val isStandingPlayer = state.field[ball.location].player?.let { rules.isStanding(it) }
-            return if (isStandingPlayer == true) {
+            return if (ball.state != BallState.BOUNCING) {
                 Catch
             } else {
                 Bounce

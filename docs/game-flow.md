@@ -154,12 +154,12 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Bounce into another player must catch if possible
   - [x] Bounce into prone/missing tz/stunned player will bounce again
   - [x] Keep bouncing until coming to rest
-- [ ] Throw-in (basic no skills)
-  - [ ] After bounce
-  - [ ] After scatter
-  - [ ] After Deviate
-  - [ ] Repeat process
-  - [ ] Catch or Bounce on landing
+- [x] Throw-in (basic no skills)
+  - [x] From corners
+  - [x] From south/north/east/west
+  - [x] Player in landing field must catch it if possible
+  - [x] Will bounce if player is not able to catch a ball
+  - [x] Repeat process if leaving the field again
 - [ ] Catch (basic no skills)
   - [ ] Accurate pass
   - [ ] Deflection into Interception
@@ -183,7 +183,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
 - [ ] Roll over if stunned last turn
 - [ ] Moving into a square
   - [ ] Moving voluntarily
-  - [ ] Moving involentary
+  - [ ] Moving involuntary
   - [ ] Being pushed
   - [ ] Need Dodge/Rush/Jump to go there
 

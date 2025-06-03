@@ -59,10 +59,10 @@ object RangeRuler {
     fun measure(origin: FieldCoordinate, target: FieldCoordinate): Range {
         val deltaX: Int = abs(target.x - origin.x)
         val deltaY: Int = abs(target.y - origin.y)
-        if ((deltaX < ranges.size) && (deltaY < ranges[deltaX].size)) {
-            return ranges[deltaX][deltaY]
+        return if ((deltaX < ranges.size) && (deltaY < ranges[deltaX].size)) {
+            ranges[deltaX][deltaY]
         } else {
-            return Range.OUT_OF_RANGE
+            Range.OUT_OF_RANGE
         }
     }
 }

@@ -326,7 +326,7 @@ open class Rules(
     }
 
     /**
-     * Returns whether a not a player is eligible for catching a ball that landed in his field.
+     * Returns whether a player is eligible for catching a ball that landed in their field.
      */
     fun canCatch(
         state: Game,

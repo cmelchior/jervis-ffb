@@ -161,7 +161,10 @@ class Player(
     var baseMove: Int = 0
     val moveModifiers = mutableListOf<StatModifier>()
     var move: Int = 0
+    // How many moves the player has left, before rushes are needed.
+    // Rolling for a Rush will modify this number.
     var movesLeft: Int = 0
+    // How many rushes the player has left this turn
     var rushesLeft: Int = 0
     // When updating `baseStrength` and `strengthModifiers`, `strength` must also be updated.
     // This requires knowledge about the rules so cannot be done in this class.

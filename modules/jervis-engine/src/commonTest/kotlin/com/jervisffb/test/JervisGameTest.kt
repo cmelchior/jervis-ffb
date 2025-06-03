@@ -1,9 +1,11 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
+import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
@@ -223,6 +225,22 @@ fun moveTo(x: Int, y: Int) = arrayOf(
     MoveTypeSelected(MoveType.STANDARD),
     FieldSquareSelected(FieldCoordinate(x, y)),
 )
+
+// Use the PathFinder to move the active player to the destined location
+@Suppress("TestFunctionName")
+fun SmartMoveTo(x: Int, y: Int): GameAction {
+    return CalculatedAction { state, rules ->
+        val activePlayer = state.activePlayer
+        val pathfinder = rules.pathFinder
+        val start = activePlayer!!.coordinates
+        val end = FieldCoordinate(x, y)
+        val path = pathfinder.calculateShortestPath(state, start, end, activePlayer.movesLeft)
+        val pathMoves = path.path.flatMap {
+            listOf(*moveTo(it.x, it.y))
+        }
+        CompositeGameAction(pathMoves)
+    }
+}
 
 fun setupPlayer(id: PlayerId, field: FieldCoordinate) = arrayOf(
     PlayerSelected(id),
