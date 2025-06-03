@@ -17,7 +17,6 @@ import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -106,11 +105,5 @@ class RushingTests: JervisGameTest() {
         assertEquals(0, player.movesLeft)
         assertEquals(FieldCoordinate(14, 5), player.location)
         assertEquals(MoveAction.SelectMoveType, controller.currentNode())
-    }
-
-    @Test
-    @Ignore
-    fun rushToBlitz() {
-        TODO("Rush to blitz when out of moves. Test should probably be in BlitzTests")
     }
 }

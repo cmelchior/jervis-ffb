@@ -15,7 +15,7 @@ fun GameEngineController.rollForward(vararg actions: GameAction?) {
     }
     actions.forEach {
         if (it != null) {
-            val action = if (it is CalculatedAction) it.get(state, rules) else it
+            val action = if (it is CalculatedAction) it.get(this, state, rules) else it
             handleAction(action)
         }
     }

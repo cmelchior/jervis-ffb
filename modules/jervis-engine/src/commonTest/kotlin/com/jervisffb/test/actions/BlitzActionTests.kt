@@ -1,10 +1,7 @@
 package com.jervisffb.test.actions
 
 import com.jervisffb.engine.actions.BlockTypeSelected
-import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Cancel
-import com.jervisffb.engine.actions.DicePoolChoice
-import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
@@ -14,7 +11,6 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
@@ -27,6 +23,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.test.JervisGameTest
+import com.jervisffb.test.SelectSingleDieResult
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import kotlin.test.BeforeTest
@@ -105,7 +102,7 @@ class BlitzActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             6.dblock, // Block roll
             NoRerollSelected(),
-            CalculatedAction { _, _ -> selectSingleDieResult() },
+            SelectSingleDieResult(),
             DirectionSelected(Direction.LEFT),
             Cancel,
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -178,7 +175,7 @@ class BlitzActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             6.dblock, // Block roll
             NoRerollSelected(),
-            CalculatedAction { _, _ -> selectSingleDieResult() },
+            SelectSingleDieResult(),
             DirectionSelected(Direction.LEFT),
             Cancel, // Do not follow up
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -210,7 +207,7 @@ class BlitzActionTests: JervisGameTest() {
             NoRerollSelected(),
             4.dblock, // Block roll
             NoRerollSelected(),
-            CalculatedAction { _, _ -> selectSingleDieResult() },
+            SelectSingleDieResult(),
             DirectionSelected(Direction.BOTTOM_LEFT),
             Cancel, // Do not follow up
             EndAction
@@ -265,7 +262,7 @@ class BlitzActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             4.dblock, // Push back
             NoRerollSelected(),
-            CalculatedAction { _, _ -> selectSingleDieResult() },
+            SelectSingleDieResult(),
             DirectionSelected(Direction.BOTTOM_LEFT),
             Cancel,
             *moveTo(13, 4),
@@ -278,13 +275,5 @@ class BlitzActionTests: JervisGameTest() {
         assertEquals(PlayerState.STANDING, attacker.state)
         assertEquals(FieldCoordinate(11, 6), defender.location)
         assertEquals(PlayerState.STANDING, defender.state)
-    }
-
-    private fun selectSingleDieResult(): DicePoolResultsSelected {
-        // TODO Need to rework these API's so this is easier
-        return controller.getAvailableActions()
-            .filterIsInstance<SelectDicePoolResult>()
-            .first().pools.first()
-            .let { DicePoolResultsSelected(listOf(DicePoolChoice(0, it.dice.map { it.result }))) }
     }
 }

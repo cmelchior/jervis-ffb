@@ -1,5 +1,6 @@
 package com.jervisffb.engine.actions
 
+import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Direction
@@ -23,9 +24,9 @@ sealed interface GameAction
  * Game Action that can delay its value until called.
  * This is only for testing and should never be accepted by a [Procedure].
  */
-class CalculatedAction(private val action: (Game, Rules) -> GameAction) : GameAction {
-    fun get(state: Game, rules: Rules): GameAction {
-        return action(state, rules)
+class CalculatedAction(private val action: GameEngineController.(Game, Rules) -> GameAction) : GameAction {
+    fun get(controller: GameEngineController, state: Game, rules: Rules): GameAction {
+        return action(controller, state, rules)
     }
 }
 

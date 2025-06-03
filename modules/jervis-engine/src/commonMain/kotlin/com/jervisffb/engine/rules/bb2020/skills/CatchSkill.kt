@@ -6,6 +6,11 @@ import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 
+/**
+ * Representation of the Catch skill.
+ *
+ * See the rulebook, page 75.
+ */
 class CatchSkill(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.AGILITY,
@@ -15,7 +20,7 @@ class CatchSkill(
     override val value: Int? = null
     override val skillId: SkillId = type.id()
     override val name: String = type.description
-    override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.value}-reroll")
+    override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.toPrettyString()}-reroll")
     override val compulsory: Boolean = false
     override val resetAt: Duration =Duration.PERMANENT
     override var used: Boolean = false
@@ -32,6 +37,7 @@ class CatchSkill(
         value: List<DieRoll<*>>,
         wasSuccess: Boolean?,
     ): Boolean {
-        return type == DiceRollType.CATCH
+        // Catch only allows rerolling failed rolls
+        return type == DiceRollType.CATCH && wasSuccess == false && player.hasTackleZones
     }
 }

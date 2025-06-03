@@ -153,13 +153,13 @@ enum class Duration {
 }
 
 /**
- * This enum enumerate all known skills across all rulesets.
+ * This enumerates all known skills across all rulesets.
  *
  * It is mostly a work-around so we can easily detect when a new skill is added so
  * we remember to update all locations.
  *
  * Skills with values are still only identified by their name here.
- * The unique combintation of a type and value is defined by [SkillId].
+ * The unique combination of a type and value is defined by [SkillId].
  * These can be created by calling [SkillType.id].
  **
  * @see com.jervisffb.engine.rules.bb2020.SkillSettings

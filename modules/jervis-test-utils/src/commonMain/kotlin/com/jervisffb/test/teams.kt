@@ -138,9 +138,13 @@ fun createDefaultHomeTeam(rules: Rules): Team {
     }
 }
 
-fun createDefaultGameState(rules: Rules, awayTeam: Team = humanTeamAway(rules)): Game {
+fun createDefaultGameState(
+    rules: Rules,
+    homeTeam: Team = createDefaultHomeTeam(rules),
+    awayTeam: Team = humanTeamAway(rules)
+): Game {
     val field = Field.createForRuleset(rules)
-    return Game(rules, createDefaultHomeTeam(rules), awayTeam, field)
+    return Game(rules, homeTeam, awayTeam, field)
 }
 
 /**

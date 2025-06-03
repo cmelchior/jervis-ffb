@@ -53,7 +53,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Necessary Violence
   - [ ] Fouling Frenzy
   - [ ] Throw a Rock
-    - [ ] Choise is optional
+    - [ ] Choice is optional
   - [ ] Under Scrutiny
   - [ ] Intensive Training
 
@@ -136,19 +136,32 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Carry over into Extra Time
   - [ ] Leader
   - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
-- [ ] Dodging
+- [ ] Dodging (basic, no skills)
 - [ ] Deviating Ball
 - [ ] Scatter Ball
 - [ ] Bouncing Ball
-- [ ] Catch
-- [ ] Bounce
-- [ ] Throw-in
-- [ ] Weather
+  - [ ] Move 1 square in random direction
+  - [ ] Bounce into another player must catch
+  - [ ] Bounce into prone/missing tz/stunned player will bounce again
+- [ ] Catch (basic no skills)
+  - [ ] Accurate pass
+  - [ ] Deflection into Interception
+  - [ ] Bouncing ball
+  - [ ] Thrown-in
+  - [ ] Scattered
+  - [ ] Deviated
+  - [ ] TackleZone modifiers
+  - [ ] Must roll for catch
+  - [ ] Players can only catch if they have tackle zones
+  - [ ] Failing to catch will bounce from square
+- [ ] Throw-in (basic no skills)
+  - [ ] After bounce
+  - [ ] After scatter
+  - [ ] After Deviate
+  - [ ] Repeat process
+  - [ ] Catch or Bounce on landing
 - [ ] Track Star Player Points
 - [ ] Track more advanced stats
-- [ ] Setup and broken rules
-- [ ] Kick off 
-- [ ] Kickoff event
 - [ ] Track Star Player Points and adjustments to it.
 - [ ] Touchdown
 - [ ] Detect Stalling
@@ -159,6 +172,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
 - [ ] Roll over if stunned last turn
 - [ ] Moving into a square
   - [ ] Moving voluntarily
+  - [ ] Moving involentary
   - [ ] Being pushed
   - [ ] Need Dodge/Rush/Jump to go there
 
@@ -238,6 +252,11 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Assists
   - [ ] Caught by the Ref
 - Hand-off Action
+  - [ ] Can start action without having the ball
+  - [ ] Action ends after handover (no more moves allowed)
+  - [ ] Can hand-over after all moves are used
+  - [ ] Players with PA - can still hand-off
+  - [ ] Test against agility to catch it
 - Pass Action
 - Throw Team-mate Action
 

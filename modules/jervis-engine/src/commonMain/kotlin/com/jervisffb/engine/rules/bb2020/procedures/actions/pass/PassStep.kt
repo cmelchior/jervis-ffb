@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.NoOpCommand
 import com.jervisffb.engine.commands.RemoveContext
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
@@ -330,17 +331,19 @@ object PassStep: Procedure() {
             val ball = state.currentBall()
             val playerInSquare = state.field[ball.location].player
             val playerIsHoldingBall = (playerInSquare?.ball != null)
-            return if (playerInSquare != null && !playerIsHoldingBall) {
-                SetBallState.scattered(ball) // TODO Is this true?
-            } else {
+            val hasTackleZones = (playerInSquare?.hasTackleZones == true)
+            val canCatch = (playerInSquare != null && !playerIsHoldingBall && hasTackleZones)
+            return if (!canCatch) {
                 SetBallState.bouncing(ball)
+            } else {
+                NoOpCommand
             }
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return if (state.currentBall().state == BallState.SCATTERED) {
-                Catch
-            } else {
+            return if (state.currentBall().state == BallState.BOUNCING) {
                 Bounce
+            } else {
+                Catch
             }
         }
 

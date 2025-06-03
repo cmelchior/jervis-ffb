@@ -50,6 +50,41 @@ because a touchback was triggered, the player can just be awarded the ball with
 no rolls needed since the Touchback rule does not specify that the player has to
 be on the receiving side.
 
+### Page 49 - Resolve Pass Action in Empty Square
+The full consequences of doing an accurate throw to an empty square are not 
+defined, leaving it up to interpretation if the ball bounces from there or 
+not.
+
+The rules say "the ball will land in the target square" and nothing more, but 
+the fluff text for bounce indicates that a ball hitting the ground will bounce. 
+
+Both "Scatter" and "Deviate" (on page 25) also explicitly state that a bounce
+will happen if the ball ends up in an empty square.
+
+It therefore seems most likely that a bounce is intended, which is what Jervis 
+does.
+
+Also, this case is explicitly spelled out in the 2016 rulebook (page 19 - 
+Bouncing Balls), where it is defined that a bounce will happen.
+
+### Page 51 - Failed Catch 
+The consequences of a failed catch are not defined, unlike picking up the ball
+(page 46) where it is explicitly stated that the ball will bounce if the pickup
+fails. 
+
+The "fluff" description of Bounce on page 25 hints at it, but this is just the 
+definition of what happens once a bounce is triggered, not what actually 
+triggers the bounce.
+
+There is probably little doubt that a bounce will happen since _something_
+needs to happen and everything else makes less sense. So this is what Jervis
+does.
+
+Also, this case is explicitly spelled out in the 2016 rulebook (page 19 - 
+Catching the Football), where it is defined that a bounce will happen.
+
+See also https://www.reddit.com/r/bloodbowl/comments/1gmscfm/rule_question_if_a_player_passes_the_ball_on_an/
+
 ### Page 74 - When to choose skill usage
 The rules make it optional to use a skill before or after a roll. In Jervis, if 
 possible, this choice always comes after the roll. There is no valid reason for 

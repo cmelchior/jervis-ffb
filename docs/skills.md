@@ -16,6 +16,17 @@ Skills should only be marked as completed here if they are implemented and have 
 ## Agility Skills
 
 - [ ] Catch
+  - [x] Reroll catching the landing after kickoff
+  - [x] Reroll catching a successful Pass
+  - [x] Reroll catching a bouncing ball
+  - [x] Reroll catching a hand-off
+  - [x] Reroll catching a deviated ball
+  - [x] Reroll catching a scattered ball
+  - [x] Reroll catching a bouncing ball
+  - [ ] Reroll convert a deflection into interception
+  - [x] Only works on failed catches
+  - [x] Does not work if missing tackle zones 
+  - [ ] Works multiple times pr. turn
 - [ ] Diving Catch
 - [ ] Diving Tackle
 - [ ] Dodge

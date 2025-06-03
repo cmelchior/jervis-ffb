@@ -3,6 +3,11 @@ package com.jervisffb.engine.rules.bb2020.skills
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId
 
+/**
+ * Representation of the Block skill.
+ *
+ * See the rulebook, page 76.
+ */
 class Block(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.GENERAL,

@@ -1,6 +1,5 @@
 package com.jervisffb.test.skills
 
-import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.FieldSquareSelected
@@ -8,7 +7,6 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
-import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerNo
@@ -18,9 +16,10 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.BreakTackleModifier
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
-import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
+import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.test.JervisGameTest
+import com.jervisffb.test.SelectTeamReroll
 import com.jervisffb.test.ext.rollForward
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -76,12 +75,7 @@ class BreakTackleTests: JervisGameTest() {
             FieldSquareSelected(FieldCoordinate(14, 5)),
             DiceRollResults(1.d6), // Dodge roll, is not enough
             Confirm, // Use Break Tackle, still not enough
-            CalculatedAction { state, rules ->
-                val context = state.getContext<DodgeRollContext>()
-                val roll = context.roll!!
-                val reroll = context.player.team.availableRerolls.first()
-                RerollOptionSelected(DiceRerollOption(reroll.id, listOf(roll)))
-            },
+            SelectTeamReroll<RegularTeamReroll>(),
             DiceRollResults(2.d6), // Dodge roll, should now succeed
         )
 

@@ -4,8 +4,6 @@ import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.Confirm
-import com.jervisffb.engine.actions.DicePoolChoice
-import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
@@ -13,7 +11,6 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.ext.dblock
@@ -29,6 +26,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.test.JervisGameTest
+import com.jervisffb.test.SelectSingleDieResult
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skills.BlockTests
 import com.jervisffb.test.skills.DodgeTests
@@ -185,7 +183,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             3.dblock,
             NoRerollSelected(),
-            CalculatedAction { _, _ -> selectSingleDieResult() },
+            SelectSingleDieResult(),
             DirectionSelected(Direction.LEFT),
             Confirm
         )
@@ -206,7 +204,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             1.dblock,
             NoRerollSelected(),
-            CalculatedAction { _, _ -> selectSingleDieResult() },
+            SelectSingleDieResult(),
         )
         assertEquals(FieldCoordinate(13, 5), attacker.location)
         assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
@@ -225,7 +223,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             2.dblock,
             NoRerollSelected(),
-            CalculatedAction { _, _ -> selectSingleDieResult() },
+            SelectSingleDieResult(),
         )
         assertEquals(FieldCoordinate(13, 5), attacker.location)
         assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
@@ -244,7 +242,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             3.dblock,
             NoRerollSelected(),
-            CalculatedAction { _, _ -> selectSingleDieResult() },
+            SelectSingleDieResult(),
             DirectionSelected(Direction.LEFT),
             Cancel,
         )
@@ -265,7 +263,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             5.dblock,
             NoRerollSelected(),
-            CalculatedAction { _, _ -> selectSingleDieResult() },
+            SelectSingleDieResult(),
             DirectionSelected(Direction.UP_LEFT),
             Cancel,
         )
@@ -286,7 +284,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             5.dblock,
             NoRerollSelected(),
-            CalculatedAction { _, _ -> selectSingleDieResult() },
+            SelectSingleDieResult(),
             DirectionSelected(Direction.BOTTOM_LEFT),
             Cancel,
         )
@@ -294,13 +292,5 @@ class BlockActionTests: JervisGameTest() {
         assertEquals(PlayerState.STANDING, attacker.state)
         assertEquals(FieldCoordinate(11, 6), defender.location)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
-    }
-
-    private fun selectSingleDieResult(): DicePoolResultsSelected {
-        // TODO Need to rework these API's so this is easier
-        return controller.getAvailableActions()
-            .filterIsInstance<SelectDicePoolResult>()
-            .first().pools.first()
-            .let { DicePoolResultsSelected(listOf(DicePoolChoice(0, it.dice.map { it.result }))) }
     }
 }

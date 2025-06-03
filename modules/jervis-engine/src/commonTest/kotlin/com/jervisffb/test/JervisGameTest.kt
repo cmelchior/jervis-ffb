@@ -55,7 +55,9 @@ abstract class JervisGameTest {
 
     @BeforeTest
     open fun setUp() {
-        state = createDefaultGameState(rules).apply {
+        homeTeam = createDefaultHomeTeam(rules)
+        awayTeam = humanTeamAway(rules)
+        state = createDefaultGameState(rules, homeTeam, awayTeam).apply {
             // Should be on LoS
             homeTeam[PlayerNo(1)].apply {
                 addSkill(SkillType.BREAK_TACKLE.id())
@@ -220,6 +222,11 @@ fun activatePlayer(playerId: String, type: PlayerStandardActionType) = arrayOf(
 fun moveTo(x: Int, y: Int) = arrayOf(
     MoveTypeSelected(MoveType.STANDARD),
     FieldSquareSelected(FieldCoordinate(x, y)),
+)
+
+fun setupPlayer(id: PlayerId, field: FieldCoordinate) = arrayOf(
+    PlayerSelected(id),
+    FieldSquareSelected(field),
 )
 
 fun skipTurns(count: Int) = Array(count) { EndTurn }
