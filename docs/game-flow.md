@@ -82,6 +82,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Changing Weather
   - [x] Quick Snap
   - [ ] Blitz
+    - [ ] Some skills are not available
   - [x] Officious Ref
   - [x] Pitch Invasion
 - [x] What goes up, must come down
@@ -131,6 +132,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Sent-off for commiting a Foul
   - [ ] Touchdown
 - [ ] Conceding
+  - [ ] Free if 3 or less players at beginning of turn
 - [ ] Team Rerolls
   - [ ] Reset at half time
   - [ ] Carry over into Extra Time
@@ -138,12 +140,26 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
 - [ ] Dodging (basic, no skills)
 - [ ] Deviating Ball
+  - [ ] D6 in random direction
+  - [ ] Player in landing square must attempt to catch it
+  - [ ] Will bounce if player in landing square has no tackle zones or is prone/stunned
+  - [ ] Will bounce if landing square is empty
 - [ ] Scatter Ball
+  - [ ] 3xD8 in random direction, doesn't fully land before last roll
+  - [ ] Player in landing square must attempt to catch it
+  - [ ] Will bounce if player in landing square has no tackle zones or is prone/stunned
+  - [ ] Will bounce if landing square is empty
 - [x] Bouncing Ball
   - [x] Move 1 square in random direction
   - [x] Bounce into another player must catch if possible
   - [x] Bounce into prone/missing tz/stunned player will bounce again
   - [x] Keep bouncing until coming to rest
+- [ ] Throw-in (basic no skills)
+  - [ ] After bounce
+  - [ ] After scatter
+  - [ ] After Deviate
+  - [ ] Repeat process
+  - [ ] Catch or Bounce on landing
 - [ ] Catch (basic no skills)
   - [ ] Accurate pass
   - [ ] Deflection into Interception
@@ -155,12 +171,6 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Must roll for catch
   - [ ] Players can only catch if they have tackle zones
   - [ ] Failing to catch will bounce from square
-- [ ] Throw-in (basic no skills)
-  - [ ] After bounce
-  - [ ] After scatter
-  - [ ] After Deviate
-  - [ ] Repeat process
-  - [ ] Catch or Bounce on landing
 - [ ] Track Star Player Points
 - [ ] Track more advanced stats
 - [ ] Track Star Player Points and adjustments to it.
