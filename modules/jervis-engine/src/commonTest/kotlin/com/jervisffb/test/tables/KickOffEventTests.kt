@@ -396,9 +396,9 @@ class KickOffEventTests: JervisGameTest() {
                 kickoffEvent = arrayOf(
                     DiceRollResults(4.d6, 4.d6), // Roll Changing Weather
                     DiceRollResults(3.d6, 4.d6), // Roll Perfect Conditions
-                    DiceRollResults(2.d8, 2.d8, 2.d8) // Scatter 3 times up
+                    DiceRollResults(2.d8, 2.d8, 2.d8) // Scatter 3 times
                 ),
-                bounce = 2.d8 // Final bounce up
+                bounce = 2.d8 // Final bounce
             ),
         )
         assertEquals(Weather.PERFECT_CONDITIONS, state.weather)

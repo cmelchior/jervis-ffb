@@ -39,7 +39,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.DeviateRoll
 import com.jervisffb.engine.rules.bb2020.procedures.DeviateRollContext
 import com.jervisffb.engine.rules.bb2020.procedures.Scatter
 import com.jervisffb.engine.rules.bb2020.procedures.ScatterRollContext
-import com.jervisffb.engine.rules.bb2020.procedures.TheKickOffEvent.ResolveBallLanding.canCatch
 import com.jervisffb.engine.rules.bb2020.procedures.ThrowIn
 import com.jervisffb.engine.rules.bb2020.procedures.ThrowInContext
 import com.jervisffb.engine.rules.bb2020.tables.Range

@@ -28,6 +28,7 @@ class BounceTests: JervisGameTest() {
         super.setUp()
         startDefaultGame() //  Ball landed at [17,7]
     }
+
     @Test
     fun moveOneSquare() {
         controller.rollForward(

@@ -139,11 +139,11 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Leader
   - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
 - [ ] Dodging (basic, no skills)
-- [ ] Deviating Ball
-  - [ ] D6 in random direction
-  - [ ] Player in landing square must attempt to catch it
-  - [ ] Will bounce if player in landing square has no tackle zones or is prone/stunned
-  - [ ] Will bounce if landing square is empty
+- [x] Deviating Ball
+  - [x] D6 in random direction
+  - [x] Player in landing square must attempt to catch it
+  - [x] Will bounce if player in landing square has no tackle zones or is prone/stunned
+  - [x] Will bounce if landing square is empty
 - [ ] Scatter Ball
   - [ ] 3xD8 in random direction, doesn't fully land before last roll
   - [ ] Player in landing square must attempt to catch it
