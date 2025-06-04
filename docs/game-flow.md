@@ -139,14 +139,15 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Carry over into Extra Time
   - [ ] Leader
   - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
-- [ ] Dodging (basic, no skills)
-  - [ ] When leaving marking player
-  - [ ] Not when leaving player with no TZ
-  - [ ] Not when moving from open into marked position
-  - [ ] -1 pr. marking player in
-  - [ ] Move before Roll
-  - [ ] Fall over in target square
-  - [ ] Can reroll 
+- [ ] Marked / Open
+- [x] Dodging (basic, no skills)
+  - [x] When leaving marking player
+  - [x] Not when leaving player with no TZ
+  - [x] Not when moving from open into marked position
+  - [x] -1 pr. marking player in
+  - [x] Move before Roll
+  - [x] Fall over in target square
+  - [x] Can reroll 
 - [x] Deviating Ball
   - [x] D6 in random direction
   - [x] Player in landing square must attempt to catch it
@@ -195,7 +196,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Being pushed
   - [ ] Need Dodge/Rush/Jump to go there
 - [ ] Characteristic Tests
-  - [ ] Agility
+  - [x] Agility
   - [ ] Passing
 
 ## Actions

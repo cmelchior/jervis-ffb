@@ -28,7 +28,7 @@ import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skills.BlockTests
-import com.jervisffb.test.skills.DodgeTests
+import com.jervisffb.test.skills.DodgeSkillTests
 import com.jervisffb.test.utils.SelectSingleDieResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -44,7 +44,7 @@ import kotlin.test.assertTrue
  *   class just tests the basic pushback.
  * - Injury rolls are tested separately in [InjuryRollTests].
  * - All skills affecting block are tested in their own class, e.g. [BlockTests]
- *   and [DodgeTests]
+ *   and [DodgeSkillTests]
  */
 class BlockActionTests: JervisGameTest() {
 

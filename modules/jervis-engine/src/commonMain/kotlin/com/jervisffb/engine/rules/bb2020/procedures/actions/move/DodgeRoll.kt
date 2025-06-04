@@ -31,7 +31,6 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.UseRerollContext
@@ -41,7 +40,6 @@ import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.BreakTackleModifier
-import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.DodgeRollModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
@@ -56,9 +54,9 @@ import com.jervisffb.engine.rules.bb2020.skills.PrehensileTail
 import com.jervisffb.engine.rules.bb2020.skills.Stunty
 import com.jervisffb.engine.rules.bb2020.skills.Titchy
 import com.jervisffb.engine.rules.bb2020.skills.TwoHeads
+import com.jervisffb.engine.rules.bb2020.testAgainstAgility
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
-import com.jervisffb.engine.utils.sum
 
 /**
  * Handle a player making a dodge roll.
@@ -321,7 +319,7 @@ object DodgeRoll: Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val afterReroll = state.hasContext<UseRerollContext>()
             val context = state.getContext<DodgeRollContext>()
-            val success = isDodgeSuccess(context.player, context.roll!!.result, context.rollModifiers)
+            val success = testAgainstAgility(context.player, context.roll!!.result, context.rollModifiers)
             return compositeCommandOf(
                 SetContext(context.copy(isSuccess = success)),
                 if (afterReroll) ExitProcedure() else GotoNode(ChooseReRollSource)
@@ -426,16 +424,6 @@ object DodgeRoll: Procedure() {
                     GotoNode(CalculateSuccess),
                 )
             }
-        }
-    }
-
-    private fun isDodgeSuccess(player: Player, d6: D6Result, modifiers: List<DiceModifier>): Boolean {
-        val target = player.agility
-        return when (d6.value) {
-            1 -> false
-            in 2..5 -> d6.value + modifiers.sum() >= target && d6.value != 1
-            6 -> true
-            else -> error("Invalid value: ${d6.value}")
         }
     }
 }

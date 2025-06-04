@@ -60,8 +60,9 @@ fun SelectSkillReroll(type: SkillType): GameAction {
 }
 
 /**
- * Create a calculated game action that will return the correct game action for
- * selecting a reroll of the provided type. If the reroll type isn't available
+ * Select the first available team reroll of the given type.
+ *
+ * If the reroll type isn't available
  * and error is thrown.
  */
 @Suppress("TestFunctionName")

@@ -29,9 +29,9 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.testAgainstAgility
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
-import com.jervisffb.engine.utils.sum
 
 /**
  * Procedure for handling a Catch Roll as described on page 51 in the rulebook.
@@ -53,7 +53,7 @@ object CatchRoll : Procedure() {
                 val rollContext = state.getContext<CatchRollContext>()
                 val resultContext = rollContext.copy(
                     roll = D6DieRoll.create(state, d6),
-                    isSuccess = isCatchSuccess(d6, rollContext.target, rollContext)
+                    isSuccess = testAgainstAgility(rollContext.catchingPlayer, d6, rollContext.modifiers)
                 )
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.CATCH, d6),
@@ -119,31 +119,18 @@ object CatchRoll : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D6Result>(action) { d6 ->
                 val catchRollContext = state.getContext<CatchRollContext>()
-                val target = catchRollContext.catchingPlayer.agility + catchRollContext.modifiers.sum()
                 val rerollResult = catchRollContext.copy(
                     roll = catchRollContext.roll!!.copyReroll(
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),
-                    isSuccess = isCatchSuccess(d6, target, catchRollContext)
+                    isSuccess = testAgainstAgility(catchRollContext.catchingPlayer, d6, catchRollContext.modifiers)
                 )
                 compositeCommandOf(
                     SetContext(rerollResult),
                     ExitProcedure(),
                 )
             }
-        }
-    }
-
-    private fun isCatchSuccess(
-        it: D6Result,
-        target: Int,
-        rollContext: CatchRollContext,
-    ): Boolean {
-        return when (it.value) {
-            1 -> false
-            6 -> true
-            else -> (target <= it.value + rollContext.modifiers.sum())
         }
     }
 }

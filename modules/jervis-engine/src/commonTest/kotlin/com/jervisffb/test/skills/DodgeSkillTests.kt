@@ -6,7 +6,7 @@ import kotlin.test.Test
 /**
  * Class testing usage of the [Dodge] skill
  */
-class DodgeTests {
+class DodgeSkillTests {
 
     @Test
     fun useDodgeRerollOnFailedDodge() {
