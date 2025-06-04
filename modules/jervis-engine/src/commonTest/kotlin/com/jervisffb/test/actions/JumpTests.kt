@@ -268,6 +268,53 @@ class JumpTests: JervisGameTest() {
         assertEquals(FieldCoordinate(11, 5), jumpingPlayer.location)
     }
 
+    // According to Designer's Commentary, failing the first Rush will leave
+    // you in the starting square (since the middle square is taken up by a
+    // prone player)
+    @Test
+    fun fallOverInStartingSquareWhenFailingFirstRush() {
+        state.getPlayerById("H1".playerId).state = PlayerState.PRONE
+        val jumpingPlayer = state.getPlayerById("A1".playerId)
+
+        // Adjust move so jumping player needs 2 rush to jump
+        jumpingPlayer.movesLeft = 0
+        jumpingPlayer.rushesLeft = 2
+
+        controller.rollForward(
+            PlayerSelected(jumpingPlayer.id),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            MoveTypeSelected(MoveType.JUMP),
+            FieldSquareSelected(11, 5),
+            1.d6, // Rush
+            NoRerollSelected(),
+        )
+        assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
+        assertEquals(FieldCoordinate(13, 5), jumpingPlayer.location)
+    }
+
+    @Test
+    fun fallOverInTargetSquareWhenFailingSecondRush() {
+        state.getPlayerById("H1".playerId).state = PlayerState.PRONE
+        val jumpingPlayer = state.getPlayerById("A1".playerId)
+
+        // Adjust move so jumping player needs 2 rush to jump
+        jumpingPlayer.movesLeft = 0
+        jumpingPlayer.rushesLeft = 2
+
+        controller.rollForward(
+            PlayerSelected(jumpingPlayer.id),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            MoveTypeSelected(MoveType.JUMP),
+            FieldSquareSelected(11, 5),
+            2.d6, // Rush
+            NoRerollSelected(),
+            1.d6, // Rush
+            NoRerollSelected(),
+        )
+        assertEquals(PlayerState.FALLEN_OVER, jumpingPlayer.state)
+        assertEquals(FieldCoordinate(11, 5), jumpingPlayer.location)
+    }
+
     @Test
     fun cannotJumpOverStandingPlayer() {
         val jumpingPlayer = state.getPlayerById("A1".playerId)

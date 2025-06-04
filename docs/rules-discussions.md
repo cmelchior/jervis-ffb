@@ -178,11 +178,6 @@ Rush/Agility.
 
 This was clarified in May 2025 FAQ - Tentacles are rolled first.
 
-## Jumping and Rushing Twice
-https://www.reddit.com/r/bloodbowl/comments/nht634/bb2020_rules_query_involving_rush_and_jumping_a/
-Right now it looks like the interpretation is that if you fail the rush, you 
-end up in the jumping square.
-
 ## Giants
 For Giants, it isn't well-defined how to interpret its location. E.g., during 
 setup, is it considered to be in the wide zone if part of it is in there, or 

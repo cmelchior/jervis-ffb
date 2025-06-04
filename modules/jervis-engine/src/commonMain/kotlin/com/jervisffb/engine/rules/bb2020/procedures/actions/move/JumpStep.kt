@@ -38,6 +38,7 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep.JUMP_DISTANCE
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
@@ -70,23 +71,20 @@ data class JumpRollContext(
  * 2) Do you end up in the starting square?
  * 3) Some other square (as the middle square is filled)?
  *
- * This was discussed here: https://www.reddit.com/r/bloodbowl/comments/nht634/bb2020_rules_query_involving_rush_and_jumping_a/
- * That discussion ended up concluding that you end up in the target square and
- * then do not have to roll agility for the Jump.
- *
- * This conclusion seems reasonable, which means that this is also how the
- * rules here are implemented.
+ * This was answered in the Designer's Commentary, and the ruling is that if you
+ * fail the first Rush, you end up in the starting square. They FAQ entry
+ * doesn't mention what happens when you fail the 2nd Rush, but it is assumed
+ * you end up in the target square per normal.
  *
  * The interaction between Jump and Tentacles is also a bit unclear,
  * https://www.reddit.com/r/bloodbowl/comments/xodttp/shadowing_and_tentacles_work_on_followups_jumps/
  *
- * But since Rush/Dodge triggers when leaving the square and Tentacles prevent you from doing so,
- * it seems a reasonable interpretation that it goes first.
+ * This was clarified in the Designer's Commentary. Tentacles are rolled first.
  */
 object JumpStep : Procedure() {
 
     // How many squares of movement are used to Jump
-    const val jumpDistance = 2
+    const val JUMP_DISTANCE = 2
 
     override val initialNode: Node = SelectTargetSquareOrCancel
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
@@ -99,8 +97,8 @@ object JumpStep : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<MoveContext>()
             val jumpingPlayer = context.player
-            val hasMoveLeft = jumpingPlayer.movesLeft + jumpingPlayer.rushesLeft >= jumpDistance && rules.isStanding(jumpingPlayer)
-            val needRush = jumpingPlayer.movesLeft < jumpDistance
+            val hasMoveLeft = jumpingPlayer.movesLeft + jumpingPlayer.rushesLeft >= JUMP_DISTANCE && rules.isStanding(jumpingPlayer)
+            val needRush = jumpingPlayer.movesLeft < JUMP_DISTANCE
             val eligibleJumpSquares = if (hasMoveLeft) {
                 val eligibleJumpSquares = jumpingPlayer.coordinates.getSurroundingCoordinates(rules, distance = 1)
                     .mapNotNull { state.field[it].player }
@@ -129,10 +127,7 @@ object JumpStep : Procedure() {
                 else -> {
                     checkTypeAndValue<FieldSquareSelected>(state, rules, action) { target ->
                         val context = state.getContext<MoveContext>()
-
-                        // Move player into target location before start rolling any dice.
                         compositeCommandOf(
-                            SetPlayerLocation(context.player, target.coordinate),
                             SetContext(context.copy(target = target.coordinate)),
                             GotoNode(CheckIfRushingIsNeeded)
                         )
@@ -142,20 +137,31 @@ object JumpStep : Procedure() {
         }
     }
 
+    // Check if rushing is needed and move player, so they will fall over in the correct
+    // place if any potential rushes fail.
     object CheckIfRushingIsNeeded : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()
             return when (context.player.movesLeft) {
-                0 -> GotoNode(RushTwice)
-                1 -> GotoNode(RushOnce)
-                else -> GotoNode(RollForJump)
+                0 -> compositeCommandOf(
+                    GotoNode(RushTwice)
+                )
+                1 -> compositeCommandOf(
+                    SetPlayerLocation(context.player, context.target!!),
+                    GotoNode(RushOnce)
+                )
+                else -> compositeCommandOf(
+                    SetPlayerLocation(context.player, context.target!!),
+                    GotoNode(RollForJump)
+                )
             }
         }
     }
 
     /**
-     * Player needs two rushes to reach the target square. If they fail either
-     * one, they fall over in the target square.
+     * Player needs two rushes to reach the target square. If they fail the first
+     * Rush, they stay in the starting square. If they fail the second, they fall
+     * over in the target square.
      */
     object RushTwice: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
@@ -164,10 +170,12 @@ object JumpStep : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RushRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
+            val moveContext = state.getContext<MoveContext>()
             val rushContext = state.getContext<RushRollContext>()
             val player = rushContext.player
             return if (rushContext.isSuccess) {
                 compositeCommandOf(
+                    SetPlayerLocation(moveContext.player, moveContext.target!!),
                     SetPlayerMoveLeft(player, player.movesLeft + 1),
                     SetPlayerRushesLeft(player, player.rushesLeft - 1),
                     RemoveContext<RushRollContext>(),
@@ -217,8 +225,8 @@ object JumpStep : Procedure() {
     }
 
     /**
-     * Player has no ordinary move allowance left, so need to make a Rush roll.
-     * If successful, they gain +1 movement allowance.
+     * Player could move to the target square (after rushes, tentacles) and can
+     * now roll for Jump.
      */
     object RollForJump: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
@@ -315,7 +323,7 @@ object JumpStep : Procedure() {
             return compositeCommandOf(
                 // Player was already moved before rolling any dice, so here we just
                 // adjust stats.
-                SetPlayerMoveLeft(movingPlayer, movingPlayer.movesLeft - jumpDistance),
+                SetPlayerMoveLeft(movingPlayer, movingPlayer.movesLeft - JUMP_DISTANCE),
                 ExitProcedure()
             )
         }

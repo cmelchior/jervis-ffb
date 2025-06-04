@@ -6,6 +6,7 @@ tests covering the particular feature. This document only covers the core game
 rules, skills are tracked separately in [skills.md](skills.md). 
 
 ## Pregame
+
 - [x] The Fans
 - [x] The Weather
   - [x] Sweltering Heat
@@ -139,6 +140,13 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Leader
   - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
 - [ ] Dodging (basic, no skills)
+  - [ ] When leaving marking player
+  - [ ] Not when leaving player with no TZ
+  - [ ] Not when moving from open into marked position
+  - [ ] -1 pr. marking player in
+  - [ ] Move before Roll
+  - [ ] Fall over in target square
+  - [ ] Can reroll 
 - [x] Deviating Ball
   - [x] D6 in random direction
   - [x] Player in landing square must attempt to catch it
@@ -186,6 +194,9 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Moving involuntary
   - [ ] Being pushed
   - [ ] Need Dodge/Rush/Jump to go there
+- [ ] Characteristic Tests
+  - [ ] Agility
+  - [ ] Passing
 
 ## Actions
 
@@ -226,6 +237,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Can only jump to opposite squares. Similar to pushes
   - [ ] Cannot jump over a Giant since the rules specify a "single square"
   - [x] Modifiers on leaving and entering
+  - [x] Fail 1st/2nd Rush and fall over
 - [ ] Pass Action
 - [ ] Hand-off Action
 - [ ] Throw Team-mate Action

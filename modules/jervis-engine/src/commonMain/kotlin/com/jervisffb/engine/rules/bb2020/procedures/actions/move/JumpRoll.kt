@@ -25,14 +25,13 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
+import com.jervisffb.engine.rules.bb2020.testAgainstAgility
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
-import com.jervisffb.engine.utils.sum
 
 /**
  * Procedure for handling a Jump Roll as described on page 45 in the rulebook.
@@ -54,7 +53,7 @@ object JumpRoll : Procedure() {
                 val rollContext = state.getContext<JumpRollContext>()
                 val resultContext = rollContext.copy(
                     roll = D6DieRoll.create(state, d6),
-                    isSuccess = isJumpSuccessful(d6, rollContext.player.agility, rollContext.modifiers)
+                    isSuccess = testAgainstAgility(rollContext.player, d6, rollContext.modifiers)
                 )
                 return compositeCommandOf(
                     ReportDiceRoll(DiceRollType.JUMP, d6),
@@ -124,7 +123,7 @@ object JumpRoll : Procedure() {
                         rerollSource = state.rerollContext!!.source,
                         rerolledResult = d6,
                     ),
-                    isSuccess = isJumpSuccessful(d6, rollContext.player.agility, rollContext.modifiers)
+                    isSuccess = testAgainstAgility(rollContext.player, d6, rollContext.modifiers)
                 )
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.JUMP, d6),
@@ -133,13 +132,5 @@ object JumpRoll : Procedure() {
                 )
             }
         }
-    }
-
-    private fun isJumpSuccessful(
-        it: D6Result,
-        target: Int,
-        modifiers: List<DiceModifier>,
-    ): Boolean {
-        return it.value != 1 && (target <= it.value + modifiers.sum())
     }
 }
