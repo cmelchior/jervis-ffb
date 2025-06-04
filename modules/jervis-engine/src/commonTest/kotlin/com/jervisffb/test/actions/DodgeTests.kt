@@ -4,14 +4,16 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
+import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.PlayerStandardActionType
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
+import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.test.JervisGameTest
+import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.utils.SelectTeamReroll
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -33,57 +35,98 @@ class DodgeTests: JervisGameTest() {
     }
 
     @Test
-    fun noRoll_movingAwayFromNonMarkingPlayer() {
-        state.field[12, 5].player!!.hasTackleZones = false
-        state.field[12, 6].player!!.hasTackleZones = false
+    fun rollWhenMovingAwayFromMarkingPlayer() {
+        controller.rollForward(
+            PlayerSelected("A1".playerId),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+        )
+        val player = awayTeam["A1".playerId]
+        assertTrue(rules.isMarked(player))
+        controller.rollForward(
+            *moveTo(14, 5),
+            6.d6,
+            NoRerollSelected()
+        )
+        assertEquals(FieldCoordinate(14, 5), player.coordinates)
+        assertEquals(PlayerState.STANDING, player.state)
+    }
 
-        val player = state.field[13, 5].player!!
+    @Test
+    fun noRollWhenMovingFromOpenToMarked() {
+        controller.rollForward(
+            PlayerSelected("A6".playerId),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+        )
+        val player = awayTeam["A6".playerId]
         assertFalse(rules.isMarked(player))
-        val markingPlayers = (player.location as OnFieldLocation).getSurroundingCoordinates(rules).any {
-            state.field[it.x, it.y].player?.let {
-                rules.canMark(it) && it.team != player.team
-            } ?: false
-        }
-        assertFalse(markingPlayers)
-
-        controller.rollForward(
-            PlayerSelected(player.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
-            *moveTo(14, 5) // Requires no dodge
-        )
-        assertEquals(FieldCoordinate(14, 5), player.location)
+        controller.rollForward(SmartMoveTo(13, 4))
+        assertTrue(rules.isMarked(player))
+        assertEquals(PlayerState.STANDING, player.state)
     }
 
     @Test
-    fun roll_movingAwayFromMarkingPlayer() {
-        val player = state.field[13, 6].player!!
-        val movesLeft = player.movesLeft
-        assertTrue(rules.isMarked(player))
+    fun modifierPrMarkingPlayer() {
         controller.rollForward(
-            PlayerSelected(player.id),
+            PlayerSelected("A6".playerId),
             PlayerActionSelected(PlayerStandardActionType.MOVE),
-            *moveTo(14, 5),
-            3.d6,
+            SmartMoveTo(12, 4)
+        )
+        val player = awayTeam["A6".playerId]
+        assertTrue(rules.isMarked(player))
+        assertEquals(1, rules.calculateMarks(state, awayTeam, player.coordinates))
+        assertEquals(2, rules.calculateMarks(state, awayTeam, FieldCoordinate(11, 5)))
+        controller.rollForward(
+            *moveTo(11, 5),
+            4.d6, // Need 5+ to dodge
             NoRerollSelected()
         )
-        assertEquals(movesLeft - 1, player.movesLeft)
-        assertEquals(FieldCoordinate(14, 5), player.location)
-        assertEquals(MoveAction.SelectMoveType, controller.currentNode())
-    }
-
-    @Test
-    fun failedRoll_turnOverInTargetSquare() {
-        val player = state.field[13, 6].player!!
-        assertTrue(rules.isMarked(player))
-        controller.rollForward(
-            PlayerSelected(player.id),
-            PlayerActionSelected(PlayerStandardActionType.MOVE),
-            *moveTo(14, 5),
-            2.d6, // Fail roll
-            NoRerollSelected()
-        )
-        assertEquals(FieldCoordinate(14, 5), player.location)
         assertEquals(PlayerState.FALLEN_OVER, player.state)
-        assertTrue(state.isTurnOver())
+    }
+
+    @Test
+    fun moveBeforeRoll() {
+        controller.rollForward(
+            PlayerSelected("A1".playerId),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *moveTo(13, 4) // Move player first
+        )
+        val player = awayTeam["A1".playerId]
+        assertEquals(FieldCoordinate(13, 4), player.coordinates)
+        // Then roll for dodge
+        controller.rollForward(
+            6.d6,
+            NoRerollSelected()
+        )
+        assertEquals(FieldCoordinate(13, 4), player.coordinates)
+        assertEquals(PlayerState.STANDING, player.state)
+    }
+
+    @Test
+    fun fallOverInTargetSquareIfFailingRoll() {
+        controller.rollForward(
+            PlayerSelected("A1".playerId),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *moveTo(12, 4),
+            1.d6, // Fail dodge
+            NoRerollSelected()
+        )
+        val player = awayTeam["A1".playerId]
+        assertEquals(PlayerState.FALLEN_OVER, player.state)
+        assertEquals(FieldCoordinate(12, 4), player.coordinates)
+    }
+
+    @Test
+    fun rerollAvailable() {
+        controller.rollForward(
+            PlayerSelected("A1".playerId),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            *moveTo(12, 4),
+            1.d6, // Fail dodge
+            SelectTeamReroll<RegularTeamReroll>(),
+            4.d6 // Succeed
+        )
+        val player = awayTeam["A1".playerId]
+        assertEquals(PlayerState.STANDING, player.state)
+        assertEquals(FieldCoordinate(12, 4), player.coordinates)
     }
 }
