@@ -226,7 +226,10 @@ fun moveTo(x: Int, y: Int) = arrayOf(
     FieldSquareSelected(FieldCoordinate(x, y)),
 )
 
-// Use the PathFinder to move the active player to the destined location
+/**
+ * Use the PathFinder to move the active player to the destined location. Only
+ * moves that require no rolls are used.
+ */
 @Suppress("TestFunctionName")
 fun SmartMoveTo(x: Int, y: Int): GameAction {
     return CalculatedAction { state, rules ->

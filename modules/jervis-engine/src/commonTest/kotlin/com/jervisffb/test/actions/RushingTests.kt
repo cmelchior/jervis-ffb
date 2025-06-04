@@ -24,7 +24,7 @@ import kotlin.test.assertTrue
 /**
  * Test a player rushing as described on page 44 in the BB2020 Rulebook.
  *
- * Note, any skills that affect dodges are testing in their own test class.
+ * Note, any skills that affect rushes are tested in their own test class.
  * This class only tests the basic functionality.
  */
 class RushingTests: JervisGameTest() {

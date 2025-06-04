@@ -26,6 +26,8 @@ import kotlin.test.assertTrue
 /**
  * Class responsible for testing the Move Action. On its own as well as a
  * part of other actions like: Blitz, Foul, Hand-Off, Pass, Throw Team-Mate.
+ *
+ * See page 44 in the rulebook.
  */
 class MoveActionTests: JervisGameTest() {
 

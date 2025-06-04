@@ -239,9 +239,6 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Cannot jump over a Giant since the rules specify a "single square"
   - [x] Modifiers on leaving and entering
   - [x] Fail 1st/2nd Rush and fall over
-- [ ] Pass Action
-- [ ] Hand-off Action
-- [ ] Throw Team-mate Action
 - [x] Block Action
   - [x] Cannot block while prone
   - [x] Can only block if marking the player.
@@ -275,14 +272,18 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Can only foul selected player
   - [ ] Assists
   - [ ] Caught by the Ref
-- Hand-off Action
-  - [ ] Can start action without having the ball
-  - [ ] Action ends after handover (no more moves allowed)
-  - [ ] Can hand-over after all moves are used
-  - [ ] Players with PA - can still hand-off
-  - [ ] Test against agility to catch it
-- Pass Action
-- Throw Team-mate Action
+- [x] Hand-off Action
+  - [x] Only 1 hand-off pr. turn
+  - [x] Move uses action
+  - [x] Can cancel action if no move/handoff is done
+  - [x] Can start action without having the ball
+  - [x] Action ends automatically after handover
+  - [x] Can hand-over after all moves are used
+  - [x] Players with PA - can still hand-off
+  - [x] Test against agility to catch it
+  - [x] Ball bounce from target player if not caught
+- [ ] Pass Action
+- [ ] Throw Team-mate Action
 
 ## BB7
 

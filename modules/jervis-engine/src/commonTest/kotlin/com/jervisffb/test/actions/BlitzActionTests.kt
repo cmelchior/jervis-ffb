@@ -31,6 +31,10 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
+/**
+ * Class responsible for testing the Blitz action.
+ * See page 46 and 59 in the rulebook.
+ */
 class BlitzActionTests: JervisGameTest() {
 
     @BeforeTest
