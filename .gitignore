@@ -1,9 +1,14 @@
+# IntelliJ
 .gradle/
 .idea/
+!.idea/vcs.xml
+.ipynb_checkpoints/
 .kotlin/
 build/
-.ipynb_checkpoints/
+
+# The tools folder should be built for each platform, so do not commit build artifacts
 tools/fumbblcli.jar
+
 
 
 # Resources are too expensive to store in Git for now
