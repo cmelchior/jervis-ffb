@@ -22,7 +22,6 @@ enum class DiceRollType {
     DEFLECTION,
     DODGE,
     DEVIATE,
-    FOUl,
     HYPNOTIC_GAZE,
     INJURY,
     INTERCEPT,

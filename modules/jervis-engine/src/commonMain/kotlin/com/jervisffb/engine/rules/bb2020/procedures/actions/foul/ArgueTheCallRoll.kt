@@ -23,19 +23,11 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallResult
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-
-enum class ArgueTheCallRollModifier(
-    override val modifier: Int,
-    override val description: String
-) : DiceModifier {
-    I_DID_NOT_SEE_A_THING(1, "I didn't see a thing"), // Biased Referee Inducement
-}
 
 /**
  * Implement the Argue The Call roll as described on page 63 in the rulebook.
@@ -51,17 +43,15 @@ object ArgueTheCallRoll: Procedure() {
 
     object RollDice : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D6))
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkType<D6Result>(action) { d6 ->
                 val context = state.getContext<FoulContext>()
                 val result = rules.argueTheCallTable.roll(d6)
 
-                // While weirdly worded "Friends with the Ref", just means that roll 5
+                // While weirdly worded "Friends with the Ref" just means that roll 5
                 // can be changed to "Well, When You Put It Like That..."
                 val nextNodeCommand = if (
                     context.fouler.team.activePrayersToNuffle.contains(PrayerToNuffle.FRIENDS_WITH_THE_REF) &&
@@ -88,11 +78,9 @@ object ArgueTheCallRoll: Procedure() {
     // option of modifying the final result. This choice is handled here.
     object ResolveFriendsWithTheReferences : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(ConfirmWhenReady, CancelWhenReady)
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 Cancel -> ExitProcedure()

@@ -152,7 +152,7 @@ class PrayersToNuffleTests: JervisGameTest() {
             Confirm, // Accept using Friends with the Ref
         )
         assertTrue(state.getPlayerById("A1".playerId).location.isOnField(rules))
-        assertEquals(PlayerState.STANDING, state.getPlayerById("A1".playerId)!!.state)
+        assertEquals(PlayerState.STANDING, state.getPlayerById("A1".playerId).state)
 
         // Check the prayer is gone by the end of drive
         controller.rollForward(

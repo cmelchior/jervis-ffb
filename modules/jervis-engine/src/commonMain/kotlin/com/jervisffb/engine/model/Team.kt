@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.inducements.Bribe
 import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
 import com.jervisffb.engine.model.inducements.SpecialPlayCard
 import com.jervisffb.engine.model.inducements.wizards.Wizard
+import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -89,6 +90,7 @@ class Team(
 
     // Team staff
     var coachBanned: Boolean = false
+    val brilliantCoachingModifiers = mutableListOf<BrilliantCoachingModifiers>()
     val apothecaries: Int // Limit
         get() = teamApothecaries.count { it.used } + tempApothecaries.count { it.used }
     val teamApothecaries = mutableListOf<Apothecary>()

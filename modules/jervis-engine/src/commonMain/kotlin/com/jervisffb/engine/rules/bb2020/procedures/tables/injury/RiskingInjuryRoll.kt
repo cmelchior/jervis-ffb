@@ -116,10 +116,7 @@ object RiskingInjuryRoll: Procedure() {
     }
 
     object RollForAmour: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
-            return ArmourRoll
-        }
-
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ArmourRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             return if (context.armourBroken) {

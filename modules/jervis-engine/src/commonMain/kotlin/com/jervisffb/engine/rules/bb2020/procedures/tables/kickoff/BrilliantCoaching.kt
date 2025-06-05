@@ -21,16 +21,20 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
 import com.jervisffb.engine.reports.ReportBrilliantCoachingResult
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.BrilliantCoachingReroll
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import com.jervisffb.engine.utils.sum
 
 data class BrilliantCoachingContext(
     val kickingTeamRoll: D6Result,
+    val kickingTeamModifiers: List<BrilliantCoachingModifiers> = emptyList(),
     val receivingTeamRoll: D6Result? = null,
+    val receivingTeamModifiers: List<BrilliantCoachingModifiers> = emptyList(),
 ): ProcedureContext
 
 /**
@@ -51,7 +55,7 @@ object BrilliantCoaching : Procedure() {
             return checkType<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BRILLIANT_COACHING, d6),
-                    SetContext(BrilliantCoachingContext(d6)),
+                    SetContext(BrilliantCoachingContext(d6, state.kickingTeam.brilliantCoachingModifiers)),
                     GotoNode(ReceivingTeamRollDie),
                 )
             }
@@ -67,7 +71,7 @@ object BrilliantCoaching : Procedure() {
             return checkType<D6Result>(action) { d6 ->
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BRILLIANT_COACHING, d6),
-                    SetContext(state.getContext<BrilliantCoachingContext>().copy(receivingTeamRoll = d6)),
+                    SetContext(state.getContext<BrilliantCoachingContext>().copy(receivingTeamRoll = d6, receivingTeamModifiers = state.receivingTeam.brilliantCoachingModifiers)),
                     GotoNode(ResolveBrilliantCoaching),
                 )
             }
@@ -77,8 +81,8 @@ object BrilliantCoaching : Procedure() {
     object ResolveBrilliantCoaching : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<BrilliantCoachingContext>()
-            val kickingResult = context.kickingTeamRoll.value + state.kickingTeam.assistantCoaches
-            val receivingResult = context.receivingTeamRoll!!.value + state.receivingTeam.assistantCoaches
+            val kickingResult = context.kickingTeamRoll.value + state.kickingTeam.assistantCoaches + context.kickingTeamModifiers.sum()
+            val receivingResult = context.receivingTeamRoll!!.value + state.receivingTeam.assistantCoaches + context.receivingTeamModifiers.sum()
             return compositeCommandOf(
                 when {
                     kickingResult > receivingResult -> AddTeamReroll(state.kickingTeam,
@@ -95,8 +99,10 @@ object BrilliantCoaching : Procedure() {
                     state.receivingTeam,
                     context.kickingTeamRoll,
                     state.kickingTeam.assistantCoaches,
+                    state.kickingTeam.brilliantCoachingModifiers,
                     context.receivingTeamRoll,
                     state.receivingTeam.assistantCoaches,
+                    state.receivingTeam.brilliantCoachingModifiers
                 ),
                 ExitProcedure(),
             )

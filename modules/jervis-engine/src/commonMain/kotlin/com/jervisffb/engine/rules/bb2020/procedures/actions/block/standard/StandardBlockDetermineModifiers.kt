@@ -70,13 +70,13 @@ object StandardBlockDetermineModifiers: Procedure() {
                 context.defender.coordinates.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
                     .filter { it != context.attacker}
-                    .count { player -> rules.canOfferAssistAgainst(player, context.defender) }
+                    .count { player -> rules.canOfferAssist(player, context.defender) }
 
             val defensiveAssists =
                 context.attacker.coordinates.getSurroundingCoordinates(rules)
                     .mapNotNull { state.field[it].player }
                     .filter { it != context.defender}
-                    .count { player -> rules.canOfferAssistAgainst(player, context.attacker) }
+                    .count { player -> rules.canOfferAssist(player, context.attacker) }
 
             return compositeCommandOf(
                 SetContext(context.copy(offensiveAssists = offensiveAssists, defensiveAssists = defensiveAssists)),

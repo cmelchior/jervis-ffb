@@ -1,6 +1,7 @@
 package com.jervisffb.engine.model.modifiers
 
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.utils.assert
 
 
 /**
@@ -28,7 +29,11 @@ data class OffensiveAssistModifier(
 data class DefensiveAssistsModifier(
     override val modifier: Int,
     override val description: String = "Defensive Assists"
-) : DiceModifier
+) : DiceModifier {
+    init {
+        assert(modifier <= 0) { "Defensive assists most be negative: $modifier" }
+    }
+}
 
 class NigglingInjuryModifier(val player: Player) : DiceModifier {
     override val modifier: Int = player.nigglingInjuries * -1

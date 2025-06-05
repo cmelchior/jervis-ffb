@@ -55,7 +55,7 @@ interface SpecialPlayCard: InducementEffect {
     // Type of Special Play Card. Should we just model this using sealed interfaces?
     val type: SpecialPlayCardType
     // When the card stops being "in play".
-    // Some cards also adds temporary skills, dice modifiers and other powers
+    // Some cards also add temporary skills, dice modifiers, and other powers
     // these are removed independently. This only tracks "the card"
     val duration: Duration
     // If the card is "played" or in use.

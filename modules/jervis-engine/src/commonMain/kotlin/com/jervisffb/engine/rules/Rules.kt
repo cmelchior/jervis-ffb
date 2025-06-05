@@ -365,12 +365,16 @@ open class Rules(
     /**
      * Returns `true` if the player is considered `Marked as described on
      * page 26 in the rulebook.
+     *
+     * @param player the player that is checked for marks.
+     * @param location The location the player is in. Can be overridden to fake the player
+     * being in another location (used, e.g., when checking if dodging is needed).
      */
-    fun isMarked(player: Player, overrideLocation: Location): Boolean {
-        if (!overrideLocation.isOnField(this)) return false
-        if (overrideLocation !is FieldCoordinate) return false
+    fun isMarked(player: Player, location: Location = player.location): Boolean {
+        if (!location.isOnField(this)) return false
+        if (location !is FieldCoordinate) return false
         val field = player.team.game.field
-        return overrideLocation.getSurroundingCoordinates(this, 1)
+        return location.getSurroundingCoordinates(this, 1)
             .asSequence()
             .filter {
                 val otherPlayer = field[it].player
@@ -379,46 +383,90 @@ open class Rules(
             .firstOrNull { canMark(field[it].player!!) } != null
     }
 
-    fun isMarked(player: Player): Boolean {
-        if (!player.location.isOnField(this)) return false
-        val field = player.team.game.field
-        return player.coordinates.getSurroundingCoordinates(this, 1)
-            .asSequence()
-            .filter {
-                val otherPlayer = field[it].player
-                otherPlayer != null && otherPlayer.team != player.team
-            }
-            .firstOrNull { canMark(field[it].player!!) } != null
-    }
-
-    fun isMarking(state: Game, player: Player, target: Player): Boolean {
+    /**
+     * Returns `true` if [player] count as marking [target], `false` if not.
+     */
+    fun isMarking(player: Player, target: Player): Boolean {
         if (!player.location.isOnField(this)) return false
         if (!target.location.isOnField(this)) return false
         if (!player.hasTackleZones) return false
-
+        if (player.state != PlayerState.STANDING) return false
+        val state = player.team.game
         return player.coordinates.getSurroundingCoordinates(this, 1)
             .any { state.field[it].player == target }
     }
 
     /**
-     * Return `true` if the [assisting] player can assist another player against
-     * [target], `false` if not.
+     * Calculate how many offensive assists the [attacker] has if all assists
+     * are provided.
+     *
+     * See page 57 in the rulebook:
+     * - Must be marking defender
+     * - Cannot assist if being marked themselves (by someone other than the defender)
+     *
+     * @param attacker The attacking player
+     * @param defender the defending player
      */
-    fun canOfferAssistAgainst(
-        assisting: Player,
+    fun calculateOffensiveAssists(attacker: Player, defender: Player): Int {
+        val field = defender.team.game.field
+        return defender.coordinates.getSurroundingCoordinates(this)
+            .mapNotNull { field[it].player }
+            .filter { it != attacker }
+            .count { player ->
+                canOfferAssist(player, defender)
+            }
+    }
+
+    /**
+     * Calculate how many defensive assists the [defender] has if all assists
+     * are provided.
+     *
+     * See page 57 in the rulebook:
+     * - Must be marking attacker
+     * - Cannot assist if being marked themselves (by someone other than the attacker)
+     *
+     * @param defender the defending player
+     * @param attacker The attacking player
+     */
+    fun calculateDefensiveAssists(defender: Player, attacker: Player): Int {
+        val field = defender.team.game.field
+        return attacker.coordinates.getSurroundingCoordinates(this)
+            .mapNotNull { field[it].player }
+            .filter { it != defender }
+            .count { player ->
+                canOfferAssist(player, attacker)
+            }
+    }
+
+    /**
+     * Return `true` if the [assister] player can offer either an offensive or
+     * defensive assist against [target], `false` if not.
+     *
+     * See page 57 in the rulebook.
+     */
+    fun canOfferAssist(
+        assister: Player,
         target: Player,
     ): Boolean {
-        if (assisting.team == target.team) return false
-        if (!assisting.location.isAdjacent(this, target.location)) return false
-        if (!canMark(assisting)) return false
+        if (assister.team == target.team) return false
+        if (!assister.location.isAdjacent(this, target.location)) return false
+        if (!canMark(assister)) return false
         // TODO If player has Guard, player can always assist
-        return assisting.coordinates.getSurroundingCoordinates(this).firstOrNull {
-            assisting.team.game.field[it].player?.let { adjacentPlayer ->
-                adjacentPlayer != target &&
-                    adjacentPlayer.team != assisting.team &&
-                    canMark(adjacentPlayer)
-            } ?: false
-        } == null
+        // We need to check if the only player marking the possible assister is the target
+        // If yes, they can still assist
+        val field = assister.team.game.field
+        return assister.coordinates
+            .getSurroundingCoordinates(this, 1, false)
+            .fold(0) { acc, coordinate ->
+                val markingPlayer: Player? = field[coordinate].player
+                val markingTeam = markingPlayer?.team
+                val canMark = markingPlayer?.let { canMark(it) } ?: false
+                if (markingPlayer != null && assister.team != markingTeam && canMark) {
+                    acc + 1
+                } else {
+                    acc
+                }
+            } <= 1
     }
 
     // Only call this method for the active team
@@ -546,7 +594,7 @@ open class Rules(
                         .mapNotNull { state.field[it].player }
                         .filter { otherPlayer -> otherPlayer.team != player.team }
                         .filter { otherPlayer -> isStanding(otherPlayer)}
-                        .any { otherPlayer -> isMarking(state, player, otherPlayer)}
+                        .any { otherPlayer -> isMarking(player, otherPlayer)}
 
                     if (isStanding && hasEligibleTargets) {
                         add(teamActions.block)

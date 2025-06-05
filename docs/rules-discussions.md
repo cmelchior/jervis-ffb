@@ -182,3 +182,30 @@ This was clarified in May 2025 FAQ - Tentacles are rolled first.
 For Giants, it isn't well-defined how to interpret its location. E.g., during 
 setup, is it considered to be in the wide zone if part of it is in there, or 
 does all of it need to be inside?
+
+## ### Page 57 / 63 - Offensive/Defensive Assists
+According to the rules, it is optional to provide offensive and defensive
+assists to blocks and fouls. However, since there seems no reason (even bad) for
+not always having the maximum number of assists, Jervis just calculates this
+automatically.
+
+For Blocks:
+- Attacker: Only increases the number of dice being rolled. If the attacker
+  wants a particular result, they can still select it.
+- Defender: Reduces the number of dice being rolled. If the defenders want the
+  attacker to have more choice, they are still not guaranteed that that choice
+  is selected.
+
+For Fouls:
+- Attacker: Increase the likelihood of an armour break. If they didn't want to
+  break armour, they wouldn't foul in the first place.
+- Defender: If they wanted to stay 
+
+If a use case shows up where there could be a use case (even a bad one), this
+will be re-evaluated.
+
+UPDATE:
+Use case found: You want to get rid of your own players so you can 
+concede without a penalty. So choosing assists should be optional (at least in
+the rules engine)
+

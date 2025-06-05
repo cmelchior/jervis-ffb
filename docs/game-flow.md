@@ -130,7 +130,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] No catch after Pass/Hand-off
   - [ ] Deflection/Interception and ball not caught by throwing team
   - [ ] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
-  - [ ] Sent-off for commiting a Foul
+  - [x] Sent-off for commiting a Foul
   - [ ] Touchdown
 - [ ] Conceding
   - [ ] Free if 3 or less players at beginning of turn
@@ -139,7 +139,12 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Carry over into Extra Time
   - [ ] Leader
   - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
-- [ ] Marked / Open
+- [ ] Marking Players
+  - [ ] Marking
+  - [ ] Marked
+  - [ ] Open
+  - [ ] Defensive Assists
+  - [ ] Offensive Assists
 - [x] Dodging (basic, no skills)
   - [x] When leaving marking player
   - [x] Not when leaving player with no TZ
@@ -198,6 +203,10 @@ rules, skills are tracked separately in [skills.md](skills.md).
 - [ ] Characteristic Tests
   - [x] Agility
   - [ ] Passing
+- [ ] End of turn
+- [ ] End of Drive
+- [ ] End of Half
+- [ ] End of Game
 
 ## Actions
 
@@ -267,11 +276,15 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Move after blitz
   - [x] Blitz uses 1 move
   - [x] Fail rush just before blitz
-- [ ] Foul Action
-  - [ ] Must select player when starting action
-  - [ ] Can only foul selected player
-  - [ ] Assists
-  - [ ] Caught by the Ref
+- [x] Foul Action
+  - [x] Must select player when starting action: Prone or Stunned
+  - [x] Can only foul selected player
+  - [x] Assists
+  - [x] Caught by the Ref
+  - [x] Sent-off is a turnover
+  - [x] Action end after foul
+  - [x] Fouling does not take up a move
+  - [x] Argue the call tests
 - [x] Hand-off Action
   - [x] Only 1 hand-off pr. turn
   - [x] Move uses action
@@ -282,6 +295,10 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Players with PA - can still hand-off
   - [x] Test against agility to catch it
   - [x] Ball bounce from target player if not caught
+- [x] Argue the Call Table
+  - [x] You're Outta Here - Bans Coach / Cannot argue again / Effect Brilliant Coaching
+  - [x] I Don't Care
+  - [x] Well, When You Put It Like That...
 - [ ] Pass Action
 - [ ] Throw Team-mate Action
 

@@ -2,17 +2,19 @@ package com.jervisffb.test.actions
 
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.NoRerollSelected
-import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
+import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.SmartMoveTo
+import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
@@ -40,11 +42,11 @@ class HandOffActionTests: JervisGameTest() {
         val player = awayTeam["A10".playerId]
         assertEquals(1, state.awayTeam.turnData.handOffActions)
         controller.rollForward(
-            PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerStandardActionType.HAND_OFF),
+            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
             EndAction
         )
         assertEquals(1, state.awayTeam.turnData.handOffActions)
+        assertEquals(Availability.AVAILABLE, awayTeam["A10".playerId].available)
     }
 
     @Test
@@ -52,8 +54,7 @@ class HandOffActionTests: JervisGameTest() {
         val player = awayTeam["A10".playerId]
         assertEquals(1, state.awayTeam.turnData.handOffActions)
         controller.rollForward(
-            PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerStandardActionType.HAND_OFF),
+            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
             *moveTo(17, 6),
             EndAction
         )
@@ -64,8 +65,7 @@ class HandOffActionTests: JervisGameTest() {
     fun canStartActionWithoutBall() {
         val player = awayTeam["A10".playerId]
         controller.rollForward(
-            PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerStandardActionType.HAND_OFF),
+            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
         )
         assertEquals(player, state.activePlayer)
         assertFalse(player.hasBall())
@@ -76,8 +76,7 @@ class HandOffActionTests: JervisGameTest() {
         val player = awayTeam["A10".playerId]
         assertEquals(1, state.awayTeam.turnData.handOffActions)
         controller.rollForward(
-            PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerStandardActionType.HAND_OFF),
+            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
         )
         assertEquals(player, state.activePlayer)
         assertFalse(player.hasBall())
@@ -100,8 +99,7 @@ class HandOffActionTests: JervisGameTest() {
         val player = awayTeam["A10".playerId]
         assertEquals(1, state.awayTeam.turnData.handOffActions)
         controller.rollForward(
-            PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerStandardActionType.HAND_OFF),
+            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
         )
         assertEquals(player, state.activePlayer)
         assertFalse(player.hasBall())
@@ -136,8 +134,7 @@ class HandOffActionTests: JervisGameTest() {
         val player = awayTeam["A10".playerId]
         player.passing = null // Set passing to "-"
         controller.rollForward(
-            PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerStandardActionType.HAND_OFF),
+            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
             *moveTo(17, 7),
             4.d6, // Pickup
             NoRerollSelected(),
@@ -152,8 +149,7 @@ class HandOffActionTests: JervisGameTest() {
     @Test
     fun catchHandOff() {
         controller.rollForward(
-            PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerStandardActionType.HAND_OFF),
+            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
             *moveTo(17, 7),
             4.d6, // Pickup
             NoRerollSelected(),
@@ -171,8 +167,7 @@ class HandOffActionTests: JervisGameTest() {
         val player = awayTeam["A10".playerId]
         player.passing = null // Set passing to "-"
         controller.rollForward(
-            PlayerSelected("A10".playerId),
-            PlayerActionSelected(PlayerStandardActionType.HAND_OFF),
+            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
             *moveTo(17, 7),
             4.d6, // Pickup
             NoRerollSelected(),
@@ -185,5 +180,19 @@ class HandOffActionTests: JervisGameTest() {
         assertFalse(awayTeam["A7".playerId].hasBall())
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
         assertEquals(FieldCoordinate(15, 0), state.singleBall().location)
+    }
+
+    @Test
+    fun doesNotRequireMove() {
+        // Fake state by giving ball to player manually
+        SetBallState.carried(state.singleBall(), awayTeam["A6".playerId]).execute(state)
+        controller.rollForward(
+            *activatePlayer("A6", PlayerStandardActionType.HAND_OFF),
+            PlayerSelected("A7".playerId),
+            6.d6, // Catch
+            NoRerollSelected(),
+        )
+        assertEquals(0, awayTeam.turnData.handOffActions)
+        assertNull(state.activePlayer)
     }
 }

@@ -17,7 +17,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.InvalidActionException
 
 /**
- * Check that not only verify the game action type, but also the value.
+ * Check that not only does the game action type match, but also the value.
  * This is, e.g., relevant when selecting locations or players.
  */
 inline fun <reified T : GameAction> ActionNode.checkTypeAndValue(

@@ -65,9 +65,10 @@ enum class PlayerState {
     SERIOUS_INJURY,
     DEAD,
     FAINTED, // From Sweltering Heat
-    BANNED,
+    BANNED, // From being sent off by the Ref
 
-    // Intermediate states
+    // Intermediate states. These states should only be used while the effect of
+    // them is being resolved. I.e., rolling armor and injury dice.
     FALLEN_OVER,
     KNOCKED_DOWN,
 
@@ -75,6 +76,8 @@ enum class PlayerState {
     STANDING,
     PRONE,
     STUNNED,
+    // This state should only be visible for a player during their own team turn.
+    // After that, it should turn into a normal STUNNED state.
     STUNNED_OWN_TURN,
 
 //    MOVING,

@@ -17,7 +17,6 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
@@ -69,8 +68,8 @@ object ArmourRoll: Procedure() {
                 // Determine result of armour roll
                 // TODO This logic needs to be expanded to support things like Mighty Blow, Claw, Chainsaw and others.
                 val roll = listOf(die1, die2)
-                val result = roll.sum()
-                val modifiers = emptyList<DiceModifier>() // Any skills that modify the result
+                val modifiers = context.armourModifiers // Any skills that modify the result
+                val result = roll.sum() + modifiers.sum()
                 val broken = (context.player.armorValue <= result)
 
                 val updatedContext = state.getContext<RiskingInjuryContext>().copy(
@@ -79,7 +78,6 @@ object ArmourRoll: Procedure() {
                     armourModifiers = modifiers,
                     armourBroken = broken
                 )
-
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.ARMOUR, roll),
                     SetContext(updatedContext),

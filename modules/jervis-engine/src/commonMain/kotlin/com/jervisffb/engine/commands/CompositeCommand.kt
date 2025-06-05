@@ -10,6 +10,7 @@ class CompositeCommand private constructor(val commands: List<Command>) : Comman
     class Builder {
         private val commands = mutableListOf<Command>()
         fun add(command: Command) = commands.add(command)
+        fun addAll(vararg commands: Command) = commands.forEach { add(it) }
         fun build(): CompositeCommand {
             return CompositeCommand(commands)
         }

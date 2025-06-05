@@ -207,10 +207,10 @@ fun createRandomAction(
 const val enableAsserts = true
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun assert(condition: Boolean) {
+inline fun assert(condition: Boolean, lazyMessage: () -> String = { "A invariant failed" }) {
     @Suppress("SimplifyBooleanWithConstants")
     if (enableAsserts && !condition) {
-        throw IllegalStateException("A invariant failed")
+        throw IllegalStateException(lazyMessage())
     }
 }
 
