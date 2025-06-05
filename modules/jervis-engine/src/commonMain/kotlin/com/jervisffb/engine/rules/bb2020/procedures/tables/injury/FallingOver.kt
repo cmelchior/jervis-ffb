@@ -4,6 +4,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
+import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
@@ -52,7 +53,10 @@ object FallingOver: Procedure() {
         }
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
+        val context = state.getContext<RiskingInjuryContext>()
         return compositeCommandOf(
+            // Falling over results in a turn-over pr. the list of turnovers on page 23 in the rulebook.
+            if (context.player.team == state.activeTeam) SetTurnOver(TurnOver.STANDARD) else null,
             if (state.currentBallOrNull() != null) SetCurrentBall(null) else null,
         )
     }

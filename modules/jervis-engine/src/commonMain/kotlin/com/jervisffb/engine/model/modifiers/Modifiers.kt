@@ -14,8 +14,8 @@ interface DiceModifier {
 
 // Modifiers added due to a square being marked by players from the opposite team.
 // I.e. the modifier is always negative
-class MarkedModifier(markingPlayers: Int) : DiceModifier {
-    override val modifier: Int = markingPlayers * -1
+class MarkedModifier(markingPlayers: Int, type: DiceModifier) : DiceModifier {
+    override val modifier: Int = markingPlayers * type.modifier
     override val description: String = "Marked"
 }
 

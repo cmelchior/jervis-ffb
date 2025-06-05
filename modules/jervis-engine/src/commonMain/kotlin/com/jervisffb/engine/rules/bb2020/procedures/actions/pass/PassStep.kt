@@ -62,7 +62,7 @@ object PassStep: Procedure() {
             val context = state.getContext<PassContext>()
             val targetSquares = context.thrower.coordinates.getSurroundingCoordinates(rules, rules.rangeRuler.maxDistance)
                 .filter {
-                    val range = rules.rangeRuler.measure(context.thrower.coordinates, it)
+                    val range = rules.rangeRuler.measure(context.thrower, it)
                     when (range) {
                         Range.PASSING_PLAYER -> false
                         Range.QUICK_PASS -> true
@@ -83,12 +83,15 @@ object PassStep: Procedure() {
                 else -> {
                     checkTypeAndValue<FieldSquareSelected>(state, rules, action) {
                         val context = state.getContext<PassContext>()
-                        val distance = rules.rangeRuler.measure(context.thrower.coordinates, it.coordinate)
+                        val distance = rules.rangeRuler.measure(context.thrower, it.coordinate)
                         val ball = context.thrower.ball!!
                         val newLocation = it.coordinate
                         compositeCommandOf(
                             ReportPassResult(context),
-                            SetContext(context.copy(target = newLocation, range = distance)),
+                            SetContext(context.copy(
+                                target = newLocation,
+                                range = distance
+                            )),
                             SetBallState.accurateThrow(ball), // Until proven otherwise. Should we invent a new type?
                             SetBallLocation(ball, newLocation),
                             GotoNode(TestForAccuracy)

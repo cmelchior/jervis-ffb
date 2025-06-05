@@ -128,7 +128,7 @@ object DodgeRoll: Procedure() {
      *
      * This includes:
      *  1. -1 for each player marking the field being moved into.
-     *  2. Stunty* (Ignore all -1 marked modifiers in target field)
+     *  2. Stunty* (Ignore all - marked modifiers in the target field)
      *  3. Titchy* (+1)
      */
     object CalculateMandatoryModifiers : ComputationNode() {
@@ -136,10 +136,15 @@ object DodgeRoll: Procedure() {
             val context = state.getContext<DodgeRollContext>()
             val player = context.player
             val modifiers = buildList {
-                // Add marking modifiers if moving player doesn't have Stunty.
+                // Add marking modifiers if the moving player doesn't have Stunty.
                 if (!player.hasSkill<Stunty>()) {
-                    val marks = rules.calculateMarks(state, player.team, context.targetSquare)
-                    if (marks > 0) add(MarkedModifier(marks))
+                    rules.addMarkedModifiers(
+                        state,
+                        player.team,
+                        context.targetSquare,
+                        this,
+                        DodgeRollModifier.MARKED
+                    )
                 }
                 if (player.hasSkill<Titchy>()) {
                     add(DodgeRollModifier.TITCHY)

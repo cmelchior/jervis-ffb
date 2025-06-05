@@ -45,4 +45,44 @@ class TurnOverTests: JervisGameTest() {
         assertEquals(1, awayTeam.turnMarker)
         assertEquals(1, awayTeam.turnMarker)
     }
+
+    @Test
+    fun fumblesPassAction() {
+        TODO()
+    }
+
+    @Test
+    fun failedToCatchPass_ground() {
+        TODO()
+    }
+
+    @Test
+    fun failedToCatchPass_opponent() {
+        TODO()
+    }
+
+    @Test
+    fun failedToCatchHandOff_ground() {
+        TODO()
+    }
+
+    @Test
+    fun failedToCatchHandOff_opponent() {
+        TODO()
+    }
+
+    @Test
+    fun deflectedPass_ground() {
+        TODO()
+    }
+
+    @Test
+    fun deflectedPass_opponent() {
+        TODO()
+    }
+
+    @Test
+    fun interceptedPass() {
+        TODO()
+    }
 }

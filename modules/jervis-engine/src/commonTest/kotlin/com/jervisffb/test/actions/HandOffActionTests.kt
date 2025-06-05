@@ -38,8 +38,7 @@ class HandOffActionTests: JervisGameTest() {
     }
 
     @Test
-    fun cancelBeforeMoveOrHandOffDoesNotUseAction() {
-        val player = awayTeam["A10".playerId]
+    fun cancelBeforeMoveOrHandOffDoesNotUseAction() { val player = awayTeam["A10".playerId]
         assertEquals(1, state.awayTeam.turnData.handOffActions)
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
@@ -51,7 +50,6 @@ class HandOffActionTests: JervisGameTest() {
 
     @Test
     fun moveWithoutBallUsesAction() {
-        val player = awayTeam["A10".playerId]
         assertEquals(1, state.awayTeam.turnData.handOffActions)
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),

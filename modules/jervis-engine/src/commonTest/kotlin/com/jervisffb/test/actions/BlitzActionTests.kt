@@ -25,6 +25,7 @@ import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
+import com.jervisffb.test.rushTo
 import com.jervisffb.test.utils.SelectSingleDieResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -153,12 +154,8 @@ class BlitzActionTests: JervisGameTest() {
             *moveTo(14, 4),
             *moveTo(14, 3),
             *moveTo(13, 3),
-            *moveTo(12, 3),
-            2.d6, // Rush
-            NoRerollSelected(),
-            *moveTo(12, 4),
-            2.d6, // Rush
-            NoRerollSelected(),
+            *rushTo(12, 3, 2.d6),
+            *rushTo(12, 4, 2.d6),
         )
         assertEquals(FieldCoordinate(12, 5), defender.location)
         assertEquals(1, controller.getAvailableActions().count())
@@ -202,9 +199,7 @@ class BlitzActionTests: JervisGameTest() {
             *moveTo(14, 4),
             *moveTo(14, 3),
             *moveTo(13, 3),
-            *moveTo(12, 4),
-            2.d6, // Rush
-            NoRerollSelected(),
+            *rushTo(12, 4),
             PlayerSelected(defender.id), // Start block
             BlockTypeSelected(BlockType.STANDARD),
             2.d6, // Needs to rush to make the block
@@ -238,9 +233,7 @@ class BlitzActionTests: JervisGameTest() {
             *moveTo(14, 4),
             *moveTo(14, 3),
             *moveTo(13, 3),
-            *moveTo(12, 4),
-            2.d6, // Rush
-            NoRerollSelected(),
+            *rushTo(12, 4, 2.d6),
             PlayerSelected(defender.id), // Start block
             BlockTypeSelected(BlockType.STANDARD),
             1.d6, // Fail last rush to make the block

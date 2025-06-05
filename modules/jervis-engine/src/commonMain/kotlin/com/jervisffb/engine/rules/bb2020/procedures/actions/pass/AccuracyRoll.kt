@@ -39,6 +39,7 @@ import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
+import com.jervisffb.engine.utils.sum
 
 /**
  * Implement the Accuracy Roll as described on page 49 in the rulebook.
@@ -131,6 +132,8 @@ object AccuracyRoll: Procedure() {
         }
     }
 
+    // HELPER METHODS
+
     private fun updatePassContext(state: Game, rules: Rules, d6: D6Result, reroll: Boolean): PassContext {
         val context = state.getContext<PassContext>()
         val modifiers = mutableListOf<DiceModifier>()
@@ -144,11 +147,11 @@ object AccuracyRoll: Procedure() {
             else -> INVALID_GAME_STATE("Unsupported range: ${context.range}")
         }?.let { modifiers.add(it) }
 
-        // Marked modifiers for square where ball is landing
+        // Marked modifiers for thrower
         rules.addMarkedModifiers(
             state,
             context.thrower.team,
-            state.field[state.currentBall().location],
+            context.thrower.coordinates,
             modifiers,
             AccuracyModifier.MARKED
         )
@@ -163,7 +166,7 @@ object AccuracyRoll: Procedure() {
 
         // Calculate result
         val passingStat = context.thrower.passing ?: Int.MAX_VALUE
-        val modifierTotal = modifiers.sumOf { it.modifier }
+        val modifierTotal = modifiers.sum()
         val result = when {
             context.thrower.passing == null -> PassingType.FUMBLED
             d6.value == 6 -> PassingType.ACCURATE

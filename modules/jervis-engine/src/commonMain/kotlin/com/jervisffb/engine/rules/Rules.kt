@@ -20,6 +20,7 @@ import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
 import com.jervisffb.engine.rules.bb2020.SkillSettings
@@ -342,7 +343,7 @@ open class Rules(
     /**
      * Return `true` if this player is able to mark other players.
      */
-    fun canMark(player: Player): Boolean {
+    fun canMarkPlayers(player: Player): Boolean {
         return player.hasTackleZones && player.state == PlayerState.STANDING
     }
 
@@ -380,7 +381,7 @@ open class Rules(
                 val otherPlayer = field[it].player
                 otherPlayer != null && otherPlayer.team != player.team
             }
-            .firstOrNull { canMark(field[it].player!!) } != null
+            .firstOrNull { canMarkPlayers(field[it].player!!) } != null
     }
 
     /**
@@ -450,7 +451,7 @@ open class Rules(
     ): Boolean {
         if (assister.team == target.team) return false
         if (!assister.location.isAdjacent(this, target.location)) return false
-        if (!canMark(assister)) return false
+        if (!canMarkPlayers(assister)) return false
         // TODO If player has Guard, player can always assist
         // We need to check if the only player marking the possible assister is the target
         // If yes, they can still assist
@@ -460,7 +461,7 @@ open class Rules(
             .fold(0) { acc, coordinate ->
                 val markingPlayer: Player? = field[coordinate].player
                 val markingTeam = markingPlayer?.team
-                val canMark = markingPlayer?.let { canMark(it) } ?: false
+                val canMark = markingPlayer?.let { canMarkPlayers(it) } ?: false
                 if (markingPlayer != null && assister.team != markingTeam && canMark) {
                     acc + 1
                 } else {
@@ -469,21 +470,26 @@ open class Rules(
             } <= 1
     }
 
-    // Only call this method for the active team
+    /**
+     * Calculate how many marks are on [square] for a player on the [activeTeam].
+     * Marks will be returned as modifiers in the [modifiers] list.
+     *
+     * This method is only relevant for the current active team and will throw an
+     * error for the inactive team.
+     */
     fun addMarkedModifiers(
         game: Game,
         activeTeam: Team,
-        square: FieldSquare,
+        square: FieldCoordinate,
         modifiers: MutableList<DiceModifier>,
         markedModifier: DiceModifier = CatchModifier.MARKED
     ) {
-        square.coordinates.getSurroundingCoordinates(this).forEach {
-            val markingPlayer: Player? = game.field[it].player
-            if (markingPlayer != null) {
-                if (markingPlayer.team != activeTeam && canMark(markingPlayer)) {
-                    modifiers.add(markedModifier)
-                }
-            }
+        if (activeTeam != game.activeTeam) {
+            INVALID_GAME_STATE("This method is only relevant for the active team: ${activeTeam.name} vs ${game.activeTeam?.name}")
+        }
+        val marks = calculateMarks(game, activeTeam, square)
+        if (marks > 0) {
+            modifiers.add(MarkedModifier(marks, markedModifier))
         }
     }
 
@@ -505,7 +511,7 @@ open class Rules(
         return square.getSurroundingCoordinates(this).fold(initial = 0) { acc, coordinate ->
             val markingPlayer: Player? = game.field[coordinate].player
             val otherTeam = markingPlayer?.team
-            val canMark = markingPlayer?.let { canMark(it) } ?: false
+            val canMark = markingPlayer?.let { canMarkPlayers(it) } ?: false
             if (markingPlayer != null && otherTeam != markedTeam && canMark) {
                 acc + 1
             } else {

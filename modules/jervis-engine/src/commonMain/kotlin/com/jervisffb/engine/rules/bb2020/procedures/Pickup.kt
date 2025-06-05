@@ -39,9 +39,14 @@ object Pickup : Procedure() {
         val pickupPlayer = state.field[ball.location].player!!
         val modifiers = mutableListOf<DiceModifier>()
 
-        // Check for field being marked
-        val marks = rules.calculateMarks(state, pickupPlayer.team, ball.location)
-        modifiers.add(MarkedModifier(marks))
+        // Add modifiers for other opponent players marking the field.
+        rules.addMarkedModifiers(
+            state,
+            pickupPlayer.team,
+            ball.location,
+            modifiers,
+            PickupModifier.MARKED
+        )
 
         // Other modifiers, like disturbing presence?
 

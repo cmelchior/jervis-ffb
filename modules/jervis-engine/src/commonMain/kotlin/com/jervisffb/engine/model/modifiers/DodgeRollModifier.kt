@@ -6,10 +6,11 @@ package com.jervisffb.engine.model.modifiers
  * Also see [MarkedModifier],
  */
 enum class DodgeRollModifier(override val modifier: Int, override val description: String) : DiceModifier {
-    TITCHY(-1, "Titchy"),
-    TWO_HEADS(1, "Two Heads"),
+    DIVING_TACKLE(-2, "Diving Tackle"),
+    MARKED(-1, "Marked"),
     PREHENSILE_TAIL(-1, "Prehensile Tail"),
-    DIVING_TACKLE(-2, "Diving Tackle")
+    TITCHY(1, "Titchy"),
+    TWO_HEADS(1, "Two Heads"),
 }
 
 data class BreakTackleModifier(val playerStrength: Int): DiceModifier {

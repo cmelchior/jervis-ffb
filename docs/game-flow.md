@@ -145,6 +145,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Open
   - [ ] Defensive Assists
   - [ ] Offensive Assists
+  - [ ] Bulk marked modifiers 
 - [x] Dodging (basic, no skills)
   - [x] When leaving marking player
   - [x] Not when leaving player with no TZ
@@ -186,8 +187,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Players can only catch if they have tackle zones
   - [ ] Failing to catch will bounce from square
 - [ ] Track Star Player Points
-- [ ] Track more advanced stats
-- [ ] Track Star Player Points and adjustments to it.
+- [ ] Track statistics (not in the rules)
 - [ ] Touchdown
 - [ ] Detect Stalling
 - [ ] Trapdoors
@@ -300,7 +300,52 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] I Don't Care
   - [x] Well, When You Put It Like That...
 - [ ] Pass Action
+  - [x] 1 pass action pr turn
+  - [x] Action used without throwing
+  - [x] Throw without moving
+  - [x] Cannot move after throw
+  - [x] Throw to any square within range
+  - [x] Can cancel throw part and restart it
+  - [x] Quick pass
+  - [x] Short pass
+  - [x] Long pass
+  - [x] Long bomb
+  - [x] Marked modifiers to parser
+  - [x] Accurate pass
+  - [x] Inaccurate pass
+  - [x] Wildly inaccurate pass
+  - [x] Fumbled pass
+  - [x] Bounce from target if not caught
+  - [ ] Passing Interference (players under the ruler)
+    - [ ] Must be standing with a tackle zone
+    - [ ] Opposing coach chooses player if multiple options
+    - [ ] Modifers 
+    - [ ] Scatter if failed catch
+    - [ ] Interception if succesfull catch
 - [ ] Throw Team-mate Action
+  - [ ] Require Throw Team-mate and Right Stuff traits
+  - [ ] Uses Pass action
+  - [ ] Action used without throwing
+  - [ ] Throw without moving
+  - [ ] Cannot move after throw
+  - [ ] Throw to any square within range
+  - [ ] Superb Throw
+  - [ ] Successful Throw
+  - [ ] Terrible Throw
+  - [ ] Fumbled Throw
+  - [ ] Scatter on non-fumbled throws
+  - [ ] Land Superb throw
+  - [ ] Land Fumbled throw
+  - [ ] Land Successful throw
+  - [ ] Land Land Terrible throw
+  - [ ] Marker modifiers on landing
+  - [ ] Land in occupied square
+  - [ ] Turnover if landing on player from own team
+  - [ ] No Turnover if thrown player is knocked down and not holding the ball
+  - [ ] Turnover if thrown player is knocked down and is holding the ball
+  - [ ] Land in occupied square with prone player
+  - [ ] Crash Landing
+  - [ ] Landing in the crowd
 
 ## BB7
 

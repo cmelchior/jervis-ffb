@@ -43,9 +43,15 @@ object Catch : Procedure() {
         if (ball.state == BallState.DEVIATING) modifiers.add(CatchModifier.DEVIATED)
         if (ball.state == BallState.SCATTERED) modifiers.add(CatchModifier.SCATTERED)
         // TODO Check for disturbing presence.
-        // Check for field being marked
-        val marks = rules.calculateMarks(state, catchingPlayer.team, ball.location)
-        modifiers.add(MarkedModifier(marks))
+
+        // Add marked modifiers for field
+        rules.addMarkedModifiers(
+            state,
+            catchingPlayer.team,
+            ball.location,
+            modifiers,
+            CatchModifier.MARKED
+        )
 
         // Check the weather
         if (state.weather == Weather.POURING_RAIN) {

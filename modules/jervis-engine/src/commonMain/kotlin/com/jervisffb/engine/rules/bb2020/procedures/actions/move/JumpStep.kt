@@ -35,6 +35,7 @@ import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.model.modifiers.JumpModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
@@ -234,7 +235,7 @@ object JumpStep : Procedure() {
             val player = moveContext.player
             val jumpFromMarks = rules.calculateMarks(state, player.team, moveContext.startingSquare)
             val jumpToMarks = rules.calculateMarks(state, player.team, moveContext.target!!)
-            val markModifier = MarkedModifier(max(jumpToMarks, jumpFromMarks))
+            val markModifier = MarkedModifier(max(jumpToMarks, jumpFromMarks), JumpModifier.MARKED)
             return SetContext(JumpRollContext(
                 player = player,
                 modifiers = listOf(markModifier),

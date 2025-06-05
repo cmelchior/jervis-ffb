@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.EndSetup
@@ -14,6 +15,7 @@ import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
@@ -224,6 +226,13 @@ fun activatePlayer(playerId: String, type: PlayerStandardActionType) = arrayOf(
 fun moveTo(x: Int, y: Int) = arrayOf(
     MoveTypeSelected(MoveType.STANDARD),
     FieldSquareSelected(FieldCoordinate(x, y)),
+)
+
+fun rushTo(x: Int, y: Int, rushRoll: D6Result = 6.d6) = arrayOf(
+    MoveTypeSelected(MoveType.STANDARD),
+    FieldSquareSelected(FieldCoordinate(x, y)),
+    rushRoll,
+    NoRerollSelected()
 )
 
 /**

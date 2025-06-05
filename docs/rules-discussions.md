@@ -183,7 +183,7 @@ For Giants, it isn't well-defined how to interpret its location. E.g., during
 setup, is it considered to be in the wide zone if part of it is in there, or 
 does all of it need to be inside?
 
-## ### Page 57 / 63 - Offensive/Defensive Assists
+## Page 57 / 63 - Offensive/Defensive Assists
 According to the rules, it is optional to provide offensive and defensive
 assists to blocks and fouls. However, since there seems no reason (even bad) for
 not always having the maximum number of assists, Jervis just calculates this
@@ -209,3 +209,7 @@ Use case found: You want to get rid of your own players so you can
 concede without a penalty. So choosing assists should be optional (at least in
 the rules engine)
 
+### Titchy
+The rules only mention +1, but not that they ignore marked modifiers. Does that
+mean they get both +1 AND all marked modifiers (effectively ignoring only the 
+first one).

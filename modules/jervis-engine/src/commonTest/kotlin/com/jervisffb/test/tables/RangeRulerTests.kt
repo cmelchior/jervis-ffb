@@ -43,4 +43,14 @@ class RangeRulerTests {
         assertEquals(Range.OUT_OF_RANGE, ruler.measure(FieldCoordinate(0, 0), FieldCoordinate(11,9)))
     }
 
+    @Test
+    fun coveredByRuler_originAndTargetNotIncluded() {
+        TODO()
+    }
+
+    @Test
+    fun coveredByRuler() {
+        // Which corner cases to consider here?
+        TODO()
+    }
 }
