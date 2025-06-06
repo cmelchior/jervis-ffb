@@ -126,18 +126,38 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Placed Prone with the Ball
   - [ ] Player with ball goes into the crowd
   - [ ] Fails to pickup ball
-  - [ ] Fumble Pass, even if caught
+  - [x] Fumble Pass, even if caught
   - [ ] No catch after Pass/Hand-off
   - [x] Deflection/Interception and ball not caught by throwing team
   - [ ] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
   - [x] Sent-off for commiting a Foul
-  - [ ] Touchdown
+  - [x] Touchdown - Success
+    - [x] Move into opponent end-zone
+    - [x] Jump into endzone
+    - [x] Leap into endzone
+    - [x] Catch pass in endzone
+    - [x] Catch hand-off in endzone
+    - [x] Catch bounce in endzone
+    - [ ] Catch scatter in endzone
+    - [x] Catch throw-in in endzone
+    - [ ] Pickup deviate in endzone
+    - [x] Pickup ball in endzone
+    - [x] Push own ball carrier into endzone
+    - [x] Push opponent ball carier into endzone 
+    - [x] Land after throw team mate in endzone
+  - [x] No Touchdown
+    - [x] Move into own end-zone
+    - [x] Fail rush into endzone
+    - [x] Fail dodge into endzone
+    - [x] pickup own ball in endzone
+
 - [ ] Conceding
   - [ ] Free if 3 or less players at beginning of turn
 - [ ] Team Rerolls
   - [ ] Reset at half time
   - [ ] Carry over into Extra Time
   - [ ] Leader
+  - [ ] Only work during teams turn
   - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
 - [ ] Marking Players
   - [ ] Marking

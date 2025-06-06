@@ -335,16 +335,27 @@ class TouchdownTests: JervisGameTest() {
 
         // Give player enough move to reach the End Zone in one turn.
         controller.rollForward(
-            PlayerSelected(player.id),
-            PlayerActionSelected(PlayerStandardActionType.PASS),
+            *activatePlayer(player.id.value, PlayerStandardActionType.PASS),
             Confirm, // Start Pass
             FieldSquareSelected(0, 3),
-            6.d6, // Throw
+            6.d6, // Accurate Throw
             NoRerollSelected(),
             6.d6, // Catch + Score
             NoRerollSelected(),
         )
         assertEquals(1, state.awayScore)
+    }
+
+    @Ignore
+    @Test
+    fun catchScatterInOpponentEndZone() {
+        TODO()
+    }
+
+    @Ignore
+    @Test
+    fun catchDeviatedBallInOpponentEndZone() {
+        TODO()
     }
 
     @Test
@@ -505,7 +516,13 @@ class TouchdownTests: JervisGameTest() {
 
     @Test
     @Ignore
-    fun ballCarrierPushedIntoOpponentEndZone() {
+    fun ballOwnCarrierPushedIntoOpponentEndZone() {
+        TODO()
+    }
+
+    @Test
+    fun opponentBallCarrierPushedIntoEndZone() {
         TODO()
     }
 }
+
