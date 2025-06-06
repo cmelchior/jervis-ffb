@@ -100,7 +100,7 @@ object QuickSnap : Procedure() {
             return when (action) {
                 EndSetup -> ExitProcedure()
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, rules, action) {
+                    checkTypeAndValue<PlayerSelected>(state, action) {
                         val context = state.getContext<QuickSnapContext>()
                         compositeCommandOf(
                             SetContext(context.copy(currentPlayer = it.getPlayer(state))),
@@ -127,7 +127,7 @@ object QuickSnap : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<FieldSquareSelected>(state, rules, action) { squareSelected ->
+            return checkTypeAndValue<FieldSquareSelected>(state, action) { squareSelected ->
                 val context = state.getContext<QuickSnapContext>()
                 return if (squareSelected.coordinate == context.currentPlayer!!.coordinates) {
                     // If the same field is selected, just treat the player as not having moved at all

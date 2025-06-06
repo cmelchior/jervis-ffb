@@ -73,12 +73,20 @@ class SetBallState private constructor(
         fun outOfBounds(ball: Ball, exit: FieldCoordinate): Command = SetBallState(
             ball = ball,
             ballState = BallState.OUT_OF_BOUNDS,
+            carriedBy = null,
             exitLocation = exit,
         )
 
         fun thrownIn(ball: Ball): Command = SetBallState(
             ball = ball,
             ballState = BallState.THROW_IN,
+            carriedBy = null,
+            exitLocation = null
+        )
+
+        fun deflected(ball: Ball): Command = SetBallState(
+            ball = ball,
+            ballState = BallState.DEFLECTED,
             carriedBy = null,
             exitLocation = null
         )

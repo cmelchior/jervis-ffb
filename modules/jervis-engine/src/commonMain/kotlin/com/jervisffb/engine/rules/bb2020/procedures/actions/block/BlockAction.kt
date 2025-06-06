@@ -50,7 +50,7 @@ data class BlockActionContext(
 ): ProcedureContext
 
 /**
- * Procedure for controlling a player's Standard Block action. Multiple Block, Stab, Projectile Vomit etc. have
+ * Procedure for controlling a player's Standard Block action. Multiple Block, Stab, Projectile Vomit, etc. have
  * their own actions.
  *
  * See page 56 in the rulebook.
@@ -142,7 +142,7 @@ object BlockAction : Procedure() {
             return when (action) {
                 is EndAction -> ExitProcedure()
                 else -> {
-                    checkTypeAndValue<BlockTypeSelected>(state, rules, action) { typeSelected ->
+                    checkTypeAndValue<BlockTypeSelected>(state, action) { typeSelected ->
                         val type = typeSelected.type
                         compositeCommandOf(
                             SetContext(context.copy(blockType = typeSelected.type)),

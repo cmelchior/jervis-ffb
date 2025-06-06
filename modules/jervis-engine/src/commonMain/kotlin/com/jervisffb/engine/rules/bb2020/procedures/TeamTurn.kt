@@ -100,7 +100,7 @@ object TeamTurn : Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
                 is PlayerSelected -> {
-                    checkTypeAndValue<PlayerSelected>(state, rules, action) { playerSelected ->
+                    checkTypeAndValue<PlayerSelected>(state, action) { playerSelected ->
                         compositeCommandOf(
                             SetContext(ActivatePlayerContext(playerSelected.getPlayer(state))),
                             GotoNode(ActivatePlayer),

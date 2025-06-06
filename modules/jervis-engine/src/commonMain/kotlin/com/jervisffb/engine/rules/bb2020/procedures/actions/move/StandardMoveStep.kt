@@ -73,7 +73,7 @@ object StandardMoveStep: Procedure() {
             return when (action) {
                 // If the player has not moved, this will not use their action
                 EndAction -> ExitProcedure()
-                else -> checkTypeAndValue<FieldSquareSelected>(state, rules, action) {
+                else -> checkTypeAndValue<FieldSquareSelected>(state, action) {
                     compositeCommandOf(
                         SetContext(context.copy(target = it.coordinate, hasMoved = true)),
                         GotoNode(MovePlayer),

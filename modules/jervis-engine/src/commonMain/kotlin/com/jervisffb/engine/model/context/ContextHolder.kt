@@ -8,12 +8,12 @@ import kotlin.reflect.KClass
  * Container for all [ProcedureContext], which also expose a nicer API for
  * accessing them in a way that doesn't leak too many details to [Game].
  *
- * This way, any [Procedure] is free to store extra data in the game state without
- * polluting the main state.
+ * This way, any [com.jervisffb.engine.fsm.Procedure] is free to store extra
+ * data in the game state without polluting the main API.
  */
 class ContextHolder {
     // Benchmark this to see what might be best way to store these.
-    // Currently using two maps to avoid allocations and ids is basically only used for Multiple Block.
+    // Currently using two maps to avoid allocations, and ids are basically only used for Multiple Block.
     private val contexts: MutableMap<KClass<out ProcedureContext>, ProcedureContext> = mutableMapOf()
     private val contextsWithIds: MutableMap<Pair<Int, KClass<out ProcedureContext>>, ProcedureContext> = mutableMapOf()
 
@@ -58,14 +58,14 @@ class ContextHolder {
 }
 
 /**
- * Stores a new context, overriding any if they exists already.
+ * Stores a new context with a given id, overriding any if they exist already.
  */
 fun Game.setContext(context: ProcedureContext, id: Int = 0) {
     this.contexts.setContext(context, id)
 }
 
 /**
- * Returns the [ProcedureContext] matching the given class, or throws
+ * Returns the [ProcedureContext] matching the given class, or throws an error
  * if none exists.
  */
 inline fun <reified T: ProcedureContext> Game.getContext(id: Int = 0): T {

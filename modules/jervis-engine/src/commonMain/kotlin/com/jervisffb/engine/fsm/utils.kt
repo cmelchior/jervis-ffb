@@ -12,7 +12,6 @@ import com.jervisffb.engine.actions.SelectSkill
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.InvalidActionException
 
@@ -22,10 +21,10 @@ import com.jervisffb.engine.utils.InvalidActionException
  */
 inline fun <reified T : GameAction> ActionNode.checkTypeAndValue(
     state: Game,
-    rules: Rules,
     action: GameAction,
     function: (T) -> Command,
 ): Command {
+    val rules = state.rules
     val node = this
     if (action is T) {
         val availableActions = node.getAvailableActions(state, rules)

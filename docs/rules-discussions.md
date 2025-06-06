@@ -213,3 +213,9 @@ the rules engine)
 The rules only mention +1, but not that they ignore marked modifiers. Does that
 mean they get both +1 AND all marked modifiers (effectively ignoring only the 
 first one).
+
+### Interception
+If a player deflects a ball, fails to catch it, it scatters, lands on the same
+player again who then catches it. Is it a successful interception that will
+award SPP?
+

@@ -36,12 +36,13 @@ data class ScatterRollContext(
 
 /**
  * Resolve a Scatter.
- * Do not try to land the ball after the scatter.
- * Just scatter the ball and let the caller handle the result.
+ *
+ * Do not try to land the ball or update its location after the scatter, this is left
+ * up to the caller of this procedure.
  *
  * See page 25 in the rulebook.
  */
-object Scatter : Procedure() {
+object ScatterRoll : Procedure() {
     override val initialNode: Node = RollDice
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null

@@ -5,6 +5,7 @@ import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
@@ -341,6 +342,18 @@ open class Rules(
     }
 
     /**
+     * Returns whether a player can deflect a ball if it is thrown over them.
+     */
+    fun canDeflect(player: Player): Boolean {
+        // See rules-faq.md, but we allow a player already holding a ball
+        // to deflect.
+        // TODO Players with "No Hands" cannot deflect
+        return player.hasTackleZones
+            && player.state == PlayerState.STANDING
+            && player.location.isOnField(this)
+    }
+
+    /**
      * Return `true` if this player is able to mark other players.
      */
     fun canMarkPlayers(player: Player): Boolean {
@@ -471,23 +484,17 @@ open class Rules(
     }
 
     /**
-     * Calculate how many marks are on [square] for a player on the [activeTeam].
+     * Calculate how many marks are on [square] for a player on the [markedTeam].
      * Marks will be returned as modifiers in the [modifiers] list.
-     *
-     * This method is only relevant for the current active team and will throw an
-     * error for the inactive team.
      */
     fun addMarkedModifiers(
         game: Game,
-        activeTeam: Team,
+        markedTeam: Team,
         square: FieldCoordinate,
         modifiers: MutableList<DiceModifier>,
         markedModifier: DiceModifier = CatchModifier.MARKED
     ) {
-        if (activeTeam != game.activeTeam) {
-            INVALID_GAME_STATE("This method is only relevant for the active team: ${activeTeam.name} vs ${game.activeTeam?.name}")
-        }
-        val marks = calculateMarks(game, activeTeam, square)
+        val marks = calculateMarks(game, markedTeam, square)
         if (marks > 0) {
             modifiers.add(MarkedModifier(marks, markedModifier))
         }
@@ -565,9 +572,17 @@ open class Rules(
 
     /**
      * Returns `true` if the team has a hold of the ball.
+     *
+     * @param ball if set, only this ball is checked, if `false` any ball is accepted.
      */
-    fun teamHasBall(team: Team): Boolean {
-        return team.firstOrNull { it.hasBall() } != null
+    fun teamHasBall(team: Team, ball: Ball? = null): Boolean {
+        return team.firstOrNull {
+            if (ball != null) {
+                it.ball == ball
+            } else {
+                it.hasBall()
+            }
+        } != null
     }
 
     /**

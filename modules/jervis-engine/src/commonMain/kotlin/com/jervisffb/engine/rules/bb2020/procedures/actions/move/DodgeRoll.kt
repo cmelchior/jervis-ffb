@@ -41,7 +41,6 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.BreakTackleModifier
 import com.jervisffb.engine.model.modifiers.DodgeRollModifier
-import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportDodgeResult
 import com.jervisffb.engine.reports.ReportSkillUsed

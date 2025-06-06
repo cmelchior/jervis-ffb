@@ -1,12 +1,15 @@
 package com.jervisffb.test.tables
 
+import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.tables.Range
 import com.jervisffb.engine.rules.bb2020.tables.RangeRuler
+import com.jervisffb.test.JervisGameTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
-class RangeRulerTests {
+class RangeRulerTests: JervisGameTest() {
 
     private val ruler = RangeRuler
 
@@ -45,12 +48,16 @@ class RangeRulerTests {
 
     @Test
     fun coveredByRuler_originAndTargetNotIncluded() {
-        TODO()
+        // Basic test, should probably also include some more advanced use cases
+        startDefaultGame()
+        val interceptors = rules.rangeRuler.opponentPlayersUnderRuler(awayTeam["A1".playerId], awayTeam["A5".playerId].coordinates)
+        assertEquals(3, interceptors.size)
+        assertFalse(interceptors.any { it.id == "A1".playerId || it.id == "A5".playerId})
     }
 
     @Test
     fun coveredByRuler() {
-        // Which corner cases to consider here?
-        TODO()
+        // TODO See https://www.luccini.it/bloodbowl/downloads/Tabella_Intercetti.pdf, it is for the old pitch size, and since the ruler has been scaled
+        //  differently, the current results might be slightly off.
     }
 }

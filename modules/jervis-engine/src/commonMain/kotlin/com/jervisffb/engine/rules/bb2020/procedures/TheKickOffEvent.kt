@@ -112,7 +112,7 @@ object TheKickOffEvent : Procedure() {
                 )
             )
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScatterRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             return compositeCommandOf(
                 RemoveContext<ScatterRollContext>(),

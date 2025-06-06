@@ -164,7 +164,7 @@ object HandOffAction : Procedure() {
             val context = state.getContext<HandOffContext>()
             return compositeCommandOf(
                 SetCurrentBall(null),
-                if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(TurnOver.STANDARD) else null,
+                if (!rules.teamHasBall(context.thrower.team, state.currentBall())) SetTurnOver(TurnOver.STANDARD) else null,
                 ExitProcedure()
             )
         }

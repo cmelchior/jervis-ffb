@@ -1,5 +1,6 @@
 package com.jervisffb.engine.commands.fsm
 
+import com.jervisffb.engine.GameEngineController.Companion.LOG
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.MutableProcedureState
 import com.jervisffb.engine.model.Game
@@ -18,6 +19,7 @@ class RemoveCurrentProcedure : Command {
     override fun execute(state: Game) {
         originalProcedure = state.removeProcedure()
         val current: MutableProcedureState? = state.currentProcedure()
+        LOG.v { "[Stack] Remove procedure: ${originalProcedure.name()}" }
         logEntry1 = SimpleLogEntry("Procedure ${originalProcedure.name()} removed.", LogCategory.STATE_MACHINE)
         logEntry2 = if (current != null) {
             SimpleLogEntry("Current state: ${current.name()}[${current.currentNode().name()}]", LogCategory.STATE_MACHINE)

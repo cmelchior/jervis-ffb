@@ -103,7 +103,7 @@ object SolidDefense : Procedure() {
             return when (action) {
                 EndSetup -> GotoNode(EndSetupAndValidate)
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, rules, action) {
+                    checkTypeAndValue<PlayerSelected>(state, action) {
                         val context = state.getContext<SolidDefenseContext>()
                         compositeCommandOf(
                             SetContext(context.copy(currentPlayer = it.getPlayer(state))),
@@ -134,7 +134,7 @@ object SolidDefense : Procedure() {
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<FieldSquareSelected>(state, rules, action) { squareSelected ->
+            return checkTypeAndValue<FieldSquareSelected>(state, action) { squareSelected ->
                 when (state.kickingTeam.isHomeTeam()) {
                     true -> if (squareSelected.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
                     false -> if (squareSelected.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)
@@ -143,7 +143,12 @@ object SolidDefense : Procedure() {
                 val movingPlayer = context.currentPlayer!!
                 compositeCommandOf(
                     SetPlayerLocation(movingPlayer, squareSelected.coordinate),
-                    SetContext(context.copy(currentPlayer = null, playersMoved = context.playersMoved.plus(movingPlayer))),
+                    SetContext(
+                        context.copy(
+                            currentPlayer = null,
+                            playersMoved = context.playersMoved.plus(movingPlayer)
+                        )
+                    ),
                     GotoNode(SelectPlayerOrEndSetup),
                 )
             }

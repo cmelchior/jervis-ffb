@@ -2,6 +2,8 @@ package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -25,6 +27,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.MoveContext
+import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -51,13 +54,14 @@ enum class PassingType {
 data class PassContext(
     val thrower: Player,
     val hasMoved: Boolean = false,
+    // Target of the pass in the current step. This means it will be updated when the ball scatters, deviates etc.
     val target: FieldCoordinate? = null,
     val range: Range? = null,
     val passingRoll: D6DieRoll? = null,
     val passingModifiers: List<DiceModifier> = emptyList(),
     val passingResult: PassingType? = null,
     val runInterference: Player? = null,
-    val passingInterference: PassingInteferenceContext? = null,
+    val passingInterference: PassingInterferenceContext? = null,
 ) : ProcedureContext
 
 /**
@@ -94,6 +98,10 @@ object PassAction : Procedure() {
     object MoveOrPassOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            if (state.isTurnOver()) {
+                return listOf(ContinueWhenReady)
+            }
+
             val context = state.getContext<PassContext>()
             val options = mutableListOf<GameActionDescriptor>()
 
@@ -117,7 +125,7 @@ object PassAction : Procedure() {
                 Confirm -> {
                     GotoNode(ResolveThrow)
                 }
-                EndAction -> ExitProcedure()
+                Continue, EndAction -> ExitProcedure()
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.thrower, action.moveType)
                     compositeCommandOf(

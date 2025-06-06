@@ -1,5 +1,6 @@
 package com.jervisffb.engine.commands.fsm
 
+import com.jervisffb.engine.GameEngineController.Companion.LOG
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
@@ -16,6 +17,7 @@ class GotoNode(private val nextNode: Node) : Command {
 
     override fun execute(state: Game) {
         val currentProcedure = state.currentProcedure() ?: INVALID_GAME_STATE("No procedure is running.")
+        LOG.v { "[Stack] Goto node: ${currentProcedure.name()}[${nextNode.name()}]" }
         logEntry = SimpleLogEntry("Transition to: ${currentProcedure.name()}[${nextNode.name()}]", LogCategory.STATE_MACHINE)
         state.addLog(logEntry)
         originalNode = currentProcedure.currentNode()

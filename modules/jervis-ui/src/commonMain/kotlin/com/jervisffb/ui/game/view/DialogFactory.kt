@@ -26,7 +26,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.FanFactorRolls
 import com.jervisffb.engine.rules.bb2020.procedures.PickupRoll
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRoll
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
-import com.jervisffb.engine.rules.bb2020.procedures.Scatter
+import com.jervisffb.engine.rules.bb2020.procedures.ScatterRoll
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
@@ -319,7 +319,7 @@ object DialogFactory {
                     )
                 }
 
-                is Scatter.RollDice -> {
+                is ScatterRoll.RollDice -> {
                     DiceRollUserInputDialog.createScatterRollDialog(rules)
                 }
 

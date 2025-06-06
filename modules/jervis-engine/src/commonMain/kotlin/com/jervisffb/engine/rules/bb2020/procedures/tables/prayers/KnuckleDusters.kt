@@ -63,7 +63,7 @@ object KnuckleDusters : Procedure() {
                     )
                 }
                 else -> {
-                    return checkTypeAndValue<PlayerSelected>(state, rules, action) {
+                    return checkTypeAndValue<PlayerSelected>(state, action) {
                         val context = state.getContext<PrayersToNuffleRollContext>()
                         val player = it.getPlayer(state)
                         compositeCommandOf(

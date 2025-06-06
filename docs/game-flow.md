@@ -128,7 +128,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Fails to pickup ball
   - [ ] Fumble Pass, even if caught
   - [ ] No catch after Pass/Hand-off
-  - [ ] Deflection/Interception and ball not caught by throwing team
+  - [x] Deflection/Interception and ball not caught by throwing team
   - [ ] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
   - [x] Sent-off for commiting a Foul
   - [ ] Touchdown
@@ -207,6 +207,9 @@ rules, skills are tracked separately in [skills.md](skills.md).
 - [ ] End of Drive
 - [ ] End of Half
 - [ ] End of Game
+- [ ] Range Ruler
+  - [ ] Follows the chart in the rulebook
+  - [ ] Interceptions are correct. See https://www.luccini.it/bloodbowl/downloads/Tabella_Intercetti.pdf
 
 ## Actions
 
@@ -295,11 +298,12 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Players with PA - can still hand-off
   - [x] Test against agility to catch it
   - [x] Ball bounce from target player if not caught
+  - [x] Cannot hand-off to opponent
 - [x] Argue the Call Table
   - [x] You're Outta Here - Bans Coach / Cannot argue again / Effect Brilliant Coaching
   - [x] I Don't Care
   - [x] Well, When You Put It Like That...
-- [ ] Pass Action
+- [x] Pass Action
   - [x] 1 pass action pr turn
   - [x] Action used without throwing
   - [x] Throw without moving
@@ -316,12 +320,21 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Wildly inaccurate pass
   - [x] Fumbled pass
   - [x] Bounce from target if not caught
-  - [ ] Passing Interference (players under the ruler)
-    - [ ] Must be standing with a tackle zone
-    - [ ] Opposing coach chooses player if multiple options
-    - [ ] Modifers 
-    - [ ] Scatter if failed catch
-    - [ ] Interception if succesfull catch
+  - [x] Passing Interference (players under the ruler)
+    - [x] Must be standing with a tackle zone
+    - [x] Opposing coach chooses player if multiple options
+    - [x] Modifiers 
+    - [x] Scatter if failed catch
+    - [x] Run Passing Interference before going out of bounds
+    - [x] Run Passing Interference on accurate pass
+    - [x] Run Passing Interference on inaccurate pass
+    - [x] Run Passing Interference on Wildly inaccurate pass
+    - [x] Convert deflection into interception
+    - [x] Deflect, but fails to catch, ball ends up on floor
+    - [x] Deflect, but fails to catch, ball ends up on thrower team
+    - [x] Deflect, but fails to catch, ball ends up on interceptor team
+    - [x] Deflect, but fails to catch, scatters the ball out of bounds
+    - [x] Passing Interference on ball going out of bounds
 - [ ] Throw Team-mate Action
   - [ ] Require Throw Team-mate and Right Stuff traits
   - [ ] Uses Pass action

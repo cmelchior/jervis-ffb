@@ -103,7 +103,7 @@ object FoulAction : Procedure() {
             return when (action) {
                 is EndAction -> ExitProcedure()
                 is PlayerSelected -> {
-                    checkTypeAndValue<PlayerSelected>(state, rules, action) {
+                    checkTypeAndValue<PlayerSelected>(state, action) {
                         val context = state.getContext<FoulContext>()
                         compositeCommandOf(
                             SetContext(context.copy(victim = action.getPlayer(state))),

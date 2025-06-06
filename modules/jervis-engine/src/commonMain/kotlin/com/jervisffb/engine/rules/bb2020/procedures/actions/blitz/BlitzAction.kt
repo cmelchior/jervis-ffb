@@ -231,7 +231,7 @@ object BlitzAction : Procedure() {
                     GotoNode(MoveOrBlockOrEndAction)
                 }
                 else -> {
-                    checkTypeAndValue<BlockTypeSelected>(state, rules, action) { typeSelected ->
+                    checkTypeAndValue<BlockTypeSelected>(state, action) { typeSelected ->
                         val type = typeSelected.type
                         compositeCommandOf(
                             SetContext(context.copy(blockType = typeSelected.type)),

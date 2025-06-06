@@ -67,6 +67,23 @@ does.
 Also, this case is explicitly spelled out in the 2016 rulebook (page 19 - 
 Bouncing Balls), where it is defined that a bounce will happen.
 
+### Page 50 - Passing Interference and Ball Clone
+The interaction between multiple balls and Passing Interference is not 
+well-defined. 
+
+For Deflection, it is only mentioned that the player must be standing with a 
+tackle zone.
+
+For Interception, it is said the player will attempt to catch the ball. Since
+Ball Clone explicitly forbids this, Interception is not allowed, but it does
+raise the question if Deflection is possible.
+
+"No Hands*" explicitly says that the player cannot interfere with the ball. The
+same is not the case for Ball Clone.
+
+For that reason, Jervis allows a player with a ball to deflect a pass, but will 
+automatically fail converting the deflection to an interception.
+
 ### Page 51 - Failed Catch 
 The consequences of a failed catch are not defined, unlike picking up the ball
 (page 46) where it is explicitly stated that the ball will bounce if the pickup

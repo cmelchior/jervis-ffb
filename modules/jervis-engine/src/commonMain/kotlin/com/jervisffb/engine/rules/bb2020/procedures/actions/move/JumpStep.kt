@@ -39,7 +39,6 @@ import com.jervisffb.engine.model.modifiers.JumpModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.JumpStep.JUMP_DISTANCE
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
@@ -126,7 +125,7 @@ object JumpStep : Procedure() {
             return when (action) {
                 Cancel -> ExitProcedure()
                 else -> {
-                    checkTypeAndValue<FieldSquareSelected>(state, rules, action) { target ->
+                    checkTypeAndValue<FieldSquareSelected>(state, action) { target ->
                         val context = state.getContext<MoveContext>()
                         compositeCommandOf(
                             SetContext(context.copy(target = target.coordinate)),

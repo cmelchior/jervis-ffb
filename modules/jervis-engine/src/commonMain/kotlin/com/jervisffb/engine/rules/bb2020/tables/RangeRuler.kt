@@ -4,6 +4,8 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import kotlinx.serialization.Serializable
 import kotlin.math.abs
+import kotlin.math.min
+import kotlin.math.sqrt
 
 /**
  * Range Ruler
@@ -14,13 +16,14 @@ import kotlin.math.abs
 object RangeRuler {
 
     // Max distance that can be thrown.
-    val maxDistance: Int = 13
+    const val MAX_DISTANCE: Int = 13
     // Width of the range ruler as a scale factor compared to a square on the board.
-    val rulerWidth: Double = 1.74
+    // Square size: 34 mm, Ruler width: 59 mm
+    private const val RULER_WIDTH: Double = 1.74
 
     // Represent the template as a string
     // Credit for this idea: https://github.com/christerk/ffb/blob/660b0e10357b10634827b4ed787f21cc9757b0c2/ffb-common/src/main/java/com/fumbbl/ffb/mechanics/bb2020/PassMechanic.java#L22
-    val TEMPlATE = """
+    private val TEMPlATE = """
         T Q Q Q S S S L L L L B B B
         Q Q Q Q S S S L L L L B B B
         Q Q Q S S S S L L L L B B
@@ -84,46 +87,35 @@ object RangeRuler {
      * [target] are not included. This is used for deflecting and intercepting balls and bombs.
      */
     fun opponentPlayersUnderRuler(thrower: Player, target: FieldCoordinate): List<Player> {
-        TODO()
+        val rules = thrower.team.game.rules
+        val opponentPlayers = mutableListOf<Player>()
+
+        // It is quicker to search through players on the field, rather than trying to calculate
+        // the squares under the ruler, so lets do that.
+        thrower.team.otherTeam().forEach { player ->
+            // Ignore any player at the the target location
+            if (!player.location.overlap(target)) {
+                if (rules.canDeflect(player) && isUnderRuler(player, thrower.coordinates, target)) {
+                    opponentPlayers.add(player)
+                }
+            }
+        }
+        return opponentPlayers
     }
 
-//    fun findInterceptors(pGame: Game, pThrower: Player<*>?, pTargetCoordinate: FieldCoordinate?): Array<Player<*>?> {
-//        val interceptors: MutableList<Player<*>?> = java.util.ArrayList<Player<*>?>()
-//        if ((pTargetCoordinate != null) && (pThrower != null)) {
-//            val throwerCoordinate: FieldCoordinate = pGame.getFieldModel().getPlayerCoordinate(pThrower)
-//            val otherTeam: Team = if (pGame.getTeamHome().hasPlayer(pThrower)) pGame.getTeamAway() else pGame.getTeamHome()
-//            val otherPlayers: Array<Player<*>> = otherTeam.getPlayers()
-//            for (otherPlayer in otherPlayers) {
-//                val interceptorState: PlayerState? = pGame.getFieldModel().getPlayerState(otherPlayer)
-//                val interceptorCoordinate: FieldCoordinate? = pGame.getFieldModel().getPlayerCoordinate(otherPlayer)
-//                if ((interceptorCoordinate != null) && (interceptorState != null) && interceptorState.hasTacklezones()
-//                    && !otherPlayer.hasSkillProperty(NamedProperties.preventCatch)
-//                ) {
-//                    if (canIntercept(throwerCoordinate, pTargetCoordinate, interceptorCoordinate)) {
-//                        interceptors.add(otherPlayer)
-//                    }
-//                }
-//            }
-//        }
-//        return interceptors.toTypedArray<Player?>()
-//    }
-//
-//    private fun canIntercept(
-//        pThrowerCoordinate: FieldCoordinate, pTargetCoordinate: FieldCoordinate,
-//        pIinterceptorCoordinate: FieldCoordinate
-//    ): Boolean {
-//        val receiverX: Int = pTargetCoordinate.getX() - pThrowerCoordinate.getX()
-//        val receiverY: Int = pTargetCoordinate.getY() - pThrowerCoordinate.getY()
-//        val interceptorX: Int = pIinterceptorCoordinate.getX() - pThrowerCoordinate.getX()
-//        val interceptorY: Int = pIinterceptorCoordinate.getY() - pThrowerCoordinate.getY()
-//        val a = (((receiverX - interceptorX) * (receiverX - interceptorX))
-//            + ((receiverY - interceptorY) * (receiverY - interceptorY)))
-//        val b = (interceptorX * interceptorX) + (interceptorY * interceptorY)
-//        val c = (receiverX * receiverX) + (receiverY * receiverY)
-//        val d1 = abs((receiverY * (interceptorX + 0.5)) - (receiverX * (interceptorY + 0.5)))
-//        val d2 = abs((receiverY * (interceptorX + 0.5)) - (receiverX * (interceptorY - 0.5)))
-//        val d3 = abs((receiverY * (interceptorX - 0.5)) - (receiverX * (interceptorY + 0.5)))
-//        val d4 = abs((receiverY * (interceptorX - 0.5)) - (receiverX * (interceptorY - 0.5)))
-//        return (c > a) && (c > b) && (RULER_WIDTH > (2 * min(min(min(d1, d2), d3), d4) / sqrt(c.toDouble())))
-//    }
+    // Credit for this idea: https://github.com/christerk/ffb/blob/3c084704c1a72ce1c64b3245429717b83f164af0/ffb-common/src/main/java/com/fumbbl/ffb/util/UtilPassing.java#L43
+    private fun isUnderRuler(player: Player, start: FieldCoordinate, target: FieldCoordinate): Boolean {
+        val receiverX: Int = target.x - start.x
+        val receiverY: Int = target.y - start.y
+        val interceptorX: Int = player.coordinates.x - start.x
+        val interceptorY: Int = player.coordinates.y - start.y
+        val a = (((receiverX - interceptorX) * (receiverX - interceptorX)) + ((receiverY - interceptorY) * (receiverY - interceptorY)))
+        val b = (interceptorX * interceptorX) + (interceptorY * interceptorY)
+        val c = (receiverX * receiverX) + (receiverY * receiverY)
+        val d1 = abs((receiverY * (interceptorX + 0.5)) - (receiverX * (interceptorY + 0.5)))
+        val d2 = abs((receiverY * (interceptorX + 0.5)) - (receiverX * (interceptorY - 0.5)))
+        val d3 = abs((receiverY * (interceptorX - 0.5)) - (receiverX * (interceptorY + 0.5)))
+        val d4 = abs((receiverY * (interceptorX - 0.5)) - (receiverX * (interceptorY - 0.5)))
+        return (c > a) && (c > b) && (RULER_WIDTH > (2 * min(min(min(d1, d2), d3), d4) / sqrt(c.toDouble())))
+    }
 }

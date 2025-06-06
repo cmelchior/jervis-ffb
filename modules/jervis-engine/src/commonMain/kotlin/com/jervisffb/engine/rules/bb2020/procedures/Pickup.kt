@@ -17,7 +17,6 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
 import com.jervisffb.engine.reports.ReportPickup
 import com.jervisffb.engine.rules.Rules

@@ -3,6 +3,7 @@ package com.jervisffb.test.actions
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -18,6 +19,7 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.SelectTeamReroll
+import com.jervisffb.test.utils.firstInstanceOf
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -35,6 +37,20 @@ class HandOffActionTests: JervisGameTest() {
     override fun setUp() {
         super.setUp()
         startDefaultGame()
+    }
+
+    @Test
+    fun cannotHandOffToOpponent() {
+        controller.rollForward(
+            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
+            *moveTo(17, 7),
+            4.d6, // Pickup
+            NoRerollSelected(),
+            SmartMoveTo(13, 4),
+        )
+        val playerTargets = controller.getAvailableActions().firstInstanceOf<SelectPlayer>().players
+        assertEquals(1, playerTargets.size)
+        assertEquals("A1".playerId, playerTargets.first())
     }
 
     @Test

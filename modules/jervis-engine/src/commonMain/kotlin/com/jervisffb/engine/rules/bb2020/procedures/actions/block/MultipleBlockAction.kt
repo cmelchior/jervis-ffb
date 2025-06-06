@@ -267,7 +267,7 @@ object MultipleBlockAction: Procedure() {
                     )
                 }
                 else -> {
-                    checkTypeAndValue<BlockTypeSelected>(state, rules, action) { typeSelected ->
+                    checkTypeAndValue<BlockTypeSelected>(state, action) { typeSelected ->
                         val type = typeSelected.type
                         val updatedContext = context.copyAndSetBlockTypeForActiveDefender(type)
                         compositeCommandOf(
@@ -357,7 +357,7 @@ object MultipleBlockAction: Procedure() {
             )
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return checkTypeAndValue<PlayerSelected>(state, rules, action) { playerSelected ->
+            return checkTypeAndValue<PlayerSelected>(state, action) { playerSelected ->
                 val context = state.getContext<MultipleBlockContext>()
                 val activeDefenderIndex = when (val player = playerSelected.getPlayer(state)) {
                     context.defender1 -> 0

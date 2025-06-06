@@ -131,7 +131,7 @@ object OfficiousRef : Procedure() {
                 Continue -> GotoNode(SelectPlayerFromKickingTeam)
                 else -> {
                     val context = state.getContext<OfficiousRefContext>()
-                    checkTypeAndValue<RandomPlayersSelected>(state, rules, action) { selectAction ->
+                    checkTypeAndValue<RandomPlayersSelected>(state, action) { selectAction ->
                         val player = selectAction.getPlayers(state).first()
                         return compositeCommandOf(
                             SetContext(context.copy(kickingTeamPlayerSelected = player)),
@@ -187,7 +187,7 @@ object OfficiousRef : Procedure() {
                 }
                 else -> {
                     val context = state.getContext<OfficiousRefContext>()
-                    checkTypeAndValue<RandomPlayersSelected>(state, rules, action) { selectAction ->
+                    checkTypeAndValue<RandomPlayersSelected>(state, action) { selectAction ->
                         val player = selectAction.getPlayers(state).first()
                         return compositeCommandOf(
                             SetContext(context.copy(receivingTeamPlayerSelected = player)),

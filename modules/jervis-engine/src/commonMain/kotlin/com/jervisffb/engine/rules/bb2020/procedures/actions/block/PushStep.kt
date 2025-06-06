@@ -409,7 +409,7 @@ object PushStep: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             // If the chosen direction results in a chain push, modify the push context
             // and redo the entire chain.
-            return checkTypeAndValue<DirectionSelected>(state, rules, action) { squareSelected ->
+            return checkTypeAndValue<DirectionSelected>(state, action) { squareSelected ->
                 val context = state.getContext<PushContext>()
                 val origin = context.pushee().coordinates
                 val target = origin.move(squareSelected.direction, 1)

@@ -16,7 +16,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.Scatter
+import com.jervisffb.engine.rules.bb2020.procedures.ScatterRoll
 import com.jervisffb.engine.rules.bb2020.procedures.ScatterRollContext
 import com.jervisffb.engine.rules.bb2020.procedures.WeatherRoll
 import com.jervisffb.engine.rules.bb2020.tables.Weather
@@ -58,7 +58,7 @@ object ChangingWeather : Procedure() {
                     from = state.singleBall().location
                 ))
         }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Scatter
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScatterRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ScatterRollContext>()
             val ball = state.singleBall()

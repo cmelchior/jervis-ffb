@@ -153,7 +153,7 @@ object ThrowTeamMateAction : Procedure() {
             val context = state.getContext<ThrowTeamMateContext>()
             return compositeCommandOf(
                 SetCurrentBall(null),
-                if (!rules.teamHasBall(context.thrower.team)) SetTurnOver(TurnOver.STANDARD) else null,
+                if (!rules.teamHasBall(context.thrower.team, state.currentBall())) SetTurnOver(TurnOver.STANDARD) else null,
                 ExitProcedure()
             )
         }

@@ -10,4 +10,5 @@ enum class BallState {
     OUT_OF_BOUNDS, // Ball left the field.
     SCATTERED, // Ball is in the air and scattering
     THROW_IN, // Ball is in the process of being thrown in after going OUT_OF_BOUNDS
+    DEFLECTED, // The ball was deflected by a player running interference
 }

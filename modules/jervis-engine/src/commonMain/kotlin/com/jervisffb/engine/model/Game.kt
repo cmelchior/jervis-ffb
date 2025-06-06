@@ -16,7 +16,6 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassingInteferenceContext
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -188,11 +187,11 @@ class Game(
     // Context objects are state holders used by procedures
     // when they need to track state between nodes
     val contexts: ContextHolder = ContextHolder()
-    var passingInteferenceContext: PassingInteferenceContext? = null
     var rerollContext: UseRerollContext? = null
 
     val balls: MutableList<Ball> = mutableListOf(Ball())
-    // Easy reference to the ball that is currently being "handled" somehow.
+    // Easy reference to the ball that is currently being "handled" somehow. This makes
+    // it easier to access it across multiple procedures.
     var currentBallReference: Ball? = null
     // Helper method for returning the current ball. Will throw an exception if no
     // ball was set as current.

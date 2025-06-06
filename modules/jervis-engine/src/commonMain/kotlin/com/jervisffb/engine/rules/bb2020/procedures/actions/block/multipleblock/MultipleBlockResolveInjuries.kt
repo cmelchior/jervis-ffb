@@ -73,7 +73,7 @@ object MultipleBlockResolveInjuries: Procedure() {
                     if (context.attackerInjuryContext != null) GotoNode(PatchUpAttacker) else ExitProcedure()
                 }
                 else -> {
-                    checkTypeAndValue<PlayerSelected>(state, rules, action) { playerSelected ->
+                    checkTypeAndValue<PlayerSelected>(state, action) { playerSelected ->
                         val context = state.getContext<MultipleBlockContext>()
                         val selectedPlayer = playerSelected.getPlayer(state)
                         val index = when (selectedPlayer) {
