@@ -4,12 +4,17 @@ import com.jervisffb.engine.GameEngineController.Companion.LOG
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
+import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
+/**
+ * Command for moving around in the state machine. Use this command to
+ * move to another [Node] inside the current [Procedure]
+ */
 class GotoNode(private val nextNode: Node) : Command {
     private lateinit var logEntry: LogEntry
     private lateinit var originalNode: Node
@@ -26,7 +31,7 @@ class GotoNode(private val nextNode: Node) : Command {
         }
         state.setCurrentNode(nextNode)
         if (nextNode is ParentNode) {
-            currentProcedure.setParentNodeState(ParentNode.State.ENTERING)
+            currentProcedure.setParentNodeState(ParentNode.State.CHECK_SKIP)
         }
     }
 

@@ -4,16 +4,19 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.EnterProcedure
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ChangeParentNodeState
+import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 
 /**
- * A ParentNode is how we can break a state machine down into continuously fine-grained steps.
- * I.e. A `Half` in Blood Bowl is split into `Drives`, which are split into `Turns`, which are split into
- * `Player Actions`.
+ * A ParentNode is how we can break a state machine down into continuously
+ * fine-grained steps. I.e. A `Half` in Blood Bowl is split into `Drives`,
+ * which are split into `Turns`, which are split into `Player Actions`.
  *
- * Calling a child procedure is its own state-machine with [EnterParentNode] and [ExitParentNode] states which makes it possible to
- * control state and flow after entering and exiting the child procedure.
+ * Calling a child procedure is its own little state machine with [onEnterNode]
+ * and [onExitNode] methods, which allows us to better control the flow in and
+ * out of child procedures.
  */
 abstract class ParentNode : Node {
 
@@ -22,20 +25,24 @@ abstract class ParentNode : Node {
      * This is only used for internal bookkeeping.
      */
     enum class State {
+        CHECK_SKIP,
         ENTERING,
         RUNNING,
         EXITING,
     }
 
-    // TODO Should we add something like a `skipNodeFor` method?
-    //  This would eliminate the need for `CheckFor<X>` computation nodes
-    //  and move the check inline into parent nodes. The downside is that the parent
-    //  node lifecycle gets even more complex :thinking:
-
     /**
      * Returns the [Procedure] this node should load and go into.
      */
     abstract fun getChildProcedure(state: Game, rules: Rules): Procedure
+
+    /**
+     * Called before [onEnterNode]. This will check if we want to skip this
+     * node completely. If a [Node] is returned, the current node is skipped in
+     * favor of the returned one. If `null` is returned, the node is executed
+     * as normal, and [onEnterNode] is called next.
+     */
+    open fun skipNodeFor(state: Game, rules: Rules): Node? = null
 
     /**
      * Called just before loading the child procedure. It is called on the level of the
@@ -55,6 +62,17 @@ abstract class ParentNode : Node {
      * to next.
      */
     abstract fun onExitNode(state: Game, rules: Rules): Command
+
+    // This method should only be called by `GameController`
+    // It is not supposed to be called by procedure subclasses.
+    fun shouldEnterNode(state: Game, rules: Rules): Command {
+        val newNode = skipNodeFor(state, rules)
+        return if (newNode != null) {
+            GotoNode(newNode)
+        } else {
+            ChangeParentNodeState(State.ENTERING)
+        }
+    }
 
     // This method should only be called by `GameController`
     // It is not supposed to be called by procedure subclasses.
@@ -82,4 +100,12 @@ abstract class ParentNode : Node {
     fun exitNode(state: Game, rules: Rules): Command {
         return onExitNode(state, rules)
     }
+
+    /**
+     * Helper node that makes it easy to exit a procedure from [ParentNode.skipNodeFor]
+     */
+    protected object ExitProcedureNode: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command = ExitProcedure()
+    }
 }
+

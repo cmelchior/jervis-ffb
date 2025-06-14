@@ -8,8 +8,8 @@ class MutableProcedureState(val procedure: Procedure, initialNode: Node) {
     // Tracks the current active node
     private var activeNode: Node = initialNode
 
-    // Track state related to ParentNode. It should only be allowed to modify this
-    // if `activeNode` is a ParentNode
+    // Track the state related to ParentNode. It should only be allowed to
+    // modify this if `activeNode` is a ParentNode
     private var parentNodeState: ParentNode.State? = null
 
     private constructor(

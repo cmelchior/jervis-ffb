@@ -341,6 +341,7 @@ class GameEngineController(
                 is ParentNode -> {
                     val commands =
                         when (stack.peepOrNull()!!.getParentNodeState()) {
+                            ParentNode.State.CHECK_SKIP -> currentNode.shouldEnterNode(state, rules)
                             ParentNode.State.ENTERING -> currentNode.enterNode(state, rules)
                             ParentNode.State.RUNNING -> currentNode.runNode(state, rules)
                             ParentNode.State.EXITING -> currentNode.exitNode(state, rules)
