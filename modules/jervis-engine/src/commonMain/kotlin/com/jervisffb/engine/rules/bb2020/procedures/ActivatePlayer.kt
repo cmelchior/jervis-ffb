@@ -10,12 +10,12 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetActivePlayer
 import com.jervisffb.engine.commands.SetAvailableActions
 import com.jervisffb.engine.commands.SetAvailableSpecialActions
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.SetHasTackleZones
 import com.jervisffb.engine.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetSpecialActionSkillUsed
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode

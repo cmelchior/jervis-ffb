@@ -9,10 +9,10 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.context.RemoveContext
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode

@@ -15,12 +15,12 @@ import com.jervisffb.engine.commands.AddNigglingInjuries
 import com.jervisffb.engine.commands.AddPlayerStatModifier
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetApothecaryUsed
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.SetMissNextGame
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
