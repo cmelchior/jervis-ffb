@@ -98,7 +98,7 @@ object PassAction : Procedure() {
     object MoveOrPassOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            if (state.isTurnOver()) {
+            if (state.endActionImmediately()) {
                 return listOf(ContinueWhenReady)
             }
 

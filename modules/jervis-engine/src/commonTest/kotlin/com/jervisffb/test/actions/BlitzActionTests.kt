@@ -26,7 +26,7 @@ import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.rushTo
-import com.jervisffb.test.utils.SelectSingleDieResult
+import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -107,7 +107,7 @@ class BlitzActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             6.dblock, // Block roll
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
             DirectionSelected(Direction.LEFT),
             Cancel,
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -176,7 +176,7 @@ class BlitzActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             6.dblock, // Block roll
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
             DirectionSelected(Direction.LEFT),
             Cancel, // Do not follow up
             DiceRollResults(1.d6, 1.d6), // Armour roll
@@ -206,7 +206,7 @@ class BlitzActionTests: JervisGameTest() {
             NoRerollSelected(),
             4.dblock, // Block roll
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
             DirectionSelected(Direction.BOTTOM_LEFT),
             Cancel, // Do not follow up
             EndAction
@@ -259,7 +259,7 @@ class BlitzActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             4.dblock, // Push back
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
             DirectionSelected(Direction.BOTTOM_LEFT),
             Cancel,
             *moveTo(13, 4),

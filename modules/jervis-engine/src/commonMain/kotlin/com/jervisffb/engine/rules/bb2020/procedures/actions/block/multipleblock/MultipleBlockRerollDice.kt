@@ -9,6 +9,7 @@ import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -17,17 +18,18 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.MultipleBlockContext
+import com.jervisffb.engine.model.context.MultipleBlockDiceRoll
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockDiceRoll
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
- * Multiple Block overrides the standard behaviour for re-rolling blocks, since the coach should
- * be able to sell the combined result at all times. For that reason, this procedure is tracking
- * the state of all relevant rolls and combines the actions available.
+ * Multiple Block overrides the standard behavior for re-rolling blocks, since
+ * the coach should be able to see the combined result at all times. For that
+ * reason, this procedure is tracking the state of all relevant rolls and
+ * combines the actions available.
  */
 object MultipleBlockRerollDice: Procedure() {
     override val initialNode: Node = ReRollSourceOrAcceptRoll
@@ -85,9 +87,9 @@ object MultipleBlockRerollDice: Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
-            val updatedContext = context.copyAndUpdateWithLatestBlockTypeContext(state)
+            val updatedBlockTypeCommand = context.updateWithLatestBlockTypeContext(state)
             return compositeCommandOf(
-                SetContext(updatedContext),
+                updatedBlockTypeCommand,
                 GotoNode(ReRollSourceOrAcceptRoll)
             )
         }

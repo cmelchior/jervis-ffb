@@ -106,20 +106,30 @@ rules, skills are tracked separately in [skills.md](skills.md).
 - [ ] Drive counter
 - [ ] Scoring
   - [x] Moving into the End Zone with the ball using a standard move
-  - [ ] Follow-up into the End Zone
-  - [ ] Jumping into the End Zone with the ball
-  - [ ] Leaping into the End Zone with the ball
+  - [x] Follow-up into the End Zone
+  - [x] Jumping into the End Zone with the ball
+  - [x] Leaping into the End Zone with the ball
   - [x] Picking the ball up in the Endzone
   - [x] Catching the ball after a pass in the end zone
   - [x] Catching the ball after a hand-off in the end zone
+  - [x] Catch scatter in endzone
+  - [x] Catch deviate in endzone
   - [x] Catching the ball after it bouncing into the end zone
   - [x] Catching the ball in the end zone after a throw-in 
-  - [ ] Push player to scoring position during block, but blocker is knocked down.
+  - [x] Push opponent player to scoring position during block, but is knocked down (no score).
   - [ ] Throw Team-mate. Player lands in the end zone
-  - [ ] Chain push: Player with the ball is pushed into the end zone
-  - [ ] Chain push: Player is pushed into the ball and picks it up.
+  - [x] Chain push: Own Player with the ball is pushed into the end zone
+  - [x] Chain push: Opponent Player with the ball is pushed into the end zone
   - [ ] Using Ball & Chain to move into the End Zone (not really supported, but just in case)
-  - [ ] Pushed into end zone after a block
+  - [x] Pushed into end zone after a block
+  - [ ] Score in opponent turn - move turn counter
+  - [ ] Score in opponent turn - at end of half
+  - [ ] Score after pushback
+  - [ ] Score after Stumble and Followup
+  - [ ] Score after Pow and Followup
+  - [ ] Opponent score after Stumble (with dodge)
+  - [ ] Opponent score after Pushback (with dodge)
+  - [ ] Attacker is trapped, but pushes another player into a scoring position. A touchdown is scored.
 - [ ] Turnover ends turn as quickly as possible
   - [ ] Falling Over
   - [ ] Knocked Down
@@ -131,26 +141,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Deflection/Interception and ball not caught by throwing team
   - [ ] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
   - [x] Sent-off for commiting a Foul
-  - [x] Touchdown - Success
-    - [x] Move into opponent end-zone
-    - [x] Jump into endzone
-    - [x] Leap into endzone
-    - [x] Catch pass in endzone
-    - [x] Catch hand-off in endzone
-    - [x] Catch bounce in endzone
-    - [ ] Catch scatter in endzone
-    - [x] Catch throw-in in endzone
-    - [ ] Pickup deviate in endzone
-    - [x] Pickup ball in endzone
-    - [x] Push own ball carrier into endzone
-    - [x] Push opponent ball carier into endzone 
-    - [x] Land after throw team mate in endzone
-  - [x] No Touchdown
-    - [x] Move into own end-zone
-    - [x] Fail rush into endzone
-    - [x] Fail dodge into endzone
-    - [x] pickup own ball in endzone
-
+  - [ ] During Multiple Block: Scoring Turnovers will win over End-Turn turnovers.
 - [ ] Conceding
   - [ ] Free if 3 or less players at beginning of turn
 - [ ] Team Rerolls
@@ -208,7 +199,6 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Failing to catch will bounce from square
 - [ ] Track Star Player Points
 - [ ] Track statistics (not in the rules)
-- [ ] Touchdown
 - [ ] Detect Stalling
 - [ ] Trapdoors
 - [ ] Maximum Stats
@@ -218,6 +208,8 @@ rules, skills are tracked separately in [skills.md](skills.md).
 - [ ] Moving into a square
   - [ ] Moving voluntarily
   - [ ] Moving involuntary
+  - [ ] Followup is voluntarily
+  - [ ] Pushback is involuntary (also side step)
   - [ ] Being pushed
   - [ ] Need Dodge/Rush/Jump to go there
 - [ ] Characteristic Tests
@@ -230,6 +222,11 @@ rules, skills are tracked separately in [skills.md](skills.md).
 - [ ] Range Ruler
   - [ ] Follows the chart in the rulebook
   - [ ] Interceptions are correct. See https://www.luccini.it/bloodbowl/downloads/Tabella_Intercetti.pdf
+- [ ] Apothecary
+  - [ ] Use on KO
+  - [ ] Use on BH
+  - [ ] Use on Casualty
+  - [ ] Use on injury when pushed into the crowd
 
 ## Actions
 
@@ -288,7 +285,13 @@ rules, skills are tracked separately in [skills.md](skills.md).
     - [ ] Can only push into empty squares
     - [ ] Follow up
     - [ ] Chain Push into free space
+    - [ ] Push into ball bounces it
+    - [ ] Bounce happens after push is resolved
     - [ ] Push into the crowd if no free space. Crowd take predence
+    - [ ] Check for scoring after push
+    - [ ] Chainpush prone player
+    - [ ] Player with ball pushed into crowd -> turnover
+    - [ ] Player with ball pushed into crowd - > throwin
   - [x] Stumble
   - [x] Pow!
 - [x] Blitz Action
@@ -341,6 +344,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Fumbled pass
   - [x] Bounce from target if not caught
   - [x] Passing Interference (players under the ruler)
+    - [x] Choose not to deflect
     - [x] Must be standing with a tackle zone
     - [x] Opposing coach chooses player if multiple options
     - [x] Modifiers 

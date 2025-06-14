@@ -11,10 +11,18 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.RemoveContext
-import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.CompositeCommand
+import com.jervisffb.engine.commands.SetBallLocation
+import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.AddContextListItem
+import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.ReplaceContextListItem
+import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -23,16 +31,20 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.reports.ReportPushedIntoCrowd
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.ThrowInContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
@@ -41,14 +53,27 @@ import com.jervisffb.engine.rules.bb2020.skills.Sidestep
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 data class PushContext(
+    // Player starting the first push
     val firstPusher: Player,
+    // First player being pushed
     val firstPushee: Player,
+    // firstPushee is knocked down after the pushback has resolved. So if they
+    // have the ball, it will bounce.
+    val isDefenderKnockedDown: Boolean,
     // Is the push part of a multiple block
     val isMultipleBlock: Boolean,
-    // Chain of pushes, for a single push, this contains one element
-    // Should only be modified from within `PushStep`.
-    val pushChain: List<PushData>,
-    val followsUp: Boolean = false,
+    // Chain of pushes. For a single push, this contains one element
+    // Should only be modified from within the `PushStep` procedure.
+    val pushChain: MutableList<PushData>,
+    // If `true`, the `firstPusher` will follow up after resolving the rest of the chain.
+    var followsUp: Boolean = false,
+    // Temporary state tracking the current player being resolved for this push step.
+    var fullyResolveInProgress: Player? = null,
+    // Track any balls that must bounce after the push is resolved.
+    // Either because a player was pushed into it, or because a trapdoor
+    // swallowed a player with a ball. Balls should be added and resolved in
+    // order.
+    val looseBalls: MutableList<Ball> = mutableListOf(),
 ) : ProcedureContext {
 
     // Returns last "pusher" in the push chain
@@ -56,7 +81,7 @@ data class PushContext(
         return pushChain.last().pusher
     }
 
-    // Returns the last "pushee in the chain
+    // Returns the last "pushee" in the chain
     fun pushee(): Player {
         return pushChain.last().pushee
     }
@@ -64,39 +89,103 @@ data class PushContext(
     data class PushData(
         val pusher: Player,
         val pushee: Player,
+        // Where is the pushee being pushed from?
         val from: FieldCoordinate,
-        val to: FieldCoordinate? = null, // If `null` push direction has not been selected yet
+        // Where is the pushee being pushed to?
+        var to: FieldCoordinate? = null, // If `null` push direction has not been selected yet
         val isBlitzing: Boolean = false, // If first pusher is doing a Blitz
         val isChainPush: Boolean = false, // True for every push beyond the first
-        val usingJuggernaut: Boolean = false,
-        val usedGrab: Boolean = false,
-        val usedStandFirm: Boolean = false,
-        val usedSideStep: Boolean = false,
-        val usedFend: Boolean = false,
-    ) {
-    }
-
-    // Copy this context and replace last push chain in the process
-    fun copyModifyPushChain(data: PushData): PushContext {
-        val newPushChain = pushChain.dropLast(1) + listOf(data)
-        return copy(pushChain = newPushChain)
-    }
-
-    fun copyAddPushChain(data: PushData): PushContext {
-        val newPushChain = pushChain + listOf(data)
-        return copy(pushChain = newPushChain)
-    }
+        var usingJuggernaut: Boolean = false,
+        var usedGrab: Boolean = false,
+        var usedStandFirm: Boolean = false,
+        var usedSideStep: Boolean = false,
+        var usedFend: Boolean = false,
+        // Set to `true` if we checked the player in this step for scoring
+        var checkedForScoringAfterTrapdoors: Boolean = false,
+    )
 }
 
 /**
- * Resolve push, including any chain pushes. If the last player is pushed into
- * the crowd, it is resolved here.
+ * This procedure is responsible for handling the first parts of a push started
+ * from a block action, i.e. a POW! or Push (Stumble is converted into either
+ * of these two before loading this procedure).
  *
- * Pushing players is a complicated process, involving a lot of skills and timings.
- * The logic is implemented in the following way, with Player A = pusher and
- * Player B = pushee.
+ * The steps involved in resolving a push is pretty complicated and differs
+ * slightly between single and multiple blocks, but this procedure is the
+ * entry point for both of them and will describe the full sequence of events.
  *
- * 1. Player A starts blitz or block and must decide to use Juggernaut or not (before the push start).
+ *
+ *
+ * -----
+ *
+ * Since the steps involved in this are complicated, this procedure is
+ * responsible for handling all chain-pushes, injuries to all players and ball
+ * bouncing/being throw-in that occurred from it. The reason behind the exact
+ * sequence of events are discussed in rules-faq.md.
+ *
+ * NOTE: While the Push Chain for single blocks and Multiple Block has
+ * many similarities. There are a also many differences. So for now, Multiple
+ * Block uses their own procedure for Push in Multiple Block. See [XXX].
+ * Helper functions shared between the two are found in [XXX].
+ *
+ * Note: We introduce the concept "Push Chain" in this doc, this simply means
+ * the data structure that tracks all the pushes and chain-pushes, starting
+ * from the attacker and ending with the last player pushed.
+ *
+ * ## Full Sequence of Events in a Push
+ *
+ * The full sequence looks like this:
+ *
+ * 1. Roll block dice and select either Push, Stumble or POW. This triggers this
+ *    procedure.
+ *
+ * 2. Determine the push chain, including all relevant skills at each step, like
+ *    Sidestep, Stand Firm or Grab. For chain-pushes, players are considered as
+ *    having left their square, but does not yet count as having entered the
+ *    target square. No dice are rolled yet. See the section after this list
+ *    on exactly how these skills are being applied and in what order.
+ *
+ * 3. Once a push chain is determined, moves are resolved from the front,
+ *    starting with the defender. This might result in some players being moved
+ *    twice. No dice are rolled yet.
+ *
+ * 4. If a player is pushed into the crowd, this is resolved now, i.e., rolling
+ *    for injury and choosing to use the apothecary.
+ *
+ * 5. Choose to follow up or not. If yes, the attacker is moved.
+ *
+ * 6. If the defender was knocked down, roll for armour/injury and use the
+ *    apothecary. If they had the ball it is knocked loose, but does not
+ *    bounce yet.
+ *
+ * 7. Check for Skills affecting the ball, like Strip Ball. If triggered, the
+ *    ball is knocked loose, but no dice is rolled yet.
+ *
+ * 8. Go through the push chain starting with the defender ending with the
+ *    attacker. If a player is standing on a trapdoor, roll to see if they are
+ *    removed. If yes, any ball they are holding is knocked loose. Do not roll
+ *    for bounce yet.
+ *
+ * 9. Go through the push chain starting with the defender and ending with the
+ *    attacker. The first player detected holding the ball will score a
+ *    touchdown. If multiple players are in a scoring position, only the first
+ *    player will score. All the remaining steps still needs to be completed.
+ *
+ * 10. Go through the push chain starting with the defender's location and
+ *     ending with the attacker's. If there is a loose ball there, it will
+ *     either bounce or be thrown in. Check for a touchdown after each ball
+ *     (if there are multiple). The first player to hold a ball in a scoring
+ *     position will get the touchdown, but all balls must be fully resolved,
+ *     i.e., the ball is either caught or landed in an empty square.
+ **
+ * ## Skills used during a single Push
+ *
+ * When determining a step in the push chain, it involves a number of skills
+ * and interactions, that are not straight-forward. The exact sequence of these
+ * are described below with Player A = pusher and Player B = pushee.
+ *
+ * 1. Player A starts blitz or block and must decide to use Juggernaut or not
+ *    (before the push start).
  *    a. Cannot be used on chain pushes.
  *
  * 2. Player B must decide whether to use Stand Firm. Page 80 in the rulebook.
@@ -116,96 +205,20 @@ data class PushContext(
  *    a. Cannot be used on a chain push.
  *    b. Cannot be used if Player A has Ball & Chain.
  *    c. Cannot be used if Player A is blitzing and using Juggernaut.
- *
- * I could not find any definitive answer for the next scenarios, i.e., what happens
- * if you end up with a circular chain push. It is theoretically possible to have
- * a chain push go back to the start, but it is unclear what happens in that case.
- *
- * There exist at least three scenarios:
- *
- * 1. With 24 players, it is possible for a Player C to push Player A away from
- *    its starting location, so it no longer is adjacent to Player B's starting
- *    location.
- *
- * 2. With 24 players, it is possible to potentially push a player C into Player
- *    B's starting location.
- *
- * 3. With 28 players, it is possible to create an infinite circle that never ends.
- *    However, this is up to the pushing coach, and they can just choose a different
- *    chain push sequence to break it.
- *
- * To account for these cases, this procedure implements the following logic:
- *
- * - When calculating a chain push, players are considered as having left their
- *   square as soon as the push direction is selected, i.e., their square is
- *   available in case of a circular chain. But the players are not moved into
- *   their target square until the entire chain is resolved.
- *
- * - If Player A is moved away so it is no longer adjacent to Player B's starting
- *   square, they are no longer allowed to follow up. The reason is due to the
- *   following sentence in the rules: "Sometimes, a player must follow-up due to
- *   an in-game effect, a special rule, or a Skill or Trait, whether they want to
- *   or not.", in this case, the in-game effect is a push or chain-push.
- *
- * - Due to the possibility of circular chain pushes, we risk having two players
- *   in the same location no matter if the chain is resolved from the start or
- *   from the end. To make it more natural, we resolve the chain from the
- *   beginning.
- *
- * The choice of resolving from the start has consequences for Treacherous
- * Trapdoor, Scoring, Ball Clone, and being Pushed Into The Crowd.
- *
- * **Treacherous Trapdoor**
- * If a chain-push results in a player being pushed into another square with a
- * player standing on a trapdoor, what happens?
- *
- *   a. The player can fall into the trapdoor before chain-pushing the other
- *      player out. If it falls through, the chain just stops there. The original
- *      player stays on the trapdoor.
- *   b. The check for trapdoor isn't done until after the full chain is resolved.
- *      Potentially leaving a "hole" in the chain.
- *
- * You could probably argue for both interpretations, so in this case, we use
- * option A, as it is easier to implement in [ResolvePush]. However, due to how
- * the logic is set up, you select all steps of the chain without checking for
- * trapdoors, and the trapdoor check is then done when fully resolving the chain.
- *
- * **Scoring **
- * If Ball Clone is in play, and you have a ball on the ground and a ball carried
- * by a player that is pushed into the End Zone, then we are going to check for
- * scoring for the player being pushed into the End Zone first, before checking
- * for Pickup (because that will happen by the end of chain-push).
- *
- * If a touchdown is scored during the push-back, we will still resolve the entire
- * chain (including pushing people into the crowd) before the turn-over is triggered.
- *
- * This means a push is modeled this way:
- * ```
- *   for_each_step_in_chain {
- *      playerA.location = pushed_into_location
- *      field.get(pushed_into_location) = playerA
- *      // At this point in time playerA.location == playerB.location (which is fine)
- *   }
- * ```
  */
-// TODO Add support for Treacherous Trapdorr
-// TODO Add support for scoring
-// TODO Probably have to rethink the logic in this procedure a bit.
-object PushStep: Procedure() {
+// TODO Add support for Treacherous Trapdoor
+object PushStepInitialMoveSequence: Procedure() {
 
     // Start the push by figuring out what kind of push and what skills could impact it.
     // The chain is as follows: Juggernaut -> Stand Firm -> Grab -> Sidestep.
-    // As an optimization this node will try to figure out if any of these can be skipped.
-    // If we end up in the middle of the chain due to this, the rest of the nodes will
-    // be executed, but will just require "Continue" if they do not apply
+    // If a skill isn't applicable the Node is skipped through a Continue action.
     override val initialNode: Node = DecideToUseJuggernaut
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<PushContext>()
-    }
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<PushContext>()
 
-    // TODO Is this where we decide on Juggernaut?
+    // TODO Is this where we decide on Juggernaut? Or should we somehow make it a node outside
+    //  the push chain (since it doesn't apply to chain pushes)
     // TODO Juggernaut probably doesn't apply to chain pushes?
     object DecideToUseJuggernaut: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.last().pusher.team
@@ -218,19 +231,17 @@ object PushStep: Procedure() {
                 false -> listOf(ContinueWhenReady)
             }
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is Confirm -> {
+                Confirm -> {
                     val context = state.getContext<PushContext>()
-                    val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usingJuggernaut = true))
+                    val pushData = context.pushChain.last()
                     return compositeCommandOf(
-                        SetContext(newContext),
+                        SetContextProperty(PushContext.PushData::usingJuggernaut, pushData, true),
                         GotoNode(DecideToUseStandFirm)
                     )
                 }
-                is Cancel,
-                is Continue -> {
+                Cancel, Continue -> {
                     GotoNode(DecideToUseStandFirm)
                 }
                 else -> INVALID_ACTION(action)
@@ -251,19 +262,17 @@ object PushStep: Procedure() {
                 false -> listOf(ContinueWhenReady)
             }
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is Confirm -> {
+                Confirm -> {
                     val context = state.getContext<PushContext>()
-                    val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedStandFirm = true))
+                    val pushData = context.pushChain.last()
                     return compositeCommandOf(
-                        SetContext(newContext),
+                        SetContextProperty(PushContext.PushData::usedStandFirm, pushData, true),
                         GotoNode(DecideToUseGrab)
                     )
                 }
-                is Cancel,
-                is Continue -> {
+                Cancel, Continue -> {
                     GotoNode(DecideToUseGrab)
                 }
                 else -> INVALID_ACTION(action)
@@ -282,19 +291,18 @@ object PushStep: Procedure() {
                 false -> listOf(ContinueWhenReady)
             }
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is Confirm -> {
+                Confirm -> {
                     val context = state.getContext<PushContext>()
-                    val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedGrab = true))
+                    val pushData = context.pushChain.last()
                     return compositeCommandOf(
-                        SetContext(newContext),
+                        SetContextProperty(PushContext.PushData::usedGrab, pushData, true),
+                        ReplaceContextListItem(context.pushChain, pushData),
                         GotoNode(DecideToUseSidestep)
                     )
                 }
-                is Cancel,
-                is Continue -> {
+                Cancel, Continue -> {
                     GotoNode(DecideToUseSidestep)
                 }
                 else -> INVALID_ACTION(action)
@@ -316,19 +324,17 @@ object PushStep: Procedure() {
                 false -> listOf(ContinueWhenReady)
             }
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is Confirm -> {
+                Confirm -> {
                     val context = state.getContext<PushContext>()
-                    val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedSideStep = true))
+                    val pushData = context.pushChain.last()
                     return compositeCommandOf(
-                        SetContext(newContext),
+                        SetContextProperty(PushContext.PushData::usedSideStep, pushData, true),
                         GotoNode(DecideToUseFend)
                     )
                 }
-                is Cancel,
-                is Continue -> {
+                Cancel, Continue -> {
                     GotoNode(DecideToUseFend)
                 }
                 else -> INVALID_ACTION(action)
@@ -350,16 +356,15 @@ object PushStep: Procedure() {
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return when (action) {
-                is Confirm -> {
+                Confirm -> {
                     val context = state.getContext<PushContext>()
-                    val newContext = context.copyModifyPushChain(context.pushChain.last().copy(usedFend = true))
+                    val pushData = context.pushChain.last()
                     return compositeCommandOf(
-                        SetContext(newContext),
+                        SetContextProperty(PushContext.PushData::usedFend, pushData, true),
                         GotoNode(SelectPushDirection)
                     )
                 }
-                is Cancel,
-                is Continue -> {
+                Cancel, Continue -> {
                     GotoNode(SelectPushDirection)
                 }
                 else -> INVALID_ACTION(action)
@@ -405,7 +410,6 @@ object PushStep: Procedure() {
                 }
             )
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             // If the chosen direction results in a chain push, modify the push context
             // and redo the entire chain.
@@ -414,19 +418,25 @@ object PushStep: Procedure() {
                 val origin = context.pushee().coordinates
                 val target = origin.move(squareSelected.direction, 1)
                 val isEmpty = isSquaresEmptyForPushing(
-                    state.getContext<PushContext>(),
-                    setOf(target),
-                    state
+                    pushContext = state.getContext<PushContext>(),
+                    pushOptions = setOf(target),
+                    state = state
                 ).isNotEmpty()
-
-                val updatedContext = context.copyModifyPushChain(context.pushChain.last().copy(to = target))
-
+                val pushData = context.pushChain.last()
+                val updateActions = listOfNotNull(
+                    SetContextProperty(PushContext.PushData::to, pushData, target),
+                    if (target.isOnField(rules)) {
+                        AddContextListItem(context.looseBalls,state.field[target].balls)
+                    } else {
+                        null
+                    }
+                ).toTypedArray()
                 val commands = if (isEmpty) {
                     // Player was moved into an empty square, which means we can start resolving
                     // the entire chain.
                     compositeCommandOf(
-                        SetContext(updatedContext),
-                        GotoNode(ResolvePush)
+                        *updateActions,
+                        GotoNode(MovePushedPlayers)
                     )
                 } else {
                     // Target field is occupied, resulting in a chain push, add the
@@ -437,9 +447,9 @@ object PushStep: Procedure() {
                         from = target,
                         isChainPush = true,
                     )
-                    val newContext = updatedContext.copyAddPushChain(newPush)
                     compositeCommandOf(
-                        SetContext(newContext),
+                        *updateActions,
+                        AddContextListItem(context.pushChain, newPush),
                         GotoNode(DecideToUseJuggernaut)
                     )
                 }
@@ -454,59 +464,103 @@ object PushStep: Procedure() {
             state: Game,
         ): List<FieldCoordinate> {
             val firstPushedFromLocation = pushContext.pushChain.first().from
-            val isFirstPushLocationAvailable = pushContext.pushChain.filterIndexed { i, el ->
-                el.to == firstPushedFromLocation
-            }.isEmpty()
+            val isFirstPushLocationAvailable = pushContext.pushChain.none { it.to == firstPushedFromLocation }
             return pushOptions.filter {
-                it == FieldCoordinate.OUT_OF_BOUNDS ||
-                    state.field[it].isUnoccupied() ||
-                    it == firstPushedFromLocation && isFirstPushLocationAvailable
+                it == FieldCoordinate.OUT_OF_BOUNDS
+                    || state.field[it].isUnoccupied()
+                    || (it == firstPushedFromLocation && isFirstPushLocationAvailable)
             }
         }
     }
 
-    object ResolvePush: ComputationNode() {
+    /**
+     * Resolve the push-chain by moving all players part of it. For now, we only
+     * update their field location. Crowd injuries and balls bouncing happens
+     * later.
+     */
+    object MovePushedPlayers: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
-            // Resolve push from the last to the first. As doing the other way seems
+            // Execute push commands from the last to the first. As doing the other way seems
             // to cause issues with Undo. Probably a bug, so it needs to be investigated.
+            // Since all other rules treat the push chain from first to last, this should only
+            // be a (safe) implementation detail.
             val moveCommands = context.pushChain.reversed().map { push ->
                 val to = push.to!!
-                if (to == FieldCoordinate.OUT_OF_BOUNDS) {
-                    // We do not know where the player is going until after the injury roll,
-                    // but they are not on the field. The pusher must decide whether to
-                    // follow up before any injury roll.
-                    SetPlayerLocation(push.pushee, FieldCoordinate.UNKNOWN)
+                // If OUT_OF_BOUNDS, further processing happens in `ResolvePushedIntoTheCrowd`
+                val outOfBounds = (to == FieldCoordinate.OUT_OF_BOUNDS)
+                if (outOfBounds) {
+                    compositeCommandOf(
+                        SetPlayerLocation(push.pushee, to),
+                        ReportPushedIntoCrowd(push.pushee, push.from)
+                    )
                 } else {
                     SetPlayerLocation(push.pushee, to)
                 }
             }
-            // TODO If the last player is being pushed into the ball, they get a chance to pick
-            //  it up. Which can potentially trigger a scoring event.
+            val nextNode = if (moveCommands.first() is CompositeCommand) {
+                ResolvePushedIntoTheCrowd
+            } else {
+                DecideToFollowUp
+            }
             return compositeCommandOf(
                 *moveCommands.toTypedArray(),
-                GotoNode(DecideToFollowUp)
+                GotoNode(nextNode)
             )
         }
     }
 
-    object PushedIntoTheCrowd: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+    // It is only ever the last player in the chain that risks being pushed into
+    // the crow. We only resolve the player injury here. Throwing the ball back
+    // in doesn't happen until later in the push sequence.
+    object ResolvePushedIntoTheCrowd: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<PushContext>()
-            return SetContext(
-                RiskingInjuryContext(
+            return if (context.pushChain.last().pushee.location == FieldCoordinate.OUT_OF_BOUNDS) {
+                null
+            } else {
+                DecideToFollowUp
+            }
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<PushContext>()
+            val pushStep = context.pushChain.last()
+            val player = pushStep.pushee
+            return buildCompositeCommand {
+                // If player had the ball, prepare it to be thrown in again.
+                // But it will not happen until laster in Push sequence.
+                if (player.hasBall()) {
+                    val ball = player.ball!!
+                    val throwContext = ThrowInContext(
+                        ball = ball,
+                        outOfBoundsAt = pushStep.from,
+                    )
+                    addAll(
+                        SetBallState.outOfBounds(ball, pushStep.from),
+                        SetBallLocation(ball, FieldCoordinate.OUT_OF_BOUNDS),
+                        SetContext(throwContext)
+                    )
+                }
+                val injuryContext = RiskingInjuryContext(
                     player = context.pushChain.last().pushee,
                     mode = RiskingInjuryMode.PUSHED_INTO_CROWD
                 )
-            )
+                add(SetContext(injuryContext))
+            }
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // TODO What about turnovers
-            return compositeCommandOf(
-                RemoveContext<RiskingInjuryContext>(),
-                ExitProcedure()
-            )
+            val context = state.getContext<PushContext>()
+            val playerOnOwnTeam = context.firstPusher.team == context.pushee().team
+            return buildCompositeCommand {
+                add(RemoveContext<RiskingInjuryContext>())
+                // See page 58 in the rulebook. If a player with the ball is pushed into the crowd,
+                // it is a turnover.
+                if (playerOnOwnTeam) {
+                    add(SetTurnOver(TurnOver.STANDARD))
+                }
+                add(GotoNode(DecideToFollowUp))
+            }
         }
     }
 
@@ -526,42 +580,36 @@ object PushStep: Procedure() {
                 )
             }
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val context = state.getContext<PushContext>()
+            val pushContext = state.getContext<PushContext>()
             val actions = when (action) {
                 is Confirm -> arrayOf(
-                    SetContext(context.copy(followsUp = true)),
-                    SetPlayerLocation(context.firstPusher, context.pushChain.first().from)
+                    SetContextProperty(PushContext::followsUp, pushContext, true),
+                    SetPlayerLocation(pushContext.firstPusher, pushContext.pushChain.first().from)
                 )
                 is Cancel -> arrayOf() // Do nothing
                 is Continue -> {
-                    if (context.firstPusher.hasSkill<Frenzy>()) {
+                    if (pushContext.firstPusher.hasSkill<Frenzy>()) {
                         arrayOf(
-                            SetContext(context.copy(followsUp = true)),
-                            SetPlayerLocation(context.firstPusher, context.pushChain.first().from)
+                            SetContextProperty(PushContext::followsUp, pushContext, true),
+                            SetPlayerLocation(pushContext.firstPusher, pushContext.pushChain.first().from)
                         )
                     } else {
                         arrayOf(
-                            SetContext(context.copy(followsUp = false)),
+                            SetContextProperty(PushContext::followsUp, pushContext, false),
                         )
                     }
                 }
                 else -> INVALID_ACTION(action)
             }
-            val pushedIntoTheCrowd = context.pushChain.last().to == FieldCoordinate.OUT_OF_BOUNDS
-            return if (pushedIntoTheCrowd) {
-                compositeCommandOf(
-                    *actions,
-                    SetPlayerLocation(context.pushChain.last().pushee, FieldCoordinate.UNKNOWN),
-                    GotoNode(PushedIntoTheCrowd)
-                )
-            } else {
-                compositeCommandOf(
-                    *actions,
-                    ExitProcedure()
-                )
-            }
+            // The parent procedure is responsible for delegating to the next
+            // parts of the push chain which should be resolving defender
+            // injuries. But this will differ slightly between single and multiple
+            // blocks.
+            return compositeCommandOf(
+                *actions,
+                ExitProcedure(),
+            )
         }
     }
 }

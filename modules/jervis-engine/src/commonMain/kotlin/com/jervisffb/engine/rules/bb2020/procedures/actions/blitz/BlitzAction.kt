@@ -361,7 +361,7 @@ object BlitzAction : Procedure() {
                     .getSurroundingCoordinates(rules, distance = 1)
                     .contains(context.defender.coordinates)
 
-            return if (state.isTurnOver()) {
+            return if (state.endActionImmediately()) {
                 return compositeCommandOf(
                     removeContextCommand,
                     ExitProcedure()

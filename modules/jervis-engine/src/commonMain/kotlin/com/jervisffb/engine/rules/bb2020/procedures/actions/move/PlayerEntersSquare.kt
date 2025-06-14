@@ -37,11 +37,14 @@ import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStepResolveSingleBlockPushChain
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
-import kotlinx.serialization.Serializable
+
 
 data class MovePlayerIntoSquareContext(
     val player: Player,
@@ -50,7 +53,7 @@ data class MovePlayerIntoSquareContext(
 
 /**
  * Procedure controlling a player entering a square using one of their
- * normal movement options or by being pushed into it.
+ * normal movement options.
  *
  * Normally it just means moving the player into that square, but if
  * Treacherous Trapdoors have been rolled on Prayers to Nuffle, it
@@ -60,9 +63,15 @@ data class MovePlayerIntoSquareContext(
  * square have been resolved, i.e., Rush, Dodge, Jump and Leap. This is covered
  * under Picking Up The Ball on page 46 in the rulebook.
  *
+ * NOTE: Pushbacks roughly follows the same logic but with different timings,
+ * so moving players into squares during a push is handled in those procedures.
+ *
+ * @see [PushStepInitialMoveSequence]
+ * @see [PushStepResolveSingleBlockPushChain]
+ * @see [MultipleBlockAction]
+ *
  * TODO This logic here is wrong and needs to be reworked. See rule-discussions.md
  */
-@Serializable
 object MovePlayerIntoSquare : Procedure() {
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<MovePlayerIntoSquareContext>()

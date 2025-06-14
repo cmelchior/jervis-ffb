@@ -235,35 +235,35 @@ object PatchUpPlayer: Procedure() {
                 val injuryCommand = when {
                     context.regenerationSuccess -> {
                         compositeCommandOf(
-                            SetPlayerState(player, com.jervisffb.engine.model.PlayerState.RESERVE),
-                            SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut)
+                            SetPlayerState(player, PlayerState.RESERVE),
+                            SetPlayerLocation(player, DogOut)
                         )
                     }
                     context.injuryResult == InjuryResult.KO && context.apothecaryUsed != null -> {
                         if (context.mode == RiskingInjuryMode.PUSHED_INTO_CROWD) {
                             compositeCommandOf(
-                                SetPlayerState(player, com.jervisffb.engine.model.PlayerState.RESERVE),
-                                SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut),
+                                SetPlayerState(player, PlayerState.RESERVE),
+                                SetPlayerLocation(player, DogOut),
                             )
                         } else {
                             if (state.activeTeamOrThrow() == player.team) {
-                                SetPlayerState(player, com.jervisffb.engine.model.PlayerState.STUNNED_OWN_TURN)
+                                SetPlayerState(player, PlayerState.STUNNED_OWN_TURN)
                             } else {
-                                SetPlayerState(player, com.jervisffb.engine.model.PlayerState.STUNNED)
+                                SetPlayerState(player, PlayerState.STUNNED)
                             }
                         }
                     }
                     context.injuryResult == InjuryResult.KO && context.apothecaryUsed == null -> {
                         compositeCommandOf(
-                            SetPlayerState(player, com.jervisffb.engine.model.PlayerState.KNOCKED_OUT),
-                            SetPlayerLocation(player, com.jervisffb.engine.model.locations.DogOut),
+                            SetPlayerState(player, PlayerState.KNOCKED_OUT),
+                            SetPlayerLocation(player, DogOut),
                         )
                     }
                     context.injuryResult == InjuryResult.KO && context.apothecaryUsed != null -> {
                         if (state.activeTeamOrThrow() == player.team) {
-                            SetPlayerState(player, com.jervisffb.engine.model.PlayerState.STUNNED_OWN_TURN)
+                            SetPlayerState(player, PlayerState.STUNNED_OWN_TURN)
                         } else {
-                            SetPlayerState(player, com.jervisffb.engine.model.PlayerState.STUNNED)
+                            SetPlayerState(player, PlayerState.STUNNED)
                         }
                     }
 

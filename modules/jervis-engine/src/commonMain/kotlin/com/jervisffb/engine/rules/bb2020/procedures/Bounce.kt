@@ -30,7 +30,8 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 
 /**
- * Resolve a Bounce.
+ * Resolve a Bounce until it is either caught or lands on the ground.
+ * If caught, this includes checking for touchdowns.
  *
  * See page 25 in the rulebook.
  */

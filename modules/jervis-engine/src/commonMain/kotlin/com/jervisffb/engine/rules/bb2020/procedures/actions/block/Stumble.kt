@@ -24,6 +24,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
@@ -34,18 +35,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryC
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.skills.Tackle
 import com.jervisffb.engine.utils.INVALID_ACTION
-
-
-data class StumbleContext(
-    val attacker: Player,
-    val defender: Player,
-    val attackerUsesTackle: Boolean = false,
-    val defenderUsesDodge: Boolean = false,
-) : ProcedureContext {
-    fun isDefenderDown(): Boolean {
-        return !defenderUsesDodge || attackerUsesTackle
-    }
-}
 
 /**
  * Resolve a Stumble when selected on a block die.
@@ -61,7 +50,7 @@ object Stumble: Procedure() {
         )
         return SetContext(stumbleContext)
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+    override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<PushContext>()
         val stumbleContext = state.getContext<StumbleContext>()
         return compositeCommandOf(
@@ -72,7 +61,7 @@ object Stumble: Procedure() {
     override fun isValid(state: Game, rules: Rules) = state.assertContext<BlockContext>()
 
     object ChooseToUseTackle: ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<StumbleContext>().attacker.team
+        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<StumbleContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val stumbleContext = state.getContext<StumbleContext>()
             return if (stumbleContext.attacker.hasSkill<Tackle>()) {
@@ -126,12 +115,12 @@ object Stumble: Procedure() {
     // is Knocked Down if either the attacker was using Tackle or the defender
     // didn't have Dodge.
     object ResolvePush: ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command? {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
             val pushContext = createPushContext(state)
             return SetContext(pushContext)
         }
 
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStep
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStepInitialMoveSequence
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<StumbleContext>()

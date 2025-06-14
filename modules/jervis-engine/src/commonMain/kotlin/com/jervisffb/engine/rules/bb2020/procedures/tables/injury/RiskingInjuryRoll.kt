@@ -15,6 +15,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -22,7 +23,6 @@ import com.jervisffb.engine.model.inducements.Apothecary
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockContext
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
 import com.jervisffb.engine.rules.bb2020.tables.InjuryResult
 import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryResult
@@ -98,9 +98,7 @@ object RiskingInjuryRoll: Procedure() {
     override val initialNode: Node = DetermineStartingRoll
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
-    override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<RiskingInjuryContext>()
-    }
+    override fun isValid(state: Game, rules: Rules) = state.assertContext<RiskingInjuryContext>()
 
     object DetermineStartingRoll: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
@@ -256,7 +254,7 @@ object RiskingInjuryRoll: Procedure() {
                 val injuryContext = state.getContext<RiskingInjuryContext>()
                 val mbContext = state.getContext<MultipleBlockContext>()
                 compositeCommandOf(
-                    SetContext(mbContext.copyAndSetInjuryReferenceForPlayer(injuryContext.player, injuryContext)),
+                    mbContext.addInjuryReferenceForPlayer(injuryContext.player, injuryContext),
                     ExitProcedure(),
                 )
             } else {

@@ -90,23 +90,27 @@ object GameDrive : Procedure() {
     object Turn : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules) = TeamTurn
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val isTurnOver = (state.turnOver == TurnOver.STANDARD)
             val activeGoalScored = (state.turnOver == TurnOver.ACTIVE_TEAM_TOUCHDOWN)
-            // TODO If this is true, we need to run another turn for the team but exit it straight away.
             val inactiveTouchdownScored = (state.turnOver == TurnOver.INACTIVE_TEAM_TOUCHDOWN)
             val isOutOfTime = if (state.halfNo <= rules.halfsPrGame) {
-                state.homeTeam.turnMarker == rules.turnsPrHalf &&
-                    state.awayTeam.turnMarker == rules.turnsPrHalf
+                state.homeTeam.turnMarker == rules.turnsPrHalf
+                    && state.awayTeam.turnMarker == rules.turnsPrHalf
             } else {
-                state.homeTeam.turnMarker == rules.turnsInExtraTime &&
-                    state.awayTeam.turnMarker == rules.turnsInExtraTime
+                state.homeTeam.turnMarker == rules.turnsInExtraTime
+                    && state.awayTeam.turnMarker == rules.turnsInExtraTime
             }
             val endDrive = activeGoalScored || isOutOfTime
             val swapTeams = !isOutOfTime && !activeGoalScored
 
             return when {
                 inactiveTouchdownScored -> {
-                    TODO("Add support for this")
+                    compositeCommandOf(
+                        // Keep the current turnover state as we use it as an indicator for what to do
+                        // on the next turn.
+                        SetActiveTeam(state.inactiveTeamOrThrow()),
+                        SetKickingTeam(state.receivingTeam),
+                        GotoNode(Turn)
+                    )
                 }
                 endDrive -> {
                     compositeCommandOf(
@@ -133,7 +137,8 @@ object GameDrive : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = EndOfDriveSequence
         override fun onExitNode(state: Game, rules: Rules): Command {
             // The End of Drive Sequence doesn't mention moving players off the pitch, so we
-            // do it here after the sequence has completed. This also includes removing th
+            // do it here after the sequence has completed. This also includes removing the
+            // ball from the field.
             val movePlayers: List<Command> = state.field
                 .filter { !it.isUnoccupied() }
                 .map {

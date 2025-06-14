@@ -116,7 +116,7 @@ interface D6StandardSkillReroll : RerollSource {
  *
  * Note, for skills that replace blocks, the procedure being referenced is the Standalone
  * variant. Special skills that can be used as part of a Multiple Block
- * are defined in [com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockContext] and will
+ * are defined in [com.jervisffb.engine.model.context.MultipleBlockContext] and will
  * be handled separately there.
  */
 interface SpecialActionProvider {

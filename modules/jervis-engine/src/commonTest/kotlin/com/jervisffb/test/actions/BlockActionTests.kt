@@ -29,7 +29,7 @@ import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skills.BlockTests
 import com.jervisffb.test.skills.DodgeSkillTests
-import com.jervisffb.test.utils.SelectSingleDieResult
+import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -183,7 +183,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             3.dblock,
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
             DirectionSelected(Direction.LEFT),
             Confirm
         )
@@ -204,7 +204,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             1.dblock,
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
         )
         assertEquals(FieldCoordinate(13, 5), attacker.location)
         assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
@@ -223,7 +223,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             2.dblock,
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
         )
         assertEquals(FieldCoordinate(13, 5), attacker.location)
         assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
@@ -242,7 +242,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             3.dblock,
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
             DirectionSelected(Direction.LEFT),
             Cancel,
         )
@@ -263,7 +263,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             5.dblock,
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
             DirectionSelected(Direction.UP_LEFT),
             Cancel,
         )
@@ -284,7 +284,7 @@ class BlockActionTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             5.dblock,
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
             DirectionSelected(Direction.BOTTOM_LEFT),
             Cancel,
         )

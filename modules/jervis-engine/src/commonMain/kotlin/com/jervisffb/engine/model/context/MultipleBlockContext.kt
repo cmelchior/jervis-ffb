@@ -1,16 +1,17 @@
-package com.jervisffb.engine.rules.bb2020.procedures.actions.block
+package com.jervisffb.engine.model.context
 
 import com.jervisffb.engine.actions.BlockDicePool
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RerollOptionSelected
+import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.context.AddContextListItem
+import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.context.ProcedureContext
-import com.jervisffb.engine.model.context.UseRerollContext
-import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.TurnOver
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.BlockType.CHAINSAW
 import com.jervisffb.engine.rules.BlockType.MULTIPLE_BLOCK
@@ -20,11 +21,12 @@ import com.jervisffb.engine.rules.BlockType.STANDARD
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
  * Class wrapping one of the block actions part of a multiple block actions.
@@ -32,7 +34,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  */
 data class MultipleBlockDiceRoll(
     val type: BlockType,
-    val rollContext: ProcedureContext, // The roll specific context for the given type
+    var rollContext: ProcedureContext, // The roll specific context for the given type
 ) {
 
     fun createDicePool(id: Int): BlockDicePool {
@@ -102,7 +104,7 @@ data class MultipleBlockDiceRoll(
         }
     }
 
-    fun copyAndSetSelectedResult(die: DieResult): MultipleBlockDiceRoll {
+    fun setSelectedDieResult(die: DieResult): Command {
         return when (type) {
             BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
@@ -120,9 +122,7 @@ data class MultipleBlockDiceRoll(
                         break
                     }
                 }
-                this.copy(
-                    rollContext = rollContext.copy(resultIndex  = selectedIndex)
-                )
+                SetContextProperty(BlockContext::resultIndex, context, selectedIndex)
             }
         }
     }
@@ -140,22 +140,29 @@ data class MultipleBlockContext(
     val defender1: Player? = null,
     val defender2: Player? = null,
     val actionAborted: Boolean = true,
-
     // Rolls for the two blocks
     val roll1: MultipleBlockDiceRoll? = null,
     val roll2: MultipleBlockDiceRoll? = null,
     // Tracks the index of which defender is currently in focus. If set, it must either be 0 or 1.
-    val activeDefender: Int? = null,
+    var activeDefender: Int? = null,
+    // If the blocks result in a push, all the data related to the push is stored here.
+    var defender1PushChain: PushContext? = null,
+    var defender2PushChain: PushContext? = null,
     // Tracks the ball for those players where it needs to bounce. Set back to `null` once the ball has bounced
-    val attackerBall: Ball? = null,
-    val defender1Ball: Ball? = null,
-    val defender2Ball: Ball? = null,
-    // Set if any of the players involved received an injury.
-    val attackerInjuryContext: RiskingInjuryContext? = null,
-    val defender1InjuryContext: RiskingInjuryContext? = null,
-    val defender2InjuryContext: RiskingInjuryContext? = null,
+    val defender1BallsHandled: Boolean = false,
+    val defender2BallsHandled: Boolean = false,
+    val attackerBallHandled: Boolean = false,
+    // Set if any of the players involved received an injury. The attacker might suffer an
+    // injury from both blocks
+    val attackerInjuryContext: MutableList<RiskingInjuryContext> = mutableListOf(),
+    var defender1InjuryContext: RiskingInjuryContext? = null,
+    var defender2InjuryContext: RiskingInjuryContext? = null,
     // Set to true, if a turnover happened during the first block.
-    val postponeTurnOver: Boolean = false
+    var postponeTurnOver: TurnOver? = null,
+    // Player starting locations (as they might leave the field due to injuries)
+    val attackerLocation: FieldCoordinate = attacker.coordinates,
+    val defender1Location: FieldCoordinate? = null,
+    val defender2Location: FieldCoordinate? = null,
 ): ProcedureContext {
 
     val rolls: List<MultipleBlockDiceRoll>
@@ -173,10 +180,10 @@ data class MultipleBlockContext(
         return get(activeDefender!!).type
     }
 
-    fun copyAndUpdateRollContext(index: Int, updatedRollContext: ProcedureContext): MultipleBlockContext {
+    fun updateRollContext(index: Int, updatedRollContext: ProcedureContext): Command {
         return when (index) {
-            0 -> copy(roll1 = roll1!!.copy(rollContext = updatedRollContext))
-            1 -> copy(roll2 = roll2!!.copy(rollContext = updatedRollContext))
+            0 -> SetContextProperty(MultipleBlockDiceRoll::rollContext, roll1!!, updatedRollContext)
+            1 -> SetContextProperty(MultipleBlockDiceRoll::rollContext, roll2!!, updatedRollContext)
             else -> throw IllegalArgumentException("Invalid roll index: $index")
         }
     }
@@ -246,7 +253,7 @@ data class MultipleBlockContext(
      * block type and replace the active [MultipleBlockDiceRoll.rollContext]
      * with it.
      */
-    fun copyAndUpdateWithLatestBlockTypeContext(state: Game): MultipleBlockContext {
+    fun updateWithLatestBlockTypeContext(state: Game): Command {
         val updatedContext = when (getActiveRerollType()) {
             BlockType.BREATHE_FIRE -> TODO()
             CHAINSAW -> TODO()
@@ -255,7 +262,7 @@ data class MultipleBlockContext(
             STAB -> TODO()
             STANDARD -> state.getContext<BlockContext>()
         }
-        return copyAndUpdateRollContext(activeDefender!!, updatedContext)
+        return updateRollContext(activeDefender!!, updatedContext)
     }
 
     /**
@@ -273,22 +280,13 @@ data class MultipleBlockContext(
     }
 
     /**
-     * Set the ball reference for the current defender.
+     * Return the commands needed to add an Injury to the injury pool.
      */
-    fun copyAndTrackBouncingBallForPlayer(player: Player, ball: Ball): ProcedureContext {
+    fun addInjuryReferenceForPlayer(player: Player, injuryContext: RiskingInjuryContext): Command {
         return when (player) {
-            attacker -> copy(attackerBall = ball)
-            defender1 -> copy(defender1Ball = ball)
-            defender2 -> copy(defender2Ball = ball)
-            else -> throw IllegalArgumentException("Invalid player: $player")
-        }
-    }
-
-    fun copyAndSetInjuryReferenceForPlayer(player: Player, injuryContext: RiskingInjuryContext): MultipleBlockContext {
-        return when (player) {
-            attacker -> copy(attackerInjuryContext = injuryContext)
-            defender1 -> copy(defender1InjuryContext = injuryContext)
-            defender2 -> copy(defender2InjuryContext = injuryContext)
+            attacker -> AddContextListItem(attackerInjuryContext, injuryContext)
+            defender1 -> SetContextProperty(MultipleBlockContext::defender1InjuryContext, this, injuryContext)
+            defender2 -> SetContextProperty(MultipleBlockContext::defender2InjuryContext, this, injuryContext)
             else -> throw IllegalArgumentException("Invalid player: $player")
         }
     }
@@ -337,25 +335,13 @@ data class MultipleBlockContext(
      * Note, it is the context stored in _this_ context that is returned,
      * and not the one stored globally.
      *
-     * See [copyAndUpdateWithLatestBlockTypeContext] for that.
+     * See [updateWithLatestBlockTypeContext] for that.
      */
     fun getContextForCurrentBlock(): ProcedureContext {
         return when (activeDefender) {
             0 -> roll1!!.rollContext
             1 -> roll2!!.rollContext
             else -> throw IllegalArgumentException("Invalid active defender: $activeDefender")
-        }
-    }
-
-    fun copyAndRemoveBallRef(ball: Ball): MultipleBlockContext {
-        return if (attackerBall == ball) {
-            copy(attackerBall = null)
-        } else if (defender1Ball == ball) {
-            copy(defender1Ball = null)
-        } else if (defender2Ball == ball) {
-            copy(defender2Ball = null)
-        } else {
-            INVALID_GAME_STATE("Ball not found: $ball")
         }
     }
 }

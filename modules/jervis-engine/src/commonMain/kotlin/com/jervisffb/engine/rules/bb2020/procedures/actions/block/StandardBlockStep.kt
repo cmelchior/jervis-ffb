@@ -38,7 +38,7 @@ data class BlockContext(
     val defensiveAssists: Int = 0,
     val roll: List<BlockDieRoll> = emptyList(),
     val hasAcceptedResult: Boolean = false, // Do not want to reroll any further
-    val resultIndex: Int = -1, // Index into `roll` that defines the selected roll
+    var resultIndex: Int = -1, // Index into `roll` that defines the selected roll
     val didFollowUp: Boolean = false,
     val aborted: Boolean = false,
 ): ProcedureContext {

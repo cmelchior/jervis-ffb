@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.pass
 
+import com.jervisffb.engine.actions.Cancel
+import com.jervisffb.engine.actions.CancelWhenReady
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -53,17 +55,19 @@ object PassingInterferenceStep: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team.otherTeam()
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PassingInterferenceContext>()
-            val selectPlayerAction = rules.rangeRuler.opponentPlayersUnderRuler(context.thrower, context.target)
+            val actions = rules.rangeRuler.opponentPlayersUnderRuler(context.thrower, context.target)
                 .let { eligiblePlayers ->
                     if (eligiblePlayers.isNotEmpty()) {
-                        SelectPlayer(eligiblePlayers.map { player -> player.id })
+                        listOf(
+                            SelectPlayer(eligiblePlayers.map { player -> player.id }),
+                            CancelWhenReady
+                        )
                     } else {
                         // No eligible players found, continue to next step.
-                        ContinueWhenReady
+                        listOf(ContinueWhenReady)
                     }
                 }
-
-            return listOf(selectPlayerAction)
+            return actions
         }
         override fun applyAction(
             action: GameAction,
@@ -71,7 +75,7 @@ object PassingInterferenceStep: Procedure() {
             rules: Rules
         ): Command {
             return when (action) {
-                Continue -> ExitProcedure()
+                Continue, Cancel -> ExitProcedure()
                 else -> {
                     checkTypeAndValue<PlayerSelected>(state, action) {
                         val context = state.getContext<PassingInterferenceContext>()

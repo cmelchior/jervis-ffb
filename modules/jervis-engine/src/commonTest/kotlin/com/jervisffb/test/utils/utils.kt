@@ -81,9 +81,11 @@ inline fun <reified T : TeamReroll> SelectTeamReroll(): GameAction {
  * Make it easy to select the final result of a single die being rolled. If
  * multiple pools are present or more than one die is being rolled, an error
  * is thrown.
+ *
+ * This function is used to select block dice results.
  */
 @Suppress("TestFunctionName")
-fun SelectSingleDieResult(): GameAction {
+fun SelectSingleBlockDieResult(): GameAction {
     return CalculatedAction { _, _ ->
         val dicePools = getAvailableActions().firstInstanceOf<SelectDicePoolResult>()
         if (dicePools.pools.size > 1) error("Too many dice pools: ${dicePools.pools.size}")

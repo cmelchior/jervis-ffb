@@ -41,20 +41,23 @@ data class ScoringATouchDownContext(
 /**
  * Procedure responsible for checking if a touchdown was scored as per page 64
  * in the rulebook. This procedure should be called every time a player with the
- * ball moves or a player receives a ball (and doesn't fall over).
+ * ball moves, or a player receives a ball (and doesn't fall over).
  *
  * Moving into the End Zone would normally result in an immediate touchdown, but
  * some things can impact it:
  *
  * - Ball Clone: The ball disappears between your hands
  * - Blood Lust: Need to bite a thrall for turnover to count
+ * - Touchdown already happened: During a push, multiple players might be end up
+ *   in a scoring position. In that case, we only treat the first player as
+ *   having scored, and ignore the rest.
  *
  * For Ball Clone, we are using the following semantics:
  * - We roll for Ball Clone before any other effect
  * - Pro is not allowed
  * - Team rerolls are not allowed
  * - If the roll fails and the ball disappeared, we let the player continue
- *   their turn as is nothing has happened
+ *   their turn as if nothing has happened.
  *
  * The reason for this is this phrase "A touchdown is scored.....No touchdown
  *  * is scored". But the exact timing is under-documented, so a valid argument
@@ -77,6 +80,10 @@ object ScoringATouchdown : Procedure() {
                 TurnOver.INACTIVE_TEAM_TOUCHDOWN
             }
             compositeCommandOf(
+                // Technically, if you score during the opponent's turn, the score isn't
+                // increased until your next real turn, but this has some problematic
+                // side effects for the end of the half. So we do it immediately instead.
+                // See rules-faq.md (page 64) for a discussion on this.
                 AddGoal(context.player.team, 1),
                 ReportGoal(state, context),
                 SetTurnOver(turnover),
@@ -88,13 +95,16 @@ object ScoringATouchdown : Procedure() {
     }
     override fun isValid(state: Game, rules: Rules) {
         val player = state.getContext<ScoringATouchDownContext>().player
-        if (player.hasBall() && player.state == PlayerState.STANDING) {
-            INVALID_GAME_STATE("Player is in invalid state: $player")
+        if (!player.hasBall() || player.state == PlayerState.STANDING) {
+            INVALID_GAME_STATE("Player needs to have the ball and be standing: $player")
         }
     }
 
     object CheckForTouchdown: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
+            // In some cases (like when resolving push chains), it is possible to
+            // score multiple touchdowns (as multiple balls exists). In that case,
+            // we ignore any other cases that could have been a touchdown
             val context = state.getContext<ScoringATouchDownContext>()
             val player = context.player
             val isInEndZone = player.location.isInEndZone(rules)
@@ -103,7 +113,8 @@ object ScoringATouchdown : Procedure() {
             } else {
                 player.location.isOnHomeSide(rules)
             }
-            return if (isInEndZone && isOnOpponentSide && player.hasBall()) {
+            val touchdownAlreadyHappened = state.turnOver == TurnOver.ACTIVE_TEAM_TOUCHDOWN || state.turnOver == TurnOver.INACTIVE_TEAM_TOUCHDOWN
+            return if (isInEndZone && isOnOpponentSide && player.hasBall() && !touchdownAlreadyHappened) {
                 compositeCommandOf(
                     SetContext(context.copy(isTouchdownScored = true)),
                     GotoNode(RollForBallClone)

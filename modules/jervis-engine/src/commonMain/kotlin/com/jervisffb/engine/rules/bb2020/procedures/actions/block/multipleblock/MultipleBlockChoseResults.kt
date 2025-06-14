@@ -13,11 +13,11 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkDicePool
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockContext
 
 /**
  * Given a
@@ -52,10 +52,11 @@ object MultipleBlockChoseResults: Procedure() {
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDicePool<DBlockResult, DBlockResult>(action) { pool1Die, pool2Die ->
                 val context = state.getContext<MultipleBlockContext>()
-                var updatedRoll1 = context.roll1!!.copyAndSetSelectedResult(pool1Die)
-                val updatedRoll2 = context.roll2!!.copyAndSetSelectedResult(pool2Die)
+                val updatedRoll1 = context.roll1!!.setSelectedDieResult(pool1Die)
+                val updatedRoll2 = context.roll2!!.setSelectedDieResult(pool2Die)
                 return compositeCommandOf(
-                    SetContext(context.copy(roll1 = updatedRoll1, roll2 = updatedRoll2)),
+                    updatedRoll1,
+                    updatedRoll2,
                     ExitProcedure()
                 )
             }

@@ -16,6 +16,7 @@ import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.RushRollContext
+import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
 import com.jervisffb.engine.rules.bb2020.procedures.CatchRoll
@@ -36,9 +37,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDown
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDownContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.Stumble
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StumbleContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseReroll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
@@ -272,12 +272,12 @@ object DialogFactory {
                     DiceRollUserInputDialog.createPrayersToNuffleRollDialog(controller.rules, context.rollsRemaining)
                 }
 
-                is PushStep.DecideToFollowUp -> {
+                is PushStepInitialMoveSequence.DecideToFollowUp -> {
                     SingleChoiceInputDialog.createFollowUpDialog(
                         controller.state.getContext<PushContext>().firstPusher
                     )
                 }
-                is PushStep.DecideToUseSidestep -> {
+                is PushStepInitialMoveSequence.DecideToUseSidestep -> {
                     val player = controller.state.getContext<PushContext>().pushee()
                     SingleChoiceInputDialog.createUseSkillDialog(
                         player,

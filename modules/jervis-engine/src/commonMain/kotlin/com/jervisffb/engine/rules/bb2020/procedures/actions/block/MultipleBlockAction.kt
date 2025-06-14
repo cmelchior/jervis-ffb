@@ -15,9 +15,11 @@ import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
@@ -26,100 +28,126 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.model.Ball
+import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.TurnOver
+import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
+import com.jervisffb.engine.rules.bb2020.procedures.ThrowIn
+import com.jervisffb.engine.rules.bb2020.procedures.ThrowInContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock.MultipleBlockChoseResults
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock.MultipleBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.multipleblock.MultipleBlockResolveInjuries
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchDownContext
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * This procedure is responsible for handling Multiple Block as described on page 80 in the rulebook.
+ * This procedure is responsible for handling Multiple Block as described on
+ * page 80 in the rulebook.
  *
  * Designer's Commentary:
- * - When using Grab, the blocked players starting square are treated as being Occupied, regardless of
- *   who is moved first.
- * - Blocked players cannot offer assists to each other.
+ * - When using Grab, the blocked players starting square are treated as being
+ *   Occupied, regardless of who is moved first.
+ * - Blocked players cannot offer assist to each other.
  * - Stab can be used on both block actions.
  *
  * Developer's Commentary:
- * Multiple Block is a challenge to implement as it breaks the flow of multiple skills and actions.
- * It is also very vaguely worded, and the description doesn't cover a lot of edge cases.
- **
- * It is especially unclear how "performed simultaneously" should be interpreted, but to accommodate Designer's
- * Commentary, we try to resolve the blocks in lock-steps (or as much as possible).
+ * Multiple Block is a challenge to implement as it breaks the flow of multiple
+ * skills and actions. It is also very vaguely worded, and the description
+ * doesn't cover a lot of edge cases.
  *
- * It is also unclear how to handle injuries, e.g., should we roll armour/injury dice in lockstep
- * and how does that work with e.g. Stab where the armour/injury roll behave differently.
- * And what about bouncing balls, when do they bounce?
+ * It is especially unclear how "performed simultaneously" should be
+ * interpreted, but to accommodate Designer's Commentary, we try to resolve the
+ * blocks in lock-steps (or as much as possible).
  *
- * Since the rules define none of this, we opt for simplicity and implement lock-step up until the
- * point of resolving a block type, then resolve that block type up to the point of having rolled for armour/injury.
- * And then finally, choose to use apothecary/regeneration or not.
+ * A full discussion of the how to interpret the rules for Multiple Block is
+ * found in rules-faq.md, so here we will just focus on the implementation.
  *
- * For pushes, this means that we fully resolve one push before doing the next.
-
- * It is unclear what should happen in a circular chain push. In that case, the starting square will be considered
- * empty. This also mirrors the normal push behavior.
+ * The sequence of events in a Multiple Block are resolved in the following way:
  *
- * The starting square will be considered "occupied" for when using Grab on the 2nd player. While this is
- * inconsistent with pushes, it is required as per the rules described in the Designer's Commentary.
+ * 1. Select the Multiple Block Special Action
  *
- * Also, if we treated the starting square as blocked for pushes, it could result in some scenarios that
- * would look weird on a board. So given that this scenario will probably never surface in a realistic
- * game of Blood Bowl, having the behavior being different seems acceptable.
+ * 2. Select target 1 and type of block: Normal or special.
  *
- * For injuries, we are introducing an "Injury Pool". This means that all injuries that happened to attacker
- * and defenders are placed in that pool and not fully resolved until both actions are "done". Then the blocking
- * coach can see the full effect of all blocks before deciding whether to use the apothecary on
- * all or some of them.
+ * 3. Select target 2 and type of block: Normal or special.
  *
- * For the sake of ease of implementation, crowd-pushes on other players than the ones being blocked
- * are resolved immediately, i.e., they are not placed in the "Injury Pool".
+ * 4. Roll block dice (or special attack dice) for target 1.
  *
- * All of this means that the logic of operations is as follows:
+ * 5. Roll block dice (or special attack dice) for target 2.
  *
- * 1. Select both block targets and type of block, i.e., normal block or special action.
- *    a. It is possible to deselect an already selected player again.
- *    b. It is possible to abort the Multiple Block at this point.
+ * 6. Choose rerolls or accept results for all dice against target 1 and target
+ *    2. This is done at the same time for both targets.
  *
- * 2. Roll dice that are not armour/injury for actions.
- *    a. Block: Normal block dice
- *    b. Projectile Vomit: D6 for who is hit.
- *    c. Chainsaw: D6 for who is hit.
- *    d. Breathe Fire: D6 for effect.
- *    c. Stab: No roll here, since it automatically "hit".
+ * 7. Select the final dice results for both target 1 and target 2. This is done
+ *    at the same time for both targets.
  *
- * 3. Select rerolls for both rolls and apply them. This process can happen multiple times here.
- *    a. Blocking player is free to choose the order of using rerolls or not.
- *    b. Pro still only works on one of them.
+ * 8. Choose which target to resolve block for first, now named A and B.
  *
- * 4. After rerolls are chosen or not. Select the result of both rolls that should be applied.
+ * 9. Determine push chain for target A. This is now Push Chain A. Similar to
+ *    how it is done for single blocks.
  *
- * 5. Let the active player decide which player to resolve first.
+ * 10. Move all players in Push Chain A.
  *
- * 6. Resolve block results:
- *    a. If two normal blocks, resolve push/chain-pushes individually, including rolling for injuries,
- *       but not rolling for apothecary or bouncing the ball. The player still stays on the field, and
- *       any injuries are placed in an "Injury Pool". Injuries caused by chain pushing other players
- *       into the crowd are resolved fully immediately.
- *    b. If a special action is combined with a block. Resolve each action as chosen by the blocker. Any
- *       injuries are placed in the "injury pool".
+ * 11. If the last player is pushed into the crowd, roll for injury and use the
+ *     apothecary. But do not throw in the ball.
  *
- *    c. Any turn-over caused by the first block is postponed until the 2nd block has resolved, i.e., the
- *       blocker does not lose access to skills mid-block.
+ * 12. Determine push chain for target B. This is now Push Chain B. Taking into
+ *     account the adjusted positions for players moved in Push Chain A. This
+ *     means a player might be moved multiple times. If Grab is used, the
+ *     original position for the defender in Block 1, is considered occupied (as
+ *     per Designer's Commentary).
  *
- * 7. Show the "injury pool" to both coaches and let them decide where to apply the apothecary. Even on all
- *    injuries or only some of them.
+ * 13. Move all players in Push Chain B.
  *
- * 8. Finally, if any of the attacker or two defenders had the ball. It will now bounce from their square,
- *    (or the square they left)
+ * 14. If the last player is pushed into the crowd, roll for injury and use the
+ *     apothecary. But do not throw in the ball.
+ *
+ * 15. Resolve the result of Block A, i.e. roll for armour/injury if needed. If
+ *     an injury occurs, place the player in either the Attacker or Defender
+ *     Injury Pool. But do not finalize the injury yet. If the player is knocked
+ *     down while holding a ball, it is knocked loose, but does not bounce yet.
+ *
+ * 16. Resolve the result of Block B, i.e. roll for armour/injury if needed. If
+ *     an injury occurs, place the player in either the Attacker or Defender
+ *     Injury Pool. The attacker can suffer two different injuries. But do not
+ *     finalize the injury yet. If the player is knocked down while holding a
+ *     ball, it is knocked loose, but does not bounce yet.
+ *
+ * 17. Resolve the Defender Injury Pool. Players must be handled in order until
+ *     the injury is fully resolved, i.e., using apothecary, regeneration, etc.
+ *     Once resolved, the injury is removed. Continue until the pool is empty.
+ *
+ * 18. Resolve the Attacker Injury Pool. Each injury is fully resolved before
+ *     going to the next, i.e., using apothecary, regeneration, etc.
+ *     Once resolved, the injury is removed. Continue until the pool is empty.
+ *
+ * 19. Check for Trapdoors in Push Chain A, starting from defender A. Go
+ *     through all squares players are pushed into. Roll for any player standing
+ *     on a trapdoor. If they are injured because of it, resolve the injury
+ *     immediately.
+ *
+ * 20. Check for Trapdoors in Push Chain B, starting from the defender B. Go
+ *     through all squares players are pushed into. Roll for any player standing
+ *     on a trapdoor. If they are injured because of it, resolve the injury
+ *     immediately.
+ *
+ * 21. Check for Touchdowns. Attacker cannot have scored, since they cannot have
+ *     moved. Check all players, starting from the defender in Push Chain A,
+ *     then in Push Chain B. If a player has scored, no other players can score
+ *     as well.
+ *
+ * 22. Resolve ball events in each square part of the push chain (bounce /
+ *     throw-in). Start with defender in Push Chain A. Then Push Chain B, end
+ *     with the attacker. If a ball lands on a player after a bounce or throw-in,
+ *     that triggers a touchdown. The remaining ball handling sequence still
+ *     needs to be completed, but no further touchdowns are scored.
  */
 object MultipleBlockAction: Procedure() {
     override val initialNode: Node = SelectDefenderOrAbortActionOrContinueBlock
@@ -219,13 +247,21 @@ object MultipleBlockAction: Procedure() {
                     when {
                         context.defender1 == null -> {
                             compositeCommandOf(
-                                SetContext(context.copy(defender1 = player, activeDefender = 0)),
+                                SetContext(context.copy(
+                                    defender1 = player,
+                                    defender1Location = player.coordinates,
+                                    activeDefender = 0)
+                                ),
                                 GotoNode(SelectBlockTypeAgainstSelectedDefender)
                             )
                         }
                         context.defender2 == null -> {
                             compositeCommandOf(
-                                SetContext(context.copy(defender2 = player, activeDefender = 1)),
+                                SetContext(context.copy(
+                                    defender2 = player,
+                                    defender2Location = player.coordinates,
+                                    activeDefender = 1
+                                )),
                                 GotoNode(SelectBlockTypeAgainstSelectedDefender)
                             )
                         }
@@ -346,7 +382,8 @@ object MultipleBlockAction: Procedure() {
     }
 
     /**
-     * After choosing the final results, now choose which player to resolve first.
+     * After choosing the final dice results, choose which player to resolve
+     * first.
      */
     object SelectPlayerToResolve: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.activeTeamOrThrow()
@@ -373,11 +410,26 @@ object MultipleBlockAction: Procedure() {
     }
 
     /**
-     * Resolve the result of the first player, including rolling for injuries.
-     * But do not fully resolve the injury yet. Iif resolving this block would result in a turnover
-     * for the blocking player, the turn-over is delayed until the second result has been resolved.
-     * E.g., the blocking player does not lose access to skills because they roll a Player Down before
-     * rolling for Stab on the second target.
+     * Resolve the result of the first player, up until the point of rolling
+     * for
+     *
+     * Fo
+     *
+     *
+     *
+     * including rolling for injuries.
+     * But do not use the apothecary yet. Instead, the injury is placed in the
+     * "injury pool".
+     *
+     * If it results in a push, we wil only resolve the push chain up until
+     * all players have been pushed, but before rolling for anything like
+     * trapdoors, bounces etc. THis will happen after we resolved the second
+     * block in a similar manner.
+     *
+     * If resolving this block results in a turnover for the blocking player,
+     * the turn-over is delayed until the end of the action. E.g., the blocking
+     * player does not lose access to skills because they roll a Player Down
+     * before rolling for Stab on the second target.
      */
     object ResolveFirstPlayer: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
@@ -391,21 +443,19 @@ object MultipleBlockAction: Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
-            val isTurnOver = state.turnOver != null
             val nextDefender = when (context.activeDefender) {
                 0 -> 1
                 1 -> 0
                 else -> throw IllegalArgumentException("Invalid active defender: ${context.activeDefender}")
             }
-
             val contextClass = context.getContextForCurrentBlock()::class
-            var updatedMultiBlockContext = context.copyAndUpdateWithLatestBlockTypeContext(state)
-            updatedMultiBlockContext = updatedMultiBlockContext.copy(activeDefender = nextDefender, postponeTurnOver = isTurnOver)
-
+            val updateMultipleBlockContextCommand = context.updateWithLatestBlockTypeContext(state)
             return compositeCommandOf(
                 RemoveContext(contextClass),
                 SetTurnOver(null),
-                SetContext(updatedMultiBlockContext),
+                updateMultipleBlockContextCommand,
+                SetContextProperty(MultipleBlockContext::activeDefender, context, nextDefender),
+                SetContextProperty(MultipleBlockContext::postponeTurnOver, context, state.turnOver),
                 GotoNode(ResolveSecondPlayer)
             )
         }
@@ -413,7 +463,7 @@ object MultipleBlockAction: Procedure() {
 
     /**
      * Resolve the result of the second player, including rolling for injuries.
-     * But do not fully resolve the injury yet.
+     * But do not use the apothecary yet.
      */
     object ResolveSecondPlayer: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
@@ -427,15 +477,13 @@ object MultipleBlockAction: Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
-
             val contextClass = context.getContextForCurrentBlock()::class
-            var updatedMultiBlockContext = context.copyAndUpdateWithLatestBlockTypeContext(state)
-            updatedMultiBlockContext = updatedMultiBlockContext.copy(activeDefender = null)
-
+            val updatedMultiBlockContextCommand = context.updateWithLatestBlockTypeContext(state)
             return compositeCommandOf(
                 RemoveContext(contextClass),
-                SetTurnOver(if (context.postponeTurnOver) TurnOver.STANDARD else null),
-                SetContext(updatedMultiBlockContext),
+                SetTurnOver(context.postponeTurnOver),
+                updatedMultiBlockContextCommand,
+                SetContextProperty(MultipleBlockContext::activeDefender,  context, null),
                 GotoNode(ResolveInjuries)
             )
         }
@@ -448,48 +496,158 @@ object MultipleBlockAction: Procedure() {
     object ResolveInjuries: ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = MultipleBlockResolveInjuries
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(CheckForBouncingBalls)
+            return GotoNode(ResolveBlock1Trapdoors)
+        }
+    }
+
+    // TODO
+    object ResolveBlock1Trapdoors: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<MultipleBlockContext>()
+            return compositeCommandOf(
+                SetContextProperty(MultipleBlockContext::activeDefender,  context, 1),
+                GotoNode(ResolveBlock2Trapdoors)
+            )
+        }
+    }
+
+    // TODO
+    object ResolveBlock2Trapdoors: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val context = state.getContext<MultipleBlockContext>()
+            return compositeCommandOf(
+                SetContextProperty(MultipleBlockContext::activeDefender,  context, 0),
+                GotoNode(CheckBlock1Touchdowns)
+            )
         }
     }
 
     /**
-     * Check if any of the players involved in the block dropped a ball that needs to bounce.
-     * The rules do not specify in which order this happens, and it probably doesn't matter, so
-     * we just start with balls dropped by defenders, doing the attacker last.
+     * During a Multiple Block, it is only possible for touchdowns to happen before ball events
+     * if there is a push involved (since follow-up is not allowed). We check the touchdown through
+     * the entire push chain starting with the defender. If a touchdown is detected, we skip checking
+     * other players.
      */
-    object CheckForBouncingBalls: ComputationNode() {
-        override fun apply(state: Game, rules: Rules): Command {
-            val context = state.getContext<MultipleBlockContext>()
-            return if (context.defender1Ball != null) {
-                compositeCommandOf(
-                    SetCurrentBall(context.defender1Ball),
-                    GotoNode(BounceCurrentBall)
-                )
-            } else if (context.defender2Ball != null) {
-                compositeCommandOf(
-                    SetCurrentBall(context.defender2Ball),
-                    GotoNode(BounceCurrentBall)
-                )
-            } else if (context.attackerBall != null) {
-                compositeCommandOf(
-                    SetCurrentBall(context.attackerBall),
-                    GotoNode(BounceCurrentBall)
-                )
-            } else {
-                ExitProcedure()
-            }
+    // TODO Losts of overlap with checking scoring in PushStepResolveSingleBlockPushChain. Can they be combined somehow?
+    object CheckBlock1Touchdowns: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val context = state.getContext<MultipleBlockContext>().defender1PushChain
+            val pushStep = context?.pushChain?.firstOrNull { checkPlayerForTouchdown(it) }
+            return if (pushStep == null) CheckBlock2Touchdowns else null
         }
-
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MultipleBlockContext>().defender1PushChain!!
+            val push = context.pushChain.first { checkPlayerForTouchdown(it) }
+            val player = push.pushee
+            return SetContext(ScoringATouchDownContext(player))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context =  state.getContext<MultipleBlockContext>().defender1PushChain!!
+            // Mark the step we just checked as complete.
+            val pushData: PushContext.PushData = context.pushChain.firstNotNullOf { el ->
+                if (checkPlayerForTouchdown(el)) el else null
+            }
+            return compositeCommandOf(
+                RemoveContext<ScoringATouchDownContext>(),
+                SetContextProperty(PushContext.PushData::checkedForScoringAfterTrapdoors, pushData, true),
+                GotoNode(CheckBlock2Touchdowns)
+            )
+        }
     }
 
-    object BounceCurrentBall: ParentNode() {
+    object CheckBlock2Touchdowns: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val context = state.getContext<MultipleBlockContext>().defender2PushChain
+            val pushStep = context?.pushChain?.firstOrNull { checkPlayerForTouchdown(it) }
+            return if (pushStep == null) ResolveBlock1DefendersBallEvents else null
+        }
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MultipleBlockContext>().defender2PushChain!!
+            val push = context.pushChain.first { checkPlayerForTouchdown(it) }
+            val player = push.pushee
+            return SetContext(ScoringATouchDownContext(player))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context =  state.getContext<MultipleBlockContext>().defender2PushChain!!
+            // Mark the step we just checked as complete.
+            val pushData: PushContext.PushData = context.pushChain.firstNotNullOf { el ->
+                if (checkPlayerForTouchdown(el)) el else null
+            }
+            return compositeCommandOf(
+                RemoveContext<ScoringATouchDownContext>(),
+                SetContextProperty(PushContext.PushData::checkedForScoringAfterTrapdoors, pushData, true),
+                GotoNode(ResolveBlock1DefendersBallEvents)
+            )
+        }
+    }
+
+    object ResolveBlock1DefendersBallEvents: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            // Figure out if this is a push block or the defender went down in the square
+            val context = state.getContext<MultipleBlockContext>()
+            val pushData = context.defender1PushChain
+            val handleBallCommand = if (pushData == null) {
+                // If there is no push, the defender could only be Knocked Down in their starting square
+                checkBouncingBallInSquare(state, context.defender1Location!!)
+            } else {
+                resolveNextBallEventsInPushChain(pushData)
+            }
+            return handleBallCommand ?: compositeCommandOf(
+                SetContext(context.copy(defender1BallsHandled = true)),
+                GotoNode(ResolveBlock2DefendersBallEvents)
+            )
+        }
+    }
+
+    object ResolveBlock2DefendersBallEvents: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            // Figure out if this is a push block or the defender went down in the square
+            val context = state.getContext<MultipleBlockContext>()
+            val pushData = context.defender2PushChain
+            val handleBallCommand = if (pushData == null) {
+                // If there is no push, the defender could only be Knocked Down in their starting square
+                checkBouncingBallInSquare(state, context.defender2Location!!)
+            } else {
+                resolveNextBallEventsInPushChain(pushData)
+            }
+            return handleBallCommand ?: compositeCommandOf(
+                SetContext(context.copy(defender2BallsHandled = true)),
+                ExitProcedure()
+            )
+        }
+    }
+
+    object BounceCurrentBall : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
+            return when (context.defender1BallsHandled) {
+                false -> GotoNode(ResolveBlock1DefendersBallEvents)
+                true -> GotoNode(ResolveBlock2DefendersBallEvents)
+            }
+        }
+    }
+
+    object ThrowInCurrentBall: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val ball = state.currentBall()
+            return SetContext(ThrowInContext(
+                ball,
+                ball.outOfBoundsAt!!
+            ))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules) = ThrowIn
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MultipleBlockContext>()
+            val nextNodeCommand = when (context.defender1BallsHandled) {
+                false -> GotoNode(ResolveBlock1DefendersBallEvents)
+                true -> GotoNode(ResolveBlock2DefendersBallEvents)
+            }
             return compositeCommandOf(
-                SetCurrentBall(null),
-                SetContext(context.copyAndRemoveBallRef(state.currentBall())),
-                GotoNode(CheckForBouncingBalls)
+                RemoveContext<ThrowInContext>(),
+                nextNodeCommand
             )
         }
     }
@@ -501,7 +659,7 @@ object MultipleBlockAction: Procedure() {
      * Returns the commands that set the correct contexts just before calling down into
      * a sub procedure for a specific block type.
      */
-    fun getEnterBlockTypeNodeCommands(state: Game, activeDefender: Int): Command {
+    private fun getEnterBlockTypeNodeCommands(state: Game, activeDefender: Int): Command {
         val context = state.getContext<MultipleBlockContext>()
         val updatedContext = context.copy(activeDefender = activeDefender)
         return compositeCommandOf(
@@ -514,13 +672,91 @@ object MultipleBlockAction: Procedure() {
      * Return the commands needed to clear the context from a specific sub procedure,
      * as well as making sure that [MultipleBlockContext] is updated.
      */
-    fun getLeaveBlockTypeNodeCommands(state: Game): Command {
+    private fun getLeaveBlockTypeNodeCommands(state: Game): Command {
         val context = state.getContext<MultipleBlockContext>()
-        val updatedMultiBlockContext = context.copyAndUpdateWithLatestBlockTypeContext(state)
+        val updateMultipleBlockContextCommand = context.updateWithLatestBlockTypeContext(state)
         val contextClass = context.getContextForCurrentBlock()::class
         return compositeCommandOf(
             RemoveContext(contextClass),
-            SetContext(updatedMultiBlockContext)
+            updateMultipleBlockContextCommand
         )
     }
+
+    private fun checkPlayerForTouchdown(step: PushContext.PushData): Boolean {
+        val game = step.pushee.team.game
+        val rules = game.rules
+        return !game.isTurnOver()
+            && rules.isStanding(step.pushee)
+            && step.pushee.hasBall()
+            && !step.checkedForScoringAfterTrapdoors
+    }
+
+    /**
+     * Check if there is a bouncing ball in a single square, used for blocks that result in either
+     * the attacker or defender being Knocked Over in their square (and not being pushed).
+     *
+     * Returns `null` if no ball is found, if a ball is found, the [Command] to transition to the next
+     * node is returned.
+     */
+    private fun checkBouncingBallInSquare(state: Game, coordinates: FieldCoordinate): Command? {
+        val square = state.field[coordinates]
+        return if (square.balls.isNotEmpty()) {
+            val ball = square.balls.single()
+            if (ball.state == BallState.BOUNCING) {
+                compositeCommandOf(
+                    SetCurrentBall(ball),
+                    GotoNode(BounceCurrentBall)
+                )
+            } else {
+                null
+            }
+        } else {
+            null
+        }
+    }
+
+    private fun resolveNextBallEventsInPushChain(context: PushContext): Command? {
+        val state = context.firstPusher.team.game
+
+        // First run through squares we know are on the field
+        var selectedBall: Ball? = null
+        for (step in 0..< context.pushChain.size) {
+            val square = context.pushChain[step].to!!
+            val ball = state.field[square].balls.singleOrNull()
+            if (ball != null && ball.state == BallState.BOUNCING) {
+                selectedBall = ball
+                break
+            }
+        }
+        // Then Check throw-in
+        if (selectedBall == null && context.pushChain.last().to == FieldCoordinate.OUT_OF_BOUNDS) {
+            val ball = state.balls.singleOrNull { it.state == BallState.OUT_OF_BOUNDS }
+            selectedBall = ball
+        }
+
+        // Finally check the attackers location (if the choose to follow up, otherwise they coul not have lost the ball)
+        if (selectedBall == null && context.followsUp) {
+            val ball = state.field[context.pushChain.first().from].balls.singleOrNull()
+            if (ball != null) {
+                if (ball.state != BallState.BOUNCING) INVALID_GAME_STATE("Unexpected ball state: ${ball.state}")
+                selectedBall = ball
+            }
+        }
+
+        return if (selectedBall != null) {
+            buildCompositeCommand {
+                add(SetCurrentBall(selectedBall))
+                val nextNode =
+                    when (selectedBall.state) {
+                        BallState.BOUNCING -> BounceCurrentBall
+                        BallState.OUT_OF_BOUNDS -> ThrowInCurrentBall
+                        else -> INVALID_GAME_STATE("Unexpected ball state: ${selectedBall.state}")
+                    }
+                add(GotoNode(nextNode))
+            }
+        } else {
+            null
+        }
+    }
 }
+

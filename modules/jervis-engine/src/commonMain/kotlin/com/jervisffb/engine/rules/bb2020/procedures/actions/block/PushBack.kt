@@ -1,16 +1,25 @@
 package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 
+import com.jervisffb.engine.actions.BlockDice
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.context.SetContextProperty
 import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.MultipleBlockContext
+import com.jervisffb.engine.model.context.StumbleContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
+import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportPushResult
 import com.jervisffb.engine.rules.Rules
@@ -20,12 +29,17 @@ import com.jervisffb.engine.rules.Rules
 // This is used by all results that push back.
 fun createPushContext(state: Game): PushContext {
     val blockContext = state.getContext<BlockContext>()
+    val stumbleContext = state.getContextOrNull<StumbleContext>()
+    // TODO Are there any special skills that also knock players down?
+    val isKnockedDown = stumbleContext?.isDefenderDown() ?: (blockContext.result.blockResult == BlockDice.POW)
+
     // Setup the context needed to resolve the full push include
     val newContext = PushContext(
-        blockContext.attacker,
-        blockContext.defender,
+        firstPusher = blockContext.attacker,
+        firstPushee = blockContext.defender,
+        isDefenderKnockedDown = isKnockedDown,
         blockContext.isUsingMultiBlock,
-        listOf(
+        mutableListOf(
             PushContext.PushData(
                 pusher = blockContext.attacker,
                 pushee = blockContext.defender,
@@ -42,9 +56,13 @@ fun createPushContext(state: Game): PushContext {
 /**
  * Resolve a pushback when select on a block die.
  * See page 57 in the rulebook.
+ *
+ * The logic differs slightly depending on this being a single block or part of
+ * a multiple block. For multiple block, we only run the first part of the push
+ * sequence. The rest is delayed until later.
  */
 object PushBack: Procedure() {
-    override val initialNode: Node = ResolvePush
+    override val initialNode: Node = ResolveInitialPushSequence
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val newContext = createPushContext(state)
         return SetContext(newContext)
@@ -56,22 +74,56 @@ object PushBack: Procedure() {
             ReportPushResult(context.firstPusher, context.pushChain.first().from, context.followsUp)
         )
     }
-
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<BlockContext>()
     }
 
-    object ResolvePush: ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStep
+    object ResolveInitialPushSequence: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStepInitialMoveSequence
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // Target is still standing after a pushback. Any injuries due to being
-            // pushed into the crowd are handled in PushStep, so here we just exit.
             val blockContext = state.getContext<BlockContext>()
             val pushContext = state.getContext<PushContext>()
-            return compositeCommandOf(
-                SetContext(blockContext.copy(didFollowUp = pushContext.followsUp)),
-                ExitProcedure()
-            )
+            val defenderHasBall = pushContext.firstPushee.hasBall()
+            return buildCompositeCommand {
+                add(SetContext(blockContext.copy(didFollowUp = pushContext.followsUp)))
+                if (blockContext.isUsingMultiBlock) {
+                    val multipleBlockContext = state.getContext<MultipleBlockContext>()
+                    val property = if (multipleBlockContext.activeDefender == 0) {
+                        MultipleBlockContext::defender1PushChain
+                    } else {
+                        MultipleBlockContext::defender2PushChain
+                    }
+                    add(SetContextProperty(property, multipleBlockContext, pushContext))
+                }
+                // If this is a single block, we can resolve the the full pushe sequence here.
+                // If not. We can only do it up to following up, and then leave the rest to
+                // be managed by the MultipleBlockAction procedure since the timing there
+                // is different from single blocks.
+                val navigationCommand = when {
+                    defenderHasBall -> GotoNode(DecideToUseStripBall)
+                    blockContext.isUsingMultiBlock -> ExitProcedure()
+                    else -> GotoNode(ResolveRemainingPushSequenceForSingleBlock)
+                }
+                add(navigationCommand)
+            }
+        }
+    }
+
+    // TODO
+    object DecideToUseStripBall: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            val isMultipleBlock = state.hasContext<MultipleBlockContext>()
+            return when (isMultipleBlock) {
+                true -> ExitProcedure()
+                false -> GotoNode(ResolveRemainingPushSequenceForSingleBlock)
+            }
+        }
+    }
+
+    object ResolveRemainingPushSequenceForSingleBlock: ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = PushStepResolveSingleBlockPushChain
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return ExitProcedure()
         }
     }
 }

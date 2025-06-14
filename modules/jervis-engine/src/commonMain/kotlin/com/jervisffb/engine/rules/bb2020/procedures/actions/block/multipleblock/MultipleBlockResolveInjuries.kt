@@ -18,11 +18,11 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.PatchUpPlayer
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -31,10 +31,10 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * Procedure responsible for resolving the "Injury Pool" for a Multiple Block.
  *
  * Reading the rules, it is unclear if resolving injuries is resolved "simultaneous".
- * The answer is probably yes, and would affect things like choosing which failed
+ * If the answer is yes, it would affect things like choosing which failed
  * regeneration roll to use a Mortuary Assistant on.
  *
- * For now, we instead just choose which player to fully resolve.
+ * For now, we opt for simplicity and instead just choose which player to fully resolve.
  * To make a proper flow, we need to split [PatchUpPlayer] into steps that can be run
  * in parallel, similar to [StandardBlocKStep]
  */
@@ -46,7 +46,7 @@ object MultipleBlockResolveInjuries: Procedure() {
         state.assertContext<BlockContext>()
     }
 
-    // TODO It isn't guaranteded that it is the blocker team that selects the dice.
+    // TODO It isn't guaranteed that it is the blocker team that selects the dice.
     // We might need to have both attacker and defender choose dice
     object SelectDefender : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<MultipleBlockContext>().attacker.team
@@ -70,7 +70,11 @@ object MultipleBlockResolveInjuries: Procedure() {
             val context = state.getContext<MultipleBlockContext>()
             return when (action) {
                 Continue -> {
-                    if (context.attackerInjuryContext != null) GotoNode(PatchUpAttacker) else ExitProcedure()
+                    if (context.attackerInjuryContext.isNotEmpty()) {
+                        GotoNode(PatchUpAttacker)
+                    } else {
+                        ExitProcedure()
+                    }
                 }
                 else -> {
                     checkTypeAndValue<PlayerSelected>(state, action) { playerSelected ->
@@ -116,10 +120,15 @@ object MultipleBlockResolveInjuries: Procedure() {
         }
     }
 
+    // TODO Make it possible to select which injury to patch first. Right now we only resolve one injury
     object PatchUpAttacker: ParentNode() {
+        override fun skipNodeFor(state: Game, rules: Rules): Node? {
+            val context = state.getContext<MultipleBlockContext>()
+            return if (context.attackerInjuryContext.isEmpty()) ExitProcedureNode else null
+        }
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MultipleBlockContext>()
-            return SetContext(context.attackerInjuryContext!!)
+            return SetContext(context.attackerInjuryContext.first())
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = PatchUpPlayer
         override fun onExitNode(state: Game, rules: Rules): Command {

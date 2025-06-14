@@ -14,11 +14,11 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TurnOver
+import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockContext
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
@@ -56,7 +56,7 @@ object KnockedDown: Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<RiskingInjuryContext>()
             // If we are part of a Multiple Block, the bounce is delayed until later,
-            // so in that case, we just store a reference to the ball, otherwise,
+            // so in that case, we just knock the ball loose and handle it later, otherwise
             // we resolve it here.
             val isBouncing = state.currentBallOrNull()?.state == BallState.BOUNCING
             return when {
@@ -64,7 +64,6 @@ object KnockedDown: Procedure() {
                     val mbContext = state.getContext<MultipleBlockContext>()
                     compositeCommandOf(
                         SetCurrentBall(null),
-                        SetContext(mbContext.copyAndTrackBouncingBallForPlayer(context.player, state.currentBall())),
                         ExitProcedure()
                     )
                 }

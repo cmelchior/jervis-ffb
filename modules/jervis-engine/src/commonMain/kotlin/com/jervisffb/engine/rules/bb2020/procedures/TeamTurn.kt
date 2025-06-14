@@ -1,5 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.procedures
 
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -14,6 +16,7 @@ import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetPlayerTemporaryStats
 import com.jervisffb.engine.commands.SetSkillUsed
 import com.jervisffb.engine.commands.SetTurnMarker
+import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -29,6 +32,7 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.reports.ReportEndingTurn
 import com.jervisffb.engine.reports.ReportStartingTurn
@@ -94,7 +98,12 @@ object TeamTurn : Procedure() {
         override fun actionOwner(state: Game, rules: Rules) = state.activeTeamOrThrow()
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            return listOf(EndTurnWhenReady) + getAvailablePlayers(state, rules).map { SelectPlayer(it) }
+            // If this team scored in the opponent's turn, their next turn ends immediately.
+            return if (state.turnOver == TurnOver.INACTIVE_TEAM_TOUCHDOWN) {
+                listOf(ContinueWhenReady)
+            } else {
+                listOf(EndTurnWhenReady) + getAvailablePlayers(state, rules).map { SelectPlayer(it) }
+            }
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
@@ -107,6 +116,12 @@ object TeamTurn : Procedure() {
                         )
                     }
                 }
+                // We actually scored in the previous turn, but for some odd reason, the rulebook defines it
+                // as happening in the next turn (where the team is active).
+                Continue -> compositeCommandOf(
+                    SetTurnOver(TurnOver.ACTIVE_TEAM_TOUCHDOWN),
+                    GotoNode(ResolveEndOfTurn),
+                )
                 EndTurn -> GotoNode(ResolveEndOfTurn)
                 else -> INVALID_ACTION(action)
             }

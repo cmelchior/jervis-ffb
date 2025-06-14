@@ -31,7 +31,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  *  - Jump
  *  - Leap
  *
- *  Turnovers are handled in the procedures that called this one.
+ *  Turnovers are handled in the parent procedures that called this one.
  *
  *  --------------
  *  Developer's Notes:
@@ -43,18 +43,18 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  *  [MoveType.STANDARD, Square(x,y), MoveType.STANDARD, Square(x1, y1), ...]
  *
  * The other option would have been to calculate all possible targets and
- * then enhance the field location with that type data. This was considered, but
- * rejected, because it would lead to a lot of calculations on each move,
+ * then enhance the field location with that type data. This was considered but
+ * rejected because it would lead to a lot of calculations on each move,
  * especially if you also want to support the UI moving multiple steps in one go.
  *
- * Mixing the two would fundamentally mean that UI logic bleeds into the rules
+ * Mixing the two would fundamentally mean that UI logic bleeds into the rule
  * layer, which is also not desirable.
  *
  * Even though the move logic looks a little more ugly due to this, we can
  * hide it in the UI layer using automated actions.
  *
- * The FUMBBL Client also has different UI for e.g., rushing (yellow square) vs.
- * Jump (context menu action).
+ * The FUMBBL Client also has a different UI for e.g., rushing (yellow square)
+ * vs. Jump (context menu action).
  *
  * Jumping are handled in [JumpStep]
  * Standing up are handled in [StandingUpStep]
@@ -78,7 +78,7 @@ object ResolveMoveTypeStep : Procedure() {
         override fun onExitNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
             val activeContext = state.getContext<ActivatePlayerContext>()
-            val endNow = activeContext.activationEndsImmediately || state.isTurnOver()
+            val endNow = state.endActionImmediately()
             val player = moveContext.player
             val pickupBall = (
                 rules.isStanding(player)
@@ -117,6 +117,7 @@ object ResolveMoveTypeStep : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup
         override fun onExitNode(state: Game, rules: Rules): Command {
+            // TODO Shoul probably check if we picked up the ball.
             return compositeCommandOf(
                 SetCurrentBall(null),
                 GotoNode(CheckForScoring)
@@ -125,7 +126,7 @@ object ResolveMoveTypeStep : Procedure() {
     }
 
     // Finally, once all rolls have been resolved, check if the moving player is scoring
-    // a touch down
+    // a touchdown.
     object CheckForScoring : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MoveContext>()

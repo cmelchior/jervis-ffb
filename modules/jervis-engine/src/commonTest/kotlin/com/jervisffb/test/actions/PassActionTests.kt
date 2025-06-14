@@ -474,6 +474,25 @@ class PassActionTests: JervisGameTest() {
     }
 
     @Test
+    fun chooseNotToDeflect() {
+        controller.rollForward(
+            *activatePlayer("A10", PlayerStandardActionType.PASS),
+            *moveTo(17, 7),
+            4.d6, // Pickup
+            NoRerollSelected(),
+            SmartMoveTo(12, 3),
+            Confirm, // Start pass
+            FieldSquareSelected(13, 9),
+            6.d6, // Pass
+            NoRerollSelected(),
+            Cancel, // Do not deflect
+            6.d6, // Catch
+            NoRerollSelected(),
+        )
+        assertTrue(awayTeam["A5".playerId].hasBall())
+    }
+
+    @Test
     fun runningInterference_accuratePass() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),

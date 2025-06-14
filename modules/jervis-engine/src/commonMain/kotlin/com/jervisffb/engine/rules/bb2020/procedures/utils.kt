@@ -36,6 +36,10 @@ import com.jervisffb.engine.rules.bb2020.skills.Sprint
  * TODO Maybe not ball an chain? :thinking:
  */
 fun calculateMoveTypesAvailable(state: Game, player: Player): SelectMoveType? {
+    if (state.endActionImmediately()) {
+        return null
+    }
+
     val rules = state.rules
     val options = mutableListOf<MoveType>()
 

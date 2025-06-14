@@ -41,7 +41,8 @@ data class ThrowInContext(
 ): ProcedureContext
 
 /**
- * Resolve a Throw In after a ball went out of bounds.
+ * Resolve a Throw In after a ball went out of bounds, up until the ball is caught
+ * or lands on an empty square. This includes checking for touchdowns.
  *
  * See page 51 in the rulebook.
  */

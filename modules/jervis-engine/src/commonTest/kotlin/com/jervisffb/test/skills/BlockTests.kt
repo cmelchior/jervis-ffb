@@ -17,7 +17,7 @@ import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.ext.addNewSkill
 import com.jervisffb.test.ext.rollForward
-import com.jervisffb.test.utils.SelectSingleDieResult
+import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,7 +45,7 @@ class BlockTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             2.dblock,
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
         )
         assertEquals(FieldCoordinate(13, 5), attacker.location)
         assertEquals(PlayerState.KNOCKED_DOWN, attacker.state)
@@ -66,7 +66,7 @@ class BlockTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             2.dblock,
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
             Confirm, // Defender uses block
             Confirm, // Attacker uses block
         )
@@ -89,7 +89,7 @@ class BlockTests: JervisGameTest() {
             BlockTypeSelected(BlockType.STANDARD),
             2.dblock,
             NoRerollSelected(),
-            SelectSingleDieResult(),
+            SelectSingleBlockDieResult(),
             Confirm, // Defender uses block
             Cancel, // Attacker doesn't use block
         )

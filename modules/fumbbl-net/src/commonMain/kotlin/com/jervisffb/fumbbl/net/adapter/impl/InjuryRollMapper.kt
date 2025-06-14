@@ -7,7 +7,7 @@ import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStep
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.ArmourRoll
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.CasualtyRoll
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.InjuryRoll
@@ -42,10 +42,10 @@ object InjuryRollMapper: CommandActionMapper {
             newActions.add(
                 action = { state: Game, rules: Rules ->
                     // Any of them will push the player of the field
-                    val action = PushStep.SelectPushDirection.getAvailableActions(state, rules).single() as SelectDirection
+                    val action = PushStepInitialMoveSequence.SelectPushDirection.getAvailableActions(state, rules).single() as SelectDirection
                     DirectionSelected(action.directions.random())
                 },
-                expectedNode = PushStep.SelectPushDirection
+                expectedNode = PushStepInitialMoveSequence.SelectPushDirection
             )
         }
 
