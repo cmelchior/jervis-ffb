@@ -46,6 +46,8 @@ things as they come up.
 - [ ] Could we add 3d dice rolling across the board? Probably difficult in pure Compose, but maybe using Lottie?
 - [ ] Import teams from TourPlay (and other online services).
 - [ ] Add AFK Limit to timer settings + AFK button in the UI
+- [ ] Add a "Player Editor" in Dev Mode that makes it possible to add skills, change stats, and states.
+      Need to figure out exactly how this should work.
 - [x] Hover on block shows dice indicator.
 - [x] Better ball animation using Projectile Motion equations.
     - https://www.youtube.com/watch?v=qtsxHx1MpUI&ab_channel=PhysicsAlmanac
