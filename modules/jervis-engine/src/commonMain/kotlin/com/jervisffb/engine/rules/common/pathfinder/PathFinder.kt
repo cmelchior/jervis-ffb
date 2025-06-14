@@ -34,7 +34,7 @@ interface PathFinder {
     }
 
     /**
-     * Calculates the shortest distance between two fields. If target cannot be reached, the path
+     * Calculates the shortest distance between two fields. If the target cannot be reached, the path
      * that brings you closets is returned.
      */
     fun calculateShortestPath(

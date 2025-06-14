@@ -247,6 +247,12 @@ fun SmartMoveTo(x: Int, y: Int): GameAction {
         val start = activePlayer!!.coordinates
         val end = FieldCoordinate(x, y)
         val path = pathfinder.calculateShortestPath(state, start, end, activePlayer.movesLeft)
+        val lastSquare = path.path.last()
+        if (lastSquare != FieldCoordinate(x, y)) {
+            throw IllegalArgumentException(
+                "Cannot reach destination (${x}, ${y}). Last step was ($lastSquare.x}, ${lastSquare.y})."
+            )
+        }
         val pathMoves = path.path.flatMap {
             listOf(*moveTo(it.x, it.y))
         }
