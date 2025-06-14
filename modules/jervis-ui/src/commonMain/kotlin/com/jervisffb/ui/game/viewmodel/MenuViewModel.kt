@@ -37,8 +37,8 @@ import okio.Path
 enum class Feature {
     DO_NOT_REROLL_SUCCESSFUL_ACTIONS,
     SELECT_KICKING_PLAYER,
-    END_PLAYER_ACTION_IF_ONLY_OPTON,
-    SELECT_BLOCK_TYPE_IF_ONLY_OPTON,
+    END_PLAYER_ACTION_IF_ONLY_OPTION,
+    SELECT_BLOCK_TYPE_IF_ONLY_OPTION,
 }
 
 class MenuViewModel {
@@ -92,8 +92,8 @@ class MenuViewModel {
     private var features: MutableMap<Feature, Boolean> = mutableMapOf(
         Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS to true,
         Feature.SELECT_KICKING_PLAYER to true,
-        Feature.END_PLAYER_ACTION_IF_ONLY_OPTON to true,
-        Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTON to true
+        Feature.END_PLAYER_ACTION_IF_ONLY_OPTION to true,
+        Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION to true
     )
 
     fun backToLastScreen() {
@@ -127,8 +127,8 @@ class MenuViewModel {
         }
     }
 
-    fun toggleFeature(rerollSuccessfulActions: Feature, enabled: Boolean) {
-        features[rerollSuccessfulActions] = enabled
+    fun toggleFeature(feature: Feature, enabled: Boolean) {
+        features[feature] = enabled
     }
 
     fun isFeatureEnabled(feature: Feature): Boolean {

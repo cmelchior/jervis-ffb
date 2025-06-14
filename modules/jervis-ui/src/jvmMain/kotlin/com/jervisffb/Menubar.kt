@@ -27,8 +27,8 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
 
     var rerollSuccessfulActions by remember { mutableStateOf(vm.isFeatureEnabled(Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS)) }
     var selectKickingPlayer by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_KICKING_PLAYER)) }
-    var autoEndPlayerAction by remember { mutableStateOf(vm.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTON)) }
-    var selectBlockType by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTON)) }
+    var autoEndPlayerAction by remember { mutableStateOf(vm.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTION)) }
+    var selectBlockType by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION)) }
 
     val setupType: GameType? by vm.setupAvailable.collectAsState()
 
@@ -71,7 +71,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
                 checked = autoEndPlayerAction,
                 onCheckedChange = {
                     autoEndPlayerAction = !autoEndPlayerAction
-                    vm.toggleFeature(Feature.END_PLAYER_ACTION_IF_ONLY_OPTON, autoEndPlayerAction)
+                    vm.toggleFeature(Feature.END_PLAYER_ACTION_IF_ONLY_OPTION, autoEndPlayerAction)
                 }
             )
             CheckboxItem(
@@ -79,7 +79,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
                 checked = selectBlockType,
                 onCheckedChange = {
                     selectBlockType = !selectBlockType
-                    vm.toggleFeature(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTON, autoEndPlayerAction)
+                    vm.toggleFeature(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION, selectBlockType)
                 }
             )
         }

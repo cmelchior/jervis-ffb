@@ -336,7 +336,7 @@ open class ManualActionProvider(
         }
 
         // If a player action can only end, just end it immediately
-        if (menuViewModel.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTON) && actions.size == 1 && actions.first() is EndActionWhenReady) {
+        if (menuViewModel.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTION) && actions.size == 1 && actions.first() is EndActionWhenReady) {
             return EndAction
         }
 
@@ -358,7 +358,7 @@ open class ManualActionProvider(
 
         // When there is only one block type for a block, just select that one straight away
         if (
-            menuViewModel.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTON) &&
+            menuViewModel.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION) &&
             (currentNode == BlockAction.SelectBlockType || currentNode == BlitzAction.SelectBlockType)
         ) {
             actions.filterIsInstance<SelectBlockType>().firstOrNull()?.let {
