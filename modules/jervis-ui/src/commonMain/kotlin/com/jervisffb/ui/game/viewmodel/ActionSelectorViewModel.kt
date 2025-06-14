@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.map
 class ActionSelectorViewModel(
     private val uiState: UiGameController,
 ) {
+    // TODO This is causing race conditions. How?
     val availableActions: Flow<List<GameAction>> = uiState.uiStateFlow.map { it.unknownActions }
 
     fun actionSelected(action: GameAction) {

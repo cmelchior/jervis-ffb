@@ -15,3 +15,4 @@ This file is just a temporary way to capture any bugs seen that I didn't have ti
   "All" doesn't work, since if you undo a dice roll, the server will register it is at a point where
   it needs to roll and then immediately re-apply the dice roll.
 - Sidebar is not updated correctly when players are banned. The count is correct, but they do not show up
+- `ActionSelectorViewModel` throws concurrent modification exception for unknownActions. Figure out a solution.
