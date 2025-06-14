@@ -4,7 +4,7 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetActiveTeam
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetKickingTeam
 import com.jervisffb.engine.commands.SetPlayerLocation

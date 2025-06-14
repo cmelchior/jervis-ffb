@@ -10,7 +10,7 @@ import com.jervisffb.engine.actions.SelectSkill
 import com.jervisffb.engine.actions.SkillSelected
 import com.jervisffb.engine.commands.AddPlayerSkill
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode

@@ -3,7 +3,6 @@ package com.jervisffb.engine.rules.bb2020.procedures.tables.injury
 import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetContext
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.compositeCommandOf

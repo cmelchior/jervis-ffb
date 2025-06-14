@@ -1,5 +1,6 @@
-package com.jervisffb.engine.commands
+package com.jervisffb.engine.commands.context
 
+import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.setContext

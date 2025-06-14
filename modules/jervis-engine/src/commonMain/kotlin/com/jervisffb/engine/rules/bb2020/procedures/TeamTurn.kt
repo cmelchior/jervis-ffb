@@ -7,10 +7,10 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.RemoveContext
+import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.ResetAvailableTeamActions
 import com.jervisffb.engine.commands.SetCanUseTeamRerolls
-import com.jervisffb.engine.commands.SetContext
+import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.SetPlayerAvailability
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetPlayerTemporaryStats
