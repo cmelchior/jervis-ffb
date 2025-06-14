@@ -273,20 +273,19 @@ enum class SkillType(val description: String) {
     SNEAKIEST_OF_THE_LOT("Sneakiest of the Lot");
 
     /**
-     * Creates an identifier for a skill type including its value.
-     * This is a way we can uniquely identify the abstract idea of a
-     * a skill within a ruleset, without associating it with a player
-     * or the specific ruleset.
+     * Creates an identifier for a skill type including its value. This is a way
+     * we can uniquely identify the abstract idea of a skill, without
+     * associating it with a player or the specific ruleset.
      *
-     * I.e. "Pro" might mean different things depending on the ruleset,
-     * but the identifier remain the same.
+     * I.e. "Pro" might mean different things depending on the ruleset, but the
+     * identifier remains the same.
      *
-     * This method is specifically designed to be used by rosters as it
-     * makes it possible to define rosters while still sharing them
-     * between different rulesets.
+     * This method is specifically designed to be used by rosters as it makes it
+     * possible to define rosters while still sharing them between different
+     * rulesets.
      *
      * Design note: The naming of this method is intentionally kept short
-     * to make skill lists in rosters more readable
+     * to make skill lists in rosters more readable.
      */
     fun id(value: Int? = null): SkillId = SkillId(this, value)
 }

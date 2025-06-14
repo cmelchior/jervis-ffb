@@ -30,7 +30,8 @@ interface GameRunner {
 }
 
 /**
- * Class describing all the properties needed to control running a full game
+ * Class describing all the properties needed to control running a full game.
+ * NOTE: This is currently only being used on the Server. Do we need it elsewhere?
  */
 data class GameSettings(
     val gameRules: Rules,

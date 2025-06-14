@@ -521,6 +521,7 @@ class TouchdownTests: JervisGameTest() {
     }
 
     @Test
+    @Ignore
     fun opponentBallCarrierPushedIntoEndZone() {
         TODO()
     }

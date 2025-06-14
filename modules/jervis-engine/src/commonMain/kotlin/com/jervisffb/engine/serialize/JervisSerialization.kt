@@ -19,7 +19,12 @@ import okio.use
 data class GameFileData(
     val homeTeam: Team,
     val awayTeam: Team,
+    // Controller in its initial state (what does this mean exactly?)
+    // actions have already been applied to it. Why was it we wanted this here?
+    // It is only being used by the DevScreen currently?
     val game: GameEngineController,
+    // All game actions already known by the game. Can be used to get a GameEngineController
+    // into the same state as when this game was saved.
     val actions: List<GameAction>,
 )
 
@@ -88,7 +93,7 @@ object JervisSerialization {
             val serializedAwayTeam = jsonFormat.decodeFromJsonElement<SerializedTeam>(fileData.game.awayTeam)
             val awayTeam = SerializedTeam.deserialize(rules, serializedAwayTeam, unknownCoach)
             val state = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
-            val controller = GameEngineController(state)
+            val controller = GameEngineController(state, fileData.game.actions)
             val gameData = GameFileData(homeTeam, awayTeam, controller, fileData.game.actions)
             return Result.success(gameData)
         } catch (ex: Exception) {

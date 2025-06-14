@@ -27,8 +27,6 @@ class LoadFileComponentModel(initialRulesBuilder: Rules.Builder, private val men
                 extensionFilterDescription = "Jervis Game Files (.${FILE_EXTENSION_GAME_FILE})",
                 extensionFilterFileType = FILE_EXTENSION_GAME_FILE
             ) { path, loadResult ->
-                println(path)
-                println(loadResult)
                 fileError.value = ""
                 filePath.value = if (path != null) path.toString() else ""
                 loadResult

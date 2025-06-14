@@ -16,6 +16,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,9 @@ import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
+import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
+import com.jervisffb.engine.serialize.GameFileData
+import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.createDefaultAwayTeam
@@ -45,7 +49,10 @@ import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.state.ReplayActionProvider
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.utils.readFile
 import com.jervisffb.utils.APPLICATION_DIRECTORY
+import com.jervisffb.utils.jervisLogger
+import io.ktor.util.logging.error
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -67,6 +74,10 @@ data class Manual(val actionMode: TeamActionMode) : GameMode
 data class Replay(val file: Path) : GameMode
 
 class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel {
+
+    companion object {
+        val LOG = jervisLogger()
+    }
 
     fun startReplayGame(navigator: Navigator, mode: Replay) {
         menuViewModel.navigatorContext.launch {
@@ -212,6 +223,59 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
         }
     }
 
+    private fun createLoadedGameScreenModel(menuViewModel: MenuViewModel, file: GameFileData): GameScreenModel {
+        val rules = file.game.rules.toBuilder().run {
+            timers.timersEnabled = false
+            diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
+            undoActionBehavior = UndoActionBehavior.ALLOWED
+            build()
+        }
+        val homeTeam = file.homeTeam
+        val awayTeam = file.awayTeam
+        val game = file.game.state
+        val gameController = file.game
+        val gameSettings = GameSettings(
+            gameRules = rules,
+            isHotseatGame = true,
+            initialActions = file.actions
+        )
+        val homeActionProvider = ManualActionProvider(
+            gameController,
+            menuViewModel,
+            TeamActionMode.HOME_TEAM,
+            gameSettings,
+        )
+        val awayActionProvider = ManualActionProvider(
+            gameController,
+            menuViewModel,
+            TeamActionMode.AWAY_TEAM,
+            gameSettings,
+        )
+        val actionProvider = LocalActionProvider(
+            gameController,
+            gameSettings,
+            homeActionProvider,
+            awayActionProvider
+        )
+        return GameScreenModel(
+            TeamActionMode.ALL_TEAMS,
+            gameController,
+            gameController.state.homeTeam,
+            gameController.state.awayTeam,
+            actionProvider,
+            mode = Manual(TeamActionMode.ALL_TEAMS),
+            menuViewModel = menuViewModel,
+            onEngineInitialized = {
+                menuViewModel.controller = gameController
+                menuViewModel.navigatorContext.launch {
+                    // TODO Send to AI controller?
+                    // controller.sendGameStarted()
+                }
+            }
+        ).also {
+            it.gameAcceptedByAllPlayers()
+        }
+    }
 
     // Starts a Dev Hotseat game with pre-determined teams, no timer and client rolls enabled
     fun startManualGame(navigator: Navigator) {
@@ -237,6 +301,34 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
         }
     }
 
+    fun loadSaveFile(navigator: Navigator) {
+        menuViewModel.navigatorContext.launch {
+            readFile(
+                extensionFilterDescription = "Jervis Game Files (.${FILE_EXTENSION_GAME_FILE})",
+                extensionFilterFileType = FILE_EXTENSION_GAME_FILE
+            ) { path, loadResult ->
+                loadResult
+                    .onSuccess { fileContent ->
+                        // Just silently ignore `null` values as it indicates the dialog was closed
+                        if (path != null) {
+                            JervisSerialization.loadFromFileContent(fileContent)
+                                .onSuccess { gameFile ->
+                                    val viewModel = createLoadedGameScreenModel(menuViewModel, gameFile)
+                                    navigator.push(GameScreen(menuViewModel, viewModel))
+                                }
+                                .onFailure { error ->
+                                    // Ignore failure for now
+                                    LOG.i { "Failed to load game file: ${error.message}" }
+                                }
+                        }
+                    }
+                    .onFailure { error ->
+                        // Ignore failure for now
+                        LOG.i { "Failed to load game file: ${error.message}" }
+                    }
+            }
+        }
+    }
 
     val availableReplayFiles: Flow<List<Pair<String, Path>>> = flow {
         // TODO For now, turn the path into an absolute path so we work with the FumbbleReplayAdapter
@@ -255,39 +347,29 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenVi
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = rememberScreenModel { DevScreenViewModel(menuViewModel) }
         val replayFiles by viewModel.availableReplayFiles.collectAsState(emptyList())
+        val staticButtons = remember {
+            listOf(
+                "Start Standard game with manual actions" to { viewModel.startManualGame(navigator) },
+                "Start Standard game with all random actions" to { viewModel.startRandomGame(navigator) },
+                "Start BB7 game with all manual actions" to { viewModel.startManualBB7Game(navigator) },
+                "Load save file" to { viewModel.loadSaveFile(navigator) }
+            )
+        }
 
         Column(
             modifier = Modifier.fillMaxSize().paperBackground(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(onClick = {
-                viewModel.startManualGame(navigator)
-            }) {
-                Text(
-                    text = "Start Standard game with manual actions",
-                    modifier = Modifier.padding(16.dp),
-                )
+            staticButtons.forEach { (title, onClick) ->
+                Button(onClick = onClick) {
+                    Text(
+                        text = title,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                viewModel.startRandomGame(navigator)
-            }) {
-                Text(
-                    text = "Start Standard game with all random actions",
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                viewModel.startManualBB7Game(navigator)
-            }) {
-                Text(
-                    text = "Start BB7 game with all manual actions",
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
             replayFiles.forEach { (name, file) ->
                 Button(onClick = {
                     viewModel.startReplayGame(navigator, Replay(file))
