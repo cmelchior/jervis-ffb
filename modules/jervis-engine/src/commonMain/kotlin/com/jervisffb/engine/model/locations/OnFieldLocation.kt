@@ -9,7 +9,9 @@ import com.jervisffb.engine.rules.Rules
 sealed interface OnFieldLocation: Location {
 
     /**
-     * Move this location a number of steps in the given direction
+     * Move this location a number of steps in the given direction.
+     * WARNING: This method does not check if the ball is still on the field, so
+     * a coordinate outside the available field area can be returned.
      */
     fun move(
         direction: Direction,

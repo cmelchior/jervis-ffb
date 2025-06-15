@@ -135,7 +135,11 @@ object PushStepResolveSingleBlockPushChain: Procedure() {
             for (step in 0..< context.pushChain.size) {
                 val square = context.pushChain[step].to!!
                 if (square.isOnField(rules)) {
-                    val ball = state.field[square].balls.singleOrNull()
+                    // In case of Ball Clone, multiple balls might be bouncing from the same
+                    // square. In that case, we do them in oldest to newest order. This
+                    // means the ball already on the ground when the player was pushed there
+                    // is bounced first.
+                    val ball = state.field[square].balls.firstOrNull()
                     if (ball != null && ball.state == BallState.BOUNCING) {
                         selectedBall = ball
                         break

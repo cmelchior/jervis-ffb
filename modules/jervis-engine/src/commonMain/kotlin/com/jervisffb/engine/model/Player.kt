@@ -239,7 +239,6 @@ class Player(
         }
     }
 
-
     fun hasBall(): Boolean = (ball != null)
 
     override fun toString(): String {

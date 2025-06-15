@@ -363,7 +363,9 @@ does it as it would be the least surprising to people.
 
 6. If the defender was knocked down, roll for armour and injury and use the 
    apothecary. If they had the ball it is knocked loose, but does not bounce 
-   yet.
+   yet. Note, in the case of Ball Clone, there will now be two balls bouncing
+   from this square. In that case, the ball on the ground when the player was
+   pushed there is bounced first.
 
 7. Check for Skills affecting the ball, like Strip Ball. If triggered, the ball
    is knocked loose, but no dice is rolled yet.

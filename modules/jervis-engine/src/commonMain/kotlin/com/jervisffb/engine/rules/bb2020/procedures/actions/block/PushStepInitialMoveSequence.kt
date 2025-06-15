@@ -11,8 +11,6 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.CompositeCommand
-import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetTurnOver
@@ -41,6 +39,7 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportPushedIntoCrowd
 import com.jervisffb.engine.rules.Rules
@@ -416,7 +415,9 @@ object PushStepInitialMoveSequence: Procedure() {
             return checkTypeAndValue<DirectionSelected>(state, action) { squareSelected ->
                 val context = state.getContext<PushContext>()
                 val origin = context.pushee().coordinates
-                val target = origin.move(squareSelected.direction, 1)
+                val target = origin.move(squareSelected.direction, 1).let {
+                    if (it.isOnField(rules)) it else FieldCoordinate.OUT_OF_BOUNDS
+                }
                 val isEmpty = isSquaresEmptyForPushing(
                     pushContext = state.getContext<PushContext>(),
                     pushOptions = setOf(target),
@@ -463,9 +464,16 @@ object PushStepInitialMoveSequence: Procedure() {
             pushOptions: Set<FieldCoordinate>,
             state: Game,
         ): List<FieldCoordinate> {
+            val filteredOptions = pushOptions.toMutableSet()
+
+            // OUT_OF_BOUNDS is only allowed if it is the only option (should this constraint be in Rules?)
+            if (filteredOptions.contains(FieldCoordinate.OUT_OF_BOUNDS) && pushOptions.size > 1) {
+                filteredOptions.remove(FieldCoordinate.OUT_OF_BOUNDS)
+            }
+
             val firstPushedFromLocation = pushContext.pushChain.first().from
             val isFirstPushLocationAvailable = pushContext.pushChain.none { it.to == firstPushedFromLocation }
-            return pushOptions.filter {
+            return filteredOptions.filter {
                 it == FieldCoordinate.OUT_OF_BOUNDS
                     || state.field[it].isUnoccupied()
                     || (it == firstPushedFromLocation && isFirstPushLocationAvailable)
@@ -481,32 +489,38 @@ object PushStepInitialMoveSequence: Procedure() {
     object MovePushedPlayers: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<PushContext>()
-            // Execute push commands from the last to the first. As doing the other way seems
-            // to cause issues with Undo. Probably a bug, so it needs to be investigated.
-            // Since all other rules treat the push chain from first to last, this should only
-            // be a (safe) implementation detail.
-            val moveCommands = context.pushChain.reversed().map { push ->
-                val to = push.to!!
-                // If OUT_OF_BOUNDS, further processing happens in `ResolvePushedIntoTheCrowd`
-                val outOfBounds = (to == FieldCoordinate.OUT_OF_BOUNDS)
-                if (outOfBounds) {
-                    compositeCommandOf(
-                        SetPlayerLocation(push.pushee, to),
-                        ReportPushedIntoCrowd(push.pushee, push.from)
-                    )
-                } else {
-                    SetPlayerLocation(push.pushee, to)
+            // Execute push commands from the last to the first, this way we avoid having to deal
+            // with squares needing to have to players temporarily. This should be a safe implementation
+            // detail, since all commands are executed before creating the game delta.
+            return buildCompositeCommand {
+                var pushedIntoCrowd = false
+                context.pushChain.reversed().forEach { push ->
+                    val to = push.to!!
+                    // If OUT_OF_BOUNDS, further processing happens in `ResolvePushedIntoTheCrowd`
+                    val outOfBounds = (to == FieldCoordinate.OUT_OF_BOUNDS)
+                    if (outOfBounds) {
+                        // See page 58 in the rulebook. If a player with the ball is pushed into the crowd,
+                        // it is a turnover. The Throw-in is handled in `ResolvePushedIntoTheCrowd`
+                        if (push.pushee.hasBall() && push.pushee.team == state.activeTeam) {
+                            add(SetTurnOver(TurnOver.STANDARD))
+                        }
+                        addAll(
+                            SetPlayerLocation(push.pushee, DogOut),
+                            ReportPushedIntoCrowd(push.pushee, push.from)
+                        )
+                        pushedIntoCrowd = true
+                    } else {
+                        // At this stage, there should only be one ball on the square,
+                        // Even if the player is holding another ball, it isn't knocked loose yet.
+                        add(SetPlayerLocation(push.pushee, to))
+                        state.field[to].balls.singleOrNull()?.let {
+                            add(SetBallState.bouncing(it))
+                        }
+                    }
                 }
+                val nextNode = if (pushedIntoCrowd) ResolvePushedIntoTheCrowd else DecideToFollowUp
+                add(GotoNode(nextNode))
             }
-            val nextNode = if (moveCommands.first() is CompositeCommand) {
-                ResolvePushedIntoTheCrowd
-            } else {
-                DecideToFollowUp
-            }
-            return compositeCommandOf(
-                *moveCommands.toTypedArray(),
-                GotoNode(nextNode)
-            )
         }
     }
 
@@ -516,7 +530,7 @@ object PushStepInitialMoveSequence: Procedure() {
     object ResolvePushedIntoTheCrowd: ParentNode() {
         override fun skipNodeFor(state: Game, rules: Rules): Node? {
             val context = state.getContext<PushContext>()
-            return if (context.pushChain.last().pushee.location == FieldCoordinate.OUT_OF_BOUNDS) {
+            return if (!context.pushChain.last().pushee.location.isOnField(rules)) {
                 null
             } else {
                 DecideToFollowUp
@@ -528,7 +542,7 @@ object PushStepInitialMoveSequence: Procedure() {
             val player = pushStep.pushee
             return buildCompositeCommand {
                 // If player had the ball, prepare it to be thrown in again.
-                // But it will not happen until laster in Push sequence.
+                // But it will not happen until later in Push sequence.
                 if (player.hasBall()) {
                     val ball = player.ball!!
                     val throwContext = ThrowInContext(
@@ -537,7 +551,6 @@ object PushStepInitialMoveSequence: Procedure() {
                     )
                     addAll(
                         SetBallState.outOfBounds(ball, pushStep.from),
-                        SetBallLocation(ball, FieldCoordinate.OUT_OF_BOUNDS),
                         SetContext(throwContext)
                     )
                 }
@@ -550,17 +563,10 @@ object PushStepInitialMoveSequence: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = RiskingInjuryRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            val context = state.getContext<PushContext>()
-            val playerOnOwnTeam = context.firstPusher.team == context.pushee().team
-            return buildCompositeCommand {
-                add(RemoveContext<RiskingInjuryContext>())
-                // See page 58 in the rulebook. If a player with the ball is pushed into the crowd,
-                // it is a turnover.
-                if (playerOnOwnTeam) {
-                    add(SetTurnOver(TurnOver.STANDARD))
-                }
-                add(GotoNode(DecideToFollowUp))
-            }
+            return compositeCommandOf(
+                RemoveContext<RiskingInjuryContext>(),
+                GotoNode(DecideToFollowUp)
+            )
         }
     }
 

@@ -61,7 +61,6 @@ object Bounce : Procedure() {
                 val isDuringKickOff = state.stack.containsNode(GameDrive.KickOffEvent)
                 val isOnKickingTeamSide = if (state.kickingTeam.isHomeTeam()) newLocation.isOnHomeSide(rules) else newLocation.isOnAwaySide(rules)
                 val outOfBounds: Boolean = newLocation.isOutOfBounds(rules) || (isDuringKickOff && isOnKickingTeamSide)
-
                 val playerAtTarget: Player? = if (!outOfBounds) state.field[newLocation].player else null
 
                 val nextNode: Command =

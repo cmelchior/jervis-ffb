@@ -18,7 +18,6 @@ import com.jervisffb.engine.model.context.CatchRollContext
 import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportCatch
@@ -181,7 +180,6 @@ object Catch : Procedure() {
                             ball = ball,
                             outOfBoundsAt = scatterContext.outOfBoundsAt,
                         )),
-                        SetBallLocation(ball, FieldCoordinate.OUT_OF_BOUNDS)
                     )
                 }
                 landsOnCatchingPlayer -> {

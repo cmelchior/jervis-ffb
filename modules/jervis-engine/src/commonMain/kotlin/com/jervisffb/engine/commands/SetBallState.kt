@@ -16,7 +16,7 @@ class SetBallState private constructor(
     private var originalCarriedBy: Player? = null
     private var originalExit: FieldCoordinate? = null
     private var originalLocation: FieldCoordinate? = null
-    // We need to store a reference to this on `execute` so we use the same
+    // We need to store a reference to this on `execute`, so we use the same
     // instance on `undo`.
     private var originalSetLocationCommand: SetBallLocation? = null
 
@@ -35,6 +35,7 @@ class SetBallState private constructor(
             exitLocation = null
         )
 
+        // Calling this will also update the ball location
         fun carried(ball: Ball, player: Player): Command = SetBallState(
             ball = ball,
             ballState = BallState.CARRIED,
@@ -70,6 +71,7 @@ class SetBallState private constructor(
             exitLocation = null
         )
 
+        // Calling this will also update the ball location to OUT_OF_BOUNDS
         fun outOfBounds(ball: Ball, exit: FieldCoordinate): Command = SetBallState(
             ball = ball,
             ballState = BallState.OUT_OF_BOUNDS,
@@ -106,6 +108,10 @@ class SetBallState private constructor(
             it.carriedBy = carriedBy
             if (carriedBy != null) {
                 originalSetLocationCommand = SetBallLocation(it, FieldCoordinate.UNKNOWN)
+                originalSetLocationCommand?.execute(state)
+            }
+            if (ballState == BallState.OUT_OF_BOUNDS) {
+                originalSetLocationCommand = SetBallLocation(it, FieldCoordinate.OUT_OF_BOUNDS)
                 originalSetLocationCommand?.execute(state)
             }
             it.outOfBoundsAt = exitLocation

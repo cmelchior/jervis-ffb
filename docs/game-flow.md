@@ -124,7 +124,8 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Pushed into end zone after a block
   - [ ] Score in opponent turn - move turn counter
   - [ ] Score in opponent turn - at end of half
-  - [ ] Score after pushback
+  - [ ] Score after pushback (holding ball)
+  - [ ] Score after pushback into ball that ends up bouncing to a player in a scoring position.
   - [ ] Score after Stumble and Followup
   - [ ] Score after Pow and Followup
   - [ ] Opponent score after Stumble (with dodge)
@@ -136,6 +137,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Placed Prone with the Ball
   - [ ] Player with ball goes into the crowd
   - [ ] Fails to pickup ball
+  - [ ] Pushing own player into Crowd does not cause turnover
   - [x] Fumble Pass, even if caught
   - [ ] No catch after Pass/Hand-off
   - [x] Deflection/Interception and ball not caught by throwing team
@@ -280,18 +282,18 @@ rules, skills are tracked separately in [skills.md](skills.md).
     - [x] Prone players cannot assist
   - [x] Player Down!
   - [x] Both Down!
-  - [ ] Push Back!
-    - [ ] Push direction
-    - [ ] Can only push into empty squares
-    - [ ] Follow up
-    - [ ] Chain Push into free space
-    - [ ] Push into ball bounces it
-    - [ ] Bounce happens after push is resolved
-    - [ ] Push into the crowd if no free space. Crowd take predence
-    - [ ] Check for scoring after push
-    - [ ] Chainpush prone player
-    - [ ] Player with ball pushed into crowd -> turnover
-    - [ ] Player with ball pushed into crowd - > throwin
+  - [x] Push Back!
+    - [x] Push direction
+    - [x] Can only push into empty squares
+    - [x] Follow up
+    - [x] Chain Push into free space
+    - [x] Push into ball bounces it
+    - [x] Bounce happens after push is resolved
+    - [x] Can only push into the crowd if no free space.
+    - [x] Chain push prone player
+    - [x] Own player chain pushed into crowd
+    - [x] Own Player with ball pushed into crowd -> throwin -> turnover
+    - [x] Player with ball pushed into crowd - > throwin
   - [x] Stumble
   - [x] Pow!
 - [x] Blitz Action
