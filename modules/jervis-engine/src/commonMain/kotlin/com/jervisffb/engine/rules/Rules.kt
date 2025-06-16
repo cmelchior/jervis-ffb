@@ -365,7 +365,7 @@ open class Rules(
      * page 26 in the rulebook.
      */
     fun isOpen(player: Player): Boolean {
-        return player.state == PlayerState.STANDING && !isMarked(player)
+        return !isMarked(player)
     }
 
     /**

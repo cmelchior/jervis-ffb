@@ -65,12 +65,14 @@ rule book.
   - [x] Bounce into another player must catch if possible
   - [x] Bounce into prone/missing tz/stunned player will bounce again
   - [x] Keep bouncing until coming to rest
-- [ ] Standing Players
-  - [ ] Open
-  - [ ] Marking with Tackle Zones
-  - [ ] Marked by Tackle Zones
-  - [ ] Does not mark team players
-  - [ ] Cannot mark with no tackle zones
+- [x] Standing Players
+  - [x] Open
+  - [x] Marking with Tackle Zones
+  - [x] Marked by Tackle Zones
+  - [x] Does not mark team players
+  - [x] Cannot mark with no tackle zones
+  - [x] Cannot deflect if missing tackle zones
+  - [x] Cannot catch if missing tackle zones
 - [ ] Placed Prone
   - [ ] Ball will bounce from prone player
   - [ ] Activation ends immediately
