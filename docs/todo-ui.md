@@ -73,3 +73,57 @@ curl --location 'https://tourplay.net/api/rosters/44442' \
 --header 'Referer: https://tourplay.net/en/blood-bowl/roster/44442' \
 --header 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
 ```
+
+## Game Timer
+
+A game timer isn't described as such in the rules, but one would probably need to
+be implemented for practical reasons.
+
+It is unclear exactly how such a timer should work in practice, so this
+section just contains my current thoughts:
+
+When `processAction` returns, the timer starts for `actionOwner`. It ends when
+`processAction` is called again. This should accurately detect the time
+it takes a player to select an action.
+
+Of course this doesn't account for a lot of cases, like network latency, disconnecting,
+being AFK for valid reasons. This will need to be considered.
+
+Also there is a very open question about what happns when a timer "runs out".
+
+The obvious answer would be an Turnover, but just setting Turnover to true
+in the model, doesn't actually trigger that. It would need some GameAction input.
+
+I guess the server could just feed automatic actions to the model. It could
+automatically select EndAction, EndTurn, Cancel, NoRerollSelected when they
+are available. But in some cases these are not present, e.g. during chain pushes
+or during setup.
+
+So there will be some cases where we need to make a judgment call about what
+to do.
+
+In theory, we could just force stop the turn by incrementing the turncounter,
+but there would be a high chance that some state is left inconsistent. I.e.
+removal of temporary stats at the end of a turn.
+
+In the old Blood Bowl rules, it say 4 minutes pr. turn, but that doesn't take
+into account all the interruptions during a turn, i.e., if all actions during
+a team turn was attributed to the active team, an annoying player could run
+down the other players clock by not selecting options.
+
+Some alternatives:
+
+1. Chess clock: You just get allocated 4x16 minutes of time for the entire game.
+   If you run out of time, your turns basically turn into No-ops.
+
+2. Allocated something like 3 minutes pr. turn + a pool to be used during the
+   opponents turn.
+
+
+
+
+
+
+
+
+

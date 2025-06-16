@@ -94,6 +94,7 @@ Skills should only be marked as completed here if they are implemented and have 
 - [ ] Juggernaut
 - [ ] Might Blow (+1)
 - [ ] Multiple Block
+  - [ ] During Multiple Block: Scoring Turnovers will win over End-Turn turnovers.
 - [ ] Pile Driver
 - [ ] Stand Firm
 - [ ] Strong Arm

@@ -3,7 +3,86 @@
 This document is used during development as a list tracker for things that need 
 to be implemented. Things should only be marked as completed when they have unit 
 tests covering the particular feature. This document only covers the core game
-rules, skills are tracked separately in [skills.md](skills.md). 
+rules. Skills are tracked separately in [todo-skills.md](todo-skills.md). 
+
+The order of items should roughly reflect the order in things appear in the 
+rule book.
+
+## General Principles
+
+- [ ] Turnover ends turn as quickly as possible
+  - [ ] Falling Over in own activation
+  - [ ] Falling Over in other players activation (no turnover)
+  - [ ] Knocked Down during own team turn
+  - [ ] Knocked Down during other teams turn (no turnover)
+  - [ ] Placed Prone with the Ball in own team turn
+  - [ ] Placed Prone with the Ball in other teams turn (no turnover)
+  - [ ] Player with ball goes into the crowd in own team turn
+  - [ ] Player with ball goes into the crowd in other team turn (no turnover)
+  - [ ] Pushing own player, not holding the ball, into the crowd (no turnover)
+  - [ ] Fails to pickup ball from ground and bounce to empty square
+  - [ ] Fails to pickup ball from ground and caught by own team
+  - [ ] Fails to pickup ball from ground and caught by other team
+  - [ ] Fumble Pass, lands on empty square
+  - [x] Fumble Pass, caught by own team
+  - [ ] Fumble Pass, caught by other team
+  - [x] Failed pass, lands on empty square
+  - [x] Failed pass, caught by other team
+  - [ ] Failed pass, caught by own team (no turnover)
+  - [x] Failed hand-off, lands on empty square
+  - [x] Failed hand-off, caught by other team
+  - [ ] Failed hand-off, caught by own team (no turnover)
+  - [x] Pass deflected and lands on empty square
+  - [x] Pass deflected and caught by other team
+  - [ ] Pass deflected and caught by own team (no turnover)
+  - [x] Pass intercepted
+  - [ ] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
+  - [x] Sent-off for commiting a Foul
+  - [ ] Touchdown scored (own team)
+  - [ ] Touchdown scored (other team)
+- [ ] Team Rerolls
+  - [ ] Reset at half time
+  - [ ] Carry over into Extra Time
+  - [ ] Only work during teams turn
+  - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
+- [x] Deviating Ball
+  - [x] D6 in random direction
+  - [x] Player in landing square must attempt to catch it
+  - [x] Will bounce if player in landing square has no tackle zones or is prone/stunned
+  - [x] Will bounce if landing square is empty
+- [x] Scatter Ball
+  - [x] 3xD8 in random direction, doesn't fully land before last roll
+  - [x] Player in landing square must attempt to catch it
+  - [x] Will bounce if player in landing square has no tackle zones or is prone/stunned
+  - [x] Will bounce if landing square is empty
+- [x] Bouncing Ball
+  - [x] Move 1 square in random direction
+  - [x] Bounce into another player must catch if possible
+  - [x] Bounce into prone/missing tz/stunned player will bounce again
+  - [x] Keep bouncing until coming to rest
+- [ ] Standing Players
+  - [ ] Open
+  - [ ] Marking with Tackle Zones
+  - [ ] Marked by Tackle Zones
+  - [ ] Does not mark team players
+  - [ ] Cannot mark with no tackle zones
+- [ ] Placed Prone
+  - [ ] Ball will bounce from prone player
+  - [ ] Activation ends immediately
+  - [ ] No armour roll
+- [ ] Falling Over
+  - [ ] Ball will bounce from prone player
+  - [ ] Activation ends immediately
+  - [ ] Roll for armour/injury
+- [ ] Knocked Down
+  - [ ] Ball will bounce from prone player
+  - [ ] Activation ends immediately if their own turn
+  - [ ] Roll for armour/injury
+- [ ] Player Characteristic
+  - [x] Agility Test
+  - [ ] Passing Test
+  - [ ] Cannot exceed maximum
+  - [ ] Cannot go below minimum
 
 ## Pregame
 
@@ -41,6 +120,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
     - [ ] How many others(???)
 - [ ] Roll on Prayers to Nuffle Table. Duplicates are only checked within the same team
   - [ ] Treacherous Trapdoor
+    - [ ] ... (so many edge cases) 
   - [x] Friends with the Ref
   - [x] Stiletto
   - [x] Iron Man
@@ -57,6 +137,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
     - [ ] Choice is optional
   - [ ] Under Scrutiny
   - [ ] Intensive Training
+- [x] Determine Kicking Team
 
 ## Start of Drive
 
@@ -103,7 +184,104 @@ rules, skills are tracked separately in [skills.md](skills.md).
 - [x] Halfs
 - [x] Extra Time
 - [x] Sudden Death
-- [ ] Drive counter
+- [ ] Active Team
+  - [ ] No active team during Kick-off Events
+- [ ] Active Player
+  - [ ] Marked player as active during action
+  - [ ] Marked player as activated after action.
+  - [ ] Can undo starting an action before rolling dice and/or moving
+    - [ ] Move
+    - [ ] Block
+    - [ ] Blitz
+    - [ ] Pass
+    - [ ] Hand-off
+    - [ ] Throw team-mate
+    - [ ] Foul
+- [x] Stand Up
+  - [x] Must stand up doing any action
+  - [x] Standing up uses 3 move
+  - [x] Standup with less than 3 strength requires a roll and use all move.
+  - [x] Failing stand-up roll ends action and uses player action
+    - [x] Move
+    - [x] Block
+    - [x] Blitz
+    - [x] Pass
+    - [x] HandOff
+    - [x] Foul
+    - [ ] Throw Teammate
+    - [ ] Special actions
+- [x] Rush
+  - [x] Rush before Dodge.
+  - [x] A player can normally rush twice pr. action
+  - [x] Rush is 2+
+  - [x] Failing a Rush puts player in target square.
+  - [x] Move action is over after rushing twice.
+- [x] Dodge (basic, no skills)
+  - [x] When leaving marking player
+  - [x] Not when leaving player with no TZ
+  - [x] Not when moving from open into marked position
+  - [x] -1 pr. marking player in
+  - [x] Move before Roll
+  - [x] Failure: Fall Over in target square
+  - [x] Can reroll
+- [x] Jump Sub-action
+  - [x] Can only jump over prone/stunned player
+  - [x] Jump over stunned/prone player from both teams
+  - [x] Must use two move to reach target square. If not enough move left (including rush), no jump is allowed.
+  - [x] If Rushing twice and fail, ends up in target square
+  - [x] Can only jump to opposite squares. Similar to pushes
+  - [ ] Cannot jump over a Giant since the rules specify a "single square"
+  - [x] Modifiers on leaving and entering
+  - [x] Fail 1st/2nd Rush and fall over
+- [ ] Pickup Ball
+  - [ ] Agility roll
+  - [ ] -1 pr. mark in square
+  - [ ] Bounce if failed
+  - [ ] Can move after pickup
+  - [ ] Cannot pick up if moving involuntarily
+    - [ ] Pushed
+- [ ] Range Ruler
+  - [ ] Follows the chart in the rulebook
+  - [ ] Interceptions are correct. See https://www.luccini.it/bloodbowl/downloads/Tabella_Intercetti.pdf
+- [ ] Catch (basic, no skills)
+  - [ ] Accurate pass
+  - [ ] Deflection into Interception
+  - [ ] Bouncing ball
+  - [ ] Thrown-in
+  - [ ] Scattered
+  - [ ] Deviated
+  - [ ] Tackle Zone modifiers
+  - [ ] Must roll for catch
+  - [ ] Players can only catch if they have tackle zones
+  - [ ] Failing to catch will bounce from square
+- [x] Throw-in (basic no skills)
+  - [x] From corners
+  - [x] From south/north/east/west
+  - [x] Player in landing field must catch it if possible
+  - [x] Will bounce if player is not able to catch a ball
+  - [x] Repeat process if leaving the field again
+- [ ] Armour and Injuries
+  - [ ] Failing armor roll leaves player prone
+  - [ ] Stunned in other team turn / Roll to prone in own turn
+  - [ ] Stunned in own turn / Still stunned in other team turn / Roll to prone in own turn
+  - [ ] KO: Moved to Dogout
+  - [ ] Casualty: Moved to Dogout
+  - [ ] Badly hurt: Miss rest of game
+  - [ ] Seriously Hurt: MNG
+  - [ ] Serious Injury: MNG + NI
+  - [ ] Lasting Injury: MNG + Stat reduction
+  - [ ] Head Injury: -1AV
+  - [ ] Smashed Knee: -1MA
+  - [ ] Broken Arm: -1PA
+  - [ ] Neck Injury: -1AG
+  - [ ] Dislocated Shoulder: -1ST
+  - [ ] Dead
+  - [ ] Reroll if stat is at minimum (source?)
+- [ ] Apothecary
+  - [ ] Use on KO
+  - [ ] Use on BH
+  - [ ] Use on Casualty
+  - [ ] Use on injury when pushed into the crowd
 - [ ] Scoring
   - [x] Moving into the End Zone with the ball using a standard move
   - [x] Follow-up into the End Zone
@@ -131,104 +309,11 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Opponent score after Stumble (with dodge)
   - [ ] Opponent score after Pushback (with dodge)
   - [ ] Attacker is trapped, but pushes another player into a scoring position. A touchdown is scored.
-- [ ] Turnover ends turn as quickly as possible
-  - [ ] Falling Over
-  - [ ] Knocked Down
-  - [ ] Placed Prone with the Ball
-  - [ ] Player with ball goes into the crowd
-  - [ ] Fails to pickup ball
-  - [ ] Pushing own player into Crowd does not cause turnover
-  - [x] Fumble Pass, even if caught
-  - [ ] No catch after Pass/Hand-off
-  - [x] Deflection/Interception and ball not caught by throwing team
-  - [ ] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
-  - [x] Sent-off for commiting a Foul
-  - [ ] During Multiple Block: Scoring Turnovers will win over End-Turn turnovers.
+- [ ] Detect Stalling
+  - [ ] Nega-trait players cannot Stall (as they all require rolls)
+  - [ ] Check stalling if player gets ball from catch
 - [ ] Conceding
   - [ ] Free if 3 or less players at beginning of turn
-- [ ] Team Rerolls
-  - [ ] Reset at half time
-  - [ ] Carry over into Extra Time
-  - [ ] Leader
-  - [ ] Only work during teams turn
-  - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
-- [ ] Marking Players
-  - [ ] Marking
-  - [ ] Marked
-  - [ ] Open
-  - [ ] Defensive Assists
-  - [ ] Offensive Assists
-  - [ ] Bulk marked modifiers 
-- [x] Dodging (basic, no skills)
-  - [x] When leaving marking player
-  - [x] Not when leaving player with no TZ
-  - [x] Not when moving from open into marked position
-  - [x] -1 pr. marking player in
-  - [x] Move before Roll
-  - [x] Fall over in target square
-  - [x] Can reroll 
-- [x] Deviating Ball
-  - [x] D6 in random direction
-  - [x] Player in landing square must attempt to catch it
-  - [x] Will bounce if player in landing square has no tackle zones or is prone/stunned
-  - [x] Will bounce if landing square is empty
-- [x] Scatter Ball
-  - [x] 3xD8 in random direction, doesn't fully land before last roll
-  - [x] Player in landing square must attempt to catch it
-  - [x] Will bounce if player in landing square has no tackle zones or is prone/stunned
-  - [x] Will bounce if landing square is empty
-- [x] Bouncing Ball
-  - [x] Move 1 square in random direction
-  - [x] Bounce into another player must catch if possible
-  - [x] Bounce into prone/missing tz/stunned player will bounce again
-  - [x] Keep bouncing until coming to rest
-- [x] Throw-in (basic no skills)
-  - [x] From corners
-  - [x] From south/north/east/west
-  - [x] Player in landing field must catch it if possible
-  - [x] Will bounce if player is not able to catch a ball
-  - [x] Repeat process if leaving the field again
-- [ ] Catch (basic no skills)
-  - [ ] Accurate pass
-  - [ ] Deflection into Interception
-  - [ ] Bouncing ball
-  - [ ] Thrown-in
-  - [ ] Scattered
-  - [ ] Deviated
-  - [ ] TackleZone modifiers
-  - [ ] Must roll for catch
-  - [ ] Players can only catch if they have tackle zones
-  - [ ] Failing to catch will bounce from square
-- [ ] Track Star Player Points
-- [ ] Track statistics (not in the rules)
-- [ ] Detect Stalling
-- [ ] Trapdoors
-- [ ] Maximum Stats
-- [ ] Knocked Down
-- [ ] Falling Over
-- [ ] Roll over if stunned last turn
-- [ ] Moving into a square
-  - [ ] Moving voluntarily
-  - [ ] Moving involuntary
-  - [ ] Followup is voluntarily
-  - [ ] Pushback is involuntary (also side step)
-  - [ ] Being pushed
-  - [ ] Need Dodge/Rush/Jump to go there
-- [ ] Characteristic Tests
-  - [x] Agility
-  - [ ] Passing
-- [ ] End of turn
-- [ ] End of Drive
-- [ ] End of Half
-- [ ] End of Game
-- [ ] Range Ruler
-  - [ ] Follows the chart in the rulebook
-  - [ ] Interceptions are correct. See https://www.luccini.it/bloodbowl/downloads/Tabella_Intercetti.pdf
-- [ ] Apothecary
-  - [ ] Use on KO
-  - [ ] Use on BH
-  - [ ] Use on Casualty
-  - [ ] Use on injury when pushed into the crowd
 
 ## Actions
 
@@ -237,39 +322,6 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [x] Starting a move action while prone and aborting it again doesn't mark player as used
   - [x] Moving any square mark the action as "used".
   - [x] Action doesn't end when no more "normal move" is left, only when all rushes are also used.
-- [x] Stand Up
-  - [x] Must stand up doing any action
-  - [x] Standing up uses 3 move
-  - [x] Standup with less than 3 strength requires a roll and use all move.
-  - [x] Failing stand-up roll ends action and uses player action
-    - [x] Move
-    - [x] Block
-    - [x] Blitz
-    - [x] Pass
-    - [x] HandOff
-    - [x] Foul
-    - [ ] Throw Teammate
-    - [ ] Special actions
-- [x] Dodge
-  - [x] Moving away from marking player requires a dodge roll.
-  - [x] Moving away from non-marking player is free.
-  - [x] Need agility roll to dodge.
-  - [x] Failure: Knocked over in target square
-- [x] Rush
-  - [x] Rush before Dodge.
-  - [x] A player can normally rush twice pr. action
-  - [x] Rush is 2+
-  - [x] Failing a Rush puts player in target square.
-  - [x] Move action is over after rushing twice.
-- [x] Jump Sub-action
-  - [x] Can only jump over prone/stunned player
-  - [x] Jump over stunned/prone player from both teams
-  - [x] Must use two move to reach target square. If not enough move left (including rush), no jump is allowed.
-  - [x] If Rushing twice and fail, ends up in target square
-  - [x] Can only jump to opposite squares. Similar to pushes
-  - [ ] Cannot jump over a Giant since the rules specify a "single square"
-  - [x] Modifiers on leaving and entering
-  - [x] Fail 1st/2nd Rush and fall over
 - [x] Block Action
   - [x] Cannot block while prone
   - [x] Can only block if marking the player.
@@ -387,64 +439,17 @@ rules, skills are tracked separately in [skills.md](skills.md).
   - [ ] Crash Landing
   - [ ] Landing in the crowd
 
+## Statistics
+
+- [ ] Track Star Player Points
+  - [ ] ... 
+- [ ] Track statistics (not in the rules)
+  - [ ] ... (figure out what to track)
+
 ## BB7
 
 - [ ] Place Kick (BB7): All locations not on kicking teams side.
 - [ ] Touchback ((BB7): Only happens when crossing back to kicker's side, not in No Man's Land.
-
-## Game Timer
-
-A game timer isn't described as such in the rules, but one would probably need to
-be implemented for practical reasons.
-
-It is unclear exactly how such a timer should work in practice, so this 
-section just contains my current thoughts:
-
-When `processAction` returns, the timer starts for `actionOwner`. It ends when 
-`processAction` is called again. This should accurately detect the time
-it takes a player to select an action.
-
-Of course this doesn't account for a lot of cases, like network latency, disconnecting, 
-being AFK for valid reasons. This will need to be considered.
-
-Also there is a very open question about what happns when a timer "runs out".
-
-The obvious answer would be an Turnover, but just setting Turnover to true
-in the model, doesn't actually trigger that. It would need some GameAction input.
-
-I guess the server could just feed automatic actions to the model. It could
-automatically select EndAction, EndTurn, Cancel, NoRerollSelected when they
-are available. But in some cases these are not present, e.g. during chain pushes
-or during setup.
-
-So there will be some cases where we need to make a judgment call about what
-to do.
-
-In theory, we could just force stop the turn by incrementing the turncounter,
-but there would be a high chance that some state is left inconsistent. I.e.
-removal of temporary stats at the end of a turn.
-
-In the old Blood Bowl rules, it say 4 minutes pr. turn, but that doesn't take
-into account all the interruptions during a turn, i.e., if all actions during
-a team turn was attributed to the active team, an annoying player could run
-down the other players clock by not selecting options.
-
-Some alternatives:
-
-1. Chess clock: You just get allocated 4x16 minutes of time for the entire game.
-   If you run out of time, your turns basically turn into No-ops.
-
-2. Allocated something like 3 minutes pr. turn + a pool to be used during the 
-   opponents turn.
-
-
-
-
-
-
-
-
-
 
 
 
