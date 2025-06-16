@@ -3,7 +3,6 @@ package com.jervisffb.engine.rules.bb2020.procedures.actions.block
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
@@ -16,7 +15,6 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.context.getContextOrNull
@@ -111,7 +109,6 @@ object Pow: Procedure() {
             val injuryContext = RiskingInjuryContext(defender, isPartOfMultipleBlock = context.isMultipleBlock)
             return buildCompositeCommand {
                 addAll(
-                    SetPlayerState(defender, PlayerState.KNOCKED_DOWN),
                     SetContext(injuryContext)
                 )
                 if (defender.hasBall()) {

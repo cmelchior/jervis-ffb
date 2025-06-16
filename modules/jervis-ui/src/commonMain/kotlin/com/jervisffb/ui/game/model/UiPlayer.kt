@@ -19,5 +19,10 @@ class UiPlayer(
     val position = model.position
     val isActive = (model.available == Availability.IS_ACTIVE)
     val isSelectable get() = (selectAction != null)
+    val isGoingDown = (
+        model.state == PlayerState.KNOCKED_DOWN
+            || model.state == PlayerState.FALLEN_OVER
+            || model.team.game.rules.isInjuried(model)
+    )
     val hasActivated = (model.available == Availability.HAS_ACTIVATED || model.available == Availability.UNAVAILABLE) && model.location.isOnField(model.team.game.rules)
 }

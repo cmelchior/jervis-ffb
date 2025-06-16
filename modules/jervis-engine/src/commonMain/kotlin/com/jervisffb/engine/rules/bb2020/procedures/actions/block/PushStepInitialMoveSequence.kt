@@ -13,6 +13,7 @@ import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
@@ -33,6 +34,7 @@ import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ProcedureContext
@@ -515,6 +517,9 @@ object PushStepInitialMoveSequence: Procedure() {
                         add(SetPlayerLocation(push.pushee, to))
                         state.field[to].balls.singleOrNull()?.let {
                             add(SetBallState.bouncing(it))
+                        }
+                        if (context.isDefenderKnockedDown) {
+                            add(SetPlayerState(push.pushee, PlayerState.KNOCKED_DOWN))
                         }
                     }
                 }

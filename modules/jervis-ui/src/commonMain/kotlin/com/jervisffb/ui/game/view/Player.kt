@@ -42,7 +42,7 @@ import kotlin.math.min
 // Keeping this around while experimenting with the Shader approach.
 // This can be re-enabled using `modifier.graphicsLayer(renderEffect = ...)
 //
-// Maybe it is worth creating all the player images with borders up fron during the initialization phase.
+// Maybe it is worth creating all the player images with borders up front during the initialization phase.
 // This would prevent the excessive amount of Shader creation in this file, but it is unclear if it is
 // worth it. Especially if the client is resized. Also, it will probably degrade the "sharpness" of the
 // border if it ends up being a part of a scaled image.
@@ -85,6 +85,7 @@ fun Player(
         PlayerImage(
             bitmap = playerImage,
             isSelectable = player.isSelectable,
+            isGoingDown = player.isGoingDown,
             alpha = if (player.hasActivated || player.isStunned) 0.5f else 1.0f,
         )
         if (player.carriesBall) {
@@ -123,7 +124,9 @@ fun Player(
 // is set. There are trade-offs to this as it forces us to keep the entire player icon
 // inside its "square". But going outside will also look messy in some cases. Probably
 // something to experiment with.
-val playerBorderShader = """
+// NOTE: This template has a %color% that must be replaced using string manipulation
+// It is possible to provide arguments to shaders, but this is just a quick prototype.
+private val playerBorderShaderTemplate = """
         uniform shader image;
         uniform vec2 resolution; // [widthPx, heightPx] 
         uniform vec2 scaleFactor; // [xScale, yScale]
@@ -156,12 +159,21 @@ val playerBorderShader = """
             vec4 blurredMask = blur(uv);
         
             // Green background with intensity from the blurred mask
-            vec4 tint = vec4(56.0/255.0, 162.0/255.0, 59.0/255.0, 1.0); // JervisTheme.rulebookGreenAccent
+            vec4 tint = %tintColor%
             vec4 greenEffect = tint * blurredMask;
         
             return greenEffect;
         }
 """.trimIndent()
+
+val playerSelectedBorderShader = playerBorderShaderTemplate.replace(
+    oldValue = "%tintColor%",
+    newValue = "vec4(56.0/255.0, 162.0/255.0, 59.0/255.0, 1.0); // JervisTheme.rulebookGreenAccent"
+)
+val playerDownBorderShader = playerBorderShaderTemplate.replace(
+    oldValue = "%tintColor%",
+    newValue = "vec4(198.0/255.0, 0.0/255.0, 0.0/255.0, 1.0); // JervisTheme.rulebookRed"
+)
 
 // Custom rendering of Player images on a field square.
 // Players that are available will render with a glowing border around them.
@@ -169,18 +181,27 @@ val playerBorderShader = """
 // Maybe we need to draw the image to a slightly larger canvas before applying the blur. This requires
 // more experimentation.
 @Composable
-private fun PlayerImage(bitmap: ImageBitmap, isSelectable: Boolean, alpha: Float) {
+private fun PlayerImage(
+    bitmap: ImageBitmap,
+    isSelectable: Boolean,
+    isGoingDown: Boolean,
+    alpha: Float
+) {
     // Use Decal to avoid artifacts at the edges. It would be nice if we could render the "glow" outside
     // the canvas. It seems possible when using renderEffects on the graphicsLayer. But will need
     // more investigation.
     val imageShader = ImageShader(bitmap, TileMode.Decal, TileMode.Decal)
-    val runtimeEffect = RuntimeEffect.makeForShader(playerBorderShader)
+    val playerBorderShader = when {
+        isGoingDown -> playerDownBorderShader
+        else -> playerSelectedBorderShader
+    }
+    val runtimeEffect = remember(playerBorderShader) { RuntimeEffect.makeForShader(playerBorderShader) }
     BoxWithConstraints(
         modifier = Modifier
             .aspectRatio(1f)
             .fillMaxSize()
             .drawWithCache {
-                if (!isSelectable) {
+                if (!isSelectable && !isGoingDown) {
                     return@drawWithCache onDrawBehind { /* Do nothing */ }
                 }
                 val canvasWidth = size.width

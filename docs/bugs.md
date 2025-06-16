@@ -16,3 +16,4 @@ This file is just a temporary way to capture any bugs seen that I didn't have ti
   it needs to roll and then immediately re-apply the dice roll.
 - Sidebar is not updated correctly when players are banned. The count is correct, but they do not show up
 - `ActionSelectorViewModel` throws concurrent modification exception for unknownActions. Figure out a solution.
+- Apothecary during Multiple Block seems to crash when used with Undo. Needs more investigation.
