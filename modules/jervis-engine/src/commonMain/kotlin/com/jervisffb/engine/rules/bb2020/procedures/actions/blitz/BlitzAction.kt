@@ -275,7 +275,6 @@ object BlitzAction : Procedure() {
                     add(GotoNode(ResolveBlock))
                 } else {
                     add(SetPlayerState(context.player, PlayerState.FALLEN_OVER))
-                    add(SetTurnOver(TurnOver.STANDARD))
                     add(GotoNode(ResolveFallingOverBeforeBlock))
                 }
             }

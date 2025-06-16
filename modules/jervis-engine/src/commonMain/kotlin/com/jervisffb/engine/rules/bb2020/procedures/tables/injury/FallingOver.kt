@@ -5,7 +5,7 @@ import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetTurnOver
-import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -14,7 +14,6 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
@@ -27,41 +26,35 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 object FallingOver: Procedure() {
     override val initialNode: Node = RollForInjury
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
-        if (state.turnOver != TurnOver.STANDARD) {
-            INVALID_GAME_STATE("Wrong turn over state: ${state.turnOver}")
-        }
         val context = state.getContext<RiskingInjuryContext>()
-
-        /**
-         * If the player falling over, carried a ball, it will drop the ball and it
-         * will bounce from this square.
-         *
-         * In case a ball was lying on the ground in the square the player was falling
-         * over in. It will bounce from the square as part of [MovePlayerIntoSquare],
-         * so when we get to this procedure this player drops the ball, there should only be
-         * one ball in the square.
-         */
-        return if (context.player.hasBall()) {
-            val ball = context.player.ball!!
-            compositeCommandOf(
-                SetBallState.bouncing(ball),
-                SetBallLocation(ball, context.player.coordinates),
-                SetCurrentBall(ball),
-            )
-        } else {
-            null
+        return buildCompositeCommand {
+            /**
+             * If the player falling over, carried a ball, they will drop the ball, and it
+             * will bounce from this square.
+             *
+             * In case a ball was lying on the ground in the square the player was falling
+             * over in. It will bounce from the square as part of [MovePlayerIntoSquare],
+             * so when we get to this procedure and the player drops the ball, there should only
+             * be one ball in the square.
+             */
+            if (context.player.hasBall()) {
+                val ball = context.player.ball!!
+                addAll(
+                    SetBallState.bouncing(ball),
+                    SetBallLocation(ball, context.player.coordinates),
+                    SetCurrentBall(ball),
+                )
+            }
+            // Falling over results in a turn-over pr. the list of turnovers on page 23 in the rulebook.
+            if (context.player.team == state.activeTeam) {
+                add(SetTurnOver(TurnOver.STANDARD))
+            }
         }
     }
-    override fun onExitProcedure(state: Game, rules: Rules): Command {
-        val context = state.getContext<RiskingInjuryContext>()
-        return compositeCommandOf(
-            // Falling over results in a turn-over pr. the list of turnovers on page 23 in the rulebook.
-            if (context.player.team == state.activeTeam) SetTurnOver(TurnOver.STANDARD) else null,
-            if (state.currentBallOrNull() != null) SetCurrentBall(null) else null,
-        )
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        return if (state.currentBallOrNull() != null) SetCurrentBall(null) else null
     }
     override fun isValid(state: Game, rules: Rules) {
-        state.assertContext<RiskingInjuryContext>()
         val context = state.getContext<RiskingInjuryContext>()
         if (context.mode != RiskingInjuryMode.FALLING_OVER) {
             INVALID_GAME_STATE("Player needs to be falling over to use this procedure: ${context.mode}")

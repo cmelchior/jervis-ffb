@@ -231,16 +231,12 @@ object PassStep: Procedure() {
             return compositeCommandOf(
                 SetBallState.bouncing(ball),
                 SetContext(passContext.copy(target = null)),
-                SetBallLocation(ball, state.getContext<PassContext>().thrower.coordinates)
+                SetBallLocation(ball, state.getContext<PassContext>().thrower.coordinates),
+                SetTurnOver(TurnOver.STANDARD), // A Fumbled Pass is always a turn-over, regardless of where the ball lands
             )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return compositeCommandOf(
-                SetTurnOver(TurnOver.STANDARD),
-                ExitProcedure()
-            )
-        }
+        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
     }
 
     /**

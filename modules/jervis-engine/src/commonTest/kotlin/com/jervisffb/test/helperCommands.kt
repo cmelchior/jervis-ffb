@@ -212,15 +212,15 @@ fun setupPlayer(id: PlayerId, field: FieldCoordinate) = arrayOf(
 fun skipTurns(count: Int) = Array(count) { EndTurn }
 
 // Do a standard 1 die block with no reroll
-fun standardBlock(target: PlayerId,  die: DBlockResult) = arrayOf(
-    PlayerSelected(target),
+fun standardBlock(target: String,  die: DBlockResult) = arrayOf(
+    PlayerSelected(target.playerId),
     BlockTypeSelected(BlockType.STANDARD),
     die,
     NoRerollSelected(),
     SelectSingleBlockDieResult(),
 )
 
-fun catch(roll: D6Result = 6.d6, reroll: GameAction = NoRerollSelected()) = arrayOf(
+fun catch(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,
 )

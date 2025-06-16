@@ -11,35 +11,40 @@ rule book.
 ## General Principles
 
 - [ ] Turnover ends turn as quickly as possible
-  - [ ] Falling Over in own activation
-  - [ ] Falling Over in other players activation (no turnover)
-  - [ ] Knocked Down during own team turn
-  - [ ] Knocked Down during other teams turn (no turnover)
+  - [x] Falling Over in own activation
+  - [ ] Falling Over in other players activation (no turnover, can this ever happen?)
+  - [x] Knocked Down during own team turn (active player)
+  - [ ] Knocked Down during own team turn (inactive player)
+  - [x] Knocked Down during other teams turn (no turnover)
   - [ ] Placed Prone with the Ball in own team turn
   - [ ] Placed Prone with the Ball in other teams turn (no turnover)
-  - [ ] Player with ball goes into the crowd in own team turn
-  - [ ] Player with ball goes into the crowd in other team turn (no turnover)
-  - [ ] Pushing own player, not holding the ball, into the crowd (no turnover)
-  - [ ] Fails to pickup ball from ground and bounce to empty square
-  - [ ] Fails to pickup ball from ground and caught by own team
-  - [ ] Fails to pickup ball from ground and caught by other team
-  - [ ] Fumble Pass, lands on empty square
+  - [x] Player with ball goes into the crowd in own team turn
+  - [x] Player with ball goes into the crowd in other team turn (no turnover)
+  - [x] Pushing own player, not holding the ball, into the crowd (no turnover)
+  - [x] Fails to pickup ball from the ground and bounce to empty square
+  - [x] Fails to pickup ball from the ground and caught by own team
+  - [x] Fails to pickup ball from the ground and caught by other team
+  - [x] Fumble Pass, lands on empty square
   - [x] Fumble Pass, caught by own team
-  - [ ] Fumble Pass, caught by other team
+  - [x] Fumble Pass, caught by other team
   - [x] Failed pass, lands on empty square
   - [x] Failed pass, caught by other team
-  - [ ] Failed pass, caught by own team (no turnover)
+  - [x] Failed pass, caught by own team (no turnover)
   - [x] Failed hand-off, lands on empty square
   - [x] Failed hand-off, caught by other team
-  - [ ] Failed hand-off, caught by own team (no turnover)
+  - [x] Failed hand-off, caught by own team (no turnover)
   - [x] Pass deflected and lands on empty square
   - [x] Pass deflected and caught by other team
-  - [ ] Pass deflected and caught by own team (no turnover)
+  - [x] Pass deflected and caught by own team (no turnover)
   - [x] Pass intercepted
   - [ ] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
   - [x] Sent-off for commiting a Foul
-  - [ ] Touchdown scored (own team)
-  - [ ] Touchdown scored (other team)
+  - [x] Touchdown scored (own team)
+  - [x] Touchdown scored (other team)
+  - [ ] Turnover state is reset when turn ends
+    - [ ] During normal team turns
+    - [ ] End of Drive
+    - [ ] End of Half
 - [ ] Team Rerolls
   - [ ] Reset at half time
   - [ ] Carry over into Extra Time
@@ -120,6 +125,10 @@ rule book.
     - [ ] How many others(???)
 - [ ] Roll on Prayers to Nuffle Table. Duplicates are only checked within the same team
   - [ ] Treacherous Trapdoor
+    - [ ] During Quick Snap Kickoff Event
+    - [ ] During Blitz Kickoff Event
+    - [ ] During Pushback
+    - [ ] During Chain Push
     - [ ] ... (so many edge cases) 
   - [x] Friends with the Ref
   - [x] Stiletto
@@ -165,6 +174,7 @@ rule book.
   - [x] Quick Snap
   - [ ] Blitz
     - [ ] Some skills are not available
+    - [ ] Blitz ends when player Knocked Down or Falls Over, but not a TurnOver
   - [x] Officious Ref
   - [x] Pitch Invasion
 - [x] What goes up, must come down
@@ -334,7 +344,7 @@ rule book.
     - [x] Prone players cannot assist
   - [x] Player Down!
   - [x] Both Down!
-  - [x] Push Back!
+  - [ ] Push Back!
     - [x] Push direction
     - [x] Can only push into empty squares
     - [x] Follow up
@@ -346,6 +356,9 @@ rule book.
     - [x] Own player chain pushed into crowd
     - [x] Own Player with ball pushed into crowd -> throwin -> turnover
     - [x] Player with ball pushed into crowd - > throwin
+    - [ ] Chain Push Attacker away
+    - [ ] Chain Push Defender away
+    - [ ] Chain Push infinite circle
   - [x] Stumble
   - [x] Pow!
   -  [ ] Pow into crowd only roll crowd injury
@@ -445,6 +458,13 @@ rule book.
   - [ ] ... 
 - [ ] Track statistics (not in the rules)
   - [ ] ... (figure out what to track)
+
+## Game Logs
+
+- [ ] Figure out how to do logging 
+  - [ ] Dice Rolls?
+  - [ ] Nested logging?
+  - [ ] Different levels of logging?
 
 ## BB7
 

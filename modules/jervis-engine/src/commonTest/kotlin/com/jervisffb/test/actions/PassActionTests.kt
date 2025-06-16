@@ -666,7 +666,7 @@ class PassActionTests: JervisGameTest() {
     }
 
     @Test
-    fun passAction_deflectEndsUpOnThrowerTeam() {
+    fun passAction_deflectEndsUpOnOpponentTeam() {
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.PASS),
             *moveTo(17, 7),

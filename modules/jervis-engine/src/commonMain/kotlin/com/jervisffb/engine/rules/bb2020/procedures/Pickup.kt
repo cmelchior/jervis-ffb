@@ -97,13 +97,12 @@ object Pickup : Procedure() {
     }
 
     object PickupFailed : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return compositeCommandOf(
-                // If it was the active player that failed the pickup, it is a turnover
-                state.activePlayer?.let { SetTurnOver(TurnOver.STANDARD) },
-                ExitProcedure(), // This is copied from Catch, which has a comment about it.
-            )
+        override fun onEnterNode(state: Game, rules: Rules): Command? {
+            // If it was the active player that failed the pickup, it is a turnover regardless
+            // of where the ball ends up.
+            return state.activePlayer?.let { SetTurnOver(TurnOver.STANDARD) }
         }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
+        override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
     }
 }

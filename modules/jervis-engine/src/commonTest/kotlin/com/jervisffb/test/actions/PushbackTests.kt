@@ -48,7 +48,7 @@ class PushbackTests: JervisGameTest() {
     fun pushDirection_corner() {
         controller.rollForward(
             *activatePlayer("A2", PlayerStandardActionType.BLOCK),
-            *standardBlock("H1".playerId, 3.dblock),
+            *standardBlock("H1", 3.dblock),
         )
 
         val actions = controller.getAvailableActions().actions
@@ -69,7 +69,7 @@ class PushbackTests: JervisGameTest() {
     fun pushDirection_line() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            *standardBlock("H1".playerId, 4.dblock),
+            *standardBlock("H1", 4.dblock),
         )
         val actions = controller.getAvailableActions().actions
         val availableDirections = actions.firstInstanceOf<SelectDirection>()
@@ -92,7 +92,7 @@ class PushbackTests: JervisGameTest() {
         SetPlayerLocation(homeTeam[5.playerNo], FieldCoordinate(11, 5)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            *standardBlock("H1".playerId, 4.dblock),
+            *standardBlock("H1", 4.dblock),
         )
         val actions = controller.getAvailableActions().actions
         val availableDirections = actions.firstInstanceOf<SelectDirection>()
@@ -111,7 +111,7 @@ class PushbackTests: JervisGameTest() {
     fun followUp() {
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            *standardBlock("H1".playerId, 4.dblock),
+            *standardBlock("H1", 4.dblock),
             DirectionSelected(Direction.LEFT),
             Confirm // Follow up
         )
@@ -126,7 +126,7 @@ class PushbackTests: JervisGameTest() {
         SetBallLocation(state.singleBall(), FieldCoordinate(11, 5)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            *standardBlock("H1".playerId, 4.dblock),
+            *standardBlock("H1", 4.dblock),
             DirectionSelected(Direction.LEFT),
             Confirm, // Follow up
             2.d8 // Bounce
@@ -141,7 +141,7 @@ class PushbackTests: JervisGameTest() {
         SetBallLocation(state.singleBall(), FieldCoordinate(11, 5)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            *standardBlock("H1".playerId, 4.dblock),
+            *standardBlock("H1", 4.dblock),
             DirectionSelected(Direction.LEFT),
         )
         assertEquals(FieldCoordinate(11, 5), state.singleBall().location)
@@ -160,7 +160,7 @@ class PushbackTests: JervisGameTest() {
         SetPlayerLocation(awayTeam[1.playerNo], FieldCoordinate(13, 0)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            *standardBlock("H1".playerId, 4.dblock),
+            *standardBlock("H1", 4.dblock),
         )
         val actions = controller.getAvailableActions().actions
         val availableDirections = actions.firstInstanceOf<SelectDirection>()
@@ -180,7 +180,7 @@ class PushbackTests: JervisGameTest() {
         SetPlayerLocation(awayTeam[1.playerNo], FieldCoordinate(1, 13)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            *standardBlock("H8".playerId, 4.dblock),
+            *standardBlock("H8", 4.dblock),
         )
         val actions = controller.getAvailableActions().actions
         val availableDirections = actions.firstInstanceOf<SelectDirection>()
@@ -208,7 +208,7 @@ class PushbackTests: JervisGameTest() {
         SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(11, 6)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            *standardBlock("H1".playerId, 4.dblock),
+            *standardBlock("H1", 4.dblock),
             DirectionSelected(Direction.LEFT), // First push
             DirectionSelected(Direction.UP_LEFT), // 2nd push
             Confirm // Follow up
@@ -226,7 +226,7 @@ class PushbackTests: JervisGameTest() {
         SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(11, 6)).execute(state)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            *standardBlock("H1".playerId, 4.dblock),
+            *standardBlock("H1", 4.dblock),
             DirectionSelected(Direction.LEFT), // First push
             DirectionSelected(Direction.UP_LEFT), // 2nd push
             Confirm // Follow up
@@ -243,7 +243,7 @@ class PushbackTests: JervisGameTest() {
         SetBallState.carried(state.singleBall(), homeTeam[4.playerNo]).execute(state)
         controller.rollForward(
             *activatePlayer("A7", PlayerStandardActionType.BLOCK),
-            *standardBlock("H4".playerId, 4.dblock),
+            *standardBlock("H4", 4.dblock),
             DirectionSelected(Direction.UP),
             DiceRollResults(1.d6, 1.d6), // Crowd Injury roll
             Confirm, // Follow up
@@ -273,7 +273,7 @@ class PushbackTests: JervisGameTest() {
         SetBallState.carried(state.singleBall(), awayTeam[5.playerNo]).execute(state)
         controller.rollForward(
             *activatePlayer("A2", PlayerStandardActionType.BLOCK),
-            *standardBlock("H2".playerId, 4.dblock),
+            *standardBlock("H2", 4.dblock),
             DirectionSelected(Direction.RIGHT), // First push
             DirectionSelected(Direction.RIGHT), // 2nd push (into the crowd)
             DiceRollResults(1.d6, 1.d6), // Crowd Injury roll, causes turnover
@@ -302,10 +302,10 @@ class PushbackTests: JervisGameTest() {
         SetPlayerLocation(awayTeam[7.playerNo], FieldCoordinate(25, 2)).execute(state)
         controller.rollForward(
             *activatePlayer("A2", PlayerStandardActionType.BLOCK),
-            *standardBlock("H2".playerId, 4.dblock),
+            *standardBlock("H2", 4.dblock),
             DirectionSelected(Direction.RIGHT), // First push
             DirectionSelected(Direction.RIGHT), // 2nd push (into the crowd)
-            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll, causes turnover
+            DiceRollResults(1.d6, 1.d6), // Crowd Injury roll
             Cancel, // Do not follow up
         )
         assertEquals(awayTeam, state.activeTeam)

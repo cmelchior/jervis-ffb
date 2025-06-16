@@ -26,11 +26,14 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  */
 object KnockedDown: Procedure() {
     override val initialNode: Node = RollForInjury
-    override fun onEnterProcedure(state: Game, rules: Rules): Command?  = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<RiskingInjuryContext>()
-        return if (context.player.team == state.activeTeamOrThrow()) return SetTurnOver(TurnOver.STANDARD) else null
+        return when (context.player.team == state.activeTeam) {
+            true -> SetTurnOver(TurnOver.STANDARD)
+            false -> null
+        }
     }
+    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<RiskingInjuryContext>()
         val context = state.getContext<RiskingInjuryContext>()
