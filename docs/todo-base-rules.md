@@ -296,6 +296,7 @@ rules, skills are tracked separately in [skills.md](skills.md).
     - [x] Player with ball pushed into crowd - > throwin
   - [x] Stumble
   - [x] Pow!
+  -  [ ] Pow into crowd only roll crowd injury
 - [x] Blitz Action
   - [x] Must select target before starting blitz 
   - [x] Rush To Blitz

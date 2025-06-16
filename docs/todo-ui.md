@@ -1,7 +1,6 @@
 # UI Todo list and Bugs
 
-This document is used to track various todo lists for the UI as well as 
-bugs encountered that are not fixed.
+This document is used to track various todo lists for the UI.
 
 The TODO list are by no means exhaustive, it is just a place to dump
 things as they come up.
