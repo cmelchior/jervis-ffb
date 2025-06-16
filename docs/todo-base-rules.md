@@ -196,8 +196,9 @@ rule book.
 - [x] Halfs
 - [x] Extra Time
 - [x] Sudden Death
-- [ ] Active Team
-  - [ ] No active team during Kick-off Events
+- [x] Active Team
+  - [x] No active team during Kick-off Events
+  - [x] Team is active during team turn
 - [ ] Active Player
   - [ ] Marked player as active during action
   - [ ] Marked player as activated after action.
