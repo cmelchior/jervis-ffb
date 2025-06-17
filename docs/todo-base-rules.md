@@ -200,16 +200,16 @@ rule book.
   - [x] No active team during Kick-off Events
   - [x] Team is active during team turn
 - [ ] Active Player
-  - [ ] Marked player as active during action
-  - [ ] Marked player as activated after action.
-  - [ ] Can undo starting an action before rolling dice and/or moving
-    - [ ] Move
-    - [ ] Block
-    - [ ] Blitz
-    - [ ] Pass
-    - [ ] Hand-off
+  - [x] Marked player as active during action
+  - [x] Marked player as activated after action.
+  - [x] Can undo starting an action before rolling dice and/or moving
+    - [x] Move
+    - [x] Block
+    - [x] Blitz
+    - [x] Pass
+    - [x] Hand-off
+    - [x] Foul
     - [ ] Throw team-mate
-    - [ ] Foul
 - [x] Stand Up
   - [x] Must stand up doing any action
   - [x] Standing up uses 3 move

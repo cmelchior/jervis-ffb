@@ -124,10 +124,17 @@ fun Player.isOnAwayTeam(): Boolean {
  * to [Availability.UNAVAILABLE] if they are stunned.
  */
 enum class Availability {
-    AVAILABLE, // Are available to be activated in this turn
-    IS_ACTIVE, // Are currently active
-    HAS_ACTIVATED, // Has already activated this turn
-    UNAVAILABLE, // Unavailable for this turn, e.g. because they are stunned.
+    // Player is available to be activated this turn.
+    AVAILABLE,
+    // Player is currently active. Note, while this mirrors the "Activated"
+    // state in the rulebook, we still allow players to go out of it again as
+    // long as they haven't moved or rolled dice.
+    IS_ACTIVE,
+    // Player has already activated this turn.
+    HAS_ACTIVATED,
+    // Player is unavailable to activate this turn, e.g. because they are
+    // stunned.
+    UNAVAILABLE,
 }
 
 class Player(

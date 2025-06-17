@@ -65,15 +65,12 @@ be on the receiving side.
 
 ### Page 42 - Player Activations and Actions
 
-From the rules, it is unclear how "Activatations" and "Actions" are the same
-thing or two different things. It gets especially confusing when you mix
-negatraits into the picture 
+From the rules, it is unclear if "Activations" and "Actions" are the same
+or two different things. It gets especially confusing when you mix nega-traits 
+into the picture, as it becomes unclear when you regain tackle zones after
+failing a nega-trait.
 
-From the rules, it is unclear if "Activation" and "Action" are two different
-concepts or one. This is e.g. relevant for the interaction between negatraits
-and regaining tackle zones (which again impact skills like Pro).
-
-The first question to answer if is the activation lifecycle looks like this:
+The first question to answer is if the activation lifecycle looks like this:
 
 ```
 -> Start Activation
@@ -83,7 +80,7 @@ The first question to answer if is the activation lifecycle looks like this:
 -> End Activation
 ```
 
-vs. 
+or this: 
 
 ```
 -> Select Action (which activates the player)
@@ -96,24 +93,24 @@ the action". Which can be read both ways.
 
 But Bone Head says "When this player is activated, ..., immediately
 after declaring the action". This indicate that the first interpretation is
-the correct one. This reading is also the one that allow players with Bone
+the correct one. This reading is also the one that allows players with Bone
 Head to use Pro to reroll Bone Head after having failed in the previous 
 turn, which seems to be the accepted convention. See 
 https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=32167&postdays=0&postorder=asc&start=0
 for a discussion on this.
 
 So Jervis has adopted the first interpretation. This also has the advantage
-that it creates specific lifecycles for new special rules to hook into.
+that it creates specific lifecycles for (new) special rules to hook into.
 
 Note, this interpretation means that activating players go through the following
 steps:
 
 1. Select Player (mostly a UI concept).
 2. Mark them as active. If standing, they now regain their tackle zones.
-3. Declare an action. For some actions like Blitz or Foul this requires
+3. Declare an action. For some actions like Blitz or Foul, this requires
    selecting a target.
 4. Roll for all Nega-traits in order, stop at the first failure (no player
-   normally has multiple of these).
+   normally has multiple of these). If failed, go directly to "End Action".
    a. Bone Head: If failed, loose tackle zones, mark action as used and move to 
       "End Action" immediately.
    b. Really Stupid: If failed, loose tackle zones, mark action as used and move
