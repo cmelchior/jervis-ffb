@@ -2,7 +2,10 @@ package com.jervisffb.ui.game.icons
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import com.jervisffb.engine.actions.BlockDice
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Direction.Companion.BOTTOM
@@ -60,11 +63,6 @@ import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_reso
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_turn_dice_status_blue
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_turn_dice_status_red
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_box_button
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_1
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_2
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_3_4
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_5
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_dice_new_skool_black_6
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_blue_modified
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_red_modified
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_turn_button
@@ -87,6 +85,7 @@ import io.ktor.http.isSuccess
 import okio.internal.commonToUtf8String
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.decodeToSvgPainter
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.skia.Image
 
@@ -121,6 +120,8 @@ object IconFactory {
     private val cachedPortraits: MutableMap<PlayerId, ImageBitmap> = mutableMapOf()
     private val cachedLargeLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
     private val cachedSmallLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
+    private val cachedImageData: MutableMap<String, ByteArray> = mutableMapOf()
+
     // FUMBBL Mappings
     private val fumbblCache = mutableMapOf<String, Url>()
 
@@ -154,6 +155,7 @@ object IconFactory {
         FieldDetails.entries.forEach {
             saveFileIntoCache(it.resource)
         }
+        initializeDiceMappings()
         saveTeamPlayerImagesToCache(homeTeam)
         saveTeamPlayerImagesToCache(awayTeam)
         return true
@@ -185,8 +187,8 @@ object IconFactory {
                 val image = Res.loadFileAsImage(path)
                 cachedImages[path] = image
                 return image
-            } catch (ex: NullPointerException) {
-                throw IllegalStateException("Could not find $path")
+            } catch (ex: Exception) {
+                throw IllegalStateException("Problems loading: $path", ex)
             }
         }
     }
@@ -266,6 +268,21 @@ object IconFactory {
         return loadImageFromNetwork(url, true)
     }
 
+    private suspend fun initializeDiceMappings() {
+        val icons = listOf(
+
+            "fumbbl/icons/icon_blockdice_bothdown.svg",
+            "fumbbl/icons/icon_blockdice_playerdown.svg",
+            "fumbbl/icons/icon_blockdice_pow.svg",
+            "fumbbl/icons/icon_blockdice_push.svg",
+            "fumbbl/icons/icon_blockdice_stumble.svg",
+        )
+        icons.forEach {
+            val bytes = Res.readBytes("files/$it")
+            cachedImageData[it] = bytes
+        }
+    }
+
     private suspend fun saveTeamPlayerImagesToCache(team: Team) {
         team.forEach { player ->
             val playerSprite = createPlayerSprite(player, player.isOnHomeTeam())
@@ -298,15 +315,16 @@ object IconFactory {
     }
 
     @Composable
-    fun getDiceIcon(die: BlockDice): ImageBitmap {
-        val res = when (die) {
-            BlockDice.PLAYER_DOWN -> Res.drawable.icons_sidebar_dice_new_skool_black_1
-            BlockDice.BOTH_DOWN -> Res.drawable.icons_sidebar_dice_new_skool_black_2
-            BlockDice.PUSH_BACK -> Res.drawable.icons_sidebar_dice_new_skool_black_3_4
-            BlockDice.STUMBLE -> Res.drawable.icons_sidebar_dice_new_skool_black_5
-            BlockDice.POW -> Res.drawable.icons_sidebar_dice_new_skool_black_6
+    fun getDiceIcon(die: BlockDice): Painter {
+        val density = LocalDensity.current
+        val key = when (die) {
+            BlockDice.PLAYER_DOWN -> "fumbbl/icons/icon_blockdice_playerdown.svg"
+            BlockDice.BOTH_DOWN -> "fumbbl/icons/icon_blockdice_bothdown.svg"
+            BlockDice.PUSH_BACK -> "fumbbl/icons/icon_blockdice_push.svg"
+            BlockDice.STUMBLE -> "fumbbl/icons/icon_blockdice_stumble.svg"
+            BlockDice.POW -> "fumbbl/icons/icon_blockdice_pow.svg"
         }
-        return imageResource(res)
+        return cachedImageData[key]?.decodeToSvgPainter(density) ?: error("Could not find: $key")
     }
 
     @Composable
