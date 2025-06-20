@@ -66,6 +66,8 @@ object JervisTheme {
     val rulebookPaper = Color(0xFFf5e3ce)
     val rulebookDisabled = Color.Gray
 
+    val diceBackground = Color(0xFF222222)
+
 //    val fumbblBlue = Color(0xFF0093d8)
 //    val fumbblRed = Color(0xFFe10525)
 //    val fumbblViolet = Color(0xFF593F62)
