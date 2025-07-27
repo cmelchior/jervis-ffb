@@ -210,7 +210,7 @@ rule book.
     - [x] Hand-off
     - [x] Foul
     - [ ] Throw team-mate
-- [x] Stand Up
+- [ ] Stand Up
   - [x] Must stand up doing any action
   - [x] Standing up uses 3 move
   - [x] Standup with less than 3 strength requires a roll and use all move.
@@ -237,7 +237,7 @@ rule book.
   - [x] Move before Roll
   - [x] Failure: Fall Over in target square
   - [x] Can reroll
-- [x] Jump Sub-action
+- [ ] Jump Sub-action
   - [x] Can only jump over prone/stunned player
   - [x] Jump over stunned/prone player from both teams
   - [x] Must use two move to reach target square. If not enough move left (including rush), no jump is allowed.
