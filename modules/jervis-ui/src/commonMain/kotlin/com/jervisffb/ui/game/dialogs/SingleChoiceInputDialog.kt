@@ -2,7 +2,6 @@ package com.jervisffb.ui.game.dialogs
 
 import androidx.compose.ui.text.font.FontVariation.width
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Cancel

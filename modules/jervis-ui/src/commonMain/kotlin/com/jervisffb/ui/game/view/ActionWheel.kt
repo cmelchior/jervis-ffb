@@ -80,12 +80,12 @@ import com.jervisffb.engine.model.Coin
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_brush_chalk
 import com.jervisffb.ui.game.dialogs.circle.ActionMenuItem
+import com.jervisffb.ui.game.dialogs.circle.ActionWheelMenuController
+import com.jervisffb.ui.game.dialogs.circle.ActionWheelMenuItem
 import com.jervisffb.ui.game.dialogs.circle.ActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.circle.ButtonLayoutMode
 import com.jervisffb.ui.game.dialogs.circle.CoinMenuItem
 import com.jervisffb.ui.game.dialogs.circle.DiceMenuItem
-import com.jervisffb.ui.game.dialogs.circle.ActionWheelMenuController
-import com.jervisffb.ui.game.dialogs.circle.ActionWheelMenuItem
 import com.jervisffb.ui.game.dialogs.circle.TopLevelMenuItem
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.icons.IconFactory
