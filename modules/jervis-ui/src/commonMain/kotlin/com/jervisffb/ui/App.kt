@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
-import com.jervisffb.ui.game.icons.IconFactory.initializeFumbblMapping
+import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.game.viewmodel.Setups
@@ -44,7 +44,7 @@ suspend fun initApplication() {
 
     // Populate FUMMBL image mapping, so `IconFactory` knows where to download
     // images from.
-    initializeFumbblMapping()
+    IconFactory.initializeFumbblMapping()
 
     // Initialize setup cache
     Setups.initialize()

@@ -1,12 +1,21 @@
 package com.jervisffb.ui.game.icons
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
-import com.jervisffb.engine.actions.BlockDice
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import com.jervisffb.engine.actions.D12Result
+import com.jervisffb.engine.actions.D16Result
+import com.jervisffb.engine.actions.D20Result
+import com.jervisffb.engine.actions.D3Result
+import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.actions.DBlockResult
+import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Direction.Companion.BOTTOM
 import com.jervisffb.engine.model.Direction.Companion.BOTTOM_LEFT
@@ -69,9 +78,10 @@ import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_turn_button
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.viewmodel.FieldDetails
-import com.jervisffb.ui.getSubImage
 import com.jervisffb.ui.loadFileAsImage
 import com.jervisffb.ui.loadImage
+import com.jervisffb.ui.utils.getSubImage
+import com.jervisffb.ui.utils.scalePixels
 import com.jervisffb.utils.canBeHost
 import com.jervisffb.utils.getHttpClient
 import io.ktor.client.request.accept
@@ -85,9 +95,50 @@ import io.ktor.http.isSuccess
 import okio.internal.commonToUtf8String
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.decodeToSvgPainter
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.skia.Image
+
+enum class DiceColor {
+    DEFAULT,
+    BROWN,
+    WHITE,
+    RED,
+    BLUE,
+    YELLOW,
+    BLACK
+}
+
+/**
+ * Enumerates the various types of actions that can appear on the Circular
+ * Action Bar.
+ */
+enum class ActionIcon(val path: String) {
+
+    // Generic actions
+    CANCEL("jervis/actions/jervis_action_cancel.png"),
+    CONFIRM("jervis/actions/jervis_action_confirm.png"),
+
+    // Developer Actions
+    ROLL_DICE("jervis/actions/jervis_action_roll_dice.png"),
+    TEAM_REROLL("jervis/actions/jervis_action_team_reroll.png"),
+
+
+    // Player Actions
+    MOVE("jervis/actions/jervis_action_move.png"),
+    BLOCK("jervis/actions/jervis_action_block.png"),
+    BLITZ("jervis/actions/jervis_action_blitz.png"),
+    FOUL("jervis/actions/jervis_action_foul.png"),
+    PASS("jervis/actions/jervis_action_pass.png"),
+    HANDOFF("jervis/actions/jervis_action_handoff.png"),
+    // THROW_TEAM_MATE()
+
+    // Move Actions
+    JUMP("jervis/actions/jervis_action_jump.png"),
+    // LEAP()
+
+    // Special Actions
+}
+
 
 /**
  * Logo size options for the team/roster logos.
@@ -114,13 +165,24 @@ data class PlayerSprite(
  * resources.
  */
 object IconFactory {
+
+    // Many of the assets are pixel-art, where we want to preserve as much or the
+    // blockiness as possible. Use the scale factor to adjust the size of images
+    // so they are close to the intended usage size. This will remove interpolation
+    // artifacts for smaller adjustments to the size.
+    val scaleFactor
+        get() = density.density.toInt()
+    private lateinit var density: Density
+
     private val cachedPlayers: MutableMap<Player, PlayerSprite> = mutableMapOf()
     // Map from resource "path" to loaded in-memory image
     private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
     private val cachedPortraits: MutableMap<PlayerId, ImageBitmap> = mutableMapOf()
     private val cachedLargeLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
     private val cachedSmallLogos: MutableMap<TeamId, ImageBitmap> = mutableMapOf()
-    private val cachedImageData: MutableMap<String, ByteArray> = mutableMapOf()
+    private val cachedDice: MutableMap<DiceColor, MutableMap<DieResult, ImageBitmap>> = mutableMapOf()
+    private val cachedCoin: MutableMap<Coin, ImageBitmap> = mutableMapOf()
+    private val cachedActionIcons: MutableMap<ActionIcon, ImageBitmap> = mutableMapOf()
 
     // FUMBBL Mappings
     private val fumbblCache = mutableMapOf<String, Url>()
@@ -151,11 +213,13 @@ object IconFactory {
     // loading images in the middle of a Composable function quite a nightmare.
     // Instead, we preload all dynamic resources up front. This will probably result in slightly
     // higher memory usage, but it will probably not be problematic.
-    suspend fun initialize(homeTeam: Team, awayTeam: Team): Boolean {
+    suspend fun initialize(density: Density, homeTeam: Team, awayTeam: Team): Boolean {
+        this.density = density
         FieldDetails.entries.forEach {
             saveFileIntoCache(it.resource)
         }
-        initializeDiceMappings()
+        initializeDiceMappings(scaleFactor)
+        initializeGameActionIcons(scaleFactor)
         saveTeamPlayerImagesToCache(homeTeam)
         saveTeamPlayerImagesToCache(awayTeam)
         return true
@@ -170,7 +234,6 @@ object IconFactory {
         val image = Res.loadFileAsImage(path)
         cachedImages[path] = image
     }
-
 
     private fun loadImageFromCache(path: String): ImageBitmap {
         return cachedImages[path] ?: error("Could not find: $path")
@@ -268,18 +331,86 @@ object IconFactory {
         return loadImageFromNetwork(url, true)
     }
 
-    private suspend fun initializeDiceMappings() {
-        val icons = listOf(
+    private suspend fun initializeDiceMappings(scaleFactor: Int) {
+        DiceColor.entries.forEach {
+            cachedDice[it] = mutableMapOf()
+        }
 
-            "fumbbl/icons/icon_blockdice_bothdown.svg",
-            "fumbbl/icons/icon_blockdice_playerdown.svg",
-            "fumbbl/icons/icon_blockdice_pow.svg",
-            "fumbbl/icons/icon_blockdice_push.svg",
-            "fumbbl/icons/icon_blockdice_stumble.svg",
+        // Block Dice
+        DBlockResult.allOptions().forEach {
+            val die = it.blockResult
+            val typeAsFileName = die.name.lowercase().replace("_", "")
+            val path = "jervis/dice/jervis_dblock_black_$typeAsFileName.png"
+            cachedDice[DiceColor.DEFAULT]!![it] = loadImageFromResources(path).scalePixels(scaleFactor)
+        }
+
+        val d6sColors = listOf(
+            DiceColor.BROWN to true,
+            DiceColor.WHITE to false,
+            DiceColor.RED to false,
+            DiceColor.BLUE to false,
+            DiceColor.YELLOW to false,
+            DiceColor.BLACK to false,
         )
-        icons.forEach {
-            val bytes = Res.readBytes("files/$it")
-            cachedImageData[it] = bytes
+
+        // D3 (Use D6 images for now)
+        d6sColors.forEach { (color, isDefault) ->
+            D3Result.allOptions().forEach {
+                val image = loadImageFromResources("jervis/dice/jervis_d6_${color.name.lowercase()}_${it.value}.png").scalePixels(scaleFactor)
+                cachedDice[color]!![it] = image
+                if (isDefault) {
+                    cachedDice[DiceColor.DEFAULT]!![it] = image
+                }
+            }
+        }
+
+        d6sColors.forEach { (color, isDefault) ->
+            D6Result.allOptions().forEach {
+                val image = loadImageFromResources("jervis/dice/jervis_d6_${color.name.lowercase()}_${it.value}.png").scalePixels(scaleFactor)
+                cachedDice[color]!![it] = image
+                if (isDefault) {
+                    cachedDice[DiceColor.DEFAULT]!![it] = image
+                }
+            }
+        }
+
+        // D8
+        D8Result.allOptions().forEach {
+            val image = loadImageFromResources("jervis/dice/jervis_d8_purple_${it.value}.png").scalePixels(scaleFactor)
+            cachedDice[DiceColor.DEFAULT]!![it] = image
+        }
+
+        // D12
+        D12Result.allOptions().forEach {
+            val image = loadImageFromResources("jervis/dice/jervis_d20_green_${it.value}.png").scalePixels(scaleFactor)
+            cachedDice[DiceColor.DEFAULT]!![it] = image
+        }
+
+        // D16
+        D16Result.allOptions().forEach {
+            val image = loadImageFromResources("jervis/dice/jervis_d20_green_${it.value}.png").scalePixels(scaleFactor)
+            cachedDice[DiceColor.DEFAULT]!![it] = image
+        }
+
+        // D20
+        D20Result.allOptions().forEach {
+            val image = loadImageFromResources("jervis/dice/jervis_d20_green_${it.value}.png").scalePixels(scaleFactor)
+            cachedDice[DiceColor.DEFAULT]!![it] = image
+        }
+
+
+        // Coins
+        Coin.entries.forEach {
+            val image = loadImageFromResources("jervis/dice/jervis_coin_${it.name.lowercase()}.png")
+            cachedCoin[it] = image.scalePixels(IconFactory.scaleFactor)
+        }
+    }
+
+    private suspend fun initializeGameActionIcons(scaleFactor: Int) {
+        ActionIcon.entries.forEach {
+            val resource = it.path
+            val image = loadImageFromResources(resource, cache = false).scalePixels(scaleFactor)
+            cachedActionIcons[it] = image
         }
     }
 
@@ -314,17 +445,45 @@ object IconFactory {
         }
     }
 
+    /**
+     * Returns size of dice image for the current dice type in [androidx.compose.ui.unit.Dp].
+     */
+    fun getDiceSizeDp(die: DieResult): DpSize {
+        val image = cachedDice[DiceColor.DEFAULT]?.get(die) ?: error("Could not find: $die")
+        return DpSize(
+            (image.width / density.density).dp,
+            (image.height / density.density).dp
+        )
+    }
+
+    /**
+     * Returns size of dice image for the current dice type in pixels
+     */
+    fun getDiceSizePx(die: DieResult): Size {
+        val image = cachedDice[DiceColor.DEFAULT]?.get(die) ?: error("Could not find: $die")
+        return Size(image.width.toFloat(), image.height.toFloat())
+    }
+
     @Composable
-    fun getDiceIcon(die: BlockDice): Painter {
-        val density = LocalDensity.current
-        val key = when (die) {
-            BlockDice.PLAYER_DOWN -> "fumbbl/icons/icon_blockdice_playerdown.svg"
-            BlockDice.BOTH_DOWN -> "fumbbl/icons/icon_blockdice_bothdown.svg"
-            BlockDice.PUSH_BACK -> "fumbbl/icons/icon_blockdice_push.svg"
-            BlockDice.STUMBLE -> "fumbbl/icons/icon_blockdice_stumble.svg"
-            BlockDice.POW -> "fumbbl/icons/icon_blockdice_pow.svg"
-        }
-        return cachedImageData[key]?.decodeToSvgPainter(density) ?: error("Could not find: $key")
+    fun getDiceIcon(die: DieResult, color: DiceColor = DiceColor.DEFAULT): ImageBitmap {
+        return cachedDice[color]?.get(die) ?: error("Could not find die: $die [$color]")
+    }
+
+    @Composable
+    fun getCoinIcon(coin: Coin): ImageBitmap {
+        return cachedCoin[coin] ?: error("Could not find coin: $coin")
+    }
+
+    fun getCoinSizeDp(coin: Coin): DpSize {
+        val image = cachedCoin[coin] ?: error("Could not find coin: $coin")
+        return DpSize(
+            (image.width / density.density).dp,
+            (image.height / density.density).dp
+        )
+    }
+
+    fun getActionIcon(action: ActionIcon): ImageBitmap {
+        return cachedActionIcons[action] ?: error("Could not find action: $action")
     }
 
     @Composable

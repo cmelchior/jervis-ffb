@@ -112,9 +112,9 @@ class GameScreenModel(
     /**
      * Initialize game icons and other assets.
      */
-    suspend fun initialize() {
+    suspend fun initialize(density: Density) {
         _loadingMessages.value = "Initializing icons"
-        IconFactory.initialize(homeTeam, awayTeam)
+        IconFactory.initialize(density, homeTeam, awayTeam)
         _loadingMessages.value = "Initializing sounds"
         SoundManager.initialize()
         uiState = UiGameController(

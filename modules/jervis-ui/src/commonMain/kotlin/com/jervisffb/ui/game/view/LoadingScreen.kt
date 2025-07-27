@@ -63,8 +63,9 @@ fun LoadingScreen(
     var showGameScreen by remember { mutableStateOf(false) }
 
     if (isReadyToStart) {
+        val density = LocalDensity.current
         LaunchedEffect(Unit) {
-            viewModel.initialize()
+            viewModel.initialize(density)
         }
     }
     LaunchedEffect(Unit) {
