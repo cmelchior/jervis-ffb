@@ -1,6 +1,9 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.ext.d3
+import com.jervisffb.engine.ext.d6
+import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Direction
@@ -120,6 +123,9 @@ data class D3Result(override val value: Int) : DieResult() {
     override val max: Short = 3
 
     companion object {
+        fun random(random: Random = Random): D3Result {
+            return random.nextInt(1, 3).d3
+        }
         fun allOptions(): List<D3Result> {
             return (1..3).map { D3Result(it) }
         }
@@ -151,6 +157,9 @@ data class D6Result(override val value: Int) : DieResult() {
         fun allOptions(): List<D6Result> {
             return (1..6).map { D6Result(it) }
         }
+        fun random(random: Random = Random): D6Result {
+            return random.nextInt(1, 7).d6
+        }
     }
 }
 
@@ -164,6 +173,9 @@ data class D8Result(override val value: Int) : DieResult() {
     companion object {
         fun allOptions(): List<D8Result> {
             return (1..8).map { D8Result(it) }
+        }
+        fun random(random: Random = Random): D8Result {
+            return random.nextInt(1, 8).d8
         }
     }
 }
@@ -346,7 +358,7 @@ sealed class DieResult : Number(), GameAction {
     abstract val max: Short
 
     init {
-        if (value < min || value > max) {
+        if (value !in min..max) {
             throw IllegalArgumentException("Result outside range: $min <= $value <= $max")
         }
     }
