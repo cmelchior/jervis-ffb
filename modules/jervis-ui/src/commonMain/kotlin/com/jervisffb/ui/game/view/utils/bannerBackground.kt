@@ -2,6 +2,7 @@ package com.jervisffb.ui.game.view.utils
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -12,7 +13,7 @@ import com.jervisffb.ui.game.view.JervisTheme
  * Background that creates a Banner-like effect. The banner ends in a point,
  * and it has a colored border.
  */
-fun Modifier.bannerBackground(): Modifier {
+fun Modifier.bannerBackground(bannerColor: Color = JervisTheme.rulebookRed): Modifier {
     return this.drawBehind {
         val width = size.width
         val height = size.height
@@ -30,7 +31,7 @@ fun Modifier.bannerBackground(): Modifier {
         }
 
         // Draw the banner
-        drawPath(path, JervisTheme.rulebookRed)
+        drawPath(path, bannerColor)
 
         // Draw the border
         val borderPath = Path().apply {
