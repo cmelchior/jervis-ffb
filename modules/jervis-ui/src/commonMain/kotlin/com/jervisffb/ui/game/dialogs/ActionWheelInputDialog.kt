@@ -138,6 +138,17 @@ class ActionWheelInputDialog(
         }
 
         fun createKickOffEventDialog(provider: UiActionProvider, rules: Rules, team: Team): UserInputDialog {
+
+            fun getResultLabel(firstD6: D6Result, secondD6: D6Result): String {
+                val rolls = listOf(firstD6, secondD6)
+                val description: String =
+                    rules.kickOffEventTable.roll(
+                        rolls.first(),
+                        rolls.last(),
+                    ).description
+                return "$description (${rolls.sumOf { it.value }})"
+            }
+
             val currentBall = team.game.singleBall()
             val center = when (currentBall.location.isOnField(rules)) {
                 true -> currentBall.location
@@ -150,15 +161,6 @@ class ActionWheelInputDialog(
                 fallbackToShowStartHoverText = false,
             ).also { wheelModel ->
                 val labelGenerator = {
-                    val dice1 = wheelModel.topMenu.getDiceButton(0).value
-                    val dice2 = wheelModel.topMenu.getDiceButton(1).value
-                    val rolls = listOf(dice1, dice2)
-                    val description: String =
-                        rules.kickOffEventTable.roll(
-                            rolls.first() as D6Result,
-                            rolls.last() as D6Result,
-                        ).description
-                    "$description (${rolls.sumOf { it.value }})"
                 }
                 wheelModel.topMenu.let { menu ->
                     menu.addDiceButton(
@@ -168,20 +170,30 @@ class ActionWheelInputDialog(
                         preferLtr = true,
                         expandable = true,
                         animatingFrom = D6Result.random(),
-                        onHover = { wheelModel.hoverText.value = labelGenerator() }
+                        onHover = { d6 ->
+                            val dice2 = wheelModel.topMenu.getDiceButton(1).value as D6Result
+                            wheelModel.hoverText.value = d6?.let {getResultLabel(it, dice2) }
+                        }
                     )
                     menu.addDiceButton(
                         id = DieId("Kickoff-D6-2"),
                         diceValue = D6Result.random(),
                         options = D6Result.allOptions(),
-                        preferLtr = true,
+                        preferLtr = false,
                         expandable = true,
                         animatingFrom = D6Result.random(),
-                        onHover = { wheelModel.hoverText.value = labelGenerator() }
+                        onHover = { d6 ->
+                            val dice1 = wheelModel.topMenu.getDiceButton(0).value as D6Result
+                            wheelModel.hoverText.value = d6?.let {getResultLabel(dice1, it) }
+                        }
                     )
                 }
                 wheelModel.bottomMenu.addActionButton(
-                    label = labelGenerator,
+                    label = {
+                        val dice1 = wheelModel.topMenu.getDiceButton(0).value as D6Result
+                        val dice2 = wheelModel.topMenu.getDiceButton(1).value as D6Result
+                        getResultLabel(dice1, dice2)
+                    },
                     icon = ActionIcon.CONFIRM,
                     enabled = true,
                     onClick = { parent, button ->
