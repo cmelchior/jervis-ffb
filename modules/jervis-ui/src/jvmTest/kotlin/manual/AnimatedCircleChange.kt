@@ -87,11 +87,9 @@ import com.jervisffb.jervis_ui.generated.resources.jervis_brush_chalk
 import com.jervisffb.ui.createDefaultAwayTeam
 import com.jervisffb.ui.createDefaultHomeTeam
 import com.jervisffb.ui.debugBorder
-import com.jervisffb.ui.dropShadow
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.ActionButton
-import com.jervisffb.ui.game.view.ExpandableDiceSelector
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.utils.applyIf
@@ -101,9 +99,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
 import org.junit.Test
-import sun.java2d.loops.ProcessPath.drawPath
-import java.awt.SystemColor.text
-import java.util.Collections.rotate
 import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.hypot

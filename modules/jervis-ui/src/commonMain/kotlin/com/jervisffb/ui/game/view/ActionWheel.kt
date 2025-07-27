@@ -495,12 +495,8 @@ private fun MenuItemButton(
                     item.label(),
                     item.icon,
                     enabled = true,
-                    onHover = {
-                        onHover(it)
-                    },
-                    onClick = {
-                        onItemSelected(item)
-                    }
+                    onHover = {onHover(it) },
+                    onClick = { onItemSelected(item) }
                 )
             }
             is DiceMenuItem<*> -> {
@@ -509,9 +505,6 @@ private fun MenuItemButton(
                     disabled = !item.enabled,
                     onExpandedChanged = onExpandChanged,
                     onHover = item.onHover as (DieResult?) -> Unit,
-                    onAnimationDone = {
-
-                    }
                 )
             }
 
@@ -519,9 +512,6 @@ private fun MenuItemButton(
                 CoinButton(
                     coin = item,
                     disabled = false,
-                    onAnimationDone = {
-
-                    }
                 )
             }
         }
