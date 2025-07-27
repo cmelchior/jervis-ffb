@@ -17,15 +17,16 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.JervisDialog
 import com.jervisffb.ui.menu.intro.CreditData
+import com.jervisffb.ui.menu.utils.JervisLogo
 import com.jervisffb.utils.openUrlInBrowser
 
 /**
@@ -46,18 +47,8 @@ fun AboutDialogComponent(viewModel: MenuViewModel) {
     if (!showDialog) return
     JervisDialog(
         title = "About Jervis Fantasy Football",
-        icon = {
-            Text(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                text = "J",
-                fontFamily = JervisTheme.fontFamily(),
-                color = JervisTheme.white,
-                textAlign = TextAlign.Center,
-                fontSize = 100.sp,
-                fontWeight = FontWeight.Bold,
-            )
-        },
-        width = 850.dp,
+        icon = { JervisLogo() },
+        width = DialogSize.MEDIUM,
         content = { _, _ ->
             CreditDialogContent(
                 dialogColor,

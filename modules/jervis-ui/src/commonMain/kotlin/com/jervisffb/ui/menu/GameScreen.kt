@@ -25,6 +25,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
 import com.jervisffb.ui.game.view.LoadingScreen
@@ -40,6 +41,7 @@ import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import com.jervisffb.ui.menu.components.JervisDialog
+import com.jervisffb.ui.menu.utils.JervisLogo
 import com.jervisffb.ui.utils.saveFile
 
 class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenModel) : Screen {
@@ -123,18 +125,11 @@ fun ExitDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> Unit
     }
     JervisDialog(
         title = "Exit Game?",
-        icon = {
-            Text(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                text = "J",
-                fontFamily = JervisTheme.fontFamily(),
-                color = JervisTheme.white,
-                textAlign = TextAlign.Center,
-                fontSize = 100.sp,
-                fontWeight = FontWeight.Bold,
-            )
-        },
-        width = 650.dp,
+        icon = { JervisLogo() },
+        width = DialogSize.MEDIUM,
+        draggable = true,
+        centerOnField = viewModel,
+        backgroundScrim = true,
         content = { textFieldColors, textColor ->
             Box(
                 modifier = Modifier.weight(1f).padding(top = 8.dp, bottom = 24.dp),
