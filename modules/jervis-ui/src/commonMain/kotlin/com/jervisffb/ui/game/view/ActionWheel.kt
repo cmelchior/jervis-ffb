@@ -1100,7 +1100,6 @@ fun <T : DieResult> ExpandableDiceSelector(
                                     if (!expanded) {
                                         expanded = true
                                     } else {
-                                        // selectedIndex = index
                                         expanded = false
                                         die.valueSelected(die.diceList[index])
                                     }
@@ -1295,12 +1294,12 @@ private fun DiceButton(
                     onPointerEvent(PointerEventType.Enter) {
                         onHover(value)
                     }
-                        .onPointerEvent(PointerEventType.Exit) {
-                            onHover(null)
-                        }
-                        .onPointerEvent(PointerEventType.Press) {
-                            onClick()
-                        }
+                    .onPointerEvent(PointerEventType.Exit) {
+                        onHover(null)
+                    }
+                    .onPointerEvent(PointerEventType.Press) {
+                        onClick()
+                    }
                 }
             ,
             contentScale = ContentScale.Fit,

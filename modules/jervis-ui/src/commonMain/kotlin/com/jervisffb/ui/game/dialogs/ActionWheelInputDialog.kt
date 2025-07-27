@@ -17,7 +17,7 @@ import com.jervisffb.ui.game.state.UiActionProvider
 
 /**
  * Class wrapping the intent to show an action wheel on the field. [viewModel]
- * contains all the menu state.
+ * contains all the menu states.
  */
 class ActionWheelInputDialog(
     override var owner: Team?,
@@ -63,6 +63,23 @@ class ActionWheelInputDialog(
             request: ActionRequest,
             isKickOff: Boolean = true
         ): UserInputDialog {
+
+            fun getResultLabel(d6: D6Result, d8: D8Result): String {
+                val description =
+                    when (val direction = state.rules.direction(d8)) {
+                        Direction(-1, -1) -> "↖"
+                        Direction(0, -1) -> "↑"
+                        Direction(1, -1) -> "↗"
+                        Direction(-1, 0) -> "←"
+                        Direction(1, 0) -> "→"
+                        Direction(-1, 1) -> "↙"
+                        Direction(0, 1) -> "↓"
+                        Direction(1, 1) -> "↘"
+                        else -> TODO("Not supported: $direction")
+                    }
+                return "Deviate: ${d6.value}$description"
+            }
+
             val team = request.team ?: state.homeTeam
             val viewModel = ActionWheelViewModel(
                 team = team,
@@ -70,6 +87,9 @@ class ActionWheelInputDialog(
                 startHoverText = "Deviate Ball",
                 fallbackToShowStartHoverText = false,
             ).also { wheelModel ->
+                val labelGenerator = {
+
+                }
                 wheelModel.topMenu.let { menu ->
                     menu.addDiceButton(
                         id = DieId("Deviate-D6"),
@@ -78,6 +98,10 @@ class ActionWheelInputDialog(
                         preferLtr = true,
                         expandable = true,
                         animatingFrom = D6Result.random(),
+                        onHover = { d6 ->
+                            val d8 = wheelModel.topMenu.getDiceButton(1).value as D8Result
+                            wheelModel.hoverText.value = d6?.let { getResultLabel(it, d8) }
+                        }
                     )
                     menu.addDiceButton(
                         id = DieId("Deviate-D8"),
@@ -86,43 +110,17 @@ class ActionWheelInputDialog(
                         preferLtr = false,
                         expandable = true,
                         animatingFrom = D8Result.random(),
-                        onHover = {
-                            val desc = if (it == null) {
-                                null
-                            } else {
-                                when (val direction = state.rules.direction(it)) {
-                                    Direction(-1, -1) -> "↖"
-                                    Direction(0, -1) -> "↑"
-                                    Direction(1, -1) -> "↗"
-                                    Direction(-1, 0) -> "←"
-                                    Direction(1, 0) -> "→"
-                                    Direction(-1, 1) -> "↙"
-                                    Direction(0, 1) -> "↓"
-                                    Direction(1, 1) -> "↘"
-                                    else -> null
-                                }
-                            }
-                            wheelModel.hoverText.value = desc
+                        onHover = { d8 ->
+                            val d6 = wheelModel.topMenu.getDiceButton(0).value as D6Result
+                            wheelModel.hoverText.value = d8?.let { getResultLabel(d6, it) }
                         }
                     )
                 }
                 wheelModel.bottomMenu.addActionButton(
                     label = {
-                        val d6 = wheelModel.topMenu.getDiceButton(0).value
-                        val d8 = wheelModel.topMenu.getDiceButton(1).value
-                        val description =
-                            when (val direction = state.rules.direction(d8 as D8Result)) {
-                                Direction(-1, -1) -> "↖"
-                                Direction(0, -1) -> "↑"
-                                Direction(1, -1) -> "↗"
-                                Direction(-1, 0) -> "←"
-                                Direction(1, 0) -> "→"
-                                Direction(-1, 1) -> "↙"
-                                Direction(0, 1) -> "↓"
-                                Direction(1, 1) -> "↘"
-                                else -> TODO("Not supported: $direction")
-                            }
-                        "Deviate Roll: ${d6.value}$description"
+                        val d6 = wheelModel.topMenu.getDiceButton(0).value as D6Result
+                        val d8 = wheelModel.topMenu.getDiceButton(1).value as D8Result
+                        getResultLabel(d6, d8)
                     },
                     icon = ActionIcon.CONFIRM,
                     enabled = true,
