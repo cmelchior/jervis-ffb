@@ -39,7 +39,7 @@ object TestDummy {
         menuViewModel,
     )
     val uiController = UiGameController(TeamActionMode.ALL_TEAMS, controller, actionProvider, menuViewModel, emptyList())
-    val fieldVieModel by lazy { FieldViewModel(uiController, gameModel.hoverPlayerFlow) }
+    val fieldVieModel by lazy { FieldViewModel(gameModel, uiController, gameModel.hoverPlayerFlow) }
     val leftSidebar by lazy {
         SidebarViewModel(
             menuViewModel,

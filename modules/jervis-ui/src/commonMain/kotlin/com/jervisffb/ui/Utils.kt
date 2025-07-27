@@ -5,13 +5,13 @@ import KROXIGOR
 import LIZARDMEN_TEAM
 import SAURUS_BLOCKERS
 import SKINK_RUNNER_LINEMEN
+import androidx.compose.animation.core.Easing
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
@@ -20,8 +20,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
@@ -59,18 +57,6 @@ fun toRadians(deg: Double): Double = deg / 180.0 * PI
 fun String.isDigitsOnly(): Boolean = this.all { it.isDigit() }
 
 /**
- * Convert a pixel value to the corresponding dp value taking the screen
- * density into account.
- *
- * On Retina displays, this will scale the pixels up.
- */
-@Composable
-fun pixelsToDp(px: Float): Dp {
-    val density = LocalDensity.current
-    return with(density) { (this.density * px).toDp() }
-}
-
-/**
  * Convert a Pixel value back to its Dp value
  *
  * This is e.g. used when using LayoutCoordinates to define the size of another
@@ -91,22 +77,6 @@ internal suspend fun Res.loadImage(path: String): ImageBitmap {
 internal suspend fun Res.loadFileAsImage(path: String): ImageBitmap {
     return Image.makeFromEncoded(readBytes("files/$path")).toComposeImageBitmap()
 }
-
-fun ImageBitmap.getSubImage(x: Int, y: Int, width: Int, height: Int): ImageBitmap {
-    val newImageBitmap = ImageBitmap(width, height)
-    val canvas = Canvas(newImageBitmap)
-    canvas.drawImageRect(
-        image = this,
-        srcOffset = IntOffset(x, y),
-        srcSize = IntSize(width, height),
-        dstOffset = IntOffset.Zero,
-        dstSize = IntSize(width, height),
-        paint = Paint() // .apply { colorFilter = ColorFilter.tint(androidx.compose.ui.graphics.Color.Unspecified) },
-    )
-
-    return newImageBitmap
-}
-
 
 fun Modifier.debugBorder(color: Color = Color.Cyan): Modifier = this.border(1.dp, color)
 
@@ -255,4 +225,12 @@ fun createDefaultBB7AwayTeam(rules: Rules): Team {
 fun formatCurrency(value: Int): String {
     val prettyValue = (value/1000).toString().reversed().chunked(3).joinToString(".").reversed()
     return "${prettyValue}K"
+}
+
+/**
+ * Reverse a [Easing] function. Can be used to reverse an animation so it looks
+ * exactly the same going back.
+ */
+fun Easing.reversed() = Easing { t ->
+    1f - this.transform(1f - t)
 }

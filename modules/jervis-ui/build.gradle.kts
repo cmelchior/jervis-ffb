@@ -115,6 +115,7 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
+                implementation("com.adamglin:compose-shadow:2.0.4")
             }
         }
         val commonTest by getting {

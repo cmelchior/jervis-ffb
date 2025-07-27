@@ -164,7 +164,7 @@ open class ManualActionProvider(
         }
 
         if (showActionDecorators) {
-            addDialogDecorators(state, actions)
+            addDialogDecorators(this, state, actions)
 
             // If a dialog is being shown, we do not want to enable any other kind of input until
             // the dialog has been resolved.
@@ -226,10 +226,11 @@ open class ManualActionProvider(
      * to create a [GameAction]. If yes, the data needed to build the dialog is added
      * to the UI state.
      */
-    private fun addDialogDecorators(state: UiGameSnapshot, actions: ActionRequest) {
+    private fun addDialogDecorators(provider: UiActionProvider, state: UiGameSnapshot, actions: ActionRequest) {
         val dialogData = DialogFactory.createDialogIfPossible(
             game,
             actions,
+            provider,
             { actionDescriptors-> mapUnknownAction(actionDescriptors.actions) }
         )
         if (state.dialogInput != null) {

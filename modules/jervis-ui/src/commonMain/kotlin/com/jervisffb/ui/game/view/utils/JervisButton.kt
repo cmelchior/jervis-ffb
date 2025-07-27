@@ -16,13 +16,14 @@ import com.jervisffb.ui.game.view.JervisTheme
 fun JervisButton(
     text: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     fillWidth: Boolean = false,
     buttonColor: Color = JervisTheme.rulebookBlue,
     textColor: Color = JervisTheme.white
 ) {
     Button(
-        modifier = if (fillWidth) Modifier.fillMaxWidth() else Modifier,
+        modifier = if (fillWidth) modifier.fillMaxWidth() else modifier,
         colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor, disabledBackgroundColor = JervisTheme.rulebookPaperMediumDark),
         onClick = onClick,
         enabled = enabled,

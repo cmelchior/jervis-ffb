@@ -72,7 +72,11 @@ fun SelectHotseatTeamScreen(
                 showImportFumbblTeamDialog = !showImportFumbblTeamDialog
             })
             Spacer(modifier = Modifier.weight(1f))
-            JervisButton("Next", onClick = { viewModel.teamSelectionDone() }, enabled = isValidTeamSelection)
+            JervisButton(
+                text = "Next",
+                onClick = { viewModel.teamSelectionDone() },
+                enabled = isValidTeamSelection
+            )
         }
     }
     if (showImportFumbblTeamDialog) {

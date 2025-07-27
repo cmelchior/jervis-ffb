@@ -1,22 +1,30 @@
 package manual
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asSkiaBitmap
-import androidx.compose.ui.unit.dp
-import org.jetbrains.skia.*
-import androidx.compose.ui.window.singleWindowApplication
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.LayoutDirection
-import com.jervisffb.engine.actions.BlockDice
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.singleWindowApplication
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.StandardBB2020Rules
@@ -24,8 +32,14 @@ import com.jervisffb.ui.createDefaultAwayTeam
 import com.jervisffb.ui.createDefaultHomeTeam
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.JervisTheme
-import com.jervisffb.ui.game.view.utils.PixelatedImage
+import com.jervisffb.ui.utils.scalePixels
 import com.jervisffb.utils.runBlocking
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.Rect
+import org.jetbrains.skia.RuntimeEffect
+import org.jetbrains.skia.RuntimeShaderBuilder
+import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.test.Test
 
 class PixelShaderTests() {
@@ -36,6 +50,7 @@ class PixelShaderTests() {
 }
 
 private fun main() = singleWindowApplication {
+    val density = LocalDensity.current
     val rules = StandardBB2020Rules()
     val game = Game(
         rules,
@@ -45,17 +60,51 @@ private fun main() = singleWindowApplication {
     )
     runBlocking {
         IconFactory.initializeFumbblMapping()
-        IconFactory.initialize(game.homeTeam, game.awayTeam)
+        IconFactory.initialize(density, game.homeTeam, game.awayTeam)
     }
     Box(
-        modifier = Modifier.size(100.dp).background(JervisTheme.diceBackground)
+        modifier = Modifier.size(48.dp).background(JervisTheme.diceBackground)
     ) {
-        PixelatedImage(painter = IconFactory.getDiceIcon(BlockDice.PLAYER_DOWN))
+
+//        PixelatedImage(
+//            painter = IconFactory.getDiceIcon(BlockDice.BOTH_DOWN),
+//        )
+//        PixelatedImage(
+//            image = IconFactory.getDiceIcon(BlockDice.BOTH_DOWN),
+//            size = 48.dp,
+//            scaleFactor = 2f
+//        )
+
+//        PixelatedImage(
+////            painter = IconFactory.getDiceIcon(BlockDice.BOTH_DOWN),
+//            painter = painterResource(Res.drawable.jervis_icon_reroll_red), // IconFactory.getDiceIcon(BlockDice.PLAYER_DOWN),
+//            pixelSize = 2f
+//        )
     }
 }
 
 @Composable
-fun PixelatedImage(
+fun PixelImageUsingResize(
+    width: Dp,
+    painter: Painter
+) {
+    Box(modifier = Modifier.graphicsLayer {
+        scaleX = 2f
+        scaleY = 2f
+    }) {
+        Box(modifier = Modifier.size(width/2)) {
+            Image(
+                painter = painter,
+                contentDescription = "",
+                contentScale = ContentScale.Fit ,
+            )
+        }
+    }
+}
+
+
+@Composable
+fun PixelatedImageWithShader(
     modifier: Modifier = Modifier,
     painter: Painter,
     pixelSize: Float = 4f
@@ -70,12 +119,14 @@ fun PixelatedImage(
                 float2 uv = pixelCoord / resolution;
                 return img.eval(uv * resolution);
             }
-        """.trimIndent()
+    """.trimIndent()
 
     val effect = remember { RuntimeEffect.makeForShader(shaderCode) }
     val shaderBuilder = remember(effect) { RuntimeShaderBuilder(effect) }
 
-    BoxWithConstraints {
+    BoxWithConstraints(
+        modifier = modifier
+    ) {
         val width = maxWidth
         val height = maxHeight
         val density = LocalDensity.current
@@ -84,7 +135,8 @@ fun PixelatedImage(
 
         // Render SVG to bitmap at requested size
         val skiaBitmap = remember {
-            val imageBitmap = painter.toImageBitmap(Size(widthPx, heightPx), density, LayoutDirection.Ltr)
+            painter.intrinsicSize
+            val imageBitmap = painter.toImageBitmap(fitInside(painter.intrinsicSize, Size(widthPx, heightPx)), density)
             imageBitmap.asSkiaBitmap()
         }
 
@@ -106,13 +158,61 @@ fun PixelatedImage(
             shaderBuilder.makeShader()
         }
 
-        Canvas(modifier = Modifier.size(width, height)) {
+        Canvas(modifier = Modifier
+        ) {
             drawIntoCanvas { canvas ->
                 val paint = Paint().apply {
                     this.shader = shader
                 }
-                canvas.nativeCanvas.drawRect(Rect.makeXYWH(0f, 0f, widthPx, heightPx), paint)
+                canvas.nativeCanvas.drawRect(Rect.makeXYWH(0f, 0f, skiaBitmap.width.toFloat(), skiaBitmap.height.toFloat()), paint)
             }
         }
     }
 }
+
+
+fun fitInside(
+    original: Size,
+    maxSize: Size
+): Size {
+    val scale = min(
+        maxSize.width / original.width,
+        maxSize.height
+            / original.height
+    )
+    return Size(
+        (original.width  * scale),
+        (original.height * scale)
+    )
+}
+
+@Composable
+fun PixelatedImage(
+    image: Painter,
+    size: Dp,
+    scaleFactor: Float = 4f,
+) {
+    val density = LocalDensity.current
+    val sizePx = with(density) { size.toPx() }
+    val painter = image
+    val img = painter
+        .toImageBitmap(
+            fitInside(painter.intrinsicSize, Size(sizePx/scaleFactor, sizePx/scaleFactor)),
+            density
+        ).scalePixels(2)
+
+    Canvas(modifier = Modifier.size(size, size).background(Color.Transparent)) {
+        val width = (img.width * scaleFactor).roundToInt()
+        val height = (img.height * scaleFactor).roundToInt()
+        drawImage(
+            image = img,
+            dstOffset = IntOffset(
+                ((this.size.width - width)/2f).roundToInt(),
+                (this.size.height - scaleFactor*height/2f).roundToInt()
+            ),
+            dstSize = IntSize(width, height),
+            filterQuality = FilterQuality.None
+        )
+    }
+}
+

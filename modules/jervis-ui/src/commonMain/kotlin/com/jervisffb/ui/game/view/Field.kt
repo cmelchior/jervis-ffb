@@ -101,6 +101,7 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Field(
+    modifier: Modifier,
     vm: FieldViewModel,
 ) {
     val field: FieldDetails by vm.field.collectAsState(FieldDetails.NICE)
@@ -110,7 +111,7 @@ fun Field(
     // TODO For now just center the field and add a black background to hide any rounding errors.
     //  Ideally that should only be a pixel or two.
     BoxWithConstraints(
-        modifier = Modifier.fillMaxWidth().background(color = Color.Black),
+        modifier = modifier.fillMaxWidth().background(color = Color.Black),
         contentAlignment = Alignment.TopCenter,
     ) {
 
@@ -374,7 +375,7 @@ private fun BoxScope.FieldMarkerLayer(
 
 // Most bottom layer (1). This is the background image for the field
 @Composable
-private fun BoxScope.BackgroundImageLayer(field: FieldDetails) {
+fun BoxScope.BackgroundImageLayer(field: FieldDetails) {
     Image(
         painter = BitmapPainter(IconFactory.getField(field)),
         contentDescription = field.description,

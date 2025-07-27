@@ -1,6 +1,9 @@
 package com.jervisffb.ui.game.viewmodel
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
@@ -12,14 +15,17 @@ import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.animations.JervisAnimation
+import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.QueuedActionsResult
+import com.jervisffb.ui.menu.GameScreenModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlin.math.roundToInt
 
 enum class FieldDetails(
     val resource: String,
@@ -41,6 +47,7 @@ enum class FieldDetails(
  * each single square on the field.
  */
 class FieldViewModel(
+    private  val screenModel: GameScreenModel,
     private val uiState: UiGameController,
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
 ) {
@@ -184,7 +191,188 @@ class FieldViewModel(
         offsets[coordinate] = layoutCoords
     }
 
-    fun updateFieldOffSet(layoutCoords: LayoutCoordinates) {
-        fieldOffset = layoutCoords
+    fun updateFieldOffSet(fieldLayoutCoordinates: LayoutCoordinates) {
+        fieldOffset = fieldLayoutCoordinates
+        screenModel.updateFieldViewData(fieldLayoutCoordinates)
     }
 }
+
+data class ActionWheelPlacementData(
+    val showTip: Boolean,
+    val tipRotationDegree: Float,
+    val offset: IntOffset,
+)
+
+enum class TipPosition {
+    Center, Top, Bottom, Left, Right,
+    TopLeft, TopRight, BottomLeft, BottomRight
+}
+
+/**
+ * Helper class making it easier to track the size and position of the field.
+ * We use this to position dialogs in relation to the field (normally in the center).
+ */
+data class FieldViewData(
+    val size: IntSize,
+    val offset: IntOffset,
+    val squaresWidth: Int,
+    val squaresHeight: Int,
+) {
+
+    fun calculateActionWheelPlacement(dialog: ActionWheelInputDialog, fieldVm: FieldViewModel, wheelSizePx: Float, ringSizePx: Float): ActionWheelPlacementData {
+        val squareSizePx = size.width/squaresWidth.toFloat()
+        val ballLocation = dialog.viewModel.center
+        val ballLocationOffsets = fieldVm.offsets[ballLocation]!!
+        val offset = ballLocationOffsets.localToWindow(Offset.Zero)
+
+        // Calculate 9 sections for the placement of the action wheel:
+        val tipPos = chooseTipPosition(
+            focus = offset - Offset(this.offset.x.toFloat(), this.offset.y.toFloat()) + Offset(squareSizePx/2f, squareSizePx/2f),
+            wheelRadius = (wheelSizePx - (wheelSizePx - ringSizePx)*0.75f)/2f,
+            fieldSize = size,
+        )
+
+        return when (tipPos) {
+            TipPosition.Center -> {
+                ActionWheelPlacementData(
+                    showTip = false,
+                    tipRotationDegree = 0f,
+                    offset = IntOffset(
+                        x = (offset.x + ballLocationOffsets.size.width/2f - wheelSizePx/2f).roundToInt(),
+                        y = (offset.y + ballLocationOffsets.size.height/2f - wheelSizePx/2f).roundToInt(),
+                    )
+                )
+            }
+            TipPosition.Top -> {
+                ActionWheelPlacementData(
+                    showTip = true,
+                    tipRotationDegree = 225f,
+                    offset = IntOffset(
+                        x = (offset.x + ballLocationOffsets.size.width/2f - wheelSizePx/2f).roundToInt(),
+                        y = (offset.y + ballLocationOffsets.size.height - wheelSizePx - (squareSizePx*0.75f)).roundToInt(),
+                    )
+                )
+            }
+            TipPosition.Bottom -> {
+                ActionWheelPlacementData(
+                    showTip = true,
+                    tipRotationDegree = 45f,
+                    offset = IntOffset(
+                        x = (offset.x + ballLocationOffsets.size.width/2f - wheelSizePx/2f).roundToInt(),
+                        y = (offset.y + ballLocationOffsets.size.height - (squareSizePx/4)).roundToInt(),
+                    )
+                )
+            }
+            TipPosition.Left -> {
+                ActionWheelPlacementData(
+                    showTip = true,
+                    tipRotationDegree = 135f,
+                    offset = IntOffset(
+                        x = (offset.x + ballLocationOffsets.size.width - wheelSizePx - squareSizePx*0.75).roundToInt(),
+                        y = (offset.y + ballLocationOffsets.size.height - wheelSizePx/2f - squareSizePx/2f).roundToInt(),
+                    )
+                )
+            }
+            TipPosition.Right -> {
+                ActionWheelPlacementData(
+                    showTip = true,
+                    tipRotationDegree = 315f,
+                    offset = IntOffset(
+                        x = (offset.x + ballLocationOffsets.size.width - squareSizePx*0.25).roundToInt(),
+                        y = (offset.y + ballLocationOffsets.size.height - wheelSizePx/2f - squareSizePx/2f).roundToInt(),
+                    )
+                )
+            }
+            TipPosition.TopLeft -> {
+                ActionWheelPlacementData(
+                    showTip = true,
+                    tipRotationDegree = 180f,
+                    offset = IntOffset(
+                        x = (offset.x + ballLocationOffsets.size.width/2f - wheelSizePx + (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                        y = (offset.y + ballLocationOffsets.size.height/2f - wheelSizePx + (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                    )
+                )
+            }
+            TipPosition.TopRight -> {
+                ActionWheelPlacementData(
+                    showTip = true,
+                    tipRotationDegree = 270f,
+                    offset = IntOffset(
+                        x = (offset.x + ballLocationOffsets.size.width/2f - (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                        y = (offset.y + ballLocationOffsets.size.height/2f - wheelSizePx + (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                    )
+                )
+            }
+            TipPosition.BottomLeft -> {
+                ActionWheelPlacementData(
+                    tipRotationDegree = 90f,
+                    showTip = true,
+                    offset = IntOffset(
+                        x = (offset.x + ballLocationOffsets.size.width/2f - wheelSizePx + (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                        y = (offset.y + ballLocationOffsets.size.height/2f - (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                    )
+                )
+            }
+            TipPosition.BottomRight -> {
+                ActionWheelPlacementData(
+                    showTip = true,
+                    tipRotationDegree = 0f,
+                    offset = IntOffset(
+                        x = (offset.x + ballLocationOffsets.size.width/2f - (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                        y = (offset.y + ballLocationOffsets.size.height/2f - (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                    )
+                )
+            }
+        }
+    }
+
+    fun chooseTipPosition(
+        focus: Offset,
+        wheelRadius: Float,
+        fieldSize: IntSize,
+    ): TipPosition {
+        val leftSpace = focus.x
+        val rightSpace = fieldSize.width - focus.x
+        val topSpace = focus.y
+        val bottomSpace = fieldSize.height - focus.y
+
+        val hasCenterRoom = leftSpace >= wheelRadius &&
+            rightSpace >= wheelRadius &&
+            topSpace >= wheelRadius &&
+            bottomSpace >= wheelRadius
+
+        if (hasCenterRoom) return TipPosition.Center
+
+        val verticalCenter = (rightSpace >= wheelRadius && rightSpace >= wheelRadius)
+        val horizontalCenter = (bottomSpace >= wheelRadius && topSpace >= wheelRadius)
+
+        val horizontal = when {
+            rightSpace >= wheelRadius -> TipPosition.Right
+            leftSpace >= wheelRadius -> TipPosition.Left
+            else -> null
+        }
+
+        val vertical = when {
+            bottomSpace >= wheelRadius -> TipPosition.Bottom
+            topSpace >= wheelRadius -> TipPosition.Top
+            else -> null
+        }
+
+        return when {
+            horizontal != null && horizontalCenter -> horizontal
+            vertical != null && verticalCenter -> vertical
+            horizontal != null && vertical != null -> {
+                when {
+                    horizontal == TipPosition.Right && vertical == TipPosition.Bottom -> TipPosition.BottomRight
+                    horizontal == TipPosition.Right && vertical == TipPosition.Top -> TipPosition.TopRight
+                    horizontal == TipPosition.Left && vertical == TipPosition.Bottom -> TipPosition.BottomLeft
+                    horizontal == TipPosition.Left && vertical == TipPosition.Top -> TipPosition.TopLeft
+                    else -> TipPosition.Center // fallback
+                }
+            }
+            else -> error("Unsupported case: ($vertical, $horizontal)")
+        }
+    }
+}
+
+

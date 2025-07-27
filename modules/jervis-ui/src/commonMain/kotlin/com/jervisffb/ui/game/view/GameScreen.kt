@@ -9,22 +9,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
+import com.jervisffb.ui.game.viewmodel.FieldViewData
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
-
+import com.jervisffb.ui.menu.GameScreenModel
 
 @Composable
 fun GameScreen(
+    screenModel: GameScreenModel,
     field: FieldViewModel,
     leftDugout: SidebarViewModel,
     rightDugout: SidebarViewModel,
@@ -35,8 +40,8 @@ fun GameScreen(
     logs: LogViewModel,
     dialogsViewModel: DialogsViewModel,
 ) {
-    Dialogs(dialogsViewModel)
     val aspectRation = (145f+145f+782f)/690f
+    val fieldPositionData: FieldViewData by screenModel.fieldViewData.collectAsState() // remember { mutableStateOf(FieldViewData(IntSize.Zero, IntOffset.Zero)) }
     Row(modifier = Modifier.aspectRatio(aspectRation).fillMaxSize()) {
         Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
             Sidebar(leftDugout, Modifier)
@@ -45,7 +50,12 @@ fun GameScreen(
             modifier = Modifier.weight(782f).align(Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Field(field)
+            Field(
+                modifier = Modifier.onGloballyPositioned {
+                    field.updateFieldOffSet(it)
+                },
+                field
+            )
             GameStatus(gameStatusController, modifier = Modifier.aspectRatio(782f/32f).fillMaxSize())
             // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
             Row(modifier = Modifier.fillMaxSize().background(Color.White)) {
@@ -67,5 +77,6 @@ fun GameScreen(
             Sidebar(rightDugout, Modifier)
         }
     }
+    Dialogs(field, fieldPositionData, dialogsViewModel)
 }
 

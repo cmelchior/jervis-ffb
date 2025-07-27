@@ -14,7 +14,7 @@ import com.jervisffb.ui.App
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.initApplication
 import com.jervisffb.ui.menu.BackNavigationHandler
-import com.jervisffb.ui.pixelsToDp
+import com.jervisffb.ui.utils.pixelsToDp
 import com.jervisffb.utils.runBlocking
 import java.awt.Desktop
 

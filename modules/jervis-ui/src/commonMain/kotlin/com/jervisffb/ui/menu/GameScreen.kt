@@ -3,7 +3,6 @@ package com.jervisffb.ui.menu
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
@@ -14,10 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.screen.Screen
@@ -73,7 +69,7 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
                     GameScreenContent(viewModel)
                 }
                 if (showExitDialog) {
-                    ExitDialogComponent(viewModel, { showExitDialog = false })
+                    ExitGameDialogComponent(viewModel, { showExitDialog = false })
                 }
             }
         }
@@ -83,7 +79,9 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
 @Composable
 private fun GameScreenContent(viewModel: GameScreenModel) {
     com.jervisffb.ui.game.view.GameScreen(
+        viewModel,
         FieldViewModel(
+            viewModel,
             viewModel.uiState,
             viewModel.hoverPlayerFlow,
         ),
@@ -104,14 +102,12 @@ private fun GameScreenContent(viewModel: GameScreenModel) {
         if (viewModel.mode is Random) RandomActionsControllerViewModel(viewModel.uiState, viewModel) else null,
         ActionSelectorViewModel(viewModel.uiState),
         LogViewModel(viewModel.uiState),
-        DialogsViewModel(viewModel.uiState),
+        DialogsViewModel(viewModel, viewModel.uiState),
     )
 }
 
 @Composable
-fun ExitDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> Unit) {
-    val dialogColor = JervisTheme.rulebookRed
-    val textColor = JervisTheme.contentTextColor
+fun ExitGameDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> Unit) {
     val navigator = LocalNavigator.currentOrThrow
     val isHotseat = viewModel.uiState.uiMode == TeamActionMode.ALL_TEAMS
     val isHost = viewModel.uiState.uiMode == TeamActionMode.HOME_TEAM

@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -65,10 +64,9 @@ fun app() {
             onCloseRequest = ::exitApplication,
         ) {
             val density = LocalDensity.current // OR, for example, Density(1f, 1f)
-            val direction = LocalLayoutDirection.current // OR, for example, LayoutDirection.Ltr
             val image = painterResource(Res.drawable.icons_actions_jump)
             val size = image.intrinsicSize
-            ImageShaderExample(image.toImageBitmap(size, density, direction))
+            ImageShaderExample(image.toImageBitmap(size, density))
         }
     }
 
@@ -77,8 +75,8 @@ fun app() {
 fun Painter.toImageBitmap(
     size: Size,
     density: Density,
-    layoutDirection: LayoutDirection,
 ): ImageBitmap {
+    val layoutDirection = LayoutDirection.Ltr
     val bitmap = ImageBitmap(size.width.toInt(), size.height.toInt())
     val canvas = Canvas(bitmap)
     CanvasDrawScope().draw(density, layoutDirection, canvas, size) {

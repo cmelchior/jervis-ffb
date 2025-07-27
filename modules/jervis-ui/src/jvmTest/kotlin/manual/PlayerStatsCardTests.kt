@@ -52,7 +52,7 @@ private fun PlayerStatsContent(
         verticalAlignment = Alignment.Top,
     ) {
         Sidebar(leftDugout, Modifier.weight(152.42f))
-        Field(field)
+        Field(Modifier, field)
         Sidebar(rightDugout, Modifier.weight(152.42f))
     }
 }

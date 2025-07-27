@@ -48,6 +48,7 @@ fun DicePoolSelectorDialog(
     dialog: DicePoolUserInputDialog,
     vm: DialogsViewModel,
 ) {
+    val diceBackground = JervisTheme.diceBackground
     var showDialog by remember(dialog) { mutableStateOf(true) }
     if (showDialog) {
         // TODO Support multiple choices, right now the UI only support one dice pr pool
@@ -73,22 +74,24 @@ fun DicePoolSelectorDialog(
                             val dicePool = el.second
                             dicePool.dice.forEachIndexed { diceIndex, el: DieRoll<*> ->
                                 val isSelected = remember(dialog) { derivedStateOf { selectedRollIndex[poolIndex] == diceIndex } }
-                                val buttonColors =
-                                    ButtonDefaults.buttonColors(
-                                        backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background,
-                                    )
-
                                 when (val diceResult = el.result) {
                                     is DBlockResult -> {
+                                        val buttonColors =
+                                            ButtonDefaults.buttonColors(
+                                                backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else diceBackground,
+                                            )
                                         val text = diceResult.blockResult.name
                                         Button(
-                                            modifier = Modifier.weight(1f).aspectRatio(1.0f),
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .aspectRatio(1.0f)
+                                            ,
                                             onClick = { selectedRollIndex[poolIndex] = diceIndex },
                                             colors = buttonColors,
                                         ) {
                                             Image(
                                                 modifier = Modifier.fillMaxSize(),
-                                                bitmap = IconFactory.getDiceIcon(diceResult.blockResult),
+                                                bitmap = IconFactory.getDiceIcon(diceResult),
                                                 contentDescription = text,
                                                 alignment = Alignment.Center,
                                                 contentScale = ContentScale.Fit
@@ -96,6 +99,10 @@ fun DicePoolSelectorDialog(
                                         }
                                     }
                                     else -> {
+                                        val buttonColors =
+                                            ButtonDefaults.buttonColors(
+                                                backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background,
+                                            )
                                         Button(
                                             modifier = Modifier.weight(1f),
                                             onClick = { selectedRollIndex[poolIndex] = diceIndex },
@@ -122,7 +129,7 @@ fun DicePoolSelectorDialog(
                                 DicePoolChoice(el.second.id, listOf(selectedRoll.result))
                             }
                         )
-                        vm.buttonActionSelected(selectedResultsAction)
+                        vm.userActionSelected(selectedResultsAction)
                     },
                     enabled = true // (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
                 ) {

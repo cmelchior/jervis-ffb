@@ -38,11 +38,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
 import com.jervisffb.ui.game.dialogs.DicePoolUserInputDialog
-import com.jervisffb.ui.game.dialogs.DiceRollUserInputDialog
+import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
+import com.jervisffb.ui.game.viewmodel.FieldViewData
+import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
@@ -161,20 +164,24 @@ fun RandomCommandBar(
 }
 
 @Composable
-fun Dialogs(vm: DialogsViewModel) {
-    val dialogData: UserInputDialog? by vm.availableActions.collectAsState(null)
+fun Dialogs(field: FieldViewModel, fieldOffset: FieldViewData, vm: DialogsViewModel) {
+    val dialogData: UserInputDialog? by vm.dialogData.collectAsState(null)
     when (dialogData) {
         is SingleChoiceInputDialog -> {
             val dialog = dialogData as SingleChoiceInputDialog
-            UserActionDialog(dialog, vm)
+            SingleSelectUserActionDialog(dialog, vm)
         }
-        is DiceRollUserInputDialog -> {
-            val dialog = dialogData as DiceRollUserInputDialog
+        is MultipleChoiceUserInputDialog -> {
+            val dialog = dialogData as MultipleChoiceUserInputDialog
             MultipleSelectUserActionDialog(dialog, vm)
         }
         is DicePoolUserInputDialog -> {
             val dialog = dialogData as DicePoolUserInputDialog
             DicePoolSelectorDialog(dialog, vm)
+        }
+        is ActionWheelInputDialog -> {
+            val dialog = dialogData as ActionWheelInputDialog
+            ActionWheelDialog(field, fieldOffset, dialog, vm)
         }
         null -> { /* Do nothing */ }
     }

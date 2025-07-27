@@ -1,6 +1,11 @@
 package com.jervisffb.ui.menu
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
@@ -14,12 +19,14 @@ import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.UiActionProvider
+import com.jervisffb.ui.game.viewmodel.FieldViewData
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 // Wrapper used to contain data needed to contain team specfic information
 // for the loading screen. Team icons are treated seperately as they might
@@ -44,6 +51,7 @@ class GameScreenModel(
     private val onGameStopped: () -> Unit = { }
 ) : ScreenModel {
 
+    val fieldViewData: MutableStateFlow<FieldViewData> = MutableStateFlow(FieldViewData(IntSize.Zero, IntOffset.Zero, gameController.rules.fieldWidth, gameController.rules.fieldHeight))
     val hoverPlayerFlow = MutableSharedFlow<Player?>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     lateinit var uiState: UiGameController
@@ -133,5 +141,16 @@ class GameScreenModel(
 
     fun stopGame() {
         onGameStopped()
+    }
+
+    fun updateFieldViewData(fieldLayoutCoordinates: LayoutCoordinates) {
+        val offset = fieldLayoutCoordinates.localToWindow(Offset.Zero)
+        val fieldPositionData = FieldViewData(
+            fieldLayoutCoordinates.size,
+            IntOffset(offset.x.roundToInt(), offset.y.roundToInt()),
+            gameController.rules.fieldWidth,
+            gameController.rules.fieldHeight
+        )
+        fieldViewData.value = fieldPositionData
     }
 }

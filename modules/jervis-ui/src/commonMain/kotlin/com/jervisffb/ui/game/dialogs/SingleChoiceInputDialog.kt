@@ -1,5 +1,8 @@
 package com.jervisffb.ui.game.dialogs
 
+import androidx.compose.ui.text.font.FontVariation.width
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction
 import com.jervisffb.engine.actions.Cancel
@@ -8,6 +11,7 @@ import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
@@ -35,6 +39,7 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.reports.ReportStartingExtraTime.message
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
@@ -47,8 +52,10 @@ data class SingleChoiceInputDialog(
     val icon: Any? = null, // Replacement for javax.swing.Icon
     val title: String,
     val message: String,
+    val width: Dp,
     val actionDescriptions: List<Pair<GameAction, String>>,
     override var owner: Team? = null,
+    val moveable: Boolean = true,
 ) : UserInputDialog {
     companion object {
         private fun getDescription(state: Game, action: GameAction): String {
@@ -89,13 +96,19 @@ data class SingleChoiceInputDialog(
             title: String,
             message: String,
             actions: List<GameAction>,
-            state: Game
+            state: Game,
+            owner: Team,
+            width: Dp = DialogSize.MEDIUM,
+            movable: Boolean = true,
         ): SingleChoiceInputDialog {
             return SingleChoiceInputDialog(
-                null,
-                title,
-                message,
-                actions.map { Pair(it, getDescription(state, it)) }
+                icon = null,
+                title = title,
+                message = message,
+                width = width,
+                actionDescriptions = actions.map { Pair(it, getDescription(state, it))},
+                owner = owner,
+                moveable = movable,
             )
         }
 
@@ -103,18 +116,42 @@ data class SingleChoiceInputDialog(
             title: String,
             message: String,
             actions: List<Pair<GameAction, String>>,
+            owner: Team,
+            width: Dp = DialogSize.MEDIUM,
+            movable: Boolean = true,
         ): SingleChoiceInputDialog {
-            return SingleChoiceInputDialog(null, title, message, actions)
+            return SingleChoiceInputDialog(
+                icon = null,
+                title = title,
+                message = message,
+                width = width,
+                actionDescriptions = actions,
+                owner = owner,
+                moveable = movable
+            )
         }
+
+        fun createFanFactorDialog(team: Team): UserInputDialog = create(
+            title = "Fan Factor Roll",
+            message = "Roll D3 for ${team.name}",
+            actions = D3Result.allOptions(),
+            state = team.game,
+            owner = team,
+            width = DialogSize.SMALL,
+            movable = false,
+        )
 
         fun createSelectKickoffCoinTossResultDialog(
             team: Team,
             actions: List<GameAction>,
         ) = create(
-            title = "Call Coin Toss Outcome",
-            message = "${team.name} must select a side of the coin",
+            title = "Coin Toss",
+            message = "Call the outcome of the coin toss.",
             actions = actions,
-            state = team.game
+            state = team.game,
+            owner = team,
+            width = DialogSize.SMALL,
+            movable = false,
         )
 
         fun createTossDialog(
@@ -123,9 +160,12 @@ data class SingleChoiceInputDialog(
         : SingleChoiceInputDialog =
             create(
                 title = "Coin Toss",
-                message = "Flip coin into the air",
+                message = "Flip coin into the air.",
                 actions = actions,
-                state = state
+                state = state,
+                owner = state.homeTeam,
+                width = DialogSize.SMALL,
+                movable = false
             )
 
         fun createChooseToKickoffDialog(
@@ -136,6 +176,9 @@ data class SingleChoiceInputDialog(
                 title = "Kickoff?",
                 message = "${team.name} must choose to kick-off or receive",
                 actions = actions,
+                owner = team,
+                width = DialogSize.SMALL,
+                movable = false
             )
 
         fun createInvalidSetupDialog(team: Team): SingleChoiceInputDialog =
@@ -143,7 +186,8 @@ data class SingleChoiceInputDialog(
                 title = "Invalid Setup",
                 message = "Invalid setup, please try again",
                 actions = listOf(Confirm),
-                state = team.game
+                state = team.game,
+                owner = team
             )
 
         fun createCatchBallDialog(
@@ -154,7 +198,8 @@ data class SingleChoiceInputDialog(
                 title = "Catch Ball",
                 message = "Roll D6 for ${player.name}",
                 actions = actions,
-                state = player.team.game
+                state = player.team.game,
+                owner = player.team,
             )
 
         fun createPickupBallDialog(
@@ -165,19 +210,22 @@ data class SingleChoiceInputDialog(
                 title = "Pickup Ball",
                 message = "Roll D6 for ${player.name}",
                 actions = actions,
-                state = player.team.game
+                state = player.team.game,
+                owner = player.team,
             )
 
         fun createCatchRerollDialog(
             state: Game,
             actions: List<GameAction>,
+            owner: Team
         ): SingleChoiceInputDialog {
             val message = "Reroll catching the ball?"
             return create(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
-                state = state
+                state = state,
+                owner = owner,
             )
         }
 
@@ -190,25 +238,30 @@ data class SingleChoiceInputDialog(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
-                state = state
+                state = state,
+                owner = state.activeTeam!!,
             )
         }
 
         fun createChooseBlockResultOrReroll(
             state: Game,
-            actions: List<GameAction>): SingleChoiceInputDialog {
+            actions: List<GameAction>,
+            owner: Team
+        ): SingleChoiceInputDialog {
             val message = "Choose result of block"
             return create(
                 title = "Choose Reroll or Result",
                 message = message,
                 actions = actions,
                 state = state,
+                owner = owner
             )
         }
 
         fun createBounceBallDialog(
             rules: Rules,
             actions: List<D8Result>,
+            owner: Team,
         ): SingleChoiceInputDialog =
             createWithDescription(
                 title = "Bounce Ball",
@@ -229,6 +282,7 @@ data class SingleChoiceInputDialog(
                             }
                         Pair(roll, description)
                     },
+                owner = owner
             )
 
         fun createFollowUpDialog(player: Player): SingleChoiceInputDialog {
@@ -236,6 +290,7 @@ data class SingleChoiceInputDialog(
                 title = "Follow-up",
                 message = "Does ${player.name} want to follow up?",
                 actions = listOf(Confirm to "Follow Up", Cancel to "Stay In Place"),
+                owner = player.team
             )
         }
 
@@ -244,6 +299,7 @@ data class SingleChoiceInputDialog(
                 title = "Use Apothecary",
                 message = "Do you want to use an apothecary to heal ${context.player.name} from a ${context.injuryResult}?",
                 actions = listOf(Confirm to "Confirm", Cancel to "Cancel"),
+                owner = context.player.team
             )
         }
 
@@ -252,6 +308,7 @@ data class SingleChoiceInputDialog(
                 title = "Use ${skill.name}?",
                 message = "Does ${player.name} want to use ${skill.name}?",
                 actions = listOf(Confirm to "Confirm", Cancel to "Cancel"),
+                owner = player.team,
             )
         }
 
@@ -260,12 +317,14 @@ data class SingleChoiceInputDialog(
                 title = "Argue the call",
                 message = "${context.fouler.name} was caught by the ref. Argue the call?",
                 actions = listOf(Confirm to "Argue", Cancel to "Stay silent"),
+                owner = context.fouler.team
             )
         }
 
         fun createRushRerollDialog(
             state: Game,
-            actions: List<GameAction>
+            actions: List<GameAction>,
+            owner: Team
         ): SingleChoiceInputDialog {
             val message = "Reroll Rush?"
             return create(
@@ -273,19 +332,22 @@ data class SingleChoiceInputDialog(
                 message = message,
                 actions = actions,
                 state = state,
+                owner = owner
             )
         }
 
         fun createDodgeRerollDialog(
             state: Game,
-            actions: List<GameAction>
+            actions: List<GameAction>,
+            owner: Team
         ): SingleChoiceInputDialog {
             val message = "Reroll Dodge?"
             return create(
                 title = "Choose Reroll",
                 message = message,
                 actions = actions,
-                state = state
+                state = state,
+                owner = owner
             )
         }
     }
