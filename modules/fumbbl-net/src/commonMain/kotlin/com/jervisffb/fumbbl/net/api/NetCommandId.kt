@@ -118,6 +118,6 @@ enum class NetCommandId(override val id: String) : FumbblEnum {
     ;
 
     fun fromCommandId(id: String) {
-        values().firstOrNull { this.id == id } ?: throw IllegalArgumentException("Unrecognized command: $id")
+        entries.firstOrNull { this.id == id } ?: throw IllegalArgumentException("Unrecognized command: $id")
     }
 }

@@ -50,7 +50,7 @@ enum class TurnMode(override val id: String, val isCheckForActivePlayers: Boolea
 
     companion object {
         fun forName(name: String?): TurnMode? {
-            return values().firstOrNull { it.id == name }
+            return entries.firstOrNull { it.id == name }
         }
     }
 }

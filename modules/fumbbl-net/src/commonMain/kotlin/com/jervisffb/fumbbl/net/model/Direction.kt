@@ -64,7 +64,7 @@ enum class Direction(override val id: String) : FumbblEnum {
 
     companion object {
         fun forName(name: String?): Direction? {
-            return values().firstOrNull { it.id == name }
+            return entries.firstOrNull { it.id == name }
         }
     }
 }
