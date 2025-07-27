@@ -1,6 +1,7 @@
 package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
 import com.jervisffb.engine.rules.bb2020.tables.InjuryResult
 
@@ -10,7 +11,7 @@ import com.jervisffb.engine.rules.bb2020.tables.InjuryResult
 class ReportInjuryResult(val context: RiskingInjuryContext) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String = buildString {
-        if (!context.armourBroken) {
+        if (!context.armourBroken && context.mode != RiskingInjuryMode.PUSHED_INTO_CROWD) {
             append("${context.player.name}'s armour held up.")
         } else {
             when (context.injuryResult!!) {
