@@ -109,6 +109,7 @@ import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 import kotlin.math.sin
+import kotlin.test.Ignore
 
 
 class MenuController(
@@ -216,7 +217,7 @@ class ActionWheelViewModel {
     }
 }
 
-
+@Ignore // Must run manually
 class AnimateTest() {
     @Test
     fun runTest() {

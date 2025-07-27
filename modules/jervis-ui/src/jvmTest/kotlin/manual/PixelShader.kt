@@ -40,8 +40,10 @@ import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.test.Ignore
 import kotlin.test.Test
 
+@Ignore // Must run manually
 class PixelShaderTests() {
     @Test
     fun testShader() {
