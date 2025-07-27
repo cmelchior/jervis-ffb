@@ -967,7 +967,7 @@ fun <T : DieResult> ExpandableDiceSelector(
     val backgroundHeight = buttonHeight + backgroundPadding
 
     // Determine the placement of popup
-    val (popupDirection, popupOffset) = remember {
+    val (popupDirection, popupOffset) = remember(die) {
         when (die.preferLtr) {
             true -> {
                 val padding = with(density) { (backgroundPadding/2).toPx().roundToInt() }
@@ -988,12 +988,12 @@ fun <T : DieResult> ExpandableDiceSelector(
 
     // Handle opening and closing animation of the dice selector
     if (expanded) {
-        LaunchedEffect(Unit) {
+        LaunchedEffect(die) {
             launch { bgWidthDp.animateTo(maxWidthDp.value, animation) }
             launch { bgAlpha.animateTo(0.5f) }
         }
     } else {
-        LaunchedEffect(Unit) {
+        LaunchedEffect(die) {
             launch { bgWidthDp.animateTo(0f, animation) }
             launch { bgAlpha.animateTo(0f) }
         }
