@@ -1,14 +1,11 @@
 package com.jervisffb.ui.game.view
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +13,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,9 +51,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -70,11 +66,19 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.adamglin.composeshadow.dropShadow
+import com.jervisffb.engine.actions.D12Result
+import com.jervisffb.engine.actions.D16Result
+import com.jervisffb.engine.actions.D20Result
+import com.jervisffb.engine.actions.D2Result
+import com.jervisffb.engine.actions.D3Result
+import com.jervisffb.engine.actions.D4Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.jervis_ui.generated.resources.Res
@@ -92,6 +96,7 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.D6Shape
 import com.jervisffb.ui.game.view.utils.D8Shape
 import com.jervisffb.ui.game.view.utils.paperBackground
+import com.jervisffb.ui.reversed
 import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.scalePixels
@@ -713,46 +718,69 @@ private fun HoverText(
     val borderWidth = 30f
     val fontWeight = FontWeight.Bold
     val textColor = Color.White
-    Box(modifier = Modifier.offset(y = 60.dp).padding(8.dp)) {
-        AnimatedVisibility(
-            visible = (message != null),
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            Box(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                // Background border
-                Text(
-                    text = message ?: "",
-                    style = MaterialTheme.typography.body1.copy(
-                        color = borderColor,
-                        fontWeight = fontWeight,
-                        fontSize = fontSize,
-                        // Shadow doesn't work well with border. We probably need a custom canvas render
-                        // shadow = Shadow(
-                        //     color = Color.Black,
-                        //     offset = Offset(2f, 2f),
-                        //     blurRadius = 8f
-                        // ),
-                        drawStyle = Stroke(
-                            miter = borderWidth,
-                            width = borderWidth,
-                            join = StrokeJoin.Round
-                        )
-                    ),
-                )
-                Text(
-                    text = message ?: "",
-                    style = MaterialTheme.typography.body1.copy(
-                        color = textColor,
-                        fontWeight = fontWeight,
-                        fontSize = fontSize,
-                    ),
-                )
-            }
+    val animationDuration = 200
+    var displayedMessage by remember { mutableStateOf<String?>(null) }
+    val bgAlpha = remember {
+        Animatable(0f)
+    }
+    LaunchedEffect(message) {
+        if (message == null) {
+            bgAlpha.animateTo(0f, tween(
+                durationMillis = (bgAlpha.value*animationDuration).roundToInt(),
+                easing = LinearOutSlowInEasing.reversed()
+            ))
+            delay((bgAlpha.value*animationDuration).roundToInt().toLong())
+            displayedMessage = null
+        } else {
+            displayedMessage = message
+            bgAlpha.animateTo(1f, tween(
+                durationMillis = ((1f-bgAlpha.value) * animationDuration).roundToInt(),
+                easing = LinearEasing
+            ))
         }
     }
+
+    // There are issues with text Stroke and alpha. It doesn't seem to render correctly.
+    // This is probably a bug, but haven't found a workaround yet. So for now, just use
+    // a solid background color.
+
+    // Background border
+//        Text(
+//            modifier = Modifier.alpha(bgAlpha.value),
+//            text = displayedMessage ?: "",
+//            style = MaterialTheme.typography.body1.copy(
+//                color = borderColor,
+//                fontWeight = fontWeight,
+//                fontSize = fontSize,
+//                // Shadow doesn't work well with border. We probably need a custom canvas render
+//                // shadow = Shadow(
+//                //     color = Color.Black,
+//                //     offset = Offset(2f, 2f),
+//                //     blurRadius = 8f
+//                // ),
+//                drawStyle = Stroke(
+//                    miter = borderWidth,
+//                    width = borderWidth,
+//                    join = StrokeJoin.Round
+//                )
+//            ),
+//        )
+    Text(
+        modifier = Modifier
+            .offset(y = 60.dp)
+            .clip(RoundedCornerShape(4.dp))
+            .alpha(bgAlpha.value)
+            .background(borderColor)
+            .padding(4.dp)
+        ,
+        text = displayedMessage ?: "",
+        lineHeight = 1.em,
+        style = MaterialTheme.typography.body1.copy(
+            color = textColor,
+            fontWeight = fontWeight,
+            fontSize = fontSize,
+        ),
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -939,7 +967,6 @@ fun <T : DieResult> ExpandableDiceSelector(
     val diceList = die.diceList
     val shadowColor = Color.Black
     var expanded by remember { mutableStateOf(false) }
-    val alpha = if (!die.animationDone) 0f else 1f
 
     // Properties we animate when expanded and deflating the selector
     val expandDurationMs = 200
@@ -951,10 +978,22 @@ fun <T : DieResult> ExpandableDiceSelector(
     val backgroundPadding = 8.dp
     val spacingBetweenItems = backgroundPadding / 2f
 
+    val rows = when (die.value) {
+        is D12Result -> 3
+        is D16Result -> 4
+        is D20Result -> 4
+        is D2Result -> 1
+        is D3Result -> 1
+        is D4Result -> 2
+        is D6Result -> 2
+        is D8Result -> 2
+        is DBlockResult -> 2
+    }
+    val itemsPrRow = diceList.size / rows
     val buttonSize = IconFactory.getDiceSizeDp(diceValue)
     val (buttonWidth, buttonHeight) = buttonSize
-    val maxWidthDp = (backgroundPadding * 2) + (spacingBetweenItems * (diceList.size - 1)) + (buttonWidth * diceList.size)
-    val backgroundHeight = buttonHeight + backgroundPadding
+    val maxWidthDp = (backgroundPadding * 2) + (spacingBetweenItems * (itemsPrRow - 1)) + (buttonWidth * itemsPrRow)
+    val backgroundHeight = (buttonHeight*rows + backgroundPadding) + (backgroundPadding/2f)*(rows-1)
 
     // Determine the placement of popup
     val (popupDirection, popupOffset) = remember(die) {
@@ -979,20 +1018,21 @@ fun <T : DieResult> ExpandableDiceSelector(
     // Handle opening and closing animation of the dice selector
     if (expanded) {
         LaunchedEffect(die) {
-            launch { bgWidthDp.animateTo(maxWidthDp.value, animation) }
-            launch { bgAlpha.animateTo(0.5f) }
+            bgWidthDp.snapTo(maxWidthDp.value)
+            // launch { bgWidthDp.animateTo(maxWidthDp.value, animation) }
+            launch { bgAlpha.animateTo(1f) }
         }
     } else {
         LaunchedEffect(die) {
-            launch { bgWidthDp.animateTo(0f, animation) }
+            bgWidthDp.snapTo(0f)
+            // launch { bgWidthDp.animateTo(0f, animation) }
             launch { bgAlpha.animateTo(0f) }
         }
     }
 
     // The visible button, but the normal and jumping one.
     Box(
-        modifier = Modifier
-            .alpha(if (disabled) 0.3f else 1f)
+        modifier = Modifier.alpha(if (disabled) 0.3f else 1f)
         ,
         contentAlignment = Alignment.CenterStart,
     ) {
@@ -1024,7 +1064,6 @@ fun <T : DieResult> ExpandableDiceSelector(
                 enabled = !disabled,
                 onClick = {
                     expanded = !expanded
-                    onHover(null)
                     onExpandedChanged(die, expanded)
                 },
                 onHover = onHover,
@@ -1048,58 +1087,66 @@ fun <T : DieResult> ExpandableDiceSelector(
                 Box(
                     modifier = Modifier
                         .padding(start = backgroundPadding / 2f)
-                        .alpha(alpha)
+                        .alpha(bgAlpha.value)
                         .height(backgroundHeight)
                         .width(maxWidthDp - backgroundPadding)
                 ) {
                     // Expanding background
                     Box(
                         modifier = Modifier
+                            .alpha(0.5f)
                             .width(bgWidthDp.value.dp)
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.Black.copy(alpha = bgAlpha.value))
                     )
                     // All buttons in the button group
-                    Row(
-                        modifier =
-                            Modifier
-                                .alpha(alpha)
-                                .fillMaxHeight()
-                                .align(Alignment.CenterStart)
-                                .padding(start = backgroundPadding/2)
-                        ,
-                        horizontalArrangement = Arrangement.spacedBy(spacingBetweenItems),
-                        verticalAlignment = Alignment.CenterVertically,
+                    Column(
+                        modifier = Modifier.fillMaxHeight().padding(top = backgroundPadding/2f, bottom = backgroundPadding/2f),
+                        verticalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        // Generally options are sorted, but we always have the currently
-                        // selected value in the front
-                        diceList.forEachIndexed { index, label ->
-                            if (!expanded && index > 0) return@forEachIndexed
-                            val currentBgWidth = bgWidthDp.value.dp
-                            val alpha = when (index == 0 || currentBgWidth > 52.dp * (index + 1)) {
-                                true -> 1f
-                                false -> 0f
-                            }
-                            DiceButton(
-                                buttonSize,
-                                alpha,
-                                value = label,
-                                enabled = !disabled,
-                                onClick = {
-                                    if (!expanded) {
-                                        expanded = true
-                                    } else {
-                                        expanded = false
-                                        die.valueSelected(die.diceList[index])
+                        val diceRow = diceList.chunked(diceList.size / rows)
+                        diceRow.forEachIndexed { rowIndex, row ->
+                            Row(
+                                modifier =
+                                    Modifier
+                                        .height(buttonHeight)
+                                        .padding(start = backgroundPadding/2)
+                                ,
+                                horizontalArrangement = Arrangement.spacedBy(spacingBetweenItems),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                // Generally options are sorted, but we always have the currently
+                                // selected value in the front
+                                row.forEachIndexed { index, label ->
+                                    val currentBgWidth = bgWidthDp.value.dp
+                                    val alpha = when (index == 0 || currentBgWidth > 52.dp * (index + 1)) {
+                                        true -> bgAlpha.value
+                                        false -> 0f
                                     }
-                                    onHover(null)
-                                    onExpandedChanged(die, expanded)
-                                },
-                                dropShadow = false,
-                                onHover = onHover,
-                                dropShadowColor = Color.Black,
-                            )
+                                    DiceButton(
+                                        buttonSize,
+                                        alpha,
+                                        value = label,
+                                        enabled = !disabled,
+                                        onClick = {
+                                            if (!expanded) {
+                                                expanded = true
+                                            } else {
+                                                expanded = false
+                                                die.valueSelected(die.diceList[rowIndex*(diceList.size / rows) + index])
+                                            }
+                                            if (rowIndex != 0 || index != 0) {
+                                                onHover(null)
+                                            }
+                                            onExpandedChanged(die, expanded)
+                                        },
+                                        dropShadow = false,
+                                        onHover = onHover,
+                                        dropShadowColor = Color.Black,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -1261,7 +1308,6 @@ private fun DiceButton(
         ,
         contentAlignment = Alignment.Center
     ) {
-
         val bitmap = IconFactory.getDiceIcon(value)
         Image(
             bitmap = bitmap,
@@ -1284,12 +1330,12 @@ private fun DiceButton(
                     onPointerEvent(PointerEventType.Enter) {
                         onHover(value)
                     }
-                    .onPointerEvent(PointerEventType.Exit) {
-                        onHover(null)
-                    }
-                    .onPointerEvent(PointerEventType.Press) {
-                        onClick()
-                    }
+                        .onPointerEvent(PointerEventType.Exit) {
+                            onHover(null)
+                        }
+                        .onPointerEvent(PointerEventType.Press) {
+                            onClick()
+                        }
                 }
             ,
             contentScale = ContentScale.Fit,
