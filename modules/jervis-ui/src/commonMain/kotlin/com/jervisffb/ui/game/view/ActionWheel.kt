@@ -92,6 +92,7 @@ import com.jervisffb.ui.game.dialogs.circle.CoinMenuItem
 import com.jervisffb.ui.game.dialogs.circle.DiceMenuItem
 import com.jervisffb.ui.game.dialogs.circle.TopLevelMenuItem
 import com.jervisffb.ui.game.icons.ActionIcon
+import com.jervisffb.ui.game.icons.DiceColor
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.utils.D6Shape
 import com.jervisffb.ui.game.view.utils.D8Shape
@@ -715,7 +716,6 @@ private fun HoverText(
     borderColor: Color,
 ) {
     val fontSize = 14.sp
-    val borderWidth = 30f
     val fontWeight = FontWeight.Bold
     val textColor = Color.White
     val animationDuration = 200
@@ -1301,6 +1301,24 @@ private fun DiceButton(
     dropShadowColor: Color = Color.Black,
     dropShadow: Boolean = true,
 ) {
+    val useSelectedColorAsHover = false
+    var hover: Boolean by remember { mutableStateOf(false) }
+    var colorFilter by remember { mutableStateOf<ColorFilter?>(null) }
+    val bitmap = if ((useSelectedColorAsHover && hover)) {
+        val color = when (value) {
+            is D3Result,
+            is D6Result -> DiceColor.YELLOW
+            else -> DiceColor.DEFAULT
+        }
+        IconFactory.getDiceIcon(value, color)
+    } else {
+        val color = when (value) {
+            is D3Result,
+            is D6Result -> DiceColor.BROWN
+            else -> DiceColor.DEFAULT
+        }
+        IconFactory.getDiceIcon(value, color)
+    }
     Box(
         modifier = Modifier
             .size(buttonSize)
@@ -1308,7 +1326,6 @@ private fun DiceButton(
         ,
         contentAlignment = Alignment.Center
     ) {
-        val bitmap = IconFactory.getDiceIcon(value)
         Image(
             bitmap = bitmap,
             contentDescription = value.value.toString(),
@@ -1326,12 +1343,21 @@ private fun DiceButton(
                         blur = 12.dp,
                     )
                 }
-                .applyIf(enabled) {
-                    onPointerEvent(PointerEventType.Enter) {
-                        onHover(value)
-                    }
+                .applyIf(true) {
+                    this
+                        .onPointerEvent(PointerEventType.Enter) {
+                            hover = true
+                            onHover(value)
+                            if (!useSelectedColorAsHover) {
+                                colorFilter = ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken)
+                            }
+                        }
                         .onPointerEvent(PointerEventType.Exit) {
+                            hover = false
                             onHover(null)
+                            if (!useSelectedColorAsHover) {
+                                colorFilter = null
+                            }
                         }
                         .onPointerEvent(PointerEventType.Press) {
                             onClick()
@@ -1340,6 +1366,7 @@ private fun DiceButton(
             ,
             contentScale = ContentScale.Fit,
             filterQuality = FilterQuality.None,
+            colorFilter = colorFilter,
         )
     }
 }
