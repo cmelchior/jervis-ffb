@@ -208,5 +208,64 @@ class ActionWheelInputDialog(
                 viewModel = viewModel,
             )
         }
+
+        fun createBounceBallDialog(
+            provider: UiActionProvider,
+            state: Game,
+            owner: Team,
+        ): UserInputDialog {
+            fun getResultLabel(d8: D8Result): String {
+                val description =
+                    when (val direction = state.rules.direction(d8)) {
+                        Direction(-1, -1) -> "↖"
+                        Direction(0, -1) -> "↑"
+                        Direction(1, -1) -> "↗"
+                        Direction(-1, 0) -> "←"
+                        Direction(1, 0) -> "→"
+                        Direction(-1, 1) -> "↙"
+                        Direction(0, 1) -> "↓"
+                        Direction(1, 1) -> "↘"
+                        else -> TODO("Not supported: $direction")
+                    }
+                return "Bounce: ${d8.value}$description"
+            }
+            val viewModel = ActionWheelViewModel(
+                team = owner,
+                center = state.currentBall().location,
+                startHoverText = "Bounce Ball",
+                fallbackToShowStartHoverText = false,
+            ).also { wheelModel ->
+                wheelModel.topMenu.let { menu ->
+                    menu.addDiceButton(
+                        id = DieId("Bounce-D8"),
+                        diceValue = D8Result.random(),
+                        options = D8Result.allOptions(),
+                        preferLtr = true,
+                        expandable = true,
+                        animatingFrom = D8Result.random(),
+                        onHover = { d8 ->
+                            wheelModel.hoverText.value = d8?.let { getResultLabel(it) }
+                        }
+                    )
+                }
+                wheelModel.bottomMenu.addActionButton(
+                    label = {
+                        val d8 = wheelModel.topMenu.getDiceButton(0).value as D8Result
+                        getResultLabel(d8)
+                    },
+                    icon = ActionIcon.CONFIRM,
+                    enabled = true,
+                    onClick = { parent, button ->
+                        val dice = wheelModel.topMenu.getDiceResults()
+                        provider.userActionSelected(dice)
+                        wheelModel.hideWheel()
+                    }
+                )
+            }
+            return ActionWheelInputDialog(
+                owner = owner,
+                viewModel = viewModel,
+            )
+        }
     }
 }

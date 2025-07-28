@@ -257,6 +257,7 @@ data class SingleChoiceInputDialog(
             )
         }
 
+        @Deprecated("Use ActionWheelInputDialog.createBounceBallDialog() instead")
         fun createBounceBallDialog(
             rules: Rules,
             actions: List<D8Result>,

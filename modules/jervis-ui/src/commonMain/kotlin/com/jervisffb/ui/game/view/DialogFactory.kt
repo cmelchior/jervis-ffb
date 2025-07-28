@@ -148,9 +148,9 @@ object DialogFactory {
                 }
 
                 is Bounce.RollDirection -> {
-                    SingleChoiceInputDialog.createBounceBallDialog(
-                        rules,
-                        D8Result.allOptions(),
+                    ActionWheelInputDialog.createBounceBallDialog(
+                        provider,
+                        controller.state,
                         controller.getAvailableActions().team ?: controller.state.homeTeam
                     )
                 }
