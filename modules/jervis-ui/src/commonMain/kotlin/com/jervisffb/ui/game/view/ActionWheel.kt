@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ContentAlpha.disabled
 import androidx.compose.material.DrawerDefaults.shape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -501,7 +502,7 @@ private fun MenuItemButton(
                     item.label(),
                     item.icon,
                     enabled = true,
-                    onHover = {onHover(it) },
+                    onHover = { onHover(it) },
                     onClick = { onItemSelected(item) }
                 )
             }
@@ -509,6 +510,10 @@ private fun MenuItemButton(
                 ExpandableDiceSelector(
                     item,
                     disabled = !item.enabled,
+                    canExpand = item.expandable,
+                    onClick = {
+                        item.onClick(item.value)
+                    },
                     onExpandedChanged = onExpandChanged,
                     onHover = item.onHover as (DieResult?) -> Unit,
                 )
@@ -961,6 +966,9 @@ fun <T : DieResult> ExpandableDiceSelector(
     // When using multiple selectors, the other selectors are disabled (grayed out)
     // while one is open.
     disabled: Boolean = false,
+    // if `false`. Clicking the primary dice button will just be treated as selecting that dice value
+    canExpand: Boolean = true,
+    onClick: (T) -> Unit = { },
     onHover: (DieResult?) -> Unit = { },
     onExpandedChanged: (ActionWheelMenuItem, Boolean) -> Unit = { _, _ -> },
     onAnimationDone: () -> Unit = {}
@@ -1068,8 +1076,13 @@ fun <T : DieResult> ExpandableDiceSelector(
                 value = diceValue,
                 enabled = !disabled,
                 onClick = {
-                    expanded = !expanded
-                    onExpandedChanged(die, expanded)
+                    if (canExpand) {
+                        expanded = !expanded
+                        onExpandedChanged(die, expanded)
+                    } else {
+                        die.valueSelected(diceValue)
+                        onClick(diceValue)
+                    }
                 },
                 onHover = onHover,
                 dropShadow = true,

@@ -19,6 +19,8 @@ class DiceMenuItem<T: DieResult>(
     val preferLtr: Boolean = true,
     enabled: Boolean = true,
     val expandable: Boolean = true,
+    // Generics are acting up here. For now, just hack it and return later.
+    val onClick: (DieResult) -> Unit = { },
     startAnimationFrom: T? = null,
     val onHover: (T?) -> Unit = { },
 ): ActionWheelMenuItem() {

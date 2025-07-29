@@ -5,6 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.DieId
+import com.jervisffb.engine.reports.ReportStartingExtraTime.id
 import com.jervisffb.ui.game.icons.ActionIcon
 import kotlin.math.ceil
 
@@ -113,6 +114,7 @@ sealed class ActionWheelMenuItem {
         preferLtr: Boolean = true,
         enabled: Boolean = true,
         expandable: Boolean = true,
+        onClick: (DieResult) -> Unit = { },
         animateValueFrom: T? = null,
         onHover: (T?) -> Unit,
     ): DiceMenuItem<T> {
@@ -124,6 +126,7 @@ sealed class ActionWheelMenuItem {
             preferLtr,
             enabled,
             expandable,
+            onClick,
             animateValueFrom,
             onHover
         )

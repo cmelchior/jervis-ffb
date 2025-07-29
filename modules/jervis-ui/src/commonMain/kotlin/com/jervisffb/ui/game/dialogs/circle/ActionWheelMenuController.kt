@@ -57,6 +57,7 @@ class ActionWheelMenuController(
         preferLtr: Boolean = true,
         enabled: Boolean = true,
         expandable: Boolean = true,
+        onClick : (DieResult) -> Unit = { },
         animatingFrom: T? = null,
         onHover: (T?) -> Unit = { }
     ): DiceMenuItem<T> {
@@ -67,6 +68,7 @@ class ActionWheelMenuController(
             preferLtr,
             enabled,
             expandable,
+            onClick,
             animatingFrom,
             onHover
         )
