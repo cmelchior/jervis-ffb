@@ -13,6 +13,7 @@ import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.view.ContextMenuOption
@@ -49,6 +50,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                     ContextMenuOption(
                         "Jump",
                         { actionProvider.userActionSelected(MoveTypeSelected(MoveType.JUMP)) },
+                        ActionIcon.JUMP
                     )
                 )
             }
@@ -58,6 +60,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                     ContextMenuOption(
                         "Leap",
                         { actionProvider.userActionSelected(MoveTypeSelected(MoveType.LEAP)) },
+                        ActionIcon.LEAP
                     )
                 )
             }
@@ -102,6 +105,7 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
                     ContextMenuOption(
                         "Stand-Up",
                         { actionProvider.userActionSelected(MoveTypeSelected(MoveType.STAND_UP)) },
+                        ActionIcon.STAND_UP
                     )
                 )
                 addStandUpAndMoveOptions(actionProvider, state, player, activeLocation, snapshot)

@@ -21,8 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import com.jervisffb.ui.game.icons.ActionIcon
 
-data class ContextMenuOption(val title: String, val command: () -> Unit)
+data class ContextMenuOption(
+    val title: String,
+    val command: () -> Unit,
+    val icon: ActionIcon
+)
 
 @Composable
 fun ContextPopupMenu(

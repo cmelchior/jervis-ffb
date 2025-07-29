@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.view.ContextMenuOption
 
@@ -16,6 +17,7 @@ class EndActionDecorator: FieldActionDecorator<EndActionWhenReady> {
                 ContextMenuOption(
                     "End action",
                     { actionProvider.userActionSelected(EndAction) },
+                    ActionIcon.END_TURN
                 )
             )
         } ?: error("No active player")

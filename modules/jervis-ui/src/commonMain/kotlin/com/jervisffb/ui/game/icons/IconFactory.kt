@@ -117,11 +117,11 @@ enum class ActionIcon(val path: String) {
     // Generic actions
     CANCEL("jervis/actions/jervis_action_cancel.png"),
     CONFIRM("jervis/actions/jervis_action_confirm.png"),
+    END_TURN("jervis/actions/jervis_action_cancel.png"),
 
     // Developer Actions
     ROLL_DICE("jervis/actions/jervis_action_roll_dice.png"),
     TEAM_REROLL("jervis/actions/jervis_action_team_reroll.png"),
-
 
     // Player Actions
     MOVE("jervis/actions/jervis_action_move.png"),
@@ -130,13 +130,24 @@ enum class ActionIcon(val path: String) {
     FOUL("jervis/actions/jervis_action_foul.png"),
     PASS("jervis/actions/jervis_action_pass.png"),
     HANDOFF("jervis/actions/jervis_action_handoff.png"),
-    // THROW_TEAM_MATE()
+    THROW_TEAM_MATE("jervis/actions/jervis_action_pass.png"),
 
     // Move Actions
+    STAND_UP("jervis/actions/jervis_action_move.png"),
+    STAND_UP_AND_END("jervis/actions/jervis_action_move.png"),
     JUMP("jervis/actions/jervis_action_jump.png"),
-    // LEAP()
+    LEAP("jervis/actions/jervis_action_jump.png"),
 
     // Special Actions
+    BALL_AND_CHAIN("jervis/actions/jervis_action_move.png"),
+    BOMBARDIER("jervis/actions/jervis_action_pass.png"),
+    BREATHE_FIRE("jervis/actions/jervis_action_blitz.png"),
+    CHAINSAW("jervis/actions/jervis_action_block.png"),
+    HYPNOTIC_GAZE("jervis/actions/jervis_action_block.png"),
+    KICK_TEAM_MATE("jervis/actions/jervis_action_pass.png"),
+    MULTIPLE_BLOCK("jervis/actions/jervis_action_block.png"),
+    PROJECTILE_VOMIT("jervis/actions/jervis_action_block.png"),
+    STAB("jervis/actions/jervis_action_block.png");
 }
 
 

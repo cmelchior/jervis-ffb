@@ -10,6 +10,7 @@ import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzActionContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockActionContext
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.view.ContextMenuOption
 
@@ -40,6 +41,7 @@ class SelectBlockTypeDecorator: FieldActionDecorator<SelectBlockType> {
                         item = ContextMenuOption(
                             "Block",
                             { actionProvider.userActionSelected(BlockTypeSelected(BlockType.STANDARD)) },
+                            ActionIcon.BLOCK
                         ),
                         showContextMenu = true
                     )

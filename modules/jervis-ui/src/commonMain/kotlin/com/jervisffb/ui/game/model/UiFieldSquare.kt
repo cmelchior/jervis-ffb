@@ -6,6 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
+import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
+import com.jervisffb.ui.game.dialogs.circle.ActionWheelViewModel
+import com.jervisffb.ui.game.dialogs.circle.MenuExpandMode
 import com.jervisffb.ui.game.view.ContextMenuOption
 
 /**
@@ -33,20 +36,51 @@ class UiFieldSquare(
     var requiresRoll: Boolean by mutableStateOf(false) // onSelected is not-null but will result in dice being rolled
     var onSelected: (() -> Unit)? by mutableStateOf(null) // Action if square is selected
     var onMenuHidden: (() -> Unit?)? by mutableStateOf(null) // Action if the context menu is hidden
-    var showContextMenu: Boolean by mutableStateOf(false) // The context menu is automatically opened
+    var showContextMenu = mutableStateOf(false) // The context menu is automatically opened
     var contextMenuOptions: SnapshotStateList<ContextMenuOption> = SnapshotStateList() // The options inside the context menu
+    val useActionWheel= true // Whether to use a Context Menu or Action Wheel for the context items
 
     fun isEmpty() = !isBallOnGround && player == null
 
     fun copyAddContextMenu(item: ContextMenuOption, showContextMenu: Boolean? = null): UiFieldSquare {
         if (showContextMenu != null) {
-            this.showContextMenu = showContextMenu
+            this.showContextMenu.value = showContextMenu
             this.contextMenuOptions += item
         } else {
             this.contextMenuOptions += item
         }
         return this
     }
+
+    fun createActionWheelDialogData(): ActionWheelInputDialog {
+        val team = player?.model?.team ?: error("Player must be set for a context menu to be shown")
+        val viewModel = ActionWheelViewModel(
+            team = team,
+            center = model.coordinates,
+            startHoverText = null,
+            fallbackToShowStartHoverText = false,
+            bottomExpandMode = MenuExpandMode.FAN_OUT,
+            shown = showContextMenu
+        ).also { wheelModel ->
+            contextMenuOptions.forEach { option ->
+                wheelModel.bottomMenu.addActionButton(
+                    label = { option.title },
+                    icon = option.icon,
+                    enabled = true,
+                    onClick = { parent, button ->
+                        option.command()
+                        wheelModel.hideWheel()
+                    }
+                )
+            }
+        }
+        return ActionWheelInputDialog(
+            owner = team,
+            viewModel = viewModel,
+        )
+    }
+
+
 }
 
 

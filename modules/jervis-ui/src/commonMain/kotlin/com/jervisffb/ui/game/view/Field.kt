@@ -488,7 +488,7 @@ private fun FieldSquare(
     val boxWrapperModifier =
         if (square.contextMenuOptions.isNotEmpty() || square.onSelected != null || square.hoverAction != null) {
             modifier.clickable {
-                square.showContextMenu = !square.showContextMenu
+                square.showContextMenu.value = !square.showContextMenu.value
                 if (square.hoverAction != null) {
                     square.hoverAction!!()
                 } else if (square.onSelected != null) {
@@ -500,10 +500,10 @@ private fun FieldSquare(
         }
 
     Box(modifier = boxWrapperModifier) {
-        if (square.showContextMenu) {
+        if (square.showContextMenu.value && !square.useActionWheel) {
             ContextPopupMenu(
                 hidePopup = { dismissed ->
-                    square.showContextMenu = false
+                    square.showContextMenu.value = false
                     if (dismissed)  {
                         square.onMenuHidden?.let {
                             it()

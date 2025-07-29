@@ -171,6 +171,11 @@ open class ManualActionProvider(
             if (state.dialogInput == null) {
                 addNonDialogActionDecorators(state, actions)
             }
+
+            // Check for the context menu
+            state.fieldSquares.values.firstOrNull { it.contextMenuOptions.isNotEmpty() }?.let {
+                state.dialogInput = it.createActionWheelDialogData()
+            }
         }
     }
 
@@ -270,7 +275,7 @@ open class ManualActionProvider(
             val square = snapshot.fieldSquares[activePlayerLocation]
             if (square != null && square.contextMenuOptions.isNotEmpty() && square.contextMenuOptions.count { it.title == "End action" } == 0) {
                 snapshot.fieldSquares[activePlayerLocation as FieldCoordinate]?.apply {
-                    showContextMenu = true
+                    showContextMenu.value = true
                 }
             }
         }

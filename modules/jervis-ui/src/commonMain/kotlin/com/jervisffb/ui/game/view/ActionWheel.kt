@@ -793,6 +793,8 @@ fun ActionButton(
     onClick: () -> Unit = { },
 ) {
     val icon = remember(icon) { IconFactory.getActionIcon(icon) }
+    val colorFilter = ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken)
+    var isHover by remember { mutableStateOf(false) }
     Box {
         Image(
             modifier = Modifier
@@ -814,9 +816,11 @@ fun ActionButton(
                 .applyIf(enabled) {
                     this.clickable { onClick() }
                         .onPointerEvent(PointerEventType.Enter) {
+                            isHover = true
                             onHover(description)
                         }
                         .onPointerEvent(PointerEventType.Exit) {
+                            isHover = false
                             onHover(null)
                         }
                 }
@@ -824,6 +828,7 @@ fun ActionButton(
             filterQuality = FilterQuality.None,
             bitmap = icon,
             contentDescription = "",
+            colorFilter = if (isHover) colorFilter else null
         )
     }
 }

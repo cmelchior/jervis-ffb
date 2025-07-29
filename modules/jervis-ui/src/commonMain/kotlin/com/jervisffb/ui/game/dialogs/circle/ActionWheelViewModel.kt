@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.dialogs.circle
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -36,10 +37,11 @@ class ActionWheelViewModel(
     // Otherwise, it will only show until hidden for the first time
     fallbackToShowStartHoverText: Boolean = false,
     topExpandMode: MenuExpandMode = MenuExpandMode.COMPACT,
-    bottomExpandMode: MenuExpandMode = MenuExpandMode.COMPACT
+    bottomExpandMode: MenuExpandMode = MenuExpandMode.COMPACT,
+    var shown: MutableState<Boolean> = mutableStateOf(true)
 ) {
     // Wheel is shown on screen
-    var shown by mutableStateOf(true)
+    // var shown by mutableStateOf(true)
     var topMenu = ActionWheelMenuController(this, -90f, topExpandMode)
     var bottomMenu = ActionWheelMenuController(this, 90f, bottomExpandMode)
 
@@ -67,6 +69,6 @@ class ActionWheelViewModel(
     }
 
     fun hideWheel() {
-        shown = false
+        shown.value = false
     }
 }

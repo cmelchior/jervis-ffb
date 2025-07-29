@@ -13,6 +13,7 @@ import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.state.UiActionProvider
@@ -22,7 +23,7 @@ class SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
     override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectPlayerAction) {
         // TODO Fix this, so we do not update each square multiple times
         descriptor.actions.forEach {
-            handleAction(actionProvider, state, snapshot, it)
+            addActionToContextMenu(actionProvider, state, snapshot, it)
         }
 
         // If prone, also add a "Stand Up & And Action". But only if the
@@ -49,42 +50,43 @@ class SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
                     actionProvider.userActionSelected(
                         CompositeGameAction(PlayerActionSelected(PlayerStandardActionType.MOVE), MoveTypeSelected(MoveType.STAND_UP))
                     )
-                }
+                },
+                icon = ActionIcon.STAND_UP_AND_END
             )
             snapshot.fieldSquares[activePlayer.location as FieldCoordinate] = oldData.copyAddContextMenu(menuItem)
         }
     }
 
-    private fun handleAction(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, action: PlayerAction) {
+    private fun addActionToContextMenu(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, action: PlayerAction) {
         state.activePlayer?.location?.let { location ->
+            val (actionName, actionIcon) = when (action.type) {
+                PlayerStandardActionType.MOVE -> "Move" to ActionIcon.MOVE
+                PlayerStandardActionType.PASS -> "Pass" to ActionIcon.PASS
+                PlayerStandardActionType.HAND_OFF -> "Hand-off" to ActionIcon.HANDOFF
+                PlayerStandardActionType.BLOCK -> "Block" to ActionIcon.BLOCK
+                PlayerStandardActionType.BLITZ -> "Blitz" to ActionIcon.BLITZ
+                PlayerStandardActionType.FOUL -> "Foul" to ActionIcon.FOUL
+                PlayerStandardActionType.SPECIAL -> "Special" to ActionIcon.CONFIRM // What to do here?
+                PlayerStandardActionType.THROW_TEAM_MATE -> "Throw Team-mate" to ActionIcon.THROW_TEAM_MATE
+                PlayerSpecialActionType.BALL_AND_CHAIN -> "Ball & Chain" to ActionIcon.BALL_AND_CHAIN
+                PlayerSpecialActionType.BOMBARDIER -> "Bombardier" to ActionIcon.BOMBARDIER
+                PlayerSpecialActionType.BREATHE_FIRE -> "Breathe Fire" to ActionIcon.BREATHE_FIRE
+                PlayerSpecialActionType.CHAINSAW -> "Chainsaw" to ActionIcon.CHAINSAW
+                PlayerSpecialActionType.HYPNOTIC_GAZE -> "Hypnotic Gaze" to ActionIcon.HYPNOTIC_GAZE
+                PlayerSpecialActionType.KICK_TEAM_MATE -> "Kick Team-mate" to ActionIcon.KICK_TEAM_MATE
+                PlayerSpecialActionType.MULTIPLE_BLOCK -> "Multiple Block" to ActionIcon.MULTIPLE_BLOCK
+                PlayerSpecialActionType.PROJECTILE_VOMIT -> "Projectile Vomit" to ActionIcon.PROJECTILE_VOMIT
+                PlayerSpecialActionType.STAB -> "Stab" to ActionIcon.STAB
+            }
+
             val oldData = snapshot.fieldSquares[location]!!
             snapshot.fieldSquares[location as FieldCoordinate] =
                 oldData.copyAddContextMenu(
-                    action.let {
-                        val name = when (it.type) {
-                            PlayerStandardActionType.MOVE -> "Move"
-                            PlayerStandardActionType.PASS -> "Pass"
-                            PlayerStandardActionType.HAND_OFF -> "Hand-off"
-                            PlayerStandardActionType.BLOCK -> "Block"
-                            PlayerStandardActionType.BLITZ -> "Blitz"
-                            PlayerStandardActionType.FOUL -> "Foul"
-                            PlayerStandardActionType.SPECIAL -> "Special"
-                            PlayerStandardActionType.THROW_TEAM_MATE -> "Throw Team-mate"
-                            PlayerSpecialActionType.BALL_AND_CHAIN -> "Ball & Chain"
-                            PlayerSpecialActionType.BOMBARDIER -> "Bombardier"
-                            PlayerSpecialActionType.BREATHE_FIRE -> "Breathe Fire"
-                            PlayerSpecialActionType.CHAINSAW -> "Chainsaw"
-                            PlayerSpecialActionType.HYPNOTIC_GAZE -> "Hypnotic Gaze"
-                            PlayerSpecialActionType.KICK_TEAM_MATE -> "Kick Team-mate"
-                            PlayerSpecialActionType.MULTIPLE_BLOCK -> "Multiple Block"
-                            PlayerSpecialActionType.PROJECTILE_VOMIT -> "Projectile Vomit"
-                            PlayerSpecialActionType.STAB -> "Stab"
-                        }
-                        ContextMenuOption(
-                            title = name,
-                            command = { actionProvider.userActionSelected(PlayerActionSelected(it.type)) },
-                        )
-                    },
+                    ContextMenuOption(
+                        title = actionName,
+                        command = { actionProvider.userActionSelected(PlayerActionSelected(action.type)) },
+                        icon = actionIcon
+                    )
                 )
         } ?: error("No active player")
     }

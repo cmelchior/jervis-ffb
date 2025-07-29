@@ -263,7 +263,7 @@ fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog:
             data.offset
         }
     }
-    if (!dialog.viewModel.shown) return
+    if (!dialog.viewModel.shown.value) return
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier.offset { offset }
