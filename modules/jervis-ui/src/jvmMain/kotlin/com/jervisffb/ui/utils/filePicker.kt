@@ -9,6 +9,7 @@ import okio.buffer
 import okio.use
 import java.io.File
 import javax.swing.JFileChooser
+import javax.swing.SwingUtilities
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.filechooser.FileView
 
@@ -65,33 +66,35 @@ private fun filePicker(
     extensionFilterFileType: String,
     onFileSelected: (Path) -> Unit,
 ) {
-    val fileChooser = JFileChooser()
-    val fileFilter = FileNameExtensionFilter(extensionFilterDescription, extensionFilterFileType)
-    fileChooser.approveButtonText = "Select"
-    fileChooser.dialogTitle = dialogTitle
-    if (selectedFile != null) {
-        fileChooser.selectedFile = File(selectedFile)
-    }
-    fileChooser.isMultiSelectionEnabled = false
-    fileChooser.fileSelectionMode = JFileChooser.FILES_ONLY
-    fileChooser.isFileHidingEnabled = true
-    fileChooser.addChoosableFileFilter(fileFilter)
-    fileChooser.setFileView(object : FileView() {
-        override fun isTraversable(file: File): Boolean = file.isDirectory()
-        override fun getName(file: File): String? {
-            if (fileFilter.accept(file)) {
-                return file.getName() // Show name only for matching files
-            }
-            return null // Hide non-matching files
+    SwingUtilities.invokeLater {
+        val fileChooser = JFileChooser()
+        val fileFilter = FileNameExtensionFilter(extensionFilterDescription, extensionFilterFileType)
+        fileChooser.approveButtonText = "Select"
+        fileChooser.dialogTitle = dialogTitle
+        if (selectedFile != null) {
+            fileChooser.selectedFile = File(selectedFile)
         }
-    })
-    fileChooser.isAcceptAllFileFilterUsed = false
-    val userSelection = when (type) {
-        FilePickerType.OPEN -> fileChooser.showOpenDialog(null)
-        FilePickerType.SAVE -> fileChooser.showSaveDialog(null)
-    }
-    if (userSelection == JFileChooser.APPROVE_OPTION) {
-        val fileToSave = fileChooser.selectedFile
-        onFileSelected(fileToSave.absolutePath.toString().toPath())
+        fileChooser.isMultiSelectionEnabled = false
+        fileChooser.fileSelectionMode = JFileChooser.FILES_ONLY
+        fileChooser.isFileHidingEnabled = true
+        fileChooser.addChoosableFileFilter(fileFilter)
+        fileChooser.fileView = object : FileView() {
+            override fun isTraversable(file: File): Boolean = file.isDirectory()
+            override fun getName(file: File): String? {
+                if (fileFilter.accept(file)) {
+                    return file.name // Show name only for matching files
+                }
+                return null // Hide non-matching files
+            }
+        }
+        fileChooser.isAcceptAllFileFilterUsed = false
+        val userSelection = when (type) {
+            FilePickerType.OPEN -> fileChooser.showOpenDialog(null)
+            FilePickerType.SAVE -> fileChooser.showSaveDialog(null)
+        }
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            val fileToSave = fileChooser.selectedFile
+            onFileSelected(fileToSave.absolutePath.toString().toPath())
+        }
     }
 }
