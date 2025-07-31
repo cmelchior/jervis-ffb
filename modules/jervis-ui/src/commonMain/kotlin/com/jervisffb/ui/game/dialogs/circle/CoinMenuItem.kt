@@ -13,11 +13,14 @@ import com.jervisffb.engine.model.Coin
 class CoinMenuItem(
     val value: Coin,
     override val parent: ActionWheelMenuItem?,
-    override val label: () -> String,
-    override val enabled: Boolean,
+    label: () -> String,
+    enabled: Boolean,
     val onClick: (Coin) -> Unit,
     private val startAnimationFrom: Coin? = null
 ): ActionWheelMenuItem() {
+    override var label: () -> String by mutableStateOf(label)
+    override var enabled: Boolean by mutableStateOf(enabled)
+
     override val expandMode: MenuExpandMode = MenuExpandMode.NONE
     override val subMenu: SnapshotStateList<ActionWheelMenuItem> = mutableStateListOf()
     var animatingFrom: Coin? by mutableStateOf(startAnimationFrom)

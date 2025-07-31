@@ -16,10 +16,10 @@ class TopLevelMenuItem(
     override val subMenu: SnapshotStateList<ActionWheelMenuItem> = mutableStateListOf(),
     override val expandMode: MenuExpandMode = MenuExpandMode.COMPACT
 ): ActionWheelMenuItem() {
-    override val label: () -> String = { "TopLevel" }
+    override var label: () -> String = { "TopLevel" }
     val size: Int get() = subMenu.size
     override val parent: ActionWheelMenuItem? = null
-    override val enabled: Boolean = true
+    override var enabled: Boolean = true
 
     var selectedMenuItem: ActionWheelMenuItem? by mutableStateOf(null)
     override val defaultStartAngle: Float = originAngle

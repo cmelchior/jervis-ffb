@@ -18,16 +18,18 @@ class DiceMenuItem<T: DieResult>(
     options: List<T>,
     val preferLtr: Boolean = true,
     enabled: Boolean = true,
-    val expandable: Boolean = true,
+    expandable: Boolean = true,
     // Generics are acting up here. For now, just hack it and return later.
-    val onClick: (DieResult) -> Unit = { },
+    onClick: (DieResult) -> Unit = { },
     startAnimationFrom: T? = null,
     val onHover: (T?) -> Unit = { },
 ): ActionWheelMenuItem() {
-    override val label: () -> String = { "Dice[${value::class.simpleName}]" }
+    override var label: () -> String by mutableStateOf({ "Dice[${value::class.simpleName}]" })
     override val expandMode: MenuExpandMode = MenuExpandMode.NONE
     override val subMenu: SnapshotStateList<ActionWheelMenuItem> = mutableStateListOf()
     override var enabled: Boolean by mutableStateOf(enabled)
+    var onClick: (DieResult) -> Unit by mutableStateOf(onClick)
+    var expandable by mutableStateOf(expandable)
     var animatingFrom: T? by mutableStateOf(startAnimationFrom)
     var animationDone: Boolean by mutableStateOf(startAnimationFrom == null)
     var value: T by mutableStateOf(value)

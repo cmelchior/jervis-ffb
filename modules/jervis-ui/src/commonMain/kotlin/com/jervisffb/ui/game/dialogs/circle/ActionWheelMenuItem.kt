@@ -20,9 +20,9 @@ import kotlin.math.ceil
  *             menu item is laid out according to the parents [expandMode].
  */
 sealed class ActionWheelMenuItem {
-    abstract val label: () -> String
+    abstract var label: () -> String
     abstract val parent: ActionWheelMenuItem?
-    abstract val enabled: Boolean
+    abstract var enabled: Boolean
     abstract val expandMode: MenuExpandMode
     abstract val subMenu: SnapshotStateList<ActionWheelMenuItem>
 
