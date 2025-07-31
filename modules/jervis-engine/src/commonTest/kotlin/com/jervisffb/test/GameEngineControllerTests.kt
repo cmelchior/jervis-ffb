@@ -1,14 +1,20 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
+import com.jervisffb.engine.commands.CompositeCommand
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.bb2020.procedures.FanFactorRolls
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
+import com.jervisffb.engine.rules.bb2020.procedures.WeatherRoll
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.utils.InvalidActionException
+import com.jervisffb.engine.utils.assert
+import com.jervisffb.test.ext.undoActions
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -89,5 +95,21 @@ class GameEngineControllerTests {
         assertEquals(1, controller.currentActionIndex().value)
         controller.handleAction(Revert)
         assertEquals(0, controller.currentActionIndex().value)
+    }
+
+    @Test
+    fun undoCompositeCommandsUndoAll() {
+        val rules = StandardBB2020Rules().toBuilder().run {
+            undoActionBehavior = UndoActionBehavior.ALLOWED // Revert is always allowed
+            build()
+        }
+        val controller = createGameController(rules)
+        assertEquals(FanFactorRolls.SetFanFactorForHomeTeam, controller.currentNode())
+        controller.handleAction(
+            CompositeGameAction(1.d3, 2.d3)
+        )
+        assertEquals(WeatherRoll.RollWeatherDice, controller.currentNode())
+        controller.handleAction(Undo)
+        assertEquals(FanFactorRolls.SetFanFactorForHomeTeam, controller.currentNode())
     }
 }

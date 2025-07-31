@@ -310,7 +310,7 @@ open class ManualActionProvider(
 
         // When reacting to an `Undo` command, all automatic responses are disabled.
         // If not disabled, Undo'ing an action might put us in a state that will
-        // automatically move us forward again, which will make it appear as the
+        // automatically move us forward again, which will make it appear as if the
         // Undo didn't work.
         if (controller.lastActionWasUndo()) {
             return null

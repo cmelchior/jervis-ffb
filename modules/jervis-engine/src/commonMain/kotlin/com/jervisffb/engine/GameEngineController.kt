@@ -255,7 +255,7 @@ class GameEngineController(
             step.commands.forEach { command -> command.undo(state) }
         }
 
-        // UNDO actions are "normal" commands that is synchronized across distributed clients, so will
+        // UNDO actions are "normal" commands that are synchronized across distributed clients, so will
         // also increment the action counter.
         // REVERT actions only happen on a single client, so instead decrement the counter, "hiding" the change.
         lastGameActionId = if (revertActionId) {
