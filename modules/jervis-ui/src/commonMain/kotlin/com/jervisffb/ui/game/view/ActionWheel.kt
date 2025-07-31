@@ -501,7 +501,7 @@ private fun MenuItemButton(
                 ActionButton(
                     item.label(),
                     item.icon,
-                    enabled = true,
+                    enabled = item.enabled,
                     onHover = { onHover(it) },
                     onClick = { onItemSelected(item) }
                 )
@@ -800,7 +800,9 @@ fun ActionButton(
     val icon = remember(icon) { IconFactory.getActionIcon(icon) }
     val colorFilter = ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken)
     var isHover by remember { mutableStateOf(false) }
-    Box {
+    Box(
+        modifier = Modifier.alpha(if (enabled) 1f else 0.3f)
+    ) {
         Image(
             modifier = Modifier
                 .dropShadow(
