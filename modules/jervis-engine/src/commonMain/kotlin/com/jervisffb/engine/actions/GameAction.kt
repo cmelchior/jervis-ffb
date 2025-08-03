@@ -4,6 +4,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
+import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.Direction
@@ -241,6 +242,9 @@ data class DBlockResult(override val value: Int) : DieResult() {
     companion object {
         fun allOptions(): List<DBlockResult> {
             return (1..6).map { DBlockResult(it) }
+        }
+        fun random(random: Random = Random): DBlockResult {
+            return random.nextInt(1, 7).dblock
         }
     }
 }

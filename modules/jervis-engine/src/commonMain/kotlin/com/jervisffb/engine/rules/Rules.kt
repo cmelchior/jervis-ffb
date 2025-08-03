@@ -25,6 +25,7 @@ import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
 import com.jervisffb.engine.rules.bb2020.SkillSettings
+import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.RerollSource
 import com.jervisffb.engine.rules.bb2020.skills.Skill
@@ -558,6 +559,17 @@ open class Rules(
             true -> allowMultipleTeamRerollsPrTurn
             false -> true
         }
+    }
+
+    /**
+     * Returns `true` if rerolls of some dice in the dice pool are still allowed.
+     * Note, this doesn't mean that a reroll is available, just that it is allowed
+     * if possible.
+     */
+    fun isRerollAllowed(dicePool: List<DieRoll<*>>): Boolean {
+        // It is only allowed to reroll a die a single time. So if a rerollSource
+        // exists, it cannot be rerolled again
+        return dicePool.any { it.rerollSource != null }
     }
 
     /**

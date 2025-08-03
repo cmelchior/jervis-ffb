@@ -38,7 +38,9 @@ class ActionWheelViewModel(
     fallbackToShowStartHoverText: Boolean = false,
     topExpandMode: MenuExpandMode = MenuExpandMode.COMPACT,
     bottomExpandMode: MenuExpandMode = MenuExpandMode.COMPACT,
-    var shown: MutableState<Boolean> = mutableStateOf(true)
+    var shown: MutableState<Boolean> = mutableStateOf(true),
+    val hideOnClickedOutside: Boolean = false,
+    private val onMenuHidden: (() -> Unit)? = null
 ) {
     // Wheel is shown on screen
     // var shown by mutableStateOf(true)
@@ -68,7 +70,12 @@ class ActionWheelViewModel(
         }
     }
 
+    fun showWheel() {
+        shown.value = true
+    }
+
     fun hideWheel() {
         shown.value = false
+        onMenuHidden?.invoke()
     }
 }

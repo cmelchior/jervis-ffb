@@ -138,6 +138,7 @@ class GameEngineController(
             }
             else -> processForwardAction(action)
         }
+        LOG.v { "Current node: ${currentNode()}" }
     }
 
     /**

@@ -29,6 +29,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.DBlockResult
@@ -236,6 +238,7 @@ fun MultipleSelectUserActionDialog(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog: ActionWheelInputDialog, vm: DialogsViewModel) {
     val wheelViewModel = dialog.viewModel
@@ -264,9 +267,21 @@ fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog:
         }
     }
     if (!dialog.viewModel.shown.value) return
-    Box(modifier = Modifier.fillMaxSize()) {
+    Popup(
+        alignment = Alignment.TopStart,
+        offset = offset,
+        onDismissRequest = {
+            if (wheelViewModel.hideOnClickedOutside) {
+                wheelViewModel.hideWheel()
+            }
+        },
+        properties = PopupProperties(
+            focusable = true,
+            clippingEnabled = true // Prevents being dragged outside the window bounds
+        )
+    ) {
         Box(
-            modifier = Modifier.offset { offset }
+            // modifier = Modifier.offset { offset }
         ) {
             ActionWheelMenu(
                 viewModel = wheelViewModel,

@@ -47,6 +47,10 @@ things as they come up.
 - [ ] Add AFK Limit to timer settings + AFK button in the UI
 - [ ] Add a "Player Editor" in Dev Mode that makes it possible to add skills, change stats, and states.
       Need to figure out exactly how this should work.
+- [ ] When Undo'ing block dice it messes up the Action Wheel logic so it shows the dice roll that is skipped when going
+      forward. That isn't a bug per see, but how the design works. However it feels jarring in that case. Not 100% sure
+      what the best approach is. We can either combine Nodes in the engine, or find some ways to hack the UI flow.
+      Either way feel kinda hack-ish :/
 - [x] Hover on block shows dice indicator.
 - [x] Better ball animation using Projectile Motion equations.
     - https://www.youtube.com/watch?v=qtsxHx1MpUI&ab_channel=PhysicsAlmanac

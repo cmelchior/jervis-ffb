@@ -35,6 +35,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameSnapshot
@@ -109,10 +111,6 @@ open class ManualActionProvider(
         SelectPlayerAction::class to SelectPlayerActionDecorator(),
     )
 
-    private fun <T: GameActionDescriptor> getDecorator(type: KClass<T>): FieldActionDecorator<GameActionDescriptor>? {
-        return fieldActionDecorators[type] as? FieldActionDecorator<GameActionDescriptor>
-    }
-
     override fun startHandler() {
         // Do nothing. We are sharing the controller with the main UiGameController
     }
@@ -136,7 +134,7 @@ open class ManualActionProvider(
             }
         }
 
-        // We only want to check for other automated settings if no queued up actions exists.
+        // We only want to check for other automated settings if no queued up actions exist.
         // This also means that anyone queuing up actions, most queue up all intermediate actions
         // as well. Even the ones that are normally automatically created.
         if (queuedActions.isEmpty()) {
@@ -164,7 +162,7 @@ open class ManualActionProvider(
         }
 
         if (showActionDecorators) {
-            addDialogDecorators(this, state, actions)
+            addModalDialogDecorators(this, state, actions)
 
             // If a dialog is being shown, we do not want to enable any other kind of input until
             // the dialog has been resolved.
@@ -172,9 +170,11 @@ open class ManualActionProvider(
                 addNonDialogActionDecorators(state, actions)
             }
 
-            // Check for the context menu
+            // Check for the context menu. The context menu is not considered a modal dialog, so is
+            // added during `addNonDialogActionDecorators()`. Thus we need to check for it here.
+            // TODO This is probably the wrong architecture as we can have multiple menus like during
             state.fieldSquares.values.firstOrNull { it.contextMenuOptions.isNotEmpty() }?.let {
-                state.dialogInput = it.createActionWheelDialogData()
+                state.dialogInput = it.createActionWheelContextMenu()
             }
         }
     }
@@ -226,12 +226,16 @@ open class ManualActionProvider(
         }
     }
 
+    private fun <T: GameActionDescriptor> getDecorator(type: KClass<T>): FieldActionDecorator<GameActionDescriptor>? {
+        return fieldActionDecorators[type] as? FieldActionDecorator<GameActionDescriptor>
+    }
+
     /**
      * Check if the game are in a state where we want to show a pop-up dialog in order
      * to create a [GameAction]. If yes, the data needed to build the dialog is added
      * to the UI state.
      */
-    private fun addDialogDecorators(provider: UiActionProvider, state: UiGameSnapshot, actions: ActionRequest) {
+    private fun addModalDialogDecorators(provider: UiActionProvider, state: UiGameSnapshot, actions: ActionRequest) {
         val dialogData = DialogFactory.createDialogIfPossible(
             game,
             actions,
@@ -302,6 +306,7 @@ open class ManualActionProvider(
      *
      * Some requirements:
      * - Any action returned this way should also have an entry in [Feature]
+     * - Except StandardBlock.RolLDice, since the ActionWheel behaves slightly different.
      */
     private fun calculateAutomaticResponse(
         controller: GameEngineController,
@@ -319,6 +324,14 @@ open class ManualActionProvider(
         // First, we check if we are playing Hotseat and the game is set to roll random
         // actions on the "server". In this case, they are generated here.
         if (!gameSettings.clientSelectedDiceRolls && gameSettings.isHotseatGame && actions.containsActionWithRandomBehavior()) {
+            return createRandomAction(controller.state, actions)
+        }
+
+        // If the Client is allowed to select dice rolls, this normally happens at the correct Node in the Engine,
+        // but for blocks where we are using the Action Wheel, the UI gets a little wonky. So in that case, we
+        // always generate the roll here, and if the coach isn't happy with the result, they can modify it. Which
+        // will result in an Undo.
+        if (gameSettings.clientSelectedDiceRolls && (controller.currentNode() is StandardBlockRollDice.RollDice || controller.currentNode() is StandardBlockRerollDice.ReRollDie)) {
             return createRandomAction(controller.state, actions)
         }
 

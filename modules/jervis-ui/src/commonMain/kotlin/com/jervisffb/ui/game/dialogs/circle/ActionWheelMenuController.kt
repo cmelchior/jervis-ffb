@@ -59,7 +59,7 @@ class ActionWheelMenuController(
         expandable: Boolean = true,
         onClick : (DieResult) -> Unit = { },
         animatingFrom: T? = null,
-        onHover: (T?) -> Unit = { }
+        onHover: (T?) -> String? = { null }
     ): DiceMenuItem<T> {
         return topLevelMenu.addDiceButton(
             id,

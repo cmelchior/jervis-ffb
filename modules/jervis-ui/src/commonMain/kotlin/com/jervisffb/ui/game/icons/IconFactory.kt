@@ -137,6 +137,9 @@ enum class ActionIcon(val path: String) {
     STAND_UP_AND_END("jervis/actions/jervis_action_move.png"),
     JUMP("jervis/actions/jervis_action_jump.png"),
     LEAP("jervis/actions/jervis_action_jump.png"),
+    STAY("jervis/actions/jervis_action_cancel.png"),
+    FOLLOW_UP("jervis/actions/jervis_action_move.png"),
+
 
     // Special Actions
     BALL_AND_CHAIN("jervis/actions/jervis_action_move.png"),

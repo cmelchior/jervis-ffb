@@ -515,7 +515,11 @@ private fun MenuItemButton(
                         item.onClick(item.value)
                     },
                     onExpandedChanged = onExpandChanged,
-                    onHover = item.onHover as (DieResult?) -> Unit,
+                    onHover = {
+                        @Suppress("UNCHECKED_CAST")
+                        val hoverText = item.onHover as (DieResult?) -> String?
+                        onHover(hoverText(it))
+                    },
                 )
             }
 

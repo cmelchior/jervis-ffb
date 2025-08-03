@@ -35,10 +35,10 @@ class UiFieldSquare(
     var dice: Int by mutableStateOf(0) // Show block dice decorator
     var requiresRoll: Boolean by mutableStateOf(false) // onSelected is not-null but will result in dice being rolled
     var onSelected: (() -> Unit)? by mutableStateOf(null) // Action if square is selected
-    var onMenuHidden: (() -> Unit?)? by mutableStateOf(null) // Action if the context menu is hidden
+    var onMenuHidden: (() -> Unit)? by mutableStateOf(null) // Action if the context menu is hidden
     var showContextMenu = mutableStateOf(false) // The context menu is automatically opened
     var contextMenuOptions: SnapshotStateList<ContextMenuOption> = SnapshotStateList() // The options inside the context menu
-    val useActionWheel= true // Whether to use a Context Menu or Action Wheel for the context items
+    val useActionWheel = true // Whether to use a Context Menu or Action Wheel for the context items
 
     fun isEmpty() = !isBallOnGround && player == null
 
@@ -52,7 +52,7 @@ class UiFieldSquare(
         return this
     }
 
-    fun createActionWheelDialogData(): ActionWheelInputDialog {
+    fun createActionWheelContextMenu(): ActionWheelInputDialog {
         val team = player?.model?.team ?: error("Player must be set for a context menu to be shown")
         val viewModel = ActionWheelViewModel(
             team = team,
@@ -60,7 +60,9 @@ class UiFieldSquare(
             startHoverText = null,
             fallbackToShowStartHoverText = false,
             bottomExpandMode = MenuExpandMode.FAN_OUT,
-            shown = showContextMenu
+            shown = showContextMenu,
+            hideOnClickedOutside = true,
+            onMenuHidden = onMenuHidden
         ).also { wheelModel ->
             contextMenuOptions.forEach { option ->
                 wheelModel.bottomMenu.addActionButton(

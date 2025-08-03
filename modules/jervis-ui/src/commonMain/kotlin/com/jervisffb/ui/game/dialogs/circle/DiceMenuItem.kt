@@ -22,7 +22,7 @@ class DiceMenuItem<T: DieResult>(
     // Generics are acting up here. For now, just hack it and return later.
     onClick: (DieResult) -> Unit = { },
     startAnimationFrom: T? = null,
-    val onHover: (T?) -> Unit = { },
+    val onHover: (T?) -> String? = { null },
 ): ActionWheelMenuItem() {
     override var label: () -> String by mutableStateOf({ "Dice[${value::class.simpleName}]" })
     override val expandMode: MenuExpandMode = MenuExpandMode.NONE

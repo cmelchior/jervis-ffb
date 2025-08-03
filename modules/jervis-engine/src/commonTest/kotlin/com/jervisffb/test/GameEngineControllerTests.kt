@@ -4,7 +4,6 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.Undo
-import com.jervisffb.engine.commands.CompositeCommand
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
@@ -13,8 +12,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.procedures.WeatherRoll
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.utils.InvalidActionException
-import com.jervisffb.engine.utils.assert
-import com.jervisffb.test.ext.undoActions
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

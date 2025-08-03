@@ -6,12 +6,12 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * Representation of a Block die.
  * See page 57 in the rulebook.
  */
-enum class BlockDice {
-    PLAYER_DOWN,
-    BOTH_DOWN,
-    PUSH_BACK,
-    STUMBLE,
-    POW,
+enum class BlockDice(val description: String) {
+    PLAYER_DOWN("Player Down"),
+    BOTH_DOWN("Both Down"),
+    PUSH_BACK("Pushback"),
+    STUMBLE("Stumble"),
+    POW("POW!"),
     ;
 
     companion object {

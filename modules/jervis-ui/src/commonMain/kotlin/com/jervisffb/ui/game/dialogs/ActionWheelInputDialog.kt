@@ -1,15 +1,32 @@
 package com.jervisffb.ui.game.dialogs
 
 import com.jervisffb.engine.ActionRequest
+import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
+import com.jervisffb.engine.actions.DBlockResult
+import com.jervisffb.engine.actions.DicePoolChoice
+import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.DiceRollResults
+import com.jervisffb.engine.actions.DieResult
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.RerollOptionSelected
+import com.jervisffb.engine.actions.RollDice
+import com.jervisffb.engine.actions.SelectDicePoolResult
+import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.DieId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
+import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
+import com.jervisffb.ui.game.dialogs.circle.ActionMenuItem
 import com.jervisffb.ui.game.dialogs.circle.ActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.circle.DiceMenuItem
 import com.jervisffb.ui.game.icons.ActionIcon
@@ -87,9 +104,6 @@ class ActionWheelInputDialog(
                 startHoverText = "Deviate Ball",
                 fallbackToShowStartHoverText = false,
             ).also { wheelModel ->
-                val labelGenerator = {
-
-                }
                 wheelModel.topMenu.let { menu ->
                     menu.addDiceButton(
                         id = DieId("Deviate-D6"),
@@ -100,7 +114,7 @@ class ActionWheelInputDialog(
                         animatingFrom = D6Result.random(),
                         onHover = { d6 ->
                             val d8 = wheelModel.topMenu.getDiceButton(1).value as D8Result
-                            wheelModel.hoverText.value = d6?.let { getResultLabel(it, d8) }
+                            d6?.let { getResultLabel(it, d8) }
                         }
                     )
                     menu.addDiceButton(
@@ -112,7 +126,7 @@ class ActionWheelInputDialog(
                         animatingFrom = D8Result.random(),
                         onHover = { d8 ->
                             val d6 = wheelModel.topMenu.getDiceButton(0).value as D6Result
-                            wheelModel.hoverText.value = d8?.let { getResultLabel(d6, it) }
+                            d8?.let { getResultLabel(d6, it) }
                         }
                     )
                 }
@@ -172,7 +186,7 @@ class ActionWheelInputDialog(
                         animatingFrom = D6Result.random(),
                         onHover = { d6 ->
                             val dice2 = wheelModel.topMenu.getDiceButton(1).value as D6Result
-                            wheelModel.hoverText.value = d6?.let {getResultLabel(it, dice2) }
+                            d6?.let {getResultLabel(it, dice2) }
                         }
                     )
                     menu.addDiceButton(
@@ -184,7 +198,7 @@ class ActionWheelInputDialog(
                         animatingFrom = D6Result.random(),
                         onHover = { d6 ->
                             val dice1 = wheelModel.topMenu.getDiceButton(0).value as D6Result
-                            wheelModel.hoverText.value = d6?.let {getResultLabel(dice1, it) }
+                            d6?.let {getResultLabel(dice1, it) }
                         }
                     )
                 }
@@ -244,7 +258,7 @@ class ActionWheelInputDialog(
                         expandable = true,
                         animatingFrom = D8Result.random(),
                         onHover = { d8 ->
-                            wheelModel.hoverText.value = d8?.let { getResultLabel(it) }
+                            d8?.let { getResultLabel(it) }
                         }
                     )
                 }
@@ -267,5 +281,218 @@ class ActionWheelInputDialog(
                 viewModel = viewModel,
             )
         }
+
+        fun createBlockRollDialog(
+            provider: UiActionProvider,
+            request: ActionRequest,
+            isBlitz: Boolean,
+            isReroll: Boolean,
+        ): UserInputDialog {
+            val state = request.team!!.game
+            val targetLocation = state.getContext<BlockContext>().defender.location as FieldCoordinate
+            val viewModel = ActionWheelViewModel(
+                team = request.team!!,
+                center = targetLocation,
+                startHoverText = when {
+                    isBlitz && !isReroll -> "Roll Block Dice"
+                    isBlitz && isReroll -> "Reroll Block Dice"
+                    !isBlitz && !isReroll -> "Roll Block Dice"
+                    !isBlitz && isReroll -> "Reroll Block Dice"
+                    else -> error("Invalid state: $isBlitz, $isReroll")
+                },
+                fallbackToShowStartHoverText = true,
+            ).also { wheelModel ->
+                val labelGenerator = {
+                }
+                wheelModel.topMenu.let { menu ->
+                    val diceCount = (request.actions.first() as RollDice).dice.size
+                    repeat(diceCount) {
+                        menu.addDiceButton(
+                            id = DieId("Block-D6-${it + 1}"),
+                            diceValue = DBlockResult.random(),
+                            options = DBlockResult.allOptions(),
+                            preferLtr = true,
+                            expandable = true,
+                            animatingFrom = DBlockResult.random(),
+                            onHover = { dblock ->
+                                dblock?.blockResult?.name
+                            }
+                        )
+                    }
+                }
+                wheelModel.bottomMenu.addActionButton(
+                    label = { "Lock Dice Roll" },
+                    icon = ActionIcon.CONFIRM,
+                    enabled = true,
+                    onClick = { parent, button ->
+                        val dice = DiceRollResults(wheelModel.topMenu.menuItems.filterIsInstance<DiceMenuItem<*>>().map { it.value })
+                        provider.userActionSelected(dice)
+                        wheelModel.hideWheel()
+                    }
+                )
+            }
+            return ActionWheelInputDialog(
+                owner = request.team!!,
+                viewModel = viewModel,
+            )
+        }
+
+        fun createSelectBlockDie(
+            provider: UiActionProvider,
+            request: ActionRequest,
+        ): UserInputDialog {
+            val dicePool = request.actions.first() as SelectDicePoolResult
+            val state = request.team!!.game
+            val targetLocation = state.getContext<BlockContext>().defender.location as FieldCoordinate
+            val viewModel = ActionWheelViewModel(
+                team = request.team!!,
+                center = targetLocation,
+                startHoverText = "Select Block Result",
+                fallbackToShowStartHoverText = false,
+            ).also { wheelModel ->
+                val labelGenerator = {
+                }
+                wheelModel.topMenu.let { menu ->
+                    val dice = dicePool.pools.first().dice as List<DieRoll<DBlockResult>>
+                    dice.forEach {
+                        menu.addDiceButton(
+                            id = it.id,
+                            diceValue = it.result,
+                            options = DBlockResult.allOptions(),
+                            preferLtr = true,
+                            expandable = false,
+                            onClick = { value: DieResult ->
+                                val action = DicePoolResultsSelected.fromSingleDice(value)
+                                provider.userActionSelected(action)
+                            },
+                            animatingFrom = DBlockResult.random(),
+                            onHover = { dblock ->
+                                dblock?.blockResult?.description
+                            }
+                        )
+                    }
+                }
+//                wheelModel.bottomMenu.addActionButton(
+//                    label = { "Lock Dice Roll" },
+//                    icon = ActionIcon.CONFIRM,
+//                    enabled = true,
+//                    onClick = { parent, button ->
+//                        val dice = DiceRollResults(wheelModel.topMenu.menuItems.filterIsInstance<DiceMenuItem<*>>().map { it.value })
+//                        provider.userActionSelected(dice)
+//                        wheelModel.hideWheel()
+//                    }
+//                )
+            }
+            return ActionWheelInputDialog(
+                owner = request.team!!,
+                viewModel = viewModel,
+            )
+        }
+
+        fun createChooseBlockResultOrReroll(
+            provider: UiActionProvider,
+            state: Game,
+            request: ActionRequest,
+            chooseResultAfterReroll: Boolean = false,
+        ): UserInputDialog {
+            val targetLocation = state.getContext<BlockContext>().defender.location as FieldCoordinate
+            val viewModel = ActionWheelViewModel(
+                team = request.team!!,
+                center = targetLocation,
+                startHoverText = "Select Block Result",
+                fallbackToShowStartHoverText = false,
+            ).also { wheelModel ->
+                var diceLocked = true
+                wheelModel.topMenu.let { menu ->
+                    val dice = state.getContext<BlockContext>().roll
+                    dice.forEach { die ->
+                        menu.addDiceButton(
+                            id = die.id,
+                            diceValue = die.result,
+                            options = DBlockResult.allOptions(),
+                            preferLtr = true,
+                            expandable = !diceLocked,
+                            onClick = { dieResult ->
+                                val actions = mutableListOf<GameAction>()
+                                var undo = false
+                                if (dieResult != die.result) {
+                                    undo = true
+                                    actions.add(DiceRollResults(menu.menuItems.filterIsInstance<DiceMenuItem<*>>().map { it.value}))
+                                }
+                                if (chooseResultAfterReroll) {
+                                    actions.add(DicePoolResultsSelected(listOf(DicePoolChoice(0, listOf(dieResult)))))
+                                } else {
+                                    actions.add(NoRerollSelected())
+                                    actions.add(DicePoolResultsSelected(listOf(DicePoolChoice(0, listOf(dieResult)))))
+                                }
+                                if (undo) {
+                                    provider.userMultipleActionsSelected(listOf(Undo, CompositeGameAction(actions)), false)
+                                } else {
+                                    provider.userActionSelected(CompositeGameAction(actions))
+                                }
+                            },
+                            animatingFrom = DBlockResult.random(),
+                            onHover = { dblock ->
+                                dblock?.blockResult?.description
+                            }
+                        )
+                    }
+                }
+
+                val rerollActionButtons = request.filterIsInstance<SelectRerollOption>().firstOrNull()?.let { rerollOption ->
+                    rerollOption.options.map { option ->
+                        val rerollSource = option.getRerollSource(state)
+                        wheelModel.bottomMenu.addActionButton(
+                            label = { rerollSource.rerollDescription },
+                            icon = ActionIcon.TEAM_REROLL,
+                            enabled = diceLocked,
+                            onClick = { parent, button ->
+                                provider.userActionSelected(RerollOptionSelected(option))
+                            }
+                        )
+                    }
+                }
+                wheelModel.bottomMenu.addActionButton(
+                    label = { "Select Dice Values" },
+                    icon = ActionIcon.CANCEL,
+                    enabled = true,
+                    onClick = { parent, button ->
+                        when (diceLocked) {
+                            true -> {
+                                diceLocked = false
+                                rerollActionButtons?.forEach { it.enabled = false }
+                                wheelModel.topMenu.menuItems.forEach {
+                                    if (it is DiceMenuItem<*>) {
+                                        it.expandable = true
+                                    }
+                                }
+                                (button as ActionMenuItem).apply {
+                                    label = { "Lock Dice Roll" }
+                                    icon = ActionIcon.CONFIRM
+                                }
+                            }
+                            false -> {
+                                diceLocked = true
+                                rerollActionButtons?.forEach { it.enabled = true }
+                                wheelModel.topMenu.menuItems.forEach {
+                                    if (it is DiceMenuItem<*>) {
+                                        it.expandable = false
+                                    }
+                                }
+                                (button as ActionMenuItem).apply {
+                                    label = { "Select Dice Values" }
+                                    icon = ActionIcon.CANCEL
+                                }
+                            }
+                        }
+                    }
+                )
+            }
+            return ActionWheelInputDialog(
+                owner = request.team!!,
+                viewModel = viewModel,
+            )
+        }
+
     }
 }

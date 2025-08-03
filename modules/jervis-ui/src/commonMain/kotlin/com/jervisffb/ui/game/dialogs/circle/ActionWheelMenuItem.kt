@@ -116,7 +116,7 @@ sealed class ActionWheelMenuItem {
         expandable: Boolean = true,
         onClick: (DieResult) -> Unit = { },
         animateValueFrom: T? = null,
-        onHover: (T?) -> Unit,
+        onHover: (T?) -> String?,
     ): DiceMenuItem<T> {
         val button = DiceMenuItem(
             this,

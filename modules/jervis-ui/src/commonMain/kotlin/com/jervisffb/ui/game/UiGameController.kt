@@ -152,7 +152,7 @@ class UiGameController(
     val rules: Rules = gameController.rules
     val diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator() // Used by UI to create random results. Should this be somewhere else?
 
-    // Persistent UI decorations that needs to be stored across frames
+    // Persistent UI decorations that needs to be stored across actions
     val uiDecorations = UiGameDecorations()
 
     private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + singleThreadDispatcher("AnimationScope"))
