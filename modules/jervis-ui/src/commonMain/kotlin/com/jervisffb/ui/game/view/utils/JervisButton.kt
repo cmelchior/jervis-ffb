@@ -17,6 +17,8 @@ fun JervisButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    textModifier: Modifier = Modifier,
+    textUppercase: Boolean = true,
     enabled: Boolean = true,
     fillWidth: Boolean = false,
     buttonColor: Color = JervisTheme.rulebookBlue,
@@ -29,7 +31,8 @@ fun JervisButton(
         enabled = enabled,
     ) {
         Text(
-            text = text.uppercase(),
+            modifier = textModifier,
+            text = if (textUppercase) text.uppercase() else text,
             fontSize = 14.sp,
             lineHeight = 1.em,
             fontWeight = FontWeight.Medium,

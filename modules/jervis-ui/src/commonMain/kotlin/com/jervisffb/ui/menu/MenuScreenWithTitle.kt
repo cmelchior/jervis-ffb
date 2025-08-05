@@ -1,7 +1,6 @@
 package com.jervisffb.ui.menu
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,12 +19,11 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_krox
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_back
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.ui.game.view.JervisTheme
@@ -34,7 +31,7 @@ import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
-import org.jetbrains.compose.resources.imageResource
+import kotlinx.serialization.json.JsonNull.content
 import org.jetbrains.skia.TextLine
 import kotlin.math.PI
 import kotlin.math.atan
@@ -44,6 +41,8 @@ import kotlin.math.tan
 fun MenuScreenWithTitle(
     menuViewModel: MenuViewModel,
     title: String,
+    textBottomPadding: Dp = 0.dp,
+    pageImage: @Composable BoxScope.() -> Unit,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -55,7 +54,11 @@ fun MenuScreenWithTitle(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box {
-                TitleBar(Modifier.fillMaxHeight(0.20f).fillMaxWidth(), title = title)
+                TitleBar(
+                    modifier = Modifier.fillMaxHeight(0.20f).fillMaxWidth(),
+                    title = title,
+                    textBottomPadding = textBottomPadding,
+                )
                 Row(
                     modifier = Modifier.align(Alignment.TopStart).padding(start = 16.dp, top = 4.dp, end = 8.dp, bottom = 16.dp)
                 ) {
@@ -71,18 +74,16 @@ fun MenuScreenWithTitle(
                 // Red bar at the bottom of the screen
             }
         }
-
-        Image(
-            modifier = Modifier.align(Alignment.BottomEnd).fillMaxWidth(0.35f).offset(x = -50.dp, y = 0.dp).scale(1f,1f),
-            bitmap = imageResource(Res.drawable.jervis_frontpage_krox),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
-        )
+        pageImage()
     }
 }
 
 @Composable
-private fun TitleBar(modifier: Modifier, title: String) {
+private fun TitleBar(
+    modifier: Modifier,
+    title: String,
+    textBottomPadding: Dp = 0.dp
+) {
     val textMeasure = rememberTextMeasurer()
     val skiaFont = loadJervisFont()
     Canvas(modifier = modifier) {
@@ -129,7 +130,7 @@ private fun TitleBar(modifier: Modifier, title: String) {
 
         drawContext.canvas.nativeCanvas.apply {
             save()
-            translate(0f, size.height)
+            translate(0f, size.height - textBottomPadding.toPx())
             rotate(-angleDegrees)
             skew(skewX.toFloat(), skewY.toFloat())
             this.drawTextLine(TextLine.make(title, skiaFont), paddingX, -paddingY, nativePaint)

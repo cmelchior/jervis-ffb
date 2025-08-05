@@ -225,7 +225,10 @@ fun NotImplementYetDialog(title: String, onDismissRequest: () -> Unit) {
         icon = { /* No icon yet */ },
         width = 650.dp,
         content = { _, textColor ->
-            Text("Not implemented yet", color = textColor)
+            Text(
+                text = "Not implemented yet",
+                color = textColor
+            )
         },
         buttons = {
             Spacer(modifier = Modifier.weight(1f))
