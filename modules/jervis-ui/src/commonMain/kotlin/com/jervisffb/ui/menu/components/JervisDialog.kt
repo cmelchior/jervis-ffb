@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.jervisffb.ui.debugBorder
 import com.jervisffb.ui.dropShadow
 import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.view.JervisTheme
@@ -189,7 +190,7 @@ fun JervisDialog(
                     }
                     Column(modifier = Modifier
                         .padding(start = 24.dp, top = 20.dp, end = 32.dp, bottom = 28.dp)
-                        .wrapContentHeight()
+                        .fillMaxSize()
                     ) {
                         JervisDialogContent(
                             title = title,
@@ -254,7 +255,7 @@ private fun ColumnScope.JervisDialogContent(
 ) {
     JervisDialogHeader(title, dialogColor)
     TitleBorder(dialogColor)
-    Column(modifier = Modifier.padding(top = 8.dp)) {
+    Column(modifier = Modifier.weight(1f).fillMaxSize().padding(top = 8.dp)) {
         content()
     }
     if (buttons != null) {
