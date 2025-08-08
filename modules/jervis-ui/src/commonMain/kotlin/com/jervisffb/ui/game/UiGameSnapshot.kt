@@ -24,6 +24,7 @@ class UiGameSnapshot(
     val game: Game,
     val stack: ProcedureStack,
     var actionsRequest: ActionRequest,
+    val uiIndicators: UiGameIndicators,
     val fieldSquares: MutableMap<FieldCoordinate, UiFieldSquare>,
 ) {
     fun clearHoverData() {

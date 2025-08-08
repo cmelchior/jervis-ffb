@@ -10,17 +10,14 @@ import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.fsm.ExitProcedure
-import com.jervisffb.engine.model.BallState
-import com.jervisffb.engine.model.Direction
+import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayer
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.animations.AnimationFactory
@@ -29,6 +26,13 @@ import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.state.QueuedActionsGenerator
 import com.jervisffb.ui.game.state.UiActionProvider
+import com.jervisffb.ui.game.state.indicators.BallCarriedIndicator
+import com.jervisffb.ui.game.state.indicators.BallExitIndicator
+import com.jervisffb.ui.game.state.indicators.BallOnGroundIndicator
+import com.jervisffb.ui.game.state.indicators.BlockIndicator
+import com.jervisffb.ui.game.state.indicators.DirectionArrowIndicator
+import com.jervisffb.ui.game.state.indicators.FieldIndicator
+import com.jervisffb.ui.game.state.indicators.MoveUsedIndicator
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
@@ -153,7 +157,15 @@ class UiGameController(
     val diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator() // Used by UI to create random results. Should this be somewhere else?
 
     // Persistent UI decorations that needs to be stored across actions
-    val uiDecorations = UiGameDecorations()
+    val uiDecorations = UiGameIndicators()
+    val fieldActionIndicators: List<FieldIndicator> = listOf(
+        BallCarriedIndicator,
+        BallExitIndicator,
+        BallOnGroundIndicator,
+        BlockIndicator,
+        DirectionArrowIndicator,
+        MoveUsedIndicator
+    )
 
     private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + singleThreadDispatcher("AnimationScope"))
     val gameScope = CoroutineScope(Job() + CoroutineName("GameLoopScope") + singleThreadDispatcher("GameLoopScope"))
@@ -231,6 +243,7 @@ class UiGameController(
                 // TODO Just changing the existing uiState might not trigger recomposition correctly
                 //  We need an efficient way to copy the old one.
                 actionProvider.decorateAvailableActions(newUiState, actions)
+                applyUiIndicators(actions, state, newUiState)
                 lastUiState = newUiState
                 menuViewModel.updateUiState(newUiState)
                 _uiStateFlow.emit(newUiState)
@@ -262,6 +275,13 @@ class UiGameController(
             if (it != null && it !is CancellationException) {
                 throw it
             }
+        }
+    }
+
+    private fun applyUiIndicators(actionRequest: ActionRequest, state: Game, snapshot: UiGameSnapshot) {
+        val currentNode = state.stack.currentNode() as ActionNode
+        fieldActionIndicators.forEach { indicator ->
+            indicator.decorate(snapshot, currentNode, state, actionRequest)
         }
     }
 
@@ -314,10 +334,16 @@ class UiGameController(
             }
         }
 
-        return UiGameSnapshot(state, state.stack.createSnapshot(), actions, squares)
+        return UiGameSnapshot(
+            state,
+            state.stack.createSnapshot(),
+            actions,
+            uiDecorations,
+            squares
+        )
     }
 
-    private fun updatePersistentUiDecorations(state: Game, delta: GameDelta, uiDecorations: UiGameDecorations) {
+    private fun updatePersistentUiDecorations(state: Game, delta: GameDelta, uiDecorations: UiGameIndicators) {
         if (delta.reversed) {
             uiDecorations.undo(delta.id)
             return
@@ -366,34 +392,8 @@ class UiGameController(
     ): UiFieldSquare {
         val square = game.field[coordinate]
         val uiPlayer = square.player?.let { UiPlayer(it) }
-        val isBallOnGround: Boolean = square.balls.any {
-            (it.state != BallState.CARRIED && it.state != BallState.OUT_OF_BOUNDS) &&
-                it.location.x == coordinate.x &&
-                it.location.y == coordinate.y
-        }
-
-        // We add a special indicator where the ball is leaving the pitch (if it is)
-        val isBallExiting: Boolean = game.balls.any {
-            it.state == BallState.OUT_OF_BOUNDS && it.outOfBoundsAt == coordinate
-        }
-
-        // Add direction arrows for already selected directions during a chain push
-        var directionSelected: Direction? = null
-        state.getContextOrNull<PushContext>()?.let { context ->
-            directionSelected = context.pushChain
-                .firstOrNull { it.to == coordinate }
-                ?.let { data: PushContext.PushData ->
-                    Direction.from(data.from, data.to!!)
-                }
-        }
-
         return UiFieldSquare(square).apply {
-            this.isBallOnGround = isBallOnGround
-            this.isBallExiting = isBallExiting
-            this.isBallCarried = (square.player?.hasBall() == true)
             this.player = uiPlayer
-            this.moveUsed = uiDecorations.getMoveUsedOrNull(coordinate)
-            this.directionSelected = directionSelected
         }
     }
 

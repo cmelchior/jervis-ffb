@@ -12,10 +12,10 @@ data class BloodSpot(val coordinate: FieldCoordinate, val injury: CasualtyResult
 
 /**
  * Tracking persistent UI decorations, i.e., things that are consequences of
- * model changes, but shouldn't be tracked there. Some examples being
+ * model changes, but arent't tracked by the rules engine. Some examples being
  * blood spots after injuries and showing where a player moved during their move.
  */
-class UiGameDecorations {
+class UiGameIndicators {
 
     // State used to track UI decorators for things that are not tracked
     // in the rules engine layer.
@@ -34,6 +34,10 @@ class UiGameDecorations {
     fun addMoveUsed(coordinate: Location) {
         if (coordinate !is FieldCoordinate) TODO("Missing support for $coordinate")
         this.movesUsed.add(MoveUsed(coordinate, movesUsed.size + (usedMoveToStandUp ?: 0)))
+    }
+
+    fun getAllMoveUsed(): Map<FieldCoordinate, Int> {
+        return movesUsed.associate { it.coordinate to it.value }
     }
 
     fun getMoveUsedOrNull(coordinate: FieldCoordinate): Int? {
