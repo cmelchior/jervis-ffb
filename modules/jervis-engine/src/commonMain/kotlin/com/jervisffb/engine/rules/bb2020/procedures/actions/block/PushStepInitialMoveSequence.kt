@@ -518,7 +518,7 @@ object PushStepInitialMoveSequence: Procedure() {
                         state.field[to].balls.singleOrNull()?.let {
                             add(SetBallState.bouncing(it))
                         }
-                        if (context.isDefenderKnockedDown) {
+                        if (context.isDefenderKnockedDown && push.pushee == context.firstPushee) {
                             add(SetPlayerState(push.pushee, PlayerState.KNOCKED_DOWN))
                         }
                     }

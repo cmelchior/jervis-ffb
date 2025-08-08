@@ -13,8 +13,10 @@ import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.ext.dblock
 import com.jervisffb.engine.ext.playerId
+import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.PlayerState
@@ -26,9 +28,11 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockChooseResult
 import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.test.JervisGameTest
+import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.skills.BlockTests
 import com.jervisffb.test.skills.DodgeSkillTests
+import com.jervisffb.test.standardBlock
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -292,5 +296,23 @@ class BlockActionTests: JervisGameTest() {
         assertEquals(PlayerState.STANDING, attacker.state)
         assertEquals(FieldCoordinate(11, 6), defender.location)
         assertEquals(PlayerState.KNOCKED_DOWN, defender.state)
+    }
+
+    // Check that only the first player in the chain is knocked down
+    @Test
+    fun chainPushPowPlayer() {
+        SetPlayerLocation(homeTeam[4.playerNo], FieldCoordinate(11, 4)).execute(state)
+        SetPlayerLocation(homeTeam[10.playerNo], FieldCoordinate(11, 5)).execute(state)
+        SetPlayerLocation(homeTeam[11.playerNo], FieldCoordinate(11, 6)).execute(state)
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 6.dblock),
+            DirectionSelected(Direction.LEFT), // First push
+            DirectionSelected(Direction.UP_LEFT), // 2nd push
+        )
+        assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
+        assertEquals(PlayerState.KNOCKED_DOWN, homeTeam["H1".playerId].state)
+        assertEquals(FieldCoordinate(10, 4), homeTeam["H10".playerId].coordinates)
+        assertEquals(PlayerState.STANDING, homeTeam["H10".playerId].state)
     }
 }
