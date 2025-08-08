@@ -345,7 +345,12 @@ fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true, onExit: () 
                     val modifier = Modifier.weight(1f).aspectRatio(1f)
                     repeat(5) { x ->
                         if (sortedList.size > (index + x) && sortedList[index + x] != null) {
-                            Player(modifier, sortedList[index + x]!!, false)
+                            Player(
+                                modifier,
+                                sortedList[index + x]!!,
+                                parentHandleClick = false,
+                                contextMenuShowing = false
+                            )
                         } else {
                             // Use empty box. Unsure if we can remove this
                             // if we want a partial row to scale correctly.
@@ -361,7 +366,12 @@ fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true, onExit: () 
                 val modifier = Modifier.weight(1f).aspectRatio(1f)
                 repeat(5) { x ->
                     if (list.size > (index + x)) {
-                        Player(modifier, list[index + x], false)
+                        Player(
+                            modifier,
+                            list[index + x],
+                            parentHandleClick = false,
+                            contextMenuShowing = false
+                        )
                     } else {
                         // Use empty box. Unsure if we can remove this
                         // if we want a partial row to scale correctly.

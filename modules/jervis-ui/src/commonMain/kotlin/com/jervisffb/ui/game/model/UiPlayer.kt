@@ -9,7 +9,8 @@ class UiPlayer(
     val model: Player,
     var selectAction: (() -> Unit)? = null,
     var onHover: (() -> Unit)? = null,
-    var onHoverExit: (() -> Unit)? = null
+    var onHoverExit: (() -> Unit)? = null,
+    var isActionWheelFocus: Boolean = false
 ) {
     val carriesBall: Boolean = model.hasBall()
     val state: PlayerState = model.state

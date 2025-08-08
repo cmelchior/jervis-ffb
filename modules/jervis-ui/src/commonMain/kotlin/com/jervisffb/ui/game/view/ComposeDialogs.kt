@@ -267,13 +267,19 @@ fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog:
         }
     }
     if (!dialog.viewModel.shown.value) return
+    val dismissRequest = remember(wheelViewModel.hideOnClickedOutside, wheelViewModel.onMenuHidden) {
+        { userDismissed: Boolean -> // `true` if the user clicked outside a button (to hide the wheel)
+            if (userDismissed && dialog.viewModel.hideOnClickedOutside) {
+                dialog.viewModel.shown.value = false
+                wheelViewModel.hideWheel(false)
+            }
+        }
+    }
     Popup(
         alignment = Alignment.TopStart,
         offset = offset,
         onDismissRequest = {
-            if (wheelViewModel.hideOnClickedOutside) {
-                wheelViewModel.hideWheel()
-            }
+            dismissRequest(true)
         },
         properties = PopupProperties(
             focusable = true,
@@ -287,7 +293,8 @@ fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog:
                 viewModel = wheelViewModel,
                 ringSize = ringSize,
                 showTip = showTip,
-                tipRotationDegree = tipRotationDegree
+                tipRotationDegree = tipRotationDegree,
+                onDismissRequest = dismissRequest,
             )
         }
     }

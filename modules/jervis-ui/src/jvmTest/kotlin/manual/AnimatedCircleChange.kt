@@ -130,5 +130,5 @@ class AnimateTest() {
 
 @Composable
 fun CircularMenuDemo(actionWheel: ActionWheelViewModel) {
-    ActionWheelMenu(actionWheel)
+    ActionWheelMenu(actionWheel, onDismissRequest = { })
 }

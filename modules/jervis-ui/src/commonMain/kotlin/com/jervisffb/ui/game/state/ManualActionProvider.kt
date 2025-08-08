@@ -40,6 +40,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.Stand
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
 import com.jervisffb.ui.game.state.decorators.DeselectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
 import com.jervisffb.ui.game.state.decorators.EndSetupDecorator
@@ -175,6 +176,17 @@ open class ManualActionProvider(
             // TODO This is probably the wrong architecture as we can have multiple menus like during
             state.fieldSquares.values.firstOrNull { it.contextMenuOptions.isNotEmpty() }?.let {
                 state.dialogInput = it.createActionWheelContextMenu()
+            }
+
+            state.dialogInput?.let { dialog ->
+                if (dialog is ActionWheelInputDialog) {
+                    val square = dialog.viewModel.center
+                    if (square != null) {
+                        state.fieldSquares[square]?.apply {
+                            this.player?.isActionWheelFocus = true
+                        }
+                    }
+                }
             }
         }
     }

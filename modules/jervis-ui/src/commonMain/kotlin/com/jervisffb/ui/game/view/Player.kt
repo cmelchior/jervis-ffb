@@ -57,6 +57,7 @@ fun Player(
     modifier: Modifier,
     player: UiPlayer,
     parentHandleClick: Boolean,
+    contextMenuShowing: Boolean,
 ) {
     val playerImage = remember(player) { IconFactory.getImage(player) }
     val ballImage = IconFactory.getHeldBallOverlay()
@@ -82,9 +83,11 @@ fun Player(
     }
 
     Box(modifier = playerModifier) {
+        //println("Player: ${player.model.location} -> down: ${player.isGoingDown}")
         PlayerImage(
             bitmap = playerImage,
             isSelectable = player.isSelectable,
+            isActionWheelFocus = contextMenuShowing,
             isGoingDown = player.isGoingDown,
             alpha = if (player.hasActivated || player.isStunned) 0.5f else 1.0f,
         )
@@ -175,6 +178,16 @@ val playerDownBorderShader = playerBorderShaderTemplate.replace(
     newValue = "vec4(198.0/255.0, 0.0/255.0, 0.0/255.0, 1.0); // JervisTheme.rulebookRed"
 )
 
+val playerInFocus = playerBorderShaderTemplate.replace(
+    oldValue = "%tintColor%",
+    newValue = "vec4(255.0/255.0, 190.0/255.0, 38.0/255.0, 1.0); // JervisTheme.orange"
+    //    newValue = "vec4(190.0/255.0, 38.0/255.0, 255.0/255.0, 1.0); // JervisTheme.purple"
+    //    newValue = "vec4(0.0/255.0, 119.0/255.0, 198.0/255.0, 1.0); // JervisTheme.rulebookBlue"
+    //    newValue = "vec4(0.0/255.0, 0.0/255.0, 0.0/255.0, 1.0); // JervisTheme.rulebookBlue"
+    //    newValue = "vec4(56.0/255.0, 162.0/255.0, 59.0/255.0, 1.0); // JervisTheme.rulebookGreenAccent"
+    //    newValue = "vec4(255.0/255.0, 255.0/255.0, 255.0/255.0, 1.0); // JervisTheme.rulebookBlue"
+)
+
 // Custom rendering of Player images on a field square.
 // Players that are available will render with a glowing border around them.
 // Some of the icons seem to go all the way to the edge, which means the glow doesn't render correctly
@@ -184,24 +197,28 @@ val playerDownBorderShader = playerBorderShaderTemplate.replace(
 private fun PlayerImage(
     bitmap: ImageBitmap,
     isSelectable: Boolean,
+    isActionWheelFocus: Boolean,
     isGoingDown: Boolean,
     alpha: Float
 ) {
+    // println("PlayerImage ($bitmap): $isGoingDown")
     // Use Decal to avoid artifacts at the edges. It would be nice if we could render the "glow" outside
     // the canvas. It seems possible when using renderEffects on the graphicsLayer. But will need
     // more investigation.
-    val imageShader = ImageShader(bitmap, TileMode.Decal, TileMode.Decal)
+    val imageShader = remember(bitmap) { ImageShader(bitmap, TileMode.Decal, TileMode.Decal) }
     val playerBorderShader = when {
+        isActionWheelFocus -> playerInFocus
         isGoingDown -> playerDownBorderShader
         else -> playerSelectedBorderShader
     }
-    val runtimeEffect = remember(playerBorderShader) { RuntimeEffect.makeForShader(playerBorderShader) }
+    // val runtimeEffect = remember(playerBorderShader.hashCode()) { RuntimeEffect.makeForShader(playerBorderShader) }
+    val runtimeEffect = RuntimeEffect.makeForShader(playerBorderShader)
     BoxWithConstraints(
         modifier = Modifier
             .aspectRatio(1f)
             .fillMaxSize()
             .drawWithCache {
-                if (!isSelectable && !isGoingDown) {
+                if (!isSelectable && !isGoingDown && !isActionWheelFocus) {
                     return@drawWithCache onDrawBehind { /* Do nothing */ }
                 }
                 val canvasWidth = size.width

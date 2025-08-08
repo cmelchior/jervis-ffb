@@ -155,7 +155,7 @@ private fun FrontpageScreen.PageContent(menuViewModel: MenuViewModel) {
                         horizontalArrangement = Arrangement.End
                     ) {
                         TopbarButton(
-                            "Dev Mode",
+                            "Dev Options",
                             onClick = { viewModel.gotoDevModeScreen(navigator) })
                         TopbarButton(
                             Res.drawable.jervis_icon_menu_settings,

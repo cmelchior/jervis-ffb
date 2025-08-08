@@ -40,7 +40,7 @@ class ActionWheelViewModel(
     bottomExpandMode: MenuExpandMode = MenuExpandMode.COMPACT,
     var shown: MutableState<Boolean> = mutableStateOf(true),
     val hideOnClickedOutside: Boolean = false,
-    private val onMenuHidden: (() -> Unit)? = null
+    val onMenuHidden: (() -> Unit)? = null
 ) {
     // Wheel is shown on screen
     // var shown by mutableStateOf(true)
@@ -74,8 +74,10 @@ class ActionWheelViewModel(
         shown.value = true
     }
 
-    fun hideWheel() {
+    fun hideWheel(actionSelected: Boolean) {
         shown.value = false
-        onMenuHidden?.invoke()
+        if (!actionSelected) {
+            onMenuHidden?.invoke()
+        }
     }
 }

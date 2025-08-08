@@ -121,6 +121,20 @@ class PushbackTests: JervisGameTest() {
     }
 
     @Test
+    fun pushLeavesPlayerStanding() {
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
+            *standardBlock("H1", 4.dblock),
+            DirectionSelected(Direction.LEFT),
+            Confirm // Follow up
+        )
+        assertEquals(FieldCoordinate(12, 5), awayTeam["A1".playerId].coordinates)
+        assertEquals(FieldCoordinate(11, 5), homeTeam["H1".playerId].coordinates)
+        assertEquals(PlayerState.STANDING, homeTeam["H1".playerId].state)
+        assertNull(state.activePlayer)
+    }
+
+    @Test
     fun pushIntoBallBouncesIt() {
         // Place ball where it will bounce when H1 is pushed into it.
         SetBallLocation(state.singleBall(), FieldCoordinate(11, 5)).execute(state)

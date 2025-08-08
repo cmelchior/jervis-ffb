@@ -43,6 +43,8 @@ import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block2d
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block2dagainst
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block3d
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block3dagainst
+import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block_away
+import com.jervisffb.jervis_ui.generated.resources.icons_decorations_block_home
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_holdball
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_prone
 import com.jervisffb.jervis_ui.generated.resources.icons_decorations_stunned
@@ -579,6 +581,14 @@ object IconFactory {
     @Composable
     fun getProneDecoration(): ImageBitmap {
         return imageResource(Res.drawable.icons_decorations_prone)
+    }
+
+    @Composable
+    fun getBlockedDecoration(homeTeam: Boolean = true): DrawableResource {
+        return when (homeTeam) {
+            true -> Res.drawable.icons_decorations_block_home
+            false -> Res.drawable.icons_decorations_block_away
+        }
     }
 
     fun getDirection(direction: Direction, active: Boolean): DrawableResource {

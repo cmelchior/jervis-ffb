@@ -10,7 +10,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.theme.TrumpTownPro
 
-
 object JervisTheme {
     @Composable
     fun fontFamily() = TrumpTownPro()
@@ -60,6 +59,7 @@ object JervisTheme {
     val rulebookRed = Color(0xFFC60000) // Color(0xFF991612)
     val rulebookRedLight = Color(0xFFC60000) // Color(0xFF991612)
     val rulebookOrange = Color(0xFFFFBE26) //Color(0xFFeca316)
+    val rulebookPurple = Color(0xFFBE26FF) //Color(0xFFeca316)
     val rulebookOrangeContrast = Color(0xFF765912)
     val rulebookGreen = Color(0xFF388235)
     val rulebookPaperDark = Color(0xFF867048)

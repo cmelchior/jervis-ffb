@@ -63,7 +63,7 @@ class ActionWheelInputDialog(
                     onClick = { parent, button ->
                         val dice = it.topMenu.menuItems.first() as DiceMenuItem<*>
                         provider.userActionSelected(dice.value)
-                        it.hideWheel()
+                        it.hideWheel(true)
                     }
                 )
             }
@@ -141,7 +141,7 @@ class ActionWheelInputDialog(
                     onClick = { parent, button ->
                         val dice = DiceRollResults(wheelModel.topMenu.menuItems.reversed().filterIsInstance<DiceMenuItem<*>>().map { it.value })
                         provider.userActionSelected(dice)
-                        wheelModel.hideWheel()
+                        wheelModel.hideWheel(true)
                     }
                 )
             }
@@ -213,7 +213,7 @@ class ActionWheelInputDialog(
                     onClick = { parent, button ->
                         val dice = DiceRollResults(wheelModel.topMenu.menuItems.reversed().filterIsInstance<DiceMenuItem<*>>().map { it.value })
                         provider.userActionSelected(dice)
-                        wheelModel.hideWheel()
+                        wheelModel.hideWheel(true)
                     }
                 )
             }
@@ -272,7 +272,7 @@ class ActionWheelInputDialog(
                     onClick = { parent, button ->
                         val dice = wheelModel.topMenu.getDiceResults()
                         provider.userActionSelected(dice)
-                        wheelModel.hideWheel()
+                        wheelModel.hideWheel(true)
                     }
                 )
             }
@@ -327,7 +327,7 @@ class ActionWheelInputDialog(
                     onClick = { parent, button ->
                         val dice = DiceRollResults(wheelModel.topMenu.menuItems.filterIsInstance<DiceMenuItem<*>>().map { it.value })
                         provider.userActionSelected(dice)
-                        wheelModel.hideWheel()
+                        wheelModel.hideWheel(true)
                     }
                 )
             }

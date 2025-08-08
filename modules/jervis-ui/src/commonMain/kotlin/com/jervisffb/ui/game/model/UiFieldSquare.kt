@@ -32,13 +32,20 @@ class UiFieldSquare(
     // State that are related to actions
     var selectableDirection: Direction? by mutableStateOf(null) // Show selectable direction arrow (i.e. with hover effect)
     var directionSelected: Direction? by mutableStateOf(null) // Show a direction arrow in its selected state
+    // If negative, it means the defender has more strength. If positive, it means the attacker has more strength.
     var dice: Int by mutableStateOf(0) // Show block dice decorator
+    var isBlocked: Boolean by mutableStateOf(false) // Show "blocked" indicator
     var requiresRoll: Boolean by mutableStateOf(false) // onSelected is not-null but will result in dice being rolled
     var onSelected: (() -> Unit)? by mutableStateOf(null) // Action if square is selected
     var onMenuHidden: (() -> Unit)? by mutableStateOf(null) // Action if the context menu is hidden
+    var canHideContextMenu = mutableStateOf(false)
     var showContextMenu = mutableStateOf(false) // The context menu is automatically opened
     var contextMenuOptions: SnapshotStateList<ContextMenuOption> = SnapshotStateList() // The options inside the context menu
     val useActionWheel = true // Whether to use a Context Menu or Action Wheel for the context items
+
+    fun hasActionWheelMenu(): Boolean {
+        return useActionWheel && contextMenuOptions.isNotEmpty()
+    }
 
     fun isEmpty() = !isBallOnGround && player == null
 
@@ -71,7 +78,7 @@ class UiFieldSquare(
                     enabled = true,
                     onClick = { parent, button ->
                         option.command()
-                        wheelModel.hideWheel()
+                        wheelModel.hideWheel(true)
                     }
                 )
             }

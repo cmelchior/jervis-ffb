@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
@@ -483,6 +484,26 @@ private fun FieldSquare(
         .background(color = bgColor)
         .onPointerEvent(PointerEventType.Enter) {
             vm.hoverOver(FieldCoordinate(width, height))
+// Prototype: Dashed box around "active" square.
+//        }.applyIf(square.showContextMenu.value) {
+//            this.drawBehind {
+//                val strokeWidth = 2.dp.toPx()
+//                val cornerRadius = 8.dp.toPx()
+//                val dashLength = 4.dp.toPx()
+//                val gapLength  = 2.dp.toPx()
+//                val effect = PathEffect.dashPathEffect(floatArrayOf(dashLength, gapLength), 0f)
+//                val inset = strokeWidth / 2f
+//                val topLeft = Offset(inset, inset)
+//                val size = Size(size.width - strokeWidth, size.height - strokeWidth)
+//
+//                drawRoundRect(
+//                    color = Color.White.copy(alpha = 0.8f),
+//                    topLeft = topLeft,
+//                    size = size,
+//                    cornerRadius = CornerRadius(cornerRadius, cornerRadius),
+//                    style = Stroke(width = strokeWidth, pathEffect = effect)
+//                )
+//            }
         }
 
     val boxWrapperModifier =
@@ -505,15 +526,14 @@ private fun FieldSquare(
                 hidePopup = { dismissed ->
                     square.showContextMenu.value = false
                     if (dismissed)  {
-                        square.onMenuHidden?.let {
-                            it()
-                        }
+                        square.onMenuHidden?.invoke()
                     }
                 },
                 commands = square.contextMenuOptions,
             )
         }
         if (square.isBallOnGround || square.isBallExiting) {
+            "".any { it.isLetterOrDigit()}
             Image(
                 modifier = Modifier
                     .fillMaxSize()
@@ -545,7 +565,12 @@ private fun FieldSquare(
         }
 
         square.player?.let {
-            Player(boxModifier, it, true)
+            Player(
+                boxModifier,
+                it,
+                true,
+                square.showContextMenu.value // && !square.useActionWheel
+            )
         }
         square.directionSelected?.let {
             DictionImage(it, interactive = false)
@@ -555,6 +580,9 @@ private fun FieldSquare(
         }
         if (square.dice != 0) {
             BlockDiceIndicatorImage(square.dice)
+        }
+        if (square.isBlocked) {
+            PlayerBlockedIndicator()
         }
     }
 }
@@ -576,15 +604,29 @@ fun DictionImage(direction: Direction, interactive: Boolean) {
     )
 }
 
+/**
+ * @param dice If negative, it means the defender has more strength. If positive,
+ * it means the attacker has more strength.
+ */
 @Composable
 fun BlockDiceIndicatorImage(dice: Int) {
 //    val interactionSource = remember { MutableInteractionSource() }
 //    val isHovered by interactionSource.collectIsHoveredAsState()
-    val imageRes = IconFactory.getBlockDiceRolledIndicator(dice)
+    val imageRes = remember(dice) { IconFactory.getBlockDiceRolledIndicator(dice) }
     Image(
         modifier = Modifier.fillMaxSize() /* .hoverable(interactionSource = interactionSource) */,
         painter = painterResource(imageRes),
         // painter = if (isHovered) painterResource(imageRes) else ColorPainter(Color.Transparent),
+        contentDescription = null,
+    )
+}
+
+@Composable
+fun PlayerBlockedIndicator() {
+    val imageRes = IconFactory.getBlockedDecoration()
+    Image(
+        modifier = Modifier.fillMaxSize(),
+        painter = painterResource(imageRes),
         contentDescription = null,
     )
 }

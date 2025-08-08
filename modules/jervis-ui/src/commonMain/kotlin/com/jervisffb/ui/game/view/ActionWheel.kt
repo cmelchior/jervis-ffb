@@ -22,9 +22,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ContentAlpha.disabled
 import androidx.compose.material.DrawerDefaults.shape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -133,6 +133,7 @@ fun ActionWheelMenu(
     animationDuration: Int = 300,
     showTip: Boolean = false,
     tipRotationDegree: Float = 0f,
+    onDismissRequest: (Boolean) -> Unit,
 ) {
     // Center of the menu in pixels
     val centerPx = with(LocalDensity.current) { Offset((ringSize/2f).toPx(), (ringSize/2f).toPx()) }
@@ -164,7 +165,7 @@ fun ActionWheelMenu(
                 }
             }
         }
-        ActionWheelBackgroundRing(ringSize, borderSize, showTip, tipRotationDegree)
+        ActionWheelBackgroundRing(ringSize, borderSize, showTip, tipRotationDegree, onDismissRequest = onDismissRequest)
         NestedMenuLayout(
             viewModel = viewModel,
             viewModel.bottomMenu,
@@ -533,6 +534,7 @@ private fun MenuItemButton(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ActionWheelBackgroundRing(
     ringSize: Dp,
@@ -541,7 +543,8 @@ private fun ActionWheelBackgroundRing(
     showTip: Boolean = false,
     // How many degrees to rotate the tip in degrees. 0f is top-left
     tipRotation: Float = 0f,
-    ringColor: Color = JervisTheme.black
+    ringColor: Color = JervisTheme.black,
+    onDismissRequest: (Boolean) -> Unit = { }
 ) {
     val chalkTexture = imageResource(Res.drawable.jervis_brush_chalk)
     val imageBrush = remember {
@@ -558,6 +561,9 @@ private fun ActionWheelBackgroundRing(
     Canvas(
         modifier = Modifier
             .fillMaxSize()
+            .clickable(interactionSource = null, indication = null) {
+                onDismissRequest(true)
+            }
             .graphicsLayer {
                 clip = false
                 compositingStrategy = CompositingStrategy.Offscreen
