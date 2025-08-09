@@ -146,12 +146,12 @@ object DialogFactory {
 
                 is BothDown.AttackerChooseToUseBlock -> {
                     val context = controller.state.getContext<BothDownContext>()
-                    SingleChoiceInputDialog.createUseSkillDialog(context.attacker, context.attacker.getSkill<Block>())
+                    ActionWheelInputDialog.createUseSkillDialog(provider, context.attacker, context.attacker.getSkill<Block>())
                 }
 
                 is BothDown.DefenderChooseToUseBlock -> {
                     val context = controller.state.getContext<BothDownContext>()
-                    SingleChoiceInputDialog.createUseSkillDialog(context.defender, context.defender.getSkill<Block>())
+                    ActionWheelInputDialog.createUseSkillDialog(provider, context.defender, context.defender.getSkill<Block>())
                 }
 
                 is Bounce.RollDirection -> {
@@ -305,7 +305,8 @@ object DialogFactory {
 
                 is PushStepInitialMoveSequence.DecideToUseSidestep -> {
                     val player = controller.state.getContext<PushContext>().pushee()
-                    SingleChoiceInputDialog.createUseSkillDialog(
+                    ActionWheelInputDialog.createUseSkillDialog(
+                        provider,
                         player,
                         player.getSkill<Sidestep>()
                     )
@@ -365,12 +366,12 @@ object DialogFactory {
 
                 is Stumble.ChooseToUseDodge -> {
                     val defender = controller.state.getContext<StumbleContext>().defender
-                    SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Dodge>())
+                    ActionWheelInputDialog.createUseSkillDialog(provider, defender, defender.getSkill<Dodge>())
                 }
 
                 is Stumble.ChooseToUseTackle -> {
                     val defender = controller.state.getContext<StumbleContext>().attacker
-                    SingleChoiceInputDialog.createUseSkillDialog(defender, defender.getSkill<Tackle>())
+                    ActionWheelInputDialog.createUseSkillDialog(provider, defender, defender.getSkill<Tackle>())
                 }
 
                 is SwelteringHeat.RollForAwayTeam,

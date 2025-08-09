@@ -26,9 +26,11 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.reports.ReportStartingExtraTime.message
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
+import com.jervisffb.engine.rules.bb2020.skills.Skill
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.ui.game.dialogs.circle.ActionMenuItem
 import com.jervisffb.ui.game.dialogs.circle.ActionWheelViewModel
@@ -45,7 +47,9 @@ class ActionWheelInputDialog(
     override var owner: Team?,
     val viewModel: ActionWheelViewModel,
 ): UserInputDialog {
+
     companion object {
+
         fun createFanFactorDialog(provider: UiActionProvider, team: Team): UserInputDialog {
             val viewModel = ActionWheelViewModel(
                 team = team,
@@ -496,6 +500,7 @@ class ActionWheelInputDialog(
                 viewModel = viewModel,
             )
         }
+
         fun createFollowupDialog(
             provider: UiActionProvider,
             request: ActionRequest,
@@ -508,7 +513,6 @@ class ActionWheelInputDialog(
                 bottomExpandMode = MenuExpandMode.TWO_WAY,
                 fallbackToShowStartHoverText = false,
             ).also { wheelModel ->
-                wheelModel.bottomMenu
                 wheelModel.bottomMenu.addActionButton(
                     label = { "Stay" },
                     icon = ActionIcon.STAY,
@@ -530,6 +534,50 @@ class ActionWheelInputDialog(
             }
             return ActionWheelInputDialog(
                 owner = request.team!!,
+                viewModel = viewModel,
+            )
+        }
+
+
+
+        // -----  HELPERS -----
+
+        // Create a Dialog for using a Skill. This is always a Yes/No answer
+        fun createUseSkillDialog(
+            provider: UiActionProvider,
+            player: Player,
+            skill: Skill,
+        ): UserInputDialog {
+            val message = "Use ${skill.name}?"
+            val viewModel = ActionWheelViewModel(
+                team = player.team,
+                center = player.coordinates,
+                startHoverText = null,
+                bottomExpandMode = MenuExpandMode.TWO_WAY,
+                fallbackToShowStartHoverText = false,
+            ).also { wheelModel ->
+                wheelModel.topMessage = message
+                wheelModel.bottomMenu.addActionButton(
+                    label = { "No" },
+                    icon = ActionIcon.CANCEL,
+                    enabled = true,
+                    onClick = { _, _ ->
+                        provider.userActionSelected(Cancel)
+                        wheelModel.hideWheel(actionSelected = true)
+                    }
+                )
+                wheelModel.bottomMenu.addActionButton(
+                    label = { "Yes" },
+                    icon = ActionIcon.CONFIRM,
+                    enabled = true,
+                    onClick = { _, _ ->
+                        provider.userActionSelected(Confirm)
+                        wheelModel.hideWheel(actionSelected = true)
+                    }
+                )
+            }
+            return ActionWheelInputDialog(
+                owner = player.team,
                 viewModel = viewModel,
             )
         }
