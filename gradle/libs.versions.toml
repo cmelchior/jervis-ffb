@@ -7,19 +7,19 @@ compose = "1.8.2" # https://github.com/JetBrains/compose-multiplatform
 composeHotReload = "1.0.0-beta04" # https://github.com/JetBrains/compose-hot-reload
 coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines
 cryptography = "0.4.0" # https://github.com/whyoleg/cryptography-kotlin/releases/tag/0.4.0
-datastore = "1.1.4" # https://developer.android.com/jetpack/androidx/releases/datastore
 datetimex = "0.6.2" # https://github.com/Kotlin/kotlinx-datetime
+datastore = "1.1.7" # https://developer.android.com/jetpack/androidx/releases/datastore
 javaAssist = "3.30.2-GA" # https://github.com/jboss-javassist/javassist
 jgit = "7.2.0.202503040940-r" # https://github.com/eclipse-jgit/jgit
-kermit = "2.0.5" # https://github.com/touchlab/Kermit
-kotlin = "2.1.21" # https://github.com/JetBrains/kotlin
-ktor = "3.1.2" # https://github.com/ktorio/ktor
+kermit = "2.0.6" # https://github.com/touchlab/Kermit
+kotlin = "2.2.0" # https://github.com/JetBrains/kotlin
+ktor = "3.2.3" # https://github.com/ktorio/ktor
 minimalJson = "0.9.5" # https://github.com/ralfstx/minimal-json
 moshiKotlin = "1.15.2" # https://github.com/square/moshi
 okhttp3 = "4.12.0" # https://github.com/square/okhttp
 okio = "3.10.2" # https://github.com/square/okio
 reflections = "0.10.2" # https://github.com/ronmamo/reflections
-serialization = "1.8.1" # https://github.com/Kotlin/kotlinx.serialization
+serialization = "1.9.0" # https://github.com/Kotlin/kotlinx.serialization
 voyager = "1.1.0-beta03" # https://github.com/adrielcafe/voyager
 
 [libraries]
