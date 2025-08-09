@@ -1,7 +1,9 @@
 package com.jervisffb.ui.game.dialogs
 
 import com.jervisffb.engine.ActionRequest
+import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.Confirm
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
@@ -20,6 +22,7 @@ import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.DieId
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -29,6 +32,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.ui.game.dialogs.circle.ActionMenuItem
 import com.jervisffb.ui.game.dialogs.circle.ActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.circle.DiceMenuItem
+import com.jervisffb.ui.game.dialogs.circle.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.UiActionProvider
 
@@ -493,6 +497,42 @@ class ActionWheelInputDialog(
                 viewModel = viewModel,
             )
         }
-
+        fun createFollowupDialog(
+            provider: UiActionProvider,
+            request: ActionRequest,
+            player: Player,
+        ): UserInputDialog {
+            val viewModel = ActionWheelViewModel(
+                team = request.team!!,
+                center = player.coordinates,
+                startHoverText = "Follow Up?",
+                bottomExpandMode = MenuExpandMode.TWO_WAY,
+                fallbackToShowStartHoverText = false,
+            ).also { wheelModel ->
+                wheelModel.bottomMenu
+                wheelModel.bottomMenu.addActionButton(
+                    label = { "Stay" },
+                    icon = ActionIcon.STAY,
+                    enabled = true,
+                    onClick = { parent, button ->
+                        provider.userActionSelected(Cancel)
+                        wheelModel.hideWheel(actionSelected = true)
+                    }
+                )
+                wheelModel.bottomMenu.addActionButton(
+                    label = { "Follow Up" },
+                    icon = ActionIcon.FOLLOW_UP,
+                    enabled = true,
+                    onClick = { parent, button ->
+                        provider.userActionSelected(Confirm)
+                        wheelModel.hideWheel(actionSelected = true)
+                    }
+                )
+            }
+            return ActionWheelInputDialog(
+                owner = request.team!!,
+                viewModel = viewModel,
+            )
+        }
     }
 }

@@ -300,9 +300,7 @@ object DialogFactory {
                 }
 
                 is PushStepInitialMoveSequence.DecideToFollowUp -> {
-                    SingleChoiceInputDialog.createFollowUpDialog(
-                        controller.state.getContext<PushContext>().firstPusher
-                    )
+                    ActionWheelInputDialog.createFollowupDialog(provider, request, controller.state.getContext<PushContext>().firstPusher)
                 }
 
                 is PushStepInitialMoveSequence.DecideToUseSidestep -> {
