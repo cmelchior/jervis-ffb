@@ -1,3 +1,4 @@
+@file:OptIn(kotlin.time.ExperimentalTime::class)
 package com.jervisffb.engine.rng
 
 import com.jervisffb.engine.actions.D12Result

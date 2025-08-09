@@ -5,7 +5,6 @@
 
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.reload.gradle.ComposeHotRun
-import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
@@ -153,11 +152,6 @@ kotlin {
             }
         }
     }
-}
-
-// Required by https://github.com/JetBrains/compose-hot-reload?tab=readme-ov-file#enable-optimizenonskippinggroups
-composeCompiler {
-    featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
 }
 
 tasks.withType<ComposeHotRun>().configureEach {

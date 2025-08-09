@@ -26,7 +26,6 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.reports.ReportStartingExtraTime.message
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
@@ -358,6 +357,7 @@ class ActionWheelInputDialog(
                 fallbackToShowStartHoverText = false,
             ).also { wheelModel ->
                 wheelModel.topMenu.let { menu ->
+                    @Suppress("UNCHECKED_CAST")
                     val dice = dicePool.pools.first().dice as List<DieRoll<DBlockResult>>
                     dice.forEach {
                         menu.addDiceButton(
