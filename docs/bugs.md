@@ -4,7 +4,6 @@ This file is just a temporary way to capture any bugs seen that I didn't have ti
 
 ## Known bugs
 
-- Cannot select Block action from prone.
 - No pass animation is being triggered when Using the Pass action.
 - Player with ball blocking across middle line drops ball that bounce, crash
 - Hover over player in dugout during setup doesn't show stat card.
@@ -17,3 +16,4 @@ This file is just a temporary way to capture any bugs seen that I didn't have ti
 - Sidebar is not updated correctly when players are banned. The count is correct, but they do not show up
 - `ActionSelectorViewModel` throws concurrent modification exception for unknownActions. Figure out a solution.
 - Apothecary during Multiple Block seems to crash when used with Undo. Needs more investigation.
+- Starting a Blitz from prone when next to the target, does not provide a quick action for standing up and attacking in one click.
