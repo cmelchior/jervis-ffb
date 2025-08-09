@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -48,7 +50,8 @@ fun AboutDialogComponent(viewModel: MenuViewModel) {
     JervisDialog(
         title = "About Jervis Fantasy Football",
         icon = { JervisLogo() },
-        width = DialogSize.MEDIUM,
+        width = DialogSize.LARGE,
+        backgroundScrim = true,
         content = { _, _ ->
             CreditDialogContent(
                 dialogColor,
@@ -90,10 +93,17 @@ private fun ColumnScope.CreditDialogContent(
     textColor: Color,
     data: CreditData,
 ) {
-    Column(modifier = Modifier.weight(1f).padding(top = 8.dp)) {
+    val columnSpace = 24.dp
+    Column(
+        modifier = Modifier
+            .height(350.dp)
+            .weight(1f)
+            .padding(top = 8.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
         Row {
             CreditLabel("Version:", "", textColor)
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(columnSpace))
             CreditText("${data.clientVersion} (${data.gitCommit})", textColor)
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -103,7 +113,7 @@ private fun ColumnScope.CreditDialogContent(
                 data.mainDeveloperDescription,
                 textColor
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(columnSpace))
             CreditText(
                 data.mainDeveloper,
                 textColor
@@ -116,9 +126,22 @@ private fun ColumnScope.CreditDialogContent(
                 data.fumbblDevelopersDescription.replace("\n" , ""),
                 textColor
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(columnSpace))
             CreditText(
                 data.fumbblDevelopers.joinToString(", "),
+                textColor
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Row {
+            CreditLabel(
+                "D6 Dice Icon Credits:",
+                "Original icons modified by Ilios.",
+                textColor
+            )
+            Spacer(modifier = Modifier.width(columnSpace))
+            CreditText(
+                "\"Pixel art dice faces\", by Vircon32 (Carra). Published at OpenGameArt under license CC-BY 4.0.",
                 textColor
             )
         }
@@ -129,7 +152,7 @@ private fun ColumnScope.CreditDialogContent(
                 "",
                 textColor
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(columnSpace))
             CreditText(
                 "Blood Bowl is a trademark of Games Workshop Limited, used without permission, used without intent to infringe, or in opposition to their copyright. This project is in no way official and is not endorsed by Games Workshop Limited.",
                 textColor
