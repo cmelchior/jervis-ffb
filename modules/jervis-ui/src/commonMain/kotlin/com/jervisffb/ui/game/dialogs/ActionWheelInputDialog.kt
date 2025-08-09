@@ -29,6 +29,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
+import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.ui.game.dialogs.circle.ActionMenuItem
 import com.jervisffb.ui.game.dialogs.circle.ActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.circle.DiceMenuItem
@@ -306,8 +307,6 @@ class ActionWheelInputDialog(
                 },
                 fallbackToShowStartHoverText = true,
             ).also { wheelModel ->
-                val labelGenerator = {
-                }
                 wheelModel.topMenu.let { menu ->
                     val diceCount = (request.actions.first() as RollDice).dice.size
                     repeat(diceCount) {
@@ -354,8 +353,6 @@ class ActionWheelInputDialog(
                 startHoverText = "Select Block Result",
                 fallbackToShowStartHoverText = false,
             ).also { wheelModel ->
-                val labelGenerator = {
-                }
                 wheelModel.topMenu.let { menu ->
                     val dice = dicePool.pools.first().dice as List<DieRoll<DBlockResult>>
                     dice.forEach {
@@ -450,47 +447,49 @@ class ActionWheelInputDialog(
                             label = { rerollSource.rerollDescription },
                             icon = ActionIcon.TEAM_REROLL,
                             enabled = diceLocked,
-                            onClick = { parent, button ->
+                            onClick = { _, _ ->
                                 provider.userActionSelected(RerollOptionSelected(option))
                             }
                         )
                     }
                 }
-                wheelModel.bottomMenu.addActionButton(
-                    label = { "Select Dice Values" },
-                    icon = ActionIcon.CANCEL,
-                    enabled = true,
-                    onClick = { parent, button ->
-                        when (diceLocked) {
-                            true -> {
-                                diceLocked = false
-                                rerollActionButtons?.forEach { it.enabled = false }
-                                wheelModel.topMenu.menuItems.forEach {
-                                    if (it is DiceMenuItem<*>) {
-                                        it.expandable = true
+                if (state.rules.undoActionBehavior == UndoActionBehavior.ALLOWED) {
+                    wheelModel.bottomMenu.addActionButton(
+                        label = { "Select Dice Values" },
+                        icon = ActionIcon.CANCEL,
+                        enabled = true,
+                        onClick = { _, button ->
+                            when (diceLocked) {
+                                true -> {
+                                    diceLocked = false
+                                    rerollActionButtons?.forEach { it.enabled = false }
+                                    wheelModel.topMenu.menuItems.forEach {
+                                        if (it is DiceMenuItem<*>) {
+                                            it.expandable = true
+                                        }
+                                    }
+                                    (button as ActionMenuItem).apply {
+                                        label = { "Lock Dice Roll" }
+                                        icon = ActionIcon.CONFIRM
                                     }
                                 }
-                                (button as ActionMenuItem).apply {
-                                    label = { "Lock Dice Roll" }
-                                    icon = ActionIcon.CONFIRM
-                                }
-                            }
-                            false -> {
-                                diceLocked = true
-                                rerollActionButtons?.forEach { it.enabled = true }
-                                wheelModel.topMenu.menuItems.forEach {
-                                    if (it is DiceMenuItem<*>) {
-                                        it.expandable = false
+                                false -> {
+                                    diceLocked = true
+                                    rerollActionButtons?.forEach { it.enabled = true }
+                                    wheelModel.topMenu.menuItems.forEach {
+                                        if (it is DiceMenuItem<*>) {
+                                            it.expandable = false
+                                        }
                                     }
-                                }
-                                (button as ActionMenuItem).apply {
-                                    label = { "Select Dice Values" }
-                                    icon = ActionIcon.CANCEL
+                                    (button as ActionMenuItem).apply {
+                                        label = { "Select Dice Values" }
+                                        icon = ActionIcon.CANCEL
+                                    }
                                 }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
             return ActionWheelInputDialog(
                 owner = request.team!!,
@@ -514,7 +513,7 @@ class ActionWheelInputDialog(
                     label = { "Stay" },
                     icon = ActionIcon.STAY,
                     enabled = true,
-                    onClick = { parent, button ->
+                    onClick = { _, _ ->
                         provider.userActionSelected(Cancel)
                         wheelModel.hideWheel(actionSelected = true)
                     }
@@ -523,7 +522,7 @@ class ActionWheelInputDialog(
                     label = { "Follow Up" },
                     icon = ActionIcon.FOLLOW_UP,
                     enabled = true,
-                    onClick = { parent, button ->
+                    onClick = { _, _ ->
                         provider.userActionSelected(Confirm)
                         wheelModel.hideWheel(actionSelected = true)
                     }
