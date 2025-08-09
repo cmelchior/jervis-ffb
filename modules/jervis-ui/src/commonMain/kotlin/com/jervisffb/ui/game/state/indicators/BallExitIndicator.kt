@@ -17,9 +17,8 @@ object BallExitIndicator: FieldIndicator {
     ) {
         // We add a special indicator where the ball is leaving the pitch (if it is)
         state.balls.forEach { ball ->
-            if (ball.resolvedLocation().isOutOfBounds(state.rules)) {
-                val outOfBoundsLocation = ball.outOfBoundsAt ?: error("No out of bounds location found for ball.")
-                uiSnapshot.fieldSquares[outOfBoundsLocation]!!.isBallExiting = true
+            ball.outOfBoundsAt?.let {loc ->
+                uiSnapshot.fieldSquares[loc]!!.isBallExiting = true
             }
         }
     }
