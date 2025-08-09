@@ -218,7 +218,7 @@ private fun PlayerImage(
             .aspectRatio(1f)
             .fillMaxSize()
             .drawWithCache {
-                if (!isSelectable && /*!isGoingDown &&*/ !isActionWheelFocus) {
+                if (!isSelectable /* && !isGoingDown && !isActionWheelFocus */) {
                     return@drawWithCache onDrawBehind { /* Do nothing */ }
                 }
                 val canvasWidth = size.width
