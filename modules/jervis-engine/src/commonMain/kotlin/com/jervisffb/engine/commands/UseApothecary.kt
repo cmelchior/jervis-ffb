@@ -12,9 +12,7 @@ class UseApothecary(private val team: Team, private val apothecary: Apothecary) 
         apothecary.used = true
     }
 
-    override fun undo(
-        state: Game,
-    ) {
+    override fun undo(state: Game) {
         apothecary.used = false
     }
 }

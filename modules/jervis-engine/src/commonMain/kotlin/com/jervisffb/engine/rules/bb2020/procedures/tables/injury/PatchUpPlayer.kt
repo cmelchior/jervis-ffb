@@ -224,7 +224,7 @@ object PatchUpPlayer: Procedure() {
      * Take into accounts all injury rolls, apothecaries and regeneration results and
      * apply the result.
      *
-     * BB11 and BB7 differs on which rolls the apothecary is used.
+     * BB11 and BB7 differ on which rolls the apothecary is used.
      */
     object ApplyInjury: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
@@ -269,14 +269,17 @@ object PatchUpPlayer: Procedure() {
 
                     // In rulesets where we do not use the Casualty Table, we just use the Injury result directly.
                     (
-                        context.finalCasualtyResult == null && context.injuryResult == InjuryResult.BADLY_HURT
-                            || context.injuryResult == InjuryResult.SERIOUSLY_HURT
-                            || context.injuryResult == InjuryResult.DEAD
+                        context.finalCasualtyResult == null
+                            && (
+                                context.injuryResult == InjuryResult.BADLY_HURT
+                                    || context.injuryResult == InjuryResult.SERIOUSLY_HURT
+                                    || context.injuryResult == InjuryResult.DEAD
+                            )
                     ) -> {
-                        compositeCommandOf(
-                            SetPlayerLocation(player, DogOut),
+                        buildCompositeCommand {
+                            add(SetPlayerLocation(player, DogOut))
                             if (context.apothecaryUsed != null && context.apothecaryInjuryRollSuccess) {
-                                SetPlayerState(player, PlayerState.RESERVE)
+                                add(SetPlayerState(player, PlayerState.RESERVE))
                             } else {
                                 val playerState = when (context.injuryResult) {
                                     InjuryResult.BADLY_HURT -> PlayerState.BADLY_HURT
@@ -284,9 +287,9 @@ object PatchUpPlayer: Procedure() {
                                     InjuryResult.DEAD -> PlayerState.DEAD
                                     else -> INVALID_GAME_STATE("Unsupported injury result: $context")
                                 }
-                                SetPlayerState(player, playerState)
+                                add(SetPlayerState(player, playerState))
                             }
-                        )
+                        }
                     }
 
                     // In rulesets where the Casualty Table is used, handle them here (Standard)
@@ -294,9 +297,15 @@ object PatchUpPlayer: Procedure() {
                         when (context.finalCasualtyResult) {
                             CasualtyResult.BADLY_HURT -> {
                                 if (context.apothecaryUsed != null) {
-                                    SetPlayerState(player, PlayerState.RESERVE)
+                                    compositeCommandOf(
+                                        SetPlayerState(player, PlayerState.RESERVE),
+                                        SetPlayerLocation(player, DogOut)
+                                    )
                                 } else {
-                                    SetPlayerLocation(player, DogOut)
+                                    compositeCommandOf(
+                                        SetPlayerState(player, PlayerState.BADLY_HURT),
+                                        SetPlayerLocation(player, DogOut)
+                                    )
                                 }
                             }
                             CasualtyResult.SERIOUSLY_HURT -> {
