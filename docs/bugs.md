@@ -17,3 +17,4 @@ This file is just a temporary way to capture any bugs seen that I didn't have ti
 - `ActionSelectorViewModel` throws concurrent modification exception for unknownActions. Figure out a solution.
 - Apothecary during Multiple Block seems to crash when used with Undo. Needs more investigation.
 - Starting a Blitz from prone when next to the target, does not provide a quick action for standing up and attacking in one click.
+- "Standup and End Action" is not working when player has a negatrait (Kroxigor)
