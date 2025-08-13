@@ -3,10 +3,12 @@ on:
   workflow_dispatch:  # Add this line to enable manual triggering
   pull_request:
     paths-ignore:
-      - '**.md'
+      - "*.md"
+      - "**/*.md"
   push:
     paths-ignore:
-      - '**.md'
+      - "*.md"
+      - "**/*.md"
     branches:
       - main
 
