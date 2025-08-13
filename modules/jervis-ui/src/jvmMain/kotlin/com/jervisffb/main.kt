@@ -34,11 +34,17 @@ fun main() = runBlocking {
                     }
                 }
             }
+
+            // This setup mirrors the size of the current FUMBBL Client, but make it slightly larger.
+            // The default should probably be to open in full screen instead, and if minimized,
+            // resize to either 16:9 or 16:10 depending on the aspect ratio of the screen.
             val scale = 1.22f
+            val width = 145f + 782f + 145f
+            val height = 690f
             val windowState =
                 rememberWindowState(
                     size = (
-                        DpSize(pixelsToDp(145f + 782f + 145f), pixelsToDp(690f)) * scale) // Game content
+                        DpSize(pixelsToDp(width), pixelsToDp(height)) * scale) // Game content
                         + DpSize(0.dp, pixelsToDp(28f)),  // Window decoration
                 )
             Window(
