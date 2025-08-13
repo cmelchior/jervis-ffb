@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Paint
@@ -21,6 +22,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.SamplingMode
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Helper [Modifier] that is conditionally applied only if the condition is `true`
@@ -108,4 +111,69 @@ fun ImageBitmap.getSubImage(x: Int, y: Int, width: Int, height: Int): ImageBitma
         paint = Paint() // .apply { colorFilter = ColorFilter.tint(androidx.compose.ui.graphics.Color.Unspecified) },
     )
     return newImageBitmap
+}
+
+
+/**
+ * Darken a color using HSL. [factor] is [0-1f].
+ */
+fun Color.darken(factor: Float): Color {
+    val hsl = rgbToHsl(red, green, blue)
+    hsl[2] = (hsl[2] * (1f - factor)).coerceIn(0f, 1f)
+    return hslToColor(hsl)
+}
+
+/**
+ * Darken a color using HSL. [factor] is [0-1f].
+ */
+fun Color.lighten(factor: Float): Color {
+    val hsl = rgbToHsl(red, green, blue)
+    hsl[2] = (hsl[2] + (1f - hsl[2]) * factor).coerceIn(0f, 1f)
+    return hslToColor(hsl)
+}
+
+// Copy from ChatGPT, so requires a more thorough review
+private fun rgbToHsl(r: Float, g: Float, b: Float): FloatArray {
+    val max = max(r, max(g, b))
+    val min = min(r, min(g, b))
+    val delta = max - min
+    var h = 0f
+    var s: Float
+    val l = (max + min) / 2f
+    if (delta == 0f) {
+        h = 0f
+        s = 0f
+    } else {
+        s = if (l > 0.5f) delta / (2f - max - min) else delta / (max + min)
+        h = when (max) {
+            r -> ((g - b) / delta + if (g < b) 6 else 0)
+            g -> ((b - r) / delta + 2)
+            else -> ((r - g) / delta + 4)
+        }
+        h /= 6f
+    }
+    return floatArrayOf(h, s, l)
+}
+
+// Copy from ChatGPT, so requires a more thorough review
+private fun hslToColor(hsl: FloatArray): Color {
+    val (h, s, l) = hsl
+    if (s == 0f) return Color(l, l, l)
+    val q = if (l < 0.5f) l * (1 + s) else l + s - l * s
+    val p = 2 * l - q
+    fun hue2rgb(p: Float, q: Float, t: Float): Float {
+        var tt = t
+        if (tt < 0f) tt += 1f
+        if (tt > 1f) tt -= 1f
+        return when {
+            tt < 1f / 6f -> p + (q - p) * 6f * tt
+            tt < 1f / 2f -> q
+            tt < 2f / 3f -> p + (q - p) * (2f / 3f - tt) * 6f
+            else -> p
+        }
+    }
+    val r = hue2rgb(p, q, h + 1f / 3f)
+    val g = hue2rgb(p, q, h)
+    val b = hue2rgb(p, q, h - 1f / 3f)
+    return Color(r, g, b)
 }
