@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -55,7 +56,6 @@ import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayerCard
-import com.jervisffb.ui.game.view.JervisTheme.fontFamily
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.menu.intro.loadJervisFont
 import com.jervisffb.ui.utils.darken
@@ -94,6 +94,8 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
             BoxWithConstraints {
                 val boxWidth = minWidth
                 val portraitHeight = (boxWidth - bigBorderSize * 2) * 0.7f * 147f/95f
+                val paddingScale = (4 / 210f) // Reference value for 4.dp padding
+
                 // Stats and image
                 Column(
                     modifier = Modifier.paperBackground(darkerTeamColor).padding(bigBorderSize),
@@ -119,6 +121,7 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                             contentAlignment = Alignment.Center,
                         ) {
                             // Player type
+                            val scaledFontSize = ((20 / 210f) * boxWidth.value).sp
                             val type = remember(player.model.position.titleSingular) {
                                 val originalTitle = player.model.position.titleSingular
                                 val splitTitle = originalTitle.split(" ")
@@ -141,7 +144,7 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                                     shadow = Shadow(Color.Black, Offset(0f, 2f), 2f),
                                 ),
                                 color = Color.White,
-                                fontSize = 20.sp,
+                                fontSize = scaledFontSize,
                                 letterSpacing = 1.sp,
                                 overflow = TextOverflow.Ellipsis,
                             )
@@ -207,18 +210,25 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
 
                             Box(
                                 modifier = Modifier
-                                    .padding(bottom = 4.dp)
+                                    .padding(bottom = borderSize)
+                                    .background(Color.Black.copy(0.0f))
+                                    .padding(
+                                        start = borderSize + 3.dp,
+                                        end = borderSize + 3.dp,
+                                        bottom = (boxWidth * paddingScale) * 2f,
+                                        top = (boxWidth * paddingScale) * 2f
+                                    )
                                 ,
                                 contentAlignment = Alignment.Center,
                             ) {
-                                PlayerName(player.model.name,  borderSize)
+                                PlayerName(player.model.name, borderSize, boxWidth)
                             }
                         }
                     }
 
                     // Player level
                     Row(
-                        modifier = Modifier.padding(top = bigBorderSize, bottom = bigBorderSize).fillMaxWidth(), // .border(4.dp, color = darkerTeamColor),
+                        modifier = Modifier.padding(top = bigBorderSize, bottom = bigBorderSize).fillMaxWidth(),
                     ) {
                         Text(
                             textAlign = TextAlign.Start,
@@ -294,26 +304,32 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
 }
 
 @Composable
-private fun BoxScope.PlayerName(name: String, borderSize: Dp) {
+private fun BoxScope.PlayerName(name: String, borderSize: Dp, boxWidth: Dp) {
     // Because Compose does not support drop shadow on Outlined Text
     // we fake it by first blurring the outline and then render the rest
+
+    val fontScale =  (16 / 210f) // Reference value (16.sp / 210.dp)
+    val shadowScale = (8 / 210f) // Reference value (8f / 210.dp)
+    val outlineScale = (6 / 210f) // Reference value (6f / 210.dp)
+    val borderSizeScale = (6 / 210f) // Reference value (6f / 210.dp)
+    val scaledBorderSize = borderSize * borderSizeScale
 
     // Outline not supported by Compose yet, so fake it
     val playerNameStyle = MaterialTheme.typography.body1.copy(
         textAlign = TextAlign.Center,
         fontFamily = JervisTheme.fontFamily(),
-        fontSize = 16.sp,
+        fontSize = (boxWidth.value * fontScale).sp,
+        lineHeight = 1.4.em,
         letterSpacing = 1.sp,
     )
-    val fontOutlineSize = with(LocalDensity.current) { 6.dp.toPx() }
+    val fontOutlineSize = with(LocalDensity.current) { (outlineScale * boxWidth.value).dp.toPx() }
 
     // Drop shadow
     Text(
         modifier = Modifier
-            .padding(borderSize)
             .fillMaxWidth()
             .graphicsLayer {
-                renderEffect = BlurEffect(8f, 8f, TileMode.Clamp)
+                renderEffect = BlurEffect(shadowScale * boxWidth.value, shadowScale * boxWidth.value, TileMode.Clamp)
             }
         ,
         text = name,
@@ -330,21 +346,23 @@ private fun BoxScope.PlayerName(name: String, borderSize: Dp) {
 
     // Outline
     Text(
-        modifier = Modifier.padding(borderSize).fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         text = name,
         overflow = TextOverflow.Ellipsis,
         style = playerNameStyle.copy(
             color = JervisTheme.white,
             drawStyle = Stroke(
-                miter = fontOutlineSize,
+                miter = 2f, // fontOutlineSize,
                 width = fontOutlineSize,
-                join = StrokeJoin.Round
+                join = StrokeJoin.Miter,
+                cap = StrokeCap.Butt,
+
             )
         ),
     )
     // Real text
     Text(
-        modifier = Modifier.padding(borderSize).fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         text = name,
         overflow = TextOverflow.Ellipsis,
         style = playerNameStyle.copy(
@@ -411,13 +429,15 @@ private fun StatBoxV3(
 ) {
     val fontScaleSmall = 0.05714285714 // Experimental value (12.sp / 210.dp)
     val fontScaleBig = 0.1047619048 // Experimental value (22.sp / / 210.dp)
+    val paddingScale = 0.014285714f // Experimental value ( 4.dp / 210.dp)
+    val shadowScale = 0.00952381f // Experimental value ( 2 / 210)
     Column(
-        modifier = modifier.fillMaxWidth().background(backgroundColor).padding(4.dp),
+        modifier = modifier.fillMaxWidth().background(backgroundColor).padding(boxWidth * paddingScale),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier.padding(bottom = boxWidth * paddingScale),
             text = title,
             fontSize = (boxWidth.value * fontScaleSmall).sp,
             lineHeight = 1.em,
@@ -438,7 +458,7 @@ private fun StatBoxV3(
             color = JervisTheme.white,
             textAlign = TextAlign.Center,
             style = TextStyle.Default.copy(
-                shadow = Shadow(JervisTheme.black, Offset(2f, 2f), 2f),
+                shadow = Shadow(JervisTheme.black, Offset(shadowScale * boxWidth.value, shadowScale * boxWidth.value), shadowScale * boxWidth.value),
             ),
         )
     }

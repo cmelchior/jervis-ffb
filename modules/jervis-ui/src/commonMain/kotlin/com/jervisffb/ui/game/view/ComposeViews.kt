@@ -53,7 +53,6 @@ import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayState
-import com.jervisffb.ui.utils.darken
 import kotlinx.coroutines.NonCancellable.start
 
 // Theme
