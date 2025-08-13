@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.map
 data class GameProgress(
     val half: Int,
     val drive: Int,
+    val turnMax: Int,
     val homeTeam: String,
     val homeTeamTurn: Int,
     val awayTeam: String,
@@ -19,9 +20,11 @@ class GameStatusViewModel(val controller: UiGameController) {
     fun progress(): Flow<GameProgress> {
         return controller.uiStateFlow.map { uiSnapshot ->
             val game = uiSnapshot.game
+            val rules = game.rules
             GameProgress(
                 game.halfNo,
                 game.driveNo,
+                if (game.halfNo > rules.halfsPrGame) rules.turnsInExtraTime else rules.turnsPrHalf,
                 game.homeTeam.name,
                 game.homeTeam.turnMarker,
                 game.awayTeam.name,

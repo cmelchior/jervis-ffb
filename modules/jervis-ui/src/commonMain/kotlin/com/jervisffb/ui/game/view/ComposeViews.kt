@@ -50,6 +50,7 @@ import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayState
+import kotlinx.coroutines.NonCancellable.start
 
 // Theme
 val debugBorder = BorderStroke(2.dp, Color.Red)
@@ -91,6 +92,7 @@ fun SectionHeader(title: String) {
         modifier =
             Modifier
                 .fillMaxWidth()
+                .padding(start = 4.dp, end = 4.dp)
                 .aspectRatio(152.42f / (452f / 15)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -200,10 +202,10 @@ fun LogViewer(
         if (vm.showDebugLogs) {
             TabRow(
                 selectedTabIndex = tabIndex,
-                backgroundColor = Color.White // 0xFFEEEEEE
+                backgroundColor = JervisTheme.rulebookGreen.copy(0.5f) // 0xFFEEEEEE
             ) {
                 tabs.forEachIndexed { index, title ->
-                    Tab(text = { Text(title) },
+                    Tab(text = { Text(title, color = Color.White) },
                         selected = tabIndex == index,
                         onClick = { tabIndex = index }
                     )
@@ -236,6 +238,7 @@ fun GameLog(vm: LogViewModel) {
     ) {
         items(items = listData, key = { item -> item.id }) {
             Text(
+                color = Color.White,
                 text = it.message,
                 lineHeight = if (it.message.lines().size > 1) 1.5.em else 1.0.em,
             )
@@ -260,6 +263,7 @@ fun DebugLog(vm: LogViewModel) {
     ) {
         items(items = listData, key = { item -> item.id }) {
             Text(
+                color = Color.White,
                 text = it.message,
                 softWrap = true,
                 lineHeight = if (it.message.lines().size > 1) 1.5.em else 1.0.em,

@@ -75,12 +75,22 @@ class GameScreenModel(
                 homeTeam.teamLogo ?: homeTeam.roster.logo,
                 LogoSize.LARGE
             )
+            homeTeamIcon.value = IconFactory.loadRosterIcon(
+                homeTeam.id,
+                homeTeam.teamLogo ?: homeTeam.roster.logo,
+                LogoSize.SMALL
+            )
         }
         menuViewModel.backgroundContext.launch {
             awayTeamIcon.value = IconFactory.loadRosterIcon(
                 awayTeam.id,
                 awayTeam.teamLogo ?: awayTeam.roster.logo,
                 LogoSize.LARGE
+            )
+            awayTeamIcon.value = IconFactory.loadRosterIcon(
+                awayTeam.id,
+                awayTeam.teamLogo ?: awayTeam.roster.logo,
+                LogoSize.SMALL
             )
         }
         homeTeamData = LoadingTeamInfo(

@@ -112,7 +112,7 @@ fun Field(
     // TODO For now just center the field and add a black background to hide any rounding errors.
     //  Ideally that should only be a pixel or two.
     BoxWithConstraints(
-        modifier = modifier.fillMaxWidth().background(color = Color.Black),
+        modifier = modifier.fillMaxWidth().background(color = JervisTheme.rulebookGreen.copy(alpha = 0.0f)).padding(start = 32.dp, end = 32.dp, bottom = 32.dp),
         contentAlignment = Alignment.TopCenter,
     ) {
 

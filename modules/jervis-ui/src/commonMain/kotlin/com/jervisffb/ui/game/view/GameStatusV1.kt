@@ -1,6 +1,5 @@
 package com.jervisffb.ui.game.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,28 +16,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.GameProgress
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 
+// Game Status Layout that is compatible with a Game Screen layout from the FUMBBL Client (2025)
 @Composable
-fun GameStatus(
+fun GameStatusV1(
     vm: GameStatusViewModel,
     modifier: Modifier,
 ) {
-    val progress by vm.progress().collectAsState(GameProgress(0, 0, "", 0, "", 0))
+    val progress by vm.progress().collectAsState(GameProgress(0, 0,0, "", 0, "", 0))
     Box(modifier = modifier) {
-        Image(
-            bitmap = IconFactory.getScorebar(),
-            contentDescription = null,
-            alignment = Alignment.Center,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxSize(),
-        )
+//        Image(
+//            bitmap = IconFactory.getScorebar(),
+//            contentDescription = null,
+//            alignment = Alignment.Center,
+//            contentScale = ContentScale.FillBounds,
+//            modifier = Modifier.fillMaxSize(),
+//        )
         val textModifier = Modifier.padding(4.dp)
 
         // Turn counter

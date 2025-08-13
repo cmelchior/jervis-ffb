@@ -311,8 +311,8 @@ fun TitleHeader(mainTitle: String, subTitle: String) {
         // smallest scale factor. There is probably a better way,
         // but for now this seems to work okay-ish.
         val lineWidth = sqrt(size.height.pow(2) + size.width.pow(2))
-        val scaleFromHeight = size.height / 385f
-        val scaleFromLength = lineWidth / 1600f
+        val scaleFromHeight = size.height / 385f // 385f (seems to be a bad fit for 16:9)
+        val scaleFromLength = lineWidth / 1600f // 1600f (seems to be a bad fit for 16:9)
         val scale = min(scaleFromHeight, scaleFromLength)
 
         // Background color

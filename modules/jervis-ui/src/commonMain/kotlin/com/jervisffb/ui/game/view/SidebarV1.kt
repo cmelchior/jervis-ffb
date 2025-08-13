@@ -23,8 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -32,15 +32,8 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.IntrinsicMeasurable
-import androidx.compose.ui.layout.IntrinsicMeasureScope
-import androidx.compose.ui.layout.LayoutModifier
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -54,14 +47,17 @@ import kotlinx.coroutines.flow.Flow
 import org.jetbrains.skia.FilterBlurMode
 import org.jetbrains.skia.MaskFilter
 
+/**
+ * Sidebar view, using a layout similar to the sidebar in the FUMBBL Client.
+ */
 @Composable
-fun Sidebar(
+fun SidebarV1(
     vm: SidebarViewModel,
     modifier: Modifier,
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         // Background images
-        Column(modifier = Modifier.fillMaxSize().align(Alignment.TopCenter)) {
+        Column(modifier = Modifier.align(Alignment.TopCenter)) {
             Image(
                 bitmap = IconFactory.getSidebarBannerTop(vm.team.isHomeTeam()),
                 contentDescription = null,
@@ -114,7 +110,7 @@ fun Sidebar(
                 }
 
                 // Make sure player stats are shown on top of reserves
-                PlayerStatsCard(vm.hoverPlayer())
+                PlayerStatsCardV1(vm.hoverPlayer())
             }
 
             // Dogout buttons
@@ -157,7 +153,7 @@ private fun ColumnScope.SidebarButtons(buttons: Flow<List<ButtonData>>) {
 }
 
 @Composable
-fun SidebarButton(modifier: Modifier, text: String, onClick: () -> Unit) {
+private fun SidebarButton(modifier: Modifier, text: String, onClick: () -> Unit) {
     // TODO Add drop shadow to the top
     Box(
         modifier = modifier.aspectRatio(71f/22f),
@@ -183,7 +179,7 @@ fun SidebarButton(modifier: Modifier, text: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun LargeSidebarButton(modifier: Modifier, text: String, onClick: () -> Unit) {
+private fun LargeSidebarButton(modifier: Modifier, text: String, onClick: () -> Unit) {
     // TODO Add drop shadow to the top
     Box(
         modifier = modifier.aspectRatio(143f/30f),
@@ -285,7 +281,7 @@ fun StatBox(
 }
 
 @Composable
-fun Reserves(reserves: Flow<List<UiPlayer>>, onExit: () -> Unit) {
+private fun Reserves(reserves: Flow<List<UiPlayer>>, onExit: () -> Unit) {
     val list: List<UiPlayer> by reserves.collectAsState(emptyList())
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionHeader("Reserves")
@@ -294,7 +290,7 @@ fun Reserves(reserves: Flow<List<UiPlayer>>, onExit: () -> Unit) {
 }
 
 @Composable
-fun Injuries(
+private fun Injuries(
     knockedOut: Flow<List<UiPlayer>>,
     badlyHurt: Flow<List<UiPlayer>>,
     seriousInjuries: Flow<List<UiPlayer>>,
@@ -329,7 +325,7 @@ fun Injuries(
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true, onExit: () -> Unit = {}) {
+private fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true, onExit: () -> Unit = {}) {
     if (!compactView) {
         val max = if (list.isNotEmpty()) list.maxBy { it.model.number.value }.model.number.value else 0
         if (max > 0) {
@@ -380,91 +376,5 @@ fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true, onExit: () 
                 }
             }
         }
-    }
-}
-
-//
-// fun Modifier.rotateVertically(clockwise: Boolean = true): Modifier {
-//    val rotate = rotate(if (clockwise) 90f else -90f)
-//
-//    val adjustBounds = layout { measurable, constraints ->
-//        val placeable = measurable.measure(constraints)
-//        layout(placeable.height, placeable.width) {
-//            placeable.place(
-//                x = -(placeable.width / 2 - placeable.height / 2),
-//                y = -(placeable.height / 2 - placeable.width / 2)
-//            )
-//        }
-//    }
-//    return rotate then adjustBounds
-// }
-//
-// fun Modifier.vertical() = layout { measurable, constraints ->
-//    val placeable = measurable.measure(constraints)
-//    layout(placeable.height, placeable.width) {
-//        placeable.place(
-//            x = -(placeable.width / 2 - placeable.height / 2),
-//            y = -(placeable.height / 2 - placeable.width / 2)
-//        )
-//    }
-// }
-
-fun Modifier.rotateVertically(rotation: VerticalRotation) =
-    then(
-        object : LayoutModifier {
-            override fun MeasureScope.measure(
-                measurable: Measurable,
-                constraints: Constraints,
-            ): MeasureResult {
-                val placeable = measurable.measure(constraints)
-                return layout(constraints.maxHeight, placeable.width) {
-                    placeable.place(
-                        x = -(placeable.width / 2 - placeable.height / 2),
-                        y = -(placeable.height / 2 - placeable.width / 2),
-                    )
-                }
-            }
-
-            override fun IntrinsicMeasureScope.minIntrinsicHeight(
-                measurable: IntrinsicMeasurable,
-                width: Int,
-            ): Int {
-                return measurable.maxIntrinsicWidth(width)
-            }
-
-            override fun IntrinsicMeasureScope.maxIntrinsicHeight(
-                measurable: IntrinsicMeasurable,
-                width: Int,
-            ): Int {
-                return measurable.maxIntrinsicWidth(width)
-            }
-
-            override fun IntrinsicMeasureScope.minIntrinsicWidth(
-                measurable: IntrinsicMeasurable,
-                height: Int,
-            ): Int {
-                return measurable.minIntrinsicHeight(height)
-            }
-
-            override fun IntrinsicMeasureScope.maxIntrinsicWidth(
-                measurable: IntrinsicMeasurable,
-                height: Int,
-            ): Int {
-                return measurable.maxIntrinsicHeight(height)
-            }
-        },
-    )
-        .then(rotate(rotation.value))
-
-enum class VerticalRotation(val value: Float) {
-    CLOCKWISE(90f),
-    COUNTER_CLOCKWISE(270f),
-}
-
-fun String.takeDot(limit: Int): String {
-    return if (this.length <= limit) {
-        this
-    } else {
-        take(limit - 1) + "…"
     }
 }

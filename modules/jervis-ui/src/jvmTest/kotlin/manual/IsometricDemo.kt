@@ -22,8 +22,10 @@ import androidx.compose.ui.window.application
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.min
+import kotlin.test.Ignore
 import kotlin.test.Test
 
+@Ignore // Must be run manually
 class IsoDemoFile() {
     @Test
     fun main() {

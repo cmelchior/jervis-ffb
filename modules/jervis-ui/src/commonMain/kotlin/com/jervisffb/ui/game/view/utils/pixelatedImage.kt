@@ -45,7 +45,9 @@ fun PixelatedImage(
     val effect = remember { RuntimeEffect.makeForShader(shaderCode) }
     val shaderBuilder = remember(effect) { RuntimeShaderBuilder(effect) }
 
-    BoxWithConstraints {
+    BoxWithConstraints(
+        modifier = modifier
+    ) {
         val width = maxWidth
         val height = maxHeight
         val density = LocalDensity.current
@@ -53,7 +55,7 @@ fun PixelatedImage(
         val heightPx = with(density) { height.toPx() }
 
         // Render SVG to bitmap at requested size
-        val skiaBitmap = remember {
+        val skiaBitmap = remember(painter) {
             val imageBitmap = painter.toImageBitmap(Size(widthPx, heightPx), density, LayoutDirection.Ltr)
             imageBitmap.asSkiaBitmap()
         }

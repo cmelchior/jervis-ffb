@@ -14,9 +14,24 @@ object JervisTheme {
     @Composable
     fun fontFamily() = TrumpTownPro()
 
+    val rulebookBlue = Color(0xFF0077C6) // Color(0xFF2a4479)
+    val rulebookRed = Color(0xFFC60000) // Color(0xFF991612)
+    val rulebookRedLight = Color(0xFFC60000) // Color(0xFF991612)
+    val rulebookOrange = Color(0xFFFFBE26) //Color(0xFFeca316)
+    val rulebookPurple = Color(0xFFBE26FF) //Color(0xFFeca316)
+    val rulebookOrangeContrast = Color(0xFF765912)
+    val rulebookGreen = Color(0xFF388235)
+    val rulebookPaperDark = Color(0xFF867048)
+    val rulebookPaperMediumDark = Color(0xFFe2d2be)
+    val rulebookPaper = Color(0xFFf5e3ce)
+    val rulebookDisabled = Color.Gray
+
     val white = Color(0xFFFFFFFF)
-    val awayTeamColor = Color(0xFF4588c4)
-    val homeTeamColor = Color(0xFFcc0102) // Color(0xFFca0000)
+    val black = Color(0xFF000000)
+
+    val awayTeamColor = rulebookBlue // Color(0xFF4588c4)
+    val homeTeamColor = rulebookRed // Color(0xFFcc0102) // Color(0xFFca0000)
+
     val accentTeamColorDark =  Color(0xFF236A29) // Color(0xFF006600)
     val accentTeamColor = Color(0xFF38a23b) // Color(0xFF006600)
     val contentBackgroundColor = Color(0xFFF4F4F4)
@@ -54,18 +69,8 @@ object JervisTheme {
     //    val rulebookRed = Color(0xFF9c0704)
     //    val rulebookOrange = Color(0xFFfbca1a)
 
-    val black = Color(0xFF000000)
-    val rulebookBlue = Color(0xFF0077C6) // Color(0xFF2a4479)
-    val rulebookRed = Color(0xFFC60000) // Color(0xFF991612)
-    val rulebookRedLight = Color(0xFFC60000) // Color(0xFF991612)
-    val rulebookOrange = Color(0xFFFFBE26) //Color(0xFFeca316)
-    val rulebookPurple = Color(0xFFBE26FF) //Color(0xFFeca316)
-    val rulebookOrangeContrast = Color(0xFF765912)
-    val rulebookGreen = Color(0xFF388235)
-    val rulebookPaperDark = Color(0xFF867048)
-    val rulebookPaperMediumDark = Color(0xFFe2d2be)
-    val rulebookPaper = Color(0xFFf5e3ce)
-    val rulebookDisabled = Color.Gray
+
+    val gameStatusBackground = Color.Gray
 
     val redDiceBottom = Color(0xFFA10000)
     val redDiceTop = Color(0xFFFF4C43)

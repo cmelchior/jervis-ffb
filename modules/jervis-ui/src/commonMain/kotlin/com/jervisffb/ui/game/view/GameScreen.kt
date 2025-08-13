@@ -1,13 +1,15 @@
 package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,41 +42,55 @@ fun GameScreen(
     logs: LogViewModel,
     dialogsViewModel: DialogsViewModel,
 ) {
-    val aspectRation = (145f+145f+782f)/690f
+    val aspectRation = (145f+145f+782f)/452f
     val fieldPositionData: FieldViewData by screenModel.fieldViewData.collectAsState() // remember { mutableStateOf(FieldViewData(IntSize.Zero, IntOffset.Zero)) }
-    Row(modifier = Modifier.aspectRatio(aspectRation).fillMaxSize()) {
-        Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
-            Sidebar(leftDugout, Modifier)
-        }
-        Column(
-            modifier = Modifier.weight(782f).align(Alignment.Top),
-            horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        GameStatusV2(gameStatusController, modifier = Modifier)
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(
+            modifier = Modifier
+                .padding(start = 24.dp, end = 24.dp)
+                .aspectRatio(aspectRation)
+            ,
+            verticalAlignment = Alignment.Bottom,
         ) {
-            Field(
-                modifier = Modifier.onGloballyPositioned {
-                    field.updateFieldOffSet(it)
-                },
-                field
-            )
-            GameStatus(gameStatusController, modifier = Modifier.aspectRatio(782f/32f).fillMaxSize())
-            // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
-            Row(modifier = Modifier.fillMaxSize().background(Color.White)) {
-                LogViewer(logs, modifier = Modifier.weight(1f).fillMaxSize())
-                Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))
-                Column(modifier = Modifier.weight(1f).fillMaxSize()) {
-                    if (replayActionsBar != null) {
-                        ReplayCommandBar(replayActionsBar, modifier = Modifier)
-                    }
-                    if (randomActionsBar != null) {
-                        RandomCommandBar(randomActionsBar, modifier = Modifier)
-                    }
-                    ActionSelector(unknownActions, modifier = Modifier.fillMaxSize())
-                }
-
+            Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
+                SidebarV2(leftDugout, Modifier)
+            }
+            Column(
+                modifier = Modifier.weight(782f).align(Alignment.Top),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Field(
+                    modifier = Modifier.onGloballyPositioned {
+                        field.updateFieldOffSet(it)
+                    },
+                    field
+                )
+                // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
+            }
+            Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
+                SidebarV2(rightDugout, Modifier)
             }
         }
-        Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
-            Sidebar(rightDugout, Modifier)
+        Row(modifier = Modifier.padding(start = 24.dp, end = 24.dp)) {
+            LogViewer(logs, modifier = Modifier.weight(1f).background(Color.White.copy(alpha = 0.1f)).fillMaxSize())
+            Spacer(modifier = Modifier.width(24.dp))
+            // Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))
+            Column(modifier = Modifier.weight(1f).background(Color.White.copy(alpha = 0.1f)).fillMaxSize()) {
+                if (replayActionsBar != null) {
+                    ReplayCommandBar(replayActionsBar, modifier = Modifier)
+                }
+                if (randomActionsBar != null) {
+                    RandomCommandBar(randomActionsBar, modifier = Modifier)
+                }
+                ActionSelector(unknownActions, modifier = Modifier.fillMaxSize())
+            }
+
         }
     }
     Dialogs(field, fieldPositionData, dialogsViewModel)

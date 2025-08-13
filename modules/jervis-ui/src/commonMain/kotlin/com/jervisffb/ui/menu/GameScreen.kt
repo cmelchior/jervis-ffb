@@ -1,5 +1,6 @@
 package com.jervisffb.ui.menu
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -9,16 +10,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.LoadingScreen
-import com.jervisffb.ui.game.view.utils.stoneBackground
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
+import com.jervisffb.ui.game.viewmodel.FieldDetails
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
@@ -49,9 +52,15 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
                     }
                 }
                 Box(
-                    modifier = Modifier.fillMaxSize().stoneBackground(),
+                    modifier = Modifier.fillMaxSize(), //.stoneBackground(),
                     contentAlignment = Alignment.TopCenter
                 ) {
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        bitmap = IconFactory.getField(FieldDetails.NICE),
+                        contentDescription = "",
+                        contentScale = ContentScale.FillBounds,
+                    )
                     val navigator = LocalNavigator.currentOrThrow
                     GameScreenContent(viewModel)
                 }
