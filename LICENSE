@@ -2,6 +2,7 @@ TABLE OF CONTENTS
 
 1. Apache License version 2.0
 2. FFB Graphics and Sounds Components
+3. D6 Dice Icons
 
 
 1. -- Apache License version 2.0 -----------------------------------------------
@@ -212,7 +213,6 @@ TABLE OF CONTENTS
    limitations under the License.
 
 
-
 2. -- FFB Graphic and Sound Components ---------------------------------------
 
    Many graphic and sound files present in
@@ -228,3 +228,14 @@ TABLE OF CONTENTS
 
    All other assets are covered by the general Apache 2 License for the Jervis
    project.
+
+
+ 3. -- D6 Dice Icons ---------------------------------------
+
+    "Pixel art dice faces", by Vircon32 (Carra). Published at OpenGameArt under
+    license CC-BY 4.0.
+
+    The original brown dice icons and their color variants are covered by this
+    license. This is all files found in
+    "/modules/jervis-ui/src/commonMain/composeResources/files/jervis/dice"
+    with a filename that starts with "d6_".
