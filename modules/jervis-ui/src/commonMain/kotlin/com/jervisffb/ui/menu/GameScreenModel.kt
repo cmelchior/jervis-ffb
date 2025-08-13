@@ -70,24 +70,28 @@ class GameScreenModel(
 
     init {
         menuViewModel.backgroundContext.launch {
+            // Use large icon for the loading screen
             homeTeamIcon.value = IconFactory.loadRosterIcon(
                 homeTeam.id,
                 homeTeam.teamLogo ?: homeTeam.roster.logo,
                 LogoSize.LARGE
             )
-            homeTeamIcon.value = IconFactory.loadRosterIcon(
+            // Prepare small icon for the game view itself
+            IconFactory.loadRosterIcon(
                 homeTeam.id,
                 homeTeam.teamLogo ?: homeTeam.roster.logo,
                 LogoSize.SMALL
             )
         }
         menuViewModel.backgroundContext.launch {
+            // Use large icon for the loading screen
             awayTeamIcon.value = IconFactory.loadRosterIcon(
                 awayTeam.id,
                 awayTeam.teamLogo ?: awayTeam.roster.logo,
                 LogoSize.LARGE
             )
-            awayTeamIcon.value = IconFactory.loadRosterIcon(
+            // Prepare small icon for the game view itself
+            IconFactory.loadRosterIcon(
                 awayTeam.id,
                 awayTeam.teamLogo ?: awayTeam.roster.logo,
                 LogoSize.SMALL
