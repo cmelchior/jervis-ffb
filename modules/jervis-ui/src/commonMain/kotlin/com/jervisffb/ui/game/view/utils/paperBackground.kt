@@ -11,14 +11,15 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
+import com.jervisffb.ui.utils.applyIf
 
 /**
  * Add noise to a background color so it mimics a paper-like texture.
  */
-fun Modifier.paperBackground(color: Color = JervisTheme.rulebookPaper, shape: Shape = RectangleShape): Modifier {
+fun Modifier.paperBackground(color: Color = JervisTheme.rulebookPaper, shape: Shape? = RectangleShape): Modifier {
     val paperShader = createGrayscaleNoiseShader()
     return this
-        .clip(shape)
+        .applyIf(shape != null) {clip(shape!!) }
         .drawBehind {
             // Add desired background color
             drawRect(color = color, size = size)

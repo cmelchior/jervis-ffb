@@ -28,7 +28,15 @@ fun GameStatusV1(
     vm: GameStatusViewModel,
     modifier: Modifier,
 ) {
-    val progress by vm.progress().collectAsState(GameProgress(0, 0,0, "", 0, "", 0))
+    val progress by vm.progress().collectAsState(GameProgress(
+        0,
+        0,
+        0,
+        "",
+        0,
+        "",
+        0,
+    ))
     Box(modifier = modifier) {
 //        Image(
 //            bitmap = IconFactory.getScorebar(),

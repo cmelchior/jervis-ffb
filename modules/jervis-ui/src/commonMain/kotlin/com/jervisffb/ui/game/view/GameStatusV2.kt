@@ -2,7 +2,9 @@ package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -13,20 +15,26 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.onClick
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -41,6 +49,8 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,6 +69,8 @@ import com.jervisffb.ui.game.viewmodel.GameProgress
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
+import com.jervisffb.ui.utils.darken
+import io.ktor.client.request.invoke
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.RuntimeEffect
@@ -185,7 +197,11 @@ private fun RowScope.TurnTracker(
 }
 
 @Composable
-private fun ScoreCounter(modifier: Modifier, progress: GameProgress, angle: Float = 5f) {
+private fun ScoreCounter(
+    modifier: Modifier,
+    progress: GameProgress,
+    angle: Float = 5f
+) {
     val bigPadding = 5.dp
     val smallPadding = 2.dp
     val counterWidth = 40.dp
@@ -213,7 +229,7 @@ private fun ScoreCounter(modifier: Modifier, progress: GameProgress, angle: Floa
                 style = counterStyle
             )
         }
-        GameStatusBox(bigPadding, angle)
+        GameStatusBox(smallPadding, angle, progress.centerBadgeText, progress.centerBadgeAction)
         ParallelogramButton(
             onClick = { },
             angleDegrees = angle,
@@ -232,36 +248,57 @@ private fun ScoreCounter(modifier: Modifier, progress: GameProgress, angle: Floa
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float) {
+private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: String, action: (() -> Unit)? = null) {
     val shape = remember(angle) { TrapezoidShape(angle) }
-    Surface(
+    var color by remember { mutableStateOf(JervisTheme.gameStatusBackground) }
+    var borderColor by remember { mutableStateOf(JervisTheme.white) }
+    Box(
         modifier = Modifier
-            .padding(start = padding, end = padding).paperBackground(shape = shape, color = JervisTheme.gameStatusBackground)
+            .padding(start = padding, end = padding)
             .width(150.dp)
             .height(64.dp)
+            .shadow(elevation = if (action == null) 0.dp else 8.dp, shape = shape, clip = false)
+            .paperBackground(shape = shape, color = color)
+            .border(4.dp, borderColor, shape)
+            .onClick(onClick = {
+                if (action != null) {
+                    action()
+                }
+            })
+            .onPointerEvent(PointerEventType.Enter) {
+                if (action != null) {
+                    color = JervisTheme.gameStatusBackground.darken(0.1f)
+                    borderColor = JervisTheme.white.darken(0.1f)
+                }
+            }
+            .onPointerEvent(PointerEventType.Exit) {
+                if (action != null) {
+                    color = JervisTheme.gameStatusBackground
+                    borderColor = JervisTheme.white
+                }
+            }
         ,
-        shape = shape,
-        color = Color.Transparent,
-        // contentColor = contentColor,
-        border = BorderStroke(4.dp, JervisTheme.white),
-        elevation = 0.dp,
     ) {
         Column(
             modifier = Modifier.alpha(0.8f)
                 .fillMaxSize()
-                .padding(8.dp),
+                .padding(8.dp)
+            ,
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            val timer = "--:--"
             Text(
-                text = "End Turn".uppercase(),
+                modifier = Modifier.offset(y = 3.dp),
+                text = text.uppercase(),
                 color = JervisTheme.white,
                 lineHeight = 1.em,
                 letterSpacing = 2.sp,
                 // fontFamily = JervisTheme.fontFamily(),
                 style = MaterialTheme.typography.body1.copy(
-                    fontSize = 11.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     shadow = Shadow(
                         color = Color.Black,
@@ -271,7 +308,7 @@ private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float) {
                 )
             )
             Text(
-                text = " ∞".uppercase(),
+                text = timer.uppercase(),
                 color = JervisTheme.white,
                 // fontFamily = JervisTheme.fontFamily(),
                 style = MaterialTheme.typography.body1.copy(

@@ -14,6 +14,7 @@ import com.jervisffb.engine.actions.DicePoolResultsSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.EndSetupWhenReady
+import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
@@ -44,6 +45,7 @@ import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
 import com.jervisffb.ui.game.state.decorators.DeselectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
 import com.jervisffb.ui.game.state.decorators.EndSetupDecorator
+import com.jervisffb.ui.game.state.decorators.EndTurnDecorator
 import com.jervisffb.ui.game.state.decorators.FieldActionDecorator
 import com.jervisffb.ui.game.state.decorators.SelectBlockTypeDecorator
 import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
@@ -104,6 +106,7 @@ open class ManualActionProvider(
         DeselectPlayer::class to DeselectPlayerDecorator(),
         EndActionWhenReady::class to EndActionDecorator(),
         EndSetupWhenReady::class to EndSetupDecorator(),
+        EndTurnWhenReady::class to EndTurnDecorator(),
         SelectBlockType::class to SelectBlockTypeDecorator(),
         SelectDirection::class to SelectDirectionDecorator(),
         SelectFieldLocation::class to SelectFieldLocationDecorator(),

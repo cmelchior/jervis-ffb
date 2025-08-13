@@ -14,6 +14,8 @@ data class GameProgress(
     val awayTeamTurn: Int,
     val homeTeamScore: Int = 0,
     val awayTeamScore: Int = 0,
+    val centerBadgeText: String = "",
+    val centerBadgeAction: (() -> Unit)? = null,
 )
 
 class GameStatusViewModel(val controller: UiGameController) {
@@ -31,6 +33,8 @@ class GameStatusViewModel(val controller: UiGameController) {
                 game.awayTeam.turnMarker,
                 game.homeScore,
                 game.awayScore,
+                uiSnapshot.centerBadgeText,
+                uiSnapshot.centerBadgeAction
             )
         }
     }

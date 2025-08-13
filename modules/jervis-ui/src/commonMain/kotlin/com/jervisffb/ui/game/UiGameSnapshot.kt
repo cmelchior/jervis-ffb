@@ -42,6 +42,8 @@ class UiGameSnapshot(
 
     // Actions associated with the Team, and not a particular player
     // These gets rendered under the sidebar for each team
+    var centerBadgeText = ""
+    var centerBadgeAction: (() -> Unit)? = null
     val homeTeamActions = mutableListOf<ButtonData>()
     val awayTeamActions = mutableListOf<ButtonData>()
 
