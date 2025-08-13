@@ -32,10 +32,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
@@ -50,6 +53,7 @@ import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayState
+import com.jervisffb.ui.utils.darken
 import kotlinx.coroutines.NonCancellable.start
 
 // Theme
@@ -190,6 +194,7 @@ fun Dialogs(field: FieldViewModel, fieldOffset: FieldViewData, vm: DialogsViewMo
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LogViewer(
     vm: LogViewModel,
@@ -200,20 +205,38 @@ fun LogViewer(
 
     Column(modifier = modifier) {
         if (vm.showDebugLogs) {
-            TabRow(
-                selectedTabIndex = tabIndex,
-                backgroundColor = JervisTheme.rulebookGreen.copy(0.5f) // 0xFFEEEEEE
+            var hovered by remember { mutableStateOf(false) }
+            Box(
+                Modifier
+                    .onPointerEvent(PointerEventType.Enter) { hovered = true }
+                    .onPointerEvent(PointerEventType.Exit) { hovered = false }
+                ,
+                contentAlignment = Alignment.TopStart
             ) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(text = { Text(title, color = Color.White) },
-                        selected = tabIndex == index,
-                        onClick = { tabIndex = index }
-                    )
+
+                // Always show the content for the selected tab
+                when (tabIndex) {
+                    0 -> GameLog(vm)
+                    1 -> DebugLog(vm)
                 }
-            }
-            when (tabIndex) {
-                0 -> GameLog(vm)
-                1 -> DebugLog(vm)
+
+                // Show the tab bar over the content when the mouse hovers over area
+                // This way, it leaves more space available on 16:9 screens
+                if (hovered) {
+                    TabRow(
+                        selectedTabIndex = tabIndex,
+                        backgroundColor = JervisTheme.rulebookGreen.copy(0.9f)
+                    ) {
+                        tabs.forEachIndexed { index, title ->
+                            Tab(
+                                text = { Text(title, color = Color.White) },
+                                selected = tabIndex == index,
+                                onClick = { tabIndex = index }
+                            )
+                        }
+                    }
+                }
+
             }
         } else {
             GameLog(vm)
