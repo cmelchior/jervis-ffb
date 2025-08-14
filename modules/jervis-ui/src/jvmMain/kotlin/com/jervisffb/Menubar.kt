@@ -29,6 +29,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
     var selectKickingPlayer by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_KICKING_PLAYER)) }
     var autoEndPlayerAction by remember { mutableStateOf(vm.isFeatureEnabled(Feature.END_PLAYER_ACTION_IF_ONLY_OPTION)) }
     var selectBlockType by remember { mutableStateOf(vm.isFeatureEnabled(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION)) }
+    var pushPlayerIntoCrowd by remember { mutableStateOf(vm.isFeatureEnabled(Feature.PUSH_PLAYER_INTO_CROWD)) }
 
     val setupType: GameType? by vm.setupAvailable.collectAsState()
 
@@ -80,6 +81,14 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
                 onCheckedChange = {
                     selectBlockType = !selectBlockType
                     vm.toggleFeature(Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION, selectBlockType)
+                }
+            )
+            CheckboxItem(
+                text = "Push Player into the Crowd when no other push directions",
+                checked = pushPlayerIntoCrowd,
+                onCheckedChange = {
+                    pushPlayerIntoCrowd = !pushPlayerIntoCrowd
+                    vm.toggleFeature(Feature.PUSH_PLAYER_INTO_CROWD, pushPlayerIntoCrowd)
                 }
             )
         }

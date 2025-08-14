@@ -39,6 +39,7 @@ enum class Feature {
     SELECT_KICKING_PLAYER,
     END_PLAYER_ACTION_IF_ONLY_OPTION,
     SELECT_BLOCK_TYPE_IF_ONLY_OPTION,
+    PUSH_PLAYER_INTO_CROWD,
 }
 
 class MenuViewModel {
@@ -93,7 +94,8 @@ class MenuViewModel {
         Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS to true,
         Feature.SELECT_KICKING_PLAYER to true,
         Feature.END_PLAYER_ACTION_IF_ONLY_OPTION to true,
-        Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION to true
+        Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION to true,
+        Feature.PUSH_PLAYER_INTO_CROWD to true,
     )
 
     fun backToLastScreen() {

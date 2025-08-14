@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.ConfirmWhenReady
 import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.DicePoolChoice
 import com.jervisffb.engine.actions.DicePoolResultsSelected
+import com.jervisffb.engine.actions.DirectionSelected
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.EndSetupWhenReady
@@ -400,6 +401,22 @@ open class ManualActionProvider(
                     return BlockTypeSelected(it.types.first())
                 }
             }
+        }
+
+        // Automatically select "Push into the crowd" when it is the only option
+        if (
+            menuViewModel.isFeatureEnabled(Feature.PUSH_PLAYER_INTO_CROWD)
+            && actions.size == 1
+            && actions.first().let {
+                if (it is SelectDirection && it.directions.size == 1) {
+                    val target = it.origin.move(it.directions.first(), 1)
+                    target.isOutOfBounds(controller.rules)
+                } else {
+                    false
+                }
+            }
+        ) {
+            return DirectionSelected((actions.first() as SelectDirection).directions.first())
         }
 
         // Automatically decide to follow op (or not), if you there really isn't a choice in the matter
