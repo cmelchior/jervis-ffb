@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.onClick
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -41,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asSkiaBitmap
@@ -70,7 +73,6 @@ import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.darken
-import io.ktor.client.request.invoke
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.RuntimeEffect
@@ -97,57 +99,29 @@ fun GameStatusV2(
             Spacer(modifier = Modifier.weight(1f))
             TeamInfo(vm.controller.gameController.state.awayTeam, JervisTheme.rulebookBlue, leftSide = false)
         }
-        Row {
-            Spacer(modifier = Modifier.weight(1f))
-            TurnTracker(Modifier.padding(top = topPadding), angle = -angle, progress.turnMax, progress.homeTeamTurn, JervisTheme.rulebookRed, vm.controller.state.activeTeam?.isHomeTeam() == true)
-            ScoreCounter(Modifier.padding(top = topPadding), progress, angle)
-            TurnTracker(Modifier.padding(top = topPadding), angle = angle, progress.turnMax, progress.awayTeamTurn, JervisTheme.rulebookBlue, vm.controller.state.activeTeam?.isAwayTeam() == true)
-            Spacer(modifier = Modifier.weight(1f))
-
-
-//
-//
-////        Image(
-////            bitmap = IconFactory.getScorebar(),
-////            contentDescription = null,
-////            alignment = Alignment.Center,
-////            contentScale = ContentScale.FillBounds,
-////            modifier = Modifier.fillMaxSize(),
-////        )
-//        val textModifier = Modifier.padding(4.dp)
-//
-//        // Turn counter
-//        Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
-//            Text(
-//                modifier = textModifier,
-//                text = "Turn",
-//                fontSize = 14.sp,
-//                color = Color.White,
-//            )
-//            Text(
-//                modifier = textModifier,
-//                text = "${progress.homeTeamTurn} / ${progress.awayTeamTurn}",
-//                color = Color.White,
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 20.sp,
-//            )
-//
-//            val half = when (progress.half) {
-//                1 -> "1st half"
-//                2 -> "2nd half"
-//                3 -> "Extra Time"
-//                else -> null
-//            }
-//            if (half != null) {
-//                Text(
-//                    modifier = textModifier,
-//                    text = "of $half",
-//                    fontSize = 14.sp,
-//                    color = Color.White,
-//                )
-//            }
-//        }
-//
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.weight(1f))
+                TurnTracker(Modifier.padding(top = topPadding), angle = -angle, progress.turnMax, progress.homeTeamTurn, JervisTheme.rulebookRed, vm.controller.state.activeTeam?.isHomeTeam() == true)
+                ScoreCounter(Modifier.padding(top = topPadding), progress, angle)
+                TurnTracker(Modifier.padding(top = topPadding), angle = angle, progress.turnMax, progress.awayTeamTurn, JervisTheme.rulebookBlue, vm.controller.state.activeTeam?.isAwayTeam() == true)
+                Spacer(modifier = Modifier.weight(1f))
+            }
+            if (progress.badgeSubButtons.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.offset(y = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    progress.badgeSubButtons.forEach { button ->
+                        StatusBarButton(
+                            text = button.title,
+                            onClick = button.onClick,
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -217,8 +191,6 @@ private fun ScoreCounter(
         ParallelogramButton(
             onClick = { },
             angleDegrees = -angle,
-//            containerColor = JervisTheme.rulebookRed, //.copy(alpha = 0.7f),
-//            borderColor = Color.Transparent, // JervisTheme.redDiceTop.copy(alpha = 0.7f),
             modifier = Modifier.padding(start = smallPadding).width(counterWidth).height(counterHeight),
         ) {
             Text(
@@ -233,8 +205,6 @@ private fun ScoreCounter(
         ParallelogramButton(
             onClick = { },
             angleDegrees = angle,
-//            containerColor = JervisTheme.rulebookBlue,
-//            borderColor = JervisTheme.rulebookBlue,
             modifier = Modifier.padding(end = smallPadding).width(counterWidth).height(counterHeight),
         ) {
             Text(
@@ -310,7 +280,6 @@ private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: Strin
             Text(
                 text = timer.uppercase(),
                 color = JervisTheme.white,
-                // fontFamily = JervisTheme.fontFamily(),
                 style = MaterialTheme.typography.body1.copy(
                     fontSize = 28.sp,
                     letterSpacing = 1.5.sp,
@@ -325,15 +294,6 @@ private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: Strin
             )
         }
     }
-//    Box(
-//        modifier = Modifier
-//            .padding(start = padding, end = padding)
-//            .width(150.dp)
-//            .height(64.dp)
-//            .clip(TrapezoidShape(angle))
-//            .paperBackground(color = JervisTheme.gameStatusBackground)
-////                .background(Color.White)
-//    )
 }
 
 /**
@@ -350,7 +310,6 @@ private fun TeamInfo(
     Box(
         modifier = Modifier
             .padding(8.dp)
-//            .dropShadow(shape = CircleShape, color = backgroundColor, blur = 2.dp)
         ,
         contentAlignment = if (leftSide) Alignment.CenterStart else Alignment.CenterEnd
     ) {
@@ -432,7 +391,7 @@ private fun TeamInfo(
 class ParallelogramShape(
     private val angleDegrees: Float
 ) : Shape {
-    override fun createOutline(size: Size, layoutDirection: androidx.compose.ui.unit.LayoutDirection, density: Density): Outline {
+    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val h = size.height
         val w = size.width
 
@@ -596,6 +555,26 @@ fun PixelatedImageWithShader(
                 canvas.nativeCanvas.drawRect(Rect.makeXYWH(0f, 0f, skiaBitmap.width.toFloat(), skiaBitmap.height.toFloat()), paint)
             }
         }
+    }
+}
+
+@Composable
+private fun StatusBarButton(text: String, onClick: () -> Unit) {
+    Button(
+        modifier = Modifier,
+        colors = ButtonDefaults.buttonColors(backgroundColor = JervisTheme.rulebookDisabled, disabledBackgroundColor = JervisTheme.rulebookPaperMediumDark),
+        onClick = onClick,
+        border = BorderStroke(3.dp, JervisTheme.white),
+        enabled = true,
+        shape = RectangleShape,
+    ) {
+        Text(
+            text = text.uppercase(),
+            fontSize = 14.sp,
+            lineHeight = 1.em,
+            fontWeight = FontWeight.Medium,
+            color = JervisTheme.white,
+        )
     }
 }
 

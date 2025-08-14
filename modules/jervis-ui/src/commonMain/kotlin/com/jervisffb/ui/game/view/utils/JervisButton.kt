@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.view.utils
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -22,12 +23,14 @@ fun JervisButton(
     enabled: Boolean = true,
     fillWidth: Boolean = false,
     buttonColor: Color = JervisTheme.rulebookBlue,
-    textColor: Color = JervisTheme.white
+    textColor: Color = JervisTheme.white,
+    border: BorderStroke? = null
 ) {
     Button(
         modifier = if (fillWidth) modifier.fillMaxWidth() else modifier,
         colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor, disabledBackgroundColor = JervisTheme.rulebookPaperMediumDark),
         onClick = onClick,
+        border = border,
         enabled = enabled,
     ) {
         Text(

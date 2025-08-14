@@ -21,6 +21,7 @@ import com.jervisffb.ui.game.viewmodel.ButtonData
  * for the duration of a single game loop.
  */
 class UiGameSnapshot(
+    val uiController: UiGameController,
     val game: Game,
     val stack: ProcedureStack,
     var actionsRequest: ActionRequest,

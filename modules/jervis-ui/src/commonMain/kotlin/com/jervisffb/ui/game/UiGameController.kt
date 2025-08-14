@@ -142,7 +142,7 @@ class UiGameController(
     val uiMode: TeamActionMode,
     val gameController: GameEngineController,
     val actionProvider: UiActionProvider,
-    private val menuViewModel: MenuViewModel,
+    val menuViewModel: MenuViewModel,
     private val preloadedActions: List<GameAction>
 ) {
 
@@ -335,6 +335,7 @@ class UiGameController(
         }
 
         return UiGameSnapshot(
+            this,
             state,
             state.stack.createSnapshot(),
             actions,

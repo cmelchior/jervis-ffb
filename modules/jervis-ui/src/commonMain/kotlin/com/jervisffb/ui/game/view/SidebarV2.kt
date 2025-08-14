@@ -2,7 +2,6 @@ package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -78,20 +77,6 @@ fun SidebarV2(
 
                 // Make sure player stats are shown on top of reserves
                 PlayerStatsCardV2(vm.hoverPlayer())
-
-                // End Turn
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    SidebarButtons(vm.actionButtons())
-                }
-            }
-
-            // Rest of content
-            Box {
-
             }
         }
     }
