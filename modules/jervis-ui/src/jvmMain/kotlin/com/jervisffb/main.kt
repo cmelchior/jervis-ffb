@@ -11,6 +11,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.App
+import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.initApplication
 import com.jervisffb.ui.menu.BackNavigationHandler
@@ -24,6 +25,8 @@ fun main() = runBlocking {
         initApplication()
         application {
             val menuViewModel = MenuViewModel()
+
+            // Register an system "About" page on platforms that support it (Only Desktop for now).
             LaunchedEffect(Unit) {
                 if (Desktop.isDesktopSupported()) {
                     val desktop = Desktop.getDesktop()
@@ -47,6 +50,12 @@ fun main() = runBlocking {
                         DpSize(pixelsToDp(width), pixelsToDp(height)) * scale) // Game content
                         + DpSize(0.dp, pixelsToDp(28f)),  // Window decoration
                 )
+
+            // Update Jervis Theme, when the window re-sizes. This is needed so we can scale other UI elements correctly
+            LaunchedEffect(windowState.size) {
+                JervisTheme.notifyWindowsSizeChange(windowState.size)
+            }
+
             Window(
                 onCloseRequest = ::exitApplication,
                 state = windowState,

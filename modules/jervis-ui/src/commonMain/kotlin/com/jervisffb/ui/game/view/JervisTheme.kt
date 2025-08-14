@@ -1,18 +1,53 @@
 package com.jervisffb.ui.game.view
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.theme.TrumpTownPro
+import com.jervisffb.ui.utils.jdp
+import com.jervisffb.ui.utils.jsp
 
 object JervisTheme {
+
+    /**
+     * The reference size is a Macbook Pro screen, i.e., 3456x2160 pixels (or 16:10).
+     * This is the reference size that all jsp and jdp values are relative to.
+     *
+     * When the real window size is this value, the following is true:
+     * - [jsp] == [sp]
+     * - [jdp] == [dp]
+     */
+    private val referenceSize = DpSize(1728.dp, 1080.dp)
+
+    // Size of the main Jervis window, including any decoration.
+    var windowSize: DpSize by mutableStateOf(DpSize.Zero)
+        private set
+
+    /**
+     * Converts a value from either [sp] or [dp] to the Jervis scaled equivalent
+     */
+    fun getScaledValue(value: Float): Float = value * (windowSize.width / referenceSize.width)
+
     @Composable
     fun fontFamily() = TrumpTownPro()
+
+    /**
+     * Update this theme with the current window size. This will also trigger an update
+     * of all [jsp] and [jdp] values.
+     */
+    fun notifyWindowsSizeChange(size: DpSize) {
+        this.windowSize = size
+    }
 
     val rulebookBlue = Color(0xFF0077C6) // Color(0xFF2a4479)
     val rulebookRed = Color(0xFFC60000) // Color(0xFF991612)
@@ -52,8 +87,7 @@ object JervisTheme {
             blurRadius = 2f
         )
     )
-
-
+    
     // Blue shades
     val darkBlue = Color(0xFF0B5598)
     val lightBlue = Color(0xFF2770B2)
@@ -94,13 +128,6 @@ object JervisTheme {
 //    val fumbblVioletLight = Color(0xFF7B6D8D)
 //    val fumbblOrange = Color(0xFFFB8B24) // Color(0xFFF58A07)
 //    val fumbblBackground = Color(0xFFE8DDB5) // Color(0xFFE6E8E6)
-}
-
-fun Color.toSkiaColor(): Int {
-    val red = (red * 255).toInt()
-    val green = (green * 255).toInt()
-    val blue = (blue * 255).toInt()
-    return org.jetbrains.skia.Color.makeRGB(r = red, g = green, b = blue)
 }
 
 

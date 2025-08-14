@@ -132,6 +132,16 @@ fun Color.lighten(factor: Float): Color {
     return hslToColor(hsl)
 }
 
+/**
+ * Convert a Compose [Color] to a Skia [org.jetbrains.skia.Color]
+ */
+fun Color.toSkiaColor(): Int {
+    val red = (red * 255).toInt()
+    val green = (green * 255).toInt()
+    val blue = (blue * 255).toInt()
+    return org.jetbrains.skia.Color.makeRGB(r = red, g = green, b = blue)
+}
+
 // Copy from ChatGPT, so requires a more thorough review
 private fun rgbToHsl(r: Float, g: Float, b: Float): FloatArray {
     val max = max(r, max(g, b))
