@@ -101,6 +101,7 @@ import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.reversed
 import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
+import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.scalePixels
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -128,8 +129,8 @@ import kotlin.math.sin
 @Composable
 fun ActionWheelMenu(
     viewModel: ActionWheelViewModel,
-    ringSize: Dp = 250.dp,
-    borderSize: Dp = 20.dp,
+    ringSize: Dp = 250.jdp,
+    borderSize: Dp = 20.jdp,
     animationDuration: Int = 300,
     showTip: Boolean = false,
     tipRotationDegree: Float = 0f,

@@ -59,6 +59,8 @@ import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.menu.intro.loadJervisFont
 import com.jervisffb.ui.utils.darken
+import com.jervisffb.ui.utils.jdp
+import com.jervisffb.ui.utils.jsp
 import com.jervisffb.ui.utils.lighten
 import kotlinx.coroutines.flow.Flow
 
@@ -76,8 +78,8 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
     val darkerTeamColor = teamColor.darken(0.5f)
     val borderColor = darkerTeamColor
     val innerBorderColor = JervisTheme.white
-    val borderSize = 6.dp
-    val bigBorderSize = 8.dp
+    val borderSize = 6.jdp
+    val bigBorderSize = 8.jdp
 
     playerData?.let { player ->
         Card(
@@ -94,7 +96,6 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
             BoxWithConstraints {
                 val boxWidth = minWidth
                 val portraitHeight = (boxWidth - bigBorderSize * 2) * 0.7f * 147f/95f
-                val paddingScale = (4 / 210f) // Reference value for 4.dp padding
 
                 // Stats and image
                 Column(
@@ -121,7 +122,7 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                             contentAlignment = Alignment.Center,
                         ) {
                             // Player type
-                            val scaledFontSize = ((20 / 210f) * boxWidth.value).sp
+                            val fontSize = 20.jsp
                             val type = remember(player.model.position.titleSingular) {
                                 val originalTitle = player.model.position.titleSingular
                                 val splitTitle = originalTitle.split(" ")
@@ -136,7 +137,7 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                                 }
                             }
                             Text(
-                                modifier = Modifier.padding(2.dp).fillMaxWidth(),
+                                modifier = Modifier.padding(2.jdp).fillMaxWidth(),
                                 textAlign = TextAlign.Center,
                                 text = type,
                                 fontFamily = JervisTheme.fontFamily(),
@@ -144,8 +145,8 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                                     shadow = Shadow(Color.Black, Offset(0f, 2f), 2f),
                                 ),
                                 color = Color.White,
-                                fontSize = scaledFontSize,
-                                letterSpacing = 1.sp,
+                                fontSize = fontSize,
+                                letterSpacing = 1.jsp,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
@@ -215,8 +216,8 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                                     .padding(
                                         start = borderSize + 3.dp,
                                         end = borderSize + 3.dp,
-                                        bottom = (boxWidth * paddingScale) * 2f,
-                                        top = (boxWidth * paddingScale) * 2f
+                                        bottom = 4.jdp,
+                                        top = 4.jdp
                                     )
                                 ,
                                 contentAlignment = Alignment.Center,
@@ -239,8 +240,8 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                             ),
                             color = Color.White,
                             maxLines = 1,
-                            fontSize = 14.sp,
-                            letterSpacing = 1.sp,
+                            fontSize = 14.jsp,
+                            letterSpacing = 1.jsp,
                             overflow = TextOverflow.Ellipsis,
                         )
                         Spacer(modifier = Modifier.weight(1f))
@@ -253,8 +254,8 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                             ),
                             color = Color.White,
                             maxLines = 1,
-                            fontSize = 14.sp,
-                            letterSpacing = 1.sp,
+                            fontSize = 14.jsp,
+                            letterSpacing = 1.jsp,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
@@ -262,7 +263,6 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                     // Skill content
                     Column(
                         modifier = Modifier
-                            // .dropShadow(shape = RectangleShape, JervisTheme.black.copy(0.5f), offsetX = 0.dp, offsetY = 0.dp, blur = 4.dp)
                             .paperBackground()
                             .border(borderSize, innerBorderColor)
                             .fillMaxSize()
@@ -274,8 +274,8 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                             val skills = player.model.skills
                             if (skills.isEmpty()) {
                                 Text(
-                                    modifier = Modifier.padding(0.dp).fillMaxWidth(),
-                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(0.jdp).fillMaxWidth(),
+                                    fontSize = 14.jsp,
                                     color = JervisTheme.contentTextColor,
                                     textAlign = TextAlign.Center,
                                     fontWeight = FontWeight.SemiBold,
@@ -285,7 +285,8 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                             } else {
                                 player.model.skills.forEach {
                                     Text(
-                                        fontSize = 14.sp,
+                                        fontSize = 14.jsp,
+                                        lineHeight = 1.5.em,
                                         color = JervisTheme.contentTextColor,
                                         fontWeight = FontWeight.SemiBold,
                                         modifier = Modifier.padding(0.dp).fillMaxWidth(),
@@ -294,7 +295,6 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                                     )
                                 }
                             }
-
                         }
                     }
                 }
@@ -311,8 +311,6 @@ private fun BoxScope.PlayerName(name: String, borderSize: Dp, boxWidth: Dp) {
     val fontScale =  (16 / 210f) // Reference value (16.sp / 210.dp)
     val shadowScale = (8 / 210f) // Reference value (8f / 210.dp)
     val outlineScale = (6 / 210f) // Reference value (6f / 210.dp)
-    val borderSizeScale = (6 / 210f) // Reference value (6f / 210.dp)
-    val scaledBorderSize = borderSize * borderSizeScale
 
     // Outline not supported by Compose yet, so fake it
     val playerNameStyle = MaterialTheme.typography.body1.copy(
@@ -393,7 +391,6 @@ private fun StatBoxV2(
                     fontSize = 8.sp,
                     lineHeight = 1.em,
                     maxLines = 1,
-                    // fontWeight = FontWeight.Bold,
                     color = Color.White,
                     textAlign = TextAlign.Center,
                 )
@@ -403,7 +400,6 @@ private fun StatBoxV2(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-//                    modifier = Modifier.padding(bottom = 2.dp),
                     modifier = Modifier,
                     text = value,
                     fontSize = 12.sp,

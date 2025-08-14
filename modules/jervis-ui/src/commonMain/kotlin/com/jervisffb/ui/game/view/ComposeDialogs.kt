@@ -50,6 +50,7 @@ import com.jervisffb.ui.game.viewmodel.FieldViewData
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.menu.components.JervisDialog
 import com.jervisffb.ui.menu.utils.JervisLogo
+import com.jervisffb.ui.utils.jdp
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.hypot
 import kotlin.math.roundToInt
@@ -238,11 +239,19 @@ fun MultipleSelectUserActionDialog(
     }
 }
 
+/**
+ * Composable responsible for showing the Action Wheel. It will also calculate the rotation and offset needed
+ * to place the wheel in a visible location (i.e. if at the edge of the Field, the wheel will be moved inside the field).
+ *
+ * TODO Reconsider this logic in light of the new game UI. It might be possible we have enough room to always show the wheel
+ *  over the field square. But this might mean we need to disable some other events while it is showing to avoid accidental
+ *  misclicks (like End Turn).
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog: ActionWheelInputDialog, vm: DialogsViewModel) {
     val wheelViewModel = dialog.viewModel
-    val ringSize = 250.dp
+    val ringSize = 250.jdp
     val boxSize = (hypot(ringSize.value, ringSize.value)).dp
     val ringSizePx = with(LocalDensity.current) { ringSize.toPx() }
     val boxWidthPx = with(LocalDensity.current) { boxSize.toPx() }
