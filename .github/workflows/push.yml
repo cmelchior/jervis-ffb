@@ -5,10 +5,12 @@ on:
     paths-ignore:
       - "*.md"
       - "**/*.md"
+      - "screenshots/*.png"
   push:
     paths-ignore:
       - "*.md"
       - "**/*.md"
+      - "screenshots/*.png"
     branches:
       - main
 
