@@ -1,6 +1,7 @@
 package com.jervisffb
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -25,7 +26,7 @@ fun main() = runBlocking {
     try {
         initApplication()
         application {
-            val menuViewModel = MenuViewModel()
+            val menuViewModel = remember { MenuViewModel() }
 
             // Register an system "About" page on platforms that support it (Only Desktop for now).
             LaunchedEffect(Unit) {
