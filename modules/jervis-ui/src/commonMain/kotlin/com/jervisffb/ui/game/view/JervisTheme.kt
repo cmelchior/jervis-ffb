@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
@@ -30,13 +31,15 @@ object JervisTheme {
     private val referenceSize = DpSize(1728.dp, 1080.dp)
 
     // Size of the main Jervis window, including any decoration.
-    var windowSize: DpSize by mutableStateOf(DpSize.Zero)
+    var windowSizeDp: DpSize by mutableStateOf(DpSize.Zero)
+        private set
+    var windowSizePx: Size by mutableStateOf(Size.Zero)
         private set
 
     /**
      * Converts a value from either [sp] or [dp] to the Jervis scaled equivalent
      */
-    fun getScaledValue(value: Float): Float = value * (windowSize.width / referenceSize.width)
+    fun getScaledValue(value: Float): Float = value * (windowSizeDp.width / referenceSize.width)
 
     @Composable
     fun fontFamily() = TrumpTownPro()
@@ -45,8 +48,9 @@ object JervisTheme {
      * Update this theme with the current window size. This will also trigger an update
      * of all [jsp] and [jdp] values.
      */
-    fun notifyWindowsSizeChange(size: DpSize) {
-        this.windowSize = size
+    fun notifyWindowsSizeChange(dpSize: DpSize, pxSize: Size) {
+        this.windowSizeDp = dpSize
+        this.windowSizePx = pxSize
     }
 
     val rulebookBlue = Color(0xFF0077C6) // Color(0xFF2a4479)

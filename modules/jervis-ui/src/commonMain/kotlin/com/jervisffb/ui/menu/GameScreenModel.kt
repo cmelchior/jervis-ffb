@@ -1,6 +1,7 @@
 package com.jervisffb.ui.menu
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.Density
@@ -19,6 +20,7 @@ import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.UiActionProvider
+import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.FieldViewData
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -51,7 +53,7 @@ class GameScreenModel(
     private val onGameStopped: () -> Unit = { }
 ) : ScreenModel {
 
-    val fieldViewData: MutableStateFlow<FieldViewData> = MutableStateFlow(FieldViewData(IntSize.Zero, IntOffset.Zero, gameController.rules.fieldWidth, gameController.rules.fieldHeight))
+    val fieldViewData: MutableStateFlow<FieldViewData> = MutableStateFlow(FieldViewData(Size.Zero, IntSize.Zero, IntOffset.Zero, gameController.rules.fieldWidth, gameController.rules.fieldHeight))
     val hoverPlayerFlow = MutableSharedFlow<Player?>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     lateinit var uiState: UiGameController
@@ -160,6 +162,7 @@ class GameScreenModel(
     fun updateFieldViewData(fieldLayoutCoordinates: LayoutCoordinates) {
         val offset = fieldLayoutCoordinates.localToWindow(Offset.Zero)
         val fieldPositionData = FieldViewData(
+            JervisTheme.windowSizePx,
             fieldLayoutCoordinates.size,
             IntOffset(offset.x.roundToInt(), offset.y.roundToInt()),
             gameController.rules.fieldWidth,

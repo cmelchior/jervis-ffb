@@ -5,6 +5,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -52,8 +53,12 @@ fun main() = runBlocking {
                 )
 
             // Update Jervis Theme, when the window re-sizes. This is needed so we can scale other UI elements correctly
+            val density = LocalDensity.current
             LaunchedEffect(windowState.size) {
-                JervisTheme.notifyWindowsSizeChange(windowState.size)
+                val windowSizePx = with(density) {
+                    windowState.size.toSize()
+                }
+                JervisTheme.notifyWindowsSizeChange(windowState.size, windowSizePx)
             }
 
             Window(

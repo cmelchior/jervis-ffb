@@ -1,6 +1,7 @@
 package com.jervisffb.ui.game.viewmodel
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -18,6 +19,7 @@ import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.QueuedActionsResult
+import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.menu.GameScreenModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -213,8 +215,9 @@ enum class TipPosition {
  * We use this to position dialogs in relation to the field (normally in the center).
  */
 data class FieldViewData(
-    val size: IntSize,
-    val offset: IntOffset,
+    val screenSize: Size,
+    val size: IntSize, // Size of the field in pixels
+    val offset: IntOffset, // Offset of the field in the main game window
     val squaresWidth: Int,
     val squaresHeight: Int,
 ) {
@@ -227,6 +230,9 @@ data class FieldViewData(
 
         // Calculate 9 sections for the placement of the action wheel:
         val tipPos = chooseTipPosition(
+            screenSize = JervisTheme.windowSizePx,
+            fieldOffset = offset,
+            squareSizePx = squareSizePx,
             focus = offset - Offset(this.offset.x.toFloat(), this.offset.y.toFloat()) + Offset(squareSizePx/2f, squareSizePx/2f),
             wheelRadius = (wheelSizePx - (wheelSizePx - ringSizePx)*0.75f)/2f,
             fieldSize = size,
@@ -327,14 +333,21 @@ data class FieldViewData(
     }
 
     fun chooseTipPosition(
-        focus: Offset,
+        screenSize: Size,
+        fieldOffset: Offset,
+        squareSizePx: Float,
+        focus: Offset, // Center of square in focus. Offset is from top-left corner of the field.
         wheelRadius: Float,
         fieldSize: IntSize,
     ): TipPosition {
-        val leftSpace = focus.x
-        val rightSpace = fieldSize.width - focus.x
-        val topSpace = focus.y
-        val bottomSpace = fieldSize.height - focus.y
+
+        // With the new game UI, we have some extra space around the field
+        // For now, just use the 2*size of a square as a heuristic. It probably
+        // needs to be further refined.
+        val leftSpace = focus.x + squareSizePx*2
+        val rightSpace = fieldSize.width - focus.x + squareSizePx*2
+        val topSpace = focus.y + squareSizePx*2
+        val bottomSpace = fieldSize.height - focus.y + squareSizePx*2
 
         val hasCenterRoom = leftSpace >= wheelRadius &&
             rightSpace >= wheelRadius &&
