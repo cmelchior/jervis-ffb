@@ -206,27 +206,28 @@ private fun RingMessage(
     borderColor: Color = JervisTheme.rulebookRed,
 ) {
     val radiusPx = with(LocalDensity.current) { radius.toPx() }
-    val offset = remember(angle, message) { getOffset(angle, radiusPx)}
-    Box(
-        modifier = Modifier
-            .offset { offset }
-            .dropShadow(
-                shape = shape,
-                color = Color.Black.copy(1f),
-                offsetX = 0.dp,
-                offsetY = 0.dp,
-                blur = 16.dp
+    val offset = remember(angle, message) { getOffset(angle, radiusPx) }
+    Box(modifier = Modifier.offset { offset.toIntOffset() }) {
+        Box(
+            modifier = Modifier
+                .dropShadow(
+                    shape = shape,
+                    color = Color.Black.copy(1f),
+                    offsetX = 0.dp,
+                    offsetY = 0.dp,
+                    blur = 16.dp
+                )
+                .paperBackground()
+                .border(width = 4.dp, borderColor)
+                .padding(start = 32.dp, end = 32.dp, top = 16.dp, bottom = 16.dp)
+        ) {
+            Text(
+                modifier = Modifier,
+                text = message ?: "",
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
-            .border(width = 4.dp, borderColor)
-            .paperBackground()
-            .padding(start = 32.dp, end = 32.dp, top = 16.dp, bottom = 16.dp)
-    ) {
-        Text(
-            modifier = Modifier,
-            text = message ?: "",
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
+        }
     }
 }
 
@@ -494,7 +495,7 @@ private fun MenuItemButton(
     val offset = getOffset(angle, radiusPx)
     Box(
         modifier = Modifier
-            .offset { offset }
+            .offset { offset.toIntOffset() }
             .alpha(alpha)
     ) {
         when (item) {
@@ -1406,10 +1407,12 @@ private fun DiceButton(
  * Calculates the offset for displacing an item from the center of a circle
  * to the radius for a given angle in degrees
  */
-private fun getOffset(angle: Float, radius: Float): IntOffset {
+private fun getOffset(angle: Float, radius: Float): Offset {
     val rad = toRadians(angle.toDouble())
-    return IntOffset(
-        (cos(rad).toFloat() * radius).roundToInt(),
-        (sin(rad).toFloat() * radius).roundToInt()
+    return Offset(
+        (cos(rad).toFloat() * radius),
+        (sin(rad).toFloat() * radius)
     )
 }
+
+private fun Offset.toIntOffset(): IntOffset = IntOffset(x.roundToInt(), y.roundToInt())

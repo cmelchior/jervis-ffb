@@ -19,7 +19,7 @@ import com.jervisffb.ui.utils.applyIf
 fun Modifier.paperBackground(color: Color = JervisTheme.rulebookPaper, shape: Shape? = RectangleShape): Modifier {
     val paperShader = createGrayscaleNoiseShader()
     return this
-        .applyIf(shape != null) {clip(shape!!) }
+        .applyIf(shape != null) { clip(shape!!) }
         .drawBehind {
             // Add desired background color
             drawRect(color = color, size = size)
