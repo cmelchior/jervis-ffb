@@ -31,7 +31,8 @@ object JervisTheme {
     private val referenceSize = DpSize(1728.dp, 1080.dp)
 
     // Size of the main Jervis window, including any decoration.
-    var windowSizeDp: DpSize by mutableStateOf(DpSize.Zero)
+    // This cannot have an initial value of DpSize.Zero, for some reason this will break WASM.
+    var windowSizeDp: DpSize by mutableStateOf(referenceSize)
         private set
     var windowSizePx: Size by mutableStateOf(Size.Zero)
         private set
