@@ -11,12 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -78,7 +78,7 @@ fun DicePoolSelectorDialog(
                                     is DBlockResult -> {
                                         val buttonColors =
                                             ButtonDefaults.buttonColors(
-                                                backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else diceBackground,
+                                                containerColor = if (isSelected.value) MaterialTheme.colorScheme.primary else diceBackground,
                                             )
                                         val text = diceResult.blockResult.name
                                         Button(
@@ -101,7 +101,7 @@ fun DicePoolSelectorDialog(
                                     else -> {
                                         val buttonColors =
                                             ButtonDefaults.buttonColors(
-                                                backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.background,
+                                                containerColor = if (isSelected.value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background,
                                             )
                                         Button(
                                             modifier = Modifier.weight(1f),
@@ -110,7 +110,7 @@ fun DicePoolSelectorDialog(
                                         ) {
                                             Text(
                                                 text = diceResult.value.toString(),
-                                                color = if (isSelected.value) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground,
+                                                color = if (isSelected.value) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground,
                                             )
                                         }                                    }
                                 }

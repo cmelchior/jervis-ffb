@@ -14,7 +14,7 @@ import com.jervisffb.ui.game.view.JervisTheme
  * window of 3456x2160 pixels (Macbook Pro screen size) is used to determine the
  * scale factor. This means that at this size [jsp] == [sp].
  *
- * This allows text sizes to scale with the size of the game window.
+ * This allows text to scale with the size of the game window.
  */
 val Float.jsp: TextUnit
     get() = JervisTheme.getScaledValue(this).sp

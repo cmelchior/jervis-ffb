@@ -5,7 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -147,7 +147,7 @@ fun IsoDemo(
     Canvas(
         Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colorScheme.background)
             .then(transformMod)
             .then(tapMod)
     ) {

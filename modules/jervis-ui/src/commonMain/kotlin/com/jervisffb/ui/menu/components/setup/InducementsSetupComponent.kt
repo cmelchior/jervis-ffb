@@ -16,8 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,7 +74,13 @@ private fun ColumnScope.InducementRow(rowNo: Int, inducement: InducementData, on
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Box(modifier = Modifier.width(70.dp), contentAlignment = Alignment.CenterStart) {
+        Box(
+            modifier = Modifier
+                .width(85.dp)
+                .padding(start = 16.dp)
+            ,
+            contentAlignment = Alignment.CenterStart
+        ) {
             JervisSwitch(
                 enabled = true,
                 checked = inducement.enabled,

@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -87,7 +87,7 @@ fun GameStatusV1(
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,
-                style = MaterialTheme.typography.h4.copy(
+                style = MaterialTheme.typography.headlineMedium.copy(
                     shadow = Shadow(
                         color = Color.Black,
                         offset = Offset(4f, 4f),
@@ -101,7 +101,7 @@ fun GameStatusV1(
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,
-                style = MaterialTheme.typography.h4.copy(
+                style = MaterialTheme.typography.headlineMedium.copy(
                     shadow = Shadow(
                         color = Color.Black,
                         offset = Offset(2f, 2f),

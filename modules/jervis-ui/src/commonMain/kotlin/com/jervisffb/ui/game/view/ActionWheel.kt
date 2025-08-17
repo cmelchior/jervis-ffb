@@ -25,9 +25,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DrawerDefaults.shape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.DrawerDefaults.shape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -791,8 +791,8 @@ private fun HoverText(
             .padding(4.dp)
         ,
         text = displayedMessage ?: "",
-        lineHeight = 1.em,
-        style = MaterialTheme.typography.body1.copy(
+        style = MaterialTheme.typography.bodySmall.copy(
+            lineHeight = 1.em,
             color = textColor,
             fontWeight = fontWeight,
             fontSize = fontSize,

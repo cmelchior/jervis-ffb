@@ -16,10 +16,10 @@ import androidx.compose.foundation.pager.PagerScope
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Tab
-import androidx.compose.material.TabPosition
-import androidx.compose.material.TabRow
-import androidx.compose.material.Text
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabPosition
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -59,7 +59,7 @@ fun ColumnScope.StartGameComponent(
             TitleBorder()
             TabRow(
                 modifier = Modifier.fillMaxWidth().height(36.dp),
-                backgroundColor = Color.Transparent,
+                containerColor = Color.Transparent,
                 selectedTabIndex = pagerStateTop.currentPage,
                 indicator = emptyIndicator,
                 divider = @Composable { /* None */ },

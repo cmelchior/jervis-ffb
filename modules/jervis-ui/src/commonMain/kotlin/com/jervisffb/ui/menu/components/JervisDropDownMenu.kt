@@ -2,11 +2,11 @@ package com.jervisffb.ui.menu.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.menu.p2p.host.DropdownEntry
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T: DropdownEntry> JervisDropDownMenu(
     title: String,
@@ -45,13 +45,14 @@ fun <T: DropdownEntry> JervisDropDownMenu(
         ) {
             entries.forEachIndexed { index, item ->
                 DropdownMenuItem(
+                    text = {
+                        Text(item.name)
+                    },
                     onClick = {
                         expanded = false
                         onSelected(item)
                     }
-                ) {
-                    Text(item.name)
-                }
+                )
             }
         }
     }

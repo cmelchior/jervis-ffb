@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -218,7 +218,7 @@ private fun LoadingScreen(viewModel: GameScreenModel) {
             // Outlines are not supported by Compose yet, so fake it by overlaying two texts.
             Text(
                 text = "VS",
-                style = MaterialTheme.typography.h1.copy(
+                style = MaterialTheme.typography.headlineMedium.copy(
                     color = Color.Black,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 120.sp,
@@ -236,7 +236,7 @@ private fun LoadingScreen(viewModel: GameScreenModel) {
             )
             Text(
                 text = "VS",
-                style = MaterialTheme.typography.h1.copy(
+                style = MaterialTheme.typography.headlineMedium.copy(
                     color = Color.White,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 120.sp,
@@ -283,7 +283,7 @@ private fun LoadingScreen(viewModel: GameScreenModel) {
             Text(
                 text = loadingMessage + "........",
                 maxLines = 1,
-                style = MaterialTheme.typography.h3.copy(
+                style = MaterialTheme.typography.headlineMedium.copy(
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
@@ -303,7 +303,7 @@ private fun LoadingScreen(viewModel: GameScreenModel) {
                 modifier = Modifier.width(targetLoadingWidth).padding(bottom = 8.dp, end = 16.dp),
                 text = loadingText,
                 maxLines = 1,
-                style = MaterialTheme.typography.h3.copy(
+                style = MaterialTheme.typography.headlineMedium.copy(
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
@@ -348,7 +348,7 @@ private fun RowScope.TeamPlayingData(
         Text(
             text = teamName.uppercase(),
             maxLines = 1,
-            style = MaterialTheme.typography.body1.copy(
+            style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = 36.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = JervisTheme.rulebookOrange,
@@ -359,7 +359,7 @@ private fun RowScope.TeamPlayingData(
             modifier = Modifier.padding(start = 4.dp, top = 10.dp, end = 4.dp, bottom = 12.dp),
             text = coachName.uppercase(),
             maxLines = 1,
-            style = MaterialTheme.typography.body1.copy(
+            style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = 22.sp,
                 color = Color.White,
                 fontStyle = FontStyle.Italic,
@@ -369,7 +369,7 @@ private fun RowScope.TeamPlayingData(
             modifier = Modifier.background(Color.Black).padding(4.dp),
             maxLines = 1,
             text = "$race - TV $teamValue",
-            style = MaterialTheme.typography.body1.copy(
+            style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = 24.sp,
                 color = Color.White,
             ),

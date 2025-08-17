@@ -17,9 +17,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -89,17 +90,19 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                 .onPointerEvent(PointerEventType.Exit) { /* Swallow it */ }
             ,
             shape = RectangleShape, //RoundedCornerShape(8.dp),
-            elevation = 4.dp,
-            backgroundColor = darkerTeamColor,
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.cardColors(containerColor = darkerTeamColor),
             // border = BorderStroke(width = bigBorderSize, color = teamColor),
         ) {
             BoxWithConstraints {
-                val boxWidth = minWidth
+                val boxWidth = maxWidth
                 val portraitHeight = (boxWidth - bigBorderSize * 2) * 0.7f * 147f/95f
 
                 // Stats and image
                 Column(
-                    modifier = Modifier.paperBackground(darkerTeamColor).padding(bigBorderSize),
+                    modifier = Modifier
+                        .paperBackground(darkerTeamColor)
+                        .padding(bigBorderSize),
                 ) {
                     Row(
                         modifier = Modifier
@@ -115,7 +118,7 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                             ,
                             verticalArrangement = Arrangement.spacedBy(borderSize),
                         ) {
-                            StatBoxV3(Modifier.fillMaxSize(), "MV", player.model.move.toString(), teamColor, boxWidth)
+                            StatBoxV3(Modifier.fillMaxSize(), "MV", player.model.move.toString(), teamColor)
                         }
                         Box(
                             modifier = Modifier.weight(0.7f).fillMaxSize().paperBackground(lightTeamColor),
@@ -164,10 +167,10 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                         ) {
                             val model = player.model
                             val modifier = Modifier.weight(1f)
-                            StatBoxV3(modifier, "ST", model.strength.toString(), teamColor, boxWidth)
-                            StatBoxV3(modifier, "AG", "${model.agility}+", teamColor, boxWidth)
-                            StatBoxV3(modifier, "PA", if (model.passing == null) "-" else "${model.passing}+", teamColor, boxWidth)
-                            StatBoxV3(modifier, "AV", "${model.armorValue}+", teamColor, boxWidth)
+                            StatBoxV3(modifier, "ST", model.strength.toString(), teamColor)
+                            StatBoxV3(modifier, "AG", "${model.agility}+", teamColor)
+                            StatBoxV3(modifier, "PA", if (model.passing == null) "-" else "${model.passing}+", teamColor)
+                            StatBoxV3(modifier, "AV", "${model.armorValue}+", teamColor)
                         }
                         Box(
                             modifier = Modifier
@@ -222,7 +225,7 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                                 ,
                                 contentAlignment = Alignment.Center,
                             ) {
-                                PlayerName(player.model.name, borderSize, boxWidth)
+                                PlayerName(player.model.name, borderSize)
                             }
                         }
                     }
@@ -289,7 +292,7 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                                         lineHeight = 1.5.em,
                                         color = JervisTheme.contentTextColor,
                                         fontWeight = FontWeight.SemiBold,
-                                        modifier = Modifier.padding(0.dp).fillMaxWidth(),
+                                        modifier = Modifier.padding(0.jdp).fillMaxWidth(),
                                         text = it.name + if (it.compulsory) "*" else "",
                                         textDecoration = if (it.used) TextDecoration.LineThrough else TextDecoration.None,
                                     )
@@ -304,30 +307,30 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
 }
 
 @Composable
-private fun BoxScope.PlayerName(name: String, borderSize: Dp, boxWidth: Dp) {
+private fun BoxScope.PlayerName(name: String, borderSize: Dp) {
     // Because Compose does not support drop shadow on Outlined Text
     // we fake it by first blurring the outline and then render the rest
 
-    val fontScale =  (16 / 210f) // Reference value (16.sp / 210.dp)
-    val shadowScale = (8 / 210f) // Reference value (8f / 210.dp)
-    val outlineScale = (6 / 210f) // Reference value (6f / 210.dp)
+//    val fontScale =  (16 / 210f) // Reference value (16.sp / 210.dp)
+//    val shadowScale = (8 / 210f) // Reference value (8f / 210.dp)
+//    val outlineScale = (6 / 210f) // Reference value (6f / 210.dp)
 
     // Outline not supported by Compose yet, so fake it
-    val playerNameStyle = MaterialTheme.typography.body1.copy(
+    val playerNameStyle = MaterialTheme.typography.bodySmall.copy(
         textAlign = TextAlign.Center,
         fontFamily = JervisTheme.fontFamily(),
-        fontSize = (boxWidth.value * fontScale).sp,
+        fontSize = 16.jsp,
         lineHeight = 1.4.em,
         letterSpacing = 1.sp,
     )
-    val fontOutlineSize = with(LocalDensity.current) { (outlineScale * boxWidth.value).dp.toPx() }
+    val fontOutlineSize = with(LocalDensity.current) { 6.jdp.toPx() }
 
     // Drop shadow
     Text(
         modifier = Modifier
             .fillMaxWidth()
             .graphicsLayer {
-                renderEffect = BlurEffect(shadowScale * boxWidth.value, shadowScale * boxWidth.value, TileMode.Clamp)
+                renderEffect = BlurEffect(2.jdp.toPx(), 2.jdp.toPx(), TileMode.Clamp)
             }
         ,
         text = name,
@@ -421,23 +424,18 @@ private fun StatBoxV3(
     title: String,
     value: String,
     backgroundColor: Color,
-    boxWidth: Dp,
 ) {
-    val fontScaleSmall = 0.05714285714 // Experimental value (12.sp / 210.dp)
-    val fontScaleBig = 0.1047619048 // Experimental value (22.sp / / 210.dp)
-    val paddingScale = 0.014285714f // Experimental value ( 4.dp / 210.dp)
-    val shadowScale = 0.00952381f // Experimental value ( 2 / 210)
     Column(
-        modifier = modifier.fillMaxWidth().background(backgroundColor).padding(boxWidth * paddingScale),
+        modifier = modifier.fillMaxWidth().background(backgroundColor).padding(4.jdp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            modifier = Modifier.padding(bottom = boxWidth * paddingScale),
+            modifier = Modifier.padding(bottom = 4.jdp),
             text = title,
-            fontSize = (boxWidth.value * fontScaleSmall).sp,
+            fontSize = 12.jsp,
             lineHeight = 1.em,
-            letterSpacing = 1.sp,
+            letterSpacing = 1.jsp,
             maxLines = 1,
             fontWeight = FontWeight.Light,
             color = Color.White,
@@ -446,15 +444,15 @@ private fun StatBoxV3(
         Text(
             modifier = Modifier,
             text = value,
-            fontSize = (boxWidth.value * fontScaleBig).sp,
+            fontSize = 22.jsp,
             lineHeight = 1.em,
             maxLines = 1,
-            letterSpacing = 2.sp,
+            letterSpacing = 2.jsp,
             fontFamily = JervisTheme.fontFamily(),
             color = JervisTheme.white,
             textAlign = TextAlign.Center,
             style = TextStyle.Default.copy(
-                shadow = Shadow(JervisTheme.black, Offset(shadowScale * boxWidth.value, shadowScale * boxWidth.value), shadowScale * boxWidth.value),
+                shadow = Shadow(JervisTheme.black, Offset(2.jdp.value, 2.jdp.value), 2.jdp.value),
             ),
         )
     }

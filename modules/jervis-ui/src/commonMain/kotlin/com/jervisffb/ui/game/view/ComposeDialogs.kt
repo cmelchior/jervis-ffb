@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -190,7 +190,7 @@ fun MultipleSelectUserActionDialog(
                                     is DBlockResult -> {
                                         val buttonColors =
                                             ButtonDefaults.buttonColors(
-                                                backgroundColor = if (isSelected.value) MaterialTheme.colors.primary else JervisTheme.diceBackground,
+                                                containerColor = if (isSelected.value) MaterialTheme.colorScheme.primary else JervisTheme.diceBackground,
                                             )
                                         val text = it.blockResult.name
                                         Button(

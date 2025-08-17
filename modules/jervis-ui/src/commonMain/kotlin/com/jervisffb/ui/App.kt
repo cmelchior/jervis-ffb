@@ -1,6 +1,6 @@
 package com.jervisffb.ui
 
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import cafe.adriel.voyager.navigator.CurrentScreen
@@ -54,7 +54,7 @@ suspend fun initApplication() {
 @Composable
 fun MyAppTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colors = MaterialTheme.colors.copy(
+        colorScheme = MaterialTheme.colorScheme.copy(
             primary = JervisTheme.homeTeamColor,
         ),
         typography = MaterialTheme.typography.copy(),

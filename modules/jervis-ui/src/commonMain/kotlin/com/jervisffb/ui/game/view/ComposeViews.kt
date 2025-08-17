@@ -1,6 +1,5 @@
 package com.jervisffb.ui.game.view
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,20 +15,19 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -53,27 +51,6 @@ import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayState
-import kotlinx.coroutines.NonCancellable.start
-
-// Theme
-val debugBorder = BorderStroke(2.dp, Color.Red)
-
-data class FumbblButtonColors(
-    private val backgroundColor: Color = Color.Gray,
-    private val contentColor: Color = Color.White,
-    private val disabledBackgroundColor: Color = Color.DarkGray,
-    private val disabledContentColor: Color = Color.White,
-) : ButtonColors {
-    @Composable
-    override fun backgroundColor(enabled: Boolean): State<Color> {
-        return rememberUpdatedState(if (enabled) backgroundColor else disabledBackgroundColor)
-    }
-
-    @Composable
-    override fun contentColor(enabled: Boolean): State<Color> {
-        return rememberUpdatedState(if (enabled) contentColor else disabledContentColor)
-    }
-}
 
 // TODO Figure out how to do drop shadows
 @Composable
@@ -224,7 +201,15 @@ fun LogViewer(
                 if (hovered) {
                     TabRow(
                         selectedTabIndex = tabIndex,
-                        backgroundColor = JervisTheme.rulebookGreen.copy(0.9f)
+                        containerColor = JervisTheme.rulebookGreen.copy(0.9f),
+                        indicator = { tabPositions ->
+                            if (tabIndex < tabPositions.size) {
+                                TabRowDefaults.SecondaryIndicator(
+                                    modifier = Modifier.tabIndicatorOffset(tabPositions[tabIndex]),
+                                    color = Color.White,
+                                )
+                            }
+                        }
                     ) {
                         tabs.forEachIndexed { index, title ->
                             Tab(
@@ -235,7 +220,6 @@ fun LogViewer(
                         }
                     }
                 }
-
             }
         } else {
             GameLog(vm)

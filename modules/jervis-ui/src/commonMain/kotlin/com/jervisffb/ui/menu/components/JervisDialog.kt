@@ -19,11 +19,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldColors
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,6 +34,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -108,12 +108,14 @@ fun JervisDialog(
     val textColor = JervisTheme.contentTextColor
     val buttonTextColor = JervisTheme.white
     val inputDialogColors: @Composable (String) -> TextFieldColors = { text: String ->
-        TextFieldDefaults.outlinedTextFieldColors(
+        TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            focusedTextColor = textColor,
             focusedLabelColor = dialogColor,
-            focusedBorderColor = dialogColor,
+            focusedIndicatorColor = dialogColor,
             unfocusedLabelColor = if (text.isEmpty()) textColor.copy(alpha = 0.4f) else textColor,
-            unfocusedBorderColor = textColor,
-            textColor = textColor,
+            unfocusedIndicatorColor = textColor,
         )
     }
     // Background box for showing a Scrim and tracking the size of the window
@@ -168,7 +170,7 @@ fun JervisDialog(
                     .defaultMinSize(minHeight = 200.dp, minWidth = width)
                     .paperBackground(color = JervisTheme.rulebookPaper)
                 ,
-                shape = MaterialTheme.shapes.medium,
+                shape = RectangleShape,
                 border = BorderStroke(8.dp, color = dialogColor),
                 color = JervisTheme.rulebookPaper,
                 contentColor = textColor,
@@ -268,7 +270,7 @@ private fun ColumnScope.JervisDialogContent(
 }
 
 @Composable
-private fun ColumnScope.JervisDialogHeader(title: String, dialogColor: Color) {
+fun ColumnScope.JervisDialogHeader(title: String, dialogColor: Color) {
     Box(
         modifier = Modifier.height(36.dp),
         contentAlignment = Alignment.CenterStart,

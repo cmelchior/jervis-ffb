@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,9 +16,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
+import com.jervisffb.jervis_ui.generated.resources.Res
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.FieldViewData
@@ -28,6 +30,7 @@ import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import com.jervisffb.ui.menu.GameScreenModel
+import com.jervisffb.ui.menu.TopbarButton
 
 @Composable
 fun GameScreen(
@@ -41,6 +44,7 @@ fun GameScreen(
     unknownActions: ActionSelectorViewModel,
     logs: LogViewModel,
     dialogsViewModel: DialogsViewModel,
+    onSettingsClick: () -> Unit,
 ) {
     val aspectRation = (145f+145f+782f)/452f
     val fieldPositionData: FieldViewData by screenModel.fieldViewData.collectAsState() // remember { mutableStateOf(FieldViewData(IntSize.Zero, IntOffset.Zero)) }
@@ -49,6 +53,7 @@ fun GameScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+        val backgroundColor = JervisTheme.white.copy(0.1f)
         GameStatusV2(gameStatusController, modifier = Modifier)
         Spacer(modifier = Modifier.height(12.dp))
         Row(
@@ -78,10 +83,10 @@ fun GameScreen(
             }
         }
         Row(modifier = Modifier.padding(start = 24.dp, end = 24.dp)) {
-            LogViewer(logs, modifier = Modifier.weight(1f).background(Color.White.copy(alpha = 0.1f)).fillMaxSize())
+            LogViewer(logs, modifier = Modifier.weight(1f).background(backgroundColor).fillMaxSize())
             Spacer(modifier = Modifier.width(24.dp))
             // Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))
-            Column(modifier = Modifier.weight(1f).background(Color.White.copy(alpha = 0.1f)).fillMaxSize()) {
+            Column(modifier = Modifier.weight(1f).background(backgroundColor).fillMaxSize()) {
                 if (replayActionsBar != null) {
                     ReplayCommandBar(replayActionsBar, modifier = Modifier)
                 }
@@ -90,7 +95,17 @@ fun GameScreen(
                 }
                 ActionSelector(unknownActions, modifier = Modifier.fillMaxSize())
             }
-
+            Spacer(modifier = Modifier.width(24.dp))
+            Column(
+                modifier = Modifier.width(48.dp).fillMaxHeight().background(backgroundColor),
+                verticalArrangement = Arrangement.Bottom,
+            ) {
+                TopbarButton(
+                    icon = Res.drawable.jervis_icon_menu_settings,
+                    contentDescription = "Settings",
+                    onClick = onSettingsClick
+                )
+            }
         }
     }
     Dialogs(field, fieldPositionData, dialogsViewModel)

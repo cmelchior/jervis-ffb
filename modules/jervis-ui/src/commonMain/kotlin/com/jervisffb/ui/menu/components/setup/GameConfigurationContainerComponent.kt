@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.Tab
-import androidx.compose.material.TabPosition
-import androidx.compose.material.TabRow
-import androidx.compose.material.Text
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabPosition
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,7 +47,7 @@ fun GameConfigurationContainerComponent(viewModel: GameConfigurationContainerCom
                 TabRow(
                     selectedTabIndex = selectedTab,
                     modifier = Modifier.fillMaxWidth().height(36.dp),
-                    backgroundColor = Color.Transparent,
+                    containerColor = Color.Transparent,
                     /* edgePadding = 0.dp, */
                     indicator = emptyIndicator,
                     divider = @Composable { /* None */ },
@@ -89,7 +89,7 @@ fun GameConfigurationContainerComponent(viewModel: GameConfigurationContainerCom
                 TabRow(
                     selectedTabIndex = pagerState.currentPage,
                     modifier = Modifier.fillMaxWidth().height(36.dp).alpha(if (showSetupTabs) 1f else 0f),
-                    backgroundColor = Color.Transparent,
+                    containerColor = Color.Transparent,
                     indicator = emptyIndicator,
                     divider = @Composable { /* None */ },
                 ) {

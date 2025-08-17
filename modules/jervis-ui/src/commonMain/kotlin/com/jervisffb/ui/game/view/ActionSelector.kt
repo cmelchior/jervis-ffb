@@ -6,9 +6,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -64,7 +65,7 @@ fun ActionSelector(
             inputs.forEach { action ->
                 Button(
                     modifier = Modifier.padding(0.dp),
-                    contentPadding = PaddingValues(2.dp),
+                    shape = RoundedCornerShape(2.dp),
                     onClick = { vm.actionSelected(action) },
                 ) {
                     val text =

@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
@@ -83,13 +83,13 @@ fun ContextPopupMenu(
             properties = PopupProperties(),
             onDismissRequest = { hidePopup(true) },
         ) {
-            Column(modifier = Modifier.width(IntrinsicSize.Max).background(MaterialTheme.colors.background)) {
+            Column(modifier = Modifier.width(IntrinsicSize.Max).background(MaterialTheme.colorScheme.background)) {
                 commands.forEach { (title, cmd) ->
                     Box(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .background(MaterialTheme.colors.background)
+                                .background(MaterialTheme.colorScheme.background)
                                 .clickable {
                                     hidePopup(false)
                                     cmd()

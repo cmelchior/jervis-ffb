@@ -2,13 +2,13 @@ package com.jervisffb.ui.menu.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.menu.p2p.host.DropdownEntry
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T: DropdownEntry> JervisDropdownMenuWithSections(
     title: String,
@@ -50,13 +50,14 @@ fun <T: DropdownEntry> JervisDropdownMenuWithSections(
                 DropdownHeader(sectionTitle.uppercase())
                 items.forEach { item ->
                     DropdownMenuItem(
+                        text = {
+                            Text(item.name)
+                        },
                         onClick = {
                             expanded = false
                             onSelected(item)
                         }
-                    ) {
-                        Text(item.name)
-                    }
+                    )
                 }
                 if (index < entries.lastIndex) {
                     Divider()
@@ -71,7 +72,7 @@ private fun DropdownHeader(text: String) {
     Text(
         modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
         text = text,
-        style = MaterialTheme.typography.body1.copy(
+        style = MaterialTheme.typography.bodySmall.copy(
             fontSize = 10.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Gray

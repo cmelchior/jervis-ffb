@@ -20,11 +20,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.onClick
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -157,7 +157,7 @@ private fun RowScope.TurnTracker(
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    style = MaterialTheme.typography.h4.copy(
+                    style = MaterialTheme.typography.headlineMedium.copy(
                         shadow = Shadow(
                             color = Color.Black,
                             offset = Offset(2f, 2f),
@@ -180,7 +180,7 @@ private fun ScoreCounter(
     val smallPadding = 2.dp
     val counterWidth = 40.dp
     val counterHeight = 48.dp
-    val counterStyle = MaterialTheme.typography.h4.copy(
+    val counterStyle = MaterialTheme.typography.headlineMedium.copy(
         shadow = Shadow(
             color = Color.Black,
             offset = Offset(2f, 2f),
@@ -267,7 +267,7 @@ private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: Strin
                 lineHeight = 1.em,
                 letterSpacing = 2.sp,
                 // fontFamily = JervisTheme.fontFamily(),
-                style = MaterialTheme.typography.body1.copy(
+                style = MaterialTheme.typography.bodySmall.copy(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     shadow = Shadow(
@@ -280,7 +280,7 @@ private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: Strin
             Text(
                 text = timer.uppercase(),
                 color = JervisTheme.white,
-                style = MaterialTheme.typography.body1.copy(
+                style = MaterialTheme.typography.bodySmall.copy(
                     fontSize = 28.sp,
                     letterSpacing = 1.5.sp,
                     fontWeight = FontWeight.Bold,
@@ -480,7 +480,8 @@ fun ParallelogramButton(
         color = if (enabled) containerColor else containerColor.copy(alpha = 0.6f),
         contentColor = contentColor,
         border = if (borderWidth > 0.dp) BorderStroke(borderWidth, borderColor) else null,
-        elevation = 0.dp,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
     ) {
         Box(
             modifier = Modifier,
@@ -562,7 +563,7 @@ fun PixelatedImageWithShader(
 private fun StatusBarButton(text: String, onClick: () -> Unit) {
     Button(
         modifier = Modifier,
-        colors = ButtonDefaults.buttonColors(backgroundColor = JervisTheme.rulebookDisabled, disabledBackgroundColor = JervisTheme.rulebookPaperMediumDark),
+        colors = ButtonDefaults.buttonColors(containerColor = JervisTheme.rulebookDisabled, disabledContainerColor = JervisTheme.rulebookPaperMediumDark),
         onClick = onClick,
         border = BorderStroke(3.dp, JervisTheme.white),
         enabled = true,

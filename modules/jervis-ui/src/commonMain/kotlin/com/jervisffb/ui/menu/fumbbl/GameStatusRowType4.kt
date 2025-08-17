@@ -13,10 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +37,7 @@ import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.menu.components.JervisCircularProgressIndicator
 
 /**
  * Just for demo purposes for now
@@ -105,12 +104,7 @@ fun ColumnScope.GameStatusRowType4(textColor: Color = JervisTheme.contentTextCol
             }
         }
         Box(modifier = Modifier.width(110.dp), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(
-                backgroundColor = JervisTheme.rulebookPaperDark.copy(alpha = 0.2f),
-                progress = 0.1f,
-                strokeWidth = 8.dp,
-                modifier = Modifier.size(60.dp)
-            )
+            JervisCircularProgressIndicator(0.1f)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxSize()) {
                 Text(
                     modifier = Modifier.weight(1f).offset(x = -2.dp),

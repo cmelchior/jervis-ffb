@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
@@ -172,6 +173,7 @@ fun TopbarButton(icon: DrawableResource, contentDescription: String, onClick: ()
         painter = painterResource(icon),
         contentDescription = contentDescription,
         contentScale = ContentScale.FillHeight,
+        colorFilter = ColorFilter.tint(JervisTheme.white),
     )
 }
 

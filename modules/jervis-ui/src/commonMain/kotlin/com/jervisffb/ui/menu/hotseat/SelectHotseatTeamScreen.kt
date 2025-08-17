@@ -10,10 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.RadioButton
-import androidx.compose.material.RadioButtonDefaults
-import androidx.compose.material.Text
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -103,7 +102,8 @@ fun PlayerTypeSelector(options: List<Pair<String, CoachType>>, selectedType: Coa
                     colors = RadioButtonDefaults.colors(
                         selectedColor = JervisTheme.rulebookRed,
                         unselectedColor = JervisTheme.contentTextColor.copy(alpha = 0.6f),
-                        disabledColor = Color.LightGray.copy(alpha = ContentAlpha.disabled)
+                        disabledSelectedColor = Color.LightGray.copy(0.38f)
+                        //disabledColor = Color.LightGray.copy(alpha = ContentAlpha.disabled)
                     )
                 )
                 Text(
