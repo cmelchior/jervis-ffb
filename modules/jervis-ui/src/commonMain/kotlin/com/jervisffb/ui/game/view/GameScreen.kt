@@ -103,7 +103,7 @@ fun GameScreen(
             ) {
                 TopbarButton(
                     icon = Res.drawable.jervis_icon_menu_undo,
-                    contentDescription = "Undo",
+                    contentDescription = "Undo Action",
                     onClick = {
                         screenModel.menuViewModel.undoAction()
                     }
