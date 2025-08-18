@@ -12,13 +12,16 @@ import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
 import com.jervisffb.engine.rules.builder.GameType
-import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisSetupFile
 import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.game.viewmodel.Setups
-import com.jervisffb.ui.utils.saveFile
 
+/**
+ * Menubar which is only visible for Desktop Apps.
+ * We have already started implementing an NavigationDrawer on the Game Screen.
+ * We should probably deprecate this and move everything there. Something to think about.
+ */
 @Composable
 fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
 
@@ -36,11 +39,7 @@ fun FrameWindowScope.WindowMenuBar(vm: MenuViewModel) {
     MenuBar {
         Menu("Developer Tools", mnemonic = 'D') {
             Item("Save Game", onClick = {
-                saveFile(
-                    dialogTitle = "Save File",
-                    fileName = JervisSerialization.getGameFileName(vm.uiState.gameController),
-                    fileContent = vm.serializeGameState(),
-                )
+                vm.showSaveGameDialog(includeDebugState = false)
             })
             Item(
                 text = "Undo Action",

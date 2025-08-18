@@ -30,7 +30,24 @@ class SerializationTests {
         controller.startManualMode(false)
         val gameFile = createTempFile("test-game-state-file", suffix = FILE_EXTENSION_GAME_FILE).pathString.toPath()
         try {
-            JervisSerialization.saveToFile(controller, gameFile)
+            JervisSerialization.saveToFile(controller, gameFile, includeDebugInformation = false)
+            val result = JervisSerialization.loadFromFile(gameFile)
+            if (!result.isSuccess) {
+                fail(result.exceptionOrNull()?.stackTraceToString())
+            }
+        } finally {
+            gameFile.toNioPath().deleteIfExists()
+        }
+    }
+
+    @Test
+    fun loadGameStateFromDumpFile() {
+        val game = createDefaultGameState(StandardBB2020Rules())
+        val controller = GameEngineController(game)
+        controller.startManualMode(false)
+        val gameFile = createTempFile("test-dump-state-file", suffix = FILE_EXTENSION_GAME_FILE).pathString.toPath()
+        try {
+            JervisSerialization.saveToFile(controller, gameFile, includeDebugInformation = true)
             val result = JervisSerialization.loadFromFile(gameFile)
             if (!result.isSuccess) {
                 fail(result.exceptionOrNull()?.stackTraceToString())

@@ -23,6 +23,7 @@ import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.intro.CreditData
+import com.jervisffb.ui.utils.saveFile
 import com.jervisffb.utils.canBeHost
 import com.jervisffb.utils.getBuildType
 import com.jervisffb.utils.getPlatformDescription
@@ -34,7 +35,6 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import okio.Path
 
 enum class Feature {
     DO_NOT_REROLL_SUCCESSFUL_ACTIONS,
@@ -48,6 +48,9 @@ class MenuViewModel {
     companion object {
         val LOG = jervisLogger()
     }
+
+    // Some place to store the last exception thrown by the Game Engine (if any)
+    var lastActionException: Throwable? = null
 
     // Expose a flow
     val setupAvailable: MutableStateFlow<GameType?> = MutableStateFlow(null)
@@ -110,12 +113,8 @@ class MenuViewModel {
 
     fun showSettingsDialog(): StateFlow<Boolean> = _showSettingsDialog
 
-    fun serializeGameState(): String {
-        return JervisSerialization.serializeGameState(controller!!)
-    }
-
-    fun saveGameState(destination: Path) {
-        JervisSerialization.saveToFile(controller!!, destination)
+    fun serializeGameState(includeDebugState: Boolean): String {
+        return JervisSerialization.serializeGameStateToJson(controller!!, includeDebugState)
     }
 
     fun undoAction() {
@@ -224,6 +223,14 @@ class MenuViewModel {
         } else {
             setupAvailable.value = null
         }
+    }
+
+    fun showSaveGameDialog(includeDebugState: Boolean = false) {
+        saveFile(
+            dialogTitle = "Save Game File",
+            fileName = JervisSerialization.getGameFileName(uiState.gameController, includeDebugState),
+            fileContent = serializeGameState(includeDebugState),
+        )
     }
 }
 

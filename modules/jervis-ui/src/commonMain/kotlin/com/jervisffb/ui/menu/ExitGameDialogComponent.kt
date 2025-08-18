@@ -59,10 +59,11 @@ fun ExitGameDialogComponent(viewModel: GameScreenModel, onDismissRequest: () -> 
             JervisButton(
                 text = "Save Game",
                 onClick = {
+                    val includeDebugState = false
                     saveFile(
                         "Save Game",
-                        JervisSerialization.getGameFileName(viewModel.uiState.gameController),
-                        JervisSerialization.serializeGameState(viewModel.uiState.gameController),
+                        JervisSerialization.getGameFileName(viewModel.uiState.gameController, includeDebugState),
+                        JervisSerialization.serializeGameStateToJson(viewModel.uiState.gameController, includeDebugState),
                     )
                 },
                 buttonColor = JervisTheme.rulebookBlue,

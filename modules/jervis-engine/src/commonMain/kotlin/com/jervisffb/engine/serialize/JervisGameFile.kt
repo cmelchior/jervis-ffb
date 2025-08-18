@@ -47,6 +47,8 @@ data class JervisGameFile(
     val metadata: JervisMetaData,
     val configuration: JervisConfiguration,
     val game: JervisGameData,
+    // Optional debug information
+    val debugInfo: JervisDebugInfo? = null
 )
 
 // Format of a Jervis Team File (.jtf)
@@ -270,6 +272,21 @@ data class JervisGameData(
     val homeTeam: JsonElement,
     val awayTeam: JsonElement,
     val actions: List<GameAction>,
+)
+
+/**
+ * Class encapsulating debug information about the game file.
+ */
+@Serializable
+data class JervisDebugInfo(
+    // Information about the platform running the Client
+    val platform: String,
+    // Information about the client
+    val client: String,
+    // Which Git Commit was used to build the Client
+    val gitCommit: String,
+    // List of errors that are relevant for debugging. This contains `Throwable.stackTraceToString()`
+    val errorList: List<String>
 )
 
 /**

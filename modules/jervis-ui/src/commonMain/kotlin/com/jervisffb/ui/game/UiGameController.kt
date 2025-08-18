@@ -269,6 +269,7 @@ class UiGameController(
                     actionProvider.actionHandled(actions.team, userAction)
                 } catch (ex: InvalidActionException) {
                     LOG.e { "Invalid action selected: ${ex.message}" }
+                    menuViewModel.lastActionException = ex
                 }
             }
         }.invokeOnCompletion {

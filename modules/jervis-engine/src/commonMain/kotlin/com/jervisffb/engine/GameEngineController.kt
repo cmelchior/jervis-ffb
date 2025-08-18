@@ -29,6 +29,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.engine.utils.isRandomAction
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.flow.Flow
@@ -98,6 +99,13 @@ class GameEngineController(
     }
 
     /**
+     * If an error occurred during a call to [handleAction], it will also
+     * be stored here before being thrown further out.
+     */
+    var lastHandleActionError: InvalidActionException? = null
+        private set
+
+    /**
      * Returns a [ActionRequest] representing the available actions for the
      * current [Node] as well as who is responsible for providing it.
      */
@@ -123,20 +131,25 @@ class GameEngineController(
         if (actionMode != ActionMode.MANUAL && actionMode != ActionMode.TEST) {
             error("Invalid action mode: $actionMode. Must be ActionMode.MANUAL or ActionMode.TEST.")
         }
-        when (action) {
-            is Undo -> {
-                if (isUndoAvailable(null)) {
-                    undoLastAction(revertActionId = false)
-                } else {
-                    throw INVALID_ACTION(Undo, "Undo is not available for the current game state or rule setup.")
+        try {
+            when (action) {
+                is Undo -> {
+                    if (isUndoAvailable(null)) {
+                        undoLastAction(revertActionId = false)
+                    } else {
+                        INVALID_ACTION(Undo, "Undo is not available for the current game state or rule setup.")
+                    }
                 }
+                is Revert -> {
+                    // If Revert is sent, we assume the user knows what they are doing
+                    // and just apply it without restrictions.
+                    undoLastAction(revertActionId = true)
+                }
+                else -> processForwardAction(action)
             }
-            is Revert -> {
-                // If Revert is sent, we assume the user knows what they are doing
-                // and just apply it without restrictions.
-                undoLastAction(revertActionId = true)
-            }
-            else -> processForwardAction(action)
+        } catch (ex: InvalidActionException) {
+            lastHandleActionError = ex
+            throw ex
         }
         LOG.v { "Current node: ${currentNode()}" }
     }
