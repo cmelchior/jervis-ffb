@@ -3,12 +3,14 @@ package com.jervisffb.ui.game.viewmodel
 import com.jervisffb.BuildConfig
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
+import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.JervisSerialization
@@ -192,7 +194,17 @@ class MenuViewModel {
             } else {
                 emptyList()
             }
+        }.let { setupActions ->
+            // In some cases, a player was already selected when selecting a Setup. This will disrupt the above logic
+            // So in that case, deselect the player first.
+            if (controller?.currentNode() == SetupTeam.PlacePlayer) {
+                val deselectAction = PlayerDeselected(game.state.getContext<SetupTeamContext>().currentPlayer!!)
+                listOf(deselectAction) + setupActions
+            } else {
+                setupActions
+            }
         }
+
         uiState.userSelectedMultipleActions(setupActions, delayEvent = false)
     }
 
