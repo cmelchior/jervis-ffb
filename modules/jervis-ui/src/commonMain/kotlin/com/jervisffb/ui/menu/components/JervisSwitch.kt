@@ -10,9 +10,13 @@ import com.jervisffb.ui.game.view.JervisTheme
 fun JervisSwitch(enabled: Boolean, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Switch(
         colors = SwitchDefaults.colors(
+            checkedBorderColor = Color.Transparent,
             uncheckedThumbColor = JervisTheme.rulebookRed,
             uncheckedTrackColor = Color.Transparent,
+            uncheckedBorderColor = JervisTheme.lightGray.copy(alpha = 0.8f),
             disabledCheckedTrackColor = JervisTheme.rulebookRed.copy(alpha = 0.38f),
+            disabledUncheckedTrackColor = Color.Transparent,
+            disabledUncheckedBorderColor = JervisTheme.lightGray.copy(alpha = 0.38f),
         ),
         enabled = enabled,
         checked = checked,

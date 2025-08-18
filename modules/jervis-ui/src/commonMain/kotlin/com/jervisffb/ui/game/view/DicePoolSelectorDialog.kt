@@ -15,6 +15,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,7 +70,11 @@ fun DicePoolSelectorDialog(
                 Column(modifier = Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(text = dialog.message)
                     dialog.dice.forEachIndexed { poolIndex, el: Pair<Dice, DicePool<*, *>> ->
-                        Divider(modifier = Modifier.height(1.dp).padding(top = 8.dp, bottom = 8.dp).background(color = Color.LightGray))
+                        HorizontalDivider(
+                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                            color = Color.LightGray,
+                            thickness = 1.dp
+                        )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             val dicePool = el.second
                             dicePool.dice.forEachIndexed { diceIndex, el: DieRoll<*> ->

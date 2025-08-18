@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -26,12 +27,13 @@ fun JervisButton(
     fillWidth: Boolean = false,
     buttonColor: Color = JervisTheme.rulebookBlue,
     textColor: Color = JervisTheme.white,
-    border: BorderStroke? = null
+    border: BorderStroke? = null,
+    shape: Shape = RoundedCornerShape(4.dp)
 ) {
     Button(
         modifier = if (fillWidth) modifier.fillMaxWidth() else modifier,
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor, disabledContainerColor = JervisTheme.rulebookPaperMediumDark),
-        shape = RoundedCornerShape(4.dp),
+        shape = shape,
         onClick = onClick,
         border = border,
         enabled = enabled,

@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_settings
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_undo
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.FieldViewData
@@ -101,8 +102,15 @@ fun GameScreen(
                 verticalArrangement = Arrangement.Bottom,
             ) {
                 TopbarButton(
+                    icon = Res.drawable.jervis_icon_menu_undo,
+                    contentDescription = "Undo",
+                    onClick = {
+                        screenModel.menuViewModel.undoAction()
+                    }
+                )
+                TopbarButton(
                     icon = Res.drawable.jervis_icon_menu_settings,
-                    contentDescription = "Settings",
+                    contentDescription = "Game Menu",
                     onClick = onSettingsClick
                 )
             }

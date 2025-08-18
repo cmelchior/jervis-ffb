@@ -185,7 +185,7 @@ fun TeamCard() {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     Text(
                         text = "VS",
-                        style = MaterialTheme.typography.h1.copy(
+                        style = MaterialTheme.typography.headlineLarge.copy(
                             color = Color.Black,
                             fontWeight = FontWeight.ExtraBold,
 //                            drawStyle = Stroke(
@@ -201,7 +201,7 @@ fun TeamCard() {
                     )
                     Text(
                         text = "VS",
-                        style = MaterialTheme.typography.h1.copy(
+                        style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White,
                         ),
@@ -226,7 +226,7 @@ fun TeamCard() {
                                 Text(
                                     text = "Dark Elf Starter #1",
                                     maxLines = 1,
-                                    style = MaterialTheme.typography.body1.copy(
+                                    style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 30.sp,
                                         fontWeight = FontWeight.ExtraBold,
 //                                        color = Color.White,
@@ -242,7 +242,7 @@ fun TeamCard() {
                                     modifier = Modifier.padding(start = 4.dp, top = 4.dp, end = 4.dp, bottom = 6.dp),
                                     text = "ilios".uppercase(),
                                     maxLines = 1,
-                                    style = MaterialTheme.typography.body1.copy(
+                                    style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 18.sp,
                                         color = Color.White,
                                         fontStyle = FontStyle.Italic,
@@ -257,7 +257,7 @@ fun TeamCard() {
                                     modifier = Modifier.background(Color.Black).padding(4.dp),
                                     maxLines = 1,
                                     text = "Dark Elf - TV 1.000K",
-                                    style = MaterialTheme.typography.body1.copy(
+                                    style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 20.sp,
                                         color = Color.White,
                                         shadow = Shadow()
@@ -284,7 +284,7 @@ fun TeamCard() {
                                 Text(
                                     text = "Elven Union Starter #1",
                                     maxLines = 1,
-                                    style = MaterialTheme.typography.body1.copy(
+                                    style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 30.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         color = JervisTheme.rulebookOrange,
@@ -299,7 +299,7 @@ fun TeamCard() {
                                     modifier = Modifier.padding(start = 4.dp, top = 4.dp, end = 4.dp, bottom = 6.dp),
                                     text = "another".uppercase(),
                                     maxLines = 1,
-                                    style = MaterialTheme.typography.body1.copy(
+                                    style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 18.sp,
                                         color = Color.White,
                                         fontStyle = FontStyle.Italic,
@@ -314,7 +314,7 @@ fun TeamCard() {
                                     modifier = Modifier.background(Color.Black).padding(4.dp),
                                     maxLines = 1,
                                     text = "Elven Union - TV 1.200K",
-                                    style = MaterialTheme.typography.body1.copy(
+                                    style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 20.sp,
                                         color = Color.White,
                                         shadow = Shadow()

@@ -1,6 +1,7 @@
 package com.jervisffb.ui.menu
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +40,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -53,6 +56,8 @@ import com.jervisffb.ui.game.view.SideBarEntryState
 import com.jervisffb.ui.game.view.utils.OrangeTitleBorder
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.menu.components.JervisTooltipArea
+import com.jervisffb.ui.menu.components.JervisTooltipPlacement
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
 import org.jetbrains.compose.resources.DrawableResource
@@ -103,7 +108,11 @@ fun MenuScreenWithSidebarAndTitle(
                     topMenuRightContent?.let {
                         it(this)
                     }
-                    TopbarButton(Res.drawable.jervis_icon_menu_settings, "Settings", onClick = { menuViewModel.openSettings(true) })
+                    TopbarButton(
+                        Res.drawable.jervis_icon_menu_settings,
+                        "Settings",
+                        onClick = { menuViewModel.openSettings(true) }
+                    )
                 }
             }
             Box(modifier = Modifier
@@ -156,25 +165,40 @@ fun MenuScreenWithSidebarAndTitle(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun TopbarButton(icon: DrawableResource, contentDescription: String, onClick: () -> Unit) {
-    var isHovered by remember { mutableStateOf(false) }
-    Image(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .height(48.dp)
-            .alpha(if (isHovered) 1f else 0.8f)
-            .clickable { onClick() }
-            .onPointerEvent(PointerEventType.Enter) { isHovered = true }
-            .onPointerEvent(PointerEventType.Exit) { isHovered = false }
-            .padding(8.dp)
-        ,
-        painter = painterResource(icon),
-        contentDescription = contentDescription,
-        contentScale = ContentScale.FillHeight,
-        colorFilter = ColorFilter.tint(JervisTheme.white),
-    )
+    JervisTooltipArea(
+        tooltip = {
+            Surface(
+                tonalElevation = 4.dp,
+                shadowElevation = 4.dp,
+                shape = RoundedCornerShape(8.dp),
+                color = JervisTheme.white.copy(alpha = 0.95f),
+            ) {
+                Text(contentDescription, Modifier.padding(horizontal = 8.dp, vertical = 6.dp))
+            }
+        },
+        delayMillis = 300,
+        tooltipPlacement = JervisTooltipPlacement.CursorPoint(offset = DpOffset((-16).dp, 16.dp))
+    ) {
+        var isHovered by remember { mutableStateOf(false) }
+        Image(
+            modifier = Modifier
+                .clip(RoundedCornerShape(4.dp))
+                .height(48.dp)
+                .alpha(if (isHovered) 1f else 0.8f)
+                .clickable { onClick() }
+                .onPointerEvent(PointerEventType.Enter) { isHovered = true }
+                .onPointerEvent(PointerEventType.Exit) { isHovered = false }
+                .padding(8.dp)
+            ,
+            painter = painterResource(icon),
+            contentDescription = contentDescription,
+            contentScale = ContentScale.FillHeight,
+            colorFilter = ColorFilter.tint(JervisTheme.white),
+        )
+    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)

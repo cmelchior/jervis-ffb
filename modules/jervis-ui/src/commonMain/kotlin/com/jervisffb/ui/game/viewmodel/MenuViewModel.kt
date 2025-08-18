@@ -77,6 +77,7 @@ class MenuViewModel {
         val body = buildString {
             appendLine("""
                 <Describe the issue>
+                <Attach Game Dump if applicable. Available under the in-game menu>
 
                 -----
                 **Client Information (${getBuildType()})**

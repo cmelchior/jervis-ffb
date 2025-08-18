@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -108,7 +109,11 @@ fun TimersSetupComponent(viewModel: SetupTimersComponentModel) {
                         enabled = timersEnabled,
                         label = { Text(normalGameBuffer.label) },
                     )
-                    Divider(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp).height(1.dp).background(JervisTheme.rulebookPaperDark.copy(0.3f)))
+                    HorizontalDivider(
+                        modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+                        thickness = 1.dp,
+                        color = JervisTheme.rulebookPaperDark.copy(0.3f),
+                    )
                     OutlinedTextField(
                         modifier = inputFieldModifier,
                         value = overtimeExtraLimit.value,

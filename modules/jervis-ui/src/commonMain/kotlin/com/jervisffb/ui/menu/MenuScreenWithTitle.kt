@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
@@ -31,7 +30,6 @@ import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.intro.createGrayscaleNoiseShader
 import com.jervisffb.ui.menu.intro.loadJervisFont
-import kotlinx.serialization.json.JsonNull.content
 import org.jetbrains.skia.TextLine
 import kotlin.math.PI
 import kotlin.math.atan
@@ -54,7 +52,7 @@ fun MenuScreenWithTitle(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box {
-                TitleBar(
+                MenuTitleBar(
                     modifier = Modifier.fillMaxHeight(0.20f).fillMaxWidth(),
                     title = title,
                     textBottomPadding = textBottomPadding,
@@ -78,11 +76,17 @@ fun MenuScreenWithTitle(
     }
 }
 
+/**
+ * Red title bar at the top of the screen for sub screens.
+ * The bottom line is slightly angled up towards the top.
+ */
 @Composable
-private fun TitleBar(
+fun MenuTitleBar(
     modifier: Modifier,
     title: String,
-    textBottomPadding: Dp = 0.dp
+    fontSize: Dp = 45.dp,
+    textBottomPadding: Dp = 0.dp,
+    textPaddingLeft: Dp = 32.dp
 ) {
     val textMeasure = rememberTextMeasurer()
     val skiaFont = loadJervisFont()
@@ -119,13 +123,13 @@ private fun TitleBar(
         // TODO Need to figure out exactly how to scale the text, so it
         //  looks "nice" in more situations
         val scale = 1.0f
-        val fontSize = 90
+        val fontSize = fontSize.toPx()
         skiaFont.size = (fontSize * scale).sp.toPx()
         val angleRadians = atan((size.height - (size.height * (160f/280f))) / size.width)
         val angleDegrees = (angleRadians * 180 / PI).toFloat()
         val skewX = tan(-angleRadians)
         val skewY = 0.0f
-        val paddingX = 32.dp.toPx()
+        val paddingX = textPaddingLeft.toPx()
         val paddingY = 16.dp.toPx()
 
         drawContext.canvas.nativeCanvas.apply {

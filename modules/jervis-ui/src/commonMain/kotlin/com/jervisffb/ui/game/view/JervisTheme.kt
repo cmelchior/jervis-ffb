@@ -78,7 +78,7 @@ object JervisTheme {
     val accentContentBackgroundColor = Color(0xFFFFFFFF)
     val buttonColor: Color = homeTeamColor
     val buttonTextColor: Color = Color.White
-    val contentTextColor: Color = Color.Black
+    val contentTextColor: Color = Color.Black.copy(alpha = 0.9f)
     val darkGray = Color(0xFF1f1f1f)
     val lightGray = Color(0xFF616161)
     val fieldSquareTextStyle = TextStyle(
