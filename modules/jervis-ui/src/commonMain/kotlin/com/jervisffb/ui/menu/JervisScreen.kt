@@ -11,9 +11,8 @@ import com.jervisffb.ui.menu.components.settings.SettingsDialogComponent
 @Composable
 fun JervisScreen(menuViewModel: MenuViewModel, content: @Composable () -> Unit) {
     Box() {
+        content()
         AboutDialogComponent(menuViewModel)
         SettingsDialogComponent(menuViewModel)
-        content()
-
     }
 }

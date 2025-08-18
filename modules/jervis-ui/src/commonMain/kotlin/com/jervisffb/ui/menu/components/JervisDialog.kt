@@ -58,6 +58,7 @@ import com.jervisffb.ui.game.viewmodel.FieldViewData
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.utils.applyIf
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.serialization.json.JsonNull.content
 import kotlin.math.roundToInt
 
 /**
@@ -66,6 +67,9 @@ import kotlin.math.roundToInt
 
 /**
  * Customizable Jervis dialog with title, icon, icon and button row.
+ *
+ * As a default, this dialog does not close when pressing Escape. Override
+ * [onDismissRequest] to enable this behavior.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -85,7 +89,6 @@ fun JervisDialog(
     buttons: (@Composable RowScope.() -> Unit)? = null,
     onDismissRequest: () -> Unit = { /* Ignore ESC as dismiss */ },
 ) {
-    var windowSize by remember { mutableStateOf(IntSize.Zero) }
     var popupSize by remember { mutableStateOf(IntSize.Zero) }
     val fieldViewInfo: FieldViewData? by centerOnField?.fieldViewData?.collectAsState() ?: MutableStateFlow<FieldViewData?>(null).collectAsState()
     var popupOffset by remember {
@@ -123,9 +126,6 @@ fun JervisDialog(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .onSizeChanged {
-                windowSize = it
-            }
             .applyIf(backgroundScrim) {
                 background(color = Color.Black.copy(alpha = 0.5f))
             }
@@ -134,7 +134,7 @@ fun JervisDialog(
         alignment = if (centerOnField == null) fallbackAlignment else Alignment.TopStart,
         offset = popupOffset,
         onDismissRequest = {
-            /* Ignore */
+            onDismissRequest()
         },
         properties = PopupProperties(
             focusable = true,
@@ -168,29 +168,31 @@ fun JervisDialog(
                         alpha = 1f
                     }
                     .defaultMinSize(minHeight = 200.dp, minWidth = width)
-                    .paperBackground(color = JervisTheme.rulebookPaper)
-                ,
+                    .paperBackground(color = JervisTheme.rulebookPaper),
                 shape = RectangleShape,
                 border = BorderStroke(8.dp, color = dialogColor),
                 color = JervisTheme.rulebookPaper,
                 contentColor = textColor,
             ) {
-                Row(Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .paperBackground(JervisTheme.rulebookPaper)
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min)
+                        .paperBackground(JervisTheme.rulebookPaper)
                 ) {
-                    Box(modifier = Modifier
-                        .width(130.dp)
-                        .fillMaxHeight()
-                        .padding(start = 24.dp)
-                        .bannerBackground(bannerColor = dialogColor)
+                    Box(
+                        modifier = Modifier
+                            .width(130.dp)
+                            .fillMaxHeight()
+                            .padding(start = 24.dp)
+                            .bannerBackground(bannerColor = dialogColor)
                     ) {
                         icon()
                     }
-                    Column(modifier = Modifier
-                        .padding(start = 24.dp, top = 20.dp, end = 32.dp, bottom = 28.dp)
-                        .fillMaxSize()
+                    Column(
+                        modifier = Modifier
+                            .padding(start = 24.dp, top = 20.dp, end = 32.dp, bottom = 28.dp)
+                            .fillMaxSize()
                     ) {
                         JervisDialogContent(
                             title = title,

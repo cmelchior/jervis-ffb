@@ -52,8 +52,6 @@ class FumbblScreen(private val menuViewModel: MenuViewModel, private val viewMod
 
 @Composable
 fun FumbblePage(menuViewModel: MenuViewModel, viewModel: FumbblScreenModel, modifier: Modifier) {
-    LoadReplayDialog(viewModel)
-    FumbblLoginDialog(viewModel)
     MenuScreenWithSidebarAndTitle(
         menuViewModel,
         title = "FUMBBL (Static)",
@@ -97,6 +95,8 @@ fun FumbblePage(menuViewModel: MenuViewModel, viewModel: FumbblScreenModel, modi
     ) {
         FumbblePageContent(viewModel)
     }
+    LoadReplayDialog(viewModel)
+    FumbblLoginDialog(viewModel)
 }
 
 @Composable

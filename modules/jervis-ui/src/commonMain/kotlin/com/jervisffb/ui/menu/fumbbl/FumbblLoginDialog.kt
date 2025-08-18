@@ -62,6 +62,7 @@ private fun LogoutDialog(viewModel: FumbblScreenModel, icon: @Composable () -> U
         title = "Log out of FUMBBL",
         icon = icon,
         width = 650.dp,
+        backgroundScrim = true,
         content = { inputDialogColors: @Composable (String) -> TextFieldColors, textColor: Color ->
             Text(
                 text = "You are logged in as ${coachName}. Would you like to log out?",
@@ -82,7 +83,8 @@ private fun LogoutDialog(viewModel: FumbblScreenModel, icon: @Composable () -> U
                 buttonColor = JervisTheme.rulebookBlue,
                 textColor = buttonTextColor,
             )
-        }
+        },
+        onDismissRequest = { viewModel.loginDialogAction(FumbblScreenModel.LoginDialogAction.CANCEL) }
     )
 }
 
@@ -97,6 +99,7 @@ private fun LoginDialog(viewModel: FumbblScreenModel, icon: @Composable () -> Un
     JervisDialog(
         title = "Log in to FUMBBL",
         icon = icon,
+        backgroundScrim = true,
         content = { inputDialogColors: @Composable (String) -> TextFieldColors, textColor: Color ->
             LoginInputField(
                 focusManager = focusManager,
@@ -162,7 +165,8 @@ private fun LoginDialog(viewModel: FumbblScreenModel, icon: @Composable () -> Un
                 textColor = buttonTextColor,
                 enabled = isLoginAvailable
             )
-        }
+        },
+        onDismissRequest = { viewModel.loginDialogAction(FumbblScreenModel.LoginDialogAction.CANCEL) }
     )
 }
 
