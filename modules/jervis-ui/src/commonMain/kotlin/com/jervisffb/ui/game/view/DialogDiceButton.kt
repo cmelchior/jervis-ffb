@@ -19,12 +19,15 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
+import com.jervisffb.engine.actions.D16Result
+import com.jervisffb.engine.actions.D20Result
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.ui.game.icons.DiceColor
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.view.utils.D20Shape
 import com.jervisffb.ui.game.view.utils.D6Shape
 import com.jervisffb.ui.game.view.utils.D8Shape
 import com.jervisffb.ui.utils.applyIf
@@ -75,6 +78,13 @@ fun DialogDiceButton(
                 }
                 .applyIf(die is D8Result) {
                     clip(D8Shape)
+                }
+                .applyIf(die is D16Result) {
+                    // We are using the D20 as a replacement for the D20 until a proper D16 gfx can be created
+                    clip(D20Shape)
+                }
+                .applyIf(die is D20Result) {
+                    clip(D20Shape)
                 }
                 .applyIf(true) {
                     this
