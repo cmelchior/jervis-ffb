@@ -784,7 +784,7 @@ private fun HoverText(
 //        )
     Text(
         modifier = Modifier
-            .offset(y = 60.dp)
+            .offset(y = 60.jdp)
             .clip(RoundedCornerShape(4.dp))
             .alpha(bgAlpha.value)
             .background(borderColor)
