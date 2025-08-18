@@ -1,7 +1,7 @@
 package com.jervisffb.ui.menu.intro
 
 import cafe.adriel.voyager.navigator.Navigator
-import com.jervisffb.ui.BuildConfig
+import com.jervisffb.BuildConfig
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.DevScreen
 import com.jervisffb.ui.menu.DevScreenViewModel

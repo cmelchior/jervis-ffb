@@ -13,22 +13,12 @@ plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.buildconfig)
     alias(libs.plugins.composeHotReload)
 }
 
 group = "com.jervisffb"
 @Suppress("UNCHECKED_CAST")
 version = (rootProject.ext["mavenVersion"] as Provider<String>).get()
-
-@Suppress("UNCHECKED_CAST")
-buildConfig {
-    this.packageName("com.jervisffb.ui")
-    buildConfigField("releaseVersion", (rootProject.ext["publicVersion"] as Provider<String?>).get())
-    buildConfigField("gitHash", (rootProject.ext["gitHash"] as Provider<String>).get())
-    buildConfigField("gitHashLong", (rootProject.ext["gitHashLong"] as Provider<String>).get())
-    buildConfigField("gitHistory", (rootProject.ext["gitHistory"] as Provider<String>).get())
-}
 
 // Generate an `index.html` file with a reference to the current version (defined by the git commit)
 // This way; we ensure the browser always loads the correct .wasm resource files. Before this, it

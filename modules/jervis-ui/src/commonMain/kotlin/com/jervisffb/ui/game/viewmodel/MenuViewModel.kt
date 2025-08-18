@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.viewmodel
 
+import com.jervisffb.BuildConfig
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -12,7 +13,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisSetupFile
-import com.jervisffb.ui.BuildConfig
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.SoundEffect
 import com.jervisffb.ui.SoundManager

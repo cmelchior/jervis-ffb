@@ -1,7 +1,7 @@
 [versions]
 atomicfu = "0.27.0" # https://github.com/Kotlin/kotlinx-atomicfu
 browser = "0.3" # https://github.com/Kotlin/kotlinx-browser
-buildconfig = "5.6.2" # https://github.com/gmazzo/gradle-buildconfig-plugin
+buildconfig = "5.6.7" # https://github.com/gmazzo/gradle-buildconfig-plugin
 clikt = "5.0.3" # https://github.com/ajalt/clikt
 compose = "1.8.2" # https://github.com/JetBrains/compose-multiplatform
 composeHotReload = "1.0.0-beta04" # https://github.com/JetBrains/compose-hot-reload
