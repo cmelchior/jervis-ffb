@@ -3,6 +3,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -180,9 +181,10 @@ fun MultipleSelectUserActionDialog(
                 ) {
                     Text(text = dialog.message, color = textColor)
                     dialog.dice.forEachIndexed { i, el: Pair<Dice, List<DieResult>> ->
-                        Row(
+                        FlowRow(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             el.second.forEach { it: DieResult ->
                                 val isSelected = remember(dialog) { derivedStateOf { selectedRolls[i] == it } }
