@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.ImportTeamFromFumbblDialog
+import com.jervisffb.ui.menu.components.ImportTeamFromTourPlayDialog
 import com.jervisffb.ui.menu.components.LoadTeamFromFileDialog
 import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponent
@@ -38,6 +39,7 @@ fun SelectP2PTeamScreen(
 ) {
     val selectedTeamByOtherCoach by viewModel.unavailableTeam.collectAsState()
     val availableTeams by viewModel.availableTeams.collectAsState()
+    var showImportTourPlayTeamDialog by remember { mutableStateOf(false) }
     var showImportFumbblTeamDialog by remember { mutableStateOf(false) }
     var showLoadTeamFromFileDialog by remember { mutableStateOf(false) }
     val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
@@ -63,6 +65,9 @@ fun SelectP2PTeamScreen(
             Spacer(modifier = Modifier.weight(1f))
             JervisButton(confirmTitle.uppercase(), onClick = { onNext() }, enabled = (selectedTeam != null))
         }
+    }
+    if (showImportTourPlayTeamDialog) {
+        ImportTeamFromTourPlayDialog(viewModel, onDismissRequest = { showImportTourPlayTeamDialog = false })
     }
     if (showImportFumbblTeamDialog) {
         ImportTeamFromFumbblDialog(viewModel, onDismissRequest = { showImportFumbblTeamDialog = false })

@@ -36,7 +36,7 @@ value class PlayerId(val value: String)
 
 @Serializable
 @JvmInline
-value class PositionId(val id: String)
+value class PositionId(val value: String)
 
 /**
  * Unique identifier for a [RerollSource]. This must be unique across
@@ -54,16 +54,8 @@ value class RerollSourceId(val id: String)
  */
 @Serializable
 data class SkillId(val type: SkillType, val value: Int?) {
-    fun toPrettyString(): String {
-        // Convert to slightly nicer looking string.
-        // Skills with value do not look 100% correct, e.g. "Might Blow(1)"
-        // But it should be good enough, since this is mostly used for serialization.
-        return buildString {
-            append(type)
-            if (value != null) {
-                append("($value)")
-            }
-        }
+    fun serialize(): String {
+        return "${type.name}${if (value != null) "($value)" else ""}"
     }
 }
 

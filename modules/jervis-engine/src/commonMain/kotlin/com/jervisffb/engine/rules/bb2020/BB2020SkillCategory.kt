@@ -105,18 +105,41 @@ abstract class SkillSettings {
     // "Name (42-)" since you cannot roll negative values on a die.
     // Fixed values like "Chance (6)" is also not allowed.
     @Transient
-    private val regex = "(^[a-zA-Z\\- ]+)\\s*(\\(([\\-+]\\d+|\\d+\\+)\\))?$".toRegex()
+    private val niceRegex = "(^[a-zA-Z\\- ]+)\\s*(\\(([\\-+]\\d+|\\d+\\+)\\))?$".toRegex()
+
+    @Transient
+    private val skillIdRegex = "(^[a-zA-Z_]+)(\\((\\d+)\\))?$".toRegex()
 
     /**
      * Converts a string to the appropriate [SkillId], or return `null` if the skill name could not be mapped
      * to a supported skill in this ruleset.
+     *
+     * The format is expected to be "nice", this can probably vary between APIs but it looks something like this:
+     * - "Mighty Blow (+1)"
+     * - "Mighty Blow(-1)"
      */
-    fun getSkillId(skillName: String): SkillId? {
-        // Split name into name an value with a sign, e.g. `+1` or `-1`
-        return regex.matchEntire(skillName)?.let { match ->
-            val name = match.groups[1]?.value?.trim() ?: error("Failed to find skill name in string: $skillName")
+    fun getSkillIdFromNiceDescription(niceSkillName: String): SkillId? {
+        return niceRegex.matchEntire(niceSkillName)?.let { match ->
+            val name = match.groups[1]?.value?.trim() ?: error("Failed to find skill name in string: $niceSkillName")
             val value = match.groups[3]?.value?.replace("+", "")?.replace("-", "")?.toInt()
             skillCache.keys.firstOrNull { it.description == name }?.let { skillType ->
+                SkillId(skillType, value)
+            }
+        }
+    }
+
+    /**
+     * Converts a string to the appropriate [SkillId], or return `null` if the skill name could not be mapped
+     * to a supported skill in this ruleset.
+     *
+     * [serializedSkillId] is expected to have a similar format to [SkillId.serialize], example: "MIGHTY_BLOW(1)"
+     */
+    fun getSkillId(serializedSkillId: String): SkillId? {
+        // Split name into name and a value
+        return skillIdRegex.matchEntire(serializedSkillId)?.let { match ->
+            val name = match.groups[1]?.value?.trim() ?: error("Failed to find skill name in string: $serializedSkillId")
+            val value = match.groups[3]?.value?.replace("+", "")?.replace("-", "")?.toInt()
+            skillCache.keys.firstOrNull { type -> type.name == name }?.let { skillType ->
                 SkillId(skillType, value)
             }
         }

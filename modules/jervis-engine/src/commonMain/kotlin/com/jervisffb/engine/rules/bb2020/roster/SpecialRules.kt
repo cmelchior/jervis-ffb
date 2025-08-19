@@ -23,6 +23,7 @@ enum class RegionalSpecialRule(override val description: String) : SpecialRules 
 enum class TeamSpecialRule(override val description: String): SpecialRules {
     BRIBERY_AND_CORRUPTION("Bribery and Corruption"),
     FAVOURED_OF_CHAOS_UNDIVIDED("Favoured of Chaos Undivided"),
+    FAVOURED_OF_HASHUT("Favoured of Hashut"),
     FAVOURED_OF_KHORNE("Favoured of Khorne"),
     FAVOURED_OF_NURGLE("Favoured of Nurgle"),
     FAVOURED_OF_TZEENTCH("Favoured of Tzeentch"),

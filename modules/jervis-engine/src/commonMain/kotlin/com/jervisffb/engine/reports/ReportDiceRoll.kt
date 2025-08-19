@@ -8,7 +8,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
 class ReportDiceRoll(
     private val type: DiceRollType,
     private val dice: List<DieResult>,
-    private val showDiceType: Boolean = false) : LogEntry() {
+    private val showDiceType: Boolean = false
+) : LogEntry() {
     constructor(type: DiceRollType, die: DieResult): this(type, listOf(die))
     constructor(roll: List<BlockDieRoll>) : this(DiceRollType.BLOCK, roll.map { it.result })
 

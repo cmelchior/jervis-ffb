@@ -76,10 +76,12 @@ class SerializedTeam(
                         playerData.name,
                         playerData.number,
                         teamData.roster[playerData.position],
-                        playerData.extraSkills.mapNotNull {
+                        playerData.extraSkills.mapNotNull { skillDescription ->
                             // TODO For now, we just ignore skills we do not support
-                            rules.skillSettings.getSkillId(it).also {
-                                LOG.d { "Could not find skill for: '$it'"}
+                            rules.skillSettings.getSkillId(skillDescription).also { skillId ->
+                                if (skillId == null) {
+                                    LOG.d { "Could not find skill for: '$skillDescription'"}
+                                }
                             }
                         },
                         playerData.statModifiers,

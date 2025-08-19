@@ -7,6 +7,12 @@ things as they come up.
 
 
 ## Todo List
+- [ ] "Import Team" background scrim does not work.
+- [ ] "Import Team" dialogs are not placed in the center of the screen.
+- [ ] I messed up the icon logic for players. I assumed that all players are 30x30...that is not correct.
+      Big Guys are 38x38 and go beyond their designated square (so they appear more imposing).
+      This means we need to separate Player icons from their square. I suspect fixing this would also 
+      make it easier to add support for Giants.
 - [ ] When selecting a team reroll, what to do about temporary rerolls.
       Right now the rules just select the most appropriate one, but most likely we need 
       to list all types of rerolls and let it be up to the UI to filter/show them somehow.

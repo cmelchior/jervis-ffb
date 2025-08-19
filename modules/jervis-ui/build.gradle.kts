@@ -92,6 +92,7 @@ kotlin {
             dependencies {
                 implementation(project(":modules:platform-utils"))
                 implementation(project(":modules:fumbbl-net"))
+                implementation(project(":modules:tourplay-net"))
                 implementation(project(":modules:jervis-engine"))
                 implementation(project(":modules:jervis-net"))
                 implementation(project(":modules:jervis-resources"))

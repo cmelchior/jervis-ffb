@@ -27,6 +27,7 @@ import com.jervisffb.engine.model.CoachType
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.menu.components.ImportTeamFromFumbblDialog
+import com.jervisffb.ui.menu.components.ImportTeamFromTourPlayDialog
 import com.jervisffb.ui.menu.components.LoadTeamFromFileDialog
 import com.jervisffb.ui.menu.components.coach.CoachSetupComponent
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponent
@@ -37,6 +38,7 @@ fun SelectHotseatTeamScreen(
     viewModel: SelectHotseatTeamScreenModel,
 ) {
     val isValidTeamSelection by viewModel.isValidTeamSelection.collectAsState(false)
+    var showImportTourPlayTeamDialog by remember { mutableStateOf(false) }
     var showImportFumbblTeamDialog by remember { mutableStateOf(false) }
     var showLoadTeamFromFileDialog by remember { mutableStateOf(false) }
 
@@ -70,6 +72,10 @@ fun SelectHotseatTeamScreen(
             JervisButton(text = "Import from FUMBBL", onClick = {
                 showImportFumbblTeamDialog = !showImportFumbblTeamDialog
             })
+            Spacer(modifier = Modifier.width(16.dp))
+            JervisButton(text = "Import from TourPlay", onClick = {
+                showImportTourPlayTeamDialog = !showImportTourPlayTeamDialog
+            })
             Spacer(modifier = Modifier.weight(1f))
             JervisButton(
                 text = "Next",
@@ -77,6 +83,10 @@ fun SelectHotseatTeamScreen(
                 enabled = isValidTeamSelection
             )
         }
+    }
+
+    if (showImportTourPlayTeamDialog) {
+        ImportTeamFromTourPlayDialog(viewModel.teamSelectorModel, onDismissRequest = { showImportTourPlayTeamDialog = false })
     }
     if (showImportFumbblTeamDialog) {
         ImportTeamFromFumbblDialog(viewModel.teamSelectorModel, onDismissRequest = { showImportFumbblTeamDialog = false })

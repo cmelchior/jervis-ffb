@@ -21,6 +21,7 @@ data class RosterPosition(
     override val title: String,
     override val titleSingular: String,
     override val shortHand: String,
+    // In total value, e.g. 100.000 (not 100 K)
     override val cost: Int,
     override val move: Int,
     override val strength: Int,

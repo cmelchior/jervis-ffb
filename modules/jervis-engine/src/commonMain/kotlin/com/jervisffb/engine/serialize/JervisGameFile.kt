@@ -131,7 +131,9 @@ enum class SpriteLocation {
     // The sprite is hosted on a remote server.
     URL,
     // The sprite is provided by FUMBBL and its remote location is defined by its ini file.
-    FUMBBL_INI
+    FUMBBL_INI,
+    // The Sprite is generated at runtime
+    GENERATED,
 }
 
 fun normalizeFumbblIconPath(path: String): String {
@@ -237,6 +239,14 @@ data class SpriteSheet(
          */
         fun ini(path: String, variants: Int? = null, selectedIndex: Int? = null): SpriteSheet {
             return SpriteSheet(SpriteLocation.FUMBBL_INI, path, variants, selectedIndex)
+        }
+
+        /**
+         * Generate a generic player sprite sheet for a given player title.
+         * It will only contain a single variant.
+         */
+        fun generated(playerTitle: String): SpriteSheet {
+            return SpriteSheet(SpriteLocation.GENERATED, playerTitle, variants = 1, selectedIndex = 0)
         }
     }
 }

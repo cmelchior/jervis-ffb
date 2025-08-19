@@ -20,7 +20,9 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.reports.LogCategory
 import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
@@ -52,6 +54,7 @@ object PrayersToNuffleRoll : Procedure() {
                 if (context.team.activePrayersToNuffle.contains(result)) {
                     compositeCommandOf(
                         ReportDiceRoll(DiceRollType.PRAYERS_TO_NUFFLE, dieRoll),
+                        SimpleLogEntry("Prayer already active: ${result.description}. Roll again.", LogCategory.GAME_PROGRESS),
                         GotoNode(RollDie)
                     )
                 } else {

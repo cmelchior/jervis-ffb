@@ -20,7 +20,7 @@ class CatchSkill(
     override val value: Int? = null
     override val skillId: SkillId = type.id()
     override val name: String = type.description
-    override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.toPrettyString()}-reroll")
+    override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.serialize()}-reroll")
     override val compulsory: Boolean = false
     override val resetAt: Duration =Duration.PERMANENT
     override var used: Boolean = false

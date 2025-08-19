@@ -126,6 +126,8 @@ rule book.
     - [ ] Biased Referee
     - [ ] How many others(???)
 - [ ] Roll on Prayers to Nuffle Table. Duplicates are only checked within the same team
+  - [ ] Roll again if duplicate was rolled
+  - [ ] Abort rolling when there are no more prayers to roll for.
   - [ ] Treacherous Trapdoor
     - [ ] During Quick Snap Kickoff Event
     - [ ] During Blitz Kickoff Event

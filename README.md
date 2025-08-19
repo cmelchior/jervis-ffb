@@ -123,6 +123,9 @@ of the following modules:
    server as well as adapters for converting a FUMBBL game into a Jervis
    equivalent.
 
+- `tourplay-net`: Wrapper for the TourPlay REST API that can download TourPlay
+   teams and make them available to Jervis.
+
  - `iosApp`: The XCode project needed to build the Jervis iPad
    app. This needs to be opened and run from XCode. It will automatically
    build all required dependencies from the project.

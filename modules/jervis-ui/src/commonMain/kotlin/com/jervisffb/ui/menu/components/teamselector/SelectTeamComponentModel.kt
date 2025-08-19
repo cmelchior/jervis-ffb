@@ -8,6 +8,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.JervisTeamFile
 import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.fumbbl.web.FumbblApi
+import com.jervisffb.tourplay.TourPlayApi
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
@@ -96,7 +97,7 @@ class SelectTeamComponentModel(
         }
     }
 
-    fun loadTeamFromNetwork(
+    fun loadFumbblTeamFromNetwork(
         teamId: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit,
@@ -110,6 +111,38 @@ class SelectTeamComponentModel(
             try {
                 val rules = rules!!
                 val teamFile = FumbblApi().loadTeam(teamId, rules)
+                CacheManager.saveTeam(teamFile)
+                val team = SerializedTeam.deserialize(rules, teamFile.team, Coach.UNKNOWN)
+                val teamInfo = getTeamInfo(teamFile, team)
+                addNewTeam(teamInfo)
+                onTeamImported(teamInfo)
+                onSuccess()
+            } catch (e: Exception) {
+                LOG.w { "Failed to load team:\n${e.stackTraceToString()}" }
+                val errorMessage = if (e.message != null) {
+                    "Could not load team - ${e.message}"
+                } else {
+                    "Could not load team due to an unknown error: ${e.stackTraceToString()}"
+                }
+                onError(errorMessage)
+            }
+        }
+    }
+
+    fun loadTourPlayTeamFromNetwork(
+        teamId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        val teamId = teamId.toLongOrNull()
+        if (teamId == null) {
+            onError("Team ID does not look like a valid number")
+            return
+        }
+        menuViewModel.navigatorContext.launch {
+            try {
+                val rules = rules!!
+                val teamFile = TourPlayApi().loadRoster(teamId, rules)
                 CacheManager.saveTeam(teamFile)
                 val team = SerializedTeam.deserialize(rules, teamFile.team, Coach.UNKNOWN)
                 val teamInfo = getTeamInfo(teamFile, team)

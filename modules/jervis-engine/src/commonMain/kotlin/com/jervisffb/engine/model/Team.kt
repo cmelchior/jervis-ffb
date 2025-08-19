@@ -117,6 +117,7 @@ class Team(
     var fanFactor: Int = 0
     var dedicatedFans: Int = 0
 
+    // Team value (in total amount, e.g 100.000, not 100 K)
     var teamValue: Int = 0
     var currentTeamValue: Int = 0
     val specialRules = mutableListOf<SpecialRules>()
