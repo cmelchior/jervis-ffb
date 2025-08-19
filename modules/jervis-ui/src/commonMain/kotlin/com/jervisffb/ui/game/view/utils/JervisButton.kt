@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.utils.applyIf
+import com.jervisffb.ui.utils.onClickWithSmallDragControl
 
 @Composable
 fun JervisButton(
@@ -31,10 +33,15 @@ fun JervisButton(
     shape: Shape = RoundedCornerShape(4.dp)
 ) {
     Button(
-        modifier = if (fillWidth) modifier.fillMaxWidth() else modifier,
+        modifier = modifier
+            .onClickWithSmallDragControl(onClick = onClick)
+            .applyIf(fillWidth) {
+                fillMaxWidth()
+            }
+        ,
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor, disabledContainerColor = JervisTheme.rulebookPaperMediumDark),
         shape = shape,
-        onClick = onClick,
+        onClick = { /* Do nothing */ },
         border = border,
         enabled = enabled,
     ) {

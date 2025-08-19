@@ -1,5 +1,7 @@
 package com.jervisffb.ui.utils
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -13,6 +15,10 @@ import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.changedToUp
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -22,6 +28,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.SamplingMode
+import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 
@@ -141,6 +148,48 @@ fun Color.toSkiaColor(): Int {
     val blue = (blue * 255).toInt()
     return org.jetbrains.skia.Color.makeRGB(r = red, g = green, b = blue)
 }
+
+/**
+ * For some reason Compose really likes to turn clicks into drags when using
+ * a touchpad.
+ *
+ * This helper customizes the experiences, so we can control when a "drag" gets
+ * turned into a "click". Note, this and `onClick` should not be combined on the
+ * same button.
+ *
+ * Note, if the drag starts just in the corner of the button, and you drag outside
+ * it, it will still be registered as a click.
+ */
+fun Modifier.onClickWithSmallDragControl(
+    slopPx: Float = 6f, // Within these many pixels a drag is converted to OnClick
+    onClick: () -> Unit
+) = pointerInput(Unit) {
+    awaitEachGesture {
+        val down = awaitFirstDown(requireUnconsumed = false)
+        var dx = 0f
+        var dy = 0f
+        var exceeded = false
+        var change = down
+        change.consume()
+        while (change.pressed) {
+            val event = awaitPointerEvent(PointerEventPass.Main)
+            val c = event.changes.first { it.id == change.id }
+            val d = c.positionChange()
+            dx += d.x; dy += d.y
+            if (hypot(dx.toDouble(), dy.toDouble()) > slopPx) {
+                exceeded = true
+                break
+            }
+            change = c
+            if (c.changedToUp()) break
+            c.consume()
+        }
+        if (!exceeded && !change.pressed) {
+            onClick()
+        }
+    }
+}
+
 
 // Copy from ChatGPT, so requires a more thorough review
 private fun rgbToHsl(r: Float, g: Float, b: Float): FloatArray {
