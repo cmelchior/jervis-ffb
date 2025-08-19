@@ -25,9 +25,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassContext
 
 /**
- * Class wrapping the intent to show a dialog for a dice roll involving multiple dice.
- * Each die gets its own line (since we assume this is only being used up to D8)
- * And the confirm button will show the final result
+ * Class wrapping the intent to show a dialog for a dice roll involving 1 - many dice.
+ * A Confirm button will show the final result.
  */
 class MultipleChoiceUserInputDialog(
     val icon: Any? = null, // TODO Replacement for Icon?

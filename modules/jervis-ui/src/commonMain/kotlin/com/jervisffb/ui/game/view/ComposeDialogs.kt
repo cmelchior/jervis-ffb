@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,7 @@ import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.circle.CoinMenuItem
 import com.jervisffb.ui.game.icons.IconFactory
+import com.jervisffb.ui.game.view.JervisTheme.buttonColor
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.FieldViewData
@@ -150,94 +152,97 @@ fun MultipleSelectUserActionDialog(
     dialog: MultipleChoiceUserInputDialog,
     vm: DialogsViewModel,
 ) {
-    var showDialog by remember(dialog) { mutableStateOf(true) }
-    if (showDialog) {
-        val selectedRolls = remember(dialog) {
-            mutableStateListOf<DieResult?>(*dialog.dice.map { vm.diceRollGenerator.rollDie(it.first) }.toTypedArray())
-        }
-        val result = DiceRollResults(selectedRolls.filterNotNull())
-        val resultText = if (result.rolls.size < dialog.dice.size) null else dialog.result(result)
-        val dialogColor = if (dialog.owner?.isHomeTeam() ?: true) JervisTheme.rulebookRed else JervisTheme.rulebookBlue
-        val buttonColor = if (dialog.owner?.isHomeTeam() ?: true) JervisTheme.rulebookBlue else JervisTheme.rulebookRed
-        JervisDialog(
-            title = dialog.title,
-            icon = {
-                Image(
-                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp, start = 20.dp, end = 20.dp),
-                    painter = painterResource(Res.drawable.jervis_icon_menu_dice_roll),
-                    contentDescription = "",
-                    colorFilter = ColorFilter.tint(JervisTheme.white),
-                )
-            },
-            width = dialog.width,
-            draggable = dialog.movable,
-            backgroundScrim = false,
-            centerOnField = vm.screenViewModel,
-            dialogColor = dialogColor,
-            content = { inputFieldTextColor, textColor ->
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Text(text = dialog.message, color = textColor)
-                    dialog.dice.forEachIndexed { i, el: Pair<Dice, List<DieResult>> ->
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            el.second.forEach { it: DieResult ->
-                                val isSelected = remember(dialog) { derivedStateOf { selectedRolls[i] == it } }
-                                when (it) {
-                                    is DBlockResult -> {
-                                        val buttonColors =
-                                            ButtonDefaults.buttonColors(
-                                                containerColor = if (isSelected.value) MaterialTheme.colorScheme.primary else JervisTheme.diceBackground,
-                                            )
-                                        val text = it.blockResult.name
-                                        Button(
-                                            modifier = Modifier.weight(1f).aspectRatio(1.0f),
-                                            onClick = { selectedRolls[i] = it },
-                                            colors = buttonColors,
-                                            contentPadding = PaddingValues(4.dp),
-                                        ) {
-                                            Image(
-                                                modifier = Modifier.fillMaxSize(),
-                                                bitmap = IconFactory.getDiceIcon(it),
-                                                contentDescription = text,
-                                                alignment = Alignment.Center,
-                                                contentScale = ContentScale.Fit
+    key(dialog) {
+        var showDialog by remember { mutableStateOf(true) }
+        if (showDialog) {
+            val selectedRolls = remember(dialog) {
+                mutableStateListOf<DieResult?>(*dialog.dice.map { vm.diceRollGenerator.rollDie(it.first) }.toTypedArray())
+            }
+            val result = DiceRollResults(selectedRolls.filterNotNull())
+            val resultText = if (result.rolls.size < dialog.dice.size) null else dialog.result(result)
+            val dialogColor = if (dialog.owner?.isHomeTeam() ?: true) JervisTheme.rulebookRed else JervisTheme.rulebookBlue
+            val buttonColor = if (dialog.owner?.isHomeTeam() ?: true) JervisTheme.rulebookBlue else JervisTheme.rulebookRed
+            JervisDialog(
+                title = dialog.title,
+                icon = {
+                    Image(
+                        modifier = Modifier.fillMaxWidth().padding(top = 24.dp, start = 20.dp, end = 20.dp),
+                        painter = painterResource(Res.drawable.jervis_icon_menu_dice_roll),
+                        contentDescription = "",
+                        colorFilter = ColorFilter.tint(JervisTheme.white),
+                    )
+                },
+                width = dialog.width,
+                draggable = dialog.movable,
+                backgroundScrim = false,
+                centerOnField = vm.screenViewModel,
+                dialogColor = dialogColor,
+                content = { inputFieldTextColor, textColor ->
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(text = dialog.message, color = textColor)
+                        dialog.dice.forEachIndexed { i, el: Pair<Dice, List<DieResult>> ->
+                            FlowRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                el.second.forEach { it: DieResult ->
+                                    val isSelected = remember(dialog) { derivedStateOf { selectedRolls[i] == it } }
+                                    when (it) {
+                                        is DBlockResult -> {
+                                            val buttonColors =
+                                                ButtonDefaults.buttonColors(
+                                                    containerColor = if (isSelected.value) MaterialTheme.colorScheme.primary else JervisTheme.diceBackground,
+                                                )
+                                            val text = it.blockResult.name
+                                            Button(
+                                                modifier = Modifier.weight(1f).aspectRatio(1.0f),
+                                                onClick = { selectedRolls[i] = it },
+                                                colors = buttonColors,
+                                                contentPadding = PaddingValues(4.dp),
+                                            ) {
+                                                Image(
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    bitmap = IconFactory.getDiceIcon(it),
+                                                    contentDescription = text,
+                                                    alignment = Alignment.Center,
+                                                    contentScale = ContentScale.Fit
+                                                )
+                                            }
+                                        }
+
+                                        else -> {
+                                            DialogDiceButton(
+                                                die = it,
+                                                isSelected = (selectedRolls[i] == it),
+                                                onClick = { selectedRolls[i] = it },
                                             )
                                         }
-                                    }
-
-                                    else -> {
-                                        DialogDiceButton(
-                                            die = it,
-                                            isSelected = (selectedRolls[i] == it),
-                                            onClick = { selectedRolls[i] = it },
-                                        )
                                     }
                                 }
                             }
                         }
                     }
+                },
+                buttons = {
+                    val buttonText by derivedStateOf { resultText ?: "Confirm" }
+                    JervisButton(
+                        modifier = Modifier.offset(y = 8.dp),
+                        text = buttonText,
+                        onClick = {
+                            showDialog = false
+                            val result = DiceRollResults(selectedRolls.filterNotNull())
+                            vm.userActionSelected(result)
+                        },
+                        buttonColor = buttonColor,
+                        enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
+                    )
                 }
-            },
-            buttons = {
-                val buttonText by derivedStateOf { resultText ?: "Confirm" }
-                JervisButton(
-                    modifier = Modifier.offset(y = 8.dp),
-                    text = buttonText,
-                    onClick = {
-                        showDialog = false
-                        vm.userActionSelected(result)
-                    },
-                    buttonColor = buttonColor,
-                    enabled = (selectedRolls.size == dialog.dice.size) && !selectedRolls.contains(null),
-                )
-            }
-        )
+            )
+        }
     }
 }
 

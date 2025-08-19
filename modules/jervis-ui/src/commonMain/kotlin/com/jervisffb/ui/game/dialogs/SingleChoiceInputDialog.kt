@@ -45,7 +45,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryC
 import com.jervisffb.engine.rules.bb2020.skills.Skill
 
 /**
- * Class wrapping the intent of choosing a single option between many
+ * Class wrapping the intent of choosing a single option between many.
+ * There is no "Confirm" button, you select the result directly.
  */
 data class SingleChoiceInputDialog(
     val icon: Any? = null, // Replacement for javax.swing.Icon
