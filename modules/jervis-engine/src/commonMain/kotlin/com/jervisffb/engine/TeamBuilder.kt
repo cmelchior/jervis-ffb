@@ -91,11 +91,18 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
         val playerSprite = when (val sprite = type.icon) {
             is SingleSprite -> sprite
             is SpriteSheet -> {
-                val index = usedSprites.getOrPut(type.id) { 0 }
-                usedSprites[type.id] = index + 1
-                sprite.copy(
-                    selectedIndex = index
-                )
+                // If a sprite sheet is known to have multiple variants, rotate between them
+                // otherwise, just reuse the same one.
+                if (sprite.variants != null) {
+                    val index = usedSprites.getOrPut(type.id) { 0 }
+                    usedSprites[type.id] = index + 1 % sprite.variants
+                    sprite.copy(
+                        selectedIndex = index
+                    )
+                } else {
+                    // If no variants, there is only one, so just return directly
+                    sprite.copy(selectedIndex = 0)
+                }
             }
             null -> null
         }
