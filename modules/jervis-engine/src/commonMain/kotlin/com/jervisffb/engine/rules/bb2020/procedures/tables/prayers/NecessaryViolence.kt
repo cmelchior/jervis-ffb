@@ -8,6 +8,7 @@ import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.assertContext
+import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
@@ -30,8 +31,9 @@ object NecessaryViolence : Procedure() {
             state: Game,
             rules: Rules,
         ): Command {
+            val context = state.getContext<PrayersToNuffleRollContext>()
             return compositeCommandOf(
-                ReportGameProgress("${state.activeTeamOrThrow()} receives Necessary Violence"),
+                ReportGameProgress("${context.team.name} receives Necessary Violence"),
                 ExitProcedure(),
             )
         }
