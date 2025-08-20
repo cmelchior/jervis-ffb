@@ -67,6 +67,25 @@ class PrayersToNuffleTests: JervisGameTest() {
         awayTeam.teamValue = 1_000_000
     }
 
+    @Test
+    fun doNotUsePrayersIfNotEnabled() {
+        val state = createDefaultGameState(rules.toBuilder().run {
+            prayersToNuffleEnabled = false
+            build()
+        })
+        state.homeTeam.teamValue = 2_000_000
+        state.awayTeam.teamValue = 1_000_000
+        val controller = GameEngineController(state)
+        controller.startTestMode(FullGame)
+        controller.rollForward(
+            *defaultFanFactor(),
+            defaultWeather(),
+            *defaultJourneyMen(),
+            *defaultInducements()
+        )
+        // If prayers are skipped, we jump directly to the coin flip.
+        assertEquals(DetermineKickingTeam.SelectCoinSide, controller.currentProcedure()!!.currentNode())
+    }
 
     @Test
     fun numberOfPrayers() {

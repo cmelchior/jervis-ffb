@@ -146,6 +146,7 @@ open class Rules(
 
     // Tables
     open val kickOffEventTable: KickOffTable = StandardKickOffEventTable,
+    open val prayersToNufflePrice: Int = 50_000,
     open val prayersToNuffleEnabled: Boolean = true,
     open val prayersToNuffleTable: PrayersToNuffleTable = StandardPrayersToNuffleTable,
     open val weatherTable: WeatherTable = StandardWeatherTable,
@@ -754,6 +755,7 @@ open class Rules(
         var pitchType: PitchType = rules.pitchType
         var matchEventsEnabled: Boolean = rules.matchEventsEnabled
         var kickOffEventTable: KickOffTable = rules.kickOffEventTable
+        var prayersToNufflePrice: Int = rules.prayersToNufflePrice
         var prayersToNuffleEnabled: Boolean = rules.prayersToNuffleEnabled
         var prayersToNuffleTable: PrayersToNuffleTable = rules.prayersToNuffleTable
         var weatherTable: WeatherTable = rules.weatherTable
@@ -805,6 +807,7 @@ open class Rules(
             pitchType,
             matchEventsEnabled,
             kickOffEventTable,
+            prayersToNufflePrice,
             prayersToNuffleEnabled,
             prayersToNuffleTable,
             weatherTable,

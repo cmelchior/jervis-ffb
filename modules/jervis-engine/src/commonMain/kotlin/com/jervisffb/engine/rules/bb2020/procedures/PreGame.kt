@@ -70,10 +70,11 @@ object PreGame : Procedure() {
 
     object CheckForPrayersToNuffle: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
+            val prayersEnabled = rules.prayersToNuffleEnabled
             val difference: Int = abs(state.homeTeam.teamValue - state.awayTeam.teamValue)
             val team = if (state.homeTeam.teamValue > state.awayTeam.teamValue) state.awayTeam else state.homeTeam
-            val rolls = difference / 50_000 // 1 roll for every 50.000 TV difference
-            return if (rolls > 0) {
+            val rolls = difference / rules.prayersToNufflePrice // 1 roll for every 50.000 TV difference
+            return if (rolls > 0 && prayersEnabled) {
                 val context = PrayersToNuffleRollContext(team, rollsRemaining = rolls)
                 return compositeCommandOf(
                     SetContext(context),
