@@ -491,12 +491,14 @@ private fun TeamTablePlayerNameText(name: String, position: String, width: Dp) {
 @Composable
 private fun TeamTableCellSkillText(startingSkills: List<String>, gainedSkills: List<String>, width: Dp) {
     Column(modifier = Modifier.width(width)) {
-        Text(
-            modifier = Modifier.width(width),
-            text = startingSkills.joinToString(", "),
-            fontSize = 10.sp,
-            lineHeight = 1.em,
-        )
+        if (!startingSkills.isEmpty()) {
+            Text(
+                modifier = Modifier.width(width),
+                text = startingSkills.joinToString(", "),
+                fontSize = 10.sp,
+                lineHeight = 1.em,
+            )
+        }
         if (gainedSkills.isNotEmpty()) {
             Text(
                 modifier = Modifier.width(width),
