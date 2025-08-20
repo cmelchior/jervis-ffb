@@ -51,11 +51,11 @@ public data class TourPlayRoster(
     public val player: Player,
     public val coachRank: CoachRank,
     // public val squadRosters: List<Any?>,
-    public val inscriptions: List<Inscription>,
+    // public val inscriptions: List<Inscription>,
     // public val inducements: List<Any?>,
     public val hasOldPlayers: Boolean,
     public val lineUps: List<LineUp>,
-    public val lastMatches: List<LastMatch>,
+    // public val lastMatches: List<LastMatch>,
 )
 
 @Serializable
