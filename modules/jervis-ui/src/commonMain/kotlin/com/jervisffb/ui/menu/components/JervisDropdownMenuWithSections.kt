@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,11 +38,12 @@ fun <T: DropdownEntry> JervisDropdownMenuWithSections(
         onExpandedChange = { expanded = !expanded },
     ) {
         OutlinedTextField(
-            modifier = modifier,
+            modifier = modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
             value = selectedEntry?.name ?: "",
-            onValueChange = { /* Ignore */ },
+            onValueChange = { },
             readOnly = true,
             label = { Text(title) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(!expanded) },
         )
         ExposedDropdownMenu(
             expanded = expanded,
