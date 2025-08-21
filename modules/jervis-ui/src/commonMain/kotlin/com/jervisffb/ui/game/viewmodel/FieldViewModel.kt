@@ -21,6 +21,7 @@ import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.menu.GameScreenModel
+import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -206,8 +207,15 @@ data class ActionWheelPlacementData(
 )
 
 enum class TipPosition {
-    Center, Top, Bottom, Left, Right,
-    TopLeft, TopRight, BottomLeft, BottomRight
+    CENTER,
+    TOP,
+    BOTTOM,
+    LEFT,
+    RIGHT,
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT,
 }
 
 /**
@@ -221,6 +229,10 @@ data class FieldViewData(
     val squaresWidth: Int,
     val squaresHeight: Int,
 ) {
+
+    companion object {
+        val LOG = jervisLogger()
+    }
 
     fun calculateActionWheelPlacement(dialog: ActionWheelInputDialog, fieldVm: FieldViewModel, wheelSizePx: Float, ringSizePx: Float): ActionWheelPlacementData {
         val squareSizePx = size.width/squaresWidth.toFloat()
@@ -239,7 +251,7 @@ data class FieldViewData(
         )
 
         return when (tipPos) {
-            TipPosition.Center -> {
+            TipPosition.CENTER -> {
                 ActionWheelPlacementData(
                     showTip = false,
                     tipRotationDegree = 0f,
@@ -249,7 +261,7 @@ data class FieldViewData(
                     )
                 )
             }
-            TipPosition.Top -> {
+            TipPosition.TOP -> {
                 ActionWheelPlacementData(
                     showTip = true,
                     tipRotationDegree = 225f,
@@ -259,7 +271,7 @@ data class FieldViewData(
                     )
                 )
             }
-            TipPosition.Bottom -> {
+            TipPosition.BOTTOM -> {
                 ActionWheelPlacementData(
                     showTip = true,
                     tipRotationDegree = 45f,
@@ -269,7 +281,7 @@ data class FieldViewData(
                     )
                 )
             }
-            TipPosition.Left -> {
+            TipPosition.LEFT -> {
                 ActionWheelPlacementData(
                     showTip = true,
                     tipRotationDegree = 135f,
@@ -279,7 +291,7 @@ data class FieldViewData(
                     )
                 )
             }
-            TipPosition.Right -> {
+            TipPosition.RIGHT -> {
                 ActionWheelPlacementData(
                     showTip = true,
                     tipRotationDegree = 315f,
@@ -289,7 +301,7 @@ data class FieldViewData(
                     )
                 )
             }
-            TipPosition.TopLeft -> {
+            TipPosition.TOP_LEFT -> {
                 ActionWheelPlacementData(
                     showTip = true,
                     tipRotationDegree = 180f,
@@ -299,7 +311,7 @@ data class FieldViewData(
                     )
                 )
             }
-            TipPosition.TopRight -> {
+            TipPosition.TOP_RIGHT -> {
                 ActionWheelPlacementData(
                     showTip = true,
                     tipRotationDegree = 270f,
@@ -309,7 +321,7 @@ data class FieldViewData(
                     )
                 )
             }
-            TipPosition.BottomLeft -> {
+            TipPosition.BOTTOM_LEFT -> {
                 ActionWheelPlacementData(
                     tipRotationDegree = 90f,
                     showTip = true,
@@ -319,7 +331,7 @@ data class FieldViewData(
                     )
                 )
             }
-            TipPosition.BottomRight -> {
+            TipPosition.BOTTOM_RIGHT -> {
                 ActionWheelPlacementData(
                     showTip = true,
                     tipRotationDegree = 0f,
@@ -354,20 +366,20 @@ data class FieldViewData(
             topSpace >= wheelRadius &&
             bottomSpace >= wheelRadius
 
-        if (hasCenterRoom) return TipPosition.Center
+        if (hasCenterRoom) return TipPosition.CENTER
 
         val verticalCenter = (rightSpace >= wheelRadius && rightSpace >= wheelRadius)
         val horizontalCenter = (bottomSpace >= wheelRadius && topSpace >= wheelRadius)
 
         val horizontal = when {
-            rightSpace >= wheelRadius -> TipPosition.Right
-            leftSpace >= wheelRadius -> TipPosition.Left
+            rightSpace >= wheelRadius -> TipPosition.RIGHT
+            leftSpace >= wheelRadius -> TipPosition.LEFT
             else -> null
         }
 
         val vertical = when {
-            bottomSpace >= wheelRadius -> TipPosition.Bottom
-            topSpace >= wheelRadius -> TipPosition.Top
+            bottomSpace >= wheelRadius -> TipPosition.BOTTOM
+            topSpace >= wheelRadius -> TipPosition.TOP
             else -> null
         }
 
@@ -376,14 +388,22 @@ data class FieldViewData(
             vertical != null && verticalCenter -> vertical
             horizontal != null && vertical != null -> {
                 when {
-                    horizontal == TipPosition.Right && vertical == TipPosition.Bottom -> TipPosition.BottomRight
-                    horizontal == TipPosition.Right && vertical == TipPosition.Top -> TipPosition.TopRight
-                    horizontal == TipPosition.Left && vertical == TipPosition.Bottom -> TipPosition.BottomLeft
-                    horizontal == TipPosition.Left && vertical == TipPosition.Top -> TipPosition.TopLeft
-                    else -> TipPosition.Center // fallback
+                    horizontal == TipPosition.RIGHT && vertical == TipPosition.BOTTOM -> TipPosition.BOTTOM_RIGHT
+                    horizontal == TipPosition.RIGHT && vertical == TipPosition.TOP -> TipPosition.TOP_RIGHT
+                    horizontal == TipPosition.LEFT && vertical == TipPosition.BOTTOM -> TipPosition.BOTTOM_LEFT
+                    horizontal == TipPosition.LEFT && vertical == TipPosition.TOP -> TipPosition.TOP_LEFT
+                    else -> TipPosition.CENTER // fallback
                 }
             }
-            else -> error("Unsupported case: ($vertical, $horizontal)")
+            horizontal != null -> horizontal
+            vertical != null -> vertical
+            // Something unexpected happened, so just hide the tip and hope for the best
+            // It has only been possible to reproduce this on Web, so probably some interaction
+            // with the browser is causing this. It requires futher investigation.
+            else -> {
+                LOG.w("Unexpected case: ($vertical, $horizontal). Fallback to CENTER")
+                TipPosition.CENTER
+            }
         }
     }
 }
