@@ -37,3 +37,6 @@ val Float.jdp: Dp
 
 val Int.jdp: Dp
     get() = JervisTheme.getScaledValue(this.toFloat()).dp
+
+val Double.jdp: Dp
+    get() = JervisTheme.getScaledValue(this.toFloat()).dp

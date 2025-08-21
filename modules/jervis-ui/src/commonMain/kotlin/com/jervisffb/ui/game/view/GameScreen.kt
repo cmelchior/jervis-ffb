@@ -32,6 +32,7 @@ import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.TopbarButton
+import com.jervisffb.ui.utils.jdp
 
 @Composable
 fun GameScreen(
@@ -55,11 +56,11 @@ fun GameScreen(
         verticalArrangement = Arrangement.Top
     ) {
         val backgroundColor = JervisTheme.white.copy(0.1f)
-        GameStatusV2(gameStatusController, modifier = Modifier)
+        GameStatusV2(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
         Spacer(modifier = Modifier.height(12.dp))
         Row(
             modifier = Modifier
-                .padding(start = 24.dp, end = 24.dp)
+                .padding(horizontal = 24.dp)
                 .aspectRatio(aspectRation)
             ,
             verticalAlignment = Alignment.Bottom,

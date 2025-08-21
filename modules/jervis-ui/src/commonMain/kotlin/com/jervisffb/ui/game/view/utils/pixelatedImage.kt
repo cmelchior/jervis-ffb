@@ -23,6 +23,9 @@ import org.jetbrains.skia.RuntimeShaderBuilder
 
 /**
  * Convert an image into a pixelated image, so it looks more like an 8-bit graphic
+ *
+ * TODO This doesn't scale automatically when using jdp values. Probably some
+ *  caching going wrong.
  */
 @Composable
 fun PixelatedImage(

@@ -3,6 +3,7 @@ package com.jervisffb.ui.game.view
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +41,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
@@ -50,10 +52,10 @@ import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -73,6 +75,8 @@ import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.darken
+import com.jervisffb.ui.utils.jdp
+import com.jervisffb.ui.utils.jsp
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.RuntimeEffect
@@ -90,7 +94,7 @@ fun GameStatusV2(
 ) {
     val progress by vm.progress().collectAsState(GameProgress(0, 0, 0, "", 0, "", 0))
     val angle = 5f
-    val topPadding = 8.dp
+    val topPadding = 8.jdp
     Box(
         modifier = modifier
     ) {
@@ -104,15 +108,27 @@ fun GameStatusV2(
         ) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.weight(1f))
-                TurnTracker(Modifier.padding(top = topPadding), angle = -angle, progress.turnMax, progress.homeTeamTurn, JervisTheme.rulebookRed, vm.controller.state.activeTeam?.isHomeTeam() == true)
+                TurnTracker(
+                    modifier = Modifier.padding(top = topPadding),
+                    angle = -angle, progress.turnMax,
+                    progress.homeTeamTurn,
+                    JervisTheme.rulebookRed,
+                    vm.controller.state.activeTeam?.isHomeTeam() == true
+                )
                 ScoreCounter(Modifier.padding(top = topPadding), progress, angle)
-                TurnTracker(Modifier.padding(top = topPadding), angle = angle, progress.turnMax, progress.awayTeamTurn, JervisTheme.rulebookBlue, vm.controller.state.activeTeam?.isAwayTeam() == true)
+                TurnTracker(
+                    modifier = Modifier.padding(top = topPadding),
+                    angle = angle, progress.turnMax,
+                    progress.awayTeamTurn,
+                    JervisTheme.rulebookBlue,
+                    vm.controller.state.activeTeam?.isAwayTeam() == true
+                )
                 Spacer(modifier = Modifier.weight(1f))
             }
             if (progress.badgeSubButtons.isNotEmpty()) {
                 Row(
-                    modifier = Modifier.offset(y = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.offset(y = 16.jdp),
+                    horizontalArrangement = Arrangement.spacedBy(8.jdp)
                 ) {
                     progress.badgeSubButtons.forEach { button ->
                         StatusBarButton(
@@ -144,19 +160,19 @@ private fun RowScope.TurnTracker(
                 else -> error("Unsupported state: ($currentTurn, $turnNo) ")
             }
             ParallelogramButton(
-                modifier = Modifier.width(36.dp).height(32.dp).alpha(alpha),
+                modifier = Modifier.width(36.jdp).height(32.jdp).alpha(alpha),
                 onClick = { },
                 angleDegrees = angle,
                 containerColor = contentColor,
                 borderColor = borderColor,
-                borderWidth = 1.5.dp,
+                borderWidth = 1.5.jdp,
             ) {
                 Text(
                     text = turnNo.toString(),
                     lineHeight = 1.em,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
+                    fontSize = 16.jsp,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         shadow = Shadow(
                             color = Color.Black,
@@ -176,10 +192,10 @@ private fun ScoreCounter(
     progress: GameProgress,
     angle: Float = 5f
 ) {
-    val bigPadding = 5.dp
-    val smallPadding = 2.dp
-    val counterWidth = 40.dp
-    val counterHeight = 48.dp
+    val bigPadding = 5.jdp
+    val smallPadding = 2.jdp
+    val counterWidth = 40.jdp
+    val counterHeight = 48.jdp
     val counterStyle = MaterialTheme.typography.headlineMedium.copy(
         shadow = Shadow(
             color = Color.Black,
@@ -197,7 +213,8 @@ private fun ScoreCounter(
                 text = "${progress.homeTeamScore}",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
-                fontSize = 28.sp,
+                lineHeight = 1.sp,
+                fontSize = 28.jsp,
                 style = counterStyle
             )
         }
@@ -211,7 +228,8 @@ private fun ScoreCounter(
                 text = "${progress.homeTeamScore}",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
-                fontSize = 28.sp,
+                lineHeight = 1.sp,
+                fontSize = 28.jsp,
                 style = counterStyle
             )
         }
@@ -227,11 +245,11 @@ private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: Strin
     Box(
         modifier = Modifier
             .padding(start = padding, end = padding)
-            .width(150.dp)
-            .height(64.dp)
-            .shadow(elevation = if (action == null) 0.dp else 8.dp, shape = shape, clip = false)
+            .width(150.jdp)
+            .height(64.jdp)
+            .shadow(elevation = if (action == null) 0.dp else 8.jdp, shape = shape, clip = false)
             .paperBackground(shape = shape, color = color)
-            .border(4.dp, borderColor, shape)
+            .border(4.jdp, borderColor, shape)
             .onClick(onClick = {
                 if (action != null) {
                     action()
@@ -254,21 +272,21 @@ private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: Strin
         Column(
             modifier = Modifier.alpha(0.8f)
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(8.jdp)
             ,
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             val timer = "--:--"
             Text(
-                modifier = Modifier.offset(y = 3.dp),
+                modifier = Modifier.offset(y = 3.jdp),
                 text = text.uppercase(),
                 color = JervisTheme.white,
                 lineHeight = 1.em,
-                letterSpacing = 2.sp,
+                letterSpacing = 2.jsp,
                 // fontFamily = JervisTheme.fontFamily(),
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 12.sp,
+                    fontSize = 12.jsp,
                     fontWeight = FontWeight.Medium,
                     shadow = Shadow(
                         color = Color.Black,
@@ -281,7 +299,7 @@ private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: Strin
                 text = timer.uppercase(),
                 color = JervisTheme.white,
                 style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 28.sp,
+                    fontSize = 28.jsp,
                     letterSpacing = 1.5.sp,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 1.em,
@@ -306,24 +324,27 @@ private fun TeamInfo(
     leftSide: Boolean
 ) {
     val backgroundShape = ParallelogramShape(if (leftSide) -10f else 10f)
-    val textPadding = 60.dp
+    val textPadding = 60.jdp
     Box(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(vertical = 8.jdp)
+            // Make the team icons be slightly closer to the edge than dugout.
+            // It looks nicer with the current gfx.
+            .offset(x = if (leftSide) -8.jdp else 8.jdp)
         ,
         contentAlignment = if (leftSide) Alignment.CenterStart else Alignment.CenterEnd
     ) {
         Column(
             modifier = Modifier
-                .applyIf(leftSide) { padding(start = 44.dp) }
-                .applyIf(!leftSide) { padding(end = 44.dp) }
+                .applyIf(leftSide) { padding(start = 44.jdp) }
+                .applyIf(!leftSide) { padding(end = 44.jdp) }
             ,
             horizontalAlignment = if (leftSide) Alignment.Start else Alignment.End,
         ) {
             Box(modifier = Modifier
                 .clip(backgroundShape)
-                .width(200.dp)
-                .height(24.dp)
+                .width(200.jdp)
+                .height(24.jdp)
                 .background(JervisTheme.black)
                 ,
                 contentAlignment = Alignment.Center
@@ -339,13 +360,13 @@ private fun TeamInfo(
                     color = Color.White,
                     // fontStyle = FontStyle.Italic,
                     lineHeight = 1.em,
-                    fontSize = 12.sp
+                    fontSize = 12.jsp
                 )
             }
             Box(modifier = Modifier
                 .clip(backgroundShape)
-                .width(300.dp)
-                .height(28.dp)
+                .width(300.jdp)
+                .height(28.jdp)
                 .background(backgroundColor)
                 ,
                 contentAlignment = Alignment.Center
@@ -361,25 +382,26 @@ private fun TeamInfo(
                     color = Color.White,
                     lineHeight = 1.em,
                     overflow = TextOverflow.Ellipsis,
-                    letterSpacing = 1.sp,
+                    letterSpacing = 1.jsp,
                     maxLines = 1,
-                    fontSize = 18.sp,
+                    fontSize = 18.jsp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = JervisTheme.fontFamily(),
                 )
             }
         }
-        PixelatedImageWithShader(
-            modifier = Modifier.padding(8.dp).size(90.dp),
-            painter = BitmapPainter(IconFactory.getLogo(team.id, LogoSize.SMALL)),
-            pixelSize = 2f,
-        )
-//        Image(
-//            modifier = Modifier.padding(8.dp).size(90.dp),
-//            bitmap = IconFactory.getLogo(team.id, LogoSize.SMALL),
-//            contentDescription = team.name,
-//            contentScale = ContentScale.Fit,
+//        PixelatedImageWithShader(
+//            modifier = Modifier.padding(8.jdp).size(90.jdp),
+//            painter = BitmapPainter(IconFactory.getLogo(team.id, LogoSize.SMALL)),
+//            pixelSize = 2f,
 //        )
+        Image(
+            modifier = Modifier.padding(vertical = 8.jdp).size(90.jdp),
+            bitmap = IconFactory.getLogo(team.id, LogoSize.SMALL),
+            contentDescription = team.name,
+            contentScale = ContentScale.Fit,
+            filterQuality = FilterQuality.None,
+        )
     }
 }
 
@@ -468,7 +490,7 @@ fun ParallelogramButton(
     modifier: Modifier = Modifier,
     containerColor: Color = JervisTheme.white.copy(alpha = 0.2f),
     contentColor: Color = JervisTheme.black,
-    borderWidth: Dp = 2.dp,
+    borderWidth: Dp = 2.jdp,
     borderColor: Color = JervisTheme.white.copy(alpha = 0.7f),
     enabled: Boolean = true,
     content: @Composable () -> Unit
