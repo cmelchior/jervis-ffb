@@ -95,7 +95,7 @@ fun SetupRulesComponent(viewModel: RulesSetupComponentModel) {
                     JervisDropdownMenuWithSections(
                         title = "Prayers to Nuffle Table",
                         entries = viewModel.prayersToNuffleTables,
-                        selectedEntry = selectedKickOffTable
+                        selectedEntry = selectedPrayersToNuffleTable,
                     ) {
                         viewModel.updatePrayersToNuffleTable(it)
                     }
