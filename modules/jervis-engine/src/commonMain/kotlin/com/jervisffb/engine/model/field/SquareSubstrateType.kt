@@ -16,8 +16,8 @@ enum class SquareSubstrateType {
     // Default kind of surface on playing fields underground or in the streets.
     // Used by Dungeon Bowl and Gutter Bowl. It normally has no special effect.
     STONE,
-    // Default surface when playing Gutter Bowl. Effects bounces and injury rolls.
+    // Default surface when playing Gutter Bowl. Affects bounces and injury rolls.
     COBBLESTONE_FLOORS,
-    // Chasm full of lava. See page 30 in Dungeon Bowl
+    // Chasm full of lava. See page 30 in Dungeon Bowl.
     FIERY_CHASM,
 }

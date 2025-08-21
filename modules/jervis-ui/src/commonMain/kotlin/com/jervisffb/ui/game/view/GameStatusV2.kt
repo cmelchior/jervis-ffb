@@ -236,6 +236,9 @@ private fun ScoreCounter(
     }
 }
 
+/**
+ * Composable responsible for showing current phase, timer and act as End Turn/Setup button.
+ */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: String, action: (() -> Unit)? = null) {
@@ -390,6 +393,9 @@ private fun TeamInfo(
                 )
             }
         }
+// We want to make the team icon appear a bit pixelated to fit into the rest of the UI,
+// but just using this doesn't scale well. We might need something that can switch between
+// using a normal image and this depending on the size (or switch pixelSize more smartly).
 //        PixelatedImageWithShader(
 //            modifier = Modifier.padding(8.jdp).size(90.jdp),
 //            painter = BitmapPainter(IconFactory.getLogo(team.id, LogoSize.SMALL)),

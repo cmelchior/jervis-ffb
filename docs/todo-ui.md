@@ -41,15 +41,12 @@ things as they come up.
 - [ ] If possible, move dice roll dialogs away from the pitch.
 - [ ] Rethink dialog design. They are currently way too big. As a minimum
       you need to be able to drag them away from the screen.
-- [ ] Some fonts need to scale with the size of the window. Introduce the concept of 
-      wsp (Window Scaled Pixels) and use them where appropriate (Player stats / Skills)
 - [ ] Figure out a better way to trigger recomposition. Currently, there is a lot of
       object creation/copying going on with UiFieldSquare. It seems performant enough
       on my machine, but it also feels like it could be optimized. Currently there
       are two places changes are happening. In the rules engine and in 
       ManualActionProvider when setting up listeners.
 - [ ] Could we add 3d dice rolling across the board? Probably difficult in pure Compose, but maybe using Lottie?
-- [ ] Import teams from TourPlay (and other online services).
 - [ ] Add AFK Limit to timer settings + AFK button in the UI
 - [ ] Add a "Player Editor" in Dev Mode that makes it possible to add skills, change stats, and states.
       Need to figure out exactly how this should work.
@@ -57,16 +54,14 @@ things as they come up.
       forward. That isn't a bug per see, but how the design works. However it feels jarring in that case. Not 100% sure
       what the best approach is. We can either combine Nodes in the engine, or find some ways to hack the UI flow.
       Either way feel kinda hack-ish :/
-- [x] Hover on block shows dice indicator.
-- [x] Better ball animation using Projectile Motion equations.
+- [ ] Better ball animation using Projectile Motion equations.
     - https://www.youtube.com/watch?v=qtsxHx1MpUI&ab_channel=PhysicsAlmanac
     - Size-Distance Scaling Equation: https://sites.millersville.edu/sgallagh/Publications/top2013.pdf
     - https://en.wikipedia.org/wiki/Visual_angle
     - https://www.quora.com/Do-objects-appear-exponentially-smaller-as-you-move-away-from-them
     - https://www.youtube.com/watch?v=_KLfj84SOh8&ab_channel=ErikRosolowsky
     - https://www.omnicalculator.com/physics/time-of-flight-projectile-motion
-- [x] Standup and end movement as a single action (UI only).
-
+    - I think I implemented the correct algorithm, but th ball landing still looks off. Need to figure out why.
 
 ## Design ideas
 
