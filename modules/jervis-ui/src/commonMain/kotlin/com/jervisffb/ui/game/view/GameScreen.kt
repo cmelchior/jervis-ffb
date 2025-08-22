@@ -57,10 +57,10 @@ fun GameScreen(
     ) {
         val backgroundColor = JervisTheme.white.copy(0.1f)
         GameStatusV2(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.jdp))
         Row(
             modifier = Modifier
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 24.jdp)
                 .aspectRatio(aspectRation)
             ,
             verticalAlignment = Alignment.Bottom,
@@ -84,7 +84,7 @@ fun GameScreen(
                 SidebarV2(rightDugout, Modifier)
             }
         }
-        Row(modifier = Modifier.padding(start = 24.dp, end = 24.dp)) {
+        Row(modifier = Modifier.padding(horizontal = 24.jdp)) {
             LogViewer(logs, modifier = Modifier.weight(1f).background(backgroundColor).fillMaxSize())
             Spacer(modifier = Modifier.width(24.dp))
             // Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))
