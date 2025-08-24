@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.view
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.onClick
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -62,21 +64,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import com.jervisffb.engine.model.Team
+import com.jervisffb.jervis_ui.generated.resources.Res
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_brilliant_coaching_reroll
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_leader_reroll
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_team_reroll
+import com.jervisffb.ui.game.UiGameStatusUpdate
+import com.jervisffb.ui.game.UiReroll
+import com.jervisffb.ui.game.UiRerollType
+import com.jervisffb.ui.game.UiTeamFeature
+import com.jervisffb.ui.game.UiTeamFeatureType
+import com.jervisffb.ui.game.UiTeamInfoUpdate
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.utils.paperBackground
-import com.jervisffb.ui.game.viewmodel.GameProgress
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
+import com.jervisffb.ui.menu.components.JervisTooltipArea
+import com.jervisffb.ui.menu.components.JervisTooltipPlacement
 import com.jervisffb.ui.toRadians
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
+import com.jervisffb.ui.utils.toImageBitmap
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.RuntimeEffect
@@ -92,18 +107,26 @@ fun GameStatusV2(
     vm: GameStatusViewModel,
     modifier: Modifier,
 ) {
-    val progress by vm.progress().collectAsState(GameProgress(0, 0, 0, "", 0, "", 0))
+    val progressFlow = remember { vm.progress() }
+    val progress by progressFlow.collectAsState(UiGameStatusUpdate.INITIAL)
+    val homeTeamFlow = remember { vm.homeTeamInfoFlow() }
+    val homeTeamInfo by homeTeamFlow.collectAsState(UiTeamInfoUpdate.INITIAL)
+    val awayTeamFlow = remember { vm.awayTeamInfoFlow() }
+    val awayTeamInfo by awayTeamFlow.collectAsState(UiTeamInfoUpdate.INITIAL)
+
     val angle = 5f
     val topPadding = 8.jdp
+    val statusBoxWidth = 170.jdp
     Box(
         modifier = modifier
     ) {
         Row {
-            TeamInfo(vm.controller.gameController.state.homeTeam, JervisTheme.rulebookRed, leftSide = true)
+            TeamInfo(homeTeamInfo, JervisTheme.rulebookRed, leftSide = true)
             Spacer(modifier = Modifier.weight(1f))
-            TeamInfo(vm.controller.gameController.state.awayTeam, JervisTheme.rulebookBlue, leftSide = false)
+            TeamInfo(awayTeamInfo, JervisTheme.rulebookBlue, leftSide = false)
         }
         Column(
+            Modifier,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -111,15 +134,15 @@ fun GameStatusV2(
                 TurnTracker(
                     modifier = Modifier.padding(top = topPadding),
                     angle = -angle, progress.turnMax,
-                    progress.homeTeamTurn,
+                    homeTeamInfo.turn,
                     JervisTheme.rulebookRed,
                     vm.controller.state.activeTeam?.isHomeTeam() == true
                 )
-                ScoreCounter(Modifier.padding(top = topPadding), progress, angle)
+                ScoreCounter(Modifier.padding(top = topPadding), progress, angle, statusBoxWidth)
                 TurnTracker(
                     modifier = Modifier.padding(top = topPadding),
                     angle = angle, progress.turnMax,
-                    progress.awayTeamTurn,
+                    awayTeamInfo.turn,
                     JervisTheme.rulebookBlue,
                     vm.controller.state.activeTeam?.isAwayTeam() == true
                 )
@@ -138,6 +161,164 @@ fun GameStatusV2(
                     }
                 }
             }
+        }
+
+        // Reroll icons
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 44.jdp)
+                .height(44.dp)
+            ,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            val distance = 6.jdp
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TeamRerolls(homeTeamInfo.rerolls, distance)
+            }
+            Spacer(modifier = Modifier.width(statusBoxWidth + 94.jdp))
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                TeamRerolls(awayTeamInfo.rerolls.reversed(), distance)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun RowScope.TeamRerolls(rerolls: List<UiReroll>, distance: Dp) {
+    val availableAlpha = 0.9f // Reduce how much the gfx "pop"
+    val unavailableAlpha = 0.3f
+    rerolls.forEachIndexed { i, reroll ->
+        if (i > 0) {
+            Spacer(modifier = Modifier.width(distance))
+        }
+        val image = when (reroll.type) {
+            UiRerollType.TEAM -> Res.drawable.jervis_icon_team_reroll
+            UiRerollType.LEADER -> Res.drawable.jervis_icon_leader_reroll
+            UiRerollType.BRILLIANT_COACHING -> Res.drawable.jervis_icon_brilliant_coaching_reroll
+            UiRerollType.UNKNOWN -> TODO()
+        }
+        JervisTooltipArea(
+            tooltip = {
+                Surface(
+                    tonalElevation = 4.dp,
+                    shadowElevation = 4.dp,
+                    shape = RoundedCornerShape(8.dp),
+                    color = JervisTheme.white.copy(alpha = 0.95f),
+                ) {
+                    Text(reroll.name, Modifier.padding(horizontal = 8.dp, vertical = 6.dp))
+                }
+            },
+            delayMillis = 300,
+            tooltipPlacement = JervisTooltipPlacement.CursorPoint(
+                offset = DpOffset((-16).dp, 16.dp)
+            )
+        ) {
+            Image(
+                modifier = Modifier
+                    .width(30.jdp)
+                    .height(40.jdp)
+                    .alpha(if (reroll.used) unavailableAlpha else availableAlpha)
+                ,
+                painter = painterResource(image),
+                contentDescription = reroll.name,
+                contentScale = ContentScale.Fit,
+            )
+
+        }
+
+
+    }
+
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun RowScope.TeamFeaturesRow(
+    leftSide: Boolean,
+    height: Dp,
+    features: List<UiTeamFeature>
+) {
+    Row(
+        modifier = Modifier
+            .applyIf(leftSide) { padding(start = 4.jdp) }
+            .applyIf(!leftSide) { padding(end = 4.jdp)}
+        ,
+        horizontalArrangement = Arrangement.spacedBy(16.jdp),
+    ) {
+        features.forEach { feature ->
+            JervisTooltipArea(
+                tooltip = {
+                    Surface(
+                        tonalElevation = 4.dp,
+                        shadowElevation = 4.dp,
+                        shape = RoundedCornerShape(8.dp),
+                        color = JervisTheme.white.copy(alpha = 0.95f),
+                    ) {
+                        Text(feature.name, Modifier.padding(horizontal = 8.dp, vertical = 6.dp))
+                    }
+                },
+                delayMillis = 300,
+                tooltipPlacement = JervisTooltipPlacement.CursorPoint(
+                    offset = if (!leftSide) DpOffset((-16).dp, 16.dp) else DpOffset((16).dp, 16.dp)
+                )
+            ) {
+                when (feature.type) {
+                    UiTeamFeatureType.APOTHECARY -> {
+                        TeamFeature(value = feature.value, icon = IconFactory.getApothecaryIcon(height), available = !feature.used)
+                    }
+                    UiTeamFeatureType.BLOODWEISER_KEG -> TODO()
+                    UiTeamFeatureType.UNKNOWN -> TODO()
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Render a team feature icon (normally inducements).
+ */
+@Composable
+private fun TeamFeature(
+    value: Int?,
+    icon: ImageBitmap,
+    // If false, it means it has been used, but will return.
+    // Inducements used that are 1-time should just disappear.
+    available: Boolean = true,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            modifier = Modifier, //.dropShadow(blurRadius = 4.dp),
+            bitmap = icon,
+            contentDescription = "",
+            contentScale = ContentScale.Fit,
+            filterQuality = FilterQuality.None,
+        )
+        if (value != null && value > 1) {
+            Text(
+                modifier = Modifier.padding(start = 6.jdp).alpha(if (available) 1f else 0.3f),
+                fontSize = 22.jsp,
+                text = value.toString(),
+                color = Color.White,
+                lineHeight = 1.em,
+                fontWeight = FontWeight.Bold,
+                fontFamily = JervisTheme.fontFamily(),
+                style = MaterialTheme.typography.bodySmall.copy(
+                    shadow = Shadow(
+                        color = Color.Black,
+                        offset = Offset(2f, 2f),
+                    )
+                )
+            )
         }
     }
 }
@@ -189,13 +370,15 @@ private fun RowScope.TurnTracker(
 @Composable
 private fun ScoreCounter(
     modifier: Modifier,
-    progress: GameProgress,
-    angle: Float = 5f
+    progress: UiGameStatusUpdate,
+    angle: Float = 5f,
+    statusBoxWidth: Dp
 ) {
+    val scoreTextSize = 28.jsp // 36.jsp
     val bigPadding = 5.jdp
     val smallPadding = 2.jdp
-    val counterWidth = 40.jdp
-    val counterHeight = 48.jdp
+    val counterWidth = 40.jdp // 60.jdp
+    val counterHeight = 48.jdp // 76.jdp
     val counterStyle = MaterialTheme.typography.headlineMedium.copy(
         shadow = Shadow(
             color = Color.Black,
@@ -210,26 +393,26 @@ private fun ScoreCounter(
             modifier = Modifier.padding(start = smallPadding).width(counterWidth).height(counterHeight),
         ) {
             Text(
-                text = "${progress.homeTeamScore}",
+                text = "${progress.homeTeamInfo.score}",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 lineHeight = 1.sp,
-                fontSize = 28.jsp,
+                fontSize = scoreTextSize,
                 style = counterStyle
             )
         }
-        GameStatusBox(smallPadding, angle, progress.centerBadgeText, progress.centerBadgeAction)
+        GameStatusBox(statusBoxWidth, smallPadding, angle, progress.centerBadgeText, progress.centerBadgeAction)
         ParallelogramButton(
             onClick = { },
             angleDegrees = angle,
             modifier = Modifier.padding(end = smallPadding).width(counterWidth).height(counterHeight),
         ) {
             Text(
-                text = "${progress.homeTeamScore}",
+                text = "${progress.awayTeamInfo.score}",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 lineHeight = 1.sp,
-                fontSize = 28.jsp,
+                fontSize = scoreTextSize,
                 style = counterStyle
             )
         }
@@ -241,15 +424,22 @@ private fun ScoreCounter(
  */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: String, action: (() -> Unit)? = null) {
+private fun RowScope.GameStatusBox(
+    statusBoxWidth: Dp,
+    padding: Dp = 0.dp,
+    angle: Float,
+    text: String,
+    action: (() -> Unit)? = null
+) {
+    val boxHeight = 72.jdp
     val shape = remember(angle) { TrapezoidShape(angle) }
     var color by remember { mutableStateOf(JervisTheme.gameStatusBackground) }
     var borderColor by remember { mutableStateOf(JervisTheme.white) }
     Box(
         modifier = Modifier
-            .padding(start = padding, end = padding)
-            .width(150.jdp)
-            .height(64.jdp)
+            .padding(horizontal = padding)
+            .width(statusBoxWidth)
+            .height(boxHeight) // 76
             .shadow(elevation = if (action == null) 0.dp else 8.jdp, shape = shape, clip = false)
             .paperBackground(shape = shape, color = color)
             .border(4.jdp, borderColor, shape)
@@ -322,77 +512,90 @@ private fun RowScope.GameStatusBox(padding: Dp = 0.dp, angle: Float, text: Strin
  */
 @Composable
 private fun TeamInfo(
-    team: Team,
+    teamInfo: UiTeamInfoUpdate,
     backgroundColor: Color,
     leftSide: Boolean
 ) {
+    val coachBarHeight = 28.jdp // 24.jdp
+    val coachBarLength = 200.jdp
+    val teamNameBarHeight = 32.jdp // 28.jdp
+    val teamNameBarLength = 350.jdp
+    val teamLogoSize = 98.jdp
+    val inducementIconTopPadding = 4.jdp
+    val inducementIconSize = 44.jdp // Same size as the player squares on the reference screen
+    val logoTopPadding = 4.jdp
+
     val backgroundShape = ParallelogramShape(if (leftSide) -10f else 10f)
     val textPadding = 60.jdp
-    Box(
-        modifier = Modifier
-            .padding(vertical = 8.jdp)
-            // Make the team icons be slightly closer to the edge than dugout.
-            // It looks nicer with the current gfx.
-            .offset(x = if (leftSide) -8.jdp else 8.jdp)
-        ,
-        contentAlignment = if (leftSide) Alignment.CenterStart else Alignment.CenterEnd
+    Column(
+        modifier = Modifier.height(teamLogoSize + inducementIconTopPadding + inducementIconSize + logoTopPadding),
+        horizontalAlignment = if (leftSide) Alignment.Start else Alignment.End,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .applyIf(leftSide) { padding(start = 44.jdp) }
-                .applyIf(!leftSide) { padding(end = 44.jdp) }
+                // Make the team icons be slightly closer to the edge than dugout.
+                // It looks nicer with the current gfx.
+                .offset(x = if (leftSide) -8.jdp else 8.jdp)
             ,
-            horizontalAlignment = if (leftSide) Alignment.Start else Alignment.End,
+            contentAlignment = if (leftSide) Alignment.CenterStart else Alignment.CenterEnd
         ) {
-            Box(modifier = Modifier
-                .clip(backgroundShape)
-                .width(200.jdp)
-                .height(24.jdp)
-                .background(JervisTheme.black)
+            Column(
+                modifier = Modifier
+                    .applyIf(leftSide) { padding(start = 44.jdp) }
+                    .applyIf(!leftSide) { padding(end = 44.jdp) }
                 ,
-                contentAlignment = Alignment.Center
+                horizontalAlignment = if (leftSide) Alignment.Start else Alignment.End,
             ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .applyIf(leftSide) { padding(start = textPadding) }
-                        .applyIf(!leftSide) { padding(end = textPadding) }
+                Box(modifier = Modifier
+                    .clip(backgroundShape)
+                    .width(coachBarLength)
+                    .height(coachBarHeight)
+                    .background(JervisTheme.black)
                     ,
-                    textAlign = if (leftSide) TextAlign.Start else TextAlign.End,
-                    text = team.coach.name,
-                    color = Color.White,
-                    // fontStyle = FontStyle.Italic,
-                    lineHeight = 1.em,
-                    fontSize = 12.jsp
-                )
-            }
-            Box(modifier = Modifier
-                .clip(backgroundShape)
-                .width(300.jdp)
-                .height(28.jdp)
-                .background(backgroundColor)
-                ,
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .applyIf(leftSide) { padding(start = textPadding) }
-                        .applyIf(!leftSide) { padding(end = textPadding) }
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .applyIf(leftSide) { padding(start = textPadding) }
+                            .applyIf(!leftSide) { padding(end = textPadding) }
+                        ,
+                        textAlign = if (leftSide) TextAlign.Start else TextAlign.End,
+                        text = teamInfo.coachName,
+                        color = Color.White,
+                        // fontStyle = FontStyle.Italic,
+                        lineHeight = 1.em,
+                        fontSize = 12.jsp
+                    )
+                }
+                Box(modifier = Modifier
+                    .clip(backgroundShape)
+                    .width(teamNameBarLength)
+                    .height(teamNameBarHeight)
+                    .background(backgroundColor)
                     ,
-                    textAlign = if (leftSide) TextAlign.Start else TextAlign.End,
-                    text = team.name,
-                    color = Color.White,
-                    lineHeight = 1.em,
-                    overflow = TextOverflow.Ellipsis,
-                    letterSpacing = 1.jsp,
-                    maxLines = 1,
-                    fontSize = 18.jsp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = JervisTheme.fontFamily(),
-                )
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .applyIf(leftSide) { padding(start = textPadding) }
+                            .applyIf(!leftSide) { padding(end = textPadding) }
+                        ,
+                        textAlign = if (leftSide) TextAlign.Start else TextAlign.End,
+                        text = teamInfo.teamName,
+                        color = Color.White,
+                        lineHeight = 1.em,
+                        overflow = TextOverflow.Ellipsis,
+                        letterSpacing = 1.jsp,
+                        maxLines = 1,
+                        fontSize = 18.jsp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = JervisTheme.fontFamily(),
+                    )
+                }
             }
-        }
 // We want to make the team icon appear a bit pixelated to fit into the rest of the UI,
 // but just using this doesn't scale well. We might need something that can switch between
 // using a normal image and this depending on the size (or switch pixelSize more smartly).
@@ -401,13 +604,27 @@ private fun TeamInfo(
 //            painter = BitmapPainter(IconFactory.getLogo(team.id, LogoSize.SMALL)),
 //            pixelSize = 2f,
 //        )
-        Image(
-            modifier = Modifier.padding(vertical = 8.jdp).size(90.jdp),
-            bitmap = IconFactory.getLogo(team.id, LogoSize.SMALL),
-            contentDescription = team.name,
-            contentScale = ContentScale.Fit,
-            filterQuality = FilterQuality.None,
-        )
+            // Team Logo
+            if (teamInfo.id.value.isNotEmpty()) {
+                Image(
+                    modifier = Modifier.padding(top = logoTopPadding).size(teamLogoSize),
+                    bitmap = IconFactory.getLogo(teamInfo.id, LogoSize.SMALL),
+                    contentDescription = teamInfo.teamName + " logo",
+                    contentScale = ContentScale.Fit,
+                    filterQuality = FilterQuality.None,
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = teamInfo.featureList.isNotEmpty()
+        ) {
+            Spacer(modifier = Modifier.height(inducementIconTopPadding))
+            Row(
+                modifier = Modifier.height(inducementIconSize),
+            ) {
+                TeamFeaturesRow(leftSide = leftSide, height = inducementIconSize, teamInfo.featureList)
+            }
+        }
     }
 }
 
@@ -470,7 +687,6 @@ class TrapezoidShape(
 
         // Clamp so bottom doesn't collapse
         val clamped = shift.coerceAtMost((w / 2) - 1f)
-        val bottomWidth = (w - 2 * abs(clamped)).coerceAtLeast(1f)
 
         val topLeftX = 0f
         val topRightX = w

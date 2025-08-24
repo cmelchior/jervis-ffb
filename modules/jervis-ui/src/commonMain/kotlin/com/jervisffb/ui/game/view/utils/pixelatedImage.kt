@@ -7,15 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
-import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
+import com.jervisffb.ui.utils.toImageBitmap
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.RuntimeEffect
@@ -59,7 +56,7 @@ fun PixelatedImage(
 
         // Render SVG to bitmap at requested size
         val skiaBitmap = remember(painter) {
-            val imageBitmap = painter.toImageBitmap(Size(widthPx, heightPx), density, LayoutDirection.Ltr)
+            val imageBitmap = painter.toImageBitmap(Size(widthPx, heightPx), density)
             imageBitmap.asSkiaBitmap()
         }
 
@@ -90,18 +87,5 @@ fun PixelatedImage(
             }
         }
     }
-}
-
-private fun Painter.toImageBitmap(
-    size: Size,
-    density: Density,
-    layoutDirection: LayoutDirection,
-): ImageBitmap {
-    val bitmap = ImageBitmap(size.width.toInt(), size.height.toInt())
-    val canvas = androidx.compose.ui.graphics.Canvas(bitmap)
-    CanvasDrawScope().draw(density, layoutDirection, canvas, size) {
-        draw(size)
-    }
-    return bitmap
 }
 

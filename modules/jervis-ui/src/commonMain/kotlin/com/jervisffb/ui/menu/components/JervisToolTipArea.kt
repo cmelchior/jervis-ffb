@@ -74,7 +74,7 @@ import kotlin.math.roundToInt
 fun JervisTooltipArea(
     tooltip: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    delayMillis: Int = 500,
+    delayMillis: Int = 300,
     tooltipPlacement: JervisTooltipPlacement = JervisTooltipPlacement.CursorPoint(
         offset = DpOffset(0.dp, 16.dp)
     ),

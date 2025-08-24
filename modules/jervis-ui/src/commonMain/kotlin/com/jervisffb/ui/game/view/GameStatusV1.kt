@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jervisffb.ui.game.viewmodel.GameProgress
+import com.jervisffb.ui.game.UiGameStatusUpdate
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 
 // Game Status Layout that is compatible with a Game Screen layout from the FUMBBL Client (2025)
@@ -28,15 +28,7 @@ fun GameStatusV1(
     vm: GameStatusViewModel,
     modifier: Modifier,
 ) {
-    val progress by vm.progress().collectAsState(GameProgress(
-        0,
-        0,
-        0,
-        "",
-        0,
-        "",
-        0,
-    ))
+    val progress by vm.progress().collectAsState(UiGameStatusUpdate.INITIAL)
     Box(modifier = modifier) {
 //        Image(
 //            bitmap = IconFactory.getScorebar(),
@@ -57,7 +49,7 @@ fun GameStatusV1(
             )
             Text(
                 modifier = textModifier,
-                text = "${progress.homeTeamTurn} / ${progress.awayTeamTurn}",
+                text = "${progress.homeTeamInfo.turn} / ${progress.awayTeamInfo.turn}",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
@@ -83,7 +75,7 @@ fun GameStatusV1(
         // TODO Need to scale the distance between them
         Row(modifier = Modifier.align(Alignment.Center), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "${progress.homeTeamScore}",
+                text = "${progress.homeTeamInfo.score}",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,
@@ -97,7 +89,7 @@ fun GameStatusV1(
             )
             Spacer(Modifier.width(78.dp))
             Text(
-                text = "${progress.awayTeamScore}",
+                text = "${progress.awayTeamInfo.score}",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,

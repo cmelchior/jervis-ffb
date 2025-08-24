@@ -8,7 +8,7 @@ import com.jervisffb.ui.game.UiGameSnapshot
 /**
  * Set a square indicator for the ball being carried by the player in that square.
  */
-object BallCarriedIndicator: FieldIndicator {
+object BallCarriedStatusIndicator: FieldStatusIndicator {
     override fun decorate(
         uiSnapshot: UiGameSnapshot,
         node: ActionNode,

@@ -16,7 +16,7 @@ import com.jervisffb.ui.game.UiGameSnapshot
  * Show a small "block" indicator on the player is they are currently in a block
  * sequence.
  */
-object BlockIndicator: FieldIndicator {
+object BlockStatusIndicator: FieldStatusIndicator {
     override fun decorate(
         uiSnapshot: UiGameSnapshot,
         node: ActionNode,

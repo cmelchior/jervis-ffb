@@ -26,13 +26,16 @@ import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.state.QueuedActionsGenerator
 import com.jervisffb.ui.game.state.UiActionProvider
-import com.jervisffb.ui.game.state.indicators.BallCarriedIndicator
-import com.jervisffb.ui.game.state.indicators.BallExitIndicator
-import com.jervisffb.ui.game.state.indicators.BallOnGroundIndicator
-import com.jervisffb.ui.game.state.indicators.BlockIndicator
-import com.jervisffb.ui.game.state.indicators.DirectionArrowIndicator
-import com.jervisffb.ui.game.state.indicators.FieldIndicator
-import com.jervisffb.ui.game.state.indicators.MoveUsedIndicator
+import com.jervisffb.ui.game.state.indicators.BallCarriedStatusIndicator
+import com.jervisffb.ui.game.state.indicators.BallExitStatusIndicator
+import com.jervisffb.ui.game.state.indicators.BallOnGroundStatusIndicator
+import com.jervisffb.ui.game.state.indicators.BlockStatusIndicator
+import com.jervisffb.ui.game.state.indicators.DirectionArrowStatusIndicator
+import com.jervisffb.ui.game.state.indicators.FieldStatusIndicator
+import com.jervisffb.ui.game.state.indicators.MoveUsedStatusIndicator
+import com.jervisffb.ui.game.state.indicators.TeamFeatureStatusIndicator
+import com.jervisffb.ui.game.state.indicators.TeamRerollStatusIndicator
+import com.jervisffb.ui.game.state.indicators.TeamSetupsAvailableStatusIndicator
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
@@ -158,13 +161,16 @@ class UiGameController(
 
     // Persistent UI decorations that needs to be stored across actions
     val uiDecorations = UiGameIndicators()
-    val fieldActionIndicators: List<FieldIndicator> = listOf(
-        BallCarriedIndicator,
-        BallExitIndicator,
-        BallOnGroundIndicator,
-        BlockIndicator,
-        DirectionArrowIndicator,
-        MoveUsedIndicator
+    val fieldStatusIndicators: List<FieldStatusIndicator> = listOf(
+        BallCarriedStatusIndicator,
+        BallExitStatusIndicator,
+        BallOnGroundStatusIndicator,
+        BlockStatusIndicator,
+        DirectionArrowStatusIndicator,
+        MoveUsedStatusIndicator,
+        TeamFeatureStatusIndicator,
+        TeamRerollStatusIndicator,
+        TeamSetupsAvailableStatusIndicator
     )
 
     private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + singleThreadDispatcher("AnimationScope"))
@@ -234,6 +240,7 @@ class UiGameController(
                 // Update UI State based on latest model state
                 actionProvider.prepareForNextAction(controller, actions)
                 val newUiState = createNewUiSnapshot(state, actions, delta, lastUiState)
+                applyUiIndicators(actions, state, newUiState)
                 _uiStateFlow.emit(newUiState)
 
                 // Detect animations and run them after updating the UI, but before making it ready
@@ -243,7 +250,6 @@ class UiGameController(
                 // TODO Just changing the existing uiState might not trigger recomposition correctly
                 //  We need an efficient way to copy the old one.
                 actionProvider.decorateAvailableActions(newUiState, actions)
-                applyUiIndicators(actions, state, newUiState)
                 lastUiState = newUiState
                 menuViewModel.updateUiState(newUiState)
                 _uiStateFlow.emit(newUiState)
@@ -281,9 +287,10 @@ class UiGameController(
 
     private fun applyUiIndicators(actionRequest: ActionRequest, state: Game, snapshot: UiGameSnapshot) {
         val currentNode = state.stack.currentNode() as ActionNode
-        fieldActionIndicators.forEach { indicator ->
+        fieldStatusIndicators.forEach { indicator ->
             indicator.decorate(snapshot, currentNode, state, actionRequest)
         }
+
     }
 
     private suspend fun runPreUpdateAnimations() {
@@ -341,7 +348,8 @@ class UiGameController(
             state.stack.createSnapshot(),
             actions,
             uiDecorations,
-            squares
+            squares,
+            UiGameStatusUpdate(state)
         )
     }
 

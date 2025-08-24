@@ -8,7 +8,7 @@ import com.jervisffb.ui.game.state.ManualActionProvider
 
 class EndTurnDecorator() : FieldActionDecorator<EndTurnWhenReady> {
     override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: EndTurnWhenReady) {
-        snapshot.centerBadgeText = "End Turn"
-        snapshot.centerBadgeAction = { actionProvider.userActionSelected(EndTurn) }
+        snapshot.gameStatus.centerBadgeText = "End Turn"
+        snapshot.gameStatus.centerBadgeAction = { actionProvider.userActionSelected(EndTurn) }
     }
 }

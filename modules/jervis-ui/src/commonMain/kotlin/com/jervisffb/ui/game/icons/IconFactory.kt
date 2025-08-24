@@ -1,16 +1,13 @@
 package com.jervisffb.ui.game.icons
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.jervisffb.engine.actions.D12Result
@@ -83,6 +80,10 @@ import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_box_button
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_blue_modified
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_red_modified
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_turn_button
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_leader_reroll
+import com.jervisffb.jervis_ui.generated.resources.jervis_icon_team_reroll
+import com.jervisffb.jervis_ui.generated.resources.jervis_inducement_apothercary
+import com.jervisffb.jervis_ui.generated.resources.jervis_inducement_keg
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.view.JervisTheme
@@ -91,6 +92,7 @@ import com.jervisffb.ui.loadFileAsImage
 import com.jervisffb.ui.loadImage
 import com.jervisffb.ui.utils.getSubImage
 import com.jervisffb.ui.utils.scalePixels
+import com.jervisffb.ui.utils.toImageBitmap
 import com.jervisffb.ui.utils.toSkiaColor
 import com.jervisffb.utils.canBeHost
 import com.jervisffb.utils.getHttpClient
@@ -106,6 +108,7 @@ import okio.internal.commonToUtf8String
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.FontStyle
@@ -539,7 +542,7 @@ object IconFactory {
         }
     }
 
-    fun getImage(player: UiPlayer): ImageBitmap {
+    fun getPlayerIcon(player: UiPlayer): ImageBitmap {
         val isHomeTeam: Boolean = player.isOnHomeTeam
         val roster: Roster = player.model.team.roster
         val playerType: Position = player.position
@@ -725,6 +728,34 @@ object IconFactory {
             3 -> Res.drawable.icons_decorations_block3d
             else -> error("Unsupported number of dice: $dice")
         }
+    }
+
+    @Composable
+    fun getTeamRerollIcon(size: Dp): ImageBitmap {
+        val sizePx = with(LocalDensity.current) { size.toPx() }
+        val res = painterResource(Res.drawable.jervis_icon_team_reroll)
+        return res.toImageBitmap(Size(sizePx, sizePx), LocalDensity.current)
+    }
+
+    @Composable
+    fun getLeaderRerollIcon(size: Dp): ImageBitmap {
+        val sizePx = with(LocalDensity.current) { size.toPx() }
+        val res = painterResource(Res.drawable.jervis_icon_leader_reroll)
+        return res.toImageBitmap(Size(sizePx, sizePx), LocalDensity.current)
+    }
+
+    @Composable
+    fun getKegIcon(size: Dp): ImageBitmap {
+        val sizePx = with(LocalDensity.current) { size.toPx() }
+        val res = painterResource(Res.drawable.jervis_inducement_keg)
+        return res.toImageBitmap(Size(sizePx, sizePx), LocalDensity.current)
+    }
+
+    @Composable
+    fun getApothecaryIcon(size: Dp): ImageBitmap {
+        val sizePx = with(LocalDensity.current) { size.toPx() }
+        val res = painterResource(Res.drawable.jervis_inducement_apothercary)
+        return res.toImageBitmap(Size(sizePx, sizePx), LocalDensity.current)
     }
 
     fun hasLogo(id: TeamId, size: LogoSize): Boolean {

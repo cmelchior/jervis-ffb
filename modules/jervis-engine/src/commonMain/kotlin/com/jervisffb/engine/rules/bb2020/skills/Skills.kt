@@ -61,7 +61,7 @@ class BrilliantCoachingReroll(val teamId: TeamId) : TeamReroll {
     override val id: RerollSourceId = RerollSourceId("${teamId.value}-brilliant-coaching")
     override val carryOverIntoOvertime: Boolean = false
     override val duration = Duration.END_OF_DRIVE
-    override val rerollResetAt: Duration = Duration.END_OF_HALF
+    override val rerollResetAt: Duration = Duration.END_OF_DRIVE
     override val rerollDescription: String = "Team Reroll (Brilliant Coaching)"
     override var rerollUsed: Boolean = false
 }

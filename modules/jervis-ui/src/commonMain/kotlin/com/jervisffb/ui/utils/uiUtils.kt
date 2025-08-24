@@ -60,7 +60,7 @@ fun pixelsToDp(px: Float): Dp {
 /**
  * Converts a [Painter] to a Compose [ImageBitmap], making it easier to process further.
  */
-private fun Painter.toImageBitmap(
+fun Painter.toImageBitmap(
     size: Size,
     density: Density,
 ): ImageBitmap {

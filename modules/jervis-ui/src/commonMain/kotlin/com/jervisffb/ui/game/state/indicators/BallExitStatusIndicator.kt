@@ -6,18 +6,20 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.ui.game.UiGameSnapshot
 
 /**
- * Numbers on the squares indicating how many move steps were used to reach
- * that step. The starting square is counted as "0".
+ * Set a square indicator for the square where a ball went out of bounds.
  */
-object MoveUsedIndicator: FieldIndicator {
+object BallExitStatusIndicator: FieldStatusIndicator {
     override fun decorate(
         uiSnapshot: UiGameSnapshot,
         node: ActionNode,
         state: Game,
         request: ActionRequest
     ) {
-        uiSnapshot.uiIndicators.getAllMoveUsed().forEach { (coordinate, moveUsed) ->
-            uiSnapshot.fieldSquares[coordinate]?.moveUsed = moveUsed
+        // We add a special indicator where the ball is leaving the pitch (if it is)
+        state.balls.forEach { ball ->
+            ball.outOfBoundsAt?.let {loc ->
+                uiSnapshot.fieldSquares[loc]!!.isBallExiting = true
+            }
         }
     }
 }

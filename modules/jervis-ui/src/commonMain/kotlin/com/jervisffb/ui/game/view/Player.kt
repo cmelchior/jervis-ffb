@@ -60,7 +60,7 @@ fun Player(
     parentHandleClick: Boolean,
     contextMenuShowing: Boolean,
 ) {
-    val playerImage = remember(player) { IconFactory.getImage(player) }
+    val playerImage = remember(player) { IconFactory.getPlayerIcon(player) }
     val ballImage = IconFactory.getHeldBallOverlay()
 
     var playerModifier: Modifier = modifier.aspectRatio(1f)

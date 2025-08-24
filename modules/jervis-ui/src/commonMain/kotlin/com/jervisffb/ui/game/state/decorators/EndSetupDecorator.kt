@@ -9,8 +9,8 @@ import com.jervisffb.ui.game.state.ManualActionProvider
 class EndSetupDecorator() : FieldActionDecorator<EndSetupWhenReady> {
     override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: EndSetupWhenReady) {
 //        if (snapshot.actionsRequest.team?.isHomeTeam() == true) {
-        snapshot.centerBadgeText = "End Setup"
-        snapshot.centerBadgeAction = { actionProvider.userActionSelected(EndSetup) }
+        snapshot.gameStatus.centerBadgeText = "End Setup"
+        snapshot.gameStatus.centerBadgeAction = { actionProvider.userActionSelected(EndSetup) }
 //            snapshot.homeTeamActions.add(
 //                ButtonData(
 //                    "End Setup",
