@@ -15,8 +15,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -74,13 +77,19 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
         true -> JervisTheme.homeTeamColor
         false -> JervisTheme.awayTeamColor
     }
-    val lightTeamColor = teamColor.lighten(0.25f)
+    val statWidthFactor = 0.3f
+    val imageWidthFactor = 0.7f
+
+    val lightTeamColor = teamColor.lighten(0.15f)
     val darkTeamColor = teamColor.darken(0.25f)
     val darkerTeamColor = teamColor.darken(0.5f)
     val borderColor = darkerTeamColor
     val innerBorderColor = JervisTheme.white
     val borderSize = 6.jdp
     val bigBorderSize = 8.jdp
+
+    val statboxLabelColor = darkerTeamColor
+    val statboxContentColor = darkTeamColor
 
     playerData?.let { player ->
         Card(
@@ -96,36 +105,47 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
         ) {
             BoxWithConstraints {
                 val boxWidth = maxWidth
-                val portraitHeight = (boxWidth - bigBorderSize * 2) * 0.7f * 147f/95f
+                val portraitHeight = (boxWidth - bigBorderSize * 2) * imageWidthFactor * 147f/95f
 
                 // Stats and image
                 Column(
                     modifier = Modifier
-                        .paperBackground(darkerTeamColor)
+                        .paperBackground(teamColor) // Background color for the entire card
                         .padding(bigBorderSize),
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(IntrinsicSize.Min),
+                            .height(IntrinsicSize.Min)
+                            .heightIn(min = (portraitHeight - (borderSize*3))/4f)
+                        ,
                     ) {
                         Column(
                             modifier = Modifier
-                                .weight(0.3f)
+                                .weight(statWidthFactor)
                                 .padding(end = borderSize)
                                 .fillMaxHeight()
                                 .background(teamColor)
                             ,
                             verticalArrangement = Arrangement.spacedBy(borderSize),
                         ) {
-                            StatBoxV3(Modifier.fillMaxSize(), "MV", player.model.move.toString(), teamColor)
+                            StatBoxV3(
+                                Modifier.fillMaxSize(),
+                                "MV",
+                                player.model.move.toString(),
+                                statboxLabelColor,
+                                statboxContentColor,
+                            )
                         }
                         Box(
-                            modifier = Modifier.weight(0.7f).fillMaxSize().paperBackground(lightTeamColor),
+                            modifier = Modifier
+                                .weight(0.7f)
+                                .fillMaxSize()
+                                .paperBackground(lightTeamColor),
                             contentAlignment = Alignment.Center,
                         ) {
                             // Player type
-                            val fontSize = 20.jsp
+                            val fontSize = 26.jsp
                             val type = remember(player.model.position.titleSingular) {
                                 val originalTitle = player.model.position.titleSingular
                                 val splitTitle = originalTitle.split(" ")
@@ -162,19 +182,19 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                         ,
                     ) {
                         Column(
-                            modifier = Modifier.weight(0.3f).fillMaxSize().padding(end = borderSize),
+                            modifier = Modifier.weight(statWidthFactor).fillMaxSize().padding(end = borderSize),
                             verticalArrangement = Arrangement.spacedBy(borderSize),
                         ) {
                             val model = player.model
                             val modifier = Modifier.weight(1f)
-                            StatBoxV3(modifier, "ST", model.strength.toString(), teamColor)
-                            StatBoxV3(modifier, "AG", "${model.agility}+", teamColor)
-                            StatBoxV3(modifier, "PA", if (model.passing == null) "-" else "${model.passing}+", teamColor)
-                            StatBoxV3(modifier, "AV", "${model.armorValue}+", teamColor)
+                            StatBoxV3(modifier, "ST", model.strength.toString(), statboxLabelColor, statboxContentColor)
+                            StatBoxV3(modifier, "AG", "${model.agility}+", statboxLabelColor, statboxContentColor)
+                            StatBoxV3(modifier, "PA", if (model.passing == null) "-" else "${model.passing}+", statboxLabelColor, statboxContentColor)
+                            StatBoxV3(modifier, "AV", "${model.armorValue}+", statboxLabelColor, statboxContentColor)
                         }
                         Box(
                             modifier = Modifier
-                                .weight(0.7f)
+                                .weight(imageWidthFactor)
                                 .fillMaxSize()
                                 .border(
                                     width = borderSize,
@@ -319,7 +339,7 @@ private fun BoxScope.PlayerName(name: String, borderSize: Dp) {
     val playerNameStyle = MaterialTheme.typography.bodySmall.copy(
         textAlign = TextAlign.Center,
         fontFamily = JervisTheme.fontFamily(),
-        fontSize = 16.jsp,
+        fontSize = 20.jsp,
         lineHeight = 1.4.em,
         letterSpacing = 1.sp,
     )
@@ -423,28 +443,40 @@ private fun StatBoxV3(
     modifier: Modifier,
     title: String,
     value: String,
+    labelBackgroundColor: Color,
     backgroundColor: Color,
 ) {
     Column(
-        modifier = modifier.fillMaxWidth().background(backgroundColor).padding(4.jdp),
-        verticalArrangement = Arrangement.Center,
+        modifier = modifier.fillMaxWidth().fillMaxHeight().background(backgroundColor),
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            modifier = Modifier.padding(bottom = 4.jdp),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(labelBackgroundColor)
+                .wrapContentHeight(align = Alignment.CenterVertically)
+            ,
             text = title,
             fontSize = 12.jsp,
             lineHeight = 1.em,
             letterSpacing = 1.jsp,
             maxLines = 1,
-            fontWeight = FontWeight.Light,
+            fontWeight = FontWeight.Normal,
             color = Color.White,
             textAlign = TextAlign.Center,
         )
         Text(
-            modifier = Modifier,
+            modifier = Modifier
+                .offset(y = (-1).jdp) // Offset to make the font look slightly more aligned
+                .fillMaxHeight(0.65f)
+                .fillMaxWidth()
+                .background(backgroundColor)
+                .wrapContentHeight(align = Alignment.CenterVertically)
+            ,
             text = value,
-            fontSize = 22.jsp,
+            fontSize = 30.jsp,
             lineHeight = 1.em,
             maxLines = 1,
             letterSpacing = 2.jsp,
