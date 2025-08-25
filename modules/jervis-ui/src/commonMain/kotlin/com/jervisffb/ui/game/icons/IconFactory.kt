@@ -69,15 +69,7 @@ import com.jervisffb.jervis_ui.generated.resources.icons_game_pb_west
 import com.jervisffb.jervis_ui.generated.resources.icons_game_pb_west_filled
 import com.jervisffb.jervis_ui.generated.resources.icons_game_sball_30x30
 import com.jervisffb.jervis_ui.generated.resources.icons_scorebar_background_scorebar
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_player_detail_blue
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_player_detail_red
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_resource_blue
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_resource_red
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_turn_dice_status_blue
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_turn_dice_status_red
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_box_button
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_blue_modified
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_red_modified
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_turn_button
 import com.jervisffb.jervis_ui.generated.resources.jervis_dogout
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_leader_reroll
@@ -610,15 +602,6 @@ object IconFactory {
         return imageResource(Res.drawable.icons_game_sball_30x30)
     }
 
-    @Composable
-    fun getPlayerDetailOverlay(onHomeTeam: Boolean): ImageBitmap {
-        return if (onHomeTeam) {
-            imageResource(Res.drawable.icons_sidebar_overlay_player_detail_red_modified)
-        } else {
-            imageResource(Res.drawable.icons_sidebar_overlay_player_detail_blue_modified)
-        }
-    }
-
     fun getPlayerPortrait(player: PlayerId): ImageBitmap {
         return cachedPortraits[player]!!
     }
@@ -640,30 +623,6 @@ object IconFactory {
     @Composable
     fun getLargeButton(): ImageBitmap {
         return imageResource(Res.drawable.icons_sidebar_turn_button)
-    }
-
-    @Composable
-    fun getSidebarBannerTop(isHomeTeam: Boolean): ImageBitmap {
-        return when (isHomeTeam) {
-            true -> imageResource(Res.drawable.icons_sidebar_background_player_detail_red)
-            false -> imageResource(Res.drawable.icons_sidebar_background_player_detail_blue)
-        }
-    }
-
-    @Composable
-    fun getSidebarBannerMiddle(isHomeTeam: Boolean): ImageBitmap {
-        return when (isHomeTeam) {
-            true -> imageResource(Res.drawable.icons_sidebar_background_turn_dice_status_red)
-            false -> imageResource(Res.drawable.icons_sidebar_background_turn_dice_status_blue)
-        }
-    }
-
-    @Composable
-    fun getSidebarBannerBottom(isHomeTeam: Boolean): ImageBitmap {
-        return when (isHomeTeam) {
-            true -> imageResource(Res.drawable.icons_sidebar_background_resource_red)
-            false -> imageResource(Res.drawable.icons_sidebar_background_resource_blue)
-        }
     }
 
     @Composable

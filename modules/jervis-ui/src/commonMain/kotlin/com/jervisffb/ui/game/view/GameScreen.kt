@@ -66,7 +66,7 @@ fun GameScreen(
             verticalAlignment = Alignment.Bottom,
         ) {
             Column(modifier = Modifier.weight(550f /*145f*/).align(Alignment.Top)) {
-                SidebarV2(leftDugout, Modifier)
+                Sidebar(leftDugout, Modifier)
             }
             Column(
                 modifier = Modifier.weight(/*782f*/ 2354f).align(Alignment.Top),
@@ -81,7 +81,7 @@ fun GameScreen(
                 // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
             }
             Column(modifier = Modifier.weight(550f /*145f*/).align(Alignment.Top)) {
-                SidebarV2(rightDugout, Modifier)
+                Sidebar(rightDugout, Modifier)
             }
         }
         Spacer(modifier = Modifier.height(24.jdp))

@@ -39,7 +39,7 @@ import com.jervisffb.ui.utils.jdp
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun SidebarV2(
+fun Sidebar(
     vm: SidebarViewModel,
     modifier: Modifier,
 ) {
@@ -75,7 +75,7 @@ fun SidebarV2(
                 }
 
                 // Make sure player stats are shown on top of reserves
-                PlayerStatsCardV2(vm.hoverPlayer())
+                PlayerStatsCard(vm.hoverPlayer())
             }
         }
     }

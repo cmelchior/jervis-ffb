@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -61,7 +60,6 @@ import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.view.utils.paperBackground
-import com.jervisffb.ui.menu.intro.loadJervisFont
 import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
@@ -70,9 +68,8 @@ import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
+fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
     val playerData by flow.collectAsState(null)
-    val font = loadJervisFont()
     val teamColor = when (playerData?.model?.isOnHomeTeam() == true) {
         true -> JervisTheme.homeTeamColor
         false -> JervisTheme.awayTeamColor
@@ -83,7 +80,6 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
     val lightTeamColor = teamColor.lighten(0.15f)
     val darkTeamColor = teamColor.darken(0.25f)
     val darkerTeamColor = teamColor.darken(0.5f)
-    val borderColor = darkerTeamColor
     val innerBorderColor = JervisTheme.white
     val borderSize = 6.jdp
     val bigBorderSize = 8.jdp
@@ -129,7 +125,7 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                             ,
                             verticalArrangement = Arrangement.spacedBy(borderSize),
                         ) {
-                            StatBoxV3(
+                            StatBox(
                                 Modifier.fillMaxSize(),
                                 "MV",
                                 player.model.move.toString(),
@@ -187,10 +183,10 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
                         ) {
                             val model = player.model
                             val modifier = Modifier.weight(1f)
-                            StatBoxV3(modifier, "ST", model.strength.toString(), statboxLabelColor, statboxContentColor)
-                            StatBoxV3(modifier, "AG", "${model.agility}+", statboxLabelColor, statboxContentColor)
-                            StatBoxV3(modifier, "PA", if (model.passing == null) "-" else "${model.passing}+", statboxLabelColor, statboxContentColor)
-                            StatBoxV3(modifier, "AV", "${model.armorValue}+", statboxLabelColor, statboxContentColor)
+                            StatBox(modifier, "ST", model.strength.toString(), statboxLabelColor, statboxContentColor)
+                            StatBox(modifier, "AG", "${model.agility}+", statboxLabelColor, statboxContentColor)
+                            StatBox(modifier, "PA", if (model.passing == null) "-" else "${model.passing}+", statboxLabelColor, statboxContentColor)
+                            StatBox(modifier, "AV", "${model.armorValue}+", statboxLabelColor, statboxContentColor)
                         }
                         Box(
                             modifier = Modifier
@@ -330,12 +326,6 @@ fun PlayerStatsCardV2(flow: Flow<UiPlayerCard?>) {
 private fun BoxScope.PlayerName(name: String, borderSize: Dp) {
     // Because Compose does not support drop shadow on Outlined Text
     // we fake it by first blurring the outline and then render the rest
-
-//    val fontScale =  (16 / 210f) // Reference value (16.sp / 210.dp)
-//    val shadowScale = (8 / 210f) // Reference value (8f / 210.dp)
-//    val outlineScale = (6 / 210f) // Reference value (6f / 210.dp)
-
-    // Outline not supported by Compose yet, so fake it
     val playerNameStyle = MaterialTheme.typography.bodySmall.copy(
         textAlign = TextAlign.Center,
         fontFamily = JervisTheme.fontFamily(),
@@ -392,54 +382,11 @@ private fun BoxScope.PlayerName(name: String, borderSize: Dp) {
     )
 }
 
+/**
+ * Render a single stat box that is part of a Playe Stats Card.
+ */
 @Composable
-private fun StatBoxV2(
-    modifier: Modifier,
-    title: String,
-    value: String,
-    teamColor: Color,
-    darkerTeamColor: Color,
-) {
-    Box(
-        modifier = modifier // .aspectRatio(1.618f)
-    ) {
-        Row {
-            Box(
-                modifier = Modifier.width(24.dp).fillMaxHeight().background(darkerTeamColor),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    modifier = Modifier,
-                    text = title,
-                    fontSize = 8.sp,
-                    lineHeight = 1.em,
-                    maxLines = 1,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                )
-            }
-            Box(
-                modifier = Modifier.fillMaxSize().background(teamColor),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    modifier = Modifier,
-                    text = value,
-                    fontSize = 12.sp,
-                    lineHeight = 1.em,
-                    maxLines = 1,
-                    fontWeight = FontWeight.Bold,
-                    color = JervisTheme.white,
-                    textAlign = TextAlign.Center,
-
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatBoxV3(
+private fun StatBox(
     modifier: Modifier,
     title: String,
     value: String,

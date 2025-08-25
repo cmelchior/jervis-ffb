@@ -12,7 +12,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.game.view.Field
-import com.jervisffb.ui.game.view.SidebarV1
+import com.jervisffb.ui.game.view.Sidebar
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import manual.dummies.TestDummy
@@ -51,8 +51,8 @@ private fun PlayerStatsContent(
                 .aspectRatio((152.42f + 782f + 152.42f) / 452f),
         verticalAlignment = Alignment.Top,
     ) {
-        SidebarV1(leftDugout, Modifier.weight(152.42f))
+        Sidebar(leftDugout, Modifier.weight(152.42f))
         Field(Modifier, field)
-        SidebarV1(rightDugout, Modifier.weight(152.42f))
+        Sidebar(rightDugout, Modifier.weight(152.42f))
     }
 }

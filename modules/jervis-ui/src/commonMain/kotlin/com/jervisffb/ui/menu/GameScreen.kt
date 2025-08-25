@@ -66,7 +66,6 @@ import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import com.jervisffb.ui.menu.components.JervisDialogHeader
 import com.jervisffb.ui.menu.components.SimpleSwitch
 import com.jervisffb.utils.openUrlInBrowser
-import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.launch
 
 class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenModel) : Screen {
@@ -91,7 +90,6 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
                             } else {
                                 drawerScope.launch { drawerState.open() }
                             }
-                            // showExitDialog = true
                             return true
                         }
                     }
