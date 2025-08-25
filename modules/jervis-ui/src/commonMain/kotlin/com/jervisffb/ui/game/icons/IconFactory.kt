@@ -69,7 +69,6 @@ import com.jervisffb.jervis_ui.generated.resources.icons_game_pb_west
 import com.jervisffb.jervis_ui.generated.resources.icons_game_pb_west_filled
 import com.jervisffb.jervis_ui.generated.resources.icons_game_sball_30x30
 import com.jervisffb.jervis_ui.generated.resources.icons_scorebar_background_scorebar
-import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_box
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_player_detail_blue
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_player_detail_red
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_background_resource_blue
@@ -80,6 +79,7 @@ import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_box_button
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_blue_modified
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_overlay_player_detail_red_modified
 import com.jervisffb.jervis_ui.generated.resources.icons_sidebar_turn_button
+import com.jervisffb.jervis_ui.generated.resources.jervis_dogout
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_leader_reroll
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_team_reroll
 import com.jervisffb.jervis_ui.generated.resources.jervis_inducement_apothercary
@@ -625,7 +625,7 @@ object IconFactory {
 
     @Composable
     fun getSidebarBackground(): ImageBitmap {
-        return imageResource(Res.drawable.icons_sidebar_background_box)
+        return imageResource(Res.drawable.jervis_dogout)
     }
 
     fun getField(field: FieldDetails): ImageBitmap {

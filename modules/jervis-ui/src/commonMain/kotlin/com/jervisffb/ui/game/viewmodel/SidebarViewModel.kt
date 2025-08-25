@@ -43,7 +43,7 @@ class SidebarViewModel(
 ) {
 
     // The image is 145f/430f, but we need to stretch to make it fit the field image.
-    val aspectRatio: Float = 145f/430f // 152.42f / 452f
+    val aspectRatio: Float = 410f/1030f // × 1030145f/430f // 152.42f / 452f
 
     private val _view = MutableStateFlow(SidebarView.RESERVES)
     private val _buttons: Flow<List<ButtonData>> = uiState.uiStateFlow.map { uiSnapshot ->

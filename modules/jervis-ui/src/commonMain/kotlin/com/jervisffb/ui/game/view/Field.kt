@@ -111,7 +111,10 @@ fun Field(
     // TODO For now just center the field and add a black background to hide any rounding errors.
     //  Ideally that should only be a pixel or two.
     BoxWithConstraints(
-        modifier = modifier.fillMaxWidth().background(color = JervisTheme.rulebookGreen.copy(alpha = 0.0f)).padding(start = 32.dp, end = 32.dp, bottom = 32.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = Color.Transparent)
+        ,
         contentAlignment = Alignment.TopCenter,
     ) {
 
@@ -630,6 +633,11 @@ fun PlayerBlockedIndicator() {
     )
 }
 
+/**
+ * Composable that draws a pixel-perfect box with the given width and height.
+ * This is used to draw the field, so we avoid sub-pixel rendering artifacts
+ * due to rounding in the individual squares
+ */
 @Composable
 private fun ExactPixelBox(modifier: Modifier, widthPx: Int, heightPx: Int, content: @Composable () -> Unit) {
     Layout(

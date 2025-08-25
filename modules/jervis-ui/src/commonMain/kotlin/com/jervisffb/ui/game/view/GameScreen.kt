@@ -48,8 +48,9 @@ fun GameScreen(
     dialogsViewModel: DialogsViewModel,
     onSettingsClick: () -> Unit,
 ) {
-    val aspectRation = (145f+145f+782f)/452f
-    val fieldPositionData: FieldViewData by screenModel.fieldViewData.collectAsState() // remember { mutableStateOf(FieldViewData(IntSize.Zero, IntOffset.Zero)) }
+    //val aspectRation = (145f+145f+782f)/452f
+    val aspectRation = (550f+550f+2354f)/1362f
+    val fieldPositionData: FieldViewData by screenModel.fieldViewData.collectAsState()
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -60,16 +61,15 @@ fun GameScreen(
         Spacer(modifier = Modifier.height(8.jdp))
         Row(
             modifier = Modifier
-                .padding(horizontal = 24.jdp)
                 .aspectRatio(aspectRation)
             ,
             verticalAlignment = Alignment.Bottom,
         ) {
-            Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
+            Column(modifier = Modifier.weight(550f /*145f*/).align(Alignment.Top)) {
                 SidebarV2(leftDugout, Modifier)
             }
             Column(
-                modifier = Modifier.weight(782f).align(Alignment.Top),
+                modifier = Modifier.weight(/*782f*/ 2354f).align(Alignment.Top),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Field(
@@ -80,10 +80,11 @@ fun GameScreen(
                 )
                 // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
             }
-            Column(modifier = Modifier.weight(145f).align(Alignment.Top)) {
+            Column(modifier = Modifier.weight(550f /*145f*/).align(Alignment.Top)) {
                 SidebarV2(rightDugout, Modifier)
             }
         }
+        Spacer(modifier = Modifier.height(24.jdp))
         Row(modifier = Modifier.padding(horizontal = 24.jdp)) {
             LogViewer(logs, modifier = Modifier.weight(1f).background(backgroundColor).fillMaxSize())
             Spacer(modifier = Modifier.width(24.dp))

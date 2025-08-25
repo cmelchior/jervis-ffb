@@ -2,6 +2,7 @@ package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -19,9 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
@@ -33,9 +33,9 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayer
-import com.jervisffb.ui.game.view.Injuries
 import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
+import com.jervisffb.ui.utils.jdp
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -44,21 +44,20 @@ fun SidebarV2(
     modifier: Modifier,
 ) {
     Box(modifier = Modifier, contentAlignment = Alignment.TopCenter) {
-
         // Side bar content
         Column(modifier = Modifier) {
-            // Dogout + player statss
-            Box(modifier = modifier.aspectRatio(vm.aspectRatio).fillMaxSize()) {
+            // Dogout + player stats
+            Box(modifier = modifier.fillMaxSize()) {
+                //Box(modifier = modifier.aspectRatio(vm.aspectRatio).fillMaxSize()) {
                 Image(
                     alignment = Alignment.TopStart,
                     painter = BitmapPainter(IconFactory.getSidebarBackground()),
                     contentDescription = "Box",
                     contentScale = ContentScale.FillWidth,
-                    colorFilter = ColorFilter.tint(JervisTheme.rulebookPaperDark.copy(alpha = 0.5f), BlendMode.SrcAtop),
                     modifier = modifier.fillMaxSize().padding(bottom = 8.dp).alpha(0.8f),
                 )
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
                         Reserves(vm.reserves()) {
                             vm.hoverExit()
                         }
@@ -207,6 +206,8 @@ private fun Injuries(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true, onExit: () -> Unit = {}) {
+    val playersPrRow = 3
+    val playerSize = 45.jdp
     if (!compactView) {
         val max = if (list.isNotEmpty()) list.maxBy { it.model.number.value }.model.number.value else 0
         if (max > 0) {
@@ -217,10 +218,18 @@ private fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true, onE
                     }
                 }
             list.forEach { sortedList[it.model.number.value - 1] = it }
-            for (index in sortedList.indices step 5) {
-                Row(modifier = Modifier.onPointerEvent(PointerEventType.Exit) { onExit() }) {
-                    val modifier = Modifier.weight(1f).aspectRatio(1f)
-                    repeat(5) { x ->
+            for (index in sortedList.indices step playersPrRow) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onPointerEvent(PointerEventType.Exit) { onExit() }
+                        .padding(bottom = 16.jdp)
+                    ,
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                ) {
+                    val modifier = Modifier.size(playerSize).aspectRatio(1f)
+                    repeat(playersPrRow) { x ->
                         if (sortedList.size > (index + x) && sortedList[index + x] != null) {
                             Player(
                                 modifier,
@@ -238,10 +247,18 @@ private fun PlayerSection(list: List<UiPlayer>, compactView: Boolean = true, onE
             }
         }
     } else {
-        for (index in list.indices step 5) {
-            Row {
-                val modifier = Modifier.weight(1f).aspectRatio(1f)
-                repeat(5) { x ->
+        for (index in list.indices step playersPrRow) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onPointerEvent(PointerEventType.Exit) { onExit() }
+                    .padding(bottom = 16.jdp)
+                ,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                val modifier = Modifier.size(playerSize).aspectRatio(1f)
+                repeat(playersPrRow) { x ->
                     if (list.size > (index + x)) {
                         Player(
                             modifier,
