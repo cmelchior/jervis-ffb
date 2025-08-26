@@ -248,8 +248,11 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
 
                     // Player level
                     Row(
-                        modifier = Modifier.padding(top = bigBorderSize, bottom = bigBorderSize).fillMaxWidth(),
+                        modifier = Modifier
+                            .padding(top = bigBorderSize, bottom = bigBorderSize)
+                            .fillMaxWidth(),
                     ) {
+                        val fontSize = 16.jsp
                         Text(
                             textAlign = TextAlign.Start,
                             text = player.model.level.description,
@@ -259,7 +262,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                             ),
                             color = Color.White,
                             maxLines = 1,
-                            fontSize = 14.jsp,
+                            fontSize = fontSize,
                             letterSpacing = 1.jsp,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -273,7 +276,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                             ),
                             color = Color.White,
                             maxLines = 1,
-                            fontSize = 14.jsp,
+                            fontSize = fontSize,
                             letterSpacing = 1.jsp,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -290,11 +293,12 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(borderSize*2),
                         ) {
+                            val skillFontSize = 16.jsp
                             val skills = player.model.skills
                             if (skills.isEmpty()) {
                                 Text(
                                     modifier = Modifier.padding(0.jdp).fillMaxWidth(),
-                                    fontSize = 14.jsp,
+                                    fontSize = skillFontSize,
                                     color = JervisTheme.contentTextColor,
                                     textAlign = TextAlign.Center,
                                     fontWeight = FontWeight.SemiBold,
@@ -304,7 +308,7 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                             } else {
                                 player.model.skills.forEach {
                                     Text(
-                                        fontSize = 14.jsp,
+                                        fontSize = skillFontSize,
                                         lineHeight = 1.5.em,
                                         color = JervisTheme.contentTextColor,
                                         fontWeight = FontWeight.SemiBold,
