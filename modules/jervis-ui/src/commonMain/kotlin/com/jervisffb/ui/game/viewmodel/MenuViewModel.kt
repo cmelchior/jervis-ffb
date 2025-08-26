@@ -33,6 +33,7 @@ import com.jervisffb.utils.singleThreadDispatcher
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -66,6 +67,7 @@ class MenuViewModel {
     val creditData: CreditData
 
     // Scope for lauching tasks directly related to navigating the UI
+    val uiScope = CoroutineScope(CoroutineName("UI") + Dispatchers.Main)
     val navigatorContext = CoroutineScope(CoroutineName("ScreenNavigator") + singleThreadDispatcher("menuThread"))
     // Scope for launching background tasks for Menu actions
     val backgroundContext = CoroutineScope(CoroutineName("ScreenBackground") + multiThreadDispatcher("menuBackgroundThread"))

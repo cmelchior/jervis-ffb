@@ -87,7 +87,7 @@ class SidebarViewModel(
             it.game.awayTeam.filter { player -> player.location == DogOut }
         }
         Pair(it, list)
-    }.shareIn(menuViewModel.backgroundContext, SharingStarted.Lazily)
+    }.shareIn(menuViewModel.uiScope, SharingStarted.Eagerly, 1)
 
     fun dogoutAction(): Flow<(() -> Unit)?> = uiState.uiStateFlow.map {
         when (team.isHomeTeam()) {

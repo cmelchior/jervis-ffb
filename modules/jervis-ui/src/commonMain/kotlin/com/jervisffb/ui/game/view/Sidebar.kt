@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -210,7 +211,10 @@ private fun Injuries(
 }
 
 /**
- * A list of players under
+ * A list of players in a dogout section
+ *
+ * @param compactView If `true` players will group together. If `false` players will remember their position when
+ * moving between the field and the dogout.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

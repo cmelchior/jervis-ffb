@@ -7,14 +7,14 @@ The UI is implemented using Compose Multiplatform, a declarative UI framework
 similar to React on web.
 
 The primary reason for choosing this approach over a more normal game engine
-approach, is that it is available across all platforms, making it easier to
+approach is that it is available across all platforms, making it easier to
 write the UI.
 
 This also allows us to lean into the possibility of easily moving the UI state
 back and forward together with the game state. This is especially relevant
 when Undo is a first-class citizen.
 
-The downside is that it is more heavy-weight than a traditional Game Engine, but 
+The downside is that the rendering performance is lower than a traditional Game Engine, but 
 as the UI isn't that demanding, the UI performance, so far, seems to hold up.
 
 We want to have an independent Rules Engine, so we try to have a strict separation
