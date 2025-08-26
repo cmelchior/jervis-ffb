@@ -44,6 +44,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -174,7 +175,15 @@ class UiGameController(
     )
 
     private val animationScope = CoroutineScope(CoroutineName("AnimationScope") + singleThreadDispatcher("AnimationScope"))
-    val gameScope = CoroutineScope(Job() + CoroutineName("GameLoopScope") + singleThreadDispatcher("GameLoopScope"))
+    val gameScope = CoroutineScope(
+        Job()
+            + CoroutineName("GameLoopScope")
+            // + singleThreadDispatcher("GameLoopScope")
+            // TODO We cannot share mutableStateOf properties across threads. Moving the entire Game Loop to the Main Thread
+            //  fixes it for now. But performance might be a problem. We need to find a performant way to run the game loop
+            //  in the background and then offload it all to the Main Thread for rendering
+            + Dispatchers.Main
+         )
 
     // Storing a reference to a UiGameSnap is generally a bad idea as it becomes invalid when the game loop
     // rolls over, but we only use the replay during setting up the UI. After that, we should have all consumers
