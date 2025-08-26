@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.state.ManualActionProvider
 
@@ -17,5 +18,11 @@ import com.jervisffb.ui.game.state.ManualActionProvider
  * for the given fields.
  */
 interface FieldActionDecorator<T: GameActionDescriptor> {
-    fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: T)
+    fun decorate(
+        actionProvider: ManualActionProvider,
+        state: Game,
+        snapshot: UiGameSnapshot,
+        descriptor: T,
+        owner: Team?
+    )
 }

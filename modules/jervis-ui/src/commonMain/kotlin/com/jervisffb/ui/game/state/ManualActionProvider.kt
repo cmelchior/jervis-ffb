@@ -24,6 +24,7 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
+import com.jervisffb.engine.actions.SelectDogout
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
@@ -50,6 +51,7 @@ import com.jervisffb.ui.game.state.decorators.EndTurnDecorator
 import com.jervisffb.ui.game.state.decorators.FieldActionDecorator
 import com.jervisffb.ui.game.state.decorators.SelectBlockTypeDecorator
 import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
+import com.jervisffb.ui.game.state.decorators.SelectDogoutDecorator
 import com.jervisffb.ui.game.state.decorators.SelectFieldLocationDecorator
 import com.jervisffb.ui.game.state.decorators.SelectMoveTypeDecorator
 import com.jervisffb.ui.game.state.decorators.SelectPlayerActionDecorator
@@ -62,6 +64,7 @@ import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
+import kotlin.to
 
 /**
  * Class responsible for enhancing the UI, so it is able to create a [GameAction].
@@ -97,23 +100,23 @@ open class ManualActionProvider(
         // is SelectBlockType -> TODO()
         // SelectCoinSide -> TODO()
         // is SelectDicePoolResult -> TODO()
-        // SelectDogout -> TODO()
         // is SelectInducement -> TODO()
         // is SelectNoReroll -> TODO()
         // is SelectRandomPlayers -> TODO()
         // is SelectRerollOption -> TODO()
         // is SelectSkill -> TODO()
         // TossCoin -> TODO()
-        DeselectPlayer::class to DeselectPlayerDecorator(),
-        EndActionWhenReady::class to EndActionDecorator(),
-        EndSetupWhenReady::class to EndSetupDecorator(),
-        EndTurnWhenReady::class to EndTurnDecorator(),
-        SelectBlockType::class to SelectBlockTypeDecorator(),
-        SelectDirection::class to SelectDirectionDecorator(),
-        SelectFieldLocation::class to SelectFieldLocationDecorator(),
-        SelectMoveType::class to SelectMoveTypeDecorator(),
-        SelectPlayer::class to SelectPlayerDecorator(),
-        SelectPlayerAction::class to SelectPlayerActionDecorator(),
+        DeselectPlayer::class to DeselectPlayerDecorator,
+        EndActionWhenReady::class to EndActionDecorator,
+        EndSetupWhenReady::class to EndSetupDecorator,
+        EndTurnWhenReady::class to EndTurnDecorator,
+        SelectBlockType::class to SelectBlockTypeDecorator,
+        SelectDirection::class to SelectDirectionDecorator,
+        SelectDogout::class to SelectDogoutDecorator,
+        SelectFieldLocation::class to SelectFieldLocationDecorator,
+        SelectMoveType::class to SelectMoveTypeDecorator,
+        SelectPlayer::class to SelectPlayerDecorator,
+        SelectPlayerAction::class to SelectPlayerActionDecorator,
     )
 
     override fun startHandler() {
@@ -276,7 +279,7 @@ open class ManualActionProvider(
         request.actions.forEach { descriptor ->
             val decorator = getDecorator(descriptor::class)
             if (decorator != null) {
-                decorator.decorate(this, state, snapshot, descriptor)
+                decorator.decorate(this, state, snapshot, descriptor, request.team)
             } else {
                 // Any action that isn't being mapped to an UI component needs to go here.
                 // This way, we ensure that the UI is never blocked during development.

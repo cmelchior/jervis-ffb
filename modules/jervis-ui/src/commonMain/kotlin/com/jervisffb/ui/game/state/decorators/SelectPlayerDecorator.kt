@@ -3,6 +3,7 @@ package com.jervisffb.ui.game.state.decorators
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
@@ -13,8 +14,14 @@ import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.calculateAssumedNoOfBlockDice
 
-class SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
-    override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectPlayer) {
+object SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
+    override fun decorate(
+        actionProvider: ManualActionProvider,
+        state: Game,
+        snapshot: UiGameSnapshot,
+        descriptor: SelectPlayer,
+        owner: Team?
+    ) {
         descriptor.players.forEach { player ->
             val selectedAction = {
                 actionProvider.userActionSelected(PlayerSelected(player))

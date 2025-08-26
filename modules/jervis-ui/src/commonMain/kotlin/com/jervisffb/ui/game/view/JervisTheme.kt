@@ -92,6 +92,8 @@ object JervisTheme {
             blurRadius = 2f
         )
     )
+    // Green background for squares that has an action associated with it.
+    val availableActionBackground = Color.Green.copy(alpha = 0.25f)
     
     // Blue shades
     val darkBlue = Color(0xFF0B5598)

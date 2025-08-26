@@ -89,6 +89,13 @@ class SidebarViewModel(
         Pair(it, list)
     }.shareIn(menuViewModel.backgroundContext, SharingStarted.Lazily)
 
+    fun dogoutAction(): Flow<(() -> Unit)?> = uiState.uiStateFlow.map {
+        when (team.isHomeTeam()) {
+            true -> it.homeDogoutOnClickAction
+            false -> it.awayDogoutOnClickAction
+        }
+    }
+
     // Player being hovered over.
     // All of these will be shown on the away team location, except when hovering over
     // the away team dugout, which should be shown in the home team

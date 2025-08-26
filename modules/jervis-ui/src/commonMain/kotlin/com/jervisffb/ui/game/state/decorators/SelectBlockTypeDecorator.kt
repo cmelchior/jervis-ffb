@@ -3,6 +3,7 @@ package com.jervisffb.ui.game.state.decorators
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -16,8 +17,14 @@ import com.jervisffb.ui.game.view.ContextMenuOption
 
 // When a target for the block has been selected, show the context menu for the kind of block
 // to perform.
-class SelectBlockTypeDecorator: FieldActionDecorator<SelectBlockType> {
-    override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectBlockType) {
+object SelectBlockTypeDecorator: FieldActionDecorator<SelectBlockType> {
+    override fun decorate(
+        actionProvider: ManualActionProvider,
+        state: Game,
+        snapshot: UiGameSnapshot,
+        descriptor: SelectBlockType,
+        owner: Team?
+    ) {
         val blockContext = state.getContextOrNull<BlockActionContext>()
         val blitzContext = state.getContextOrNull<BlitzActionContext>()
         val multipleBlockContext = state.getContextOrNull<MultipleBlockContext>()

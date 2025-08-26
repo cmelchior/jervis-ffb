@@ -1,6 +1,7 @@
 package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayer
 import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
+import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
 import kotlinx.coroutines.flow.Flow
 
@@ -43,7 +45,14 @@ fun Sidebar(
     vm: SidebarViewModel,
     modifier: Modifier,
 ) {
-    Box(modifier = Modifier, contentAlignment = Alignment.TopCenter) {
+    val sidebarAction by vm.dogoutAction().collectAsState(null)
+    Box(
+        modifier = Modifier
+            .applyIf(sidebarAction != null) {
+                clickable { sidebarAction?.invoke() }.background(JervisTheme.availableActionBackground)
+            },
+        contentAlignment = Alignment.TopCenter
+    ) {
         // Side bar content
         Column(modifier = Modifier) {
             // Dogout + player stats

@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
@@ -18,7 +19,7 @@ import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.view.ContextMenuOption
 
-class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
+object SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
 
     // Actions we allow to skip manually selecting Stand Up
     val eligibleActions = setOf(
@@ -30,7 +31,13 @@ class SelectMoveTypeDecorator: FieldActionDecorator<SelectMoveType> {
         PlayerStandardActionType.THROW_TEAM_MATE
     )
 
-    override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectMoveType) {
+    override fun decorate(
+        actionProvider: ManualActionProvider,
+        state: Game,
+        snapshot: UiGameSnapshot,
+        descriptor: SelectMoveType,
+        owner: Team?
+    ) {
         descriptor.types.forEach {
             handleType(actionProvider, state, snapshot, it)
         }

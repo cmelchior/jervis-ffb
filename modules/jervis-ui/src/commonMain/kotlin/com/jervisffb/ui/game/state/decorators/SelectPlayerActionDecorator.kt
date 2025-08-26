@@ -8,6 +8,7 @@ import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.SelectPlayerAction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.PlayerSpecialActionType
@@ -19,8 +20,14 @@ import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.ContextMenuOption
 
-class SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
-    override fun decorate(actionProvider: ManualActionProvider, state: Game, snapshot: UiGameSnapshot, descriptor: SelectPlayerAction) {
+object SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
+    override fun decorate(
+        actionProvider: ManualActionProvider,
+        state: Game,
+        snapshot: UiGameSnapshot,
+        descriptor: SelectPlayerAction,
+        owner: Team?
+    ) {
         // TODO Fix this, so we do not update each square multiple times
         descriptor.actions.forEach {
             addActionToContextMenu(actionProvider, state, snapshot, it)

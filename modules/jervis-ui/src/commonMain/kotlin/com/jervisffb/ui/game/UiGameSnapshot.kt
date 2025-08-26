@@ -1,5 +1,8 @@
 package com.jervisffb.ui.game
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.fsm.ProcedureStack
@@ -136,8 +139,12 @@ class UiGameSnapshot(
     val homeTeamActions = mutableListOf<ButtonData>()
     val awayTeamActions = mutableListOf<ButtonData>()
 
-    // Attach actions to players found in the dogout
+    // Attach actions to players found in the dugout
     val dogoutActions: MutableMap<PlayerId, () -> Unit> = mutableMapOf()
+
+    // onClick action for the dugout. `dogoutActions` take precedence over this action
+    var homeDogoutOnClickAction: (() -> Unit)? by mutableStateOf(null)
+    var awayDogoutOnClickAction: (() -> Unit)? by mutableStateOf(null)
 
     // If set, it means we are in the middle of a move action that allows the player
     // to move multiple squares.
