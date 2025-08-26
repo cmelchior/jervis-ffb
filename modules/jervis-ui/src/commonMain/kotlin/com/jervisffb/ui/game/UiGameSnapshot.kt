@@ -3,6 +3,7 @@ package com.jervisffb.ui.game
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.fsm.ProcedureStack
@@ -70,17 +71,35 @@ class UiTeamInfoUpdate(
     }
 }
 
+// The UiGameStatusUpdate will be updated during an iteration of the game loop, so all fields
+// must be mutableState to trigger updates correctly.
 class UiGameStatusUpdate(
-    var half: Int,
-    var drive: Int,
-    var turnMax: Int,
-    val homeTeamInfo: UiTeamInfoUpdate,
-    val awayTeamInfo: UiTeamInfoUpdate,
-    var centerBadgeText: String,
-    var centerBadgeAction: (() -> Unit)?,
-    var badgeSubButtons: MutableList<ButtonData>,
-    val actionButtons: MutableList<ButtonData>,
+    half: Int,
+    drive: Int,
+    turnMax: Int,
+    homeTeamInfo: UiTeamInfoUpdate,
+    awayTeamInfo: UiTeamInfoUpdate,
+    centerBadgeText: String,
+    centerBadgeAction: (() -> Unit)?,
+    badgeSubButtons: MutableList<ButtonData>,
+    actionButtons: MutableList<ButtonData>,
 ) {
+
+    var half: Int by mutableStateOf(half)
+    var drive: Int by mutableStateOf(drive)
+    var turnMax: Int by mutableStateOf(turnMax)
+    val homeTeamInfo: UiTeamInfoUpdate = homeTeamInfo
+    val awayTeamInfo: UiTeamInfoUpdate = awayTeamInfo
+    var centerBadgeText: String by mutableStateOf(centerBadgeText)
+    var centerBadgeAction: (() -> Unit)? by mutableStateOf(centerBadgeAction)
+    val badgeSubButtons: SnapshotStateList<ButtonData> = SnapshotStateList()
+    val actionButtons: SnapshotStateList<ButtonData> = SnapshotStateList()
+
+    init {
+        badgeSubButtons.addAll(badgeSubButtons)
+        actionButtons.addAll(actionButtons)
+    }
+
     constructor(game: Game) : this(
         half = game.halfNo,
         drive = game.driveNo,
