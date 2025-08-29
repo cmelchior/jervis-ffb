@@ -100,6 +100,7 @@ kotlin {
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.coroutines)
                 implementation(libs.bundles.voyager)
+                implementation(libs.kotlinx.collections.immutable)
                 implementation(libs.jsonserialization)
                 implementation(compose.components.resources)
                 implementation(compose.runtime)

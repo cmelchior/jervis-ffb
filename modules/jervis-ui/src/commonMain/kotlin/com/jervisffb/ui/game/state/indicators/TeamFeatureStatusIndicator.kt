@@ -4,7 +4,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.UiTeamFeature
 import com.jervisffb.ui.game.UiTeamFeatureType
 import com.jervisffb.ui.game.UiTeamInfoUpdate
@@ -19,23 +19,28 @@ import com.jervisffb.ui.game.UiTeamInfoUpdate
  */
 object TeamFeatureStatusIndicator: FieldStatusIndicator {
     override fun decorate(
-        uiSnapshot: UiGameSnapshot,
         node: ActionNode,
         state: Game,
-        request: ActionRequest
+        request: ActionRequest,
+        acc: UiSnapshotAccumulator
     ) {
-        // Setup team apothecaries
-        configureTeamFeatures(state.homeTeam, uiSnapshot.gameStatus.homeTeamInfo)
-        configureTeamFeatures(state.awayTeam, uiSnapshot.gameStatus.awayTeamInfo)
+        acc.updateTeamInfo(state.homeTeam) { team, teamInfo ->
+            configureTeamFeatures(team, teamInfo)
+        }
+        acc.updateTeamInfo(state.awayTeam) { team, teamInfo ->
+            configureTeamFeatures(team, teamInfo)
+        }
     }
 
-    private fun configureTeamFeatures(team: Team, teamInfo: UiTeamInfoUpdate) {
+    private fun configureTeamFeatures(team: Team, teamInfo: UiTeamInfoUpdate): UiTeamInfoUpdate {
         val availableTeamApothecaries = team.teamApothecaries.count { !it.used }
-        teamInfo.featureList.add(UiTeamFeature(
-            name = "Team Apothecary",
-            value = availableTeamApothecaries,
-            type = UiTeamFeatureType.APOTHECARY,
-            used = false
-        ))
+        return teamInfo.copy(
+            featureList = teamInfo.featureList.add(UiTeamFeature(
+                name = "Team Apothecary",
+                value = availableTeamApothecaries,
+                type = UiTeamFeatureType.APOTHECARY,
+                used = false
+            ))
+        )
     }
 }

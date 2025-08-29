@@ -4,20 +4,24 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 
 object EndSetupDecorator : FieldActionDecorator<EndSetupWhenReady> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,
-        snapshot: UiGameSnapshot,
         descriptor: EndSetupWhenReady,
-        owner: Team?
+        owner: Team?,
+        acc: UiSnapshotAccumulator
     ) {
 //        if (snapshot.actionsRequest.team?.isHomeTeam() == true) {
-        snapshot.gameStatus.centerBadgeText = "End Setup"
-        snapshot.gameStatus.centerBadgeAction = { actionProvider.userActionSelected(EndSetup) }
+        acc.updateGameStatus {
+            it.copy(
+                centerBadgeText = "End Setup",
+                centerBadgeAction = { actionProvider.userActionSelected(EndSetup) }
+            )
+        }
 //            snapshot.homeTeamActions.add(
 //                ButtonData(
 //                    "End Setup",

@@ -3,7 +3,7 @@ package com.jervisffb.ui.game.state.indicators
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 
 /**
  * Numbers on the squares indicating how many move steps were used to reach
@@ -11,13 +11,15 @@ import com.jervisffb.ui.game.UiGameSnapshot
  */
 object MoveUsedStatusIndicator: FieldStatusIndicator {
     override fun decorate(
-        uiSnapshot: UiGameSnapshot,
         node: ActionNode,
         state: Game,
-        request: ActionRequest
+        request: ActionRequest,
+        acc: UiSnapshotAccumulator
     ) {
-        uiSnapshot.uiIndicators.getAllMoveUsed().forEach { (coordinate, moveUsed) ->
-            uiSnapshot.fieldSquares[coordinate]?.moveUsed = moveUsed
+        acc.getAllMoveUsed().forEach { (coordinate, moveUsed) ->
+            acc.updateSquare(coordinate) {
+                it.copy(moveUsed = moveUsed)
+            }
         }
     }
 }

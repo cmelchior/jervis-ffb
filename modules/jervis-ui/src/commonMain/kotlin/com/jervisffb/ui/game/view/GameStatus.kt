@@ -103,7 +103,7 @@ import kotlin.math.tan
 
 // Game Status Layout that is compatible with a Game Screen layout for a Blood Bowl 3 inspired layout
 @Composable
-fun GameStatusV2(
+fun GameStatus(
     vm: GameStatusViewModel,
     modifier: Modifier,
 ) {
@@ -138,7 +138,7 @@ fun GameStatusV2(
                     JervisTheme.rulebookRed,
                     vm.controller.state.activeTeam?.isHomeTeam() == true
                 )
-                ScoreCounter(Modifier.padding(top = topPadding), progress, angle, statusBoxWidth)
+                ScoreCounter(Modifier.padding(top = topPadding), progress, homeTeamInfo, awayTeamInfo, angle, statusBoxWidth)
                 TurnTracker(
                     modifier = Modifier.padding(top = topPadding),
                     angle = angle, progress.turnMax,
@@ -371,6 +371,8 @@ private fun RowScope.TurnTracker(
 private fun ScoreCounter(
     modifier: Modifier,
     progress: UiGameStatusUpdate,
+    homeTeamInfo: UiTeamInfoUpdate,
+    awayTeamInfo: UiTeamInfoUpdate,
     angle: Float = 5f,
     statusBoxWidth: Dp
 ) {
@@ -393,7 +395,7 @@ private fun ScoreCounter(
             modifier = Modifier.padding(start = smallPadding).width(counterWidth).height(counterHeight),
         ) {
             Text(
-                text = "${progress.homeTeamInfo.score}",
+                text = "${homeTeamInfo.score}",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 lineHeight = 1.sp,
@@ -408,7 +410,7 @@ private fun ScoreCounter(
             modifier = Modifier.padding(end = smallPadding).width(counterWidth).height(counterHeight),
         ) {
             Text(
-                text = "${progress.awayTeamInfo.score}",
+                text = "${awayTeamInfo.score}",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 lineHeight = 1.sp,

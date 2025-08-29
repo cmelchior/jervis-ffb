@@ -3,6 +3,8 @@ package com.jervisffb.ui.utils
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
@@ -19,7 +21,9 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -190,6 +194,14 @@ fun Modifier.onClickWithSmallDragControl(
     }
 }
 
+/**
+ * Modifier that sets the size of the Composable using pixel values.
+ */
+fun Modifier.pixelSize(size: IntSize) =
+    this.layout { measurable, _ ->
+        val placeable = measurable.measure(Constraints.fixed(size.width, size.height))
+        layout(size.width, size.height) { placeable.place(0, 0) }
+    }
 
 // Copy from ChatGPT, so requires a more thorough review
 private fun rgbToHsl(r: Float, g: Float, b: Float): FloatArray {

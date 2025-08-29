@@ -42,7 +42,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.Stand
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
 import com.jervisffb.ui.game.state.decorators.DeselectPlayerDecorator
 import com.jervisffb.ui.game.state.decorators.EndActionDecorator
@@ -150,7 +150,7 @@ open class ManualActionProvider(
         }
     }
 
-    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
+    override fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator) {
         availableActions = actions
         if (queuedActions.isNotEmpty()) return
         if (automatedAction != null) return
@@ -170,27 +170,29 @@ open class ManualActionProvider(
         }
 
         if (showActionDecorators) {
-            addModalDialogDecorators(this, state, actions)
+            addModalDialogDecorators(this, acc, actions)
 
             // If a dialog is being shown, we do not want to enable any other kind of input until
             // the dialog has been resolved.
-            if (state.dialogInput == null) {
-                addNonDialogActionDecorators(state, actions)
+            if (acc.dialogInput == null) {
+                addNonDialogActionDecorators(acc, actions)
             }
 
             // Check for the context menu. The context menu is not considered a modal dialog, so is
             // added during `addNonDialogActionDecorators()`. Thus we need to check for it here.
             // TODO This is probably the wrong architecture as we can have multiple menus like during
-            state.fieldSquares.values.firstOrNull { it.contextMenuOptions.isNotEmpty() }?.let {
-                state.dialogInput = it.createActionWheelContextMenu()
+            acc.squares.values.firstOrNull { it.contextMenuOptions.isNotEmpty() }?.let {
+                acc.dialogInput = it.createActionWheelContextMenu(game.state)
             }
 
-            state.dialogInput?.let { dialog ->
+            acc.dialogInput?.let { dialog ->
                 if (dialog is ActionWheelInputDialog) {
                     val square = dialog.viewModel.center
                     if (square != null) {
-                        state.fieldSquares[square]?.apply {
-                            this.player?.isActionWheelFocus = true
+                        acc.updateSquare(square) {
+                            it.copy(
+                                isActionWheelFocus = true
+                            )
                         }
                     }
                 }
@@ -198,7 +200,7 @@ open class ManualActionProvider(
         }
     }
 
-    override fun decorateSelectedAction(state: UiGameSnapshot, action: GameAction) {
+    override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
         // Do nothing (for now)
     }
 
@@ -254,7 +256,7 @@ open class ManualActionProvider(
      * to create a [GameAction]. If yes, the data needed to build the dialog is added
      * to the UI state.
      */
-    private fun addModalDialogDecorators(provider: UiActionProvider, state: UiGameSnapshot, actions: ActionRequest) {
+    private fun addModalDialogDecorators(provider: UiActionProvider, state: UiSnapshotAccumulator, actions: ActionRequest) {
         val dialogData = DialogFactory.createDialogIfPossible(
             game,
             actions,
@@ -274,17 +276,17 @@ open class ManualActionProvider(
      */
     // TODO Should probably refactor this so every case is in its own function. Perhaps move to a separate
     //  class to make it more explicit?
-    private fun addNonDialogActionDecorators(snapshot: UiGameSnapshot, request: ActionRequest) {
-        val state = snapshot.game
+    private fun addNonDialogActionDecorators(acc: UiSnapshotAccumulator, request: ActionRequest) {
+        val state = acc.game
         request.actions.forEach { descriptor ->
             val decorator = getDecorator(descriptor::class)
             if (decorator != null) {
-                decorator.decorate(this, state, snapshot, descriptor, request.team)
+                decorator.decorate(this, state, descriptor, request.team, acc)
             } else {
                 // Any action that isn't being mapped to an UI component needs to go here.
                 // This way, we ensure that the UI is never blocked during development.
                 // In an ideal world, nothing should ever go here.
-                snapshot.unknownActions.addAll(mapUnknownAction(descriptor))
+                mapUnknownAction(descriptor).forEach { acc.addUnknownAction(it) }
             }
         }
 
@@ -295,10 +297,13 @@ open class ManualActionProvider(
         // Otherwise, it means that the player is in the middle of their action and we should
         // not show the context menu up front. That should be up to the player
         state.activePlayer?.location?.let { activePlayerLocation ->
-            val square = snapshot.fieldSquares[activePlayerLocation]
-            if (square != null && square.contextMenuOptions.isNotEmpty() && square.contextMenuOptions.count { it.title == "End action" } == 0) {
-                snapshot.fieldSquares[activePlayerLocation as FieldCoordinate]?.apply {
-                    showContextMenu.value = true
+            acc.updateSquare(activePlayerLocation as FieldCoordinate) {
+                if (it.contextMenuOptions.isNotEmpty() && it.contextMenuOptions.none { it.title == "End action" }) {
+                    it.copy(
+                        showContextMenu = true
+                    )
+                } else {
+                    it
                 }
             }
         }

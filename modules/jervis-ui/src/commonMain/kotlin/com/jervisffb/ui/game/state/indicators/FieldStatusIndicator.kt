@@ -3,7 +3,7 @@ package com.jervisffb.ui.game.state.indicators
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.decorators.FieldActionDecorator
 
 /**
@@ -17,9 +17,9 @@ import com.jervisffb.ui.game.state.decorators.FieldActionDecorator
  */
 interface FieldStatusIndicator {
     fun decorate(
-        uiSnapshot: UiGameSnapshot,
         node: ActionNode,
         state: Game,
-        request: ActionRequest
+        request: ActionRequest,
+        acc: UiSnapshotAccumulator
     )
 }

@@ -6,7 +6,7 @@ import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ReplayActionProvider
 import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.Setups
@@ -21,13 +21,15 @@ import com.jervisffb.ui.menu.TeamActionMode
  */
 object TeamSetupsAvailableStatusIndicator: FieldStatusIndicator {
     override fun decorate(
-        uiSnapshot: UiGameSnapshot,
         node: ActionNode,
         state: Game,
-        request: ActionRequest
+        request: ActionRequest,
+        acc: UiSnapshotAccumulator
     ) {
-        val actions = createBadgeActions(uiSnapshot)
-        uiSnapshot.gameStatus.badgeSubButtons.addAll(actions)
+        val actions = createBadgeActions(acc)
+        acc.updateGameStatus {
+            it.copy(badgeSubButtons = it.badgeSubButtons.addAll(actions))
+        }
     }
 
     private fun isTeamHumanAndControlledByClient(team: Team, mustBeHomeTeam: Boolean): Boolean {
@@ -38,15 +40,11 @@ object TeamSetupsAvailableStatusIndicator: FieldStatusIndicator {
         }
     }
 
-    private fun createBadgeActions(uiSnapshot: UiGameSnapshot): List<ButtonData> {
+    private fun createBadgeActions(uiSnapshot: UiSnapshotAccumulator): List<ButtonData> {
         // TODO Find a better way to detect game mode
         if (uiSnapshot.uiController.actionProvider is ReplayActionProvider) return emptyList()
         val state = uiSnapshot.uiController.state
         val buttons = mutableListOf<ButtonData>()
-
-        // TODO Can both teams add actions here? I don't think so
-        buttons.addAll(uiSnapshot.homeTeamActions)
-        buttons.addAll(uiSnapshot.awayTeamActions)
 
         // Check if this team is during the setup phase. For now, we just hard-code a few examples
         // This is mostly for WASM, iOS as JVM has a proper menu bar. This should be reworked

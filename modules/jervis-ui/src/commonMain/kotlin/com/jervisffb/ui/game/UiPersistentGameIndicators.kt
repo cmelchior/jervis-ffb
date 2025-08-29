@@ -15,7 +15,7 @@ data class BloodSpot(val coordinate: FieldCoordinate, val injury: CasualtyResult
  * model changes, but arent't tracked by the rules engine. Some examples being
  * blood spots after injuries and showing where a player moved during their move.
  */
-class UiGameIndicators {
+class UiPersistentGameIndicators {
 
     // State used to track UI decorators for things that are not tracked
     // in the rules engine layer.
@@ -24,7 +24,7 @@ class UiGameIndicators {
     private val blodspots: MutableMap<FieldCoordinate, BloodSpot> = mutableMapOf()
 
     private var usedMoveToStandUp: Int? = null
-    private val movesUsed: MutableList<MoveUsed> = mutableListOf()
+    val movesUsed: MutableList<MoveUsed> = mutableListOf() // TODO Probably shouldn't be public
 
     // Track when standing up, so we can adjust showing "Move Used" decorator
     fun addMoveUsedToStandUp(move: Int) {

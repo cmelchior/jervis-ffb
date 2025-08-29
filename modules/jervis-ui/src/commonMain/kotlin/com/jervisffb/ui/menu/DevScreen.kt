@@ -49,7 +49,7 @@ import com.jervisffb.ui.createDefaultAwayTeam
 import com.jervisffb.ui.createDefaultBB7AwayTeam
 import com.jervisffb.ui.createDefaultBB7HomeTeam
 import com.jervisffb.ui.createDefaultHomeTeam
-import com.jervisffb.ui.game.LocalActionProvider
+import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.state.ReplayActionProvider

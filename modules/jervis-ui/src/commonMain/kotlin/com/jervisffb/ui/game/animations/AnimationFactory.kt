@@ -35,7 +35,6 @@ import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_
 import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_sweltering_heat
 import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_timeout
 import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_very_sunny
-import com.jervisffb.ui.game.UiGameSnapshot
 
 /**
  * Class responsible for detecting if an animation should be run, and which one.
@@ -62,9 +61,9 @@ object AnimationFactory {
      * Return animation being run after the UI has been updated to the latest state,
      * but before action decorators are used.
      */
-    fun getFrameAnimation(snapshot: UiGameSnapshot, rules: Rules): JervisAnimation? {
-        val state = snapshot.game
-        val stack = snapshot.stack
+    fun getFrameAnimation(state: Game, rules: Rules): JervisAnimation? {
+        val state = state
+        val stack = state.stack
 
         // Animate kick-off
         // We want to animate the kick-off (ball flying) after the kick-off event has been resolved.

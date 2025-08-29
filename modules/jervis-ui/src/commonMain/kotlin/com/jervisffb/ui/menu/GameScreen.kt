@@ -251,10 +251,10 @@ private fun GameDrawerContent(
 
             DrawerSectionHeader("Developer Tools")
             val currentNodeDescription: String = remember(uiState) {
-                uiState?.uiController?.gameController?.let {
+                uiState?.stack?.let {
                     with(it) {
-                        val procedure = currentProcedure() ?: return@let "null"
-                        val currentNode = currentNode() ?: return@let "${procedure.name()}[<null>]"
+                        val procedure = it.peepOrNull() ?: return@let "null"
+                        val currentNode = it.currentProcedure()?.currentNode() ?: return@let "${procedure.name()}[<null>]"
                         "${procedure.name()}[${currentNode.name()}]"
                     }
                 } ?: "Unknown"
@@ -277,7 +277,7 @@ private fun GameDrawerContent(
             }
             Row(modifier = Modifier.fillMaxWidth().background(JervisTheme.rulebookPaperMediumDark).padding(vertical = 8.dp)) {
                 val actionOwner = remember(uiState) {
-                    uiState?.actionsRequest?.team?.name ?: "Both"
+                    uiState?.actionOwner?.name ?: "Both"
                 }
                 Text(
                     text = "Action Owner:",

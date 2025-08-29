@@ -46,7 +46,6 @@ import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.circle.CoinMenuItem
 import com.jervisffb.ui.game.icons.IconFactory
-import com.jervisffb.ui.game.view.JervisTheme.buttonColor
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.FieldViewData
@@ -282,11 +281,10 @@ fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog:
             data.offset
         }
     }
-    if (!dialog.viewModel.shown.value) return
+    if (!dialog.viewModel.isVisible()) return
     val dismissRequest = remember(wheelViewModel.hideOnClickedOutside, wheelViewModel.onMenuHidden) {
         { userDismissed: Boolean -> // `true` if the user clicked outside a button (to hide the wheel)
             if (userDismissed && dialog.viewModel.hideOnClickedOutside) {
-                dialog.viewModel.shown.value = false
                 wheelViewModel.hideWheel(false)
             }
         }

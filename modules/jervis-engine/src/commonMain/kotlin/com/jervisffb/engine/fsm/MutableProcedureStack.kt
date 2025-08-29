@@ -76,6 +76,11 @@ class MutableProcedureStack {
     fun peepOrNull(): MutableProcedureState? = history.lastOrNull()
 
     /**
+     * Returns the current active [MutableProcedureState] (if any).
+     */
+    fun currentProcedure(): MutableProcedureState? = peepOrNull()
+
+    /**
      * Returns `true` if the given [Procedure] is part of the current stack.
      */
     fun containsProcedure(procedure: Procedure): Boolean {

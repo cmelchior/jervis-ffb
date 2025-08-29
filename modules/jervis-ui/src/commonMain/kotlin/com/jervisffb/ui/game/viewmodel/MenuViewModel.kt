@@ -67,7 +67,7 @@ class MenuViewModel {
     val creditData: CreditData
 
     // Scope for lauching tasks directly related to navigating the UI
-    val uiScope = CoroutineScope(CoroutineName("UI") + Dispatchers.Main)
+    val uiScope = CoroutineScope(CoroutineName("UI") + Dispatchers.Default)
     val navigatorContext = CoroutineScope(CoroutineName("ScreenNavigator") + singleThreadDispatcher("menuThread"))
     // Scope for launching background tasks for Menu actions
     val backgroundContext = CoroutineScope(CoroutineName("ScreenBackground") + multiThreadDispatcher("menuBackgroundThread"))

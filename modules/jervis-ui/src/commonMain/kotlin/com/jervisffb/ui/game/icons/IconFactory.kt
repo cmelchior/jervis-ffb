@@ -33,8 +33,6 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.isOnHomeTeam
-import com.jervisffb.engine.rules.common.roster.Position
-import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteLocation
@@ -77,7 +75,7 @@ import com.jervisffb.jervis_ui.generated.resources.jervis_icon_team_reroll
 import com.jervisffb.jervis_ui.generated.resources.jervis_inducement_apothercary
 import com.jervisffb.jervis_ui.generated.resources.jervis_inducement_keg
 import com.jervisffb.ui.CacheManager
-import com.jervisffb.ui.game.model.UiPlayer
+import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.FieldDetails
 import com.jervisffb.ui.loadFileAsImage
@@ -199,7 +197,7 @@ object IconFactory {
         get() = density.density.toInt()
     private lateinit var density: Density
 
-    private val cachedPlayers: MutableMap<Player, PlayerSprite> = mutableMapOf()
+    private val cachedPlayers: MutableMap<PlayerId, PlayerSprite> = mutableMapOf()
     // Map from resource "path" to loaded in-memory image
     private val cachedImages: MutableMap<String, ImageBitmap> = mutableMapOf()
     private val cachedPortraits: MutableMap<PlayerId, ImageBitmap> = mutableMapOf()
@@ -522,7 +520,7 @@ object IconFactory {
     private suspend fun saveTeamPlayerImagesToCache(team: Team) {
         team.forEach { player ->
             val playerSprite = createPlayerSprite(player, player.isOnHomeTeam())
-            cachedPlayers[player] = playerSprite
+            cachedPlayers[player.id] = playerSprite
             val portrait = player.icon?.portrait ?: SingleSprite.embedded("jervis/portraits/default_portrait.png")
             val portraitImage = when (portrait.type) {
                 SpriteLocation.EMBEDDED -> loadImageFromResources(portrait.resource)
@@ -534,17 +532,13 @@ object IconFactory {
         }
     }
 
-    fun getPlayerIcon(player: UiPlayer): ImageBitmap {
-        val isHomeTeam: Boolean = player.isOnHomeTeam
-        val roster: Roster = player.model.team.roster
-        val playerType: Position = player.position
+    fun getPlayerIcon(player: UiFieldPlayer): ImageBitmap {
         val isActive = player.isActive
-
-        if (cachedPlayers.contains(player.model)) {
+        if (cachedPlayers.contains(player.id)) {
             return if (isActive) {
-                cachedPlayers[player.model]!!.active
+                cachedPlayers[player.id]!!.active
             } else {
-                cachedPlayers[player.model]!!.default
+                cachedPlayers[player.id]!!.default
             }
         } else {
             error("Could not find: $player")
@@ -764,7 +758,7 @@ object IconFactory {
                 extractSprites(image, sprite.variants, sprite.selectedIndex ?: 0, isOnHomeTeam)
             }
         }
-        cachedPlayers[player] = sprite
+        cachedPlayers[player.id] = sprite
         return sprite
     }
 

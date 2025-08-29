@@ -19,7 +19,7 @@ import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
@@ -55,11 +55,11 @@ class RandomActionProvider(
         this.actions = controller.getAvailableActions()
     }
 
-    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
+    override fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator) {
         // Do nothing
     }
 
-    override fun decorateSelectedAction(state: UiGameSnapshot, action: GameAction) {
+    override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
         // Do nothing
     }
 

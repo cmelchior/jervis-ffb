@@ -3,7 +3,6 @@ package com.jervisffb.ui.game
 import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameDelta
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.GameSettings
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.MoveType
@@ -12,19 +11,17 @@ import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayer
+import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.InvalidActionException
-import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.animations.AnimationFactory
 import com.jervisffb.ui.game.animations.JervisAnimation
+import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
-import com.jervisffb.ui.game.model.UiPlayer
-import com.jervisffb.ui.game.state.QueuedActionsGenerator
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.state.indicators.BallCarriedStatusIndicator
 import com.jervisffb.ui.game.state.indicators.BallExitStatusIndicator
@@ -38,96 +35,21 @@ import com.jervisffb.ui.game.state.indicators.TeamRerollStatusIndicator
 import com.jervisffb.ui.game.state.indicators.TeamSetupsAvailableStatusIndicator
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.TeamActionMode
+import com.jervisffb.ui.utils.FrameRateAverager
 import com.jervisffb.utils.jervisLogger
 import com.jervisffb.utils.singleThreadDispatcher
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-
-// For games fully controlled locally. This wraps home and away providers.
-// Rules concerning timers are also handled here.
-class LocalActionProvider(
-    private val engine: GameEngineController,
-    private val settings: GameSettings,
-    private val homeProvider: UiActionProvider,
-    private val awayProvider: UiActionProvider,
-): UiActionProvider() {
-
-    private var currentProvider = homeProvider
-
-    private var actionJob: Job? = null
-
-    override fun startHandler() {
-        homeProvider.startHandler()
-        awayProvider.startHandler()
-    }
-
-    override fun actionHandled(team: Team?, action: GameAction) {
-        homeProvider.actionHandled(team, action)
-        awayProvider.actionHandled(team, action)
-    }
-
-    override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
-        currentProvider = if (actions.team?.isAwayTeam() == true) {
-            awayProvider
-        } else {
-            homeProvider
-        }
-        currentProvider.prepareForNextAction(controller, actions)
-    }
-
-    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
-        currentProvider.decorateAvailableActions(state, actions)
-    }
-
-    override fun decorateSelectedAction(state: UiGameSnapshot, action: GameAction) {
-        currentProvider.decorateSelectedAction(state, action)
-    }
-
-    override suspend fun getAction(): GameAction {
-        val provider = currentProvider
-        // For now, disable timer actions as we need to implement timer infrastructure
-        // in the network protocol first
-        val timersEnabled = settings.timerSettings.timersEnabled && false
-        if (timersEnabled) {
-            @OptIn(DelicateCoroutinesApi::class)
-            actionJob = GlobalScope.launch(CoroutineName("ActionJob")) {
-                // TODO Need to figure out if we are using setup / turn / response timers and track it correctly
-                // delay(settings.timerSettings.turnFreeTime ?: settings.timerSettings.turnActionTime)
-                val action = createRandomAction(engine.state, engine.getAvailableActions())
-                provider.userActionSelected(action)
-            }
-        }
-        return provider.getAction().also {
-            actionJob?.cancel()
-        }
-    }
-
-    override fun userActionSelected(action: GameAction) {
-        currentProvider.userActionSelected(action)
-    }
-
-    override fun userMultipleActionsSelected(actions: List<GameAction>, delayEvent: Boolean) {
-        currentProvider.userMultipleActionsSelected(actions, delayEvent)
-    }
-
-    override fun registerQueuedActionGenerator(generator: QueuedActionsGenerator) {
-        currentProvider.registerQueuedActionGenerator(generator)
-    }
-
-    override fun hasQueuedActions(): Boolean {
-        return currentProvider.hasQueuedActions()
-    }
-}
 
 /**
  * This class is the main entry point for holding the UI game state. It acts
@@ -161,7 +83,7 @@ class UiGameController(
     val diceGenerator: DiceRollGenerator = UnsafeRandomDiceGenerator() // Used by UI to create random results. Should this be somewhere else?
 
     // Persistent UI decorations that needs to be stored across actions
-    val uiDecorations = UiGameIndicators()
+    val uiDecorations = UiPersistentGameIndicators()
     val fieldStatusIndicators: List<FieldStatusIndicator> = listOf(
         BallCarriedStatusIndicator,
         BallExitStatusIndicator,
@@ -183,7 +105,7 @@ class UiGameController(
             //  fixes it for now. But performance might be a problem. We need to find a performant way to run the game loop
             //  in the background and then offload it all to the Main Thread for rendering
             + Dispatchers.Main
-         )
+    )
 
     // Storing a reference to a UiGameSnap is generally a bad idea as it becomes invalid when the game loop
     // rolls over, but we only use the replay during setting up the UI. After that, we should have all consumers
@@ -218,6 +140,7 @@ class UiGameController(
         // when setting up everything.
         controller.startManualMode()
         actionProvider.startHandler()
+        val fpsCounter = FrameRateAverager()
 
         gameScope.launch {
 
@@ -231,7 +154,24 @@ class UiGameController(
             }
 
             // Run main game loop
-            var lastUiState: UiGameSnapshot? = null
+            var lastUiState = UiGameSnapshot(
+                actionOwner = null,
+                game = controller.state,
+                squares = persistentMapOf(),
+                players = persistentMapOf(),
+                freeBalls = emptyMap(),
+                status = UiGameStatusUpdate.INITIAL,
+                unknownActions = persistentListOf(),
+                homeDogoutOnClickAction = null,
+                awayDogoutOnClickAction = null,
+                dialogInput = null,
+                movesUsed = persistentListOf(),
+                weather = Weather.PERFECT_CONDITIONS,
+                homeTeamInfo = UiTeamInfoUpdate.INITIAL,
+                awayTeamInfo = UiTeamInfoUpdate.INITIAL,
+                pathFinder = null,
+            )
+
             while (!controller.stack.isEmpty()) {
 
                 // Read new model state
@@ -248,20 +188,22 @@ class UiGameController(
 
                 // Update UI State based on latest model state
                 actionProvider.prepareForNextAction(controller, actions)
-                val newUiState = createNewUiSnapshot(state, actions, delta, lastUiState)
-                applyUiIndicators(actions, state, newUiState)
-                _uiStateFlow.emit(newUiState)
+                val acc = UiSnapshotAccumulator(lastUiState, this@UiGameController)
+                addBaseGameStateChanges(state, actions, delta, acc)
+                applyUiIndicators(actions, state, acc)
+                _uiStateFlow.emit(acc.build())
 
                 // Detect animations and run them after updating the UI, but before making it ready
                 // for creating the user actions
-                runPostUpdateAnimations(newUiState)
+                runPostUpdateAnimations(state)
 
                 // TODO Just changing the existing uiState might not trigger recomposition correctly
                 //  We need an efficient way to copy the old one.
-                actionProvider.decorateAvailableActions(newUiState, actions)
-                lastUiState = newUiState
-                menuViewModel.updateUiState(newUiState)
-                _uiStateFlow.emit(newUiState)
+                actionProvider.decorateAvailableActions(actions, acc)
+                acc.build().let {
+                    menuViewModel.updateUiState(it)
+                    _uiStateFlow.emit(it)
+                }
 
                 // Wait for the system to produce the next action, this can either be
                 // automatically generated or come from the UI. Here we do not care where
@@ -270,15 +212,17 @@ class UiGameController(
 
                 // After an action was selected, run all decorators that modify
                 // the UI while the action is being processed.
-                actionProvider.decorateSelectedAction(newUiState, userAction)
-                _uiStateFlow.emit(newUiState)
+                actionProvider.decorateSelectedAction(userAction, acc)
+                val finalUiState = acc.build()
+                _uiStateFlow.emit(finalUiState)
 
                 // Then run any animations triggered by the action (but before the state is updated)
-                runPostActionAnimations(newUiState, userAction)
+                runPostActionAnimations(state, userAction)
 
                 // Last, send action to the Rules Engine for processing.
                 // This will start the next iteration of the game loop.
                 // TODO Add error handling here. What to do for invalid actions?
+                lastUiState = finalUiState
                 try {
                     gameController.handleAction(userAction)
                     actionProvider.actionHandled(actions.team, userAction)
@@ -294,10 +238,10 @@ class UiGameController(
         }
     }
 
-    private fun applyUiIndicators(actionRequest: ActionRequest, state: Game, snapshot: UiGameSnapshot) {
+    private fun applyUiIndicators(actionRequest: ActionRequest, state: Game, acc: UiSnapshotAccumulator) {
         val currentNode = state.stack.currentNode() as ActionNode
         fieldStatusIndicators.forEach { indicator ->
-            indicator.decorate(snapshot, currentNode, state, actionRequest)
+            indicator.decorate(currentNode, state, actionRequest, acc)
         }
 
     }
@@ -312,9 +256,9 @@ class UiGameController(
         }
     }
 
-    private suspend fun runPostUpdateAnimations(snapshot: UiGameSnapshot) {
+    private suspend fun runPostUpdateAnimations(state: Game) {
         if (!gameController.lastActionWasUndo()) {
-            val animation = AnimationFactory.getFrameAnimation(snapshot, rules)
+            val animation = AnimationFactory.getFrameAnimation(state, rules)
             if (animation != null) {
                 _animationFlow.emit(animation)
                 animationDone.receive()
@@ -322,9 +266,9 @@ class UiGameController(
         }
     }
 
-    private suspend fun runPostActionAnimations(snapshot: UiGameSnapshot, action: GameAction) {
+    private suspend fun runPostActionAnimations(state: Game, action: GameAction) {
         if (!gameController.lastActionWasUndo()) {
-            val animation = AnimationFactory.getPostActionAnimation(snapshot.game, action)
+            val animation = AnimationFactory.getPostActionAnimation(state, action)
             if (animation != null) {
                 _animationFlow.emit(animation)
                 animationDone.receive()
@@ -333,38 +277,37 @@ class UiGameController(
     }
 
     /**
-     * Method responsible for updating the UI state based on recent changes.
+     * Method responsible for updating the UI state based on recent changes in the [Game] model.
+     * This includes
      */
-    private fun createNewUiSnapshot(state: Game, actions: ActionRequest, delta: GameDelta, lastUiState: UiGameSnapshot?): UiGameSnapshot {
+    private fun addBaseGameStateChanges(state: Game, actions: ActionRequest, delta: GameDelta, acc: UiSnapshotAccumulator) {
 
         // Update the persistent UI decorations before starting
-        updatePersistentUiDecorations(state, delta, uiDecorations)
+        updatePersistentUiDecorations(state, delta, uiDecorations, acc)
 
         // Re-render the entire field. This feels a bit like overkill, but making it more granular
         // is going to be challenging, and it doesn't look like there is a performance problem doing it.
-        val squares: MutableMap<FieldCoordinate, UiFieldSquare> = mutableMapOf<FieldCoordinate, UiFieldSquare>().apply {
-            (0 until rules.fieldWidth).forEach { x ->
-                (0 until rules.fieldHeight).forEach { y ->
-                    val coordinate = FieldCoordinate(x, y)
-                    this[coordinate] = renderSquare(coordinate, state)
-                }
+        (0 until rules.fieldWidth).forEach { x ->
+            (0 until rules.fieldHeight).forEach { y ->
+                val coordinate = FieldCoordinate(x, y)
+                val square= renderSquare(coordinate, state)
+                acc.addOrUpdateSquare(coordinate, square)
             }
         }
 
-        return UiGameSnapshot(
-            this,
-            state,
-            state.stack.createSnapshot(),
-            actions,
-            uiDecorations,
-            squares,
-            UiGameStatusUpdate(state)
-        )
+        // This will reset the player state and the data class should ensure equality is
+        // checked correctly using the auto-generated `equals()`
+        state.homeTeam.forEach { player ->
+            acc.addOrUpdatePlayer(player.id, UiFieldPlayer(player))
+        }
+        state.awayTeam.forEach { player ->
+            acc.addOrUpdatePlayer(player.id, UiFieldPlayer(player))
+        }
     }
 
-    private fun updatePersistentUiDecorations(state: Game, delta: GameDelta, uiDecorations: UiGameIndicators) {
+    private fun updatePersistentUiDecorations(state: Game, delta: GameDelta, uiIndicators: UiPersistentGameIndicators, acc: UiSnapshotAccumulator) {
         if (delta.reversed) {
-            uiDecorations.undo(delta.id)
+            uiIndicators.undo(delta.id)
             return
         }
 
@@ -375,7 +318,7 @@ class UiGameController(
             //   deltaId = delta.id,
             //   action = { /* TODO */ }
             // )
-            uiDecorations.resetMovesUsed()
+            uiIndicators.resetMovesUsed()
         }
 
 
@@ -383,9 +326,9 @@ class UiGameController(
         if (delta.containsAction(MoveTypeSelected(MoveType.STAND_UP))) {
             val activePlayer = state.activePlayer!!
             if (activePlayer.move >= rules.moveRequiredForStandingUp) {
-                uiDecorations.addMoveUsedToStandUp(rules.moveRequiredForStandingUp)
+                uiIndicators.addMoveUsedToStandUp(rules.moveRequiredForStandingUp)
             } else {
-                uiDecorations.addMoveUsedToStandUp(activePlayer.move)
+                uiIndicators.addMoveUsedToStandUp(activePlayer.move)
             }
         }
 
@@ -397,12 +340,13 @@ class UiGameController(
         ) {
             // TODO This seems to break on touch downs
             val start = delta.allCommands().filterIsInstance<SetPlayerLocation>().single().originalPlayerLocation
-            uiDecorations.addMoveUsed(start)
-            uiDecorations.registerUndo(
+            uiIndicators.addMoveUsed(start)
+            uiIndicators.registerUndo(
                 deltaId = delta.id,
-                action = { uiDecorations.removeLastMoveUsed() }
+                action = { uiIndicators.removeLastMoveUsed() }
             )
         }
+        acc.setMovesUsed(uiIndicators.movesUsed)
     }
 
     private fun renderSquare(
@@ -410,10 +354,10 @@ class UiGameController(
         game: Game,
     ): UiFieldSquare {
         val square = game.field[coordinate]
-        val uiPlayer = square.player?.let { UiPlayer(it) }
-        return UiFieldSquare(square).apply {
-            this.player = uiPlayer
-        }
+        return UiFieldSquare(
+            coordinates = coordinate,
+            player = square.player?.id
+        )
     }
 
     fun userSelectedAction(action: GameAction) {

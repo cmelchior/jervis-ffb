@@ -10,7 +10,7 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 
 /**
  * Show a small "block" indicator on the player is they are currently in a block
@@ -18,10 +18,10 @@ import com.jervisffb.ui.game.UiGameSnapshot
  */
 object BlockStatusIndicator: FieldStatusIndicator {
     override fun decorate(
-        uiSnapshot: UiGameSnapshot,
         node: ActionNode,
         state: Game,
-        request: ActionRequest
+        request: ActionRequest,
+        acc: UiSnapshotAccumulator
     ) {
         val blockContext = state.getContextOrNull<BlockContext>()
         val multipleBlockContext = state.getContextOrNull<MultipleBlockContext>()
@@ -38,8 +38,8 @@ object BlockStatusIndicator: FieldStatusIndicator {
                 DogOut -> { /* Do not show indicators in the Dogout */ }
                 is GiantLocation -> TODO("Giant locations not supported yet")
                 is FieldCoordinate -> {
-                    uiSnapshot.fieldSquares[loc]?.apply {
-                        isBlocked = true
+                    acc.updateSquare(loc) {
+                        it.copy(isBlocked = false)
                     }
                 }
             }

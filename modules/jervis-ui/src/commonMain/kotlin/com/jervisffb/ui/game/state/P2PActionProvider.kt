@@ -10,7 +10,7 @@ import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.net.messages.GameActionServerError
 import com.jervisffb.net.messages.ServerError
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
 import com.jervisffb.ui.menu.p2p.P2PClientNetworkAdapter
 import com.jervisffb.utils.jervisLogger
@@ -120,15 +120,15 @@ class P2PActionProvider(
         handlingServerRevert = queuedServerActions.isNotEmpty()
     }
 
-    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
+    override fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator) {
         if (!handlingServerRevert) {
-            currentProvider.decorateAvailableActions(state, actions)
+            currentProvider.decorateAvailableActions(actions, acc)
         }
     }
 
-    override fun decorateSelectedAction(state: UiGameSnapshot, action: GameAction) {
+    override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
         if (!handlingServerRevert) {
-            currentProvider.decorateSelectedAction(state, action)
+            currentProvider.decorateSelectedAction(action, acc)
         }
     }
 

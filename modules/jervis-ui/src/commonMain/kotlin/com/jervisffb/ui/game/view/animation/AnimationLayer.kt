@@ -11,7 +11,9 @@ import com.jervisffb.ui.game.animations.PassAnimation
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 
 @Composable
-fun AnimationLayer(vm: FieldViewModel) {
+fun AnimationLayer(
+    vm: FieldViewModel,
+) {
     Box(modifier = Modifier.fillMaxSize()) {
         val animationData by vm.observeAnimation().collectAsState(null)
         if (animationData?.second is KickOffEventAnimation) {

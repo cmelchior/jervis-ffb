@@ -13,7 +13,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.PlayerStandardActionType
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.QueuedActionsResult
@@ -24,13 +24,13 @@ object SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,
-        snapshot: UiGameSnapshot,
         descriptor: SelectPlayerAction,
-        owner: Team?
+        owner: Team?,
+        acc: UiSnapshotAccumulator
     ) {
         // TODO Fix this, so we do not update each square multiple times
         descriptor.actions.forEach {
-            addActionToContextMenu(actionProvider, state, snapshot, it)
+            addActionToContextMenu(actionProvider, state, acc, it)
         }
 
         // If prone, also add a "Stand Up & And Action". But only if the
@@ -38,7 +38,7 @@ object SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
         // TODO If the player has Jump Up, all non-move actions can also do this.
         val activePlayer = state.activePlayer ?: error("No active player")
         if (activePlayer.state == PlayerState.PRONE) {
-            val oldData = snapshot.fieldSquares[activePlayer.location as FieldCoordinate]!!
+            // val oldData = acc.fieldSquares[activePlayer.location as FieldCoordinate]!!
             val menuItem = ContextMenuOption(
                 title = "Stand Up & End Action",
                 command = {
@@ -60,11 +60,15 @@ object SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
                 },
                 icon = ActionIcon.STAND_UP_AND_END
             )
-            snapshot.fieldSquares[activePlayer.location as FieldCoordinate] = oldData.copyAddContextMenu(menuItem)
+            acc.updateSquare(activePlayer.location as FieldCoordinate) {
+                it.copy(
+                    contextMenuOptions = it.contextMenuOptions.add(menuItem)
+                )
+            }
         }
     }
 
-    private fun addActionToContextMenu(actionProvider: UiActionProvider, state: Game, snapshot: UiGameSnapshot, action: PlayerAction) {
+    private fun addActionToContextMenu(actionProvider: UiActionProvider, state: Game, acc: UiSnapshotAccumulator, action: PlayerAction) {
         state.activePlayer?.location?.let { location ->
             val (actionName, actionIcon) = when (action.type) {
                 PlayerStandardActionType.MOVE -> "Move" to ActionIcon.MOVE
@@ -86,15 +90,17 @@ object SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
                 PlayerSpecialActionType.STAB -> "Stab" to ActionIcon.STAB
             }
 
-            val oldData = snapshot.fieldSquares[location]!!
-            snapshot.fieldSquares[location as FieldCoordinate] =
-                oldData.copyAddContextMenu(
-                    ContextMenuOption(
-                        title = actionName,
-                        command = { actionProvider.userActionSelected(PlayerActionSelected(action.type)) },
-                        icon = actionIcon
+            acc.updateSquare(location as FieldCoordinate) {
+                it.copy(
+                    contextMenuOptions = it.contextMenuOptions.add(
+                        ContextMenuOption(
+                            title = actionName,
+                            command = { actionProvider.userActionSelected(PlayerActionSelected(action.type)) },
+                            icon = actionIcon
+                        )
                     )
                 )
+            }
         } ?: error("No active player")
     }
 }

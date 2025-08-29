@@ -1,5 +1,9 @@
 package com.jervisffb.ui.menu
 
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
@@ -21,6 +25,8 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.state.UiActionProvider
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.game.view.field.FieldSizeData
+import com.jervisffb.ui.game.view.field.PointerEventBus
 import com.jervisffb.ui.game.viewmodel.FieldViewData
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -40,6 +46,17 @@ data class LoadingTeamInfo(
     val teamValue: String
 )
 
+// Act as a bridge between Compose and ViewModels.
+// It is stored inside a ComposeLocal for Compose to access when rendering the field
+// The GameScreenModel must guarantee that one instance of this exists for the lifetime
+// of the Game Screen.
+@Stable
+class LocalFieldDataWrapper {
+    var size: FieldSizeData by mutableStateOf(FieldSizeData(0, IntSize.Zero, 0, 0))
+    val pointerBus: PointerEventBus = PointerEventBus()
+    var isContentMenuVisible by mutableStateOf(false)
+}
+
 class GameScreenModel(
     private val uiMode: TeamActionMode,
     private val gameController: GameEngineController,
@@ -53,8 +70,17 @@ class GameScreenModel(
     private val onGameStopped: () -> Unit = { }
 ) : ScreenModel {
 
-    val fieldViewData: MutableStateFlow<FieldViewData> = MutableStateFlow(FieldViewData(Size.Zero, IntSize.Zero, IntOffset.Zero, gameController.rules.fieldWidth, gameController.rules.fieldHeight))
+    val fieldViewData: MutableStateFlow<FieldViewData> = MutableStateFlow(
+        FieldViewData(
+            Size.Zero,
+            IntSize.Zero,
+            IntOffset.Zero,
+            gameController.rules.fieldWidth,
+            gameController.rules.fieldHeight
+        )
+    )
     val hoverPlayerFlow = MutableSharedFlow<Player?>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val sharedFieldData = LocalFieldDataWrapper()
 
     lateinit var uiState: UiGameController
     var fumbbl: FumbblReplayAdapter? = null
@@ -114,7 +140,7 @@ class GameScreenModel(
     }
 
     /**
-     * If the loaading screen is used for a P2P Game, calling this method will displ
+     * If the loading screen is used for a P2P Game, calling this method will displ
      */
     fun waitForOpponent() {
         val waitMessage = when (uiMode) {

@@ -11,18 +11,18 @@ import kotlinx.coroutines.flow.map
  */
 class GameStatusViewModel(val controller: UiGameController) {
     fun progress(): Flow<UiGameStatusUpdate> {
-        return controller.uiStateFlow.map { uiSnapshot -> uiSnapshot.gameStatus }
+        return controller.uiStateFlow.map { uiSnapshot -> uiSnapshot.status }
     }
 
     fun homeTeamInfoFlow(): Flow<UiTeamInfoUpdate> {
         return controller.uiStateFlow.map { uiSnapshot ->
-            uiSnapshot.gameStatus.homeTeamInfo
+            uiSnapshot.homeTeamInfo
         }
     }
 
     fun awayTeamInfoFlow(): Flow<UiTeamInfoUpdate> {
         return controller.uiStateFlow.map { uiSnapshot ->
-            uiSnapshot.gameStatus.awayTeamInfo
+            uiSnapshot.awayTeamInfo
         }
     }
 }

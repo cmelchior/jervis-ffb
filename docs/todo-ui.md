@@ -63,6 +63,7 @@ things as they come up.
     - https://www.omnicalculator.com/physics/time-of-flight-projectile-motion
     - I think I implemented the correct algorithm, but th ball landing still looks off. Need to figure out why.
 
+
 ## Design ideas
 
 - [ ] Experiment with an action system similar to BB3 (round action circle around player)
@@ -70,28 +71,13 @@ things as they come up.
 - [ ] Is it worth exploring an isometric view (to make it more immersive)? 
       - [ ] How feasible is it to use the current player graphics?
 
+
 ## Architecture Thought Dumping Ground
 
-From the start, it was a bit unclear how to structure the UI, and a lot of the code has undergone
-heavy refactoring already. However, small problems still pop up, and I suspect it is because we 
-tried to be too clever and wanted to avoid doing too many things on the UI thread. This has resulted 
-in bugs with`mutableStateOf` not being thread safe and Flows from the Snapshot layer not updating the UI
-correctly. Some of it is probably because I do not fully understand how Compose works, but some
-of it also points to deeper problems.
+After the restructuring of the UI architecture to be more clean and immutable, I think there 
+is a relatively clear path forward. However, we still need to figure out a good way to benchmark it.
+It seems fast enough, but I suspect there are lots of ways it can be optimized. 
 
-We need to figure out the exact architecture of the UI, especially around threading. The two biggest
-problems are:
-
-1. How to organize threading. Ideally we can calculate all changes before hitting the UI, but then
-   again. The UI isn't doing much while waiting for the next change, so probably it doesn't matter much?
-2. How to trigger recompositions reliably and most efficiently? Using an ECS-like architecture means we 
-   need to figure out how to transfer the UI-State after calculations? Could we just not? And just 
-   update the UI as we go? Probably worth exploring.
-3. Right now we have a clean UISnapshot for every game loop. This is really nice for Undo. if we 
-   move into direction 2, we need to figure out how to undo changes again. Do we also need a Command
-   like pattern for the UI? E.g. this cannot be implemented in decorators since a previous snapshot
-   doesn't know which decorators have been triggered. Should we have some kind of "reset" method on
-   all Ui classes?
 
 ## Game Timer
 

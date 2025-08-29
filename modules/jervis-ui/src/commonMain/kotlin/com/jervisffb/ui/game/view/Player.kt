@@ -26,7 +26,8 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import com.jervisffb.ui.game.icons.IconFactory
-import com.jervisffb.ui.game.model.UiPlayer
+import com.jervisffb.ui.game.model.UiFieldPlayer
+import com.jervisffb.ui.game.viewmodel.UiPlayerTransientData
 import com.jervisffb.ui.utils.toSkiaColor
 import org.jetbrains.skia.ImageFilter
 import org.jetbrains.skia.RuntimeEffect
@@ -56,7 +57,8 @@ private val playerAvailableDropShadowEffect: RenderEffect = ImageFilter.makeDrop
 @Composable
 fun Player(
     modifier: Modifier,
-    player: UiPlayer,
+    player: UiFieldPlayer,
+    transientData: UiPlayerTransientData?,
     parentHandleClick: Boolean,
     contextMenuShowing: Boolean,
 ) {
@@ -67,24 +69,23 @@ fun Player(
 
     if (player.isSelectable && !parentHandleClick) {
         playerModifier = playerModifier.clickable {
-            player.selectAction!!()
+            player.selectedAction!!()
         }
     }
-    if (player.onHover != null) {
+    if (transientData?.onHover != null) {
         playerModifier =
             playerModifier.onPointerEvent(eventType = PointerEventType.Enter) {
-                player.onHover!!.invoke()
+                transientData.onHover.invoke()
             }
     }
-    if (player.onHoverExit != null) {
+    if (transientData?.onHoverExit != null) {
         playerModifier =
             playerModifier.onPointerEvent(eventType = PointerEventType.Exit) {
-                player.onHoverExit!!.invoke()
+                transientData.onHoverExit.invoke()
             }
     }
 
     Box(modifier = playerModifier) {
-        //println("Player: ${player.model.location} -> down: ${player.isGoingDown}")
         PlayerImage(
             bitmap = playerImage,
             isSelectable = player.isSelectable,

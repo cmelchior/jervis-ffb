@@ -15,8 +15,10 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
+import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.animations.JervisAnimation
 import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
+import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.QueuedActionsResult
 import com.jervisffb.ui.game.view.JervisTheme
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlin.math.roundToInt
 
@@ -46,11 +49,33 @@ enum class FieldDetails(
 }
 
 /**
+ * Expand player data with extra callbacks related to UI hover effects.
+ * TODO I think this is only used for the Player Stat Card, so we can probably
+ *  find a way to remove this.
+ */
+data class UiPlayerTransientData(
+    val onHover: (() -> Unit)?,
+    val onHoverExit: (() -> Unit)?,
+)
+
+/**
+ * Information needed to render PathFinder information on the board.
+ */
+data class UiPathFinderData(
+    val coordinate: FieldCoordinate,
+    // Indicate the amount of move used to reach a potential target square.
+    // This number will override `moveUsed` if present
+    val futureMoveDistance: Int,
+    // Action triggered if this square is selected.
+    val hoverAction: () -> Unit,
+)
+
+/**
  * This class collects all the information needed to render the field. This includes all information needed for
  * each single square on the field.
  */
 class FieldViewModel(
-    private  val screenModel: GameScreenModel,
+    private val screenModel: GameScreenModel,
     private val uiState: UiGameController,
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,
 ) {
@@ -58,9 +83,10 @@ class FieldViewModel(
     val game = uiState.state
     val width = rules.fieldWidth
     val height = rules.fieldHeight
+    val sharedFieldData = screenModel.sharedFieldData
 
-    val field = uiState.uiStateFlow.map { uiSnapshot ->
-        val weather = uiSnapshot.game.weather
+    val fieldBackground: Flow<FieldDetails> = uiState.uiStateFlow.map { uiSnapshot ->
+        val weather = uiSnapshot.weather
         when (weather) {
             Weather.SWELTERING_HEAT -> FieldDetails.HEAT
             Weather.VERY_SUNNY -> FieldDetails.SUNNY
@@ -82,18 +108,22 @@ class FieldViewModel(
 
     fun highlights(): StateFlow<FieldCoordinate?> = _highlights
 
-    fun hoverOver(square: FieldCoordinate) {
+    fun triggerHoverEnter(square: FieldCoordinate) {
         game.field[square].player.let { player: Player? ->
             hoverPlayerChannel.safeTryEmit(player)
         }
         _highlights.value = square
     }
 
-    fun exitHover() {
+    fun triggerHoverExit() {
         _highlights.value = null
     }
 
-    fun observeField(): Flow<Map<FieldCoordinate, UiFieldSquare>> {
+    /**
+     * This flow exposes path finder data on the field (if relevant). I.e., future
+     * moves are written on each square of the field
+     */
+    fun observePathFinder(): Flow<Map<FieldCoordinate, UiPathFinderData>> {
         return combine(_highlights, uiState.uiStateFlow) { mouseEnter, uiSnapshot ->
             // If a highlighted square exists, we are going to calculate the shortest path to that
             // square and annotate the path towards it as well. These decorations take precedence
@@ -101,15 +131,12 @@ class FieldViewModel(
             val activePlayer: Player? = uiSnapshot.game.activePlayer
             val requiresStandingUp = (activePlayer?.state == PlayerState.PRONE)
 
-            // Clear all existing highlight data.
-            uiSnapshot.clearHoverData()
-
             // Use path finder
-            uiSnapshot.pathFinder?.let { pathFinder ->
+            val pathList = uiSnapshot.pathFinder?.let { pathFinder ->
                 if (showPathFinder(activePlayer, mouseEnter)) {
                     val standingUpPenalty = if (requiresStandingUp) rules.moveRequiredForStandingUp else 0
                     // TODO This logic fails when Undo'ing. Figure out why.
-                    val path: List<FieldCoordinate> = pathFinder.getClosestPathTo(mouseEnter!!, (activePlayer!!.movesLeft - standingUpPenalty))
+                    val path: List<FieldCoordinate> = uiSnapshot.pathFinder.getClosestPathTo(mouseEnter!!, (activePlayer!!.movesLeft - standingUpPenalty))
 
                     // Create the action triggered if clicking the mouse-over field.
                     val action = {
@@ -154,25 +181,46 @@ class FieldViewModel(
                     // that is currently being hovered over.
                     val standingUpModifier = if (requiresStandingUp) rules.moveRequiredForStandingUp else 0
                     val currentMovesLeft = activePlayer.move - activePlayer.movesLeft
-                    path.forEachIndexed { index, pathSquare ->
-                        val currentSquareData = uiSnapshot.fieldSquares[pathSquare]!!
+                    path.mapIndexed { index, pathSquare ->
+                        val currentSquareData = uiSnapshot.squares[pathSquare]!!
 
                         val shownMoveValue = when (index) {
                             0 -> currentMovesLeft + index + 1 + standingUpModifier
                             else -> currentMovesLeft + index + 1 + standingUpModifier
                         }
 
-                        uiSnapshot.fieldSquares[pathSquare]?.apply {
-                            futureMoveValue = shownMoveValue
-                            hoverAction = if (currentSquareData.model.coordinates == mouseEnter) action else null
-                        }
+                        UiPathFinderData(
+                            coordinate = pathSquare,
+                            futureMoveDistance = shownMoveValue,
+                            hoverAction = action
+                        )
                     }
+                } else {
+                    emptyList()
                 }
             }
-
-            // Finally, return the potentially modified squares
-            uiSnapshot.fieldSquares.toMap()
+            pathList?.associate { it.coordinate to it } ?: emptyMap()
         }
+    }
+
+    fun observeSnapshot(): Flow<UiGameSnapshot>  = uiState.uiStateFlow
+
+    fun observeField(): Flow<Map<FieldCoordinate, Pair<UiFieldSquare, UiFieldPlayer?>>> {
+        return combine(_highlights, uiState.uiStateFlow) { mouseEnter, uiSnapshot ->
+            uiSnapshot.squares.map {
+                it.key to Pair(it.value, uiSnapshot.players[it.value.player])
+            }.toMap()
+        }
+    }
+
+    fun observeActionWheel(): Flow<ActionWheelInputDialog?> {
+        return uiState.uiStateFlow.map {
+            if (it.dialogInput != null && it.dialogInput::class == ActionWheelInputDialog::class) {
+                it.dialogInput as ActionWheelInputDialog
+            } else {
+                null
+            }
+        }.distinctUntilChanged()
     }
 
     private fun showPathFinder(

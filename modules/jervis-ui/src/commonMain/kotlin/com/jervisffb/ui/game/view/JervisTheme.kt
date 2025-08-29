@@ -94,7 +94,9 @@ object JervisTheme {
     )
     // Green background for squares that has an action associated with it.
     val availableActionBackground = Color.Green.copy(alpha = 0.25f)
-    
+    val hoverColor: Color = Color.Cyan.copy(alpha = 0.25f)
+    val ballExitColor: Color = Color.Red
+
     // Blue shades
     val darkBlue = Color(0xFF0B5598)
     val lightBlue = Color(0xFF2770B2)

@@ -12,9 +12,9 @@ import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.GameFileData
-import com.jervisffb.ui.game.LocalActionProvider
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
+import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
 import com.jervisffb.ui.game.view.SideBarEntryState

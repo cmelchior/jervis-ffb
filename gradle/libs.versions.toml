@@ -9,6 +9,7 @@ coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines
 cryptography = "0.4.0" # https://github.com/whyoleg/cryptography-kotlin/releases/tag/0.4.0
 datetimex = "0.6.2" # https://github.com/Kotlin/kotlinx-datetime
 datastore = "1.1.7" # https://developer.android.com/jetpack/androidx/releases/datastore
+immutableCollections = "0.4.0" # https://github.com/Kotlin/kotlinx.collections.immutable
 javaAssist = "3.30.2-GA" # https://github.com/jboss-javassist/javassist
 jgit = "7.2.0.202503040940-r" # https://github.com/eclipse-jgit/jgit
 kermit = "2.0.6" # https://github.com/touchlab/Kermit
@@ -37,6 +38,7 @@ kermit  = { group = "co.touchlab", name = "kermit", version.ref = "kermit" }
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetimex" }
 kotlinx-browser = { group = "org.jetbrains.kotlinx", name = "kotlinx-browser", version.ref = "browser"}
+kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "immutableCollections" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-server-contentNegotation = { group = "io.ktor", name = "ktor-server-content-negotiation", version.ref = "ktor" }

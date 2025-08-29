@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_undo
+import com.jervisffb.ui.game.view.field.Field
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.FieldViewData
@@ -57,7 +58,7 @@ fun GameScreen(
         verticalArrangement = Arrangement.Top
     ) {
         val backgroundColor = JervisTheme.white.copy(0.1f)
-        GameStatusV2(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
+        GameStatus(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
         Spacer(modifier = Modifier.height(8.jdp))
         Row(
             modifier = Modifier

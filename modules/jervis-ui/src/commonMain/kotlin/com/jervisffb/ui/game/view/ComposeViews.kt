@@ -163,6 +163,7 @@ fun Dialogs(field: FieldViewModel, fieldOffset: FieldViewData, vm: DialogsViewMo
         }
         is ActionWheelInputDialog -> {
             val dialog = dialogData as ActionWheelInputDialog
+            dialog.viewModel.updateSharedFieldData(vm.screenViewModel.sharedFieldData)
             ActionWheelDialog(field, fieldOffset, dialog, vm)
         }
         null -> { /* Do nothing */ }

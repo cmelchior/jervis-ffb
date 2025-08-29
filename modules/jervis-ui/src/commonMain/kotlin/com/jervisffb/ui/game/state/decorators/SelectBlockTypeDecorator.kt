@@ -10,7 +10,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzActionContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockActionContext
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.view.ContextMenuOption
@@ -21,9 +21,9 @@ object SelectBlockTypeDecorator: FieldActionDecorator<SelectBlockType> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,
-        snapshot: UiGameSnapshot,
         descriptor: SelectBlockType,
-        owner: Team?
+        owner: Team?,
+        acc: UiSnapshotAccumulator
     ) {
         val blockContext = state.getContextOrNull<BlockActionContext>()
         val blitzContext = state.getContextOrNull<BlitzActionContext>()
@@ -43,15 +43,18 @@ object SelectBlockTypeDecorator: FieldActionDecorator<SelectBlockType> {
                 BlockType.STAB -> TODO()
                 BlockType.MULTIPLE_BLOCK,
                 BlockType.STANDARD -> {
-                    val activeSquare = snapshot.fieldSquares[activeLocation] ?: error("Could not find square: $activeLocation")
-                    snapshot.fieldSquares[activeLocation] = activeSquare.copyAddContextMenu(
-                        item = ContextMenuOption(
-                            "Block",
-                            { actionProvider.userActionSelected(BlockTypeSelected(BlockType.STANDARD)) },
-                            ActionIcon.BLOCK
-                        ),
-                        showContextMenu = true
-                    )
+                    acc.updateSquare(activeLocation) {
+                        it.copy(
+                            contextMenuOptions = it.contextMenuOptions.add(
+                                ContextMenuOption(
+                                    "Block",
+                                    { actionProvider.userActionSelected(BlockTypeSelected(type)) },
+                                    ActionIcon.BLOCK
+                                )
+                            ),
+                            showContextMenu = true
+                        )
+                    }
                 }
             }
         }

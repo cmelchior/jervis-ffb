@@ -4,7 +4,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Team
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -50,10 +50,10 @@ abstract class UiActionProvider {
     abstract suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest)
     // Hook for the UI to set up the UI so the next action can be selected.
     // E.g. enable onClick listeners on Players, highlight certain aspects of the field or show Dialogs.
-    abstract fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest)
+    abstract fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator)
     // Hook to manipulate the UI after an action has been selected
     // TODO Is this used for anything?
-    abstract fun decorateSelectedAction(state: UiGameSnapshot, action: GameAction)
+    abstract fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator)
     // Block until the next action is generated. Normally by calling `userActionSelected`.
     abstract suspend fun getAction(): GameAction
     // Parse in an action that will returned to the next call to `getAction` (or if it is currently waiting for an action)

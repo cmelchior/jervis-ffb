@@ -9,8 +9,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
-import com.jervisffb.ui.game.UiGameSnapshot
-import com.jervisffb.ui.game.model.UiPlayer
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.calculateAssumedNoOfBlockDice
 
@@ -18,27 +17,27 @@ object SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
     override fun decorate(
         actionProvider: ManualActionProvider,
         state: Game,
-        snapshot: UiGameSnapshot,
         descriptor: SelectPlayer,
-        owner: Team?
+        owner: Team?,
+        acc: UiSnapshotAccumulator
     ) {
-        descriptor.players.forEach { player ->
+        descriptor.players.forEach { playerId ->
             val selectedAction = {
-                actionProvider.userActionSelected(PlayerSelected(player))
+                actionProvider.userActionSelected(PlayerSelected(playerId))
             }
 
-            val playerLocation = state.getPlayerById(player).location
+            val playerLocation = state.getPlayerById(playerId).location
 
             // Calculate dice decorators (if any)
             var dice = when (state.stack.currentNode()) {
                 BlockAction.SelectDefenderOrEndAction -> {
                     val attacker = state.activePlayer!!
-                    val defender = state.getPlayerById(player)
+                    val defender = state.getPlayerById(playerId)
                     calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = false)
                 }
                 BlitzAction.MoveOrBlockOrEndAction -> {
                     val attacker = state.activePlayer!!
-                    val defender = state.getPlayerById(player)
+                    val defender = state.getPlayerById(playerId)
                     calculateAssumedNoOfBlockDice(state, attacker, defender, isBlitzing = true)
                 }
                 else -> 0
@@ -47,17 +46,25 @@ object SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
             // Depending on the location, the event is tracked slightly different
             when (playerLocation) {
                 DogOut -> {
-                    snapshot.dogoutActions[player] = selectedAction
+                    acc.updatePlayer(playerId) {
+                        it.copy(
+                            selectedAction = selectedAction
+                        )
+                    }
                 }
                 is FieldCoordinate -> {
-                    val square = snapshot.fieldSquares[playerLocation]
-                    snapshot.fieldSquares[playerLocation]?.apply {
-                        this.dice = dice
-                        // TODO square.player!! is sometimes `null` here :/
-                        val oldPlayer = this.player ?: error("No player found for $playerLocation")
-                        this.player = UiPlayer(oldPlayer.model, selectedAction, oldPlayer.onHover, oldPlayer.onHoverExit)
-                        onSelected = selectedAction
-                    } ?: error("Unexpected player location : $playerLocation")
+                    acc.updateSquare(playerLocation) {
+                        it.copy(
+                            dice = dice,
+                            selectedAction = null,
+                            isActionWheelFocus = false
+                        )
+                    }
+                    acc.updatePlayer(playerId) {
+                        it.copy(
+                            selectedAction = selectedAction,
+                        )
+                    }
                 }
                 is GiantLocation -> TODO("Not supported right now")
             }

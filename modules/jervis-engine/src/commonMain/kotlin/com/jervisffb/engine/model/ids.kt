@@ -65,7 +65,15 @@ value class RosterId(val id: String)
 
 @Serializable
 @JvmInline
-value class TeamId(val value: String = "")
+value class TeamId(val value: String = "") {
+    fun getTeamReference(state: Game): Team {
+        return when {
+            state.homeTeam.id == this -> state.homeTeam
+            state.awayTeam.id == this -> state.awayTeam
+            else -> error("Unknown team: $value")
+        }
+    }
+}
 
 @Serializable
 @JvmInline

@@ -4,7 +4,7 @@ import com.jervisffb.engine.ActionRequest
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Team
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
@@ -42,11 +42,11 @@ class RemoteActionProvider(
         this.actions = controller.getAvailableActions()
     }
 
-    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
+    override fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator) {
         // Do nothing
     }
 
-    override fun decorateSelectedAction(state: UiGameSnapshot, action: GameAction) {
+    override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
         // Do nothing
     }
 

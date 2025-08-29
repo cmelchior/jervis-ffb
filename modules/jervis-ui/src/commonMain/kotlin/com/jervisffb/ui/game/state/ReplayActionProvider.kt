@@ -8,7 +8,7 @@ import com.jervisffb.fumbbl.net.adapter.CalculatedJervisAction
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.fumbbl.net.adapter.JervisAction
 import com.jervisffb.fumbbl.net.adapter.OptionalJervisAction
-import com.jervisffb.ui.game.UiGameSnapshot
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
@@ -107,12 +107,12 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
         this.actions = controller.getAvailableActions()
     }
 
-    override fun decorateAvailableActions(state: UiGameSnapshot, actions: ActionRequest) {
+    override fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator) {
         println("Decorating available actions for ReplayActionProvider")
         // Do nothing
     }
 
-    override fun decorateSelectedAction(state: UiGameSnapshot, action: GameAction) {
+    override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
         // Do nothing
     }
 

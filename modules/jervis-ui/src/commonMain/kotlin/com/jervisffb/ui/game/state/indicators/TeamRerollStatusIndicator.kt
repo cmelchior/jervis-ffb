@@ -7,9 +7,9 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.bb2020.skills.BrilliantCoachingReroll
 import com.jervisffb.engine.rules.bb2020.skills.LeaderTeamReroll
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
-import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.UiReroll
 import com.jervisffb.ui.game.UiRerollType
+import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.UiTeamInfoUpdate
 
 /**
@@ -20,16 +20,20 @@ import com.jervisffb.ui.game.UiTeamInfoUpdate
  */
 object TeamRerollStatusIndicator: FieldStatusIndicator {
     override fun decorate(
-        uiSnapshot: UiGameSnapshot,
         node: ActionNode,
         state: Game,
-        request: ActionRequest
+        request: ActionRequest,
+        acc: UiSnapshotAccumulator
     ) {
-        configureTeamRerolls(state.homeTeam, uiSnapshot.gameStatus.homeTeamInfo)
-        configureTeamRerolls(state.awayTeam, uiSnapshot.gameStatus.awayTeamInfo)
+        acc.updateTeamInfo(state.homeTeam) { team, teamInfo ->
+            configureTeamRerolls(team, teamInfo)
+        }
+        acc.updateTeamInfo(state.awayTeam) { team, teamInfo ->
+            configureTeamRerolls(team, teamInfo)
+        }
     }
 
-    private fun configureTeamRerolls(team: Team, teamInfo: UiTeamInfoUpdate) {
+    private fun configureTeamRerolls(team: Team, teamInfo: UiTeamInfoUpdate): UiTeamInfoUpdate {
         // Define the order in which we want to show Rerolls. Generally we want to show the
         // one that disappears first at the front of the list (we also want to use it first).
         val order = listOf(
@@ -61,11 +65,11 @@ object TeamRerollStatusIndicator: FieldStatusIndicator {
                 }
             }
         }
-
         val reorderedRerolls = rerolls.sortedWith(
             compareBy { rank[it.type] ?: Int.MAX_VALUE } // unknown keys go last
         )
-
-        teamInfo.rerolls.addAll(reorderedRerolls)
+        return teamInfo.copy(
+            rerolls = teamInfo.rerolls.addAll(reorderedRerolls)
+        )
     }
 }

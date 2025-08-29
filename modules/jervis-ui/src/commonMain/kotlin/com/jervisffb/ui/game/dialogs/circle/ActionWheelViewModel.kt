@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
@@ -38,14 +39,13 @@ class ActionWheelViewModel(
     fallbackToShowStartHoverText: Boolean = false,
     topExpandMode: MenuExpandMode = MenuExpandMode.COMPACT,
     bottomExpandMode: MenuExpandMode = MenuExpandMode.COMPACT,
-    var shown: MutableState<Boolean> = mutableStateOf(true),
+    val visible: Boolean = true, // Whether the Action Wheel should be visible from the start
     val hideOnClickedOutside: Boolean = false,
     val onMenuHidden: (() -> Unit)? = null
 ) {
-    // Wheel is shown on screen
-    // var shown by mutableStateOf(true)
     var topMenu = ActionWheelMenuController(this, -90f, topExpandMode)
     var bottomMenu = ActionWheelMenuController(this, 90f, bottomExpandMode)
+    private var sharedFieldData: LocalFieldDataWrapper? = null
 
     // Hover text properties
     var fallbackToStartHoverText: Boolean by mutableStateOf(fallbackToShowStartHoverText)
@@ -71,13 +71,30 @@ class ActionWheelViewModel(
     }
 
     fun showWheel() {
-        shown.value = true
+        sharedFieldData?.let {
+            it.isContentMenuVisible = visible
+        } ?: error("Missing LocalFieldDataWrapper")
     }
 
     fun hideWheel(actionSelected: Boolean) {
-        shown.value = false
-        if (!actionSelected) {
-            onMenuHidden?.invoke()
-        }
+        sharedFieldData?.let {
+            it.isContentMenuVisible = false
+            if (!actionSelected) {
+                onMenuHidden?.invoke()
+            }
+        } ?: error("Missing LocalFieldDataWrapper")
+    }
+
+    fun isVisible(): Boolean {
+        return sharedFieldData?.isContentMenuVisible ?: visible
+    }
+
+    /**
+     * This must be called to connect the ViewModel to Compose. This was the only way
+     * to separate when ViewModels and SharedFieldData was created.
+     */
+    fun updateSharedFieldData(sharedFieldData: LocalFieldDataWrapper) {
+        this.sharedFieldData = sharedFieldData
+        sharedFieldData.isContentMenuVisible = visible
     }
 }
