@@ -24,11 +24,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.logo_fumbbl_small
+import com.jervisffb.ui.IssueTracker
+import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.isDigitsOnly
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
+import com.jervisffb.utils.openUrlInBrowser
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -38,7 +41,7 @@ fun ImportTeamFromFumbblDialog(
 ) {
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var errorWrapper by remember { mutableStateOf<Pair<String, Throwable?>?>(null) }
 
     JervisDialog(
         title = "Import Team From FUMBBL",
@@ -50,7 +53,7 @@ fun ImportTeamFromFumbblDialog(
                 colorFilter = ColorFilter.tint(JervisTheme.white),
             )
         },
-        width = 650.dp,
+        width = DialogSize.MEDIUM,
         backgroundScrim = true,
         content = { _, textColor ->
             Box(
@@ -79,8 +82,8 @@ fun ImportTeamFromFumbblDialog(
                         text = "Support is experimental and bugs will be present. Please report any teams that cannot be imported.",
                         fontSize = MaterialTheme.typography.bodySmall.fontSize,
                     )
-                    if (error?.isNotBlank() == true) {
-                        Text(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp), text = error!!, color = JervisTheme.rulebookRed)
+                    if (errorWrapper != null) {
+                        Text(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp), text = errorWrapper?.first ?: "Unknown error", color = JervisTheme.rulebookRed)
                     }
                 }
             }
@@ -91,6 +94,23 @@ fun ImportTeamFromFumbblDialog(
                 onClick = { onDismissRequest() },
             )
             Spacer(modifier = Modifier.weight(1f))
+            if (errorWrapper != null) {
+                JervisButton(
+                    text = "Report Issue",
+                    onClick = {
+                        val reportIssueUrl = IssueTracker.createIssueUrlFromException(
+                            title = "Cannot load team from FUMBBL",
+                            body = "Team ID: $inputText",
+                            errorWrapper!!.second!!
+                        )
+                        openUrlInBrowser(reportIssueUrl)
+                    },
+                    enabled = !isLoading && inputText.isNotBlank() && inputText.isDigitsOnly(),
+                    buttonColor = JervisTheme.rulebookBlue,
+                    textColor = buttonTextColor
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+            }
             JervisButton(
                 text = if (isLoading) "Downloading..." else "Import Team",
                 onClick = {
@@ -101,9 +121,9 @@ fun ImportTeamFromFumbblDialog(
                             isLoading = false
                             onDismissRequest()
                         },
-                        onError = { msg ->
+                        onError = { msg, error ->
                             isLoading = false
-                            error = msg
+                            errorWrapper = msg to error
                         },
                     )
                 },

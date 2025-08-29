@@ -3,6 +3,7 @@ package com.jervisffb.tourplay
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerLevel
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -52,15 +53,19 @@ class TourPlayApi() {
     suspend fun loadRoster(
         rosterId: Long,
         rules: Rules,
-    ): JervisTeamFile {
-        val rosterData = loadTeamFromTourPlay(rosterId)
-        val jervisRoster = convertToBB2020JervisRoster(rules, rosterData)
-        val jervisTeam = convertToBB2020JervisTeam(rules, jervisRoster, rosterData)
-        return JervisTeamFile(
-            metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-            team = jervisTeam,
-            history = null,
-        )
+    ): Result<JervisTeamFile> {
+        try {
+            val rosterData = loadTeamFromTourPlay(rosterId)
+            val jervisRoster = convertToBB2020JervisRoster(rules, rosterData)
+            val jervisTeam = convertToBB2020JervisTeam(rules, jervisRoster, rosterData)
+            return Result.success(JervisTeamFile(
+                metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
+                team = jervisTeam,
+                history = null,
+            ))
+        } catch (ex: Exception) {
+            return Result.failure(ex)
+        }
     }
 
     private fun convertToBB2020JervisRoster(rules: Rules, roster: TourPlayRoster): BB2020Roster {
@@ -88,6 +93,11 @@ class TourPlayApi() {
                 },
                 primary = mapToSkillCategory(position.skillNormal),
                 secondary = mapToSkillCategory(position.skillDouble),
+                size = when {
+                    position.isBigGuy == true -> PlayerSize.BIG_GUY
+                    position.position == "Giant" -> PlayerSize.GIANT // TODO Unclear if this is correct
+                    else -> PlayerSize.STANDARD
+                },
                 icon = iconRef,
                 portrait = portraitRef,
             )
@@ -140,8 +150,6 @@ class TourPlayApi() {
                 )
             }
         }
-//        val file = "/Users/christian.melchior/Private/jervis-ffb/tools/tourplay-roster-44442.json".toPath().readText()
-//        return json.decodeFromString<TourPlayRoster>(file)
         if (response.status.isSuccess()) {
             val rosterAsJson = response.bodyAsText()
             return json.decodeFromString<TourPlayRoster>(rosterAsJson)

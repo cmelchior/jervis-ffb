@@ -57,8 +57,8 @@ data class CreditData(
         sound assets are borrowed from there. All credits go to the respective creators, see 
         the link below.
     """.trimIndent(),
+    val newIssueUrl: String = "",
     val projectUrl: String = "https://github.com/cmelchior/jervis-ffb",
-    val newIssueUrl: String = "https://github.com/cmelchior/jervis-ffb/issues/new",
     val fumbblAttributionUrl: String = "https://fumbbl.com/p/attribution"
 )
 

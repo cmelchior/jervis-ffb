@@ -20,3 +20,4 @@ fun SettingsDialogComponent(viewModel: MenuViewModel) {
         onDismissRequest = { viewModel.openSettings(false) }
     )
 }
+

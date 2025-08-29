@@ -21,12 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
 import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.isDigitsOnly
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
 import com.jervisffb.ui.menu.utils.JervisLogo
+import com.jervisffb.utils.openUrlInBrowser
 
 @Composable
 fun ImportTeamFromTourPlayDialog(
@@ -35,7 +37,7 @@ fun ImportTeamFromTourPlayDialog(
 ) {
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var errorWrapper by remember { mutableStateOf<Pair<String, Throwable?>?>(null) }
 
     JervisDialog(
         title = "Import Team From TourPlay",
@@ -77,11 +79,11 @@ fun ImportTeamFromTourPlayDialog(
                         text = "Support is experimental and bugs will be present. Please report any teams that cannot be imported.",
                         fontSize = MaterialTheme.typography.bodySmall.fontSize,
                     )
-                    if (error?.isNotBlank() == true) {
+                    errorWrapper?.let {
                         SelectionContainer {
                             Text(
                                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                                text = error!!,
+                                text = it.first,
                                 color = JervisTheme.rulebookRed
                             )
                         }
@@ -95,6 +97,23 @@ fun ImportTeamFromTourPlayDialog(
                 onClick = { onDismissRequest() },
             )
             Spacer(modifier = Modifier.weight(1f))
+            if (errorWrapper != null) {
+                JervisButton(
+                    text = "Report Issue",
+                    onClick = {
+                        val reportIssueUrl = IssueTracker.createIssueUrlFromException(
+                            title = "Cannot load team from TourPlay",
+                            body = "Roster ID: $inputText",
+                            errorWrapper!!.second!!
+                        )
+                        openUrlInBrowser(reportIssueUrl)
+                    },
+                    enabled = !isLoading && inputText.isNotBlank() && inputText.isDigitsOnly(),
+                    buttonColor = JervisTheme.rulebookBlue,
+                    textColor = buttonTextColor
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+            }
             JervisButton(
                 text = if (isLoading) "Downloading..." else "Import Team",
                 onClick = {
@@ -105,9 +124,9 @@ fun ImportTeamFromTourPlayDialog(
                             isLoading = false
                             onDismissRequest()
                         },
-                        onError = { msg ->
+                        onError = { msg, error ->
                             isLoading = false
-                            error = msg
+                            errorWrapper = msg to error
                         },
                     )
                 },

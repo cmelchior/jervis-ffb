@@ -311,8 +311,9 @@ private fun GameDrawerContent(
                 )
             }
             DrawerButton("Dump Game State to File", onClick = { menuViewModel.showSaveGameDialog(includeDebugState = true) })
-            DrawerButton("Report Issue", onClick = { openUrlInBrowser(menuViewModel.creditData.newIssueUrl) })
-
+            if (menuViewModel.creditData.newIssueUrl.isNotEmpty()) {
+                DrawerButton("Report Issue", onClick = { openUrlInBrowser(menuViewModel.creditData.newIssueUrl) })
+            }
             DrawerSectionHeader("Automated Actions")
             AutomatedOptionsSection(menuViewModel)
         }

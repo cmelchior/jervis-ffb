@@ -1,5 +1,6 @@
 package com.jervisffb.ui.menu.components.teamselector
 
+import co.touchlab.kermit.Logger.Companion.e
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Team
@@ -36,6 +37,8 @@ class SelectTeamComponentModel(
         val LOG = jervisLogger()
     }
 
+    val fumbblApi = FumbblApi()
+
     var unavailableTeam = MutableStateFlow<TeamId?>(null)
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
@@ -53,15 +56,21 @@ class SelectTeamComponentModel(
 
     private fun loadTeamList(rules: Rules) {
         menuViewModel.navigatorContext.launch {
-            CacheManager.loadTeams().map { teamFile ->
-                val teamData = teamFile.team
-                val unknownCoach = Coach(CoachId("Unknown"), "TemporaryCoach")
-                val team = SerializedTeam.deserialize(rules, teamData, unknownCoach)
-                getTeamInfo(teamFile, team)
+            val teams =  CacheManager.loadTeams().mapNotNull { teamFile ->
+                try {
+                    val teamData = teamFile.team
+                    val unknownCoach = Coach(CoachId("Unknown"), "TemporaryCoach")
+                    val team = SerializedTeam.deserialize(rules, teamData, unknownCoach)
+                    getTeamInfo(teamFile, team)
+                } catch (ex: Exception) {
+                    // How to handle teams not being able to load?
+                    LOG.e("Failed to load team: ${ex.message}")
+                    null
+                }
             }
+            teams
                 .filter { it.type == rules.gameType }
                 .let {
-                    // TODO Fix race condition with addNewTime
                     availableTeams.value = it.sortedBy { it.teamName }
                 }
         }
@@ -100,31 +109,36 @@ class SelectTeamComponentModel(
     fun loadFumbblTeamFromNetwork(
         teamId: String,
         onSuccess: () -> Unit,
-        onError: (String) -> Unit,
+        onError: (String, Throwable?) -> Unit,
     ) {
         val teamId = teamId.toLongOrNull()
         if (teamId == null) {
-            onError("Team ID does not look like a valid number")
+            onError("Team ID does not look like a valid number", null)
             return
         }
-        menuViewModel.navigatorContext.launch {
+        menuViewModel.backgroundContext.launch {
             try {
                 val rules = rules!!
-                val teamFile = FumbblApi().loadTeam(teamId, rules)
-                CacheManager.saveTeam(teamFile)
-                val team = SerializedTeam.deserialize(rules, teamFile.team, Coach.UNKNOWN)
-                val teamInfo = getTeamInfo(teamFile, team)
-                addNewTeam(teamInfo)
-                onTeamImported(teamInfo)
-                onSuccess()
+                val loadResult = fumbblApi.loadTeam(teamId, rules)
+                if (loadResult.isFailure) {
+                    onError("Could not load team", loadResult.exceptionOrNull())
+                } else {
+                    val teamFile = loadResult.getOrThrow()
+                    val team = SerializedTeam.deserialize(rules, teamFile.team, Coach.UNKNOWN)
+                    CacheManager.saveTeam(teamFile)
+                    val teamInfo = getTeamInfo(teamFile, team)
+                    addNewTeam(teamInfo)
+                    onTeamImported(teamInfo)
+                    onSuccess()
+                }
             } catch (e: Exception) {
                 LOG.w { "Failed to load team:\n${e.stackTraceToString()}" }
-                val errorMessage = if (e.message != null) {
+                val errorMessage = if (e.message?.isNotBlank() == true) {
                     "Could not load team - ${e.message}"
                 } else {
-                    "Could not load team due to an unknown error: ${e.stackTraceToString()}"
+                    "Could not load team due to an unknown error"
                 }
-                onError(errorMessage)
+                onError(errorMessage, e)
             }
         }
     }
@@ -132,31 +146,36 @@ class SelectTeamComponentModel(
     fun loadTourPlayTeamFromNetwork(
         teamId: String,
         onSuccess: () -> Unit,
-        onError: (String) -> Unit,
+        onError: (String, Throwable?) -> Unit,
     ) {
         val teamId = teamId.toLongOrNull()
         if (teamId == null) {
-            onError("Team ID does not look like a valid number")
+            onError("Team ID does not look like a valid number", null)
             return
         }
-        menuViewModel.navigatorContext.launch {
+        menuViewModel.backgroundContext.launch {
             try {
                 val rules = rules!!
-                val teamFile = TourPlayApi().loadRoster(teamId, rules)
-                CacheManager.saveTeam(teamFile)
-                val team = SerializedTeam.deserialize(rules, teamFile.team, Coach.UNKNOWN)
-                val teamInfo = getTeamInfo(teamFile, team)
-                addNewTeam(teamInfo)
-                onTeamImported(teamInfo)
-                onSuccess()
+                val rosterResult = TourPlayApi().loadRoster(teamId, rules)
+                if (rosterResult.isFailure) {
+                    onError("Could not load roster", rosterResult.exceptionOrNull())
+                } else {
+                    val teamFile = rosterResult.getOrThrow()
+                    val team = SerializedTeam.deserialize(rules, teamFile.team, Coach.UNKNOWN)
+                    CacheManager.saveTeam(teamFile)
+                    val teamInfo = getTeamInfo(teamFile, team)
+                    addNewTeam(teamInfo)
+                    onTeamImported(teamInfo)
+                    onSuccess()
+                }
             } catch (e: Exception) {
                 LOG.w { "Failed to load team:\n${e.stackTraceToString()}" }
                 val errorMessage = if (e.message != null) {
                     "Could not load team - ${e.message}"
                 } else {
-                    "Could not load team due to an unknown error: ${e.stackTraceToString()}"
+                    "Could not load team due to an unknown error"
                 }
-                onError(errorMessage)
+                onError(errorMessage, e)
             }
         }
     }

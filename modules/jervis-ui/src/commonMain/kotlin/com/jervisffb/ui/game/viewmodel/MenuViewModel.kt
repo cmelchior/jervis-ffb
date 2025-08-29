@@ -1,6 +1,5 @@
 package com.jervisffb.ui.game.viewmodel
 
-import com.jervisffb.BuildConfig
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerDeselected
@@ -16,6 +15,7 @@ import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisSetupFile
 import com.jervisffb.ui.CacheManager
+import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.SoundEffect
 import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.game.UiGameController
@@ -25,12 +25,9 @@ import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.intro.CreditData
 import com.jervisffb.ui.utils.saveFile
 import com.jervisffb.utils.canBeHost
-import com.jervisffb.utils.getBuildType
-import com.jervisffb.utils.getPlatformDescription
 import com.jervisffb.utils.jervisLogger
 import com.jervisffb.utils.multiThreadDispatcher
 import com.jervisffb.utils.singleThreadDispatcher
-import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +41,12 @@ enum class Feature {
     SELECT_BLOCK_TYPE_IF_ONLY_OPTION,
     PUSH_PLAYER_INTO_CROWD,
 }
+
+data class ErrorDialog(
+    val visible: Boolean,
+    val title: String,
+    val error: Throwable? = null,
+)
 
 class MenuViewModel {
     companion object {
@@ -63,7 +66,9 @@ class MenuViewModel {
 
     private val _showSettingsDialog = MutableStateFlow(false)
     private val _showDialogDialog = MutableStateFlow(false)
+    private val _showErrorDialog = MutableStateFlow(ErrorDialog(false, "",))
     val isAboutDialogVisible: StateFlow<Boolean> = _showDialogDialog
+    val isErrorDialogVisible: StateFlow<ErrorDialog> = _showErrorDialog
     val creditData: CreditData
 
     // Scope for lauching tasks directly related to navigating the UI
@@ -76,25 +81,30 @@ class MenuViewModel {
         // Customize the create issue link, so it contains some basic information about the client
         // Formatting is weird because `getPlatformDescription` returns a multiline text that doesn't
         // follow the same indentation as the rest of the text.
-        val body = buildString {
-            appendLine("""
+        val body = """
                 <Describe the issue>
                 <Attach Game Dump if applicable. Available under the in-game menu>
-
-                -----
-                **Client Information (${getBuildType()})**
-                Jervis Client Version: ${BuildConfig.releaseVersion}
-                Git Commit: ${BuildConfig.gitHash}
-            """.trimIndent())
-            appendLine(getPlatformDescription())
-        }.encodeURLParameter()
+        """.trimIndent()
+        val issueUrl = IssueTracker.createIssueUrl(title = null, body = body, IssueTracker.Label.USER)
         creditData = CreditData(
-            newIssueUrl = "https://github.com/cmelchior/jervis-ffb/issues/new?body=$body&labels=user"
+            newIssueUrl = issueUrl
         )
     }
 
     fun showAboutDialog(visible: Boolean) {
         _showDialogDialog.value = visible
+    }
+
+    fun showErrorDialog(message: String, error: Throwable? = null) {
+        _showErrorDialog.value = ErrorDialog(
+            visible = true,
+            title = message,
+            error = error,
+        )
+    }
+
+    fun hideErrorDialog() {
+        _showErrorDialog.value = ErrorDialog(visible = false, title = "",)
     }
 
     // Default values .. figure out a way to persist these

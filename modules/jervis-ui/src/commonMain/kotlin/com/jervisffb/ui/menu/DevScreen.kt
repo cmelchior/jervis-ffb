@@ -325,14 +325,14 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
                                     navigator.push(GameScreen(menuViewModel, viewModel))
                                 }
                                 .onFailure { error ->
-                                    // Ignore failure for now
                                     LOG.i { "Failed to load game file: ${error.message}" }
+                                    menuViewModel.showErrorDialog("Failed to load game file", error)
                                 }
                         }
                     }
                     .onFailure { error ->
-                        // Ignore failure for now
                         LOG.i { "Failed to load game file: ${error.message}" }
+                        menuViewModel.showErrorDialog("Failed to load game file", error)
                     }
             }
         }
