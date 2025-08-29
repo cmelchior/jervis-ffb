@@ -55,13 +55,13 @@ object SelectPlayerDecorator: FieldActionDecorator<SelectPlayer> {
                 is FieldCoordinate -> {
                     acc.updateSquare(playerLocation) {
                         it.copy(
-                            dice = dice,
                             selectedAction = null,
                             isActionWheelFocus = false
                         )
                     }
                     acc.updatePlayer(playerId) {
                         it.copy(
+                            dice = dice,
                             selectedAction = selectedAction,
                         )
                     }

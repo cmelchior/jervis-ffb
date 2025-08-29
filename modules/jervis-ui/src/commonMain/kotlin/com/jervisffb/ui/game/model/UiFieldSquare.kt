@@ -26,8 +26,6 @@ data class UiFieldSquare(
     val selectableDirection: Direction? = null, // Show selectable direction arrow (i.e. with hover effect)
     val directionSelected: Direction? = null, // Show a direction arrow in its selected state
     // If negative, it means the defender has more strength. If positive, it means the attacker has more strength.
-    val dice: Int = 0, // Show block dice decorator
-    val isBlocked: Boolean = false, // Show "blocked" indicator
     val requiresRoll: Boolean = false, // onSelected is not-null but will result in dice being rolled
     val selectedAction: (() -> Unit)? = null, // Action if square is selected
     val onMenuHidden: (() -> Unit)? = null, // Action if the context menu is hidden

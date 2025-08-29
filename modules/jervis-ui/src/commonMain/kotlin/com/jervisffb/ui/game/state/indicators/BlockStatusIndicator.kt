@@ -38,8 +38,8 @@ object BlockStatusIndicator: FieldStatusIndicator {
                 DogOut -> { /* Do not show indicators in the Dogout */ }
                 is GiantLocation -> TODO("Giant locations not supported yet")
                 is FieldCoordinate -> {
-                    acc.updateSquare(loc) {
-                        it.copy(isBlocked = false)
+                    acc.updatePlayer(player.id) {
+                        it.copy(isBlocked = true)
                     }
                 }
             }

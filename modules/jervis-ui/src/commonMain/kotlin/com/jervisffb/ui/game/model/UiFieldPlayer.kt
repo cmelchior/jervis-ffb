@@ -5,8 +5,10 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.isOnHomeTeam
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.roster.Position
 
 /**
@@ -15,6 +17,7 @@ import com.jervisffb.engine.rules.common.roster.Position
  */
 data class UiFieldPlayer(
     val id: PlayerId,
+    val coordinate: FieldCoordinate,
     val number: PlayerNo,
     val team: TeamId,
     val selectedAction: (() -> Unit)?,
@@ -25,9 +28,12 @@ data class UiFieldPlayer(
     val isActive: Boolean,
     val isGoingDown: Boolean,
     val hasActivated: Boolean,
+    val dice: Int = 0, // Show block dice decorator
+    val isBlocked: Boolean = false, // Show "blocked" indicator
 ) {
     constructor(model: Player, selectAction: (() -> Unit)? = null) : this(
         id = model.id,
+        coordinate = model.coordinates,
         number = model.number,
         team = model.team.id,
         selectedAction = selectAction,

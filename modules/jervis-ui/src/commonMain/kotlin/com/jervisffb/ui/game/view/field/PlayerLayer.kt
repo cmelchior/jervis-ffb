@@ -67,12 +67,12 @@ private fun PlayerWithIndicators(
                 true,
                 square.showContextMenu // && !square.useActionWheel
             )
-        }
-        if (square.dice != 0) {
-            BlockDiceIndicatorImage(square.dice)
-        }
-        if (square.isBlocked) {
-            PlayerBlockedIndicator()
+            if (it.dice != 0) {
+                BlockDiceIndicatorImage(it.dice)
+            }
+            if (it.isBlocked) {
+                PlayerBlockedIndicator()
+            }
         }
     }
 }
