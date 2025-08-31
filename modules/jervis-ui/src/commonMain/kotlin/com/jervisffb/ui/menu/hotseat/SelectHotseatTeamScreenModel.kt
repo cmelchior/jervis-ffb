@@ -19,7 +19,7 @@ import kotlin.uuid.Uuid
  * View model for controlling the "Select <Home/Away> Team" screen, that is the 2nd and 3rd step in the "Hotseat Game" flow.
  */
 class SelectHotseatTeamScreenModel(
-    private val menuViewModel: MenuViewModel,
+    val menuViewModel: MenuViewModel,
     private val parentModel: HotseatScreenModel,
     private val onNextScreen: () -> Unit,
     private val onTeamImported: (TeamInfo) -> Unit = { _ -> /* Do nothing */ } ,

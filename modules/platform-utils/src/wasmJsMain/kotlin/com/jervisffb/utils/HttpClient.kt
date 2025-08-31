@@ -12,29 +12,34 @@ import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-actual fun getHttpClient(): HttpClient {
-    val client = HttpClient() {
-        install(Logging) {
-            logger = Logger.DEFAULT
-            level = LogLevel.NONE
-        }
+private object WebSharedClient {
+    val httpClient by lazy {
+        HttpClient {
+            install(Logging) {
+                logger = Logger.DEFAULT
+                level = LogLevel.NONE
+            }
 
-        // We should allow redirects for all types, not just GET and HEAD
-        // See https://github.com/ktorio/ktor/issues/1793
-        install(HttpRedirect) {
-            checkHttpMethod = false
-        }
+            // We should allow redirects for all types, not just GET and HEAD
+            // See https://github.com/ktorio/ktor/issues/1793
+            install(HttpRedirect) {
+                checkHttpMethod = false
+            }
 
-        install(WebSockets) {
-            contentConverter = KotlinxWebsocketSerializationConverter(Json)
-        }
+            install(WebSockets) {
+                contentConverter = KotlinxWebsocketSerializationConverter(Json)
+            }
 
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-            })
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                })
+            }
         }
     }
-    return client
 }
 
+
+actual fun getHttpClient(): HttpClient {
+    return WebSharedClient.httpClient
+}

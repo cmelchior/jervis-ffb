@@ -86,10 +86,18 @@ fun SelectHotseatTeamScreen(
     }
 
     if (showImportTourPlayTeamDialog) {
-        ImportTeamFromTourPlayDialog(viewModel.teamSelectorModel, onDismissRequest = { showImportTourPlayTeamDialog = false })
+        ImportTeamFromTourPlayDialog(
+            viewModel.teamSelectorModel,
+            viewModel.menuViewModel,
+            onDismissRequest = { showImportTourPlayTeamDialog = false }
+        )
     }
     if (showImportFumbblTeamDialog) {
-        ImportTeamFromFumbblDialog(viewModel.teamSelectorModel, onDismissRequest = { showImportFumbblTeamDialog = false })
+        ImportTeamFromFumbblDialog(
+            viewModel.teamSelectorModel,
+            viewModel.menuViewModel,
+            onDismissRequest = { showImportFumbblTeamDialog = false }
+        )
     }
     if (showLoadTeamFromFileDialog) {
         LoadTeamFromFileDialog(viewModel.teamSelectorModel, onDismissRequest = { showLoadTeamFromFileDialog = false })

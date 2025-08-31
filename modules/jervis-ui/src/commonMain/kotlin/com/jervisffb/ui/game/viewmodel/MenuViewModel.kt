@@ -31,6 +31,7 @@ import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -47,6 +48,18 @@ data class ErrorDialog(
     val title: String,
     val error: Throwable? = null,
 )
+
+data class ReportIssueDialogData(
+    val visible: Boolean,
+    val title: String,
+    val body: String,
+    val error: Throwable? = null,
+    val gameState: GameEngineController? = null
+) {
+    companion object {
+        val HIDDEN = ReportIssueDialogData(false, "", "")
+    }
+}
 
 class MenuViewModel {
     companion object {
@@ -67,15 +80,17 @@ class MenuViewModel {
     private val _showSettingsDialog = MutableStateFlow(false)
     private val _showDialogDialog = MutableStateFlow(false)
     private val _showErrorDialog = MutableStateFlow(ErrorDialog(false, "",))
+    private val _showReportIssueDialog = MutableStateFlow(ReportIssueDialogData.HIDDEN)
     val isAboutDialogVisible: StateFlow<Boolean> = _showDialogDialog
     val isErrorDialogVisible: StateFlow<ErrorDialog> = _showErrorDialog
+    val isReportIssueDialogVisible: StateFlow<ReportIssueDialogData> = _showReportIssueDialog
     val creditData: CreditData
 
     // Scope for lauching tasks directly related to navigating the UI
     val uiScope = CoroutineScope(CoroutineName("UI") + Dispatchers.Default)
     val navigatorContext = CoroutineScope(CoroutineName("ScreenNavigator") + singleThreadDispatcher("menuThread"))
     // Scope for launching background tasks for Menu actions
-    val backgroundContext = CoroutineScope(CoroutineName("ScreenBackground") + multiThreadDispatcher("menuBackgroundThread"))
+    val backgroundContext = CoroutineScope(SupervisorJob() + CoroutineName("ScreenBackground") + multiThreadDispatcher("menuBackgroundThread"))
 
     init {
         // Customize the create issue link, so it contains some basic information about the client
@@ -105,6 +120,20 @@ class MenuViewModel {
 
     fun hideErrorDialog() {
         _showErrorDialog.value = ErrorDialog(visible = false, title = "",)
+    }
+
+    fun showReportIssueDialog(title: String, body: String, error: Throwable? = null, gameState: GameEngineController? = null) {
+        _showReportIssueDialog.value = ReportIssueDialogData(
+            visible = true,
+            title = title,
+            body = body,
+            error = error,
+            gameState = gameState
+        )
+    }
+
+    fun hideReportIssueDialog() {
+        _showReportIssueDialog.value = ReportIssueDialogData.HIDDEN
     }
 
     // Default values .. figure out a way to persist these

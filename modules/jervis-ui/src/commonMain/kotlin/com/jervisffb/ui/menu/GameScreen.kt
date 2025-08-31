@@ -65,7 +65,6 @@ import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import com.jervisffb.ui.menu.components.JervisDialogHeader
 import com.jervisffb.ui.menu.components.SimpleSwitch
-import com.jervisffb.utils.openUrlInBrowser
 import kotlinx.coroutines.launch
 
 class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenModel) : Screen {
@@ -104,6 +103,7 @@ class GameScreen(val menuViewModel: MenuViewModel, val viewModel: GameScreenMode
                     drawerState = drawerState,
                     drawerContent = {
                         GameDrawerContent(
+                            viewModel = viewModel,
                             menuViewModel = menuViewModel,
                             showExitDialog = { visible ->
                                 showExitDialog = visible
@@ -210,6 +210,7 @@ private fun ColumnScope.AutomatedOptionsSection(vm: MenuViewModel) {
 
 @Composable
 private fun GameDrawerContent(
+    viewModel: GameScreenModel,
     menuViewModel: MenuViewModel,
     showExitDialog: (Boolean) -> Unit,
     showMenuDrawer: (Boolean) -> Unit
@@ -312,7 +313,16 @@ private fun GameDrawerContent(
             }
             DrawerButton("Dump Game State to File", onClick = { menuViewModel.showSaveGameDialog(includeDebugState = true) })
             if (menuViewModel.creditData.newIssueUrl.isNotEmpty()) {
-                DrawerButton("Report Issue", onClick = { openUrlInBrowser(menuViewModel.creditData.newIssueUrl) })
+                DrawerButton(
+                    text = "Report Issue",
+                    onClick = {
+                        menuViewModel.showReportIssueDialog(
+                            title = "",
+                            body = "",
+                            gameState = viewModel.uiState.gameController
+                        )
+                    }
+                )
             }
             DrawerSectionHeader("Automated Actions")
             AutomatedOptionsSection(menuViewModel)

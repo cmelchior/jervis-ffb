@@ -76,7 +76,14 @@ fun AboutDialogComponent(viewModel: MenuViewModel) {
             Spacer(modifier = Modifier.width(16.dp))
             JervisButton(
                 text = "Report Issue",
-                onClick = { openUrlInBrowser(creditData.newIssueUrl) },
+                onClick = {
+                    viewModel.showReportIssueDialog(
+                        title = "",
+                        body = "",
+                        error = null,
+                        gameState = null,
+                    )
+                },
                 buttonColor = JervisTheme.rulebookBlue,
                 textColor = buttonTextColor,
             )

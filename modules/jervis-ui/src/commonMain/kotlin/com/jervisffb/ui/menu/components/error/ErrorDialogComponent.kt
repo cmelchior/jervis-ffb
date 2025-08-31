@@ -20,7 +20,6 @@ import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.viewmodel.ErrorDialog
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.JervisDialog
-import com.jervisffb.utils.openUrlInBrowser
 
 /**
  * Handles showing a system error to the user. This includes showing the error
@@ -35,8 +34,11 @@ fun ErrorDialogComponent(viewModel: MenuViewModel) {
         message = dialogData.error?.message ?: "An unknown error has occurred.",
         showReportIssue = (dialogData.error != null),
         onReportIssueRequest = {
-            val reportUrl = createGithubUrl(dialogData)
-            openUrlInBrowser(reportUrl)
+            viewModel.showReportIssueDialog(
+                title = dialogData.title,
+                body = dialogData.error?.message ?: "An unknown error has occurred.",
+                error = dialogData.error
+            )
         },
         onDismissRequest = {
             viewModel.hideErrorDialog()

@@ -21,18 +21,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
 import com.jervisffb.ui.game.view.utils.JervisButton
+import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.isDigitsOnly
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
 import com.jervisffb.ui.menu.utils.JervisLogo
-import com.jervisffb.utils.openUrlInBrowser
 
 @Composable
 fun ImportTeamFromTourPlayDialog(
     viewModel: SelectTeamComponentModel,
+    menuViewModel: MenuViewModel,
     onDismissRequest: () -> Unit
 ) {
     var inputText by remember { mutableStateOf("") }
@@ -101,12 +101,11 @@ fun ImportTeamFromTourPlayDialog(
                 JervisButton(
                     text = "Report Issue",
                     onClick = {
-                        val reportIssueUrl = IssueTracker.createIssueUrlFromException(
-                            title = "Cannot load team from TourPlay",
+                        menuViewModel.showReportIssueDialog(
+                            title = "Cannot load team from TourPlay ($inputText)",
                             body = "Roster ID: $inputText",
-                            errorWrapper!!.second!!
+                            error = errorWrapper!!.second!!,
                         )
-                        openUrlInBrowser(reportIssueUrl)
                     },
                     enabled = !isLoading && inputText.isNotBlank() && inputText.isDigitsOnly(),
                     buttonColor = JervisTheme.rulebookBlue,

@@ -3,7 +3,6 @@ package com.jervisffb.tourplay
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerLevel
-import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -93,11 +92,6 @@ class TourPlayApi() {
                 },
                 primary = mapToSkillCategory(position.skillNormal),
                 secondary = mapToSkillCategory(position.skillDouble),
-                size = when {
-                    position.isBigGuy == true -> PlayerSize.BIG_GUY
-                    position.position == "Giant" -> PlayerSize.GIANT // TODO Unclear if this is correct
-                    else -> PlayerSize.STANDARD
-                },
                 icon = iconRef,
                 portrait = portraitRef,
             )

@@ -314,7 +314,6 @@ class P2PNetworkTests {
         } finally {
             // Unsure why we need to also close the session on this side to avoid coroutine errors
 //            session.close(CloseReason(CloseReason.Codes.NORMAL, ""))
-            client.close()
             server.stop()
         }
     }

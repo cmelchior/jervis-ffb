@@ -131,19 +131,23 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
     suspend fun loadTeam(
         teamId: Long,
         rules: Rules,
-    ): JervisTeamFile {
-        val team = loadTeamFromFumbbl(teamId)
-        val roster = loadRosterFromFumbbl(team.roster.id)
-        // Unclear if we need exact player details. I assume it could be possible to override
-        // the portrait, but seems fine to just use the one from the position for now
-        // val players: Set<PlayerDetails> = loadTeamPlayers(team)
-        val jervisRoster = convertToBB2020JervisRoster(rules, roster)
-        val jervisTeam = convertToBB2020JervisTeam(rules, jervisRoster, team)
-        return JervisTeamFile(
-            metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-            team = jervisTeam,
-            history = null,
-        )
+    ): Result<JervisTeamFile> {
+        try {
+            val team = loadTeamFromFumbbl(teamId)
+            val roster = loadRosterFromFumbbl(team.roster.id)
+            // Unclear if we need exact player details. I assume it could be possible to override
+            // the portrait, but seems fine to just use the one from the position for now
+            // val players: Set<PlayerDetails> = loadTeamPlayers(team)
+            val jervisRoster = convertToBB2020JervisRoster(rules, roster)
+            val jervisTeam = convertToBB2020JervisTeam(rules, jervisRoster, team)
+            return Result.success(JervisTeamFile(
+                metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
+                team = jervisTeam,
+                history = null,
+            ))
+        } catch (ex: Exception) {
+            return Result.failure(ex)
+        }
     }
 
     private suspend fun loadRosterFromFumbbl(rosterId: Int): FumbbleRosterDetails {

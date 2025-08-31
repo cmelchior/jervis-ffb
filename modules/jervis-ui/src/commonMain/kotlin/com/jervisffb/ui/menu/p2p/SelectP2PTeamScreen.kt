@@ -67,10 +67,18 @@ fun SelectP2PTeamScreen(
         }
     }
     if (showImportTourPlayTeamDialog) {
-        ImportTeamFromTourPlayDialog(viewModel, onDismissRequest = { showImportTourPlayTeamDialog = false })
+        ImportTeamFromTourPlayDialog(
+            viewModel,
+            viewModel.menuViewModel,
+            onDismissRequest = { showImportTourPlayTeamDialog = false }
+        )
     }
     if (showImportFumbblTeamDialog) {
-        ImportTeamFromFumbblDialog(viewModel, onDismissRequest = { showImportFumbblTeamDialog = false })
+        ImportTeamFromFumbblDialog(
+            viewModel,
+            viewModel.menuViewModel,
+            onDismissRequest = { showImportFumbblTeamDialog = false }
+        )
     }
     if (showLoadTeamFromFileDialog) {
         LoadTeamFromFileDialog(viewModel, onDismissRequest = { showLoadTeamFromFileDialog = false })

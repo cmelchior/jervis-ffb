@@ -24,19 +24,19 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.logo_fumbbl_small
-import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
 import com.jervisffb.ui.game.view.utils.JervisButton
+import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.isDigitsOnly
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
-import com.jervisffb.utils.openUrlInBrowser
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun ImportTeamFromFumbblDialog(
     viewModel: SelectTeamComponentModel,
+    menuViewModel: MenuViewModel,
     onDismissRequest: () -> Unit
 ) {
     var inputText by remember { mutableStateOf("") }
@@ -98,12 +98,11 @@ fun ImportTeamFromFumbblDialog(
                 JervisButton(
                     text = "Report Issue",
                     onClick = {
-                        val reportIssueUrl = IssueTracker.createIssueUrlFromException(
-                            title = "Cannot load team from FUMBBL",
+                        menuViewModel.showReportIssueDialog(
+                            title = "Cannot load team from FUMBBL ($inputText)",
                             body = "Team ID: $inputText",
-                            errorWrapper!!.second!!
+                            error = errorWrapper!!.second!!,
                         )
-                        openUrlInBrowser(reportIssueUrl)
                     },
                     enabled = !isLoading && inputText.isNotBlank() && inputText.isDigitsOnly(),
                     buttonColor = JervisTheme.rulebookBlue,

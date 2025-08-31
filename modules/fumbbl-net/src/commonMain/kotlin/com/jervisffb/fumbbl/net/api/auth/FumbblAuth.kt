@@ -73,6 +73,6 @@ class FumbblAuth {
     }
 
     fun close() {
-        client.close()
+        /* Do nothing */
     }
 }

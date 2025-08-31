@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
  * @see [SelectTeamComponent]
  */
 class SelectTeamComponentModel(
-    private val menuViewModel: MenuViewModel,
+    val menuViewModel: MenuViewModel,
     private val getCoach: () -> Coach,
     private val onTeamSelected: (TeamInfo?) -> Unit,
     private val onTeamImported: (TeamInfo) -> Unit = { _ -> /* Do nothing */ },
@@ -38,6 +38,7 @@ class SelectTeamComponentModel(
     }
 
     val fumbblApi = FumbblApi()
+    val tourplayApi = TourPlayApi()
 
     var unavailableTeam = MutableStateFlow<TeamId?>(null)
     val availableTeams = MutableStateFlow<List<TeamInfo>>(emptyList())
@@ -55,7 +56,7 @@ class SelectTeamComponentModel(
     }
 
     private fun loadTeamList(rules: Rules) {
-        menuViewModel.navigatorContext.launch {
+        menuViewModel.backgroundContext.launch {
             val teams =  CacheManager.loadTeams().mapNotNull { teamFile ->
                 try {
                     val teamData = teamFile.team
@@ -156,7 +157,7 @@ class SelectTeamComponentModel(
         menuViewModel.backgroundContext.launch {
             try {
                 val rules = rules!!
-                val rosterResult = TourPlayApi().loadRoster(teamId, rules)
+                val rosterResult = tourplayApi.loadRoster(teamId, rules)
                 if (rosterResult.isFailure) {
                     onError("Could not load roster", rosterResult.exceptionOrNull())
                 } else {
