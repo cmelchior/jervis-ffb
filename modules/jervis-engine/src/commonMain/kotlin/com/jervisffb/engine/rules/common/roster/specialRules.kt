@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.bb2020.roster
+package com.jervisffb.engine.rules.common.roster
 
 import kotlinx.serialization.Serializable
 
@@ -31,6 +31,7 @@ enum class TeamSpecialRule(override val description: String): SpecialRules {
     LOW_COST_LINEMEN("Low Cost Linemen"),
     MASTERS_OF_UNDEATH("Masters of Undeath"),
 }
+
 
 // Special rules that are being applied by procedures, i.e. they do not
 // have any "state", just an effect on how the game is played.

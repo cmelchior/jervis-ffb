@@ -36,12 +36,12 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.reports.ReportEndingTurn
 import com.jervisffb.engine.reports.ReportStartingTurn
-import com.jervisffb.engine.rules.PlayerSpecialActionType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducementContext
 import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducements
 import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.ResolveThrowARock
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
+import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.utils.INVALID_ACTION
 

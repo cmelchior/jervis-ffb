@@ -8,9 +8,9 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
-import com.jervisffb.engine.rules.BlockType
-import com.jervisffb.engine.rules.PlayerAction
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
+import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.utils.cartesianProduct
 import com.jervisffb.engine.utils.combinations
 import kotlinx.serialization.Serializable

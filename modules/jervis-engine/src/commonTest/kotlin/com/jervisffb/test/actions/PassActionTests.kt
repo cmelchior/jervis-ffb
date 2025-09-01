@@ -21,10 +21,10 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassingType
 import com.jervisffb.engine.rules.bb2020.tables.Range
+import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer

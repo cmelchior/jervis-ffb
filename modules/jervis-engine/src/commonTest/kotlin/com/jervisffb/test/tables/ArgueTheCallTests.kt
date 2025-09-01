@@ -10,8 +10,8 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
-import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.skills.BrilliantCoachingReroll
+import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer

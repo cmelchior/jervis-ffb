@@ -2,8 +2,8 @@ package com.jervisffb.engine.serialize
 
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
-import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
-import com.jervisffb.engine.rules.bb2020.roster.StarPlayerPosition
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import kotlinx.serialization.Serializable
 
 /**

@@ -2,8 +2,8 @@ package com.jervisffb.resources
 
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
-import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
-import com.jervisffb.engine.rules.bb2020.roster.StarPlayerPosition
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import com.jervisffb.engine.rules.common.skills.SkillType.DODGE
 import com.jervisffb.engine.rules.common.skills.SkillType.LONER
 import com.jervisffb.engine.rules.common.skills.SkillType.SIDESTEP

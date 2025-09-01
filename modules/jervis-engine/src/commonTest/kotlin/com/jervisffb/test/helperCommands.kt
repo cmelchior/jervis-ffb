@@ -26,8 +26,8 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Coin
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.BlockType
-import com.jervisffb.engine.rules.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.utils.SelectSingleBlockDieResult
 import kotlin.collections.plus
 

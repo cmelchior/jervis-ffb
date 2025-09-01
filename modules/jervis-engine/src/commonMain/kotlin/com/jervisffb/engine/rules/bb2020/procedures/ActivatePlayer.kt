@@ -33,9 +33,6 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.modifiers.TemporaryEffectType
 import com.jervisffb.engine.reports.ReportActionEnded
 import com.jervisffb.engine.reports.ReportActionSelected
-import com.jervisffb.engine.rules.PlayerAction
-import com.jervisffb.engine.rules.PlayerSpecialActionType
-import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.AnimalSavagery
 import com.jervisffb.engine.rules.bb2020.skills.BloodLust
@@ -45,6 +42,9 @@ import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2020.skills.ReallyStupid
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
+import com.jervisffb.engine.rules.common.actions.PlayerAction
+import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
+import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.utils.INVALID_ACTION
 
@@ -115,7 +115,7 @@ object ActivatePlayer : Procedure() {
             if (context.markActionAsUsed || state.endActionImmediately()) {
                 val activeTeam = state.activeTeamOrThrow()
                 val markActionAsUsedCommand = when (val type = context.declaredAction!!.type) {
-                    PlayerStandardActionType.MOVE -> SetAvailableActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerStandardActionType.MOVE)
+                    PlayerStandardActionType.MOVE -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.MOVE)
                     PlayerStandardActionType.PASS -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.PASS)
                     PlayerStandardActionType.HAND_OFF -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.HAND_OFF)
                     PlayerStandardActionType.BLOCK -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.BLOCK)
@@ -132,19 +132,19 @@ object ActivatePlayer : Procedure() {
                     PlayerSpecialActionType.MULTIPLE_BLOCK -> {
                         compositeCommandOf(
                             SetSpecialActionSkillUsed(player, player.getSkill<MultipleBlock>(), true),
-                            SetAvailableSpecialActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerSpecialActionType.MULTIPLE_BLOCK)
+                            SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.MULTIPLE_BLOCK)
                         )
                     }
                     PlayerSpecialActionType.PROJECTILE_VOMIT -> {
                         compositeCommandOf(
                             SetSpecialActionSkillUsed(player, player.getSkill<ProjectileVomit>(), true),
-                            SetAvailableSpecialActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerSpecialActionType.PROJECTILE_VOMIT)
+                            SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.PROJECTILE_VOMIT)
                         )
                     }
                     PlayerSpecialActionType.STAB -> {
                         compositeCommandOf(
                             SetSpecialActionSkillUsed(player, player.getSkill<Stab>(), true),
-                            SetAvailableSpecialActions.markAsUsed(activeTeam, com.jervisffb.engine.rules.PlayerSpecialActionType.STAB)
+                            SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.STAB)
                         )
                     }
                 }

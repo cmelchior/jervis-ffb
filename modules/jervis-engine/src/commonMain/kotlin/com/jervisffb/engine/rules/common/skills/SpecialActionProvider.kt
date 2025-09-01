@@ -1,6 +1,6 @@
 package com.jervisffb.engine.rules.common.skills
 
-import com.jervisffb.engine.rules.PlayerSpecialActionType
+import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 
 /**
  * Interface for skills that provide a special player action.

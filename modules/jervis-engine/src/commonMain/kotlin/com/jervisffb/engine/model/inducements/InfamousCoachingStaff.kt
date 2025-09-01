@@ -1,9 +1,9 @@
 package com.jervisffb.engine.model.inducements
 
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.bb2020.roster.PlayerSpecialRule
-import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
-import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
+import com.jervisffb.engine.rules.common.roster.PlayerSpecialRule
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 
 enum class InfamousCoachingStaffType {
     JOSEF_BUGMAN,

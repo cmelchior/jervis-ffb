@@ -7,9 +7,9 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzActionContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockActionContext
+import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider

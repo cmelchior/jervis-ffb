@@ -2,7 +2,7 @@ package com.jervisffb.engine.commands
 
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.PlayerSpecialActionType
+import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 class SetAvailableSpecialActions(

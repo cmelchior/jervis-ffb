@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules
 
 /**
- * Enumerate all the dice roll types available in Blood Bowl
+ * Enumerate all dice roll types available across all variants of Blood Bowl.
  */
 enum class DiceRollType {
     ACCURACY, // For passing

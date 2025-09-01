@@ -1,6 +1,5 @@
-package com.jervisffb.engine.rules
+package com.jervisffb.engine.rules.bb2020
 
-import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockAction
@@ -10,166 +9,13 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.handoff.HandOffAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassAction
+import com.jervisffb.engine.rules.common.actions.PlayerAction
+import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
+import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.actions.TeamActions
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.rules.bb2020.procedures.actions.handoff.ThrowTeamMateAction
 import kotlinx.serialization.Serializable
-
-//
-//object PlayerActionSerializer : KSerializer<PlayerAction> {
-//    override val descriptor: SerialDescriptor =
-//        buildClassSerialDescriptor("PlayerAction") {
-//            val stringDescriptor = String.serializer().descriptor
-//            val boolDescriptor = Boolean.serializer().descriptor
-//            element("name", stringDescriptor)
-//            element("type", boolDescriptor)
-//            element("procedure", stringDescriptor)
-//            element("compulsory", boolDescriptor)
-//            element("isSpecial", boolDescriptor)
-//        }
-//
-//    override fun serialize(
-//        encoder: Encoder,
-//        value: PlayerAction,
-//    ) {
-//        val compositeEncoder = encoder.beginStructure(descriptor)
-//        compositeEncoder.encodeStringElement(descriptor, 0, value.name)
-//        compositeEncoder.encodeSerializableElement(descriptor, 1, PlayerActionType.serializer(), value.type)
-//        compositeEncoder.encodeStringElement(descriptor, 2, value.procedure::class.qualifiedName.toString())
-//        compositeEncoder.encodeBooleanElement(descriptor, 3, value.compulsory)
-//        compositeEncoder.encodeBooleanElement(descriptor, 4, value.isSpecial)
-//        compositeEncoder.endStructure(descriptor)
-//    }
-//
-//    override fun deserialize(decoder: Decoder): PlayerAction {
-//        val compositeDecoder = decoder.beginStructure(descriptor)
-//        var name = ""
-//        var type: PlayerActionType? = null
-//        var worksDuringBlitz: Boolean = false
-//        var procedure: Procedure? = null
-//        var compulsory = false
-//        var isSpecial = false
-//        loop@ while (true) {
-//            when (val index = compositeDecoder.decodeElementIndex(descriptor)) {
-//                CompositeDecoder.DECODE_DONE -> break@loop
-//                0 -> name = compositeDecoder.decodeStringElement(descriptor, index)
-//                1 -> type = compositeDecoder.decodeSerializableElement(descriptor, index, PlayerActionType.serializer())
-//                2 -> procedure = loadProcedure(compositeDecoder.decodeStringElement(descriptor, index)) // Convert String back to Procedure
-//                3 -> compulsory = compositeDecoder.decodeBooleanElement(descriptor, index)
-//                4 -> isSpecial = compositeDecoder.decodeBooleanElement(descriptor, index)
-//                else -> throw SerializationException("Unknown index $index")
-//            }
-//        }
-//        compositeDecoder.endStructure(descriptor)
-//
-//
-//
-//
-//
-//        return PlayerAction(name, type!!, procedure!!, compulsory, isSpecial)
-//    }
-//
-//    private fun loadProcedure(procedureFQN: String): Procedure {
-//        TODO()
-////        return Class.forName(procedureFQN).kotlin.objectInstance
-//    }
-//}
-
-
-
-/**
- * Wrapper representing a player action. This can either be a normal or special action.
- */
-@Serializable()
-data class PlayerAction(
-    val name: String,
-    val type: ActionType,
-    val countsAs: PlayerStandardActionType?,
-    // How many times (by different players) can this action be used pr team turn
-    val availablePrTurn: Int,
-    // if type == BLOCK, this decides if this action also works during the blitz
-    val worksDuringBlitz: Boolean,
-    val procedure: Procedure,
-    val compulsory: Boolean, // If true, players must choose this action
-) {
-    val isSpecial = (type == PlayerStandardActionType.SPECIAL) || (countsAs == PlayerStandardActionType.SPECIAL)
-}
-
-@Serializable
-sealed interface ActionType
-
-/**
- * Enumerate the different "main" action types available in Blood Bowl.
- * The special category should only be used for skills that are completely
- * their own, and doesn't replace a skill in one of the other categories.
- */
-@Serializable
-enum class PlayerStandardActionType: ActionType {
-    MOVE,
-    PASS,
-    HAND_OFF,
-    THROW_TEAM_MATE,
-    BLOCK,
-    BLITZ,
-    FOUL,
-    SPECIAL
-}
-
-/**
- * Enumerate the different special action types possible in Blood Bowl.
- * All special actions are tied to skills.
- */
-@Serializable
-enum class PlayerSpecialActionType: ActionType {
-    BALL_AND_CHAIN,
-    BOMBARDIER,
-    BREATHE_FIRE,
-    CHAINSAW,
-    HYPNOTIC_GAZE,
-    KICK_TEAM_MATE,
-    MULTIPLE_BLOCK,
-    PROJECTILE_VOMIT,
-    STAB,
-}
-
-@Serializable
-enum class BlockType {
-    BREATHE_FIRE,
-    CHAINSAW,
-    MULTIPLE_BLOCK,
-    PROJECTILE_VOMIT,
-    STAB,
-    STANDARD,
-    // Multiple Block
-    // Ball & Chain (replace all other actions)
-    // Bombardier (Its own action, 1 pr. team turn)
-    // Chainsaw (Replace block action or block part of Blitz, 1. pr activation)
-    // Kick Team-mate (its own action, 1 pr. team turn)
-    // Projectile Vomit (Replace block action or block part of Blitz, 1. pr activation)
-    // Stab (Replace block action or block part of Blitz, no limit)
-    // Hypnotic Gaze (Its own action)
-    // Breathe Fire (replace block or block part of blitz, once pr. activation)
-}
-
-
-@Serializable
-abstract class TeamActions {
-    operator fun get(type: ActionType): PlayerAction {
-        return when (type) {
-            is PlayerStandardActionType -> get(type)
-            is PlayerSpecialActionType -> get(type)
-        }
-    }
-    abstract operator fun get(type: PlayerStandardActionType): PlayerAction
-    abstract operator fun get(type: PlayerSpecialActionType): PlayerAction
-
-    abstract val move: PlayerAction
-    abstract val pass: PlayerAction
-    abstract val handOff: PlayerAction
-    abstract val block: PlayerAction
-    abstract val blitz: PlayerAction
-    abstract val foul: PlayerAction
-    abstract val specialActions: Set<PlayerAction>
-}
 
 /**
  * Define the standard set of actions that are available in the rules.

@@ -6,9 +6,9 @@ import com.jervisffb.engine.model.inducements.JosefBugman
 import com.jervisffb.engine.model.inducements.StandardBiasedReferee
 import com.jervisffb.engine.model.inducements.wizards.HirelingSportsWizard
 import com.jervisffb.engine.model.inducements.wizards.Wizard
-import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
-import com.jervisffb.engine.rules.bb2020.roster.StarPlayerPosition
-import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
+import com.jervisffb.engine.rules.common.roster.SpecialRules
+import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
+import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.teams.THE_BLACK_GOBBO
 import kotlinx.serialization.Serializable
 

@@ -9,7 +9,6 @@ import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.serialize.SpriteSource

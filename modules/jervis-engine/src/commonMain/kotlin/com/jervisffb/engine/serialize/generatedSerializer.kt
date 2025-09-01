@@ -1,5 +1,9 @@
 package com.jervisffb.engine.serialize
 
+import com.jervisffb.engine.rules.bb2020.BB2020TeamActions
+import com.jervisffb.engine.rules.common.actions.TeamActions
+import com.jervisffb.engine.rules.common.roster.RosterPosition
+import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
@@ -79,8 +83,8 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.roster.Position::class) {
-        subclass(com.jervisffb.engine.rules.bb2020.roster.RosterPosition::class)
-        subclass(com.jervisffb.engine.rules.bb2020.roster.StarPlayerPosition::class)
+        subclass(RosterPosition::class)
+        subclass(StarPlayerPosition::class)
     }
     polymorphic(com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable::class) {
         subclass(com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable::class)
@@ -110,8 +114,8 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.model.inducements.wizards.Fireball::class)
         subclass(com.jervisffb.engine.model.inducements.wizards.Zap::class)
     }
-    polymorphic(com.jervisffb.engine.rules.TeamActions::class) {
-        subclass(com.jervisffb.engine.rules.BB2020TeamActions::class)
+    polymorphic(TeamActions::class) {
+        subclass(BB2020TeamActions::class)
     }
     polymorphic(com.jervisffb.engine.model.inducements.wizards.Wizard::class) {
         subclass(com.jervisffb.engine.model.inducements.wizards.HirelingSportsWizard::class)

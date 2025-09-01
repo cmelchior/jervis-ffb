@@ -10,8 +10,8 @@ import com.jervisffb.engine.model.inducements.settings.SimpleInducement
 import com.jervisffb.engine.model.inducements.settings.StandardMercenaryInducements
 import com.jervisffb.engine.model.inducements.settings.StarPlayersInducement
 import com.jervisffb.engine.model.inducements.settings.WizardsInducement
-import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
-import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import kotlinx.serialization.Serializable
 
 val DEFAULT_INDUCEMENTS = mapOf<InducementType, Inducement<*>>(

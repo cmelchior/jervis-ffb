@@ -12,12 +12,6 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.BlockType
-import com.jervisffb.engine.rules.BlockType.CHAINSAW
-import com.jervisffb.engine.rules.BlockType.MULTIPLE_BLOCK
-import com.jervisffb.engine.rules.BlockType.PROJECTILE_VOMIT
-import com.jervisffb.engine.rules.BlockType.STAB
-import com.jervisffb.engine.rules.BlockType.STANDARD
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
@@ -27,6 +21,12 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.Stand
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.actions.BlockType.CHAINSAW
+import com.jervisffb.engine.rules.common.actions.BlockType.MULTIPLE_BLOCK
+import com.jervisffb.engine.rules.common.actions.BlockType.PROJECTILE_VOMIT
+import com.jervisffb.engine.rules.common.actions.BlockType.STAB
+import com.jervisffb.engine.rules.common.actions.BlockType.STANDARD
 
 /**
  * Class wrapping one of the block actions part of a multiple block actions.

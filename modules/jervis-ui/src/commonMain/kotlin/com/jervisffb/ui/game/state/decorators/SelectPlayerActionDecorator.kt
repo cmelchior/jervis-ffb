@@ -10,9 +10,9 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.PlayerAction
-import com.jervisffb.engine.rules.PlayerSpecialActionType
-import com.jervisffb.engine.rules.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.actions.PlayerAction
+import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
+import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider

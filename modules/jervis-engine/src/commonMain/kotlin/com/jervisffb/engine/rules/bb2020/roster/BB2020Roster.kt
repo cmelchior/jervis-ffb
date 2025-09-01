@@ -2,6 +2,8 @@ package com.jervisffb.engine.rules.bb2020.roster
 
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.common.roster.Roster
+import com.jervisffb.engine.rules.common.roster.RosterPosition
+import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.serialize.RosterLogo
 import kotlinx.serialization.Serializable
 
