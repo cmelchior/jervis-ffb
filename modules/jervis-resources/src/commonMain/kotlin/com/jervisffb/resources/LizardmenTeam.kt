@@ -1,3 +1,4 @@
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -31,6 +32,7 @@ val SKINK_RUNNER_LINEMEN =
         listOf(SkillType.DODGE.id(), STUNTY.id()),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_skinkrunner.png",6),
         SingleSprite.ini("$portraitRootPath/lizardmen_skinkrunner.png")
     )
@@ -46,6 +48,7 @@ val CHAMELEON_SKINKS =
         listOf(DODGE.id(), /* On the Ball, Shadowing */ SkillType.STUNTY.id()),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_chameleonskink.png",2),
         SingleSprite.ini("$portraitRootPath/lizardmen_chameleonskink.png")
     )
@@ -61,6 +64,7 @@ val SAURUS_BLOCKERS =
         emptyList(),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_saurusblocker.png",6),
         SingleSprite.ini("$portraitRootPath/lizardmen_saurusblocker.png")
     )
@@ -82,6 +86,7 @@ val KROXIGOR =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        PlayerSize.BIG_GUY,
         SpriteSheet.ini("$iconRootPath/lizardmen_kroxigor.png",1),
         SingleSprite.ini("$portraitRootPath/lizardmen_kroxigor.png")
     )

@@ -1,5 +1,6 @@
 package com.jervisffb.resources
 
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -45,6 +46,7 @@ val ORC_LINEMEN =
         emptyList(/* Animosity */),
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/orc_lineman.png",6),
         SingleSprite.ini("$portraitRootPath/orc_lineman.png")
 
@@ -65,6 +67,7 @@ val ORC_THROWER =
         ),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/orc_thrower.png",2),
         SingleSprite.ini("$portraitRootPath/orc_thrower.png")
     )
@@ -83,6 +86,7 @@ val ORC_BLITZER =
         ),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/orc_blitzer.png", 4),
         SingleSprite.ini("$portraitRootPath/orc_blitzer.png")
     )
@@ -100,6 +104,7 @@ val BIG_UN_BLOCKERS =
         ),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/orc_bigunblocker.png", 4),
         SingleSprite.ini("$portraitRootPath/orc_bigunblocker.png")
     )
@@ -119,6 +124,7 @@ val GOBLIN =
         ),
         listOf(AGILITY),
         listOf(GENERAL, STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/orc_goblin.png", 4),
         SingleSprite.ini("$portraitRootPath/orc_goblin.png")
     )
@@ -142,6 +148,7 @@ val UNTRAINED_TROLL =
         ),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL, PASSING),
+        PlayerSize.BIG_GUY,
         SpriteSheet.ini("$iconRootPath/orc_troll.png", 1),
         SingleSprite.ini("$portraitRootPath/orc_troll.png")
     )

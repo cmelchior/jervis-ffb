@@ -1,5 +1,6 @@
 package com.jervisffb.test
 
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -26,6 +27,7 @@ val HUMAN_LINEMAN =
         emptyList(),
         listOf(SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         null,
         null
     )
@@ -41,6 +43,7 @@ val HUMAN_THROWER =
         listOf(/* Pass */ SkillType.SURE_HANDS.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         null,
         null
     )
@@ -56,6 +59,7 @@ val HUMAN_CATCHER =
         listOf(SkillType.CATCH.id(), SkillType.DODGE.id()),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.STRENGTH, SkillCategory.PASSING),
+        PlayerSize.STANDARD,
         null,
         null,
     )
@@ -71,6 +75,7 @@ val HUMAN_BLITZER =
         listOf(SkillType.BLOCK.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
+        PlayerSize.STANDARD,
         null,
         null
     )
@@ -86,6 +91,7 @@ val HALFLING_HOPEFUL =
         emptyList(),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         null,
         null
     )
@@ -101,6 +107,7 @@ val OGRE =
         emptyList(),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        PlayerSize.BIG_GUY,
         null,
         null
     )

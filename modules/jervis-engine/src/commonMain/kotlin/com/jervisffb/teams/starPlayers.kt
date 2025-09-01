@@ -1,5 +1,6 @@
 package com.jervisffb.teams
 
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.roster.StarPlayerPosition
@@ -24,6 +25,7 @@ val THE_BLACK_GOBBO = StarPlayerPosition(
         SkillType.STUNTY.id()
     ),
     listOf(RegionalSpecialRule.BADLANDS_BRAWL, RegionalSpecialRule.UNDERWORLD_CHALLENGE),
+    PlayerSize.STANDARD,
     SpriteSheet.embedded("$iconRootPath/TheBlackGobbo.png",1),
     SingleSprite.embedded("$portraitRootPath/TheBlackGobbo.png")
 )

@@ -1,5 +1,6 @@
 package com.jervisffb.resources
 
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -39,6 +40,7 @@ val AMAZON_LINEMAN =
         ),
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/amazon_triballinewoman.png",9),
         SingleSprite.ini("$portraitRootPath/amazon_triballinewoman.png")
 
@@ -60,6 +62,7 @@ val AMAZON_THROWER =
         ),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/amazon_eaglewarriorthrower.png",2),
         SingleSprite.ini("$portraitRootPath/amazon_eaglewarriorthrower.png")
     )
@@ -79,6 +82,7 @@ val AMAZON_BLITZER =
         ),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/amazon_piranhawarriorblitzer.png", 2),
         SingleSprite.ini("$portraitRootPath/amazon_piranhawarriorblitzer.png")
     )
@@ -97,6 +101,7 @@ val AMAZON_BLOCKER =
         ),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/amazon_jaguarwarriorblocker.png", 2),
         SingleSprite.ini("$portraitRootPath/amazon_jaguarwarriorblocker.png")
     )

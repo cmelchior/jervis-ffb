@@ -28,8 +28,8 @@ suspend fun initApplication() {
     val LOG = jervisLogger()
 
     // For now, we re-initialize the default teams for every new version. This is done because
-    //  we are still iterating on the fileformat and serialization format. Once these are
-    // stable, we should probably avoid this.
+    //  we are still iterating on the file format and serialization format. Once these are
+    // stable, we should avoid this.
     val clientReleaseVersion = BuildConfig.releaseVersion
     val isClientInitialized = PROPERTIES_MANAGER.getBoolean(PROP_INITIALIZED) ?: false
     val initializedVersion = PROPERTIES_MANAGER.getString(PROP_INITIALIZED_VERSION)

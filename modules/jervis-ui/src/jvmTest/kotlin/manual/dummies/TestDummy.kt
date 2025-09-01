@@ -11,6 +11,7 @@ import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
 import com.jervisffb.ui.menu.GameScreenModel
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.ui.menu.Manual
 import com.jervisffb.ui.menu.TeamActionMode
 
@@ -21,7 +22,7 @@ object TestDummy {
     val settings = GameSettings(StandardBB2020Rules())
     val homeActionProvider = ManualActionProvider(controller, menuViewModel,TeamActionMode.HOME_TEAM, settings)
     val awayActionProvider = ManualActionProvider(controller, menuViewModel,  TeamActionMode.AWAY_TEAM, settings)
-
+    val dummyFieldWrapper = LocalFieldDataWrapper()
     val actionProvider = LocalActionProvider(
         controller,
         settings,
@@ -44,6 +45,7 @@ object TestDummy {
         SidebarViewModel(
             menuViewModel,
             uiController,
+            dummyFieldWrapper,
             state.homeTeam,
             gameModel.hoverPlayerFlow
         )
@@ -52,6 +54,7 @@ object TestDummy {
         SidebarViewModel(
             menuViewModel,
             uiController,
+            dummyFieldWrapper,
             state.awayTeam,
             gameModel.hoverPlayerFlow
         )

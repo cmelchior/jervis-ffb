@@ -13,6 +13,7 @@ import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.model.UiSidebarPlayer
 import com.jervisffb.ui.game.state.ReplayActionProvider
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,6 +32,7 @@ data class ButtonData(
 class SidebarViewModel(
     private val menuViewModel: MenuViewModel,
     private val uiState: UiGameController,
+    val sharedFieldData: LocalFieldDataWrapper,
     val team: Team,
     // Channel specifically for handling the Player Stat Card being visible or not
     private val hoverPlayerChannel: MutableSharedFlow<Player?>,

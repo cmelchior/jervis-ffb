@@ -3,6 +3,7 @@ package com.jervisffb.fumbbl.web
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerLevel
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -218,6 +219,11 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
                 primary = mapToSkillCategory(position.normalSkills),
                 secondary = mapToSkillCategory(position.doubleSkills),
                 icon = iconRef,
+                size = when {
+                    // FUMBBL does not support Giants
+                    position.type == "Big Guy" -> PlayerSize.BIG_GUY
+                    else -> PlayerSize.STANDARD
+                },
                 portrait = portraitRef,
             )
         }

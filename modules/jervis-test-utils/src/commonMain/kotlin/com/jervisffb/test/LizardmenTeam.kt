@@ -1,5 +1,6 @@
 package com.jervisffb.test
 
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -21,6 +22,7 @@ val SKINK_RUNNER_LINEMEN =
         listOf(SkillType.DODGE.id(), SkillType.STUNTY.id()),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         null,
         null
     )
@@ -36,6 +38,7 @@ val CHAMELEON_SKINKS =
         listOf(SkillType.DODGE.id(), /* On the Ball, Shadowing */ SkillType.STUNTY.id()),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         null,
         null
     )
@@ -51,6 +54,7 @@ val SAURUS_BLOCKERS =
         emptyList(),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
+        PlayerSize.STANDARD,
         null,
         null
     )
@@ -72,6 +76,7 @@ val KROXIGOR =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        PlayerSize.BIG_GUY,
         null,
         null
     )

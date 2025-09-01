@@ -3,6 +3,7 @@ package com.jervisffb.engine.rules.bb2020.roster
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
@@ -31,6 +32,7 @@ data class RosterPosition(
     override val skills: List<SkillId>,
     override val primary: List<SkillCategory>,
     override val secondary: List<SkillCategory>,
+    override val size: PlayerSize,
     override val icon: SpriteSource?,
     override val portrait: SpriteSource?,
 ) : Position {

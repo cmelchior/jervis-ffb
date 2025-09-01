@@ -1,5 +1,6 @@
 package com.jervisffb.resources
 
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -32,6 +33,7 @@ val SKAVEN_LINEMAN =
         emptyList(),
         listOf(SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/skaven_lineman.png", 9),
         SingleSprite.ini("$portraitRootPath/skaven_lineman.png")
 
@@ -48,6 +50,7 @@ val SKAVEN_THROWER =
         listOf(PASS.id(), SURE_HANDS.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/skaven_thrower.png", 2),
         SingleSprite.ini("$portraitRootPath/skaven_thrower.png")
     )
@@ -63,6 +66,7 @@ val GUTTER_RUNNER =
         listOf(DODGE.id()),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.MUTATIONS, SkillCategory.PASSING, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/skaven_gutterrunner.png", 4),
         SingleSprite.ini("$portraitRootPath/skaven_gutterrunner.png")
     )
@@ -78,6 +82,7 @@ val SKAVEN_BLITZER =
         listOf(BLOCK.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.PASSING),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/skaven_blitzer.png", 2),
         SingleSprite.ini("$portraitRootPath/skaven_blitzer.png")
     )
@@ -99,6 +104,7 @@ val RAT_OGRE =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL, SkillCategory.MUTATIONS),
+        PlayerSize.BIG_GUY,
         SpriteSheet.ini("$iconRootPath/skaven_ratogre.png", 1),
         SingleSprite.ini("$portraitRootPath/skaven_ratogre.png")
     )

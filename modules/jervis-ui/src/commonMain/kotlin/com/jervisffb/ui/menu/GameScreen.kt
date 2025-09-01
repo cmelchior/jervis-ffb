@@ -352,12 +352,14 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
         SidebarViewModel(
             viewModel.menuViewModel,
             viewModel.uiState,
+            viewModel.sharedFieldData,
             viewModel.homeTeam,
             viewModel.hoverPlayerFlow
         ),
         SidebarViewModel(
             viewModel.menuViewModel,
             viewModel.uiState,
+            viewModel.sharedFieldData,
             viewModel.awayTeam,
             viewModel.hoverPlayerFlow
         ),
@@ -370,9 +372,6 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
         onSettingsClick
     )
 }
-
-
-
 
 /**
  * Temporary composable for "normal" buttons in the NavigationDrawer. Using the normal blue hovering ones

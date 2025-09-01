@@ -71,14 +71,16 @@ private fun SquareHighlightAndAction(
 ) {
     val sharedFieldData = vm.sharedFieldData
 
-    val bgColor = when {
-        sharedFieldData.isContentMenuVisible -> Color.Transparent
-        square.selectedAction != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
-        // Hide square color when diretion arrows are shown
-        square.selectableDirection != null || square.directionSelected != null -> Color.Transparent
-        player?.isSelectable == true -> Color.Transparent
-        square.selectedAction != null -> JervisTheme.availableActionBackground // Fallback for active squares
-        else -> Color.Transparent
+    val bgColor = remember(sharedFieldData.isContentMenuVisible, square, player) {
+        when {
+            sharedFieldData.isContentMenuVisible -> Color.Transparent
+            square.selectedAction != null && square.requiresRoll -> Color.Yellow.copy(alpha = 0.25f)
+            // Hide square color when diretion arrows are shown
+            square.selectableDirection != null || square.directionSelected != null -> Color.Transparent
+            player?.isSelectable == true -> Color.Transparent
+            square.selectedAction != null -> JervisTheme.availableActionBackground // Fallback for active squares
+            else -> Color.Transparent
+        }
     }
 
     // Setup onHover events
@@ -93,7 +95,9 @@ private fun SquareHighlightAndAction(
     val boxWrapperModifier =
         if (square.contextMenuOptions.isNotEmpty() || player?.selectedAction != null || square.selectedAction != null || pathfinderData?.hoverAction != null) {
             modifier.jervisPointerEvent(FieldPointerEventType.ClickSquare, square.coordinates) {
-                vm.sharedFieldData.isContentMenuVisible = !vm.sharedFieldData.isContentMenuVisible
+                if (square.contextMenuOptions.isNotEmpty()) {
+                    vm.sharedFieldData.isContentMenuVisible = !vm.sharedFieldData.isContentMenuVisible
+                }
                 if (square.contextMenuOptions.isEmpty()) {
                     pathfinderData?.hoverAction()
                         ?: player?.selectedAction?.invoke()

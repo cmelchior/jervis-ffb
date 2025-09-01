@@ -4,11 +4,11 @@ import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.model.isOnHomeTeam
-import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.rules.common.roster.Position
 
 /**
@@ -17,9 +17,10 @@ import com.jervisffb.engine.rules.common.roster.Position
  */
 data class UiFieldPlayer(
     val id: PlayerId,
-    val coordinate: FieldCoordinate,
+    val location: Location,
     val number: PlayerNo,
     val team: TeamId,
+    val size: PlayerSize,
     val selectedAction: (() -> Unit)?,
     val carriesBall: Boolean,
     val state: PlayerState,
@@ -33,9 +34,10 @@ data class UiFieldPlayer(
 ) {
     constructor(model: Player, selectAction: (() -> Unit)? = null) : this(
         id = model.id,
-        coordinate = model.coordinates,
+        location = model.location,
         number = model.number,
         team = model.team.id,
+        size = model.position.size,
         selectedAction = selectAction,
         carriesBall = model.hasBall(),
         state = model.state,

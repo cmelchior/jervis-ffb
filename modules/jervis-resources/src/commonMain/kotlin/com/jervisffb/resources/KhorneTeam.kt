@@ -1,5 +1,6 @@
 package com.jervisffb.resources
 
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -27,6 +28,7 @@ val BLOODBORN_MARAUDER_LINEMEN =
         listOf(FRENZY.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/khorne_bloodbornmarauderlineman.png",7),
         SingleSprite.ini("$portraitRootPath/khorne_bloodbornmarauderlineman.png")
     )
@@ -42,6 +44,7 @@ val KHORNGORS =
         listOf(HORNS.id() /*, Juggernaut */),
         listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/khorne_khorngor.png",4),
         SingleSprite.ini("$portraitRootPath/khorne_khorngor.png")
     )
@@ -57,6 +60,7 @@ val BLOODSEEKERS =
         listOf(FRENZY.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/khorne_bloodseeker.png", 4),
         SingleSprite.ini("$portraitRootPath/khorne_bloodseeker.png")
     )
@@ -78,6 +82,7 @@ val BLOODSPAWN =
         ),
         listOf(SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        PlayerSize.BIG_GUY,
         SpriteSheet.ini("$iconRootPath/khorne_bloodspawn.png", 1),
         SingleSprite.ini("$portraitRootPath/khorne_bloodspawn.png")
     )

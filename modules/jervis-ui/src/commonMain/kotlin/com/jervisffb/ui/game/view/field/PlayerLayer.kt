@@ -3,25 +3,32 @@ package com.jervisffb.ui.game.view.field
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.zIndex
+import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.view.Player
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.UiPlayerTransientData
+import com.jervisffb.ui.utils.pixelSize
 import org.jetbrains.compose.resources.painterResource
+import kotlin.math.roundToInt
 
 /**
  * Layer 8: Player Layer.
  *
- * This layer is responsible for placing players including any indicators that
+ * This layer is responsible for placing players on the field (and not dogout) including any indicators that
  * are relevant to them, like "block dice count", "blocked" or "prone".
  *
  * Loose balls and bombs are NOT handled by this layer.
@@ -32,19 +39,42 @@ import org.jetbrains.compose.resources.painterResource
 fun PlayerLayer(
     vm: FieldViewModel,
 ) {
-    val fieldDataFlow = remember { vm.observeField() }
-    val fieldData: Map<FieldCoordinate, Pair<UiFieldSquare, UiFieldPlayer?>> by fieldDataFlow.collectAsState(emptyMap())
+    val fieldSizeData = LocalFieldData.current.size
+    val playersFlow = remember { vm.observeSnapshot() }
+    val snapshot: UiGameSnapshot? by playersFlow.collectAsState(null)
+    if (snapshot == null) return
+    // Needed to keep player zIndexes from creating problems on other layers
+    Box(modifier = Modifier.fillMaxSize()) {
+        snapshot!!.players.forEach { (id, player) ->
+            if (player.location !is FieldCoordinate) return@forEach
 
-    // TODO Refactor this so we do not use squares, but manually place players
-    FieldSquares(vm) { modifier, x, y ->
-        val squareData: UiFieldSquare? = fieldData[FieldCoordinate(x, y)]?.first
-        val playerData: UiFieldPlayer? = fieldData[FieldCoordinate(x, y)]?.second
-        PlayerWithIndicators(
-            modifier,
-            squareData ?: UiFieldSquare(FieldCoordinate.UNKNOWN),
-            playerData,
-            null,  // TODO We need to also pass that in here. Not really. This is handled by the general hover channel...This design needs to be revisited
-        )
+            val playerSize = fieldSizeData.getPlayerSquareSize(player.size)
+            val coordinates = player.location
+            val xDiff = playerSize.width - fieldSizeData.squareSize.width
+            val yDiff = playerSize.height - fieldSizeData.squareSize.height
+
+            // We want players at the bottom-right to be above players on the top-left.
+            // So we can just enumerate the zIndexes using the player coordinates.
+            val zIndex = (coordinates.x + 1) * coordinates.y
+            Box(
+                modifier = Modifier
+                    .zIndex(zIndex.toFloat())
+                    .pixelSize(playerSize)
+                    .offset {
+                        IntOffset(
+                            x = (coordinates.x * fieldSizeData.squareSize.width - xDiff / 2f).roundToInt(),
+                            y = (coordinates.y * fieldSizeData.squareSize.height - yDiff / 2f).roundToInt()
+                        )
+                    }
+            ) {
+                PlayerWithIndicators(
+                    Modifier,
+                    snapshot!!.squares[coordinates]!!,
+                    player,
+                    null,  // TODO We need to also pass that in here. Not really. This is handled by the general hover channel...This design needs to be revisited
+                )
+            }
+        }
     }
 }
 

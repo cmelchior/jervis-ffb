@@ -3,6 +3,7 @@ package com.jervisffb.engine.rules.common.roster
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.SkillId
@@ -38,9 +39,13 @@ interface Position {
     val skills: List<SkillId>
     // If set, this position can only play for teams with the given regional special rule
     val playsFor: List<RegionalSpecialRule>
+    val size: PlayerSize
     val icon: SpriteSource?
     val portrait: SpriteSource?
 
+    /**
+     * Create a new player for this position.
+     */
     fun createPlayer(
         rules: Rules,
         team: Team,

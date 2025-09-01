@@ -1,5 +1,6 @@
 package com.jervisffb.resources
 
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -26,6 +27,7 @@ val ELVEN_LINEMAN =
         emptyList(),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.GENERAL),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/elvenunion_lineman.png",8),
         SingleSprite.ini("$portraitRootPath/elvenunion_lineman.png")
     )
@@ -41,6 +43,7 @@ val ELVEN_THROWER =
         listOf(PASS.id()),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL, SkillCategory.PASSING),
         listOf(SkillCategory.GENERAL),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/elvenunion_thrower.png",2),
         SingleSprite.ini("$portraitRootPath/elvenunion_thrower.png")
     )
@@ -56,6 +59,7 @@ val ELVEN_CATCHER =
         listOf(CATCH.id(), /* Nerves Of Steel */),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.GENERAL),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/elvenunion_catcher.png", 4),
         SingleSprite.ini("$portraitRootPath/elvenunion_catcher.png")
     )
@@ -71,6 +75,7 @@ val ELVEN_BLITZER =
         listOf(BLOCK.id(), SkillType.SIDESTEP.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/elvenunion_blitzer.png", 2),
         SingleSprite.ini("$portraitRootPath/elvenunion_blitzer.png")
     )

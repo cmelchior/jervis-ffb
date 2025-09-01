@@ -1,5 +1,6 @@
 package com.jervisffb.resources
 
+import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
@@ -29,6 +30,7 @@ val HOBGOBLIN_LINEMEN =
         emptyList(),
         listOf(SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/chaosdwarf_hobgoblinlineman.png", 10),
         SingleSprite.ini("$portraitRootPath/chaosdwarf_hobgoblinlineman.png")
     )
@@ -44,6 +46,7 @@ val CHAOS_DWARF_BLOCKERS =
         listOf(BLOCK.id(), TACKLE.id(), THICK_SKULL.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/chaosdwarf_chaosdwarfblocker.png", 6),
         SingleSprite.ini("$portraitRootPath/chaosdwarf_chaosdwarfblocker.png")
     )
@@ -63,6 +66,7 @@ val BULL_CENTAUR_BLITZERS =
         ),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
+        PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/chaosdwarf_bullcentaurblitzer.png", 2),
         SingleSprite.ini("$portraitRootPath/chaosdwarf_bullcentaurblitzer.png")
     )
@@ -78,6 +82,7 @@ val ENSLAVED_MINOTAUR =
         emptyList(),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.STRENGTH, SkillCategory.PASSING),
+        PlayerSize.BIG_GUY,
         SpriteSheet.ini("$iconRootPath/chaosdwarf_enslavedminotaur.png",1),
         SingleSprite.ini("$portraitRootPath/chaosdwarf_enslavedminotaur.png")
     )

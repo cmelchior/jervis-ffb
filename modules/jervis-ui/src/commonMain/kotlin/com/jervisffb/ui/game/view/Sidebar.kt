@@ -36,8 +36,10 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiSidebarPlayer
 import com.jervisffb.ui.game.viewmodel.ButtonData
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.jdp
+import com.jervisffb.ui.utils.pixelSize
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -67,11 +69,12 @@ fun Sidebar(
                 )
                 Column(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                        Reserves(vm.reserves()) {
+                        Reserves(vm.reserves(), vm.sharedFieldData) {
                             vm.hoverExit()
                         }
                         Injuries(
                             showIfEmpty = false,
+                            vm.sharedFieldData,
                             vm.knockedOut(),
                             vm.badlyHurt(),
                             vm.seriousInjuries(),
@@ -157,17 +160,18 @@ private fun LargeSidebarButton(modifier: Modifier, text: String, onClick: () -> 
 }
 
 @Composable
-private fun Reserves(reserves: Flow<List<UiSidebarPlayer>>, onExit: () -> Unit) {
+private fun Reserves(reserves: Flow<List<UiSidebarPlayer>>, sharedData: LocalFieldDataWrapper, onExit: () -> Unit) {
     val list: List<UiSidebarPlayer> by reserves.collectAsState(emptyList())
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionHeader("Reserves")
-        PlayerSection(list, compactView = false, onExit = onExit)
+        PlayerSection(list, sharedData, compactView = false, onExit = onExit)
     }
 }
 
 @Composable
 private fun Injuries(
     showIfEmpty: Boolean,
+    sharedFieldData: LocalFieldDataWrapper,
     knockedOut: Flow<List<UiSidebarPlayer>>,
     badlyHurt: Flow<List<UiSidebarPlayer>>,
     seriousInjuries: Flow<List<UiSidebarPlayer>>,
@@ -184,27 +188,27 @@ private fun Injuries(
         val specialList: List<UiSidebarPlayer> by special.collectAsState(emptyList())
         if (knockedOutList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Knocked Out")
-            PlayerSection(knockedOutList)
+            PlayerSection(knockedOutList, sharedFieldData)
         }
         if (badlyHurtList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Badly Hurt")
-            PlayerSection(badlyHurtList)
+            PlayerSection(badlyHurtList, sharedFieldData)
         }
         if (seriousInjuryList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Seriously Injured")
-            PlayerSection(seriousInjuryList)
+            PlayerSection(seriousInjuryList, sharedFieldData)
         }
         if (deadList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Dead")
-            PlayerSection(deadList)
+            PlayerSection(deadList, sharedFieldData)
         }
         if (bannedList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Banned")
-            PlayerSection(bannedList)
+            PlayerSection(bannedList, sharedFieldData)
         }
         if (specialList.isNotEmpty() || showIfEmpty) {
             SectionHeader("Special")
-            PlayerSection(specialList)
+            PlayerSection(specialList, sharedFieldData)
         }
     }
 }
@@ -217,9 +221,10 @@ private fun Injuries(
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun PlayerSection(list: List<UiSidebarPlayer>, compactView: Boolean = true, onExit: () -> Unit = {}) {
+private fun PlayerSection(list: List<UiSidebarPlayer>, sharedFieldData: LocalFieldDataWrapper, compactView: Boolean = true, onExit: () -> Unit = {}) {
     val playersPrRow = 3
-    val playerSize = 45.jdp
+    val fieldSize = sharedFieldData.size
+
     if (!compactView) {
         val max = if (list.isNotEmpty()) list.maxBy { it.number.value }.number.value else 0
         if (max > 0) {
@@ -234,26 +239,29 @@ private fun PlayerSection(list: List<UiSidebarPlayer>, compactView: Boolean = tr
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 24.jdp)
                         .onPointerEvent(PointerEventType.Exit) { onExit() }
-                        .padding(bottom = 16.jdp)
                     ,
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
-                    val modifier = Modifier.size(playerSize).aspectRatio(1f)
+                    val modifier = Modifier.aspectRatio(1f)
                     repeat(playersPrRow) { x ->
-                        if (sortedList.size > (index + x) && sortedList[index + x] != null) {
-                            Player(
-                                modifier,
-                                sortedList[index + x]!!.player,
-                                sortedList[index + x]!!.transientData,
-                                parentHandleClick = false,
-                                contextMenuShowing = false
-                            )
-                        } else {
-                            // Use empty box. Unsure if we can remove this
-                            // if we want a partial row to scale correctly.
-                            Box(modifier = modifier)
+                        Box(
+                            modifier = modifier.weight(1f),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            if (sortedList.size > (index + x) && sortedList[index + x] != null) {
+                                val player = sortedList[index + x]!!.player
+                                val playerSizePx = fieldSize.getPlayerSquareSize(player.size)
+                                Player(
+                                    Modifier.pixelSize(playerSizePx),
+                                    player,
+                                    sortedList[index + x]!!.transientData,
+                                    parentHandleClick = false,
+                                    contextMenuShowing = false
+                                )
+                            }
                         }
                     }
                 }
@@ -265,25 +273,28 @@ private fun PlayerSection(list: List<UiSidebarPlayer>, compactView: Boolean = tr
                 modifier = Modifier
                     .fillMaxWidth()
                     .onPointerEvent(PointerEventType.Exit) { onExit() }
-                    .padding(bottom = 16.jdp)
+                    .padding(horizontal = 24.jdp)
                 ,
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                val modifier = Modifier.size(playerSize).aspectRatio(1f)
+                val modifier = Modifier.aspectRatio(1f)
                 repeat(playersPrRow) { x ->
-                    if (list.size > (index + x)) {
-                        Player(
-                            modifier,
-                            list[index + x].player,
-                            list[index + x].transientData,
-                            parentHandleClick = false,
-                            contextMenuShowing = false
-                        )
-                    } else {
-                        // Use empty box. Unsure if we can remove this
-                        // if we want a partial row to scale correctly.
-                        Box(modifier = modifier)
+                    Box(
+                        modifier = modifier.weight(1f),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (list.size > (index + x)) {
+                            val player = list[index + x].player
+                            val playerSizePx = fieldSize.getPlayerSquareSize(player.size)
+                            Player(
+                                modifier.pixelSize(playerSizePx),
+                                player,
+                                list[index + x].transientData,
+                                parentHandleClick = false,
+                                contextMenuShowing = false
+                            )
+                        }
                     }
                 }
             }
