@@ -91,7 +91,7 @@ fun JervisDialog(
 ) {
     var popupSize by remember { mutableStateOf(IntSize.Zero) }
     val fieldViewInfo: FieldViewData? by centerOnField?.fieldViewData?.collectAsState() ?: MutableStateFlow<FieldViewData?>(null).collectAsState()
-    var popupOffset by remember {
+    var popupOffset by remember(fieldViewInfo) {
         fieldViewInfo?.let { fvd ->
             mutableStateOf(
                 IntOffset(
