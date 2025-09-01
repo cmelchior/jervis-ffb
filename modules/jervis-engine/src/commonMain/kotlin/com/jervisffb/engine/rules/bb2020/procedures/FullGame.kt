@@ -13,7 +13,7 @@ import com.jervisffb.engine.reports.ReportGameResult
 import com.jervisffb.engine.reports.ReportGoingIntoExtraTime
 import com.jervisffb.engine.reports.ReportStartingGame
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.Duration
+import com.jervisffb.engine.rules.common.skills.Duration
 
 object FullGame : Procedure() {
     override val initialNode: Node = PreGameSequence

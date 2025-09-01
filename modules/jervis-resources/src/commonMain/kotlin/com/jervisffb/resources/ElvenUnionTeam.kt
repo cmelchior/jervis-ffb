@@ -5,11 +5,11 @@ import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.RosterPosition
-import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
-import com.jervisffb.engine.rules.bb2020.skills.SkillType
-import com.jervisffb.engine.rules.bb2020.skills.SkillType.BLOCK
-import com.jervisffb.engine.rules.bb2020.skills.SkillType.CATCH
-import com.jervisffb.engine.rules.bb2020.skills.SkillType.PASS
+import com.jervisffb.engine.rules.common.skills.SkillCategory
+import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.rules.common.skills.SkillType.BLOCK
+import com.jervisffb.engine.rules.common.skills.SkillType.CATCH
+import com.jervisffb.engine.rules.common.skills.SkillType.PASS
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet

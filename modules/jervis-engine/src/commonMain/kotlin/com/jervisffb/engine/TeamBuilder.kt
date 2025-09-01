@@ -15,10 +15,10 @@ import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
-import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite

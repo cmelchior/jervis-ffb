@@ -42,7 +42,7 @@ import com.jervisffb.engine.reports.ReportStartingExtraTime.message
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.bb2020.skills.Skill
+import com.jervisffb.engine.rules.common.skills.Skill
 
 /**
  * Class wrapping the intent of choosing a single option between many.

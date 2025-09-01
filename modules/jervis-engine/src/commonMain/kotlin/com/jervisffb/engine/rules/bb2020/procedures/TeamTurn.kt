@@ -41,8 +41,8 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducementContext
 import com.jervisffb.engine.rules.bb2020.procedures.inducements.ActivateInducements
 import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.ResolveThrowARock
-import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
+import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**

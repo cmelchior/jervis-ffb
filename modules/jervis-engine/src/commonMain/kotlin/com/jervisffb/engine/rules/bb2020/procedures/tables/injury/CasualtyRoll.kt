@@ -20,7 +20,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.Skill
+import com.jervisffb.engine.rules.common.skills.Skill
 
 /**
  * Implement the Casualty Roll as described on page 61 in the rulebook.

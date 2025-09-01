@@ -6,8 +6,8 @@ import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.SpecialRules
-import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.utils.jervisLogger
 import kotlinx.serialization.Serializable

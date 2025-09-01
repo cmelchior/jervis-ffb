@@ -12,7 +12,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.bb2020.roster.TeamSpecialRule
-import com.jervisffb.engine.rules.bb2020.skills.SkillType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.fumbbl.net.model.SpecialRule
 import com.jervisffb.resources.CHAOS_DWARF_TEAM

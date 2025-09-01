@@ -3,6 +3,10 @@ package com.jervisffb.engine.rules.bb2020.skills
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.rules.PlayerSpecialActionType
+import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.SkillCategory
+import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 
 class MultipleBlock(
     override val player: Player,

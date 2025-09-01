@@ -10,8 +10,8 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.tables.weather.SwelteringHeat
-import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.tables.Weather
+import com.jervisffb.engine.rules.common.skills.Duration
 
 /**
  * This procedure controls the End of Drive sequence as described

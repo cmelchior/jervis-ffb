@@ -6,7 +6,7 @@ import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.model.DieId
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.RerollSourceId
-import com.jervisffb.engine.rules.bb2020.skills.RerollSource
+import com.jervisffb.engine.rules.common.skills.RerollSource
 import kotlinx.serialization.Serializable
 
 /**

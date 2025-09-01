@@ -8,9 +8,9 @@ import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.model.modifiers.TemporaryEffect
 import com.jervisffb.engine.model.modifiers.TemporaryEffectType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.Skill
-import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.serialize.PlayerUiData
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.ExperimentalSerializationApi

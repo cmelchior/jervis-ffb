@@ -13,7 +13,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BlockType
 import com.jervisffb.engine.rules.PlayerStandardActionType
 import com.jervisffb.engine.rules.bb2020.skills.Block
-import com.jervisffb.engine.rules.bb2020.skills.SkillType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.ext.addNewSkill
 import com.jervisffb.test.ext.rollForward

@@ -2,9 +2,9 @@ package com.jervisffb.engine.rules.bb2020.specialrules
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId
-import com.jervisffb.engine.rules.bb2020.skills.Duration
-import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
-import com.jervisffb.engine.rules.bb2020.skills.SkillType
+import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.SkillCategory
+import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
  * Representation of the Sneakiest of the Lot special rule.

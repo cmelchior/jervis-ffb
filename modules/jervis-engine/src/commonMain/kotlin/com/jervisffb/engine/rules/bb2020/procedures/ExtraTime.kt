@@ -18,7 +18,7 @@ import com.jervisffb.engine.reports.ReportGoingIntoSuddenDeath
 import com.jervisffb.engine.reports.ReportStartingDrive
 import com.jervisffb.engine.reports.ReportStartingExtraTime
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.Duration
+import com.jervisffb.engine.rules.common.skills.Duration
 
 /**
  * Procedure responsible for handling Extra Time as described on page 67 in the rulebook.

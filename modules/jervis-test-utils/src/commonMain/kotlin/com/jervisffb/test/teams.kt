@@ -15,7 +15,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.SkillType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.teamBuilder
 
 

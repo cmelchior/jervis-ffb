@@ -1,7 +1,7 @@
 package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.rules.bb2020.skills.Skill
+import com.jervisffb.engine.rules.common.skills.Skill
 
 class ReportSkillUsed(
     player: Player,

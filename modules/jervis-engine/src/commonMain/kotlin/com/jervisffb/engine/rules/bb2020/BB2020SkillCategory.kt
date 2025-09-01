@@ -12,7 +12,6 @@ import com.jervisffb.engine.rules.bb2020.skills.BreatheFire
 import com.jervisffb.engine.rules.bb2020.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2020.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
-import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.bb2020.skills.Horns
 import com.jervisffb.engine.rules.bb2020.skills.Leap
@@ -26,9 +25,6 @@ import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2020.skills.ReallyStupid
 import com.jervisffb.engine.rules.bb2020.skills.Regeneration
 import com.jervisffb.engine.rules.bb2020.skills.Sidestep
-import com.jervisffb.engine.rules.bb2020.skills.Skill
-import com.jervisffb.engine.rules.bb2020.skills.SkillCategory
-import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.rules.bb2020.skills.Sprint
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.bb2020.skills.Stunty
@@ -41,6 +37,10 @@ import com.jervisffb.engine.rules.bb2020.skills.Titchy
 import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
 import com.jervisffb.engine.rules.bb2020.skills.Wrestle
 import com.jervisffb.engine.rules.bb2020.specialrules.SneakiestOfTheLot
+import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.engine.rules.common.skills.SkillCategory
+import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 

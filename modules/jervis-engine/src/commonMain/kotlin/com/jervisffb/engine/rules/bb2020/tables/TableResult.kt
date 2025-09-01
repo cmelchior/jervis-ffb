@@ -1,7 +1,7 @@
 package com.jervisffb.engine.rules.bb2020.tables
 
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.rules.bb2020.skills.Duration
+import com.jervisffb.engine.rules.common.skills.Duration
 
 /**
  * Wrapper around a table result, e.g. rolling on the Kick-Off Table or

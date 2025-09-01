@@ -1,6 +1,6 @@
 package com.jervisffb.engine.model
 
-import com.jervisffb.engine.rules.bb2020.skills.SkillType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 

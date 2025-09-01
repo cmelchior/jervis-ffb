@@ -1,6 +1,6 @@
 package com.jervisffb.engine.model.modifiers
 
-import com.jervisffb.engine.rules.bb2020.skills.Duration
+import com.jervisffb.engine.rules.common.skills.Duration
 import kotlinx.serialization.Serializable
 
 /**

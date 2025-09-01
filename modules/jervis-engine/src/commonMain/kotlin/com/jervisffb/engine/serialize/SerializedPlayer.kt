@@ -7,7 +7,7 @@ import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerType
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.modifiers.StatModifier
-import com.jervisffb.engine.rules.bb2020.skills.Duration
+import com.jervisffb.engine.rules.common.skills.Duration
 import kotlinx.serialization.Serializable
 
 /**

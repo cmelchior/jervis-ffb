@@ -7,9 +7,9 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
-import com.jervisffb.engine.rules.bb2020.skills.Skill
-import com.jervisffb.engine.rules.bb2020.skills.SkillType
 import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
+import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.engine.rules.common.skills.SkillType
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.test.assertTrue

@@ -22,7 +22,6 @@ import kotlinx.serialization.Serializable
  * - Standard (FUMBBL-Compatible)
  * - BB7
  */
-
 abstract class BB2020Rules : Rules(
     name = "Blood Bowl 2020 Rules",
     gameType = GameType.STANDARD

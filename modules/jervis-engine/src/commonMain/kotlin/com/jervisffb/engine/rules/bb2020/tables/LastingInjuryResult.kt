@@ -2,7 +2,7 @@ package com.jervisffb.engine.rules.bb2020.tables
 
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.model.modifiers.StatModifier.Type
-import com.jervisffb.engine.rules.bb2020.skills.Duration
+import com.jervisffb.engine.rules.common.skills.Duration
 
 /**
  * Enumerate the possible stat modifications that can happen after

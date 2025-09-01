@@ -1,7 +1,7 @@
 package com.jervisffb.engine.model.modifiers
 
 import com.jervisffb.engine.model.modifiers.StatModifier.Type
-import com.jervisffb.engine.rules.bb2020.skills.Duration
+import com.jervisffb.engine.rules.common.skills.Duration
 
 /**
  * Interface describing a change to a player's base line stat.

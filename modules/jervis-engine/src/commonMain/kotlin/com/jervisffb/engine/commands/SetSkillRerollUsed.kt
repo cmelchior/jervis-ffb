@@ -1,7 +1,7 @@
 package com.jervisffb.engine.commands
 
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.skills.RerollSource
+import com.jervisffb.engine.rules.common.skills.RerollSource
 
 class SetSkillRerollUsed(private val source: RerollSource) : Command {
     private var original: Boolean = false

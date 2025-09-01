@@ -27,9 +27,9 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.SkillType.FRENZY
-import com.jervisffb.engine.rules.bb2020.skills.SkillType.SIDESTEP
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.common.skills.SkillType.FRENZY
+import com.jervisffb.engine.rules.common.skills.SkillType.SIDESTEP
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.resources.AMAZON_BLITZER

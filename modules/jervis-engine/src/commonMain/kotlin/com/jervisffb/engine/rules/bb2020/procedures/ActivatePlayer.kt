@@ -40,12 +40,12 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.AnimalSavagery
 import com.jervisffb.engine.rules.bb2020.skills.BloodLust
 import com.jervisffb.engine.rules.bb2020.skills.BoneHead
-import com.jervisffb.engine.rules.bb2020.skills.Duration
 import com.jervisffb.engine.rules.bb2020.skills.MultipleBlock
 import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2020.skills.ReallyStupid
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
+import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 data class ActivatePlayerContext(

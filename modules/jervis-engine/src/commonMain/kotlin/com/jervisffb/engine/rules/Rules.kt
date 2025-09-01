@@ -26,10 +26,6 @@ import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
 import com.jervisffb.engine.rules.bb2020.SkillSettings
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
-import com.jervisffb.engine.rules.bb2020.skills.Duration
-import com.jervisffb.engine.rules.bb2020.skills.RerollSource
-import com.jervisffb.engine.rules.bb2020.skills.Skill
-import com.jervisffb.engine.rules.bb2020.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.CasualtyTable
 import com.jervisffb.engine.rules.bb2020.tables.InjuryTable
@@ -58,6 +54,10 @@ import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
 import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
+import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.RerollSource
+import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
 import kotlinx.serialization.Serializable

@@ -2,8 +2,8 @@ package com.jervisffb.engine.commands
 
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.rules.bb2020.skills.Skill
-import com.jervisffb.engine.rules.bb2020.skills.SpecialActionProvider
+import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

@@ -12,7 +12,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.QuickSnap
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.TimeOut
-import com.jervisffb.engine.rules.bb2020.skills.Duration
+import com.jervisffb.engine.rules.common.skills.Duration
 
 enum class KickOffEvent(
     override val description: String,
