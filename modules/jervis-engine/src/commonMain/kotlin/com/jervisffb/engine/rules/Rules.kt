@@ -674,6 +674,12 @@ open class Rules(
                     // TODO Check if any players are currently prone/stunned
                     add(teamActions.foul)
                 }
+                // Even though Secure The Ball is only in the 2025 ruleset, we have the check here
+                // since it makes maintaining the logic easier. The action is disabled by setting the
+                // count to 0 in the TeamActions setup
+                if (it.secureTheBallActions > 0) {
+                    add(teamActions.secureTheBall)
+                }
             }
 
             // Add any special actions that are provided by skills

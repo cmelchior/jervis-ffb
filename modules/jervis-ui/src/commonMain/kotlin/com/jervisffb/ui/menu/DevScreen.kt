@@ -36,6 +36,7 @@ import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
@@ -111,8 +112,17 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
         }
     }
 
-    private fun createDevHotseatScreenModel(menuViewModel: MenuViewModel, randomActions: Boolean = false): GameScreenModel {
-        val rules = StandardBB2020Rules().toBuilder().run {
+    private fun createDevHotseatScreenModel(
+        menuViewModel: MenuViewModel,
+        randomActions: Boolean = false,
+        rulesVersion: Int = 2020,
+    ): GameScreenModel {
+        val baseRules = when (rulesVersion) {
+            2020 -> StandardBB2020Rules()
+            2025 -> StandardBB2025Rules()
+            else -> throw IllegalArgumentException("Invalid rules version: $rulesVersion")
+        }
+        val rules = baseRules.toBuilder().run {
             timers.timersEnabled = false
             diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
             undoActionBehavior = UndoActionBehavior.ALLOWED
@@ -286,9 +296,9 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
     }
 
     // Starts a Dev Hotseat game with pre-determined teams, no timer and client rolls enabled
-    fun startManualGame(navigator: Navigator) {
+    fun startManualGame(navigator: Navigator, rulesVersion: Int) {
         menuViewModel.navigatorContext.launch {
-            val viewModel = createDevHotseatScreenModel(menuViewModel)
+            val viewModel = createDevHotseatScreenModel(menuViewModel, rulesVersion = rulesVersion)
             navigator.push(GameScreen(menuViewModel, viewModel))
         }
     }
@@ -364,9 +374,10 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenVi
         val replayFiles by viewModel.availableReplayFiles.collectAsState(emptyList())
         val staticButtons = remember {
             listOf(
-                "Start Standard game with manual actions" to { viewModel.startManualGame(navigator) },
-                "Start Standard game with all random actions" to { viewModel.startRandomGame(navigator) },
-                "Start BB7 game with all manual actions" to { viewModel.startManualBB7Game(navigator) },
+                "Start Standard game with manual actions (2025)" to { viewModel.startManualGame(navigator, rulesVersion = 2025) },
+                "Start Standard game with manual actions (2020)" to { viewModel.startManualGame(navigator, rulesVersion = 2020) },
+                "Start Standard game with all random actions (2020" to { viewModel.startRandomGame(navigator) },
+                "Start BB7 game with all manual actions (20202)" to { viewModel.startManualBB7Game(navigator) },
                 "Load save file" to { viewModel.loadSaveFile(navigator) }
             )
         }
