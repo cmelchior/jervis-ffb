@@ -96,7 +96,7 @@ class StandingUpTests: JervisGameTest() {
 
     @Test
     fun failingStandingUpRollEndsAction() {
-        // Put down opponent player (so we have a target for foul actions
+        // Put down opponent player (so we have a target for foul actions)
         state.getPlayerById("H1".playerId).let {
             it.state = PlayerState.PRONE
             it.hasTackleZones = false
@@ -161,6 +161,12 @@ class StandingUpTests: JervisGameTest() {
                 PlayerStandardActionType.THROW_TEAM_MATE,
                 PlayerStandardActionType.SPECIAL -> {
                     // Skip for now
+                    startAction = null
+                }
+                PlayerStandardActionType.SECURE_THE_BALL -> {
+                    // Skip for now. We don't know the specifics for this action yet
+                    // Also, this action isn't supported in BB2020, it shouldn't be
+                    // tested here. We need to figure out how to split the tests.
                     startAction = null
                 }
             }
