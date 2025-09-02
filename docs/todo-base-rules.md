@@ -150,6 +150,7 @@ rule book.
     - [ ] Choice is optional
   - [ ] Under Scrutiny
   - [ ] Intensive Training
+    - [ ] "Available to Play" also include all players on the field when rolled as a kick-off result
 - [x] Determine Kicking Team
 
 ## Start of Drive
