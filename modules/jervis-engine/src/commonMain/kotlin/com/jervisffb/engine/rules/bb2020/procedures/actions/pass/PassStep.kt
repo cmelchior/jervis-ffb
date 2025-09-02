@@ -41,8 +41,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.ScatterRoll
 import com.jervisffb.engine.rules.bb2020.procedures.ScatterRollContext
 import com.jervisffb.engine.rules.bb2020.procedures.ThrowIn
 import com.jervisffb.engine.rules.bb2020.procedures.ThrowInContext
+import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.Weather
-import com.jervisffb.engine.rules.coo.tables.Range
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

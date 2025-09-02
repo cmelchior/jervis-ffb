@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.coo.tables
+package com.jervisffb.engine.rules.common.tables
 
 /**
  * Enumeration of all ranges used for passing across all rulesets.

@@ -38,7 +38,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveType
 import com.jervisffb.engine.rules.bb2020.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
-import com.jervisffb.engine.rules.coo.tables.Range
+import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull

@@ -25,7 +25,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassingType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.coo.tables.Range
+import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.test.ext.rollForward
 import kotlin.test.BeforeTest
 import kotlin.test.Test

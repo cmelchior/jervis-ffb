@@ -2,7 +2,7 @@ package com.jervisffb.engine.rules.common.tables
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.coo.tables.Range
+import com.jervisffb.engine.rules.common.tables.Range
 
 /**
  * Interface representing a Range Ruler used for throwing balls, bombs and players.

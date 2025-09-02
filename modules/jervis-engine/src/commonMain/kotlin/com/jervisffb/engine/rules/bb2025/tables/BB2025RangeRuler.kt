@@ -2,8 +2,8 @@ package com.jervisffb.engine.rules.bb2025.tables
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.rules.common.tables.RangeRuler
-import com.jervisffb.engine.rules.coo.tables.Range
 import kotlinx.serialization.Serializable
 import kotlin.math.abs
 import kotlin.math.min
