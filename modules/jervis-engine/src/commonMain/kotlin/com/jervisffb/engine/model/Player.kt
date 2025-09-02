@@ -52,49 +52,6 @@ object IntRangeSerializer: KSerializer<IntRange> {
     }
 }
 
-
-
-// TODO Should we split this into DogoutState and FieldState?
-enum class PlayerState {
-    // Dogout states
-    RESERVE,
-    KNOCKED_OUT,
-    BADLY_HURT,
-    LASTING_INJURY,
-    SERIOUSLY_HURT,
-    SERIOUS_INJURY,
-    DEAD,
-    FAINTED, // From Sweltering Heat
-    BANNED, // From being sent off by the Ref
-
-    // Intermediate states. These states should only be used while the effect of
-    // them is being resolved. I.e., rolling armor and injury dice.
-    FALLEN_OVER,
-    KNOCKED_DOWN,
-
-    // Field states
-    STANDING,
-    PRONE,
-    STUNNED,
-    // This state should only be visible for a player during their own team turn.
-    // After that, it should turn into a normal STUNNED state.
-    STUNNED_OWN_TURN,
-
-//    MOVING,
-//    UNKNOWN,
-//    MISSING,
-//    FALLING,
-//    BLOCKED,
-//    EXHAUSTED,
-//    BEING_DRAGGED,
-//    PICKED_UP,
-//    HIT_ON_GROUND,
-//    HIT_BY_FIREBALL,
-//    HIT_BY_LIGHTNING,
-//    HIT_BY_BOMB,
-//    SETUP_PREVENTED
-}
-
 @Serializable
 @JvmInline
 value class PlayerNo(val value: Int) : Comparable<PlayerNo> {
@@ -159,6 +116,7 @@ class Player(
         }
     var facing: PlayerFacing = PlayerFacing.UNKNOWN
     var state: PlayerState = PlayerState.RESERVE
+    var statusEffects = mutableListOf<PlayerStatusEffect>()
     val isActive: Boolean get() = (team.game.activePlayer == this)
     var available: Availability = Availability.AVAILABLE
     var stunnedThisTurn: Boolean? = null
