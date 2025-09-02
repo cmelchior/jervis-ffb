@@ -32,6 +32,7 @@ class SetAvailableActions(
                 PlayerStandardActionType.BLITZ -> team.turnData.blitzActions - 1
                 PlayerStandardActionType.FOUL -> team.turnData.foulActions - 1
                 PlayerStandardActionType.SPECIAL -> TODO()
+                PlayerStandardActionType.SECURE_THE_BALL -> team.turnData.secureTheBallActions - 1
             }
 
             return SetAvailableActions(

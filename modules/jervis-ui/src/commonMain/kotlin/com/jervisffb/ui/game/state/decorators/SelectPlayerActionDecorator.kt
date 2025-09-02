@@ -79,6 +79,7 @@ object SelectPlayerActionDecorator: FieldActionDecorator<SelectPlayerAction> {
                 PlayerStandardActionType.FOUL -> "Foul" to ActionIcon.FOUL
                 PlayerStandardActionType.SPECIAL -> "Special" to ActionIcon.CONFIRM // What to do here?
                 PlayerStandardActionType.THROW_TEAM_MATE -> "Throw Team-mate" to ActionIcon.THROW_TEAM_MATE
+                PlayerStandardActionType.SECURE_THE_BALL -> "Secure the Ball" to ActionIcon.SECURE_THE_BALL
                 PlayerSpecialActionType.BALL_AND_CHAIN -> "Ball & Chain" to ActionIcon.BALL_AND_CHAIN
                 PlayerSpecialActionType.BOMBARDIER -> "Bombardier" to ActionIcon.BOMBARDIER
                 PlayerSpecialActionType.BREATHE_FIRE -> "Breathe Fire" to ActionIcon.BREATHE_FIRE

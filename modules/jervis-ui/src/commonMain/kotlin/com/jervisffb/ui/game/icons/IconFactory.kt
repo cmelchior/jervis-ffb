@@ -140,6 +140,7 @@ enum class ActionIcon(val path: String) {
     PASS("jervis/actions/jervis_action_pass.png"),
     HANDOFF("jervis/actions/jervis_action_handoff.png"),
     THROW_TEAM_MATE("jervis/actions/jervis_action_pass.png"),
+    SECURE_THE_BALL("jervis/actions/jervis_action_secure_the_ball.png"),
 
     // Move Actions
     STAND_UP("jervis/actions/jervis_action_move.png"),

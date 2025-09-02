@@ -10,8 +10,11 @@ import kotlinx.serialization.Serializable
 data class PlayerAction(
     val name: String,
     val type: ActionType,
+    // Even if this action is of a given [type]. It will be treated as this type for the purpose
+    // of counting actions. This is mostly relevant for Special Actions, like Chainsaw and the like
+    // that counts as Block.
     val countsAs: PlayerStandardActionType?,
-    // How many times (by different players) can this action be used pr team turn
+    // How many times (by different players) can this action be used pr team turn.
     val availablePrTurn: Int,
     // if type == BLOCK, this decides if this action also works during the blitz
     val worksDuringBlitz: Boolean,

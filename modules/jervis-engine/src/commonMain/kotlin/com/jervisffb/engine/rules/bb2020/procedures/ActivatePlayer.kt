@@ -121,6 +121,7 @@ object ActivatePlayer : Procedure() {
                     PlayerStandardActionType.BLOCK -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.BLOCK)
                     PlayerStandardActionType.BLITZ -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.BLITZ)
                     PlayerStandardActionType.FOUL -> SetAvailableActions.markAsUsed(activeTeam, PlayerStandardActionType.FOUL)
+                    PlayerStandardActionType.SECURE_THE_BALL -> TODO()
                     PlayerStandardActionType.THROW_TEAM_MATE -> TODO()
                     PlayerStandardActionType.SPECIAL -> null
                     PlayerSpecialActionType.BALL_AND_CHAIN -> TODO()

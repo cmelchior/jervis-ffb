@@ -9,12 +9,13 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 enum class PlayerStandardActionType: ActionType {
+    BLITZ,
+    BLOCK,
+    FOUL,
+    HAND_OFF,
     MOVE,
     PASS,
-    HAND_OFF,
+    SECURE_THE_BALL,
+    SPECIAL,
     THROW_TEAM_MATE,
-    BLOCK,
-    BLITZ,
-    FOUL,
-    SPECIAL
 }

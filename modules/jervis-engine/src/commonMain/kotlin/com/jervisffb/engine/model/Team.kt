@@ -55,6 +55,12 @@ class TeamTurnData(private val game: Game) {
         set(value) {
             availableStandardActions[PlayerStandardActionType.FOUL] = value
         }
+    var secureTheBallActions: Int
+        get() = availableStandardActions[PlayerStandardActionType.SECURE_THE_BALL]!!
+        set(value) {
+            availableStandardActions[PlayerStandardActionType.SECURE_THE_BALL] = value
+        }
+
     val availableStandardActions =
         mutableMapOf(
             PlayerStandardActionType.MOVE to 0,
@@ -63,6 +69,7 @@ class TeamTurnData(private val game: Game) {
             PlayerStandardActionType.BLOCK to 0,
             PlayerStandardActionType.BLITZ to 0,
             PlayerStandardActionType.FOUL to 0,
+            PlayerStandardActionType.SECURE_THE_BALL to 0,
         )
 
     val availableSpecialActions = mutableMapOf<PlayerSpecialActionType, Int>()

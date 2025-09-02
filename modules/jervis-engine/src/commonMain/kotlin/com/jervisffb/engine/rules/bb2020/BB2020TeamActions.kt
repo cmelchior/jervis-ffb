@@ -1,5 +1,6 @@
 package com.jervisffb.engine.rules.bb2020
 
+import com.jervisffb.engine.rules.bb2020.procedures.DummyProcedure
 import com.jervisffb.engine.rules.bb2020.procedures.actions.blitz.BlitzAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockAction
@@ -94,6 +95,17 @@ class BB2020TeamActions : TeamActions() {
             procedure = FoulAction,
             compulsory = false,
         ),
+
+        // Secure the Ball is not supported in BB 20202
+        PlayerStandardActionType.SECURE_THE_BALL to PlayerAction(
+            name = "Secure the Ball",
+            type = PlayerStandardActionType.SECURE_THE_BALL,
+            countsAs = null,
+            availablePrTurn = 0,
+            worksDuringBlitz = false,
+            procedure = DummyProcedure,
+            compulsory = false,
+        ),
     )
 
     override val specialActions: Set<PlayerAction> = buildSet {
@@ -156,4 +168,5 @@ class BB2020TeamActions : TeamActions() {
     override val block: PlayerAction = get(PlayerStandardActionType.BLOCK)
     override val blitz: PlayerAction = get(PlayerStandardActionType.BLITZ)
     override val foul: PlayerAction = get(PlayerStandardActionType.FOUL)
+    override val secureTheBall: PlayerAction = get(PlayerStandardActionType.SECURE_THE_BALL)
 }

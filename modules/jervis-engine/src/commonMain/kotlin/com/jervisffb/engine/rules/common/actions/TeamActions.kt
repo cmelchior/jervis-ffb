@@ -20,4 +20,5 @@ abstract class TeamActions {
     abstract val blitz: PlayerAction
     abstract val foul: PlayerAction
     abstract val specialActions: Set<PlayerAction>
+    abstract val secureTheBall: PlayerAction
 }
