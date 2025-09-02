@@ -7,6 +7,8 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.serialize.JervisSerialization.jsonFormat
 import com.jervisffb.utils.getBuildType
 import com.jervisffb.utils.getPlatformDescription
 import com.jervisffb.utils.platformFileSystem
@@ -28,7 +30,22 @@ data class GameFileData(
     // All game actions already known by the game. Can be used to get a GameEngineController
     // into the same state as when this game was saved.
     val actions: List<GameAction>,
-)
+) {
+
+    // If we update the rules before starting the engine, we need to re-initialize the game
+    // engine to keep everything consistent.
+    fun updateRules(rules: Rules): GameEngineController {
+        return GameEngineController(
+            state = Game(
+                rules = rules,
+                homeTeam = game.state.homeTeam,
+                awayTeam = game.state.awayTeam,
+                field = Field.createForRuleset(rules)
+            ),
+            initialActions = actions
+        )
+    }
+}
 
 /**
  * Class encapsulating the the logic for serializing and deserializing a Jervis game file.

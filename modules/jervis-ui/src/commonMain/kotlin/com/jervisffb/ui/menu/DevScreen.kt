@@ -190,7 +190,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
         }
         val homeTeam = createDefaultBB7HomeTeam(rules)
         val awayTeam = createDefaultBB7AwayTeam(rules)
-        val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
+        val game = Game(rules, homeTeam, awayTeam, Field.createForRuleset(rules))
         val gameController = GameEngineController(game)
         val gameSettings = GameSettings(gameRules = rules, isHotseatGame = true)
         val homeActionProvider = when (randomActions) {
@@ -242,49 +242,47 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
     }
 
     private fun createLoadedGameScreenModel(menuViewModel: MenuViewModel, file: GameFileData): GameScreenModel {
+        // If we update the rules, we need to create the Game Engine to keep it consistent
         val rules = file.game.rules.toBuilder().run {
             timers.timersEnabled = false
             diceRollsOwner = DiceRollOwner.ROLL_ON_CLIENT
             undoActionBehavior = UndoActionBehavior.ALLOWED
             build()
         }
-        val homeTeam = file.homeTeam
-        val awayTeam = file.awayTeam
-        val game = file.game.state
-        val gameController = file.game
+        val updatedController = file.updateRules(rules)
         val gameSettings = GameSettings(
             gameRules = rules,
             isHotseatGame = true,
             initialActions = file.actions
         )
         val homeActionProvider = ManualActionProvider(
-            gameController,
+            updatedController,
             menuViewModel,
             TeamActionMode.HOME_TEAM,
             gameSettings,
         )
         val awayActionProvider = ManualActionProvider(
-            gameController,
+            updatedController,
             menuViewModel,
             TeamActionMode.AWAY_TEAM,
             gameSettings,
         )
         val actionProvider = LocalActionProvider(
-            gameController,
+            updatedController,
             gameSettings,
             homeActionProvider,
             awayActionProvider
         )
         return GameScreenModel(
             TeamActionMode.ALL_TEAMS,
-            gameController,
-            gameController.state.homeTeam,
-            gameController.state.awayTeam,
+            updatedController,
+            updatedController.state.homeTeam,
+            updatedController.state.awayTeam,
             actionProvider,
             mode = Manual(TeamActionMode.ALL_TEAMS),
             menuViewModel = menuViewModel,
             onEngineInitialized = {
-                menuViewModel.controller = gameController
+                menuViewModel.controller = updatedController
                 menuViewModel.navigatorContext.launch {
                     // TODO Send to AI controller?
                     // controller.sendGameStarted()
