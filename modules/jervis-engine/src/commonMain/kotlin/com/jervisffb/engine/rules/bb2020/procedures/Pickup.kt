@@ -21,7 +21,7 @@ import com.jervisffb.engine.model.modifiers.PickupModifier
 import com.jervisffb.engine.reports.ReportPickup
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.rules.bb2020.tables.Weather
+import com.jervisffb.engine.rules.common.tables.Weather
 
 /**
  * Resolve a Pickup, i.e., when a player moves into a field where the ball is placed.

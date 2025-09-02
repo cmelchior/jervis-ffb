@@ -36,7 +36,7 @@ import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.KickOffEventContext
-import com.jervisffb.engine.rules.bb2020.tables.KickOffEvent
+import com.jervisffb.engine.rules.common.tables.KickOffEvent
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 

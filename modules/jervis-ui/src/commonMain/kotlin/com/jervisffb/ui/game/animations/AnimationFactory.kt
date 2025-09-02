@@ -16,9 +16,9 @@ import com.jervisffb.engine.rules.bb2020.procedures.CatchRoll
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOffEvent
 import com.jervisffb.engine.rules.bb2020.procedures.WeatherRoll
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.ChangingWeather
-import com.jervisffb.engine.rules.bb2020.tables.KickOffEvent
-import com.jervisffb.engine.rules.bb2020.tables.TableResult
-import com.jervisffb.engine.rules.bb2020.tables.Weather
+import com.jervisffb.engine.rules.common.tables.KickOffEvent
+import com.jervisffb.engine.rules.common.tables.TableResult
+import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_blitz
 import com.jervisffb.jervis_ui.generated.resources.icons_animation_kickoff_kick_off_blizzard

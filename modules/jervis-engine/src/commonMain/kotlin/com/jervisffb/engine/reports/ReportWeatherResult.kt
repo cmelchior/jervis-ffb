@@ -1,6 +1,6 @@
 package com.jervisffb.engine.reports
 
-import com.jervisffb.engine.rules.bb2020.tables.Weather
+import com.jervisffb.engine.rules.common.tables.Weather
 
 class ReportWeatherResult(weather: Weather) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

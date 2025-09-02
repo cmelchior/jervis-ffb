@@ -1,7 +1,7 @@
 package com.jervisffb.engine.model.locations
 
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.tables.CornerThrowInPosition
+import com.jervisffb.engine.rules.common.tables.CornerThrowInPosition
 
 /**
  * Interface representing the abstract idea of a location. This can either

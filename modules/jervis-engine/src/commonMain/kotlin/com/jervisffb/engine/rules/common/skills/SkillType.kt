@@ -1,22 +1,24 @@
 package com.jervisffb.engine.rules.common.skills
 
+import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.SkillId
 import kotlinx.serialization.Serializable
 
 /**
- * This enumerates all known skills across all rulesets. In particular a type
- * doesn't arry any meaning, it is just an identifier. The exect behaviour
- * is determined by a an implementation of the [Skill] interface or a specific
- * [Procedure].
+ * This lists all known skills across all rulesets.
  *
- * It is mostly a work-around so we can easily detect when a new skill is added, so
- * we remember to update all locations.
+ * Note, a type doesn't carry any meaning, it is just an identifier. The exact
+ * behavior is determined by an implementation of the [Skill] interface or a
+ * specific [Procedure].
+ *
+ * It is mostly a work-around, so we can easily detect when a new skill is added,
+ * so we remember to update all locations.
  *
  * Skills with values are still only identified by their name here.
  * The unique combination of a type and value is defined by [SkillId].
  * These can be created by calling [SkillType.id].
- **
- * @see com.jervisffb.engine.rules.bb2020.SkillSettings
+ *
+ * @see SkillSettings
  */
 @Serializable
 enum class SkillType(val description: String) {

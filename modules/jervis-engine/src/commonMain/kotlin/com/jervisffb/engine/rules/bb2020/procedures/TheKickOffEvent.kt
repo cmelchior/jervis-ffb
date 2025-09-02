@@ -35,7 +35,7 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportTouchback
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.tables.TableResult
+import com.jervisffb.engine.rules.common.tables.TableResult
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 data class KickOffEventContext(

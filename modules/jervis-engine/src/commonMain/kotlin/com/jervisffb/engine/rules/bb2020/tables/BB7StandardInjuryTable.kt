@@ -1,6 +1,8 @@
 package com.jervisffb.engine.rules.bb2020.tables
 
 import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.rules.common.tables.InjuryResult
+import com.jervisffb.engine.rules.common.tables.InjuryTable
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 

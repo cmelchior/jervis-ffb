@@ -3,7 +3,7 @@ package com.jervisffb.fumbbl.net.adapter.impl
 import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
-import com.jervisffb.engine.rules.bb2020.tables.RandomDirectionTemplate
+import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

@@ -3,7 +3,7 @@ package com.jervisffb.ui.game
 import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.Location
-import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
+import com.jervisffb.engine.rules.common.tables.CasualtyResult
 import com.jervisffb.fumbbl.net.model.BloodSpot
 import org.jetbrains.compose.resources.DrawableResource
 

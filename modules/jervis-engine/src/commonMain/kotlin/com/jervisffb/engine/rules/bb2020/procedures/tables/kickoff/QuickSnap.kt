@@ -37,7 +37,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.KickOffEventContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquare
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquareContext
-import com.jervisffb.engine.rules.bb2020.tables.KickOffEvent
+import com.jervisffb.engine.rules.common.tables.KickOffEvent
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 data class QuickSnapContext(

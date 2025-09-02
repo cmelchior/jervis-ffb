@@ -8,11 +8,11 @@ import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
 import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
-import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.roster.SpecialRules
+import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 import com.jervisffb.engine.serialize.RosterLogo
 
 class TeamHalfData(private val game: Game) {

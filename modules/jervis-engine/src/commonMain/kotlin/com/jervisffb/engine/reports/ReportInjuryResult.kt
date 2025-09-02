@@ -2,8 +2,8 @@ package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
-import com.jervisffb.engine.rules.bb2020.tables.InjuryResult
+import com.jervisffb.engine.rules.common.tables.CasualtyResult
+import com.jervisffb.engine.rules.common.tables.InjuryResult
 
 // This class is a mess. We need to find a better way to organize it, but it should probably wait
 // until we have a better idea how to organize logs in the UI since it could affect grouping

@@ -18,8 +18,8 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
 import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.SolidDefense
-import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
-import com.jervisffb.engine.rules.bb2020.tables.Weather
+import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
+import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame

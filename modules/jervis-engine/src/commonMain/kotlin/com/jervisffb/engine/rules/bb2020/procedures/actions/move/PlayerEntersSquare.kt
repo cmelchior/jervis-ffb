@@ -43,7 +43,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStepResolv
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
-import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
+import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 
 
 data class MovePlayerIntoSquareContext(

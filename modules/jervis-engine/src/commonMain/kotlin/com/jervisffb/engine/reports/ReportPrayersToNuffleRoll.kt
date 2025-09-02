@@ -2,7 +2,7 @@ package com.jervisffb.engine.reports
 
 import com.jervisffb.engine.actions.D16Result
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.bb2020.tables.TableResult
+import com.jervisffb.engine.rules.common.tables.TableResult
 
 class ReportPrayersToNuffleRoll(
     team: Team,

@@ -5,25 +5,29 @@ import com.jervisffb.engine.model.BallType
 import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.model.StadiumType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020ArgueTheCallTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020CasualtyTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020LastingInjuryTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardInjuryTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardKickOffEventTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardPrayersToNuffleTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardWeatherTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020StuntyInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7StandardInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7StuntyInjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.CasualtyTable
-import com.jervisffb.engine.rules.bb2020.tables.InjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.KickOffTable
-import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.SpringWeatherTable
-import com.jervisffb.engine.rules.bb2020.tables.StandardInjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.StandardKickOffEventTable
-import com.jervisffb.engine.rules.bb2020.tables.StandardPrayersToNuffleTable
-import com.jervisffb.engine.rules.bb2020.tables.StandardWeatherTable
-import com.jervisffb.engine.rules.bb2020.tables.StuntyInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.SummerWeatherTable
-import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
 import com.jervisffb.engine.rules.bb2020.tables.WinterWeatherTable
+import com.jervisffb.engine.rules.bb2025.tables.BB2025ArgueTheCallTable
+import com.jervisffb.engine.rules.bb2025.tables.BB2025CasualtyTable
+import com.jervisffb.engine.rules.bb2025.tables.BB2025LastingInjuryTable
+import com.jervisffb.engine.rules.bb2025.tables.BB2025StandardInjuryTable
+import com.jervisffb.engine.rules.bb2025.tables.BB2025StandardKickOffEventTable
+import com.jervisffb.engine.rules.bb2025.tables.BB2025StandardPrayersToNuffleTable
+import com.jervisffb.engine.rules.bb2025.tables.BB2025StandardWeatherTable
+import com.jervisffb.engine.rules.bb2025.tables.BB2025StuntyInjuryTable
 import com.jervisffb.engine.rules.builder.BallSelectorRule
 import com.jervisffb.engine.rules.builder.NoStadium
 import com.jervisffb.engine.rules.builder.RollForStadiumUsed
@@ -32,6 +36,13 @@ import com.jervisffb.engine.rules.builder.SpecificStadium
 import com.jervisffb.engine.rules.builder.SpecificUnusualBall
 import com.jervisffb.engine.rules.builder.StadiumRule
 import com.jervisffb.engine.rules.builder.StandardBall
+import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
+import com.jervisffb.engine.rules.common.tables.CasualtyTable
+import com.jervisffb.engine.rules.common.tables.InjuryTable
+import com.jervisffb.engine.rules.common.tables.KickOffTable
+import com.jervisffb.engine.rules.common.tables.LastingInjuryTable
+import com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable
+import com.jervisffb.engine.rules.common.tables.WeatherTable
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.utils.DropdownEntryWithValue
 import com.jervisffb.ui.menu.utils.findEntry
@@ -51,85 +62,93 @@ class RulesSetupComponentModel(
 
     val weatherTables = listOf<Pair<String, List<DropdownEntryWithValue<WeatherTable>>>>(
         "Rulebook" to listOf(
-            DropdownEntryWithValue("Standard", StandardWeatherTable, true),
+            DropdownEntryWithValue("Standard (2025)", BB2025StandardWeatherTable, true),
+            DropdownEntryWithValue("Standard (2020)", BB2020StandardWeatherTable, true),
         ),
-        "Death Zone" to listOf(
+        "Death Zone (2020)" to listOf(
             DropdownEntryWithValue("Spring", SpringWeatherTable, false),
             DropdownEntryWithValue("Summer", SummerWeatherTable, false),
             DropdownEntryWithValue("Autumn", SummerWeatherTable, false),
             DropdownEntryWithValue("Winter", WinterWeatherTable, false),
-            DropdownEntryWithValue("Subterranean", StandardWeatherTable, false),
-            DropdownEntryWithValue("Primordial", StandardWeatherTable, false),
-            DropdownEntryWithValue("Graveyard", StandardWeatherTable, false),
-            DropdownEntryWithValue("Desolate Wasteland", StandardWeatherTable, false),
-            DropdownEntryWithValue("Mountainous", StandardWeatherTable, false),
-            DropdownEntryWithValue("Coastal", StandardWeatherTable, false),
-            DropdownEntryWithValue("Desert", StandardWeatherTable, false),
+            DropdownEntryWithValue("Subterranean", BB2020StandardWeatherTable, false),
+            DropdownEntryWithValue("Primordial", BB2020StandardWeatherTable, false),
+            DropdownEntryWithValue("Graveyard", BB2020StandardWeatherTable, false),
+            DropdownEntryWithValue("Desolate Wasteland", BB2020StandardWeatherTable, false),
+            DropdownEntryWithValue("Mountainous", BB2020StandardWeatherTable, false),
+            DropdownEntryWithValue("Coastal", BB2020StandardWeatherTable, false),
+            DropdownEntryWithValue("Desert", BB2020StandardWeatherTable, false),
         )
     )
 
     val prayersToNuffleTables = listOf<Pair<String, List<DropdownEntryWithValue<PrayersToNuffleTable>>>>(
         "Rulebook" to listOf(
-            DropdownEntryWithValue("Standard", StandardPrayersToNuffleTable, true),
+            DropdownEntryWithValue("Standard (2025)", BB2025StandardPrayersToNuffleTable, true),
+            DropdownEntryWithValue("Standard (2020)", BB2020StandardPrayersToNuffleTable, true),
         ),
-        "Death Zone" to listOf(
+        "Death Zone (2020)" to listOf(
             DropdownEntryWithValue("Blood Bowl Sevens", BB7PrayersToNuffleTable, true),
         ),
     )
 
     val kickOffTables = listOf<Pair<String, List<DropdownEntryWithValue<KickOffTable>>>>(
         "Rulebook" to listOf(
-            DropdownEntryWithValue("Standard", StandardKickOffEventTable, true),
+            DropdownEntryWithValue("Standard (2025)", BB2025StandardKickOffEventTable, true),
+            DropdownEntryWithValue("Standard (2020)", BB2020StandardKickOffEventTable, true),
         ),
-        "Death Zone" to listOf(
+        "Death Zone (2020)" to listOf(
             DropdownEntryWithValue("Blood Bowl Sevens", BB7KickOffEventTable, true),
         ),
         "Spike Magazine 15 (Amazons)" to listOf(
-            DropdownEntryWithValue("Temple-City", StandardKickOffEventTable, false),
+            DropdownEntryWithValue("Temple-City", BB2020StandardKickOffEventTable, false),
         )
     )
 
     val injuryTables = listOf<Pair<String, List<DropdownEntryWithValue<InjuryTable>>>>(
         "Rulebook" to listOf(
-            DropdownEntryWithValue("Standard", StandardInjuryTable, true),
+            DropdownEntryWithValue("Standard (2025)", BB2025StandardInjuryTable, true),
+            DropdownEntryWithValue("Standard (2020)", BB2020StandardInjuryTable, true),
         ),
-        "Death Zone" to listOf(
+        "Death Zone (2020)" to listOf(
             DropdownEntryWithValue("Blood Bowl Sevens", BB7StandardInjuryTable, true),
         ),
     )
 
     val stuntyInjuryTables = listOf<Pair<String, List<DropdownEntryWithValue<InjuryTable>>>>(
         "Rulebook" to listOf(
-            DropdownEntryWithValue("Standard", StuntyInjuryTable, true),
+            DropdownEntryWithValue("Standard (2025)", BB2025StuntyInjuryTable, true),
+            DropdownEntryWithValue("Standard (2020)", BB2020StuntyInjuryTable, true),
         ),
-        "Death Zone" to listOf(
+        "Death Zone (2020)" to listOf(
             DropdownEntryWithValue("Blood Bowl Sevens", BB7StuntyInjuryTable, true),
         ),
     )
 
     val casualtyTables = listOf<Pair<String, List<DropdownEntryWithValue<CasualtyTable>>>>(
         "Rulebook" to listOf(
-            DropdownEntryWithValue("Standard", CasualtyTable, true),
+            DropdownEntryWithValue("Standard (2025)", BB2025CasualtyTable, true),
+            DropdownEntryWithValue("Standard (2020)", BB2020CasualtyTable, true),
         ),
     )
 
     val lastingInjuryTables = listOf<Pair<String, List<DropdownEntryWithValue<LastingInjuryTable>>>>(
         "Rulebook" to listOf(
-            DropdownEntryWithValue("Standard", LastingInjuryTable, true),
+            DropdownEntryWithValue("Standard (2025)", BB2025LastingInjuryTable, true),
+            DropdownEntryWithValue("Standard (2020)", BB2020LastingInjuryTable, true),
         ),
     )
 
     val argueTheCallTables = listOf<Pair<String, List<DropdownEntryWithValue<ArgueTheCallTable>>>>(
         "Rulebook" to listOf(
-            DropdownEntryWithValue("Standard", ArgueTheCallTable, true),
+            DropdownEntryWithValue("Standard (2025)", BB2025ArgueTheCallTable, true),
+            DropdownEntryWithValue("Standard (2020)", BB2020ArgueTheCallTable, true),
         ),
     )
 
     val unusualBallList = listOf<Pair<String, List<DropdownEntryWithValue<BallSelectorRule>>>>(
         "Rulebook" to listOf(
-            DropdownEntryWithValue("Normal Ball", StandardBall, true)
+            DropdownEntryWithValue("Normal Ball", StandardBall, true),
         ),
-        "Death Zone" to listOf(
+        "Death Zone (2020)" to listOf(
             DropdownEntryWithValue("Roll On Unusual Balls Table", RollOnUnusualBallTable, false),
             DropdownEntryWithValue("Explodin'", SpecificUnusualBall(BallType.EXPLODIN), false),
             DropdownEntryWithValue("Deamonic", SpecificUnusualBall(BallType.DEAMONIC), false),
@@ -171,7 +190,7 @@ class RulesSetupComponentModel(
     )
 
     val stadia = listOf<Pair<String, List<DropdownEntryWithValue<StadiumRule>>>>(
-        "Death Zone" to listOf(
+        "Death Zone (2020)" to listOf(
             DropdownEntryWithValue("Disabled", NoStadium, true),
             DropdownEntryWithValue("Enabled", RollForStadiumUsed, false),
         ),
@@ -206,17 +225,7 @@ class RulesSetupComponentModel(
     val extraTime = MutableStateFlow(false)
 
     init {
-        updateWeatherTable(weatherTables.first().second.first())
-        updatePrayersToNuffleTable(prayersToNuffleTables.first().second.first())
-        updateKickoffTable(kickOffTables.first().second.first())
-        updateInjuryTable(injuryTables.first().second.first())
-        updateStuntyInjuryTable(stuntyInjuryTables.first().second.first())
-        updateCasualtyTable(casualtyTables.first().second.first())
-        updateLastingInjuryTable(lastingInjuryTables.first().second.first())
-        updateArgueTheCallTable(argueTheCallTables.first().second.first())
-        updateUnusualBall(unusualBallList.first().second.first())
-        updatePitch(pitches.first().second.first())
-        updateStadium(stadia.first().second.first())
+        updateRulesBuilder(rulesBuilder)
     }
 
     fun updateRulesBase(entry: DropdownEntryWithValue<Rules>) {

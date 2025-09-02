@@ -28,11 +28,11 @@ import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
 import com.jervisffb.engine.rules.bb2020.skills.Pro
 import com.jervisffb.engine.rules.bb2020.skills.Stab
-import com.jervisffb.engine.rules.bb2020.tables.PrayerStatModifier
-import com.jervisffb.engine.rules.bb2020.tables.PrayerToNuffle
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
+import com.jervisffb.engine.rules.common.tables.PrayerStatModifier
+import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.createDefaultGameState

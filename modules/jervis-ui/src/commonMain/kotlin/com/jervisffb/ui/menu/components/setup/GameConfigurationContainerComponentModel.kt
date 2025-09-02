@@ -5,6 +5,7 @@ import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.FumbblBB2020Rules
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
@@ -52,6 +53,7 @@ private val standardRulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
         undoActionBehavior = UndoActionBehavior.ALLOWED
         build()
     }),
+    DropdownEntryWithValue("Blood Bowl 2025 Rules (Strict)", StandardBB2025Rules()),
 )
 
 private val bb7RulesBaseList = listOf<DropdownEntryWithValue<Rules>>(

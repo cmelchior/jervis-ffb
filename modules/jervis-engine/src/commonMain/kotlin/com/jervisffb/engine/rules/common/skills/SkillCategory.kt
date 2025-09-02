@@ -2,7 +2,7 @@ package com.jervisffb.engine.rules.common.skills
 
 /**
  * All Skill Categories across all rulesets. Whether or not they are supported
- * is defined by the relevant [com.jervisffb.engine.rules.bb2020.SkillSettings]
+ * is defined by the relevant [SkillSettings]
  */
 enum class SkillCategory(val description: String) {
     AGILITY("Agility"),

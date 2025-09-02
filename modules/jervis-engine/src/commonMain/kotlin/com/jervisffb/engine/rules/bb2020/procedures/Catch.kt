@@ -25,7 +25,7 @@ import com.jervisffb.engine.reports.ReportInterception
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchDownContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchdown
-import com.jervisffb.engine.rules.bb2020.tables.Weather
+import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

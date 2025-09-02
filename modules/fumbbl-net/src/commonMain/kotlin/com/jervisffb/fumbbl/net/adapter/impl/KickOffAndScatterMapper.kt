@@ -8,7 +8,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.DeviateRoll
 import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
-import com.jervisffb.engine.rules.bb2020.tables.RandomDirectionTemplate
+import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add

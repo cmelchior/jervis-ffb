@@ -25,7 +25,7 @@ import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
 import com.jervisffb.engine.rules.bb2020.skills.Loner
-import com.jervisffb.engine.rules.bb2020.tables.PrayerStatModifier
+import com.jervisffb.engine.rules.common.tables.PrayerStatModifier
 
 /**
  * Procedure for handling the Prayer to Nuffle "Iron Man" as described on page 39

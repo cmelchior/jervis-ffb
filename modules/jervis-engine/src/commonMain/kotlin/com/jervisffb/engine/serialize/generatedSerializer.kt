@@ -4,6 +4,10 @@ import com.jervisffb.engine.rules.bb2020.BB2020TeamActions
 import com.jervisffb.engine.rules.common.actions.TeamActions
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
+import com.jervisffb.engine.rules.common.skills.SkillSettings
+import com.jervisffb.engine.rules.common.tables.InjuryTable
+import com.jervisffb.engine.rules.common.tables.KickOffTable
+import com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
@@ -69,15 +73,15 @@ val generatedJervisSerializerModule = SerializersModule {
             subclass(com.jervisffb.engine.actions.DBlockResult::class)
         }
     }
-    polymorphic(com.jervisffb.engine.rules.bb2020.tables.InjuryTable::class) {
+    polymorphic(InjuryTable::class) {
         subclass(com.jervisffb.engine.rules.bb2020.tables.BB7StandardInjuryTable::class)
         subclass(com.jervisffb.engine.rules.bb2020.tables.BB7StuntyInjuryTable::class)
-        subclass(com.jervisffb.engine.rules.bb2020.tables.StandardInjuryTable::class)
-        subclass(com.jervisffb.engine.rules.bb2020.tables.StuntyInjuryTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020StandardInjuryTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020StuntyInjuryTable::class)
     }
-    polymorphic(com.jervisffb.engine.rules.bb2020.tables.KickOffTable::class) {
+    polymorphic(KickOffTable::class) {
         subclass(com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable::class)
-        subclass(com.jervisffb.engine.rules.bb2020.tables.StandardKickOffEventTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020StandardKickOffEventTable::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.pathfinder.PathFinder::class) {
         subclass(com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder::class)
@@ -86,9 +90,9 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(RosterPosition::class)
         subclass(StarPlayerPosition::class)
     }
-    polymorphic(com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable::class) {
+    polymorphic(PrayersToNuffleTable::class) {
         subclass(com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable::class)
-        subclass(com.jervisffb.engine.rules.bb2020.tables.StandardPrayersToNuffleTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020StandardPrayersToNuffleTable::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.roster.Roster::class) {
         subclass(com.jervisffb.engine.rules.bb2020.roster.BB2020Roster::class)
@@ -107,7 +111,7 @@ val generatedJervisSerializerModule = SerializersModule {
     }
     polymorphic(com.jervisffb.engine.serialize.SerializedTeam::class) {
     }
-    polymorphic(com.jervisffb.engine.rules.bb2020.SkillSettings::class) {
+    polymorphic(SkillSettings::class) {
         subclass(com.jervisffb.engine.rules.bb2020.BB2020SkillSettings::class)
     }
     polymorphic(com.jervisffb.engine.model.inducements.Spell::class) {

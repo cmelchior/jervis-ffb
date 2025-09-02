@@ -7,13 +7,13 @@ import com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7StandardInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7StuntyInjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.InjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.KickOffTable
-import com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable
 import com.jervisffb.engine.rules.builder.FoulActionBehavior
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.KickingPlayerBehavior
 import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
+import com.jervisffb.engine.rules.common.tables.InjuryTable
+import com.jervisffb.engine.rules.common.tables.KickOffTable
+import com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable
 import kotlinx.serialization.Serializable
 
 /**

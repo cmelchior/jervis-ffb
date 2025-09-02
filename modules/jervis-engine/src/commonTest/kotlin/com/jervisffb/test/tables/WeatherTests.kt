@@ -26,9 +26,9 @@ import com.jervisffb.engine.model.modifiers.PickupModifier
 import com.jervisffb.engine.model.modifiers.RushModifier
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassingType
-import com.jervisffb.engine.rules.bb2020.tables.Range
-import com.jervisffb.engine.rules.bb2020.tables.Weather
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.tables.Weather
+import com.jervisffb.engine.rules.coo.tables.Range
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultFanFactor

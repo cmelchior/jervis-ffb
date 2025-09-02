@@ -25,24 +25,16 @@ import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
 import com.jervisffb.engine.rules.bb2020.BB2020TeamActions
-import com.jervisffb.engine.rules.bb2020.SkillSettings
 import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
-import com.jervisffb.engine.rules.bb2020.tables.ArgueTheCallTable
-import com.jervisffb.engine.rules.bb2020.tables.CasualtyTable
-import com.jervisffb.engine.rules.bb2020.tables.InjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.KickOffTable
-import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.PrayersToNuffleTable
-import com.jervisffb.engine.rules.bb2020.tables.RandomDirectionTemplate
-import com.jervisffb.engine.rules.bb2020.tables.RangeRuler
-import com.jervisffb.engine.rules.bb2020.tables.StandardInjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.StandardKickOffEventTable
-import com.jervisffb.engine.rules.bb2020.tables.StandardPrayersToNuffleTable
-import com.jervisffb.engine.rules.bb2020.tables.StandardWeatherTable
-import com.jervisffb.engine.rules.bb2020.tables.StuntyInjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.ThrowInPosition
-import com.jervisffb.engine.rules.bb2020.tables.ThrowInTemplate
-import com.jervisffb.engine.rules.bb2020.tables.WeatherTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020ArgueTheCallTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020CasualtyTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020LastingInjuryTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020RangeRuler
+import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardInjuryTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardKickOffEventTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardPrayersToNuffleTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardWeatherTable
+import com.jervisffb.engine.rules.bb2020.tables.BB2020StuntyInjuryTable
 import com.jervisffb.engine.rules.builder.BallSelectorRule
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.FoulActionBehavior
@@ -60,7 +52,19 @@ import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
+import com.jervisffb.engine.rules.common.skills.SkillSettings
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
+import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
+import com.jervisffb.engine.rules.common.tables.CasualtyTable
+import com.jervisffb.engine.rules.common.tables.InjuryTable
+import com.jervisffb.engine.rules.common.tables.KickOffTable
+import com.jervisffb.engine.rules.common.tables.LastingInjuryTable
+import com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable
+import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
+import com.jervisffb.engine.rules.common.tables.RangeRuler
+import com.jervisffb.engine.rules.common.tables.ThrowInPosition
+import com.jervisffb.engine.rules.common.tables.ThrowInTemplate
+import com.jervisffb.engine.rules.common.tables.WeatherTable
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
 import kotlinx.serialization.Serializable
@@ -80,8 +84,7 @@ import kotlinx.serialization.Serializable
  * Developer's Commentary:
  * The idea is that this class should be able to represent all game types, but that hasn't been
  * fully tested yet, e.g., Dungeon Bowl has a very different view of what the field looks
- * and behaves, so most likely some aspects need to be redesigned.
- *
+ * and behaves, so most likely some aspects need to be redesigned.*
  * It is also a bit unclear how well this class transcends ruleset, i.e., between BB2016 and BB2020
  */
 @Serializable
@@ -148,20 +151,20 @@ open class Rules(
     open val matchEventsEnabled: Boolean = false,
 
     // Tables
-    open val kickOffEventTable: KickOffTable = StandardKickOffEventTable,
+    open val kickOffEventTable: KickOffTable = BB2020StandardKickOffEventTable,
     open val prayersToNufflePrice: Int = 50_000,
     open val prayersToNuffleEnabled: Boolean = true,
-    open val prayersToNuffleTable: PrayersToNuffleTable = StandardPrayersToNuffleTable,
-    open val weatherTable: WeatherTable = StandardWeatherTable,
-    open val injuryTable: InjuryTable = StandardInjuryTable,
-    open val stuntyInjuryTable: InjuryTable = StuntyInjuryTable,
-    open val casualtyTable: CasualtyTable = CasualtyTable,
-    open val lastingInjuryTable: LastingInjuryTable = LastingInjuryTable,
-    open val argueTheCallTable: ArgueTheCallTable = ArgueTheCallTable,
+    open val prayersToNuffleTable: PrayersToNuffleTable = BB2020StandardPrayersToNuffleTable,
+    open val weatherTable: WeatherTable = BB2020StandardWeatherTable,
+    open val injuryTable: InjuryTable = BB2020StandardInjuryTable,
+    open val stuntyInjuryTable: InjuryTable = BB2020StuntyInjuryTable,
+    open val casualtyTable: CasualtyTable = BB2020CasualtyTable,
+    open val lastingInjuryTable: LastingInjuryTable = BB2020LastingInjuryTable,
+    open val argueTheCallTable: ArgueTheCallTable = BB2020ArgueTheCallTable,
 
     // Templates
     open val randomDirectionTemplate: RandomDirectionTemplate = RandomDirectionTemplate,
-    open val rangeRuler: RangeRuler = RangeRuler,
+    open val rangeRuler: RangeRuler = BB2020RangeRuler,
 
     // Team Actions
     open val teamActions: TeamActions = BB2020TeamActions(),

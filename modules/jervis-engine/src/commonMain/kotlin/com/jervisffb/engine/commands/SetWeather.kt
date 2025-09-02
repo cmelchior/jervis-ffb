@@ -1,7 +1,7 @@
 package com.jervisffb.engine.commands
 
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.tables.Weather
+import com.jervisffb.engine.rules.common.tables.Weather
 
 class SetWeather(private val weather: Weather) : Command {
     private lateinit var originalWeather: Weather

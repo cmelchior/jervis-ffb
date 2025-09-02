@@ -23,9 +23,9 @@ import com.jervisffb.engine.model.inducements.Apothecary
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.tables.CasualtyResult
-import com.jervisffb.engine.rules.bb2020.tables.InjuryResult
-import com.jervisffb.engine.rules.bb2020.tables.LastingInjuryResult
+import com.jervisffb.engine.rules.common.tables.CasualtyResult
+import com.jervisffb.engine.rules.common.tables.InjuryResult
+import com.jervisffb.engine.rules.common.tables.LastingInjuryResult
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 enum class RiskingInjuryMode {
