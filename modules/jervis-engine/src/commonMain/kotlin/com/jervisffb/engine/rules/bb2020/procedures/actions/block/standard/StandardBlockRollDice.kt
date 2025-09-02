@@ -19,8 +19,8 @@ import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
+import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
 import kotlin.math.absoluteValue
 
 /**

@@ -6,6 +6,7 @@ import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.model.Ball
+import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
@@ -25,7 +26,6 @@ import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
 import com.jervisffb.engine.rules.bb2020.BB2020TeamActions
-import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.tables.BB2020ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020CasualtyTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020LastingInjuryTable
@@ -49,6 +49,7 @@ import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.TeamActions
 import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
 import com.jervisffb.engine.rules.common.pathfinder.PathFinder
+import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
@@ -173,6 +174,7 @@ open class Rules(
     // Dice roll targets defined in the rulebook
     open val standingUpTarget: Int = 4, // See page 44 in the rule book
     open val moveRequiredForStandingUp: Int = 3,
+    open val secureTheBallTarget: Int = 2, // Blood Bowl Season 3 announcement blogposts
 
     // Behavior customization, .e.g. allow the rules to specify which Procedure should
     // be used for certain aspects of the game
@@ -644,7 +646,6 @@ open class Rules(
     fun getAvailableActions(state: Game, player: Player): List<PlayerAction> {
         if (state.activePlayer != player) INVALID_GAME_STATE("$player is not the active player")
         if (player.location !is OnFieldLocation) return emptyList()
-
         return buildList {
             // Add any team actions that are available
             state.activeTeamOrThrow().turnData.let {
@@ -679,9 +680,27 @@ open class Rules(
                 }
                 // Even though Secure The Ball is only in the 2025 ruleset, we have the check here
                 // since it makes maintaining the logic easier. The action is disabled by setting the
-                // count to 0 in the TeamActions setup
+                // count to 0 in the TeamActions setup.
                 if (it.secureTheBallActions > 0) {
-                    add(teamActions.secureTheBall)
+                    // Securing the Ball is only available if no standing players wit TZ's are within 2 of the ball.
+                    // In case of multiple balls, only one ball has to satisfy the criteria for he action to be available.
+                    // The ball has to be on the floor at the start of the activation.
+                    val elligibleBallExists = state.balls.any { ball ->
+                        val onTheGround = (ball.state == BallState.ON_GROUND)
+                        val enemiesInRange = ball.location.getSurroundingCoordinates(
+                            rules = this@Rules,
+                            distance = 2,
+                            includeOutOfBounds = false
+                        ).any {
+                            state.field[it].player?.let { p->
+                                (p.team != player.team) && this@Rules.canMarkPlayers(p)
+                            } ?: false
+                        }
+                        onTheGround && !enemiesInRange
+                    }
+                    if (elligibleBallExists) {
+                        add(teamActions.secureTheBall)
+                    }
                 }
             }
 
@@ -783,6 +802,7 @@ open class Rules(
         var allowMultipleTeamRerollsPrTurn: Boolean = rules.allowMultipleTeamRerollsPrTurn
         var standingUpTarget: Int = rules.standingUpTarget
         var moveRequiredForStandingUp: Int = rules.moveRequiredForStandingUp
+        var secureTheBallTarget: Int = rules.secureTheBallTarget
         var undoActionBehavior: UndoActionBehavior = rules.undoActionBehavior
         var diceRollsOwner: DiceRollOwner = rules.diceRollsOwner
         var foulActionBehavior: FoulActionBehavior = rules.foulActionBehavior
@@ -835,6 +855,7 @@ open class Rules(
             allowMultipleTeamRerollsPrTurn,
             standingUpTarget,
             moveRequiredForStandingUp,
+            secureTheBallTarget,
             undoActionBehavior,
             diceRollsOwner,
             foulActionBehavior,

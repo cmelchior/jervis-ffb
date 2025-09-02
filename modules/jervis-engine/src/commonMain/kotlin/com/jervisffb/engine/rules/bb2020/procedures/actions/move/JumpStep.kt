@@ -38,10 +38,10 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.JumpModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import kotlin.math.max
 
 data class JumpRollContext(

@@ -1,7 +1,6 @@
 package com.jervisffb.ui.game.view
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,7 +34,7 @@ import com.jervisffb.engine.actions.Dice
 import com.jervisffb.engine.actions.DicePool
 import com.jervisffb.engine.actions.DicePoolChoice
 import com.jervisffb.engine.actions.DicePoolResultsSelected
-import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
+import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.ui.game.dialogs.DicePoolUserInputDialog
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel

@@ -6,6 +6,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockA
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.ProjectileVomitAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StabAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction
+import com.jervisffb.engine.rules.bb2025.procedures.actions.SecureTheBallAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.handoff.HandOffAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassAction
@@ -101,7 +102,7 @@ class BB2025TeamActions : TeamActions() {
             countsAs = null,
             availablePrTurn = 1,
             worksDuringBlitz = false,
-            procedure = FoulAction,
+            procedure = SecureTheBallAction,
             compulsory = false,
         ),
     )

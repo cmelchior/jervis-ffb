@@ -4,13 +4,15 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.rules.common.tables.WeatherTable
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlinx.serialization.Serializable
 
 /**
  * Class representing the Weather Table.
  *
  * See page XX in the BB 2025 rulebook.
  */
-object BB2025StandardWeatherTable: WeatherTable {
+@Serializable
+object BB2025StandardWeatherTable: WeatherTable() {
     override val name: String = "Standard Weather Table"
     private val table: Map<Int, Weather> =
         mapOf(

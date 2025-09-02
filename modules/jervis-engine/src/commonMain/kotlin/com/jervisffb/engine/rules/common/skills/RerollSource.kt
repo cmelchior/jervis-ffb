@@ -3,8 +3,8 @@ package com.jervisffb.engine.rules.common.skills
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
+import com.jervisffb.engine.rules.common.procedures.DieRoll
 
 // Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {

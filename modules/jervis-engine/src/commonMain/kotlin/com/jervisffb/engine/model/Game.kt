@@ -120,7 +120,7 @@ class Game(
     fun isTurnOver(): Boolean = turnOver != null
 
     // Checks if an action should end immediately.
-    // It feels wrong to have this method here (since contains some logic and
+    // It feels wrong to have this method here (since it contains some logic and
     // reference a context). Should it be an utility method or be in the Rules
     // instead?
     fun endActionImmediately(): Boolean {

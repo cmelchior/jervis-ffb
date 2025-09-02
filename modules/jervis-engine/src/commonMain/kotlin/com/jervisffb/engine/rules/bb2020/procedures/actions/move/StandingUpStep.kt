@@ -26,8 +26,8 @@ import com.jervisffb.engine.model.modifiers.HelpingHandsModifier
 import com.jervisffb.engine.reports.ReportStandingUp
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
-import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.rules.bb2020.skills.Timmmber
+import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 data class StandingUpRollContext(

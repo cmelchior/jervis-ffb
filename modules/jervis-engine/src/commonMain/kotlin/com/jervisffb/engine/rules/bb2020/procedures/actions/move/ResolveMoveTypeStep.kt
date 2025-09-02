@@ -15,10 +15,12 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.procedures.Pickup
+import com.jervisffb.engine.rules.bb2025.procedures.actions.SecureTheBallContext
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
@@ -77,6 +79,7 @@ object ResolveMoveTypeStep : Procedure() {
 
         override fun onExitNode(state: Game, rules: Rules): Command {
             val moveContext = state.getContext<MoveContext>()
+            val secureTheBallContext = state.getContextOrNull<SecureTheBallContext>()
             val activeContext = state.getContext<ActivatePlayerContext>()
             val endNow = state.endActionImmediately()
             val player = moveContext.player
@@ -85,23 +88,55 @@ object ResolveMoveTypeStep : Procedure() {
                     && state.field[player.location as FieldCoordinate].balls.isNotEmpty()
                     && state.field[player.location as FieldCoordinate].balls.all { it.state == BallState.ON_GROUND }
             )
-
-            return if (pickupBall && !endNow) {
-                compositeCommandOf(
-                    if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
-                    GotoNode(PickUpBall)
-                )
-            } else if (endNow) {
-                compositeCommandOf(
-                    if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
-                    ExitProcedure()
-                )
-            } else {
-                compositeCommandOf(
-                    if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
-                    GotoNode(CheckForScoring)
-                )
+            val secureTheBall = (secureTheBallContext?.player === player) && pickupBall
+            return when {
+                // Securing the Ball takes precedence over picking up the ball.
+                secureTheBall && !endNow -> {
+                    compositeCommandOf(
+                        if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                        GotoNode(SecureTheBall)
+                    )
+                }
+                pickupBall && !endNow -> {
+                    compositeCommandOf(
+                        if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                        GotoNode(PickUpBall)
+                    )
+                }
+                endNow -> {
+                    compositeCommandOf(
+                        if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                        ExitProcedure()
+                    )
+                }
+                else -> {
+                    compositeCommandOf(
+                        if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
+                        GotoNode(CheckForScoring)
+                    )
+                }
             }
+        }
+    }
+
+    // If a player moved into the ball as part of a Secure The Ball action, they must now attempt to secure it.
+    // This is NOT a Pickup.
+    object SecureTheBall : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<MoveContext>()
+            val ball = state.field[context.player.coordinates].balls.single()
+            if (ball.location != context.player.coordinates) {
+                INVALID_GAME_STATE("Ball ${ball.location} must be at ${context.player.coordinates}")
+            }
+            return SetCurrentBall(ball)
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = com.jervisffb.engine.rules.bb2025.procedures.actions.SecureTheBallStep
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // TODO Should probably check if we picked up the ball.
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                GotoNode(CheckForScoring)
+            )
         }
     }
 
@@ -117,7 +152,7 @@ object ResolveMoveTypeStep : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // TODO Shoul probably check if we picked up the ball.
+            // TODO Should probably check if we picked up the ball.
             return compositeCommandOf(
                 SetCurrentBall(null),
                 GotoNode(CheckForScoring)
@@ -137,5 +172,4 @@ object ResolveMoveTypeStep : Procedure() {
             return ExitProcedure()
         }
     }
-
 }

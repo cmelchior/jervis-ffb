@@ -1,6 +1,7 @@
 package com.jervisffb.engine.rules.builder
 
 import com.jervisffb.engine.model.BallType
+import kotlinx.serialization.Serializable
 
 /**
  * Interface representing how the ball being used for the game is selected.
@@ -11,8 +12,12 @@ import com.jervisffb.engine.model.BallType
  * [SpecificUnusualBall] is an alternative option for just choosing whatever ball is fun
  * to use.
  */
+@Serializable
 sealed interface BallSelectorRule
 
+@Serializable
 data object StandardBall: BallSelectorRule
+@Serializable
 data object RollOnUnusualBallTable: BallSelectorRule
+@Serializable
 data class SpecificUnusualBall(val type: BallType): BallSelectorRule

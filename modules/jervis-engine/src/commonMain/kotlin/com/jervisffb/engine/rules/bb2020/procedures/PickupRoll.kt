@@ -31,6 +31,7 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 import com.jervisffb.engine.utils.sum
@@ -98,7 +99,7 @@ object PickupRoll : Procedure() {
                 Continue -> ExitProcedure()
                 is NoRerollSelected -> ExitProcedure()
                 is RerollOptionSelected -> {
-                    val rerollContext = UseRerollContext(DiceRollType.CATCH, action.getRerollSource(state))
+                    val rerollContext = UseRerollContext(DiceRollType.PICKUP, action.getRerollSource(state))
                     compositeCommandOf(
                         SetOldContext(Game::rerollContext, rerollContext),
                         GotoNode(UseRerollSource),

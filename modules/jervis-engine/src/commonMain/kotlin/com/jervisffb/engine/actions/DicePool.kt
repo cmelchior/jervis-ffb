@@ -1,8 +1,8 @@
 package com.jervisffb.engine.actions
 
-import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
-import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
-import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
+import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
+import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.DieRoll
 
 /**
  * A "Dice Pool" is the main concept wrapping any pool of dice (of the same type)

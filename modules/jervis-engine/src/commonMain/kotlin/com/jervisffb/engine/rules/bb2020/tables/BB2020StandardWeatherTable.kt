@@ -4,11 +4,13 @@ import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.rules.common.tables.WeatherTable
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
+import kotlinx.serialization.Serializable
 
 /**
  * Class representing the Weather Table on page 37 in the rulebook.
  */
-object BB2020StandardWeatherTable: WeatherTable {
+@Serializable
+object BB2020StandardWeatherTable: WeatherTable() {
     override val name: String = "Standard Weather Table"
     private val table: Map<Int, Weather> =
         mapOf(
@@ -40,37 +42,44 @@ object BB2020StandardWeatherTable: WeatherTable {
 /**
  * Class representing the Spring Weather Table on page 76 in the Death Zone rulebook.
  */
-object SpringWeatherTable: WeatherTable {
+@Serializable
+object SpringWeatherTable: WeatherTable() {
     override val name: String = "Spring Weather Table"
     override fun roll(firstD6: D6Result, secondD6: D6Result): Weather {
-        TODO("Not yet implemented")
+        // Not implemented yet
+        return Weather.PERFECT_CONDITIONS
     }
 }
 
 /**
  * Class representing the Summer Weather Table on page 77 in the Death Zone rulebook.
  */
-object SummerWeatherTable: WeatherTable {
+@Serializable
+object SummerWeatherTable: WeatherTable() {
     override val name: String = "Summer Weather Table"
     override fun roll(firstD6: D6Result, secondD6: D6Result): Weather {
-        TODO("Not yet implemented")
+        // Not implemented yet
+        return Weather.PERFECT_CONDITIONS
     }
 }
 
 /**
  * Class representing the Autumn Weather Table on page 77 in the Death Zone rulebook.
  */
-object AutumnWeatherTable: WeatherTable {
+@Serializable
+object AutumnWeatherTable: WeatherTable() {
     override val name: String = "Autumn Weather Table"
     override fun roll(firstD6: D6Result, secondD6: D6Result): Weather {
-        TODO("Not yet implemented")
+        // Not implemented yet
+        return Weather.PERFECT_CONDITIONS
     }
 }
 
 /**
  * Class representing the Winter Weather Table on page 78 in the Death Zone rulebook.
  */
-object WinterWeatherTable: WeatherTable {
+@Serializable
+object WinterWeatherTable: WeatherTable() {
     override val name: String
         get() = TODO("Not yet implemented")
 

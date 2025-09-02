@@ -3,7 +3,7 @@ package com.jervisffb.engine.model.context
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
-import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 
 /**
  * Context data for a player making a dodge rol.

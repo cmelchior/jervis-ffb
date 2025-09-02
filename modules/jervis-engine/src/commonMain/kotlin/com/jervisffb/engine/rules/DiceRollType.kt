@@ -41,6 +41,7 @@ enum class DiceRollType {
     QUICK_SNAP,
     RUSH,
     SCATTER,
+    SECURE_THE_BALL,
     SOLID_DEFENSE,
     SUDDEN_DEATH,
     STANDING_UP,

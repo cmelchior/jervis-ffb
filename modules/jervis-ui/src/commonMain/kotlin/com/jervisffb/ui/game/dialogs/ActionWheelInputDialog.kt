@@ -27,9 +27,9 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
+import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.ui.game.dialogs.circle.ActionMenuItem
 import com.jervisffb.ui.game.dialogs.circle.ActionWheelViewModel

@@ -3,7 +3,7 @@ package com.jervisffb.engine.reports
 import com.jervisffb.engine.actions.DBlockResult
 import com.jervisffb.engine.actions.DieResult
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll
+import com.jervisffb.engine.rules.common.procedures.BlockDieRoll
 
 class ReportDiceRoll(
     private val type: DiceRollType,

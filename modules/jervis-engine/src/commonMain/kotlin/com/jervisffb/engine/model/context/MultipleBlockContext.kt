@@ -14,7 +14,6 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
@@ -27,6 +26,7 @@ import com.jervisffb.engine.rules.common.actions.BlockType.MULTIPLE_BLOCK
 import com.jervisffb.engine.rules.common.actions.BlockType.PROJECTILE_VOMIT
 import com.jervisffb.engine.rules.common.actions.BlockType.STAB
 import com.jervisffb.engine.rules.common.actions.BlockType.STANDARD
+import com.jervisffb.engine.rules.common.procedures.DieRoll
 
 /**
  * Class wrapping one of the block actions part of a multiple block actions.

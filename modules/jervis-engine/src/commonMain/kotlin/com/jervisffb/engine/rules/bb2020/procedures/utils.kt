@@ -109,7 +109,10 @@ fun calculateOptionsForMoveType(state: Game, rules: Rules, player: Player, type:
 }
 
 /**
- * Returns the [Command] for setting the available number of rushes for this action.
+ * Returns the [Command] for setting the available number of rushes for the current action.
+ *
+ * Currently, this is called at the beginning of all actions with move components. This is
+ * probably wrong, and it should be called when a player runs out of normal moves.
  */
 fun getSetPlayerRushesCommand(rules: Rules, player: Player): Command {
     // We unconditionally use Sprint as the coach can just decide _not_ to use

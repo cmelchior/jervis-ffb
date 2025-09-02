@@ -6,9 +6,9 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.bb2020.procedures.DieRoll
 import com.jervisffb.engine.rules.bb2020.procedures.UseStandardSkillReroll
 import com.jervisffb.engine.rules.bb2020.procedures.UseTeamReroll
+import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill

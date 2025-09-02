@@ -1,13 +1,5 @@
 package com.jervisffb.engine.serialize
 
-import com.jervisffb.engine.rules.bb2020.BB2020TeamActions
-import com.jervisffb.engine.rules.common.actions.TeamActions
-import com.jervisffb.engine.rules.common.roster.RosterPosition
-import com.jervisffb.engine.rules.common.roster.StarPlayerPosition
-import com.jervisffb.engine.rules.common.skills.SkillSettings
-import com.jervisffb.engine.rules.common.tables.InjuryTable
-import com.jervisffb.engine.rules.common.tables.KickOffTable
-import com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
@@ -17,12 +9,25 @@ import kotlinx.serialization.modules.subclass
  * Instead rerun the notebook in `tools/GenerateSerializers.ipynb` to update.
  */
 val generatedJervisSerializerModule = SerializersModule {
+    polymorphic(com.jervisffb.engine.rules.common.tables.ArgueTheCallTable::class) {
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020ArgueTheCallTable::class)
+        subclass(com.jervisffb.engine.rules.bb2025.tables.BB2025ArgueTheCallTable::class)
+    }
+    polymorphic(com.jervisffb.engine.rules.builder.BallSelectorRule::class) {
+        subclass(com.jervisffb.engine.rules.builder.RollOnUnusualBallTable::class)
+        subclass(com.jervisffb.engine.rules.builder.SpecificUnusualBall::class)
+        subclass(com.jervisffb.engine.rules.builder.StandardBall::class)
+    }
     polymorphic(com.jervisffb.engine.model.inducements.BiasedReferee::class) {
         subclass(com.jervisffb.engine.model.inducements.StandardBiasedReferee::class)
     }
-    polymorphic(com.jervisffb.engine.rules.bb2020.procedures.DieRoll::class) {
-        subclass(com.jervisffb.engine.rules.bb2020.procedures.BlockDieRoll::class)
-        subclass(com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll::class)
+    polymorphic(com.jervisffb.engine.rules.common.tables.CasualtyTable::class) {
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020CasualtyTable::class)
+        subclass(com.jervisffb.engine.rules.bb2025.tables.BB2025CasualtyTable::class)
+    }
+    polymorphic(com.jervisffb.engine.rules.common.procedures.DieRoll::class) {
+        subclass(com.jervisffb.engine.rules.common.procedures.BlockDieRoll::class)
+        subclass(com.jervisffb.engine.rules.common.procedures.D6DieRoll::class)
     }
     polymorphic(com.jervisffb.engine.actions.GameAction::class) {
         subclass(com.jervisffb.engine.actions.BlockTypeSelected::class)
@@ -73,26 +78,38 @@ val generatedJervisSerializerModule = SerializersModule {
             subclass(com.jervisffb.engine.actions.DBlockResult::class)
         }
     }
-    polymorphic(InjuryTable::class) {
-        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7StandardInjuryTable::class)
-        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7StuntyInjuryTable::class)
+    polymorphic(com.jervisffb.engine.rules.common.tables.InjuryTable::class) {
         subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020StandardInjuryTable::class)
         subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020StuntyInjuryTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7StandardInjuryTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7StuntyInjuryTable::class)
+        subclass(com.jervisffb.engine.rules.bb2025.tables.BB2025StandardInjuryTable::class)
+        subclass(com.jervisffb.engine.rules.bb2025.tables.BB2025StuntyInjuryTable::class)
     }
-    polymorphic(KickOffTable::class) {
-        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable::class)
+    polymorphic(com.jervisffb.engine.rules.common.tables.KickOffTable::class) {
         subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020StandardKickOffEventTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable::class)
+        subclass(com.jervisffb.engine.rules.bb2025.tables.BB2025StandardKickOffEventTable::class)
+    }
+    polymorphic(com.jervisffb.engine.rules.common.tables.LastingInjuryTable::class) {
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020LastingInjuryTable::class)
+        subclass(com.jervisffb.engine.rules.bb2025.tables.BB2025LastingInjuryTable::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.pathfinder.PathFinder::class) {
         subclass(com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.roster.Position::class) {
-        subclass(RosterPosition::class)
-        subclass(StarPlayerPosition::class)
+        subclass(com.jervisffb.engine.rules.common.roster.RosterPosition::class)
+        subclass(com.jervisffb.engine.rules.common.roster.StarPlayerPosition::class)
     }
-    polymorphic(PrayersToNuffleTable::class) {
-        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable::class)
+    polymorphic(com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable::class) {
         subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020StandardPrayersToNuffleTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable::class)
+        subclass(com.jervisffb.engine.rules.bb2025.tables.BB2025StandardPrayersToNuffleTable::class)
+    }
+    polymorphic(com.jervisffb.engine.rules.common.tables.RangeRuler::class) {
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020RangeRuler::class)
+        subclass(com.jervisffb.engine.rules.bb2025.tables.BB2025RangeRuler::class)
     }
     polymorphic(com.jervisffb.engine.rules.common.roster.Roster::class) {
         subclass(com.jervisffb.engine.rules.bb2020.roster.BB2020Roster::class)
@@ -101,25 +118,43 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.rules.BB72020Rules::class)
         subclass(com.jervisffb.engine.rules.FumbblBB2020Rules::class)
         subclass(com.jervisffb.engine.rules.StandardBB2020Rules::class)
+        subclass(com.jervisffb.engine.rules.StandardBB2025Rules::class)
         polymorphic(com.jervisffb.engine.rules.BB2020Rules::class) {
             subclass(com.jervisffb.engine.rules.BB72020Rules::class)
             subclass(com.jervisffb.engine.rules.FumbblBB2020Rules::class)
             subclass(com.jervisffb.engine.rules.StandardBB2020Rules::class)
+        }
+        polymorphic(com.jervisffb.engine.rules.BB2025Rules::class) {
+            subclass(com.jervisffb.engine.rules.StandardBB2025Rules::class)
         }
     }
     polymorphic(com.jervisffb.engine.serialize.SerializedPlayer::class) {
     }
     polymorphic(com.jervisffb.engine.serialize.SerializedTeam::class) {
     }
-    polymorphic(SkillSettings::class) {
+    polymorphic(com.jervisffb.engine.rules.common.skills.SkillSettings::class) {
         subclass(com.jervisffb.engine.rules.bb2020.BB2020SkillSettings::class)
+    }
+    polymorphic(com.jervisffb.engine.rules.builder.StadiumRule::class) {
+        subclass(com.jervisffb.engine.rules.builder.NoStadium::class)
+        subclass(com.jervisffb.engine.rules.builder.RollForStadiumUsed::class)
+        subclass(com.jervisffb.engine.rules.builder.SpecificStadium::class)
     }
     polymorphic(com.jervisffb.engine.model.inducements.Spell::class) {
         subclass(com.jervisffb.engine.model.inducements.wizards.Fireball::class)
         subclass(com.jervisffb.engine.model.inducements.wizards.Zap::class)
     }
-    polymorphic(TeamActions::class) {
-        subclass(BB2020TeamActions::class)
+    polymorphic(com.jervisffb.engine.rules.common.actions.TeamActions::class) {
+        subclass(com.jervisffb.engine.rules.bb2020.BB2020TeamActions::class)
+        subclass(com.jervisffb.engine.rules.bb2025.BB2025TeamActions::class)
+    }
+    polymorphic(com.jervisffb.engine.rules.common.tables.WeatherTable::class) {
+        subclass(com.jervisffb.engine.rules.bb2020.tables.AutumnWeatherTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020StandardWeatherTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.SpringWeatherTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.SummerWeatherTable::class)
+        subclass(com.jervisffb.engine.rules.bb2020.tables.WinterWeatherTable::class)
+        subclass(com.jervisffb.engine.rules.bb2025.tables.BB2025StandardWeatherTable::class)
     }
     polymorphic(com.jervisffb.engine.model.inducements.wizards.Wizard::class) {
         subclass(com.jervisffb.engine.model.inducements.wizards.HirelingSportsWizard::class)

@@ -46,7 +46,6 @@ import com.jervisffb.engine.reports.ReportDodgeResult
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.D6DieRoll
 import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
 import com.jervisffb.engine.rules.bb2020.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2020.skills.PrehensileTail
@@ -54,6 +53,7 @@ import com.jervisffb.engine.rules.bb2020.skills.Stunty
 import com.jervisffb.engine.rules.bb2020.skills.Titchy
 import com.jervisffb.engine.rules.bb2020.skills.TwoHeads
 import com.jervisffb.engine.rules.bb2020.testAgainstAgility
+import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 
