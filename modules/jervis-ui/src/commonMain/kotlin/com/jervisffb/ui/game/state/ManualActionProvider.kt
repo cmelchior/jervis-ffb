@@ -346,7 +346,7 @@ open class ManualActionProvider(
         }
 
         // First, we check if we are playing Hotseat and the game is set to roll random
-        // actions on the "server". In this case, they are generated here.
+        // actions on the "server". In this case, they are generated here as no server exists.
         if (!gameSettings.clientSelectedDiceRolls && gameSettings.isHotseatGame && actions.containsActionWithRandomBehavior()) {
             return createRandomAction(controller.state, actions)
         }

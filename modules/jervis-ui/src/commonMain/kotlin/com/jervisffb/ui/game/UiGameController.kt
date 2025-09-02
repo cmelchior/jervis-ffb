@@ -113,7 +113,8 @@ class UiGameController(
     private val _uiStateFlow = MutableSharedFlow<UiGameSnapshot>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
     val uiStateFlow: Flow<UiGameSnapshot> = _uiStateFlow
 
-    private val _animationFlow = MutableSharedFlow<JervisAnimation?>(onBufferOverflow = BufferOverflow.SUSPEND)
+    // `replay` is only used to allow the UI to register itself after the game controller has started
+    private val _animationFlow = MutableSharedFlow<JervisAnimation?>(replay = 1, onBufferOverflow = BufferOverflow.SUSPEND)
     val animationFlow: Flow<JervisAnimation?> = _animationFlow
 
     // Channel used by the UI to indicate when the animation is done
