@@ -374,8 +374,8 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenVi
             listOf(
                 "Start Standard game with manual actions (2025)" to { viewModel.startManualGame(navigator, rulesVersion = 2025) },
                 "Start Standard game with manual actions (2020)" to { viewModel.startManualGame(navigator, rulesVersion = 2020) },
-                "Start Standard game with all random actions (2020" to { viewModel.startRandomGame(navigator) },
-                "Start BB7 game with all manual actions (20202)" to { viewModel.startManualBB7Game(navigator) },
+                "Start Standard game with all random actions (2020)" to { viewModel.startRandomGame(navigator) },
+                "Start BB7 game with all manual actions (2020)" to { viewModel.startManualBB7Game(navigator) },
                 "Load save file" to { viewModel.loadSaveFile(navigator) }
             )
         }

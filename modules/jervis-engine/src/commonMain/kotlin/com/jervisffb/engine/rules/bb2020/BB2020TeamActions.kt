@@ -96,7 +96,7 @@ class BB2020TeamActions : TeamActions() {
             compulsory = false,
         ),
 
-        // Secure the Ball is not supported in BB 20202
+        // Secure the Ball is not supported in BB 2020
         PlayerStandardActionType.SECURE_THE_BALL to PlayerAction(
             name = "Secure the Ball",
             type = PlayerStandardActionType.SECURE_THE_BALL,

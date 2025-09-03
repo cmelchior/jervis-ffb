@@ -118,7 +118,7 @@ fun GameMenuDrawer(
                 DrawerSectionHeader("Game", topPadding = 0.dp)
                 DrawerButton("Save Game") { menuViewModel.showSaveGameDialog(includeDebugState = false) }
 
-                DrawerSectionHeader("Developer Tools")
+                DrawerSectionHeader("Developer Console")
                 val currentNodeDescription: String = remember(uiState) {
                     menuViewModel.uiState?.gameController?.let { it ->
                         with(it) {
