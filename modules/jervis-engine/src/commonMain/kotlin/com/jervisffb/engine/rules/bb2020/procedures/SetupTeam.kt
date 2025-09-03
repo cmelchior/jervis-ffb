@@ -118,16 +118,18 @@ object SetupTeam : Procedure() {
                     )
                 }
                 is FieldSquareSelected -> {
-                    when (context.team.isHomeTeam()) {
-                        true -> if (action.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
-                        false -> if (action.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)
+                    checkTypeAndValue<FieldSquareSelected>(state, action) {
+                        when (context.team.isHomeTeam()) {
+                            true -> if (action.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
+                            false -> if (action.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)
+                        }
+                        compositeCommandOf(
+                            SetPlayerLocation(player, FieldCoordinate(action.x, action.y)),
+                            SetPlayerState(player, PlayerState.STANDING),
+                            SetContext(context.copy(currentPlayer = null)),
+                            GotoNode(SelectPlayerOrEndSetup),
+                        )
                     }
-                    compositeCommandOf(
-                        SetPlayerLocation(player, FieldCoordinate(action.x, action.y)),
-                        SetPlayerState(player, PlayerState.STANDING),
-                        SetContext(context.copy(currentPlayer = null)),
-                        GotoNode(SelectPlayerOrEndSetup),
-                    )
                 }
                 else -> INVALID_ACTION(action)
             }

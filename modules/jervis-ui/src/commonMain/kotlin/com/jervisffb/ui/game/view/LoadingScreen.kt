@@ -65,7 +65,16 @@ fun LoadingScreen(
     if (isReadyToStart) {
         val density = LocalDensity.current
         LaunchedEffect(Unit) {
-            viewModel.initialize(density)
+            try {
+                viewModel.initialize(density)
+            } catch (ex: Exception) {
+                viewModel.menuViewModel.showReportIssueDialog(
+                    title = "Error starting game",
+                    body = ex.message ?: "An unknown error has occurred.",
+                    error = ex,
+                    gameState = viewModel.menuViewModel.controller
+                )
+            }
         }
     }
     LaunchedEffect(Unit) {

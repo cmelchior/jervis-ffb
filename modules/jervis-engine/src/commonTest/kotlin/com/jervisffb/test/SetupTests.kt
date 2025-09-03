@@ -1,33 +1,33 @@
 package com.jervisffb.test
 
-import co.touchlab.kermit.Logger.Companion.i
-import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
-import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.utils.InvalidActionException
+import com.jervisffb.test.ext.rollForward
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
  * This class is testing various setups and whether [Rules.isValidSetup] works as intended.
  */
-class SetupTests {
-
-    private val rules = StandardBB2020Rules()
-    private lateinit var state: Game
-    private lateinit var controller: GameEngineController
+class SetupTests: JervisGameTest() {
 
     @BeforeTest
-    fun setUp() {
-        state = createDefaultGameState(rules)
-        controller = GameEngineController(state)
+    override fun setUp() {
+        super.setUp()
+        controller.rollForward(
+            *defaultPregame(),
+        )
     }
 
     // All players at the LoS with 2 in each wide-zone one step
@@ -262,6 +262,23 @@ class SetupTests {
             moveTo(this[12.playerNo], 11, 8)
         }
         assertFalse(rules.isValidSetup(state, state.homeTeam))
+    }
+
+    // Test for bug:
+    // Setups just send events without considering what the legal actions are.
+    // This can result in a setup trying to place a player on top of another
+    // player. The rules engine should reject these invalid moves, not just
+    // assume the actions are valid.
+    @Test
+    fun placePlayerOnTopOfOtherPlayer() {
+        val targetSquare = FieldCoordinate(12, 4)
+        controller.rollForward(
+            *setupPlayer("H1".playerId, targetSquare),
+            PlayerSelected("H2".playerId)
+        )
+        assertFailsWith<InvalidActionException> {
+            controller.handleAction(FieldSquareSelected(targetSquare))
+        }
     }
 
     private fun moveTo(player: Player, x: Int, y: Int) {
