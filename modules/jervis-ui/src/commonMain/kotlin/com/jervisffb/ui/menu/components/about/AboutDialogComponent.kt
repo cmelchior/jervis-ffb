@@ -1,5 +1,6 @@
 package com.jervisffb.ui.menu.components.about
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -51,6 +52,7 @@ fun AboutDialogComponent(viewModel: MenuViewModel) {
         title = "About Jervis Fantasy Football",
         icon = { JervisLogo() },
         width = DialogSize.LARGE,
+        minHeight = JervisTheme.windowSizeDp.height * 0.9f,
         backgroundScrim = true,
         content = { _, _ ->
             CreditDialogContent(
@@ -107,13 +109,14 @@ private fun ColumnScope.CreditDialogContent(
             .weight(1f)
             .padding(top = 8.dp)
             .verticalScroll(rememberScrollState())
+        ,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Row {
             CreditLabel("Version:", "", textColor)
             Spacer(modifier = Modifier.width(columnSpace))
             CreditText("${data.clientVersion} (${data.gitCommit})", textColor)
         }
-        Spacer(modifier = Modifier.height(16.dp))
         Row {
             CreditLabel(
                 "Creator:",
@@ -126,7 +129,18 @@ private fun ColumnScope.CreditDialogContent(
                 textColor
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Row {
+            CreditLabel(
+                "Disclaimer:",
+                "",
+                textColor
+            )
+            Spacer(modifier = Modifier.width(columnSpace))
+            CreditText(
+                "Blood Bowl is a trademark of Games Workshop Limited, used without permission, used without intent to infringe, or in opposition to their copyright. This project is in no way official and is not endorsed by Games Workshop Limited.",
+                textColor
+            )
+        }
         Row {
             CreditLabel(
                 "FUMBBL Credits:",
@@ -139,7 +153,6 @@ private fun ColumnScope.CreditDialogContent(
                 textColor
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
         Row {
             CreditLabel(
                 "D6 Dice Icon Credits:",
@@ -152,16 +165,15 @@ private fun ColumnScope.CreditDialogContent(
                 textColor
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
         Row {
             CreditLabel(
-                "Disclaimer:",
-                "",
+                "Material Design Icons",
+                "Several icons used in the UI come from the Material Design Icons: Arrows, Back, Copy, Folder, Settings, Undo.",
                 textColor
             )
             Spacer(modifier = Modifier.width(columnSpace))
             CreditText(
-                "Blood Bowl is a trademark of Games Workshop Limited, used without permission, used without intent to infringe, or in opposition to their copyright. This project is in no way official and is not endorsed by Games Workshop Limited.",
+                "Published at https://fonts.google.com/icons under license Apache 2.0.",
                 textColor
             )
         }
