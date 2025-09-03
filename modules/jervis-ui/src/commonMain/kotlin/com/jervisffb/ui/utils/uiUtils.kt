@@ -3,9 +3,9 @@ package com.jervisffb.ui.utils
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -21,6 +21,8 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
@@ -202,6 +204,23 @@ fun Modifier.pixelSize(size: IntSize) =
         val placeable = measurable.measure(Constraints.fixed(size.width, size.height))
         layout(size.width, size.height) { placeable.place(0, 0) }
     }
+
+/**
+ * Dummy coordinates to be used when the UI is not yet fully initialized.
+ */
+val DummyLayoutCoordinates = object: LayoutCoordinates {
+    override val size: IntSize = IntSize.Zero
+    override val providedAlignmentLines: Set<AlignmentLine> = emptySet()
+    override val parentLayoutCoordinates: LayoutCoordinates? = null
+    override val parentCoordinates: LayoutCoordinates? = null
+    override val isAttached: Boolean = false
+    override fun windowToLocal(relativeToWindow: Offset): Offset = Offset.Zero
+    override fun localToWindow(relativeToLocal: Offset): Offset = Offset.Zero
+    override fun localToRoot(relativeToLocal: Offset): Offset = Offset.Zero
+    override fun localPositionOf(sourceCoordinates: LayoutCoordinates, relativeToSource: Offset): Offset = Offset.Zero
+    override fun localBoundingBoxOf(sourceCoordinates: LayoutCoordinates, clipBounds: Boolean): Rect = Rect.Zero
+    override fun get(alignmentLine: AlignmentLine): Int = 0
+}
 
 // Copy from ChatGPT, so requires a more thorough review
 private fun rgbToHsl(r: Float, g: Float, b: Float): FloatArray {

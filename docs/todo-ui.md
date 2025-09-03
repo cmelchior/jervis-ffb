@@ -78,6 +78,9 @@ After the restructuring of the UI architecture to be more clean and immutable, I
 is a relatively clear path forward. However, we still need to figure out a good way to benchmark it.
 It seems fast enough, but I suspect there are lots of ways it can be optimized. 
 
+- [ ] Having both `FieldViewData` and `FieldSizeData` feels a bit redundant. It
+      Would be nice to combine them some way.
+
 
 ## Game Timer
 

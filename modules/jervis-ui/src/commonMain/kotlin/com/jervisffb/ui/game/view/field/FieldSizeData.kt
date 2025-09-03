@@ -11,8 +11,8 @@ import kotlin.math.roundToInt
 data class FieldSizeData(
     val borderBrushSizePx: Int,
     val squareSize: IntSize, // Square size on the field
-    val squaresPrRow: Int,
-    val squaresPrColumn: Int
+    val squaresPrRow: Int, // "model" squares pr. row
+    val squaresPrColumn: Int // "model" squares pr. column
 ) {
 
     // Players might to take more or less space, but still use squareSize as where to find their "center"
