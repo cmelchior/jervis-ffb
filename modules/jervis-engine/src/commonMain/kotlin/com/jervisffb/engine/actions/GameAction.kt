@@ -34,9 +34,11 @@ class CalculatedAction(private val action: GameEngineController.(Game, Rules) ->
     }
 }
 
-// Group multiple actions together as one.
-// The rule engine will this action as an atomic action. This means that when you
-// Undo this action, all "sub-actions" will all be undone as one.
+/**
+ * Group multiple actions together as one.
+ * The rule engine will this action as an atomic action. This means that when you
+ * Undo this action, all "sub-actions" will all be undone as one.
+ */
 @Serializable
 data class CompositeGameAction(val list: List<GameAction>): GameAction {
     constructor(vararg actions: GameAction) : this(listOf(*actions))

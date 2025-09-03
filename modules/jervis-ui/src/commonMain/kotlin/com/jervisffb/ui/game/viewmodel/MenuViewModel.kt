@@ -2,6 +2,8 @@ package com.jervisffb.ui.game.viewmodel
 
 import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.CompositeGameAction
+import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
@@ -239,17 +241,35 @@ class MenuViewModel {
                 emptyList()
             }
         }.let { setupActions ->
-            // In some cases, a player was already selected when selecting a Setup. This will disrupt the above logic
-            // So in that case, deselect the player first.
-            if (controller?.currentNode() == SetupTeam.PlacePlayer) {
-                val deselectAction = PlayerDeselected(game.state.getContext<SetupTeamContext>().currentPlayer!!)
-                listOf(deselectAction) + setupActions
-            } else {
-                setupActions
+            // Applying a setup to a random game state is tricky, so we attempt
+            // to start from a known state by resetting the state. This is done
+            // by first moving all players back to the dogout.
+            // This is a best effort attempt, but invalid setups should not crash the game,
+            // Instead they should show up as errors in the Developer Console in the in-game
+            // menu.
+            val resetStateActions = buildList {
+                val context = game.state.getContext<SetupTeamContext>()
+
+                // In some cases, a player was already selected when starting a setup.
+                // So we need to take that into account as well.
+                if (controller?.currentNode() == SetupTeam.PlacePlayer) {
+                    val deselectAction = PlayerDeselected(context.currentPlayer!!)
+                    add(deselectAction)
+                }
+
+                // Move any players on the field back to the dogout.
+                context.team.forEach { player ->
+                    if (player.location.isOnField(rules)) {
+                        add(PlayerSelected(player.id))
+                        add(DogoutSelected)
+                    }
+                }
             }
+            resetStateActions + setupActions
         }
 
-        uiState.userSelectedMultipleActions(setupActions, delayEvent = false)
+        // Treat the entire setup as one action. Which makes it easy to undo again
+        uiState.userSelectedAction(CompositeGameAction(setupActions))
     }
 
     // Called by the UiGameController whenever a new snapshot is created. This can be used to determine
