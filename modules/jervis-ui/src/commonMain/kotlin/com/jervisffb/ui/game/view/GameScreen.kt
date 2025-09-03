@@ -24,6 +24,7 @@ import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_undo
 import com.jervisffb.ui.game.view.field.Field
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
+import com.jervisffb.ui.game.viewmodel.FieldDetails
 import com.jervisffb.ui.game.viewmodel.FieldViewData
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
@@ -57,7 +58,6 @@ fun GameScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        val backgroundColor = JervisTheme.white.copy(0.1f)
         GameStatus(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
         Spacer(modifier = Modifier.height(8.jdp))
         Row(
@@ -87,6 +87,7 @@ fun GameScreen(
         }
         Spacer(modifier = Modifier.height(24.jdp))
         Row(modifier = Modifier.padding(horizontal = 24.jdp)) {
+            val backgroundColor by screenModel.logsBackgroundColor.collectAsState(FieldDetails.NICE.logBackground)
             LogViewer(logs, modifier = Modifier.weight(1f).background(backgroundColor).fillMaxSize())
             Spacer(modifier = Modifier.width(24.dp))
             // Divider(color = Color.LightGray, modifier = Modifier.fillMaxHeight().width(1.dp))

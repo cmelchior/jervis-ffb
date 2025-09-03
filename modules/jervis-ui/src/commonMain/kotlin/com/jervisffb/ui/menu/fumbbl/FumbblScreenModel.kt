@@ -1,13 +1,10 @@
 package com.jervisffb.ui.menu.fumbbl
 
 import cafe.adriel.voyager.core.model.ScreenModel
+import com.jervis.generated.SettingsKeys
 import com.jervisffb.fumbbl.web.FumbblApi
-import com.jervisffb.ui.PROPERTIES_MANAGER
+import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
-import com.jervisffb.utils.PROP_CLIENT_ID
-import com.jervisffb.utils.PROP_CLIENT_SECRET
-import com.jervisffb.utils.PROP_COACH_NAME
-import com.jervisffb.utils.PROP_OAUTH_TOKEN
 import com.jervisffb.utils.isRegularFile
 import com.jervisffb.utils.openUrlInBrowser
 import com.jervisffb.utils.platformFileSystem
@@ -61,11 +58,11 @@ class FumbblScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel 
         // Check for persisted credentials, if found we assume they are still valid
         // and mark the user as logged in (if they are too old, they will be refreshed
         // the first time they are needed
-        PROPERTIES_MANAGER.let { propManager ->
-            _coachName.value = propManager.getString(PROP_COACH_NAME) ?: ""
-            _clientId.value = propManager.getString(PROP_CLIENT_ID) ?: ""
-            _clientSecret.value = propManager.getString(PROP_CLIENT_SECRET) ?: ""
-            oauthToken = propManager.getString(PROP_OAUTH_TOKEN) ?: ""
+        SETTINGS_MANAGER.let { propManager ->
+            _coachName.value = propManager.getString(SettingsKeys.FUMBBL_CLIENT_NAME, "")
+            _clientId.value = propManager.getString(SettingsKeys.FUMBBL_CLIENT_ID, "")
+            _clientSecret.value = propManager.getString(SettingsKeys.FUMBBL_CLIENT_SECRET, "")
+            oauthToken = propManager.getString(SettingsKeys.FUMBBL_OAUTH_TOKEN, "")
             _isLoggedIn.value = oauthToken.isNotBlank()
         }
     }
@@ -128,11 +125,11 @@ class FumbblScreenModel(private val menuViewModel: MenuViewModel) : ScreenModel 
 
     private fun updatePersistedAuthData(oauthToken: String, coachName: String, clientId: String, clientSecret: String) {
         menuViewModel.navigatorContext.launch {
-            PROPERTIES_MANAGER.run {
-                setProperty(PROP_OAUTH_TOKEN, oauthToken)
-                setProperty(PROP_COACH_NAME, coachName)
-                setProperty(PROP_CLIENT_ID, clientId)
-                setProperty(PROP_CLIENT_SECRET, clientSecret)
+            SETTINGS_MANAGER.run {
+                put(SettingsKeys.FUMBBL_OAUTH_TOKEN, oauthToken)
+                put(SettingsKeys.FUMBBL_CLIENT_NAME, coachName)
+                put(SettingsKeys.FUMBBL_CLIENT_ID, clientId)
+                put(SettingsKeys.FUMBBL_CLIENT_SECRET, clientSecret)
             }
         }
     }

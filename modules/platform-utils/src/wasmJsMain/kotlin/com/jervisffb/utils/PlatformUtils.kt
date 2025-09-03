@@ -46,3 +46,8 @@ public actual fun copyToClipboard(text: String) {
 public actual fun triggerGC() {
     // Do nothing
 }
+
+public actual fun getSystemEnvironmentVariable(key: String): String? {
+    return null
+}
+

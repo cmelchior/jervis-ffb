@@ -1,5 +1,6 @@
 package com.jervisffb.ui.game.viewmodel
 
+import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerDeselected
@@ -16,6 +17,7 @@ import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisSetupFile
 import com.jervisffb.ui.CacheManager
 import com.jervisffb.ui.IssueTracker
+import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.SoundEffect
 import com.jervisffb.ui.SoundManager
 import com.jervisffb.ui.game.UiGameController
@@ -35,12 +37,13 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-enum class Feature {
-    DO_NOT_REROLL_SUCCESSFUL_ACTIONS,
-    SELECT_KICKING_PLAYER,
-    END_PLAYER_ACTION_IF_ONLY_OPTION,
-    SELECT_BLOCK_TYPE_IF_ONLY_OPTION,
-    PUSH_PLAYER_INTO_CROWD,
+// Map between "Automated Actions" and their corresponding settings keys.
+enum class Feature(val settingsKey: String) {
+    DO_NOT_REROLL_SUCCESSFUL_ACTIONS(SettingsKeys.JERVIS_AUTO_ACTION_DO_NOT_REROLL_SUCCESSFUL_ACTIONS_VALUE),
+    SELECT_KICKING_PLAYER(SettingsKeys.JERVIS_AUTO_ACTION_SELECT_KICKING_PLAYER_VALUE),
+    END_PLAYER_ACTION_IF_ONLY_OPTION(SettingsKeys.JERVIS_AUTO_ACTION_END_PLAYER_ACTION_IF_ONLY_OPTION_VALUE),
+    SELECT_BLOCK_TYPE_IF_ONLY_OPTION(SettingsKeys.JERVIS_AUTO_ACTION_SELECT_BLOCK_TYPE_IF_ONE_OPTION_VALUE),
+    PUSH_PLAYER_INTO_CROWD(SettingsKeys.JERVIS_AUTO_ACTION_PUSH_PLAYER_INTO_CROWD_VALUE),
 }
 
 data class ErrorDialog(
@@ -61,6 +64,10 @@ data class ReportIssueDialogData(
     }
 }
 
+/**
+ * View Model controlling the full Jervis Menu System. This probably has too much responsibility right now,
+ * but we do need something that cuts across a lot of concerns since the menu can impact all parts of the UI.
+ */
 class MenuViewModel {
     companion object {
         val LOG = jervisLogger()
@@ -172,13 +179,9 @@ class MenuViewModel {
         }
     }
 
-    fun toggleFeature(feature: Feature, enabled: Boolean) {
-        features[feature] = enabled
-    }
-
     fun isFeatureEnabled(feature: Feature): Boolean {
         val isUndoing = controller?.lastActionWasUndo() ?: false
-        return !isUndoing && (features[feature] ?: false)
+        return !isUndoing && SETTINGS_MANAGER.getBoolean(feature.settingsKey, false)
     }
 
     fun loadSetup(setup: JervisSetupFile) {

@@ -2,12 +2,6 @@
 
 package com.jervisffb.utils
 
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.first
 import okio.FileSystem
 import okio.Path
@@ -15,9 +9,7 @@ import okio.Path.Companion.toPath
 import okio.buffer
 import okio.use
 import platform.Foundation.NSDocumentDirectory
-import platform.Foundation.NSFileManager
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
-import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 
 // TODO We are mostly using this for replay files. Probably this can be hidden behind some kind of better
@@ -60,50 +52,3 @@ actual class FileManager {
         }
     }
 }
-
-actual class PropertiesManager actual constructor() {
-
-    @OptIn(ExperimentalForeignApi::class)
-    private val store = PreferenceDataStoreFactory.createWithPath(
-        produceFile = {
-            val documentDirectory: NSURL = NSFileManager.defaultManager.URLForDirectory(
-                directory = NSDocumentDirectory,
-                inDomain = NSUserDomainMask,
-                appropriateForURL = null,
-                create = false,
-                error = null,
-            ) ?: error("Could not get document directory")
-            val dataStoreFileName = "settings.preferences_pb"
-            (documentDirectory.path + "/$dataStoreFileName").toPath()
-        }
-    )
-
-    actual fun getSystemEnv(key: String): String {
-        TODO("`getSystemEnv()` not yet implemented")
-    }
-
-    actual suspend fun getString(key: String): String? {
-        return store.data.first()[stringPreferencesKey(key)]
-    }
-
-    actual suspend fun getBoolean(key: String): Boolean? {
-        return store.data.first()[booleanPreferencesKey(key)]
-    }
-
-    actual suspend fun getInt(key: String): Int? {
-        return store.data.first()[intPreferencesKey(key)]
-    }
-
-    actual suspend fun setProperty(key: String, value: Any?) {
-        store.edit { props ->
-            when (value) {
-                is String -> props[stringPreferencesKey(key)] = value
-                is Boolean -> props[booleanPreferencesKey(key)] = value
-                is Int -> props[intPreferencesKey(key)] = value
-                else -> throw IllegalArgumentException("Unsupported value type: ${value?.let { it::class.simpleName }}")
-            }
-        }
-    }
-}
-
-

@@ -29,6 +29,10 @@ kotlin {
                 implementation(libs.coroutines)
                 implementation(libs.okio)
                 implementation(libs.okio.fake)
+                implementation(libs.settings)
+                implementation(libs.settings.noarg)
+                implementation(libs.settings.coroutines)
+                implementation(libs.settings.observable)
                 api(libs.jsonserialization)
                 api(libs.kermit)
                 api(libs.ktor.client.core)
@@ -44,8 +48,6 @@ kotlin {
                 implementation(libs.coroutines.swing)
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.reflections)
-                implementation(libs.datastore)
-                implementation(libs.datastore.preferences)
             }
         }
 
@@ -67,8 +69,6 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
                 implementation(libs.ktor.client.darwin)
-                implementation(libs.datastore)
-                implementation(libs.datastore.preferences)
             }
         }
     }

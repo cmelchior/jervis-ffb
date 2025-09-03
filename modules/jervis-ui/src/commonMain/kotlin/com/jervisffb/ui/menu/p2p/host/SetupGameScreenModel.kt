@@ -1,15 +1,15 @@
 package com.jervisffb.ui.menu.p2p.host
 
 import cafe.adriel.voyager.core.model.ScreenModel
+import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.ui.PROPERTIES_MANAGER
+import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.coach.CoachSetupComponentModel
 import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponentModel
-import com.jervisffb.utils.PROP_DEFAULT_HOST_COACH_NAME
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -41,7 +41,7 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
         setGameName("Game-${Random.nextInt(10_000)}")
         setPort(8080.toString())
         menuViewModel.navigatorContext.launch {
-            PROPERTIES_MANAGER.getString(PROP_DEFAULT_HOST_COACH_NAME)?.let {
+            SETTINGS_MANAGER.getStringOrNull(SettingsKeys.JERVIS_DEFAULT_HOST_COACH_NAME)?.let {
                 coachSetupModel.updateCoachName(it)
             }
         }
@@ -78,7 +78,7 @@ class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val
 
     fun gameSetupDone() {
         menuViewModel.navigatorContext.launch {
-            PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_HOST_COACH_NAME, getCoachName())
+            SETTINGS_MANAGER.set(SettingsKeys.JERVIS_DEFAULT_HOST_COACH_NAME, getCoachName())
         }
         parentModel.userAcceptedGameSetup()
     }

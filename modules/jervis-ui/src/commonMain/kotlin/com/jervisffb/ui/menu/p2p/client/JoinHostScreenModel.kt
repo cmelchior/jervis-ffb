@@ -1,15 +1,15 @@
 package com.jervisffb.ui.menu.p2p.client
 
 import cafe.adriel.voyager.core.model.ScreenModel
+import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisExitCode
-import com.jervisffb.ui.PROPERTIES_MANAGER
+import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.coach.CoachSetupComponentModel
 import com.jervisffb.ui.menu.p2p.AbstractClintNetworkMessageHandler
-import com.jervisffb.utils.PROP_DEFAULT_CLIENT_COACH_NAME
 import io.ktor.http.Url
 import io.ktor.websocket.CloseReason
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,7 +65,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
 
     init {
         menuViewModel.navigatorContext.launch {
-            PROPERTIES_MANAGER.getString(PROP_DEFAULT_CLIENT_COACH_NAME)?.let {
+            SETTINGS_MANAGER.getStringOrNull(SettingsKeys.JERVIS_DEFAULT_CLIENT_COACH_NAME)?.let {
                 coachSetupModel.updateCoachName(it)
             }
         }
@@ -108,7 +108,7 @@ class JoinHostScreenModel(private val menuViewModel: MenuViewModel, private val 
             _joinState.value = JoinState.JOINING
             val coachName = coachSetupModel.coachName.value
             val coachType = coachSetupModel.coachType.value
-            PROPERTIES_MANAGER.setProperty(PROP_DEFAULT_CLIENT_COACH_NAME, coachName)
+            SETTINGS_MANAGER.set(SettingsKeys.JERVIS_DEFAULT_CLIENT_COACH_NAME, coachName)
             model.networkAdapter.joinHost(
                 gameUrl = joiningUrl,
                 coachName = coachName,

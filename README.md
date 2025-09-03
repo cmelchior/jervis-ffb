@@ -68,7 +68,12 @@ Development requirements are:
 - Git on the commandline
 - Xcode 16.2 (if building for iPad)
 
-Note, this has only been tested on Mac and Windows, so things on Linux might be broken.
+Note, this has only been tested on Mac and Windows, so things on Linux might be 
+broken.
+
+Some code for handling game settings are generated as part of the build process, 
+so unresolved references might be present when opening this project for the 
+first time. This should be fixed after the first build.
 
 A local desktop game client can be started using:
 

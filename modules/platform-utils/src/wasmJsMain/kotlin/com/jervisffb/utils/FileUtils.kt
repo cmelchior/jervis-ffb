@@ -7,7 +7,6 @@ import KeyPath
 import com.jervisffb.utils.DatabaseManager.filesStore
 import com.juul.indexeddb.external.IDBKey
 import com.juul.indexeddb.external.IDBKeyRange
-import kotlinx.browser.window
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
@@ -131,25 +130,5 @@ actual class FileManager {
             val store = objectStore(filesStore)
             store.put(jso<WebFile> { path = "$dir/$fileName" ; content = fileContent.toInt8Array() })
         }
-    }
-}
-
-actual class PropertiesManager actual constructor() {
-
-    actual fun getSystemEnv(key: String): String {
-        TODO("`getSystemEnv` not implemented on WASM")
-    }
-
-    actual suspend fun getString(key: String): String? {
-        return window.localStorage.getItem(key)
-    }
-    actual suspend fun getBoolean(key: String): Boolean? {
-        return window.localStorage.getItem(key)?.toBoolean()
-    }
-    actual suspend fun getInt(key: String): Int? {
-        return window.localStorage.getItem(key)?.toInt()
-    }
-    actual suspend fun setProperty(key: String, value: Any?) {
-        window.localStorage.setItem(key, value.toString())
     }
 }

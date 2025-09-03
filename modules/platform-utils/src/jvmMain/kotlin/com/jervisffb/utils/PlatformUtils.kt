@@ -158,3 +158,7 @@ public actual fun triggerGC() {
     @Suppress("DEPRECATION")
     System.runFinalization()
 }
+
+public actual fun getSystemEnvironmentVariable(key: String): String? {
+    return System.getenv(key)
+}

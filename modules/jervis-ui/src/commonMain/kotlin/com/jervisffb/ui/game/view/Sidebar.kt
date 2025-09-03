@@ -32,6 +32,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.jervis.generated.SettingsKeys
+import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiSidebarPlayer
 import com.jervisffb.ui.game.viewmodel.ButtonData
@@ -59,14 +61,16 @@ fun Sidebar(
         Column(modifier = Modifier) {
             // Dogout + player stats
             Box(modifier = modifier.fillMaxSize()) {
-                //Box(modifier = modifier.aspectRatio(vm.aspectRatio).fillMaxSize()) {
-                Image(
-                    alignment = Alignment.TopStart,
-                    painter = BitmapPainter(IconFactory.getSidebarBackground()),
-                    contentDescription = "Box",
-                    contentScale = ContentScale.FillWidth,
-                    modifier = modifier.fillMaxSize().padding(bottom = 8.dp).alpha(0.8f),
-                )
+                val useSidebarImage by SETTINGS_MANAGER.observeBooleanKey(SettingsKeys.JERVIS_UI_SHOW_DOGOUT_BACKGROUND_VALUE, true).collectAsState(true)
+                if (useSidebarImage) {
+                    Image(
+                        alignment = Alignment.TopStart,
+                        painter = BitmapPainter(IconFactory.getSidebarBackground()),
+                        contentDescription = "Box",
+                        contentScale = ContentScale.FillWidth,
+                        modifier = modifier.fillMaxSize().padding(bottom = 8.dp).alpha(0.8f),
+                    )
+                }
                 Column(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
                         Reserves(vm.reserves(), vm.sharedFieldData) {

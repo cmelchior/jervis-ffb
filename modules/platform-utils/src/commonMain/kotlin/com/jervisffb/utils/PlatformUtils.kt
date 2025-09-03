@@ -64,3 +64,9 @@ public expect fun copyToClipboard(text: String)
  * it
  */
 public expect fun triggerGC()
+
+/**
+ * If the System supports system environment variables, this will attempt to fetch it.
+ * If the platform doesn't support this or the key wasn't found, `null` is returned
+ */
+public expect fun getSystemEnvironmentVariable(key: String): String?

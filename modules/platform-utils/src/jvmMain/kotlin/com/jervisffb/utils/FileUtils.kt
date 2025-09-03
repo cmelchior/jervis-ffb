@@ -2,14 +2,6 @@
 
 package com.jervisffb.utils
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import kotlinx.coroutines.flow.first
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -46,40 +38,6 @@ actual class FileManager {
         platformFileSystem.createDirectories("$APPLICATION_DIRECTORY/$dir".toPath())
         platformFileSystem.write("$APPLICATION_DIRECTORY/$dir/$fileName".toPath()) {
             write(fileContent)
-        }
-    }
-}
-
-actual class PropertiesManager actual constructor() {
-
-    actual fun getSystemEnv(key: String): String {
-        return System.getenv(key)
-    }
-
-    private val store: DataStore<Preferences> = PreferenceDataStoreFactory.create {
-        File("${System.getProperty("user.home")}/.jervis/settings.preferences_pb")
-    }
-
-    actual suspend fun getString(key: String): String? {
-        return store.data.first()[stringPreferencesKey(key)]
-    }
-
-    actual suspend fun getBoolean(key: String): Boolean? {
-        return store.data.first()[booleanPreferencesKey(key)]
-    }
-
-    actual suspend fun getInt(key: String): Int? {
-        return store.data.first()[intPreferencesKey(key)]
-    }
-
-    actual suspend fun setProperty(key: String, value: Any?) {
-        store.edit { props ->
-            when (value) {
-                is String -> props[stringPreferencesKey(key)] = value
-                is Boolean -> props[booleanPreferencesKey(key)] = value
-                is Int -> props[intPreferencesKey(key)] = value
-                else -> throw IllegalArgumentException("Unsupported value type: ${value?.let { it::class.simpleName }}")
-            }
         }
     }
 }

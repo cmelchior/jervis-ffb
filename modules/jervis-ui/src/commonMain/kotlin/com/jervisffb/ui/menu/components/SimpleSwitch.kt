@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.JervisTheme
 
@@ -15,9 +16,15 @@ fun SimpleSwitch(
     label: String,
     isSelected: Boolean,
     isEnabled: Boolean = true,
+    innerPadding: Dp = 0.dp,
     onSelected: (Boolean) -> Unit
 ) {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPadding)
+        , verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             modifier = Modifier.padding(end = 4.dp).weight(1f),
             text = label,

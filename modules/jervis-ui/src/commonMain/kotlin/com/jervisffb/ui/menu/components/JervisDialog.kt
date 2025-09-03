@@ -272,7 +272,7 @@ private fun ColumnScope.JervisDialogContent(
 }
 
 @Composable
-fun ColumnScope.JervisDialogHeader(title: String, dialogColor: Color) {
+fun JervisDialogHeader(title: String, dialogColor: Color) {
     Box(
         modifier = Modifier.height(36.dp),
         contentAlignment = Alignment.CenterStart,

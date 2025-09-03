@@ -9,7 +9,12 @@ import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class LogViewModel(val uiState: UiGameController) {
+/**
+ * View model responsible for handling the Log and Debug log window.
+ */
+class LogViewModel(
+    val uiState: UiGameController
+) {
 
     companion object {
         val LOG = jervisLogger()
@@ -20,6 +25,7 @@ class LogViewModel(val uiState: UiGameController) {
     val controller = uiState.gameController
     val logsCache = mutableListOf<LogEntry>()
     val debugLogsCache = mutableListOf<LogEntry>()
+
     val debugLogs: Flow<List<LogEntry>> =
         controller.logsEvents.map {
             when (it) {

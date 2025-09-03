@@ -2,6 +2,7 @@ package com.jervisffb.ui.game.viewmodel
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -12,7 +13,6 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
@@ -37,15 +37,39 @@ enum class FieldDetails(
     val resource: String,
     val description: String,
     // Draw lines, dots and end zone markers (if false, it is assumed they are part of the image)
-    val drawFieldMarkers: Boolean
+    val drawFieldMarkers: Boolean,
+    // The background color of the log panels. Can be used to make the text more readable on certain
+    // backgrounds like Blizzard (where it otherwise ends up white on white)
+    val logBackground: Color = JervisTheme.white.copy(0.1f)
 ) {
     // Use a custom field for now as we need something that can be used for both Standard and BB7
     // It would probably look better with custom fields, but this should be fine for now.
-    HEAT("jervis/pitch/default/heat.png", "Sweltering Heat", true),
-    SUNNY("jervis/pitch/default/sunny.png", "Very Sunny", true),
-    NICE("jervis/pitch/default/nice.png", "Perfect Conditions", true),
-    RAIN("jervis/pitch/default/rain.png", "Pouring Rain", true),
-    BLIZZARD("jervis/pitch/default/blizzard.png", "Blizzard", true),
+    HEAT(
+        "jervis/pitch/default/heat.png",
+        "Sweltering Heat",
+        true,
+    ),
+    SUNNY(
+        "jervis/pitch/default/sunny.png",
+        "Very Sunny",
+        true
+    ),
+    NICE(
+        "jervis/pitch/default/nice.png",
+        "Perfect Conditions",
+        true
+    ),
+    RAIN(
+        "jervis/pitch/default/rain.png",
+        "Pouring Rain",
+        true
+    ),
+    BLIZZARD(
+        "jervis/pitch/default/blizzard.png",
+        "Blizzard",
+        true,
+        JervisTheme.black.copy(0.2f)
+    ),
 }
 
 /**
@@ -85,16 +109,7 @@ class FieldViewModel(
     val height = rules.fieldHeight
     val sharedFieldData = screenModel.sharedFieldData
 
-    val fieldBackground: Flow<FieldDetails> = uiState.uiStateFlow.map { uiSnapshot ->
-        val weather = uiSnapshot.weather
-        when (weather) {
-            Weather.SWELTERING_HEAT -> FieldDetails.HEAT
-            Weather.VERY_SUNNY -> FieldDetails.SUNNY
-            Weather.PERFECT_CONDITIONS -> FieldDetails.NICE
-            Weather.POURING_RAIN -> FieldDetails.RAIN
-            Weather.BLIZZARD -> FieldDetails.BLIZZARD
-        }
-    }
+    val fieldBackground = screenModel.fieldBackground
 
     private val _highlights = MutableStateFlow<FieldCoordinate?>(null)
 
