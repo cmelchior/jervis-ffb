@@ -154,7 +154,7 @@ private fun CreateIssueDialog(
             if (game != null) {
                 Row {
                     SimpleSwitch(
-                        label = "Include copy of the game state (does not include chat)",
+                        label = "Include a copy of the game state (does not include chat)",
                         isSelected = attachGameDump,
                         isEnabled = true,
                         onSelected = { checked ->

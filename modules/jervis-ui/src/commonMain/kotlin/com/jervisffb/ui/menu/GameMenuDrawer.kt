@@ -63,7 +63,6 @@ import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.components.JervisDialogHeader
 import com.jervisffb.ui.menu.components.SimpleSwitch
 import com.jervisffb.ui.utils.applyIf
-import com.jervisffb.utils.openUrlInBrowser
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
@@ -199,7 +198,14 @@ fun GameMenuDrawer(
                     )
                 }
                 DrawerButton("Dump Game State to File") { menuViewModel.showSaveGameDialog(includeDebugState = true) }
-                DrawerButton("Report Issue") { openUrlInBrowser(menuViewModel.creditData.newIssueUrl) }
+                DrawerButton("Report Issue") {
+                    menuViewModel.showReportIssueDialog(
+                        title = "",
+                        body = "",
+                        error = null,
+                        gameState = menuViewModel.controller
+                    )
+                }
                 DrawerSectionHeader("Settings")
                 val generatedMenu = getGameSettingsMenu()
                 generatedMenu.sections.forEachIndexed { index, section ->
