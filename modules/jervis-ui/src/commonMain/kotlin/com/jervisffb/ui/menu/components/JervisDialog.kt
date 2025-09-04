@@ -58,7 +58,6 @@ import com.jervisffb.ui.game.viewmodel.FieldViewData
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.utils.applyIf
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.serialization.json.JsonNull.content
 import kotlin.math.roundToInt
 
 /**
@@ -95,8 +94,8 @@ fun JervisDialog(
         fieldViewInfo?.let { fvd ->
             mutableStateOf(
                 IntOffset(
-                    x = ((fvd.size.width - popupSize.width) / 2f).roundToInt() + fvd.offset.x,
-                    y = ((fvd.size.height - popupSize.height) / 2f).roundToInt() + fvd.offset.y,
+                    x = ((fvd.fieldSizePx.width - popupSize.width) / 2f).roundToInt() + fvd.fieldOffset.x,
+                    y = ((fvd.fieldSizePx.height - popupSize.height) / 2f).roundToInt() + fvd.fieldOffset.y,
                 )
             )
         } ?: mutableStateOf(IntOffset.Zero)
@@ -212,8 +211,8 @@ fun JervisDialog(
 fun recalculateOffset(fieldViewInfo: FieldViewData?, popupSize: IntSize, paddingPx: Int): IntOffset {
     return fieldViewInfo?.let { fvd ->
         IntOffset(
-            x = ((fvd.size.width - popupSize.width) / 2f).roundToInt() + fvd.offset.x - 2*paddingPx,
-            y = ((fvd.size.height - popupSize.height) / 2f).roundToInt() + fvd.offset.y - 2*paddingPx,
+            x = ((fvd.fieldSizePx.width - popupSize.width) / 2f).roundToInt() + fvd.fieldOffset.x - 2*paddingPx,
+            y = ((fvd.fieldSizePx.height - popupSize.height) / 2f).roundToInt() + fvd.fieldOffset.y - 2*paddingPx,
         )
     } ?: IntOffset.Zero
 }

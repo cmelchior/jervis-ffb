@@ -68,7 +68,7 @@ class FieldViewModel(
 
     // Track offsets of field squares (so we can use them to animate things between squares)
     var fieldOffset: LayoutCoordinates? = null
-    val offsets: MutableMap<FieldCoordinate, LayoutCoordinates?> = mutableMapOf()
+    val squareOffsets: MutableMap<FieldCoordinate, LayoutCoordinates?> = mutableMapOf()
 
     fun observeAnimation(): Flow<Pair<UiGameController, JervisAnimation>?> {
         return uiState.animationFlow.map { if (it != null) Pair(uiState, it) else null }
@@ -207,7 +207,7 @@ class FieldViewModel(
     }
 
     fun updateOffset(coordinate: FieldCoordinate, layoutCoords: LayoutCoordinates) {
-        offsets[coordinate] = layoutCoords
+        squareOffsets[coordinate] = layoutCoords
     }
 
     fun updateFieldOffSet(fieldLayoutCoordinates: LayoutCoordinates) {

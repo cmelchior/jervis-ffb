@@ -34,12 +34,12 @@ fun PassResultAnimation(vm: FieldViewModel, animation: PassAnimation) {
 
     // Kicker
     val startOffset = remember {
-        vm.offsets[animation.from]!!.positionInRoot() - vm.fieldOffset!!.positionInRoot()
+        vm.squareOffsets[animation.from]!!.positionInRoot() - vm.fieldOffset!!.positionInRoot()
     }
     // Landing field
-    val endOffset = remember { vm.offsets[animation.to]!!.positionInRoot() - vm.fieldOffset!!.positionInRoot() }
+    val endOffset = remember { vm.squareOffsets[animation.to]!!.positionInRoot() - vm.fieldOffset!!.positionInRoot() }
     // Size of square (which dictates size of ball)
-    val targetSquareSize = remember { vm.offsets[animation.to]!!.boundsInRoot() }
+    val targetSquareSize = remember { vm.squareOffsets[animation.to]!!.boundsInRoot() }
 
     val (duration, animStateCalculator) = animation.getStateCalculator(
         startOffset,

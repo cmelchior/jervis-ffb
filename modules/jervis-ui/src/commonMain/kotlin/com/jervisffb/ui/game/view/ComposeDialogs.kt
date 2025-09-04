@@ -266,8 +266,8 @@ fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog:
     val offset = remember(fieldData, dialog.viewModel.center) {
         if (dialog.viewModel.center == null) {
             IntOffset(
-                x = (fieldData.offset.x + (fieldData.size.width / 2f) - boxWidthPx/2f).roundToInt(),
-                y = (fieldData.offset.y + (fieldData.size.height / 2f) - boxWidthPx/2f).roundToInt(),
+                x = (fieldData.fieldOffset.x + (fieldData.fieldSizePx.width / 2f) - boxWidthPx/2f).roundToInt(),
+                y = (fieldData.fieldOffset.y + (fieldData.fieldSizePx.height / 2f) - boxWidthPx/2f).roundToInt(),
             )
         } else {
             val data = fieldData.calculateActionWheelPlacement(

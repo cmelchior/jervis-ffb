@@ -33,9 +33,9 @@ enum class TipPosition {
  * We use this to position dialogs in relation to the field (normally in the center).
  */
 data class FieldViewData(
-    val screenSize: Size,
-    val size: IntSize, // Size of the field in pixels
-    val offset: IntOffset, // Offset of the field in the main game window
+    val screenSize: Size, // Size of the main game window
+    val fieldSizePx: IntSize, // Size of the field in pixels. This includes the border.
+    val fieldOffset: IntOffset, // Offset of the field in the main game window
     val squaresWidth: Int,
     val squaresHeight: Int,
 ) {
@@ -45,9 +45,9 @@ data class FieldViewData(
     }
 
     fun calculateActionWheelPlacement(dialog: ActionWheelInputDialog, fieldVm: FieldViewModel, wheelSizePx: Float, ringSizePx: Float): ActionWheelPlacementData {
-        val squareSizePx = size.width/squaresWidth.toFloat()
+        val squareSizePx = fieldSizePx.width/squaresWidth.toFloat()
         val ballLocation = dialog.viewModel.center
-        val ballLocationOffsets = fieldVm.offsets[ballLocation] ?: DummyLayoutCoordinates
+        val ballLocationOffsets = fieldVm.squareOffsets[ballLocation] ?: DummyLayoutCoordinates
         val offset = ballLocationOffsets.localToWindow(Offset.Zero)
 
         // Calculate 9 sections for the placement of the action wheel:
@@ -55,9 +55,9 @@ data class FieldViewData(
             screenSize = JervisTheme.windowSizePx,
             fieldOffset = offset,
             squareSizePx = squareSizePx,
-            focus = offset - Offset(this.offset.x.toFloat(), this.offset.y.toFloat()) + Offset(squareSizePx/2f, squareSizePx/2f),
+            focus = offset - Offset(this.fieldOffset.x.toFloat(), this.fieldOffset.y.toFloat()) + Offset(squareSizePx/2f, squareSizePx/2f),
             wheelRadius = (wheelSizePx - (wheelSizePx - ringSizePx)*0.75f)/2f,
-            fieldSize = size,
+            fieldSize = fieldSizePx,
         )
 
         return when (tipPos) {
