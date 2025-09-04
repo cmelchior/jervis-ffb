@@ -5,12 +5,13 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.DogoutSelected
 import com.jervisffb.engine.actions.FieldSquareSelected
-import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
@@ -253,7 +254,11 @@ class MenuViewModel {
                 // In some cases, a player was already selected when starting a setup.
                 // So we need to take that into account as well.
                 if (controller?.currentNode() == SetupTeam.PlacePlayer) {
-                    val deselectAction = PlayerDeselected(context.currentPlayer!!)
+                    val deselectAction = when (context.currentPlayer!!.location) {
+                        DogOut -> DogoutSelected
+                        is FieldCoordinate -> FieldSquareSelected(context.currentPlayer!!.coordinates)
+                        is GiantLocation -> TODO()
+                    }
                     add(deselectAction)
                 }
 
