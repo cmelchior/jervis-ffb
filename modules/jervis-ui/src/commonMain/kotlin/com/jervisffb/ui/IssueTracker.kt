@@ -9,6 +9,7 @@ import com.jervisffb.utils.getPlatformDescription
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.encodeURLParameter
@@ -137,9 +138,16 @@ object IssueTracker {
                     }
                 }
             )
-            return when (val result = json.decodeFromString<CreateIssueResponse>(httpResponse.body())) {
-                is CreateIssueError -> Result.failure(RuntimeException(result.message))
-                is CreateIssueSuccess -> Result.success(result.message)
+            try {
+                val result = json.decodeFromString<CreateIssueResponse>(httpResponse.body())
+                return when (result) {
+                    is CreateIssueError -> Result.failure(RuntimeException(result.message))
+                    is CreateIssueSuccess -> Result.success(result.message)
+                }
+            } catch (_: Exception) {
+                return Result.failure(
+                    RuntimeException("Failed to create issue [${httpResponse.status}]: ${httpResponse.bodyAsText()}")
+                )
             }
         } catch (ex: Exception) {
             return Result.failure(ex)

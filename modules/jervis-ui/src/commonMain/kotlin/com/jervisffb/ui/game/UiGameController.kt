@@ -228,6 +228,12 @@ class UiGameController(
                     gameController.handleAction(userAction)
                     actionProvider.actionHandled(actions.team, userAction)
                 } catch (ex: InvalidActionException) {
+                    menuViewModel.showReportIssueDialog(
+                        title = "Invalid action created",
+                        body = "The UI created an action that was rejected by the rules engine: ${ex.message}",
+                        error = ex,
+                        gameState = gameController
+                    )
                     LOG.e { "Invalid action selected: ${ex.message}" }
                     menuViewModel.lastActionException = ex
                 }

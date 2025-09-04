@@ -60,7 +60,7 @@ inline fun <reified T : GameAction> ActionNode.checkTypeAndValue(
         }
         return function(action)
     } else {
-        INVALID_ACTION(action, "Action ($action) is not of the expected type: ${T::class}")
+        INVALID_ACTION(action, "Action ($action) is not of the expected type: ${T::class.simpleName}")
     }
 }
 
@@ -78,7 +78,7 @@ inline fun <reified T : GameAction> ActionNode.checkType(
     if (userAction is T) {
         return function(userAction)
     } else {
-        throw InvalidActionException("Action ($action) is not of the expected type: ${T::class}")
+        throw InvalidActionException("Action ($action) is not of the expected type: ${T::class.simpleName}")
     }
 }
 
@@ -93,7 +93,7 @@ inline fun <reified D1 : DieResult> ActionNode.checkDiceRoll(
             }
             val first: DieResult = action.rolls.first()
             if (first !is D1) {
-                throw InvalidActionException("Expected first roll to be ${D1::class}, but was ${first::class}")
+                throw InvalidActionException("Expected first roll to be ${D1::class.simpleName}, but was ${first::class.simpleName}")
             }
             return function(first)
         }
@@ -102,7 +102,7 @@ inline fun <reified D1 : DieResult> ActionNode.checkDiceRoll(
         }
         else -> {
             throw InvalidActionException(
-                "Action ($action) is not of the expected type: ${DiceRollResults::class}",
+                "Action ($action) is not of the expected type: ${DiceRollResults::class.simpleName}",
             )
         }
     }
@@ -137,15 +137,15 @@ inline fun <reified D1 : DieResult, reified D2 : DieResult> ActionNode.checkDice
         val first: DieResult = action.rolls[0]
         val second: DieResult = action.rolls[1]
         if (first !is D1) {
-            throw InvalidActionException("Expected first roll to be ${D1::class}, but was ${first::class}")
+            throw InvalidActionException("Expected first roll to be ${D1::class.simpleName}, but was ${first::class.simpleName}")
         }
         if (second !is D2) {
-            throw InvalidActionException("Expected first roll to be ${D1::class}, but was ${second::class}")
+            throw InvalidActionException("Expected first roll to be ${D1::class.simpleName}, but was ${second::class.simpleName}")
         }
         return function(first, second)
     } else {
         throw InvalidActionException(
-            "Action ($action) is not of the expected type: ${DiceRollResults::class}",
+            "Action ($action) is not of the expected type: ${DiceRollResults::class.simpleName}",
         )
     }
 }
@@ -157,7 +157,7 @@ inline fun <reified D1 : DieResult> ActionNode.checkDiceRollList(
     if (action is DiceRollResults) {
         val first = action.rolls.first()
         if (first !is D1) {
-            throw InvalidActionException("Expected first roll to be ${D1::class}, but was ${first::class}")
+            throw InvalidActionException("Expected first roll to be ${D1::class.simpleName}, but was ${first::class.simpleName}")
         }
         @Suppress("UNCHECKED_CAST")
         return function(action.rolls as List<D1>)
@@ -165,7 +165,7 @@ inline fun <reified D1 : DieResult> ActionNode.checkDiceRollList(
         return function(listOf(action))
     } else {
         throw InvalidActionException(
-            "Action ($action) is not of the expected type: ${DiceRollResults::class}",
+            "Action ($action) is not of the expected type: ${DiceRollResults::class.simpleName}",
         )
     }
 }
@@ -187,10 +187,10 @@ inline fun <reified D1 : DieResult, reified D2 : DieResult> ActionNode.checkDice
     val first = action.results.first().diceSelected.single()
     val second = action.results.last().diceSelected.single()
     if (first !is D1) {
-        INVALID_ACTION(action, "Expected first roll to be ${D1::class}, but was ${first::class}")
+        INVALID_ACTION(action, "Expected first roll to be ${D1::class.simpleName}, but was ${first::class.simpleName}")
     }
     if (second !is D2) {
-        INVALID_ACTION(action, "Expected first roll to be ${D1::class}, but was ${second::class}")
+        INVALID_ACTION(action, "Expected first roll to be ${D1::class.simpleName}, but was ${second::class.simpleName}")
     }
     return function(first, second)
 }
