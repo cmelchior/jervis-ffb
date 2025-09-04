@@ -6,7 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 
@@ -17,7 +19,6 @@ import com.jervisffb.ui.game.viewmodel.FieldViewModel
  * square.
  *
  * TODO: Should this behave differently for Giants which are bigger than one square?
- * TODO: This effect should be made togglable in settings.
  *
  * See [Field] for more details about layer ordering.
  */
@@ -27,7 +28,8 @@ fun FieldHoverUnderlayLayer(
 ) {
     val fieldSizeData = LocalFieldData.current.size
     val highlightedSquare: FieldCoordinate? by vm.highlights().collectAsState()
-    if (highlightedSquare != null && highlightedSquare!!.isOnField(vm.game.rules)) {
+    val showHover by SETTINGS_MANAGER.observeBooleanKey(SettingsKeys.JERVIS_UI_SHOW_MOUSE_OVER_EFFECT_ON_SQUARE_VALUE, true).collectAsState(true)
+    if (highlightedSquare != null && showHover && highlightedSquare!!.isOnField(vm.game.rules)) {
         Box(
             modifier = Modifier
                 .jervisSquare(fieldSizeData, highlightedSquare!!)
