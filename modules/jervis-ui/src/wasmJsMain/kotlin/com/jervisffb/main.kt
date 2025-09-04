@@ -1,8 +1,16 @@
 package com.jervisffb
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeViewport
 import com.jervisffb.ui.App
+import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.initApplication
 import com.jervisffb.ui.menu.BackNavigationHandler
@@ -29,7 +37,9 @@ suspend fun main() {
             }
         }
         ComposeViewport(document.body!!) {
-            // WindowMenuBar(menuViewModel)
+            OnBrowserResize { sizeDp, sizePx ->
+                JervisTheme.notifyWindowsSizeChange(sizeDp, sizePx)
+            }
             App(menuViewModel)
         }
     } catch (ex: Throwable) {
@@ -43,4 +53,25 @@ suspend fun main() {
 // They are defined directly inside `index.html`.
 private fun clearLoadingScreen() {
     document.body?.innerHTML = ""
+}
+
+@Composable
+private fun OnBrowserResize(onResize: (sizeDp: DpSize, sizePx: Size) -> Unit) {
+    val density = LocalDensity.current
+    DisposableEffect(Unit) {
+        val listener: (org.w3c.dom.events.Event) -> Unit = {
+            val sizePx = Size(window.innerWidth.toFloat(), window.innerHeight.toFloat())
+            val sizeDp = with(density) {
+                val widthDp = window.innerWidth.dp
+                val heightDp = window.innerHeight.dp
+                DpSize(widthDp, heightDp)
+            }
+            onResize(sizeDp, sizePx)
+        }
+        window.addEventListener("resize", listener)
+        listener.invoke(org.w3c.dom.events.Event("resize"))
+        onDispose {
+            window.removeEventListener("resize", listener)
+        }
+    }
 }
