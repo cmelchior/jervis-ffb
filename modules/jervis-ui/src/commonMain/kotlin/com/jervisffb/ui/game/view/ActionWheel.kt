@@ -130,13 +130,13 @@ fun ActionWheelMenu(
     viewModel: ActionWheelViewModel,
     ringSize: Dp = 250.jdp,
     borderSize: Dp = 20.jdp,
+    maxSize: Dp = 300.jdp,
     animationDuration: Int = 300,
     showTip: Boolean = false,
     tipRotationDegree: Float = 0f,
     onDismissRequest: (Boolean) -> Unit,
 ) {
     // Center of the menu in pixels
-    val centerPx = with(LocalDensity.current) { Offset((ringSize/2f).toPx(), (ringSize/2f).toPx()) }
     val teamColor = remember(viewModel.owner) {
         when (viewModel.owner.isHomeTeam()) {
             true -> JervisTheme.rulebookRed
@@ -148,7 +148,6 @@ fun ActionWheelMenu(
     // var hoverText by remember { mutableStateOf<String?>(viewModel.startingHoverText) }
     // val hoverText: String? by viewModel.hoverText.collectAsState()
     var topMessage = viewModel.topMessage
-    val maxSize = (hypot(ringSize.value, ringSize.value)).jdp
     Box(
         modifier = Modifier
             .size(maxSize)

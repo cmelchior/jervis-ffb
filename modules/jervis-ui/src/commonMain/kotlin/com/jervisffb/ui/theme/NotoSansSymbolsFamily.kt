@@ -17,5 +17,5 @@ import org.jetbrains.compose.resources.Font
 @Composable
 fun NotoSansSymbols() = FontFamily(
     Font(Res.font.NotoSansSymbols_Medium, weight = FontWeight.Normal),
-        Font(Res.font.NotoSansSymbols_Bold, weight = FontWeight.Bold)
+    Font(Res.font.NotoSansSymbols_Bold, weight = FontWeight.Bold)
 )

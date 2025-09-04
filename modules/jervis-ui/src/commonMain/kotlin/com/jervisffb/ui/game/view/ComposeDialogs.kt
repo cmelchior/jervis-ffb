@@ -300,12 +300,11 @@ fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog:
             clippingEnabled = true // Prevents being dragged outside the window bounds
         )
     ) {
-        Box(
-            // modifier = Modifier.offset { offset }
-        ) {
+        Box() {
             ActionWheelMenu(
                 viewModel = wheelViewModel,
                 ringSize = ringSize,
+                maxSize = boxSize,
                 showTip = showTip,
                 tipRotationDegree = tipRotationDegree,
                 onDismissRequest = dismissRequest,
