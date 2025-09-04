@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jervisffb.ui.theme.NotoSansSymbols
 import com.jervisffb.ui.theme.TrumpTownPro
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
@@ -44,6 +45,14 @@ object JervisTheme {
 
     @Composable
     fun fontFamily() = TrumpTownPro()
+
+    /**
+     * In most cases, we can just rely on the system font family, but it has problems
+     * with Unicode characters outside the normal range (at least on Web). So for that
+     * purpose, we have a default font family that can be used in those cases.
+     */
+    @Composable
+    fun defaultFontFamily() = NotoSansSymbols()
 
     /**
      * Update this theme with the current window size. This will also trigger an update

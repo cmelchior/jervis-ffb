@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerDefaults.shape
@@ -61,13 +60,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.adamglin.composeshadow.dropShadow
@@ -782,6 +781,19 @@ private fun HoverText(
 //                )
 //            ),
 //        )
+
+    val baselineShift = remember(displayedMessage) {
+        // Aligning the text in the center of a colored background is pretty tricky
+        // due to different fonts and how Compose treat ascent / descent. This is
+        // mostly a problem for the direction hover as it includes unicode arrows.
+        // So for now we just account that specific case. Until we can come up with
+        // a better way of doing it.
+        if (displayedMessage?.startsWith("Direction: ") == true) {
+            BaselineShift.None
+        } else {
+            BaselineShift(-0.05f)
+        }
+    }
     Text(
         modifier = Modifier
             .offset(y = 60.jdp)
@@ -792,10 +804,11 @@ private fun HoverText(
         ,
         text = displayedMessage ?: "",
         style = MaterialTheme.typography.bodySmall.copy(
-            lineHeight = 1.em,
+            fontFamily = JervisTheme.defaultFontFamily(), // Needed to support direction arrows on Web
+            fontSize = fontSize,
             color = textColor,
             fontWeight = fontWeight,
-            fontSize = fontSize,
+            baselineShift = baselineShift
         ),
     )
 }
