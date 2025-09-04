@@ -38,8 +38,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
-import kotlinx.serialization.Serializable
-
 
 data class ThrowTeamMateContext(
     val thrower: Player,
@@ -51,7 +49,6 @@ data class ThrowTeamMateContext(
  * Procedure for controlling a player's Hand-off action.
  * See page 51 in the rulebook.
  */
-@Serializable
 object ThrowTeamMateAction : Procedure() {
     override val initialNode: Node = MoveOrHandOffOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command {

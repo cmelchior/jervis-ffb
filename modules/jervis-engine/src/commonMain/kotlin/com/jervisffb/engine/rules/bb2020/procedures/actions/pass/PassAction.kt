@@ -42,7 +42,6 @@ import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
-import kotlinx.serialization.Serializable
 
 enum class PassingType {
     ACCURATE,
@@ -69,7 +68,6 @@ data class PassContext(
  *
  * See page 48 in the rulebook.
  */
-@Serializable
 object PassAction : Procedure() {
     override val initialNode: Node = MoveOrPassOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command {

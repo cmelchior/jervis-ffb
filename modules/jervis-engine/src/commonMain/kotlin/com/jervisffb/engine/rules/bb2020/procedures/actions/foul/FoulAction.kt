@@ -40,8 +40,6 @@ import com.jervisffb.engine.rules.common.tables.ArgueTheCallResult
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
-import kotlinx.serialization.Serializable
-
 
 data class FoulContext(
     val fouler: Player,
@@ -62,7 +60,6 @@ data class FoulContext(
  *
  * See page 63 in the rulebook.
  */
-@Serializable
 object FoulAction : Procedure() {
     override val initialNode: Node = SelectFoulTargetOrCancel
     override fun onEnterProcedure(state: Game, rules: Rules): Command {

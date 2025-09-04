@@ -34,7 +34,6 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.InjuryResult
 import com.jervisffb.engine.utils.INVALID_ACTION
-import kotlinx.serialization.Serializable
 
 /**
  * Procedure for using an apothecary as described on page 95 in Death Zone.
@@ -44,7 +43,6 @@ import kotlinx.serialization.Serializable
  * This procedure has a lot of overlap with the [UseBB11Apothecary] procedure.
  * There might be a better way to keep them in sync; for now, it is a manual process.
  */
-@Serializable
 object UseBB7Apothecary: Procedure() {
     override val initialNode: Node = ChooseToUseApothecary
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null

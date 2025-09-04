@@ -36,7 +36,6 @@ import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.utils.INVALID_ACTION
-import kotlinx.serialization.Serializable
 
 /**
  * Context for a "Block Action". This context only tracks the top-level state relevant to a block action.
@@ -79,7 +78,6 @@ data class BlockActionContext(
  * 3. It is up to [StandardBlockStep] and [MultipleBlockAction] to correctly set up the call order of these as well
  *    making sure that they have the correct context's set.
  */
-@Serializable
 object BlockAction : Procedure() {
     override val initialNode: Node = SelectDefenderOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null

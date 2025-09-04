@@ -57,7 +57,6 @@ import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
-import kotlinx.serialization.Serializable
 
 data class BlitzActionContext(
     val attacker: Player,
@@ -73,7 +72,6 @@ data class BlitzActionContext(
  *
  * See page 43 in the rulebook.
  */
-@Serializable
 object BlitzAction : Procedure() {
     override val initialNode: Node = SelectTargetOrCancel
     override fun onEnterProcedure(state: Game, rules: Rules): Command {

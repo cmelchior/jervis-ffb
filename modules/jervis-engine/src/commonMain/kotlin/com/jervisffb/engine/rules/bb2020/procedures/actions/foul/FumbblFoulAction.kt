@@ -36,8 +36,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
-import kotlinx.serialization.Serializable
-
 
 /**
  * Procedure for controlling a player's Foul action.
@@ -45,7 +43,6 @@ import kotlinx.serialization.Serializable
  * FUMBBL does not follow the rulebook and allow the fouler to wait with
  * selecting the victim until they are going to perform the foul.
  */
-@Serializable
 object FumbblFoulAction : Procedure() {
     override val initialNode: Node = MoveOrFoulOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command {

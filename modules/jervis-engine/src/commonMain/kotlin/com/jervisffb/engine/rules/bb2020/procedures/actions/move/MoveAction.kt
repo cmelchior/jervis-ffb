@@ -23,12 +23,10 @@ import com.jervisffb.engine.rules.bb2020.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import kotlinx.serialization.Serializable
 
 /**
  * Procedure controlling a Move action as described on page 44 in the rulebook.
  */
-@Serializable
 object MoveAction : Procedure() {
     override val initialNode: Node = SelectMoveType
     override fun onEnterProcedure(state: Game, rules: Rules): Command {

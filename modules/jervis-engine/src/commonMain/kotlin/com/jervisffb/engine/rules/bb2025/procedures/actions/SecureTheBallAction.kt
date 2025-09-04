@@ -34,7 +34,6 @@ import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
-import kotlinx.serialization.Serializable
 
 
 data class SecureTheBallContext(
@@ -69,7 +68,6 @@ data class SecureTheBallContext(
  * - Assumption: If a player has chosen the action, the player MUST roll for Secure the Ball and
  *               not Pickup when moving into the ball.
  */
-@Serializable
 object SecureTheBallAction : Procedure() {
     override val initialNode: Node = MoveOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command {

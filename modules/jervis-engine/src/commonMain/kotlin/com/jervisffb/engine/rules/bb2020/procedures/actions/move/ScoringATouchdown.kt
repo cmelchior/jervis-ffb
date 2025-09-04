@@ -31,7 +31,6 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.BloodLust
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import kotlinx.serialization.Serializable
 
 data class ScoringATouchDownContext(
     val player: Player,
@@ -67,7 +66,6 @@ data class ScoringATouchDownContext(
  * If Ball Clone succeeds, other effects will be taken into account, like
  * Blood Lust.
  */
-@Serializable
 object ScoringATouchdown : Procedure() {
     override val initialNode: Node = CheckForTouchdown
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
