@@ -21,6 +21,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
+import com.jervisffb.engine.actions.Revert
 import com.jervisffb.engine.actions.SelectBlockType
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
@@ -30,6 +31,7 @@ import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.SelectPlayerAction
+import com.jervisffb.engine.actions.Undo
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -59,6 +61,7 @@ import com.jervisffb.ui.game.state.decorators.SelectPlayerDecorator
 import com.jervisffb.ui.game.view.DialogFactory
 import com.jervisffb.ui.game.viewmodel.Feature
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.delay
@@ -92,6 +95,7 @@ open class ManualActionProvider(
     private var delayBetweenActions = false
     private val queuedActions = mutableListOf<GameAction>()
     private val queuedActionsGeneratorFuncs = mutableListOf<QueuedActionsGenerator>()
+    private var sharedData: LocalFieldDataWrapper? = null
 
     val fieldActionDecorators = mapOf(
         // EndSetupWhenReady -> TODO()
@@ -125,6 +129,10 @@ open class ManualActionProvider(
 
     override fun actionHandled(team: Team?, action: GameAction) {
         // Do nothing. We are sharing the controller with the main UiGameController
+    }
+
+    override fun updateSharedData(sharedData: LocalFieldDataWrapper) {
+        this.sharedData = sharedData
     }
 
     override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
@@ -201,7 +209,15 @@ open class ManualActionProvider(
     }
 
     override fun decorateSelectedAction(action: GameAction, acc: UiSnapshotAccumulator) {
-        // Do nothing (for now)
+        // If Undo'ing actions, this might happen through short-cuts and not the UI.
+        // If this happens while a context menu is open, its state will be left hanging.
+        // In particular `LocalFieldDataWrapper.isContentMenuVisible`. For that reason, we always
+        // that state here when the action is Undo or Revert.
+        // TODO In general we need to rethink the lifecycle of the Action Wheel since we want to enable
+        //  animations between states in the Wheel. At that point, this logic should probably be revisited.
+        if (action is Undo || action is Revert) {
+            sharedData?.isContentMenuVisible = false
+        }
     }
 
     override suspend fun getAction(): GameAction {

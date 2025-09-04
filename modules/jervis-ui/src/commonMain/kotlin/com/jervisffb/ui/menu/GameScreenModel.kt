@@ -60,8 +60,11 @@ data class LoadingTeamInfo(
 // of the Game Screen.
 @Stable
 class LocalFieldDataWrapper {
+    // Information about the size of the Field, especially the width and height in pixels
     var size: FieldSizeData by mutableStateOf(FieldSizeData(0, IntSize.Zero, 0, 0))
+    // Used to share mouse events across all field layers
     val pointerBus: PointerEventBus = PointerEventBus()
+    // Indicates whether a context menu is visible
     var isContentMenuVisible by mutableStateOf(false)
 }
 
@@ -129,6 +132,7 @@ class GameScreenModel(
     }
 
     init {
+        actionProvider.updateSharedData(sharedFieldData)
         menuViewModel.backgroundContext.launch {
             // Use large icon for the loading screen
             homeTeamIcon.value = IconFactory.loadRosterIcon(

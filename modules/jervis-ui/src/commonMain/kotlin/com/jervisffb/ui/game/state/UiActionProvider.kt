@@ -5,6 +5,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.utils.singleThreadDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -27,6 +28,10 @@ data class QueuedActionsResult(val actions: List<GameAction>, val delayBetweenAc
 abstract class UiActionProvider {
     abstract fun startHandler()
     abstract fun actionHandled(team: Team?, action: GameAction)
+
+    // Called after setting up the UI and before starting the game loop.
+    // This allows Compose and UI controller to share data that cross across a lot of responsibilities.
+    abstract fun updateSharedData(sharedData: LocalFieldDataWrapper)
 
     val errorHandler = CoroutineExceptionHandler { _, exception ->
         // TODO This doesn't seem to work?

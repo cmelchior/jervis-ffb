@@ -20,6 +20,7 @@ import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.ui.game.UiSnapshotAccumulator
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
@@ -39,6 +40,7 @@ class RandomActionProvider(
         val LOG = jervisLogger()
     }
 
+    private var sharedData: LocalFieldDataWrapper? = null
     private var job: Job? = null
     private var paused = false
     private lateinit var actions: ActionRequest
@@ -49,6 +51,10 @@ class RandomActionProvider(
 
     override fun actionHandled(team: Team?, action: GameAction) {
         // Do nothing
+    }
+
+    override fun updateSharedData(sharedData: LocalFieldDataWrapper) {
+        this.sharedData = sharedData
     }
 
     override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {

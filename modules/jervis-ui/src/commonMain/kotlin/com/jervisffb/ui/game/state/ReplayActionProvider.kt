@@ -10,6 +10,7 @@ import com.jervisffb.fumbbl.net.adapter.JervisAction
 import com.jervisffb.fumbbl.net.adapter.OptionalJervisAction
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
+import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -29,6 +30,7 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
     private lateinit var actions: ActionRequest
     var started = false
     private val pauseMutex = Mutex(locked = true)
+    private var sharedData: LocalFieldDataWrapper? = null
 
     override fun startHandler() {
         if (started) return
@@ -100,6 +102,10 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
 
     override fun actionHandled(team: Team?, action: GameAction) {
         // Do nothing
+    }
+
+    override fun updateSharedData(sharedData: LocalFieldDataWrapper) {
+        this.sharedData = sharedData
     }
 
     override suspend fun prepareForNextAction(controller: GameEngineController, actions: ActionRequest) {
