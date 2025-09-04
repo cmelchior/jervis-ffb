@@ -230,7 +230,11 @@ class UiGameController(
                 } catch (ex: InvalidActionException) {
                     menuViewModel.showReportIssueDialog(
                         title = "Invalid action created",
-                        body = "The UI created an action that was rejected by the rules engine: ${ex.message}",
+                        body = """
+                            The UI created an action that was rejected by the rules engine.
+                            State: ${state.stack.stateToPrettyString()}
+                            ${ex.message}
+                        """.trimIndent(),
                         error = ex,
                         gameState = gameController
                     )

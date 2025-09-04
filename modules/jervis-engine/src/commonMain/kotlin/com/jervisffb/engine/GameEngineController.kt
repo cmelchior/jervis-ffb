@@ -388,10 +388,11 @@ class GameEngineController(
     }
 
     private fun setInitialProcedure(procedure: Procedure) {
-        LOG.v { "[Stack] Set initial procedure: ${procedure.name()}[${procedure.initialNode.name()}" }
+        val message = "Set initial procedure: ${procedure.stateToPrettyString(procedure.initialNode)}"
+        LOG.v { "[Stack] $message" }
         val command =
             compositeCommandOf(
-                SimpleLogEntry("Set initial procedure: ${procedure.name()}[${procedure.initialNode.name()}]", LogCategory.STATE_MACHINE),
+                SimpleLogEntry(message, LogCategory.STATE_MACHINE),
                 EnterProcedure(procedure),
             )
         executeCommand(command)

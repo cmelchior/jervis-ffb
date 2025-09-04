@@ -120,13 +120,7 @@ fun GameMenuDrawer(
 
                 DrawerSectionHeader("Developer Console")
                 val currentNodeDescription: String = remember(uiState) {
-                    menuViewModel.uiState?.gameController?.let { it ->
-                        with(it) {
-                            val procedure = currentProcedure() ?: return@let "null"
-                            val currentNode = currentNode() ?: return@let "${procedure.name()}[<null>]"
-                            "${procedure.name()}[${currentNode.name()}]"
-                        }
-                    } ?: "Unknown"
+                    menuViewModel.uiState?.gameController?.stack?.stateToPrettyString() ?: "Unknown"
                 }
                 Row(
                     modifier = Modifier

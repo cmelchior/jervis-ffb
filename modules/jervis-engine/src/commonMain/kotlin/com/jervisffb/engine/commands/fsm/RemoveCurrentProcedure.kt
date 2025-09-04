@@ -22,7 +22,7 @@ class RemoveCurrentProcedure : Command {
         LOG.v { "[Stack] Remove procedure: ${originalProcedure.name()}" }
         logEntry1 = SimpleLogEntry("Procedure ${originalProcedure.name()} removed.", LogCategory.STATE_MACHINE)
         logEntry2 = if (current != null) {
-            SimpleLogEntry("Current state: ${current.name()}[${current.currentNode().name()}]", LogCategory.STATE_MACHINE)
+            SimpleLogEntry("Current state: ${current.toPrettyString()}", LogCategory.STATE_MACHINE)
         } else {
             SimpleLogEntry("Current state: <Empty>", LogCategory.STATE_MACHINE)
         }

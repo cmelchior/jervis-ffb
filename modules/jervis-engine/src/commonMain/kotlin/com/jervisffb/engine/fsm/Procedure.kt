@@ -33,6 +33,13 @@ abstract class Procedure {
         // Do nothing
     }
 
+    /**
+     * Returns a pretty string representation of this procedure with the given node.
+     */
+    fun stateToPrettyString(node: Node): String {
+        return "${name()}[${node.name()}]"
+    }
+
     private class EnterProcedureNode(private val procedure: Procedure) : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             return compositeCommandOf(

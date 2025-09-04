@@ -8,7 +8,7 @@ import com.jervisffb.engine.reports.SimpleLogEntry
 
 class EnterProcedure(private val procedure: Procedure) : Command {
     private val enterProcedureEntry =
-        SimpleLogEntry(message = "Load procedure: ${procedure.name()}[${procedure.initialNode.name()}]", LogCategory.STATE_MACHINE)
+        SimpleLogEntry(message = "Load procedure: ${procedure.stateToPrettyString(procedure.initialNode)}", LogCategory.STATE_MACHINE)
 
     override fun execute(state: Game) {
         LOG.v { "[Stack] Enter procedure: ${procedure.name()}[<init>]" }

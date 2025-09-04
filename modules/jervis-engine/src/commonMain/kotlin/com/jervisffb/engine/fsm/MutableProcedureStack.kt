@@ -150,4 +150,14 @@ class MutableProcedureStack {
     fun createSnapshot(): ProcedureStack {
         return ProcedureStack(history.map { it.createSnapshot() })
     }
+
+    /**
+     * Will report the current active procedure and node (if known). If no
+     * procedure is active, it will return "Unknown".
+     */
+    fun stateToPrettyString(): String {
+        currentProcedure()?.let {
+            return "${it.procedure.name()}[${it.currentNode().name()}]"
+        } ?: return "Unknown"
+    }
 }

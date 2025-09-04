@@ -22,8 +22,9 @@ class GotoNode(private val nextNode: Node) : Command {
 
     override fun execute(state: Game) {
         val currentProcedure = state.currentProcedure() ?: INVALID_GAME_STATE("No procedure is running.")
-        LOG.v { "[Stack] Goto node: ${currentProcedure.name()}[${nextNode.name()}]" }
-        logEntry = SimpleLogEntry("Transition to: ${currentProcedure.name()}[${nextNode.name()}]", LogCategory.STATE_MACHINE)
+        val nextState = currentProcedure.procedure.stateToPrettyString(nextNode)
+        LOG.v { "[Stack] Goto node: $nextState" }
+        logEntry = SimpleLogEntry("Transition to: $nextState", LogCategory.STATE_MACHINE)
         state.addLog(logEntry)
         originalNode = currentProcedure.currentNode()
         if (originalNode is ParentNode) {

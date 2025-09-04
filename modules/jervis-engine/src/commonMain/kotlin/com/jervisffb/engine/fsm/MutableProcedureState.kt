@@ -62,7 +62,5 @@ class MutableProcedureState(val procedure: Procedure, initialNode: Node) {
      */
     fun name(): String = procedure.name()
 
-    override fun toString(): String {
-        return "${name()}[${activeNode.name()}]"
-    }
+    fun toPrettyString(): String = procedure.stateToPrettyString(activeNode)
 }
