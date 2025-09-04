@@ -148,7 +148,7 @@ fun ActionWheelMenu(
     // var hoverText by remember { mutableStateOf<String?>(viewModel.startingHoverText) }
     // val hoverText: String? by viewModel.hoverText.collectAsState()
     var topMessage = viewModel.topMessage
-    val maxSize = (hypot(ringSize.value, ringSize.value)).dp
+    val maxSize = (hypot(ringSize.value, ringSize.value)).jdp
     Box(
         modifier = Modifier
             .size(maxSize)
