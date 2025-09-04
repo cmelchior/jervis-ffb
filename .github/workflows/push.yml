@@ -304,5 +304,6 @@ jobs:
             cp ./jervis/create_issue.php ./jervis_new
             mv ./jervis ./jervis_old
             mv ./jervis_new ./jervis
+            mv ./jervis_old/uploads ./jervis
             rm -rf ./jervis_old
             rm ./jervis_upload/devbuilds.zip
