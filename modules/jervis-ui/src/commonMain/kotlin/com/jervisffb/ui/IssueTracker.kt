@@ -122,6 +122,14 @@ object IssueTracker {
                     appendLine(throwable.stackTraceToString())
                     appendLine("```")
                 }
+                appendLine()
+                appendLine()
+                append("""
+                    -----
+                    **Client Information (${getBuildType()})**
+                    Jervis Client Version: ${BuildConfig.releaseVersion}
+                    Git Commit: ${BuildConfig.gitHash}
+                """.trimIndent())
             }
             val client = getHttpClient()
             val httpResponse = client.submitFormWithBinaryData(
