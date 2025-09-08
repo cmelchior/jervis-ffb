@@ -34,7 +34,7 @@ object TeamRerollStatusIndicator: FieldStatusIndicator {
     }
 
     private fun configureTeamRerolls(team: Team, teamInfo: UiTeamInfoUpdate): UiTeamInfoUpdate {
-        // Define the order in which we want to show Rerolls. Generally we want to show the
+        // Define the order in which we want to show Rerolls. Generally, we want to show the
         // one that disappears first at the front of the list (we also want to use it first).
         val order = listOf(
             UiRerollType.BRILLIANT_COACHING,
@@ -48,11 +48,7 @@ object TeamRerollStatusIndicator: FieldStatusIndicator {
         val rerolls = team.rerolls.mapNotNull {
             when (it) {
                 is BrilliantCoachingReroll -> {
-                    if (!it.rerollUsed) {
-                        UiReroll("Brilliant Coaching Reroll", UiRerollType.BRILLIANT_COACHING, it.rerollUsed)
-                    } else {
-                        null
-                    }
+                    UiReroll("Brilliant Coaching Reroll", UiRerollType.BRILLIANT_COACHING, it.rerollUsed)
                 }
 
                 is LeaderTeamReroll -> {
@@ -66,8 +62,9 @@ object TeamRerollStatusIndicator: FieldStatusIndicator {
             }
         }
         val reorderedRerolls = rerolls.sortedWith(
-            compareBy { rank[it.type] ?: Int.MAX_VALUE } // unknown keys go last
+            compareBy<UiReroll> { rank[it.type] }.thenBy { !it.used }
         )
+
         return teamInfo.copy(
             rerolls = teamInfo.rerolls.addAll(reorderedRerolls)
         )

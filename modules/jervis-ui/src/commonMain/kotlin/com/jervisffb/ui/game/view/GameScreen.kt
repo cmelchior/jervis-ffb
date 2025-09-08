@@ -58,7 +58,7 @@ fun GameScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        GameStatus(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
+        TopBarGameStatus(gameStatusController, modifier = Modifier.padding(horizontal = 24.jdp))
         Spacer(modifier = Modifier.height(8.jdp))
         Row(
             modifier = Modifier

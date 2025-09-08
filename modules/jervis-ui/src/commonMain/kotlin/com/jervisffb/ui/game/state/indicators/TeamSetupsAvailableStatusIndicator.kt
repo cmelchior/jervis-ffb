@@ -5,7 +5,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
+import com.jervisffb.engine.rules.bb2020.procedures.StartOfDriveSequence
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ReplayActionProvider
 import com.jervisffb.ui.game.viewmodel.ButtonData
@@ -50,8 +50,8 @@ object TeamSetupsAvailableStatusIndicator: FieldStatusIndicator {
         // This is mostly for WASM, iOS as JVM has a proper menu bar. This should be reworked
         // once we add proper menu support on WASM/iOS.
         // Also, consider moving this logic into decorators somehow.
-        val setupKickingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupKickingTeam)
-        val setupReceivingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupReceivingTeam)
+        val setupKickingTeam = uiSnapshot.stack.containsNode(StartOfDriveSequence.SetupKickingTeam)
+        val setupReceivingTeam = uiSnapshot.stack.containsNode(StartOfDriveSequence.SetupReceivingTeam)
         val teamControlledByClient = when (uiSnapshot.uiController.uiMode) {
             TeamActionMode.HOME_TEAM -> (setupKickingTeam && isTeamHumanAndControlledByClient(state.kickingTeam, true)) || (setupReceivingTeam && isTeamHumanAndControlledByClient(state.receivingTeam, true))
             TeamActionMode.AWAY_TEAM -> (setupKickingTeam && isTeamHumanAndControlledByClient(state.kickingTeam, false)) || (setupReceivingTeam && isTeamHumanAndControlledByClient(state.receivingTeam, false))

@@ -29,6 +29,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.skills.SkillType.FRENZY
+import com.jervisffb.engine.rules.common.skills.SkillType.LEADER
 import com.jervisffb.engine.rules.common.skills.SkillType.SIDESTEP
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.jervis_ui.generated.resources.Res
@@ -146,7 +147,7 @@ fun createDefaultHomeTeam(rules: Rules): Team {
         addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), HUMAN_LINEMAN)
         addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), HUMAN_LINEMAN)
         addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), HUMAN_LINEMAN)
-        addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HUMAN_THROWER, listOf(SIDESTEP.id()))
+        addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HUMAN_THROWER, listOf(LEADER.id()))
         addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HUMAN_CATCHER, listOf(SIDESTEP.id()))
         addPlayer(PlayerId("H7"), "Catcher-7-H", PlayerNo(7), HUMAN_CATCHER)
         addPlayer(PlayerId("H8"), "Blitzer-8-H", PlayerNo(8), HUMAN_BLITZER)
@@ -173,7 +174,7 @@ fun createDefaultAwayTeam(rules: Rules): Team {
         addPlayer(PlayerId("A6"), "Saurus-6-A", PlayerNo(6), SAURUS_BLOCKERS, listOf(FRENZY.id()))
         addPlayer(PlayerId("A7"), "Saurus-7-A", PlayerNo(7), SAURUS_BLOCKERS, listOf(FRENZY.id()))
         addPlayer(PlayerId("A8"), "ChameleonSkink-8-A", PlayerNo(8), CHAMELEON_SKINKS)
-        addPlayer(PlayerId("A9"), "Skink-9-A", PlayerNo(9), SKINK_RUNNER_LINEMEN)
+        addPlayer(PlayerId("A9"), "Skink-9-A", PlayerNo(9), SKINK_RUNNER_LINEMEN, listOf(LEADER.id()))
         addPlayer(PlayerId("A10"), "Skink-10-A", PlayerNo(10), SKINK_RUNNER_LINEMEN)
         addPlayer(PlayerId("A11"), "Skink-11-A", PlayerNo(11), SKINK_RUNNER_LINEMEN)
         rerolls = 4

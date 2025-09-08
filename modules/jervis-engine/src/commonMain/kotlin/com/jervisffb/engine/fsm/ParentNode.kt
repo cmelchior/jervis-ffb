@@ -38,7 +38,7 @@ abstract class ParentNode : Node {
 
     /**
      * Called before [onEnterNode]. This will check if we want to skip this
-     * node completely. If a [Node] is returned, the current node is skipped in
+     * node completely. If a [Node] is returned, this parent node is skipped in
      * favor of the returned one. If `null` is returned, the node is executed
      * as normal, and [onEnterNode] is called next.
      */

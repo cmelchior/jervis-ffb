@@ -50,6 +50,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryC
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
+import com.jervisffb.engine.rules.bb2020.skills.Leader
 import com.jervisffb.engine.rules.bb2020.skills.Sidestep
 import com.jervisffb.engine.utils.INVALID_ACTION
 
@@ -510,6 +511,15 @@ object PushStepInitialMoveSequence: Procedure() {
                             SetPlayerLocation(push.pushee, DogOut),
                             ReportPushedIntoCrowd(push.pushee, push.from)
                         )
+
+                        // Check if Leader rerolls are still available after a player with Leader
+                        // left the field.
+                        if (push.pushee.hasSkill<Leader>()) {
+                            Leader.removeLeaderRerollIfNotAvailable(push.pushee.team)?.let { removeRerollCommand ->
+                                add(removeRerollCommand)
+                            }
+                        }
+
                         pushedIntoCrowd = true
                     } else {
                         // At this stage, there should only be one ball on the square,

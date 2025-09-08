@@ -78,6 +78,14 @@ Skills should only be marked as completed here if they are implemented and have 
 - [ ] Fumblerooskie
 - [ ] Hail Mary Pass
 - [ ] Leader
+  - [ ] Available after setup
+  - [ ] Does not reset for overtime
+  - [ ] Carry over into overtime
+  - [ ] After Knocked Down
+  - [ ] After Falling over
+  - [ ] Removed immediately if pushed into the crowd
+  - [ ] Not removed if other players with Leader on the field
+  - [ ] Only one, regardless of number of players
 - [ ] Nerves of Steel
 - [ ] On the Ball
 - [ ] Pass

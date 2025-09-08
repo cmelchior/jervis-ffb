@@ -19,10 +19,12 @@ import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.inducements.Apothecary
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.skills.Leader
 import com.jervisffb.engine.rules.common.tables.CasualtyResult
 import com.jervisffb.engine.rules.common.tables.InjuryResult
 import com.jervisffb.engine.rules.common.tables.LastingInjuryResult
@@ -97,7 +99,15 @@ data class RiskingInjuryContext(
 object RiskingInjuryRoll: Procedure() {
     override val initialNode: Node = DetermineStartingRoll
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
-    override fun onExitProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command? {
+        // A player with Leader has left the field after an injury roll. If they had Leader
+        // we need to check if the leader reroll is still available.
+        val player = state.getContext<RiskingInjuryContext>().player
+        if (!player.location.isOnField(rules) && player.hasSkill<Leader>()) {
+            return Leader.removeLeaderRerollIfNotAvailable(player.team)
+        }
+        return null
+    }
     override fun isValid(state: Game, rules: Rules) = state.assertContext<RiskingInjuryContext>()
 
     object DetermineStartingRoll: ComputationNode() {

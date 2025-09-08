@@ -6,7 +6,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isOnAwayTeam
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
+import com.jervisffb.engine.rules.bb2020.procedures.StartOfDriveSequence
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot
@@ -50,8 +50,8 @@ class SidebarViewModel(
         // This is mostly for WASM, iOS as JVM has a proper menu bar. This should be reworked
         // once we add proper menu support on WASM/iOS.
         // Also, consider moving this logic into decorators somehow.
-        val setupKickingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupKickingTeam) && uiSnapshot.game.kickingTeam == team
-        val setupReceivingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupReceivingTeam) && uiSnapshot.game.receivingTeam == team
+        val setupKickingTeam = uiSnapshot.stack.containsNode(StartOfDriveSequence.SetupKickingTeam) && uiSnapshot.game.kickingTeam == team
+        val setupReceivingTeam = uiSnapshot.stack.containsNode(StartOfDriveSequence.SetupReceivingTeam) && uiSnapshot.game.receivingTeam == team
         val teamControlledByClient = when (uiState.uiMode) {
             TeamActionMode.HOME_TEAM -> team.isHomeTeam()
             TeamActionMode.AWAY_TEAM -> team.isAwayTeam()

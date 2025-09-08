@@ -5,7 +5,7 @@ import com.jervisffb.engine.model.Game
 /**
  * Class for wrapping multiple commands while still exposing them as one command.
  */
-class CompositeCommand private constructor(val commands: List<Command>) : Command {
+class CompositeCommand(val commands: List<Command>) : Command {
 
     class Builder {
         private val commands = mutableListOf<Command>()
@@ -16,17 +16,13 @@ class CompositeCommand private constructor(val commands: List<Command>) : Comman
         }
     }
 
-    override fun undo(
-        state: Game,
-    ) {
+    override fun undo(state: Game) {
         for (i in commands.size - 1 downTo 0) {
             commands[i].undo(state)
         }
     }
 
-    override fun execute(
-        state: Game,
-    ) {
+    override fun execute(state: Game) {
         commands.forEach { it.execute(state) }
     }
 

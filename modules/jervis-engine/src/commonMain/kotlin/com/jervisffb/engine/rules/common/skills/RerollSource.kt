@@ -9,7 +9,7 @@ import com.jervisffb.engine.rules.common.procedures.DieRoll
 // Should we split this into a "normal dice" and "block dice" interface?
 interface RerollSource {
     val id: RerollSourceId // Unique identifier for this reroll. Should be unique across both teams.
-    val rerollResetAt: Duration
+    val rerollResetAt: Duration // Not currently used (except for documentation purposes). Can it be removed?
     val rerollDescription: String
     var rerollUsed: Boolean
     val rerollProcedure: Procedure

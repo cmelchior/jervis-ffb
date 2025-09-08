@@ -12,9 +12,9 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
-import com.jervisffb.engine.rules.bb2020.procedures.GameDrive
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
+import com.jervisffb.engine.rules.bb2020.procedures.StartOfDriveSequence
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisSetupFile
@@ -288,8 +288,8 @@ class MenuViewModel {
     // which menu actions should be enabled/disabled.
     fun updateUiState(uiSnapshot: UiGameSnapshot) {
         // Enable/Disable Setup options
-        val setupKickingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupKickingTeam)
-        val setupReceivingTeam = uiSnapshot.stack.containsNode(GameDrive.SetupReceivingTeam)
+        val setupKickingTeam = uiSnapshot.stack.containsNode(StartOfDriveSequence.SetupKickingTeam)
+        val setupReceivingTeam = uiSnapshot.stack.containsNode(StartOfDriveSequence.SetupReceivingTeam)
         val teamControlledByClient = when (uiState.uiMode) {
             TeamActionMode.HOME_TEAM -> setupKickingTeam && uiSnapshot.game.kickingTeam.isHomeTeam()
             TeamActionMode.AWAY_TEAM -> setupReceivingTeam && uiSnapshot.game.receivingTeam.isHomeTeam()

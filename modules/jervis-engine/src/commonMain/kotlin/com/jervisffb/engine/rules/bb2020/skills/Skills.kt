@@ -2,7 +2,6 @@ package com.jervisffb.engine.rules.bb2020.skills
 
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
@@ -48,8 +47,8 @@ class RegularTeamReroll(val teamId: TeamId, val index: Int) : TeamReroll {
     override var rerollUsed: Boolean = false
 }
 
-class LeaderTeamReroll(val player: PlayerId) : TeamReroll {
-    override val id: RerollSourceId = RerollSourceId("${player.value}-leader")
+class LeaderTeamReroll(val team: TeamId) : TeamReroll {
+    override val id: RerollSourceId = RerollSourceId("${team.value}-leader")
     override val carryOverIntoOvertime: Boolean = true
     override val duration = Duration.SPECIAL
     override val rerollResetAt: Duration = Duration.END_OF_HALF

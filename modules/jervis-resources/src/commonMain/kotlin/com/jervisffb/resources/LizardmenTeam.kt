@@ -29,7 +29,7 @@ val SKINK_RUNNER_LINEMEN =
         "Sk",
         60_000,
         8, 2, 3, 4, 8,
-        listOf(SkillType.DODGE.id(), STUNTY.id()),
+        listOf(DODGE.id(), STUNTY.id()),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
         PlayerSize.STANDARD,

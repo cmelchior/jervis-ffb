@@ -35,6 +35,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
 import com.jervisffb.engine.model.modifiers.DefensiveAssistsModifier
@@ -44,6 +45,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.Bounce
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
+import com.jervisffb.engine.rules.bb2020.skills.Leader
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallResult
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -200,6 +202,14 @@ object FoulStep: Procedure() {
                 SetPlayerState(player, PlayerState.BANNED),
                 SetPlayerLocation(player, DogOut),
             )
+
+            // If the player had the Leader skill, we need to check if anyone else on the field
+            // has Leader, otherwise the reroll is removed.
+            if (player.hasSkill<Leader>()) {
+                Leader.removeLeaderRerollIfNotAvailable(player.team)?.let { removeRerollCommand ->
+                    add(removeRerollCommand)
+                }
+            }
         }
     }
 }

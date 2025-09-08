@@ -12,6 +12,12 @@ fun compositeCommandOf(vararg commands: Command?): Command {
     }
 }
 
+fun compositeCommandOf(commands: List<Command>): Command {
+    return CompositeCommand.create {
+        commands.forEach { add(it) }
+    }
+}
+
 /**
  * Build a [CompositeCommand] using a declarative approach similar to [buildList] etc.
  */

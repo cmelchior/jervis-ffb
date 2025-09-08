@@ -4,13 +4,11 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetActiveTeam
 import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetKickingTeam
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
 import com.jervisffb.engine.commands.SetTurnOver
 import com.jervisffb.engine.commands.compositeCommandOf
-import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.Node
@@ -21,69 +19,23 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.reports.ReportSetupKickingTeam
-import com.jervisffb.engine.reports.ReportSetupReceivingTeam
-import com.jervisffb.engine.reports.ReportStartingKickOff
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
+/**
+ * Game drive procedure.
+ *
+ * This procedure manages the entire game drive, from setting up the teams to executing the kick-off and handling turnovers.
+ */
 object GameDrive : Procedure() {
-    override val initialNode: Node = SetupKickingTeam
+    override val initialNode: Node = StartOfDrive
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
 
-    object SetupKickingTeam : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            return compositeCommandOf(
-                SetContext(SetupTeamContext(state.kickingTeam)),
-                ReportSetupKickingTeam(state.kickingTeam),
-            )
-        }
-        override fun getChildProcedure(state: Game, rules: Rules) = SetupTeam
+    object StartOfDrive : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = StartOfDriveSequence
         override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(SetupReceivingTeam)
-        }
-    }
-
-    object SetupReceivingTeam : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = SetupTeam
-
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            return compositeCommandOf(
-                SetContext(SetupTeamContext(state.receivingTeam)),
-                ReportSetupReceivingTeam(state.receivingTeam),
-            )
-        }
-
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return GotoNode(KickOff)
-        }
-    }
-
-    object KickOff : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = TheKickOff
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            return compositeCommandOf(
-                // Only one ball should exist at kick-off
-                SetCurrentBall(state.balls.single()),
-                ReportStartingKickOff(state.kickingTeam)
-            )
-        }
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return compositeCommandOf(
-                GotoNode(KickOffEvent),
-            )
-        }
-    }
-
-    object KickOffEvent : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = TheKickOffEvent
-        override fun onExitNode(state: Game, rules: Rules): Command {
-            return compositeCommandOf(
-                SetCurrentBall(null),
-                SetActiveTeam(state.receivingTeam),
-                GotoNode(Turn),
-            )
+            return GotoNode(Turn)
         }
     }
 

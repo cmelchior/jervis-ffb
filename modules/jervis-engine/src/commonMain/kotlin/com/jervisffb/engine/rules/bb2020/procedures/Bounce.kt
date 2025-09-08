@@ -58,7 +58,7 @@ object Bounce : Procedure() {
 
                 // Out of bounds is normally just outside the field, but during kick-off we need to
                 // consider the case where the ball bounces back to the kicking teams side.
-                val isDuringKickOff = state.stack.containsNode(GameDrive.KickOffEvent)
+                val isDuringKickOff = state.stack.containsNode(StartOfDriveSequence.KickOffEvent)
                 val isOnKickingTeamSide = if (state.kickingTeam.isHomeTeam()) newLocation.isOnHomeSide(rules) else newLocation.isOnAwaySide(rules)
                 val outOfBounds: Boolean = newLocation.isOutOfBounds(rules) || (isDuringKickOff && isOnKickingTeamSide)
                 val playerAtTarget: Player? = if (!outOfBounds) state.field[newLocation].player else null

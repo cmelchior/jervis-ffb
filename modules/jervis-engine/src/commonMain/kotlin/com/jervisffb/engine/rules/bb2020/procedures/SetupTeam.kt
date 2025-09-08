@@ -13,9 +13,11 @@ import com.jervisffb.engine.actions.SelectDogout
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.actions.TargetSquare
+import com.jervisffb.engine.commands.AddTeamReroll
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -34,9 +36,12 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.skills.Leader
+import com.jervisffb.engine.rules.bb2020.skills.LeaderTeamReroll
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 data class SetupTeamContext(
@@ -139,8 +144,20 @@ object SetupTeam : Procedure() {
     object EndSetupAndValidate : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<SetupTeamContext>()
-            return if (rules.isValidSetup(state, context.team)) {
-                ExitProcedure()
+            val team = context.team
+            return if (rules.isValidSetup(state, team)) {
+                // If any player with Leader in on the field, the team receives another reroll
+                buildCompositeCommand {
+                    if (rules.isStartOfHalf(state)) {
+                        val hasLeader = team.any {
+                            it.hasSkill<Leader>() && it.location.isOnField(rules)
+                        }
+                        if (hasLeader) {
+                            add(AddTeamReroll(team, LeaderTeamReroll(team.id)))
+                        }
+                    }
+                    add(ExitProcedure())
+                }
             } else {
                 GotoNode(InformOfInvalidSetup)
             }

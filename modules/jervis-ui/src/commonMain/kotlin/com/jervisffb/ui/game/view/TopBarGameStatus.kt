@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -103,7 +102,7 @@ import kotlin.math.tan
 
 // Game Status Layout that is compatible with a Game Screen layout for a Blood Bowl 3 inspired layout
 @Composable
-fun GameStatus(
+fun TopBarGameStatus(
     vm: GameStatusViewModel,
     modifier: Modifier,
 ) {
@@ -192,7 +191,7 @@ fun GameStatus(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RowScope.TeamRerolls(rerolls: List<UiReroll>, distance: Dp) {
+private fun TeamRerolls(rerolls: List<UiReroll>, distance: Dp) {
     val availableAlpha = 0.9f // Reduce how much the gfx "pop"
     val unavailableAlpha = 0.3f
     rerolls.forEachIndexed { i, reroll ->
@@ -241,7 +240,7 @@ private fun RowScope.TeamRerolls(rerolls: List<UiReroll>, distance: Dp) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RowScope.TeamFeaturesRow(
+private fun TeamFeaturesRow(
     leftSide: Boolean,
     height: Dp,
     features: List<UiTeamFeature>
@@ -324,10 +323,10 @@ private fun TeamFeature(
 }
 
 @Composable
-private fun RowScope.TurnTracker(
+private fun TurnTracker(
     modifier: Modifier,
     angle: Float = 10f,
-    turnMax: Int =  8,
+    turnMax: Int = 8,
     currentTurn: Int = 0,
     teamColor: Color,
     activeTeam: Boolean
@@ -426,7 +425,7 @@ private fun ScoreCounter(
  */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-private fun RowScope.GameStatusBox(
+private fun GameStatusBox(
     statusBoxWidth: Dp,
     padding: Dp = 0.dp,
     angle: Float,

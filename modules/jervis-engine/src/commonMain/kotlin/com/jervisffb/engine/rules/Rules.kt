@@ -743,6 +743,16 @@ open class Rules(
     }
 
     /**
+     * Returns true if the current game is the start of a half (and not start of overtime)
+     */
+    fun isStartOfHalf(state: Game): Boolean {
+        val rules = state.rules
+        return (state.halfNo >= 1&& state.halfNo <= rules.halfsPrGame)
+            && state.homeTeam.turnMarker == 0
+            && state.homeTeam.turnMarker == 0
+    }
+
+    /**
      * Skills might change subtly between rule versions, for that reason, we need a single place to lookup
      * skill definitions from their id (since we might want to support teams across multiple rulesets).
      */

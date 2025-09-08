@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2020.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2020.skills.Dodge
 import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.bb2020.skills.Horns
+import com.jervisffb.engine.rules.bb2020.skills.Leader
 import com.jervisffb.engine.rules.bb2020.skills.Leap
 import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
@@ -279,9 +280,9 @@ class BB2020SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.LEADER -> {
-                    // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
+                        Leader(player, category, expiresAt)
+                    }
                 }
                 SkillType.NERVES_OF_STEEL -> {
                     // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->

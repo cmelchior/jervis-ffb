@@ -25,6 +25,7 @@ import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.skills.LeaderTeamReroll
 import com.jervisffb.engine.rules.bb2020.skills.Sprint
 import com.jervisffb.engine.rules.common.skills.Duration
 
@@ -176,13 +177,27 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
         }
     }
 
-    // Remove all temporary rerolls that might have expired
-    // TODO Consider overtime here
-    // TODO What about Leader?
+    // Remove all temporary rerolls that might have expired.
+    // Note, Leader has a SPECIAL duration and is handled by itself
     val removableRerolls: List<RemoveTeamReroll> = teams.flatMap { team ->
         team.rerolls
             .filter { it.duration == duration }
             .map { RemoveTeamReroll(team, it) }
+    }
+
+    // Leader rerolls are only removed between normal halfs. They are kept
+    // when entering overtime.
+    // TODO Should the concept of CARRY_INTO_OVERTIME be lifted to Duration somehow?
+    val removableLeaderRerolls = if (
+        state.halfNo < state.rules.halfsPrGame && duration == Duration.END_OF_HALF
+    ) {
+        teams.flatMap { team ->
+            team.rerolls
+                .filterIsInstance<LeaderTeamReroll>()
+                .map { reroll -> RemoveTeamReroll(team, reroll) }
+        }
+    } else {
+        emptyList()
     }
 
     // Find all active Prayers of Nuffle that expires at the given duration
@@ -200,10 +215,13 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
             .map { SetSpecialPlayCardActive(it, false) }
     }
 
+
     return (
         removableStatModifiers
             + removableSkills
+            + removableTemporaryEffects
             + removableRerolls
+            + removableLeaderRerolls
             + removablePrayers
             + specialPlayCards
     ).toTypedArray()
@@ -228,5 +246,3 @@ fun List<InfamousCoachingStaff>.getAvailableAbilities(trigger: Timing, state: Ga
         .filter { it.triggers.contains(trigger) && !it.used }
         .filter { it.isApplicable(state, rules) }
 }
-
-
