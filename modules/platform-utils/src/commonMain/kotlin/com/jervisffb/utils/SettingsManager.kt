@@ -38,6 +38,10 @@ class SettingsManager() {
         return getSystemEnvironmentVariable(key)
     }
 
+    fun hasKey(key: String): Boolean {
+        return settings.hasKey(key)
+    }
+
     fun getStringOrNull(key: String): String? {
         return settings.getStringOrNull(key)
     }

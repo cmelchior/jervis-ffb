@@ -4,9 +4,13 @@ import com.jervisffb.BuildConfig
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_MESSAGE
+import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_STACKTRACE
+import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_TITLE
 import com.jervisffb.utils.getBuildType
 import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.getPlatformDescription
+import com.jervisffb.utils.jervisLogger
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
@@ -33,22 +37,14 @@ private data class CreateIssueSuccess(override val message: String) : CreateIssu
 @SerialName("error")
 private data class CreateIssueError(override val message: String) : CreateIssueResponse
 
-
 /**
  * Wrapper around issue tracking. This class provides a convenient way to report issues to
  * report issues to GitHub.
- *
- * TODO Add a proxy in between the client and GitHub, most users will not have a GitHub account
- *  so they cannot create issues easily.
  */
 object IssueTracker {
     const val NEW_ISSUE_BASE_URL: String = "https://jervis.ilios.dk/create_issue.php"
 
-    enum class Label(val description: String) {
-        USER("user"),
-        USER_CRASH("user+crash")
-    }
-
+    private val LOG = jervisLogger()
     private val json = Json
 
     /**
@@ -115,6 +111,45 @@ object IssueTracker {
             }
         } catch (ex: Throwable) {
             return Result.failure(ex)
+        }
+    }
+
+    /**
+     * Save an uncaught exception so it can be reported later.
+     * This method must never throw.
+     */
+    fun saveUncaughtException(throwable: Throwable) {
+        try {
+            val title = "Uncaught application error: ${throwable::class.simpleName}"
+            val body = throwable.message ?: "No message provided"
+            val stackTrace = throwable.stackTraceToString()
+            with(SETTINGS_MANAGER) {
+                put(PROP_UNCAUGHT_ERROR_TITLE, title)
+                put(PROP_UNCAUGHT_ERROR_MESSAGE, body)
+                put(PROP_UNCAUGHT_ERROR_STACKTRACE, stackTrace)
+            }
+            LOG.e { throwable.stackTraceToString() }
+        } catch (ex: Throwable) {
+            // Ignore. This method is only called in case of catastrophic
+            // failures and should not add to it.
+            LOG.e { "Failed to save uncaught exception: $ex" }
+            LOG.e { "Failed to handle application error: $throwable" }
+        }
+    }
+
+    /**
+     * Clear any saved uncaught exceptions.
+     */
+    fun clearUncaughtException() {
+        try {
+            with(SETTINGS_MANAGER) {
+                put(PROP_UNCAUGHT_ERROR_TITLE, null)
+                put(PROP_UNCAUGHT_ERROR_MESSAGE, null)
+                put(PROP_UNCAUGHT_ERROR_STACKTRACE, null)
+            }
+        } catch (_: Throwable) {
+            // Ignore. This method is only called in case of catastrophic
+            // failures and should not add to it.
         }
     }
 }

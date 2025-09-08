@@ -12,6 +12,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.App
+import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.initApplication
 import com.jervisffb.ui.menu.BackNavigationHandler
@@ -21,55 +22,55 @@ import java.awt.Desktop
 
 
 fun main() = runBlocking {
-    try {
-        initApplication()
-        application {
-            val menuViewModel = remember { MenuViewModel() }
+    // Save all uncaught exceptions so they can be reported on next startup
+    Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+        IssueTracker.saveUncaughtException(throwable)
+    }
 
-            // Register an system "About" page on platforms that support it (Only Desktop for now).
-            LaunchedEffect(Unit) {
-                if (Desktop.isDesktopSupported()) {
-                    val desktop = Desktop.getDesktop()
-                    if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
-                        desktop.setAboutHandler {
-                            menuViewModel.showAboutDialog(true)
-                        }
+    initApplication()
+    application {
+        val menuViewModel = remember { MenuViewModel() }
+
+        // Register an system "About" page on platforms that support it (Only Desktop for now).
+        LaunchedEffect(Unit) {
+            if (Desktop.isDesktopSupported()) {
+                val desktop = Desktop.getDesktop()
+                if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
+                    desktop.setAboutHandler {
+                        menuViewModel.showAboutDialog(true)
                     }
                 }
             }
-
-            // This setup mirrors the size of the current FUMBBL Client, but make it slightly larger.
-            // The default should probably be to open in full screen instead, and if minimized,
-            // resize to either 16:9 or 16:10 depending on the aspect ratio of the screen.
-            val scale = 1.22f
-            val width = 145f + 782f + 145f
-            val height = 690f
-            val windowState =
-                rememberWindowState(
-                    size = (
-                        DpSize(pixelsToDp(width), pixelsToDp(height)) * scale) // Game content
-                        + DpSize(0.dp, pixelsToDp(28f)),  // Window decoration
-                )
-            Window(
-                onCloseRequest = ::exitApplication,
-                state = windowState,
-                onKeyEvent = { event ->
-                    if (event.key == Key.Escape && event.type == KeyEventType.KeyDown) {
-                        BackNavigationHandler.execute()
-                        true
-                    } else {
-                        false
-                    }
-                },
-                title = "Jervis Fantasy Football"
-            ) {
-                WindowMenuBar(menuViewModel)
-                App(menuViewModel)
-            }
         }
-    } catch (ex: Throwable) {
-        // TODO Show crash dialog
-        throw ex
+
+        // This setup mirrors the size of the current FUMBBL Client, but make it slightly larger.
+        // The default should probably be to open in full screen instead, and if minimized,
+        // resize to either 16:9 or 16:10 depending on the aspect ratio of the screen.
+        val scale = 1.22f
+        val width = 145f + 782f + 145f
+        val height = 690f
+        val windowState =
+            rememberWindowState(
+                size = (
+                    DpSize(pixelsToDp(width), pixelsToDp(height)) * scale) // Game content
+                    + DpSize(0.dp, pixelsToDp(28f)),  // Window decoration
+            )
+        Window(
+            onCloseRequest = ::exitApplication,
+            state = windowState,
+            onKeyEvent = { event ->
+                if (event.key == Key.Escape && event.type == KeyEventType.KeyDown) {
+                    BackNavigationHandler.execute()
+                    true
+                } else {
+                    false
+                }
+            },
+            title = "Jervis Fantasy Football"
+        ) {
+            WindowMenuBar(menuViewModel)
+            App(menuViewModel)
+        }
     }
 }
 

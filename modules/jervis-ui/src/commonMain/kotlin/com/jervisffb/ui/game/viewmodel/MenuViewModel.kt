@@ -19,6 +19,7 @@ import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisSetupFile
 import com.jervisffb.ui.CacheManager
+import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.SoundEffect
 import com.jervisffb.ui.SoundManager
@@ -28,6 +29,9 @@ import com.jervisffb.ui.menu.BackNavigationHandler
 import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.intro.CreditData
 import com.jervisffb.ui.utils.saveFile
+import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_MESSAGE
+import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_STACKTRACE
+import com.jervisffb.utils.PROP_UNCAUGHT_ERROR_TITLE
 import com.jervisffb.utils.canBeHost
 import com.jervisffb.utils.jervisLogger
 import com.jervisffb.utils.multiThreadDispatcher
@@ -58,6 +62,7 @@ data class ReportIssueDialogData(
     val visible: Boolean,
     val title: String,
     val body: String,
+    val hint: String = "",
     val error: Throwable? = null,
     val gameState: GameEngineController? = null
 ) {
@@ -100,6 +105,32 @@ class MenuViewModel {
     val navigatorContext = CoroutineScope(CoroutineName("ScreenNavigator") + singleThreadDispatcher("menuThread"))
     // Scope for launching background tasks for Menu actions
     val backgroundContext = CoroutineScope(SupervisorJob() + CoroutineName("ScreenBackground") + multiThreadDispatcher("menuBackgroundThread"))
+
+    init {
+        try {
+            if (SETTINGS_MANAGER.hasKey(PROP_UNCAUGHT_ERROR_TITLE)) {
+                val dialogData = ReportIssueDialogData(
+                    visible = true,
+                    title = SETTINGS_MANAGER.getStringOrNull(PROP_UNCAUGHT_ERROR_TITLE) ?: "Uncaught application error",
+                    body = buildString {
+                        appendLine(SETTINGS_MANAGER.getStringOrNull(PROP_UNCAUGHT_ERROR_MESSAGE) ?: "")
+                        appendLine()
+                        appendLine("````")
+                        appendLine(SETTINGS_MANAGER.getStringOrNull(PROP_UNCAUGHT_ERROR_STACKTRACE) ?: "")
+                        appendLine("````")
+                    },
+                    hint = "Jervis crashed unexpectedly last time it was used. Please report this issue to the developer.",
+                    error = null,
+                    gameState = null
+                )
+                _showReportIssueDialog.value = dialogData
+            }
+        } catch (_: Throwable) {
+            /* Ignore, we should never crash when reporting previous errors */
+        } finally {
+            IssueTracker.clearUncaughtException()
+        }
+    }
 
     fun showAboutDialog(visible: Boolean) {
         _showDialogDialog.value = visible

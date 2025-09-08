@@ -51,6 +51,7 @@ fun CreateIssueDialogComponent(viewModel: MenuViewModel) {
     val dialogData: ReportIssueDialogData by viewModel.isReportIssueDialogVisible.collectAsState()
     if (!dialogData.visible) return
     CreateIssueDialog(
+        hint = dialogData.hint,
         title = dialogData.title,
         message = dialogData.body,
         error = dialogData.error,
@@ -70,6 +71,7 @@ fun CreateIssueDialogComponent(viewModel: MenuViewModel) {
  */
 @Composable
 private fun CreateIssueDialog(
+    hint: String,
     title: String,
     message: String,
     error: Throwable? = null,
@@ -119,6 +121,12 @@ private fun CreateIssueDialog(
         minHeight = JervisTheme.windowSizeDp.height * 0.8f,
         backgroundScrim = true,
         content = { _, textColor ->
+            if (hint.isNotBlank()) {
+                Text(
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    text = hint,
+                    color = JervisTheme.contentTextColor)
+            }
             JervisOutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = title,
