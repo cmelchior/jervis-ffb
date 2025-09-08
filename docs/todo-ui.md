@@ -7,6 +7,10 @@ things as they come up.
 
 
 ## Todo List
+- [ ] Create a Global Uncaught Exception Handler. This might be tricky due to how Compose works.
+      E.g. if Compose crash, we cannot show a compose dialog and must implement fallback UI on
+      all platforms. Alternatively, in case of the this kind of crash, we store it and show a 
+      warning the first time the app is started again.
 - [ ] "Import Team" background scrim does not work.
 - [ ] "Import Team" dialogs are not placed in the center of the screen.
 - [ ] I messed up the icon logic for players. I assumed that all players are 30x30...that is not correct.

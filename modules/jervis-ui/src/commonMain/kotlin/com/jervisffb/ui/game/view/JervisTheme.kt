@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +38,8 @@ object JervisTheme {
         private set
     var windowSizePx: Size by mutableStateOf(Size.Zero)
         private set
+    var screenDensity: Density by mutableStateOf(Density(1f))
+        private set
 
     /**
      * Converts a value from either [sp] or [dp] to the Jervis scaled equivalent
@@ -58,9 +61,10 @@ object JervisTheme {
      * Update this theme with the current window size. This will also trigger an update
      * of all [jsp] and [jdp] values.
      */
-    fun notifyWindowsSizeChange(dpSize: DpSize, pxSize: Size) {
+    fun notifyWindowsSizeChange(density: Density, dpSize: DpSize, pxSize: Size) {
         this.windowSizeDp = dpSize
         this.windowSizePx = pxSize
+        this.screenDensity = density
     }
 
     val rulebookBlue = Color(0xFF0077C6) // Color(0xFF2a4479)

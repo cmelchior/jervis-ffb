@@ -6,14 +6,12 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.ui.App
-import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.initApplication
 import com.jervisffb.ui.menu.BackNavigationHandler
@@ -52,16 +50,6 @@ fun main() = runBlocking {
                         DpSize(pixelsToDp(width), pixelsToDp(height)) * scale) // Game content
                         + DpSize(0.dp, pixelsToDp(28f)),  // Window decoration
                 )
-
-            // Update Jervis Theme, when the window re-sizes. This is needed so we can scale other UI elements correctly
-            val density = LocalDensity.current
-            LaunchedEffect(windowState.size) {
-                val windowSizePx = with(density) {
-                    windowState.size.toSize()
-                }
-                JervisTheme.notifyWindowsSizeChange(windowState.size, windowSizePx)
-            }
-
             Window(
                 onCloseRequest = ::exitApplication,
                 state = windowState,

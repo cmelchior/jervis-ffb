@@ -13,7 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.JervisTheme.buttonTextColor
 import com.jervisffb.ui.game.view.utils.JervisButton
@@ -45,23 +44,6 @@ fun ErrorDialogComponent(viewModel: MenuViewModel) {
         }
     )
 }
-
-private fun createGithubUrl(dialogData: ErrorDialog): String {
-    return if (dialogData.error != null) {
-        IssueTracker.createIssueUrlFromException(
-            dialogData.title,
-            "",
-            dialogData.error
-        )
-    } else {
-        IssueTracker.createIssueUrl(
-            dialogData.title,
-            "",
-            IssueTracker.Label.USER
-        )
-    }
-}
-
 
 /**
  * Dialog showing that something is still missing to be implemented

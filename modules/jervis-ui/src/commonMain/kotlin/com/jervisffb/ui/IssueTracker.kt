@@ -3,6 +3,7 @@ package com.jervisffb.ui
 import com.jervisffb.BuildConfig
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.utils.getBuildType
 import com.jervisffb.utils.getHttpClient
 import com.jervisffb.utils.getPlatformDescription
@@ -12,7 +13,6 @@ import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
-import io.ktor.http.encodeURLParameter
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
@@ -51,54 +51,6 @@ object IssueTracker {
 
     private val json = Json
 
-    fun createIssueUrlFromException(title: String, body: String, error: Throwable): String {
-        val body = buildString {
-            if (body.isNotBlank()) {
-                append(body)
-                if (!body.endsWith("\n")) {
-                    appendLine()
-                }
-                appendLine()
-            }
-            appendLine("-----")
-            appendLine()
-            appendLine("```")
-            append(error.stackTraceToString().substring(0, 1500))
-            if (!this.endsWith("\n")) {
-                appendLine()
-            }
-            appendLine("```")
-        }
-        return createIssueUrl(title, body, Label.USER_CRASH)
-    }
-
-    fun createIssueUrl(title: String?, body: String, label: Label): String {
-        val urlBody = buildString {
-            append(body)
-            appendLine()
-            append("""
-                
-                -----
-                **Client Information (${getBuildType()})**
-                Jervis Client Version: ${BuildConfig.releaseVersion}
-                Git Commit: ${BuildConfig.gitHash}
-            """.trimIndent())
-            appendLine()
-            append(getPlatformDescription())
-        }.encodeURLParameter()
-
-        return buildString{
-            append(NEW_ISSUE_BASE_URL)
-            if (title != null) {
-                append("?title=${title.encodeURLParameter()}&")
-            } else {
-                append("?")
-            }
-            append("body=$urlBody")
-            append("&label=${label.description}")
-        }
-    }
-
     /**
      * Create a new issue on GitHub using the Jervis Support Bot proxy.
      * If successful, returns the URL to the newly created issue.
@@ -130,6 +82,10 @@ object IssueTracker {
                     Jervis Client Version: ${BuildConfig.releaseVersion}
                     Git Commit: ${BuildConfig.gitHash}
                 """.trimIndent())
+                appendLine()
+                append(getPlatformDescription())
+                appendLine("Screen Density: ${JervisTheme.screenDensity.density}")
+                append("Window size: ${JervisTheme.windowSizePx.width.toInt()}x${JervisTheme.windowSizePx.height.toInt()}")
             }
             val client = getHttpClient()
             val httpResponse = client.submitFormWithBinaryData(
@@ -157,7 +113,7 @@ object IssueTracker {
                     RuntimeException("Failed to create issue [${httpResponse.status}]: ${httpResponse.bodyAsText()}")
                 )
             }
-        } catch (ex: Exception) {
+        } catch (ex: Throwable) {
             return Result.failure(ex)
         }
     }

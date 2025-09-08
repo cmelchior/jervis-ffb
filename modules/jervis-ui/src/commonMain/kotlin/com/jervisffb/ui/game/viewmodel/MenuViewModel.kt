@@ -19,7 +19,6 @@ import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisSetupFile
 import com.jervisffb.ui.CacheManager
-import com.jervisffb.ui.IssueTracker
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.SoundEffect
 import com.jervisffb.ui.SoundManager
@@ -94,27 +93,13 @@ class MenuViewModel {
     val isAboutDialogVisible: StateFlow<Boolean> = _showDialogDialog
     val isErrorDialogVisible: StateFlow<ErrorDialog> = _showErrorDialog
     val isReportIssueDialogVisible: StateFlow<ReportIssueDialogData> = _showReportIssueDialog
-    val creditData: CreditData
+    val creditData: CreditData = CreditData()
 
     // Scope for lauching tasks directly related to navigating the UI
     val uiScope = CoroutineScope(CoroutineName("UI") + Dispatchers.Default)
     val navigatorContext = CoroutineScope(CoroutineName("ScreenNavigator") + singleThreadDispatcher("menuThread"))
     // Scope for launching background tasks for Menu actions
     val backgroundContext = CoroutineScope(SupervisorJob() + CoroutineName("ScreenBackground") + multiThreadDispatcher("menuBackgroundThread"))
-
-    init {
-        // Customize the create issue link, so it contains some basic information about the client
-        // Formatting is weird because `getPlatformDescription` returns a multiline text that doesn't
-        // follow the same indentation as the rest of the text.
-        val body = """
-                <Describe the issue>
-                <Attach Game Dump if applicable. Available under the in-game menu>
-        """.trimIndent()
-        val issueUrl = IssueTracker.createIssueUrl(title = null, body = body, IssueTracker.Label.USER)
-        creditData = CreditData(
-            newIssueUrl = issueUrl
-        )
-    }
 
     fun showAboutDialog(visible: Boolean) {
         _showDialogDialog.value = visible
@@ -145,15 +130,6 @@ class MenuViewModel {
     fun hideReportIssueDialog() {
         _showReportIssueDialog.value = ReportIssueDialogData.HIDDEN
     }
-
-    // Default values .. figure out a way to persist these
-    private var features: MutableMap<Feature, Boolean> = mutableMapOf(
-        Feature.DO_NOT_REROLL_SUCCESSFUL_ACTIONS to true,
-        Feature.SELECT_KICKING_PLAYER to true,
-        Feature.END_PLAYER_ACTION_IF_ONLY_OPTION to true,
-        Feature.SELECT_BLOCK_TYPE_IF_ONLY_OPTION to true,
-        Feature.PUSH_PLAYER_INTO_CROWD to true,
-    )
 
     fun backToLastScreen() {
         BackNavigationHandler.execute()
