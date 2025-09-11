@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -52,6 +54,7 @@ import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_wall_player
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_back
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.game.view.JervisTheme.fontFamily
 import com.jervisffb.ui.game.view.SideBarEntryState
 import com.jervisffb.ui.game.view.utils.OrangeTitleBorder
 import com.jervisffb.ui.game.view.utils.paperBackground
@@ -176,7 +179,14 @@ fun TopbarButton(icon: DrawableResource, contentDescription: String, onClick: ()
                 shape = RoundedCornerShape(8.dp),
                 color = JervisTheme.white.copy(alpha = 0.95f),
             ) {
-                Text(contentDescription, Modifier.padding(horizontal = 8.dp, vertical = 6.dp))
+                Text(
+                    text = contentDescription,
+                    Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = JervisTheme.extendedDefaultFontFamily(),
+                        baselineShift = BaselineShift(0.05f)
+                    ),
+                )
             }
         },
         delayMillis = 300,

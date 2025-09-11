@@ -51,3 +51,20 @@ public actual fun getSystemEnvironmentVariable(key: String): String? {
     return null
 }
 
+@JsFun("() => (typeof window !== 'undefined' && typeof document !== 'undefined')")
+private external fun isBrowserJs(): Boolean
+
+@JsFun("() => (globalThis.navigator?.userAgentData?.platform ?? globalThis.navigator?.platform ?? '')")
+private external fun platformJs(): String
+
+@JsFun("() => (globalThis.navigator?.userAgent ?? '')")
+private external fun userAgentJs(): String
+
+public actual fun hasMacKeyboard(): Boolean {
+    if (!isBrowserJs()) return false
+    val platform = platformJs().lowercase()
+    val userAgent = userAgentJs().lowercase()
+    // Covers Chromium (userAgentData), Safari/Firefox (platform/userAgent), and older UAs
+    return platform.contains("mac") || userAgent.contains("mac os x") || userAgent.contains("macintosh")
+}
+

@@ -160,5 +160,10 @@ public actual fun triggerGC() {
 }
 
 public actual fun getSystemEnvironmentVariable(key: String): String? {
-    return System.getenv(key)
+    return System.getProperty(key) ?: System.getenv(key)
+}
+
+public actual fun hasMacKeyboard(): Boolean {
+    // Assume that if the platform is Mac, it has a Mac keyboard
+    return getSystemEnvironmentVariable("os.name")?.startsWith("Mac", ignoreCase = true) == true
 }

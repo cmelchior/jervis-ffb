@@ -70,3 +70,11 @@ public expect fun triggerGC()
  * If the platform doesn't support this or the key wasn't found, `null` is returned
  */
 public expect fun getSystemEnvironmentVariable(key: String): String?
+
+/**
+ * Returns `true` if the client is expected to run with a Mac keyboard.
+ *
+ * For now, iOS will always return `false`, but since it is possible to have a keyboard
+ * attached, we need to find a way to detect this case.
+ */
+public expect fun hasMacKeyboard(): Boolean

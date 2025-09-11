@@ -7,6 +7,8 @@ things as they come up.
 
 
 ## Todo List
+- [ ] Make a keyboard shortcut for showing "Player range" and "Tackle Zones"
+      Unclear which keys makes sense. Probably need to make it configurable
 - [ ] When should Leader reroll be added/removed/transparent? Right now it happens when setup completes?
       Should it follow the player during setup instead?
 - [ ] I messed up the icon logic for players. I assumed that all players are 30x30...that is not correct.

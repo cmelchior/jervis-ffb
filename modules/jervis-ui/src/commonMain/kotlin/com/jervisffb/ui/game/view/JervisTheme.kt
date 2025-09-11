@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.theme.NotoSansSymbols
+import com.jervisffb.ui.theme.NotoSansSymbols2
 import com.jervisffb.ui.theme.TrumpTownPro
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
@@ -56,6 +57,9 @@ object JervisTheme {
      */
     @Composable
     fun defaultFontFamily() = NotoSansSymbols()
+
+    @Composable
+    fun extendedDefaultFontFamily() = NotoSansSymbols2()
 
     /**
      * Update this theme with the current window size. This will also trigger an update

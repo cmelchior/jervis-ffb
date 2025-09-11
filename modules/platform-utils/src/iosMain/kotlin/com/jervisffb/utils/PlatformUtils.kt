@@ -69,3 +69,5 @@ public actual fun triggerGC() {
 public actual fun getSystemEnvironmentVariable(key: String): String? {
     return platform.Foundation.NSProcessInfo.processInfo.environment[key]?.toString()
 }
+
+public actual fun hasMacKeyboard(): Boolean = false

@@ -31,8 +31,11 @@ import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
 import com.jervisffb.ui.game.viewmodel.SidebarViewModel
+import com.jervisffb.ui.keybinds.ClientShortcut
+import com.jervisffb.ui.keybinds.KeyBindings
 import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.TopbarButton
+import com.jervisffb.ui.utils.createPlatformButtonLabel
 import com.jervisffb.ui.utils.jdp
 
 @Composable
@@ -105,14 +108,14 @@ fun GameScreen(
             ) {
                 TopbarButton(
                     icon = Res.drawable.jervis_icon_menu_undo,
-                    contentDescription = "Undo Action",
+                    contentDescription = KeyBindings.createPlatformButtonLabel(ClientShortcut.UNDO),
                     onClick = {
                         screenModel.menuViewModel.undoAction()
                     }
                 )
                 TopbarButton(
                     icon = Res.drawable.jervis_icon_menu_settings,
-                    contentDescription = "Game Menu",
+                    contentDescription = KeyBindings.createPlatformButtonLabel(ClientShortcut.GAME_MENU),
                     onClick = onSettingsClick
                 )
             }
