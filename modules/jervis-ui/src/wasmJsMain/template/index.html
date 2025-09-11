@@ -17,16 +17,25 @@
         }
     </script>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        /**
+         * html, body cannot be a centered flexbox as it will cause rounding errors
+         * when placing the canvas, causing the background color to show at the edges.
+         * Instead we create a flex container inside the root that does the centering.
+         */
+        html, body {
             margin: 0;
+            height: 100%;
+            overflow: hidden;
             background: #C60000;
             font-family: sans-serif;
         }
         #container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        #loader {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -45,7 +54,7 @@
         }
         #progressFill {
             height: 100%;
-            width: 0%;
+            width: 0;
             background-color: #FFBE26;
             transition: width 0.2s ease;
         }
@@ -63,14 +72,16 @@
 </head>
 <body>
     <div id="container">
-        <img src="logo.svg" width="300px">
-        <div id="progressBar">
-            <div id="progressBackground">
-                <div id="progressFill"></div>
-            </div>
-            <div class="status">
-                <span id="statusDescription">Left-aligned text</span>
-                <span id="statusValue">Right-aligned text</span>
+        <div id="loader">
+            <img src="logo.svg" width="300px">
+            <div id="progressBar">
+                <div id="progressBackground">
+                    <div id="progressFill"></div>
+                </div>
+                <div class="status">
+                    <span id="statusDescription">Left-aligned text</span>
+                    <span id="statusValue">Right-aligned text</span>
+                </div>
             </div>
         </div>
     </div>

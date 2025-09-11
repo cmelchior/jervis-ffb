@@ -50,8 +50,8 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
                         if (commandFromReplay !is OptionalJervisAction && commandFromReplay.expectedNode != controller.state.stack.currentNode()) {
                             throw IllegalStateException(
                                 """
-                        Current node: ${controller.state.stack.currentNode()::class.qualifiedName}
-                        Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
+                        Current node: ${controller.state.stack.currentNode()::class.simpleName}
+                        Expected node: ${commandFromReplay.expectedNode::class.simpleName}
                         Action: ${
                                     when (commandFromReplay) {
                                         is CalculatedJervisAction ->
@@ -84,8 +84,8 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
                                     LOG.d {
                                         """
                                     Skipping Optional Action: ${commandFromReplay.action}
-                                    Current node: ${controller.state.stack.currentNode()::class.qualifiedName}
-                                    Expected node: ${commandFromReplay.expectedNode::class.qualifiedName}
+                                    Current node: ${controller.state.stack.currentNode()::class.simpleName}
+                                    Expected node: ${commandFromReplay.expectedNode::class.simpleName}
                                         """.trimIndent()
                                     }
                                     j++

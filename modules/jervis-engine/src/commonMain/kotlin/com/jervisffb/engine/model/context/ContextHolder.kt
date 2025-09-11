@@ -93,7 +93,7 @@ inline fun <reified T: ProcedureContext> Game.hasContext(id: Int = 0): Boolean {
  */
 inline fun <reified T: ProcedureContext> Game.assertContext() {
     if (this.contexts.getContext(T::class) == null) {
-        INVALID_GAME_STATE("Missing context of type: ${T::class.qualifiedName}")
+        INVALID_GAME_STATE("Missing context of type: ${T::class.simpleName}")
     }
 }
 

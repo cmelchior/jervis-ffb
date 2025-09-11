@@ -1,6 +1,5 @@
 package com.jervisffb.fumbbl.net.adapter
 
-//import org.reflections.Reflections
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.fumbbl.net.ModelChangeProcessor
@@ -34,13 +33,13 @@ class MapperChain constructor(jervisGame: Game, fumbblGame: FumbblGame, checkCom
         this.checkCommands = checkCommands
         val classes = getMappersInPackage()
         val loadedMappers = classes
-            .filter { it.qualifiedName?.contains("AbortActionMapper") == false }
+            .filter { it.simpleName != "AbortActionMapper" }
             .filter { ReflectionUtils.isSubclassOf(it, CommandActionMapper::class) }
             .map {
                 try {
                     ReflectionUtils.objectInstance(it) as CommandActionMapper
                 } catch (ex: Exception) {
-                    throw IllegalStateException("Failed to instantiate mapper ${it.qualifiedName}", ex)
+                    throw IllegalStateException("Failed to instantiate mapper ${it.simpleName}", ex)
                 }
             }
         mappers = listOf(AbortActionMapper) + loadedMappers
@@ -69,8 +68,8 @@ class MapperChain constructor(jervisGame: Game, fumbblGame: FumbblGame, checkCom
                             val errorMessage = """
                                 Processing CommandNr ${serverCommand.commandNr} failed.
                                 Using mapper: ${ReflectionUtils.simpleClassName(mapper)}
-                                Current node: ${jervisGameController.state.stack.currentNode()::class.qualifiedName}
-                                Expected node: ${action.expectedNode::class.qualifiedName}
+                                Current node: ${jervisGameController.state.stack.currentNode()::class.simpleName}
+                                Expected node: ${action.expectedNode::class.simpleName}
                             """.trimIndent()
                             throw IllegalStateException(errorMessage)
                         }
