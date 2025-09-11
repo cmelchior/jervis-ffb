@@ -130,6 +130,7 @@ fun ImportTeamFromFumbblDialog(
                 buttonColor = JervisTheme.rulebookBlue,
                 textColor = buttonTextColor
             )
-        }
+        },
+        onDismissRequest = onDismissRequest,
     )
 }

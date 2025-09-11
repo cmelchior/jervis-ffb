@@ -25,7 +25,7 @@ import com.jervisffb.ui.game.dialogs.circle.DiceMenuItem
 import com.jervisffb.ui.game.dialogs.circle.MenuExpandMode
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.icons.IconFactory
-import com.jervisffb.ui.game.view.ActionWheelMenu
+import com.jervisffb.ui.game.view.ActionWheel
 import com.jervisffb.utils.runBlocking
 import org.junit.Test
 import kotlin.test.Ignore
@@ -130,5 +130,5 @@ class AnimateTest() {
 
 @Composable
 fun CircularMenuDemo(actionWheel: ActionWheelViewModel) {
-    ActionWheelMenu(actionWheel, onDismissRequest = { })
+    ActionWheel(actionWheel, onDismissRequest = { })
 }

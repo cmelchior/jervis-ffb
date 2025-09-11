@@ -95,9 +95,15 @@ private fun SquareHighlightAndAction(
     val boxWrapperModifier =
         if (square.contextMenuOptions.isNotEmpty() || player?.selectedAction != null || square.selectedAction != null || pathfinderData?.hoverAction != null) {
             modifier.jervisPointerEvent(FieldPointerEventType.ClickSquare, square.coordinates) {
-                if (square.contextMenuOptions.isNotEmpty()) {
-                    vm.sharedFieldData.isContentMenuVisible = !vm.sharedFieldData.isContentMenuVisible
+                // Generally, the Action Wheel is handled by ActionWheelLayer, except when the action wheel is hidden
+                // In that case, it is the square that should handle opening it again, after which control transfers
+                // back to the ActionWheelLayer
+                if (square.contextMenuOptions.isNotEmpty() && !vm.sharedFieldData.isContentMenuVisible) {
+                    vm.sharedFieldData.isContentMenuVisible = true
                 }
+
+                // Toggling the Action Wheel should take precedence over triggering square/player actions.
+                // Ideally, none should be configured anyway, but just in case.
                 if (square.contextMenuOptions.isEmpty()) {
                     pathfinderData?.hoverAction()
                         ?: player?.selectedAction?.invoke()
@@ -110,7 +116,7 @@ private fun SquareHighlightAndAction(
 
 
     Box(modifier = boxWrapperModifier) {
-        // TODO Move this to the Dialog Layer
+        // TODO Move this to the Dialog Layer?
         if (sharedFieldData.isContentMenuVisible && !square.useActionWheel) {
             ContextPopupMenu(
                 hidePopup = { dismissed ->
@@ -134,7 +140,7 @@ private fun SquareHighlightAndAction(
                     contentDescription = "Ball left field at ${square.coordinates}",
                 )
             }
-        } else if (pathfinderData?.futureMoveDistance != null && square.isEmpty()) {
+        } else if (pathfinderData?.futureMoveDistance != null && square.isEmpty() && !sharedFieldData.isContentMenuVisible) {
             val moveValue = pathfinderData.futureMoveDistance.toString()
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(

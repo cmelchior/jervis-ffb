@@ -62,12 +62,16 @@ class FieldViewModel(
     val height = rules.fieldHeight
     val sharedFieldData = screenModel.sharedFieldData
 
+    val fieldViewData = screenModel.fieldViewData
     val fieldBackground = screenModel.fieldBackground
 
     private val _highlights = MutableStateFlow<FieldCoordinate?>(null)
 
+    // Field layout coordinates (inside the border)
+    var fieldCoordinates: LayoutCoordinates? = null
+    var borderSize: Float = 0f
     // Track offsets of field squares (so we can use them to animate things between squares)
-    var fieldOffset: LayoutCoordinates? = null
+    // Square offset is from inside the field border.
     val squareOffsets: MutableMap<FieldCoordinate, LayoutCoordinates?> = mutableMapOf()
 
     fun observeAnimation(): Flow<Pair<UiGameController, JervisAnimation>?> {
@@ -210,8 +214,9 @@ class FieldViewModel(
         squareOffsets[coordinate] = layoutCoords
     }
 
-    fun updateFieldOffSet(fieldLayoutCoordinates: LayoutCoordinates) {
-        fieldOffset = fieldLayoutCoordinates
-        screenModel.updateFieldViewData(fieldLayoutCoordinates)
+    fun updateFieldOffSet(fieldLayoutCoordinates: LayoutCoordinates, borderSize: Float) {
+        fieldCoordinates = fieldLayoutCoordinates
+        this@FieldViewModel.borderSize = borderSize
+        screenModel.updateFieldViewData(fieldLayoutCoordinates, borderSize)
     }
 }

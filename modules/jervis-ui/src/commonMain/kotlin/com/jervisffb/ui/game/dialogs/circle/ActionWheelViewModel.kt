@@ -72,7 +72,7 @@ class ActionWheelViewModel(
 
     fun showWheel() {
         sharedFieldData?.let {
-            it.isContentMenuVisible = visible
+            it.isContentMenuVisible = true
         } ?: error("Missing LocalFieldDataWrapper")
     }
 

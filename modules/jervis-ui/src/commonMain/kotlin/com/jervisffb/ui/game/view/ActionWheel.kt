@@ -10,7 +10,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +55,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -112,7 +112,7 @@ import kotlin.math.sin
 
 /**
  * This file contains all the composable required to render a "Circular Action Menu".
- * The main entry point is [ActionWheelMenu], which is driven by an instance of
+ * The main entry point is [ActionWheel], which is driven by an instance of
  * [ActionWheelViewModel].
  */
 
@@ -126,7 +126,7 @@ import kotlin.math.sin
  * like adding or removing menus.
  */
 @Composable
-fun ActionWheelMenu(
+fun ActionWheel(
     viewModel: ActionWheelViewModel,
     ringSize: Dp = 250.jdp,
     borderSize: Dp = 20.jdp,
@@ -144,10 +144,7 @@ fun ActionWheelMenu(
         }
     }
     val hoverText: String? by viewModel.hoverText.collectAsState()
-
-    // var hoverText by remember { mutableStateOf<String?>(viewModel.startingHoverText) }
-    // val hoverText: String? by viewModel.hoverText.collectAsState()
-    var topMessage = viewModel.topMessage
+    val topMessage = viewModel.topMessage
     Box(
         modifier = Modifier
             .size(maxSize)
@@ -561,9 +558,6 @@ private fun ActionWheelBackgroundRing(
     Canvas(
         modifier = Modifier
             .fillMaxSize()
-            .clickable(interactionSource = null, indication = null) {
-                onDismissRequest(true)
-            }
             .graphicsLayer {
                 clip = false
                 compositingStrategy = CompositingStrategy.Offscreen
@@ -619,109 +613,6 @@ private fun ActionWheelBackgroundRing(
         )
     }
 }
-
-//@Composable
-//private fun ActionWheelBackgroundRing(
-//    ringSize: Dp,
-//    borderSize: Dp,
-//    // Whether to show the tip
-//    showTip: Boolean = false,
-//    // How many degrees to rotate the tip in degrees. 0f is top-left
-//    tipRotation: Float = 0f,
-//    ringColor: Color = JervisTheme.black
-//) {
-//    val imageBrush = ShaderBrush(createGrayscaleNoiseShader())
-//    val ringAlpha = 1f
-//    //val imageBrush = SolidColor(ringColor)
-//    val padding = ((hypot(ringSize.value, ringSize.value)).dp - ringSize) / 2f
-//    Canvas(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .graphicsLayer {
-//                clip = false
-//                compositingStrategy = CompositingStrategy.Offscreen
-//            }
-//    ) {
-//        val radius = ringSize.toPx() / 2f
-//        val center = Offset(size.width / 2f, size.height / 2f)
-//        val tip = Offset(center.x - ringSize.toPx() / 2f, center.y - ringSize.toPx() / 2f) // tip of the droplet
-//        if (showTip) {
-//            val path = Path().apply {
-//                moveTo(tip.x, tip.y)
-//                lineTo(x = center.x, y = padding.toPx())
-//                arcTo(
-//                    rect = Rect(
-//                        center = center,
-//                        radius = radius
-//                    ),
-//                    startAngleDegrees = -90f,
-//                    sweepAngleDegrees = 270f,
-//                    forceMoveTo = true
-//                )
-//                lineTo(x = tip.x, y = tip.y)
-//                close()
-//            }
-//
-//            rotate(degrees = tipRotation) {
-//                // Add desired background color
-//                drawPath(
-//                    path = path,
-//                    brush = SolidColor(JervisTheme.rulebookPaper),
-//                    alpha = 1f,
-//                    //colorFilter = ColorFilter.tint(JervisTheme.rulebookPaper),
-//                )
-//                // Add semi-transparent noise on top
-//                drawRect(
-//                    size = size,
-//                    brush = imageBrush,
-//                    alpha = 0.3f,
-//                )
-//                drawPath(
-//                    path = path,
-//                    brush = imageBrush,
-//                    alpha = 1f,
-//                    colorFilter = ColorFilter.tint(JervisTheme.rulebookPaper.copy(alpha = 0.5f)),
-//                )
-//                drawPath(
-//                    path = path,
-//                    brush = SolidColor(ringColor),
-//                    style = Stroke(width = 6f, join = StrokeJoin.Miter),
-//                )
-////                drawPath(
-////                    path = path,
-////                    brush = imageBrush,
-////                    alpha = 1f,
-////                    colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha)),
-////                )
-//            }
-//        } else {
-//            drawCircle(
-//                brush = imageBrush,
-//                radius = radius,
-//                center = center,
-//                alpha = 1f,
-//                colorFilter = ColorFilter.tint(ringColor.copy(alpha = ringAlpha)),
-//            )
-//        }
-//
-//        val innerRadius = radius - borderSize.toPx()
-//        val innerPath = Path().apply {
-//            addOval(Rect(center = center, radius = innerRadius))
-//        }
-//
-//        drawPath(
-//            path = innerPath,
-//            color = Color.Transparent,
-//            blendMode = BlendMode.Clear
-//        )
-//        drawPath(
-//            path = innerPath,
-//            style = Stroke(width = 6f, join = StrokeJoin.Miter),
-//            color = ringColor,
-//        )
-//
-//    }
-//}
 
 // Helper text that hovers just below the center player.
 // Generally, this should be a "hover" effect when mousing over buttons
@@ -845,15 +736,32 @@ fun ActionButton(
                 .border(2.dp, Color.Black.copy(0.5f), CircleShape)
                 .clip(CircleShape)
                 .applyIf(enabled) {
-                    this.clickable { onClick() }
-                        .onPointerEvent(PointerEventType.Enter) {
-                            isHover = true
-                            onHover(description)
+                    this.pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val e = awaitPointerEvent()
+                                when (e.type) {
+                                    PointerEventType.Enter -> {
+                                        isHover = true
+                                        onHover(description)
+                                    }
+                                    PointerEventType.Exit  -> {
+                                        isHover = false
+                                        onHover(null)
+                                    }
+                                    PointerEventType.Press -> {
+                                        // We are about to trigger onClick, so prevent
+                                        // other layers from reacting too early
+                                        e.changes.forEach { it.consume() }
+                                    }
+                                    PointerEventType.Release -> {
+                                        e.changes.forEach { it.consume() }
+                                        onClick()
+                                    }
+                                }
+                            }
                         }
-                        .onPointerEvent(PointerEventType.Exit) {
-                            isHover = false
-                            onHover(null)
-                        }
+                    }
                 }
             ,
             filterQuality = FilterQuality.None,
@@ -953,15 +861,30 @@ fun CoinImage(
                     )
                 }
                 .applyIf(enabled) {
-                    onPointerEvent(PointerEventType.Enter) {
-                        colorFilter = ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken)
+                    this.pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val e = awaitPointerEvent()
+                                when (e.type) {
+                                    PointerEventType.Enter -> {
+                                        colorFilter = ColorFilter.tint(JervisTheme.black.copy(0.1f), BlendMode.Darken)
+                                    }
+                                    PointerEventType.Exit  -> {
+                                        colorFilter = null
+                                    }
+                                    PointerEventType.Press -> {
+                                        // We are about to trigger onClick, so prevent
+                                        // other layers from reacting too early
+                                        e.changes.forEach { it.consume() }
+                                        onClick(coin)
+                                    }
+                                    PointerEventType.Release -> {
+                                        e.changes.forEach { it.consume() }
+                                    }
+                                }
+                            }
+                        }
                     }
-                        .onPointerEvent(PointerEventType.Exit) {
-                            colorFilter = null
-                        }
-                        .onPointerEvent(PointerEventType.Press) {
-                            onClick(coin)
-                        }
                 }
                 .clip(CircleShape)
             ,

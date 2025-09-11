@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
  * for controlling the entire flow of setting up and connecting players, up until
  * running the game.
  */
-class P2PHostScreenModel(private val navigator: Navigator, private val menuViewModel: MenuViewModel) : ScreenModel {
+class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: MenuViewModel) : ScreenModel {
 
     companion object {
         val LOG = jervisLogger()

@@ -46,7 +46,7 @@ import kotlin.random.Random
  * for controlling the entire flow of joining the host, selecting the team up
  * until running the actual game.
  */
-class P2PClientScreenModel(private val navigator: Navigator, private val menuViewModel: MenuViewModel) : ScreenModel {
+class P2PClientScreenModel(private val navigator: Navigator, val menuViewModel: MenuViewModel) : ScreenModel {
 
     // Handles all state transitions
     private val workflow: Workflow = Workflow()

@@ -12,16 +12,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.game.view.utils.JervisButton
-import com.jervisffb.ui.menu.components.ImportTeamFromFumbblDialog
-import com.jervisffb.ui.menu.components.ImportTeamFromTourPlayDialog
-import com.jervisffb.ui.menu.components.LoadTeamFromFileDialog
 import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponent
 import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
@@ -39,9 +34,6 @@ fun SelectP2PTeamScreen(
 ) {
     val selectedTeamByOtherCoach by viewModel.unavailableTeam.collectAsState()
     val availableTeams by viewModel.availableTeams.collectAsState()
-    var showImportTourPlayTeamDialog by remember { mutableStateOf(false) }
-    var showImportFumbblTeamDialog by remember { mutableStateOf(false) }
-    var showLoadTeamFromFileDialog by remember { mutableStateOf(false) }
     val selectedTeam: TeamInfo? by viewModel.selectedTeam.collectAsState()
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -56,31 +48,24 @@ fun SelectP2PTeamScreen(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
             Spacer(modifier = Modifier.width(if (isHost) 40.dp else 60.dp)) // Move the first button out from the sidebar image
             JervisButton(text = "Load from file", onClick = {
-                showLoadTeamFromFileDialog = !showLoadTeamFromFileDialog
+                with(viewModel) {
+                    showLoadTeamFromFileDialog.value = !showLoadTeamFromFileDialog.value
+                }
             })
             Spacer(modifier = Modifier.width(16.dp))
             JervisButton(text = "Import from FUMBBL", onClick = {
-                showImportFumbblTeamDialog = !showImportFumbblTeamDialog
+                with(viewModel) {
+                    showImportFumbblTeamDialog.value = !showImportFumbblTeamDialog.value
+                }
+            })
+            Spacer(modifier = Modifier.width(16.dp))
+            JervisButton(text = "Import from TourPlay", onClick = {
+                with(viewModel) {
+                    showImportTourPlayTeamDialog.value = !showImportTourPlayTeamDialog.value
+                }
             })
             Spacer(modifier = Modifier.weight(1f))
             JervisButton(confirmTitle.uppercase(), onClick = { onNext() }, enabled = (selectedTeam != null))
         }
-    }
-    if (showImportTourPlayTeamDialog) {
-        ImportTeamFromTourPlayDialog(
-            viewModel,
-            viewModel.menuViewModel,
-            onDismissRequest = { showImportTourPlayTeamDialog = false }
-        )
-    }
-    if (showImportFumbblTeamDialog) {
-        ImportTeamFromFumbblDialog(
-            viewModel,
-            viewModel.menuViewModel,
-            onDismissRequest = { showImportFumbblTeamDialog = false }
-        )
-    }
-    if (showLoadTeamFromFileDialog) {
-        LoadTeamFromFileDialog(viewModel, onDismissRequest = { showLoadTeamFromFileDialog = false })
     }
 }

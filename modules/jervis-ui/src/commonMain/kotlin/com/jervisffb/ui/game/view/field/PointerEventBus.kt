@@ -73,7 +73,7 @@ class PointerEventBus {
         if (lastSquarePressed == eventSquare && eventSquare != null) {
             clickSquare.tryEmit(eventSquare)
         }
-        lastSquarePressed == null
+        lastSquarePressed = null
     }
 
 

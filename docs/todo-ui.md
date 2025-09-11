@@ -9,8 +9,6 @@ things as they come up.
 ## Todo List
 - [ ] When should Leader reroll be added/removed/transparent? Right now it happens when setup completes?
       Should it follow the player during setup instead?
-- [ ] "Import Team" background scrim does not work.
-- [ ] "Import Team" dialogs are not placed in the center of the screen.
 - [ ] I messed up the icon logic for players. I assumed that all players are 30x30...that is not correct.
       Big Guys are 38x38 and go beyond their designated square (so they appear more imposing).
       This means we need to separate Player icons from their square. I suspect fixing this would also 

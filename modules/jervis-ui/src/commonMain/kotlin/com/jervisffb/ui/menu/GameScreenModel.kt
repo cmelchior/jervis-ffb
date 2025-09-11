@@ -85,6 +85,7 @@ class GameScreenModel(
         FieldViewData(
             Size.Zero,
             IntSize.Zero,
+            0f,
             IntOffset.Zero,
             gameController.rules.fieldWidth,
             gameController.rules.fieldHeight
@@ -214,11 +215,12 @@ class GameScreenModel(
         onGameStopped()
     }
 
-    fun updateFieldViewData(fieldLayoutCoordinates: LayoutCoordinates) {
+    fun updateFieldViewData(fieldLayoutCoordinates: LayoutCoordinates, borderSize: Float) {
         val offset = fieldLayoutCoordinates.localToWindow(Offset.Zero)
         val fieldPositionData = FieldViewData(
             JervisTheme.windowSizePx,
             fieldLayoutCoordinates.size,
+            borderSize,
             IntOffset(offset.x.roundToInt(), offset.y.roundToInt()),
             gameController.rules.fieldWidth,
             gameController.rules.fieldHeight

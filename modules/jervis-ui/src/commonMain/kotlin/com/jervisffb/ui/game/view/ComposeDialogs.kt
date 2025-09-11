@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -31,8 +32,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import com.jervisffb.engine.actions.CoinSideSelected
 import com.jervisffb.engine.actions.CoinTossResult
 import com.jervisffb.engine.actions.DBlockResult
@@ -255,7 +254,7 @@ fun MultipleSelectUserActionDialog(
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog: ActionWheelInputDialog, vm: DialogsViewModel) {
+fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog: ActionWheelInputDialog) {
     val wheelViewModel = dialog.viewModel
     val ringSize = 250.jdp
     val boxSize = (hypot(ringSize.value, ringSize.value)).dp
@@ -266,8 +265,8 @@ fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog:
     val offset = remember(fieldData, dialog.viewModel.center) {
         if (dialog.viewModel.center == null) {
             IntOffset(
-                x = (fieldData.fieldOffset.x + (fieldData.fieldSizePx.width / 2f) - boxWidthPx/2f).roundToInt(),
-                y = (fieldData.fieldOffset.y + (fieldData.fieldSizePx.height / 2f) - boxWidthPx/2f).roundToInt(),
+                x = ((fieldData.fieldSizePx.width / 2f) - boxWidthPx/2f).roundToInt(),
+                y = ((fieldData.fieldSizePx.height / 2f) - boxWidthPx/2f).roundToInt(),
             )
         } else {
             val data = fieldData.calculateActionWheelPlacement(
@@ -289,26 +288,19 @@ fun ActionWheelDialog(fieldVm: FieldViewModel, fieldData: FieldViewData, dialog:
             }
         }
     }
-    Popup(
-        alignment = Alignment.TopStart,
-        offset = offset,
-        onDismissRequest = {
-            dismissRequest(true)
-        },
-        properties = PopupProperties(
-            focusable = true,
-            clippingEnabled = true // Prevents being dragged outside the window bounds
-        )
+
+    Box(
+        modifier = Modifier
+            .wrapContentSize()
+            .offset { offset }
     ) {
-        Box() {
-            ActionWheelMenu(
-                viewModel = wheelViewModel,
-                ringSize = ringSize,
-                maxSize = boxSize,
-                showTip = showTip,
-                tipRotationDegree = tipRotationDegree,
-                onDismissRequest = dismissRequest,
-            )
-        }
+        ActionWheel(
+            viewModel = wheelViewModel,
+            ringSize = ringSize,
+            maxSize = boxSize,
+            showTip = showTip,
+            tipRotationDegree = tipRotationDegree,
+            onDismissRequest = dismissRequest,
+        )
     }
 }

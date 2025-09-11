@@ -133,6 +133,7 @@ fun ImportTeamFromTourPlayDialog(
                 buttonColor = JervisTheme.rulebookBlue,
                 textColor = buttonTextColor
             )
-        }
+        },
+        onDismissRequest = onDismissRequest,
     )
 }

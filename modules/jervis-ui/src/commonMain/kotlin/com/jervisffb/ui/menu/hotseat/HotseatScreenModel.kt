@@ -1,5 +1,7 @@
 package com.jervisffb.ui.menu.hotseat
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.navigator.Navigator
@@ -27,6 +29,7 @@ import com.jervisffb.ui.menu.TeamActionMode
 import com.jervisffb.ui.menu.components.TeamInfo
 import com.jervisffb.ui.menu.components.setup.ConfigType
 import com.jervisffb.ui.menu.components.starting.StartGameComponentModel
+import com.jervisffb.ui.menu.components.teamselector.SelectTeamComponentModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -36,7 +39,7 @@ import kotlinx.coroutines.launch
  * for controlling the entire flow of setting up and selecting players, up until
  * running the game.
  */
-class HotseatScreenModel(private val navigator: Navigator, private val menuViewModel: MenuViewModel) : ScreenModel {
+class HotseatScreenModel(private val navigator: Navigator, val menuViewModel: MenuViewModel) : ScreenModel {
 
     val sidebarEntries: SnapshotStateList<SidebarEntry> = SnapshotStateList()
 
@@ -86,6 +89,10 @@ class HotseatScreenModel(private val navigator: Navigator, private val menuViewM
         selectedAwayTeam.map { it?.teamData!! },
         menuViewModel
     )
+
+    // Track dialogs. We need them here because the dialogs needs to live outside the
+    // individual screens to render correctly
+    var currentTeamSelectorViewModel: MutableState<SelectTeamComponentModel?> = mutableStateOf(null)
 
     private var gameScreenModel: GameScreenModel? = null
 

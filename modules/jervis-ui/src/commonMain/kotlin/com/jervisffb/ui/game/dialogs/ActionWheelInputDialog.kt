@@ -279,8 +279,8 @@ class ActionWheelInputDialog(
                     enabled = true,
                     onClick = { parent, button ->
                         val dice = wheelModel.topMenu.getDiceResults()
-                        provider.userActionSelected(dice)
                         wheelModel.hideWheel(true)
+                        provider.userActionSelected(dice)
                     }
                 )
             }

@@ -5,7 +5,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
-import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.utils.DummyLayoutCoordinates
 import com.jervisffb.utils.jervisLogger
 import kotlin.math.roundToInt
@@ -35,39 +34,44 @@ enum class TipPosition {
 data class FieldViewData(
     val screenSize: Size, // Size of the main game window
     val fieldSizePx: IntSize, // Size of the field in pixels. This includes the border.
+    val borderSizePx: Float,
     val fieldOffset: IntOffset, // Offset of the field in the main game window
-    val squaresWidth: Int,
-    val squaresHeight: Int,
+    val columns: Int, // Number of columns in the field.
+    val rows: Int,  // Number of rows in the field.
 ) {
+    val squareWidth: Float = (fieldSizePx.width - 2*borderSizePx)/columns.toFloat()
+    val squareHeight: Float = (fieldSizePx.height - 2*borderSizePx)/columns.toFloat()
 
     companion object {
         val LOG = jervisLogger()
     }
 
     fun calculateActionWheelPlacement(dialog: ActionWheelInputDialog, fieldVm: FieldViewModel, wheelSizePx: Float, ringSizePx: Float): ActionWheelPlacementData {
-        val squareSizePx = fieldSizePx.width/squaresWidth.toFloat()
+        val squareSizePx = squareWidth
         val ballLocation = dialog.viewModel.center
-        val ballLocationOffsets = fieldVm.squareOffsets[ballLocation] ?: DummyLayoutCoordinates
-        val offset = ballLocationOffsets.localToWindow(Offset.Zero)
+        // Offset according to root
+        val ballLocationCoordinates = fieldVm.squareOffsets[ballLocation] ?: DummyLayoutCoordinates
+        val fieldCoordinates = fieldVm.fieldCoordinates ?: DummyLayoutCoordinates
+        val fieldOffset = fieldCoordinates.localToRoot(Offset.Zero) // Offset(borderSizePx, borderSizePx))
+        val focus = ballLocationCoordinates.localToRoot(Offset.Zero) - fieldOffset + Offset(squareSizePx/2f, squareSizePx/2f)
 
         // Calculate 9 sections for the placement of the action wheel:
         val tipPos = chooseTipPosition(
-            screenSize = JervisTheme.windowSizePx,
-            fieldOffset = offset,
             squareSizePx = squareSizePx,
-            focus = offset - Offset(this.fieldOffset.x.toFloat(), this.fieldOffset.y.toFloat()) + Offset(squareSizePx/2f, squareSizePx/2f),
+            focus = focus,
             wheelRadius = (wheelSizePx - (wheelSizePx - ringSizePx)*0.75f)/2f,
             fieldSize = fieldSizePx,
         )
 
+        val tipAdjustment = squareSizePx*0.25f // How much to adjust tip from center
         return when (tipPos) {
             TipPosition.CENTER -> {
                 ActionWheelPlacementData(
                     showTip = false,
                     tipRotationDegree = 0f,
                     offset = IntOffset(
-                        x = (offset.x + ballLocationOffsets.size.width/2f - wheelSizePx/2f).roundToInt(),
-                        y = (offset.y + ballLocationOffsets.size.height/2f - wheelSizePx/2f).roundToInt(),
+                        x = (focus.x - wheelSizePx/2f).roundToInt(),
+                        y = (focus.y - wheelSizePx/2f).roundToInt(),
                     )
                 )
             }
@@ -76,8 +80,8 @@ data class FieldViewData(
                     showTip = true,
                     tipRotationDegree = 225f,
                     offset = IntOffset(
-                        x = (offset.x + ballLocationOffsets.size.width/2f - wheelSizePx/2f).roundToInt(),
-                        y = (offset.y + ballLocationOffsets.size.height - wheelSizePx - (squareSizePx*0.75f)).roundToInt(),
+                        x = (focus.x - wheelSizePx/2f).roundToInt(),
+                        y = (focus.y - wheelSizePx - tipAdjustment).roundToInt(),
                     )
                 )
             }
@@ -86,8 +90,8 @@ data class FieldViewData(
                     showTip = true,
                     tipRotationDegree = 45f,
                     offset = IntOffset(
-                        x = (offset.x + ballLocationOffsets.size.width/2f - wheelSizePx/2f).roundToInt(),
-                        y = (offset.y + ballLocationOffsets.size.height - (squareSizePx/4)).roundToInt(),
+                        x = (focus.x - wheelSizePx/2f).roundToInt(),
+                        y = (focus.y + tipAdjustment).roundToInt(),
                     )
                 )
             }
@@ -96,8 +100,8 @@ data class FieldViewData(
                     showTip = true,
                     tipRotationDegree = 135f,
                     offset = IntOffset(
-                        x = (offset.x + ballLocationOffsets.size.width - wheelSizePx - squareSizePx*0.75).roundToInt(),
-                        y = (offset.y + ballLocationOffsets.size.height - wheelSizePx/2f - squareSizePx/2f).roundToInt(),
+                        x = (focus.x - wheelSizePx - tipAdjustment).roundToInt(),
+                        y = (focus.y - wheelSizePx/2f).roundToInt(),
                     )
                 )
             }
@@ -106,8 +110,8 @@ data class FieldViewData(
                     showTip = true,
                     tipRotationDegree = 315f,
                     offset = IntOffset(
-                        x = (offset.x + ballLocationOffsets.size.width - squareSizePx*0.25).roundToInt(),
-                        y = (offset.y + ballLocationOffsets.size.height - wheelSizePx/2f - squareSizePx/2f).roundToInt(),
+                        x = (focus.x + tipAdjustment).roundToInt(),
+                        y = (focus.y - wheelSizePx/2f).roundToInt(),
                     )
                 )
             }
@@ -116,8 +120,8 @@ data class FieldViewData(
                     showTip = true,
                     tipRotationDegree = 180f,
                     offset = IntOffset(
-                        x = (offset.x + ballLocationOffsets.size.width/2f - wheelSizePx + (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
-                        y = (offset.y + ballLocationOffsets.size.height/2f - wheelSizePx + (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                        x = (focus.x - wheelSizePx + ((wheelSizePx - ringSizePx)/2f) - tipAdjustment).roundToInt(),
+                        y = (focus.y - wheelSizePx + ((wheelSizePx - ringSizePx)/2f) - tipAdjustment).roundToInt(),
                     )
                 )
             }
@@ -126,8 +130,8 @@ data class FieldViewData(
                     showTip = true,
                     tipRotationDegree = 270f,
                     offset = IntOffset(
-                        x = (offset.x + ballLocationOffsets.size.width/2f - (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
-                        y = (offset.y + ballLocationOffsets.size.height/2f - wheelSizePx + (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                        x = (focus.x - ((wheelSizePx - ringSizePx)/2f) + tipAdjustment).roundToInt(),
+                        y = (focus.y - wheelSizePx + ((wheelSizePx - ringSizePx)/2f) - tipAdjustment).roundToInt(),
                     )
                 )
             }
@@ -136,8 +140,8 @@ data class FieldViewData(
                     tipRotationDegree = 90f,
                     showTip = true,
                     offset = IntOffset(
-                        x = (offset.x + ballLocationOffsets.size.width/2f - wheelSizePx + (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
-                        y = (offset.y + ballLocationOffsets.size.height/2f - (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                        x = (focus.x - wheelSizePx + ((wheelSizePx - ringSizePx)/2f) - tipAdjustment).roundToInt(),
+                        y = (focus.y - ((wheelSizePx - ringSizePx)/2f) + tipAdjustment).roundToInt(),
                     )
                 )
             }
@@ -146,8 +150,8 @@ data class FieldViewData(
                     showTip = true,
                     tipRotationDegree = 0f,
                     offset = IntOffset(
-                        x = (offset.x + ballLocationOffsets.size.width/2f - (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
-                        y = (offset.y + ballLocationOffsets.size.height/2f - (wheelSizePx - ringSizePx - squareSizePx/2)/2f).roundToInt(),
+                        x = (focus.x - ((wheelSizePx - ringSizePx)/2f) + tipAdjustment).roundToInt(),
+                        y = (focus.y - ((wheelSizePx - ringSizePx)/2f) + tipAdjustment).roundToInt(),
                     )
                 )
             }
@@ -155,8 +159,6 @@ data class FieldViewData(
     }
 
     fun chooseTipPosition(
-        screenSize: Size,
-        fieldOffset: Offset,
         squareSizePx: Float,
         focus: Offset, // Center of square in focus. Offset is from top-left corner of the field.
         wheelRadius: Float,
@@ -178,7 +180,7 @@ data class FieldViewData(
 
         if (hasCenterRoom) return TipPosition.CENTER
 
-        val verticalCenter = (rightSpace >= wheelRadius && rightSpace >= wheelRadius)
+        val verticalCenter = (leftSpace >= wheelRadius && rightSpace >= wheelRadius)
         val horizontalCenter = (bottomSpace >= wheelRadius && topSpace >= wheelRadius)
 
         val horizontal = when {
@@ -197,19 +199,20 @@ data class FieldViewData(
             horizontal != null && horizontalCenter -> horizontal
             vertical != null && verticalCenter -> vertical
             horizontal != null && vertical != null -> {
-                when {
-                    horizontal == TipPosition.RIGHT && vertical == TipPosition.BOTTOM -> TipPosition.BOTTOM_RIGHT
-                    horizontal == TipPosition.RIGHT && vertical == TipPosition.TOP -> TipPosition.TOP_RIGHT
-                    horizontal == TipPosition.LEFT && vertical == TipPosition.BOTTOM -> TipPosition.BOTTOM_LEFT
-                    horizontal == TipPosition.LEFT && vertical == TipPosition.TOP -> TipPosition.TOP_LEFT
-                    else -> TipPosition.CENTER // fallback
+                when (horizontal) {
+                    TipPosition.RIGHT if vertical == TipPosition.BOTTOM -> TipPosition.BOTTOM_RIGHT
+                    TipPosition.RIGHT if vertical == TipPosition.TOP -> TipPosition.TOP_RIGHT
+                    TipPosition.LEFT if vertical == TipPosition.BOTTOM -> TipPosition.BOTTOM_LEFT
+                    TipPosition.LEFT if vertical == TipPosition.TOP -> TipPosition.TOP_LEFT
+                    else -> TipPosition.CENTER
+                    // fallback
                 }
             }
             horizontal != null -> horizontal
             vertical != null -> vertical
             // Something unexpected happened, so just hide the tip and hope for the best
             // It has only been possible to reproduce this on Web, so probably some interaction
-            // with the browser is causing this. It requires futher investigation.
+            // with the browser is causing this. It requires further investigation.
             else -> {
                 LOG.w("Unexpected case: ($vertical, $horizontal). Fallback to CENTER")
                 TipPosition.CENTER

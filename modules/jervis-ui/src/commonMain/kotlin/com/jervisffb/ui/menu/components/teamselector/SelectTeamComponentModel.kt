@@ -1,5 +1,6 @@
 package com.jervisffb.ui.menu.components.teamselector
 
+import androidx.compose.runtime.mutableStateOf
 import co.touchlab.kermit.Logger.Companion.e
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
@@ -45,6 +46,10 @@ class SelectTeamComponentModel(
     val selectedTeam = MutableStateFlow<TeamInfo?>(null)
     val loadingTeams: MutableStateFlow<Boolean> = MutableStateFlow(true)
     var rules: Rules? = null
+
+    var showImportTourPlayTeamDialog = mutableStateOf(false)
+    var showImportFumbblTeamDialog = mutableStateOf(false)
+    var showLoadTeamFromFileDialog = mutableStateOf(false)
 
     fun initialize(rules: Rules) {
         this.rules = rules

@@ -20,7 +20,7 @@ import kotlin.uuid.Uuid
  */
 class SelectHotseatTeamScreenModel(
     val menuViewModel: MenuViewModel,
-    private val parentModel: HotseatScreenModel,
+    val parentModel: HotseatScreenModel,
     private val onNextScreen: () -> Unit,
     private val onTeamImported: (TeamInfo) -> Unit = { _ -> /* Do nothing */ } ,
 ) : ScreenModel {

@@ -16,8 +16,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_settings
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_undo
@@ -25,7 +25,6 @@ import com.jervisffb.ui.game.view.field.Field
 import com.jervisffb.ui.game.viewmodel.ActionSelectorViewModel
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.FieldDetails
-import com.jervisffb.ui.game.viewmodel.FieldViewData
 import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.GameStatusViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
@@ -52,7 +51,6 @@ fun GameScreen(
 ) {
     //val aspectRation = (145f+145f+782f)/452f
     val aspectRation = (550f+550f+2354f)/1362f
-    val fieldPositionData: FieldViewData by screenModel.fieldViewData.collectAsState()
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -70,14 +68,14 @@ fun GameScreen(
                 Sidebar(leftDugout, Modifier)
             }
             Column(
-                modifier = Modifier.weight(/*782f*/ 2354f).align(Alignment.Top),
+                // Make sure that field layers (including the Action Wheel) are placed above the sidebar
+                modifier = Modifier.zIndex(1f).weight(/*782f*/ 2354f).align(Alignment.Top),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Field(
-                    modifier = Modifier.onGloballyPositioned {
-                        field.updateFieldOffSet(it)
-                    },
-                    field
+                    Modifier,
+                    field,
+                    borderBrushSize = 3.dp
                 )
                 // ReplayController(replayController, actionSelector, modifier = Modifier.height(48.dp))
             }
@@ -120,6 +118,6 @@ fun GameScreen(
             }
         }
     }
-    Dialogs(field, fieldPositionData, dialogsViewModel)
+    Dialogs(dialogsViewModel)
 }
 

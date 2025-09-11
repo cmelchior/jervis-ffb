@@ -2,6 +2,7 @@ package com.jervisffb.ui.menu.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,13 +18,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,8 +37,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -44,8 +58,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import com.jervisffb.ui.dropShadow
 import com.jervisffb.ui.game.dialogs.DialogSize
 import com.jervisffb.ui.game.view.JervisTheme
@@ -61,14 +73,29 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.roundToInt
 
 /**
- * This file contains Composables for creating Jervis themed dialogs
- */
-
-/**
+ * This file contains composable for creating Jervis-themed dialogs.
+ *
  * Customizable Jervis dialog with title, icon, icon and button row.
+ * Note, we cannot use Dialog or Popup since they will alway be on top of the
+ * stack and we want the custom ordering like the in-game drawer to be able
+ * to move on top of these.
  *
  * As a default, this dialog does not close when pressing Escape. Override
  * [onDismissRequest] to enable this behavior.
+ *
+ * Developer's Commentary:
+ * Handling pointer events across a complex layout is a bit of a nightmare,
+ * especially if we want to selectively block certain events. It looks like
+ * attaching any pointer listener to a layout will cause it to be the
+ * "root" for which events flow, even if it only registers for certain events.
+ * This makes it impossible to have a dialog scrim living outside the field that
+ * intercepts Press but allows Enter/Exit events to reach the field.
+ *
+ * Given that the use cases are currently not fully explored, we go with the
+ * "easy"-approach, which is that the presence of a scrim also determines
+ * if it intercepts ESC to cancel as well as pointer events. If the scrim
+ * is not visible, these events will just propagate to whatever layer is
+ * underneath.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -88,9 +115,10 @@ fun JervisDialog(
     buttons: (@Composable RowScope.() -> Unit)? = null,
     onDismissRequest: () -> Unit = { /* Ignore ESC as dismiss */ },
 ) {
+    val focusRequester = remember { FocusRequester() }
     var popupSize by remember { mutableStateOf(IntSize.Zero) }
     val fieldViewInfo: FieldViewData? by centerOnField?.fieldViewData?.collectAsState() ?: MutableStateFlow<FieldViewData?>(null).collectAsState()
-    var popupOffset by remember(fieldViewInfo) {
+    var popupOffset: IntOffset by remember(fieldViewInfo) {
         fieldViewInfo?.let { fvd ->
             mutableStateOf(
                 IntOffset(
@@ -120,6 +148,12 @@ fun JervisDialog(
             unfocusedIndicatorColor = textColor,
         )
     }
+
+    // Make sure scrim has focus so it can intercept ESC events
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus() // ensure we actually get keyboard focus
+    }
+
     // Background box for showing a Scrim and tracking the size of the window
     // so we can accurately position the popup in the center.
     Box(
@@ -127,80 +161,119 @@ fun JervisDialog(
             .fillMaxSize()
             .applyIf(backgroundScrim) {
                 background(color = Color.Black.copy(alpha = 0.5f))
+                    .onPointerEvent(PointerEventType.Press, pass = PointerEventPass.Final) {
+                        if (!it.changes.any { it.isConsumed }) {
+                            onDismissRequest()
+                        }
+                    }
+                    .focusRequester(focusRequester)
+                    .focusable()
+                    .onPreviewKeyEvent { event ->
+                        if (event.type == KeyEventType.KeyDown && event.key == Key.Escape) {
+                            onDismissRequest()
+                            true // consume
+                        } else {
+                            false
+                        }
+                    }
             }
-    )
-    Popup(
-        alignment = if (centerOnField == null) fallbackAlignment else Alignment.TopStart,
-        offset = popupOffset,
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        properties = PopupProperties(
-            focusable = true,
-            clippingEnabled = true // Prevents being dragged outside the window bounds
-        )
+            .padding(16.dp)
+        ,
+        contentAlignment = if (centerOnField == null) fallbackAlignment else Alignment.TopStart,
     ) {
+        // The popup itself
         Box(
             modifier = Modifier
-                .padding(8.dp)
-                .dropShadow(JervisTheme.black.copy(0.5f), 0.dp, offsetY = 0.dp, blurRadius = 8.dp)
-        ) {
-            Surface(
-                modifier = Modifier
-                    .alpha(alpha)
-                    .heightIn(min = minHeight)
-                    .width(width)
-                    .pointerInput(Unit) {
-                        detectDragGestures { change, dragAmount ->
-                            change.consume()
-                            if (draggable) {
-                                popupOffset = IntOffset(
-                                    x = (popupOffset.x + dragAmount.x).roundToInt(),
-                                    y = (popupOffset.y + dragAmount.y).roundToInt()
-                                )
+                .wrapContentSize()
+                .applyIf(centerOnField != null) {
+                    offset { popupOffset }
+                }
+                .pointerInput(title) {
+                    // Prevent mouse events on menu items to reach the Drawer
+                    // as clicks here will close it.
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent(pass = PointerEventPass.Main)
+                            if (event.type == PointerEventType.Press) {
+                                event.changes.forEach { it.consume() }
                             }
                         }
                     }
-                    .onSizeChanged {
-                        popupSize = it
-                        popupOffset = recalculateOffset(fieldViewInfo, popupSize, paddingPx)
-                        alpha = 1f
+                }
+                .onPreviewKeyEvent { event ->
+                    // If a dialog has Input fields, it might risk having focus, so also detect ESC here
+                    println("Key event: $event")
+                    if (event.type == KeyEventType.KeyDown && event.key == Key.Escape) {
+                        onDismissRequest()
+                        true // consume
+                    } else {
+                        false
                     }
-                    .defaultMinSize(minHeight = 200.dp, minWidth = width)
-                    .paperBackground(color = JervisTheme.rulebookPaper),
-                shape = RectangleShape,
-                border = BorderStroke(8.dp, color = dialogColor),
-                color = JervisTheme.rulebookPaper,
-                contentColor = textColor,
+                }
+            ,
+        ) {
+            Box(
+                modifier = Modifier
+                    .dropShadow(JervisTheme.black.copy(0.5f), 0.dp, offsetY = 0.dp, blurRadius = 8.dp)
             ) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min)
-                        .paperBackground(JervisTheme.rulebookPaper)
+                Surface(
+                    modifier = Modifier
+                        .alpha(alpha)
+                        .heightIn(min = minHeight)
+                        .width(width)
+                        .pointerInput(Unit) {
+                            detectDragGestures { change, dragAmount ->
+                                change.consume()
+                                if (draggable) {
+                                    // TODO Prevent dragging the dialog outside the screen
+                                    popupOffset = IntOffset(
+                                        x = (popupOffset.x + dragAmount.x).roundToInt(),
+                                        y = (popupOffset.y + dragAmount.y).roundToInt()
+                                    )
+                                }
+                            }
+                        }
+                        .onSizeChanged {
+                            popupSize = it
+                            popupOffset = recalculateOffset(fieldViewInfo, popupSize, paddingPx)
+                            alpha = 1f
+                        }
+                        .defaultMinSize(minHeight = 200.dp, minWidth = width)
+                        .paperBackground(color = JervisTheme.rulebookPaper),
+                    shape = RectangleShape,
+                    border = BorderStroke(8.dp, color = dialogColor),
+                    color = JervisTheme.rulebookPaper,
+                    contentColor = textColor,
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .width(130.dp)
-                            .fillMaxHeight()
-                            .padding(start = 24.dp)
-                            .bannerBackground(bannerColor = dialogColor)
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Min)
+                            .paperBackground(JervisTheme.rulebookPaper)
                     ) {
-                        icon()
-                    }
-                    Column(
-                        modifier = Modifier
-                            .padding(start = 24.dp, top = 20.dp, end = 32.dp, bottom = 28.dp)
-                            .fillMaxSize()
-                    ) {
-                        JervisDialogContent(
-                            title = title,
-                            dialogColor = dialogColor,
-                            textColor = textColor,
-                            inputDialogColors = inputDialogColors,
-                            content = { content(this, inputDialogColors, textColor) },
-                            buttons = buttons,
-                        )
+                        Box(
+                            modifier = Modifier
+                                .width(130.dp)
+                                .fillMaxHeight()
+                                .padding(start = 24.dp)
+                                .bannerBackground(bannerColor = dialogColor)
+                        ) {
+                            icon()
+                        }
+                        Column(
+                            modifier = Modifier
+                                .padding(start = 24.dp, top = 20.dp, end = 32.dp, bottom = 28.dp)
+                                .fillMaxSize()
+                        ) {
+                            JervisDialogContent(
+                                title = title,
+                                dialogColor = dialogColor,
+                                textColor = textColor,
+                                inputDialogColors = inputDialogColors,
+                                content = { content(this, inputDialogColors, textColor) },
+                                buttons = buttons,
+                            )
+                        }
                     }
                 }
             }
@@ -226,6 +299,7 @@ fun NotImplementYetDialog(title: String, onDismissRequest: () -> Unit) {
         title,
         icon = { /* No icon yet */ },
         width = 650.dp,
+        backgroundScrim = true,
         content = { _, textColor ->
             Text(
                 text = "Not implemented yet",

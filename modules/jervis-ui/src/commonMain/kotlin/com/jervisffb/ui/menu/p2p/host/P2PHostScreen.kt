@@ -36,6 +36,9 @@ import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.JervisScreen
 import com.jervisffb.ui.menu.MenuScreenWithSidebarAndTitle
+import com.jervisffb.ui.menu.components.ImportTeamFromFumbblDialog
+import com.jervisffb.ui.menu.components.ImportTeamFromTourPlayDialog
+import com.jervisffb.ui.menu.components.LoadTeamFromFileDialog
 import com.jervisffb.ui.menu.p2p.SelectP2PTeamScreen
 import com.jervisffb.ui.menu.p2p.StartP2PGamePage
 
@@ -70,6 +73,26 @@ class P2PHostScreen(private val menuViewModel: MenuViewModel, private val viewMo
             ) {
                 PageContent(viewModel)
             }
+        }
+        if (viewModel.selectTeamModel.componentModel.showImportTourPlayTeamDialog.value) {
+            ImportTeamFromTourPlayDialog(
+                viewModel.selectTeamModel.componentModel,
+                viewModel.menuViewModel,
+                onDismissRequest = { viewModel.selectTeamModel.componentModel.showImportTourPlayTeamDialog.value = false }
+            )
+        }
+        if (viewModel.selectTeamModel.componentModel.showImportFumbblTeamDialog.value) {
+            ImportTeamFromFumbblDialog(
+                viewModel.selectTeamModel.componentModel,
+                viewModel.menuViewModel,
+                onDismissRequest = { viewModel.selectTeamModel.componentModel.showImportFumbblTeamDialog.value = false }
+            )
+        }
+        if (viewModel.selectTeamModel.componentModel.showLoadTeamFromFileDialog.value) {
+            LoadTeamFromFileDialog(
+                viewModel.selectTeamModel.componentModel,
+                onDismissRequest = { viewModel.selectTeamModel.componentModel.showLoadTeamFromFileDialog.value = false }
+            )
         }
     }
 }

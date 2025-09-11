@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,8 @@ val LocalFieldData = staticCompositionLocalOf<LocalFieldDataWrapper> {
  * ** Action dialogs **
  * 10. Direction arrows: These are rendered on top of everything
  * 11. Animation Layer: This is where animations run (is this true)
- * 12. Dialog Layer: These are controlled outside the scope of this field.
+ * 12. Action Wheel Layer: This is where the action wheel is rendered
+ * 13. Dialog Layer: These are controlled outside the scope of this field.
  *
  * Developer's Commentary:
  * I am still thinking about these layers. Maybe some of the lower layers needs to change order?
@@ -88,19 +90,18 @@ val LocalFieldData = staticCompositionLocalOf<LocalFieldDataWrapper> {
 fun Field(
     modifier: Modifier,
     vm: FieldViewModel,
+    borderBrushSize: Dp = 3.dp,
 ) {
     val field: FieldDetails by vm.fieldBackground.collectAsState(FieldDetails.NICE)
-
-    // TODO For now just center the field and add a black background to hide any rounding errors.
-    //  Ideally that should only be a pixel or two.
+    val borderBrushSizePx = with(LocalDensity.current) { borderBrushSize.toPx() }
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
+            // In case of rounding errors. The underlying game background will be showingx
             .background(color = Color.Transparent)
         ,
         contentAlignment = Alignment.TopCenter,
     ) {
-        val borderBrushSize = 3.dp
         val localDensity = LocalDensity.current
         val fieldDataSize = remember(maxWidth, maxHeight) {
             // Calculate maximum square size based on maximum width
@@ -131,35 +132,35 @@ fun Field(
                             while (true) {
                                 val e = awaitPointerEvent()
                                 val eventSquare = e.changes.first().position.toFieldSquare(fieldSizeData)
-                                when (e.type) {
-                                    PointerEventType.Move  -> {
-                                        if (eventSquare != null) {
-                                            pointerBus.notifyMove(eventSquare)
+                                val consumed = e.changes.any { it.isConsumed }
+                                if (!consumed) {
+                                    when (e.type) {
+                                        PointerEventType.Move  -> {
+                                            if (eventSquare != null) {
+                                                pointerBus.notifyMove(eventSquare)
+                                            }
                                         }
-                                    }
-                                    PointerEventType.Enter -> {
-                                        if (eventSquare != null) {
-                                            pointerBus.notifyEnterField(eventSquare)
+                                        PointerEventType.Enter -> {
+                                            if (eventSquare != null) {
+                                                pointerBus.notifyEnterField(eventSquare)
+                                            }
                                         }
-                                    }
-                                    PointerEventType.Exit  -> {
-                                        pointerBus.notifyExitField()
-                                        vm.triggerHoverExit()
-                                    }
-                                    PointerEventType.Press -> {
-                                        if (eventSquare != null) {
-                                            pointerBus.notifyPressSquare(eventSquare)
+                                        PointerEventType.Exit  -> {
+                                            pointerBus.notifyExitField()
+                                            vm.triggerHoverExit()
                                         }
-                                    }
-                                    PointerEventType.Release -> {
-                                        pointerBus.notifyReleaseSquare(eventSquare)
+                                        PointerEventType.Press -> {
+                                            if (eventSquare != null) {
+                                                pointerBus.notifyPressSquare(eventSquare)
+                                            }
+                                        }
+                                        PointerEventType.Release -> {
+                                            pointerBus.notifyReleaseSquare(eventSquare)
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    .onGloballyPositioned { coordinates ->
-                        vm.updateFieldOffSet(coordinates)
                     }
                 ,
                 widthPx = localField.size.totalFieldWidthPx,
@@ -180,7 +181,13 @@ fun Field(
 
                     // All other content is assumed to be "inside" the border.
                     // TODO This might not be true, players and ball can leave this area
-                    Box(modifier = Modifier.fillMaxSize().padding(borderBrushSize)) {
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(borderBrushSize)
+                        .onGloballyPositioned { coordinates ->
+                            vm.updateFieldOffSet(coordinates, borderBrushSizePx)
+                        }
+                    ) {
                         FieldActionsAndUnderlaysLayers(vm)
                         FieldHoverUnderlayLayer(vm)
                         WeatherEffectsLayer(vm)
@@ -190,6 +197,7 @@ fun Field(
                         BallLayer(vm)
                         DirectionArrowsLayer(vm)
                         AnimationLayer(vm)
+                        ActionWheelLayer(vm)
                     }
                 }
             }

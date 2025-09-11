@@ -45,8 +45,6 @@ import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
-import com.jervisffb.ui.game.viewmodel.FieldViewData
-import com.jervisffb.ui.game.viewmodel.FieldViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
 import com.jervisffb.ui.game.viewmodel.ReplayControllerViewModel
@@ -146,7 +144,7 @@ fun RandomCommandBar(
 }
 
 @Composable
-fun Dialogs(field: FieldViewModel, fieldOffset: FieldViewData, vm: DialogsViewModel) {
+fun Dialogs(vm: DialogsViewModel) {
     val dialogData: UserInputDialog? by vm.dialogData.collectAsState(null)
     when (dialogData) {
         is SingleChoiceInputDialog -> {
@@ -161,11 +159,7 @@ fun Dialogs(field: FieldViewModel, fieldOffset: FieldViewData, vm: DialogsViewMo
             val dialog = dialogData as DicePoolUserInputDialog
             DicePoolSelectorDialog(dialog, vm)
         }
-        is ActionWheelInputDialog -> {
-            val dialog = dialogData as ActionWheelInputDialog
-            dialog.viewModel.updateSharedFieldData(vm.screenViewModel.sharedFieldData)
-            ActionWheelDialog(field, fieldOffset, dialog, vm)
-        }
+        is ActionWheelInputDialog, // Handled by ActionWheelLayer
         null -> { /* Do nothing */ }
     }
 }
