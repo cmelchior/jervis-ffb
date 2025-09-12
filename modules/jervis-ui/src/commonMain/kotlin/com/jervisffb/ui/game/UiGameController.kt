@@ -319,16 +319,12 @@ class UiGameController(
     private fun updatePersistentUiDecorations(state: Game, delta: GameDelta, uiIndicators: UiPersistentGameIndicators, acc: UiSnapshotAccumulator) {
         if (delta.reversed) {
             uiIndicators.undo(delta.id)
+            acc.setMovesUsed(uiIndicators.movesUsed)
             return
         }
 
         // Clear move markers when an action ends
         if (delta.containsCommand { it is ExitProcedure && it.procedure == ActivatePlayer }) {
-            // TODO Restore path info
-            // uiDecorations.registerUndo(
-            //   deltaId = delta.id,
-            //   action = { /* TODO */ }
-            // )
             uiIndicators.resetMovesUsed()
         }
 
