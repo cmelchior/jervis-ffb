@@ -85,7 +85,7 @@ or this:
 ```
 -> Select Action (which activates the player)
 ...
--> End Activation (which ends the activation)
+-> End Action (which ends the activation)
 ```
 
 The rulebook uses the phrase "when you activate a player, you must declare
@@ -108,7 +108,7 @@ steps:
 1. Select Player (mostly a UI concept).
 2. Mark them as active. If standing, they now regain their tackle zones.
 3. Declare an action. For some actions like Blitz or Foul, this requires
-   selecting a target.
+   selecting a target. 
 4. Roll for all Nega-traits in order, stop at the first failure (no player
    normally has multiple of these). If failed, go directly to "End Action".
    a. Bone Head: If failed, loose tackle zones, mark action as used and move to 
@@ -125,6 +125,29 @@ steps:
 6. Perform the action.
 7. End Action.
 8. End Activation.
+
+### Page 42 - Player Activation and actions with a target
+
+The rulebook does not specify how to handle actions that require a target,
+but no eligible targets are available. Blitz (page 59) only says that you
+must select the target when activating the player. Foul (page 63) uses a similar
+phrase.
+
+This means that two options are possible:
+
+1. You can always declare the action (like Blitz or Foul), but just leave out
+   selecting the target. This, of course, means that you cannot use the "Block"
+   and "Foul" part of these actions, but other special rules might still apply
+   during the movement part.
+
+2. You cannot declare the action because the criteria for declaring the action
+   is not met. 
+
+Jervis has chosen the second interpretation for the following reasons:
+- It prevents going against the current written rules, even if they are 
+  incomplete.
+- It makes the UI cleaner and more intuitive.
+- Currently, no known special rules benefit from the first interpretation.
 
 ### Page 49 - Resolve Pass Action in Empty Square
 The full consequences of doing an accurate throw to an empty square are not 

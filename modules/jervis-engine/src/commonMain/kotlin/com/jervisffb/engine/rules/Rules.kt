@@ -642,6 +642,7 @@ open class Rules(
 
     /**
      * Returns all actions available to this player when they are activated.
+     * Actions that require a target to activate are filtered out, e.g., Blitz and Foul.
      */
     fun getAvailableActions(state: Game, player: Player): List<PlayerAction> {
         if (state.activePlayer != player) INVALID_GAME_STATE("$player is not the active player")
@@ -661,22 +662,27 @@ open class Rules(
                         .filter { otherPlayer -> isStanding(otherPlayer)}
                         .any { otherPlayer -> isMarking(player, otherPlayer)}
 
+                    // TODO Also check for Jump Up
                     if (isStanding && hasEligibleTargets) {
                         add(teamActions.block)
                     }
                 }
                 if (it.blitzActions > 0) {
-                    val hasEligibleTargets = player.team.otherTeam()
+                    val hasEligibleBlitzTargets = player.team.otherTeam()
                         .filter { targetPlayer ->  targetPlayer.location.isOnField(this@Rules) }
                         .any {  targetPlayer -> isStanding(targetPlayer) }
 
-                    if (hasEligibleTargets) {
+                    if (hasEligibleBlitzTargets) {
                         add(teamActions.blitz)
                     }
                 }
                 if (it.foulActions > 0) {
-                    // TODO Check if any players are currently prone/stunned
-                    add(teamActions.foul)
+                    val hasEligibleFoulTargets = player.team.otherTeam()
+                        .filter { targetPlayer ->  targetPlayer.location.isOnField(this@Rules) }
+                        .any {  targetPlayer -> targetPlayer.state == PlayerState.PRONE || targetPlayer.state == PlayerState.STUNNED }
+                    if (hasEligibleFoulTargets) {
+                        add(teamActions.foul)
+                    }
                 }
                 // Even though Secure The Ball is only in the 2025 ruleset, we have the check here
                 // since it makes maintaining the logic easier. The action is disabled by setting the
@@ -685,7 +691,7 @@ open class Rules(
                     // Securing the Ball is only available if no standing players wit TZ's are within 2 of the ball.
                     // In case of multiple balls, only one ball has to satisfy the criteria for he action to be available.
                     // The ball has to be on the floor at the start of the activation.
-                    val elligibleBallExists = state.balls.any { ball ->
+                    val eligibleBallExists = state.balls.any { ball ->
                         val onTheGround = (ball.state == BallState.ON_GROUND)
                         val enemiesInRange = ball.location.getSurroundingCoordinates(
                             rules = this@Rules,
@@ -698,7 +704,7 @@ open class Rules(
                         }
                         onTheGround && !enemiesInRange
                     }
-                    if (elligibleBallExists) {
+                    if (eligibleBallExists) {
                         add(teamActions.secureTheBall)
                     }
                 }

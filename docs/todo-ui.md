@@ -9,6 +9,7 @@ things as they come up.
 ## Todo List
 - [ ] Make a keyboard shortcut for showing "Player range" and "Tackle Zones"
       Unclear which keys makes sense. Probably need to make it configurable
+- [ ] Add UI indicator signaling limit of opponent players move (see BB3).
 - [ ] When should Leader reroll be added/removed/transparent? Right now it happens when setup completes?
       Should it follow the player during setup instead?
 - [ ] I messed up the icon logic for players. I assumed that all players are 30x30...that is not correct.
@@ -20,10 +21,6 @@ things as they come up.
       to list all types of rerolls and let it be up to the UI to filter/show them somehow.
 - [ ] Add "quick"-action when prone, where you can also select Jump if it would be 
       possible after standing up.
-- [ ] Filter actions that cannot be used because they cannot select a target
-  - Foul
-  - Block if Prone (but yes combined with Jump Up)
-  - Blitz if no players
 - [ ] Custom cursors:
   - [ ] During move
   - [ ] When selecting block
@@ -31,23 +28,10 @@ things as they come up.
   - [ ] When selecting foul target
 - [ ] Add numbers to yellow squares to indicate the target number for rush/dodge.
 - [ ] Keep player card open for the currently active player.
-- [ ] Add support for Rerolls / Apothecary / etc. in the sidebars
-- [ ] Create "dice"-like background for dice rolls.
-- [ ] Only have 3 players pr. row in the Dugout (similar to FUMBBL).
-- [ ] Add numbers where the player has moved already
 - [ ] Passes going out of bounds currently land in exitAt, make the animation move the
       ball out of bounds.
 - [ ] Set size of player icons and square decorators correctly. Right now they are bit off making them look blurry.
-- [ ] Add UI indicator signaling limit of opponent players move (see BB3).
 - [ ] Add scrollbar indicator to game log components.
-- [ ] If possible, move dice roll dialogs away from the pitch.
-- [ ] Rethink dialog design. They are currently way too big. As a minimum
-      you need to be able to drag them away from the screen.
-- [ ] Figure out a better way to trigger recomposition. Currently, there is a lot of
-      object creation/copying going on with UiFieldSquare. It seems performant enough
-      on my machine, but it also feels like it could be optimized. Currently there
-      are two places changes are happening. In the rules engine and in 
-      ManualActionProvider when setting up listeners.
 - [ ] Could we add 3d dice rolling across the board? Probably difficult in pure Compose, but maybe using Lottie?
 - [ ] Add AFK Limit to timer settings + AFK button in the UI
 - [ ] Add a "Player Editor" in Dev Mode that makes it possible to add skills, change stats, and states.
@@ -63,7 +47,7 @@ things as they come up.
     - https://www.quora.com/Do-objects-appear-exponentially-smaller-as-you-move-away-from-them
     - https://www.youtube.com/watch?v=_KLfj84SOh8&ab_channel=ErikRosolowsky
     - https://www.omnicalculator.com/physics/time-of-flight-projectile-motion
-    - I think I implemented the correct algorithm, but th ball landing still looks off. Need to figure out why.
+    - I think I implemented the correct algorithm, but the ball landing still looks off. Need to figure out why.
 
 
 ## Design ideas
