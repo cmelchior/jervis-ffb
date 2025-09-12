@@ -89,6 +89,7 @@ import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
+import com.jervisffb.ui.utils.onClickWithSmallDragControl
 import com.jervisffb.ui.utils.toImageBitmap
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.Paint
@@ -807,9 +808,11 @@ fun PixelatedImageWithShader(
 @Composable
 private fun StatusBarButton(text: String, onClick: () -> Unit) {
     Button(
-        modifier = Modifier,
+        modifier = Modifier
+            .onClickWithSmallDragControl(onClick = onClick)
+        ,
         colors = ButtonDefaults.buttonColors(containerColor = JervisTheme.rulebookDisabled, disabledContainerColor = JervisTheme.rulebookPaperMediumDark),
-        onClick = onClick,
+        onClick = { /* Ignore */ },
         border = BorderStroke(3.dp, JervisTheme.white),
         enabled = true,
         shape = RectangleShape,
