@@ -159,6 +159,8 @@ fun JervisDialog(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .focusRequester(focusRequester)
+            .focusable()
             .applyIf(backgroundScrim) {
                 background(color = Color.Black.copy(alpha = 0.5f))
                     .onPointerEvent(PointerEventType.Press, pass = PointerEventPass.Final) {
@@ -166,8 +168,6 @@ fun JervisDialog(
                             onDismissRequest()
                         }
                     }
-                    .focusRequester(focusRequester)
-                    .focusable()
                     .onPreviewKeyEvent { event ->
                         if (event.type == KeyEventType.KeyDown && event.key == Key.Escape) {
                             onDismissRequest()
