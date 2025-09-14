@@ -11,6 +11,7 @@ import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
@@ -45,6 +46,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -345,8 +347,13 @@ class UiGameController(
             delta.steps.firstOrNull()?.action == MoveTypeSelected(MoveType.STANDARD) &&
             delta.steps.lastOrNull()?.action is FieldSquareSelected
         ) {
-            // TODO This seems to break on touch downs
-            val start = delta.allCommands().filterIsInstance<SetPlayerLocation>().single().originalPlayerLocation
+            val start = delta.allCommands()
+                .filterIsInstance<SetPlayerLocation>()
+                .first {
+                    // When a touchdown is triggered, we will see both the player moving into the end zone and
+                    //  all players moving into the Dogout. We only care about the first.
+                    it.location != DogOut
+                }.originalPlayerLocation
             uiIndicators.addMoveUsed(start)
             uiIndicators.registerUndo(
                 deltaId = delta.id,
