@@ -3,7 +3,8 @@
 This file is just a temporary way to capture any bugs seen that I didn't have time to investigate yet.
 
 ## Known bugs
-
+- CompositeGameActions are broken up in the save file, so if you reload a save file and start Undo'ing actions,
+  it will behave differently than if you do it from the same game.
 - No pass animation is being triggered when Using the Pass action.
 - Player with ball blocking across middle line drops ball that bounce, crash
 - Hover over player in dugout during setup doesn't show stat card.

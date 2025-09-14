@@ -17,15 +17,15 @@ class ExitProcedure : Command {
     private lateinit var originalNode: Node
 
     override fun execute(state: Game) {
-        val procedureState = state.currentProcedure() ?: INVALID_GAME_STATE("No procedure is running.")
+        val procedureState = state.currentProcedureState() ?: INVALID_GAME_STATE("No procedure is running.")
         procedure = procedureState.procedure
         originalNode = procedureState.currentNode()
-        val currentProcedure = state.currentProcedure()!!
+        val currentProcedure = state.currentProcedureState()!!
         currentProcedure.setCurrentNode(currentProcedure.procedure.exitNode)
     }
 
     override fun undo(state: Game) {
         // Remove the `exitNode`
-        state.currentProcedure()!!.setCurrentNode(originalNode)
+        state.currentProcedureState()!!.setCurrentNode(originalNode)
     }
 }

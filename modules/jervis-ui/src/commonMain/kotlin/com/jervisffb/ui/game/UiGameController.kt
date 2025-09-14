@@ -17,6 +17,8 @@ import com.jervisffb.engine.rng.DiceRollGenerator
 import com.jervisffb.engine.rng.UnsafeRandomDiceGenerator
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayer
+import com.jervisffb.engine.rules.bb2020.procedures.StartOfDriveSequence
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.StandardMoveStep
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.ui.game.animations.AnimationFactory
@@ -46,7 +48,6 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -328,6 +329,13 @@ class UiGameController(
         // Clear move markers when an action ends
         if (delta.containsCommand { it is ExitProcedure && it.procedure == ActivatePlayer }) {
             uiIndicators.resetMovesUsed()
+            return
+        }
+
+        // Clear move markers when starting a drive. This also handles after a touchdown
+        if (state.currentProcedureState()?.procedure == StartOfDriveSequence) {
+            uiIndicators.resetMovesUsed()
+            return
         }
 
 
@@ -343,10 +351,10 @@ class UiGameController(
 
         // Add decoration when moving player
         // TODO Add support JUMP/LEAP
-        if (
-            delta.steps.firstOrNull()?.action == MoveTypeSelected(MoveType.STANDARD) &&
-            delta.steps.lastOrNull()?.action is FieldSquareSelected
-        ) {
+        val normalMoveStep = delta.steps.lastOrNull()?.let {
+            it.procedure == StandardMoveStep && it.action is FieldSquareSelected
+        } ?: false
+        if (normalMoveStep) {
             val start = delta.allCommands()
                 .filterIsInstance<SetPlayerLocation>()
                 .first {

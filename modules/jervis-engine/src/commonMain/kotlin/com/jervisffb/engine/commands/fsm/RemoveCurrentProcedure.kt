@@ -18,7 +18,7 @@ class RemoveCurrentProcedure : Command {
 
     override fun execute(state: Game) {
         originalProcedure = state.removeProcedure()
-        val current: MutableProcedureState? = state.currentProcedure()
+        val current: MutableProcedureState? = state.currentProcedureState()
         LOG.v { "[Stack] Remove procedure: ${originalProcedure.name()}" }
         logEntry1 = SimpleLogEntry("Procedure ${originalProcedure.name()} removed.", LogCategory.STATE_MACHINE)
         logEntry2 = if (current != null) {

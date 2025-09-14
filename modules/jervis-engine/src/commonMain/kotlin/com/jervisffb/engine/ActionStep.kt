@@ -20,8 +20,8 @@ import com.jervisffb.engine.reports.LogEntry
  */
 data class ActionStep(
     val action: GameAction,
-    val procedure: Procedure,
-    val node: Node,
+    val procedure: Procedure, // The procedure that handled the action
+    val node: Node, // The node that handled the action
     // Commands are flattened, i.e., a hierarchy of CompositeCommands is unrolled into a single long list.
     val commands: List<Command>,
 ) {

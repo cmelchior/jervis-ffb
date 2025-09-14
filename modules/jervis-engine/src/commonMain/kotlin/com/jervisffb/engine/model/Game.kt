@@ -244,7 +244,7 @@ class Game(
             ?: INVALID_GAME_STATE("Reroll $id could not be found")
     }
 
-    fun currentProcedure(): MutableProcedureState? = stack.peepOrNull()
+    fun currentProcedureState(): MutableProcedureState? = stack.peepOrNull()
 
     fun addProcedure(procedure: Procedure) {
         stack.pushProcedure(procedure)

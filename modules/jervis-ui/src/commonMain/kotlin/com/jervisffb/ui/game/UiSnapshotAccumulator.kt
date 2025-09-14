@@ -10,7 +10,6 @@ import com.jervisffb.ui.game.model.UiFieldPlayer
 import com.jervisffb.ui.game.model.UiFieldSquare
 import com.jervisffb.ui.game.state.decorators.FieldActionDecorator
 import com.jervisffb.ui.game.state.indicators.FieldStatusIndicator
-import io.ktor.client.utils.EmptyContent.status
 import kotlinx.collections.immutable.persistentListOf
 
 /**

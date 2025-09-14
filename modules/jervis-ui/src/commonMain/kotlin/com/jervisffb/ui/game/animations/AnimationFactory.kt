@@ -115,7 +115,7 @@ object AnimationFactory {
      */
     fun getPostActionAnimation(state: Game, action: GameAction): JervisAnimation? {
         if (action == Undo) return null
-        val currentNode = state.currentProcedure()?.currentNode()
+        val currentNode = state.currentProcedureState()?.currentNode()
 
         // Animate KickOff Event Result
         // Right now we just "guess" that the rules do the same table lookup.

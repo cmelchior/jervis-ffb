@@ -21,7 +21,7 @@ class GotoNode(private val nextNode: Node) : Command {
     private lateinit var originalParentState: ParentNode.State
 
     override fun execute(state: Game) {
-        val currentProcedure = state.currentProcedure() ?: INVALID_GAME_STATE("No procedure is running.")
+        val currentProcedure = state.currentProcedureState() ?: INVALID_GAME_STATE("No procedure is running.")
         val nextState = currentProcedure.procedure.stateToPrettyString(nextNode)
         LOG.v { "[Stack] Goto node: $nextState" }
         logEntry = SimpleLogEntry("Transition to: $nextState", LogCategory.STATE_MACHINE)
@@ -37,7 +37,7 @@ class GotoNode(private val nextNode: Node) : Command {
     }
 
     override fun undo(state: Game) {
-        val currentProcedure = state.currentProcedure()!!
+        val currentProcedure = state.currentProcedureState()!!
         if (nextNode is ParentNode) {
             currentProcedure.setParentNodeState(null)
         }
