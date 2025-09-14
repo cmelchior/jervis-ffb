@@ -64,6 +64,9 @@ fun GameScreen(
         Row(
             modifier = Modifier
                 .aspectRatio(aspectRation)
+                // Field should be above the sidebar and bottom log viewers, so the Action Wheel
+                // is the first thing that intercepts touch events if it overlaps with these sections.
+                .zIndex(1f)
             ,
             verticalAlignment = Alignment.Bottom,
         ) {
