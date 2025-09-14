@@ -40,7 +40,7 @@ class CalculatedAction(private val action: GameEngineController.(Game, Rules) ->
  * Undo this action, all "sub-actions" will all be undone as one.
  */
 @Serializable
-data class CompositeGameAction(val list: List<GameAction>): GameAction {
+data class CompositeGameAction(val actionList: List<GameAction>): GameAction {
     constructor(vararg actions: GameAction) : this(listOf(*actions))
 }
 

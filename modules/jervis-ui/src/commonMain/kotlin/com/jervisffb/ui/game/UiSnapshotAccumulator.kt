@@ -65,7 +65,7 @@ class UiSnapshotAccumulator(
     fun updateSquare(coordinate: FieldCoordinate, func: (UiFieldSquare) -> UiFieldSquare) {
         val currentSquare = squaresBuilder[coordinate] ?: error("Could not find square for coordinate: $coordinate")
         val newSquare = func(currentSquare)
-        // We probably do not need to compare here, since using this method always result in updates (I hope)
+        // We probably do not need to compare here, since using this method always results in updates (I hope)
         if (currentSquare != newSquare) {
             squaresBuilder[coordinate] = newSquare
         }

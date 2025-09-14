@@ -90,7 +90,7 @@ fun ActionSelector(
                             is MoveTypeSelected -> action.moveType.toString()
                             Undo -> TODO()
                             Revert -> TODO()
-                            is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
+                            is CompositeGameAction -> action.actionList.joinToString(prefix = "[", postfix = "]")
                             is PlayerSubActionSelected -> action.action.toString()
                             is SkillSelected -> action.skill.toString()
                             is InducementSelected -> action.name

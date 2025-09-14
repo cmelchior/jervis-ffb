@@ -1,6 +1,5 @@
 package com.jervisffb.ui.game.dialogs
 
-import androidx.compose.ui.text.font.FontVariation.width
 import androidx.compose.ui.unit.Dp
 import com.jervisffb.engine.actions.BlockTypeSelected
 import com.jervisffb.engine.actions.CalculatedAction
@@ -38,7 +37,6 @@ import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.reports.ReportStartingExtraTime.message
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
@@ -81,7 +79,7 @@ data class SingleChoiceInputDialog(
                 Undo -> TODO()
                 Revert -> TODO()
                 is MoveTypeSelected -> action.moveType.toString()
-                is CompositeGameAction -> action.list.joinToString(prefix = "[", postfix = "]")
+                is CompositeGameAction -> action.actionList.joinToString(prefix = "[", postfix = "]")
                 is PlayerSubActionSelected -> action.name
                 is SkillSelected -> action.skill.toString()
                 is InducementSelected -> action.name

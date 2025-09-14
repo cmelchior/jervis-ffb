@@ -2,6 +2,7 @@ package com.jervisffb.engine.serialize
 
 import com.jervisffb.BuildConfig
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.CompositeGameAction
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Field
@@ -90,7 +91,22 @@ object JervisSerialization {
             JervisGameFile(
                 JervisMetaData(FILE_FORMAT_VERSION),
                 JervisConfiguration(controller.rules),
-                JervisGameData(controller.initialHomeTeamState!!, controller.initialAwayTeamState!!, controller.history.flatMap { it.steps.map { it.action }}),
+                JervisGameData(
+                    homeTeam = controller.initialHomeTeamState!!,
+                    awayTeam = controller.initialAwayTeamState!!,
+                    actions = controller.history.flatMap { delta ->
+                        when (delta.steps.size) {
+                            0 -> emptyList()
+                            1 -> listOf(delta.steps.single().action)
+                            else -> {
+                                // If a GameDelta has multiple steps, we want to keep them as such, so we
+                                // we turn them back into a CompositeGameAction in the save file.
+                                val actions = delta.steps.map { it.action }
+                                listOf(CompositeGameAction(actions))
+                            }
+                        }
+                    }
+                ),
                 debugInfo
             )
         return jsonFormat.encodeToString(fileData)

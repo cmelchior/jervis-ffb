@@ -292,7 +292,7 @@ class GameEngineController(
         deltaBuilder = DeltaBuilder(newDeltaId, actionOwner)
         when (userAction) {
             is Undo -> error("Invalid action: $userAction")
-            is CompositeGameAction -> userAction.list.forEach { actionElement ->
+            is CompositeGameAction -> userAction.actionList.forEach { actionElement ->
                 processSingleAction(deltaBuilder, actionElement)
             }
             else -> processSingleAction(deltaBuilder, userAction)
