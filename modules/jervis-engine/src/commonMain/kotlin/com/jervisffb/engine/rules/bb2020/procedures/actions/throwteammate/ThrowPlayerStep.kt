@@ -42,7 +42,12 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.LandingModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.reports.ReportPlayerBounce
+import com.jervisffb.engine.reports.ReportPlayerLandingInSquare
+import com.jervisffb.engine.reports.ReportPlayerLandingOnAnotherPlayer
+import com.jervisffb.engine.reports.ReportQualityOfThrow
 import com.jervisffb.engine.reports.ReportStartingThrowTeamMate
+import com.jervisffb.engine.reports.ReportThrownPlayerGoingOutOfBounds
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
@@ -111,7 +116,7 @@ object ThrowPlayerStep: Procedure() {
                         val newLocation = it.coordinate
                         val automaticFumble = context.thrower.passing == null
                         buildCompositeCommand {
-                            add(ReportStartingThrowTeamMate(context))
+                            add(ReportStartingThrowTeamMate(context, it.coordinate))
                             if (automaticFumble) {
                                 // Having a PA of - is an automatic fumble, no dice is rolled
                                 addAll(
@@ -146,13 +151,16 @@ object ThrowPlayerStep: Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = QualityRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ThrowTeamMateContext>()
-            return when (context.qualityRollResult) {
-                ThrowPlayerResult.SUCCESSFUL_THROW,
-                ThrowPlayerResult.SUPERB_THROW -> GotoNode(ResolveThrowOnTarget)
-                ThrowPlayerResult.TERRIBLE_THROW -> GotoNode(ResolveDeviateThrow)
-                ThrowPlayerResult.FUMBLED_THROW -> GotoNode(ResolveFumbledThrow)
-                null -> INVALID_GAME_STATE("Missing passing result value")
-            }
+            return compositeCommandOf(
+                ReportQualityOfThrow(context),
+                when (context.qualityRollResult) {
+                    ThrowPlayerResult.SUCCESSFUL_THROW,
+                    ThrowPlayerResult.SUPERB_THROW -> GotoNode(ResolveThrowOnTarget)
+                    ThrowPlayerResult.TERRIBLE_THROW -> GotoNode(ResolveDeviateThrow)
+                    ThrowPlayerResult.FUMBLED_THROW -> GotoNode(ResolveFumbledThrow)
+                    null -> INVALID_GAME_STATE("Missing passing result value")
+                }
+            )
         }
     }
 
@@ -232,6 +240,7 @@ object ThrowPlayerStep: Procedure() {
                     ),
                     SetContext(throwContext.copy(target = FieldCoordinate.OUT_OF_BOUNDS, outOfBoundsAt = scatterContext.outOfBoundsAt)),
                     RemoveContext<ScatterRollContext>(),
+                    ReportThrownPlayerGoingOutOfBounds(throwContext, scatter = true),
                     GotoNode(ResolveLandingInTheCrowd)
                 )
             } else {
@@ -304,6 +313,12 @@ object ThrowPlayerStep: Procedure() {
                         target = adjustedTarget,
                         outOfBoundsAt = if (landingNode == ResolveLandingInTheCrowd) throwContext.thrownPlayer.coordinates else null
                     )),
+                    if (landingNode == ResolveLandingInTheCrowd) {
+                        ReportThrownPlayerGoingOutOfBounds(throwContext, scatter = false)
+                    } else {
+                        ReportPlayerBounce(throwContext, adjustedTarget)
+
+                    },
                     GotoNode(landingNode)
                 )
             }
@@ -319,6 +334,7 @@ object ThrowPlayerStep: Procedure() {
             val playerInSquare = state.field[throwContext.target!!].player ?: INVALID_GAME_STATE("No player found in square: ${throwContext.target}")
             val injuryContext = RiskingInjuryContext(playerInSquare)
             return compositeCommandOf(
+                ReportPlayerLandingOnAnotherPlayer(throwContext, playerInSquare),
                 SetPlayerState(playerInSquare, PlayerState.KNOCKED_DOWN),
                 SetContext(injuryContext),
                 SetContext(throwContext.copy(knockedDownWhenLanding = true))
@@ -431,6 +447,7 @@ object ThrowPlayerStep: Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = LandingRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
+            val throwContext = state.getContext<ThrowTeamMateContext>()
             val rollContext = state.getContext<LandingRollContext>()
             val successfulLanding = rollContext.isSuccess
             // If the player successfully landed. One of 3 things will happen:
@@ -438,11 +455,14 @@ object ThrowPlayerStep: Procedure() {
             // 2. They landed successfully on a square with a ball. They must attempt to pick it up.
             // 3. They landed unsuccessfully on the square. They will Fall Over and the ball will bounce.
             //    If there are multiple balls in play, the ball held by the player is bounced first.
-            return if (successfulLanding) {
-                GotoNode(LandSuccessfullyInSquare)
-            } else {
-                GotoNode(ResolveLandingPlayerFallingOver)
-            }
+            return compositeCommandOf(
+                ReportPlayerLandingInSquare(throwContext, rollContext),
+                if (successfulLanding) {
+                    GotoNode(LandSuccessfullyInSquare)
+                } else {
+                    GotoNode(ResolveLandingPlayerFallingOver)
+                }
+            )
         }
     }
 

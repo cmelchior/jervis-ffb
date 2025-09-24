@@ -34,6 +34,7 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.model.modifiers.DiceModifier
+import com.jervisffb.engine.reports.ReportPickingUpPlayerToThrow
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveTypeStep
@@ -167,6 +168,7 @@ object ThrowTeamMateAction : Procedure() {
                         || thrownPlayer.state == PlayerState.STUNNED
                         || thrownPlayer.state == PlayerState.STUNNED_OWN_TURN
                     compositeCommandOf(
+                        ReportPickingUpPlayerToThrow(context, thrownPlayer),
                         SetContext(context.copy(
                             thrownPlayer = thrownPlayer,
                             willCrashLand = willCrashLand
