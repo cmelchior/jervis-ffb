@@ -27,7 +27,7 @@ class SetAvailableActions(
                 PlayerStandardActionType.MOVE -> team.turnData.moveActions - 1
                 PlayerStandardActionType.PASS -> team.turnData.passActions - 1
                 PlayerStandardActionType.HAND_OFF -> team.turnData.handOffActions - 1
-                PlayerStandardActionType.THROW_TEAM_MATE -> TODO()
+                PlayerStandardActionType.THROW_TEAM_MATE -> team.turnData.throwTeamMateActions - 1
                 PlayerStandardActionType.BLOCK -> team.turnData.blockActions - 1
                 PlayerStandardActionType.BLITZ -> team.turnData.blitzActions - 1
                 PlayerStandardActionType.FOUL -> team.turnData.foulActions - 1

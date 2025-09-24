@@ -220,12 +220,27 @@ fun standardBlock(target: String,  die: DBlockResult) = arrayOf(
     SelectSingleBlockDieResult(),
 )
 
+fun dodge(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
 fun catch(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,
 )
 
 fun pickup(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
+fun qualityRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
+    roll,
+    reroll,
+)
+
+fun landingRoll(roll: D6Result = 6.d6, reroll: GameAction? = NoRerollSelected()) = arrayOf(
     roll,
     reroll,
 )

@@ -13,6 +13,8 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameTest
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
@@ -96,6 +98,7 @@ class StandingUpTests: JervisGameTest() {
 
     @Test
     fun failingStandingUpRollEndsAction() {
+
         // Put down opponent player (so we have a target for foul actions)
         state.getPlayerById("H1".playerId).let {
             it.state = PlayerState.PRONE
@@ -107,11 +110,14 @@ class StandingUpTests: JervisGameTest() {
         player.move = 2
         player.movesLeft = 2
 
+        // Give player Throw Team-mate
+        rules.skillSettings.createSkill(player, SkillType.THROW_TEAMMATE, Duration.END_OF_GAME)
+
         // Just check normal actions for now
         PlayerStandardActionType.entries.forEach { action ->
             var startAction: ((GameEngineController) -> Unit)? = null
             lateinit var checkActionUsed: () -> Unit
-            lateinit var rollBack: () -> Int
+            lateinit var rollBack: () -> Int // How many actions to undo to prepare for the next test
             when (action) {
                 PlayerStandardActionType.MOVE -> {
                     startAction = { controller ->
@@ -158,7 +164,13 @@ class StandingUpTests: JervisGameTest() {
                     checkActionUsed = { assertEquals(0, player.team.turnData.foulActions) }
                     rollBack = { 6 }
                 }
-                PlayerStandardActionType.THROW_TEAM_MATE,
+                PlayerStandardActionType.THROW_TEAM_MATE -> {
+                    startAction = { controller ->
+                        controller.rollForward(PlayerActionSelected(PlayerStandardActionType.THROW_TEAM_MATE))
+                    }
+                    checkActionUsed = { assertEquals(0, player.team.turnData.throwTeamMateActions) }
+                    rollBack = { 5 }
+                }
                 PlayerStandardActionType.SPECIAL -> {
                     // Skip for now
                     startAction = null

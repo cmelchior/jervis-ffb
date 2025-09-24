@@ -88,7 +88,11 @@ val HALFLING_HOPEFUL =
         "H",
         30_000,
         5, 2, 3, 4, 7,
-        emptyList(),
+        listOf(
+            SkillType.DODGE.id(),
+            SkillType.RIGHT_STUFF.id(),
+            SkillType.STUNTY.id()
+        ),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         PlayerSize.STANDARD,
@@ -104,7 +108,13 @@ val OGRE =
         "O",
         140_000,
         5, 5, 4, 5, 10,
-        emptyList(),
+        listOf(
+            SkillType.BONE_HEAD.id(),
+            SkillType.LONER.id(4),
+            SkillType.MIGHTY_BLOW.id(1),
+            SkillType.THICK_SKULL.id(),
+            SkillType.THROW_TEAMMATE.id()
+        ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         PlayerSize.BIG_GUY,

@@ -13,7 +13,6 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkDiceRollList
-import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
@@ -24,10 +23,10 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.assert
 
 data class ScatterRollContext(
-    val ball: Ball,
     val from: FieldCoordinate,
     val scatterRoll: List<D8Result> = emptyList(),
     val landsAt: FieldCoordinate? = null, // Will be `null` if out of bounds
@@ -48,9 +47,10 @@ object ScatterRoll : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<ScatterRollContext>()
-        val context = state.getContext<ScatterRollContext>()
-        if (context.ball.state != BallState.SCATTERED) {
-            throw IllegalStateException("Ball is not scattered, but ${context.ball.state}")
+        state.currentBallOrNull()?.let {
+            if (it.state != BallState.SCATTERED) {
+                INVALID_GAME_STATE("Ball is not scattered, but ${it.state}")
+            }
         }
     }
 
@@ -75,6 +75,7 @@ object ScatterRoll : Procedure() {
                         break
                     }
                 }
+                @Suppress("DATA_CLASS_INVISIBLE_COPY_USAGE_WARNING")
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.SCATTER, dice),
                     SetContext(

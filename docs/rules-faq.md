@@ -4,7 +4,7 @@ This file describes how rules with an element of ambiguity are implemented as
 well as the rationale behind doing it the given way.  
 
 Due to copyright restrictions, this FAQ will not directly copy sections of text
-from the rulebooks, but only reference them by page numbers.
+from the rulebooks but only reference them by page numbers.
 
 See [rules-discussions.md](rules-discussions.md) for rules that are not implemented yet.
 
@@ -14,10 +14,10 @@ See [rules-discussions.md](rules-discussions.md) for rules that are not implemen
 Several interactions between trapdoors and other rules are not clearly defined.
 These are described in more detail in the following sections.
 
-#### Page 57 - Trapdoors and Knocked Down Results
+#### Page 57 - Trapdoors and Knocked Down/Fall Over Results
 The trapdoor says that as soon as a player enters the square, we should roll
-for the trapdoor. However, the interaction with a POW/Stumble is not
-clarified. There are two options:
+for the trapdoor. However, the interaction with a POW/Stumble or a thrown player
+failing to land is not clarified. There are two options:
 
 1. We roll for the trapdoor when pushed back, but before being Knocked Down, 
    i.e. similar to being pushed into the crowd where only the crowd injury is
@@ -28,7 +28,8 @@ clarified. There are two options:
 
 The exact wording in the rulebook says "enter a trapdoor square for any reason",
 but does not use the word "immediately" similar to Pushed into the Crowd. For
-that reason Jervis adopts the second option, similar to FUMBBL.
+that reason Jervis adopts the second option. This is also similar to how
+FUMBBL has implemented it.
 
 #### Page 58 - Trapdoors and Chain-pushes
 The interaction between trapdoors and chain-pushes is not described in the
@@ -166,9 +167,18 @@ does.
 Also, this case is explicitly spelled out in the 2016 rulebook (page 19 - 
 Bouncing Balls), where it is defined that a bounce will happen.
 
+### Page 49/53 - Pass/Throw Team-mate with Passing "-"
+For both passing the ball and throwing a team-mate, it is noted that a having a
+PA of `-` is an automatic fumble. But not if you can roll the die.
+
+For all practical purposes this distinction doesn't matter, and since it reduces
+the number of steps, we choose to disallow rolling any dice. The throw just goes
+directly to resolving the fumble.
+
 ### Page 50 - Passing Interference and Ball Clone
 The interaction between multiple balls and Passing Interference is not 
-well-defined. 
+well-defined, i.e. can a player already holding a ball attempt to do 
+interference?
 
 For Deflection, it is only mentioned that the player must be standing with a 
 tackle zone.
@@ -181,7 +191,7 @@ raise the question if Deflection is possible.
 same is not the case for Ball Clone.
 
 For that reason, Jervis allows a player with a ball to deflect a pass, but will 
-automatically fail converting the deflection to an interception.
+automatically fail to convert the deflection to an interception.
 
 ### Page 51 - Failed Catch 
 The consequences of a failed catch are not defined, unlike picking up the ball
@@ -200,6 +210,64 @@ Also, this case is explicitly spelled out in the 2016 rulebook (page 19 -
 Catching the Football), where it is defined that a bounce will happen.
 
 See also https://www.reddit.com/r/bloodbowl/comments/1gmscfm/rule_question_if_a_player_passes_the_ball_on_an/
+
+### Page 54 - Landing and Touchdowns
+The interaction between touchdowns and landings is not well-defined. E.g., do
+you check for touchdowns during the landing, or only after everything is at 
+rest?
+
+Consider the following sequence of events.
+
+1. Player H1 is one square away from the end-zone holding the ball, preparing to
+   hand it off to H2 in the end zone for a score in the next turn.
+2. Player A1 throws A2, so they hit H1, knocking them over. We resolve the 
+   knockdown before bouncing A2. In this case H1 is injured and leaves the 
+   field. Per the rules for Knocked Down, the ball is knocked loose and bounce.
+   It bounces to H2, who catches it.
+3. A2 now bounces to H2 and knocks them over too. Knocking the ball loose yet
+   again.
+
+The question now is: Is it a touchdown or not?  
+
+The rules on page 64 don't cover this specifically, but only use wording like
+"enters a square ... without being knocked down" and "catches the ball in the 
+end-zone."
+
+This means that we can interpret this in two ways:
+
+1. A touchdown is scored as soon as the ball is caught in the end-zone. That 
+   the player is knocked down later is not relevant and is similar to how you
+   resolve other turnovers.
+
+2. We only check for touchdowns after everything is at rest.
+
+You could probably argue both ways. However, given that the rulebook also has a 
+section specifically calling out touchdowns not counting if the player falls
+over while moving into the end-zone, the most reasonable approach seems to be
+to check after everything is at rest.
+
+So this is the interpretation Jervis uses.
+
+### Page 54 - Crash Landing and Landing in an Occupied Square
+Landing in an Occupied Square and Crash Landing are described in two sections,
+as two independent things. But it is possible to for both to happen at the same
+time. This leaves it open to interpretation what happens if the bounce from 
+landing on a player counts as the bounce from crash-landing, or you need to 
+bounce twice in that case.
+
+The assumption is that Landing in an Occupied Square takes precedence, and you
+only need to bounce once. 
+
+This also has implications on what happens when resolving going down. A Crash
+Landing will result in the player Falling Over, while a bounce will result in a 
+Knocked Down. So this means that in the case both things happen, the player will
+be Knocked Down.
+
+### Page 54 - Landing and Trapdoors
+Trapdoors mention entering for "any reason". However, it is unclear exactly how
+this interacts with throwing a player. Jervis assumes that throwing a player
+also counts and that it will first trigger after you rolled for Landing, similar
+to how it works for Dogdges, where you also roll for dodge before trapdoors.
 
 ### Page 58 - Pushed Players and Chain-pushes
 Pushbacks and the timing of other events are not well-defined in the rulebook. 
@@ -246,7 +314,7 @@ from the person they are pushing themselves, which seems paradoxical.
 So for that reason, we will choose option 3 as the interpretation. It is also
 easier to implement.
 
-Note, this choice does not affect the problem that a chain-push can affect a 
+Note; this choice does not affect the problem that a chain-push can affect a 
 square that was already chain-pushed. In this case, there are two 
 interpretations for player A (pusher) and player B (pushee):
 
@@ -292,7 +360,7 @@ involving balls:
 2. A player holding the ball was pushed into a trapdoor and was swallowed.
 3. A player holding the ball was pushed into a crowd.
 
-The order of resolving this is not defined in the rulebook, and only matters
+The order of resolving this is not defined in the rulebook and only matters
 if there are multiple balls in play. But an order still needs to be defined.
 
 The solution that would make most "sense" would be just resolve events in order
@@ -302,9 +370,9 @@ their ball before the ball being thrown in from the crowd?
 In this case Jervis has opted to resolve things in the order players are moved.
 This means:
 
-1. Resolve all locations in the push chain, starting from the defenders position
-   This also means that bounces from normallyresolved before throwing in.
-2. Then resolve the attackers location, as their "follow-up" was the last move.
+1. Resolve all locations in the push chain, starting from the defender position.
+   This also means that bounces from are resolved before a before throwing in.
+2. Then resolve the attacker location, as their "follow-up" was the last move.
    This will always be a bounce.
 
 #### Touchdowns
@@ -327,7 +395,7 @@ when Ball Clone is in play. But some of the questions that arise:
 4. If the attacker is trapped by a trapdoor, but managed to push another
    player into a scoring position. Is the touchdown scored?
 
-For now Jervis, uses the same logic as for how chain-pushes are resolved, i.e.
+For now Jervis uses the same logic as for how chain-pushes are resolved, i.e.,
 we resolve the chain in the order players are moved. The player that first gets 
 hold of the ball successfully will score a touchdown (and all other touchdowns 
 are ignored). In the case the attacker caused a turn-over, this will be 
@@ -395,7 +463,7 @@ does it as it would be the least surprising to people.
    removed. If yes, any ball they are holding is knocked loose. Do not roll for
    bounce yet.
 
-9. Check if any players in the push chain is in a scoring position holding the
+9. Check if any players in the push chain are in a scoring position holding the
    ball. Going through the push chain starting from the defender and ending with
    the attacker. If a touchdown is scored, the remaining balls still need to
    be resolved (due to the possibility of exploding balls). But no other
@@ -496,7 +564,7 @@ interpretation.
 Jervis has taken the following approach:
 
 - 1. The order of checks should match the single block case.
-- 2. When in doubt lean towards the FUMBBL implementation (if possible).
+- 2. When in doubt, lean towards the FUMBBL implementation (if possible).
 
 These two restrictions has a number of implications
 
@@ -646,7 +714,7 @@ This was also discussed here: https://www.reddit.com/r/bloodbowl/comments/18giy1
 
 ## Special Play Cards
 
-### Random Event: Ball Clone
+### Random Event: Ball Clone and Bounce
 During Ball Clone, if one ball enters a square with another ball, it says that
 "one ball will immediately bounce", making it unclear which ball
 is bouncing:
@@ -671,6 +739,51 @@ Since all of these aspects are undefined, the implementation always lets the
 last ball bounce. This solves all the questions above as well as increases the
 "awesome"-factor if it actually succeeds since it prevents the turn-over.
 
+### Random Event: Ball Clone and Player with the ball landing unsuccessfully on another ball
+The interaction between multiple balls and throwing a player already holding a
+ball is not well-defined. The card does mention that a player holding the ball
+cannot pick up another ball, so landing successfully on another ball will
+just cause it to bounce.
+
+If the thrown player lands unsuccessfully on another ball, both balls will
+bounce, but the order isn't described. It could be:
+
+1. The ball already in the square bounces first.
+2. The ball being held by the player falling over will bounce first.
+
+This does probably not have a practical difference, so Jervis is choosing to
+have the ball held by the thrown player bounce first, then the ball on the
+square. This is also similar to a normal ball bounce, where it is the last
+ball going into a square that bounces first.
+
+### Random Event: Ball Clone and multiple touchdowns
+When throwing a team-mate, it is possible to have multiple balls ending up in
+the end-zone at "the same time". E.g., if the player thrown hits another player
+also holding a ball. Both balls get knocked loose and both end up getting caught 
+in the end-zone.
+
+The question then arises: In which order do you check for potential touchdowns
+and what happens if you score multiple times?
+
+This is not at all defined in the rulebook, so we are left up to guesswork.
+The following interpretations could be considered:
+
+1. We test it in the order the balls landed in the end-zone.
+2. The active coach decides the order
+3. The active coach decides first on their team. The inactive coach then decides
+   the order on their team.
+
+Since we already chose to only check for touchdowns when everything is "at 
+rest", option 1 does not seem reasonable. Given that we normally let a coach
+decide the order of events on their own team, having the active coach decide 
+between players on the inactive team also seems unfair. This leaves us with 
+option 3, which is the implementation used in Jervis.
+
+This leaves the question of what happens if you score multiple times. In this
+case, the choice is pretty arbitrary, but given that it is unclear how to
+handle two touchdowns, we simply choose to ignore the second one. This also
+means that any effect that will trigger on a player scoring (like Bloodlust) is
+ignored as soon as we detect the first touchdown.
 
 ## Almanac - 2024
 

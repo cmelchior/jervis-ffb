@@ -35,14 +35,15 @@ enum class RiskingInjuryMode {
     KNOCKED_DOWN,
     PUSHED_INTO_CROWD,
     FOUL,
-    HIT_BY_ROCK
+    HIT_BY_ROCK,
+    BAD_LANDING // TODO Is there a difference between Bad Landing and Crash Landing here?
 }
 
 // What do we need to track?
 data class RiskingInjuryContext(
     val player: Player,
     val isPartOfMultipleBlock: Boolean = false,
-    val mode: RiskingInjuryMode = RiskingInjuryMode.KNOCKED_DOWN, // Do we need this?
+    val mode: RiskingInjuryMode = RiskingInjuryMode.KNOCKED_DOWN,
 
     // Armour roll
     val armourRoll: List<D6Result> = listOf(),

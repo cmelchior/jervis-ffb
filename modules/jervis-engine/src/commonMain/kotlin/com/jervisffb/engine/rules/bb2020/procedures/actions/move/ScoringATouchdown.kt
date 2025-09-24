@@ -45,23 +45,23 @@ data class ScoringATouchDownContext(
  * Moving into the End Zone would normally result in an immediate touchdown, but
  * some things can impact it:
  *
- * - Ball Clone: The ball disappears between your hands
+ * - Ball Clone: The ball disappears between your hands.
  * - Blood Lust: Need to bite a thrall for turnover to count
  * - Touchdown already happened: During a push, multiple players might be end up
  *   in a scoring position. In that case, we only treat the first player as
- *   having scored, and ignore the rest.
+ *   having scored and ignore the rest.
  *
  * For Ball Clone, we are using the following semantics:
- * - We roll for Ball Clone before any other effect
- * - Pro is not allowed
- * - Team rerolls are not allowed
+ * - We roll for Ball Clone before any other effect.
+ * - Pro is not allowed.
+ * - Team rerolls are not allowed.
  * - If the roll fails and the ball disappeared, we let the player continue
  *   their turn as if nothing has happened.
  *
  * The reason for this is this phrase "A touchdown is scored.....No touchdown
  *  * is scored". But the exact timing is under-documented, so a valid argument
- *  could probably be made that the player's turn ends as well. So for now,
- *  the choice is somewhat arbitrary.
+ *  could be made that the player's turn ends as well. So for now, the choice is
+ *  somewhat arbitrary.
  *
  * If Ball Clone succeeds, other effects will be taken into account, like
  * Blood Lust.

@@ -31,7 +31,7 @@ import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.reports.ReportPassResult
+import com.jervisffb.engine.reports.ReportStartingPass
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.Bounce
 import com.jervisffb.engine.rules.bb2020.procedures.Catch
@@ -90,7 +90,7 @@ object PassStep: Procedure() {
                         val ball = context.thrower.ball!!
                         val newLocation = it.coordinate
                         compositeCommandOf(
-                            ReportPassResult(context),
+                            ReportStartingPass(context),
                             SetContext(
                                 context.copy(
                                     target = newLocation,
@@ -148,7 +148,6 @@ object PassStep: Procedure() {
                 SetBallLocation(ball, context.target!!),
                 SetContext(
                     ScatterRollContext(
-                        ball = ball,
                         from = context.target)
                 )
             )

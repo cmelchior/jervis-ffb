@@ -23,15 +23,13 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
-import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.DiceRollType
@@ -40,35 +38,38 @@ import com.jervisffb.engine.rules.bb2020.procedures.Bounce
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStepResolveSingleBlockPushChain
+import com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate.ThrowPlayerStep
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 
 
-data class MovePlayerIntoSquareContext(
-    val player: Player,
-    val target: FieldCoordinate
-) : ProcedureContext
-
 /**
  * Procedure controlling a player entering a square using one of their
- * normal movement options.
+ * normal movement options or landing there after being thrown.
  *
  * Normally it just means moving the player into that square, but if
  * Treacherous Trapdoors have been rolled on Prayers to Nuffle, it
  * might result in the player being removed from play immediately.
  *
  * This procedure should not be called until after all rolls for entering the
- * square have been resolved, i.e., Rush, Dodge, Jump and Leap. This is covered
- * under Picking Up The Ball on page 46 in the rulebook.
+ * square have been resolved, i.e., Rush, Dodge, Jump, Leap and Landing. This is
+ * covered under Picking Up The Ball on page 46 in the rulebook.
  *
- * NOTE: Pushbacks roughly follows the same logic but with different timings,
+ * This procedure does NOT check for touchdowns nor pickups. That is left up
+ * to the parent procedure.
+ *
+ * NOTE: Pushbacks roughly follow the same logic but with different timings,
  * so moving players into squares during a push is handled in those procedures.
+ *
+ * NOTE: This procedure only supports a player landing successfully after a
+ * throw. Falling Over after a throw is handled in XXX.
  *
  * @see [PushStepInitialMoveSequence]
  * @see [PushStepResolveSingleBlockPushChain]
  * @see [MultipleBlockAction]
+ * @see [ThrowPlayerStep]
  *
  * TODO This logic here is wrong and needs to be reworked. See rule-discussions.md
  */
@@ -87,7 +88,7 @@ object MovePlayerIntoSquare : Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<MovePlayerIntoSquareContext>()
             return compositeCommandOf(
-                SetPlayerLocation(context.player, context.target),
+                SetPlayerLocation(context.player, context.target, isThrown = false),
                 GotoNode(CheckForBouncingBall),
             )
         }

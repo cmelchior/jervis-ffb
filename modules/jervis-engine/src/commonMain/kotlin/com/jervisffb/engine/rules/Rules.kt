@@ -16,6 +16,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.FieldCoordinate.Companion.OUT_OF_BOUNDS
 import com.jervisffb.engine.model.locations.Location
@@ -26,6 +27,7 @@ import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
 import com.jervisffb.engine.rules.bb2020.BB2020TeamActions
+import com.jervisffb.engine.rules.bb2020.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.bb2020.tables.BB2020ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020CasualtyTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020LastingInjuryTable
@@ -651,7 +653,10 @@ open class Rules(
             // Add any team actions that are available
             state.activeTeamOrThrow().turnData.let {
                 if (it.moveActions > 0) add(teamActions.move)
-                if (it.passActions > 0) add(teamActions.pass)
+                if (it.passActions > 0 && it.throwTeamMateActions == teamActions.throwTeamMate.availablePrTurn) {
+                    // Pass and Throw Team-mate are mutually exclusive
+                    add(teamActions.pass)
+                }
                 if (it.handOffActions > 0) add(teamActions.handOff)
                 if (it.blockActions > 0) {
                     val isStanding = (player.state == PlayerState.STANDING)
@@ -683,6 +688,10 @@ open class Rules(
                     if (hasEligibleFoulTargets) {
                         add(teamActions.foul)
                     }
+                }
+                if (it.throwTeamMateActions > 0 && it.passActions == teamActions.pass.availablePrTurn && player.hasSkill<ThrowTeamMate>()) {
+                    // Throw Team-mate and Pass are mutually exclusive
+                    add(teamActions.throwTeamMate)
                 }
                 // Even though Secure The Ball is only in the 2025 ruleset, we have the check here
                 // since it makes maintaining the logic easier. The action is disabled by setting the

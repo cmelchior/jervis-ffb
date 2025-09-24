@@ -42,4 +42,12 @@ data class ActionRequest(
             ?.let { (it as SelectMoveType).types.contains(type) }
         return found == true
     }
+
+    inline fun <reified T: GameActionDescriptor> contains(): Boolean {
+        return actions.any { it is T }
+    }
+
+    inline fun <reified T: GameActionDescriptor> get(): T {
+        return actions.first { it is T } as T
+    }
 }

@@ -5,18 +5,30 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.Location
 
-class SetPlayerLocation(val player: Player, val location: Location) : Command {
+/**
+ * Set player location. This also include state changes related to being thrown or not.
+ */
+class SetPlayerLocation(
+    val player: Player,
+    val location: Location,
+    val isThrown: Boolean = false, // If true, the player is thrown to the new location rather than being placed
+) : Command {
+    private var originalPlayerBeingThrown = false
     lateinit var originalPlayerLocation: Location
     private var originalPlayerOnField: Player? = null
+    private var originalThrownPlayerOnField: Player? = null
 
     override fun execute(state: Game) {
+        // Save original state
         this.originalPlayerLocation = player.location
+        this.originalPlayerBeingThrown = player.isBeingThrown
         if (originalPlayerLocation is FieldCoordinate) {
-            val currentLocation = player.location as FieldCoordinate
             if (player.location == FieldCoordinate.UNKNOWN || player.location == FieldCoordinate.OUT_OF_BOUNDS) {
                 this.originalPlayerOnField = null
+                this.originalThrownPlayerOnField = null
             } else {
                 this.originalPlayerOnField = state.field[player.location as FieldCoordinate].player
+                this.originalThrownPlayerOnField = state.field[player.location as FieldCoordinate].thrownPlayer
             }
         }
 
@@ -25,34 +37,49 @@ class SetPlayerLocation(val player: Player, val location: Location) : Command {
         if (oldLocation is FieldCoordinate && oldLocation != FieldCoordinate.UNKNOWN && oldLocation != FieldCoordinate.OUT_OF_BOUNDS) {
             state.field[oldLocation].apply {
                 // In some cases, players are in an intermediate state, where
-                // field.location doesn't match player.location In that case,
-                // do not remove the player from the field
+                // field.location doesn't match player.location. E.g. when
+                // setting up a pushback chain. In that case, do not remove the
+                // player from the field.
                 if (player == this@SetPlayerLocation.player) {
                     player = null
+                }
+                if (thrownPlayer == this@SetPlayerLocation.player) {
+                    thrownPlayer = null
                 }
             }
         }
 
         // Add to new location
         player.location = location
+        player.isBeingThrown = isThrown
         if (location is FieldCoordinate && location != FieldCoordinate.UNKNOWN && location != FieldCoordinate.OUT_OF_BOUNDS) {
             state.field[location].apply {
-                player = this@SetPlayerLocation.player
+                if (isThrown) {
+                    thrownPlayer = this@SetPlayerLocation.player
+                } else {
+                    player = this@SetPlayerLocation.player
+                }
             }
         }
     }
 
     override fun undo(state: Game) {
-        if (location is FieldCoordinate) {
+        if (location is FieldCoordinate && location != FieldCoordinate.UNKNOWN && location != FieldCoordinate.OUT_OF_BOUNDS) {
             state.field[location].apply {
-                player = null
+                if (isThrown) {
+                    thrownPlayer = null
+                } else {
+                    player = null
+                }
             }
         }
         player.location = originalPlayerLocation
+        player.isBeingThrown = originalPlayerBeingThrown
         val originalLoc = originalPlayerLocation
-        if (originalLoc is FieldCoordinate) {
+        if (originalLoc is FieldCoordinate && originalLoc != FieldCoordinate.UNKNOWN && originalLoc != FieldCoordinate.OUT_OF_BOUNDS) {
             state.field[originalLoc].apply {
                 player = originalPlayerOnField
+                thrownPlayer = originalThrownPlayerOnField
             }
         }
     }

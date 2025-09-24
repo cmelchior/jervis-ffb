@@ -35,7 +35,7 @@ object ChangingWeather : Procedure() {
     object ChangeWeather : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = WeatherRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If the ball is not out-of-bounds already it scatters further
+            // If the ball is not out-of-bounds already, it scatters further.
             return if (
                 state.weather == Weather.PERFECT_CONDITIONS &&
                 state.singleBall().location.isOnField(rules)
@@ -54,9 +54,9 @@ object ChangingWeather : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             return SetContext(
                 ScatterRollContext(
-                    ball = state.singleBall(),
                     from = state.singleBall().location
-                ))
+                )
+            )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScatterRoll
         override fun onExitNode(state: Game, rules: Rules): Command {

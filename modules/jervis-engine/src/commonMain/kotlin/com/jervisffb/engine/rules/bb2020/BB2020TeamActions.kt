@@ -10,12 +10,12 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.handoff.HandOffAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassAction
+import com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate.ThrowTeamMateAction
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.actions.TeamActions
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-import com.jervisffb.rules.bb2020.procedures.actions.handoff.ThrowTeamMateAction
 import kotlinx.serialization.Serializable
 
 /**
@@ -168,5 +168,6 @@ class BB2020TeamActions : TeamActions() {
     override val block: PlayerAction = get(PlayerStandardActionType.BLOCK)
     override val blitz: PlayerAction = get(PlayerStandardActionType.BLITZ)
     override val foul: PlayerAction = get(PlayerStandardActionType.FOUL)
+    override val throwTeamMate: PlayerAction = get(PlayerStandardActionType.THROW_TEAM_MATE)
     override val secureTheBall: PlayerAction = get(PlayerStandardActionType.SECURE_THE_BALL)
 }

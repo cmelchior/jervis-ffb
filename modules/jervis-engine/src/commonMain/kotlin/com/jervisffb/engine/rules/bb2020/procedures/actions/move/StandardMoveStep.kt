@@ -28,6 +28,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.MoveContext
+import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.RushRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules

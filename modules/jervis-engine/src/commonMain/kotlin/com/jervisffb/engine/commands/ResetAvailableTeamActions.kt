@@ -13,6 +13,7 @@ class ResetAvailableTeamActions(
     private val blockActions: Int,
     private val blitzActions: Int,
     private val foulActions: Int,
+    private val throwTeamMateActions: Int,
     private val secureTheBallActions: Int,
     private val specialActions: Map<PlayerSpecialActionType, Int>
 ) : Command {
@@ -22,6 +23,7 @@ class ResetAvailableTeamActions(
     var originalBlockActions = 0
     var originalBlitzActions = 0
     var originalFoulActions = 0
+    var originalThrowTeamMateActions = 0
     var originalSecureTheBallActions = 0
     var originalSpecialActions = emptyMap<PlayerSpecialActionType, Int>()
 
@@ -34,6 +36,7 @@ class ResetAvailableTeamActions(
         originalBlockActions = team.turnData.availableStandardActions[PlayerStandardActionType.BLOCK]!!
         originalBlitzActions = team.turnData.availableStandardActions[PlayerStandardActionType.BLITZ]!!
         originalFoulActions = team.turnData.availableStandardActions[PlayerStandardActionType.FOUL]!!
+        originalThrowTeamMateActions = team.turnData.availableStandardActions[PlayerStandardActionType.THROW_TEAM_MATE]!!
         originalSecureTheBallActions = team.turnData.availableStandardActions[PlayerStandardActionType.SECURE_THE_BALL]!!
         originalSpecialActions = team.turnData.availableSpecialActions.toMap()
         team.turnData.let {
@@ -43,6 +46,7 @@ class ResetAvailableTeamActions(
             it.blockActions = blockActions
             it.blitzActions = blitzActions
             it.foulActions = foulActions
+            it.throwTeamMateActions = throwTeamMateActions
             it.secureTheBallActions = secureTheBallActions
             it.availableSpecialActions.clear()
             it.availableSpecialActions.putAll(specialActions)
@@ -59,6 +63,7 @@ class ResetAvailableTeamActions(
             it.blockActions = originalBlockActions
             it.blitzActions = originalBlitzActions
             it.foulActions = originalFoulActions
+            it.throwTeamMateActions = originalThrowTeamMateActions
             it.secureTheBallActions = originalSecureTheBallActions
             it.availableSpecialActions.clear()
             it.availableSpecialActions.putAll(originalSpecialActions)

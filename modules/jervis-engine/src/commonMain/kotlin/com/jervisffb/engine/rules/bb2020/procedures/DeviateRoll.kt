@@ -15,7 +15,6 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkDiceRoll
-import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
@@ -36,7 +35,8 @@ data class DeviateRollContext(
 /**
  * Resolve a Deviate Roll.
  *
- * Note, this procedure does not move the ball or change its state, it only save the result inside
+ * Both balls and players can deviate, but note that this procedure does not
+ * move either of them nor change their state. It only saves the result inside
  * [DeviateRollContext]. It is up to the parent procedure to handle it.
  *
  * See page 25 in the rulebook.
@@ -47,10 +47,6 @@ object DeviateRoll : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<DeviateRollContext>()
-        val ball = state.field[state.getContext<DeviateRollContext>().from].balls.single()
-        if (ball.state != BallState.DEVIATING && ball.state != BallState.IN_AIR) {
-            throw IllegalStateException("Ball is not deviating, but ${ball.state}")
-        }
     }
 
     object RollDice : ActionNode() {

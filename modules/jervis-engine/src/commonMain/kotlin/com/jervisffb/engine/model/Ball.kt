@@ -18,11 +18,9 @@ class Ball {
 
     /**
      * Returns the ball location, taking into account that it might be carried
-     * by a player, in which case the players coordinate is returned.
+     * by a player, in which case the player coordinate is returned.
      */
     fun resolvedLocation(): FieldCoordinate {
-        return carriedBy?.let {
-            it.coordinates
-        } ?: location
+        return carriedBy?.coordinates ?: location
     }
 }

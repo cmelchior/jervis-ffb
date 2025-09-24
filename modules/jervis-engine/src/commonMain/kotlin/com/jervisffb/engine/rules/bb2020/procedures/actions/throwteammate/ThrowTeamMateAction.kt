@@ -1,5 +1,7 @@
-package com.jervisffb.rules.bb2020.procedures.actions.handoff
+package com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate
 
+import com.jervisffb.engine.actions.Continue
+import com.jervisffb.engine.actions.ContinueWhenReady
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
@@ -8,10 +10,8 @@ import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
-import com.jervisffb.engine.commands.SetBallLocation
-import com.jervisffb.engine.commands.SetBallState
-import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetTurnOver
+import com.jervisffb.engine.commands.buildCompositeCommand
 import com.jervisffb.engine.commands.compositeCommandOf
 import com.jervisffb.engine.commands.context.RemoveContext
 import com.jervisffb.engine.commands.context.SetContext
@@ -21,6 +21,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
@@ -29,92 +30,157 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.locations.OnFieldLocation
+import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
-import com.jervisffb.engine.rules.bb2020.procedures.Catch
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.bb2020.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
+import com.jervisffb.engine.rules.bb2020.skills.RightStuff
+import com.jervisffb.engine.rules.bb2020.skills.ThrowTeamMate
+import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
 
+// See page 53 in the rulebook
+enum class ThrowPlayerResult {
+    SUPERB_THROW,
+    SUCCESSFUL_THROW,
+    TERRIBLE_THROW,
+    FUMBLED_THROW,
+}
+
 data class ThrowTeamMateContext(
     val thrower: Player,
-    val catcher: Player? = null,
+    val thrownPlayer: Player? = null,
     val hasMoved: Boolean = false,
+    // Target of the throw in the current step. This means it will be updated when the ball scatters, deviates, etc.
+    val target: FieldCoordinate? = null,
+    val range: Range? = null,
+    val qualityRoll: D6DieRoll? = null,
+    val qualityRollModifiers: List<DiceModifier> = emptyList(),
+    val qualityRollResult: ThrowPlayerResult? = null,
+    // If a player without TZ or prone/stunned are thrown they will bounce one
+    // extra time before landing.
+    val willCrashLand: Boolean = false,
+    // If a player bounces on another player, they will automatically be Knocked Down when finally landing.
+    val knockedDownWhenLanding: Boolean = false,
+    // If the player scattered, deviated or bounced into the crowd while holding the ball.
+    // The ball should be thrown in from this field.
+    val outOfBoundsAt: FieldCoordinate? = null
 ) : ProcedureContext
 
 /**
- * Procedure for controlling a player's Hand-off action.
- * See page 51 in the rulebook.
+ * Procedure for controlling a player's Throw team-mate action.
+ * See page 52 in the rulebook.
+ *
+ * This procedure assumes that the caller has checked that the thrower has the
+ * Throw Team-mate trait
+ *
  */
 object ThrowTeamMateAction : Procedure() {
-    override val initialNode: Node = MoveOrHandOffOrEndAction
+    override val initialNode: Node = MoveOrThrowPlayerOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val player = state.activePlayer!!
         return compositeCommandOf(
             getSetPlayerRushesCommand(rules, player),
-            SetContext(ThrowTeamMateContext(player))
+            SetContext(
+                ThrowTeamMateContext(
+                    thrower = player,
+                )
+            )
         )
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<ThrowTeamMateContext>()
+        val activePlayerContext = state.getContext<ActivatePlayerContext>()
         return compositeCommandOf(
             RemoveContext<ThrowTeamMateContext>(),
-            SetContext(state.getContext<ActivatePlayerContext>().copy(markActionAsUsed = context.hasMoved))
+            SetContext(
+                activePlayerContext.copy(
+                    markActionAsUsed = (context.hasMoved || context.qualityRoll != null)
+                )
+            )
         )
     }
     override fun isValid(state: Game, rules: Rules) {
-        if (state.activePlayer == null) INVALID_GAME_STATE("No active player")
+        state.activePlayer ?: INVALID_GAME_STATE("No active player")
+        if (state.activePlayer?.hasSkill<ThrowTeamMate>() != true) {
+            INVALID_GAME_STATE("Player does not have Throw Team-mate: ${state.activePlayer}")
+        }
     }
 
-    object MoveOrHandOffOrEndAction : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<ThrowTeamMateContext>().thrower.team
+    object MoveOrThrowPlayerOrEndAction : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.activePlayer!!.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<ThrowTeamMateContext>()
-            val options = mutableListOf<GameActionDescriptor>()
-
-            // Find possible move types
-            options.addIfNotNull(calculateMoveTypesAvailable(state, context.thrower))
-
-            // Check if adjacent to a possible receiver
-            if (context.thrower.hasBall()) {
-                context.thrower.coordinates.getSurroundingCoordinates(rules, 1)
-                    .mapNotNull { state.field[it].player }
-                    .filter { it.team == context.thrower.team && it.state == PlayerState.STANDING }
-                    .forEach {
-                        options.add(SelectPlayer(it))
-                    }
+            if (state.endActionImmediately()) {
+                return listOf(ContinueWhenReady)
             }
 
-            // Just end the action
+            val context = state.getContext<ThrowTeamMateContext>()
+            val options = mutableListOf<GameActionDescriptor>()
+            val thrower = context.thrower
+            val throwerLocation = thrower.location
+
+            // Find possible move types
+            options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
+
+            // If the thrower is next to a standing player with "Right Stuff", they can be selected for the throw
+            if (thrower.state == PlayerState.STANDING && throwerLocation is OnFieldLocation) {
+                val eligiblePlayers = throwerLocation.getSurroundingCoordinates(rules, 1).mapNotNull {
+                    val player = state.field[it].player
+                    val canBeThrown = player != null
+                        && player.team == thrower.team
+                        && player.hasSkill<RightStuff>()
+                        && player.strength <= player.getSkill<RightStuff>().maxStrength
+                    if (canBeThrown) {
+                        player.id
+                    } else {
+                        null
+                    }
+                }
+                if (eligiblePlayers.isNotEmpty()) {
+                    options.add(SelectPlayer(eligiblePlayers))
+                }
+            }
+
+            // End the pass action before trying to throw the ball
             options.add(EndActionWhenReady)
+
             return options
         }
 
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            val handOffContext = state.getContext<ThrowTeamMateContext>()
+            val context = state.getContext<ThrowTeamMateContext>()
             return when (action) {
-                EndAction -> ExitProcedure()
-                is MoveTypeSelected -> {
-                    val moveContext = MoveContext(handOffContext.thrower, action.moveType)
+                Continue, EndAction -> ExitProcedure()
+                is PlayerSelected -> checkTypeAndValue<PlayerSelected>(state, action) {
+                    val context = state.getContext<ThrowTeamMateContext>()
+                    val thrownPlayer = it.getPlayer(state)
+                    val willCrashLand = !thrownPlayer.hasTackleZones
+                        || thrownPlayer.state == PlayerState.PRONE
+                        || thrownPlayer.state == PlayerState.STUNNED
+                        || thrownPlayer.state == PlayerState.STUNNED_OWN_TURN
                     compositeCommandOf(
-                        SetContext(handOffContext.copy(hasMoved = true)),
+                        SetContext(context.copy(
+                            thrownPlayer = thrownPlayer,
+                            willCrashLand = willCrashLand
+                        )),
+                        GotoNode(ResolveThrowPlayer)
+                    )
+                }
+                is MoveTypeSelected -> checkTypeAndValue<MoveTypeSelected>(state, action) { moveTypeAction ->
+                    val moveContext = MoveContext(context.thrower, moveTypeAction.moveType)
+                    compositeCommandOf(
                         SetContext(moveContext),
                         GotoNode(ResolveMove)
                     )
                 }
-                is PlayerSelected -> {
-                    val ball = handOffContext.thrower.ball!!
-                    compositeCommandOf(
-                        SetContext(handOffContext.copy(catcher = action.getPlayer(state))),
-                        SetBallState.accurateThrow(ball),
-                        SetBallLocation(ball, action.getPlayer(state).coordinates),
-                        GotoNode(ResolveCatch)
-                    )
-                }
-
                 else -> INVALID_ACTION(action)
             }
         }
@@ -123,35 +189,38 @@ object ThrowTeamMateAction : Procedure() {
     object ResolveMove : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = ResolveMoveTypeStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If player is not standing on the field after the move, it is a turn over,
-            // otherwise they are free to continue their hand-off.
+            // If a player is not standing on the field after the move, it is a turnover,
+            // otherwise they are free to continue their Throw Team-mate action.
+            val moveContext = state.getContext<MoveContext>()
             val context = state.getContext<ThrowTeamMateContext>()
-            return if (state.endActionImmediately()) {
-                ExitProcedure()
-            } else if (!rules.isStanding(context.thrower)) {
-                compositeCommandOf(
-                    SetTurnOver(TurnOver.STANDARD),
-                    ExitProcedure()
-                )
-            } else {
-                GotoNode(MoveOrHandOffOrEndAction)
+            return buildCompositeCommand {
+                if (moveContext.hasMoved) {
+                    add(SetContext(context.copy(hasMoved = true)))
+                }
+                if (state.endActionImmediately()) {
+                    add(ExitProcedure())
+                } else if (!rules.isStanding(context.thrower)) {
+                    add(SetTurnOver(TurnOver.STANDARD))
+                    add(ExitProcedure())
+                } else {
+                    add(GotoNode(MoveOrThrowPlayerOrEndAction))
+                }
             }
         }
     }
 
-    object ResolveCatch : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
-            return SetCurrentBall(state.getContext<ThrowTeamMateContext>().thrower.ball!!)
-        }
-        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch
+    object ResolveThrowPlayer : ParentNode() {
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ThrowPlayerStep
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // If no player on the holds the ball after the hand-off is complete, it is a turnover.
-            // otherwise the action just ends
             val context = state.getContext<ThrowTeamMateContext>()
             return compositeCommandOf(
-                SetCurrentBall(null),
-                if (!rules.teamHasBall(context.thrower.team, state.currentBall())) SetTurnOver(TurnOver.STANDARD) else null,
-                ExitProcedure()
+                if (context.target == null) {
+                    // No target was selected, so no throw was attempted, continue the action.
+                    GotoNode(MoveOrThrowPlayerOrEndAction)
+                } else {
+                    // Thrower is not allowed to move after the throw, regardless of the outcome.
+                    ExitProcedure()
+                }
             )
         }
     }

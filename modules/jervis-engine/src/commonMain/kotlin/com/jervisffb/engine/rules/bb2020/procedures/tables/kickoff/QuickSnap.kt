@@ -27,6 +27,7 @@ import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -36,7 +37,6 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.KickOffEventContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquare
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MovePlayerIntoSquareContext
 import com.jervisffb.engine.rules.common.tables.KickOffEvent
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 

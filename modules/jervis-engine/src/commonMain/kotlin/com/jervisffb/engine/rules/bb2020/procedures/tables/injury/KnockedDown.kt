@@ -28,9 +28,16 @@ object KnockedDown: Procedure() {
     override val initialNode: Node = RollForInjury
     override fun onEnterProcedure(state: Game, rules: Rules): Command? {
         val context = state.getContext<RiskingInjuryContext>()
-        return when (context.player.team == state.activeTeam) {
-            true -> SetTurnOver(TurnOver.STANDARD)
-            false -> null
+        // See page 23 in the rulebook
+        val isOnActiveTeam = (context.player.team == state.activeTeam)
+        // It is only a turnover if a thrown player is knocked down holding the ball (see Errata May 2025)
+        val hasBall = context.player.hasBall()
+        val playerThrown = (context.mode == RiskingInjuryMode.BAD_LANDING)
+
+        return if ((isOnActiveTeam && !playerThrown) || (isOnActiveTeam && playerThrown && hasBall)) {
+            SetTurnOver(TurnOver.STANDARD)
+        } else {
+            null
         }
     }
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null

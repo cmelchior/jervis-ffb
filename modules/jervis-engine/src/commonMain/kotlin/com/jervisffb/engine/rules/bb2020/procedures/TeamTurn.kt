@@ -207,6 +207,7 @@ object TeamTurn : Procedure() {
         val blockActions = rules.teamActions.block.availablePrTurn
         val blitzActions = rules.teamActions.blitz.availablePrTurn
         val foulActions = rules.teamActions.foul.availablePrTurn
+        val throwTeamActions = rules.teamActions.throwTeamMate.availablePrTurn
         val secureTheBallActions = rules.teamActions.secureTheBall.availablePrTurn
         val specialActions = rules.teamActions.specialActions
         return ResetAvailableTeamActions(
@@ -217,6 +218,7 @@ object TeamTurn : Procedure() {
             blockActions,
             blitzActions,
             foulActions,
+            throwTeamActions,
             secureTheBallActions,
             buildMap {
                 specialActions.forEach {

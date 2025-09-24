@@ -1,8 +1,6 @@
 package com.jervisffb.test
 
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.actions.RerollOptionSelected
-import com.jervisffb.engine.actions.SelectRerollOption
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
@@ -60,9 +58,4 @@ abstract class JervisGameTest {
             *defaultKickOffHomeTeam(),
         )
     }
-
-    protected fun useTeamReroll(controller: GameEngineController) =
-        RerollOptionSelected(
-            controller.getAvailableActions().actions.filterIsInstance<SelectRerollOption>().first().options.first()
-        )
 }

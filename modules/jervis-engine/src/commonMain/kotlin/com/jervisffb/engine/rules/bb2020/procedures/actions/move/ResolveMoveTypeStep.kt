@@ -152,10 +152,11 @@ object ResolveMoveTypeStep : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Pickup
         override fun onExitNode(state: Game, rules: Rules): Command {
-            // TODO Should probably check if we picked up the ball.
+            // Pickup is checking for pickup success/failure and touchdowns, so just
+            // abort here.
             return compositeCommandOf(
                 SetCurrentBall(null),
-                GotoNode(CheckForScoring)
+                ExitProcedure()
             )
         }
     }

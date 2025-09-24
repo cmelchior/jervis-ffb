@@ -19,6 +19,7 @@ abstract class TeamActions {
     abstract val block: PlayerAction
     abstract val blitz: PlayerAction
     abstract val foul: PlayerAction
+    abstract val throwTeamMate: PlayerAction
     abstract val specialActions: Set<PlayerAction>
     abstract val secureTheBall: PlayerAction
 }

@@ -264,6 +264,7 @@ open class ManualActionProvider(
     }
 
     private fun <T: GameActionDescriptor> getDecorator(type: KClass<T>): FieldActionDecorator<GameActionDescriptor>? {
+        @Suppress("UNCHECKED_CAST")
         return fieldActionDecorators[type] as? FieldActionDecorator<GameActionDescriptor>
     }
 

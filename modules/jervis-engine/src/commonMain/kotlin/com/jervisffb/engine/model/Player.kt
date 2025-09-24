@@ -114,6 +114,9 @@ class Player(
                 is GiantLocation -> INVALID_GAME_STATE("Cannot ask for coordinates for a giant player")
             }
         }
+    // True from the player is selected as the thrown player until they finalize their landing
+    // in an empty square or out of bounds.
+    var isBeingThrown: Boolean = false
     var facing: PlayerFacing = PlayerFacing.UNKNOWN
     var state: PlayerState = PlayerState.RESERVE
     var statusEffects = mutableListOf<PlayerStatusEffect>()

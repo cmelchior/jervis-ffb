@@ -107,7 +107,6 @@ object TheKickOffEvent : Procedure() {
             val ball = state.singleBall()
             return SetContext(
                 ScatterRollContext(
-                    ball = ball,
                     from = ball.location,
                 )
             )

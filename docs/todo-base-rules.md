@@ -37,10 +37,12 @@ rule book.
   - [x] Pass deflected and caught by other team
   - [x] Pass deflected and caught by own team (no turnover)
   - [x] Pass intercepted
-  - [ ] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
+  - [x] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
   - [x] Sent-off for commiting a Foul
   - [x] Touchdown scored (own team)
   - [x] Touchdown scored (other team)
+  - [ ] Touchdowns are not checked until everything is "at rest".
+  - [ ] In case of checking for touchdowns. The order is Active Team (active coach chooses order), then Inactive Team (inactive coach chooses order).
   - [ ] Turnover state is reset when turn ends
     - [ ] During normal team turns
     - [ ] End of Drive
@@ -224,7 +226,7 @@ rule book.
     - [x] Pass
     - [x] HandOff
     - [x] Foul
-    - [ ] Throw Teammate
+    - [x] Throw Teammate
     - [ ] Special actions
 - [x] Rush
   - [x] Rush before Dodge.
@@ -313,7 +315,8 @@ rule book.
   - [x] Catching the ball after it bouncing into the end zone
   - [x] Catching the ball in the end zone after a throw-in 
   - [x] Push opponent player to scoring position during block, but is knocked down (no score).
-  - [ ] Throw Team-mate. Player lands in the end zone
+  - [x] Throw Team-mate. Player lands in the end zone
+  - [ ] Throw Team-mate. Two balls in play. Player with ball lands falls on another ball. Both balls bounce to the end zone and is caught.
   - [x] Chain push: Own Player with the ball is pushed into the end zone
   - [x] Chain push: Opponent Player with the ball is pushed into the end zone
   - [ ] Using Ball & Chain to move into the End Zone (not really supported, but just in case)
@@ -435,30 +438,35 @@ rule book.
     - [x] Deflect, but fails to catch, ball ends up on interceptor team
     - [x] Deflect, but fails to catch, scatters the ball out of bounds
     - [x] Passing Interference on ball going out of bounds
-- [ ] Throw Team-mate Action
-  - [ ] Require Throw Team-mate and Right Stuff traits
-  - [ ] Uses Pass action
-  - [ ] Action used without throwing
-  - [ ] Throw without moving
-  - [ ] Cannot move after throw
-  - [ ] Throw to any square within range
-  - [ ] Superb Throw
-  - [ ] Successful Throw
-  - [ ] Terrible Throw
-  - [ ] Fumbled Throw
-  - [ ] Scatter on non-fumbled throws
-  - [ ] Land Superb throw
-  - [ ] Land Fumbled throw
-  - [ ] Land Successful throw
-  - [ ] Land Land Terrible throw
-  - [ ] Marker modifiers on landing
-  - [ ] Land in occupied square
-  - [ ] Turnover if landing on player from own team
-  - [ ] No Turnover if thrown player is knocked down and not holding the ball
-  - [ ] Turnover if thrown player is knocked down and is holding the ball
-  - [ ] Land in occupied square with prone player
-  - [ ] Crash Landing
-  - [ ] Landing in the crowd
+- [x] Throw Team-mate Action
+  - [x] Require Throw Team-mate and Right Stuff traits
+  - [x] Right Stuff player must have Strenght 3 or less
+  - [x] Pass Action and Throw Team-mate are mutually exclusive
+  - [x] Action used when moving without throwing
+  - [x] Action used when throwing without moving
+  - [x] Cannot move after the throw
+  - [x] Superb Throw
+  - [x] Successful Throw
+  - [x] Terrible Throw
+  - [x] Fumbled Throw
+  - [x] Scatter on non-fumbled throws
+  - [x] Land Superb throw
+  - [x] Land Fumbled throw
+  - [x] Land Successful throw
+  - [x] Land Terrible throw
+  - [x] Marker modifiers on landing
+  - [x] Land in an occupied square
+  - [x] Turnover if landing on a player from their own team
+  - [x] Not turnover if landing on player from an opponent team
+  - [x] No Turnover if a thrown player is knocked down and not holding the ball
+  - [x] Turnover if the thrown player is knocked down and is holding the ball
+  - [x] Land in the occupied square with prone player. Roll injury again
+  - [x] Land in the end-zone with ball trigger touchdown.
+  - [x] Land on a player with the ball. Ball gets knocked loose. It bounces immediately
+  - [x] Player with a ball lands badly on another ball. Player ball is bounced first, then ball on ground
+  - [x] Player with a ball lands successfully on the ball. Ball on the ground bounces after landing.
+  - [x] Crash Landing
+  - [x] Landing in the crowd
 
 ## Statistics
 

@@ -13,7 +13,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
  * *Developer's Commentary:*
  * Squares can contain quite a lot of things, all from UI representation to special rules to
  * environmental features. Capturing all of these, while making the model flexible is quite
- * difficult. So the current approach is just a first step towards it. Most likely edge-cases
+ * challenging. So the current approach is just a first step towards it. Most likely edge-cases
  * will show themselves once proper Dungeon Bowl support is added.
  *
  * To capture all possible permutations, a field is built up of multiple layers. They consist
@@ -23,13 +23,13 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
  *    is a normal pitch square.
  * 2. [substrate] describes the surface being played on, like grass or rock.
  * 3. [environmentalFeature] describe any special "thing" that is on the square. This
- *    is most commonly statues and the like
+ *    is most commonly statues and the like.
  * 4. [impassable] is its own property and controls if players are allowed to move through the
  *    square. Players can temporarily be on a square that is impassable, but it should only be
- *    a temporary state. Like when a player is pushed into a Fiery Chasm.
+ *    a temporary state. Like when a player is pushed into a Fiery Chasm. TODO What about Leap?
  * 5. [blockLineOfSight] whether a square blocks LoS. This currently has no effect on the rules,
  *    but we track it for completeness and just in case some extra rule is introduced in the future
- *    that might use it.
+ *    that might use it. TODO What about Leap?
  * 6. [hasTrapdoor] Whether the square has a trapdoor. This is currently tracked separately
  *    because it is unclear if you could place trapdoors on things like a suspension bridge.
  * 7. [hasChest] Whether the square has a chest. It is currently just a boolean, but might need
@@ -46,7 +46,15 @@ class FieldSquare(
     val coordinates: FieldCoordinate
 ): FieldCoordinate by coordinates {
     constructor(x: Int, y: Int) : this(FieldCoordinate(x, y))
+
+    // The player that is currently on the square.
+    // This property must be kept in sync with `Player.location`.
     var player: Player? = null
+
+    // A player is in the process of landing on the square.
+    // This property must be kept in sync with `Player.isBeingThrown`.
+    var thrownPlayer: Player? = null
+
     // Having multiple balls in the same field should just be a temporary state
     // as the BB2020 Rules do not allow two balls in the same square. One will always bounce.
     var balls: MutableList<Ball> = mutableListOf()
@@ -86,9 +94,9 @@ class FieldSquare(
     // Whether the square has a portal or not
     var portal: Portal? = null
 
-    // Is field unoccupied as per the definition on page 44 in the rulebook.
+    // Is the field unoccupied as per the definition on page 44 in the rulebook?
     fun isUnoccupied(): Boolean = (player == null)
 
-    // Is field occupied as per the definition on page 44 in the rulebook.
+    // Is the field occupied as per the definition on page 44 in the rulebook?
     fun isOccupied(): Boolean = !isUnoccupied()
 }

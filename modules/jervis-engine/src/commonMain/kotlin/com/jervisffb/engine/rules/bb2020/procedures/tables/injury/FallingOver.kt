@@ -25,7 +25,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  */
 object FallingOver: Procedure() {
     override val initialNode: Node = RollForInjury
-    override fun onEnterProcedure(state: Game, rules: Rules): Command? {
+    override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val context = state.getContext<RiskingInjuryContext>()
         return buildCompositeCommand {
             /**
@@ -46,7 +46,10 @@ object FallingOver: Procedure() {
                 )
             }
             // Falling over results in a turn-over pr. the list of turnovers on page 23 in the rulebook.
-            if (context.player.team == state.activeTeam) {
+            // But only if they are the active player (i.e. thrown players falling over does not trigger this)
+            val activeTeam = (context.player.team == state.activeTeam)
+            val activePlayer = (state.activePlayer == context.player)
+            if (activeTeam && activePlayer) {
                 add(SetTurnOver(TurnOver.STANDARD))
             }
         }

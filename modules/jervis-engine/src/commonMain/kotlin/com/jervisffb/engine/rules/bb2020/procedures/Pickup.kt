@@ -20,15 +20,16 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.PickupModifier
 import com.jervisffb.engine.reports.ReportPickup
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveTypeStep
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchDownContext
+import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ScoringATouchdown
 import com.jervisffb.engine.rules.common.tables.Weather
 
 /**
  * Resolve a Pickup, i.e., when a player moves into a field where the ball is placed.
  * See page 46 in the rulebook.
  *
- * Scoring is checked in [ResolveMoveTypeStep] to avoid duplicating this check across
- * all procedures reacting to a player being moved.
+ * If the pickup failed, a turnover is triggered. If the pickup succeeded, we also
+ * check if the player picking up the ball scored a touchdown.
  */
 object Pickup : Procedure() {
     override val initialNode: Node = RollToPickup
@@ -84,7 +85,7 @@ object Pickup : Procedure() {
                 compositeCommandOf(
                     SetBallState.carried(ball, result.player),
                     ReportPickup(result.player, result.target, result.modifiers, result.roll!!.result, true),
-                    ExitProcedure()
+                    GotoNode(CheckForScoring),
                 )
             } else {
                 compositeCommandOf(
@@ -104,5 +105,18 @@ object Pickup : Procedure() {
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command = ExitProcedure()
+    }
+
+    // Finally, once all rolls have been resolved, check if the player picking up the ball scored
+    // a touchdown.
+    object CheckForScoring : ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            val context = state.getContext<PickupRollContext>()
+            return SetContext(ScoringATouchDownContext(context.player))
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = ScoringATouchdown
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            return ExitProcedure()
+        }
     }
 }

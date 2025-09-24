@@ -22,6 +22,7 @@ import com.jervisffb.engine.rules.bb2020.skills.Pro
 import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2020.skills.ReallyStupid
 import com.jervisffb.engine.rules.bb2020.skills.Regeneration
+import com.jervisffb.engine.rules.bb2020.skills.RightStuff
 import com.jervisffb.engine.rules.bb2020.skills.Sidestep
 import com.jervisffb.engine.rules.bb2020.skills.Sprint
 import com.jervisffb.engine.rules.bb2020.skills.Stab
@@ -30,6 +31,7 @@ import com.jervisffb.engine.rules.bb2020.skills.SureFeet
 import com.jervisffb.engine.rules.bb2020.skills.SureHands
 import com.jervisffb.engine.rules.bb2020.skills.Tackle
 import com.jervisffb.engine.rules.bb2020.skills.ThickSkull
+import com.jervisffb.engine.rules.bb2020.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.bb2020.skills.Timmmber
 import com.jervisffb.engine.rules.bb2020.skills.Titchy
 import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
@@ -478,9 +480,9 @@ class BB2020SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.RIGHT_STUFF -> {
-                    // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
+                        RightStuff(player, category, expiresAt)
+                    }
                 }
                 SkillType.SECRET_WEAPON -> {
                     // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
@@ -523,9 +525,9 @@ class BB2020SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.THROW_TEAMMATE -> {
-                    // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
+                        ThrowTeamMate(player, category, expiresAt)
+                    }
                 }
                 SkillType.UNCHANNELLED_FURY -> {
                     addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->

@@ -55,6 +55,11 @@ class TeamTurnData(private val game: Game) {
         set(value) {
             availableStandardActions[PlayerStandardActionType.FOUL] = value
         }
+    var throwTeamMateActions: Int
+        get() = availableStandardActions[PlayerStandardActionType.THROW_TEAM_MATE]!!
+        set(value) {
+            availableStandardActions[PlayerStandardActionType.THROW_TEAM_MATE] = value
+        }
     var secureTheBallActions: Int
         get() = availableStandardActions[PlayerStandardActionType.SECURE_THE_BALL]!!
         set(value) {
@@ -69,6 +74,7 @@ class TeamTurnData(private val game: Game) {
             PlayerStandardActionType.BLOCK to 0,
             PlayerStandardActionType.BLITZ to 0,
             PlayerStandardActionType.FOUL to 0,
+            PlayerStandardActionType.THROW_TEAM_MATE to 0,
             PlayerStandardActionType.SECURE_THE_BALL to 0,
         )
 

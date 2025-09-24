@@ -67,12 +67,14 @@ fun PlayerLayer(
                         )
                     }
             ) {
-                PlayerWithIndicators(
-                    Modifier,
-                    snapshot!!.squares[coordinates]!!,
-                    player,
-                    null,  // TODO We need to also pass that in here. Not really. This is handled by the general hover channel...This design needs to be revisited
-                )
+                if (coordinates.isOnField(snapshot!!.game.rules)) {
+                    PlayerWithIndicators(
+                        Modifier,
+                        snapshot!!.squares[coordinates]!!,
+                        player,
+                        null,  // TODO We need to also pass that in here. Not really. This is handled by the general hover channel...This design needs to be revisited
+                    )
+                }
             }
         }
     }

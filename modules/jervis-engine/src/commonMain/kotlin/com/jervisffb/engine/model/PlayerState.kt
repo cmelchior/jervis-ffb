@@ -34,8 +34,6 @@ enum class PlayerState {
     // After that, it should turn into a normal STUNNED state.
     STUNNED_OWN_TURN,
 
-
-
 //    MOVING,
 //    UNKNOWN,
 //    MISSING,

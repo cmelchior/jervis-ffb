@@ -38,11 +38,13 @@ import com.jervisffb.resources.AMAZON_BLOCKER
 import com.jervisffb.resources.AMAZON_LINEMAN
 import com.jervisffb.resources.AMAZON_TEAM
 import com.jervisffb.resources.BIG_UN_BLOCKERS
+import com.jervisffb.resources.HALFLING_HOPEFUL
 import com.jervisffb.resources.HUMAN_BLITZER
 import com.jervisffb.resources.HUMAN_CATCHER
 import com.jervisffb.resources.HUMAN_LINEMAN
 import com.jervisffb.resources.HUMAN_TEAM
 import com.jervisffb.resources.HUMAN_THROWER
+import com.jervisffb.resources.OGRE
 import com.jervisffb.resources.ORC_BLITZER
 import com.jervisffb.resources.ORC_LINEMEN
 import com.jervisffb.resources.ORC_TEAM
@@ -143,8 +145,8 @@ fun createDefaultHomeTeam(rules: Rules): Team {
     return teamBuilder(rules, HUMAN_TEAM) {
         coach = Coach(CoachId("home-coach"), "HomeCoach")
         name = "HomeTeam"
-        addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), HUMAN_LINEMAN)
-        addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), HUMAN_LINEMAN)
+        addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), OGRE)
+        addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), HALFLING_HOPEFUL)
         addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), HUMAN_LINEMAN)
         addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), HUMAN_LINEMAN)
         addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HUMAN_THROWER, listOf(LEADER.id()))

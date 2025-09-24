@@ -52,7 +52,7 @@ object Catch : Procedure() {
         }
         if (ballStateModifier != null) modifiers.add(ballStateModifier)
 
-        // Add marked modifiers for field
+        // Add marked modifiers for the field
         rules.addMarkedModifiers(
             state,
             catchingPlayer.team,
@@ -133,10 +133,7 @@ object Catch : Procedure() {
             val ball = state.currentBall()
             return when (ball.state) {
                 BallState.SCATTERED -> {
-                    val scatterContext = ScatterRollContext(
-                        ball = ball,
-                        from = ball.location
-                    )
+                    val scatterContext = ScatterRollContext(from = ball.location)
                     SetContext(scatterContext)
                 }
                 else -> null
@@ -166,7 +163,7 @@ object Catch : Procedure() {
     object ResolveScatteredBallLanding: ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val scatterContext = state.getContext<ScatterRollContext>()
-            val ball = scatterContext.ball
+            val ball = state.currentBall()
             val landOutOfBounds = (scatterContext.outOfBoundsAt != null)
             val landsOnCatchingPlayer = scatterContext.landsAt?.let {
                 state.field[it].player?.let { player -> rules.canCatch(state, player) }

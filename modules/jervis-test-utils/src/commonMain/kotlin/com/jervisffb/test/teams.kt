@@ -42,6 +42,30 @@ fun humanTeamAway(rules: Rules): Team {
     }
 }
 
+fun advancedHumanTeamAway(rules: Rules): Team {
+    return teamBuilder(rules, HUMAN_TEAM) {
+        coach = Coach(CoachId("away-coach"), "AwayCoach")
+        name = "Advanced Away Team"
+        addPlayer(PlayerId("A1"), "Ogre-1-A", PlayerNo(1), OGRE)
+        addPlayer(PlayerId("A2"), "Lineman-2-A", PlayerNo(2), HUMAN_LINEMAN)
+        addPlayer(PlayerId("A3"), "Lineman-3-A", PlayerNo(3), HUMAN_LINEMAN)
+        addPlayer(PlayerId("A4"), "Lineman-4-A", PlayerNo(4), HUMAN_LINEMAN)
+        addPlayer(PlayerId("A5"), "Thrower-5-A", PlayerNo(5), HUMAN_LINEMAN)
+        addPlayer(PlayerId("A6"), "Catcher-6-A", PlayerNo(6), HUMAN_LINEMAN)
+        addPlayer(PlayerId("A7"), "Catcher-7-A", PlayerNo(7), HUMAN_CATCHER)
+        addPlayer(PlayerId("A8"), "Blitzer-8-A", PlayerNo(8), HUMAN_BLITZER)
+        addPlayer(PlayerId("A9"), "Blitzer-9-A", PlayerNo(9), HUMAN_BLITZER)
+        addPlayer(PlayerId("A10"), "Blitzer-10-A", PlayerNo(10), HUMAN_BLITZER)
+        addPlayer(PlayerId("A11"), "Blitzer-11-A", PlayerNo(11), HUMAN_BLITZER)
+        addPlayer(PlayerId("A12"), "Lineman-12-A", PlayerNo(12), HUMAN_LINEMAN)
+        addPlayer(PlayerId("A13"), "Hafling-13-A", PlayerNo(13), HALFLING_HOPEFUL)
+        rerolls = 4
+        apothecaries = 1
+        dedicatedFans = 2
+        teamValue = 1_000_000
+    }
+}
+
 fun lizardMenAwayTeam(rules: Rules): Team {
     return teamBuilder(rules, LIZARDMEN_TEAM) {
         coach = Coach(CoachId("away-coach"), "AwayCoach")
@@ -137,6 +161,35 @@ fun createDefaultHomeTeam(rules: Rules): Team {
         teamValue = 1_000_000
     }
 }
+
+/**
+ * Extended team that can be used to test more advanced setups.
+ */
+fun createAdvancedHomeTeam(rules: Rules): Team {
+    return teamBuilder(rules, HUMAN_TEAM) {
+        coach = Coach(CoachId("home-coach"), "HomeCoach")
+        name = "Advanced Home Team"
+        addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), OGRE)
+        addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), HUMAN_LINEMAN)
+        addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), HUMAN_LINEMAN)
+        addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), HUMAN_LINEMAN)
+        addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), HUMAN_THROWER, listOf(SkillType.SIDESTEP.id()))
+        addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), HUMAN_CATCHER, listOf(SkillType.SIDESTEP.id()))
+        addPlayer(PlayerId("H7"), "Catcher-7-H", PlayerNo(7), HUMAN_CATCHER)
+        addPlayer(PlayerId("H8"), "Blitzer-8-H", PlayerNo(8), HUMAN_BLITZER)
+        addPlayer(PlayerId("H9"), "Blitzer-9-H", PlayerNo(9), HUMAN_BLITZER)
+        addPlayer(PlayerId("H10"), "Blitzer-10-H", PlayerNo(10), HUMAN_BLITZER)
+        addPlayer(PlayerId("H11"), "Blitzer-11-H", PlayerNo(11), HUMAN_BLITZER)
+        addPlayer(PlayerId("H12"), "Lineman-12-H", PlayerNo(12), HUMAN_LINEMAN)
+        addPlayer(PlayerId("H13"), "Hafling-13-H", PlayerNo(13), HALFLING_HOPEFUL)
+        rerolls = 4
+        apothecaries = 1
+        dedicatedFans = 1
+        teamValue = 1_000_000
+    }
+}
+
+
 
 fun createDefaultGameState(
     rules: Rules,
