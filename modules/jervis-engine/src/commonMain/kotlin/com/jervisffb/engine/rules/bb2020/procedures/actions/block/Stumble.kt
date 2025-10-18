@@ -53,6 +53,7 @@ object Stumble: Procedure() {
         val stumbleContext = state.getContext<StumbleContext>()
         return compositeCommandOf(
             RemoveContext<PushContext>(),
+            RemoveContext<StumbleContext>(),
             ReportStumbleResult(context.firstPusher, context.firstPushee, stumbleContext.isDefenderDown())
         )
     }

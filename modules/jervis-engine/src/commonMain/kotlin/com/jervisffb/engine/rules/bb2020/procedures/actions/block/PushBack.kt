@@ -29,7 +29,10 @@ import com.jervisffb.engine.rules.Rules
 // This is used by all results that push back.
 fun createPushContext(state: Game): PushContext {
     val blockContext = state.getContext<BlockContext>()
-    val stumbleContext = state.getContextOrNull<StumbleContext>()
+    val stumbleContext = state.getContextOrNull<StumbleContext>()?.also {
+        check(it.attacker == blockContext.attacker) { "BlockContext and StumbleContext out of sync:\n$blockContext\n$it" }
+        check(it.defender == blockContext.defender) { "BlockContext and StumbleContext out of sync:\n$blockContext\n$it" }
+    }
     // TODO Are there any special skills that also knock players down?
     val isKnockedDown = stumbleContext?.isDefenderDown() ?: (blockContext.result.blockResult == BlockDice.POW)
 
