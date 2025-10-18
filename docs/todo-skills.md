@@ -45,7 +45,19 @@ Skills should only be marked as completed here if they are implemented and have 
 - [ ] Dauntless
 - [ ] Dirty Player (+1)
 - [ ] Fend
+  - [ ] Prevents Frenzy from working
 - [ ] Frenzy*
+  - [ ] Must take two blocks if player if able
+  - [ ] Works during Block and Blitz
+  - [ ] Must rush if needed
+  - [ ] 2nd block isn't taken in case of a touchdown
+  - [ ] Cannot take 2nd block if no more move/rushes left  
+  - [ ] Works on Rooted player (even though they are not pushed back (FAQ)
+  - [ ] Works on Stand Firm player - No FAQ, but the same reasoning as for Rooted.
+  - [ ] Roll twice for Foul Appearance (FAQ)
+  - [ ] Frenzy 2nd block is not taken when defender is using Fend (as they cannot follow up)
+  - [ ] Works on players with the Foul Appearance trait
+  - [ ] 2nd block is not required to be a normal block but can be any valid "block" special action (FAQ)
 - [ ] Kick
 - [ ] Pro
 - [ ] Shadowing

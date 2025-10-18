@@ -590,7 +590,7 @@ object PushStepInitialMoveSequence: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             return if (
-                context.firstPusher.hasSkill<Frenzy>() || // Always follow up when having Frenzy
+                context.firstPusher.hasSkill<Frenzy>() || // Always follow up when having Frenzy (unless prevented by Fend)
                 context.isMultipleBlock // Never follow up when using Multiple Block
             ) {
                 listOf(ContinueWhenReady)
