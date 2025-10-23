@@ -17,8 +17,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
@@ -194,16 +194,14 @@ fun LogViewer(
                 // Show the tab bar over the content when the mouse hovers over area
                 // This way, it leaves more space available on 16:9 screens
                 if (hovered) {
-                    TabRow(
+                    PrimaryTabRow(
                         selectedTabIndex = tabIndex,
                         containerColor = JervisTheme.rulebookGreen.copy(0.9f),
-                        indicator = { tabPositions ->
-                            if (tabIndex < tabPositions.size) {
-                                TabRowDefaults.SecondaryIndicator(
-                                    modifier = Modifier.tabIndicatorOffset(tabPositions[tabIndex]),
-                                    color = Color.White,
-                                )
-                            }
+                        indicator = {
+                            TabRowDefaults.SecondaryIndicator(
+                                modifier = Modifier.tabIndicatorOffset(tabIndex, matchContentSize = false),
+                                color = Color.White,
+                            )
                         }
                     ) {
                         tabs.forEachIndexed { index, title ->

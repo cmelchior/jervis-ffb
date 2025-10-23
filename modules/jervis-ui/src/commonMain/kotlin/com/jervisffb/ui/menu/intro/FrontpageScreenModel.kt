@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.jervisffb.ui.menu.intro
 
 import cafe.adriel.voyager.navigator.Navigator
@@ -12,13 +14,14 @@ import com.jervisffb.ui.menu.fumbbl.FumbblScreen
 import com.jervisffb.ui.menu.fumbbl.FumbblScreenModel
 import com.jervisffb.utils.jervisLogger
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Display data for the About dialog.
@@ -90,7 +93,7 @@ class FrontpageScreenModel(private val menuViewModel: MenuViewModel) : JervisScr
         val dateFormat = LocalDate.Format {
             monthName(MonthNames.ENGLISH_ABBREVIATED)
             char(' ')
-            dayOfMonth()
+            day()
             chars(", ")
             year()
         }

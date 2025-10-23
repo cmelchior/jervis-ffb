@@ -16,9 +16,9 @@ import androidx.compose.foundation.pager.PagerScope
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabPosition
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabIndicatorScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,6 +34,7 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.game.view.TeamTable
 import com.jervisffb.ui.game.view.utils.TitleBorder
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -50,14 +51,12 @@ fun ColumnScope.StartGameComponent(
     val tabs = listOf("Home Team", "Away Team")
     val coroutineScope = rememberCoroutineScope()
 
-    val emptyIndicator = @Composable { tabPositions: List<TabPosition> ->
-        // Do nothing
-    }
+    val emptyIndicator: @Composable TabIndicatorScope.() -> Unit = { /* Do nothing */ }
 
     Box(modifier = Modifier.fillMaxSize().weight(1f)) {
         Column(modifier = Modifier.fillMaxSize()) {
             TitleBorder()
-            TabRow(
+            PrimaryTabRow(
                 modifier = Modifier.fillMaxWidth().height(36.dp),
                 containerColor = Color.Transparent,
                 selectedTabIndex = pagerStateTop.currentPage,

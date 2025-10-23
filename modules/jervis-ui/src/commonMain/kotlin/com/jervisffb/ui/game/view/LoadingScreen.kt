@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.jervisffb.ui.game.view
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -46,9 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jervisffb.ui.menu.GameScreenModel
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
 import org.jetbrains.skia.Point
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 @Composable
 fun LoadingScreen(

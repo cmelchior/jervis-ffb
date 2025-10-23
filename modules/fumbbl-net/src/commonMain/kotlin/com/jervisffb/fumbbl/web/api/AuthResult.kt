@@ -1,9 +1,12 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.jervisffb.fumbbl.web.api
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 // Typed return result from /oauth/token
 @Serializable

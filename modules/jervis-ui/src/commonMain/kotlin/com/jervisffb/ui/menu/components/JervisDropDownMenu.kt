@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +34,7 @@ fun <T: DropdownEntry> JervisDropDownMenu(
         onExpandedChange = { expanded = !expanded },
     ) {
         OutlinedTextField(
-            modifier = modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+            modifier = modifier.menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
             value = selectedEntry?.name ?: "",
             onValueChange = { },
             enabled = enabled,
@@ -46,7 +46,7 @@ fun <T: DropdownEntry> JervisDropDownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            entries.forEachIndexed { index, item ->
+            entries.forEach { item ->
                 DropdownMenuItem(
                     text = {
                         Text(item.name)

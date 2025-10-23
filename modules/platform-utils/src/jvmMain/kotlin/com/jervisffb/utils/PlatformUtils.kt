@@ -1,3 +1,6 @@
+@file:OptIn(ExperimentalTime::class)
+@file:Suppress("removal")
+
 package com.jervisffb.utils
 
 import co.touchlab.kermit.LogWriter
@@ -5,7 +8,6 @@ import co.touchlab.kermit.Severity
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.isSuccess
-import kotlinx.datetime.Clock
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -16,6 +18,8 @@ import java.io.PrintWriter
 import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.net.URI
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 public actual fun threadId(): ULong {
     @Suppress("DEPRECATION")

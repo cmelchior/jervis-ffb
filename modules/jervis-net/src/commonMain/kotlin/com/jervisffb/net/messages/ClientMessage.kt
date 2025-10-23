@@ -23,6 +23,7 @@ val DUMMY_SESSION = object : WebSocketSession {
     override var maxFrameSize: Long = 0L
     override val outgoing: SendChannel<Frame> = TODO()
     override suspend fun flush() { /* No-op */ }
+    @Deprecated("Use cancel() instead.", replaceWith = ReplaceWith("cancel()", "kotlinx.coroutines.cancel"), level = DeprecationLevel.ERROR)
     override fun terminate() { /* No-op */ }
 }
 

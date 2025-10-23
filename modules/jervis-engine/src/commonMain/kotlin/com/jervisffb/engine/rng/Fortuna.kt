@@ -16,9 +16,9 @@ import com.jervisffb.engine.utils.assert
 import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.algorithms.AES
 import dev.whyoleg.cryptography.operations.Cipher
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.experimental.xor
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * https://github.com/christerk/ffb/blob/48cbbc770a0b6d9dee6a43244949a8894f10d1bf/ffb-server/src/main/java/com/fumbbl/ffb/server/util/rng/Fortuna.java
