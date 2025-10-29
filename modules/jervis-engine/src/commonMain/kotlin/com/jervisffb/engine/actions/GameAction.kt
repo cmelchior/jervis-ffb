@@ -1,6 +1,7 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.D12Result
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
@@ -111,6 +112,8 @@ data class D2Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 2
 
+    override fun allOptions(): List<D2Result> = Companion.allOptions()
+
     companion object {
         fun allOptions(): List<D2Result> {
             return (1..2).map { D2Result(it) }
@@ -124,6 +127,8 @@ data class D3Result(override val value: Int) : DieResult() {
 
     override val min: Short = 1
     override val max: Short = 3
+
+    override fun allOptions(): List<D3Result> = Companion.allOptions()
 
     companion object {
         fun random(random: Random = Random): D3Result {
@@ -142,6 +147,8 @@ data class D4Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 4
 
+    override fun allOptions(): List<D4Result> = Companion.allOptions()
+
     companion object {
         fun allOptions(): List<D4Result> {
             return (1..4).map { D4Result(it) }
@@ -155,6 +162,8 @@ data class D6Result(override val value: Int) : DieResult() {
 
     override val min: Short = 1
     override val max: Short = 6
+
+    override fun allOptions(): List<D6Result> = Companion.allOptions()
 
     companion object {
         fun allOptions(): List<D6Result> {
@@ -172,6 +181,8 @@ data class D8Result(override val value: Int) : DieResult() {
 
     override val min: Short = 1
     override val max: Short = 8
+
+    override fun allOptions(): List<D8Result> = Companion.allOptions()
 
     companion object {
         fun allOptions(): List<D8Result> {
@@ -192,6 +203,8 @@ data class D12Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 12
 
+    override fun allOptions(): List<D12Result> = Companion.allOptions()
+
     companion object {
         fun allOptions(): List<D12Result> {
             return (1..12).map { D12Result(it) }
@@ -207,6 +220,8 @@ data class D16Result(override val value: Int) : DieResult() {
 
     override val min: Short = 1
     override val max: Short = 16
+
+    override fun allOptions(): List<D16Result> = Companion.allOptions()
 
     companion object {
         fun allOptions(): List<D16Result> {
@@ -224,6 +239,8 @@ data class D20Result(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 20
 
+    override fun allOptions(): List<D20Result> = Companion.allOptions()
+
     companion object {
         fun allOptions(): List<D20Result> {
             return (1..20).map { D20Result(it) }
@@ -239,6 +256,7 @@ data class DBlockResult(override val value: Int) : DieResult() {
     override val min: Short = 1
     override val max: Short = 6
 
+    override fun allOptions(): List<DBlockResult> = Companion.allOptions()
     val blockResult: BlockDice = BlockDice.fromD6(D6Result(value))
 
     companion object {
@@ -369,6 +387,7 @@ sealed class DieResult : Number(), GameAction {
         }
     }
 
+    abstract fun allOptions(): List<DieResult>
     override fun toByte(): Byte = value.toByte()
     override fun toDouble(): Double = value.toDouble()
     override fun toFloat(): Float = value.toFloat()

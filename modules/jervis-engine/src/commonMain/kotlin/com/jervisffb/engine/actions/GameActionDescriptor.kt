@@ -399,9 +399,9 @@ data class SelectRerollOption(
 }
 
 // Successful might be hard to interpret in some cases, in which this is `null`
-// Otherwise it contains
+// Otherwise it contains the result of the first roll.
 data class SelectNoReroll(
-    // Whether the first roll was considered a "succcess".
+    // Whether the first roll was considered a "success".
     // This is technically just state, but since this is normally
     // defined inside various custom contexts. It is very tricky
     // to get to this state from whoever is creating the GameAction.
@@ -414,4 +414,5 @@ data class SelectNoReroll(
     override val size: Int = 1
     override fun createRandom(random: Random): GameAction = NoRerollSelected(dicePoolId)
     override fun createAll(): List<GameAction> = listOf(NoRerollSelected(dicePoolId))
+    fun create(): NoRerollSelected = NoRerollSelected(dicePoolId)
 }

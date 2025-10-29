@@ -4,6 +4,7 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.GameActionId
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.fsm.ActionNode
@@ -16,6 +17,7 @@ import com.jervisffb.engine.model.Team
  * @see [GameEngineController.getAvailableActions]
  */
 data class ActionRequest(
+    val id: GameActionId, // The id for the next action being generated
     val team: Team?,
     val actions: List<GameActionDescriptor>
 ): List<GameActionDescriptor> by actions {
@@ -49,5 +51,9 @@ data class ActionRequest(
 
     inline fun <reified T: GameActionDescriptor> get(): T {
         return actions.first { it is T } as T
+    }
+
+    inline fun <reified T: GameActionDescriptor> getOrNull(): T? {
+        return actions.firstOrNull { it is T } as T?
     }
 }

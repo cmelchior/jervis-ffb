@@ -93,7 +93,7 @@ class GameEngineController(
     private val isStopped = false
 
     // State for tracking Undo actions.
-    var lastActionIfUndo: GameDelta? = null
+    var lastActionIfUndo: Pair<Node?, GameDelta>? = null
     fun lastActionWasUndo(): Boolean {
         return lastActionIfUndo != null
     }
@@ -106,17 +106,29 @@ class GameEngineController(
         private set
 
     /**
+     * Returns the last [GameAction] that was processed by [handleAction].
+     */
+    val lastAction: GameAction?
+        get() {
+            return if (lastActionIfUndo != null) {
+                Undo
+            } else {
+                history.lastOrNull()?.steps?.lastOrNull()?.action
+            }
+        }
+
+    /**
      * Returns a [ActionRequest] representing the available actions for the
      * current [Node] as well as who is responsible for providing it.
      */
     fun getAvailableActions(): ActionRequest {
-        if (stack.isEmpty()) return ActionRequest(null, emptyList())
+        if (stack.isEmpty()) return ActionRequest(nextActionIndex(), null, emptyList())
         if (stack.currentNode() !is ActionNode) {
             throw IllegalStateException("State machine is not waiting at an ActionNode: ${stack.currentNode()}")
         }
         val currentNode: ActionNode = stack.currentNode() as ActionNode
         val actions = currentNode.getAvailableActions(state, rules)
-        return ActionRequest(currentNode.actionOwner(state, rules), actions)
+        return ActionRequest(nextActionIndex(), currentNode.actionOwner(state, rules), actions)
     }
 
     /**
@@ -168,7 +180,7 @@ class GameEngineController(
      * of the action that was undone.
      */
     fun getDelta(): GameDelta {
-        return lastActionIfUndo ?: _history.lastOrNull() ?: GameDelta(id = GameActionId(0), steps = emptyList())
+        return lastActionIfUndo?.second ?: _history.lastOrNull() ?: GameDelta(id = GameActionId(0), steps = emptyList())
     }
 
     /**
@@ -212,6 +224,14 @@ class GameEngineController(
     fun currentProcedure(): MutableProcedureState? = stack.peepOrNull()
 
     fun currentNode(): Node? = currentProcedure()?.currentNode()
+
+    fun previousNode(): Node? {
+        return if (lastActionWasUndo()) {
+            lastActionIfUndo?.first
+        } else {
+            history.lastOrNull()?.steps?.lastOrNull()?.node
+        }
+    }
 
     /**
      * Returns `true` if it is possible to [Undo] the current game state, `false` if not.
@@ -264,7 +284,7 @@ class GameEngineController(
         }
         if (_history.isEmpty()) return
         val delta = _history.removeLast().reverse()
-        lastActionIfUndo = delta
+        lastActionIfUndo = currentNode() to delta
         delta.steps.forEach { step ->
             step.commands.forEach { command -> command.undo(state) }
         }

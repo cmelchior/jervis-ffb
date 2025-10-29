@@ -25,7 +25,9 @@ data class GameDelta(
     val id: GameActionId,
     val steps: List<ActionStep>,
     val owner: TeamId? = null,
-    // Game Delta is being reversed. Used during when undoing deltas.
+    // Game Delta is being reversed. Used during undoing deltas.
+    // When this is true, steps are reversed. This means the last entry is always
+    // the last action that was executed.
     val reversed: Boolean = false,
 ) {
     fun containsAction(action: GameAction): Boolean {
