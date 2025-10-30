@@ -25,9 +25,9 @@ import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.LeaderTeamReroll
 import com.jervisffb.engine.rules.bb2020.skills.Sprint
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
 
 /**
  * Returns a list of all possible move actions for a given player.

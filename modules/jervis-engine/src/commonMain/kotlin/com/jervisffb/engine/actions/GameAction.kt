@@ -15,9 +15,9 @@ import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.DiceRerollOption
 import com.jervisffb.engine.rules.common.actions.ActionType
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.skills.DiceRerollOption
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
@@ -391,7 +391,7 @@ sealed class DieResult : Number(), GameAction {
     override fun toByte(): Byte = value.toByte()
     override fun toDouble(): Double = value.toDouble()
     override fun toFloat(): Float = value.toFloat()
-    override fun toInt(): Int = value.toInt()
+    override fun toInt(): Int = value
     override fun toLong(): Long = value.toLong()
     override fun toShort(): Short = value.toShort()
     override fun toString(): String {

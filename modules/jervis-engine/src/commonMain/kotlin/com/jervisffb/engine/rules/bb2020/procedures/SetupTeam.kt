@@ -41,7 +41,7 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.Leader
-import com.jervisffb.engine.rules.bb2020.skills.LeaderTeamReroll
+import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 data class SetupTeamContext(

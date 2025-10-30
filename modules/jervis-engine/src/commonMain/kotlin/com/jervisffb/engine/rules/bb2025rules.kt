@@ -1,5 +1,6 @@
 package com.jervisffb.engine.rules
 
+import com.jervisffb.engine.rules.bb2025.BB2025SkillSettings
 import com.jervisffb.engine.rules.bb2025.BB2025TeamActions
 import com.jervisffb.engine.rules.bb2025.tables.BB2025ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2025.tables.BB2025CasualtyTable
@@ -22,6 +23,7 @@ abstract class BB2025Rules : Rules(
     gameVersion = GameVersion.BB2025,
     gameType = GameType.STANDARD,
     teamActions = BB2025TeamActions(),
+    skillSettings = BB2025SkillSettings(),
     kickOffEventTable = BB2025StandardKickOffEventTable,
     prayersToNuffleTable = BB2025StandardPrayersToNuffleTable,
     weatherTable = BB2025StandardWeatherTable,

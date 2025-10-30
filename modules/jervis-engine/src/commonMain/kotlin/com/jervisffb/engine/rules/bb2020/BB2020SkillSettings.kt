@@ -543,6 +543,22 @@ class BB2020SkillSettings: SkillSettings() {
                         SneakiestOfTheLot(player, category, expiresAt)
                     }
                 }
+
+                // Skills not supported in this ruleset
+                SkillType.BULLSEYE,
+                SkillType.EYE_GOUGE,
+                SkillType.GIVE_AND_GO,
+                SkillType.LETHAL_FLIGHT,
+                SkillType.LONE_FOULER,
+                SkillType.PUNT,
+                SkillType.PUT_THE_BOOT_IN,
+                SkillType.QUICK_FOUL,
+                SkillType.SABOTEUR,
+                SkillType.STEADY_FOOTING,
+                SkillType.TAUNT,
+                SkillType.VIOLENT_INNOVATOR -> {
+                    // Ignore
+                }
             }
         }
     }
