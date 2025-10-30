@@ -5,7 +5,7 @@ import com.jervisffb.engine.rules.common.skills.Skill
 
 class ReportSkillUsed(
     player: Player,
-    skill: Skill,
+    skill: Skill<*>,
 ) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS
     override val message: String = "${player.name} used ${skill.name}"

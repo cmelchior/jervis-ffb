@@ -1,7 +1,6 @@
 package com.jervisffb.engine.rules.common.tables
 
 import com.jervisffb.engine.actions.D6Result
-import com.jervisffb.engine.rules.common.tables.InjuryResult
 import kotlinx.serialization.Serializable
 
 /**

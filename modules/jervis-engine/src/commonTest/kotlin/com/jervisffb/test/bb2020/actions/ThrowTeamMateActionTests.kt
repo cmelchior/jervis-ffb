@@ -26,7 +26,7 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.bb2020.procedures.FullGame
-import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
+import com.jervisffb.engine.rules.bb2020.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.TeamReroll
 import com.jervisffb.test.JervisGameBB2020Test

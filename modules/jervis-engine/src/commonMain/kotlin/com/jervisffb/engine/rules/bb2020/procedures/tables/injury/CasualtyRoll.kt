@@ -44,7 +44,7 @@ object CasualtyRoll: Procedure() {
 
                 // Determine the result of casualty roll
                 val result = rules.casualtyTable.roll(d16)
-                val modifiers = emptyList<Skill>() // Just having skills here is not enough, we need more generic Modifier
+                val modifiers = emptyList<Skill<*>>() // Just having skills here is not enough, we need more generic Modifier
 
                 val updatedContext = context.copy(
                     casualtyRoll = d16,

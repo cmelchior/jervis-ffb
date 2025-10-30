@@ -546,7 +546,7 @@ class ActionWheelInputDialog(
         fun createUseSkillDialog(
             provider: UiActionProvider,
             player: Player,
-            skill: Skill,
+            skill: Skill<*>,
         ): UserInputDialog {
             val message = "Use ${skill.name}?"
             val viewModel = ActionWheelViewModel(

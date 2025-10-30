@@ -6,12 +6,12 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
-class Loner constructor(
+class Loner(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.TRAITS,
     override val value: Int? = 4,
     override val expiresAt: Duration,
-) : BB2025Skill {
+) : BB2025IntSkill {
     override val type: SkillType = SkillType.LONER
     override val skillId: SkillId = type.id(value)
     override val name: String = "${type.description}($value+)"

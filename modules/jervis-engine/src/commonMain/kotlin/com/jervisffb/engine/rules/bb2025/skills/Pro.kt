@@ -19,7 +19,7 @@ class Pro(
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2025Skill, RerollSource {
     override val type: SkillType = SkillType.PRO
-    override val value: Int? = null
+    override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description
     override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.serialize()}-reroll")

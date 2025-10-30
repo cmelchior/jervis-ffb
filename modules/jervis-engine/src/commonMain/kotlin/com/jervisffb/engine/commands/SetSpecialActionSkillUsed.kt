@@ -9,7 +9,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 /**
  * Mark a skill as have being used or not.
  */
-class SetSpecialActionSkillUsed(private val player: Player, private val skill: Skill, val used: Boolean) : Command {
+class SetSpecialActionSkillUsed(private val player: Player, private val skill: Skill<*>, val used: Boolean) : Command {
     private var originalUsed: Boolean = false
 
     init {

@@ -50,7 +50,7 @@ fun SelectSkillReroll(type: SkillType): GameAction {
         val skillReroll = selectRerolls.options.first {
             val source = it.getRerollSource(state)
             // Only support single D6 dice rolls for now
-            if (source is Skill) {
+            if (source is Skill<*>) {
                 source.type == type
             } else {
                 false
@@ -100,7 +100,7 @@ fun SelectSingleBlockDieResult(): GameAction {
 /**
  * WARNING: Only use this method if you mean a very specific skill in a specific ruleset.
  */
-inline fun <reified T: Skill> Player.hasSkill(): Boolean {
+inline fun <reified T: Skill<*>> Player.hasSkill(): Boolean {
     return this.skills.filterIsInstance<T>().isNotEmpty()
 }
 

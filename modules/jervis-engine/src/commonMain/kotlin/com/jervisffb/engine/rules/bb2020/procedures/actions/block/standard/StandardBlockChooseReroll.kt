@@ -84,7 +84,7 @@ object StandardBlockChooseReroll: Procedure() {
         // Team reroll: Can reroll all of them
         val availableSkills: List<DiceRerollOption> =
             attackingPlayer.skills
-                .filter { skill: Skill -> skill is RerollSource }
+                .filter { skill: Skill<*> -> skill is RerollSource }
                 .map { it as RerollSource }
                 .filter { it.canReroll(DiceRollType.BLOCK, diceRoll) }
                 .flatMap { it.calculateRerollOptions(DiceRollType.BLOCK, diceRoll) }

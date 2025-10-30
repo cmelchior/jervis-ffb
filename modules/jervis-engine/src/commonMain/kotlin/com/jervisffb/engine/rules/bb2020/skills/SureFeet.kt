@@ -16,7 +16,7 @@ class SureFeet(
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2020Skill, D6StandardSkillReroll {
     override val type: SkillType = SkillType.SURE_FEET
-    override val value: Int? = null
+    override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description
     override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.serialize()}-reroll")

@@ -7,7 +7,7 @@ import com.jervisffb.engine.rules.common.skills.Skill
 /**
  * Mark a skill as have being used or not.
  */
-class SetSkillUsed(private val player: Player, private val skill: Skill, val used: Boolean) : Command {
+class SetSkillUsed(private val player: Player, private val skill: Skill<*>, val used: Boolean) : Command {
     private var originalUsed: Boolean = false
 
     override fun execute(state: Game) {

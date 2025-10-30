@@ -34,11 +34,6 @@ import com.jervisffb.engine.model.modifiers.TemporaryEffectType
 import com.jervisffb.engine.reports.ReportActionEnded
 import com.jervisffb.engine.reports.ReportActionSelected
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.AnimalSavagery
-import com.jervisffb.engine.rules.bb2020.skills.BloodLust
-import com.jervisffb.engine.rules.bb2020.skills.BoneHead
-import com.jervisffb.engine.rules.bb2020.skills.ReallyStupid
-import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
@@ -424,12 +419,12 @@ object ActivatePlayer : Procedure() {
      */
     private fun hasNegaTrait(player: Player): Boolean {
         return player.skills.any { skill ->
-            when (skill) {
-                is AnimalSavagery,
-                is BoneHead,
-                is BloodLust,
-                is ReallyStupid,
-                is UnchannelledFury -> true
+            when (skill.type) {
+                SkillType.ANIMAL_SAVAGERY,
+                SkillType.BONE_HEAD,
+                SkillType.BLOOD_LUST,
+                SkillType.REALLY_STUPID,
+                SkillType.UNCHANNELLED_FURY -> true
                 else -> false
             }
         }

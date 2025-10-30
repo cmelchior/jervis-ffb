@@ -21,7 +21,7 @@ class Dodge(
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2025Skill, D6StandardSkillReroll {
     override val type: SkillType = SkillType.DODGE
-    override val value: Int? = null
+    override val value: Unit? = null
     override val skillId: SkillId = type.id()
     override val name: String = type.description
     override val id: RerollSourceId = RerollSourceId("${player.id.value}-${skillId.serialize()}-reroll")

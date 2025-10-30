@@ -17,7 +17,7 @@ class PrehensileTail(
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2025Skill {
     override val type: SkillType = SkillType.PREHENSILE_TAIL
-    override val value: Int? = null
+    override val value: Unit? = null
     override val skillId: SkillId = type.id(value)
     override val name: String = type.description
     override val compulsory: Boolean = false

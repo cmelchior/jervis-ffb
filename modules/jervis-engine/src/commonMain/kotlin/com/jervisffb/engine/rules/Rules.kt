@@ -776,7 +776,7 @@ open class Rules(
      * Skills might change subtly between rule versions, for that reason, we need a single place to lookup
      * skill definitions from their id (since we might want to support teams across multiple rulesets).
      */
-    fun createSkill(player: Player, skill: SkillId, expiresAt: Duration = Duration.PERMANENT): Skill {
+    fun createSkill(player: Player, skill: SkillId, expiresAt: Duration = Duration.PERMANENT): Skill<*> {
         return skillSettings.createSkill(player, skill, expiresAt)
     }
 

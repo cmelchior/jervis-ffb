@@ -14,7 +14,7 @@ class BreatheFire(
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2025Skill, SpecialActionProvider {
     override val type: SkillType = SkillType.BREATHE_FIRE
-    override val value: Int? = null
+    override val value: Unit? = null
     override val skillId: SkillId = type.id()
     override val name: String = type.description
     override val compulsory: Boolean = false

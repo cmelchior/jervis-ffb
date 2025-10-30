@@ -302,7 +302,7 @@ data class SingleChoiceInputDialog(
             )
         }
 
-        fun createUseSkillDialog(player: Player, skill: Skill): UserInputDialog {
+        fun createUseSkillDialog(player: Player, skill: Skill<*>): UserInputDialog {
             return createWithDescription(
                 title = "Use ${skill.name}?",
                 message = "Does ${player.name} want to use ${skill.name}?",

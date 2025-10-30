@@ -161,7 +161,7 @@ class Player(
     // or a player that was added to the pitch through Spot The Sneak. In these cases, we might want
     // to mark the player somehow. This is done through a TemporaryEffect
     val temporaryEffects = mutableListOf<TemporaryEffect>()
-    val extraSkills = mutableListOf<Skill>()
+    val extraSkills = mutableListOf<Skill<*>>()
     var positionSkills = position.skills.mapNotNull {
         // TODO For now, just ignore skills that are not supported
         if (rules.skillSettings.isSkillSupported(it.type)) {
@@ -170,7 +170,7 @@ class Player(
             null
         }
     }.toMutableList()
-    val skills: List<Skill>
+    val skills: List<Skill<*>>
         get() = extraSkills + positionSkills // TODO This probably result in _a lot_ of copying. Find a way to optimize this
 
     var nigglingInjuries: Int = 0
@@ -194,14 +194,14 @@ class Player(
         extraSkills.add(skill)
     }
 
-    fun addSkill(skill: Skill) {
+    fun addSkill(skill: Skill<*>) {
         if (skill.player != this) {
             throw IllegalArgumentException("Skill $skill is not owned by ${this.id}: ${skill.player.id}")
         }
         extraSkills.add(skill)
     }
 
-    fun removeSkill(skill: Skill) {
+    fun removeSkill(skill: Skill<*>) {
         if (!extraSkills.remove(skill)) {
             INVALID_GAME_STATE("Could not remove skill: ${skill.name}")
         }
@@ -213,11 +213,11 @@ class Player(
         return "Player(id='${id.value}', name='$name', number=$number, position=$position)"
     }
 
-    inline fun getSkill(type: SkillType): Skill {
+    fun getSkill(type: SkillType): Skill<*> {
         return skills.firstOrNull { it.type == type } ?: INVALID_GAME_STATE("Player does not have the skill $type")
     }
 
-    inline fun getSkillOrNull(type: SkillType): Skill? {
+    fun getSkillOrNull(type: SkillType): Skill<*>? {
         return skills.firstOrNull { it.type == type }
     }
 
@@ -256,10 +256,10 @@ class Player(
     }
 }
 
-inline fun Player.hasSkill(type: SkillType): Boolean = this.skills.any { it.type == type }
+fun Player.hasSkill(type: SkillType): Boolean = this.skills.any { it.type == type }
 
 // This method assumes the player is on the field
-inline fun Player.isSkillAvailable(type: SkillType): Boolean {
+fun Player.isSkillAvailable(type: SkillType): Boolean {
     return getSkillOrNull(type)?.let { skill ->
         if (!hasTackleZones && !skill.workWithoutTackleZones) {
             return@let false

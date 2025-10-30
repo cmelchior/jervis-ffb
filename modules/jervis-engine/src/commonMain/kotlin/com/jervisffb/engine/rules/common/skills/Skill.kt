@@ -8,7 +8,7 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
  * This interface represents player Skills. Since these skills are stateful
  * they are required to have a [skillId] that is unique across the entire game.
  */
-interface Skill {
+interface Skill<T> {
     // The player this skill is assigne to
     val player: Player
     // Unique identifier for the skill
@@ -20,7 +20,7 @@ interface Skill {
     val type: SkillType
     // Represents any value in brackes, like Might Blow(1+) or Loner(4+). It is up to the context to correctly
     // interpret this value
-    val value: Int?
+    val value: T?
     // Which category does this skill belong to?
     val category: SkillCategory
     // Human readable name of this skill

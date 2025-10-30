@@ -1,7 +1,10 @@
 package com.jervisffb.engine.rules.common.skills
 
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.SkillValue
+import io.ktor.client.request.invoke
 import kotlinx.serialization.Serializable
 
 /**
@@ -121,11 +124,17 @@ enum class SkillType(val description: String) {
     BREATHE_FIRE("Breathe Fire"), // Reference missing
     CHAINSAW("Chainsaw"),
     DECAY("Decay"),
+    DRUNKARD("Drunkard"),
+    HATRED("Hatred"),
     HIT_AND_RUN("Hit and Run"),
     HYPNOTIC_GAZE("Hypnotic Gaze"),
+    INSIGNIFICANT("Insignificant"),
     KICK_TEAMMATE("Kick Team-mate"),
     LONER("Loner"),
+    MY_BALL("My Ball"),
+    NO_BALL("No Ball"),
     NO_HANDS("No Hands"),
+    PICK_ME_UP("Pick-me-up"),
     PLAGUE_RIDDEN("Plague Ridden"),
     POGO_STICK("Pojo Stick"),
     PROJECTILE_VOMIT("Projectile Vomit"),
@@ -141,7 +150,9 @@ enum class SkillType(val description: String) {
     THROW_TEAMMATE("Throw Team-mate"),
     TIMMMBER("Timmm-ber!"),
     TITCHY("Titchy"),
+    TRICKSTER("Trickster"),
     UNCHANNELLED_FURY("Unchannelled Fury"),
+    UNSTEADY("Unsteady"),
 
     // Special Rules (Star Players)
     SNEAKIEST_OF_THE_LOT("Sneakiest of the Lot");
@@ -161,5 +172,7 @@ enum class SkillType(val description: String) {
      * Design note: The naming of this method is intentionally kept short
      * to make skill lists in rosters more readable.
      */
-    fun id(value: Int? = null): SkillId = SkillId(this, value)
+    fun id(value: Int): SkillId = SkillId(this, SkillValue.Int(value))
+    fun id(value: PlayerKeyword): SkillId = SkillId(this, SkillValue.Keyword(value))
+    fun id(value: Any? = null): SkillId = SkillId(this, SkillValue.None)
 }

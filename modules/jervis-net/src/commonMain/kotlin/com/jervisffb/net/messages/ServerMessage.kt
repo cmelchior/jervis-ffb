@@ -8,8 +8,6 @@ import com.jervisffb.engine.model.Spectator
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.net.GameId
-import com.jervisffb.net.messages.P2PClientState.JOIN_SERVER
-import com.jervisffb.net.messages.P2PHostState.JOIN_SERVER
 import kotlinx.serialization.Serializable
 
 /**

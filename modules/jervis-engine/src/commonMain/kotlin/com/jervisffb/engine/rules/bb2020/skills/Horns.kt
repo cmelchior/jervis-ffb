@@ -17,7 +17,7 @@ class Horns(
     override val expiresAt: Duration = Duration.PERMANENT,
 ) : BB2020Skill {
     override val type: SkillType = SkillType.HORNS
-    override val value: Int? = null
+    override val value: Unit? = null
     override val skillId: SkillId = type.id()
     override val name: String = type.description
     override val compulsory: Boolean = false
