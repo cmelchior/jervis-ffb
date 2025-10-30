@@ -7,8 +7,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import kotlinx.serialization.Serializable
 
 /**
- * Class representing the Injury Table.
- *
+ * Class representing the Casualty Table.
  * See page XX in the BB 2025 rulebook.
  */
 @Serializable
@@ -21,10 +20,10 @@ object BB2025CasualtyTable: CasualtyTable {
             4 to CasualtyResult.BADLY_HURT,
             5 to CasualtyResult.BADLY_HURT,
             6 to CasualtyResult.BADLY_HURT,
-            7 to CasualtyResult.SERIOUSLY_HURT,
-            8 to CasualtyResult.SERIOUSLY_HURT,
+            7 to CasualtyResult.BADLY_HURT,
+            8 to CasualtyResult.BADLY_HURT,
             9 to CasualtyResult.SERIOUSLY_HURT,
-            10 to CasualtyResult.SERIOUS_INJURY,
+            10 to CasualtyResult.SERIOUSLY_HURT,
             11 to CasualtyResult.SERIOUS_INJURY,
             12 to CasualtyResult.SERIOUS_INJURY,
             13 to CasualtyResult.LASTING_INJURY,
