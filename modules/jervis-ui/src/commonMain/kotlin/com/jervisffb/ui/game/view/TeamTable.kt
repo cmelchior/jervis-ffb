@@ -49,6 +49,9 @@ import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.icons.IconFactory
@@ -113,6 +116,12 @@ fun TeamTable(width: Dp, team: Team, isOnHomeTeam: Boolean) {
             team.currentTeamValue,
             team.teamLogo ?: team.roster.logo
         )
+        Spacer(modifier = Modifier.height(3.dp))
+        SpecialRulesSection(
+            version = team.version,
+            league = team.league,
+            specialRules = team.specialRules,
+        )
         TeamTableWrapper()
     }
 }
@@ -126,6 +135,30 @@ private fun TeamTableDivider() {
         .background(color = JervisTheme.rulebookRed)
     ) {
 
+    }
+}
+
+@Composable
+private fun SpecialRulesSection(
+    version: GameVersion,
+    league: RegionalSpecialRule?,
+    specialRules: List<SpecialRules>
+) {
+    Row(modifier = Modifier.height(IntrinsicSize.Min).background(JervisTheme.rulebookPaperMediumDark)) {
+        Column(
+            modifier = Modifier.weight(1f).padding(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            if (league != null) {
+                TeamDataRowSingle("League", league.description)
+            }
+            val specialRulesDescription = if (specialRules.isEmpty()) {
+                "None"
+            } else {
+                specialRules.joinToString(", ") { it.description }
+            }
+            TeamDataRowSingle("Special Rules", specialRulesDescription)
+        }
     }
 }
 
@@ -184,6 +217,23 @@ private fun TeamInfoSection(
         }
     }
 }
+
+@Composable
+private fun TeamDataRowSingle(header: String, value: String) {
+    Row {
+        Text(
+            text = "$header:",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            fontSize = 14.sp,
+            text = value,
+        )
+    }
+}
+
 
 @Composable
 private fun TeamDataRow(col1Header: String, col1Value: String, col2Header: String, col2Value: String) {

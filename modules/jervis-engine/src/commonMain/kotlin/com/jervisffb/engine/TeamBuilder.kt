@@ -57,6 +57,8 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
     var currentTeamValue: Int = 0
     var treasury: Int = 0
     var dedicatedFans: Int = 0
+    // For now, just use sensible defaults for the league
+    var league = roster.leagues.singleOrNull() ?: roster.leagues.firstOrNull()
     val specialRules = mutableListOf<SpecialRules>()
     var teamLogo: RosterLogo? = null
     var apothecaries: Int = 0
@@ -136,6 +138,7 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
                     }
                 })
             }
+            this.league = this@TeamBuilder.league
             this.rerolls.addAll((0 ..<this@TeamBuilder.rerolls).map {
                 RegularTeamReroll(id, it)
             })
