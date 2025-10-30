@@ -30,11 +30,8 @@ import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
-import com.jervisffb.engine.rules.bb2020.skills.BreatheFire
-import com.jervisffb.engine.rules.bb2020.skills.Frenzy
-import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
-import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
@@ -223,7 +220,7 @@ object BlockAction : Procedure() {
             // After the Push was resolved, if the target is still standing
             // and the attacker has frenzy and was able to follow up, a
             // second block is thrown
-            val hasFrenzy = context.attacker.isSkillAvailable<Frenzy>()
+            val hasFrenzy = context.attacker.isSkillAvailable(SkillType.FRENZY)
             val isNextToTarget = (
                 rules.isStanding(context.attacker) &&
                     rules.isStanding(context.defender) &&
@@ -236,7 +233,7 @@ object BlockAction : Procedure() {
                 compositeCommandOf(
                     removeContextCommand,
                     SetContext(context.copy(hasBlocked = hasBlocked)),
-                    SetSkillUsed(context.attacker, context.attacker.getSkill<Frenzy>(), true),
+                    SetSkillUsed(context.attacker, context.attacker.getSkill(SkillType.FRENZY), true),
                     GotoNode(SelectBlockType),
                 )
             } else {
@@ -259,11 +256,11 @@ object BlockAction : Procedure() {
         return buildList {
             BlockType.entries.forEach { type ->
                 when (type) {
-                    BlockType.BREATHE_FIRE -> if (player.isSkillAvailable<BreatheFire>()) add(type)
-                    BlockType.CHAINSAW -> if (player.isSkillAvailable<ProjectileVomit>()) add(type)
+                    BlockType.BREATHE_FIRE -> if (player.isSkillAvailable(SkillType.BREATHE_FIRE)) add(type)
+                    BlockType.CHAINSAW -> if (player.isSkillAvailable(SkillType.PROJECTILE_VOMIT)) add(type)
                     BlockType.MULTIPLE_BLOCK -> if (!isMultipleBlock) add(type)
-                    BlockType.PROJECTILE_VOMIT -> if (player.isSkillAvailable<ProjectileVomit>()) add(type)
-                    BlockType.STAB -> if (player.isSkillAvailable<Stab>()) add(type)
+                    BlockType.PROJECTILE_VOMIT -> if (player.isSkillAvailable(SkillType.PROJECTILE_VOMIT)) add(type)
+                    BlockType.STAB -> if (player.isSkillAvailable(SkillType.STAB)) add(type)
                     BlockType.STANDARD -> add(type)
                 }
             }

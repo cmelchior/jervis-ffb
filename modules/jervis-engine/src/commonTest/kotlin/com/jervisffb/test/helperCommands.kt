@@ -34,8 +34,9 @@ import kotlin.collections.plus
 /**
  * This file contains helper command functions that group common patterns,
  * making it easier to write tests that are more readable
+ *
+ * For now, these needs to be compatible with both BB2020 and BB2025
  */
-
 
 fun defaultFanFactor() = arrayOf(
     1.d3, // Home Fan Factor Roll

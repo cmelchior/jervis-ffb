@@ -25,9 +25,9 @@ import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.Sprint
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
+import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
  * Returns a list of all possible move actions for a given player.
@@ -121,7 +121,7 @@ fun getSetPlayerRushesCommand(rules: Rules, player: Player): Command {
     // skill or not.
     // TODO This is not correct. When combined with Frenzy, there might be cases
     //  where you do not want to use Sprint.
-    val rushesPrAction = if (player.hasSkill<Sprint>()) rules.rushesPrAction + 1 else rules.rushesPrAction
+    val rushesPrAction = if (player.hasSkill(SkillType.SPRINT)) rules.rushesPrAction + 1 else rules.rushesPrAction
     return SetPlayerRushesLeft(player, rushesPrAction)
 }
 

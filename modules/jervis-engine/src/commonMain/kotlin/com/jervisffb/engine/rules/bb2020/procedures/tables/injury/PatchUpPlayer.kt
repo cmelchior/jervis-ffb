@@ -42,7 +42,7 @@ import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportInjuryResult
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.Regeneration
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.CasualtyResult
 import com.jervisffb.engine.rules.common.tables.InjuryResult
 import com.jervisffb.engine.utils.INVALID_ACTION
@@ -75,7 +75,7 @@ object PatchUpPlayer: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<RiskingInjuryContext>().player.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<RiskingInjuryContext>()
-            if (context.player.hasSkill<Regeneration>()) {
+            if (context.player.hasSkill(SkillType.REGENERATION)) {
                 return listOf(
                     ConfirmWhenReady,
                     CancelWhenReady,

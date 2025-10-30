@@ -4,6 +4,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import okio.Path
 import okio.Path.Companion.toPath
 import kotlin.io.path.createTempFile
@@ -25,7 +26,7 @@ class SerializationTests {
 
     @Test
     fun loadGameStateFromFile() {
-        val game = createDefaultGameState(StandardBB2020Rules())
+        val game = createDefaultGameStateBB2020(StandardBB2020Rules())
         val controller = GameEngineController(game)
         controller.startManualMode(false)
         val gameFile = createTempFile("test-game-state-file", suffix = FILE_EXTENSION_GAME_FILE).pathString.toPath()
@@ -42,7 +43,7 @@ class SerializationTests {
 
     @Test
     fun loadGameStateFromDumpFile() {
-        val game = createDefaultGameState(StandardBB2020Rules())
+        val game = createDefaultGameStateBB2020(StandardBB2020Rules())
         val controller = GameEngineController(game)
         controller.startManualMode(false)
         val gameFile = createTempFile("test-dump-state-file", suffix = FILE_EXTENSION_GAME_FILE).pathString.toPath()

@@ -24,8 +24,8 @@ import androidx.compose.ui.window.rememberWindowState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.test.createDefaultGameState
-import com.jervisffb.test.createStartingTestSetup
+import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
+import com.jervisffb.test.bb2020.createStartingTestSetup
 import org.junit.Ignore
 import org.junit.Test
 
@@ -47,7 +47,7 @@ class DjikstraTests {
 @Composable
 fun DjiekstraContent() {
     val rules = StandardBB2020Rules()
-    val state = createDefaultGameState(rules)
+    val state = createDefaultGameStateBB2020(rules)
     createStartingTestSetup(state)
 
     val result = rules.pathFinder.calculateAllPaths(state, FieldCoordinate(12, 6), 6)

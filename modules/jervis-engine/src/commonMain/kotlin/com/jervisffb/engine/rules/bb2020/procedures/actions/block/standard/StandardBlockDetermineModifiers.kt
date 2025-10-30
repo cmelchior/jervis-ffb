@@ -19,7 +19,7 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.MultipleBlockAction
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.StandardBlockStep
-import com.jervisffb.engine.rules.bb2020.skills.Horns
+import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
  * Calculate all modifiers before rolling the block dice.
@@ -42,7 +42,7 @@ object StandardBlockDetermineModifiers: Procedure() {
             // TODO Implement Horns logic. Modify strength using the modifier system
             val context = state.getContext<BlockContext>()
             return buildCompositeCommand {
-                if (context.isBlitzing && context.attacker.hasSkill<Horns>()) {
+                if (context.isBlitzing && context.attacker.hasSkill(SkillType.HORNS)) {
                     add(AddPlayerStatModifier(context.attacker, SkillStatModifier.HORNS))
                 }
                 add(GotoNode(ResolveDauntless))

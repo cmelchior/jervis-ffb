@@ -30,8 +30,8 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
-import com.jervisffb.engine.rules.bb2020.skills.Loner
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.SkillType
 
 data class IntensiveTrainingContext(
     val player: Player,
@@ -52,7 +52,7 @@ object IntensiveTraining : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val availablePlayers = state.getContext<PrayersToNuffleRollContext>().team
                 .filter {it.state == PlayerState.RESERVE }
-                .filter { !it.hasSkill<Loner>() }
+                .filter { !it.hasSkill(SkillType.LONER) }
                 .map { SelectPlayer(it) }
             return availablePlayers.ifEmpty {
                 listOf(ContinueWhenReady)

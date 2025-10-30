@@ -64,10 +64,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.OfficiousRef
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.OfficiousRefContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.BadHabits
 import com.jervisffb.engine.rules.bb2020.procedures.tables.weather.SwelteringHeat
-import com.jervisffb.engine.rules.bb2020.skills.Block
-import com.jervisffb.engine.rules.bb2020.skills.Dodge
-import com.jervisffb.engine.rules.bb2020.skills.Sidestep
-import com.jervisffb.engine.rules.bb2020.skills.Tackle
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
@@ -146,12 +143,12 @@ object DialogFactory {
 
                 is BothDown.AttackerChooseToUseBlock -> {
                     val context = controller.state.getContext<BothDownContext>()
-                    ActionWheelInputDialog.createUseSkillDialog(provider, context.attacker, context.attacker.getSkill<Block>())
+                    ActionWheelInputDialog.createUseSkillDialog(provider, context.attacker, context.attacker.getSkill(SkillType.BLOCK))
                 }
 
                 is BothDown.DefenderChooseToUseBlock -> {
                     val context = controller.state.getContext<BothDownContext>()
-                    ActionWheelInputDialog.createUseSkillDialog(provider, context.defender, context.defender.getSkill<Block>())
+                    ActionWheelInputDialog.createUseSkillDialog(provider, context.defender, context.defender.getSkill(SkillType.BLOCK))
                 }
 
                 is Bounce.RollDirection -> {
@@ -308,7 +305,7 @@ object DialogFactory {
                     ActionWheelInputDialog.createUseSkillDialog(
                         provider,
                         player,
-                        player.getSkill<Sidestep>()
+                        player.getSkill(SkillType.SIDESTEP)
                     )
                 }
 
@@ -366,12 +363,12 @@ object DialogFactory {
 
                 is Stumble.ChooseToUseDodge -> {
                     val defender = controller.state.getContext<StumbleContext>().defender
-                    ActionWheelInputDialog.createUseSkillDialog(provider, defender, defender.getSkill<Dodge>())
+                    ActionWheelInputDialog.createUseSkillDialog(provider, defender, defender.getSkill(SkillType.DODGE))
                 }
 
                 is Stumble.ChooseToUseTackle -> {
                     val defender = controller.state.getContext<StumbleContext>().attacker
-                    ActionWheelInputDialog.createUseSkillDialog(provider, defender, defender.getSkill<Tackle>())
+                    ActionWheelInputDialog.createUseSkillDialog(provider, defender, defender.getSkill(SkillType.TACKLE))
                 }
 
                 is SwelteringHeat.RollForAwayTeam,

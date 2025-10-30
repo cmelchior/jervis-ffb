@@ -49,9 +49,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.ThrowInContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
-import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.bb2020.skills.Leader
-import com.jervisffb.engine.rules.bb2020.skills.Sidestep
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 data class PushContext(
@@ -316,7 +315,7 @@ object PushStepInitialMoveSequence: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<PushContext>().pushChain.first().pushee.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>().pushChain.last()
-            val hasSidestep = context.pushee.hasSkill<Sidestep>()
+            val hasSidestep = context.pushee.hasSkill(SkillType.SIDESTEP)
             val validSideStepTargets = context.pushee.coordinates
                 .getSurroundingCoordinates(rules)
                 .count { state.field[it].isUnoccupied() } > 0
@@ -514,7 +513,7 @@ object PushStepInitialMoveSequence: Procedure() {
 
                         // Check if Leader rerolls are still available after a player with Leader
                         // left the field.
-                        if (push.pushee.hasSkill<Leader>()) {
+                        if (push.pushee.hasSkill(SkillType.LEADER)) {
                             Leader.removeLeaderRerollIfNotAvailable(push.pushee.team)?.let { removeRerollCommand ->
                                 add(removeRerollCommand)
                             }
@@ -590,7 +589,7 @@ object PushStepInitialMoveSequence: Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<PushContext>()
             return if (
-                context.firstPusher.hasSkill<Frenzy>() || // Always follow up when having Frenzy (unless prevented by Fend)
+                context.firstPusher.hasSkill(SkillType.FRENZY) || // Always follow up when having Frenzy (unless prevented by Fend)
                 context.isMultipleBlock // Never follow up when using Multiple Block
             ) {
                 listOf(ContinueWhenReady)
@@ -610,7 +609,7 @@ object PushStepInitialMoveSequence: Procedure() {
                 )
                 is Cancel -> arrayOf() // Do nothing
                 is Continue -> {
-                    if (pushContext.firstPusher.hasSkill<Frenzy>()) {
+                    if (pushContext.firstPusher.hasSkill(SkillType.FRENZY)) {
                         arrayOf(
                             SetContextProperty(PushContext::followsUp, pushContext, true),
                             SetPlayerLocation(pushContext.firstPusher, pushContext.pushChain.first().from)

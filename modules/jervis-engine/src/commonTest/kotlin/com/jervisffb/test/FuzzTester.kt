@@ -19,6 +19,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
 import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.utils.createRandomAction
+import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import kotlin.random.Random
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -32,7 +33,7 @@ import kotlin.test.fail
  *
  * For now, this class has to be run manually.
  *
- * Note: If running many tests, there will be a huge performance increase by
+ * Note: If running many tests, there will be a huge performance penalty by
  * raising the log level to `Assert` in [com.jervisffb.utils.jervisLogger]
  **/
 @Ignore // Comment out to run
@@ -44,7 +45,7 @@ class FuzzTester {
         repeat(games) { gameNo ->
             val seed = Random.nextLong()
             val random = Random(seed)
-            val state = createDefaultGameState(StandardBB2020Rules())
+            val state = createDefaultGameStateBB2020(StandardBB2020Rules())
             val controller = GameEngineController(state)
             controller.startManualMode(logAvailableActions = false)
             try {
@@ -65,7 +66,7 @@ class FuzzTester {
         repeat(games) { gameNo ->
             val seed = Random.nextLong()
             val random = Random(seed)
-            val state = createDefaultGameState(BB72020Rules())
+            val state = createDefaultGameStateBB2020(BB72020Rules())
             val controller = GameEngineController(state)
             controller.startManualMode(logAvailableActions = false)
             try {

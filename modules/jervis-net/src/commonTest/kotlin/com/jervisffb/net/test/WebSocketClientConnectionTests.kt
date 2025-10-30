@@ -6,7 +6,7 @@ import com.jervisffb.net.GameId
 import com.jervisffb.net.JervisClientWebSocketConnection
 import com.jervisffb.net.JervisExitCode
 import com.jervisffb.net.LightServer
-import com.jervisffb.test.createDefaultHomeTeam
+import com.jervisffb.test.bb2020.createDefaultHomeTeamBB2020
 import com.jervisffb.utils.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,7 +22,7 @@ class WebSocketClientConnectionTests {
             gameName = "testGame",
             rules = rules,
             hostCoach = CoachId("HomeCoachID"),
-            hostTeam = createDefaultHomeTeam(rules),
+            hostTeam = createDefaultHomeTeamBB2020(rules),
             clientCoach = null,
             clientTeam = null,
             testMode = true

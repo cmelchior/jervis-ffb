@@ -7,6 +7,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.TeamReroll
@@ -95,3 +96,11 @@ fun SelectSingleBlockDieResult(): GameAction {
         DicePoolResultsSelected(listOf(poolChoice))
     }
 }
+
+/**
+ * WARNING: Only use this method if you mean a very specific skill in a specific ruleset.
+ */
+inline fun <reified T: Skill> Player.hasSkill(): Boolean {
+    return this.skills.filterIsInstance<T>().isNotEmpty()
+}
+

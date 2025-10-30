@@ -71,7 +71,7 @@ class Leader(
          */
         fun removeLeaderRerollIfNotAvailable(team: Team): Command? {
             val rules = team.game.rules
-            val leaderOnField =team.any { it.location.isOnField(rules) && it.hasSkill<Leader>() }
+            val leaderOnField =team.any { it.location.isOnField(rules) && it.hasSkill(SkillType.LEADER) }
             return if (!leaderOnField) {
                 val commands = team.rerolls.filterIsInstance<LeaderTeamReroll>().map {
                     RemoveTeamReroll(team, it)

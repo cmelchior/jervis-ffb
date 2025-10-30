@@ -30,8 +30,7 @@ import com.jervisffb.engine.reports.ReportStumbleResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.KnockedDown
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.bb2020.skills.Dodge
-import com.jervisffb.engine.rules.bb2020.skills.Tackle
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
@@ -63,7 +62,7 @@ object Stumble: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<StumbleContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val stumbleContext = state.getContext<StumbleContext>()
-            return if (stumbleContext.attacker.hasSkill<Tackle>()) {
+            return if (stumbleContext.attacker.hasSkill(SkillType.TACKLE)) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
                 listOf(ContinueWhenReady)
@@ -88,7 +87,7 @@ object Stumble: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team? = state.getContext<StumbleContext>().defender.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val stumbleContext = state.getContext<StumbleContext>()
-            return if (stumbleContext.defender.hasSkill<Dodge>()) {
+            return if (stumbleContext.defender.hasSkill(SkillType.DODGE)) {
                 listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
                 listOf(ContinueWhenReady)

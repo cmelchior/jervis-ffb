@@ -12,6 +12,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.bb2020.procedures.WeatherRoll
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.utils.InvalidActionException
+import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -26,7 +27,7 @@ class GameEngineControllerTests {
     private lateinit var controller: GameEngineController
 
     private fun createGameController(rules: Rules): GameEngineController {
-        val state = createDefaultGameState(rules)
+        val state = createDefaultGameStateBB2020(rules)
         controller = GameEngineController(state)
         controller.startTestMode(FullGame)
         return controller

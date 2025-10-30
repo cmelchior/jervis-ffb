@@ -41,8 +41,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveType
 import com.jervisffb.engine.rules.bb2020.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.bb2020.skills.RightStuff
-import com.jervisffb.engine.rules.bb2020.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -111,7 +111,7 @@ object ThrowTeamMateAction : Procedure() {
     }
     override fun isValid(state: Game, rules: Rules) {
         state.activePlayer ?: INVALID_GAME_STATE("No active player")
-        if (state.activePlayer?.hasSkill<ThrowTeamMate>() != true) {
+        if (state.activePlayer?.hasSkill(SkillType.THROW_TEAMMATE) != true) {
             INVALID_GAME_STATE("Player does not have Throw Team-mate: ${state.activePlayer}")
         }
     }
@@ -135,10 +135,18 @@ object ThrowTeamMateAction : Procedure() {
             if (thrower.state == PlayerState.STANDING && throwerLocation is OnFieldLocation) {
                 val eligiblePlayers = throwerLocation.getSurroundingCoordinates(rules, 1).mapNotNull {
                     val player = state.field[it].player
+
+                    val maxStrength = when (val rightStuffSkill = player?.getSkillOrNull(SkillType.RIGHT_STUFF)) {
+                        null -> Int.MIN_VALUE
+                        is RightStuff -> rightStuffSkill.maxStrength
+                        is com.jervisffb.engine.rules.bb2025.skills.RightStuff -> rightStuffSkill.maxStrength
+                        else -> INVALID_GAME_STATE("Unknown Right Stuff skill type: ${rightStuffSkill::class.simpleName}")
+                    }
+
                     val canBeThrown = player != null
                         && player.team == thrower.team
-                        && player.hasSkill<RightStuff>()
-                        && player.strength <= player.getSkill<RightStuff>().maxStrength
+                        && player.hasSkill(SkillType.RIGHT_STUFF)
+                        && player.strength <= maxStrength
                     if (canBeThrown) {
                         player.id
                     } else {

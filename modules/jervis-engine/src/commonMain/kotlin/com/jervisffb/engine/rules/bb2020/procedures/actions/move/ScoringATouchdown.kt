@@ -28,7 +28,7 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.reports.ReportGoal
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.BloodLust
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
@@ -132,7 +132,7 @@ object ScoringATouchdown : Procedure() {
             val context = state.getContext<ScoringATouchDownContext>()
             return when (action) {
                 Continue -> {
-                    if (context.player.hasSkill<BloodLust>()) GotoNode(CheckBloodLust) else ExitProcedure()
+                    if (context.player.hasSkill(SkillType.BLOOD_LUST)) GotoNode(CheckBloodLust) else ExitProcedure()
                 }
                 else -> INVALID_ACTION(action)
             }

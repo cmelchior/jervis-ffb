@@ -213,12 +213,12 @@ class Player(
         return "Player(id='${id.value}', name='$name', number=$number, position=$position)"
     }
 
-    inline fun <reified T: Skill> getSkill(): T {
-        return skills.filterIsInstance<T>().firstOrNull() ?: INVALID_GAME_STATE("Player does not have the skill ${T::class.simpleName}")
+    inline fun getSkill(type: SkillType): Skill {
+        return skills.firstOrNull { it.type == type } ?: INVALID_GAME_STATE("Player does not have the skill $type")
     }
 
-    inline fun <reified T: Skill> getSkillOrNull(): T? {
-        return skills.filterIsInstance<T>().firstOrNull()
+    inline fun getSkillOrNull(type: SkillType): Skill? {
+        return skills.firstOrNull { it.type == type }
     }
 
     fun addStatModifier(modifier: StatModifier) {
@@ -256,13 +256,11 @@ class Player(
     }
 }
 
-inline fun <reified T: Skill> Player.hasSkill(): Boolean {
-    return this.skills.filterIsInstance<T>().isNotEmpty()
-}
+inline fun Player.hasSkill(type: SkillType): Boolean = this.skills.any { it.type == type }
 
 // This method assumes the player is on the field
-inline fun <reified T: Skill> Player.isSkillAvailable(): Boolean {
-    return getSkillOrNull<T>()?.let { skill ->
+inline fun Player.isSkillAvailable(type: SkillType): Boolean {
+    return getSkillOrNull(type)?.let { skill ->
         if (!hasTackleZones && !skill.workWithoutTackleZones) {
             return@let false
         }

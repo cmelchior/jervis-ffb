@@ -40,8 +40,8 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.Leader
 import com.jervisffb.engine.rules.common.skills.LeaderTeamReroll
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 data class SetupTeamContext(
@@ -150,7 +150,7 @@ object SetupTeam : Procedure() {
                 buildCompositeCommand {
                     if (rules.isStartOfHalf(state)) {
                         val hasLeader = team.any {
-                            it.hasSkill<Leader>() && it.location.isOnField(rules)
+                            it.hasSkill(SkillType.LEADER) && it.location.isOnField(rules)
                         }
                         if (hasLeader) {
                             add(AddTeamReroll(team, LeaderTeamReroll(team.id)))

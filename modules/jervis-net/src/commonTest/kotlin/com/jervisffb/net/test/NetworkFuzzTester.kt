@@ -43,8 +43,8 @@ import com.jervisffb.net.messages.TeamJoinedMessage
 import com.jervisffb.net.messages.TeamSelectedMessage
 import com.jervisffb.net.messages.UpdateClientStateMessage
 import com.jervisffb.net.messages.UpdateHostStateMessage
-import com.jervisffb.test.createDefaultHomeTeam
-import com.jervisffb.test.lizardMenAwayTeam
+import com.jervisffb.test.bb2020.createDefaultHomeTeamBB2020
+import com.jervisffb.test.bb2020.lizardMenAwayTeam
 import com.jervisffb.utils.runBlocking
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -105,7 +105,7 @@ class NetworkFuzzTester {
             gameName = "test",
             rules = rules,
             hostCoach = CoachId("HomeCoachID"),
-            hostTeam = createDefaultHomeTeam(rules),
+            hostTeam = createDefaultHomeTeamBB2020(rules),
             clientCoach = null,
             clientTeam = null,
             testMode = true,
@@ -133,7 +133,7 @@ class NetworkFuzzTester {
             "host",
             CoachType.HUMAN,
             true,
-            P2PTeamInfo(createDefaultHomeTeam(rules))
+            P2PTeamInfo(createDefaultHomeTeamBB2020(rules))
         )
         conn1.send(join1)
         checkServerMessage<GameStateSyncMessage>(conn1) {

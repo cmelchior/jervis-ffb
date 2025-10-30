@@ -33,7 +33,7 @@ import com.jervisffb.engine.reports.ReportBothDownResult
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.KnockedDown
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.bb2020.skills.Block
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 data class BothDownContext(
@@ -140,7 +140,7 @@ object BothDown: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().defender.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BothDownContext>()
-            val hasBlock = context.defender.getSkillOrNull<Block>() != null
+            val hasBlock = context.defender.getSkillOrNull(SkillType.BLOCK) != null
             return when (hasBlock) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)
@@ -166,7 +166,7 @@ object BothDown: Procedure() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<BothDownContext>().attacker.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<BothDownContext>()
-            val hasBlock = (context.attacker.getSkillOrNull<Block>() != null)
+            val hasBlock = (context.attacker.getSkillOrNull(SkillType.BLOCK) != null)
             return when (hasBlock) {
                 true -> listOf(ConfirmWhenReady, CancelWhenReady)
                 false -> listOf(ContinueWhenReady)

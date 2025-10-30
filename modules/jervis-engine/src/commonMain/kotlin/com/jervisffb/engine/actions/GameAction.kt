@@ -1,7 +1,6 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameEngineController
-import com.jervisffb.engine.actions.D12Result
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8

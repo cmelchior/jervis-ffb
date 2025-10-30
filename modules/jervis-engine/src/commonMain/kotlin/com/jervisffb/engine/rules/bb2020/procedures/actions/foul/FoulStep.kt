@@ -46,6 +46,7 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryC
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll
 import com.jervisffb.engine.rules.bb2020.skills.Leader
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallResult
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
@@ -205,7 +206,7 @@ object FoulStep: Procedure() {
 
             // If the player had the Leader skill, we need to check if anyone else on the field
             // has Leader, otherwise the reroll is removed.
-            if (player.hasSkill<Leader>()) {
+            if (player.hasSkill(SkillType.LEADER)) {
                 Leader.removeLeaderRerollIfNotAvailable(player.team)?.let { removeRerollCommand ->
                     add(removeRerollCommand)
                 }

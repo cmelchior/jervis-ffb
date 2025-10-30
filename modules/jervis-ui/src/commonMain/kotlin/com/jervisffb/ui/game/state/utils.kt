@@ -4,7 +4,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.calculateBlockDiceToRoll
-import com.jervisffb.engine.rules.bb2020.skills.Horns
+import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
  * Calculate the expected number of dice to be rolled if [attacker] blocks [defender].
@@ -19,7 +19,7 @@ fun calculateAssumedNoOfBlockDice(state: Game, attacker: Player, defender: Playe
 
     // TODO Horns, Dauntless, Multiple Block. Are other things affecting strength?
 
-    if (attacker.hasSkill<Horns>() && isBlitzing) {
+    if (attacker.hasSkill(SkillType.HORNS) && isBlitzing) {
         attackerStrength += 1
     }
 

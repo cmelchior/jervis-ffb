@@ -37,15 +37,13 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.AnimalSavagery
 import com.jervisffb.engine.rules.bb2020.skills.BloodLust
 import com.jervisffb.engine.rules.bb2020.skills.BoneHead
-import com.jervisffb.engine.rules.bb2020.skills.MultipleBlock
-import com.jervisffb.engine.rules.bb2020.skills.ProjectileVomit
 import com.jervisffb.engine.rules.bb2020.skills.ReallyStupid
-import com.jervisffb.engine.rules.bb2020.skills.Stab
 import com.jervisffb.engine.rules.bb2020.skills.UnchannelledFury
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.Duration
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 
 data class ActivatePlayerContext(
@@ -132,19 +130,19 @@ object ActivatePlayer : Procedure() {
                     PlayerSpecialActionType.KICK_TEAM_MATE -> TODO()
                     PlayerSpecialActionType.MULTIPLE_BLOCK -> {
                         compositeCommandOf(
-                            SetSpecialActionSkillUsed(player, player.getSkill<MultipleBlock>(), true),
+                            SetSpecialActionSkillUsed(player, player.getSkill(SkillType.MULTIPLE_BLOCK), true),
                             SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.MULTIPLE_BLOCK)
                         )
                     }
                     PlayerSpecialActionType.PROJECTILE_VOMIT -> {
                         compositeCommandOf(
-                            SetSpecialActionSkillUsed(player, player.getSkill<ProjectileVomit>(), true),
+                            SetSpecialActionSkillUsed(player, player.getSkill(SkillType.PROJECTILE_VOMIT), true),
                             SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.PROJECTILE_VOMIT)
                         )
                     }
                     PlayerSpecialActionType.STAB -> {
                         compositeCommandOf(
-                            SetSpecialActionSkillUsed(player, player.getSkill<Stab>(), true),
+                            SetSpecialActionSkillUsed(player, player.getSkill(SkillType.STAB), true),
                             SetAvailableSpecialActions.markAsUsed(activeTeam, PlayerSpecialActionType.STAB)
                         )
                     }
@@ -249,7 +247,7 @@ object ActivatePlayer : Procedure() {
 
     object CheckForBoneHead: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            return if (state.activePlayer!!.hasSkill<BoneHead>()) {
+            return if (state.activePlayer!!.hasSkill(SkillType.BONE_HEAD)) {
                 GotoNode(ResolveBoneHead)
             } else {
                 GotoNode(CheckForReallyStupid)
@@ -274,7 +272,7 @@ object ActivatePlayer : Procedure() {
 
     object CheckForReallyStupid: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            return if (state.activePlayer!!.hasSkill<ReallyStupid>()) {
+            return if (state.activePlayer!!.hasSkill(SkillType.REALLY_STUPID)) {
                 GotoNode(ResolveReallyStupid)
             } else {
                 GotoNode(CheckForUnchannelledFury)
@@ -299,7 +297,7 @@ object ActivatePlayer : Procedure() {
 
     object CheckForUnchannelledFury: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            return if (state.activePlayer!!.hasSkill<UnchannelledFury>()) {
+            return if (state.activePlayer!!.hasSkill(SkillType.UNCHANNELLED_FURY)) {
                 GotoNode(ResolveUnchannelledFury)
             } else {
                 GotoNode(CheckForBloodLust)
@@ -324,7 +322,7 @@ object ActivatePlayer : Procedure() {
 
     object CheckForAnimalSavagery: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            return if (state.activePlayer!!.hasSkill<AnimalSavagery>()) {
+            return if (state.activePlayer!!.hasSkill(SkillType.ANIMAL_SAVAGERY)) {
                 GotoNode(ResolveAnimalSavagery)
             } else {
                 GotoNode(CheckForBloodLust)
@@ -350,7 +348,7 @@ object ActivatePlayer : Procedure() {
 
     object CheckForBloodLust: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            return if (state.activePlayer!!.hasSkill<BloodLust>()) {
+            return if (state.activePlayer!!.hasSkill(SkillType.BLOOD_LUST)) {
                 GotoNode(ResolveBloodLust)
             } else {
                 GotoNode(CheckForOpponentInterruptSkills)

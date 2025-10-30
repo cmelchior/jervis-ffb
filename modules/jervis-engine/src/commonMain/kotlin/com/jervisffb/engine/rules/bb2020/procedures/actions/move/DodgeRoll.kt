@@ -46,14 +46,9 @@ import com.jervisffb.engine.reports.ReportDodgeResult
 import com.jervisffb.engine.reports.ReportSkillUsed
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
-import com.jervisffb.engine.rules.bb2020.skills.DivingTackle
-import com.jervisffb.engine.rules.bb2020.skills.PrehensileTail
-import com.jervisffb.engine.rules.bb2020.skills.Stunty
-import com.jervisffb.engine.rules.bb2020.skills.Titchy
-import com.jervisffb.engine.rules.bb2020.skills.TwoHeads
 import com.jervisffb.engine.rules.bb2020.testAgainstAgility
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 
@@ -136,7 +131,7 @@ object DodgeRoll: Procedure() {
             val player = context.player
             val modifiers = buildList {
                 // Add marking modifiers if the moving player doesn't have Stunty.
-                if (!player.hasSkill<Stunty>()) {
+                if (!player.hasSkill(SkillType.STUNTY)) {
                     rules.addMarkedModifiers(
                         state,
                         player.team,
@@ -145,7 +140,7 @@ object DodgeRoll: Procedure() {
                         DodgeRollModifier.MARKED
                     )
                 }
-                if (player.hasSkill<Titchy>()) {
+                if (player.hasSkill(SkillType.TITCHY)) {
                     add(DodgeRollModifier.TITCHY)
                 }
             }
@@ -164,7 +159,7 @@ object DodgeRoll: Procedure() {
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
-            return if (context.player.hasSkill<TwoHeads>()) {
+            return if (context.player.hasSkill(SkillType.TWO_HEADS)) {
                 return listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
                 listOf(ContinueWhenReady)
@@ -176,7 +171,7 @@ object DodgeRoll: Procedure() {
             return compositeCommandOf(
                 when (action) {
                     Confirm -> {
-                        ReportSkillUsed(context.player, context.player.getSkill<TwoHeads>())
+                        ReportSkillUsed(context.player, context.player.getSkill(SkillType.TWO_HEADS))
                         SetContext(context.copyAndAddModifier(DodgeRollModifier.TWO_HEADS))
                     }
                     Cancel,
@@ -196,7 +191,7 @@ object DodgeRoll: Procedure() {
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
-            return if (context.player.isSkillAvailable<BreakTackle>()) {
+            return if (context.player.isSkillAvailable(SkillType.BREAK_TACKLE)) {
                 return listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
                 listOf(ContinueWhenReady)
@@ -210,9 +205,9 @@ object DodgeRoll: Procedure() {
                 Confirm -> {
                     val modifier = BreakTackleModifier(player.strength)
                     compositeCommandOf(
-                        ReportSkillUsed(context.player, context.player.getSkill<BreakTackle>()),
+                        ReportSkillUsed(context.player, context.player.getSkill(SkillType.BREAK_TACKLE)),
                         SetContext(context.copyAndAddModifier(modifier)),
-                        SetSkillUsed(player = player, skill = player.getSkill<BreakTackle>(), used = true),
+                        SetSkillUsed(player = player, skill = player.getSkill(SkillType.BREAK_TACKLE), used = true),
                         GotoNode(ChooseToUsePrehensileTail)
                     )
                 }
@@ -239,7 +234,7 @@ object DodgeRoll: Procedure() {
                         ?: false
                 }
                 .mapNotNull { state.field[it].player }
-                .filter { it.isSkillAvailable<PrehensileTail>() }
+                .filter { it.isSkillAvailable(SkillType.PREHENSILE_TAIL) }
                 .map { SelectPlayer(it) }
 
             return if (eligiblePlayers.isEmpty()) {
@@ -255,7 +250,7 @@ object DodgeRoll: Procedure() {
                 is PlayerSelected -> {
                     val player = action.getPlayer(state)
                     compositeCommandOf(
-                        ReportSkillUsed(player, player.getSkill<PrehensileTail>()),
+                        ReportSkillUsed(player, player.getSkill(SkillType.PREHENSILE_TAIL)),
                         SetContext(context.copyAndAddModifier(DodgeRollModifier.PREHENSILE_TAIL)),
                         GotoNode(ChooseToUseDivingTackle)
                     )
@@ -285,7 +280,7 @@ object DodgeRoll: Procedure() {
                     } ?: false
                 }
                 .mapNotNull { state.field[it].player }
-                .filter { it.isSkillAvailable<DivingTackle>() }
+                .filter { it.isSkillAvailable(SkillType.DIVING_TACKLE) }
                 .map { SelectPlayer(it) }
 
             return if (eligiblePlayers.isEmpty()) {
@@ -300,7 +295,7 @@ object DodgeRoll: Procedure() {
             return when (action) {
                 is PlayerSelected -> {
                     val player = action.getPlayer(state)
-                    val skill = player.getSkill<DivingTackle>()
+                    val skill = player.getSkill(SkillType.DIVING_TACKLE)
                     compositeCommandOf(
                         ReportSkillUsed(player, skill),
                         SetContext(context.copyAndAddModifier(DodgeRollModifier.DIVING_TACKLE)),

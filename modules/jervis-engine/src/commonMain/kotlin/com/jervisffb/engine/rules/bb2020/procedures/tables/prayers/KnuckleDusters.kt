@@ -23,8 +23,6 @@ import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.PrayersToNuffleRollContext
-import com.jervisffb.engine.rules.bb2020.skills.Loner
-import com.jervisffb.engine.rules.bb2020.skills.MightyBlow
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 
@@ -46,7 +44,7 @@ object KnuckleDusters : Procedure() {
             val context = state.getContext<PrayersToNuffleRollContext>()
             val availablePlayers = context.team
                 .filter { it.state == PlayerState.RESERVE || it.location.isOnField(rules) }
-                .filter { !it.hasSkill<Loner>() && !it.hasSkill<MightyBlow>() }
+                .filter { !it.hasSkill(SkillType.LONER) && !it.hasSkill(SkillType.MIGHTY_BLOW) }
                 .map { SelectPlayer(it) }
 
             return availablePlayers.ifEmpty {

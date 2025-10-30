@@ -52,8 +52,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.FallingOver
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
-import com.jervisffb.engine.rules.bb2020.skills.Frenzy
 import com.jervisffb.engine.rules.common.actions.BlockType
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
@@ -351,7 +351,7 @@ object BlitzAction : Procedure() {
             // After the Push was resolved, if the target is still standing
             // and the attacker has frenzy and was able to follow up, a
             // second block is thrown
-            val hasFrenzy = context.attacker.isSkillAvailable<Frenzy>()
+            val hasFrenzy = context.attacker.isSkillAvailable(SkillType.FRENZY)
             val isNextToTarget = rules.isStanding(context.defender!!)
                 && rules.isStanding(context.attacker)
                 && context.attacker.coordinates
@@ -367,7 +367,7 @@ object BlitzAction : Procedure() {
                 compositeCommandOf(
                     removeContextCommand,
                     SetContext(context.copy(hasBlocked = hasBlocked)),
-                    SetSkillUsed(context.attacker, context.attacker.getSkill<Frenzy>(), true),
+                    SetSkillUsed(context.attacker, context.attacker.getSkill(SkillType.FRENZY), true),
                     GotoNode(SelectBlockType),
                 )
             } else {

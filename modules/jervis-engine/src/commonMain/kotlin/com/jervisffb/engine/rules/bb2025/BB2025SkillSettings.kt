@@ -31,6 +31,7 @@ import com.jervisffb.engine.rules.bb2025.skills.SureFeet
 import com.jervisffb.engine.rules.bb2025.skills.SureHands
 import com.jervisffb.engine.rules.bb2025.skills.Tackle
 import com.jervisffb.engine.rules.bb2025.skills.ThickSkull
+import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.bb2025.skills.Timmmber
 import com.jervisffb.engine.rules.bb2025.skills.Titchy
 import com.jervisffb.engine.rules.bb2025.skills.UnchannelledFury
@@ -589,9 +590,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.THROW_TEAMMATE -> {
-                    // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
+                        ThrowTeamMate(player, category, expiresAt)
+                    }
                 }
                 SkillType.UNCHANNELLED_FURY -> {
                     addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->

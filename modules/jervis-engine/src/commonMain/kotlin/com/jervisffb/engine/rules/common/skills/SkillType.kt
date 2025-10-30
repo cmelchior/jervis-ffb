@@ -22,6 +22,10 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 enum class SkillType(val description: String) {
+
+    // Currently all values are sorted after their BB2025 categories. Skills
+    // not available in BB2025 are placed in the category for ther version.
+
     // Agility
     CATCH("Catch"),
     DIVING_CATCH("Diving Catch"),
@@ -107,13 +111,13 @@ enum class SkillType(val description: String) {
     THICK_SKULL("Thick Skull"),
 
     // Traits
+    ALWAYS_HUNGRY("Always Hungry"),
     ANIMAL_SAVAGERY("Animal Savagery"),
     ANIMOSITY("Animosity"),
-    ALWAYS_HUNGRY("Always Hungry"),
     BALL_AND_CHAIN("Ball & Chain"),
+    BLOOD_LUST("Blood Lust"), // Reference missing
     BOMBARDIER("Bombardier"),
     BONE_HEAD("Bone Head"),
-    BLOOD_LUST("Blood Lust"), // Reference missing
     BREATHE_FIRE("Breathe Fire"), // Reference missing
     CHAINSAW("Chainsaw"),
     DECAY("Decay"),
@@ -134,9 +138,9 @@ enum class SkillType(val description: String) {
     SWARMING("Swarming"),
     SWOOP("Swoop"),
     TAKE_ROOT("Take Root"),
-    TITCHY("Titchy"),
-    TIMMMBER("Timmm-ber!"),
     THROW_TEAMMATE("Throw Team-mate"),
+    TIMMMBER("Timmm-ber!"),
+    TITCHY("Titchy"),
     UNCHANNELLED_FURY("Unchannelled Fury"),
 
     // Special Rules (Star Players)

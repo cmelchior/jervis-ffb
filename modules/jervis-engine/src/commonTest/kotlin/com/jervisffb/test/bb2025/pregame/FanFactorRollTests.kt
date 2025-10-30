@@ -1,0 +1,23 @@
+package com.jervisffb.test.bb2025.pregame
+
+import com.jervisffb.engine.ext.d3
+import com.jervisffb.test.JervisGameBB2025Test
+import com.jervisffb.test.ext.rollForward
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class FanFactorRollTests: JervisGameBB2025Test() {
+
+    @Test
+    fun rollingForFanFactor() {
+        controller.rollForward(
+            1.d3, // Home team roll
+            2.d3, // Away team roll
+        )
+        assertEquals(2, state.homeTeam.fanFactor)
+        assertEquals(1, state.homeTeam.dedicatedFans)
+        assertEquals(4, state.awayTeam.fanFactor)
+        assertEquals(2, state.awayTeam.dedicatedFans)
+    }
+
+}

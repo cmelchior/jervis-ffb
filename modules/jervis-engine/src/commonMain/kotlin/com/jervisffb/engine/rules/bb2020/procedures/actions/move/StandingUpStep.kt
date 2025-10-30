@@ -26,8 +26,8 @@ import com.jervisffb.engine.model.modifiers.HelpingHandsModifier
 import com.jervisffb.engine.reports.ReportStandingUp
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
-import com.jervisffb.engine.rules.bb2020.skills.Timmmber
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 data class StandingUpRollContext(
@@ -88,7 +88,7 @@ object StandingUpStep : Procedure() {
             // you will never attempt it in the first place.
             val player = state.getContext<MoveContext>().player
             val modifiers = mutableListOf<DiceModifier>()
-            if (player.isSkillAvailable<Timmmber>()) {
+            if (player.isSkillAvailable(SkillType.TIMMMBER)) {
                 val helpers = (player.location as OnFieldLocation).getSurroundingCoordinates(rules, 1)
                     .count { coordinate ->
                         val neighborPlayer = state.field[coordinate].player

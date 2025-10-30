@@ -27,7 +27,6 @@ import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
 import com.jervisffb.engine.rules.bb2020.BB2020TeamActions
-import com.jervisffb.engine.rules.bb2020.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.bb2020.tables.BB2020ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020CasualtyTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020LastingInjuryTable
@@ -57,6 +56,7 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.engine.rules.common.skills.SkillSettings
+import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
 import com.jervisffb.engine.rules.common.tables.CasualtyTable
@@ -694,7 +694,7 @@ open class Rules(
                         add(teamActions.foul)
                     }
                 }
-                if (it.throwTeamMateActions > 0 && it.passActions == teamActions.pass.availablePrTurn && player.hasSkill<ThrowTeamMate>()) {
+                if (it.throwTeamMateActions > 0 && it.passActions == teamActions.pass.availablePrTurn && player.hasSkill(SkillType.THROW_TEAMMATE)) {
                     // Throw Team-mate and Pass are mutually exclusive
                     add(teamActions.throwTeamMate)
                 }
