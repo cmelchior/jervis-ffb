@@ -1,7 +1,8 @@
 package com.jervisffb.resources
 
 import com.jervisffb.engine.serialize.JervisSerialization
-import kotlinx.serialization.encodeToString
+import com.jervisffb.resources.bb2020.BB2020StandaloneRosters
+import com.jervisffb.resources.bb2025.BB2025StandaloneRosters
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import java.io.File
@@ -34,7 +35,12 @@ class GenerateRosterFiles {
         val rosterCache = File(root, "rosters")
         rosterCache.mkdirs()
 
-        StandaloneRosters.defaultRosters.forEach { (fileName, roster) ->
+        BB2020StandaloneRosters.defaultRosters.forEach { (fileName, roster) ->
+            val json = json.encodeToString(roster)
+            File(rosterCache, fileName).writeText(json, charset = Charsets.UTF_8)
+        }
+
+        BB2025StandaloneRosters.defaultRosters.forEach { (fileName, roster) ->
             val json = json.encodeToString(roster)
             File(rosterCache, fileName).writeText(json, charset = Charsets.UTF_8)
         }

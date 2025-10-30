@@ -1,8 +1,10 @@
+package com.jervisffb.resources.bb2020
+
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -32,6 +34,7 @@ val SKINK_RUNNER_LINEMEN =
         listOf(DODGE.id(), STUNTY.id()),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_skinkrunner.png",6),
         SingleSprite.ini("$portraitRootPath/lizardmen_skinkrunner.png")
@@ -48,6 +51,7 @@ val CHAMELEON_SKINKS =
         listOf(DODGE.id(), /* On the Ball, Shadowing */ SkillType.STUNTY.id()),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_chameleonskink.png",2),
         SingleSprite.ini("$portraitRootPath/lizardmen_chameleonskink.png")
@@ -64,6 +68,7 @@ val SAURUS_BLOCKERS =
         emptyList(),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
+        emptyList(),
         PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_saurusblocker.png",6),
         SingleSprite.ini("$portraitRootPath/lizardmen_saurusblocker.png")
@@ -86,6 +91,7 @@ val KROXIGOR =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        emptyList(),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("$iconRootPath/lizardmen_kroxigor.png",1),
         SingleSprite.ini("$portraitRootPath/lizardmen_kroxigor.png")
@@ -97,20 +103,21 @@ val KROXIGOR =
  * See page 118 in the rulebook
  */
 @Serializable
-val LIZARDMEN_TEAM = BB2020Roster(
+val LIZARDMEN_TEAM_BB2020 = Roster(
     id = RosterId("jervis-lizardmen"),
     name = "Lizardmen Team",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 70_000,
     allowApothecary = true,
-    specialRules = listOf(RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE),
     positions = listOf(
         SKINK_RUNNER_LINEMEN,
         CHAMELEON_SKINKS,
         SAURUS_BLOCKERS,
         KROXIGOR,
     ),
+    leagues = emptyList(),
+    specialRules = listOf(RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE),
     logo = RosterLogo(
         large = SingleSprite.embedded("jervis/roster/logo_lizardmen_large.png"),
         small = SingleSprite.embedded("jervis/roster/logo_lizardmen_small.png")

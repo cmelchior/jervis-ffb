@@ -75,7 +75,9 @@ class SelectTeamComponentModel(
                 }
             }
             teams
-                .filter { it.type == rules.gameType }
+                .filter {
+                    it.type == rules.gameType && it.version == rules.gameVersion
+                }
                 .let {
                     availableTeams.value = it.sortedBy { it.teamName }
                 }
@@ -91,6 +93,7 @@ class SelectTeamComponentModel(
         return TeamInfo(
             teamId = team.id,
             teamName = team.name,
+            version = team.version,
             type = team.type,
             teamRoster = team.roster.name,
             teamValue = team.teamValue,

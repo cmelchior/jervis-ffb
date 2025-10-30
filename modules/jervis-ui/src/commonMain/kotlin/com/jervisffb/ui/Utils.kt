@@ -1,10 +1,5 @@
 package com.jervisffb.ui
 
-import CHAMELEON_SKINKS
-import KROXIGOR
-import LIZARDMEN_TEAM
-import SAURUS_BLOCKERS
-import SKINK_RUNNER_LINEMEN
 import androidx.compose.animation.core.Easing
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
@@ -33,22 +28,27 @@ import com.jervisffb.engine.rules.common.skills.SkillType.LEADER
 import com.jervisffb.engine.rules.common.skills.SkillType.SIDESTEP
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.jervis_ui.generated.resources.Res
-import com.jervisffb.resources.AMAZON_BLITZER
-import com.jervisffb.resources.AMAZON_BLOCKER
-import com.jervisffb.resources.AMAZON_LINEMAN
-import com.jervisffb.resources.AMAZON_TEAM
-import com.jervisffb.resources.BIG_UN_BLOCKERS
-import com.jervisffb.resources.HALFLING_HOPEFUL
-import com.jervisffb.resources.HUMAN_BLITZER
-import com.jervisffb.resources.HUMAN_CATCHER
-import com.jervisffb.resources.HUMAN_LINEMAN
-import com.jervisffb.resources.HUMAN_TEAM
-import com.jervisffb.resources.HUMAN_THROWER
-import com.jervisffb.resources.OGRE
-import com.jervisffb.resources.ORC_BLITZER
-import com.jervisffb.resources.ORC_LINEMEN
-import com.jervisffb.resources.ORC_TEAM
-import com.jervisffb.resources.ORC_THROWER
+import com.jervisffb.resources.bb2020.AMAZON_BLITZER
+import com.jervisffb.resources.bb2020.AMAZON_BLOCKER
+import com.jervisffb.resources.bb2020.AMAZON_LINEMAN
+import com.jervisffb.resources.bb2020.AMAZON_TEAM_BB2020
+import com.jervisffb.resources.bb2020.BIG_UN_BLOCKERS
+import com.jervisffb.resources.bb2020.CHAMELEON_SKINKS
+import com.jervisffb.resources.bb2020.HALFLING_HOPEFUL
+import com.jervisffb.resources.bb2020.HUMAN_BLITZER
+import com.jervisffb.resources.bb2020.HUMAN_CATCHER
+import com.jervisffb.resources.bb2020.HUMAN_LINEMAN
+import com.jervisffb.resources.bb2020.HUMAN_TEAM_BB2020
+import com.jervisffb.resources.bb2020.HUMAN_THROWER
+import com.jervisffb.resources.bb2020.KROXIGOR
+import com.jervisffb.resources.bb2020.LIZARDMEN_TEAM_BB2020
+import com.jervisffb.resources.bb2020.OGRE
+import com.jervisffb.resources.bb2020.ORC_BLITZER
+import com.jervisffb.resources.bb2020.ORC_LINEMEN
+import com.jervisffb.resources.bb2020.ORC_TEAM_BB2020
+import com.jervisffb.resources.bb2020.ORC_THROWER
+import com.jervisffb.resources.bb2020.SAURUS_BLOCKERS
+import com.jervisffb.resources.bb2020.SKINK_RUNNER_LINEMEN
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.skia.FilterBlurMode
 import org.jetbrains.skia.Image
@@ -142,7 +142,7 @@ fun Modifier.dropShadow(
 )
 
 fun createDefaultHomeTeam(rules: Rules): Team {
-    return teamBuilder(rules, HUMAN_TEAM) {
+    return teamBuilder(rules, HUMAN_TEAM_BB2020) {
         coach = Coach(CoachId("home-coach"), "HomeCoach")
         name = "HomeTeam"
         addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), OGRE)
@@ -165,7 +165,7 @@ fun createDefaultHomeTeam(rules: Rules): Team {
 }
 
 fun createDefaultAwayTeam(rules: Rules): Team {
-    return teamBuilder(rules, LIZARDMEN_TEAM) {
+    return teamBuilder(rules, LIZARDMEN_TEAM_BB2020) {
         coach = Coach(CoachId("away-coach"), "AwayCoach")
         name = "AwayTeam"
         addPlayer(PlayerId("A1"), "Kroxigor-1-A", PlayerNo(1), KROXIGOR)
@@ -186,7 +186,7 @@ fun createDefaultAwayTeam(rules: Rules): Team {
 }
 
 fun createDefaultBB7HomeTeam(rules: Rules): Team {
-    return teamBuilder(rules, AMAZON_TEAM) {
+    return teamBuilder(rules, AMAZON_TEAM_BB2020) {
         name = "Amazon Starter Team #1"
         type = GameType.BB7
         addPlayer(PlayerId("Am-bb7-1"), "Blitzer-1", PlayerNo(1), AMAZON_BLITZER)
@@ -205,7 +205,7 @@ fun createDefaultBB7HomeTeam(rules: Rules): Team {
 }
 
 fun createDefaultBB7AwayTeam(rules: Rules): Team {
-    return teamBuilder(rules, ORC_TEAM) {
+    return teamBuilder(rules, ORC_TEAM_BB2020) {
         name = "Orc Starter Team #1"
         type = GameType.BB7
         addPlayer(PlayerId("Orc-bb7-1"), "Blitzer-1", PlayerNo(1), ORC_BLITZER)

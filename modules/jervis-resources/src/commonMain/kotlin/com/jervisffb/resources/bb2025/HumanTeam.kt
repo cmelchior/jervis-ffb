@@ -1,0 +1,176 @@
+package com.jervisffb.resources.bb2025
+
+import com.jervisffb.engine.model.PlayerSize
+import com.jervisffb.engine.model.PositionId
+import com.jervisffb.engine.model.RosterId
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
+import com.jervisffb.engine.rules.common.roster.RosterPosition
+import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
+import com.jervisffb.engine.rules.common.skills.SkillCategory.AGILITY
+import com.jervisffb.engine.rules.common.skills.SkillCategory.GENERAL
+import com.jervisffb.engine.rules.common.skills.SkillCategory.PASSING
+import com.jervisffb.engine.rules.common.skills.SkillCategory.STRENGTH
+import com.jervisffb.engine.rules.common.skills.SkillType.BLOCK
+import com.jervisffb.engine.rules.common.skills.SkillType.BONE_HEAD
+import com.jervisffb.engine.rules.common.skills.SkillType.CATCH
+import com.jervisffb.engine.rules.common.skills.SkillType.DODGE
+import com.jervisffb.engine.rules.common.skills.SkillType.LONER
+import com.jervisffb.engine.rules.common.skills.SkillType.MIGHTY_BLOW
+import com.jervisffb.engine.rules.common.skills.SkillType.PASS
+import com.jervisffb.engine.rules.common.skills.SkillType.RIGHT_STUFF
+import com.jervisffb.engine.rules.common.skills.SkillType.STUNTY
+import com.jervisffb.engine.rules.common.skills.SkillType.SURE_HANDS
+import com.jervisffb.engine.rules.common.skills.SkillType.THICK_SKULL
+import com.jervisffb.engine.rules.common.skills.SkillType.THROW_TEAMMATE
+import com.jervisffb.engine.serialize.RosterLogo
+import com.jervisffb.engine.serialize.SingleSprite
+import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.resources.iconRootPath
+import com.jervisffb.resources.portraitRootPath
+
+/**
+ * Human Teams
+ */
+val HUMAN_LINEMAN =
+    RosterPosition(
+        PositionId("human-lineman"),
+        16,
+        "Human Lineman",
+        "Human Lineman",
+        "L",
+        50_000,
+        6, 3, 3, 4, 9,
+        emptyList(),
+        listOf(GENERAL),
+        listOf(AGILITY, STRENGTH),
+        emptyList(),
+        PlayerSize.STANDARD,
+        SpriteSheet.ini("${iconRootPath}/human_lineman.png",8),
+        SingleSprite.ini("${portraitRootPath}/human_lineman.png")
+
+    )
+val HUMAN_THROWER =
+    RosterPosition(
+        PositionId("human-thrower"),
+        2,
+        "Throwers",
+        "Thrower",
+        "T",
+        80_000,
+        6, 3, 3, 2, 9,
+        listOf(
+            PASS.id(),
+            SURE_HANDS.id()
+        ),
+        listOf(GENERAL, PASSING),
+        listOf(AGILITY, STRENGTH),
+        emptyList(),
+        PlayerSize.STANDARD,
+        SpriteSheet.ini("${iconRootPath}/human_thrower.png",2),
+        SingleSprite.ini("${portraitRootPath}/human_thrower.png")
+    )
+val HUMAN_CATCHER =
+    RosterPosition(
+        PositionId("human-catcher"),
+        4,
+        "Catchers",
+        "Catcher",
+        "C",
+        65_000,
+        8, 2, 3, 5, 8,
+        listOf(
+            CATCH.id(),
+            DODGE.id()
+        ),
+        listOf(AGILITY, GENERAL),
+        listOf(STRENGTH, PASSING),
+        emptyList(),
+        PlayerSize.STANDARD,
+        SpriteSheet.ini("${iconRootPath}/human_catcher.png", 4),
+        SingleSprite.ini("${portraitRootPath}/human_catcher.png")
+    )
+val HUMAN_BLITZER =
+    RosterPosition(
+        PositionId("human-blitzer"),
+        4,
+        "Blitzers",
+        "Blitzer",
+        "B",
+        85_000,
+        7, 3, 3, 4, 9,
+        listOf(BLOCK.id()),
+        listOf(GENERAL, STRENGTH),
+        listOf(AGILITY, PASSING),
+        emptyList(),
+        PlayerSize.STANDARD,
+        SpriteSheet.ini("${iconRootPath}/human_blitzer.png", 4),
+        SingleSprite.ini("${portraitRootPath}/human_blitzer.png")
+    )
+val HALFLING_HOPEFUL =
+    RosterPosition(
+        PositionId("human-hafling-hopeful"),
+        3,
+        "Halfling Hopefuls",
+        "Halfling Hopeful",
+        "H",
+        30_000,
+        5, 2, 3, 4, 7,
+        listOf(
+            DODGE.id(),
+            RIGHT_STUFF.id(),
+            STUNTY.id()
+        ),
+        listOf(AGILITY),
+        listOf(GENERAL, STRENGTH),
+        emptyList(),
+        PlayerSize.STANDARD,
+        SpriteSheet.ini("${iconRootPath}/human_halflinghopeful.png", 8),
+        SingleSprite.ini("${portraitRootPath}/human_halflinghopeful.png")
+    )
+val OGRE =
+    RosterPosition(
+        PositionId("human-ogre"),
+        1,
+        "Ogre",
+        "Ogre",
+        "O",
+        140_000,
+        5, 5, 4, 5, 10,
+        listOf(
+            BONE_HEAD.id(),
+            LONER.id(4),
+            MIGHTY_BLOW.id(1),
+            THICK_SKULL.id(),
+            THROW_TEAMMATE.id()
+        ),
+        listOf(STRENGTH),
+        listOf(AGILITY, GENERAL),
+        emptyList(),
+        PlayerSize.BIG_GUY,
+        SpriteSheet.ini("${iconRootPath}/human_ogre.png", 8),
+        SingleSprite.ini("${portraitRootPath}/human_ogre.png")
+    )
+
+val HUMAN_TEAM_BB2025 = Roster(
+    id = RosterId("jervis-human"),
+    name = "Human Team",
+    tier = 1,
+    numberOfRerolls = 8,
+    rerollCost = 50_000,
+    allowApothecary = true,
+    positions = listOf(
+        HUMAN_LINEMAN,
+        HUMAN_THROWER,
+        HUMAN_CATCHER,
+        HUMAN_BLITZER,
+        HALFLING_HOPEFUL,
+        OGRE,
+    ),
+    leagues = listOf(RegionalSpecialRule.OLD_WORLD_CLASSIC),
+    specialRules = listOf(TeamSpecialRule.TEAM_CAPTAIN),
+    logo = RosterLogo(
+        large = SingleSprite.embedded("jervis/roster/logo_human_large.png"),
+        small = SingleSprite.embedded("jervis/roster/logo_human_small.png")
+    )
+)

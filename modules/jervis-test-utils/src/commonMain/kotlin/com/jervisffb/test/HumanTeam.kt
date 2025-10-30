@@ -3,8 +3,8 @@ package com.jervisffb.test
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -27,6 +27,7 @@ val HUMAN_LINEMAN =
         emptyList(),
         listOf(SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
         null,
         null
@@ -43,6 +44,7 @@ val HUMAN_THROWER =
         listOf(/* Pass */ SkillType.SURE_HANDS.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
         null,
         null
@@ -59,6 +61,7 @@ val HUMAN_CATCHER =
         listOf(SkillType.CATCH.id(), SkillType.DODGE.id()),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.STRENGTH, SkillCategory.PASSING),
+        emptyList(),
         PlayerSize.STANDARD,
         null,
         null,
@@ -75,6 +78,7 @@ val HUMAN_BLITZER =
         listOf(SkillType.BLOCK.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
+        emptyList(),
         PlayerSize.STANDARD,
         null,
         null
@@ -95,6 +99,7 @@ val HALFLING_HOPEFUL =
         ),
         listOf(SkillCategory.AGILITY),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
         null,
         null
@@ -117,18 +122,20 @@ val OGRE =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
+        emptyList(),
         PlayerSize.BIG_GUY,
         null,
         null
     )
 
-val HUMAN_TEAM = BB2020Roster(
+val HUMAN_TEAM = Roster(
     id = RosterId("jervis-human"),
     name = "Human Team",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 50_000,
     allowApothecary = true,
+    leagues = emptyList(),
     specialRules = listOf(RegionalSpecialRule.OLD_WORLD_CLASSIC),
     positions = listOf(
         HUMAN_LINEMAN,

@@ -1,10 +1,10 @@
-package com.jervisffb.resources
+package com.jervisffb.resources.bb2025
 
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillCategory.AGILITY
 import com.jervisffb.engine.rules.common.skills.SkillCategory.GENERAL
@@ -20,11 +20,11 @@ import com.jervisffb.engine.rules.common.skills.SkillType.SAFE_PASS
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.resources.iconRootPath
+import com.jervisffb.resources.portraitRootPath
 
 /**
  * Amazon Teams
- *
- * See page 47 in the 2022 Almanac.
  */
 val AMAZON_LINEMAN =
     RosterPosition(
@@ -40,9 +40,10 @@ val AMAZON_LINEMAN =
         ),
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/amazon_triballinewoman.png",9),
-        SingleSprite.ini("$portraitRootPath/amazon_triballinewoman.png")
+        SpriteSheet.ini("${iconRootPath}/amazon_triballinewoman.png",9),
+        SingleSprite.ini("${portraitRootPath}/amazon_triballinewoman.png")
 
     )
 val AMAZON_THROWER =
@@ -62,9 +63,10 @@ val AMAZON_THROWER =
         ),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/amazon_eaglewarriorthrower.png",2),
-        SingleSprite.ini("$portraitRootPath/amazon_eaglewarriorthrower.png")
+        SpriteSheet.ini("${iconRootPath}/amazon_eaglewarriorthrower.png",2),
+        SingleSprite.ini("${portraitRootPath}/amazon_eaglewarriorthrower.png")
     )
 val AMAZON_BLITZER =
     RosterPosition(
@@ -82,9 +84,10 @@ val AMAZON_BLITZER =
         ),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/amazon_piranhawarriorblitzer.png", 2),
-        SingleSprite.ini("$portraitRootPath/amazon_piranhawarriorblitzer.png")
+        SpriteSheet.ini("${iconRootPath}/amazon_piranhawarriorblitzer.png", 2),
+        SingleSprite.ini("${portraitRootPath}/amazon_piranhawarriorblitzer.png")
     )
 val AMAZON_BLOCKER =
     RosterPosition(
@@ -101,25 +104,27 @@ val AMAZON_BLOCKER =
         ),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/amazon_jaguarwarriorblocker.png", 2),
-        SingleSprite.ini("$portraitRootPath/amazon_jaguarwarriorblocker.png")
+        SpriteSheet.ini("${iconRootPath}/amazon_jaguarwarriorblocker.png", 2),
+        SingleSprite.ini("${portraitRootPath}/amazon_jaguarwarriorblocker.png")
     )
 
-val AMAZON_TEAM = BB2020Roster(
+val AMAZON_TEAM_BB2025 = Roster(
     id = RosterId("jervis-amazon"),
     name = "Amazon Team",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 60_000,
     allowApothecary = true,
-    specialRules = listOf(RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE),
     positions = listOf(
         AMAZON_LINEMAN,
         AMAZON_THROWER,
         AMAZON_BLITZER,
         AMAZON_BLOCKER,
     ),
+    leagues = listOf(RegionalSpecialRule.LUSTRIAN_SUPERLEAGUE),
+    specialRules = listOf(),
     logo = RosterLogo(
         large = SingleSprite.embedded("jervis/roster/logo_amazon_large.png"),
         small = SingleSprite.embedded("jervis/roster/logo_amazon_small.png")

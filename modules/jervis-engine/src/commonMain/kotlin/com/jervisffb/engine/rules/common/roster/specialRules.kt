@@ -7,29 +7,37 @@ sealed interface SpecialRules {
     val description: String
 }
 
+/**
+ * In BB2020 these are called Regional Special Rules, in BB2025 they are just called
+ * Leagues.
+ */
 @Serializable
 enum class RegionalSpecialRule(override val description: String) : SpecialRules {
     BADLANDS_BRAWL("Badlands Brawl"),
+    CHAOS_CLASH("Chaos Clash"),
     ELVEN_KINGDOMS_LEAGUE("Elven Kingdoms League"),
     HAFLING_THIMBLE_CUP("Hafling Thimble Cup"),
     LUSTRIAN_SUPERLEAGUE("Lustrian Superleague"),
     OLD_WORLD_CLASSIC("Old World Classic"),
     SYLVANIAN_SPOTLIGHT("Sylvanian Spotlight"),
     UNDERWORLD_CHALLENGE("Underworld Challenge"),
-    WORLDS_EDGE_SUPERLEAGUE("Worlds Edge Superleague")
+    WOODLAND_LEAGUE("Woodland League"),
+    WORLDS_EDGE_SUPERLEAGUE("Worlds Edge Superleague"),
 }
 
 @Serializable
 enum class TeamSpecialRule(override val description: String): SpecialRules {
+    BRAWLIN_BRUTES("Brawlin' Brutes"),
     BRIBERY_AND_CORRUPTION("Bribery and Corruption"),
     FAVOURED_OF_CHAOS_UNDIVIDED("Favoured of Chaos Undivided"),
     FAVOURED_OF_HASHUT("Favoured of Hashut"),
     FAVOURED_OF_KHORNE("Favoured of Khorne"),
     FAVOURED_OF_NURGLE("Favoured of Nurgle"),
-    FAVOURED_OF_TZEENTCH("Favoured of Tzeentch"),
     FAVOURED_OF_SLAANESH("Favoured of Slaanesh"),
+    FAVOURED_OF_TZEENTCH("Favoured of Tzeentch"),
     LOW_COST_LINEMEN("Low Cost Linemen"),
     MASTERS_OF_UNDEATH("Masters of Undeath"),
+    TEAM_CAPTAIN("Team Captain"),
 }
 
 

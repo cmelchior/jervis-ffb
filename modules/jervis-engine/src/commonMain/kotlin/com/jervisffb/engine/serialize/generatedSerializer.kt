@@ -111,9 +111,6 @@ val generatedJervisSerializerModule = SerializersModule {
         subclass(com.jervisffb.engine.rules.bb2020.tables.BB2020RangeRuler::class)
         subclass(com.jervisffb.engine.rules.bb2025.tables.BB2025RangeRuler::class)
     }
-    polymorphic(com.jervisffb.engine.rules.common.roster.Roster::class) {
-        subclass(com.jervisffb.engine.rules.bb2020.roster.BB2020Roster::class)
-    }
     polymorphic(com.jervisffb.engine.rules.Rules::class) {
         subclass(com.jervisffb.engine.rules.BB72020Rules::class)
         subclass(com.jervisffb.engine.rules.FumbblBB2020Rules::class)

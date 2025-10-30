@@ -1,10 +1,10 @@
-package com.jervisffb.resources
+package com.jervisffb.resources.bb2025
 
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType.ANIMAL_SAVAGERY
@@ -19,6 +19,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType.SURE_HANDS
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.resources.iconRootPath
+import com.jervisffb.resources.portraitRootPath
 import kotlinx.serialization.Serializable
 
 val SKAVEN_LINEMAN =
@@ -33,9 +35,10 @@ val SKAVEN_LINEMAN =
         emptyList(),
         listOf(SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/skaven_lineman.png", 9),
-        SingleSprite.ini("$portraitRootPath/skaven_lineman.png")
+        SpriteSheet.ini("${iconRootPath}/skaven_lineman.png", 9),
+        SingleSprite.ini("${portraitRootPath}/skaven_lineman.png")
 
     )
 val SKAVEN_THROWER =
@@ -50,9 +53,10 @@ val SKAVEN_THROWER =
         listOf(PASS.id(), SURE_HANDS.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.PASSING),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/skaven_thrower.png", 2),
-        SingleSprite.ini("$portraitRootPath/skaven_thrower.png")
+        SpriteSheet.ini("${iconRootPath}/skaven_thrower.png", 2),
+        SingleSprite.ini("${portraitRootPath}/skaven_thrower.png")
     )
 val GUTTER_RUNNER =
     RosterPosition(
@@ -66,9 +70,10 @@ val GUTTER_RUNNER =
         listOf(DODGE.id()),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.MUTATIONS, SkillCategory.PASSING, SkillCategory.STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/skaven_gutterrunner.png", 4),
-        SingleSprite.ini("$portraitRootPath/skaven_gutterrunner.png")
+        SpriteSheet.ini("${iconRootPath}/skaven_gutterrunner.png", 4),
+        SingleSprite.ini("${portraitRootPath}/skaven_gutterrunner.png")
     )
 val SKAVEN_BLITZER =
     RosterPosition(
@@ -82,9 +87,10 @@ val SKAVEN_BLITZER =
         listOf(BLOCK.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS, SkillCategory.PASSING),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/skaven_blitzer.png", 2),
-        SingleSprite.ini("$portraitRootPath/skaven_blitzer.png")
+        SpriteSheet.ini("${iconRootPath}/skaven_blitzer.png", 2),
+        SingleSprite.ini("${portraitRootPath}/skaven_blitzer.png")
     )
 val RAT_OGRE =
     RosterPosition(
@@ -104,21 +110,21 @@ val RAT_OGRE =
         ),
         listOf(SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL, SkillCategory.MUTATIONS),
+        emptyList(),
         PlayerSize.BIG_GUY,
-        SpriteSheet.ini("$iconRootPath/skaven_ratogre.png", 1),
-        SingleSprite.ini("$portraitRootPath/skaven_ratogre.png")
+        SpriteSheet.ini("${iconRootPath}/skaven_ratogre.png", 1),
+        SingleSprite.ini("${portraitRootPath}/skaven_ratogre.png")
     )
 
 // Page 116 in the rulebook
 @Serializable
-val SKAVEN_TEAM = BB2020Roster(
+val SKAVEN_TEAM_BB2025 = Roster(
     id = RosterId("jervis-skaven"),
     name = "Skaven Team",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 50_000,
     allowApothecary = true,
-    specialRules = listOf(RegionalSpecialRule.UNDERWORLD_CHALLENGE),
     positions = listOf(
         SKAVEN_LINEMAN,
         SKAVEN_THROWER,
@@ -126,6 +132,8 @@ val SKAVEN_TEAM = BB2020Roster(
         SKAVEN_BLITZER,
         RAT_OGRE,
     ),
+    leagues = listOf(RegionalSpecialRule.UNDERWORLD_CHALLENGE),
+    specialRules = listOf(),
     logo = RosterLogo(
         large = SingleSprite.embedded("jervis/roster/logo_skaven_large.png"),
         small = SingleSprite.embedded("jervis/roster/logo_skaven_small.png")

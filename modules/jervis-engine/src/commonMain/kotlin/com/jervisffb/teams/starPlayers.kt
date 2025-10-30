@@ -24,6 +24,7 @@ val THE_BLACK_GOBBO = StarPlayerPosition(
         SkillType.STAB.id(),
         SkillType.STUNTY.id()
     ),
+    emptyList(),
     listOf(RegionalSpecialRule.BADLANDS_BRAWL, RegionalSpecialRule.UNDERWORLD_CHALLENGE),
     PlayerSize.STANDARD,
     SpriteSheet.embedded("$iconRootPath/TheBlackGobbo.png",1),

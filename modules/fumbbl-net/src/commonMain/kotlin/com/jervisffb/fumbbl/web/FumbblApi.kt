@@ -10,9 +10,10 @@ import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
@@ -193,7 +194,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
         }
     }
 
-    private fun convertToBB2020JervisRoster(rules: Rules, roster: FumbbleRosterDetails): BB2020Roster {
+    private fun convertToBB2020JervisRoster(rules: Rules, roster: FumbbleRosterDetails): Roster {
         val positions: List<RosterPosition> = roster.positions.map { position ->
             val iconRef = SpriteSheet.fumbbl(position.icon)
             val portraitRef = SingleSprite.fumbbl(position.portrait)
@@ -218,6 +219,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
                 },
                 primary = mapToSkillCategory(position.normalSkills),
                 secondary = mapToSkillCategory(position.doubleSkills),
+                keywords = emptyList(),
                 icon = iconRef,
                 size = when {
                     // FUMBBL does not support Giants
@@ -237,13 +239,14 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             small = SingleSprite.fumbbl(roster.logos.size192),
         )
 
-        return BB2020Roster(
+        return Roster(
             id = RosterId(roster.id),
             name = roster.name,
             tier = 0, // Unknown
             numberOfRerolls = 8, // Is there a limit?
             rerollCost = roster.rerollCost,
             allowApothecary = (roster.apothecary.equals("yes", ignoreCase = true)),
+            leagues = emptyList(),
             specialRules = specialRules,
             positions = positions,
             logo = logo,
@@ -286,7 +289,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
             .filter { !jervisPosition.skills.contains(it) }
     }
 
-    private fun convertToBB2020JervisTeam(rules: Rules, jervisRoster: BB2020Roster, team: FumbbleTeamDetails): SerializedTeam {
+    private fun convertToBB2020JervisTeam(rules: Rules, jervisRoster: Roster, team: FumbbleTeamDetails): SerializedTeam {
         // Unclear if we want to check for rulesets. Many rulesets will probably have compatible rosters, so it would
         // be unclear how to do that. For now, we will just accept any, and then let it be up to the deserializser
         // to throw an exception if it finds something that isn't supported.
@@ -300,6 +303,9 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
         return SerializedTeam(
             id = TeamId(team.id.toString()),
             name = team.name,
+            // Unclear how we can tell BB2025 and BB2020 rosters apart in the FUMBBL API, for now
+            // just assume it is BB2020.
+            version = GameVersion.BB2020,
             // Right now we just assume that the FUMBBL team matches the given game type
             // We probably need to refine this later.
             type = rules.gameType,
@@ -339,7 +345,7 @@ class FumbblApi(private val coachName: String? = null, private var oauthToken: S
     }
 
     private fun getBB2020Position(
-        jervisRoster: BB2020Roster,
+        jervisRoster: Roster,
         position: PositionId,
     ): RosterPosition {
         return jervisRoster.positions.firstOrNull {

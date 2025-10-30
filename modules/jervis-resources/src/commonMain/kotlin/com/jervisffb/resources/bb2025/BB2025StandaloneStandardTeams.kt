@@ -1,11 +1,8 @@
-package com.jervisffb.resources
+package com.jervisffb.resources.bb2025
 
-import LIZARDMEN_TEAM
-import SAURUS_BLOCKERS
-import SKINK_RUNNER_LINEMEN
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialize.JervisMetaData
 import com.jervisffb.engine.serialize.buildTeamFile
@@ -13,13 +10,13 @@ import com.jervisffb.engine.teamBuilder
 
 // The List of default starter team rosters
 // This is primarily used by Standalone Mode
-object StandaloneStandardTeams {
-    private val rules = StandardBB2020Rules()
+object BB2025StandaloneStandardTeams {
+    private val rules = StandardBB2025Rules()
     val defaultTeams = mapOf(
-        "human-starter-team.jrt" to buildTeamFile {
+        "human-starter-team-bb2025.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
-            roster = HUMAN_TEAM
-            team = teamBuilder(rules, HUMAN_TEAM) {
+            roster = HUMAN_TEAM_BB2025
+            team = teamBuilder(rules, HUMAN_TEAM_BB2025) {
                 name = "Human Starter Team #1"
                 addPlayer(PlayerId("Hu1"), "Ogre-1", PlayerNo(1), OGRE)
                 addPlayer(PlayerId("Hu2"), "Blitzer-2", PlayerNo(2), HUMAN_BLITZER)
@@ -40,10 +37,10 @@ object StandaloneStandardTeams {
             history = null
         },
 
-        "lizardmen-starter-team.jrt" to buildTeamFile {
+        "lizardmen-starter-team-bb2025.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
-            roster = LIZARDMEN_TEAM
-            team = teamBuilder(rules, LIZARDMEN_TEAM) {
+            roster = LIZARDMEN_TEAM_BB2025
+            team = teamBuilder(rules, LIZARDMEN_TEAM_BB2025) {
                 name = "Lizardmen Starter Team #1"
                 addPlayer(PlayerId("Li1"), "Skink-1", PlayerNo(1), SKINK_RUNNER_LINEMEN)
                 addPlayer(PlayerId("Li2"), "Skink-2", PlayerNo(2), SKINK_RUNNER_LINEMEN)
@@ -64,10 +61,10 @@ object StandaloneStandardTeams {
             history = null
         },
 
-        "skaven-starter-team.jrt" to buildTeamFile {
+        "skaven-starter-team-bb2025.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
-            roster = SKAVEN_TEAM
-            team = teamBuilder(rules, SKAVEN_TEAM) {
+            roster = SKAVEN_TEAM_BB2025
+            team = teamBuilder(rules, SKAVEN_TEAM_BB2025) {
                 name = "Skaven Starter Team #1"
                 addPlayer(PlayerId("Sk1"), "Blitzer-1", PlayerNo(1), SKAVEN_BLITZER)
                 addPlayer(PlayerId("Sk2"), "Blitzer-2", PlayerNo(2), SKAVEN_BLITZER)
@@ -88,10 +85,10 @@ object StandaloneStandardTeams {
             history = null
         },
 
-        "khorne-starter-team.jrt" to buildTeamFile {
+        "khorne-starter-team-bb2025.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
-            roster = KHORNE_TEAM
-            team = teamBuilder(rules, KHORNE_TEAM) {
+            roster = KHORNE_TEAM_BB2025
+            team = teamBuilder(rules, KHORNE_TEAM_BB2025) {
                 name = "Khorne Starter Team #1"
                 addPlayer(PlayerId("Kh1"), "Lineman-1", PlayerNo(1), BLOODBORN_MARAUDER_LINEMEN)
                 addPlayer(PlayerId("Kh2"), "Lineman-2", PlayerNo(2), BLOODBORN_MARAUDER_LINEMEN)

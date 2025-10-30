@@ -1,10 +1,10 @@
-package com.jervisffb.resources
+package com.jervisffb.resources.bb2020
 
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillCategory.AGILITY
 import com.jervisffb.engine.rules.common.skills.SkillCategory.GENERAL
@@ -25,6 +25,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType.THROW_TEAMMATE
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.resources.iconRootPath
+import com.jervisffb.resources.portraitRootPath
 
 /**
  * Human Teams
@@ -43,9 +45,10 @@ val HUMAN_LINEMAN =
         emptyList(),
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/human_lineman.png",8),
-        SingleSprite.ini("$portraitRootPath/human_lineman.png")
+        SpriteSheet.ini("${iconRootPath}/human_lineman.png",8),
+        SingleSprite.ini("${portraitRootPath}/human_lineman.png")
 
     )
 val HUMAN_THROWER =
@@ -63,9 +66,10 @@ val HUMAN_THROWER =
         ),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/human_thrower.png",2),
-        SingleSprite.ini("$portraitRootPath/human_thrower.png")
+        SpriteSheet.ini("${iconRootPath}/human_thrower.png",2),
+        SingleSprite.ini("${portraitRootPath}/human_thrower.png")
     )
 val HUMAN_CATCHER =
     RosterPosition(
@@ -82,9 +86,10 @@ val HUMAN_CATCHER =
         ),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/human_catcher.png", 4),
-        SingleSprite.ini("$portraitRootPath/human_catcher.png")
+        SpriteSheet.ini("${iconRootPath}/human_catcher.png", 4),
+        SingleSprite.ini("${portraitRootPath}/human_catcher.png")
     )
 val HUMAN_BLITZER =
     RosterPosition(
@@ -98,9 +103,10 @@ val HUMAN_BLITZER =
         listOf(BLOCK.id()),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY, PASSING),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/human_blitzer.png", 4),
-        SingleSprite.ini("$portraitRootPath/human_blitzer.png")
+        SpriteSheet.ini("${iconRootPath}/human_blitzer.png", 4),
+        SingleSprite.ini("${portraitRootPath}/human_blitzer.png")
     )
 val HALFLING_HOPEFUL =
     RosterPosition(
@@ -118,9 +124,10 @@ val HALFLING_HOPEFUL =
         ),
         listOf(AGILITY),
         listOf(GENERAL, STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/human_halflinghopeful.png", 8),
-        SingleSprite.ini("$portraitRootPath/human_halflinghopeful.png")
+        SpriteSheet.ini("${iconRootPath}/human_halflinghopeful.png", 8),
+        SingleSprite.ini("${portraitRootPath}/human_halflinghopeful.png")
     )
 val OGRE =
     RosterPosition(
@@ -140,18 +147,20 @@ val OGRE =
         ),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL),
+        emptyList(),
         PlayerSize.BIG_GUY,
-        SpriteSheet.ini("$iconRootPath/human_ogre.png", 8),
-        SingleSprite.ini("$portraitRootPath/human_ogre.png")
+        SpriteSheet.ini("${iconRootPath}/human_ogre.png", 8),
+        SingleSprite.ini("${portraitRootPath}/human_ogre.png")
     )
 
-val HUMAN_TEAM = BB2020Roster(
+val HUMAN_TEAM_BB2020 = Roster(
     id = RosterId("jervis-human"),
     name = "Human Team",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 50_000,
     allowApothecary = true,
+    leagues = emptyList(),
     specialRules = listOf(RegionalSpecialRule.OLD_WORLD_CLASSIC),
     positions = listOf(
         HUMAN_LINEMAN,

@@ -1,7 +1,7 @@
 package com.jervisffb.engine.serialize
 
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
+import com.jervisffb.engine.rules.common.roster.Roster
 
 fun buildTeamFile(function: JervisTeamFileBuilder.() -> Unit): JervisTeamFile {
     val builder = JervisTeamFileBuilder()
@@ -13,7 +13,7 @@ class JervisTeamFileBuilder {
     var metadata: JervisMetaData? = null
     var history: GameHistory? = null
     var team: Team? = null
-    var roster: BB2020Roster? = null
+    var roster: Roster? = null
     fun build(): JervisTeamFile {
         return JervisTeamFile(
             metadata!!,

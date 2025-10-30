@@ -4,10 +4,12 @@ import androidx.compose.ui.graphics.ImageBitmap
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.GameVersion
 
 data class TeamInfo(
     val teamId: TeamId,
     val teamName: String,
+    val version: GameVersion,
     val type: GameType,
     val teamRoster: String,
     val teamValue: Int,

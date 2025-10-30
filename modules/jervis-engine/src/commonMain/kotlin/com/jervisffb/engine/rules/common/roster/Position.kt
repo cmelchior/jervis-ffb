@@ -2,6 +2,7 @@ package com.jervisffb.engine.rules.common.roster
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerType
@@ -17,9 +18,13 @@ import com.jervisffb.engine.serialize.SpriteSource
  * Interface describing a position on a team. This includes all types
  * of players.
  *
- * For now, this interface is tailored towards BB2020 rulesets, but e.g.
- * BB2016 didn't have parsing. So if we want the rules engine to support
- * multiple rulesets we probably have to rethink this strategy.
+ * Developer's Commentary:
+ * For now, this interface is a superset of the BB2020 and BB2025 rulesets,
+ * which means that some properties might not make sense for a given ruleset.
+ * E.g., keywords are used in BB2025, but not BB2020.
+ *
+ * It is unclear if this strategy is the best, but for now it seems to work.
+ * [Roster] is using a similar strategy.
  */
 interface Position {
     val id: PositionId
@@ -36,6 +41,7 @@ interface Position {
     val primary: List<SkillCategory>
     val secondary: List<SkillCategory>
     val skills: List<SkillId>
+    val keywords: List<PlayerKeyword>
     // If set, this position can only play for teams with the given regional special rule
     val playsFor: List<RegionalSpecialRule>
     val size: PlayerSize

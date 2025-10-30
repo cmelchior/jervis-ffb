@@ -41,6 +41,7 @@ import com.jervisffb.engine.rules.builder.BallSelectorRule
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.FoulActionBehavior
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.builder.KickingPlayerBehavior
 import com.jervisffb.engine.rules.builder.NoStadium
 import com.jervisffb.engine.rules.builder.StadiumRule
@@ -94,6 +95,8 @@ import kotlinx.serialization.Serializable
 open class Rules(
     // Name of the rule set
     open val name: String,
+    // Which base version is this ruleset based on
+    open val gameVersion: GameVersion,
     // What type of game is this ruleset intended for
     open val gameType: GameType,
 
@@ -784,6 +787,7 @@ open class Rules(
      */
     class Builder(rules: Rules) {
         var name: String = rules.name
+        var gameVersion: GameVersion = rules.gameVersion
         var gameType: GameType = rules.gameType
         var timers: TimerSettings.Builder = rules.timers.toBuilder()
         var inducements: InducementSettings.Builder = rules.inducements.toBuilder()
@@ -837,6 +841,7 @@ open class Rules(
 
         fun build() = Rules(
             name,
+            gameVersion,
             gameType,
             timers.build(),
             inducements.build(),

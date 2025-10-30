@@ -314,6 +314,7 @@ class P2PHostScreenModel(private val navigator: Navigator, val menuViewModel: Me
         selectedTeam.value = TeamInfo(
             teamId = homeTeam.id,
             teamName = homeTeam.name,
+            version = homeTeam.version,
             type = homeTeam.type,
             teamRoster = homeTeam.roster.name,
             teamValue = homeTeam.teamValue,

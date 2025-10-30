@@ -4,8 +4,9 @@ import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.teamBuilder
@@ -24,9 +25,10 @@ import kotlinx.serialization.Serializable
 class SerializedTeam(
     val id: TeamId,
     val name: String,
+    val version: GameVersion,
     val type: GameType,
     val players: List<SerializedPlayer>,
-    val roster: BB2020Roster,
+    val roster: Roster,
     val rerolls: Int,
     val apothecaries: Int,
     val cheerleaders: Int,
@@ -45,6 +47,7 @@ class SerializedTeam(
             return SerializedTeam(
                 team.id,
                 team.name,
+                team.version,
                 team.type,
                 team.map { SerializedPlayer.serialize(it) },
                 team.roster,
@@ -67,6 +70,7 @@ class SerializedTeam(
             return teamBuilder(rules, teamData.roster) {
                 id = teamData.id
                 name = teamData.name
+                version = teamData.version
                 type = teamData.type
                 this.coach = coach
 

@@ -1,4 +1,4 @@
-package com.jervisffb.resources
+package com.jervisffb.resources.bb2020
 
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerNo
@@ -11,13 +11,13 @@ import com.jervisffb.engine.teamBuilder
 
 // The List of default starter team rosters for BB7.
 // This is primarily used by Standalone Mode
-object StandaloneBB7Teams {
+object BB2020StandaloneBB7Teams {
     private val rules = BB72020Rules()
     val defaultTeams = mapOf(
-        "amazon-bb7-starter-team.jrt" to buildTeamFile {
+        "amazon-bb7-starter-team-bb2020.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
-            roster = AMAZON_TEAM
-            team = teamBuilder(rules, AMAZON_TEAM) {
+            roster = AMAZON_TEAM_BB2020
+            team = teamBuilder(rules, AMAZON_TEAM_BB2020) {
                 name = "Amazon Starter Team #1"
                 type = GameType.BB7
                 addPlayer(PlayerId("Am-bb7-1"), "Blitzer-1", PlayerNo(1), AMAZON_BLITZER)
@@ -36,10 +36,10 @@ object StandaloneBB7Teams {
             history = null
         },
 
-        "orc-bb7-starter-team.jrt" to buildTeamFile {
+        "orc-bb7-starter-team-bb2020.jrt" to buildTeamFile {
             metadata = JervisMetaData(FILE_FORMAT_VERSION)
-            roster = ORC_TEAM
-            team = teamBuilder(rules, ORC_TEAM) {
+            roster = ORC_TEAM_BB2020
+            team = teamBuilder(rules, ORC_TEAM_BB2020) {
                 name = "Orc Starter Team #1"
                 type = GameType.BB7
                 addPlayer(PlayerId("Orc-bb7-1"), "Blitzer-1", PlayerNo(1), ORC_BLITZER)

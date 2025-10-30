@@ -6,11 +6,13 @@ import com.jervisffb.engine.model.inducements.InfamousCoachingStaff
 import com.jervisffb.engine.model.inducements.SpecialPlayCard
 import com.jervisffb.engine.model.inducements.wizards.Wizard
 import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.skills.TeamReroll
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 import com.jervisffb.engine.serialize.RosterLogo
@@ -93,10 +95,15 @@ class TeamTurnData(private val game: Game) {
 class Team(
     val id: TeamId,
     val name: String,
+    val version: GameVersion,
     val type: GameType,
-    val roster: BB2020Roster,
+    val roster: Roster,
     var coach: Coach
 ) : Collection<Player> {
+
+    // In BB2025, the team needs to select the league they play in, which determines
+    // which star players are available.
+    var league: RegionalSpecialRule? = null
 
     // All players on the team
     val noToPlayer = mutableMapOf<PlayerNo, Player>()

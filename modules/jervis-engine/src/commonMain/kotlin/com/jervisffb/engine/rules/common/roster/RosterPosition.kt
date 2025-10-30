@@ -2,6 +2,7 @@ package com.jervisffb.engine.rules.common.roster
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerType
@@ -31,6 +32,7 @@ data class RosterPosition(
     override val skills: List<SkillId>,
     override val primary: List<SkillCategory>,
     override val secondary: List<SkillCategory>,
+    override val keywords: List<PlayerKeyword>,
     override val size: PlayerSize,
     override val icon: SpriteSource?,
     override val portrait: SpriteSource?,

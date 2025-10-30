@@ -1,11 +1,12 @@
-package com.jervisffb.resources
+package com.jervisffb.resources.bb2025
 
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
+import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillCategory.AGILITY
 import com.jervisffb.engine.rules.common.skills.SkillCategory.GENERAL
 import com.jervisffb.engine.rules.common.skills.SkillCategory.PASSING
@@ -26,12 +27,12 @@ import com.jervisffb.engine.rules.common.skills.SkillType.THROW_TEAMMATE
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.resources.iconRootPath
+import com.jervisffb.resources.portraitRootPath
 import kotlinx.serialization.Serializable
 
 /**
  * Orc Team
- *
- * See page 123 in the rulebook
  */
 
 val ORC_LINEMEN =
@@ -46,9 +47,10 @@ val ORC_LINEMEN =
         emptyList(/* Animosity */),
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/orc_lineman.png",6),
-        SingleSprite.ini("$portraitRootPath/orc_lineman.png")
+        SpriteSheet.ini("${iconRootPath}/orc_lineman.png",6),
+        SingleSprite.ini("${portraitRootPath}/orc_lineman.png")
 
     )
 val ORC_THROWER =
@@ -67,9 +69,10 @@ val ORC_THROWER =
         ),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/orc_thrower.png",2),
-        SingleSprite.ini("$portraitRootPath/orc_thrower.png")
+        SpriteSheet.ini("${iconRootPath}/orc_thrower.png",2),
+        SingleSprite.ini("${portraitRootPath}/orc_thrower.png")
     )
 val ORC_BLITZER =
     RosterPosition(
@@ -86,9 +89,10 @@ val ORC_BLITZER =
         ),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/orc_blitzer.png", 4),
-        SingleSprite.ini("$portraitRootPath/orc_blitzer.png")
+        SpriteSheet.ini("${iconRootPath}/orc_blitzer.png", 4),
+        SingleSprite.ini("${portraitRootPath}/orc_blitzer.png")
     )
 val BIG_UN_BLOCKERS =
     RosterPosition(
@@ -104,9 +108,10 @@ val BIG_UN_BLOCKERS =
         ),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/orc_bigunblocker.png", 4),
-        SingleSprite.ini("$portraitRootPath/orc_bigunblocker.png")
+        SpriteSheet.ini("${iconRootPath}/orc_bigunblocker.png", 4),
+        SingleSprite.ini("${portraitRootPath}/orc_bigunblocker.png")
     )
 val GOBLIN =
     RosterPosition(
@@ -124,9 +129,10 @@ val GOBLIN =
         ),
         listOf(AGILITY),
         listOf(GENERAL, STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/orc_goblin.png", 4),
-        SingleSprite.ini("$portraitRootPath/orc_goblin.png")
+        SpriteSheet.ini("${iconRootPath}/orc_goblin.png", 4),
+        SingleSprite.ini("${portraitRootPath}/orc_goblin.png")
     )
 val UNTRAINED_TROLL =
     RosterPosition(
@@ -148,22 +154,20 @@ val UNTRAINED_TROLL =
         ),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL, PASSING),
+        emptyList(),
         PlayerSize.BIG_GUY,
-        SpriteSheet.ini("$iconRootPath/orc_troll.png", 1),
-        SingleSprite.ini("$portraitRootPath/orc_troll.png")
+        SpriteSheet.ini("${iconRootPath}/orc_troll.png", 1),
+        SingleSprite.ini("${portraitRootPath}/orc_troll.png")
     )
 
 @Serializable
-val ORC_TEAM = BB2020Roster(
+val ORC_TEAM_BB2025 = Roster(
     id = RosterId("jervis-orc"),
     name = "Orc",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 60_000,
     allowApothecary = true,
-    specialRules = listOf(
-        RegionalSpecialRule.BADLANDS_BRAWL,
-    ),
     positions = listOf(
         ORC_LINEMEN,
         ORC_THROWER,
@@ -172,6 +176,8 @@ val ORC_TEAM = BB2020Roster(
         GOBLIN,
         UNTRAINED_TROLL,
     ),
+    leagues = listOf(RegionalSpecialRule.BADLANDS_BRAWL),
+    specialRules = listOf(TeamSpecialRule.BRAWLIN_BRUTES, TeamSpecialRule.TEAM_CAPTAIN),
     logo = RosterLogo(
         large = SingleSprite.embedded("jervis/roster/logo_orc_large.png"),
         small = SingleSprite.embedded("jervis/roster/logo_orc_small.png")

@@ -1,9 +1,9 @@
-package com.jervisffb.resources
+package com.jervisffb.resources.bb2020
 
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -13,6 +13,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType.PASS
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.resources.iconRootPath
+import com.jervisffb.resources.portraitRootPath
 import kotlinx.serialization.Serializable
 
 val ELVEN_LINEMAN =
@@ -27,9 +29,10 @@ val ELVEN_LINEMAN =
         emptyList(),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.GENERAL),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/elvenunion_lineman.png",8),
-        SingleSprite.ini("$portraitRootPath/elvenunion_lineman.png")
+        SpriteSheet.ini("${iconRootPath}/elvenunion_lineman.png",8),
+        SingleSprite.ini("${portraitRootPath}/elvenunion_lineman.png")
     )
 val ELVEN_THROWER =
     RosterPosition(
@@ -43,9 +46,10 @@ val ELVEN_THROWER =
         listOf(PASS.id()),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL, SkillCategory.PASSING),
         listOf(SkillCategory.GENERAL),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/elvenunion_thrower.png",2),
-        SingleSprite.ini("$portraitRootPath/elvenunion_thrower.png")
+        SpriteSheet.ini("${iconRootPath}/elvenunion_thrower.png",2),
+        SingleSprite.ini("${portraitRootPath}/elvenunion_thrower.png")
     )
 val ELVEN_CATCHER =
     RosterPosition(
@@ -59,9 +63,10 @@ val ELVEN_CATCHER =
         listOf(CATCH.id(), /* Nerves Of Steel */),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.GENERAL),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/elvenunion_catcher.png", 4),
-        SingleSprite.ini("$portraitRootPath/elvenunion_catcher.png")
+        SpriteSheet.ini("${iconRootPath}/elvenunion_catcher.png", 4),
+        SingleSprite.ini("${portraitRootPath}/elvenunion_catcher.png")
     )
 val ELVEN_BLITZER =
     RosterPosition(
@@ -75,19 +80,21 @@ val ELVEN_BLITZER =
         listOf(BLOCK.id(), SkillType.SIDESTEP.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.PASSING),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/elvenunion_blitzer.png", 2),
-        SingleSprite.ini("$portraitRootPath/elvenunion_blitzer.png")
+        SpriteSheet.ini("${iconRootPath}/elvenunion_blitzer.png", 2),
+        SingleSprite.ini("${portraitRootPath}/elvenunion_blitzer.png")
     )
 
 @Serializable
-val ELVEN_UNION_TEAM = BB2020Roster(
+val ELVEN_UNION_TEAM_BB2020 = Roster(
     id = RosterId("jervis-elvish-union"),
     name = "Elven Union",
     tier = 2,
     numberOfRerolls = 8,
     rerollCost = 50_000,
     allowApothecary = true,
+    leagues = emptyList(),
     specialRules = emptyList(),
     positions = listOf(
         ELVEN_LINEMAN,

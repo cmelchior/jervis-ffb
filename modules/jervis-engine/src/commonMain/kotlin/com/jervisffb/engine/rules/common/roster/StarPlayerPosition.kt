@@ -2,6 +2,7 @@ package com.jervisffb.engine.rules.common.roster
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PlayerType
@@ -32,6 +33,7 @@ class StarPlayerPosition(
     override val passing: Int?,
     override var armorValue: Int,
     override val skills: List<SkillId>,
+    override val keywords: List<PlayerKeyword>,
     override val playsFor: List<RegionalSpecialRule>,
     override val size: PlayerSize,
     override val icon: SpriteSource?,

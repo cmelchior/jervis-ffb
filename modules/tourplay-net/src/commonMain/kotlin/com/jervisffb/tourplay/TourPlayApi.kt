@@ -10,8 +10,9 @@ import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
@@ -68,7 +69,7 @@ class TourPlayApi() {
         }
     }
 
-    private fun convertToBB2020JervisRoster(rules: Rules, roster: TourPlayRoster): BB2020Roster {
+    private fun convertToBB2020JervisRoster(rules: Rules, roster: TourPlayRoster): Roster {
         val positions = roster.rosterMaster.lineUpMasters.map { position ->
             // TODO How to map from TourPlay to FUMBBL Icons / Portraits?
             // As a temporary solution. We need some place holders
@@ -93,6 +94,7 @@ class TourPlayApi() {
                 },
                 primary = mapToSkillCategory(position.skillNormal),
                 secondary = mapToSkillCategory(position.skillDouble),
+                keywords = emptyList(),
                 size = when {
                     position.isBigGuy == true -> PlayerSize.BIG_GUY
                     position.position == "Giant" -> PlayerSize.GIANT // TODO Unclear if this is correct
@@ -111,13 +113,14 @@ class TourPlayApi() {
             large = SingleSprite.url("http://tourplay.net/emblems/${roster.id}/96.x3-${roster.imageFile}"),
             small = SingleSprite.url("http://tourplay.net/emblems/${roster.id}/96.x2-${roster.imageFile}"),
         )
-        return BB2020Roster(
+        return Roster(
             id = RosterId(roster.rosterMaster.id.toString()),
             name = roster.rosterMaster.name,
             tier = roster.rosterMaster.tier,
             numberOfRerolls = 8, // Is there a limit?
             rerollCost = roster.rosterMaster.prizeReRoll,
             allowApothecary = roster.rosterMaster.apothecary,
+            leagues = emptyList(),
             specialRules = specialRules,
             positions = positions,
             logo = logo,
@@ -239,7 +242,7 @@ class TourPlayApi() {
         }
     }
 
-    private fun convertToBB2020JervisTeam(rules: Rules, jervisRoster: BB2020Roster, team: TourPlayRoster): SerializedTeam {
+    private fun convertToBB2020JervisTeam(rules: Rules, jervisRoster: Roster, team: TourPlayRoster): SerializedTeam {
         // This only supports basic conversion.
         // Some things are unclear for FUMBBL Teams:
         // - How are player types like MERCENARY and JOURNEYMEN defined?
@@ -248,6 +251,8 @@ class TourPlayApi() {
         return SerializedTeam(
             id = TeamId(team.id.toString()),
             name = team.teamName,
+            // TourPlay doesn't support BB2025 yet, so just hardcode the version to BB2020
+            version = GameVersion.BB2020,
             // Right now we just assume that the FUMBBL team matches the given game type
             // We probably need to refine this later.
             type = rules.gameType,

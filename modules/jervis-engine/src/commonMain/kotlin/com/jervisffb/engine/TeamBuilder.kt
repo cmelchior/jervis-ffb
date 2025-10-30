@@ -13,10 +13,11 @@ import com.jervisffb.engine.model.inducements.Apothecary
 import com.jervisffb.engine.model.inducements.ApothecaryType
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.bb2020.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.common.roster.Position
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.SpecialRules
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.serialize.PlayerUiData
@@ -35,11 +36,12 @@ private data class PlayerData(
     val icon: PlayerUiData? = null,
 )
 
-class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
+class TeamBuilder(val rules: Rules, val roster: Roster) {
     private val players: MutableMap<PlayerNo, PlayerData> = mutableMapOf()
     var id: TeamId = TeamId("team-${Random.nextLong()}")
     var coach: Coach = Coach(CoachId("jervis-coach"), "Jervis")
     var name: String = ""
+    var version: GameVersion = rules.gameVersion
     var type: GameType = GameType.STANDARD
     var rerolls: Int = 0
         set(value) {
@@ -110,7 +112,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
     }
 
     fun build(): Team {
-        return Team(id, name, type, roster, coach).apply {
+        return Team(id, name, version, type, roster, coach).apply {
             this@TeamBuilder.players.forEach {
                 val data: PlayerData = it.value
                 add(data.type.createPlayer(
@@ -150,7 +152,7 @@ class TeamBuilder(val rules: Rules, val roster: BB2020Roster) {
 
 fun teamBuilder(
     rules: Rules,
-    roster: BB2020Roster,
+    roster: Roster,
     action: TeamBuilder.() -> Unit,
 ): Team {
     val builder = TeamBuilder(rules, roster)

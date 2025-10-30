@@ -1,10 +1,10 @@
-package com.jervisffb.resources
+package com.jervisffb.resources.bb2025
 
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillCategory
@@ -16,6 +16,8 @@ import com.jervisffb.engine.rules.common.skills.SkillType.THICK_SKULL
 import com.jervisffb.engine.serialize.RosterLogo
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.resources.iconRootPath
+import com.jervisffb.resources.portraitRootPath
 import kotlinx.serialization.Serializable
 
 val HOBGOBLIN_LINEMEN =
@@ -30,9 +32,10 @@ val HOBGOBLIN_LINEMEN =
         emptyList(),
         listOf(SkillCategory.GENERAL),
         listOf(SkillCategory.AGILITY, SkillCategory.STRENGTH),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/chaosdwarf_hobgoblinlineman.png", 10),
-        SingleSprite.ini("$portraitRootPath/chaosdwarf_hobgoblinlineman.png")
+        SpriteSheet.ini("${iconRootPath}/chaosdwarf_hobgoblinlineman.png", 10),
+        SingleSprite.ini("${portraitRootPath}/chaosdwarf_hobgoblinlineman.png")
     )
 val CHAOS_DWARF_BLOCKERS =
     RosterPosition(
@@ -46,9 +49,10 @@ val CHAOS_DWARF_BLOCKERS =
         listOf(BLOCK.id(), TACKLE.id(), THICK_SKULL.id()),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY, SkillCategory.MUTATIONS),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/chaosdwarf_chaosdwarfblocker.png", 6),
-        SingleSprite.ini("$portraitRootPath/chaosdwarf_chaosdwarfblocker.png")
+        SpriteSheet.ini("${iconRootPath}/chaosdwarf_chaosdwarfblocker.png", 6),
+        SingleSprite.ini("${portraitRootPath}/chaosdwarf_chaosdwarfblocker.png")
     )
 val BULL_CENTAUR_BLITZERS =
     RosterPosition(
@@ -66,9 +70,10 @@ val BULL_CENTAUR_BLITZERS =
         ),
         listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
         listOf(SkillCategory.AGILITY),
+        emptyList(),
         PlayerSize.STANDARD,
-        SpriteSheet.ini("$iconRootPath/chaosdwarf_bullcentaurblitzer.png", 2),
-        SingleSprite.ini("$portraitRootPath/chaosdwarf_bullcentaurblitzer.png")
+        SpriteSheet.ini("${iconRootPath}/chaosdwarf_bullcentaurblitzer.png", 2),
+        SingleSprite.ini("${portraitRootPath}/chaosdwarf_bullcentaurblitzer.png")
     )
 val ENSLAVED_MINOTAUR =
     RosterPosition(
@@ -82,35 +87,28 @@ val ENSLAVED_MINOTAUR =
         emptyList(),
         listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
         listOf(SkillCategory.STRENGTH, SkillCategory.PASSING),
+        emptyList(),
         PlayerSize.BIG_GUY,
-        SpriteSheet.ini("$iconRootPath/chaosdwarf_enslavedminotaur.png",1),
-        SingleSprite.ini("$portraitRootPath/chaosdwarf_enslavedminotaur.png")
+        SpriteSheet.ini("${iconRootPath}/chaosdwarf_enslavedminotaur.png",1),
+        SingleSprite.ini("${portraitRootPath}/chaosdwarf_enslavedminotaur.png")
     )
 
 // See Teams of Legend: https://www.warhammer-community.com/wp-content/uploads/2020/11/lFZy1SIuNmWvxPj1.pdf
 @Serializable
-val CHAOS_DWARF_TEAM = BB2020Roster(
+val CHAOS_DWARF_TEAM_BB2025 = Roster(
     id = RosterId("jervis-chaos-dwarf"),
     name = "Chaos Dwarf",
     tier = 1,
     numberOfRerolls = 8,
     rerollCost = 70_000,
     allowApothecary = true,
-    // Only select one of Favoured of
-    specialRules = listOf(
-        RegionalSpecialRule.BADLANDS_BRAWL,
-        RegionalSpecialRule.WORLDS_EDGE_SUPERLEAGUE,
-        TeamSpecialRule.FAVOURED_OF_CHAOS_UNDIVIDED,
-        TeamSpecialRule.FAVOURED_OF_KHORNE,
-        TeamSpecialRule.FAVOURED_OF_NURGLE,
-        TeamSpecialRule.FAVOURED_OF_TZEENTCH,
-        TeamSpecialRule.FAVOURED_OF_SLAANESH,
-    ),
     positions = listOf(
         HOBGOBLIN_LINEMEN,
         CHAOS_DWARF_BLOCKERS,
         BULL_CENTAUR_BLITZERS,
         ENSLAVED_MINOTAUR,
     ),
+    leagues = listOf(RegionalSpecialRule.BADLANDS_BRAWL, RegionalSpecialRule.CHAOS_CLASH),
+    specialRules = listOf(TeamSpecialRule.FAVOURED_OF_HASHUT),
     logo = RosterLogo.NONE
 )

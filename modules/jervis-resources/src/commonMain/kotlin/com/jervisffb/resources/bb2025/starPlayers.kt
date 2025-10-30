@@ -1,4 +1,4 @@
-package com.jervisffb.resources
+package com.jervisffb.resources.bb2025
 
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
@@ -11,8 +11,10 @@ import com.jervisffb.engine.rules.common.skills.SkillType.STAB
 import com.jervisffb.engine.rules.common.skills.SkillType.STUNTY
 import com.jervisffb.engine.serialize.SingleSprite
 import com.jervisffb.engine.serialize.SpriteSheet
+import com.jervisffb.resources.iconRootPath
+import com.jervisffb.resources.portraitRootPath
 
-val THE_BLACK_GOBBO =  StarPlayerPosition(
+val THE_BLACK_GOBBO_BB2025 =  StarPlayerPosition(
     PositionId("the-black-gobbo"),
     "The Black Gobbo",
     "Bg",
@@ -28,14 +30,15 @@ val THE_BLACK_GOBBO =  StarPlayerPosition(
         STAB.id(),
         STUNTY.id()
     ),
+    emptyList(),
     listOf(RegionalSpecialRule.BADLANDS_BRAWL, RegionalSpecialRule.UNDERWORLD_CHALLENGE),
     PlayerSize.STANDARD,
-    SpriteSheet.ini("$iconRootPath/TheBlackGobbo.png",1),
-    SingleSprite.ini("$portraitRootPath/TheBlackGobbo.png")
+    SpriteSheet.ini("${iconRootPath}/TheBlackGobbo.png",1),
+    SingleSprite.ini("${portraitRootPath}/TheBlackGobbo.png")
 )
 
 val STAR_PLAYERS = listOf(
-    THE_BLACK_GOBBO,
+    THE_BLACK_GOBBO_BB2025,
 )
 
 

@@ -1,6 +1,8 @@
 package com.jervisffb.resources
 
 import com.jervisffb.engine.serialize.JervisSerialization
+import com.jervisffb.resources.bb2020.BB2020StandaloneBB7Teams
+import com.jervisffb.resources.bb2020.BB2020StandaloneStandardTeams
 import com.jervisffb.utils.APPLICATION_DIRECTORY
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -34,7 +36,7 @@ class GenerateTeamFiles {
         val rosterCache = File(root, "teams")
         rosterCache.mkdirs()
 
-        (StandaloneStandardTeams.defaultTeams + StandaloneBB7Teams.defaultTeams).forEach { (fileName, roster) ->
+        (BB2020StandaloneStandardTeams.defaultTeams + BB2020StandaloneBB7Teams.defaultTeams).forEach { (fileName, roster) ->
             val json = json.encodeToString(roster)
             val file = File(rosterCache, fileName)
             if (file.exists()) {

@@ -9,17 +9,17 @@ import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.roster.BB2020Roster
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
+import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.TeamSpecialRule
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.teamBuilder
 import com.jervisffb.fumbbl.net.model.SpecialRule
-import com.jervisffb.resources.CHAOS_DWARF_TEAM
-import com.jervisffb.resources.ELVEN_UNION_TEAM
-import com.jervisffb.resources.HUMAN_TEAM
-import com.jervisffb.resources.KHORNE_TEAM
-import com.jervisffb.resources.SKAVEN_TEAM
+import com.jervisffb.resources.bb2020.CHAOS_DWARF_TEAM_BB2020
+import com.jervisffb.resources.bb2020.ELVEN_UNION_TEAM_BB2020
+import com.jervisffb.resources.bb2020.HUMAN_TEAM_BB2020
+import com.jervisffb.resources.bb2020.KHORNE_TEAM_BB2020
+import com.jervisffb.resources.bb2020.SKAVEN_TEAM_BB2020
 
 typealias FumbblGame = com.jervisffb.fumbbl.net.model.Game
 typealias FumbblTeam = com.jervisffb.fumbbl.net.model.Team
@@ -105,15 +105,15 @@ private fun extractTeam(rules: Rules, team: FumbblTeam): Team {
     }
 }
 
-private fun extractRoster(roster: FumbblRoster): BB2020Roster {
+private fun extractRoster(roster: FumbblRoster): Roster {
     // TODO Add logic for building custom rosters, for now
     //  just refer to the original rules
     return when (roster.rosterName) {
-        "Chaos Dwarf" -> CHAOS_DWARF_TEAM
-        "Human" -> HUMAN_TEAM
-        "Khorne" -> KHORNE_TEAM
-        "Elven Union" -> ELVEN_UNION_TEAM
-        "Skaven" -> SKAVEN_TEAM
+        "Chaos Dwarf" -> CHAOS_DWARF_TEAM_BB2020
+        "Human" -> HUMAN_TEAM_BB2020
+        "Khorne" -> KHORNE_TEAM_BB2020
+        "Elven Union" -> ELVEN_UNION_TEAM_BB2020
+        "Skaven" -> SKAVEN_TEAM_BB2020
         else -> TODO("Missing team: ${roster.rosterName}")
     }
 }

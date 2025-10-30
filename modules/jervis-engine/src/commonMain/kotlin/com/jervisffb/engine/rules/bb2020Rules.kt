@@ -9,6 +9,7 @@ import com.jervisffb.engine.rules.bb2020.tables.BB7StandardInjuryTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7StuntyInjuryTable
 import com.jervisffb.engine.rules.builder.FoulActionBehavior
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.builder.KickingPlayerBehavior
 import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
 import com.jervisffb.engine.rules.common.tables.InjuryTable
@@ -24,6 +25,7 @@ import kotlinx.serialization.Serializable
  */
 abstract class BB2020Rules : Rules(
     name = "Blood Bowl 2020 Rules",
+    gameVersion = GameVersion.BB2020,
     gameType = GameType.STANDARD
 ) {
 }

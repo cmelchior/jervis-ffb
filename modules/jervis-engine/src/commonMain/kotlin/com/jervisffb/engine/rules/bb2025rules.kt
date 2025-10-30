@@ -11,6 +11,7 @@ import com.jervisffb.engine.rules.bb2025.tables.BB2025StandardPrayersToNuffleTab
 import com.jervisffb.engine.rules.bb2025.tables.BB2025StandardWeatherTable
 import com.jervisffb.engine.rules.bb2025.tables.BB2025StuntyInjuryTable
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.builder.GameVersion
 import kotlinx.serialization.Serializable
 
 /**
@@ -18,6 +19,7 @@ import kotlinx.serialization.Serializable
  */
 abstract class BB2025Rules : Rules(
     name = "Blood Bowl 2025 Rules",
+    gameVersion = GameVersion.BB2025,
     gameType = GameType.STANDARD,
     teamActions = BB2025TeamActions(),
     kickOffEventTable = BB2025StandardKickOffEventTable,

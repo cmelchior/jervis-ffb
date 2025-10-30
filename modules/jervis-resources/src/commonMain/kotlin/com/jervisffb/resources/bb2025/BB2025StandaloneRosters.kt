@@ -1,43 +1,42 @@
-package com.jervisffb.resources
+package com.jervisffb.resources.bb2025
 
-import LIZARDMEN_TEAM
 import com.jervisffb.engine.serialize.FILE_FORMAT_VERSION
 import com.jervisffb.engine.serialize.JervisMetaData
 import com.jervisffb.engine.serialize.JervisRosterFile
 
-object StandaloneRosters {
+object BB2025StandaloneRosters {
     val defaultRosters = mapOf(
-        "amazon-roster.jrr" to JervisRosterFile(
+        "amazon-roster-bb2025.jrr" to JervisRosterFile(
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-            roster = AMAZON_TEAM,
+            roster = AMAZON_TEAM_BB2025,
         ),
-        "chaos-dwarf-roster.jrr" to JervisRosterFile(
+        "chaos-dwarf-roster-bb2025.jrr" to JervisRosterFile(
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-            roster = CHAOS_DWARF_TEAM,
+            roster = CHAOS_DWARF_TEAM_BB2025,
         ),
-        "elven-union-roster.jrr" to JervisRosterFile(
+        "elven-union-roster-bb2025.jrr" to JervisRosterFile(
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-            roster = ELVEN_UNION_TEAM,
+            roster = ELVEN_UNION_TEAM_BB2025,
         ),
-        "human-roster.jrr" to JervisRosterFile(
+        "human-roster-bb2025.jrr" to JervisRosterFile(
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-            roster = HUMAN_TEAM,
+            roster = HUMAN_TEAM_BB2025,
         ),
-        "khorne-roster.jrr" to JervisRosterFile(
+        "khorne-roster-bb2025.jrr" to JervisRosterFile(
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-            roster = KHORNE_TEAM,
+            roster = KHORNE_TEAM_BB2025,
         ),
-        "lizardmen-roster.jrr" to JervisRosterFile(
+        "lizardmen-roster-bb2025.jrr" to JervisRosterFile(
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-            roster = LIZARDMEN_TEAM,
+            roster = LIZARDMEN_TEAM_BB2025,
         ),
-        "orc-roster.jrr" to JervisRosterFile(
+        "orc-roster-bb2025.jrr" to JervisRosterFile(
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-            roster = ORC_TEAM,
+            roster = ORC_TEAM_BB2025,
         ),
-        "skaven-roster.jrr" to JervisRosterFile(
+        "skaven-roster-bb2025.jrr" to JervisRosterFile(
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
-            roster = SKAVEN_TEAM,
+            roster = SKAVEN_TEAM_BB2025,
         ),
     )
 }
