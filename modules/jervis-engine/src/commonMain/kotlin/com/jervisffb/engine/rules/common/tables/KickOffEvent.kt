@@ -12,6 +12,8 @@ import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.PitchInvasion
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.QuickSnap
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.TimeOut
+import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
+import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.DodgySnack
 import com.jervisffb.engine.rules.common.skills.Duration
 
 /**
@@ -22,19 +24,21 @@ enum class KickOffEvent(
     override val procedure: Procedure,
     override val duration: Duration
 ): TableResult {
-    GET_THE_REF("Get the Ref", GetTheRef, Duration.END_OF_GAME),
-    TIME_OUT("Time Out", TimeOut, Duration.END_OF_GAME),
-    TIME_OUT_BB7("Time Out", TimeOut, Duration.END_OF_GAME),
-    SOLID_DEFENSE("Solid Defense", SolidDefense, Duration.END_OF_GAME),
-    SOLID_DEFENSE_BB7("Solid Defense", TimeOut, Duration.END_OF_GAME),
-    HIGH_KICK("High Kick", HighKick, Duration.END_OF_GAME),
-    CHEERING_FANS("Cheering Fans", CheeringFans, Duration.END_OF_GAME),
-    BRILLIANT_COACHING("Brilliant Coaching", BrilliantCoaching, Duration.END_OF_GAME),
-    CHANGING_WEATHER("Changing Weather", ChangingWeather, Duration.END_OF_GAME),
-    QUICK_SNAP("Quick Snap", QuickSnap, Duration.END_OF_GAME),
-    QUICK_SNAP_BB7("Quick Snap", QuickSnap, Duration.END_OF_GAME),
-    BLITZ("Blitz", Blitz, Duration.END_OF_GAME),
-    BLITZ_BB7("Blitz", Blitz, Duration.END_OF_GAME),
-    OFFICIOUS_REF("Officious Ref", OfficiousRef, Duration.END_OF_GAME),
-    PITCH_INVASION("Pitch Invasion", PitchInvasion, Duration.END_OF_GAME),
+    BLITZ("Blitz", Blitz, Duration.IMMEDIATE),
+    BLITZ_BB7("Blitz", Blitz, Duration.IMMEDIATE),
+    BRILLIANT_COACHING("Brilliant Coaching", BrilliantCoaching, Duration.IMMEDIATE),
+    CHANGING_WEATHER("Changing Weather", ChangingWeather, Duration.IMMEDIATE),
+    CHARGE("Charge!", Charge, Duration.IMMEDIATE),
+    CHEERING_FANS("Cheering Fans", CheeringFans, Duration.IMMEDIATE),
+    DODGY_SNACK("Dodgy Snack", DodgySnack, Duration.IMMEDIATE),
+    GET_THE_REF("Get the Ref", GetTheRef, Duration.IMMEDIATE),
+    HIGH_KICK("High Kick", HighKick, Duration.IMMEDIATE),
+    OFFICIOUS_REF("Officious Ref", OfficiousRef, Duration.IMMEDIATE),
+    PITCH_INVASION("Pitch Invasion", PitchInvasion, Duration.IMMEDIATE),
+    QUICK_SNAP("Quick Snap", QuickSnap, Duration.IMMEDIATE),
+    QUICK_SNAP_BB7("Quick Snap", QuickSnap, Duration.IMMEDIATE),
+    SOLID_DEFENSE("Solid Defense", SolidDefense, Duration.IMMEDIATE),
+    SOLID_DEFENSE_BB7("Solid Defense", TimeOut, Duration.IMMEDIATE),
+    TIME_OUT("Time Out", TimeOut, Duration.IMMEDIATE),
+    TIME_OUT_BB7("Time Out", TimeOut, Duration.IMMEDIATE),
 }

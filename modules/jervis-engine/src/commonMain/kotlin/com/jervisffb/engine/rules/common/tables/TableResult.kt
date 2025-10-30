@@ -14,5 +14,9 @@ import com.jervisffb.engine.rules.common.skills.Duration
 interface TableResult {
     val description: String
     val procedure: Procedure
+    // What "duration" mean is defined by each sub-class of this interface.
+    // It is mostly here to make it possible to remove table results again in
+    // an uniform way. Table results that trigger an effect, but otherwise do
+    // nothing, should be given a duration of IMMEDIATE.
     val duration: Duration
 }

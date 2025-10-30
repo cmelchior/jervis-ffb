@@ -24,8 +24,8 @@ object BB2025StandardKickOffEventTable: KickOffTable {
             7 to KickOffEvent.BRILLIANT_COACHING,
             8 to KickOffEvent.CHANGING_WEATHER,
             9 to KickOffEvent.QUICK_SNAP,
-            10 to KickOffEvent.BLITZ,
-            11 to KickOffEvent.OFFICIOUS_REF,
+            10 to KickOffEvent.CHARGE,
+            11 to KickOffEvent.DODGY_SNACK,
             12 to KickOffEvent.PITCH_INVASION,
         )
 

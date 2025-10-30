@@ -130,7 +130,10 @@ class SidebarViewModel(
 
     fun banned(): Flow<List<UiSidebarPlayer>> = mapTo(PlayerState.BANNED, dogoutFlow)
 
-    fun special(): Flow<List<UiSidebarPlayer>> = mapTo(PlayerState.FAINTED, dogoutFlow)
+    fun special(): Flow<List<UiSidebarPlayer>> = mapTo(
+        listOf(PlayerState.FAINTED, PlayerState.DODGY_SNACK),
+        dogoutFlow
+    )
 
     fun hoverOver(player: Player) {
         hoverPlayerChannel.safeTryEmit(player)

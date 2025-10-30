@@ -20,6 +20,7 @@ enum class PlayerState {
     DEAD,
     FAINTED, // From Sweltering Heat
     BANNED, // From being sent off by the Ref
+    DODGY_SNACK, // Miss the drive from Dodgy Snack
 
     // Intermediate states. These states should only be used while the effect of
     // them is being resolved. I.e., rolling armor and injury dice.

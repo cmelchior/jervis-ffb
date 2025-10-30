@@ -182,7 +182,13 @@ rule book.
   - [ ] Blitz
     - [ ] Some skills are not available
     - [ ] Blitz ends when player Knocked Down or Falls Over, but not a TurnOver
+  - [ ] Charge
+    - [ ] All skills are available
+    - [ ] Rerolls are available
   - [x] Officious Ref
+  - [ ] Dodgy Snack
+    - [ ] On 2+, player stays on field with -1 AV, MA
+    - [ ] On 1, player is put in Reserves until end of drive
   - [x] Pitch Invasion
 - [x] What goes up, must come down
   - [x] Land on Field

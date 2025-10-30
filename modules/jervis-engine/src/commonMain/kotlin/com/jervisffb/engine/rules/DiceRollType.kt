@@ -20,6 +20,8 @@ enum class DiceRollType {
     CHEERING_FANS,
     FAN_FACTOR,
     DODGE,
+    DODGY_SNACK_ROLL_OFF,
+    DODGY_SNACK_EFFECT,
     DEVIATE,
     HYPNOTIC_GAZE,
     INJURY,

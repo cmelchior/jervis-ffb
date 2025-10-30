@@ -393,24 +393,26 @@ open class Rules(
 
     /**
      * Returns `true` if this player has a state that is considered an "Injury"
+     * This is mostly used for UI purposes.
      */
     fun isInjuried(player: Player): Boolean {
         return when (player.state) {
-            PlayerState.RESERVE,
-            PlayerState.FAINTED,
             PlayerState.BANNED,
+            PlayerState.DODGY_SNACK,
+            PlayerState.FAINTED,
             PlayerState.FALLEN_OVER,
             PlayerState.KNOCKED_DOWN,
-            PlayerState.STANDING,
             PlayerState.PRONE,
+            PlayerState.RESERVE,
+            PlayerState.STANDING,
             PlayerState.STUNNED,
             PlayerState.STUNNED_OWN_TURN -> false
-            PlayerState.KNOCKED_OUT,
             PlayerState.BADLY_HURT,
+            PlayerState.DEAD,
+            PlayerState.KNOCKED_OUT,
             PlayerState.LASTING_INJURY,
             PlayerState.SERIOUSLY_HURT,
-            PlayerState.SERIOUS_INJURY,
-            PlayerState.DEAD -> true
+            PlayerState.SERIOUS_INJURY -> true
         }
     }
 

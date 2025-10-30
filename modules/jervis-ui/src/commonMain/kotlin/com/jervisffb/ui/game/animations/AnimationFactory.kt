@@ -135,6 +135,7 @@ object AnimationFactory {
                 KickOffEvent.CHANGING_WEATHER -> null
                 KickOffEvent.BRILLIANT_COACHING -> Res.drawable.icons_animation_kickoff_kick_off_brilliant_coaching
                 KickOffEvent.QUICK_SNAP -> Res.drawable.icons_animation_kickoff_kick_off_quick_snap
+                KickOffEvent.CHARGE -> Res.drawable.icons_animation_kickoff_kick_off_blitz
                 KickOffEvent.BLITZ -> Res.drawable.icons_animation_kickoff_kick_off_blitz
                 KickOffEvent.OFFICIOUS_REF -> Res.drawable.icons_animation_kickoff_kick_off_officious_ref
                 KickOffEvent.PITCH_INVASION -> Res.drawable.icons_animation_kickoff_kick_off_pitch_invasion
