@@ -38,5 +38,9 @@ object BB2025StandaloneRosters {
             metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
             roster = SKAVEN_TEAM_BB2025,
         ),
+        "dwarf-roster-bb2025.jrr" to JervisRosterFile(
+            metadata = JervisMetaData(fileFormat = FILE_FORMAT_VERSION),
+            roster = DWARF_TEAM_BB2025,
+        )
     )
 }

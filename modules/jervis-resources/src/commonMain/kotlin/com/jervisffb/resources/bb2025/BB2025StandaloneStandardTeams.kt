@@ -108,6 +108,30 @@ object BB2025StandaloneStandardTeams {
             }
             history = null
         },
+
+        "dwarf-starter-team-bb2025.jrt" to buildTeamFile {
+            metadata = JervisMetaData(FILE_FORMAT_VERSION)
+            roster = DWARF_TEAM_BB2025
+            team = teamBuilder(rules, DWARF_TEAM_BB2025) {
+                name = "Dwarf Starter Team #1"
+                addPlayer(PlayerId("Dw1"), "Lineman-1", PlayerNo(1), DWARF_LINEMAN)
+                addPlayer(PlayerId("Dw2"), "Lineman-2", PlayerNo(2), DWARF_LINEMAN)
+                addPlayer(PlayerId("Dw3"), "Lineman-3", PlayerNo(3), DWARF_LINEMAN)
+                addPlayer(PlayerId("Dw4"), "Lineman-4", PlayerNo(4), DWARF_LINEMAN)
+                addPlayer(PlayerId("Dw5"), "Lineman-5", PlayerNo(5), DWARF_LINEMAN)
+                addPlayer(PlayerId("Dw6"), "Lineman-6", PlayerNo(6), DWARF_LINEMAN)
+                addPlayer(PlayerId("Dw7"), "Lineman-7", PlayerNo(7), DWARF_LINEMAN)
+                addPlayer(PlayerId("Dw8"), "Blitzer-1", PlayerNo(8), DWARF_BLITZER)
+                addPlayer(PlayerId("Dw9"), "Blitzer-2", PlayerNo(9), DWARF_BLITZER)
+                addPlayer(PlayerId("Dw10"), "Runner-1", PlayerNo(10), DWARF_RUNNER)
+                addPlayer(PlayerId("Dw11"), "TrollSlayer-1", PlayerNo(11), TROLL_SLAYER)
+                rerolls = 2
+                apothecaries = 0
+                dedicatedFans = 2
+                teamValue = 1_000_000
+            }
+            history = null
+        },
     )
 
 }
