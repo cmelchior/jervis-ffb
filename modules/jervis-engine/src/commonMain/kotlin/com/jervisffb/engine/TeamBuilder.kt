@@ -99,7 +99,7 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
                 // otherwise, just reuse the same one.
                 if (sprite.variants != null) {
                     val index = usedSprites.getOrPut(type.id) { 0 }
-                    usedSprites[type.id] = index + 1 % sprite.variants
+                    usedSprites[type.id] = (index + 1) % sprite.variants
                     sprite.copy(
                         selectedIndex = index
                     )
