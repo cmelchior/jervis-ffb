@@ -23,8 +23,7 @@ enum class LastingInjuryResult(
     DISLOCATED_HIP("Dislocated Hip (+1 AG)", 1, StatModifier.Type.AG),
     BROKEN_SHOULDER("Broken Shoulder (-1 ST)", -1, StatModifier.Type.ST),
 
-    // BB2020
+    // BB2020 uses slightly different naming for the last two injuries.
     NECK_INJURY("Neck Injury (+1 AG)", 1, StatModifier.Type.AG),
     DISLOCATED_SHOULDER("Dislocated Shoulder (-1 ST)", -1, StatModifier.Type.ST),
-
 }
