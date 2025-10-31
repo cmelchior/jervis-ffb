@@ -38,6 +38,7 @@ import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
 import com.jervisffb.engine.serialize.GameFileData
@@ -46,10 +47,12 @@ import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_frontpage_goblin
 import com.jervisffb.ui.CacheManager
-import com.jervisffb.ui.createDefaultAwayTeam
+import com.jervisffb.ui.createDefaultBB2020AwayTeam
+import com.jervisffb.ui.createDefaultBB2020HomeTeam
+import com.jervisffb.ui.createDefaultBB2025AwayTeam
+import com.jervisffb.ui.createDefaultBB2025HomeTeam
 import com.jervisffb.ui.createDefaultBB7AwayTeam
 import com.jervisffb.ui.createDefaultBB7HomeTeam
-import com.jervisffb.ui.createDefaultHomeTeam
 import com.jervisffb.ui.game.state.LocalActionProvider
 import com.jervisffb.ui.game.state.ManualActionProvider
 import com.jervisffb.ui.game.state.RandomActionProvider
@@ -115,12 +118,11 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
     private fun createDevHotseatScreenModel(
         menuViewModel: MenuViewModel,
         randomActions: Boolean = false,
-        rulesVersion: Int = 2020,
+        rulesVersion: GameVersion = GameVersion.BB2020,
     ): GameScreenModel {
         val baseRules = when (rulesVersion) {
-            2020 -> StandardBB2020Rules()
-            2025 -> StandardBB2025Rules()
-            else -> throw IllegalArgumentException("Invalid rules version: $rulesVersion")
+            GameVersion.BB2020 -> StandardBB2020Rules()
+            GameVersion.BB2025 -> StandardBB2025Rules()
         }
         val rules = baseRules.toBuilder().run {
             timers.timersEnabled = false
@@ -128,8 +130,14 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
             undoActionBehavior = UndoActionBehavior.ALLOWED
             build()
         }
-        val homeTeam = createDefaultHomeTeam(rules)
-        val awayTeam = createDefaultAwayTeam(rules)
+        val homeTeam = when (rulesVersion) {
+            GameVersion.BB2020 -> createDefaultBB2020HomeTeam(rules)
+            GameVersion.BB2025 -> createDefaultBB2025HomeTeam(rules)
+        }
+        val awayTeam = when (rulesVersion) {
+            GameVersion.BB2020 -> createDefaultBB2020AwayTeam(rules)
+            GameVersion.BB2025 -> createDefaultBB2025AwayTeam(rules)
+        }
         val game = Game(rules, homeTeam, awayTeam, Field.Companion.createForRuleset(rules))
         val gameController = GameEngineController(game)
         val gameSettings = GameSettings(gameRules = rules, isHotseatGame = true)
@@ -294,7 +302,7 @@ class DevScreenViewModel(private val menuViewModel: MenuViewModel) : ScreenModel
     }
 
     // Starts a Dev Hotseat game with pre-determined teams, no timer and client rolls enabled
-    fun startManualGame(navigator: Navigator, rulesVersion: Int) {
+    fun startManualGame(navigator: Navigator, rulesVersion: GameVersion) {
         menuViewModel.navigatorContext.launch {
             val viewModel = createDevHotseatScreenModel(menuViewModel, rulesVersion = rulesVersion)
             navigator.push(GameScreen(menuViewModel, viewModel))
@@ -372,8 +380,8 @@ class DevScreen(private val menuViewModel: MenuViewModel, viewModel: DevScreenVi
         val replayFiles by viewModel.availableReplayFiles.collectAsState(emptyList())
         val staticButtons = remember {
             listOf(
-                "Start Standard game with manual actions (2025)" to { viewModel.startManualGame(navigator, rulesVersion = 2025) },
-                "Start Standard game with manual actions (2020)" to { viewModel.startManualGame(navigator, rulesVersion = 2020) },
+                "Start Standard game with manual actions (2025)" to { viewModel.startManualGame(navigator, rulesVersion = GameVersion.BB2025) },
+                "Start Standard game with manual actions (2020)" to { viewModel.startManualGame(navigator, rulesVersion = GameVersion.BB2020) },
                 "Start Standard game with all random actions (2020)" to { viewModel.startRandomGame(navigator) },
                 "Start BB7 game with all manual actions (2020)" to { viewModel.startManualBB7Game(navigator) },
                 "Load save file" to { viewModel.loadSaveFile(navigator) }

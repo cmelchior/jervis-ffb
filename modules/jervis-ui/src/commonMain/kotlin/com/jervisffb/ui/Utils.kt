@@ -49,6 +49,8 @@ import com.jervisffb.resources.bb2020.ORC_TEAM_BB2020
 import com.jervisffb.resources.bb2020.ORC_THROWER
 import com.jervisffb.resources.bb2020.SAURUS_BLOCKERS
 import com.jervisffb.resources.bb2020.SKINK_RUNNER_LINEMEN
+import com.jervisffb.resources.bb2025.HUMAN_TEAM_BB2025
+import com.jervisffb.resources.bb2025.LIZARDMEN_TEAM_BB2025
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.skia.FilterBlurMode
 import org.jetbrains.skia.Image
@@ -141,7 +143,7 @@ fun Modifier.dropShadow(
     }
 )
 
-fun createDefaultHomeTeam(rules: Rules): Team {
+fun createDefaultBB2020HomeTeam(rules: Rules): Team {
     return teamBuilder(rules, HUMAN_TEAM_BB2020) {
         coach = Coach(CoachId("home-coach"), "HomeCoach")
         name = "HomeTeam"
@@ -164,7 +166,30 @@ fun createDefaultHomeTeam(rules: Rules): Team {
     }
 }
 
-fun createDefaultAwayTeam(rules: Rules): Team {
+fun createDefaultBB2025HomeTeam(rules: Rules): Team {
+    return teamBuilder(rules, HUMAN_TEAM_BB2025) {
+        coach = Coach(CoachId("home-coach"), "HomeCoach")
+        name = "HomeTeam"
+        addPlayer(PlayerId("H1"), "Lineman-1-H", PlayerNo(1), com.jervisffb.resources.bb2025.OGRE)
+        addPlayer(PlayerId("H2"), "Lineman-2-H", PlayerNo(2), com.jervisffb.resources.bb2025.HALFLING_HOPEFUL)
+        addPlayer(PlayerId("H3"), "Lineman-3-H", PlayerNo(3), com.jervisffb.resources.bb2025.HUMAN_LINEMAN)
+        addPlayer(PlayerId("H4"), "Lineman-4-H", PlayerNo(4), com.jervisffb.resources.bb2025.HUMAN_LINEMAN)
+        addPlayer(PlayerId("H5"), "Thrower-5-H", PlayerNo(5), com.jervisffb.resources.bb2025.HUMAN_THROWER, listOf(LEADER.id()))
+        addPlayer(PlayerId("H6"), "Catcher-6-H", PlayerNo(6), com.jervisffb.resources.bb2025.HUMAN_CATCHER, listOf(SIDESTEP.id()))
+        addPlayer(PlayerId("H7"), "Catcher-7-H", PlayerNo(7), com.jervisffb.resources.bb2025.HUMAN_CATCHER)
+        addPlayer(PlayerId("H8"), "Blitzer-8-H", PlayerNo(8), com.jervisffb.resources.bb2025.HUMAN_BLITZER)
+        addPlayer(PlayerId("H9"), "Blitzer-9-H", PlayerNo(9), com.jervisffb.resources.bb2025.HUMAN_BLITZER)
+        addPlayer(PlayerId("H10"), "Blitzer-10-H", PlayerNo(10), com.jervisffb.resources.bb2025.HUMAN_BLITZER)
+        addPlayer(PlayerId("H11"), "Blitzer-11-H", PlayerNo(11), com.jervisffb.resources.bb2025.HUMAN_BLITZER)
+        addPlayer(PlayerId("H12"), "Lineman-12-H", PlayerNo(12), com.jervisffb.resources.bb2025.HUMAN_LINEMAN)
+        rerolls = 4
+        apothecaries = 1
+        dedicatedFans = 1
+        teamValue = 1_000_000
+    }
+}
+
+fun createDefaultBB2020AwayTeam(rules: Rules): Team {
     return teamBuilder(rules, LIZARDMEN_TEAM_BB2020) {
         coach = Coach(CoachId("away-coach"), "AwayCoach")
         name = "AwayTeam"
@@ -179,6 +204,27 @@ fun createDefaultAwayTeam(rules: Rules): Team {
         addPlayer(PlayerId("A9"), "Skink-9-A", PlayerNo(9), SKINK_RUNNER_LINEMEN, listOf(LEADER.id()))
         addPlayer(PlayerId("A10"), "Skink-10-A", PlayerNo(10), SKINK_RUNNER_LINEMEN)
         addPlayer(PlayerId("A11"), "Skink-11-A", PlayerNo(11), SKINK_RUNNER_LINEMEN)
+        rerolls = 4
+        apothecaries = 1
+        teamValue = 1_000_000
+    }
+}
+
+fun createDefaultBB2025AwayTeam(rules: Rules): Team {
+    return teamBuilder(rules, LIZARDMEN_TEAM_BB2025) {
+        coach = Coach(CoachId("away-coach"), "AwayCoach")
+        name = "AwayTeam"
+        addPlayer(PlayerId("A1"), "Kroxigor-1-A", PlayerNo(1), com.jervisffb.resources.bb2025.KROXIGOR)
+        addPlayer(PlayerId("A2"), "Saurus-2-A", PlayerNo(2), com.jervisffb.resources.bb2025.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A3"), "Saurus-3-A", PlayerNo(3), com.jervisffb.resources.bb2025.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A4"), "Saurus-4-A", PlayerNo(4), com.jervisffb.resources.bb2025.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A5"), "Saurus-5-A", PlayerNo(5), com.jervisffb.resources.bb2025.SAURUS_BLOCKERS)
+        addPlayer(PlayerId("A6"), "Saurus-6-A", PlayerNo(6), com.jervisffb.resources.bb2025.SAURUS_BLOCKERS, listOf(FRENZY.id()))
+        addPlayer(PlayerId("A7"), "Saurus-7-A", PlayerNo(7), com.jervisffb.resources.bb2025.SAURUS_BLOCKERS, listOf(FRENZY.id()))
+        addPlayer(PlayerId("A8"), "ChameleonSkink-8-A", PlayerNo(8), com.jervisffb.resources.bb2025.CHAMELEON_SKINKS)
+        addPlayer(PlayerId("A9"), "Skink-9-A", PlayerNo(9), com.jervisffb.resources.bb2025.SKINK_RUNNER_LINEMEN, listOf(LEADER.id()))
+        addPlayer(PlayerId("A10"), "Skink-10-A", PlayerNo(10), com.jervisffb.resources.bb2025.SKINK_RUNNER_LINEMEN)
+        addPlayer(PlayerId("A11"), "Skink-11-A", PlayerNo(11), com.jervisffb.resources.bb2025.SKINK_RUNNER_LINEMEN)
         rerolls = 4
         apothecaries = 1
         teamValue = 1_000_000

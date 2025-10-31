@@ -36,6 +36,7 @@ import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.bb2025.skills.Timmmber
 import com.jervisffb.engine.rules.bb2025.skills.Titchy
 import com.jervisffb.engine.rules.bb2025.skills.UnchannelledFury
+import com.jervisffb.engine.rules.bb2025.skills.Unsteady
 import com.jervisffb.engine.rules.bb2025.skills.Wrestle
 import com.jervisffb.engine.rules.bb2025.specialrules.SneakiestOfTheLot
 import com.jervisffb.engine.rules.common.skills.SkillCategory
@@ -619,7 +620,9 @@ class BB2025SkillSettings: SkillSettings() {
                     }
                 }
                 SkillType.UNSTEADY -> {
-                    // TODO()
+                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category, expiresAt ->
+                        Unsteady(player, category, expiresAt)
+                    }
                 }
 
                 //

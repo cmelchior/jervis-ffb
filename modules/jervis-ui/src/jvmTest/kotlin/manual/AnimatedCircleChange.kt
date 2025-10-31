@@ -18,8 +18,8 @@ import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.ui.createDefaultAwayTeam
-import com.jervisffb.ui.createDefaultHomeTeam
+import com.jervisffb.ui.createDefaultBB2020AwayTeam
+import com.jervisffb.ui.createDefaultBB2020HomeTeam
 import com.jervisffb.ui.game.dialogs.circle.ActionWheelViewModel
 import com.jervisffb.ui.game.dialogs.circle.DiceMenuItem
 import com.jervisffb.ui.game.dialogs.circle.MenuExpandMode
@@ -37,8 +37,8 @@ class AnimateTest() {
         val rules = StandardBB2020Rules()
         val game = Game(
             rules,
-            createDefaultHomeTeam(rules),
-            createDefaultAwayTeam(rules),
+            createDefaultBB2020HomeTeam(rules),
+            createDefaultBB2020AwayTeam(rules),
             Field.createForRuleset(rules),
         )
         val actionWheel = createActionWheel(game.homeTeam)

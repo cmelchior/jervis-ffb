@@ -1,12 +1,17 @@
 package com.jervisffb.resources.bb2025
 
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
 import com.jervisffb.engine.rules.common.roster.RegionalSpecialRule
 import com.jervisffb.engine.rules.common.roster.Roster
 import com.jervisffb.engine.rules.common.roster.RosterPosition
-import com.jervisffb.engine.rules.common.skills.SkillCategory
+import com.jervisffb.engine.rules.common.skills.SkillCategory.AGILITY
+import com.jervisffb.engine.rules.common.skills.SkillCategory.DEVIOUS
+import com.jervisffb.engine.rules.common.skills.SkillCategory.GENERAL
+import com.jervisffb.engine.rules.common.skills.SkillCategory.PASSING
+import com.jervisffb.engine.rules.common.skills.SkillCategory.STRENGTH
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SkillType.BONE_HEAD
 import com.jervisffb.engine.rules.common.skills.SkillType.DODGE
@@ -25,16 +30,16 @@ import kotlinx.serialization.Serializable
 val SKINK_RUNNER_LINEMEN =
     RosterPosition(
         PositionId("lizardmen-skink-runner-lineman"),
-        12,
+        16,
         "Skink Runner Linemen",
         "Skink Runner Lineman",
         "Sk",
         60_000,
         8, 2, 3, 4, 8,
         listOf(DODGE.id(), STUNTY.id()),
-        listOf(SkillCategory.AGILITY),
-        listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
-        emptyList(),
+        listOf(AGILITY),
+        listOf(GENERAL, DEVIOUS, PASSING, STRENGTH),
+        listOf(PlayerKeyword.LIZARDMAN, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_skinkrunner.png",6),
         SingleSprite.ini("$portraitRootPath/lizardmen_skinkrunner.png")
@@ -48,10 +53,10 @@ val CHAMELEON_SKINKS =
         "Cs",
         70_000,
         7, 2, 3, 3, 8,
-        listOf(DODGE.id(), /* On the Ball, Shadowing */ SkillType.STUNTY.id()),
-        listOf(SkillCategory.AGILITY),
-        listOf(SkillCategory.GENERAL, SkillCategory.PASSING, SkillCategory.STRENGTH),
-        emptyList(),
+        listOf(DODGE.id(), SkillType.ON_THE_BALL.id(), SkillType.SHADOWING.id(), STUNTY.id()),
+        listOf(AGILITY, PASSING),
+        listOf(GENERAL, DEVIOUS, STRENGTH),
+        listOf(PlayerKeyword.LIZARDMAN, PlayerKeyword.THROWER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_chameleonskink.png",2),
         SingleSprite.ini("$portraitRootPath/lizardmen_chameleonskink.png")
@@ -63,12 +68,12 @@ val SAURUS_BLOCKERS =
         "Saurus Blockers",
         "Saurus Blocker",
         "S",
-        85_000,
+        90_000,
         6, 4, 5, 6, 10,
-        emptyList(),
-        listOf(SkillCategory.GENERAL, SkillCategory.STRENGTH),
-        listOf(SkillCategory.AGILITY),
-        emptyList(),
+        listOf(SkillType.JUGGERNAUT.id(), SkillType.UNSTEADY.id()),
+        listOf(GENERAL, STRENGTH),
+        listOf(AGILITY),
+        listOf(PlayerKeyword.LIZARDMAN, PlayerKeyword.BLOCKER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("$iconRootPath/lizardmen_saurusblocker.png",6),
         SingleSprite.ini("$portraitRootPath/lizardmen_saurusblocker.png")
@@ -81,17 +86,17 @@ val KROXIGOR =
         "Kroxigor",
         "K",
         140_000,
-        6, 5, 5, null, 10,
+        6, 5, 5, 6, 10,
         listOf(
             BONE_HEAD.id(),
             LONER.id(4),
-            MIGHTY_BLOW.id(1),
+            MIGHTY_BLOW.id(),
+            PREHENSILE_TAIL.id(),
             THICK_SKULL.id(),
-            PREHENSILE_TAIL.id()
         ),
-        listOf(SkillCategory.STRENGTH),
-        listOf(SkillCategory.AGILITY, SkillCategory.GENERAL),
-        emptyList(),
+        listOf(STRENGTH),
+        listOf(AGILITY, GENERAL),
+        listOf(PlayerKeyword.LIZARDMAN, PlayerKeyword.BIG_GUY),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("$iconRootPath/lizardmen_kroxigor.png",1),
         SingleSprite.ini("$portraitRootPath/lizardmen_kroxigor.png")

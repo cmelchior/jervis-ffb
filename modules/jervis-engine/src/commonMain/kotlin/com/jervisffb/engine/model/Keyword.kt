@@ -43,5 +43,6 @@ enum class PlayerKeyword(override val description: String) : Keyword {
 enum class SkillKeyword(override val description: String) : Keyword {
     ACTIVE("Active"),
     PASSIVE("Passive"),
+    ELITE("Elite"),
 }
 

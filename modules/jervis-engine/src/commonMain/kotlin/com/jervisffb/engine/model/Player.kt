@@ -172,7 +172,9 @@ class Player(
     }.toMutableList()
     val skills: List<Skill<*>>
         get() = extraSkills + positionSkills // TODO This probably result in _a lot_ of copying. Find a way to optimize this
-
+    // Unclear if keywords are all backed in from the start or they can change. For now, assume just keep them locked to the position
+    val keywords: List<PlayerKeyword>
+        get() = position.keywords
     var nigglingInjuries: Int = 0
     var missNextGame: Boolean = false
     var starPlayerPoints: Int = 0
@@ -265,7 +267,8 @@ fun Player.isSkillAvailable(type: SkillType): Boolean {
             return@let false
         }
         // TODO Is a Stunned player considered Prone or are they completely separate?
-        if ((state == PlayerState.PRONE || state == PlayerState.STUNNED || state == PlayerState.STUNNED_OWN_TURN) && !skill.workWhenProne) {
+        val isProne = (state == PlayerState.PRONE || state == PlayerState.STUNNED || state == PlayerState.STUNNED_OWN_TURN)
+        if (isProne && !skill.workWhenProne) {
             return@let false
         }
         return !skill.used

@@ -13,10 +13,12 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.IntRangeSerializer
 import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.SkillId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.hasSkill
+import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.FieldCoordinate.Companion.OUT_OF_BOUNDS
 import com.jervisffb.engine.model.locations.Location
@@ -701,7 +703,9 @@ open class Rules(
                 // Even though Secure The Ball is only in the 2025 ruleset, we have the check here
                 // since it makes maintaining the logic easier. The action is disabled by setting the
                 // count to 0 in the TeamActions setup.
-                if (it.secureTheBallActions > 0) {
+                val hasUnsteady = player.isSkillAvailable(SkillType.UNSTEADY)
+                val isBigGuy = player.keywords.contains(PlayerKeyword.BIG_GUY)
+                if (it.secureTheBallActions > 0 && !hasUnsteady && !isBigGuy) {
                     // Securing the Ball is only available if no standing players wit TZ's are within 2 of the ball.
                     // In case of multiple balls, only one ball has to satisfy the criteria for he action to be available.
                     // The ball has to be on the floor at the start of the activation.

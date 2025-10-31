@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asSkiaBitmap
@@ -28,8 +27,8 @@ import androidx.compose.ui.window.singleWindowApplication
 import com.jervisffb.engine.model.Field
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.ui.createDefaultAwayTeam
-import com.jervisffb.ui.createDefaultHomeTeam
+import com.jervisffb.ui.createDefaultBB2020AwayTeam
+import com.jervisffb.ui.createDefaultBB2020HomeTeam
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.utils.scalePixels
@@ -56,8 +55,8 @@ private fun main() = singleWindowApplication {
     val rules = StandardBB2020Rules()
     val game = Game(
         rules,
-        createDefaultHomeTeam(rules),
-        createDefaultAwayTeam(rules),
+        createDefaultBB2020HomeTeam(rules),
+        createDefaultBB2020AwayTeam(rules),
         Field.createForRuleset(rules),
     )
     runBlocking {
