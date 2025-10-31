@@ -16,9 +16,15 @@ enum class LastingInjuryResult(
     override val type: StatModifier.Type,
     override val expiresAt: Duration = Duration.PERMANENT
 ): StatModifier {
+    // BB2025
     HEAD_INJURY("Head Injury (-1 AV)", -1, StatModifier.Type.AV),
     SMASHED_KNEE("Smashed Knee (-1 MA)", -1, StatModifier.Type.MA),
     BROKEN_ARM("Broken Arm (+1 PA)",1, StatModifier.Type.PA),
+    DISLOCATED_HIP("Dislocated Hip (+1 AG)", 1, StatModifier.Type.AG),
+    BROKEN_SHOULDER("Broken Shoulder (-1 ST)", -1, StatModifier.Type.ST),
+
+    // BB2020
     NECK_INJURY("Neck Injury (+1 AG)", 1, StatModifier.Type.AG),
     DISLOCATED_SHOULDER("Dislocated Shoulder (-1 ST)", -1, StatModifier.Type.ST),
+
 }

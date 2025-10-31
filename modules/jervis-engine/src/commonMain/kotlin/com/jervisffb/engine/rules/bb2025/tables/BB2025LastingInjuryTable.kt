@@ -19,8 +19,8 @@ object BB2025LastingInjuryTable: LastingInjuryTable {
             2 to LastingInjuryResult.HEAD_INJURY,
             3 to LastingInjuryResult.SMASHED_KNEE,
             4 to LastingInjuryResult.BROKEN_ARM,
-            5 to LastingInjuryResult.NECK_INJURY,
-            6 to LastingInjuryResult.DISLOCATED_SHOULDER,
+            5 to LastingInjuryResult.DISLOCATED_HIP,
+            6 to LastingInjuryResult.BROKEN_SHOULDER,
         )
 
     /**
