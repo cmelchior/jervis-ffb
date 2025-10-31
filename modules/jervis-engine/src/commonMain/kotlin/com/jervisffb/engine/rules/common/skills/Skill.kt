@@ -25,7 +25,7 @@ interface Skill<T> {
     val category: SkillCategory
     // Human readable name of this skill
     val name: String
-    // Whether this skill is compulsory to use
+    // Whether this skill is required to be used
     val compulsory: Boolean
     // Whether this skill count as being "used". The meaning of this is interpreted in the context it is used.
     // If the skill is always available, this should always be false.

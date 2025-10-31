@@ -10,6 +10,7 @@ import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
 import com.jervisffb.engine.rules.bb2025.skills.Frenzy
+import com.jervisffb.engine.rules.bb2025.skills.Hatred
 import com.jervisffb.engine.rules.bb2025.skills.Horns
 import com.jervisffb.engine.rules.bb2025.skills.Leader
 import com.jervisffb.engine.rules.bb2025.skills.Leap
@@ -498,8 +499,8 @@ class BB2025SkillSettings: SkillSettings() {
                     // TODO()
                 }
                 SkillType.HATRED -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
-                        TODO()
+                    addKeywordEntry(type, SkillCategory.TRAITS) { player, category, value,expiresAt ->
+                        Hatred(player, category, value, expiresAt)
                     }
                 }
                 SkillType.HIT_AND_RUN -> {
