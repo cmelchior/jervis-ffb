@@ -25,7 +25,8 @@ interface Skill<T> {
     val category: SkillCategory
     // Human readable name of this skill
     val name: String
-    // Whether this skill is required to be used
+    // Whether this skill is required to be used.
+    // In the rulebook, this means skilled marked with *.
     val compulsory: Boolean
     // Whether this skill count as being "used". The meaning of this is interpreted in the context it is used.
     // If the skill is always available, this should always be false.
@@ -34,8 +35,10 @@ interface Skill<T> {
     // When the `used` state reset back to `false`?
     val resetAt: Duration
     // Whether this skill works when the player has lost its tackle zones
+    // If `true`, in BB2025 this is equal to the skill having the `Passive` keyword.
     val workWithoutTackleZones: Boolean
     // Whether this skill works when the player is prone or stunned
+    // If `true`, in BB2025 this is equal to the skill having the `Passive` keyword.
     val workWhenProne: Boolean
     // If the skill is temporary, this defines when the skill expires and is removed
     val expiresAt: Duration

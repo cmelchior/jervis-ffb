@@ -169,7 +169,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Throw Team-mate
 - [ ] Timmm-ber!
 - [ ] Unchannelled Fury*
-- [ ] Unsteady
+- [x] Unsteady
+  - [x] Prevent selecting Secure the Ball if standing
+  - [x] Prevent selecting Throw Team-mate prone
 
 # Star Player Skills
 

@@ -14,7 +14,7 @@ import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.BreakTackleModifier
-import com.jervisffb.engine.rules.bb2020.skills.BreakTackle
+import com.jervisffb.engine.rules.bb2025.skills.BreakTackle
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
 import com.jervisffb.engine.rules.common.skills.SkillType
