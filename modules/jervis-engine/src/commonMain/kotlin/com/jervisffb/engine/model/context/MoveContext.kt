@@ -5,7 +5,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.MoveAction
+import com.jervisffb.engine.rules.common.procedures.actions.move.MoveAction
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**

@@ -25,8 +25,8 @@ import com.jervisffb.engine.reports.ReportAvailableActions
 import com.jervisffb.engine.reports.ReportHandleAction
 import com.jervisffb.engine.reports.SimpleLogEntry
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
+import com.jervisffb.engine.rules.common.procedures.FullGame
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.InvalidActionException

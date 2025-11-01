@@ -1,19 +1,19 @@
 package com.jervisffb.engine.rules.common.tables
 
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.Blitz
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.BrilliantCoaching
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.ChangingWeather
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.CheeringFans
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.GetTheRef
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.HighKick
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.OfficiousRef
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.PitchInvasion
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.QuickSnap
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.SolidDefense
-import com.jervisffb.engine.rules.bb2020.procedures.tables.kickoff.TimeOut
 import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.Charge
 import com.jervisffb.engine.rules.bb2025.procedures.tables.kickoff.DodgySnack
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.Blitz
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.BrilliantCoaching
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.ChangingWeather
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.CheeringFans
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.GetTheRef
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.HighKick
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.OfficiousRef
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.PitchInvasion
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.QuickSnap
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
+import com.jervisffb.engine.rules.common.procedures.tables.kickoff.TimeOut
 import com.jervisffb.engine.rules.common.skills.Duration
 
 /**

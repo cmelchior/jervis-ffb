@@ -9,7 +9,7 @@ import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 
 /**

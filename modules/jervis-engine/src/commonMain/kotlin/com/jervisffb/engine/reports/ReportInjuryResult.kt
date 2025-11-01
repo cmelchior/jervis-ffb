@@ -1,7 +1,7 @@
 package com.jervisffb.engine.reports
 
-import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryMode
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryMode
 import com.jervisffb.engine.rules.common.tables.CasualtyResult
 import com.jervisffb.engine.rules.common.tables.InjuryResult
 

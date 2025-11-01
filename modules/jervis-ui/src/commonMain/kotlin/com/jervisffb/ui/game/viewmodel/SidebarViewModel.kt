@@ -6,7 +6,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.isOnAwayTeam
 import com.jervisffb.engine.model.locations.DogOut
-import com.jervisffb.engine.rules.bb2020.procedures.StartOfDriveSequence
+import com.jervisffb.engine.rules.common.procedures.StartOfDriveSequence
 import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.UiGameSnapshot

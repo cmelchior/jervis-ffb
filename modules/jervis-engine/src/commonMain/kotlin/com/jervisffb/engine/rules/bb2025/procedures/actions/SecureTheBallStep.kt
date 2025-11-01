@@ -20,7 +20,7 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportSecuredTheBallResult
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.Bounce
+import com.jervisffb.engine.rules.common.procedures.Bounce
 
 /**
  * Procedure for when a player moved into the ball, and must now attempt to

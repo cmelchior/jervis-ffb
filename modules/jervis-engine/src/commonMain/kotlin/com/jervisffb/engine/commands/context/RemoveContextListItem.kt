@@ -11,7 +11,7 @@ import com.jervisffb.engine.model.Game
  * This command can remove items from those lists, so we do not have to copy the
  * entire list to modify it.
  *
- * @see com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
+ * @see com.jervisffb.engine.rules.common.procedures.actions.block.PushContext
  * @see com.jervisffb.engine.model.context.DodgeRollContext
  */
 class RemoveContextListItem<T>(private val list: MutableList<T>, private val item: T): Command {

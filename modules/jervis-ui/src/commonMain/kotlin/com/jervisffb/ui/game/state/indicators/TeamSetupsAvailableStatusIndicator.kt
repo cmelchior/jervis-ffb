@@ -5,7 +5,7 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.CoachType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.bb2020.procedures.StartOfDriveSequence
+import com.jervisffb.engine.rules.common.procedures.StartOfDriveSequence
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.ReplayActionProvider
 import com.jervisffb.ui.game.viewmodel.ButtonData

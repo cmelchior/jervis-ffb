@@ -1,6 +1,6 @@
 package com.jervisffb.engine.reports
 
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.StandingUpRollContext
+import com.jervisffb.engine.rules.common.procedures.actions.move.StandingUpRollContext
 
 class ReportStandingUp(val context: StandingUpRollContext) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

@@ -1,6 +1,6 @@
 package com.jervisffb.engine.reports
 
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BothDownContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.BothDownContext
 
 class ReportBothDownResult(val context: BothDownContext) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

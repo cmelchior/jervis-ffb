@@ -3,7 +3,7 @@ package com.jervisffb.engine.model.inducements.specialplays
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.inducements.DirtyTrick
 import com.jervisffb.engine.model.inducements.Timing
-import com.jervisffb.engine.rules.bb2020.procedures.inducements.dirtytricks.SpotTheSneakProcedure
+import com.jervisffb.engine.rules.common.procedures.inducements.dirtytricks.SpotTheSneakProcedure
 import com.jervisffb.engine.rules.common.skills.Duration
 
 // Dirty Trick: Spot the Sneak - See Special Plays Card Pack

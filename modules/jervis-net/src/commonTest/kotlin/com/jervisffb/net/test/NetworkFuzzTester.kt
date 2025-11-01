@@ -17,11 +17,11 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
-import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
+import com.jervisffb.engine.rules.common.procedures.SetupTeam
+import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
 import com.jervisffb.engine.serialize.SerializedTeam
 import com.jervisffb.engine.utils.containsActionWithRandomBehavior
 import com.jervisffb.engine.utils.createRandomAction

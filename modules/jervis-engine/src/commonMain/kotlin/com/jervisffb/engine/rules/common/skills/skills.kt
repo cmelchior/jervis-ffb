@@ -5,9 +5,9 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.TeamId
 import com.jervisffb.engine.rules.DiceRollType
-import com.jervisffb.engine.rules.bb2020.procedures.UseStandardSkillReroll
-import com.jervisffb.engine.rules.bb2020.procedures.UseTeamReroll
 import com.jervisffb.engine.rules.common.procedures.DieRoll
+import com.jervisffb.engine.rules.common.procedures.UseStandardSkillReroll
+import com.jervisffb.engine.rules.common.procedures.UseTeamReroll
 import kotlinx.serialization.Serializable
 
 sealed interface TeamReroll : RerollSource {

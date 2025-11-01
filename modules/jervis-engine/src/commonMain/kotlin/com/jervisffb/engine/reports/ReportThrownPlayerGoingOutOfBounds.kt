@@ -1,6 +1,6 @@
 package com.jervisffb.engine.reports
 
-import com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate.ThrowTeamMateContext
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 
 class ReportThrownPlayerGoingOutOfBounds(val context: ThrowTeamMateContext, val scatter: Boolean) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

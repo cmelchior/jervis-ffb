@@ -3,8 +3,8 @@ package com.jervisffb.engine.model.inducements.wizards
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.inducements.Spell
 import com.jervisffb.engine.model.inducements.Timing
-import com.jervisffb.engine.rules.bb2020.procedures.inducements.spells.FireBallProcedure
-import com.jervisffb.engine.rules.bb2020.procedures.inducements.spells.ZapProcedure
+import com.jervisffb.engine.rules.common.procedures.inducements.spells.FireBallProcedure
+import com.jervisffb.engine.rules.common.procedures.inducements.spells.ZapProcedure
 import kotlinx.serialization.Serializable
 
 // Fireball spell - See page 94 in the rulebook

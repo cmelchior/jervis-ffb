@@ -6,8 +6,8 @@ import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.rules.bb2020.procedures.FullGame
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
+import com.jervisffb.engine.rules.common.procedures.FullGame
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import com.jervisffb.test.bb2020.createDefaultHomeTeamBB2020

@@ -1,22 +1,23 @@
 package com.jervisffb.engine.rules.common.tables
 
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.BadHabits
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.BlessedStatueOfNuffle
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.FanInteraction
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.FoulingFrenzy
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.FriendsWithTheRef
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.GreasyCleats
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.IntensiveTraining
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.IronMan
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.KnuckleDusters
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.MolesUnderThePitch
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.NecessaryViolence
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.PerfectPassing
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.Stiletto
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.ThrowARock
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.TreacherousTrapdoor
-import com.jervisffb.engine.rules.bb2020.procedures.tables.prayers.UnderScrutiny
+import com.jervisffb.engine.rules.common.procedures.DummyProcedure
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.BadHabits
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.BlessedStatueOfNuffle
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.FanInteraction
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.FoulingFrenzy
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.FriendsWithTheRef
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.GreasyCleats
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.IntensiveTraining
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.IronMan
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.KnuckleDusters
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.MolesUnderThePitch
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.NecessaryViolence
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.PerfectPassing
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.Stiletto
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.ThrowARock
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.TreacherousTrapdoor
+import com.jervisffb.engine.rules.common.procedures.tables.prayers.UnderScrutiny
 import com.jervisffb.engine.rules.common.skills.Duration
 
 /**
@@ -27,6 +28,11 @@ enum class PrayerToNuffle(
     override val procedure: Procedure,
     override val duration: Duration
 ): TableResult {
+
+    // BB2025 - All prayers now last the entire game
+    DAZZLING_CATCHING("Dazzling Catching", DummyProcedure, Duration.END_OF_GAME),
+
+    // BB2020 - Slight changes to duration and effect
     TREACHEROUS_TRAPDOOR("Treacherous Trapdor", TreacherousTrapdoor, Duration.END_OF_HALF),
     FRIENDS_WITH_THE_REF("Friends with the Ref", FriendsWithTheRef, Duration.END_OF_DRIVE),
     STILETTO("Stiletto", Stiletto, Duration.END_OF_DRIVE),

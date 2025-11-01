@@ -12,10 +12,10 @@ import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
-import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
-import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
-import com.jervisffb.engine.rules.bb2020.procedures.StartOfDriveSequence
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.common.procedures.SetupTeam
+import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
+import com.jervisffb.engine.rules.common.procedures.StartOfDriveSequence
 import com.jervisffb.engine.serialize.JervisSerialization
 import com.jervisffb.engine.serialize.JervisSetupFile
 import com.jervisffb.ui.CacheManager

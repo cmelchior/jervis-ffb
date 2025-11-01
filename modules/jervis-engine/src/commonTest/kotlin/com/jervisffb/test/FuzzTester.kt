@@ -15,9 +15,9 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
-import com.jervisffb.engine.rules.bb2020.procedures.SetupTeam
-import com.jervisffb.engine.rules.bb2020.procedures.SetupTeamContext
 import com.jervisffb.engine.rules.builder.GameType
+import com.jervisffb.engine.rules.common.procedures.SetupTeam
+import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import kotlin.random.Random

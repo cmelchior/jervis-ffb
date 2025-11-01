@@ -3,7 +3,7 @@ package com.jervisffb.engine.model.inducements
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.DummyProcedure
+import com.jervisffb.engine.rules.common.procedures.DummyProcedure
 import com.jervisffb.engine.rules.common.skills.Duration
 import kotlinx.serialization.Serializable
 

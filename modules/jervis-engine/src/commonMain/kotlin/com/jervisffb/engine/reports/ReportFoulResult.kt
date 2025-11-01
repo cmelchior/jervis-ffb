@@ -1,6 +1,6 @@
 package com.jervisffb.engine.reports
 
-import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
+import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulContext
 
 class ReportFoulResult(val foul: FoulContext) : LogEntry() {
     override val category: LogCategory = LogCategory.GAME_PROGRESS

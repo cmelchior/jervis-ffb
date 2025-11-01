@@ -1,0 +1,191 @@
+package com.jervisffb.engine.rules.common.procedures.tables.kickoff
+
+import com.jervisffb.engine.actions.ConfirmWhenReady
+import com.jervisffb.engine.actions.D3Result
+import com.jervisffb.engine.actions.Dice
+import com.jervisffb.engine.actions.EndSetup
+import com.jervisffb.engine.actions.EndSetupWhenReady
+import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.actions.GameActionDescriptor
+import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.RollDice
+import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectPlayer
+import com.jervisffb.engine.actions.TargetSquare
+import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetPlayerLocation
+import com.jervisffb.engine.commands.compositeCommandOf
+import com.jervisffb.engine.commands.context.RemoveContext
+import com.jervisffb.engine.commands.context.SetContext
+import com.jervisffb.engine.commands.fsm.ExitProcedure
+import com.jervisffb.engine.commands.fsm.GotoNode
+import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
+import com.jervisffb.engine.fsm.Node
+import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.fsm.checkType
+import com.jervisffb.engine.fsm.checkTypeAndValue
+import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.getContext
+import com.jervisffb.engine.reports.ReportDiceRoll
+import com.jervisffb.engine.reports.ReportGameProgress
+import com.jervisffb.engine.rules.DiceRollType
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.procedures.KickOffEventContext
+import com.jervisffb.engine.rules.common.tables.KickOffEvent
+import com.jervisffb.engine.utils.INVALID_ACTION
+import com.jervisffb.engine.utils.INVALID_GAME_STATE
+
+data class SolidDefenseContext(
+    val roll: D3Result,
+    // Track all players moved, should be size <= roll + 3/1
+    val playersMoved: Set<Player> = emptySet(),
+    // Current player being moved
+    val currentPlayer: Player? = null,
+): ProcedureContext
+
+/**
+ * Procedure for handling the Kick-Off Event: "Solid Defense" as described on page 41
+ * of the rulebook.
+ *
+ * Also supports the BB7 variant of the event, which is described on page 94 in Death Zone.
+ */
+object SolidDefense : Procedure() {
+    override val initialNode: Node = RollDie
+    override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
+    override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<SolidDefenseContext>()
+
+    object RollDie : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team? = null
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            return listOf(RollDice(Dice.D3))
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return checkType<D3Result>(action) { d3 ->
+                val extraPlayerCount = getExtraPlayersCount(state)
+                compositeCommandOf(
+                    ReportDiceRoll(DiceRollType.SOLID_DEFENSE, d3),
+                    SetContext(SolidDefenseContext(roll = d3)),
+                    ReportGameProgress("Solid Defense: ${state.kickingTeam.name} may move [${d3.value} + $extraPlayerCount = ${d3.value + extraPlayerCount}] players"),
+                    GotoNode(SelectPlayerOrEndSetup),
+                )
+            }
+        }
+    }
+
+    object SelectPlayerOrEndSetup: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            // Max D3 + 3/1 players must be selected, including those in the playersMoved list.
+            // If the player is not already in the playersMoved list, they must be open.
+            val extraPlayerCount = getExtraPlayersCount(state)
+            val context = state.getContext<SolidDefenseContext>()
+            return if (context.playersMoved.size >= context.roll.value + extraPlayerCount) {
+                // Max number of players has already been moved. So only they can move now.
+                context.playersMoved.map { SelectPlayer(it) } + EndSetupWhenReady
+            } else {
+                // All already selected players can move regardless of them being open or not.
+                // All other players must be open to be able to move
+                val eligiblePlayers = state.kickingTeam
+                    .filter { rules.isStanding(it) }
+                    .filter { rules.isOpen(it) }
+                    .toSet() + context.playersMoved.toSet()
+                eligiblePlayers.map { SelectPlayer(it) } + EndSetupWhenReady
+            }
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return when (action) {
+                EndSetup -> GotoNode(EndSetupAndValidate)
+                else -> {
+                    checkTypeAndValue<PlayerSelected>(state, action) {
+                        val context = state.getContext<SolidDefenseContext>()
+                        compositeCommandOf(
+                            SetContext(context.copy(currentPlayer = it.getPlayer(state))),
+                            GotoNode(PlacePlayer),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    object PlacePlayer: ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            val context = state.getContext<SolidDefenseContext>()
+            // Allow players to be placed on the kicking teams side. At this stage, the more
+            // elaborate rules are not enforced. That will first happen in `EndSetupAndValidate`
+            val freeFields: List<TargetSquare> =
+                state.field
+                    .filter {rules.isInSetupArea(state.kickingTeam, it) }
+                    .filter { it.isUnoccupied() }
+                    .map { TargetSquare.setup(it.coordinates) }
+
+            val playerCoordinates = context.currentPlayer!!.coordinates
+            return listOf(
+                SelectFieldLocation(freeFields + TargetSquare.setup(playerCoordinates))
+            )
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return checkTypeAndValue<FieldSquareSelected>(state, action) { squareSelected ->
+                when (state.kickingTeam.isHomeTeam()) {
+                    true -> if (squareSelected.coordinate.isOnAwaySide(rules)) INVALID_ACTION(action)
+                    false -> if (squareSelected.coordinate.isOnHomeSide(rules)) INVALID_ACTION(action)
+                }
+                val context = state.getContext<SolidDefenseContext>()
+                val movingPlayer = context.currentPlayer!!
+                compositeCommandOf(
+                    SetPlayerLocation(movingPlayer, squareSelected.coordinate),
+                    SetContext(
+                        context.copy(
+                            currentPlayer = null,
+                            playersMoved = context.playersMoved.plus(movingPlayer)
+                        )
+                    ),
+                    GotoNode(SelectPlayerOrEndSetup),
+                )
+            }
+        }
+    }
+
+    object EndSetupAndValidate : ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
+            return if (rules.isValidSetup(state, state.kickingTeam)) {
+                ExitProcedure()
+            } else {
+                GotoNode(InformOfInvalidSetup)
+            }
+        }
+    }
+
+    object InformOfInvalidSetup : ActionNode() {
+        override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam
+        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
+            return listOf(ConfirmWhenReady)
+        }
+
+        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            return GotoNode(SelectPlayerOrEndSetup)
+        }
+    }
+
+    //
+    // HELPER FUNCTIONS
+    //
+    private fun getExtraPlayersCount(state: Game): Int {
+        val context = state.getContext<KickOffEventContext>()
+        val type = context.result as? KickOffEvent ?: INVALID_GAME_STATE("Unexpected table result: ${context.result}")
+        return when (type) {
+            KickOffEvent.SOLID_DEFENSE -> 3
+            KickOffEvent.SOLID_DEFENSE_BB7 -> 1
+            else -> INVALID_GAME_STATE("Unsupported Kickoff Event: ${type.name}")
+        }
+    }
+}

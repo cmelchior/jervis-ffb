@@ -30,7 +30,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Class testing usage of the [com.jervisffb.engine.rules.bb2020.procedures.Catch] skill
+ * Class testing usage of the [com.jervisffb.engine.rules.common.procedures.Catch] skill
  *
  * See page 75 in the rulebook for the skill.
  * See page 51 in the rulebook for the catching description.

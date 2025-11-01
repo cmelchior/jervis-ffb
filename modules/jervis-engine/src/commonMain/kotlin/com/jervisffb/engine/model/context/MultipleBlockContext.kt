@@ -14,12 +14,6 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockApplyResult
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRerollDice
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.standard.StandardBlockRollDice
-import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryContext
 import com.jervisffb.engine.rules.common.actions.BlockType
 import com.jervisffb.engine.rules.common.actions.BlockType.CHAINSAW
 import com.jervisffb.engine.rules.common.actions.BlockType.MULTIPLE_BLOCK
@@ -27,6 +21,12 @@ import com.jervisffb.engine.rules.common.actions.BlockType.PROJECTILE_VOMIT
 import com.jervisffb.engine.rules.common.actions.BlockType.STAB
 import com.jervisffb.engine.rules.common.actions.BlockType.STANDARD
 import com.jervisffb.engine.rules.common.procedures.DieRoll
+import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.PushContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockApplyResult
+import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRerollDice
+import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRollDice
+import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
 
 /**
  * Class wrapping one of the block actions part of a multiple block actions.

@@ -1,7 +1,7 @@
 package com.jervisffb.test.bb2020.actions
 
 import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.BlockContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.BlockContext
 import com.jervisffb.test.JervisGameBB2020Test
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -7,8 +7,8 @@ import com.jervisffb.engine.rules.common.skills.Duration
  * List all possible stat modification, across all rules variants, that can
  * happen after rolling on the Lasting Injury Table.
  *
- * @see [com.jervisffb.engine.rules.bb2020.procedures.tables.injury.LastingInjuryRoll]
- * @see [com.jervisffb.engine.rules.bb2020.procedures.tables.injury.RiskingInjuryRoll.RollForLastingInjury]
+ * @see [com.jervisffb.engine.rules.common.procedures.tables.injury.LastingInjuryRoll]
+ * @see [com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryRoll.RollForLastingInjury]
  */
 enum class LastingInjuryResult(
     override val description: String,

@@ -26,11 +26,11 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.ActivatePlayerContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.move.ResolveMoveTypeStep
-import com.jervisffb.engine.rules.bb2020.procedures.calculateMoveTypesAvailable
-import com.jervisffb.engine.rules.bb2020.procedures.getSetPlayerRushesCommand
+import com.jervisffb.engine.rules.common.procedures.ActivatePlayerContext
+import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulContext
+import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
+import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
+import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull

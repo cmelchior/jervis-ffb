@@ -22,9 +22,9 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassingType
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
+import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
+import com.jervisffb.engine.rules.common.procedures.actions.pass.PassingType
 import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.SmartMoveTo

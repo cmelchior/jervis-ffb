@@ -2,7 +2,7 @@ package com.jervisffb.engine.commands.context
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.PushContext
 import kotlin.reflect.KMutableProperty1
 
 /**

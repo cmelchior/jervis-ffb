@@ -12,7 +12,7 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
  * This command can add items to those lists, so we do not have to copy the
  * entire list in order to modify it..
  *
- * @see com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
+ * @see com.jervisffb.engine.rules.common.procedures.actions.block.PushContext
  * @see com.jervisffb.engine.model.context.DodgeRollContext
  */
 class AddContextListItem<T>(private val list: MutableList<T>, private val items: List<T>): Command {

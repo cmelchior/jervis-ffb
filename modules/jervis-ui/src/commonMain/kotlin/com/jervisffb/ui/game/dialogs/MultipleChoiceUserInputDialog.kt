@@ -21,8 +21,8 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.pass.PassContext
+import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulContext
+import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 
 /**
  * Class wrapping the intent to show a dialog for a dice roll involving 1 - many dice.

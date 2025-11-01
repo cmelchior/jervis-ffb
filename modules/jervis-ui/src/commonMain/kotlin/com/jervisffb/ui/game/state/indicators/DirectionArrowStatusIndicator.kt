@@ -5,8 +5,8 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContextOrNull
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushContext
-import com.jervisffb.engine.rules.bb2020.procedures.actions.block.PushStepInitialMoveSequence
+import com.jervisffb.engine.rules.common.procedures.actions.block.PushContext
+import com.jervisffb.engine.rules.common.procedures.actions.block.PushStepInitialMoveSequence
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.state.decorators.SelectDirectionDecorator
 

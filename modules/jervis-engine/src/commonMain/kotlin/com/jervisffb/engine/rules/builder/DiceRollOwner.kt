@@ -1,12 +1,12 @@
 package com.jervisffb.engine.rules.builder
 
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.rules.bb2020.procedures.TheFUMBBLKickOff
-import com.jervisffb.engine.rules.bb2020.procedures.TheKickOff
-import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction
-import com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FumbblFoulAction
-import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.UseBB11Apothecary
-import com.jervisffb.engine.rules.bb2020.procedures.tables.injury.UseBB7Apothecary
+import com.jervisffb.engine.rules.common.procedures.TheFUMBBLKickOff
+import com.jervisffb.engine.rules.common.procedures.TheKickOff
+import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulAction
+import com.jervisffb.engine.rules.common.procedures.actions.foul.FumbblFoulAction
+import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothecary
+import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
 
 enum class DiceRollOwner {
     // The server logic is responsible for rolling the dice.

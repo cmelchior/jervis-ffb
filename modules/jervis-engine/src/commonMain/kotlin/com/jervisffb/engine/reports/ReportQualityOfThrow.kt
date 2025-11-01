@@ -1,7 +1,7 @@
 package com.jervisffb.engine.reports
 
-import com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate.ThrowPlayerResult
-import com.jervisffb.engine.rules.bb2020.procedures.actions.throwteammate.ThrowTeamMateContext
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowPlayerResult
+import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
 
 class ReportQualityOfThrow(
     context: ThrowTeamMateContext
