@@ -54,41 +54,44 @@ import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 
 /**
  * Handle a player making a dodge roll.
- * See page 45 in the rulebook.
+ * See page 45 in the BB2020 rulebook.
  *
- * Dodge can be modified in a number of ways. In this implementation it is handled the following way:
- * Note, the order of skills is the order they are resolved in.
+ * Dodge can be modified in a number of ways. In this implementation it is
+ * handled the following way:
+ *
+ * Note; the order of skills is the order they are resolved in.
  *
  * 1. Roll D6.
  * 2. Calculate required modifiers. These apply to both roll and reroll.
- *      a. -1 for each marking player in target field
- *      b. Stunty* (Ignore all -1 marked modifiers in target field)
- *      c. Titchy* (+1)
+ *      a. -1 for each marking player in the target field.
+ *      b. Stunty* (Ignore all -1 marked modifiers in the target field).
+ *      c. Titchy* (+1).
  * 2. Choose optional modifiers. These apply to both roll and reroll.
- *      a. Two Heads (+1)
- *      b. Break Tackle (+1 with S4 or +2 with S5)
- *      c. Prehensile Tail (-1)
- *      d. Diving Tackle (-2, and user prone)
+ *      a. Two Heads (+1).
+ *      b. Break Tackle (+1/+2 in 2020, +1/+2/+3 in 2025).
+ *      c. Prehensile Tail (-1).
+ *      d. Diving Tackle (-2, and user prone).
  * 4. Choose to Reroll or not.
- * 5. If Reroll. Choose optional modifiers with negative consequences for user.
+ * 5. If Reroll. Choose optional modifiers with negative consequences for the user.
  *      a. Diving Tackle
  * 6. Calculate the final result.
  *
- * Designer's Commentary:
- * It is possible to wait using Diving Tackle until the reroll has been made
+ * Designer's Commentary (BB2020):
+ * It is possible to wait using Diving Tackle until the reroll has been made.
  *
  * Developer's Commentary:
- * Given the Designer's Commentary, technically all optional skills not selected before the
- * first roll should go through another selection process, but I cannot find any reason why
- * you would want that. It makes sense for "Diving Tackle", since it brings a penalty, but
- * for others it doesn't.
+ * Given the Designer's Commentary, technically all optional skills not selected
+ * before the first roll should go through another selection process, but I
+ * cannot find any reason why you would want that. It makes sense for "Diving
+ * Tackle", since it brings a penalty, but for others it doesn't.
  *
- * The only reason you would want to avoid using them is to intentionally fail the roll, in
- * which case, you wouldn't want to apply them after a reroll either.
+ * The only reason you would want to avoid using them is to intentionally fail
+ * the roll, in which case, you wouldn't want to apply them after a reroll
+ * either.
  *
- * Also, it is unclear from the rules who choose to use skills first, e.g., Break Tackle and
- * Prehensile Tail. In this case, it doesn't matter since they are both "free", but in other
- * cases it might.
+ * Also, it is unclear from the rules who chooses to use skills first, e.g.,
+ * Break Tackle and Prehensile Tail. In this case, it doesn't matter since they
+ * are both "free", but in other cases it might.
  */
 object DodgeRoll: Procedure() {
     override val initialNode: Node = RollDie
@@ -203,7 +206,7 @@ object DodgeRoll: Procedure() {
             val player = context.player
             return when (action) {
                 Confirm -> {
-                    val modifier = BreakTackleModifier(player.strength)
+                    val modifier = BreakTackleModifier(player.strength, rules.baseVersion)
                     compositeCommandOf(
                         ReportSkillUsed(context.player, context.player.getSkill(SkillType.BREAK_TACKLE)),
                         SetContext(context.copyAndAddModifier(modifier)),

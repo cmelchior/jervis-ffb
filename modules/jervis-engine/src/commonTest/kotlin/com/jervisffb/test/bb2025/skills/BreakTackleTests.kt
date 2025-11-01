@@ -26,7 +26,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-
 /**
  * Class testing usage of the [BreakTackle] skill
  */
@@ -39,7 +38,8 @@ class BreakTackleTests: JervisGameBB2025Test() {
             // Should be on LoS
             awayTeam[PlayerNo(1)].apply {
                 addSkill(SkillType.BREAK_TACKLE.id())
-                strength = 4
+                strength = 3
+                agility = 4
             }
         }
         startDefaultGame()
@@ -54,12 +54,12 @@ class BreakTackleTests: JervisGameBB2025Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
             FieldSquareSelected(FieldCoordinate(14, 5)),
-            DiceRollResults(2.d6), // Dodge roll, is not enough
+            DiceRollResults(3.d6), // Dodge roll, is not enough
             Confirm // Use Break Tackle
         )
         val context = state.getContext<DodgeRollContext>()
         assertEquals(1, context.rollModifiers.size)
-        assertEquals(BreakTackleModifier(player.strength), context.rollModifiers.first())
+        assertEquals(BreakTackleModifier(player.strength, rules.baseVersion), context.rollModifiers.first())
         assertTrue(context.isSuccess)
         assertTrue(player.getSkill(SkillType.BREAK_TACKLE).used)
     }
@@ -73,26 +73,31 @@ class BreakTackleTests: JervisGameBB2025Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
             FieldSquareSelected(FieldCoordinate(14, 5)),
-            DiceRollResults(1.d6), // Dodge roll, is not enough
+            DiceRollResults(2.d6), // Dodge roll, is not enough
             Confirm, // Use Break Tackle, still not enough
             SelectTeamReroll<RegularTeamReroll>(),
-            DiceRollResults(2.d6), // Dodge roll, should now succeed
+            DiceRollResults(3.d6), // Dodge roll, should now succeed
         )
 
         val context = state.getContext<DodgeRollContext>()
         assertEquals(1, context.rollModifiers.size)
-        assertEquals(BreakTackleModifier(player.strength), context.rollModifiers.first())
+        assertEquals(BreakTackleModifier(player.strength, rules.baseVersion), context.rollModifiers.first())
         assertTrue(player.getSkill(SkillType.BREAK_TACKLE).used)
         assertTrue(context.isSuccess)
     }
 
     @Test
+    fun breakTackleModifierForS3() {
+        assertEquals(1, BreakTackleModifier(3, rules.baseVersion).modifier)
+    }
+
+    @Test
     fun breakTackleModifierForS4() {
-        assertEquals(1, BreakTackleModifier(4).modifier)
+        assertEquals(2, BreakTackleModifier(4, rules.baseVersion).modifier)
     }
 
     @Test
     fun breakTackleModifierForS5() {
-        assertEquals(2, BreakTackleModifier(5).modifier)
+        assertEquals(3, BreakTackleModifier(5, rules.baseVersion).modifier)
     }
 }

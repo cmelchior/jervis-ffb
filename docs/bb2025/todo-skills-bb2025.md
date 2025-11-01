@@ -125,7 +125,12 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 
 - [ ] Arm Bar
 - [ ] Brawler
-- [ ] Break Tackle
+- [x] Break Tackle
+  - [x] Can only use once pr turn
+  - [x] If used on the first roll, it also applies to any reroll
+  - [x] +1 if ST3 or less
+  - [x] +2 if ST4
+  - [x] +3 if ST5 or more
 - [ ] Bulls Eye
 - [ ] Grab
 - [ ] Guard

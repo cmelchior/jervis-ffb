@@ -26,7 +26,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-
 /**
  * Class testing usage of the [BreakTackle] skill
  */
@@ -59,7 +58,7 @@ class BreakTackleTests: JervisGameBB2020Test() {
         )
         val context = state.getContext<DodgeRollContext>()
         assertEquals(1, context.rollModifiers.size)
-        assertEquals(BreakTackleModifier(player.strength), context.rollModifiers.first())
+        assertEquals(BreakTackleModifier(player.strength, rules.baseVersion), context.rollModifiers.first())
         assertTrue(context.isSuccess)
         assertTrue(player.getSkill(SkillType.BREAK_TACKLE).used)
     }
@@ -81,18 +80,18 @@ class BreakTackleTests: JervisGameBB2020Test() {
 
         val context = state.getContext<DodgeRollContext>()
         assertEquals(1, context.rollModifiers.size)
-        assertEquals(BreakTackleModifier(player.strength), context.rollModifiers.first())
+        assertEquals(BreakTackleModifier(player.strength, rules.baseVersion), context.rollModifiers.first())
         assertTrue(player.getSkill(SkillType.BREAK_TACKLE).used)
         assertTrue(context.isSuccess)
     }
 
     @Test
     fun breakTackleModifierForS4() {
-        assertEquals(1, BreakTackleModifier(4).modifier)
+        assertEquals(1, BreakTackleModifier(4, rules.baseVersion).modifier)
     }
 
     @Test
     fun breakTackleModifierForS5() {
-        assertEquals(2, BreakTackleModifier(5).modifier)
+        assertEquals(2, BreakTackleModifier(5, rules.baseVersion).modifier)
     }
 }
