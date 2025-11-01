@@ -1,17 +1,24 @@
-# Skills
+# Skills - BB2020
 
-This document lists all skills known in the Blood Bowl 2020 Ruleset and whether they are implemented
-in Jervis. If a skill was introduced after the BB2020 base rules, a reference to its source is provided.
+---
+NOTE: This document was forked when BB2025 was released. Since the focus will be
+on having full support for BB2025, future updates to this document are unlikely.
+---
+
+This document lists all skills known in the Blood Bowl 2020 Ruleset and whether 
+they are implemented in Jervis. If a skill was introduced after the BB2020 base 
+rules, a reference to its source is provided.
 
 Skills marked with * are mandatory.
 
-As a general rule, skills are implemented faithfully, i.e., they should follow the rules as written.
-This also includes choosing whether to use them or not. The rules module will generally always ask for 
-usage, but this might be responded to automatically by higher layers before being shown as a dialog to 
+As a general rule, skills are implemented faithfully, i.e., they should follow 
+the rules as written. This also includes choosing whether to use them or not. 
+The rules module will generally always ask for usage, but this might be 
+responded to automatically by higher layers before being shown as a dialog to 
 players. 
 
-Skills should only be marked as completed here if they are implemented and have a test class in
-`modules/game-model/src/commonTest/kotlin/dk/ilios/jervis/skills`
+Skills should only be marked as completed here if they are implemented and have
+a test class in `modules/game-model/src/commonTest/kotlin/dk/ilios/jervis/skills`
 
 ## Agility Skills
 

@@ -1,4 +1,9 @@
-# Rules FAQ
+# Rules FAQ - BB2020
+
+---
+NOTE: This document was forked when BB2025 was released. Since the focus will be
+on having full support for BB2025, future updates to this document are unlikely.
+---
 
 This file describes how rules with an element of ambiguity are implemented as 
 well as the rationale behind doing it the given way.  
@@ -6,7 +11,12 @@ well as the rationale behind doing it the given way.
 Due to copyright restrictions, this FAQ will not directly copy sections of text
 from the rulebooks but only reference them by page numbers.
 
-See [rules-discussions.md](rules-discussions.md) for rules that are not implemented yet.
+See [rules-discussions-bb2020.md](rules-discussions-bb2020.md) for rules that 
+are not implemented yet.
+
+This document is about the 2020 version of the rules, while many of the 
+dicussion points also apply to BB2025, these are covered in 
+[rules-discussions-bb2025.md](../bb2025/rules-discussions-bb2025.md).
 
 ## Rulebook
 

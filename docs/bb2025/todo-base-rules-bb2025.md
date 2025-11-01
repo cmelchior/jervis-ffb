@@ -1,0 +1,503 @@
+# Game Flow Implementation - BB2025
+
+---
+The current status is just copied from BB2020 and shouldn't be considered
+correct for BB2025 (yet). I need to go through the entire BB2025 rulebook in
+order to update the list, but this requires me having a copy of it first.
+---
+
+This document is used during development as a list tracker for things that need
+to be implemented. Things should only be marked as completed when they have unit
+tests covering the particular feature. This document only covers the core game
+rules. Skills are tracked separately in [todo-skills-bb2025.md](todo-skills-bb2025.md).
+
+The order of items should roughly reflect the order things appear in the rule 
+book.
+
+## General Principles
+
+- [ ] Turnover ends turn as quickly as possible
+    - [x] Falling Over in own activation
+    - [ ] Falling Over in other players activation (no turnover, can this ever happen?)
+    - [x] Knocked Down during own team turn (active player)
+    - [ ] Knocked Down during own team turn (inactive player)
+    - [x] Knocked Down during other teams turn (no turnover)
+    - [ ] Placed Prone with the Ball in own team turn
+    - [ ] Placed Prone with the Ball in other teams turn (no turnover)
+    - [x] Player with ball goes into the crowd in own team turn
+    - [x] Player with ball goes into the crowd in other team turn (no turnover)
+    - [x] Pushing own player, not holding the ball, into the crowd (no turnover)
+    - [x] Fails to pickup ball from the ground and bounce to empty square
+    - [x] Fails to pickup ball from the ground and caught by own team
+    - [x] Fails to pickup ball from the ground and caught by other team
+    - [x] Fumble Pass, lands on empty square
+    - [x] Fumble Pass, caught by own team
+    - [x] Fumble Pass, caught by other team
+    - [x] Failed pass, lands on empty square
+    - [x] Failed pass, caught by other team
+    - [x] Failed pass, caught by own team (no turnover)
+    - [x] Failed hand-off, lands on empty square
+    - [x] Failed hand-off, caught by other team
+    - [x] Failed hand-off, caught by own team (no turnover)
+    - [x] Pass deflected and lands on empty square
+    - [x] Pass deflected and caught by other team
+    - [x] Pass deflected and caught by own team (no turnover)
+    - [x] Pass intercepted
+    - [x] Throw Team-mate (with ball) fails to land safely, lands in crowd, is eaten
+    - [x] Sent-off for commiting a Foul
+    - [x] Touchdown scored (own team)
+    - [x] Touchdown scored (other team)
+    - [ ] Touchdowns are not checked until everything is "at rest".
+    - [ ] In case of checking for touchdowns. The order is Active Team (active coach chooses order), then Inactive Team (inactive coach chooses order).
+    - [ ] Turnover state is reset when turn ends
+        - [ ] During normal team turns
+        - [ ] End of Drive
+        - [ ] End of Half
+- [ ] Team Rerolls
+    - [ ] Reset at half time
+    - [ ] Carry over into Extra Time
+    - [ ] Only work during teams turn
+    - [ ] Can be used to reroll types of rolls: <Figure out list of rolls>
+- [ ] Deviating Ball
+    - [x] D6 in random direction
+    - [x] Player in landing square must attempt to catch it
+    - [x] Will bounce if player in landing square has no tackle zones or is prone/stunned
+    - [x] Will bounce if landing square is empty
+- [ ] Scatter Ball
+    - [x] 3xD8 in random direction, doesn't fully land before last roll
+    - [x] Player in landing square must attempt to catch it
+    - [x] Will bounce if player in landing square has no tackle zones or is prone/stunned
+    - [x] Will bounce if landing square is empty
+- [ ] Bouncing Ball
+    - [x] Move 1 square in random direction
+    - [x] Bounce into another player must catch if possible
+    - [x] Bounce into prone/missing tz/stunned player will bounce again
+    - [x] Keep bouncing until coming to rest
+- [ ] Standing Players
+    - [x] Open
+    - [x] Marking with Tackle Zones
+    - [x] Marked by Tackle Zones
+    - [x] Does not mark team players
+    - [x] Cannot mark with no tackle zones
+    - [x] Cannot deflect if missing tackle zones
+    - [x] Cannot catch if missing tackle zones
+- [ ] Placed Prone
+    - [ ] Ball will bounce from prone player
+    - [ ] Activation ends immediately
+    - [ ] No armour roll
+- [ ] Falling Over
+    - [ ] Ball will bounce from prone player
+    - [ ] Activation ends immediately
+    - [ ] Roll for armour/injury
+- [ ] Knocked Down
+    - [ ] Ball will bounce from prone player
+    - [ ] Activation ends immediately if their own turn
+    - [ ] Roll for armour/injury
+- [ ] Player Characteristic
+    - [x] Agility Test
+    - [ ] Passing Test
+    - [ ] Cannot exceed maximum
+    - [ ] Cannot go below minimum
+
+## Pregame
+
+- [ ] The Fans
+- [ ] The Weather
+    - [x] Sweltering Heat
+    - [x] Very Sunny
+    - [x] Perfect Conditions
+    - [x] Pouring Rain
+    - [x] Blizzard
+- [ ] Take on Journeymen
+- [ ] Inducements (Select and Buy)
+    - [ ] Temp Agency Cheerleaders
+    - [ ] Part-time Assistant Coaches
+    - [ ] Weather Mage
+    - [ ] Bloodweiser Kegs
+    - [ ] Special Plays (soooo many cards)
+    - [ ] Extra Team Training
+    - [ ] Bribes
+    - [ ] Wandering Apothecaries
+    - [ ] Mortuary Assistant
+    - [ ] Plague Doctor
+    - [ ] Riteous Rockies
+    - [ ] Halfing Master Chef
+    - [ ] Unlimited Mercenary Players
+    - [ ] Star Players
+    - [ ] (In)famous Coaching Staff
+        - [ ] Josef Bugman
+        - [ ] How many others(???)
+    - [ ] Wizard
+        - [ ] Hireling Sports-Wizard
+        - [ ] How many others(???)
+    - [ ] Biased Referee
+        - [ ] Biased Referee
+        - [ ] How many others(???)
+- [ ] Roll on Prayers to Nuffle Table. Duplicates are only checked within the same team
+    - [ ] Roll again if duplicate was rolled
+    - [ ] Abort rolling when there are no more prayers to roll for.
+    - [ ] Treacherous Trapdoor
+        - [ ] During Quick Snap Kickoff Event
+        - [ ] During Blitz Kickoff Event
+        - [ ] During Pushback
+        - [ ] During Chain Push
+        - [ ] ... (so many edge cases)
+    - [x] Friends with the Ref
+    - [x] Stiletto
+    - [x] Iron Man
+    - [x] Knuckle Dusters
+    - [x] Bad Habits
+    - [x] Greasy Cleats
+    - [x] Blessed Statue of Nuffle
+    - [x] Moles under the Pitch
+    - [ ] Perfect Passing
+    - [ ] Fan Interaction
+    - [ ] Necessary Violence
+    - [ ] Fouling Frenzy
+    - [ ] Throw a Rock
+        - [ ] Choice is optional
+    - [ ] Under Scrutiny
+    - [ ] Intensive Training
+        - [ ] "Available to Play" also include all players on the field when rolled as a kick-off result
+- [ ] Determine Kicking Team
+
+## Start of Drive
+
+- [ ] Setup
+    - [x] Too many players on the field
+    - [x] Too few players on the field
+    - [x] Too many players in Wide Zones
+    - [x] 0 players available
+    - [x] Too few players on the LoS
+    - [x] If less than 3 players, all must be on LoS
+- [ ] Kick-off (Kicking player and target)
+    - [x] Default: Players not on LoS
+    - [x] 3 or less
+    - [x] All players on LoS
+    - [x] Place Kick: Only locations on the opponent side
+- [ ] The Kick-off Event
+    - [x] Get the Ref
+    - [x] Time-out
+    - [x] Solid Defense
+    - [x] High Kick
+        - [x] Allow moving player to kicking side
+    - [x] Cheering Fans
+    - [x] Brilliant Coaching
+    - [x] Changing Weather
+    - [x] Quick Snap
+    - [ ] Blitz
+        - [ ] Some skills are not available
+        - [ ] Blitz ends when player Knocked Down or Falls Over, but not a TurnOver
+    - [ ] Charge
+        - [ ] All skills are available
+        - [ ] Rerolls are available
+    - [x] Officious Ref
+    - [ ] Dodgy Snack
+        - [ ] On 2+, player stays on field with -1 AV, MA
+        - [ ] On 1, player is put in Reserves until end of drive
+    - [x] Pitch Invasion
+- [ ] What goes up, must come down
+    - [x] Land on Field
+    - [x] Lands on Player
+    - [x] Team rerolls not available for catch
+- [ ] Touchbacks
+    - [x] Give to player
+    - [x] Give to prone player is all players are fallen over
+    - [x] End sequence as soon as ball goes over middle. I.e., not catch rolls etc.
+    - [x] Going out of bounds
+    - [x] Go out of bounds / award to player that is then knocked down and ball bounce (previous bug)
+
+## Game
+
+- [ ] Moving the turn marker
+- [ ] Halfs
+- [ ] Extra Time
+- [ ] Sudden Death
+- [ ] Active Team
+    - [x] No active team during Kick-off Events
+    - [x] Team is active during team turn
+- [ ] Active Player
+    - [x] Marked player as active during action
+    - [x] Marked player as activated after action.
+    - [x] Can undo starting an action before rolling dice and/or moving
+        - [x] Move
+        - [x] Block
+        - [x] Blitz
+        - [x] Pass
+        - [x] Hand-off
+        - [x] Foul
+        - [ ] Throw team-mate
+- [ ] Stand Up
+    - [x] Must stand up doing any action
+    - [x] Standing up uses 3 move
+    - [x] Standup with less than 3 strength requires a roll and use all move.
+    - [x] Failing stand-up roll ends action and uses player action
+        - [x] Move
+        - [x] Block
+        - [x] Blitz
+        - [x] Pass
+        - [x] HandOff
+        - [x] Foul
+        - [x] Throw Teammate
+        - [ ] Special actions
+- [ ] Rush
+    - [x] Rush before Dodge.
+    - [x] A player can normally rush twice pr. action
+    - [x] Rush is 2+
+    - [x] Failing a Rush puts player in target square.
+    - [x] Move action is over after rushing twice.
+- [ ] Dodge (basic, no skills)
+    - [x] When leaving marking player
+    - [x] Not when leaving player with no TZ
+    - [x] Not when moving from open into marked position
+    - [x] -1 pr. marking player in
+    - [x] Move before Roll
+    - [x] Failure: Fall Over in target square
+    - [x] Can reroll
+- [ ] Jump Sub-action
+    - [x] Can only jump over prone/stunned player
+    - [x] Jump over stunned/prone player from both teams
+    - [x] Must use two move to reach target square. If not enough move left (including rush), no jump is allowed.
+    - [x] If Rushing twice and fail, ends up in target square
+    - [x] Can only jump to opposite squares. Similar to pushes
+    - [ ] Cannot jump over a Giant since the rules specify a "single square"
+    - [x] Modifiers on leaving and entering
+    - [x] Fail 1st/2nd Rush and fall over
+- [ ] Pickup Ball
+    - [ ] Agility roll
+    - [ ] -1 pr. mark in square
+    - [ ] Bounce if failed
+    - [ ] Can move after pickup
+    - [ ] Cannot pick up if moving involuntarily
+        - [ ] Pushed
+- [ ] Range Ruler
+    - [ ] Follows the chart in the rulebook
+    - [ ] Interceptions are correct. See https://www.luccini.it/bloodbowl/downloads/Tabella_Intercetti.pdf
+- [ ] Catch (basic, no skills)
+    - [ ] Accurate pass
+    - [ ] Deflection into Interception
+    - [ ] Bouncing ball
+    - [ ] Thrown-in
+    - [ ] Scattered
+    - [ ] Deviated
+    - [ ] Tackle Zone modifiers
+    - [ ] Must roll for catch
+    - [ ] Players can only catch if they have tackle zones
+    - [ ] Failing to catch will bounce from square
+- [ ] Throw-in (basic no skills)
+    - [x] From corners
+    - [x] From south/north/east/west
+    - [x] Player in landing field must catch it if possible
+    - [x] Will bounce if player is not able to catch a ball
+    - [x] Repeat process if leaving the field again
+- [ ] Armour and Injuries
+    - [ ] Failing armor roll leaves player prone
+    - [ ] Stunned in other team turn / Roll to prone in own turn
+    - [ ] Stunned in own turn / Still stunned in other team turn / Roll to prone in own turn
+    - [ ] KO: Moved to Dogout
+    - [ ] Casualty: Moved to Dogout
+    - [ ] Badly hurt: Miss rest of game
+    - [ ] Seriously Hurt: MNG
+    - [ ] Serious Injury: MNG + NI
+    - [ ] Lasting Injury: MNG + Stat reduction
+    - [ ] Head Injury: -1AV
+    - [ ] Smashed Knee: -1MA
+    - [ ] Broken Arm: -1PA
+    - [ ] Neck Injury: -1AG
+    - [ ] Dislocated Shoulder: -1ST
+    - [ ] Dead
+    - [ ] Reroll if stat is at minimum (source?)
+- [ ] Apothecary
+    - [ ] Use on KO
+    - [ ] Use on BH
+    - [ ] Use on Casualty
+    - [ ] Use on injury when pushed into the crowd
+    - [ ] Select first roll
+    - [ ] Select 2nd roll
+- [ ] Scoring
+    - [x] Moving into the End Zone with the ball using a standard move
+    - [x] Follow-up into the End Zone
+    - [x] Jumping into the End Zone with the ball
+    - [x] Leaping into the End Zone with the ball
+    - [x] Picking the ball up in the Endzone
+    - [x] Catching the ball after a pass in the end zone
+    - [x] Catching the ball after a hand-off in the end zone
+    - [x] Catch scatter in endzone
+    - [x] Catch deviate in endzone
+    - [x] Catching the ball after it bouncing into the end zone
+    - [x] Catching the ball in the end zone after a throw-in
+    - [x] Push opponent player to scoring position during block, but is knocked down (no score).
+    - [x] Throw Team-mate. Player lands in the end zone
+    - [ ] Throw Team-mate. Two balls in play. Player with ball lands falls on another ball. Both balls bounce to the end zone and is caught.
+    - [x] Chain push: Own Player with the ball is pushed into the end zone
+    - [x] Chain push: Opponent Player with the ball is pushed into the end zone
+    - [ ] Using Ball & Chain to move into the End Zone (not really supported, but just in case)
+    - [x] Pushed into end zone after a block
+    - [ ] Score in opponent turn - move turn counter
+    - [ ] Score in opponent turn - at end of half
+    - [ ] Score after pushback (holding ball)
+    - [ ] Score after pushback into ball that ends up bouncing to a player in a scoring position.
+    - [ ] Score after Stumble and Followup
+    - [ ] Score after Pow and Followup
+    - [ ] Opponent score after Stumble (with dodge)
+    - [ ] Opponent score after Pushback (with dodge)
+    - [ ] Attacker is trapped, but pushes another player into a scoring position. A touchdown is scored.
+- [ ] Detect Stalling
+    - [ ] Nega-trait players cannot Stall (as they all require rolls)
+    - [ ] Check stalling if player gets ball from catch
+- [ ] Conceding
+    - [ ] Free if 3 or less players at beginning of turn
+
+## Actions
+
+- [ ] Move Action
+    - [x] Select player and end action before moving doesn't doesn't mark the player as used.
+    - [x] Starting a move action while prone and aborting it again doesn't mark player as used
+    - [x] Moving any square mark the action as "used".
+    - [x] Action doesn't end when no more "normal move" is left, only when all rushes are also used.
+- [ ] Block Action
+    - [x] Cannot block while prone
+    - [x] Can only block if marking the player.
+    - [x] Unlimited blocks
+    - [x] 1 - 3 dice rolls depending on strength
+    - [x] Turnover if knocked down
+    - [x] Assists
+        - [x] Assists from open players
+        - [x] Players being marked themselves cannot assist
+        - [x] Prone players cannot assist
+    - [x] Player Down!
+    - [x] Both Down!
+    - [ ] Push Back!
+        - [x] Push direction
+        - [x] Can only push into empty squares
+        - [x] Follow up
+        - [x] Chain Push into free space
+        - [x] Push into ball bounces it
+        - [x] Bounce happens after push is resolved
+        - [x] Can only push into the crowd if no free space.
+        - [x] Chain push prone player
+        - [x] Own player chain pushed into crowd
+        - [x] Own Player with ball pushed into crowd -> throwin -> turnover
+        - [x] Player with ball pushed into crowd - > throwin
+        - [ ] Chain Push Attacker away
+        - [ ] Chain Push Defender away
+        - [ ] Chain Push infinite circle
+    - [x] Stumble
+    - [x] Pow!
+    -  [ ] Pow into crowd only roll crowd injury
+- [ ] Blitz Action
+    - [x] Must select target before starting blitz
+    - [x] Rush To Blitz
+    - [x] Cannot blitz if no more move
+    - [x] Cannot blitz if no valid targets
+    - [x] Move after blitz
+    - [x] Blitz uses 1 move
+    - [x] Fail rush just before blitz
+- [ ] Foul Action
+    - [x] Must select player when starting action: Prone or Stunned
+    - [x] Can only foul selected player
+    - [x] Assists
+    - [x] Caught by the Ref
+    - [x] Sent-off is a turnover
+    - [x] Action end after foul
+    - [x] Fouling does not take up a move
+    - [x] Argue the call tests
+- [ ] Hand-off Action
+    - [x] Only 1 hand-off pr. turn
+    - [x] Move uses action
+    - [x] Can cancel action if no move/handoff is done
+    - [x] Can start action without having the ball
+    - [x] Action ends automatically after handover
+    - [x] Can hand-over after all moves are used
+    - [x] Players with PA - can still hand-off
+    - [x] Test against agility to catch it
+    - [x] Ball bounce from target player if not caught
+    - [x] Cannot hand-off to opponent
+- [ ] Argue the Call Table
+    - [x] You're Outta Here - Bans Coach / Cannot argue again / Effect Brilliant Coaching
+    - [x] I Don't Care
+    - [x] Well, When You Put It Like That...
+- [ ] Pass Action
+    - [x] 1 pass action pr turn
+    - [x] Action used without throwing
+    - [x] Throw without moving
+    - [x] Cannot move after throw
+    - [x] Throw to any square within range
+    - [x] Can cancel throw part and restart it
+    - [x] Quick pass
+    - [x] Short pass
+    - [x] Long pass
+    - [x] Long bomb
+    - [x] Marked modifiers to parser
+    - [x] Accurate pass
+    - [x] Inaccurate pass
+    - [x] Wildly inaccurate pass
+    - [x] Fumbled pass
+    - [x] Bounce from target if not caught
+    - [x] Passing Interference (players under the ruler)
+        - [x] Choose not to deflect
+        - [x] Must be standing with a tackle zone
+        - [x] Opposing coach chooses player if multiple options
+        - [x] Modifiers
+        - [x] Scatter if failed catch
+        - [x] Run Passing Interference before going out of bounds
+        - [x] Run Passing Interference on accurate pass
+        - [x] Run Passing Interference on inaccurate pass
+        - [x] Run Passing Interference on Wildly inaccurate pass
+        - [x] Convert deflection into interception
+        - [x] Deflect, but fails to catch, ball ends up on floor
+        - [x] Deflect, but fails to catch, ball ends up on thrower team
+        - [x] Deflect, but fails to catch, ball ends up on interceptor team
+        - [x] Deflect, but fails to catch, scatters the ball out of bounds
+        - [x] Passing Interference on ball going out of bounds
+- [ ] Throw Team-mate Action
+    - [x] Require Throw Team-mate and Right Stuff traits
+    - [x] Right Stuff player must have Strenght 3 or less
+    - [x] Pass Action and Throw Team-mate are mutually exclusive
+    - [x] Action used when moving without throwing
+    - [x] Action used when throwing without moving
+    - [x] Cannot move after the throw
+    - [x] Superb Throw
+    - [x] Successful Throw
+    - [x] Terrible Throw
+    - [x] Fumbled Throw
+    - [x] Scatter on non-fumbled throws
+    - [x] Land Superb throw
+    - [x] Land Fumbled throw
+    - [x] Land Successful throw
+    - [x] Land Terrible throw
+    - [x] Marker modifiers on landing
+    - [x] Land in an occupied square
+    - [x] Turnover if landing on a player from their own team
+    - [x] Not turnover if landing on player from an opponent team
+    - [x] No Turnover if a thrown player is knocked down and not holding the ball
+    - [x] Turnover if the thrown player is knocked down and is holding the ball
+    - [x] Land in the occupied square with prone player. Roll injury again
+    - [x] Land in the end-zone with ball trigger touchdown.
+    - [x] Land on a player with the ball. Ball gets knocked loose. It bounces immediately
+    - [x] Player with a ball lands badly on another ball. Player ball is bounced first, then ball on ground
+    - [x] Player with a ball lands successfully on the ball. Ball on the ground bounces after landing.
+    - [x] Crash Landing
+    - [x] Landing in the crowd
+
+## Statistics
+
+- [ ] Track Star Player Points
+    - [ ] ...
+- [ ] Track statistics (not in the rules)
+    - [ ] ... (figure out what to track)
+
+## Game Logs
+
+- [ ] Figure out how to do logging
+    - [ ] Dice Rolls?
+    - [ ] Nested logging?
+    - [ ] Different levels of logging?
+
+## BB7
+
+- [ ] Place Kick (BB7): All locations not on kicking teams side.
+- [ ] Touchback ((BB7): Only happens when crossing back to kicker's side, not in No Man's Land.
+
+
+

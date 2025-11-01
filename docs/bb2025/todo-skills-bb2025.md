@@ -1,0 +1,256 @@
+# Skills - BB2025
+
+This document lists all skills known in the Blood Bowl 2025 Ruleset and whether
+they are implemented in Jervis. If a skill was introduced after the BB2025 base
+rules, a reference to its source is provided.
+
+Skills marked with * are mandatory.
+Skill keywords used in the rulebook are added in ().
+
+As a general rule, skills are implemented faithfully, i.e., they should follow
+the rules as written. This also includes choosing whether to use them or not.
+The rules module will generally always ask for usage, but this might be
+responded to automatically by higher layers in either the server or the client
+before being shown as a dialog to players.
+
+Skills should only be marked as completed here if they are implemented and have
+a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2025/skills`.
+
+## Agility Skills
+
+- [ ] Catch
+    - [x] Reroll catching the landing after kickoff
+    - [x] Reroll catching a successful Pass
+    - [x] Reroll catching a bouncing ball
+    - [x] Reroll catching a hand-off
+    - [x] Reroll catching a deviated ball
+    - [x] Reroll catching a scattered ball
+    - [x] Reroll catching a bouncing ball
+    - [ ] Reroll convert a deflection into interception
+    - [x] Only works on failed catches
+    - [x] Does not work if missing tackle zones
+    - [ ] Works multiple times pr. turn
+- [ ] Diving Catch
+- [ ] Diving Tackle
+- [ ] Dodge
+- [ ] Defensive
+- [ ] Hit and Run
+- [ ] Jump Up
+- [ ] Leap
+- [ ] Safe Pair of Hands
+- [ ] Sidestep
+- [ ] Sprint
+- [ ] Sure Feet
+
+## Devious Skills
+
+- [ ] Dirty Player
+- [ ] Eye Gouge
+- [ ] Fumblerooskie
+- [ ] Lethal Flight
+- [ ] Pile Driver
+- [ ] Put the Boot In
+- [ ] Quick Foul
+- [ ] Saboteur
+- [ ] Shadowing
+- [ ] Sneaky Git
+- [ ] Violent Innovator
+
+## General Skills
+
+- [ ] Block
+- [ ] Dauntless
+- [ ] Fend
+    - [ ] Prevents Frenzy from working
+- [ ] Frenzy*
+    - [ ] Must take two blocks if player if able
+    - [ ] Works during Block and Blitz
+    - [ ] Must rush if needed
+    - [ ] 2nd block isn't taken in case of a touchdown
+    - [ ] Cannot take 2nd block if no more move/rushes left
+    - [ ] Works on Rooted player (even though they are not pushed back (FAQ)
+    - [ ] Works on Stand Firm player - No FAQ, but the same reasoning as for Rooted.
+    - [ ] Roll twice for Foul Appearance (FAQ)
+    - [ ] Frenzy 2nd block is not taken when defender is using Fend (as they cannot follow up)
+    - [ ] Works on players with the Foul Appearance trait
+    - [ ] 2nd block is not required to be a normal block but can be any valid "block" special action (FAQ)
+- [ ] Kick
+- [ ] Pro
+- [ ] Steady Footing
+- [ ] Strip Ball
+- [ ] Sure Hands
+- [ ] Tackle
+- [ ] Taunt
+- [ ] Wrestle
+
+## Mutations
+
+- [ ] Big Hand
+- [ ] Claws
+- [ ] Disturbing Presence*
+- [ ] Extra Arms
+- [ ] Foul Appearance*
+- [ ] Horns
+- [ ] Iron Hard Skin
+- [ ] Monstrous Mouth
+- [ ] Prehensile Tail
+- [ ] Tentacles
+- [ ] Two Heads
+- [ ] Very Long Legs
+
+## Passing Skills
+
+- [ ] Accurate
+- [ ] Cannoneer
+- [ ] Cloud Burster
+- [ ] Dump-off
+- [ ] Give and Go
+- [ ] Hail Mary Pass
+- [ ] Leader
+    - [ ] Available after setup
+    - [ ] Does not reset for overtime
+    - [ ] Carry over into overtime
+    - [ ] After Knocked Down
+    - [ ] After Falling over
+    - [ ] Removed immediately if pushed into the crowd
+    - [ ] Not removed if other players with Leader on the field
+    - [ ] Only one, regardless of number of players
+- [ ] Nerves of Steel
+- [ ] On the Ball
+- [ ] Pass
+- [ ] Punt
+- [ ] Safe Pass
+
+## Strength Skills
+
+- [ ] Arm Bar
+- [ ] Brawler
+- [ ] Break Tackle
+- [ ] Bulls Eye
+- [ ] Grab
+- [ ] Guard
+- [ ] Juggernaut
+- [ ] Mighty Blow
+- [ ] Multiple Block
+    - [ ] During Multiple Block: Scoring Turnovers will win over End-Turn turnovers.
+- [ ] Stand Firm
+- [ ] Strong Arm
+- [ ] Thick Skull
+
+## Traits
+
+- [ ] Animal Savagery*
+- [ ] Animosity (X)*
+- [ ] Always Hungry*
+- [ ] Ball & Chain*
+- [ ] Bombardier
+- [ ] Bone Head*
+- [ ] Blood Lust (X+)*
+- [ ] Breathe Fire
+- [ ] Chainsaw*
+- [ ] Decay*
+- [ ] Hypnotic Gaze
+- [ ] Kick Team-mate
+- [ ] Loner (X+)*
+- [ ] No Ball*
+- [ ] Plague Ridden
+- [ ] Pogo Stick
+- [ ] Projectile Vomit
+- [ ] Really Stupid*
+- [ ] Regeneration
+- [ ] Right Stuff*
+- [ ] Secret Weapon*
+- [ ] Stab
+- [ ] Stunty*
+- [ ] Swarming
+- [ ] Swoop
+- [ ] Take Root*
+- [ ] Titchy*
+- [ ] Throw Team-mate
+- [ ] Timmm-ber!
+- [ ] Unchannelled Fury*
+- [ ] Unsteady
+
+# Star Player Skills
+
+## Rulebook
+
+TODO
+
+## Extra Star Players (Warhammer Community Download)
+Source: https://www.warhammer-community.com/en-gb/downloads/blood-bowl/
+
+- [ ] Blast It!, Barik Farblast
+- [ ] Putrid Regurgitation, Bilerot Vomitflesh
+- [ ] Sneakiest of the Lot, The Black Gobbo
+- [ ] Look Into My Eyes, Boa Kon'sstriktr
+- [ ] Kaboom!, Bomber Dribblesnot
+- [ ] Tasty Morsel, 'Captain' Karina von Riesz
+- [ ] Reliable, Deeproot Strongbranch
+- [ ] A Sneaky Pair, Dribl & Drull
+- [ ] Mesmerizing Dance, Eldril Sidewinder
+- [ ] Baleful Hex, Estelle La Veneaux
+- [ ] Whirling Dervish, Fungus the Loon
+- [ ] Frenzied Rush, Glart Smashrip
+- [ ] Shot to Nothing, Gloriel Summerbloom
+- [ ] Primal Savagery, Glotl Stop
+- [ ] I'll Carry You, Grak & Crumbleberry
+- [ ] Gored by the Bull, Grashnak Blackhoof
+- [ ] Incorporeal, Gretchen Wächter
+- [ ] Wisdom of the White Dwarf, Grombrindal
+- [ ] Quick Bite, Guffle Pusmaw
+- [ ] Treacherous, Hakflem Skuttlespike
+- [ ] Old Pro, Helmut Wolf
+- [ ] Unstoppable Momentum, H'thark the Unstoppable
+- [ ] Dwarven Scourge, Ivan ‘the Animal’ Deathshroud
+- [ ] Raiding Party, Ivar Eriksson
+- [ ] Swift as the Breeze, Jordell Freshbreeze
+- [ ] Indomitable, Karla Von Kill
+- [ ] Black Ink, Kiroth Krakeneye
+- [ ] I'll Be Back, Kreek Rustgouger
+- [ ] Vicious Vines, Maple Highgrove
+- [ ] Maximum Carnage, Max Spleenripper
+- [ ] Crushing Blow, Mighty Zug
+- [ ] Kick ’em While They’re Down!, Nobbla Blackwart
+- [ ] Toxin Connoisseur, Rashnak Backstabber
+- [ ] Slashing Nails, Roxanna Darknail
+- [ ] Yoink!, Scrappa Sorehead
+- [ ] Fury of the Blood Good, Scyla Anfingrimm
+- [ ] Pump Up the Crowd, Skrorg Snowpelt
+- [ ] Working in Tandem, Lucient & Valen Swift
+- [ ] Furious Outburst, Swiftwine Glimmershard
+- [ ] Beer Barrel Bash, Thorsson Stoutmead
+- [ ] Savage Mauling, Wilhelm Chaney
+- [ ] Woodland Fury, Willow Rosebark
+- [ ] Watch out, Withergrasp Doubledrool
+- [ ] Blastin' Solves Everything, Zzharg Madeye
+- [ ] Excuse Me, Are You a Zoat?, Zolcath the Zoat
+
+## BB2020 Players
+Figure out what happened to these players and either remove them or add them to 
+the correct list.
+
+- [ ] All You Can Eat, Cindy Piewhistle: https://bbtactics.com/all-you-can-eat/
+- [ ] Blind Rage, Akhorne the Squirrel: https://bbtactics.com/blind-rage/
+- [ ] Bounding Leap, Rowana Foresetfoot
+- [ ] Brutal Block, Frank ‘n’ Stein
+- [ ] Catch of the Day, Rodney Roachbait: https://youtu.be/Q95AhhT8MJ4?si=FCgqzgXcPNvZ5tjb&t=235
+- [ ] Consummate Professional, Griff Oberwald
+- [ ] Crushing Blow, Varag Ghoul-Chewer
+- [ ] Ghostly Flames, Bryce 'the Slice' Cambuel: https://bbtactics.com/ghostly-flames/
+- [ ] Halfling Luck, Puggy Baconbreath
+- [ ] Lord of Chaos, Lord Borak The Despoiler
+- [ ] Master Assassin, Skitter Stab-Stab
+- [ ] Ram, Rumbelow Sheepskin
+- [ ] Slayer, Grim Ironjaw
+- [ ] Star of the Show, Count Luthor von Drakenborg: https://bbtactics.com/star-of-the-show/
+- [ ] Strong Passing Game, Skrull Halfheight
+- [ ] The Ballista, Morg ‘n’ Thorg
+- [ ] Thinking Man’s Troll, Ripper Bolgrot
+- [ ] Watch Out!, Withergrasp Doubledrool
+
+# Special Skills
+
+This is not really skills, but more like "Special Rules". Unsure exactly how to track these.
+
+- None

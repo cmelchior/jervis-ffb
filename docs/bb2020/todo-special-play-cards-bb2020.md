@@ -1,4 +1,9 @@
-# Special Play Cards
+# Special Play Cards - BB2020
+
+---
+NOTE: This document was forked when BB2025 was released. Since the focus will be
+on having full support for BB2025, future updates to this document are unlikely.
+---
 
 In Blood Bowl 2020, there is an huge number of Special Play cards. 48 comes with the base
 game, but then each team also has a set. In total there are more than 300 different cards.

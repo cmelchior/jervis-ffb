@@ -1,9 +1,14 @@
-# Game Flow Implementation
+# Game Flow Implementation - BB2020
+
+---
+NOTE: This document was forked when BB2025 was released. Since the focus will be
+on having full support for BB2025, future updates to this document are unlikely.
+---
 
 This document is used during development as a list tracker for things that need 
 to be implemented. Things should only be marked as completed when they have unit 
 tests covering the particular feature. This document only covers the core game
-rules. Skills are tracked separately in [todo-skills.md](todo-skills.md). 
+rules. Skills are tracked separately in [todo-skills-bb2020.md](todo-skills-bb2020.md). 
 
 The order of items should roughly reflect the order in things appear in the 
 rule book.

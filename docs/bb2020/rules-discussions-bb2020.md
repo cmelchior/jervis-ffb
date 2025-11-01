@@ -1,8 +1,14 @@
-# Rules Discussions
+# Rules Discussions - BB2020
 
-This file contains interesting discussions about rule ambiguities and how the rules should be
-interpreted. All of these are not implemented yet. This is just a list of things to keep an eye
-out for during development. See [rules-faq.md](rules-faq.md) for rules that are already implemented.
+---
+NOTE: This document was forked when BB2025 was released. Since the focus will be
+on having full support for BB2025, future updates to this document are unlikely.
+---
+
+This file contains interesting discussions about rule ambiguities and how the 
+rules should be interpreted in BB2020. All of these are not implemented yet. 
+This is just a list of things to keep an eye out for during development. See 
+[rules-faq.md](rules-faq.md) for rules that are already implemented.
 
 ## Chainsaw vs. Mighty Blow
 https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=33049
