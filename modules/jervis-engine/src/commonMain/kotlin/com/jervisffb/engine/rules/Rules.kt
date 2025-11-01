@@ -97,14 +97,14 @@ import kotlinx.serialization.Serializable
 open class Rules(
     // Name of the rule set
     open val name: String,
-    // Which base version is this ruleset based on
-    open val gameVersion: GameVersion,
-    // What type of game is this ruleset intended for
+    // Which base version of Blood Bowl is this ruleset based on
+    open val baseVersion: GameVersion,
+    // What type of game is this ruleset intended for.
     open val gameType: GameType,
 
     // Which timer settings are in place for this game
     open val timers: TimerSettings = TimerSettings.Companion.BB_CLOCK,
-    // Which inducements are available in this game
+    // Which inducements are available in this game.
     open val inducements: InducementSettings = InducementSettings(DEFAULT_INDUCEMENTS),
 
     // Characteristic limits
@@ -793,7 +793,7 @@ open class Rules(
      */
     class Builder(rules: Rules) {
         var name: String = rules.name
-        var gameVersion: GameVersion = rules.gameVersion
+        var gameVersion: GameVersion = rules.baseVersion
         var gameType: GameType = rules.gameType
         var timers: TimerSettings.Builder = rules.timers.toBuilder()
         var inducements: InducementSettings.Builder = rules.inducements.toBuilder()

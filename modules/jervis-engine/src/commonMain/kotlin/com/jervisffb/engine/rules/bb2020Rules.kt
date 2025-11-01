@@ -25,7 +25,7 @@ import kotlinx.serialization.Serializable
  */
 abstract class BB2020Rules : Rules(
     name = "Blood Bowl 2020 Rules",
-    gameVersion = GameVersion.BB2020,
+    baseVersion = GameVersion.BB2020,
     gameType = GameType.STANDARD
 ) {
 }

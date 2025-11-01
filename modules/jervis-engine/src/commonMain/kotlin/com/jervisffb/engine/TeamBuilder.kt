@@ -41,7 +41,7 @@ class TeamBuilder(val rules: Rules, val roster: Roster) {
     var id: TeamId = TeamId("team-${Random.nextLong()}")
     var coach: Coach = Coach(CoachId("jervis-coach"), "Jervis")
     var name: String = ""
-    var version: GameVersion = rules.gameVersion
+    var version: GameVersion = rules.baseVersion
     var type: GameType = GameType.STANDARD
     var rerolls: Int = 0
         set(value) {

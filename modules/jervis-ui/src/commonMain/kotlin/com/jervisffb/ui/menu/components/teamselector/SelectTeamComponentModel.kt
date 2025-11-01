@@ -1,7 +1,6 @@
 package com.jervisffb.ui.menu.components.teamselector
 
 import androidx.compose.runtime.mutableStateOf
-import co.touchlab.kermit.Logger.Companion.e
 import com.jervisffb.engine.model.Coach
 import com.jervisffb.engine.model.CoachId
 import com.jervisffb.engine.model.Team
@@ -76,7 +75,7 @@ class SelectTeamComponentModel(
             }
             teams
                 .filter {
-                    it.type == rules.gameType && it.version == rules.gameVersion
+                    it.type == rules.gameType && it.version == rules.baseVersion
                 }
                 .let {
                     availableTeams.value = it.sortedBy { it.teamName }
