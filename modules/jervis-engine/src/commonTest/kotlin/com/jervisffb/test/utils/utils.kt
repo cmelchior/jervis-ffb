@@ -63,8 +63,7 @@ fun SelectSkillReroll(type: SkillType): GameAction {
 /**
  * Select the first available team reroll of the given type.
  *
- * If the reroll type isn't available
- * and error is thrown.
+ * If the reroll type isn't available, an error is thrown.
  */
 @Suppress("TestFunctionName")
 inline fun <reified T : TeamReroll> SelectTeamReroll(): GameAction {

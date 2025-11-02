@@ -170,7 +170,9 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Swarming
 - [ ] Swoop
 - [ ] Take Root*
-- [ ] Titchy*
+- [x] Titchy*
+  - [x] +1 when making a dodge
+  - [x] Does not give -1 when dodging into a square marked by this player
 - [ ] Throw Team-mate
 - [ ] Timmm-ber!
 - [ ] Unchannelled Fury*

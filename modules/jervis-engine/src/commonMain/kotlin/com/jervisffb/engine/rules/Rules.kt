@@ -544,6 +544,27 @@ open class Rules(
     }
 
     /**
+     * Returns all players not from the [markedTeam] that can mark the [square].
+     */
+    fun getMarkingPlayers(
+        game: Game,
+        markedTeam: Team,
+        square: FieldCoordinate,
+    ): List<Player> {
+        if (!square.isOnField(this)) throw IllegalArgumentException("${square.toLogString()} is not on the field")
+        return square.getSurroundingCoordinates(this).mapNotNull { coordinate ->
+            val markingPlayer: Player? = game.field[coordinate].player
+            val otherTeam = markingPlayer?.team
+            val canMark = markingPlayer?.let { canMarkPlayers(it) } ?: false
+            if (markingPlayer != null && otherTeam != markedTeam && canMark) {
+                markingPlayer
+            } else {
+                null
+            }
+        }
+    }
+
+    /**
      * Calculates how many opponent players are marking a given field square.
      * See page 26 in the rulebook.
      *

@@ -5,11 +5,13 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerNo
+import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
@@ -61,6 +63,12 @@ class BreakTackleTests: JervisGameBB2020Test() {
         assertEquals(BreakTackleModifier(player.strength, rules.baseVersion), context.rollModifiers.first())
         assertTrue(context.isSuccess)
         assertTrue(player.getSkill(SkillType.BREAK_TACKLE).used)
+        controller.rollForward(
+            NoRerollSelected(),
+        )
+        assertEquals(FieldCoordinate(14, 5), player.location)
+        assertEquals(PlayerState.STANDING, player.state)
+        assertTrue(player.getSkill(SkillType.BREAK_TACKLE).used)
     }
 
     @Test
@@ -72,17 +80,14 @@ class BreakTackleTests: JervisGameBB2020Test() {
             PlayerActionSelected(PlayerStandardActionType.MOVE),
             MoveTypeSelected(MoveType.STANDARD),
             FieldSquareSelected(FieldCoordinate(14, 5)),
-            DiceRollResults(1.d6), // Dodge roll, is not enough
+            DiceRollResults(2.d6), // Dodge roll, is not enough
             Confirm, // Use Break Tackle, still not enough
             SelectTeamReroll<RegularTeamReroll>(),
-            DiceRollResults(2.d6), // Dodge roll, should now succeed
+            DiceRollResults(3.d6), // Dodge roll, should now succeed (but only with Break Tackle)
         )
-
-        val context = state.getContext<DodgeRollContext>()
-        assertEquals(1, context.rollModifiers.size)
-        assertEquals(BreakTackleModifier(player.strength, rules.baseVersion), context.rollModifiers.first())
+        assertEquals(FieldCoordinate(14, 5), player.location)
+        assertEquals(PlayerState.STANDING, player.state)
         assertTrue(player.getSkill(SkillType.BREAK_TACKLE).used)
-        assertTrue(context.isSuccess)
     }
 
     @Test

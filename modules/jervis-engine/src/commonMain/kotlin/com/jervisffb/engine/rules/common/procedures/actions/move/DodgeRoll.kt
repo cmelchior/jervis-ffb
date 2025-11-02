@@ -36,11 +36,11 @@ import com.jervisffb.engine.model.context.DodgeRollContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.context.hasContext
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.modifiers.BreakTackleModifier
 import com.jervisffb.engine.model.modifiers.DodgeRollModifier
+import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportDodgeResult
 import com.jervisffb.engine.reports.ReportSkillUsed
@@ -124,7 +124,8 @@ object DodgeRoll: Procedure() {
      * Set all mandatory dodge modifiers.
      *
      * This includes:
-     *  1. -1 for each player marking the field being moved into.
+     *  1. -1 for each player marking the field being moved into, unless they
+     *     have Titchy*.
      *  2. Stunty* (Ignore all - marked modifiers in the target field)
      *  3. Titchy* (+1)
      */
@@ -134,14 +135,17 @@ object DodgeRoll: Procedure() {
             val player = context.player
             val modifiers = buildList {
                 // Add marking modifiers if the moving player doesn't have Stunty.
+                // Players with Titchy do not count when counting marks on the square
+                // being dodged into.
                 if (!player.hasSkill(SkillType.STUNTY)) {
-                    rules.addMarkedModifiers(
-                        state,
-                        player.team,
-                        context.targetSquare,
-                        this,
-                        DodgeRollModifier.MARKED
-                    )
+                    val marks = rules.getMarkingPlayers(
+                        game = state,
+                        markedTeam = player.team,
+                        square = context.targetSquare
+                    ).count { !it.isSkillAvailable(SkillType.TITCHY) }
+                    if (marks != 0) {
+                        add(MarkedModifier(marks, DodgeRollModifier.MARKED))
+                    }
                 }
                 if (player.hasSkill(SkillType.TITCHY)) {
                     add(DodgeRollModifier.TITCHY)
@@ -155,7 +159,7 @@ object DodgeRoll: Procedure() {
     }
 
     /**
-     * Choose whether dodging player should use Two Heads (if applicable).
+     * Choose whether the dodging player should use Two Heads (if applicable).
      */
     object ChooseToUseTwoHeads: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team
@@ -319,8 +323,8 @@ object DodgeRoll: Procedure() {
      */
     object CalculateSuccess: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            val afterReroll = state.hasContext<UseRerollContext>()
             val context = state.getContext<DodgeRollContext>()
+            val afterReroll = (context.roll?.rerolledResult != null)
             val success = testAgainstAgility(context.player, context.roll!!.result, context.rollModifiers)
             return compositeCommandOf(
                 SetContext(context.copy(isSuccess = success)),

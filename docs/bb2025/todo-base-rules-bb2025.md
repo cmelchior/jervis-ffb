@@ -479,6 +479,13 @@ book.
     - [x] Player with a ball lands successfully on the ball. Ball on the ground bounces after landing.
     - [x] Crash Landing
     - [x] Landing in the crowd
+- [ ] Secure the Ball
+  - [ ] Not allowed if Big Guy
+  - [ ] 2+, No modifiers, including Rain
+  - [ ] Not allowed if standing player with TZ's within 2 squares
+  - [ ] Action ends after pickup
+  - [ ] Cannot switch to "pickup" when moving into the ball
+  - [ ] Turnover if failing to secure the ball
 
 ## Statistics
 

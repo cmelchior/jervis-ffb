@@ -7,9 +7,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Titchy* skill.
+ * Representation of the Titchy*(Passive) skill.
  *
- * See page 87 in the rulebook.
+ * See page XX in the rulebook.
  */
 class Titchy(
     override val player: Player,
@@ -23,6 +23,6 @@ class Titchy(
     override val compulsory: Boolean = true
     override val resetAt: Duration = Duration.PERMANENT
     override var used: Boolean = false
-    override val workWithoutTackleZones: Boolean = false
-    override val workWhenProne: Boolean = false
+    override val workWithoutTackleZones: Boolean = true
+    override val workWhenProne: Boolean = true
 }
