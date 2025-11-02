@@ -3,6 +3,7 @@ package com.jervisffb.engine.rules.bb2025.skills
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.SkillKeyword
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.D6StandardSkillReroll
@@ -33,6 +34,10 @@ class Dodge(
     override val rerollDescription: String = "Dodge Reroll"
     override val rerollResetAt: Duration = Duration.END_OF_TURN
     override var rerollUsed: Boolean = false
+    override val keywords: List<SkillKeyword> = listOf(
+        SkillKeyword.ACTIVE,
+        SkillKeyword.ELITE,
+    )
 
     override fun canReroll(type: DiceRollType, value: List<DieRoll<*>>, wasSuccess: Boolean?): Boolean {
         return type == DiceRollType.DODGE

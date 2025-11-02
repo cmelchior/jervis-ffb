@@ -2,6 +2,7 @@ package com.jervisffb.engine.rules.bb2025.skills
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.SkillKeyword
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
@@ -25,4 +26,5 @@ class ThickSkull(
     override var used: Boolean = false
     override val workWithoutTackleZones: Boolean = true
     override val workWhenProne: Boolean = true
+    override val keywords: List<SkillKeyword> = listOf(SkillKeyword.PASSIVE)
 }

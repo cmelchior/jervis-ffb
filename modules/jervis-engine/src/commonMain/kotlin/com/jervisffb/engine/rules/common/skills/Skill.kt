@@ -2,6 +2,7 @@ package com.jervisffb.engine.rules.common.skills
 
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.SkillKeyword
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 
 /**
@@ -42,7 +43,10 @@ interface Skill<T> {
     val workWhenProne: Boolean
     // If the skill is temporary, this defines when the skill expires and is removed
     val expiresAt: Duration
+    // Any keywords associated with this skill (only used in BB2025)
+    val keywords: List<SkillKeyword>
     // Whether this skill is temporary (removed at latest and end of game) or not
     val isTemporary: Boolean
         get() = (expiresAt != Duration.PERMANENT)
+
 }

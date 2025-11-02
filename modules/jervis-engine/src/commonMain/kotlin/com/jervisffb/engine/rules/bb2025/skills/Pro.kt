@@ -4,6 +4,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.SkillKeyword
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.procedures.UseProReroll
@@ -28,6 +29,7 @@ class Pro(
     override var used: Boolean = false
     override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = false
+    override val keywords: List<SkillKeyword> = listOf(SkillKeyword.ACTIVE)
 
     override val rerollResetAt: Duration = Duration.END_OF_ACTIVATION
     override val rerollDescription: String = "Pro Reroll"

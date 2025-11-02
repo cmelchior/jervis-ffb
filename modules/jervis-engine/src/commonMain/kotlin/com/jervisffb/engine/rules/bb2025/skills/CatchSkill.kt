@@ -3,6 +3,7 @@ package com.jervisffb.engine.rules.bb2025.skills
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.RerollSourceId
 import com.jervisffb.engine.model.SkillId
+import com.jervisffb.engine.model.SkillKeyword
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.D6StandardSkillReroll
@@ -30,6 +31,7 @@ class CatchSkill(
     override var used: Boolean = false
     override val workWithoutTackleZones: Boolean = false
     override val workWhenProne: Boolean = false
+    override val keywords: List<SkillKeyword> = listOf(SkillKeyword.ACTIVE)
 
     // Catch is always available
     override val rerollResetAt: Duration = Duration.PERMANENT
