@@ -187,7 +187,22 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 
 ## Rulebook
 
-TODO
+- [ ] Krump and Smash, Varag Ghoul-Chewer
+- [ ] Savage Blow, Anqi Panqi
+- [ ] Master Assassin, Skitter Stab-Stab
+- [ ] Star of the Show, Count Luthor von Drakenborg
+- [ ] Dwarven Grit, Josef Bugman
+- [ ] Thinking Man’s Troll, Ripper Bolgrot
+- [ ] Slayer, Grim Ironjaw
+- [ ] Blind Rage, Akhorne the Squirrel
+- [ ] Consummate Professional, Griff Oberwald
+- [ ] All You Can Eat, Cindy Piewhistle
+- [ ] Halfling Luck, Puggy Baconbreath
+- [ ] The Ballista, Morg ‘n’ Thorg
+- [ ] Catch of the Day, Rodney Roachbait
+- [ ] Lord of Chaos, Lord Borak The Despoiler
+- [ ] Ram, Rumbelow Sheepskin
+- [ ] The Flashing Blade, Jeremiah Kool
 
 ## Extra Star Players (Warhammer Community Download)
 Source: https://www.warhammer-community.com/en-gb/downloads/blood-bowl/
@@ -242,23 +257,10 @@ Source: https://www.warhammer-community.com/en-gb/downloads/blood-bowl/
 Figure out what happened to these players and either remove them or add them to 
 the correct list.
 
-- [ ] All You Can Eat, Cindy Piewhistle: https://bbtactics.com/all-you-can-eat/
-- [ ] Blind Rage, Akhorne the Squirrel: https://bbtactics.com/blind-rage/
 - [ ] Bounding Leap, Rowana Foresetfoot
 - [ ] Brutal Block, Frank ‘n’ Stein
-- [ ] Catch of the Day, Rodney Roachbait: https://youtu.be/Q95AhhT8MJ4?si=FCgqzgXcPNvZ5tjb&t=235
-- [ ] Consummate Professional, Griff Oberwald
-- [ ] Crushing Blow, Varag Ghoul-Chewer
 - [ ] Ghostly Flames, Bryce 'the Slice' Cambuel: https://bbtactics.com/ghostly-flames/
-- [ ] Halfling Luck, Puggy Baconbreath
-- [ ] Lord of Chaos, Lord Borak The Despoiler
-- [ ] Master Assassin, Skitter Stab-Stab
-- [ ] Ram, Rumbelow Sheepskin
-- [ ] Slayer, Grim Ironjaw
-- [ ] Star of the Show, Count Luthor von Drakenborg: https://bbtactics.com/star-of-the-show/
 - [ ] Strong Passing Game, Skrull Halfheight
-- [ ] The Ballista, Morg ‘n’ Thorg
-- [ ] Thinking Man’s Troll, Ripper Bolgrot
 - [ ] Watch Out!, Withergrasp Doubledrool
 
 # Special Skills
