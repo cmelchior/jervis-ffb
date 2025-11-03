@@ -1,5 +1,6 @@
 package com.jervisffb.resources.bb2025
 
+import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerSize
 import com.jervisffb.engine.model.PositionId
 import com.jervisffb.engine.model.RosterId
@@ -44,7 +45,7 @@ val HUMAN_LINEMAN =
         emptyList(),
         listOf(GENERAL),
         listOf(AGILITY, STRENGTH),
-        emptyList(),
+        listOf(PlayerKeyword.HUMAN, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/human_lineman.png",8),
         SingleSprite.ini("${portraitRootPath}/human_lineman.png")
@@ -65,7 +66,7 @@ val HUMAN_THROWER =
         ),
         listOf(GENERAL, PASSING),
         listOf(AGILITY, STRENGTH),
-        emptyList(),
+        listOf(PlayerKeyword.HUMAN, PlayerKeyword.THROWER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/human_thrower.png",2),
         SingleSprite.ini("${portraitRootPath}/human_thrower.png")
@@ -85,7 +86,7 @@ val HUMAN_CATCHER =
         ),
         listOf(AGILITY, GENERAL),
         listOf(STRENGTH, PASSING),
-        emptyList(),
+        listOf(PlayerKeyword.HUMAN, PlayerKeyword.CATCHER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/human_catcher.png", 4),
         SingleSprite.ini("${portraitRootPath}/human_catcher.png")
@@ -102,7 +103,7 @@ val HUMAN_BLITZER =
         listOf(BLOCK.id()),
         listOf(GENERAL, STRENGTH),
         listOf(AGILITY, PASSING),
-        emptyList(),
+        listOf(PlayerKeyword.HUMAN, PlayerKeyword.BLITZER),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/human_blitzer.png", 4),
         SingleSprite.ini("${portraitRootPath}/human_blitzer.png")
@@ -123,7 +124,7 @@ val HALFLING_HOPEFUL =
         ),
         listOf(AGILITY),
         listOf(GENERAL, STRENGTH),
-        emptyList(),
+        listOf(PlayerKeyword.HALFLING, PlayerKeyword.LINEMAN),
         PlayerSize.STANDARD,
         SpriteSheet.ini("${iconRootPath}/human_halflinghopeful.png", 8),
         SingleSprite.ini("${portraitRootPath}/human_halflinghopeful.png")
@@ -146,7 +147,7 @@ val OGRE =
         ),
         listOf(STRENGTH),
         listOf(AGILITY, GENERAL),
-        emptyList(),
+        listOf(PlayerKeyword.OGRE, PlayerKeyword.BIG_GUY),
         PlayerSize.BIG_GUY,
         SpriteSheet.ini("${iconRootPath}/human_ogre.png", 8),
         SingleSprite.ini("${portraitRootPath}/human_ogre.png")

@@ -8,12 +8,14 @@ package com.jervisffb.engine.model
  * BB 2020, e.g., Rooted and Hypno-Gazed can also be considered "effects",
  * although the rulebook mostly focus on what the effect does.
  */
-enum class PlayerStatusEffect {
+enum class PlayerStatusEffect(val description: String) {
     // BB 2020
-    ROOTED,
-    HYPNO_GAZED,
+    HYPNO_GAZED("Hypno-Gazed"),
 
     // BB 2025
-    DISTRACTED,
-    CHOMPED,
+    ROOTED("Rooted"),
+    DISTRACTED("Distracted"),
+    CHOMPED("Chomped"),
+    EYE_GOUGE("Eye Gouge"),
+    DODGY_SNACK("Dodgy Snack")
 }

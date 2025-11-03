@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -56,9 +57,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.jervisffb.engine.model.PlayerState
+import com.jervisffb.engine.model.PlayerStatusEffect
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayerCard
+import com.jervisffb.ui.game.view.JervisTheme.rulebookBlue
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.jdp
@@ -291,7 +295,11 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                         ,
                     ) {
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(borderSize*2),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(borderSize*2)
+                            ,
                         ) {
                             val skillFontSize = 16.jsp
                             val skills = player.model.skills
@@ -319,11 +327,72 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                                 }
                             }
                         }
+                        FlowRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(borderSize*2)
+                            ,
+                            horizontalArrangement = Arrangement.spacedBy(borderSize, Alignment.End),
+                            verticalArrangement = Arrangement.spacedBy(borderSize),
+                        ) {
+                            when (player.model.state) {
+                                PlayerState.PRONE -> {
+                                    StatusText("Prone", JervisTheme.statusProne)
+                                }
+                                PlayerState.STUNNED -> {
+                                    StatusText("Stunned", JervisTheme.statusStunned)
+                                }
+                                PlayerState.STUNNED_OWN_TURN -> {
+                                    StatusText("Stunned", JervisTheme.statusStunned)
+                                }
+                                else -> { /* Do nothing */ }
+                            }
+                            player.model.statusEffects.forEach { statusEffect ->
+                                when (statusEffect) {
+                                    PlayerStatusEffect.ROOTED -> {
+                                        StatusText("Rooted", JervisTheme.statusRooted)
+                                    }
+                                    PlayerStatusEffect.DISTRACTED -> {
+                                        StatusText("Distracted", JervisTheme.statusDistracted)
+                                    }
+                                    PlayerStatusEffect.CHOMPED -> {
+                                        StatusText("Chomped", JervisTheme.statusChomped)
+                                    }
+                                    PlayerStatusEffect.EYE_GOUGE -> {
+                                        StatusText("Eye Gouge", JervisTheme.statusEyeGouge)
+                                    }
+                                    PlayerStatusEffect.DODGY_SNACK -> {
+                                        StatusText("Dodgy Snack", JervisTheme.statusDodgySnack)
+                                    }
+                                    PlayerStatusEffect.HYPNO_GAZED -> {
+                                        // Ignore
+                                    }
+                                }
+                            }
+                            player.model.keywords.forEach { keyword ->
+                                StatusText(
+                                    text = keyword.description,
+                                    textColor = JervisTheme.white,
+                                    backgroundColor = if (player.model.isOnHomeTeam()) JervisTheme.rulebookRed else JervisTheme.rulebookBlue)
+                            }
+                        }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun StatusText(text: String, backgroundColor: Color, textColor: Color = JervisTheme.contentTextColor) {
+    Text(
+        text = text,
+        modifier = Modifier.background(backgroundColor).padding(4.jdp),
+        fontSize = 14.jsp,
+        lineHeight = 1.0.em,
+        color = textColor,
+        fontWeight = FontWeight.SemiBold,
+    )
 }
 
 @Composable
