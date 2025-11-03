@@ -24,6 +24,7 @@ import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.Coin
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.BlockType
@@ -165,6 +166,11 @@ fun defaultKickOffAwayTeam(
 
 fun activatePlayer(playerId: String, type: PlayerStandardActionType) = arrayOf(
     PlayerSelected(PlayerId(playerId)),
+    PlayerActionSelected(type),
+)
+
+fun activatePlayer(player: Player, type: PlayerStandardActionType) = arrayOf(
+    PlayerSelected(player.id),
     PlayerActionSelected(type),
 )
 

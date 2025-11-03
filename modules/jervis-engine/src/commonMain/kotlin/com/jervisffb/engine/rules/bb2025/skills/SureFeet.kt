@@ -28,8 +28,7 @@ class SureFeet(
     override val workWhenProne: Boolean = false
     override val keywords: List<SkillKeyword> = listOf(SkillKeyword.ACTIVE)
 
-    override val rerollResetAt: Duration =
-        Duration.END_OF_TURN
+    override val rerollResetAt: Duration = Duration.END_OF_TURN
     override val rerollDescription: String = "Sure Feet Reroll"
     override var rerollUsed: Boolean = false
 

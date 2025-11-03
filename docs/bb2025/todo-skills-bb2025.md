@@ -40,7 +40,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Safe Pair of Hands
 - [ ] Sidestep
 - [ ] Sprint
-- [ ] Sure Feet
+- [x] Sure Feet
+  - [x] Reroll failed Rush
+  - [x] Reroll successful Rush
+  - [x] Only once pr turn
 
 ## Devious Skills
 
