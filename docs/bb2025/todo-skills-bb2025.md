@@ -256,6 +256,7 @@ Source: https://www.warhammer-community.com/en-gb/downloads/blood-bowl/
 - [ ] Crushing Blow, Mighty Zug
 - [ ] Kick ’em While They’re Down!, Nobbla Blackwart
 - [ ] Toxin Connoisseur, Rashnak Backstabber
+- [ ] Bounding Leap, Rowana Foresetfoot
 - [ ] Slashing Nails, Roxanna Darknail
 - [ ] Yoink!, Scrappa Sorehead
 - [ ] Fury of the Blood Good, Scyla Anfingrimm
@@ -273,7 +274,6 @@ Source: https://www.warhammer-community.com/en-gb/downloads/blood-bowl/
 Figure out what happened to these players and either remove them or add them to 
 the correct list.
 
-- [ ] Bounding Leap, Rowana Foresetfoot
 - [ ] Brutal Block, Frank ‘n’ Stein
 - [ ] Ghostly Flames, Bryce 'the Slice' Cambuel: https://bbtactics.com/ghostly-flames/
 - [ ] Strong Passing Game, Skrull Halfheight
