@@ -6,9 +6,9 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 
 /**
- * Context data for a player making a dodge rol.
+ * Context data for a player making a dodge roll.
  *
- * @see [com.jervisffb.rules.bb2020.procedures.actions.move.DodgeRoll]
+ * @see com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
  */
 data class DodgeRollContext(
     val player: Player,

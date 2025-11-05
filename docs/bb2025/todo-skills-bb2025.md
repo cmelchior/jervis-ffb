@@ -101,7 +101,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Monstrous Mouth
 - [ ] Prehensile Tail
 - [ ] Tentacles
-- [ ] Two Heads
+- [x] Two Heads
+  - [x] Use skill on dodge
+  - [x] Use skill multiple times pr. turn
+  - [x] Skill use is optional
 - [ ] Very Long Legs
 
 ## Passing Skills

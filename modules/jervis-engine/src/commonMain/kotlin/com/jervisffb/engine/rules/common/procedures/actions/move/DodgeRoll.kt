@@ -166,8 +166,8 @@ object DodgeRoll: Procedure() {
 
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<DodgeRollContext>()
-            return if (context.player.hasSkill(SkillType.TWO_HEADS)) {
-                return listOf(ConfirmWhenReady, CancelWhenReady)
+            return if (context.player.isSkillAvailable(SkillType.TWO_HEADS)) {
+                listOf(ConfirmWhenReady, CancelWhenReady)
             } else {
                 listOf(ContinueWhenReady)
             }

@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 /**
  * Representation of the Two Heads skill.
  *
- * See page 87 in the rulebook.
+ * See page XX in the rulebook.
  */
 class TwoHeads(
     override val player: Player,

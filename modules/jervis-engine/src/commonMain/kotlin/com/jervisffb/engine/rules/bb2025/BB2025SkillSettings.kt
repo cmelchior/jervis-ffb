@@ -37,6 +37,7 @@ import com.jervisffb.engine.rules.bb2025.skills.ThickSkull
 import com.jervisffb.engine.rules.bb2025.skills.ThrowTeamMate
 import com.jervisffb.engine.rules.bb2025.skills.Timmmber
 import com.jervisffb.engine.rules.bb2025.skills.Titchy
+import com.jervisffb.engine.rules.bb2025.skills.TwoHeads
 import com.jervisffb.engine.rules.bb2025.skills.UnchannelledFury
 import com.jervisffb.engine.rules.bb2025.skills.Unsteady
 import com.jervisffb.engine.rules.bb2025.skills.Wrestle
@@ -307,9 +308,9 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.TWO_HEADS -> {
-                    // addEntry(type, SkillCategory.MUTATIONS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry(type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
+                        TwoHeads(player, category, expiresAt)
+                    }
                 }
                 SkillType.VERY_LONG_LEGS -> {
                     // addEntry(type, SkillCategory.MUTATIONS) { player, category, _ , expiresAt ->
