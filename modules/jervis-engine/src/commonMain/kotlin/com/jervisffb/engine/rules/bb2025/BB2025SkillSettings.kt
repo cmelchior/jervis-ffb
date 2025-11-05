@@ -1,11 +1,13 @@
 package com.jervisffb.engine.rules.bb2025
 
+import com.jervisffb.engine.rules.bb2025.skills.Accurate
 import com.jervisffb.engine.rules.bb2025.skills.AnimalSavagery
 import com.jervisffb.engine.rules.bb2025.skills.Block
 import com.jervisffb.engine.rules.bb2025.skills.BloodLust
 import com.jervisffb.engine.rules.bb2025.skills.BoneHead
 import com.jervisffb.engine.rules.bb2025.skills.BreakTackle
 import com.jervisffb.engine.rules.bb2025.skills.BreatheFire
+import com.jervisffb.engine.rules.bb2025.skills.Cannoneer
 import com.jervisffb.engine.rules.bb2025.skills.CatchSkill
 import com.jervisffb.engine.rules.bb2025.skills.DivingTackle
 import com.jervisffb.engine.rules.bb2025.skills.Dodge
@@ -319,14 +321,14 @@ class BB2025SkillSettings: SkillSettings() {
                 // Passing Category
                 //
                 SkillType.ACCURATE -> {
-                    // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry(type, SkillCategory.PASSING) { player, category,expiresAt ->
+                        Accurate(player, category, expiresAt)
+                    }
                 }
                 SkillType.CANNONEER -> {
-                    // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
+                    addNoValueEntry(type, SkillCategory.PASSING) { player, category,expiresAt ->
+                        Cannoneer(player, category, expiresAt)
+                    }
                 }
                 SkillType.CLOUD_BURSTER -> {
                     // addEntry(type, SkillCategory.PASSING) { player, category, _ , expiresAt ->

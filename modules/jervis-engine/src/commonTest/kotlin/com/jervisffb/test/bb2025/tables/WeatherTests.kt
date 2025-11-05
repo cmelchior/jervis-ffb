@@ -102,7 +102,8 @@ class WeatherTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             Confirm,
             FieldSquareSelected(18, 7), // 1 Field away = Quick Pass
-            4.d6 // Roll for Accuracy roll (should be 5+ to be accurate)
+            4.d6, // Roll for Accuracy roll (should be 5+ to be accurate)
+            NoRerollSelected(),
         )
         val context = state.getContext<PassContext>()
         assertContains(context.passingModifiers, AccuracyModifier.VERY_SUNNY)

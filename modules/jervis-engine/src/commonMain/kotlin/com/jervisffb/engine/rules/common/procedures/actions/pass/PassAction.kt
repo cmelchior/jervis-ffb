@@ -43,6 +43,8 @@ import com.jervisffb.engine.rules.common.tables.Range
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 
 enum class PassingType {
     ACCURATE,
@@ -58,11 +60,15 @@ data class PassContext(
     val target: FieldCoordinate? = null,
     val range: Range? = null,
     val passingRoll: D6DieRoll? = null,
-    val passingModifiers: List<DiceModifier> = emptyList(),
+    val passingModifiers: PersistentList<DiceModifier> = persistentListOf(),
     val passingResult: PassingType? = null,
     val runInterference: Player? = null,
     val passingInterference: PassingInterferenceContext? = null,
-) : ProcedureContext
+) : ProcedureContext {
+    fun copyAndAdd(passingModifier: DiceModifier): PassContext = this.copy(
+        passingModifiers = passingModifiers.add(passingModifier)
+    )
+}
 
 /**
  * Procedure for controlling a player's Pass action.

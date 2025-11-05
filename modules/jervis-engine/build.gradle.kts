@@ -50,6 +50,7 @@ kotlin {
                 implementation(project(":modules:platform-utils"))
                 implementation(libs.cryptography.core)
                 implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.collections.immutable)
                 implementation(libs.coroutines)
                 implementation(libs.jsonserialization)
                 implementation(libs.okio)

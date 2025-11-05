@@ -61,7 +61,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 
 ## General Skills
 
-- [ ] Block
+- [x] Block
+  - [x] Using Block is optional
+  - [ ] Block does not work when distracted
+  - [ ] Defender chooses bloc
 - [ ] Dauntless
 - [ ] Fend
     - [ ] Prevents Frenzy from working
@@ -103,8 +106,14 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 
 ## Passing Skills
 
-- [ ] Accurate
-- [ ] Cannoneer
+- [x] Accurate
+  - [x] Works on Quick Pass
+  - [x] Works on Safe Pass
+  - [x] Is optional
+- [x] Cannoneer
+  - [x] Works on Long Pass
+  - [x] Works on Long Bomb
+  - [x] Is optional
 - [ ] Cloud Burster
 - [ ] Dump-off
 - [ ] Give and Go
@@ -152,6 +161,10 @@ a test class in `modules/jervis-engine/src/commonTest/kotlin/dk/ilios/jervis/bb2
 - [ ] Always Hungry*
 - [ ] Ball & Chain*
 - [ ] Bombardier
+  - [ ] Accurate skill works
+  - [ ] Cannoneer skill works
+- [ ] Bone Armor*
+- [ ] Bone Fury*
 - [ ] Bone Head*
 - [ ] Blood Lust (X+)*
 - [ ] Breathe Fire
