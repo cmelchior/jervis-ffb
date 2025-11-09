@@ -507,11 +507,6 @@ class BB2025SkillSettings: SkillSettings() {
                         Hatred(player, category, value, expiresAt)
                     }
                 }
-                SkillType.HIT_AND_RUN -> {
-                    // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
-                    // TODO()
-                    // }
-                }
                 SkillType.HYPNOTIC_GAZE -> {
                     // addEntry(type, SkillCategory.TRAITS) { player, category, _ , expiresAt ->
                     // TODO()

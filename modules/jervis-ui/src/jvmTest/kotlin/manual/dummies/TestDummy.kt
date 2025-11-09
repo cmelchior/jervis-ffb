@@ -43,6 +43,7 @@ object TestDummy {
     val fieldVieModel by lazy { FieldViewModel(gameModel, uiController, gameModel.hoverPlayerFlow) }
     val leftSidebar by lazy {
         SidebarViewModel(
+            gameModel,
             menuViewModel,
             uiController,
             dummyFieldWrapper,
@@ -52,6 +53,7 @@ object TestDummy {
     }
     val rightSidebar by lazy {
         SidebarViewModel(
+            gameModel,
             menuViewModel,
             uiController,
             dummyFieldWrapper,
