@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -64,6 +63,7 @@ import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.view.JervisTheme.rulebookBlue
 import com.jervisffb.ui.game.view.utils.paperBackground
+import com.jervisffb.ui.utils.BottomEndFlowRow
 import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
@@ -327,13 +327,13 @@ fun PlayerStatsCard(flow: Flow<UiPlayerCard?>) {
                                 }
                             }
                         }
-                        FlowRow(
+                        BottomEndFlowRow(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(borderSize*2)
                             ,
-                            horizontalArrangement = Arrangement.spacedBy(borderSize, Alignment.End),
-                            verticalArrangement = Arrangement.spacedBy(borderSize),
+                            horizontalSpacing = borderSize,
+                            verticalSpacing = borderSize
                         ) {
                             when (player.model.state) {
                                 PlayerState.PRONE -> {
