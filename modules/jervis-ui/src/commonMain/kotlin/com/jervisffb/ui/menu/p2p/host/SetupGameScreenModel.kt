@@ -23,7 +23,7 @@ import kotlin.uuid.Uuid
  */
 class SetupGameScreenModel(private val menuViewModel: MenuViewModel, private val parentModel: P2PHostScreenModel) : ScreenModel {
 
-    val gameSetupModel = GameConfigurationContainerComponentModel(menuViewModel)
+    val gameSetupModel = GameConfigurationContainerComponentModel(false, menuViewModel)
     val coachSetupModel = CoachSetupComponentModel(menuViewModel) {
         checkValidSetup()
     }

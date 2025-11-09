@@ -15,7 +15,7 @@ class Loner(
 ) : BB2025IntSkill {
     override val type: SkillType = SkillType.LONER
     override val skillId: SkillId = type.id(value)
-    override val name: String = "${type.description}($value+)"
+    override val name: String = "${type.description}(${value ?: "X"}+)"
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
     override var used: Boolean = false // This skill is always available

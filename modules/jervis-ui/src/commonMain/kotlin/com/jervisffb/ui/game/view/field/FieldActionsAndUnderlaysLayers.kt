@@ -94,28 +94,36 @@ private fun SquareHighlightAndAction(
     // TODO Move some of this to the Dialog Layer?
     val boxWrapperModifier =
         if (square.contextMenuOptions.isNotEmpty() || player?.selectedAction != null || square.selectedAction != null || pathfinderData?.hoverAction != null) {
-            modifier.jervisPointerEvent(FieldPointerEventType.ClickSquare, square.coordinates) {
-                // Generally, the Action Wheel is handled by ActionWheelLayer, except when the action wheel is hidden
-                // In that case, it is the square that should handle opening it again, after which control transfers
-                // back to the ActionWheelLayer
-                if (square.contextMenuOptions.isNotEmpty() && !vm.sharedFieldData.isContentMenuVisible) {
-                    vm.sharedFieldData.isContentMenuVisible = true
-                }
+            modifier
+                .jervisPointerEvent(FieldPointerEventType.PrimaryClickSquare, square.coordinates) {
+                    // In that case, it is the square that should handle opening it again, after which control transfers
+                    // back to the ActionWheelLayer
+                    if (square.contextMenuOptions.isNotEmpty() && !vm.sharedFieldData.isContentMenuVisible) {
+                        vm.sharedFieldData.isContentMenuVisible = true
+                    }
 
-                // Toggling the Action Wheel should take precedence over triggering square/player actions.
-                // Ideally, none should be configured anyway, but just in case.
-                if (square.contextMenuOptions.isEmpty()) {
-                    pathfinderData?.hoverAction()
-                        ?: player?.selectedAction?.invoke()
-                        ?: square.selectedAction?.invoke()
+                    // Toggling the Action Wheel should take precedence over triggering square/player actions.
+                    // Ideally, none should be configured anyway, but just in case.
+                    if (square.contextMenuOptions.isEmpty()) {
+                        pathfinderData?.hoverAction()
+                            ?: player?.selectedAction?.invoke()
+                            ?: square.selectedAction?.invoke()
+                    }
                 }
-            }
         } else {
             modifier
         }
 
 
-    Box(modifier = boxWrapperModifier) {
+    Box(
+        modifier = boxWrapperModifier
+            .jervisPointerEvent(FieldPointerEventType.SecondaryClickSquare, square.coordinates) {
+                println("Trigger context menu: $square")
+                if (player != null) {
+                    vm.triggerShowContextMenu(player.id)
+                }
+            }
+    ) {
         // TODO Move this to the Dialog Layer?
         if (sharedFieldData.isContentMenuVisible && !square.useActionWheel) {
             ContextPopupMenu(

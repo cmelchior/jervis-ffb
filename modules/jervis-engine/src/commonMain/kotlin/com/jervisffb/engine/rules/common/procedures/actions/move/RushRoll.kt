@@ -42,7 +42,7 @@ import com.jervisffb.engine.utils.sum
 
 /**
  * Handle a player rushing a single square.
- * See page 44 in the rulebook.
+ * See page 44 in the BB2020 rulebook.
  *
  * This procedure is only responsible for the actual dice roll. The result
  * must be handled by the procedure calling this one. This also includes

@@ -9,7 +9,7 @@ import com.jervisffb.ui.menu.components.setup.GameConfigurationContainerComponen
  * View model for controlling the "Setup Game" screen, that is the 1st step in the "Hotseat Game" flow.
  */
 class SetupHotseatGameScreenModel(private val menuViewModel: MenuViewModel, private val parentModel: HotseatScreenModel) : ScreenModel {
-    val gameConfigModel = GameConfigurationContainerComponentModel(menuViewModel)
+    val gameConfigModel = GameConfigurationContainerComponentModel(true, menuViewModel)
 
     fun createRules(): Rules {
         return gameConfigModel.createRules()

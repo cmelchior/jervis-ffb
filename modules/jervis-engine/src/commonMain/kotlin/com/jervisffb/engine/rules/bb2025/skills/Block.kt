@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 /**
  * Representation of the Block skill.
  *
- * See the rulebook, page 76.
+ * See the rulebook, page XX.
  */
 class Block(
     override val player: Player,

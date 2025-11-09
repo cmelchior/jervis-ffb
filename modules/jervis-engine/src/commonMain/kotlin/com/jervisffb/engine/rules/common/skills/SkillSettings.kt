@@ -20,75 +20,6 @@ import kotlinx.serialization.Transient
 @Serializable
 abstract class SkillSettings {
 
-    // We need a factory for each type of value that skills can use. This seems to be the only to keep
-    // the type-system somewhat happy.
-    private interface SkillFactory<T> {
-        val defaultSkillId: SkillId
-        fun createSkill(player: Player, value: SkillValue?, expiresAt: Duration): Skill<T>
-    }
-
-    private class NoValueSkillFactory(
-        private val type: SkillType,
-        private val category: SkillCategory,
-        private val createFunc: ((Player, SkillCategory, Duration) -> Skill<Unit>),
-    ): SkillFactory<Unit> {
-        override val defaultSkillId: SkillId = SkillId(type, SkillValue.None)
-        override fun createSkill(player: Player, value: SkillValue?, expiresAt: Duration): Skill<Unit> {
-            return createFunc(player, category, expiresAt)
-        }
-    }
-
-    private class IntSkillFactory(
-        private val type: SkillType,
-        private val category: SkillCategory,
-        private val defaultValue: Int?,
-        private val createFunc: ((Player, SkillCategory, Int?, Duration) -> Skill<Int>),
-    ): SkillFactory<Int> {
-        override val defaultSkillId: SkillId =
-            when (defaultValue) {
-                null -> SkillId(type, SkillValue.None)
-                else -> SkillId(type, SkillValue.Int(defaultValue))
-            }
-        override fun createSkill(player: Player, value: SkillValue?, expiresAt: Duration): Skill<Int> {
-            return if (defaultSkillId.value != SkillValue.None && value == SkillValue.None) {
-                createFunc(player, category, defaultValue, expiresAt)
-            } else {
-                val value = when (value) {
-                    null -> null
-                    is SkillValue.Int -> value.value
-                    else -> error("Unsupported value type: $value")
-                }
-                createFunc(player, category, value, expiresAt)
-            }
-        }
-    }
-
-    private class KeywordSkillFactory(
-        private val type: SkillType,
-        private val category: SkillCategory,
-        private val defaultValue: PlayerKeyword?,
-        private val createFunc: ((Player, SkillCategory, PlayerKeyword?, Duration) -> Skill<PlayerKeyword>),
-    ): SkillFactory<PlayerKeyword> {
-        override val defaultSkillId: SkillId =
-            when (defaultValue) {
-                null -> SkillId(type, SkillValue.None)
-                else -> SkillId(type, SkillValue.Keyword(defaultValue))
-            }
-        override fun createSkill(player: Player, value: SkillValue?, expiresAt: Duration): Skill<PlayerKeyword> {
-            return if (defaultSkillId.value != SkillValue.None && value == SkillValue.None) {
-                createFunc(player, category, defaultValue, expiresAt)
-            } else {
-                val value = when (value) {
-                    null -> null
-                    is SkillValue.Keyword -> value.value
-                    else -> error("Unsupported value type: $value")
-                }
-                createFunc(player, category, value, expiresAt)
-            }
-        }
-    }
-
-
     // Wrapper class that manages creation of skills
     // The type system around this
     private class SkillFactoryOld<T>(
@@ -125,10 +56,10 @@ abstract class SkillSettings {
         // Creates the skill as it is listed in the categories sections in the rulebook.
         // This is only relevant for skills with values like "Loner (4+)" or "Mighty Blow (+1)".
         fun createDefaultSkill(player: Player, expiresAt: Duration): Skill<T> {
-            if (defaultValue == null || defaultValue is SkillValue.None) {
-                return createSkill(player, expiresAt)
+            return if (defaultValue == null || defaultValue is SkillValue.None) {
+                createSkill(player, expiresAt)
             } else {
-                return createSkill(player, defaultValue, expiresAt)
+                createSkill(player, defaultValue, expiresAt)
             }
         }
     }
@@ -233,10 +164,13 @@ abstract class SkillSettings {
      *
      * If the category isn't supported, an [IllegalStateException] is thrown.
      */
-    fun getAvailableSkills(category: SkillCategory): List<SkillId> {
+    fun getAvailableSkillsIds(category: SkillCategory): List<SkillId> {
         return categories[category]?.map {
             it.defaultSkillId
         } ?: error("Skill category not supported: $category")
+    }
+    fun getAvailableSkills(category: SkillCategory): List<SkillFactory<*>> {
+        return categories[category] ?: error("Skill category not supported: $category")
     }
 
     /**
@@ -271,33 +205,36 @@ abstract class SkillSettings {
     // Helper method for populating the `skillCache` and `categories` mappings. Should only be called from
     // `initializeSkillCache()`
     protected fun addIntEntry(
+        name: String,
         type: SkillType,
         category: SkillCategory,
         defaultValue: Int? = null,
         createFunc: (Player, SkillCategory, Int?, Duration) -> Skill<Int>
     ) {
-        val entry = IntSkillFactory(type, category, defaultValue, createFunc)
+        val entry = IntSkillFactory(name, type, category, defaultValue, createFunc)
         skillCache[type] = entry
         categories[category]?.add(entry) ?: error("Cannot find category: ${category.name}")
     }
 
     protected fun addNoValueEntry(
+        name: String,
         type: SkillType,
         category: SkillCategory,
         createFunc: (Player, SkillCategory, Duration) -> Skill<Unit>
     ) {
-        val entry = NoValueSkillFactory(type, category, createFunc)
+        val entry = NoValueSkillFactory(name, type, category, createFunc)
         skillCache[type] = entry
         categories[category]?.add(entry) ?: error("Cannot find category: ${category.name}")
     }
 
     protected fun addKeywordEntry(
+        name: String,
         type: SkillType,
         category: SkillCategory,
         defaultValue: PlayerKeyword? = null,
         createFunc: (Player, SkillCategory, PlayerKeyword?, Duration) -> Skill<PlayerKeyword>
     ) {
-        val entry = KeywordSkillFactory(type, category, defaultValue, createFunc)
+        val entry = KeywordSkillFactory(name, type, category, defaultValue, createFunc)
         skillCache[type] = entry
         categories[category]?.add(entry) ?: error("Cannot find category: ${category.name}")
     }

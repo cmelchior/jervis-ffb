@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
 import com.jervisffb.ui.game.view.ActionWheelDialog
@@ -56,6 +57,7 @@ fun ActionWheelLayer(
                             val e = awaitPointerEvent()
                             // Action Wheel Buttons might already have consumed the event, which we need to respect here.
                             if (e.changes.any { it.isConsumed }) continue
+                            if (e.buttons.isSecondaryPressed) continue
                             when (e.type) {
                                 PointerEventType.Press -> {
                                     // Press is allowed to reach lower layers when the wheel isn't visible
@@ -78,7 +80,6 @@ fun ActionWheelLayer(
                             }
                         }
                     }
-
                 }
         ) {
             ActionWheelDialog(vm, fieldData, inputDialog)

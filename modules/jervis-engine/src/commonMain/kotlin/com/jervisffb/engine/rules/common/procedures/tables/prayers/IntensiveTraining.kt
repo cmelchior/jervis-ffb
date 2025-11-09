@@ -84,7 +84,7 @@ object IntensiveTraining : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val context = state.getContext<IntensiveTrainingContext>()
             return listOf(SelectSkill(skills = context.player.position.primary.flatMap {
-                rules.skillSettings.getAvailableSkills(it)
+                rules.skillSettings.getAvailableSkillsIds(it)
             }))
         }
 

@@ -200,6 +200,9 @@ open class Rules(
     open val useApothecaryBehavior: UseApothecaryBehavior = UseApothecaryBehavior.STANDARD,
     // Configure skills available, their behaviour and which category they belong to.
     open val skillSettings: SkillSettings = BB2020SkillSettings(),
+    // If `true`, coaches are allowed to edit their own team while the game is in progress.
+    // (For now, this is just a local setting that doesn't work in networked games)
+    open val allowPlayerEditsDuringGame: Boolean = false,
 ) {
     // Defines how the paths between locations on the field are calculated. This can be rules-specific,
     // since it might involve the use of skills.
@@ -765,9 +768,9 @@ open class Rules(
      * When either a `baseX` or `XModifiers` stat value has been updated, this method should also
      * be called so the total player stat can be calculated correctly.
      */
-    fun updatePlayerStat(player: Player, modifier: StatModifier) {
+    fun updatePlayerStat(player: Player, stat: StatModifier.Type) {
         with(player) {
-            when (modifier.type) {
+            when (stat) {
                 StatModifier.Type.AV -> armorValue = (baseArmorValue + armourModifiers.sum()).coerceIn(armorValueRange)
                 StatModifier.Type.MA -> move = (baseMove + moveModifiers.sum()).coerceIn(moveRange)
                 StatModifier.Type.PA -> {
@@ -779,7 +782,7 @@ open class Rules(
                     } else {
                         basePassing
                     }
-                    passing = newPassing?.coerceIn(passingRange) ?: passing
+                    passing = newPassing?.coerceIn(passingRange)
                 }
                 StatModifier.Type.AG -> agility = (baseAgility + agilityModifiers.sum()).coerceIn(agilityRange)
                 StatModifier.Type.ST -> strength = (baseStrength + strengthModifiers.sum()).coerceIn(strengthRange)
@@ -865,6 +868,7 @@ open class Rules(
         var kickingPlayerBehavior: KickingPlayerBehavior = rules.kickingPlayerBehavior
         var useApothecaryBehavior: UseApothecaryBehavior = rules.useApothecaryBehavior
         var skillSettings: SkillSettings = rules.skillSettings
+        var allowPlayerEditsDuringGame: Boolean = rules.allowPlayerEditsDuringGame
 
         fun build() = Rules(
             name,
@@ -918,7 +922,8 @@ open class Rules(
             foulActionBehavior,
             kickingPlayerBehavior,
             useApothecaryBehavior,
-            skillSettings
+            skillSettings,
+            allowPlayerEditsDuringGame
         )
     }
 }

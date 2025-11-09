@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.MoveType
 import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.utils.safeTryEmit
@@ -89,6 +90,10 @@ class FieldViewModel(
 
     fun triggerHoverExit() {
         _highlights.value = null
+    }
+
+    fun triggerShowContextMenu(player: PlayerId) {
+        screenModel.showPlayerContextMenu(player)
     }
 
     /**

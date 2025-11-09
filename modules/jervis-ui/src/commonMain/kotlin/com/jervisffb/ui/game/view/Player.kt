@@ -25,9 +25,13 @@ import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
+import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiFieldPlayer
+import com.jervisffb.ui.game.view.field.FieldPointerEventType
+import com.jervisffb.ui.game.view.field.jervisPointerEvent
 import com.jervisffb.ui.game.viewmodel.UiPlayerTransientData
+import com.jervisffb.ui.utils.applyIf
 import com.jervisffb.ui.utils.toSkiaColor
 import org.jetbrains.skia.ImageFilter
 import org.jetbrains.skia.RuntimeEffect
@@ -80,9 +84,15 @@ fun Player(
     }
     if (transientData?.onHoverExit != null) {
         playerModifier =
-            playerModifier.onPointerEvent(eventType = PointerEventType.Exit) {
-                transientData.onHoverExit.invoke()
-            }
+            playerModifier
+                .onPointerEvent(eventType = PointerEventType.Exit) {
+                    transientData.onHoverExit.invoke()
+                }
+                .applyIf(player.location is FieldCoordinate) {
+                    jervisPointerEvent(event = FieldPointerEventType.SecondaryClickSquare, player.location as FieldCoordinate) {
+                        transientData.onHoverExit.invoke()
+                    }
+                }
     }
 
     Box(modifier = playerModifier) {

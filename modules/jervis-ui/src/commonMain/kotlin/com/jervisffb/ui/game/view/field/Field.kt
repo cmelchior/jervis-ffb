@@ -21,6 +21,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -151,7 +152,7 @@ fun Field(
                                         }
                                         PointerEventType.Press -> {
                                             if (eventSquare != null) {
-                                                pointerBus.notifyPressSquare(eventSquare)
+                                                pointerBus.notifyPressSquare(eventSquare, !e.buttons.isSecondaryPressed)
                                             }
                                         }
                                         PointerEventType.Release -> {

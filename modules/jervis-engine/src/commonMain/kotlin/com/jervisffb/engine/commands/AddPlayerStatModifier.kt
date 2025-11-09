@@ -8,14 +8,14 @@ class AddPlayerStatModifier(private val player: Player, val modifier: StatModifi
     override fun execute(state: Game) {
         player.apply {
             addStatModifier(modifier)
-            player.team.game.rules.updatePlayerStat(player, modifier)
+            player.team.game.rules.updatePlayerStat(player, modifier.type)
         }
     }
 
     override fun undo(state: Game) {
         player.apply {
             removeStatModifier(modifier)
-            player.team.game.rules.updatePlayerStat(player, modifier)
+            player.team.game.rules.updatePlayerStat(player, modifier.type)
         }
     }
 }

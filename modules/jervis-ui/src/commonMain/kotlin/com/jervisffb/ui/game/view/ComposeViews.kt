@@ -20,7 +20,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,11 +38,13 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.jervisffb.engine.model.Player
 import com.jervisffb.ui.game.dialogs.ActionWheelInputDialog
 import com.jervisffb.ui.game.dialogs.DicePoolUserInputDialog
 import com.jervisffb.ui.game.dialogs.MultipleChoiceUserInputDialog
 import com.jervisffb.ui.game.dialogs.SingleChoiceInputDialog
 import com.jervisffb.ui.game.dialogs.UserInputDialog
+import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.viewmodel.DialogsViewModel
 import com.jervisffb.ui.game.viewmodel.LogViewModel
 import com.jervisffb.ui.game.viewmodel.RandomActionsControllerViewModel
@@ -146,6 +147,7 @@ fun RandomCommandBar(
 @Composable
 fun Dialogs(vm: DialogsViewModel) {
     val dialogData: UserInputDialog? by vm.dialogData.collectAsState(null)
+    val contextMenuData: Player? by vm.contextMenu.collectAsState(null)
     when (dialogData) {
         is SingleChoiceInputDialog -> {
             val dialog = dialogData as SingleChoiceInputDialog
@@ -161,6 +163,9 @@ fun Dialogs(vm: DialogsViewModel) {
         }
         is ActionWheelInputDialog, // Handled by ActionWheelLayer
         null -> { /* Do nothing */ }
+    }
+    contextMenuData?.let { player ->
+        PlayerContextMenuDialog(vm.screenViewModel, UiPlayerCard(player))
     }
 }
 

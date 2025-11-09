@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jervisffb.ui.menu.components.JervisDropDownMenu
+import com.jervisffb.ui.menu.components.SimpleSwitch
 import com.jervisffb.ui.menu.components.SmallHeader
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -46,6 +47,7 @@ fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
     val undoActionBehavior by viewModel.selectedUndoActionBehavior.collectAsState()
     val foulActionBehavior by viewModel.selectedFoulActionBehavior.collectAsState()
     val kickingPlayerBehavior by viewModel.selectedKickingPlayerBehavior.collectAsState()
+    val allowPlayerEdits by viewModel.allowPlayerEdits.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize().padding(top = 16.dp),
@@ -138,11 +140,6 @@ fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
                         enabled = true,
                         label = { Text(turnsPrHalf.label) }
                     )
-
-                    SmallHeader("Randomness", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
-                    JervisDropDownMenu("Dice Rolls", enabled = true, selectedEntry = diceRollOwner, entries = viewModel.diceRollEntries) {
-                        viewModel.updateDiceRollBehavior(it)
-                    }
                     SmallHeader("Variants", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
                     JervisDropDownMenu("Undo Actions", enabled = true, selectedEntry = undoActionBehavior, entries = viewModel.undoActionsEntries) {
                         viewModel.updateUndoActionBehavior(it)
@@ -152,6 +149,17 @@ fun CustomizationSetupComponent(viewModel: CustomizationSetupComponentModel) {
                     }
                     JervisDropDownMenu("Kicking Player", enabled = true, selectedEntry = kickingPlayerBehavior, entries = viewModel.kickingPlayerBehavior) {
                         viewModel.updateKickingPlayerBehavior(it)
+                    }
+                    SmallHeader("Dev Settings", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
+                    JervisDropDownMenu("Dice Rolls", enabled = true, selectedEntry = diceRollOwner, entries = viewModel.diceRollEntries) {
+                        viewModel.updateDiceRollBehavior(it)
+                    }
+                    if (viewModel.isHotseat) {
+                        // TODO Make this globally available when we have refactored editing a player to go
+                        //  through "dev game actions".
+                        SimpleSwitch("Allow Player Edits", isSelected = allowPlayerEdits) {
+                            viewModel.updateAllowPlayerEdits(it)
+                        }
                     }
                 }
             }

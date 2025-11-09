@@ -66,7 +66,7 @@ class BB2025SkillSettings: SkillSettings() {
                 // Agility Category
                 //
                 SkillType.CATCH -> {
-                    addNoValueEntry(type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                    addNoValueEntry("Cath", type, SkillCategory.AGILITY) { player, category,expiresAt ->
                         CatchSkill(player, category, expiresAt)
                     }
                 }
@@ -76,12 +76,12 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.DIVING_TACKLE -> {
-                    addNoValueEntry(type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                    addNoValueEntry("Diving Tackle", type, SkillCategory.AGILITY) { player, category,expiresAt ->
                         DivingTackle(player, category, expiresAt)
                     }
                 }
                 SkillType.DODGE -> {
-                    addNoValueEntry(type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                    addNoValueEntry("Dodge", type, SkillCategory.AGILITY) { player, category,expiresAt ->
                         Dodge(player, category, expiresAt)
                     }
                 }
@@ -101,7 +101,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.LEAP -> {
-                    addNoValueEntry(type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                    addNoValueEntry("Leap", type, SkillCategory.AGILITY) { player, category,expiresAt ->
                         Leap(player, category, expiresAt)
                     }
                 }
@@ -111,17 +111,17 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.SIDESTEP -> {
-                    addNoValueEntry(type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                    addNoValueEntry("Sidestep", type, SkillCategory.AGILITY) { player, category,expiresAt ->
                         Sidestep(player, category, expiresAt)
                     }
                 }
                 SkillType.SPRINT -> {
-                    addNoValueEntry(type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                    addNoValueEntry("Sprint", type, SkillCategory.AGILITY) { player, category,expiresAt ->
                         Sprint(player, category, expiresAt)
                     }
                 }
                 SkillType.SURE_FEET -> {
-                    addNoValueEntry(type, SkillCategory.AGILITY) { player, category,expiresAt ->
+                    addNoValueEntry("Sure Feet", type, SkillCategory.AGILITY) { player, category,expiresAt ->
                         SureFeet(player, category, expiresAt)
                     }
                 }
@@ -194,7 +194,7 @@ class BB2025SkillSettings: SkillSettings() {
                 // General Category
                 //
                 SkillType.BLOCK -> {
-                    addNoValueEntry(type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                    addNoValueEntry("Block", type, SkillCategory.GENERAL) { player, category,expiresAt ->
                         Block(player, category, expiresAt)
                     }
                 }
@@ -209,7 +209,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.FRENZY -> {
-                    addNoValueEntry(type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                    addNoValueEntry("Frenzy", type, SkillCategory.GENERAL) { player, category,expiresAt ->
                         Frenzy(player, category, expiresAt)
                     }
                 }
@@ -219,7 +219,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.PRO -> {
-                    addNoValueEntry(type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                    addNoValueEntry("Pro", type, SkillCategory.GENERAL) { player, category,expiresAt ->
                         Pro(player, category, expiresAt)
                     }
                 }
@@ -234,12 +234,12 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.SURE_HANDS -> {
-                    addNoValueEntry(type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                    addNoValueEntry("Sure Hands", type, SkillCategory.GENERAL) { player, category,expiresAt ->
                         SureHands(player, category, expiresAt)
                     }
                 }
                 SkillType.TACKLE -> {
-                    addNoValueEntry(type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                    addNoValueEntry("Tackle", type, SkillCategory.GENERAL) { player, category,expiresAt ->
                         Tackle(player, category, expiresAt)
                     }
                 }
@@ -249,7 +249,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.WRESTLE -> {
-                    addNoValueEntry(type, SkillCategory.GENERAL) { player, category,expiresAt ->
+                    addNoValueEntry("Wrestle", type, SkillCategory.GENERAL) { player, category,expiresAt ->
                         Wrestle(player, category, expiresAt)
                     }
                 }
@@ -283,7 +283,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.HORNS -> {
-                    addNoValueEntry(type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
+                    addNoValueEntry("Horns", type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
                         Horns(player, category, expiresAt)
                     }
                 }
@@ -298,7 +298,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.PREHENSILE_TAIL -> {
-                    addNoValueEntry(type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
+                    addNoValueEntry("Prehensile Tail", type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
                         PrehensileTail(player, category, expiresAt)
                     }
                 }
@@ -308,7 +308,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.TWO_HEADS -> {
-                    addNoValueEntry(type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
+                    addNoValueEntry("Two Heads", type, SkillCategory.MUTATIONS) { player, category,expiresAt ->
                         TwoHeads(player, category, expiresAt)
                     }
                 }
@@ -322,12 +322,12 @@ class BB2025SkillSettings: SkillSettings() {
                 // Passing Category
                 //
                 SkillType.ACCURATE -> {
-                    addNoValueEntry(type, SkillCategory.PASSING) { player, category,expiresAt ->
+                    addNoValueEntry("Accurate", type, SkillCategory.PASSING) { player, category,expiresAt ->
                         Accurate(player, category, expiresAt)
                     }
                 }
                 SkillType.CANNONEER -> {
-                    addNoValueEntry(type, SkillCategory.PASSING) { player, category,expiresAt ->
+                    addNoValueEntry("Cannoneer", type, SkillCategory.PASSING) { player, category,expiresAt ->
                         Cannoneer(player, category, expiresAt)
                     }
                 }
@@ -352,7 +352,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.LEADER -> {
-                    addNoValueEntry(type, SkillCategory.PASSING) { player, category,expiresAt ->
+                    addNoValueEntry("Leader", type, SkillCategory.PASSING) { player, category,expiresAt ->
                         Leader(player, category, expiresAt)
                     }
                 }
@@ -367,7 +367,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.PASS -> {
-                    addNoValueEntry(type, SkillCategory.PASSING) { player, category,expiresAt ->
+                    addNoValueEntry("Pass", type, SkillCategory.PASSING) { player, category,expiresAt ->
                         Pass(player, category, expiresAt)
                     }
                 }
@@ -396,7 +396,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.BREAK_TACKLE -> {
-                    addNoValueEntry(type, SkillCategory.STRENGTH) { player, category,expiresAt ->
+                    addNoValueEntry("Break Tackle", type, SkillCategory.STRENGTH) { player, category,expiresAt ->
                         BreakTackle(player, category, expiresAt)
                     }
                 }
@@ -421,12 +421,12 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.MIGHTY_BLOW -> {
-                    addIntEntry(type, SkillCategory.STRENGTH, 1) { player, category, _, expiresAt ->
+                    addIntEntry("Mighty Blow", type, SkillCategory.STRENGTH, 1) { player, category, _, expiresAt ->
                         MightyBlow(player, category, expiresAt)
                     }
                 }
                 SkillType.MULTIPLE_BLOCK -> {
-                    addNoValueEntry(type, SkillCategory.STRENGTH) { player, category,expiresAt ->
+                    addNoValueEntry("Multiple Block", type, SkillCategory.STRENGTH) { player, category,expiresAt ->
                         MultipleBlock(player, category, expiresAt)
                     }
                 }
@@ -441,7 +441,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.THICK_SKULL -> {
-                    addNoValueEntry(type, SkillCategory.STRENGTH) { player, category,expiresAt ->
+                    addNoValueEntry("Thick Skull", type, SkillCategory.STRENGTH) { player, category,expiresAt ->
                         ThickSkull(player, category, expiresAt)
                     }
                 }
@@ -450,7 +450,7 @@ class BB2025SkillSettings: SkillSettings() {
                 // Traits Category
                 //
                 SkillType.ANIMAL_SAVAGERY -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Animal Savagery", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         AnimalSavagery(player, category, expiresAt)
                     }
                 }
@@ -475,17 +475,17 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.BONE_HEAD -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Bone Head", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         BoneHead(player, category, expiresAt)
                     }
                 }
                 SkillType.BLOOD_LUST -> {
-                    addIntEntry(type, SkillCategory.TRAITS, 4) { player, category, value, expiresAt ->
+                    addIntEntry("Blood Lust(X+)", type, SkillCategory.TRAITS, 4) { player, category, value, expiresAt ->
                         BloodLust(player, category, value, expiresAt)
                     }
                 }
                 SkillType.BREATHE_FIRE -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Breathe Fire", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         BreatheFire(player, category, expiresAt)
                     }
                 }
@@ -503,7 +503,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // TODO()
                 }
                 SkillType.HATRED -> {
-                    addKeywordEntry(type, SkillCategory.TRAITS) { player, category, value,expiresAt ->
+                    addKeywordEntry("Hatred(X)", type, SkillCategory.TRAITS) { player, category, value,expiresAt ->
                         Hatred(player, category, value, expiresAt)
                     }
                 }
@@ -526,7 +526,7 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.LONER -> {
-                    addIntEntry(type, SkillCategory.TRAITS, 4) { player, category, value, expiresAt ->
+                    addIntEntry("Loner(X+)", type, SkillCategory.TRAITS, 4) { player, category, value, expiresAt ->
                         Loner(player, category, value, expiresAt)
                     }
                 }
@@ -550,22 +550,22 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.PROJECTILE_VOMIT -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Projectile Vomit", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         ProjectileVomit(player, category, expiresAt)
                     }
                 }
                 SkillType.REALLY_STUPID -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Really Stupid", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         ReallyStupid(player, category, expiresAt)
                     }
                 }
                 SkillType.REGENERATION -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Regeneration", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         Regeneration(player, category, expiresAt)
                     }
                 }
                 SkillType.RIGHT_STUFF -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Right Stuff", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         RightStuff(player, category, expiresAt)
                     }
                 }
@@ -575,12 +575,12 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.STAB -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Stab", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         Stab(player, category, expiresAt)
                     }
                 }
                 SkillType.STUNTY -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Stunty", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         Stunty(player, category, expiresAt)
                     }
                 }
@@ -600,17 +600,17 @@ class BB2025SkillSettings: SkillSettings() {
                     // }
                 }
                 SkillType.TITCHY -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Titchy", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         Titchy(player, category, expiresAt)
                     }
                 }
                 SkillType.TIMMMBER -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Timmm-ber", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         Timmmber(player, category, expiresAt)
                     }
                 }
                 SkillType.THROW_TEAMMATE -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Throw Team-mate", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         ThrowTeamMate(player, category, expiresAt)
                     }
                 }
@@ -618,12 +618,12 @@ class BB2025SkillSettings: SkillSettings() {
 
                 }
                 SkillType.UNCHANNELLED_FURY -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category,expiresAt ->
+                    addNoValueEntry("Unchannelled Fury", type, SkillCategory.TRAITS) { player, category,expiresAt ->
                         UnchannelledFury(player, category, expiresAt)
                     }
                 }
                 SkillType.UNSTEADY -> {
-                    addNoValueEntry(type, SkillCategory.TRAITS) { player, category, expiresAt ->
+                    addNoValueEntry("Unsteady", type, SkillCategory.TRAITS) { player, category, expiresAt ->
                         Unsteady(player, category, expiresAt)
                     }
                 }
@@ -632,7 +632,7 @@ class BB2025SkillSettings: SkillSettings() {
                 // Special Rules Category
                 //
                 SkillType.SNEAKIEST_OF_THE_LOT -> {
-                    addNoValueEntry(type, SkillCategory.SPECIAL_RULES) { player, category,expiresAt ->
+                    addNoValueEntry("Sneakiest of the Lot", type, SkillCategory.SPECIAL_RULES) { player, category,expiresAt ->
                         SneakiestOfTheLot(player, category, expiresAt)
                     }
                 }

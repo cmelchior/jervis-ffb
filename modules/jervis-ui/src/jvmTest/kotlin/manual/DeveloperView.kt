@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
@@ -39,11 +40,18 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.jervisffb.engine.model.Field
+import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.TeamId
+import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.serialize.SingleSprite
+import com.jervisffb.ui.createDefaultBB2020AwayTeam
+import com.jervisffb.ui.createDefaultBB2020HomeTeam
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.icons.LogoSize
 import com.jervisffb.ui.game.view.JervisTheme
+import com.jervisffb.ui.game.view.TeamTable
+import com.jervisffb.utils.runBlocking
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.exp
@@ -64,8 +72,21 @@ class DeveloperViewTests() {
 }
 
 
-fun mainTeamTable() =
+fun mainTeamTable() {
+    val rules = StandardBB2020Rules()
+    val game = Game(
+        rules,
+        createDefaultBB2020HomeTeam(rules),
+        createDefaultBB2020AwayTeam(rules),
+        Field.createForRuleset(rules),
+    )
+
     application {
+        val density = LocalDensity.current
+        runBlocking {
+            IconFactory.initializeFumbblMapping()
+            IconFactory.initialize(density, game.homeTeam, game.awayTeam)
+        }
         val windowState = rememberWindowState()
         Window(onCloseRequest = ::exitApplication, state = windowState) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -73,6 +94,7 @@ fun mainTeamTable() =
             }
         }
     }
+}
 
 
 @Composable
@@ -182,7 +204,7 @@ private fun TeamInfoSection(
 ) {
     var logo: ImageBitmap? by remember { mutableStateOf(null) }
     LaunchedEffect(Unit) {
-        logo = IconFactory.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("roster/logo/roster_logo_chaos_chosen.png"), LogoSize.SMALL)
+        logo = IconFactory.loadRosterIcon(TeamId("chaos_chosen"), SingleSprite.embedded("jervis/roster/logo_orc_small.png"), LogoSize.SMALL)
     }
 
     Row(modifier = Modifier.background(JervisTheme.rulebookPaperMediumDark)) {

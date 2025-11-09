@@ -15,7 +15,10 @@ class MightyBlow(
     override val value: Int = 1
     override val type: SkillType = SkillType.MIGHTY_BLOW
     override val skillId: SkillId = type.id(value)
-    override val name: String = type.description
+    override val name: String = buildString {
+        append(type.description)
+        if (value > 1) append("(+$value)")
+    }
     override val compulsory: Boolean = false
     override val resetAt: Duration = Duration.PERMANENT
     override var used: Boolean = false // This skill is always available

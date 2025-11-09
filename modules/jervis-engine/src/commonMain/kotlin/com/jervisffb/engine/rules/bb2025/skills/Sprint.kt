@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 /**
  * Represents the "Sprint" skill.
  *
- * See page 75 in the rulebook.
+ * See page XX in the rulebook.
  */
 class Sprint(
     override val player: Player,

@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.map
 enum class FieldPointerEventType {
     EnterSquare,
     ExitSquare,
-    ClickSquare
+    PrimaryClickSquare,
+    SecondaryClickSquare,
 }
 
 /**
@@ -35,10 +36,11 @@ class PointerEventBus {
     private val exitField = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val enterSquare = MutableSharedFlow<FieldCoordinate>(extraBufferCapacity = 1)
     private val exitSquare = MutableSharedFlow<FieldCoordinate>(extraBufferCapacity = 1)
-    private val clickSquare = MutableSharedFlow<FieldCoordinate?>(extraBufferCapacity = 1)
+    private val primaryClickSquare = MutableSharedFlow<FieldCoordinate?>(extraBufferCapacity = 1)
+    private val secondaryClickSquare = MutableSharedFlow<FieldCoordinate?>(extraBufferCapacity = 1)
     private val currentHover = MutableSharedFlow<FieldCoordinate?>(extraBufferCapacity = 1)
 
-    var lastSquarePressed: FieldCoordinate? = null
+    var lastSquarePressed: Pair<FieldCoordinate, Boolean>? = null
     var lastMoveSquare: FieldCoordinate? = null
 
     fun notifyMove(eventSquare: FieldCoordinate) {
@@ -65,13 +67,17 @@ class PointerEventBus {
         exitField.tryEmit(Unit)
     }
 
-    fun notifyPressSquare(eventSquare: FieldCoordinate) {
-        lastSquarePressed = eventSquare
+    fun notifyPressSquare(eventSquare: FieldCoordinate, isPrimary: Boolean) {
+        lastSquarePressed = eventSquare to isPrimary
     }
 
     fun notifyReleaseSquare(eventSquare: FieldCoordinate?) {
-        if (lastSquarePressed == eventSquare && eventSquare != null) {
-            clickSquare.tryEmit(eventSquare)
+        if (lastSquarePressed?.first == eventSquare && eventSquare != null) {
+            if (lastSquarePressed?.second == true) {
+                primaryClickSquare.tryEmit(eventSquare)
+            } else {
+                secondaryClickSquare.tryEmit(eventSquare)
+            }
         }
         lastSquarePressed = null
     }
@@ -87,8 +93,11 @@ class PointerEventBus {
     fun hoverSquare(square: FieldCoordinate): Flow<Boolean> {
         return currentHover.map { it == square }.distinctUntilChanged()
     }
-    fun clickSquare(square: FieldCoordinate): Flow<Boolean> {
-        return clickSquare.map { it == square }.filter { it }
+    fun primaryClickSquare(square: FieldCoordinate): Flow<Boolean> {
+        return primaryClickSquare.map { it == square }.filter { it }
+    }
+    fun secondaryClickSquare(square: FieldCoordinate): Flow<Boolean> {
+        return secondaryClickSquare.map { it == square }.filter { it }
     }
 
     fun exitField(): Flow<Unit> {

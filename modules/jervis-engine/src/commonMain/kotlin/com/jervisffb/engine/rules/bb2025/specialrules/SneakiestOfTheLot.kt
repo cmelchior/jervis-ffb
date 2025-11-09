@@ -24,7 +24,6 @@ class SneakiestOfTheLot(
     override val compulsory: Boolean = true
     override val resetAt: Duration = Duration.END_OF_TURN
     override var used: Boolean = false
-        get() = TODO("Not yet implemented")
     override val workWithoutTackleZones: Boolean = true
     override val workWhenProne: Boolean = true
     override val keywords: List<SkillKeyword> = listOf(SkillKeyword.PASSIVE)

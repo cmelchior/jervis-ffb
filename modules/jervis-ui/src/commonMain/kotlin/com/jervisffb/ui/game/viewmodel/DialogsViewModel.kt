@@ -1,11 +1,13 @@
 package com.jervisffb.ui.game.viewmodel
 
 import com.jervisffb.engine.actions.GameAction
+import com.jervisffb.engine.model.Player
 import com.jervisffb.ui.game.UiGameController
 import com.jervisffb.ui.game.dialogs.UserInputDialog
 import com.jervisffb.ui.menu.GameScreenModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Class responsible for handling and showing model dialogs.
@@ -21,4 +23,9 @@ class DialogsViewModel(
         uiState.userSelectedAction(action)
     }
     val dialogData: Flow<UserInputDialog?> = uiState.uiStateFlow.map { it.dialogInput }
+    val contextMenu: Flow<Player?> = screenViewModel.contextMenuFlow.onEach {
+        if (it != null) {
+            screenViewModel.sharedFieldData.pointerBus.notifyExitField()
+        }
+    }
 }

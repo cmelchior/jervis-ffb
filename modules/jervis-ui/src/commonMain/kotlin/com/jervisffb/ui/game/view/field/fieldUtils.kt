@@ -50,7 +50,8 @@ fun Modifier.jervisPointerEvent(
         when (event) {
             FieldPointerEventType.EnterSquare -> ctx.pointerBus.enterSquare(coordinate)
             FieldPointerEventType.ExitSquare -> ctx.pointerBus.exitSquare(coordinate)
-            FieldPointerEventType.ClickSquare -> ctx.pointerBus.clickSquare(coordinate)
+            FieldPointerEventType.PrimaryClickSquare -> ctx.pointerBus.primaryClickSquare(coordinate)
+            FieldPointerEventType.SecondaryClickSquare -> ctx.pointerBus.secondaryClickSquare(coordinate)
         }
     }
     LaunchedEffect(flow) {

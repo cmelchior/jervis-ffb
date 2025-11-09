@@ -7,6 +7,8 @@ things as they come up.
 
 
 ## Todo List
+- [ ] Add a "dev-mode" protocol for networked game. Should be used for e.g. "Allow Player Edits". Need to figure out 
+      how to refresh UI on the other client.
 - [ ] Make a keyboard shortcut for showing "Player range" and "Tackle Zones"
       Unclear which keys makes sense. Probably need to make it configurable
 - [ ] Add UI indicator signaling limit of opponent players move (see BB3).

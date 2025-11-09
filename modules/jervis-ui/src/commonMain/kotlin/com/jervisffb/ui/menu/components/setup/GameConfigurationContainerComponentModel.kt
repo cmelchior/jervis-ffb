@@ -74,7 +74,7 @@ private val bb7RulesBaseList = listOf<DropdownEntryWithValue<Rules>>(
  * This component is the main responsible for coordinating all aspects of configuring the rules
  * for a game.
  */
-class GameConfigurationContainerComponentModel(private val menuViewModel: MenuViewModel) : ScreenModel {
+class GameConfigurationContainerComponentModel(val isHotseat: Boolean, private val menuViewModel: MenuViewModel) : ScreenModel {
 
     val selectedGameTab: MutableStateFlow<Int> = MutableStateFlow(1)
 
@@ -154,7 +154,7 @@ class GameConfigurationContainerComponentModel(private val menuViewModel: MenuVi
     val rulesModel = RulesSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, this, menuViewModel)
     val timersModel = SetupTimersComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
     val inducementsModel = InducementsSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
-    val customizationsModel = CustomizationSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
+    val customizationsModel = CustomizationSetupComponentModel(isHotseat, this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)
 
     // Component models responsible for loading a previous game
     val loadFileModel = LoadFileComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, menuViewModel)

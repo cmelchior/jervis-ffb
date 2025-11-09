@@ -17,9 +17,11 @@ import com.jervis.generated.SettingsKeys
 import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.PlayerId
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.Weather
+import com.jervisffb.engine.utils.safeTryEmit
 import com.jervisffb.fumbbl.net.adapter.FumbblReplayAdapter
 import com.jervisffb.ui.SETTINGS_MANAGER
 import com.jervisffb.ui.SoundManager
@@ -107,6 +109,8 @@ class GameScreenModel(
     val homeTeamData: LoadingTeamInfo
     val awayTeamIcon: MutableStateFlow<ImageBitmap?> = MutableStateFlow(null)
     val awayTeamData: LoadingTeamInfo
+    private val _contextMenuFlow  = MutableSharedFlow<PlayerId?>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val contextMenuFlow: Flow<Player?> = _contextMenuFlow.map { it?.let { uiState.state.getPlayerById(it) } }
     val uiState: UiGameController = UiGameController(
         uiMode,
         gameController,
@@ -226,5 +230,13 @@ class GameScreenModel(
             gameController.rules.fieldHeight
         )
         fieldViewData.value = fieldPositionData
+    }
+
+    fun showPlayerContextMenu(player: PlayerId) {
+        hoverPlayerFlow.safeTryEmit(null)
+        _contextMenuFlow.tryEmit(player)
+    }
+    fun hidePlayerContextMenu() {
+        _contextMenuFlow.tryEmit(null)
     }
 }

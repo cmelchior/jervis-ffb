@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * This component model is responsible for all the UI control needed to configure the the more
  * advanced customization options under the "Customizations" tab.
  */
-class CustomizationSetupComponentModel(initialRulesBuilder: Rules.Builder, private val menuViewModel: MenuViewModel) : ScreenModel {
+class CustomizationSetupComponentModel(val isHotseat: Boolean, initialRulesBuilder: Rules.Builder, private val menuViewModel: MenuViewModel) : ScreenModel {
 
     var rulesBuilder = initialRulesBuilder
     val isSetupValid: MutableStateFlow<Boolean> = MutableStateFlow(true)
@@ -58,6 +58,7 @@ class CustomizationSetupComponentModel(initialRulesBuilder: Rules.Builder, priva
     val selectedUndoActionBehavior = MutableStateFlow(undoActionsEntries.first { it.value == UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS })
     val selectedFoulActionBehavior = MutableStateFlow(foulActionBehavior.first { it.value == FoulActionBehavior.STRICT })
     val selectedKickingPlayerBehavior = MutableStateFlow(kickingPlayerBehavior.first { it.value == KickingPlayerBehavior.STRICT })
+    val allowPlayerEdits = MutableStateFlow(rulesBuilder.allowPlayerEditsDuringGame)
 
     fun updateFieldWidth(value: String) {
         updateIntEntry(value, fieldWidth)
@@ -135,6 +136,11 @@ class CustomizationSetupComponentModel(initialRulesBuilder: Rules.Builder, priva
     fun updateKickingPlayerBehavior(it: DropdownEntryWithValue<KickingPlayerBehavior>) {
         selectedKickingPlayerBehavior.value = it
         rulesBuilder.kickingPlayerBehavior = it.value
+    }
+
+    fun updateAllowPlayerEdits(value: Boolean) {
+        allowPlayerEdits.value = value
+        rulesBuilder.allowPlayerEditsDuringGame = value
     }
 
     private fun updateIntEntry(value: String, flow: MutableStateFlow<InputFieldDataWithValue<Int>>) {

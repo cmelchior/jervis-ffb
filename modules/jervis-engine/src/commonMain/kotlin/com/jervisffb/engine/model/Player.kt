@@ -173,8 +173,7 @@ class Player(
     val skills: List<Skill<*>>
         get() = extraSkills + positionSkills // TODO This probably result in _a lot_ of copying. Find a way to optimize this
     // Unclear if keywords are all backed in from the start or they can change. For now, assume just keep them locked to the position
-    val keywords: List<PlayerKeyword>
-        get() = position.keywords
+    val keywords: MutableList<PlayerKeyword> = position.keywords.toMutableList()
     var nigglingInjuries: Int = 0
     var missNextGame: Boolean = false
     var starPlayerPoints: Int = 0
@@ -205,7 +204,9 @@ class Player(
 
     fun removeSkill(skill: Skill<*>) {
         if (!extraSkills.remove(skill)) {
-            INVALID_GAME_STATE("Could not remove skill: ${skill.name}")
+            if (!positionSkills.remove(skill)) {
+                INVALID_GAME_STATE("Could not remove skill: ${skill.name}")
+            }
         }
     }
 
