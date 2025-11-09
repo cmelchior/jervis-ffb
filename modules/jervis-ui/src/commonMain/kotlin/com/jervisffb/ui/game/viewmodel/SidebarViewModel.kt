@@ -13,6 +13,7 @@ import com.jervisffb.ui.game.UiGameSnapshot
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.model.UiSidebarPlayer
 import com.jervisffb.ui.game.state.ReplayActionProvider
+import com.jervisffb.ui.menu.GameScreenModel
 import com.jervisffb.ui.menu.LocalFieldDataWrapper
 import com.jervisffb.ui.menu.TeamActionMode
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +31,7 @@ data class ButtonData(
 )
 
 class SidebarViewModel(
+    private val gameViewModel: GameScreenModel,
     private val menuViewModel: MenuViewModel,
     private val uiState: UiGameController,
     val sharedFieldData: LocalFieldDataWrapper,
@@ -77,7 +79,11 @@ class SidebarViewModel(
             snapshot.players[player.id]?.let {
                 UiSidebarPlayer(
                     it,
-                    UiPlayerTransientData(onHover = { hoverOver(player) }, onHoverExit = { hoverExit() })
+                    UiPlayerTransientData(
+                        onHover = { hoverOver(player) },
+                        onHoverExit = { hoverExit() },
+                        onSecondaryClick = { gameViewModel.showPlayerContextMenu(player.id) }
+                    )
                 )
             } ?: error("Cannot find player: $player.id}")
         }

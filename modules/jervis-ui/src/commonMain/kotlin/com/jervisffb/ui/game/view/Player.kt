@@ -23,8 +23,11 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiFieldPlayer
@@ -91,6 +94,27 @@ fun Player(
                 .applyIf(player.location is FieldCoordinate) {
                     jervisPointerEvent(event = FieldPointerEventType.SecondaryClickSquare, player.location as FieldCoordinate) {
                         transientData.onHoverExit.invoke()
+                    }
+                }
+                .applyIf(player.location is DogOut) {
+                    pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            var down = false // Track press, so we can filter Release correctly
+                            while (true) {
+                                val e = awaitPointerEvent()
+                                when (e.type) {
+                                    PointerEventType.Press -> {
+                                        down = e.buttons.isSecondaryPressed
+                                    }
+                                    PointerEventType.Release -> {
+                                        if (down) {
+                                            transientData.onSecondaryClick?.invoke()
+                                        }
+                                        down = false
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
     }
@@ -213,7 +237,6 @@ private fun PlayerImage(
     isGoingDown: Boolean,
     alpha: Float
 ) {
-    // println("PlayerImage ($bitmap): $isGoingDown")
     // Use Decal to avoid artifacts at the edges. It would be nice if we could render the "glow" outside
     // the canvas. It seems possible when using renderEffects on the graphicsLayer. But will need
     // more investigation.

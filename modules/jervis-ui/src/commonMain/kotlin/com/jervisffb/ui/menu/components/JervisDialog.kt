@@ -202,7 +202,6 @@ fun JervisDialog(
                 }
                 .onPreviewKeyEvent { event ->
                     // If a dialog has Input fields, it might risk having focus, so also detect ESC here
-                    println("Key event: $event")
                     if (event.type == KeyEventType.KeyDown && event.key == Key.Escape) {
                         onDismissRequest()
                         true // consume

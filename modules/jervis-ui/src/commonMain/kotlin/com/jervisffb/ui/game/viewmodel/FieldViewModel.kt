@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.map
 data class UiPlayerTransientData(
     val onHover: (() -> Unit)?,
     val onHoverExit: (() -> Unit)?,
+    val onSecondaryClick: (() -> Unit)? = null,
 )
 
 /**

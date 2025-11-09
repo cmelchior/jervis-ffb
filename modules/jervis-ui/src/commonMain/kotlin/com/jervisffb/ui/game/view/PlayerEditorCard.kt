@@ -6,25 +6,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -33,7 +27,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -48,37 +41,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.jervisffb.engine.model.Player
-import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.model.PlayerStatusEffect
 import com.jervisffb.engine.model.SkillValue
 import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.modifiers.StatModifier
@@ -87,7 +65,6 @@ import com.jervisffb.engine.rules.common.skills.Skill
 import com.jervisffb.jervis_ui.generated.resources.Res
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_minus
 import com.jervisffb.jervis_ui.generated.resources.jervis_icon_menu_plus
-import com.jervisffb.ui.game.icons.IconFactory
 import com.jervisffb.ui.game.model.UiKeywordData
 import com.jervisffb.ui.game.model.UiPlayerCard
 import com.jervisffb.ui.game.model.UiSkillData
@@ -96,11 +73,10 @@ import com.jervisffb.ui.game.view.utils.JervisButton
 import com.jervisffb.ui.game.view.utils.TitleBorder
 import com.jervisffb.ui.game.view.utils.paperBackground
 import com.jervisffb.ui.menu.components.JervisDialogHeader
-import com.jervisffb.ui.utils.darken
 import com.jervisffb.ui.utils.jdp
 import com.jervisffb.ui.utils.jsp
-import com.jervisffb.ui.utils.lighten
 import com.jervisffb.ui.utils.onClickWithSmallDragControl
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -109,35 +85,21 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun PlayerEditorCard(player: UiPlayerCard) {
     var updateTrigger by remember { mutableStateOf(0) }
-    val teamColor = when (player.model.isOnHomeTeam() == true) {
-        true -> JervisTheme.homeTeamColor
-        false -> JervisTheme.awayTeamColor
-    }
-
-    val lightTeamColor = teamColor.lighten(0.15f)
-    val darkTeamColor = teamColor.darken(0.25f)
-    val darkerTeamColor = teamColor.darken(0.5f)
-    val innerBorderColor = JervisTheme.white
     val borderSize = 6.jdp
-    val bigBorderSize = 8.jdp
-
-    val statboxLabelColor = darkerTeamColor
-    val statboxContentColor = darkTeamColor
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .onPointerEvent(PointerEventType.Enter) { /* Swallow it */ }
             .onPointerEvent(PointerEventType.Exit) { /* Swallow it */ }
         ,
-//        shape = RectangleShape,
-//        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-//        colors = CardDefaults.cardColors(containerColor = darkerTeamColor),
-//        border = BorderStroke(width = bigBorderSize, color = teamColor),
     ) {
         Row() {
-            PlayerStatsAndImage(player, updateTrigger, bigBorderSize, teamColor, borderSize, statboxLabelColor, statboxContentColor, lightTeamColor, innerBorderColor)
-            PlayerEditor(player, updateTrigger, borderSize, innerBorderColor, { updateTrigger += 1})
+            BoxWithConstraints(
+                modifier = Modifier.aspectRatio(555f/1362f),
+            ) {
+                PlayerStatsCard(flowOf(player))
+            }
+            PlayerEditor(player, updateTrigger, borderSize, { updateTrigger += 1})
         }
     }
 }
@@ -149,7 +111,10 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
     var currentTitle by remember { mutableStateOf("") }
     var currentOptions: UiSkillData? by remember { mutableStateOf(null) }
     var resume: ((Skill<*>?) -> Unit)? by remember { mutableStateOf(null) }
-    val color = JervisTheme.rulebookBlue
+    val color = when (currentPlayer?.isOnHomeTeam() == true) {
+        true -> JervisTheme.homeTeamColor
+        false -> JervisTheme.awayTeamColor
+    }
     if (visible) {
         Box(
             modifier = Modifier
@@ -178,7 +143,7 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
                                     onClick = { resume?.invoke(
                                         currentOptions!!.factory.createSkill(currentPlayer!!, SkillValue.Int(value), Duration.PERMANENT)
                                     ) },
-                                    color = JervisTheme.rulebookBlue
+                                    color = color
                                 )
                             }
                         }
@@ -189,7 +154,7 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
                                     onClick = { resume?.invoke(
                                         currentOptions!!.factory.createSkill(currentPlayer!!, SkillValue.Keyword(keyword), Duration.PERMANENT)
                                     )},
-                                    JervisTheme.rulebookBlue
+                                    color
                                 )
                             }
                         }
@@ -201,7 +166,11 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     horizontalArrangement = Arrangement.End,
                 ) {
-                    JervisButton(text = "Cancel", onClick = { resume?.invoke(null) })
+                    JervisButton(
+                        text = "Cancel",
+                        onClick = { resume?.invoke(null) },
+                        buttonColor = color,
+                    )
                 }
             }
         }
@@ -215,7 +184,7 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
                 currentOptions = options
                 resume = { chosen ->
                     if (cont.isActive) {
-                        cont.resume(chosen) { cause, _, context ->
+                        cont.resume(chosen) { _, _, _ ->
                             /* Do nothing on cancellation */
                         }
                     }
@@ -229,293 +198,12 @@ fun rememberSkillSelectorOverlay(): suspend (player: Player, title: String, skil
 }
 
 @Composable
-private fun PlayerStatsAndImage(
+private fun PlayerEditor(
     player: UiPlayerCard,
     updateTrigger: Int,
-    bigBorderSize: Dp,
-    teamColor: Color,
     borderSize: Dp,
-    statboxLabelColor: Color,
-    statboxContentColor: Color,
-    lightTeamColor: Color,
-    innerBorderColor: Color
+    notifyUpdate: () -> Unit
 ) {
-    key(updateTrigger) {
-        val statWidthFactor = 0.3f
-        val imageWidthFactor = 0.7f
-
-        BoxWithConstraints(
-            modifier = Modifier.aspectRatio(555f/1362f),
-        ) {
-            val boxWidth = maxWidth
-            val portraitHeight = (boxWidth - bigBorderSize * 2) * imageWidthFactor * 147f/95f
-
-            // Stats and image
-            Column(
-                modifier = Modifier
-                    .paperBackground(teamColor) // Background color for the entire card
-                    .padding(bigBorderSize),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min)
-                        .heightIn(min = (portraitHeight - (borderSize*3))/4f)
-                    ,
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(statWidthFactor)
-                            .padding(end = borderSize)
-                            .fillMaxHeight()
-                            .background(teamColor)
-                        ,
-                        verticalArrangement = Arrangement.spacedBy(borderSize),
-                    ) {
-                        StatBox(
-                            Modifier.fillMaxSize(),
-                            "MV",
-                            player.model.move.toString(),
-                            statboxLabelColor,
-                            statboxContentColor,
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .weight(0.7f)
-                            .fillMaxSize()
-                            .paperBackground(lightTeamColor),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        // Player type
-                        val fontSize = 26.jsp
-                        val type = remember(player.model.position.titleSingular) {
-                            val originalTitle = player.model.position.titleSingular
-                            val splitTitle = originalTitle.split(" ")
-                            // We want to have the common case of two words in the title be split
-                            // across two lines as it looks better as the chance of getting too
-                            // close to the sides increases. This heuristic can probably be improved
-                            // in the future.
-                            if (splitTitle.size == 2) {
-                                "${splitTitle[0]}\n${splitTitle[1]}"
-                            } else {
-                                originalTitle
-                            }
-                        }
-                        Text(
-                            modifier = Modifier.padding(2.jdp).fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            text = type,
-                            fontFamily = JervisTheme.fontFamily(),
-                            style = TextStyle.Default.copy(
-                                shadow = Shadow(Color.Black, Offset(0f, 2f), 2f),
-                            ),
-                            color = Color.White,
-                            fontSize = fontSize,
-                            letterSpacing = 1.jsp,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(borderSize))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(portraitHeight)
-                    ,
-                ) {
-                    Column(
-                        modifier = Modifier.weight(statWidthFactor).fillMaxSize().padding(end = borderSize),
-                        verticalArrangement = Arrangement.spacedBy(borderSize),
-                    ) {
-                        val model = player.model
-                        val modifier = Modifier.weight(1f)
-                        StatBox(modifier, "ST", model.strength.toString(), statboxLabelColor, statboxContentColor)
-                        StatBox(modifier, "AG", "${model.agility}+", statboxLabelColor, statboxContentColor)
-                        StatBox(modifier, "PA", if (model.passing == null) "-" else "${model.passing}+", statboxLabelColor, statboxContentColor)
-                        StatBox(modifier, "AV", "${model.armorValue}+", statboxLabelColor, statboxContentColor)
-                    }
-                    Box(
-                        modifier = Modifier
-                            .weight(imageWidthFactor)
-                            .fillMaxSize()
-                            .border(
-                                width = borderSize,
-                                color = innerBorderColor,
-                            )
-                        ,
-                        contentAlignment = Alignment.BottomCenter,
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RectangleShape)
-                                .graphicsLayer {
-                                    scaleX = 1.05f
-                                    scaleY = 1.05f
-                                }
-                            ,
-                            // .aspectRatio(95f / 147f).fillMaxWidth(),
-                            bitmap = IconFactory.getPlayerPortrait(player.model.id),
-                            filterQuality = FilterQuality.None,
-                            contentDescription = "Image of ${player.model.name}",
-                            contentScale = ContentScale.Fit,
-                            alignment = Alignment.Center,
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .padding(bottom = borderSize)
-                                .background(Color.Black.copy(0.0f))
-                                .padding(
-                                    start = borderSize + 3.dp,
-                                    end = borderSize + 3.dp,
-                                    bottom = 4.jdp,
-                                    top = 4.jdp
-                                )
-                            ,
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            PlayerName(player.model.name, borderSize)
-                        }
-                    }
-                }
-
-                // Player level
-                Row(
-                    modifier = Modifier
-                        .padding(top = bigBorderSize, bottom = bigBorderSize)
-                        .fillMaxWidth(),
-                ) {
-                    val fontSize = 16.jsp
-                    Text(
-                        textAlign = TextAlign.Start,
-                        text = player.model.level.description,
-                        fontFamily = JervisTheme.fontFamily(),
-                        style = TextStyle.Default.copy(
-                            shadow = Shadow(Color.Black, Offset(0f, 2f), 2f),
-                        ),
-                        color = Color.White,
-                        maxLines = 1,
-                        fontSize = fontSize,
-                        letterSpacing = 1.jsp,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        textAlign = TextAlign.Start,
-                        text = "${player.model.starPlayerPoints} SPP",
-                        fontFamily = JervisTheme.fontFamily(),
-                        style = TextStyle.Default.copy(
-                            shadow = Shadow(Color.Black, Offset(0f, 2f), 2f),
-                        ),
-                        color = Color.White,
-                        maxLines = 1,
-                        fontSize = fontSize,
-                        letterSpacing = 1.jsp,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-
-                // Skill content
-                Column(
-                    modifier = Modifier
-                        .paperBackground()
-                        .border(borderSize, innerBorderColor)
-                        .fillMaxSize()
-                    ,
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .padding(borderSize*2)
-                        ,
-                    ) {
-                        val skillFontSize = 16.jsp
-                        val skills = player.model.skills
-                        if (skills.isEmpty()) {
-                            Text(
-                                modifier = Modifier.padding(0.jdp).fillMaxWidth(),
-                                fontSize = skillFontSize,
-                                color = JervisTheme.contentTextColor,
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.SemiBold,
-                                fontStyle = FontStyle.Italic,
-                                text = "No Skills"
-                            )
-                        } else {
-                            player.model.skills.forEach {
-                                Text(
-                                    fontSize = skillFontSize,
-                                    lineHeight = 1.5.em,
-                                    color = JervisTheme.contentTextColor,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(0.jdp).fillMaxWidth(),
-                                    text = it.name + if (it.compulsory) "*" else "",
-                                    textDecoration = if (it.used) TextDecoration.LineThrough else TextDecoration.None,
-                                )
-                            }
-                        }
-                    }
-                    FlowRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(borderSize*2)
-                        ,
-                        horizontalArrangement = Arrangement.spacedBy(borderSize, Alignment.End),
-                        verticalArrangement = Arrangement.spacedBy(borderSize),
-                    ) {
-                        when (player.model.state) {
-                            PlayerState.PRONE -> {
-                                StatusText("Prone", JervisTheme.statusProne)
-                            }
-                            PlayerState.STUNNED -> {
-                                StatusText("Stunned", JervisTheme.statusStunned)
-                            }
-                            PlayerState.STUNNED_OWN_TURN -> {
-                                StatusText("Stunned", JervisTheme.statusStunned)
-                            }
-                            else -> { /* Do nothing */ }
-                        }
-                        player.model.statusEffects.forEach { statusEffect ->
-                            when (statusEffect) {
-                                PlayerStatusEffect.ROOTED -> {
-                                    StatusText("Rooted", JervisTheme.statusRooted)
-                                }
-                                PlayerStatusEffect.DISTRACTED -> {
-                                    StatusText("Distracted", JervisTheme.statusDistracted)
-                                }
-                                PlayerStatusEffect.CHOMPED -> {
-                                    StatusText("Chomped", JervisTheme.statusChomped)
-                                }
-                                PlayerStatusEffect.EYE_GOUGE -> {
-                                    StatusText("Eye Gouge", JervisTheme.statusEyeGouge)
-                                }
-                                PlayerStatusEffect.DODGY_SNACK -> {
-                                    StatusText("Dodgy Snack", JervisTheme.statusDodgySnack)
-                                }
-                                PlayerStatusEffect.HYPNO_GAZED -> {
-                                    // Ignore
-                                }
-                            }
-                        }
-                        player.model.keywords.forEach { keyword ->
-                            StatusText(
-                                text = keyword.description,
-                                textColor = JervisTheme.white,
-                                backgroundColor = if (player.model.isOnHomeTeam()) JervisTheme.rulebookRed else rulebookBlue
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun PlayerEditor(player: UiPlayerCard, updateTrigger: Int, borderSize: Dp, innerBorderColor: Color, notifyUpdate: () -> Unit) {
     val tabs = listOf("Skills", "Stats", "Keywords")
     val pagerStateTop = rememberPagerState(initialPage = 0) { tabs.size }
     val coroutineScope = rememberCoroutineScope()
@@ -882,133 +570,6 @@ private fun KeywordsSelectorTab(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun StatusText(text: String, backgroundColor: Color, textColor: Color = JervisTheme.contentTextColor) {
-    Text(
-        text = text,
-        modifier = Modifier.background(backgroundColor).padding(4.jdp),
-        fontSize = 14.jsp,
-        lineHeight = 1.0.em,
-        color = textColor,
-        fontWeight = FontWeight.SemiBold,
-    )
-}
-
-@Composable
-private fun BoxScope.PlayerName(name: String, borderSize: Dp) {
-    // Because Compose does not support drop shadow on Outlined Text
-    // we fake it by first blurring the outline and then render the rest
-    val playerNameStyle = MaterialTheme.typography.bodySmall.copy(
-        textAlign = TextAlign.Center,
-        fontFamily = JervisTheme.fontFamily(),
-        fontSize = 20.jsp,
-        lineHeight = 1.4.em,
-        letterSpacing = 1.sp,
-    )
-    val fontOutlineSize = with(LocalDensity.current) { 6.jdp.toPx() }
-
-    // Drop shadow
-    Text(
-        modifier = Modifier
-            .fillMaxWidth()
-            .graphicsLayer {
-                renderEffect = BlurEffect(2.jdp.toPx(), 2.jdp.toPx(), TileMode.Clamp)
-            }
-        ,
-        text = name,
-        overflow = TextOverflow.Ellipsis,
-        style = playerNameStyle.copy(
-            color = JervisTheme.black,
-            drawStyle = Stroke(
-                miter = fontOutlineSize,
-                width = fontOutlineSize,
-                join = StrokeJoin.Round
-            )
-        ),
-    )
-
-    // Outline
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = name,
-        overflow = TextOverflow.Ellipsis,
-        style = playerNameStyle.copy(
-            color = JervisTheme.white,
-            drawStyle = Stroke(
-                miter = 2f, // fontOutlineSize,
-                width = fontOutlineSize,
-                join = StrokeJoin.Miter,
-                cap = StrokeCap.Butt,
-
-            )
-        ),
-    )
-    // Real text
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = name,
-        overflow = TextOverflow.Ellipsis,
-        style = playerNameStyle.copy(
-            color = JervisTheme.black,
-        )
-    )
-}
-
-/**
- * Render a single stat box that is part of a Playe Stats Card.
- */
-@Composable
-private fun StatBox(
-    modifier: Modifier,
-    title: String,
-    value: String,
-    labelBackgroundColor: Color,
-    backgroundColor: Color,
-) {
-    Column(
-        modifier = modifier.fillMaxWidth().fillMaxHeight().background(backgroundColor),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .background(labelBackgroundColor)
-                .wrapContentHeight(align = Alignment.CenterVertically)
-            ,
-            text = title,
-            fontSize = 12.jsp,
-            lineHeight = 1.em,
-            letterSpacing = 1.jsp,
-            maxLines = 1,
-            fontWeight = FontWeight.Normal,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-        )
-        Text(
-            modifier = Modifier
-                .offset(y = (-1).jdp) // Offset to make the font look slightly more aligned
-                .fillMaxHeight(0.65f)
-                .fillMaxWidth()
-                .background(backgroundColor)
-                .wrapContentHeight(align = Alignment.CenterVertically)
-            ,
-            text = value,
-            fontSize = 30.jsp,
-            lineHeight = 1.em,
-            maxLines = 1,
-            letterSpacing = 2.jsp,
-            fontFamily = JervisTheme.fontFamily(),
-            color = JervisTheme.white,
-            textAlign = TextAlign.Center,
-            style = TextStyle.Default.copy(
-                shadow = Shadow(JervisTheme.black, Offset(2.jdp.value, 2.jdp.value), 2.jdp.value),
-            ),
-        )
     }
 }
 

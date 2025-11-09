@@ -139,6 +139,7 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
             viewModel.hoverPlayerFlow,
         ),
         SidebarViewModel(
+            viewModel,
             viewModel.menuViewModel,
             viewModel.uiState,
             viewModel.sharedFieldData,
@@ -146,6 +147,7 @@ private fun GameScreenContent(viewModel: GameScreenModel, onSettingsClick: () ->
             viewModel.hoverPlayerFlow
         ),
         SidebarViewModel(
+            viewModel,
             viewModel.menuViewModel,
             viewModel.uiState,
             viewModel.sharedFieldData,

@@ -114,7 +114,6 @@ class ReplayActionProvider(private val menuViewModel: MenuViewModel, private val
     }
 
     override fun decorateAvailableActions(actions: ActionRequest, acc: UiSnapshotAccumulator) {
-        println("Decorating available actions for ReplayActionProvider")
         // Do nothing
     }
 

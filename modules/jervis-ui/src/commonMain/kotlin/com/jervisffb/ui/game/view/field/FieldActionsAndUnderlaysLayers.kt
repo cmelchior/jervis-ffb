@@ -118,7 +118,6 @@ private fun SquareHighlightAndAction(
     Box(
         modifier = boxWrapperModifier
             .jervisPointerEvent(FieldPointerEventType.SecondaryClickSquare, square.coordinates) {
-                println("Trigger context menu: $square")
                 if (player != null) {
                     vm.triggerShowContextMenu(player.id)
                 }
