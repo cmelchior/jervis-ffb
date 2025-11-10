@@ -131,6 +131,7 @@ val generatedJervisSerializerModule = SerializersModule {
     }
     polymorphic(com.jervisffb.engine.rules.common.skills.SkillSettings::class) {
         subclass(com.jervisffb.engine.rules.bb2020.BB2020SkillSettings::class)
+        subclass(com.jervisffb.engine.rules.bb2025.BB2025SkillSettings::class)
     }
     polymorphic(com.jervisffb.engine.rules.builder.StadiumRule::class) {
         subclass(com.jervisffb.engine.rules.builder.NoStadium::class)
