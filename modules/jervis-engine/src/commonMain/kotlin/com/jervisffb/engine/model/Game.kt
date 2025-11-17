@@ -176,7 +176,8 @@ class Game(
     }
 
     // Kicking/Receiving team is decided during the pre-game sequence.
-    // See page 38 in the rulebook.
+    // See page 38 in the BB2020 rulebook.
+    // See page 46 in the BB2025 rulebook.
     var kickingTeam: Team = this.homeTeam
     var receivingTeam: Team = this.awayTeam
     var kickingTeamInLastHalf: Team = kickingTeam

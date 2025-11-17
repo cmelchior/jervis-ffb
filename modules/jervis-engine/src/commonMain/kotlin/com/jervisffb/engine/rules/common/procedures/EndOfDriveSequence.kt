@@ -14,8 +14,17 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.tables.Weather
 
 /**
- * This procedure controls the End of Drive sequence as described
- * on page 66 in the rulebook.
+ * This procedure controls the End of Drive sequence.
+ *
+ * See page 66 in the BB2020 rulebook.
+ * See page 82 in the BB2025 rulebook.
+ *
+ * Developer's Commentary:
+ * In BB2020, the sequence was not well-defined for ending effects, making
+ * it up for interpretation. In BB2025, ending effects are explicitly mentioned
+ * between Dealing with Secret Weapons and Recovering Knocked-out Players.
+ *
+ * For simplicity, we adopt the same sequence for BB2020.
  */
 object EndOfDriveSequence: Procedure() {
     override val initialNode = DealWithSecretWeapons
@@ -27,6 +36,9 @@ object EndOfDriveSequence: Procedure() {
             return GotoNode(RecoverKnockedOutPlayers)
         }
     }
+
+
+
 
     object RecoverKnockedOutPlayers: ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {

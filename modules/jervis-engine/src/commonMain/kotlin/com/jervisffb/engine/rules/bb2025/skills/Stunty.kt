@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Stunty* skill.
+ * Representation of the Stunty* (Passive) skill.
  *
- * See page 86 in the rulebook.
+ * See page 136 in the BB2025 rulebook.
  */
 class Stunty(
     override val player: Player,

@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Break Tackle skill.
+ * Representation of the Break Tackle (Active) skill.
  *
- * See page XX in the rulebook.
+ * See page 126 in the BB2025 rulebook.
  */
 class BreakTackle(
     override val player: Player,

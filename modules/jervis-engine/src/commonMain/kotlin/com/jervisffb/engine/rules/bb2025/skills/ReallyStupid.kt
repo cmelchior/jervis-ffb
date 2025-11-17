@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Bone Head* skill.
+ * Representation of the Really Stupid* (Passive) skill.
  *
- * See page 86 in the rulebook.
+ * See page 135 in the BB2025 rulebook.
  */
 class ReallyStupid(
     override val player: Player,

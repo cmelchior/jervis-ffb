@@ -562,6 +562,16 @@ This seems like an oversight, so Jervis is choosing an implementation where
 the score counter is incremented immediately and if not at the end of the half,
 the next turn is skipped.
 
+### Page 66 - End of Drive Sequence: Sweltering Heat and Secret Weapons
+In BB2020, it is a bit unclear if Sweltering Heat or Deal with Secret Weapons 
+happens first. but Sweltering heat does mention "once a drive ends", which 
+matches the "The Drive Ends" step of the End of Drive sequence.
+
+In BB2025, this ordering is described fully, so checking for Sweltering Heat
+happens between Deal with Secret Weapons and Recover KNocked-out Players.
+
+For simplicity, Jervis is choosing the same ordering in BB2020 as in BB2025.
+
 ### Page 80 - Multiple Block
 When using Multiple Block, it is unclear what "Both Block actions are 
 performed simultaneously" means exactly. Does it apply to all steps of both

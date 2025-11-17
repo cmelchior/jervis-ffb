@@ -11,6 +11,11 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
+/**
+ * Represents the Sure Hands (Active) skill.
+ *
+ * See page 136 in the BB2025 rulebook.
+ */
 class SureHands(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.GENERAL,

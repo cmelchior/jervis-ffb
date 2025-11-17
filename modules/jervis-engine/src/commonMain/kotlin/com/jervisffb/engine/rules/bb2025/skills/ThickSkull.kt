@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Thick Skull skill.
+ * Representation of the Thick Skull (Passive) skill.
  *
- * See page 80 in the rulebook.
+ * See page 137 in the BB2025 rulebook.
  */
 class ThickSkull(
     override val player: Player,

@@ -33,7 +33,8 @@ import com.jervisffb.engine.rules.Rules
  * Resolve a Bounce until it is either caught or lands on the ground.
  * If caught, this includes checking for touchdowns.
  *
- * See page 25 in the rulebook.
+ * See page 25 in the BB2020 rulebook.
+ * See page 34 in the BB2025 rulebook.
  */
 object Bounce : Procedure() {
     override val initialNode: Node = RollDirection

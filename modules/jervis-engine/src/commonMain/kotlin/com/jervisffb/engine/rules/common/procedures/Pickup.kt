@@ -26,10 +26,21 @@ import com.jervisffb.engine.rules.common.tables.Weather
 
 /**
  * Resolve a Pickup, i.e., when a player moves into a field where the ball is placed.
- * See page 46 in the rulebook.
+ *
+ * See page 46 in the BB2020 rulebook.
+ * See page 57 in the BB2025 rulebook.
  *
  * If the pickup failed, a turnover is triggered. If the pickup succeeded, we also
  * check if the player picking up the ball scored a touchdown.
+ *
+ * Developer's Commentary:
+ * In BB2020, the only restriction is that a player has to move voluntarily into
+ * the ball. In BB2025 there is an extra restriction: It also has to be during
+ * the player's activation.
+ *
+ * It is unclear if there are any cases where a player can move voluntarily
+ * without the player being active, so for now we assume the logic is the same
+ * across BB2020 and BB2025.
  */
 object Pickup : Procedure() {
     override val initialNode: Node = RollToPickup

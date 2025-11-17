@@ -7,6 +7,11 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
+/**
+ * Representation of the Mighty Blow (Active) skill.
+ *
+ * See page 131 in the BB2025 rulebook.
+ */
 class MightyBlow(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.STRENGTH,

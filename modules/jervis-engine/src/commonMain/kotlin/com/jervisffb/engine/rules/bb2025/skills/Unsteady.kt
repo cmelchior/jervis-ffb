@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 /**
  * Representation of the Unsteady* (Passive) skill.
  *
- * See page xx in the rulebook.
+ * See page 138 in the BB2025 rulebook.
  */
 class Unsteady(
     override val player: Player,

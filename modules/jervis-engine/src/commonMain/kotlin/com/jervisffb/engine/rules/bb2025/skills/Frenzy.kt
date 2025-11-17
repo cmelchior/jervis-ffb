@@ -7,6 +7,11 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
+/**
+ * Representation of the Frenzy* (Active) skill.
+ *
+ * See page 128 in the BB2025 rulebook.
+ */
 class Frenzy(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.GENERAL,

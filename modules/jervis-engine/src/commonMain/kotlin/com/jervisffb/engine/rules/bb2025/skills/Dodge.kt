@@ -12,9 +12,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Dodge skill.
+ * Representation of the Dodge (Active) skill.
  *
- * See the rulebook, page 75.
+ * See page 127 in the BB2025 rulebook.
  */
 class Dodge(
     override val player: Player,

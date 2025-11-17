@@ -108,7 +108,7 @@ open class Rules(
     open val inducements: InducementSettings = InducementSettings(DEFAULT_INDUCEMENTS),
 
     // Characteristic limits
-    // See page 28 in the rulebook
+    // See page 28 in the BB2020 rulebook and pxage 37 in the BB2025 rulebook
     @Serializable(IntRangeSerializer::class)
     open val moveRange: IntRange = 1..9,
     @Serializable(IntRangeSerializer::class)
@@ -382,7 +382,7 @@ open class Rules(
 
     /**
      * Returns `true` if the player is considered `Open` as described on
-     * page 26 in the rulebook.
+     * page 38 in the BB2025 rulebook.
      */
     fun isOpen(player: Player): Boolean {
         return !isMarked(player)
@@ -390,10 +390,18 @@ open class Rules(
 
     /**
      * Returns `true` if the player is considered "Standing" as described
-     * on page 26 in the rulebook.
+     * on page 38 in the BB2025 rulebook.
      */
     fun isStanding(player: Player): Boolean {
         return player.state == PlayerState.STANDING && player.location.isOnField(this)
+    }
+
+    /**
+     * Returns `true` if the player is considered "Distracted" as described on
+     * page 38 in the BB2025 rulebook.
+     */
+    fun isDistracted(player: Player): Boolean {
+        return isStanding(player) && !player.hasTackleZones
     }
 
     /**

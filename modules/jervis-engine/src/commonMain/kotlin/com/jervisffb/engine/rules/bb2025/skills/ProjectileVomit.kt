@@ -9,6 +9,11 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 
+/**
+ * Representation of the Projectile Vomit (Active) skill.
+ *
+ * See page 133 in the BB2025 rulebook.
+ */
 class ProjectileVomit(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.TRAITS,

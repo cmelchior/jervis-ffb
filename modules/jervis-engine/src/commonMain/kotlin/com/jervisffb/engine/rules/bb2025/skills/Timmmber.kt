@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Timmm-ber! skill.
+ * Representation of the Timmm-ber! (Passive) skill.
  *
- * See page 87 in the rulebook.
+ * See page 137 in the BB2025 rulebook.
  */
 class Timmmber(
     override val player: Player,

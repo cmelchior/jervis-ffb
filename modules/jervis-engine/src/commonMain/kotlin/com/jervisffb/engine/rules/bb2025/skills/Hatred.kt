@@ -9,10 +9,10 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Hatred(X) skill. If a player gets hatred against
+ * Representation of the Hatred(X)* (Passive) skill. If a player gets hatred against
  * multiple opponents, this is represented by multiple instances of this skill.
  *
- * See page xx in the BB2025 rulebook.
+ * See page 129 in the BB2025 rulebook.
  */
 class Hatred(
     override val player: Player,

@@ -9,6 +9,11 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 
+/**
+ * Represents the Stab (Active) skill.
+ *
+ * See page 136 in the BB2025 rulebook.
+ */
 class Stab(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.TRAITS,

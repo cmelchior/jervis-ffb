@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Blood Lust(X+)* skill.
+ * Representation of the Blood Lust(X+)* (Passive) skill.
  *
- * See Spike Magazin XXX
+ * See page 125 in the BB2025 rulebook.
  */
 class BloodLust(
     override val player: Player,

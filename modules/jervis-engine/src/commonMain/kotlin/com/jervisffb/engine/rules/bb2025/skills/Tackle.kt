@@ -7,6 +7,11 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
+/**
+ * Represents the Tackle (Active) skill.
+ *
+ * See page 137 in the BB2025 rulebook.
+ */
 class Tackle(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.GENERAL,

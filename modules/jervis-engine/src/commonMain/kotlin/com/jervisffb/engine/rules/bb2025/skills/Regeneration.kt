@@ -7,6 +7,11 @@ import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
+/**
+ * Representation of the Regeneration (Passive) skill.
+ *
+ * See page 135 in the BB2025 rulebook.
+ */
 class Regeneration(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.TRAITS,

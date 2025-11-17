@@ -44,7 +44,13 @@ data class ThrowInContext(
  * Resolve a Throw In after a ball went out of bounds, up until the ball is caught
  * or lands on an empty square. This includes checking for touchdowns.
  *
- * See page 51 in the rulebook.
+ * See page 51 in the BB2020 rulebook.
+ * See page 73 in the BB2025 rulebook.
+ *
+ * Developer's Commentary:
+ * In BB2025, it is unspecified what happens when you throw in to an empty
+ * square. For now, Jervis assumes this is an oversight and that the ball will
+ * bounce like in BB2020.
  */
 object ThrowIn : Procedure() {
     override val initialNode: Node = RollDirection

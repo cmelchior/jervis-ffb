@@ -10,7 +10,7 @@ import com.jervisffb.engine.rules.common.skills.SkillType
 /**
  * Representation of the Cannoneer (Active) skill.
  *
- * See page XX in the rulebook.
+ * See page 126 in the BB2025 rulebook.
  */
 class Cannoneer(
     override val player: Player,

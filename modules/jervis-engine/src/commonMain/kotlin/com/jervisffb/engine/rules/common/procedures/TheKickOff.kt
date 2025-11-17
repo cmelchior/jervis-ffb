@@ -40,8 +40,9 @@ import com.jervisffb.engine.utils.INVALID_GAME_STATE
 /**
  * Do the Kick-Off.
  *
- * - See page 40 in the rulebook
+ * - See page 40 in the BB2020 rulebook.
  * - See Designer's Commentary - May 2023, page 2.
+ * - See page 47 in the BB2025 rulebook.
  */
 object TheKickOff : Procedure() {
     override val initialNode: Node = NominateKickingPlayer

@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Prehensile Tail skill.
+ * Representation of the Prehensile Tail (Active) skill.
  *
- * See page 87 in the rulebook.
+ * See page 133 in the rulebook.
  */
 class PrehensileTail(
     override val player: Player,

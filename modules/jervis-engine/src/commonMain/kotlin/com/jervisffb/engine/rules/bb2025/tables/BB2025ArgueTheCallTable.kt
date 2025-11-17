@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 /**
  * Class representing the Argue the Call table.
  *
- * See page XX in the BB 2025 rulebook.
+ * See page 69 in the BB2025 rulebook.
  */
 @Serializable
 object BB2025ArgueTheCallTable: ArgueTheCallTable {

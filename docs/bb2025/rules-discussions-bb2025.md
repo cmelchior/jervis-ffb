@@ -11,10 +11,24 @@ a certain interpretation.
 * TODO: Review BB2020 version of this file and move over any relevant items.
 
 ## Rulebook
-None
+
+### Page 73 - Throw-ins
+Does not specify what happens if the ball lands in an unoccupied square making
+it undefined. In BB2020, it would bounce, so most likely this section was 
+just accidentally deleted. Passing to an empty specifically mentions that it
+will bounce as well.
+
 
 ## Spike 19
 None
 
 ## Spike 20
 None
+
+
+## Notes of things to follow up on
+
+- Prayers to Nuffle are now moved into the Inducement section instead of being its own thing.
+- Only one reroll is allowed per dice pool. Regardless of how many dice it affects.
+- Turn over: Failing to catch ball. Is it a turnover if 2nd player catches the ball
+- Bounces are now a Scatter(1) roll - Does it matter?

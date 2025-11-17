@@ -29,7 +29,10 @@ import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Resolve a player attempting to catch the ball as described on page 51 in the rulebook.
+ * Resolve a player attempting to catch the ball.
+ *
+ * See page 51 in the BB2020 rulebook.
+ * See page 72 in the BB2025 rulebook.
  *
  * This procedure assumes that the parent already checked if the cath is valid
  * in the first place.

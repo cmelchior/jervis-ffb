@@ -46,27 +46,13 @@ data class SecureTheBallContext(
 /**
  * Procedure for controlling a player's Secure the Ball action.
  *
- * The exact details of this action are still unknown, so this is just a best-effort
- * implementation from what we know so far.
+ * See page 59 in the BB2025 rulebook.
  *
- * This procedure assumes that it was legal to call it, i.e., it is up to the caller
- * to ensure there are no enemies within range.
- *
- * - Player Action: 2+ to pickup the ball
- * - It ends the players activation, not turn
- * - It requires no standing or non distracted player within 2 squares of the ball
- * - Some players can't use it. (Big Guys can't but there are others that can't too)
- * - it's an additional Action, usual pick up rules don't change
- * - Secure the Ball is NOT a pick up, which means skills such as sure hands do not work
- * - Assumption: Team Rerolls work
- * - Assumption: Failing to secure the ball ends in a turnover.
- * - Assumption: It is 2 squares from the ball, not the player starting the action.
- * - Assumption: If multiple balls, this action is valid if at least one ball is legal target.
- * - Assumption: No modifiers of any kind apply, it is a straight 2+ roll.
- * - Assumption: The ball will bounce if failing to secure it.
- * - Assumption: You cannot select Secure the Ball if it is already being carried.
- * - Assumption: If a player has chosen the action, the player MUST roll for Secure the Ball and
- *               not Pickup when moving into the ball.
+ * Developer's Commentary:
+ * It is currently a bit unclear which modifiers (if any) apply to rolling for
+ * securing the ball. For now, we assume that the wording "they will
+ * automatically pick up the ball" means that this is a straight 2+ roll
+ * with no modifiers - This roll is specifically NOT a pickup-roll.
  */
 object SecureTheBallAction : Procedure() {
     override val initialNode: Node = MoveOrEndAction
@@ -153,6 +139,5 @@ object SecureTheBallAction : Procedure() {
             }
         }
     }
-
 }
 

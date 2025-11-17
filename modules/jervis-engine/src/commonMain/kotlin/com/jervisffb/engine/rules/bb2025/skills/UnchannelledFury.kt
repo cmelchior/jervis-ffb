@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Unchannelled Fury* skill.
+ * Representation of the Unchannelled Fury* (Passive) skill.
  *
- * See page 87 in the rulebook.
+ * See page 138 in the BB2025 rulebook.
  */
 class UnchannelledFury(
     override val player: Player,

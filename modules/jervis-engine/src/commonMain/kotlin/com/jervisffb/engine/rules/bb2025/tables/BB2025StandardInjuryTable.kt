@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 /**
  * Class representing the Injury Table.
  *
- * See page XX in the BB 2025 rulebook.
+ * See page 66 in the BB2025 rulebook.
  */
 @Serializable
 object BB2025StandardInjuryTable: InjuryTable() {

@@ -14,7 +14,8 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Leader skill. See page 79 in the rulebook.
+ * Representation of the Leader (Passive) skill. See page 130 in the BB2025
+ * rulebook.
  *
  * The skill itself has no effect by itself. It is just a marker used by the rules.
  *

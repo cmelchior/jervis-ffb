@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Accurate(Active) skill.
+ * Representation of the Accurate (Active) skill.
  *
- * See page XX in the rulebook.
+ * See page 123 in the BB2025 rulebook.
  */
 class Accurate(
     override val player: Player,

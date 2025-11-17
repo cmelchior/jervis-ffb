@@ -12,9 +12,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Catch skill.
+ * Representation of the Catch (Active) skill.
  *
- * See the rulebook, page 75.
+ * See page 126 in the BB2025 rulebook.
  */
 class CatchSkill(
     override val player: Player,

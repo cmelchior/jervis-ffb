@@ -52,7 +52,10 @@ data class JumpRollContext(
 ): ProcedureContext
 
 /**
- * Procedure controlling a Jump action as described on page 45 in the rulebook.
+ * Procedure controlling a Jump action.
+ *
+ * See page 45 in the BB2020 rulebook.
+ * See page 56 in the BB2025 rulebook.
  *
  * The order of checks is:
  * 1. Tentacles
@@ -72,9 +75,12 @@ data class JumpRollContext(
  * 3) Some other square (as the middle square is filled)?
  *
  * This was answered in the Designer's Commentary, and the ruling is that if you
- * fail the first Rush, you end up in the starting square. They FAQ entry
- * doesn't mention what happens when you fail the 2nd Rush, but it is assumed
- * you end up in the target square per normal.
+ * fail the first Rush, you end up in the starting square. The FAQ entry
+ * doesn't mention what happens when you fail the 2nd Rush.
+ *
+ * BB2025 Update: In BB2025 it is defined that failing any Rush leaves the player
+ * in the starting field. So we apply the same rule to BB2020.
+ *
  *
  * The interaction between Jump and Tentacles is also a bit unclear,
  * https://www.reddit.com/r/bloodbowl/comments/xodttp/shadowing_and_tentacles_work_on_followups_jumps/

@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Represents the "Sprint" skill.
+ * Represents the Leap (Active) skill.
  *
- * See page 75 in the rulebook.
+ * See page 130 in the BB2025 rulebook.
  */
 class Leap(
     override val player: Player,

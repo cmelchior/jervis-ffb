@@ -14,6 +14,11 @@ import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
+/**
+ * Representation of the Pro (Active) skill.
+ *
+ * See page 133 in the BB2025 rulebook.
+ */
 class Pro(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.GENERAL,

@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Diving Tackle skill.
+ * Representation of the Diving Tackle (Active) skill.
  *
- * See page 75 in the rulebook.
+ * See page 127 in the BB2025 rulebook.
  */
 class DivingTackle(
     override val player: Player,

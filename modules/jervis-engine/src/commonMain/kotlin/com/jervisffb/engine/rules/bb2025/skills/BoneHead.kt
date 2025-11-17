@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Bone Head* skill.
+ * Representation of the Bone Head* (Passive) skill.
  *
- * See page 84 in the rulebook.
+ * See page 126 in the BB2025 rulebook.
  */
 class BoneHead(
     override val player: Player,

@@ -9,6 +9,11 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
 
+/**
+ * Representation of the Breathe Fire (Active) skill.
+ *
+ * See page 126 in the BB2025 rulebook.
+ */
 class BreatheFire(
     override val player: Player,
     override val category: SkillCategory = SkillCategory.TRAITS,

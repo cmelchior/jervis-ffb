@@ -29,11 +29,6 @@ Examples are: Dodge/Tackle and Break Tackle/Diving Tackle.
        Decides" or "InActive Coach Decides"
     c. For Both Down the order is: Defender then Attacker (link to source?)
 
-## End of Drive Sequence: Sweltering Heat and Secret Weapons
-It is a bit unclear if Sweltering Heat or Deal with Secret Weapons happens 
-first, but Sweltering heat does mention "once a drive ends", which matches the 
-"The Drive Ends" step of the End of Drive sequence.
-
 ## End of Turn sequence
 It isn't well-defined in which order things happen at the end of the turn, but 
 currently the only thing that reset/expire is skills that uses rerolls. None of 

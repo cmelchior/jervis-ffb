@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Throw Team-mate skill.
+ * Representation of the Throw Team-mate (Active) skill.
  *
- * See page 87 in the rulebook.
+ * See page 137 in the BB2025 rulebook.
  */
 class ThrowTeamMate(
     override val player: Player,

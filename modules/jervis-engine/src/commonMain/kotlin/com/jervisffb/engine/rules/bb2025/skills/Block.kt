@@ -8,9 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * Representation of the Block skill.
+ * Representation of the Block (Active) skill.
  *
- * See the rulebook, page XX.
+ * See page 124 in the BB2025 rulebook.
  */
 class Block(
     override val player: Player,

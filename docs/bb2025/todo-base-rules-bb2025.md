@@ -133,15 +133,16 @@ book.
     - [ ] Biased Referee
         - [ ] Biased Referee
         - [ ] How many others(???)
-- [ ] Roll on Prayers to Nuffle Table. Duplicates are only checked within the same team
-    - [ ] Roll again if duplicate was rolled
-    - [ ] Abort rolling when there are no more prayers to roll for.
-    - [ ] Treacherous Trapdoor
-        - [ ] During Quick Snap Kickoff Event
-        - [ ] During Blitz Kickoff Event
-        - [ ] During Pushback
-        - [ ] During Chain Push
-        - [ ] ... (so many edge cases)
+     - [ ] Prayers to Nuffle Table.
+        - [ ] Roll again if duplicate was rolled
+        - [ ] Abort rolling when there are no more prayers to roll for.
+        - [ ] Treacherous Trapdoor
+           - [ ] During Quick Snap Kickoff Event
+           - [ ] During Blitz Kickoff Event
+           - [ ] During Pushback
+           - [ ] During Chain Push
+           - [ ] ... (so many edge cases)
+
     - [x] Friends with the Ref
     - [x] Stiletto
     - [x] Iron Man
@@ -206,6 +207,7 @@ book.
     - [x] End sequence as soon as ball goes over middle. I.e., not catch rolls etc.
     - [x] Going out of bounds
     - [x] Go out of bounds / award to player that is then knocked down and ball bounce (previous bug)
+    - [ ] If no eligible targets, place on any unoccupied square on their half.
 
 ## Game
 
@@ -227,6 +229,8 @@ book.
         - [x] Hand-off
         - [x] Foul
         - [ ] Throw team-mate
+    - [ ] Forgo Activation
+       - [ ] Still triggers Stalling
 - [ ] Stand Up
     - [x] Must stand up doing any action
     - [x] Standing up uses 3 move
@@ -306,7 +310,8 @@ book.
     - [ ] Neck Injury: -1AG
     - [ ] Dislocated Shoulder: -1ST
     - [ ] Dead
-    - [ ] Reroll if stat is at minimum (source?)
+    - [ ] (BB2025) If at minimum and get Stat decrease, just treat it as a MNG.
+    - [ ] (BB2020) Undefined
 - [ ] Apothecary
     - [ ] Use on KO
     - [ ] Use on BH
@@ -347,6 +352,16 @@ book.
     - [ ] Check stalling if player gets ball from catch
 - [ ] Conceding
     - [ ] Free if 3 or less players at beginning of turn
+
+## End of Drive
+
+- [ ] Deal with Secret Weapons
+   - [ ] Works as using ARgue the Call
+   - [ ] If multiple secret weapons. If coach is banned, no more argues can be made.
+- [ ] End of Drive Effects
+    - [ ] Clear Sweltering Heat
+- [ ] Recover Knocked-Out players
+- [ ] The Drive Ends
 
 ## Actions
 
@@ -481,7 +496,7 @@ book.
     - [x] Landing in the crowd
 - [ ] Secure the Ball
   - [ ] Not allowed if Big Guy
-  - [ ] 2+, No modifiers, including Rain
+  - [ ] 2+, No modifiers, including Rain (automatic pickup if roll is cleared)
   - [ ] Not allowed if standing player with TZ's within 2 squares
   - [ ] Action ends after pickup
   - [ ] Cannot switch to "pickup" when moving into the ball

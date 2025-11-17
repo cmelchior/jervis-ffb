@@ -31,7 +31,11 @@ data class PrayersToNuffleRollContext(
 /**
  * This procedure is responsible for managing the Pregame sequence.
  *
- * See page 37 in the rulebook.
+ * See page 37 in the BB2020 rulebook.
+ * See page 44 in the BB2025 rulebook.
+ *
+ * In BB2024, Prayers to Nuffle are a separate step in the pre-game sequence, while in
+ * BB2025 it has been folded into buying inducements.
  */
 object PreGame : Procedure() {
     override val initialNode: Node = TheFans

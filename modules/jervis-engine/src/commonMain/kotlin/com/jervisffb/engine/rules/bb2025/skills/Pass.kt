@@ -8,7 +8,9 @@ import com.jervisffb.engine.rules.common.skills.SkillCategory
 import com.jervisffb.engine.rules.common.skills.SkillType
 
 /**
- * TODO Missing Reroll support
+ * Representation of the Pass (Active) skill.
+ *
+ * See page 132 in the BB2025 rulebook.
  */
 class Pass(
     override val player: Player,
