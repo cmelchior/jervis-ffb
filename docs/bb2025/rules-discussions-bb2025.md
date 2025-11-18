@@ -12,6 +12,13 @@ a certain interpretation.
 
 ## Rulebook
 
+### Page 54 - Standing up 
+It is unclear what "regardless of any modifiers" means? Either it means only 
+looking at the MA stat on the character sheet or it means the current MA stat
+including any modifiers.
+
+Example: Mummy with MA 3 receives a Dodgy Snack, making it MA 2 for the drive.
+
 ### Page 73 - Throw-ins
 Does not specify what happens if the ball lands in an unoccupied square making
 it undefined. In BB2020, it would bounce, so most likely this section was 

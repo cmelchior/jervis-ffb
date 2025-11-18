@@ -26,7 +26,7 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 
 /**
- * Test a player standing up as described on page 44 in the BB2020 Rulebook.
+ * Test a player standing up as described on page 54 in the BB2025 Rulebook.
  *
  * Note, any skills that affect standing up are tested in their own test class.
  * This class only tests the basic functionality.

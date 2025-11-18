@@ -235,6 +235,8 @@ book.
     - [x] Must stand up doing any action
     - [x] Standing up uses 3 move
     - [x] Standup with less than 3 strength requires a roll and use all move.
+    - [ ] Player with MA 3 and Dodgy Snack needs to roll to stand up.
+    - [ ] Player with MA 2 and (<some bonus move modifier) does not need to roll up
     - [x] Failing stand-up roll ends action and uses player action
         - [x] Move
         - [x] Block
