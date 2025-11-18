@@ -30,4 +30,3 @@ class Zap(/*override val wizard: Wizard*/) : Spell {
     )
     override val procedure: Procedure = ZapProcedure
 }
-

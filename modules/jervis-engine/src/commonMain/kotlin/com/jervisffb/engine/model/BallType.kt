@@ -28,4 +28,13 @@ enum class BallType {
     // See page 65 in Spike Almanac 2022
     CRYSTAL_SKULL,
     SNAKE_SWALLOWED,
+
+    // See page 16 in Spike Magazine 19
+    ORNATE,
+    BLESSED,
+
+    // See page 16 in Spike Magazine 20
+    CANOPIC_JAR,
+    SPHYNX,
+
 }

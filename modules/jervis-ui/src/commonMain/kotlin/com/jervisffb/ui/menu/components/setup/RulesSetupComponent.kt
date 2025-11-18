@@ -174,7 +174,7 @@ fun SetupRulesComponent(viewModel: RulesSetupComponentModel) {
                     }
 
                     SmallHeader("Events", topPadding = smallHeaderTopPadding, bottomPadding = smallHeaderBottomPadding)
-                    SimpleSwitch("Prayers To Nuffle", prayersToNuffleEnabled) {
+                    SimpleSwitch("Prayers To Nuffle (BB2020)", prayersToNuffleEnabled) {
                         viewModel.updatePrayersToNuffle(it)
                     }
                     SimpleSwitch("Match Events", matchEventsEnabled) {

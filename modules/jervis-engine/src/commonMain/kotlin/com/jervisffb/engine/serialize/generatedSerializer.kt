@@ -156,5 +156,6 @@ val generatedJervisSerializerModule = SerializersModule {
     }
     polymorphic(com.jervisffb.engine.model.inducements.wizards.Wizard::class) {
         subclass(com.jervisffb.engine.model.inducements.wizards.HirelingSportsWizard::class)
+        subclass(com.jervisffb.engine.model.inducements.wizards.SportsWizard::class)
     }
 }

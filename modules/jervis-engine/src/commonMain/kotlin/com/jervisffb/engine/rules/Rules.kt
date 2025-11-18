@@ -1,6 +1,5 @@
 package com.jervisffb.engine.rules
 
-import com.jervisffb.engine.DEFAULT_INDUCEMENTS
 import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.actions.D3Result
@@ -38,6 +37,7 @@ import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardKickOffEventTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardPrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardWeatherTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020StuntyInjuryTable
+import com.jervisffb.engine.rules.bb2025.DEFAULT_INDUCEMENTS_BB2025
 import com.jervisffb.engine.rules.builder.BallSelectorRule
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.FoulActionBehavior
@@ -105,7 +105,7 @@ open class Rules(
     // Which timer settings are in place for this game
     open val timers: TimerSettings = TimerSettings.Companion.BB_CLOCK,
     // Which inducements are available in this game.
-    open val inducements: InducementSettings = InducementSettings(DEFAULT_INDUCEMENTS),
+    open val inducements: InducementSettings = InducementSettings(DEFAULT_INDUCEMENTS_BB2025),
 
     // Characteristic limits
     // See page 28 in the BB2020 rulebook and pxage 37 in the BB2025 rulebook
@@ -160,6 +160,8 @@ open class Rules(
 
     // Tables
     open val kickOffEventTable: KickOffTable = BB2020StandardKickOffEventTable,
+    // This defines the BB2020 behavior where Prayers To Nuffle are rolled during the Pre-game Sequence.
+    // BB2025 Prayers are defined under inducements.
     open val prayersToNufflePrice: Int = 50_000,
     open val prayersToNuffleEnabled: Boolean = true,
     open val prayersToNuffleTable: PrayersToNuffleTable = BB2020StandardPrayersToNuffleTable,

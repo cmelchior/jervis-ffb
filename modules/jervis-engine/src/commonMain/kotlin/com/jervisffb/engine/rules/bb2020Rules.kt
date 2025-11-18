@@ -1,8 +1,8 @@
 package com.jervisffb.engine.rules
 
-import com.jervisffb.engine.DEFAULT_INDUCEMENTS
 import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.model.inducements.settings.InducementType
+import com.jervisffb.engine.rules.bb2020.DEFAULT_INDUCEMENTS_BB2020
 import com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7PrayersToNuffleTable
 import com.jervisffb.engine.rules.bb2020.tables.BB7StandardInjuryTable
@@ -26,7 +26,8 @@ import kotlinx.serialization.Serializable
 abstract class BB2020Rules : Rules(
     name = "Blood Bowl 2020 Rules",
     baseVersion = GameVersion.BB2020,
-    gameType = GameType.STANDARD
+    gameType = GameType.STANDARD,
+    inducements = InducementSettings(DEFAULT_INDUCEMENTS_BB2020),
 ) {
 }
 
@@ -75,7 +76,7 @@ class BB72020Rules : BB2020Rules() {
     override val stuntyInjuryTable: InjuryTable = BB7StuntyInjuryTable
     override val prayersToNuffleTable: PrayersToNuffleTable = BB7PrayersToNuffleTable
     override val useApothecaryBehavior = UseApothecaryBehavior.BB7
-    override val inducements = InducementSettings(DEFAULT_INDUCEMENTS).toBuilder().run {
+    override val inducements = InducementSettings(DEFAULT_INDUCEMENTS_BB2020).toBuilder().run {
         InducementType.entries.forEach { type ->
             when (type) {
                 InducementType.TEMP_AGENCY_CHEERLEADER -> {
@@ -119,6 +120,13 @@ class BB72020Rules : BB2020Rules() {
                         it.max = 5
                     }
                 }
+
+                InducementType.PRAYERS_TO_NUFFLE,
+                InducementType.TEAM_MASCOT,
+                InducementType.BLITZERS_BEST_KEGS,
+                InducementType.BRETONNIAN_PASTRIES,
+                InducementType.BRETONNIAN_DAMSEL,
+                InducementType.CANOPIC_JAR -> { /* Ignore */ }
             }
         }
         build()

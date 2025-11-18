@@ -17,11 +17,12 @@ import kotlinx.serialization.Serializable
 // They should probably be split into "Setup/Rules Inducements" and "Inducements added to the team"
 
 /**
- * See page 89 in the rulebook
+ * See page 89 in the BB2020 rulebook.
+ * See page 142 in the BB2025 rulebook
  */
 enum class InducementType {
 
-    // Standard game, se page 89 in the rulebook
+    // Standard game, se page 89 in the BB2020 rulebook
     TEMP_AGENCY_CHEERLEADER,
     PART_TIME_ASSISTANT_COACH,
     WEATHER_MAGE,
@@ -40,7 +41,7 @@ enum class InducementType {
     WIZARD,
     BIASED_REFEREE,
 
-    // DeathZone
+    // BB2020 DeathZone
     // ...
     WAAAGH_DRUMMER,
     CAVORTING_NURGLINGS,
@@ -49,7 +50,20 @@ enum class InducementType {
     MASTER_OF_BALLISTICS,
     EXPANDED_MERCENARY_PLAYERS, // Contains a lot of sub options
     GIANT,
-    DESPERATE_MEASURES // Only available for BB7
+    DESPERATE_MEASURES, // Only available for BB7
+
+    // Standard game, se page 142 in the BB2025 rulebook
+    // This only contains entries not also available in BB2020
+    PRAYERS_TO_NUFFLE,
+    TEAM_MASCOT,
+    BLITZERS_BEST_KEGS,
+
+    // Spike 19
+    BRETONNIAN_PASTRIES,
+    BRETONNIAN_DAMSEL,
+
+    // Spike 20
+    CANOPIC_JAR,
 
     // Other extensions
     // ...

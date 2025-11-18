@@ -24,7 +24,7 @@ interface Wizard {
     }
 }
 
-// See page 94 in the rulebook
+// See page 94 in the BB2020 rulebook
 @Serializable
 class HirelingSportsWizard: Wizard {
     override val name: String get() = type.description
@@ -32,5 +32,16 @@ class HirelingSportsWizard: Wizard {
     override val spells: List<Spell> = listOf(
         Fireball(/*this*/),
         Zap(/*this*/)
+    )
+}
+
+// See page 149 in the BB2025 rulebook
+@Serializable
+class SportsWizard: Wizard {
+    override val name: String get() = type.description
+    override val type: WizardType = WizardType.SPORTS_WIZARD
+    override val spells: List<Spell> = listOf(
+        Fireball(/*this*/),
+        Zap(/*this*/),
     )
 }

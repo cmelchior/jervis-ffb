@@ -65,6 +65,12 @@ class RulesSetupComponentModel(
             DropdownEntryWithValue("Standard (2025)", BB2025StandardWeatherTable, true),
             DropdownEntryWithValue("Standard (2020)", BB2020StandardWeatherTable, true),
         ),
+        "Spike Magazine 19 (Bretonnians)" to listOf(
+            DropdownEntryWithValue("Bretonnia", BB2025StandardWeatherTable, false),
+        ),
+        "Spike Magazine 20 (Khemri)" to listOf(
+            DropdownEntryWithValue("Nehekharan Desert", BB2025StandardWeatherTable, false),
+        ),
         "Death Zone (2020)" to listOf(
             DropdownEntryWithValue("Spring", SpringWeatherTable, false),
             DropdownEntryWithValue("Summer", SummerWeatherTable, false),
@@ -94,6 +100,12 @@ class RulesSetupComponentModel(
         "Rulebook" to listOf(
             DropdownEntryWithValue("Standard (2025)", BB2025StandardKickOffEventTable, true),
             DropdownEntryWithValue("Standard (2020)", BB2020StandardKickOffEventTable, true),
+        ),
+        "Spike Magazine 19 (Bretonnians)" to listOf(
+            DropdownEntryWithValue("Bretonnia", BB2025StandardKickOffEventTable, false),
+        ),
+        "Spike Magazine 20 (Khemri)" to listOf(
+            DropdownEntryWithValue("Nehekharan", BB2025StandardKickOffEventTable, false),
         ),
         "Death Zone (2020)" to listOf(
             DropdownEntryWithValue("Blood Bowl Sevens", BB7KickOffEventTable, true),
@@ -148,6 +160,14 @@ class RulesSetupComponentModel(
         "Rulebook" to listOf(
             DropdownEntryWithValue("Normal Ball", StandardBall, true),
         ),
+        "Spike Magazine 19 (Bretonnians)" to listOf(
+            DropdownEntryWithValue("Ornate", SpecificUnusualBall(BallType.ORNATE), false),
+            DropdownEntryWithValue("Blessed", SpecificUnusualBall(BallType.BLESSED), false),
+        ),
+        "Spike Magazine 20 (Khemri)" to listOf(
+            DropdownEntryWithValue("Canopic Jar", SpecificUnusualBall(BallType.CANOPIC_JAR), false),
+            DropdownEntryWithValue("Sphynx", SpecificUnusualBall(BallType.SPHYNX), false),
+        ),
         "Death Zone (2020)" to listOf(
             DropdownEntryWithValue("Roll On Unusual Balls Table", RollOnUnusualBallTable, false),
             DropdownEntryWithValue("Explodin'", SpecificUnusualBall(BallType.EXPLODIN), false),
@@ -186,6 +206,12 @@ class RulesSetupComponentModel(
         ),
         "Spike Magazine 15 (Amazons)" to listOf(
             DropdownEntryWithValue("Overgrown Jungle", PitchType.OVERGROWN_JUNGLE, false),
+        ),
+        "Spike Magazine 19 (Bretonnians)" to listOf(
+            DropdownEntryWithValue("Bretonnian Courtyard", PitchType.BRETONNIAN_COURTYARD, false),
+        ),
+        "Spike Magazine 20 (Khemri)" to listOf(
+            DropdownEntryWithValue("Pyramid Catacombs", PitchType.PYRAMID_CATACOMBS, false),
         )
     )
 

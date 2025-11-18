@@ -4,4 +4,6 @@ enum class PitchType {
     STANDARD, // No special properties, from the Rulebook.
     FROZEN_LAKE, // Norse Pitch
     OVERGROWN_JUNGLE, // Amazon Pitch
+    BRETONNIAN_COURTYARD, // Brettonia Pitch
+    PYRAMID_CATACOMBS, // Khemri Pitch
 }

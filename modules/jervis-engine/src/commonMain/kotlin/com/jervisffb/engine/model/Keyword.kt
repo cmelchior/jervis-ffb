@@ -18,6 +18,7 @@ enum class PlayerKeyword(override val description: String) : Keyword {
     CONSTRUCT("Construct"),
     DWARF("Dwarf"),
     ELF("Elf"),
+    FROG("Frog"),
     GHOUL("Ghoul"),
     GNOBLAR("Gnoblar"),
     GNOME("Gnome"),

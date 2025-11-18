@@ -1,6 +1,7 @@
 package com.jervisffb.engine.model.inducements.wizards
 
 enum class WizardType(val description: String, val named: Boolean) {
+    // BB2020
     HIRELING_SPORTS_WIZARD("Hireling Sports-Wizard", named = false), // See page 94 in the rulebook
     CHAOS_SORCERER("Chaos Sorcerer", named = false),
     DRUCHII_SPORTS_WIZARD("Druchii Sports-Wizard", named = false),
@@ -15,4 +16,7 @@ enum class WizardType(val description: String, val named: Boolean) {
 
     // Named wizards
     HORATIO_X_SCHOTTENHEIM("Horatio X. Schottenheim", named = true), // See page 32 in the Deathzone rulebook
+
+    // BB2025
+    SPORTS_WIZARD("Sports Wizard", named = false), // See page 149 in the rulebook
 }

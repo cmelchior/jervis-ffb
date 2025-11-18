@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.jervisffb.engine.reports.ReportStartingExtraTime.category
 import com.jervisffb.ui.formatCurrency
 import com.jervisffb.ui.game.view.JervisTheme
 import com.jervisffb.ui.menu.components.JervisSwitch
@@ -33,8 +34,8 @@ import com.jervisffb.ui.menu.components.SmallHeader
 @Composable
 fun InducementsSetupComponent(viewModel: InducementsSetupComponentModel) {
 
-    val rulebookInducements = viewModel.rulebookInducements
-    val deathZoneInducements = viewModel.deathZoneInducements
+    val inducementCategories = viewModel.inducementCategories
+    val inducementData = viewModel.inducements
 
     Box(
         modifier = Modifier.fillMaxSize().padding(top = 16.dp),
@@ -45,18 +46,13 @@ fun InducementsSetupComponent(viewModel: InducementsSetupComponentModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            SmallHeader("Rulebook", bottomPadding = 0.dp)
-            Spacer(modifier = Modifier.height(8.dp))
-            rulebookInducements.forEachIndexed { rowNo, inducement ->
-                InducementRow(rowNo, inducement, { enabled ->
-                    viewModel.updateStandardInducementEnabled(inducement.type, enabled)
-                })
-            }
-            SmallHeader("Death Zone", topPadding = smallHeaderTopPadding, bottomPadding = 0.dp)
-            Spacer(modifier = Modifier.height(8.dp))
-            deathZoneInducements.forEachIndexed { rowNo, inducement ->
-                InducementRow(rowNo, inducement) { enabled ->
-                    viewModel.updateDeathZoneInducementEnabled(inducement.type, enabled)
+            inducementCategories.forEachIndexed { index, category ->
+                SmallHeader(category, topPadding = if (index != 0) smallHeaderTopPadding else 0.dp, bottomPadding = 0.dp)
+                Spacer(modifier = Modifier.height(8.dp))
+                inducementData[category]?.forEachIndexed { rowNo, inducement ->
+                    InducementRow(rowNo, inducement) { enabled ->
+                        viewModel.updateInducementEnabled(category, inducement.type, enabled)
+                    }
                 }
             }
         }
