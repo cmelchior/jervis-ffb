@@ -5,7 +5,7 @@ import com.jervisffb.engine.actions.D3Result
 /**
  * Context data for handling rolling for Sweltering Heat.
  *
- * @see [com.jervisffb.rules.bb2020.procedures.weather.SwelteringHeat]
+ * @see [com.jervisffb.engine.rules.common.procedures.tables.weather.SwelteringHeat]
  */
 data class SwelteringHeatContext(
     val homeRoll: D3Result? = null,

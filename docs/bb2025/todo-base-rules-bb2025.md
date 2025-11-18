@@ -102,7 +102,7 @@ book.
 ## Pregame
 
 - [x] The Fans
-- [ ] The Weather
+- [x] The Weather
     - [x] Sweltering Heat
     - [x] Very Sunny
     - [x] Perfect Conditions

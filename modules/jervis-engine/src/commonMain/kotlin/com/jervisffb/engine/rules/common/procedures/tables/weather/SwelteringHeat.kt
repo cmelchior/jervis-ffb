@@ -32,8 +32,10 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 
 /**
- * Procedure for handling "Sweltering Heat" as described on page 37 in the
- * rulebook.
+ * Procedure for handling "Sweltering Heat".
+ *
+ * See page 37 in the BB2020 rulebook.
+ * See page 46 in the BB2025 rulebook.
  */
 object SwelteringHeat : Procedure() {
     override val initialNode: Node = RollForHomeTeam

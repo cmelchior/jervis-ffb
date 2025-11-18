@@ -22,8 +22,10 @@ import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.tables.Weather
 
 /**
- * This procedure controls rolling for the weather as described on
- * page 37 in the rulebook.
+ * This procedure controls rolling for the weather.
+ *
+ * See page 37 in the BB2020 rulebook.
+ * See page 46 in the BB2025 rulebook.
  */
 object WeatherRoll : Procedure() {
     override val initialNode: Node = RollWeatherDice
