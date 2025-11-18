@@ -365,7 +365,7 @@ book.
 
 ## Actions
 
-- [ ] Move Action
+- [x] Move Action
     - [x] Select player and end action before moving doesn't doesn't mark the player as used.
     - [x] Starting a move action while prone and aborting it again doesn't mark player as used
     - [x] Moving any square mark the action as "used".

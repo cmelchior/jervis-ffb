@@ -27,7 +27,7 @@ import kotlin.test.assertTrue
  * Class responsible for testing the Move Action. On its own as well as a
  * part of other actions like: Blitz, Foul, Hand-Off, Pass, Throw Team-Mate.
  *
- * See page 44 in the rulebook.
+ * See page 54 in the BB2025 rulebook.
  */
 class MoveActionTests: JervisGameBB2025Test() {
 

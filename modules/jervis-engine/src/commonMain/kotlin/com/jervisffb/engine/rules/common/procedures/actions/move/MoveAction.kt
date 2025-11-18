@@ -25,7 +25,10 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure controlling a Move action as described on page 44 in the rulebook.
+ * Procedure controlling a Move action.
+ *
+ * See page 44 in the BB2020 rulebook.
+ * See page 54 in the BB2025 rulebook.
  */
 object MoveAction : Procedure() {
     override val initialNode: Node = SelectMoveType
