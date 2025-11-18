@@ -101,7 +101,7 @@ book.
 
 ## Pregame
 
-- [ ] The Fans
+- [x] The Fans
 - [ ] The Weather
     - [x] Sweltering Heat
     - [x] Very Sunny

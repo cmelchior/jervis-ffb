@@ -22,8 +22,10 @@ import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 
 /**
- * This procedure controls rolling for "The Fans" as described on page
- * 37 in the rulebook.
+ * This procedure controls rolling for "The Fans".
+ *
+ * See page 37 in the BB2020 rulebook.
+ * See page 45 in the BB2025 rulebook.
  */
 object FanFactorRolls : Procedure() {
     override val initialNode: Node = SetFanFactorForHomeTeam
@@ -32,11 +34,9 @@ object FanFactorRolls : Procedure() {
 
     object SetFanFactorForHomeTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.homeTeam
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             return checkDiceRoll<D3Result>(action) { d3 ->
                 val dedicatedFans = state.homeTeam.dedicatedFans
@@ -53,11 +53,9 @@ object FanFactorRolls : Procedure() {
 
     object SetFanFactorForAwayTeam : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.awayTeam
-
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             return listOf(RollDice(Dice.D3))
         }
-
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             val dedicatedFans = state.awayTeam.dedicatedFans
             return checkDiceRoll<D3Result>(action) {
