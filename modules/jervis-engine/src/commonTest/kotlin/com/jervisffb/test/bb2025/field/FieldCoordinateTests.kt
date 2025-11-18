@@ -2,16 +2,17 @@ package com.jervisffb.test.bb2025.field
 
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class FieldCoordinateTests {
-    private val rules = StandardBB2020Rules()
+    private val rules = StandardBB2025Rules()
     private lateinit var state: Game
 
     @BeforeTest
@@ -401,6 +402,75 @@ class FieldCoordinateTests {
         assertEquals(1, a.distanceTo(FieldCoordinate(0, -1))) // Up
         assertEquals(2, a.distanceTo(FieldCoordinate(2, -1))) // Top-right
         assertEquals(3, a.distanceTo(FieldCoordinate(-3, 3))) // Bottom-left
+    }
+
+    @Test
+    fun validWideZoneCoordinates() {
+        val validCoordinates = listOf(
+            FieldCoordinate(0, 0),
+            FieldCoordinate(0, 3),
+            FieldCoordinate(12, 0),
+            FieldCoordinate(12, 3),
+            FieldCoordinate(25, 0),
+            FieldCoordinate(25, 3),
+            FieldCoordinate(13, 0),
+            FieldCoordinate(13, 3),
+            FieldCoordinate(25, 14),
+            FieldCoordinate(25, 11),
+            FieldCoordinate(0, 14),
+            FieldCoordinate(0, 11),
+        )
+        validCoordinates.forEach {
+            assertTrue(it.isInWideZone(rules), "Not in wide zone: $it")
+        }
+    }
+
+    @Test
+    fun invalidWideZoneCoordinates() {
+        val invalidCoordinates = listOf(
+            FieldCoordinate(0, 4),
+            FieldCoordinate(12, 4),
+            FieldCoordinate(13, 4),
+            FieldCoordinate(25, 4),
+
+            FieldCoordinate(0, 10),
+            FieldCoordinate(12, 10),
+            FieldCoordinate(13, 10),
+            FieldCoordinate(25, 10),
+
+            FieldCoordinate(-1, -1),
+            FieldCoordinate(-1, 0),
+            FieldCoordinate(0, -1),
+
+            FieldCoordinate(25, -1),
+            FieldCoordinate(26, -1),
+            FieldCoordinate(26, 0),
+
+            FieldCoordinate(26, 14),
+            FieldCoordinate(27, 15),
+            FieldCoordinate(26, 15),
+
+            FieldCoordinate(0, 15),
+            FieldCoordinate(-1, 15),
+            FieldCoordinate(-1, 14),
+        )
+        invalidCoordinates.forEach {
+            assertFalse(it.isInWideZone(rules), "Is in a wide zone: $it")
+        }
+    }
+
+    @Test
+    fun wideZoneAndEndZoneOverlap() {
+        val validCoordinates = listOf(
+            FieldCoordinate(0, 0),
+            FieldCoordinate(25, 0),
+            FieldCoordinate(25, 14),
+            FieldCoordinate(0, 14),
+        )
+        validCoordinates.forEach {
+            assertTrue(it.isInWideZone(rules), "Not in wide zone: $it")
+            assertTrue(it.isInEndZone(rules), "Not in end zone: $it")
+        }
     }
 
     /**

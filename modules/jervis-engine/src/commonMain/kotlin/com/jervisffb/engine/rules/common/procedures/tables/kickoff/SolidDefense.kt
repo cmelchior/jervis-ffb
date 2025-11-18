@@ -157,7 +157,7 @@ object SolidDefense : Procedure() {
 
     object EndSetupAndValidate : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
-            return if (rules.isValidSetup(state, state.kickingTeam)) {
+            return if (rules.isSetupValid(state, state.kickingTeam).isEmpty()) {
                 ExitProcedure()
             } else {
                 GotoNode(InformOfInvalidSetup)

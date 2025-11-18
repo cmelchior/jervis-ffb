@@ -24,15 +24,20 @@ interface FieldCoordinate: OnFieldLocation {
     val y: Int
 
     override fun isOnLineOfScrimmage(rules: Rules): Boolean {
+        if (x < 0 || x >= rules.fieldWidth) return false
         return x == rules.lineOfScrimmageHome || x == rules.lineOfScrimmageAway
     }
 
+    // Page 23 in BB2025 defines the Wide Zone to run across the entire length
+    // of the pitch.
     override fun isInWideZone(rules: Rules): Boolean {
+        if (x < 0 || x >= rules.fieldWidth) return false
         return (0 until rules.wideZone).contains(y) ||
             (rules.fieldHeight - rules.wideZone until rules.fieldHeight).contains(y)
     }
 
     override fun isInEndZone(rules: Rules): Boolean {
+        if (y < 0 || y >= rules.fieldHeight) return false
         return x < rules.endZone || x >= rules.fieldWidth - rules.endZone
     }
 
@@ -43,16 +48,19 @@ interface FieldCoordinate: OnFieldLocation {
     }
 
     override fun isInNoMansLand(rules: Rules): Boolean {
+        if (y < 0 || y >= rules.fieldHeight) return false
         return x > rules.lineOfScrimmageHome && x < rules.lineOfScrimmageAway
     }
 
     // "Home-side" is a bit vague and needs to be clarified
     override fun isOnHomeSide(rules: Rules): Boolean {
+        if (y < 0 || y >= rules.fieldHeight) return false
         return x < rules.fieldWidth / 2
     }
 
     // "Away-side" is a bit vague and needs to be clarified
     override fun isOnAwaySide(rules: Rules): Boolean {
+        if (y < 0 || y >= rules.fieldHeight) return false
         return x >= rules.fieldWidth / 2
     }
 

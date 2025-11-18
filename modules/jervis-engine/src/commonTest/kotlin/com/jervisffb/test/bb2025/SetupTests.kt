@@ -9,19 +9,28 @@ import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.MissingPlayersOnLoS
+import com.jervisffb.engine.rules.common.TooManyPlayersInWideZone
+import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnField
 import com.jervisffb.engine.utils.InvalidActionException
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.setupPlayer
+import com.jervisffb.test.utils.firstInstanceOfOrNull
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
- * This class is testing various setups and whether [Rules.isValidSetup] works as intended.
+ * This class is testing various setups and whether [Rules.isSetupValid] works
+ * as intended.
  */
 class SetupTests: JervisGameBB2025Test() {
 
@@ -49,7 +58,7 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[10.playerNo], 11, 12)
             moveTo(this[11.playerNo], 11, 13)
         }
-        assertTrue(rules.isValidSetup(state, state.homeTeam))
+        assertTrue(rules.isSetupValid(state, state.homeTeam).isEmpty())
     }
 
     // 3 required players on LoS, all others are in the end-zone.
@@ -68,7 +77,7 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[10.playerNo], 25, 12)
             moveTo(this[11.playerNo], 25, 14)
         }
-        assertTrue(rules.isValidSetup(state, state.awayTeam))
+        assertTrue(rules.isSetupValid(state, state.awayTeam).isEmpty())
     }
 
     // All players on the LoS including 2 in each wide-zone
@@ -87,7 +96,7 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[10.playerNo], 13, 12)
             moveTo(this[11.playerNo], 13, 13)
         }
-        assertTrue(rules.isValidSetup(state, state.awayTeam))
+        assertTrue(rules.isSetupValid(state, state.awayTeam).isEmpty())
     }
 
     // If the team has less than 3 players, they must all be on the LoS
@@ -103,21 +112,27 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[11.playerNo], 11, 4)
             moveTo(this[12.playerNo], 11, 10)
         }
-        assertFalse(rules.isValidSetup(state, state.homeTeam))
+        var brokenRules = rules.isSetupValid(state, state.homeTeam)
+        assertTrue(brokenRules.isNotEmpty())
+        assertEquals(1, brokenRules.size)
+        assertIs<MissingPlayersOnLoS>(brokenRules.first())
 
         // 1 player in Wide-zone LoS and 1 in Center LoS
         state.homeTeam.apply {
             moveTo(this[11.playerNo], 12, 0)
             moveTo(this[12.playerNo], 12, 10)
         }
-        assertFalse(rules.isValidSetup(state, state.homeTeam))
+        brokenRules = rules.isSetupValid(state, state.homeTeam)
+        assertTrue(brokenRules.isNotEmpty())
+        assertIs<MissingPlayersOnLoS>(brokenRules.first())
 
         // 2 Players on Center Field LoS
         state.homeTeam.apply {
             moveTo(this[11.playerNo], 12, 4)
             moveTo(this[12.playerNo], 12, 10)
         }
-        assertTrue(rules.isValidSetup(state, state.homeTeam))
+        brokenRules = rules.isSetupValid(state, state.homeTeam)
+        assertTrue(brokenRules.isEmpty())
     }
 
     // If 0 players are available, setup can still be completed
@@ -126,7 +141,7 @@ class SetupTests: JervisGameBB2025Test() {
         state.homeTeam.forEach {
             it.state = PlayerState.KNOCKED_OUT
         }
-        assertTrue(rules.isValidSetup(state, state.homeTeam))
+        assertTrue(rules.isSetupValid(state, state.homeTeam).isEmpty())
     }
 
     @Test
@@ -146,7 +161,8 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[10.playerNo], 14, 12)
             moveTo(this[11.playerNo], 14, 13)
         }
-        assertFalse(rules.isValidSetup(state, state.awayTeam))
+        val brokenRules = rules.isSetupValid(state, state.homeTeam)
+        assertTrue(brokenRules.isNotEmpty())
     }
 
     @Test
@@ -166,7 +182,11 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[10.playerNo], 14, 12)
             moveTo(this[11.playerNo], 14, 13)
         }
-        assertFalse(rules.isValidSetup(state, state.awayTeam))
+        val brokenRules = rules.isSetupValid(state, state.awayTeam)
+        assertTrue(brokenRules.isNotEmpty())
+        assertIs<TooManyPlayersInWideZone>(brokenRules.first())
+        val brokenRule = brokenRules.single() as TooManyPlayersInWideZone
+        assertFalse(brokenRule.top)
     }
 
     @Test
@@ -186,7 +206,11 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[10.playerNo], 11, 12)
             moveTo(this[11.playerNo], 11, 13)
         }
-        assertFalse(rules.isValidSetup(state, state.homeTeam))
+        val brokenRules = rules.isSetupValid(state, state.homeTeam)
+        assertTrue(brokenRules.isNotEmpty())
+        assertIs<TooManyPlayersInWideZone>(brokenRules.first())
+        val brokenRule = brokenRules.single() as TooManyPlayersInWideZone
+        assertTrue(brokenRule.top)
     }
 
     @Test
@@ -206,7 +230,10 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[10.playerNo], 11, 12)
             moveTo(this[11.playerNo], 11, 13)
         }
-        assertFalse(rules.isValidSetup(state, state.homeTeam))
+        val brokenRules = rules.isSetupValid(state, state.homeTeam)
+        assertTrue(brokenRules.isNotEmpty())
+        val brokenRule = brokenRules.single() as TooManyPlayersInWideZone
+        assertFalse(brokenRule.top)
     }
 
     // 3 players are required on the LoS
@@ -226,7 +253,9 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[10.playerNo], 11, 12)
             moveTo(this[11.playerNo], 11, 13)
         }
-        assertFalse(rules.isValidSetup(state, state.homeTeam))
+        val brokenRules = rules.isSetupValid(state, state.homeTeam)
+        assertEquals(1, brokenRules.size)
+        assertIs<MissingPlayersOnLoS>(brokenRules.single())
     }
 
     @Test
@@ -244,7 +273,9 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[9.playerNo], 11, 2)
             moveTo(this[10.playerNo], 11, 12)
         }
-        assertFalse(rules.isValidSetup(state, state.homeTeam))
+        val brokenRules = rules.isSetupValid(state, state.homeTeam)
+        assertEquals(1, brokenRules.size)
+        assertIs<WrongAmountOfPlayersOnField>(brokenRules.single())
     }
 
     @Test
@@ -264,7 +295,17 @@ class SetupTests: JervisGameBB2025Test() {
             moveTo(this[11.playerNo], 11, 7)
             moveTo(this[12.playerNo], 11, 8)
         }
-        assertFalse(rules.isValidSetup(state, state.homeTeam))
+        val brokenRules = rules.isSetupValid(state, state.homeTeam)
+        assertEquals(1, brokenRules.size)
+        assertIs<WrongAmountOfPlayersOnField>(brokenRules.single())
+    }
+
+    @Test
+    fun invalid_emptyField() {
+        val brokenRules = rules.isSetupValid(state, state.homeTeam)
+        assertEquals(2, brokenRules.size)
+        assertNotNull(brokenRules.firstInstanceOfOrNull<WrongAmountOfPlayersOnField>())
+        assertNotNull(brokenRules.firstInstanceOfOrNull<MissingPlayersOnLoS>())
     }
 
     // Test for bug:

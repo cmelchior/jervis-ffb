@@ -49,6 +49,10 @@ import com.jervisffb.engine.rules.builder.StadiumRule
 import com.jervisffb.engine.rules.builder.StandardBall
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
+import com.jervisffb.engine.rules.common.MissingPlayersOnLoS
+import com.jervisffb.engine.rules.common.SetupRule
+import com.jervisffb.engine.rules.common.TooManyPlayersInWideZone
+import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnField
 import com.jervisffb.engine.rules.common.actions.PlayerAction
 import com.jervisffb.engine.rules.common.actions.TeamActions
 import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
@@ -210,21 +214,37 @@ open class Rules(
     // since it might involve the use of skills.
     open val pathFinder: PathFinder = BB2020PathFinder()
 
-    fun isValidSetup(state: Game, team: Team): Boolean {
+    /**
+     * Checks if a given setup is valid. If not valid, a list of broken rules
+     * will be returned. If the setup is valid, an empty list is returned.
+     */
+    fun isSetupValid(state: Game, team: Team): List<SetupRule> {
         val isHomeTeam = team.isHomeTeam()
         val inReserve: List<Player> = team.filter { it.state == PlayerState.RESERVE && !it.location.isOnField(this) }
         val onField: List<Player> = team.filter { it.state == PlayerState.STANDING && it.location.isOnField(this) }
         val totalAvailablePlayers: Int = inReserve.size + onField.size
 
+        val brokenRules = mutableListOf<SetupRule>()
+
         // If below 11 players, all players must be fielded
         if (totalAvailablePlayers < maxPlayersOnField && inReserve.isNotEmpty()) {
-            return false
+            brokenRules.add(
+                WrongAmountOfPlayersOnField(
+                    availablePlayers = totalAvailablePlayers,
+                    playersOnField = onField.size
+                )
+            )
         }
 
         // Otherwise 11 players must be on the field
         // TODO Swarming might change this
         if (totalAvailablePlayers >= maxPlayersOnField && onField.size != maxPlayersOnField) {
-            return false
+            brokenRules.add(
+                WrongAmountOfPlayersOnField(
+                    availablePlayers = totalAvailablePlayers,
+                    playersOnField = onField.size
+                )
+            )
         }
 
         // Check LoS requirements
@@ -235,14 +255,24 @@ open class Rules(
                 field[losIndex, y].isOccupied()
             }.size
 
-        // If available, 3 players must be on the Centre Field LoS
-        if (onField.size >= playersRequiredOnLineOfScrimmage && playersOnLos < playersRequiredOnLineOfScrimmage.toInt()) {
-            return false
+        // If available, 3 players must be on the Center Field LoS
+        if (totalAvailablePlayers >= playersRequiredOnLineOfScrimmage && playersOnLos < playersRequiredOnLineOfScrimmage) {
+            brokenRules.add(
+                MissingPlayersOnLoS(
+                    players = playersOnLos,
+                    requiredPlayers = playersRequiredOnLineOfScrimmage
+                )
+            )
         }
 
         // If less than 3 players, all must be on the Centre Field LoS
-        if (onField.size < playersRequiredOnLineOfScrimmage && onField.size != playersOnLos) {
-            return false
+        if (totalAvailablePlayers < playersRequiredOnLineOfScrimmage && onField.size != playersOnLos) {
+            brokenRules.add(
+                MissingPlayersOnLoS(
+                    players = onField.size,
+                    requiredPlayers = totalAvailablePlayers
+                )
+            )
         }
 
         // Max two players on the Top Wide Zone.
@@ -265,7 +295,13 @@ open class Rules(
             }
         }
         if (topWideZoneCount > maxPlayersInWideZone) {
-            return false
+            brokenRules.add(
+                TooManyPlayersInWideZone(
+                    top = true,
+                    players = topWideZoneCount,
+                    maxPlayers = maxPlayersInWideZone
+                )
+            )
         }
 
         // Max two players on the Bottom Wide Zone
@@ -288,10 +324,16 @@ open class Rules(
             }
         }
         if (bottomWideZoneCount > maxPlayersInWideZone) {
-            return false
+            brokenRules.add(
+                TooManyPlayersInWideZone(
+                    top = false,
+                    players = bottomWideZoneCount,
+                    maxPlayers = maxPlayersInWideZone
+                )
+            )
         }
 
-        return true
+        return brokenRules
     }
 
     /**

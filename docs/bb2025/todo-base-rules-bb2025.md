@@ -143,14 +143,14 @@ book.
            - [ ] During Chain Push
            - [ ] ... (so many edge cases)
 
-    - [x] Friends with the Ref
-    - [x] Stiletto
-    - [x] Iron Man
-    - [x] Knuckle Dusters
-    - [x] Bad Habits
-    - [x] Greasy Cleats
-    - [x] Blessed Statue of Nuffle
-    - [x] Moles under the Pitch
+    - [ ] Friends with the Ref
+    - [ ] Stiletto
+    - [ ] Iron Man
+    - [ ] Knuckle Dusters
+    - [ ] Bad Habits
+    - [ ] Greasy Cleats
+    - [ ] Blessed Statue of Nuffle
+    - [ ] Moles under the Pitch
     - [ ] Perfect Passing
     - [ ] Fan Interaction
     - [ ] Necessary Violence
@@ -164,13 +164,14 @@ book.
 
 ## Start of Drive
 
-- [ ] Setup
+- [x] Setup
     - [x] Too many players on the field
     - [x] Too few players on the field
     - [x] Too many players in Wide Zones
     - [x] 0 players available
     - [x] Too few players on the LoS
     - [x] If less than 3 players, all must be on LoS
+    - [x] Wide-zone also includes the End Zone area.
 - [ ] Kick-off (Kicking player and target)
     - [x] Default: Players not on LoS
     - [x] 3 or less

@@ -145,7 +145,7 @@ object SetupTeam : Procedure() {
         override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<SetupTeamContext>()
             val team = context.team
-            return if (rules.isValidSetup(state, team)) {
+            return if (rules.isSetupValid(state, team).isEmpty()) {
                 // If any player with Leader in on the field, the team receives another reroll
                 buildCompositeCommand {
                     if (rules.isStartOfHalf(state)) {

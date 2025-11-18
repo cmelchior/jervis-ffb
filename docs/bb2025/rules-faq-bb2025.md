@@ -14,8 +14,17 @@ are not implemented yet.
 
 ## Rulebook
 
+### Page 23 - The Blood Bowl Pitch
+The definition of Wide Zone is unclear (bullet 2). The rules describe it with 
+"from End Zone to End Zone", but does not clarify if that includes or excludes 
+the End Zone.
+
+Jervis uses the interpretation that it _does_ include the End Zone as the 
+Sidelines (bullet 3) include the same wording, and those clearly run the entire
+length of the pitch.
+
 ### Page 59 - Secure the Ball
-It is a bit unclear if modifiers like "Pouring Rain" apply to securing the ball.
+It is unclear if modifiers like "Pouring Rain" apply to securing the ball.
 
 Arguments for:
 * Secure the Ball counts as "Picking up the ball" as described on page 57. This 
