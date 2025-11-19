@@ -21,7 +21,6 @@ import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.safeTryEmit
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlin.properties.Delegates
 
 // TODO Just keep it as a singleton until we explore the requirements further.
 /**
@@ -107,12 +106,8 @@ class Game(
 
     // Game progress
     var abortIfBallOutOfBounds: Boolean = false
-    var halfNo by Delegates.observable(0) { prop, old, new ->
-        // Do nothing
-    }
-    var driveNo by Delegates.observable(0) { prop, old, new ->
-        // Do nothing
-    }
+    var halfNo: Int = 0
+    var driveNo: Int = 0
 
     // Global state properties
     // We should only have properties here that are relevant to more than

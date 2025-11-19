@@ -1,33 +1,18 @@
 package com.jervisffb.test.bb2025
 
-import com.jervisffb.engine.actions.Cancel
 import com.jervisffb.engine.actions.DiceRollResults
-import com.jervisffb.engine.actions.DirectionSelected
-import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndTurn
-import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.d8
-import com.jervisffb.engine.ext.dblock
-import com.jervisffb.engine.ext.playerId
-import com.jervisffb.engine.ext.playerNo
-import com.jervisffb.engine.model.Availability
-import com.jervisffb.engine.model.Direction
-import com.jervisffb.engine.model.PlayerState
-import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2025Test
-import com.jervisffb.test.SmartMoveTo
-import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.defaultKickOffAwayTeam
 import com.jervisffb.test.defaultKickOffHomeTeam
 import com.jervisffb.test.defaultPregame
 import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
-import com.jervisffb.test.moveTo
 import com.jervisffb.test.skipTurns
-import com.jervisffb.test.standardBlock
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -35,9 +20,8 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
- * Class responsible for testing game progress, i.e., moving turn markers,
- * correctly switching half's, moving into overtime and when teams and players
- * activate.
+ * Class responsible for testing basic game progress, i.e., moving turn markers,
+ * correctly switching half's.
  */
 class GameProgressTests: JervisGameBB2025Test() {
 
@@ -129,184 +113,4 @@ class GameProgressTests: JervisGameBB2025Test() {
     fun driveCounterIncreaseOnScoring() {
         TODO()
     }
-
-    @Test
-    fun activatePlayerBeforeSelectingAction() {
-        setupGame()
-        val player = awayTeam[1.playerNo]
-        assertEquals(Availability.AVAILABLE, player.available)
-        controller.rollForward(PlayerSelected(player.id))
-        assertEquals(Availability.IS_ACTIVE, player.available)
-        assertEquals(player, state.activePlayer)
-    }
-
-    @Test
-    fun playerIsActiveDuringAction() {
-        setupGame()
-        val player = awayTeam[1.playerNo]
-        controller.rollForward(
-            *activatePlayer("A1", PlayerStandardActionType.MOVE)
-        )
-        assertEquals(Availability.IS_ACTIVE, player.available)
-    }
-
-    @Test
-    fun undoMoveActivation() {
-        setupGame()
-        val player = awayTeam[10.playerNo]
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.MOVE),
-            EndAction
-        )
-        assertEquals(Availability.AVAILABLE, player.available)
-    }
-
-    @Test
-    fun cannotUndoMoveActivation() {
-        setupGame()
-        val player = awayTeam[10.playerNo]
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.MOVE),
-            SmartMoveTo(15, 7),
-            EndAction
-        )
-        assertEquals(Availability.HAS_ACTIVATED, player.available)
-    }
-
-    @Test
-    fun undoBlockActivation() {
-        setupGame()
-        val player = awayTeam[1.playerNo]
-        controller.rollForward(
-            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            PlayerSelected("H1".playerId),
-            EndAction
-        )
-        assertEquals(Availability.AVAILABLE, player.available)
-    }
-
-    @Test
-    fun cannotUndoBlockActivation() {
-        setupGame()
-        val player = awayTeam[1.playerNo]
-        controller.rollForward(
-            *activatePlayer("A1", PlayerStandardActionType.BLOCK),
-            *standardBlock("H1", 4.dblock),
-            DirectionSelected(Direction.Companion.LEFT),
-            Cancel,
-        )
-        assertEquals(Availability.HAS_ACTIVATED, player.available)
-    }
-
-
-    @Test
-    fun undoBlitzActivation() {
-        setupGame()
-        val player = awayTeam[1.playerNo]
-        controller.rollForward(
-            *activatePlayer("A1", PlayerStandardActionType.BLITZ),
-            PlayerSelected("H1".playerId),
-            EndAction
-        )
-        assertEquals(Availability.AVAILABLE, player.available)
-    }
-
-    @Test
-    fun cannotUndoBlitzActivation() {
-        setupGame()
-        val player = awayTeam[10.playerNo]
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.BLITZ),
-            PlayerSelected("H1".playerId),
-            *moveTo(15, 7),
-            EndAction
-        )
-        assertEquals(Availability.HAS_ACTIVATED, player.available)
-    }
-
-    @Test
-    fun undoPassActivation() {
-        setupGame()
-        val player = awayTeam[1.playerNo]
-        controller.rollForward(
-            *activatePlayer("A1", PlayerStandardActionType.PASS),
-            EndAction
-        )
-        assertEquals(Availability.AVAILABLE, player.available)
-    }
-
-    @Test
-    fun cannotUndoPassActivation() {
-        setupGame()
-        val player = awayTeam[10.playerNo]
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.PASS),
-            *moveTo(15, 7),
-            EndAction
-        )
-        assertEquals(Availability.HAS_ACTIVATED, player.available)
-    }
-
-    @Test
-    fun undoHandOffActivation() {
-        setupGame()
-        val player = awayTeam[10.playerNo]
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
-            EndAction
-        )
-        assertEquals(Availability.AVAILABLE, player.available)
-    }
-
-    @Test
-    fun cannotUndoHandOffActivation() {
-        setupGame()
-        val player = awayTeam[10.playerNo]
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
-            *moveTo(15, 7),
-            EndAction
-        )
-        assertEquals(Availability.HAS_ACTIVATED, player.available)
-    }
-
-    @Test
-    fun undoFoulActivation() {
-        setupGame()
-        homeTeam["H1".playerId].state = PlayerState.PRONE
-        val player = awayTeam[10.playerNo]
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
-            EndAction
-        )
-        assertEquals(Availability.AVAILABLE, player.available)
-    }
-
-    @Test
-    fun cannotUndoFoulActivation() {
-        setupGame()
-        homeTeam["H1".playerId].state = PlayerState.PRONE
-        val player = awayTeam[10.playerNo]
-        controller.rollForward(
-            *activatePlayer("A10", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
-            *moveTo(15, 7),
-            EndAction
-        )
-        assertEquals(Availability.HAS_ACTIVATED, player.available)
-    }
-
-    @Ignore
-    @Test
-    fun undoThrowTeamMateActivation() {
-        TODO()
-    }
-
-    @Ignore
-    @Test
-    fun cannotUndoThrowTeamMateActivation() {
-        TODO()
-    }
-
 }

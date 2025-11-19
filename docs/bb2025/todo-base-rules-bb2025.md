@@ -211,14 +211,14 @@ book.
 
 ## Game
 
-- [ ] Moving the turn marker
-- [ ] Halfs
-- [ ] Extra Time
-- [ ] Sudden Death
-- [ ] Active Team
+- [x] Moving the turn marker
+- [x] Halfs
+- [x] Extra Time
+- [x] Sudden Death
+- [x] Active Team
     - [x] No active team during Kick-off Events
     - [x] Team is active during team turn
-- [ ] Active Player
+- [x] Active Player
     - [x] Marked player as active during action
     - [x] Marked player as activated after action.
     - [x] Can undo starting an action before rolling dice and/or moving
@@ -228,7 +228,7 @@ book.
         - [x] Pass
         - [x] Hand-off
         - [x] Foul
-        - [ ] Throw team-mate
+        - [x] Throw team-mate
     - [ ] Forgo Activation
        - [ ] Still triggers Stalling
 - [ ] Stand Up
