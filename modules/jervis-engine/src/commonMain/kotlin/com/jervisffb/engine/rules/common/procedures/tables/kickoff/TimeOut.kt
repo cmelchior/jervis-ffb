@@ -8,10 +8,10 @@ import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.KickOffEventContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportTimeout
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.KickOffEventContext
 
 /**
  * Procedure for handling the Kick-Off Event: "Time-Out" as described on page 41

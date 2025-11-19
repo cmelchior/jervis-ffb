@@ -10,6 +10,8 @@ import com.jervisffb.engine.model.isOnHomeTeam
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2020.procedures.BB2020TheKickOffEvent
+import com.jervisffb.engine.rules.bb2025.procedures.BB2025TheKickOffEvent
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.CatchRoll
@@ -75,7 +77,7 @@ object AnimationFactory {
         )
         val firstBounce = (stack.singleCurrentNode(Bounce.RollDirection) && !stack.containsNode(Catch.CatchFailed))
         val isResolvingLanding = stack.containsNode(TheKickOffEvent.ResolveBallLanding)
-        val touchBack = stack.currentNode() == TheKickOffEvent.TouchBack
+        val touchBack = (stack.currentNode() == BB2020TheKickOffEvent.TouchBack) || (stack.currentNode() == BB2025TheKickOffEvent.TouchBack)
         if (
             (firstCatch && !firstBounce && isResolvingLanding)
             || (!firstCatch && firstBounce && isResolvingLanding)

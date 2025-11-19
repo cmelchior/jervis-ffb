@@ -35,19 +35,20 @@ import com.jervisffb.test.utils.assertTypeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
 /**
- * Tests for the Kick-off sequence as described on page 40 in the rulebook.
+ * Tests for the Kick-off sequence as described on page 47 in the BB2025 rulebook.
  * This covers:
  * - Nominating kicking player
  * - Placing the kick
  * - Deviating the kick
- * - What goes up, must come down
+ * - What goes up...
  * - Touchbacks
  *
- * All kick-off events have special tests in [com.jervisffb.test.bb2020.tables.KickOffEventTests].
+ * All kick-off events have special tests in [com.jervisffb.test.bb2025.tables.KickOffEventTests].
  */
 class KickOffTests: JervisGameBB2025Test() {
 
@@ -373,11 +374,12 @@ class KickOffTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun touchback_giveToProneOrStunnedPlayer() {
+    fun touchback_placeOnUnoccupiedSquare() {
         // In theory, it is possible for a Kickoff Event to leave the entire
-        // receiving team prone (e.g., Pitch Invasion with a very little team).
+        // receiving team prone (e.g., Pitch Invasion with a very small team).
         // We just fake it here, by setting the prone state for all players
-        // after the kickoff event.
+        // after the kickoff event. In this case, the ball is placed on an
+        // unoccupied square and does not bounce.
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
@@ -390,39 +392,15 @@ class KickOffTests: JervisGameBB2025Test() {
         assertEquals(BallState.OUT_OF_BOUNDS, state.getBall().state)
         state.receivingTeam.forEach { it.state = PlayerState.PRONE }
         state.receivingTeam["A2".playerId].state = PlayerState.STUNNED
-        val availablePlayers = (controller.getAvailableActions().first() as SelectPlayer).players
-        assertEquals(11, availablePlayers.size)
+        assertNull(controller.getAvailableActions().getOrNull<SelectPlayer>())
+        val availableSquares = (controller.getAvailableActions().get<SelectFieldLocation>().squares)
+        assertEquals(((26*15/2)-11), availableSquares.size)
         controller.rollForward(
-            PlayerSelected("A1".playerId), // Touchback to prone player
-            7.d8, // Bounce to [13,6] (Where there is a stunned player)
-            5.d8, // Bounce to [14,6] from stunned player
+            FieldSquareSelected(25, 0)
         )
         assertEquals(1, awayTeam.turnMarker)
+        assertEquals(FieldCoordinate(25, 0), state.singleBall().location)
         assertEquals(BallState.ON_GROUND, state.singleBall().state)
-    }
-
-    @Test
-    fun touchback_secondTouchbackAfterBounceFromPronePlayer() {
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 0),
-                deviate = DiceRollResults(1.d8, 1.d6),
-                bounce = null
-            ),
-        )
-        assertEquals(BallState.OUT_OF_BOUNDS, state.getBall().state)
-        state.receivingTeam.forEach { it.state = PlayerState.PRONE }
-        controller.rollForward(
-            PlayerSelected("A1".playerId), // Touchback to prone player
-            1.d8, // Bounce to [12,5] (Which is on kicking team side)
-            PlayerSelected("A2".playerId), // Touchback to another prone player
-            5.d8, // Bounce to [14,6]
-        )
-        assertEquals(1, awayTeam.turnMarker)
-        assertEquals(BallState.ON_GROUND, state.singleBall().state,)
-        assertEquals(FieldCoordinate(14,6), state.singleBall().location)
     }
 
     // Bugfix: Check that the ball location is updated correctly after awarding a touchback

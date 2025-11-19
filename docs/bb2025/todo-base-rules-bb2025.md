@@ -172,9 +172,9 @@ book.
     - [x] Too few players on the LoS
     - [x] If less than 3 players, all must be on LoS
     - [x] Wide-zone also includes the End Zone area.
-- [ ] Kick-off (Kicking player and target)
+- [x] Kick-off (Kicking player and target)
     - [x] Default: Players not on LoS
-    - [x] 3 or less
+    - [x] 3 or less, allowed to select player on LoS
     - [x] All players on LoS
     - [x] Place Kick: Only locations on the opponent side
 - [ ] The Kick-off Event
@@ -198,17 +198,16 @@ book.
         - [ ] On 2+, player stays on field with -1 AV, MA
         - [ ] On 1, player is put in Reserves until end of drive
     - [x] Pitch Invasion
-- [ ] What goes up, must come down
+- [x] What goes up...
     - [x] Land on Field
     - [x] Lands on Player
     - [x] Team rerolls not available for catch
-- [ ] Touchbacks
+- [x] Touchbacks
     - [x] Give to player
-    - [x] Give to prone player is all players are fallen over
+    - [x] Place on unoccupied square if all players prone.
     - [x] End sequence as soon as ball goes over middle. I.e., not catch rolls etc.
     - [x] Going out of bounds
     - [x] Go out of bounds / award to player that is then knocked down and ball bounce (previous bug)
-    - [ ] If no eligible targets, place on any unoccupied square on their half.
 
 ## Game
 
