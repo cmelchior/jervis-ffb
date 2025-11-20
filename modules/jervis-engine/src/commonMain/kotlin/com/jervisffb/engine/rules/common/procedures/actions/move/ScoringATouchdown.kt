@@ -93,7 +93,7 @@ object ScoringATouchdown : Procedure() {
     }
     override fun isValid(state: Game, rules: Rules) {
         val player = state.getContext<ScoringATouchDownContext>().player
-        if (!player.hasBall() || player.state == PlayerState.STANDING) {
+        if (!player.hasBall() || player.state != PlayerState.STANDING) {
             INVALID_GAME_STATE("Player needs to have the ball and be standing: $player")
         }
     }

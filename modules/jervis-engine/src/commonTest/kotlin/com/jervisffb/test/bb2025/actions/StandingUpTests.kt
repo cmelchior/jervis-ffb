@@ -13,7 +13,6 @@ import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.ext.rollForward
@@ -111,7 +110,7 @@ class StandingUpTests: JervisGameBB2025Test() {
         player.movesLeft = 2
 
         // Give player Throw Team-mate
-        rules.skillSettings.createSkill(player, SkillType.THROW_TEAMMATE, Duration.END_OF_GAME)
+        player.addSkill(SkillType.THROW_TEAMMATE)
 
         // Just check normal actions for now
         PlayerStandardActionType.entries.forEach { action ->

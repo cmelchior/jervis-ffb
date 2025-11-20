@@ -113,7 +113,7 @@ object ResolveMoveTypeStep : Procedure() {
                 else -> {
                     compositeCommandOf(
                         if (moveContext.hasMoved) SetContext(activeContext.copy(markActionAsUsed = true)) else null,
-                        GotoNode(CheckForScoring)
+                        if (player.hasBall()) GotoNode(CheckForScoring) else ExitProcedure()
                     )
                 }
             }

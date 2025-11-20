@@ -6,6 +6,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
@@ -117,7 +118,10 @@ object MovePlayerIntoSquare : Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val context = state.getContext<MovePlayerIntoSquareContext>()
             val ball = state.field[context.target].balls.first { it.state == BallState.ON_GROUND }
-            return SetCurrentBall(ball)
+            return compositeCommandOf(
+                SetBallState.bouncing(ball),
+                SetCurrentBall(ball)
+            )
         }
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {

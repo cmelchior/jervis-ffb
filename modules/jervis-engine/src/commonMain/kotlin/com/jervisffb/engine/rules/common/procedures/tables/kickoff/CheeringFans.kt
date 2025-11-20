@@ -20,7 +20,6 @@ import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.ProcedureContext
-import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportCheeringFansResult
 import com.jervisffb.engine.reports.ReportDiceRoll
@@ -43,7 +42,6 @@ object CheeringFans : Procedure() {
     override val initialNode: Node = KickingTeamRollDie
     override fun onEnterProcedure(state: Game, rules: Rules): Command? = null
     override fun onExitProcedure(state: Game, rules: Rules): Command = RemoveContext<CheeringFansContext>()
-    override fun isValid(state: Game, rules: Rules) = state.assertContext<CheeringFansContext>()
 
     object KickingTeamRollDie : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.kickingTeam

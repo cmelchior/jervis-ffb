@@ -43,8 +43,8 @@ class MutableProcedureStack {
 
     /**
      * Returns `true` if the stack is empty, i.e., no events can be processed.
-     * This state should only be allowed when either starting the FSM or it is ready
-     * to close down because there is no more work to do.
+     * This state should only be allowed when either starting the FSM or when it
+     * is ready to close down because there is no more work to do.
      */
     fun isEmpty(): Boolean = history.isEmpty()
     fun isNotEmpty(): Boolean = !isEmpty()
@@ -156,8 +156,8 @@ class MutableProcedureStack {
      * procedure is active, it will return "Unknown".
      */
     fun stateToPrettyString(): String {
-        currentProcedure()?.let {
-            return "${it.procedure.name()}[${it.currentNode().name()}]"
-        } ?: return "Unknown"
+        return currentProcedure()?.let {
+            "${it.procedure.name()}[${it.currentNode().name()}]"
+        } ?: "Unknown"
     }
 }

@@ -59,8 +59,8 @@ object FallingOver: Procedure() {
     }
     override fun isValid(state: Game, rules: Rules) {
         val context = state.getContext<RiskingInjuryContext>()
-        if (context.mode != RiskingInjuryMode.FALLING_OVER) {
-            INVALID_GAME_STATE("Player needs to be falling over to use this procedure: ${context.mode}")
+        if (context.mode != RiskingInjuryMode.FALLING_OVER && context.mode != RiskingInjuryMode.BAD_LANDING) {
+            INVALID_GAME_STATE("Player needs to have landed badly or be falling over oto use this procedure: ${context.mode}")
         }
     }
 

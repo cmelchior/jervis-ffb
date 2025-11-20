@@ -6,6 +6,8 @@ import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.utils.InvalidActionException
+import com.jervisffb.engine.utils.InvalidGameStateException
 
 /**
  * Node type that represents the need of a users "action" to progress.
@@ -44,7 +46,10 @@ abstract class ActionNode : Node {
      * Warning: It is up to implementers of this method to also modify the [Procedure] state in order
      * to progress the [MutableProcedureStack]. The most common ways of doing this are through
      * [com.jervisffb.engine.commands.fsm.GotoNode] or [com.jervisffb.engine.commands.fsm.ExitProcedure]
-     * commands. Failing to do this will result in the FSM not progressing and just appear stuck.
+     * commands. Failing to do this will result in the FSM not progressing and just appearing stuck.
+     *
+     * If the [action] is invalid or not applicable to this node, an [InvalidActionException] or
+     * [InvalidGameStateException] should be thrown.
      */
     abstract fun applyAction(action: GameAction, state: Game, rules: Rules): Command
 }

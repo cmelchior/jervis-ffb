@@ -42,7 +42,9 @@ object Bounce : Procedure() {
     override fun onExitProcedure(state: Game, rules: Rules): Command? = null
     override fun isValid(state: Game, rules: Rules) {
         val ball = state.currentBall()
-        if (ball.state != BallState.BOUNCING) throw IllegalStateException("Ball is not bouncing, but ${ball.state}")
+        if (ball.state != BallState.BOUNCING) {
+            throw IllegalStateException("Ball is not bouncing, but ${ball.state}")
+        }
     }
 
     object RollDirection : ActionNode() {

@@ -44,8 +44,8 @@ object KnockedDown: Procedure() {
     override fun isValid(state: Game, rules: Rules) {
         state.assertContext<RiskingInjuryContext>()
         val context = state.getContext<RiskingInjuryContext>()
-        if (context.mode != RiskingInjuryMode.KNOCKED_DOWN) {
-            INVALID_GAME_STATE("Player needs to be knocked down over to use this procedure: ${context.mode}")
+        if (context.mode != RiskingInjuryMode.KNOCKED_DOWN && context.mode != RiskingInjuryMode.BAD_LANDING) {
+            INVALID_GAME_STATE("Player needs to have a bad landing or be knocked down to use this procedure: ${context.mode}")
         }
     }
 

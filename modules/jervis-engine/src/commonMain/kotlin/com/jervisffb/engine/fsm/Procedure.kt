@@ -42,6 +42,9 @@ abstract class Procedure {
 
     private class EnterProcedureNode(private val procedure: Procedure) : ComputationNode() {
         override fun apply(state: Game, rules: Rules): Command {
+            // Check if the procedure is valid to call before we run it.
+            // If invalid, this method should throw an exception
+            procedure.isValid(state, rules)
             return compositeCommandOf(
                 procedure.onEnterProcedure(state, rules),
                 GotoNode(procedure.initialNode),
