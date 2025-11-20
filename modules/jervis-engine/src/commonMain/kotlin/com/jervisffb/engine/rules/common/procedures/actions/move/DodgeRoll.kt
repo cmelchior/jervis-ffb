@@ -54,7 +54,9 @@ import com.jervisffb.engine.utils.calculateAvailableRerollsFor
 
 /**
  * Handle a player making a dodge roll.
+ *
  * See page 45 in the BB2020 rulebook.
+ * See page 55 in the BB2025 rulebook.
  *
  * Dodge can be modified in a number of ways. In this implementation it is
  * handled the following way:
@@ -273,7 +275,7 @@ object DodgeRoll: Procedure() {
 
     /**
      * Choose whether to use Diving Tackle (if applicable).
-     * If multiple players has it, only 1 can use it.
+     * If multiple players have it, only 1 can use it.
      */
     object ChooseToUseDivingTackle: ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<DodgeRollContext>().player.team.otherTeam()

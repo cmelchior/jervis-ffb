@@ -21,9 +21,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Test a player dodging as described on page 45 in the BB2020 Rulebook.
+ * Test a player dodging as described on page 55 in the BB2025 Rulebook.
  *
- * Note, any skills that affect dodges are testing in their own test class.
+ * Note, any skills that affect dodges are testedd in their own test class.
  * This class only tests the basic functionality.
  */
 class DodgeTests: JervisGameBB2025Test() {

@@ -252,7 +252,7 @@ book.
     - [x] Rush is 2+
     - [x] Failing a Rush puts player in target square.
     - [x] Move action is over after rushing twice.
-- [ ] Dodge (basic, no skills)
+- [x] Dodge (basic, no skills)
     - [x] When leaving marking player
     - [x] Not when leaving player with no TZ
     - [x] Not when moving from open into marked position
