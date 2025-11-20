@@ -417,8 +417,8 @@ book.
     - [x] Move after blitz
     - [x] Blitz uses 1 move
     - [x] Fail rush just before blitz
-- [ ] Foul Action
-    - [ ] Can select target when standing next to them.
+- [x] Foul Action
+    - [x] Can only select target when standing next to them.
     - [x] Assists
     - [x] Caught by the Ref
     - [x] Sent-off is a turnover
@@ -436,7 +436,7 @@ book.
     - [x] Test against agility to catch it
     - [x] Ball bounce from target player if not caught
     - [x] Cannot hand-off to opponent
-- [ ] Argue the Call Table
+- [x] Argue the Call Table
     - [x] You're Outta Here - Bans Coach / Cannot argue again / Effect Brilliant Coaching
     - [x] I Don't Care
     - [x] Well, When You Put It Like That...

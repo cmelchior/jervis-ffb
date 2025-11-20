@@ -196,7 +196,7 @@ open class Rules(
     // Who is responsible for rolling dice or taking random actions.
     open val diceRollsOwner: DiceRollOwner = DiceRollOwner.ROLL_ON_SERVER,
     // Probably need to replace this with a reference to the FoulProcedure
-    open val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.STRICT,
+    open val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.BB2025,
     // Probably need to replace this with a reference to the KickProcedure
     open val kickingPlayerBehavior: KickingPlayerBehavior = KickingPlayerBehavior.STRICT,
     // Which procedure to use when deciding and using an apothecary.

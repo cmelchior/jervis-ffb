@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.bb2025.procedures.actions
+package com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball
 
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetBallState

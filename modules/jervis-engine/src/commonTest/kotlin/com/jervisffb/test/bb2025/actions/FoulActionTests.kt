@@ -21,17 +21,19 @@ import com.jervisffb.test.activatePlayer
 import com.jervisffb.test.ext.rollForward
 import com.jervisffb.test.moveTo
 import com.jervisffb.test.utils.firstInstanceOf
+import com.jervisffb.test.utils.firstInstanceOfOrNull
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
- * Class responsible for testing the Foul Action as described on page 63 in the
- * rulebook.
+ * Class responsible for testing the Foul Action as described on page 69 in the
+ * BB2025 rulebook.
  *
- * Argue the call is tested in [com.jervisffb.test.bb2020.tables.ArgueTheCallTests]
- * Turnovers are tested in [com.jervisffb.test.bb2020.TurnOverTests]
+ * Argue the call is tested in [com.jervisffb.test.bb2025.tables.ArgueTheCallTests]
+ * Turnovers are tested in [com.jervisffb.test.bb2025.TurnOverTests]
  */
 class FoulActionTests: JervisGameBB2025Test() {
 
@@ -64,19 +66,29 @@ class FoulActionTests: JervisGameBB2025Test() {
     }
 
     @Test
-    fun canOnlyFoulSelectedPlayer() {
+    fun cannotSelectTargetOnTheDistance() {
+        homeTeam["H5".playerId].state = PlayerState.STUNNED
+        controller.rollForward(
+            *activatePlayer("A1", PlayerStandardActionType.FOUL),
+        )
+        val targets = controller.getAvailableActions().firstInstanceOfOrNull<SelectPlayer>()
+        assertNull(targets)
+    }
+
+    @Test
+    fun canFoulAllEligibleTargets() {
         homeTeam["H1".playerId].state = PlayerState.PRONE
         homeTeam["H2".playerId].state = PlayerState.STUNNED
         assertEquals(1, awayTeam.turnData.foulActions)
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
-            SmartMoveTo(13, 4),
+            SmartMoveTo(11, 5),
         )
 
         val targets = controller.getAvailableActions().firstInstanceOf<SelectPlayer>()
-        assertEquals(1, targets.size)
-        assertEquals("H1".playerId, targets.players.first())
+        assertEquals(2, targets.size)
+        assertTrue(targets.players.contains("H1".playerId))
+        assertTrue(targets.players.contains("H2".playerId))
     }
 
     @Test
@@ -85,7 +97,6 @@ class FoulActionTests: JervisGameBB2025Test() {
         assertEquals(1, awayTeam.turnData.foulActions)
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
         )
         assertEquals(awayTeam["A1".playerId], state.activePlayer)
         controller.rollForward(
@@ -102,7 +113,6 @@ class FoulActionTests: JervisGameBB2025Test() {
         assertEquals(1, awayTeam.turnData.foulActions)
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
             SmartMoveTo(13, 4),
             EndAction // Move next to the prone player, but do not foul and just end the action
         )
@@ -117,7 +127,6 @@ class FoulActionTests: JervisGameBB2025Test() {
         assertEquals(1, awayTeam.turnData.foulActions)
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
             SmartMoveTo(13, 4),
             PlayerSelected("H1".playerId), // Start foul, A1 can assist
             DiceRollResults(5.d6, 3.d6), // 8 + 1 = Armor break
@@ -135,7 +144,6 @@ class FoulActionTests: JervisGameBB2025Test() {
         assertEquals(1, awayTeam.turnData.foulActions)
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H2".playerId),
             SmartMoveTo(11, 5),
             PlayerSelected("H2".playerId), // Start foul, H1 can assist
             DiceRollResults(5.d6, 4.d6), // 9 - 1 = Fail armour break
@@ -151,7 +159,6 @@ class FoulActionTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
             SmartMoveTo(13, 4),
             PlayerSelected("H1".playerId), // Start foul
             DiceRollResults(2.d6, 2.d6), // Roll double -> Sent off
@@ -170,7 +177,6 @@ class FoulActionTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
             SmartMoveTo(13, 4),
             PlayerSelected("H1".playerId), // Start foul
             DiceRollResults(5.d6, 6.d6), // Break armour
@@ -189,14 +195,13 @@ class FoulActionTests: JervisGameBB2025Test() {
         assertEquals(1, awayTeam.turnData.foulActions)
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId)
         )
         val player = awayTeam["A6".playerId]
         assertEquals(player, state.activePlayer)
         assertEquals(Availability.IS_ACTIVE, player.available)
         controller.rollForward(
             SmartMoveTo(13, 4),
-            PlayerSelected("H1".playerId), // Start foul
+            PlayerSelected("H1".playerId),
             DiceRollResults(5.d6, 6.d6), // 8 + 1 = Armor break
             DiceRollResults(1.d6, 2.d6), // Stunned -> Foul ends
         )
@@ -210,7 +215,6 @@ class FoulActionTests: JervisGameBB2025Test() {
         homeTeam["H1".playerId].state = PlayerState.PRONE
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
             PlayerSelected("H1".playerId), // Start foul
             DiceRollResults(1.d6, 2.d6), // Armour roll
         )
@@ -223,7 +227,6 @@ class FoulActionTests: JervisGameBB2025Test() {
         homeTeam["H1".playerId].state = PlayerState.PRONE
         controller.rollForward(
             *activatePlayer("A10", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
             *moveTo(17, 7),
             4.d6, // Pickup
             NoRerollSelected(),

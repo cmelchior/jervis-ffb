@@ -2,7 +2,7 @@ package com.jervisffb.fumbbl.net.adapter.impl.foul
 
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.rules.common.procedures.actions.foul.FumbblFoulAction
+import com.jervisffb.engine.rules.bb2025.procedures.actions.foul.FoulAction
 import com.jervisffb.fumbbl.net.adapter.CommandActionMapper
 import com.jervisffb.fumbbl.net.adapter.JervisActionHolder
 import com.jervisffb.fumbbl.net.adapter.add
@@ -30,6 +30,6 @@ object SelectFoulTargetMapper: CommandActionMapper {
         // There is a bug in FUMBBL, so you do not have to select the Foul target
         // when star
         val report = command.firstReport() as FoulReport
-        newActions.add(PlayerSelected(report.defenderId.toJervisId()), FumbblFoulAction.MoveOrFoulOrEndAction)
+        newActions.add(PlayerSelected(report.defenderId.toJervisId()), FoulAction.MoveOrFoulOrEndAction)
     }
 }

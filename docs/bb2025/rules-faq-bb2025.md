@@ -79,6 +79,28 @@ Jervis has adopted the 2nd interpretation, as otherwise, the wording "they will
 automatically pick up the ball" will not make any sense. This interpretation
 is consistent with how FUMBBL interprets this rule.
 
+### Page 69 - Foul Action and Lone Fouler
+It is ambiguous what happens if you reroll a natural double in a Foul Action
+with Lone Fouler.
+
+Does the fouler still get sent off or not?
+
+The Re-rolls section on page 33 is no help here either as it doesn't mention
+what happens to the original role.
+
+Arguments for:
+* Being Sent-off uses the wording "...if during a Foul Action a natural double 
+  is rolled..", with no indication that rerolling removes consequences of the 
+  first roll.
+* The wording is "rolled" not "outcome of the roll" (or similar).
+
+Arguments against:
+* In all other cases, e.g., Rush, you do not fall over if you re-roll a 1.
+* The word "re-reroll" implies that the first roll is not counted.
+
+Jervis has adopted the 2nd interpretation, as that is most in line with what 
+people would assume a re-roll does (entirely replacing the first roll). This
+would also explain why it isn't described better in the rulebook. 
 
 ## Spike 19
 None

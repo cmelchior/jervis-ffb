@@ -45,7 +45,6 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
         // Foul 1st time and get the coach banned
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
             SmartMoveTo(13, 4),
             PlayerSelected("H1".playerId), // Start foul
             DiceRollResults(2.d6, 2.d6), // Roll double -> Sent off
@@ -61,7 +60,6 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
         controller.rollForward(
             EndTurn, // Give control back to away team
             *activatePlayer("A1", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId), // Select same foul target
             PlayerSelected("H1".playerId),  // Start the foul
             DiceRollResults(2.d6, 2.d6), // Caught again by the ref. Is sent off without being offered the chance to argue
         )
@@ -108,7 +106,6 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
             SmartMoveTo(13, 4),
             PlayerSelected("H1".playerId), // Start foul
             DiceRollResults(2.d6, 2.d6), // Roll double -> Sent off
@@ -128,7 +125,6 @@ class ArgueTheCallTests: JervisGameBB2025Test() {
         assertEquals(awayTeam, state.activeTeam)
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
             SmartMoveTo(13, 4),
             PlayerSelected("H1".playerId), // Start foul
             DiceRollResults(2.d6, 2.d6), // Roll double -> Sent off

@@ -32,8 +32,8 @@ class CustomizationSetupComponentModel(val isHotseat: Boolean, initialRulesBuild
     )
 
     val foulActionBehavior = listOf(
-        DropdownEntryWithValue("Strict", FoulActionBehavior.STRICT, true),
-        DropdownEntryWithValue("FUMBBL-compatible", FoulActionBehavior.FUMBBL, true),
+        DropdownEntryWithValue("BB2025/FUMBBL (Select at target)", FoulActionBehavior.BB2025, true),
+        DropdownEntryWithValue("BB2020 (Select when declaring action)", FoulActionBehavior.BB2020, true),
     )
 
     val kickingPlayerBehavior = listOf(
@@ -56,7 +56,7 @@ class CustomizationSetupComponentModel(val isHotseat: Boolean, initialRulesBuild
     val turnsPrHalf = MutableStateFlow(InputFieldDataWithValue("Turns Pr. Half", rulesBuilder.turnsPrHalf.toString(), rulesBuilder.turnsPrHalf, isError = false))
     val selectedDiceRollBehavior = MutableStateFlow(diceRollEntries.first { it.value == DiceRollOwner.ROLL_ON_SERVER })
     val selectedUndoActionBehavior = MutableStateFlow(undoActionsEntries.first { it.value == UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS })
-    val selectedFoulActionBehavior = MutableStateFlow(foulActionBehavior.first { it.value == FoulActionBehavior.STRICT })
+    val selectedFoulActionBehavior = MutableStateFlow(foulActionBehavior.first { it.value == FoulActionBehavior.BB2025 })
     val selectedKickingPlayerBehavior = MutableStateFlow(kickingPlayerBehavior.first { it.value == KickingPlayerBehavior.STRICT })
     val allowPlayerEdits = MutableStateFlow(rulesBuilder.allowPlayerEditsDuringGame)
 

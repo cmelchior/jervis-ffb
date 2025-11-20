@@ -18,10 +18,10 @@ import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.common.procedures.actions.pass.PassContext
 
 /**

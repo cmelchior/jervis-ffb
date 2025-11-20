@@ -157,11 +157,10 @@ class StandingUpTests: JervisGameBB2025Test() {
                     startAction = { controller ->
                         controller.rollForward(
                             PlayerActionSelected(PlayerStandardActionType.FOUL),
-                            PlayerSelected("H1".playerId),
                         )
                     }
                     checkActionUsed = { assertEquals(0, player.team.turnData.foulActions) }
-                    rollBack = { 6 }
+                    rollBack = { 5 }
                 }
                 PlayerStandardActionType.THROW_TEAM_MATE -> {
                     startAction = { controller ->

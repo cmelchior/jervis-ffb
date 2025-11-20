@@ -27,6 +27,7 @@ abstract class BB2020Rules : Rules(
     name = "Blood Bowl 2020 Rules",
     baseVersion = GameVersion.BB2020,
     gameType = GameType.STANDARD,
+    foulActionBehavior = FoulActionBehavior.BB2020,
     inducements = InducementSettings(DEFAULT_INDUCEMENTS_BB2020),
 ) {
 }
@@ -50,7 +51,7 @@ class FumbblBB2020Rules : BB2020Rules() {
     override val name: String
         get() = "Blood Bowl 2020 Rules (FUMBBL Compatible)"
     override val kickingPlayerBehavior: KickingPlayerBehavior = KickingPlayerBehavior.FUMBBL
-    override val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.FUMBBL
+    override val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.BB2025
 }
 
 /**

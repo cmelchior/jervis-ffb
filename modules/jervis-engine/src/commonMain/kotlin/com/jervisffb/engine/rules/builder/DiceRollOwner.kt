@@ -3,8 +3,6 @@ package com.jervisffb.engine.rules.builder
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.rules.common.procedures.TheFUMBBLKickOff
 import com.jervisffb.engine.rules.common.procedures.TheKickOff
-import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulAction
-import com.jervisffb.engine.rules.common.procedures.actions.foul.FumbblFoulAction
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB11Apothecary
 import com.jervisffb.engine.rules.common.procedures.tables.injury.UseBB7Apothecary
 
@@ -37,8 +35,8 @@ interface ProcedureHolder {
 }
 
 enum class FoulActionBehavior(override val procedure: Procedure) : ProcedureHolder {
-    STRICT(FoulAction), // Select target when starting the foul action
-    FUMBBL(FumbblFoulAction), // Select the foul player, just before rolling for the foul
+    BB2025(com.jervisffb.engine.rules.bb2025.procedures.actions.foul.FoulAction), // Select the target just before rolling for the foul
+    BB2020(com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction), // Select the target when declaring the foul action
 }
 
 enum class KickingPlayerBehavior(override val procedure: Procedure): ProcedureHolder {

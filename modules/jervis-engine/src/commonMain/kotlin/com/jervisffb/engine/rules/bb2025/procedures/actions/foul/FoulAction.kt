@@ -1,11 +1,12 @@
-package com.jervisffb.engine.rules.common.procedures.actions.foul
+package com.jervisffb.engine.rules.bb2025.procedures.actions.foul
 
-import com.jervisffb.engine.actions.D6Result
+import com.jervisffb.engine.actions.DeselectPlayer
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.MoveTypeSelected
+import com.jervisffb.engine.actions.PlayerDeselected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.commands.Command
@@ -20,48 +21,37 @@ import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
-import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.ActivatePlayerContext
+import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.MoveContext
-import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportFoulResult
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
-import com.jervisffb.engine.rules.common.procedures.tables.injury.RiskingInjuryContext
-import com.jervisffb.engine.rules.common.tables.ArgueTheCallResult
 import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.addIfNotNull
 
-data class FoulContext(
-    val fouler: Player,
-    val victim: Player? = null,
-    val foulAssists: Int = 0,
-    val defensiveAssists: Int = 0,
-    val injuryRoll: RiskingInjuryContext? = null,
-    val hasMoved: Boolean = false,
-    val hasFouled: Boolean = false,
-    val spottedByTheRef: Boolean = false,
-    val argueTheCall: Boolean = false,
-    val argueTheCallRoll: D6Result? = null,
-    val argueTheCallResult: ArgueTheCallResult? = null
-) : ProcedureContext
-
 /**
- * Procedure for controlling a player's Blitz action.
+ * Procedure for controlling a player's Foul action.
+ * Unlike in BB2020, in BB2025, you do not have to select the target of the
+ * foul when declaring the action. This is done during the action when
+ * standing next to them.
  *
- * See page 63 in the rulebook.
+ * This is also the behavior that the FUMBBL Client uses for BB2020.
+ *
+ * See page 69 in the BB2026 rulebook.
  */
+
 object FoulAction : Procedure() {
-    override val initialNode: Node = SelectFoulTargetOrCancel
+    override val initialNode: Node = MoveOrFoulOrEndAction
     override fun onEnterProcedure(state: Game, rules: Rules): Command {
         val player = state.activePlayer ?: INVALID_GAME_STATE("No active player")
         return compositeCommandOf(
@@ -83,55 +73,39 @@ object FoulAction : Procedure() {
         )
     }
 
-    object SelectFoulTargetOrCancel : ActionNode() {
-        override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
-        override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val fouler = state.getContext<FoulContext>().fouler
-            val availableTargetPlayers = fouler.team.otherTeam().filter {
-                // You cannot foul your own players, so no need to check for STUNNED_OWN_TURN
-                it.location.isOnField(rules) && (it.state == PlayerState.PRONE || it.state == PlayerState.STUNNED)
-            }.map {
-                SelectPlayer(it)
-            }
-            return availableTargetPlayers + listOf(EndActionWhenReady)
-        }
-
-        override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
-            return when (action) {
-                is EndAction -> ExitProcedure()
-                is PlayerSelected -> {
-                    checkTypeAndValue<PlayerSelected>(state, action) {
-                        val context = state.getContext<FoulContext>()
-                        compositeCommandOf(
-                            SetContext(context.copy(victim = action.getPlayer(state))),
-                            GotoNode(MoveOrFoulOrEndAction)
-                        )
-                    }
-                }
-                else -> INVALID_ACTION(action)
-            }
-        }
-    }
-
     object MoveOrFoulOrEndAction : ActionNode() {
         override fun actionOwner(state: Game, rules: Rules): Team = state.getContext<FoulContext>().fouler.team
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
-            val context = state.getContext<FoulContext>()
             val options = mutableListOf<GameActionDescriptor>()
 
             // Find possible move types
             options.addIfNotNull(calculateMoveTypesAvailable(state, state.activePlayer!!))
 
             // Check if adjacent to target of the Blitz
-            if (context.fouler.location.isAdjacent(rules, context.victim!!.location)) {
-                options.add(SelectPlayer(context.victim))
+            val foulContext= state.getContext<FoulContext>()
+            val fouler = foulContext.fouler
+            if (foulContext.hasMoved) {
+                options.add(EndActionWhenReady)
+            } else {
+                options.add(DeselectPlayer(fouler))
+            }
+            val availableTargetPlayers = fouler.team.otherTeam()
+                .filter {
+                    // You cannot foul your own players, so no need to check for STUNNED_OWN_TURN
+                    it.location.isOnField(rules) && (it.state == PlayerState.PRONE || it.state == PlayerState.STUNNED)
+                }
+                .filter {
+                    it.location.isAdjacent(rules, fouler.location)
+                }.let {
+                    if (it.isEmpty()) return@let null
+                    SelectPlayer.fromPlayers(it)
+                }
+            if (availableTargetPlayers != null) {
+                options.add(availableTargetPlayers)
             }
 
-            // End action before the block
-            // As soon as a target is selected, you can no longer cancel the action
-            // (Ideally this should be allowed until you take the first move)
+            // End action before the foul
             options.add(EndActionWhenReady)
-
             return options
         }
 
@@ -139,6 +113,7 @@ object FoulAction : Procedure() {
             val context = state.getContext<FoulContext>()
             return when (action) {
                 EndAction -> ExitProcedure()
+                is PlayerDeselected -> ExitProcedure()
                 is MoveTypeSelected -> {
                     val moveContext = MoveContext(context.fouler, action.moveType)
                     compositeCommandOf(
@@ -181,6 +156,7 @@ object FoulAction : Procedure() {
                     add(GotoNode(MoveOrFoulOrEndAction))
                 }
             }
+
         }
     }
 
@@ -192,4 +168,3 @@ object FoulAction : Procedure() {
         }
     }
 }
-

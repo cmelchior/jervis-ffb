@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.bb2025.procedures.actions
+package com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball
 
 import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndActionWhenReady
@@ -27,7 +27,6 @@ import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.SecureTheBallRollContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable
 import com.jervisffb.engine.rules.common.procedures.getSetPlayerRushesCommand
@@ -71,7 +70,7 @@ object SecureTheBallAction : Procedure() {
         val context = state.getContext<SecureTheBallContext>()
         val activePlayerContext = state.getContext<ActivatePlayerContext>()
         return compositeCommandOf(
-            RemoveContext<FoulContext>(),
+            RemoveContext<SecureTheBallContext>(),
             SetContext(
                 activePlayerContext.copy(
                     markActionAsUsed = context.hasMoved

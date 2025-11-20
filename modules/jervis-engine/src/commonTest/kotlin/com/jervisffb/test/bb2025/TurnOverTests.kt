@@ -537,7 +537,6 @@ class TurnOverTests: JervisGameBB2025Test() {
         assertEquals(0, homeTeam.turnMarker)
         controller.rollForward(
             *activatePlayer("A6", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId),
             SmartMoveTo(13, 4),
             PlayerSelected("H1".playerId), // Start foul
             DiceRollResults(2.d6, 2.d6), // Roll double -> Sent off

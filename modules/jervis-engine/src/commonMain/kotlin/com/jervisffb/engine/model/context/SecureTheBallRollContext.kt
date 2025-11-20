@@ -7,7 +7,7 @@ import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 /**
  * Context data for rolling for securing the ball.
  *
- * @see [com.jervisffb.engine.rules.bb2025.procedures.actions.SecureTheBallRoll]
+ * @see [com.jervisffb.engine.rules.bb2025.procedures.actions.securetheball.SecureTheBallRoll]
  */
 data class SecureTheBallRollContext(
     val player: Player,

@@ -33,6 +33,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
+import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
@@ -52,7 +53,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
- * Procedure for handling the Foul part of a [FoulAction].
+ * Procedure for handling the Foul part of a [com.jervisffb.engine.rules.bb2020.procedures.actions.foul.FoulAction].
  */
 object FoulStep: Procedure() {
     override val initialNode: Node = CalculateAssists

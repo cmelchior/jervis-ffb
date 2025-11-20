@@ -12,6 +12,7 @@ import com.jervisffb.engine.actions.DiceRollResults
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.model.context.CatchRollContext
+import com.jervisffb.engine.model.context.FoulContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.RushRollContext
@@ -43,7 +44,6 @@ import com.jervisffb.engine.rules.common.procedures.actions.block.standard.Stand
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRerollDice
 import com.jervisffb.engine.rules.common.procedures.actions.block.standard.StandardBlockRollDice
 import com.jervisffb.engine.rules.common.procedures.actions.foul.ArgueTheCallRoll
-import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulContext
 import com.jervisffb.engine.rules.common.procedures.actions.foul.FoulStep
 import com.jervisffb.engine.rules.common.procedures.actions.move.DodgeRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.RushRoll

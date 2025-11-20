@@ -163,7 +163,6 @@ class PrayersToNuffleTests: JervisGameBB2025Test() {
         // Foul player and roll 5 to trigger the prayer
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.FOUL),
-            PlayerSelected("H1".playerId), // Select H1 as the target of the action
             PlayerSelected("H1".playerId), // Foul H1 since he is next to A1
             DiceRollResults(1.d6, 1.d6), // Armour roll = Caught by ref
             Confirm, // Argue the call
