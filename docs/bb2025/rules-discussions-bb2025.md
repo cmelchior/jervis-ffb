@@ -13,11 +13,11 @@ a certain interpretation.
 ## Rulebook
 
 ### Page 54 - Standing up 
-It is unclear what "regardless of any modifiers" means? Either it means only 
-looking at the MA stat on the character sheet or it means the current MA stat
-including any modifiers.
+It is unclear what "regardless of any modifiers" means? Is Dodgy Snack a 
+modifier? Is a Lasting Injury? What about a stat increase bought with SPP?
 
 Example: Mummy with MA 3 receives a Dodgy Snack, making it MA 2 for the drive.
+Do they need to roll to stand up or not?
 
 ### Page 73 - Throw-ins
 Does not specify what happens if the ball lands in an unoccupied square making
@@ -25,6 +25,9 @@ it undefined. In BB2020, it would bounce, so most likely this section was
 just accidentally deleted. Passing to an empty specifically mentions that it
 will bounce as well.
 
+### Page 143 - Treacherous Trapdoor
+It is unclear what "entering for any reason" means and when it triggers. This
+impacts a lot of things from Jump and High Kick to Chain Push.
 
 ## Spike 19
 None

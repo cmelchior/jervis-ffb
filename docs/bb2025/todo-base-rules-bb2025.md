@@ -73,6 +73,7 @@ book.
     - [x] Bounce into another player must catch if possible
     - [x] Bounce into prone/missing tz/stunned player will bounce again
     - [x] Keep bouncing until coming to rest
+    - [ ] Throw-in (unclear how this works in BB2025)
 - [ ] Standing Players
     - [x] Open
     - [x] Marking with Tackle Zones
@@ -139,8 +140,10 @@ book.
         - [ ] Treacherous Trapdoor
            - [ ] During Quick Snap Kickoff Event
            - [ ] During Blitz Kickoff Event
+           - [ ] During High Kick
            - [ ] During Pushback
            - [ ] During Chain Push
+           - [ ] Jump into square
            - [ ] ... (so many edge cases)
 
     - [ ] Friends with the Ref
@@ -415,8 +418,7 @@ book.
     - [x] Blitz uses 1 move
     - [x] Fail rush just before blitz
 - [ ] Foul Action
-    - [x] Must select player when starting action: Prone or Stunned
-    - [x] Can only foul selected player
+    - [ ] Can select target when standing next to them.
     - [x] Assists
     - [x] Caught by the Ref
     - [x] Sent-off is a turnover
