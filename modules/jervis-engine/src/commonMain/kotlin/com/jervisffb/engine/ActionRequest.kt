@@ -50,10 +50,10 @@ data class ActionRequest(
     }
 
     inline fun <reified T: GameActionDescriptor> get(): T {
-        return actions.first { it is T } as T
+        return actions.single { it is T } as T
     }
 
     inline fun <reified T: GameActionDescriptor> getOrNull(): T? {
-        return actions.firstOrNull { it is T } as T?
+        return actions.singleOrNull { it is T } as T?
     }
 }
