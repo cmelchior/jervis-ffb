@@ -26,6 +26,7 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkDiceRoll
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
+import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.getContext

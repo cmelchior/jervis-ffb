@@ -20,6 +20,7 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.InducementSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
@@ -87,6 +88,7 @@ data class SingleChoiceInputDialog(
                 is BlockTypeSelected -> action.type.name
                 is DicePoolResultsSelected -> action.results.toString()
                 is DirectionSelected -> action.direction.toString()
+                is ForegoActivationSelected -> "Forego Activation: ${action.playerId}"
             }
         }
 

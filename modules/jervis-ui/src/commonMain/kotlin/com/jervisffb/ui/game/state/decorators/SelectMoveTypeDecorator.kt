@@ -8,11 +8,11 @@ import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
-import com.jervisffb.engine.rules.common.procedures.ActivatePlayerContext
 import com.jervisffb.ui.game.UiSnapshotAccumulator
 import com.jervisffb.ui.game.icons.ActionIcon
 import com.jervisffb.ui.game.state.ManualActionProvider

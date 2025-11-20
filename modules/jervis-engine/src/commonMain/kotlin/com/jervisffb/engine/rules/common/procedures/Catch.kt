@@ -75,7 +75,6 @@ object Catch : Procedure() {
         return SetContext(rollContext)
     }
     override fun isValid(state: Game, rules: Rules) {
-        super.isValid(state, rules)
         // Check that this is only called on a standing player with tackle zones
         val ballLocation = state.currentBall().location
         if (state.field[ballLocation].player == null) {

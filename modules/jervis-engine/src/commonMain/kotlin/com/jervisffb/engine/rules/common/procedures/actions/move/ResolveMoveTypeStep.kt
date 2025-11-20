@@ -12,6 +12,7 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
+import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
@@ -20,7 +21,6 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2025.procedures.actions.SecureTheBallContext
 import com.jervisffb.engine.rules.bb2025.procedures.actions.SecureTheBallStep
-import com.jervisffb.engine.rules.common.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.common.procedures.Pickup
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 

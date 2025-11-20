@@ -20,6 +20,8 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.bb2025.procedures.TeamTurn
+import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
 /**
@@ -40,7 +42,12 @@ object GameDrive : Procedure() {
     }
 
     object Turn : ParentNode() {
-        override fun getChildProcedure(state: Game, rules: Rules) = TeamTurn
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure {
+            return when (rules.baseVersion) {
+                GameVersion.BB2020 -> com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
+                GameVersion.BB2025 -> com.jervisffb.engine.rules.bb2025.procedures.TeamTurn
+            }
+        }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val activeGoalScored = (state.turnOver == TurnOver.ACTIVE_TEAM_TOUCHDOWN)
             val inactiveTouchdownScored = (state.turnOver == TurnOver.INACTIVE_TEAM_TOUCHDOWN)

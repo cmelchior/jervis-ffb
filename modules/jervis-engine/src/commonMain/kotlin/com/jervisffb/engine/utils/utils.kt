@@ -34,6 +34,7 @@ import com.jervisffb.engine.actions.EndSetupWhenReady
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.EndTurnWhenReady
 import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.InducementSelected
@@ -53,6 +54,7 @@ import com.jervisffb.engine.actions.SelectDicePoolResult
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.actions.SelectDogout
 import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectForgoActivation
 import com.jervisffb.engine.actions.SelectInducement
 import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectNoReroll
@@ -111,6 +113,7 @@ fun List<GameActionDescriptor>.containsActionWithRandomBehavior(): Boolean {
             is SelectRerollOption -> false
             is SelectSkill -> false
             TossCoin -> true
+            is SelectForgoActivation -> false
         }
     }
     if (randomActions.contains(true) && randomActions.contains(false)) {
@@ -162,6 +165,7 @@ fun GameAction.isRandomAction(): Boolean {
         is SkillSelected -> false
         Undo -> false
         Revert -> false
+        is ForegoActivationSelected -> false
     }
 }
 

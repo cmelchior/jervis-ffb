@@ -9,13 +9,13 @@ import com.jervisffb.engine.fsm.MutableProcedureStack
 import com.jervisffb.engine.fsm.MutableProcedureState
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.Procedure
+import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.ContextHolder
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.getContextOrNull
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.LogEntry
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.tables.Weather
 import com.jervisffb.engine.utils.INVALID_GAME_STATE

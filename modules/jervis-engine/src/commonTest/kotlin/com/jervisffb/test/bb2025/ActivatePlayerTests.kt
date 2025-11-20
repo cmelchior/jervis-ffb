@@ -1,17 +1,20 @@
 package com.jervisffb.test.bb2025
 
+import com.jervisffb.engine.actions.EndTurn
+import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.PlayerSelected
+import com.jervisffb.engine.actions.SelectForgoActivation
+import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.ext.playerNo
 import com.jervisffb.engine.model.Availability
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.activatePlayer
-import com.jervisffb.test.defaultKickOffHomeTeam
-import com.jervisffb.test.defaultPregame
-import com.jervisffb.test.defaultSetup
 import com.jervisffb.test.ext.rollForward
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 /**
  * Class responsible for testing the high-level proprieties of activating
@@ -30,17 +33,14 @@ import kotlin.test.assertEquals
  */
 class ActivatePlayerTests: JervisGameBB2025Test() {
 
-    private fun setupGame() {
-        controller.rollForward(
-            *defaultPregame(),
-            *defaultSetup(),
-            *defaultKickOffHomeTeam()
-        )
+    @BeforeTest
+    override fun setUp() {
+        super.setUp()
+        startDefaultGame()
     }
 
     @Test
     fun activatePlayerBeforeSelectingAction() {
-        setupGame()
         val player = awayTeam[1.playerNo]
         assertEquals(Availability.AVAILABLE, player.available)
         controller.rollForward(PlayerSelected(player.id))
@@ -50,11 +50,31 @@ class ActivatePlayerTests: JervisGameBB2025Test() {
 
     @Test
     fun playerIsActiveDuringAction() {
-        setupGame()
         val player = awayTeam[1.playerNo]
         controller.rollForward(
             *activatePlayer("A1", PlayerStandardActionType.MOVE)
         )
         assertEquals(Availability.IS_ACTIVE, player.available)
+    }
+
+    @Test
+    fun canForegoActivation() {
+        val action = controller.getAvailableActions().getOrNull<SelectForgoActivation>()
+        assertNotNull(action)
+        assertEquals(11, action.players.size)
+        controller.rollForward(
+            ForegoActivationSelected("A1".playerId)
+        )
+        assertEquals(Availability.HAS_ACTIVATED, awayTeam["A1".playerId].available)
+    }
+
+    @Test
+    fun canEndTurnEvenIfAllPlayersAreNotActivated() {
+        // All players will automatically forego their activation, but we cannot test
+        // this better unless we factor in Stalling.
+        controller.rollForward(
+            EndTurn
+        )
+        assertEquals(homeTeam, state.activeTeam)
     }
 }

@@ -1,6 +1,7 @@
 package com.jervisffb.engine.actions
 
 import com.jervisffb.engine.GameEngineController
+import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.fsm.ActionNode
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.Player
@@ -341,6 +342,20 @@ data class DeselectPlayer(
     override val size: Int = players.size
     override fun createRandom(random: Random): GameAction = PlayerDeselected(players.random(random))
     override fun createAll(): List<GameAction> = players.map { PlayerDeselected(it) }
+}
+
+data class SelectForgoActivation(
+    val players: List<PlayerId>
+) : GameActionDescriptor {
+    override val size: Int = players.size
+    override fun createRandom(random: Random): GameAction = ForegoActivationSelected(players.random(random))
+    override fun createAll(): List<GameAction> = players.map { ForegoActivationSelected(it) }
+
+    companion object {
+        fun fromPlayers(players: List<Player>): SelectForgoActivation {
+            return SelectForgoActivation(players.map { it.id })
+        }
+    }
 }
 
 data class SelectPlayerAction(

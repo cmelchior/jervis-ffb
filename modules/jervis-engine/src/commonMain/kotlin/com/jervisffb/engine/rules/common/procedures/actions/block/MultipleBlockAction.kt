@@ -32,11 +32,11 @@ import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
+import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.MultipleBlockContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
-import com.jervisffb.engine.rules.common.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.ThrowIn
 import com.jervisffb.engine.rules.common.procedures.ThrowInContext

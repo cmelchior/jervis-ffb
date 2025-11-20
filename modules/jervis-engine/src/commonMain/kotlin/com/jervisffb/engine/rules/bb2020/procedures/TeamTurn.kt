@@ -1,4 +1,4 @@
-package com.jervisffb.engine.rules.common.procedures
+package com.jervisffb.engine.rules.bb2020.procedures
 
 import com.jervisffb.engine.actions.Continue
 import com.jervisffb.engine.actions.ContinueWhenReady
@@ -33,11 +33,14 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.TurnOver
+import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.inducements.Timing
 import com.jervisffb.engine.reports.ReportEndingTurn
 import com.jervisffb.engine.reports.ReportStartingTurn
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.actions.PlayerSpecialActionType
+import com.jervisffb.engine.rules.common.procedures.getResetPlayerAvailabilityCommands
+import com.jervisffb.engine.rules.common.procedures.getResetTemporaryModifiersCommands
 import com.jervisffb.engine.rules.common.procedures.inducements.ActivateInducementContext
 import com.jervisffb.engine.rules.common.procedures.inducements.ActivateInducements
 import com.jervisffb.engine.rules.common.procedures.tables.prayers.ResolveThrowARock
@@ -47,8 +50,7 @@ import com.jervisffb.engine.utils.INVALID_ACTION
 
 /**
  * Procedure for controlling the active teams turn.
- *
- * See page 42 in the rulebook
+ * See page 42 in the BB2020 rulebook.
  */
 object TeamTurn : Procedure() {
     override val initialNode: Node = SelectPlayerOrEndTurn

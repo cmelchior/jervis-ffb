@@ -229,7 +229,7 @@ book.
         - [x] Hand-off
         - [x] Foul
         - [x] Throw team-mate
-    - [ ] Forgo Activation
+    - [x] Forgo Activation
        - [ ] Still triggers Stalling
 - [ ] Stand Up
     - [x] Must stand up doing any action
@@ -350,8 +350,12 @@ book.
     - [ ] Opponent score after Pushback (with dodge)
     - [ ] Attacker is trapped, but pushes another player into a scoring position. A touchdown is scored.
 - [ ] Detect Stalling
+    - [ ] Check when Foregoing Activation
+    - [ ] Check at and end of action
+      - [ ] Passed the ball to another player (pass / hand-off)
+      - [ ] Still has the ball
     - [ ] Nega-trait players cannot Stall (as they all require rolls)
-    - [ ] Check stalling if player gets ball from catch
+    - [ ] Do not check for stalling after turn-over
 - [ ] Conceding
     - [ ] Free if 3 or less players at beginning of turn
 

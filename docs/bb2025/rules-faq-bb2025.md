@@ -23,6 +23,23 @@ Jervis uses the interpretation that it _does_ include the End Zone as the
 Sidelines (bullet 3) include the same wording, and those clearly run the entire
 length of the pitch.
 
+### Page 50 - End Turn and Forgo Activation
+The wording around turns is a bit unclear about whether you _must_ activate all 
+players (or forgo their activation), but the wording "until they have all 
+activated or a Turnover is caused" indicates this.
+
+For this reason, Jervis does allow you to end a turn before manually activating
+all players. But in that case, Jervis will automatically Forgo Activation for
+all remaining players as this might trigger Stalling.
+
+### Page 52 - Forego Activation
+This section is written in a way that indicates that forgoing activating 
+doesn't clear Distracted. This is based on this wording "...and so will not be
+subjected to any rules that take place at the start or during their activation".
+
+This means that if a player is Distracted and chooses to forgo their activation, 
+the Distracted status will _not_ be cleared.
+
 ### Page 59 - Secure the Ball
 It is unclear if modifiers like "Pouring Rain" apply to securing the ball.
 

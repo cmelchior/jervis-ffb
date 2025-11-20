@@ -318,6 +318,13 @@ data class PlayerDeselected(val playerId: PlayerId) : GameAction {
 }
 
 @Serializable
+data class ForegoActivationSelected(val playerId: PlayerId) : GameAction {
+    fun getPlayer(state: Game): Player {
+        return state.getPlayerById(playerId)
+    }
+}
+
+@Serializable
 data class PlayerActionSelected(val action: ActionType) : GameAction
 
 // TODO Merge with PlayerActionSelected

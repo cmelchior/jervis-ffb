@@ -15,8 +15,8 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.rules.bb2020.procedures.TeamTurn
 import com.jervisffb.engine.rules.common.procedures.Bounce
-import com.jervisffb.engine.rules.common.procedures.TeamTurn
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
 import com.jervisffb.engine.rules.common.tables.PrayerToNuffle
 import com.jervisffb.engine.rules.common.tables.Weather

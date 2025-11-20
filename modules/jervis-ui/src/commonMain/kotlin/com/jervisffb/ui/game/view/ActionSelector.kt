@@ -32,6 +32,7 @@ import com.jervisffb.engine.actions.EndAction
 import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.EndTurn
 import com.jervisffb.engine.actions.FieldSquareSelected
+import com.jervisffb.engine.actions.ForegoActivationSelected
 import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.InducementSelected
 import com.jervisffb.engine.actions.MoveTypeSelected
@@ -98,6 +99,7 @@ fun ActionSelector(
                             is CalculatedAction -> TODO("Should only be used in tests")
                             is DicePoolResultsSelected -> "Dice pool: $action"
                             is DirectionSelected -> "Direction: ${action.direction}"
+                            is ForegoActivationSelected -> "Forego Activation: ${action.playerId}"
                         }
                     Text(text, fontSize = 10.sp)
                 }

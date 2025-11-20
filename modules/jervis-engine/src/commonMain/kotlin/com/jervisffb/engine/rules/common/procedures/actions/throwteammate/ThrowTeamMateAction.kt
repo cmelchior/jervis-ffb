@@ -27,6 +27,7 @@ import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.TurnOver
+import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
@@ -37,7 +38,6 @@ import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.reports.ReportPickingUpPlayerToThrow
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.bb2020.skills.RightStuff
-import com.jervisffb.engine.rules.common.procedures.ActivatePlayerContext
 import com.jervisffb.engine.rules.common.procedures.D6DieRoll
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.calculateMoveTypesAvailable

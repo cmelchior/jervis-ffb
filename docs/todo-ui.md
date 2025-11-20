@@ -7,6 +7,7 @@ things as they come up.
 
 
 ## Todo List
+- [ ] Add a "right-click" menu for players. We should combine "Edit Player" and "Forego Activation" in there.
 - [ ] Add a better error message when reporting invalid setup. Possibly adopt the BB3 approach where you are shown all the invariants during setup.
 - [ ] Add a "dev-mode" protocol for networked game. Should be used for e.g. "Allow Player Edits". Need to figure out 
       how to refresh UI on the other client.
