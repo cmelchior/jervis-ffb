@@ -1,11 +1,16 @@
 package com.jervisffb.test.bb2025.actions
 
 import com.jervisffb.engine.actions.EndActionWhenReady
+import com.jervisffb.engine.actions.MoveType
+import com.jervisffb.engine.actions.MoveTypeSelected
 import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.PlayerActionSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
+import com.jervisffb.engine.actions.SelectFieldLocation
+import com.jervisffb.engine.actions.SelectMoveType
 import com.jervisffb.engine.actions.SelectRerollOption
+import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.ext.d6
 import com.jervisffb.engine.ext.playerId
 import com.jervisffb.engine.model.PlayerState
@@ -22,7 +27,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Test a player rushing as described on page 44 in the BB2020 Rulebook.
+ * Test a player rushing as described on page 58 in the BB2025 Rulebook.
  *
  * Note, any skills that affect rushes are tested in their own test class.
  * This class only tests the basic functionality.
@@ -105,5 +110,16 @@ class RushingTests: JervisGameBB2025Test() {
         assertEquals(0, player.movesLeft)
         assertEquals(FieldCoordinate(14, 5), player.location)
         assertEquals(MoveAction.SelectMoveType, controller.currentNode())
+    }
+
+    @Test
+    fun rushNotAvailableAtTheBeginningOfMove() {
+        controller.rollForward(
+            PlayerSelected("A1".playerId),
+            PlayerActionSelected(PlayerStandardActionType.MOVE),
+            MoveTypeSelected(MoveType.STANDARD),
+        )
+        val targets = controller.getAvailableActions().get<SelectFieldLocation>()
+        assertTrue(targets.squares.none { it.type == TargetSquare.Type.RUSH })
     }
 }

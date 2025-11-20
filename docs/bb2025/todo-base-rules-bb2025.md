@@ -246,7 +246,7 @@ book.
         - [x] Foul
         - [x] Throw Teammate
         - [ ] Special actions
-- [ ] Rush
+- [x] Rush
     - [x] Rush before Dodge.
     - [x] A player can normally rush twice pr. action
     - [x] Rush is 2+

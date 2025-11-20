@@ -40,6 +40,22 @@ subjected to any rules that take place at the start or during their activation".
 This means that if a player is Distracted and chooses to forgo their activation, 
 the Distracted status will _not_ be cleared.
 
+### Page 58 - Rushing
+The wording in the rulebook does not strictly specify that you can only Rush 
+after using all normal Movement, which means that you can argue that a player 
+can roll for Rush at the beginning of the turn, which could be an advantage in 
+terms of positioning if it fails.
+
+The opposite argument is that the rulebook uses the wording "..attempt to
+push themselves and move a little bit further than they normally could..."; this
+phrasing indicates that the roll happens after using normal movement.
+
+The one example in the rulebook also demonstrates it happening after using the 
+normal movement.
+
+Since the BB2020 rulebook was also clear about this happening after using normal 
+movement, Jervis will adopt the same interpretation for BB2025.
+
 ### Page 59 - Secure the Ball
 It is unclear if modifiers like "Pouring Rain" apply to securing the ball.
 

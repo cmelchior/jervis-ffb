@@ -42,13 +42,15 @@ import com.jervisffb.engine.utils.sum
 
 /**
  * Handle a player rushing a single square.
+ *
  * See page 44 in the BB2020 rulebook.
+ * See page 58 in the BB2025 rulebook.
  *
- * This procedure is only responsible for the actual dice roll. The result
- * must be handled by the procedure calling this one. This also includes
- * modifying the number of rushes left.
+ * This procedure is only responsible for the actual dice roll. The parent
+ * procedure must handle the result of the roll, it is not handled here.
+ * This also includes modifying the number of rushes left.
  *
- * Designer's Commentary:
+ * Designer's Commentary (BB2020):
  * If two rushes are necessary for a Jump/Leap and the first roll is a failure,
  * the player will be knocked down in the starting square, rather than
  * in the ending square.
@@ -57,10 +59,10 @@ import com.jervisffb.engine.utils.sum
  * If more than one rush is required, it is up to the caller of this procedure
  * to do so. And also handle each roll result.
  *
- * Skills are optional to use, so technically you would choose to use Sprint
+ * Skills are optional to use, so technically you could choose to use Sprint
  * as part of doing a Rush, but since Rushing is also optional, we opt for the
  * easier implementation and check for Sprint when starting an action and add
- * either 2 or 3 allowed rushes there.
+ * either 2 or 3 allowed rushes at that point.
  *
  * Also, an observation about Rushing. It is worded this way in the rules:
  *
@@ -69,6 +71,20 @@ import com.jervisffb.engine.utils.sum
  * This means that if, by any means, a player is able to do two actions.
  * They would be able to move 2*Rush distance. Sprint has a similar wording
  * that would allow it to be used in both actions as well.
+ *
+ * Developer's Commentary (BB2025):
+ * The wording in the rulebook does not strictly specify that you can
+ * only Rush after using all normal Movement, which means that you can argue
+ * that a player can roll for Rush at the beginning of the turn (which could be
+ * an advantage in terms of positioning).
+ *
+ * The opposite argument is that the rulebook uses the wording "..attempt to
+ * push themselves and move a little bit further than they normally could...";
+ * this phrasing indicates that the roll happens after using normal movement.
+ *
+ * The BB2020 was clear about this happening after using normal movement.
+ *
+ * For these reasons Jervis will use the BB2020 behavior in BB2025 as well.
  *
  * @see [StandardMoveStep.ResolveRush]
  */
