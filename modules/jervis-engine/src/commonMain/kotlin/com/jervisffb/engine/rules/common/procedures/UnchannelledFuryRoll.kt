@@ -10,7 +10,7 @@ import com.jervisffb.engine.actions.NoRerollSelected
 import com.jervisffb.engine.actions.RerollOptionSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectNoReroll
-import com.jervisffb.engine.commands.AddPlayerTemporaryEffect
+import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetOldContext
 import com.jervisffb.engine.commands.buildCompositeCommand
@@ -30,7 +30,7 @@ import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.UseRerollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.TemporaryEffect
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
@@ -62,7 +62,7 @@ object UnchannelledFuryRoll: Procedure() {
         return buildCompositeCommand {
             add(RemoveContext<UnchannelledFuryRollContext>())
             if (!context.isSuccess) {
-                add(AddPlayerTemporaryEffect(context.player, TemporaryEffect.unchannelledFury()))
+                add(AddPlayerStatusEffect(context.player, PlayerStatusEffect.unchannelledFury()))
                 add(
                     SetContext(activateContext.copy(
                         rolledForNegaTrait = true,

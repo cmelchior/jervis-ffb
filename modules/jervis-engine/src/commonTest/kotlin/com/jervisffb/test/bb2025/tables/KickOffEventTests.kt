@@ -16,6 +16,8 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
+import com.jervisffb.engine.model.modifiers.KickoffStatModifier
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.rules.bb2025.procedures.TeamTurn
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.tables.kickoff.SolidDefense
@@ -611,6 +613,115 @@ class KickOffEventTests: JervisGameBB2025Test() {
     @Ignore
     fun charge() {
 
+    }
+
+    @Test
+    fun dodgySnack_reduceStats() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(6.d6, 5.d6), // Roll Dodgy Snack
+                    6.d6, // Home team rolls
+                    3.d6, // Away team rolls
+                    RandomPlayersSelected(listOf("A1".playerId)),
+                    2.d6,
+                )
+            )
+        )
+        val player = state.getPlayerById("A1".playerId)
+        assertTrue(player.location.isOnField(rules))
+        assertTrue(player.statusEffects.any { it.type == PlayerStatusEffectType.DODGY_SNACK })
+        assertTrue(player.armourModifiers.any { it == KickoffStatModifier.DODGY_SNACK_AV })
+        assertTrue(player.moveModifiers.any { it == KickoffStatModifier.DODGY_SNACK_MA })
+    }
+
+    @Test
+    fun dodgySnack_sick() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(6.d6, 5.d6), // Roll Dodgy Snack
+                    6.d6, // Home team rolls
+                    3.d6, // Away team rolls
+                    RandomPlayersSelected(listOf("A1".playerId)),
+                    1.d6,
+                )
+            )
+        )
+        val player = state.getPlayerById("A1".playerId)
+        assertFalse(player.location.isOnField(rules))
+        assertEquals(PlayerState.DODGY_SNACK, player.state)
+        assertFalse(player.armourModifiers.any { it == KickoffStatModifier.DODGY_SNACK_AV })
+        assertFalse(player.moveModifiers.any { it == KickoffStatModifier.DODGY_SNACK_MA })
+    }
+
+    @Test
+    fun dodgySnack_expireAtEndOfDrive() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(6.d6, 5.d6), // Roll Dodgy Snack
+                    6.d6, // Home team rolls
+                    3.d6, // Away team rolls
+                    RandomPlayersSelected(listOf("A1".playerId)),
+                    2.d6,
+                )
+            ),
+            *skipTurns(16)
+        )
+        val player = state.getPlayerById("A1".playerId)
+        assertFalse(player.statusEffects.any { it.type == PlayerStatusEffectType.DODGY_SNACK })
+        assertFalse(player.armourModifiers.any { it == KickoffStatModifier.DODGY_SNACK_AV })
+        assertFalse(player.moveModifiers.any { it == KickoffStatModifier.DODGY_SNACK_MA })    }
+
+    @Test
+    fun dodgySnack_bothTeams() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(6.d6, 5.d6), // Roll Dodgy Snack
+                    3.d6, // Home team rolls
+                    3.d6, // Away team rolls
+                    RandomPlayersSelected(listOf("A3".playerId)),
+                    2.d6,
+                    RandomPlayersSelected(listOf("H1".playerId)),
+                    2.d6,
+                )
+            )
+        )
+        assertTrue(state.getPlayerById("A1".playerId).statusEffects.none { it.type == PlayerStatusEffectType.DODGY_SNACK })
+        assertTrue(state.getPlayerById("H3".playerId).statusEffects.none { it.type == PlayerStatusEffectType.DODGY_SNACK })
+    }
+
+    @Test
+    fun dodgySnack_noAvailablePlayers() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup()
+        )
+        // Fake it by moving all kickoff players back to Dogout after setup
+        awayTeam.forEachIndexed { index, player ->
+            player.state = PlayerState.RESERVE
+            player.location = DogOut
+        }
+        controller.rollForward(
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(6.d6, 5.d6), // Roll Dodgy Snack
+                    6.d6, // Home team rolls
+                    1.d6, // Away team rolls
+                )
+            )
+        )
+        assertEquals(TeamTurn.SelectPlayerOrEndTurn, controller.currentNode())
     }
 
     @Test

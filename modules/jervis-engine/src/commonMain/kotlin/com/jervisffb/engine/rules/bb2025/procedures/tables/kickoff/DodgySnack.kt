@@ -10,7 +10,7 @@ import com.jervisffb.engine.actions.RandomPlayersSelected
 import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectRandomPlayers
 import com.jervisffb.engine.commands.AddPlayerStatModifier
-import com.jervisffb.engine.commands.AddPlayerTemporaryEffect
+import com.jervisffb.engine.commands.AddPlayerStatusEffect
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
@@ -32,7 +32,7 @@ import com.jervisffb.engine.model.context.DodgySnackContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.KickoffStatModifier
-import com.jervisffb.engine.model.modifiers.TemporaryEffect
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.DiceRollType
@@ -230,9 +230,9 @@ object DodgySnack : Procedure() {
                 ReportGameProgress("${player.name} ate a bad snack and spends the drive on the lavatory")
             )
             else -> compositeCommandOf(
-                AddPlayerTemporaryEffect(player, TemporaryEffect.dodgySnack()),
                 AddPlayerStatModifier(player, KickoffStatModifier.DODGY_SNACK_MA),
                 AddPlayerStatModifier(player, KickoffStatModifier.DODGY_SNACK_AV),
+                AddPlayerStatusEffect(player, PlayerStatusEffect.dodgySnack()),
                 ReportGameProgress("${player.name} ate a bad snack and does not feel well (-1 MA/AV)"),
             )
         }

@@ -30,7 +30,7 @@ import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.context.ActivatePlayerContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.hasSkill
-import com.jervisffb.engine.model.modifiers.TemporaryEffectType
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.reports.ReportActionEnded
 import com.jervisffb.engine.reports.ReportActionSelected
 import com.jervisffb.engine.rules.Rules
@@ -363,7 +363,7 @@ object ActivatePlayer : Procedure() {
         }
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<ActivatePlayerContext>()
-            return if (context.player.hasTemporaryEffect(TemporaryEffectType.BLOOD_LUST)) {
+            return if (context.player.hasStatusEffect(PlayerStatusEffectType.BLOOD_LUST)) {
                 GotoNode(ResolveBloodLustAtEndOfActivation)
             } else {
                 return compositeCommandOf(

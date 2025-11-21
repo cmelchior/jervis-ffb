@@ -4,9 +4,9 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.locations.GiantLocation
 import com.jervisffb.engine.model.locations.Location
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffect
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.model.modifiers.StatModifier
-import com.jervisffb.engine.model.modifiers.TemporaryEffect
-import com.jervisffb.engine.model.modifiers.TemporaryEffectType
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.roster.Position
 import com.jervisffb.engine.rules.common.skills.Skill
@@ -119,7 +119,6 @@ class Player(
     var isBeingThrown: Boolean = false
     var facing: PlayerFacing = PlayerFacing.UNKNOWN
     var state: PlayerState = PlayerState.RESERVE
-    var statusEffects = mutableListOf<PlayerStatusEffect>()
     val isActive: Boolean get() = (team.game.activePlayer == this)
     var available: Availability = Availability.AVAILABLE
     var stunnedThisTurn: Boolean? = null
@@ -159,8 +158,8 @@ class Player(
     var armorValue: Int = 0
     // Some effects are hard to put into other buckets, like a player that failed a Blood Lust roll
     // or a player that was added to the pitch through Spot The Sneak. In these cases, we might want
-    // to mark the player somehow. This is done through a TemporaryEffect
-    val temporaryEffects = mutableListOf<TemporaryEffect>()
+    // to mark the player somehow. This is done through a PlayerStatusEffect.
+    val statusEffects: MutableList<PlayerStatusEffect> = mutableListOf()
     val extraSkills = mutableListOf<Skill<*>>()
     var positionSkills = position.skills.mapNotNull {
         // TODO For now, just ignore skills that are not supported
@@ -254,8 +253,21 @@ class Player(
         return armourModifiers + moveModifiers + passingModifiers + agilityModifiers + strengthModifiers
     }
 
-    fun hasTemporaryEffect(effect: TemporaryEffectType): Boolean {
-        return temporaryEffects.any { it.type == effect }
+    fun addStatusEffect(effect: PlayerStatusEffect) {
+        if (!statusEffects.add(effect)) {
+            INVALID_GAME_STATE("Could not add status effect: ${effect.type}")
+        }
+        println(statusEffects)
+    }
+
+    fun removeStatusEffect(effect: PlayerStatusEffect) {
+        if (!statusEffects.remove(effect)) {
+            INVALID_GAME_STATE("Could not remove status effect: ${effect.type}")
+        }
+    }
+
+    fun hasStatusEffect(effect: PlayerStatusEffectType): Boolean {
+        return statusEffects.any { it.type == effect }
     }
 }
 

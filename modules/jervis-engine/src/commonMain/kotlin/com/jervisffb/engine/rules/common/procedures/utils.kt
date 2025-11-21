@@ -7,7 +7,7 @@ import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
 import com.jervisffb.engine.commands.RemovePlayerSkill
 import com.jervisffb.engine.commands.RemovePlayerStatModifier
-import com.jervisffb.engine.commands.RemovePlayerTemporaryEffect
+import com.jervisffb.engine.commands.RemovePlayerStatusEffect
 import com.jervisffb.engine.commands.RemovePrayersToNuffle
 import com.jervisffb.engine.commands.RemoveTeamReroll
 import com.jervisffb.engine.commands.SetPlayerAvailability
@@ -171,9 +171,9 @@ fun getResetTemporaryModifiersCommands(state: Game, rules: Rules, duration: Dura
     // Find all other temporary effects
     val removableTemporaryEffects = teams.flatMap { team ->
         team.flatMap { player ->
-            player.temporaryEffects
+            player.statusEffects
                 .filter { it.duration == duration }
-                .map { RemovePlayerTemporaryEffect(player, it) }
+                .map { RemovePlayerStatusEffect(player, it) }
         }
     }
 
