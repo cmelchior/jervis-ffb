@@ -5,6 +5,7 @@ import com.jervisffb.engine.actions.EndSetup
 import com.jervisffb.engine.actions.FieldSquareSelected
 import com.jervisffb.engine.actions.PlayerSelected
 import com.jervisffb.engine.actions.RandomPlayersSelected
+import com.jervisffb.engine.actions.SelectPlayer
 import com.jervisffb.engine.ext.d16
 import com.jervisffb.engine.ext.d3
 import com.jervisffb.engine.ext.d6
@@ -183,6 +184,40 @@ class KickOffEventTests: JervisGameBB2025Test() {
     }
 
     @Test
+    fun solidDefense_doNotCountPlayersNotBeingMoved() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup(),
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(2.d6, 2.d6), // Roll Solid Defense
+                    1.d3, // D3 + 3 players
+                    PlayerSelected("H6".playerId),
+                    FieldSquareSelected(11, 1), // Same location, do not count
+                    PlayerSelected("H7".playerId),
+                    FieldSquareSelected(9, 6), // Move 1
+                    PlayerSelected("H8".playerId),
+                    FieldSquareSelected(9, 13), // Move 1
+                    PlayerSelected("H9".playerId),
+                    FieldSquareSelected(10, 13), // Move 1
+                    PlayerSelected("H10".playerId),
+                    FieldSquareSelected(8, 7), // Move 1
+                ),
+                bounce = null
+            )
+        )
+        // At this point we moved 5 players, 1 to the same location, 4 to new locations.
+        // The last four should continue to be moved
+        val availablePlayers = controller.getAvailableActions().get<SelectPlayer>().players
+        assertEquals(4, availablePlayers.size)
+        assertFalse(availablePlayers.contains("H6".playerId))
+        assertTrue(availablePlayers.contains("H7".playerId))
+        assertTrue(availablePlayers.contains("H8".playerId))
+        assertTrue(availablePlayers.contains("H9".playerId))
+        assertTrue(availablePlayers.contains("H10".playerId))
+    }
+
+    @Test
     fun highKick() {
         controller.rollForward(
             *defaultPregame(),
@@ -255,22 +290,21 @@ class KickOffEventTests: JervisGameBB2025Test() {
         controller.rollForward(
             *defaultPregame(),
             *defaultSetup(),
+        )
+        // Put all players prone so they are no longer Open
+        awayTeam.forEach { it.state = PlayerState.PRONE }
+        controller.rollForward(
             *defaultKickOffHomeTeam(
-                placeKick = FieldSquareSelected(13, 0),
-                deviate = DiceRollResults(2.d8, 1.d6), // Move ball to [11,7], behind opponent LoS
+                placeKick = FieldSquareSelected(21, 7),
+                deviate = DiceRollResults(2.d8, 1.d6), // Move ball to [21,5]
                 kickoffEvent = arrayOf(
-                    DiceRollResults(1.d6, 4.d6), // Roll High Kick, cannot be used
+                    DiceRollResults(1.d6, 4.d6), // Roll High Kick, cannot be used because no players are available
                 ),
-                bounce = null
+                bounce = 2.d8
             ),
         )
-        assertEquals(BallState.OUT_OF_BOUNDS, state.getBall().state)
-        controller.rollForward(
-            PlayerSelected("A2".playerId) // Touchback
-        )
-        val player = state.getPlayerById("A2".playerId)
-        assertTrue(player.hasBall())
-        assertEquals(BallState.CARRIED, state.getBall().state)
+        assertEquals(BallState.ON_GROUND, state.getBall().state)
+        assertEquals(awayTeam, state.activeTeam)
     }
 
 

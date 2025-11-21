@@ -4,7 +4,7 @@ import com.jervisffb.engine.GameEngineController
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerNo
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.BB2025Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.UndoActionBehavior
 import com.jervisffb.engine.rules.common.procedures.FullGame
@@ -21,7 +21,7 @@ import kotlin.test.BeforeTest
  */
 abstract class JervisGameBB2025Test {
 
-    open val rules: Rules = StandardBB2025Rules().toBuilder().run {
+    open val rules: BB2025Rules = StandardBB2025Rules().toBuilder().run {
         undoActionBehavior = UndoActionBehavior.ALLOWED
         build()
     }

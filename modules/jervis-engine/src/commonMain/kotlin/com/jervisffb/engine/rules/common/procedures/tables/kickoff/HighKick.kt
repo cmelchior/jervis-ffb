@@ -20,20 +20,22 @@ import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
 
 /**
- * Procedure for handling the Kick-Off Event: "HighKick" as described on page 41
- * of the rulebook.
+ * Procedure for handling the Kick-Off Event: "HighKick"
  *
- *  Developer's Commentary:
- *  Following the strict ordering of the rules, the Kick-Off Event is resolved
- *  before "What Goes Up, Must Come Down". This means that the touchback rule cannot
- *  yet be applied when High Kick is resolved.
+ * See page 41 in the BB2020 rulebook.
+ * See page 48 in the BB2025 rulebook.
  *
- *  No-where is it stated that the high kick player cannot enter the opponent's field.
- *  So in theory, it would be allowed to move a player into the opponent's field and
- *  then resolve the ball coming down.
+ * Developer's Commentary:
+ * Following the strict ordering of the rules, the Kick-Off Event is resolved
+ * before "What Goes Up...". This means that the touchback rule cannot yet be
+ * applied when High Kick is resolved.
  *
- *  This would result in a touchback, and the the ball could be given to the player
- *  that moved into the opponent's half.
+ * No-where is it stated that the high kick player cannot enter the opponent's
+ * side. This means it is allowed to move a player into the opponent's field and
+ * then resolve the ball coming down.
+ *
+ * This would result in a touchback, and the ball could be given to the
+ * player that moved into the opponent's half.
  */
 object HighKick : Procedure() {
     override val initialNode: Node = SelectPlayer
@@ -45,15 +47,21 @@ object HighKick : Procedure() {
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val openPlayers = state.receivingTeam
                 .filter { rules.isOpen(it) }
-                .map { SelectPlayer(it) }
+                .let {
+                    if (it.isEmpty()) {
+                        null
+                    } else {
+                        com.jervisffb.engine.actions.SelectPlayer.fromPlayers(it)
+                    }
+                }
 
             val ball = state.currentBall()
             return if (
                 ball.location.isOnField(rules) &&
                 state.field[ball.location].isUnoccupied() &&
-                openPlayers.isNotEmpty()
+                openPlayers != null
             ) {
-                openPlayers
+                listOf(openPlayers)
             } else {
                 listOf(ContinueWhenReady)
             }
@@ -66,7 +74,6 @@ object HighKick : Procedure() {
                         ReportGameProgress("No player could be selected for High Kick"),
                         ExitProcedure(),
                     )
-
                 }
                 else -> {
                     checkTypeAndValue<PlayerSelected>(state, action) {

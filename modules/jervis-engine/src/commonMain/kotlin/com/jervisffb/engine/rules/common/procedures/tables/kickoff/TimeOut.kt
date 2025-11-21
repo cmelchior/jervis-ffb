@@ -14,8 +14,10 @@ import com.jervisffb.engine.reports.ReportTimeout
 import com.jervisffb.engine.rules.Rules
 
 /**
- * Procedure for handling the Kick-Off Event: "Time-Out" as described on page 41
- * of the rulebook.
+ * Procedure for handling the Kick-Off Event: "Time-Out".
+ *
+ * See page 41 in the BB2020 rulebook.
+ * See page 48 in the BB2025 rulebook.
  */
 object TimeOut : Procedure() {
     override val initialNode: Node = MoveTurnMarker

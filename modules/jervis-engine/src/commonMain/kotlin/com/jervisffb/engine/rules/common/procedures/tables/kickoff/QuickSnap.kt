@@ -25,13 +25,11 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.fsm.checkTypeAndValue
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.context.KickOffEventContext
 import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
-import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.QuickSnapContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportQuickSnapResult
 import com.jervisffb.engine.rules.DiceRollType
@@ -40,20 +38,14 @@ import com.jervisffb.engine.rules.common.procedures.actions.move.MovePlayerIntoS
 import com.jervisffb.engine.rules.common.tables.KickOffEvent
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 
-data class QuickSnapContext(
-    val roll: D3Result,
-    // Track all players moved, should be size <= roll + 3
-    val playersMoved: Set<Player> = emptySet(),
-    // Current player being moved
-    val currentPlayer: Player? = null,
-    val target: FieldCoordinate? = null,
-): ProcedureContext
-
 /**
- * Procedure for handling the Kick-Off Event: "Quick Snap" as described on page 41
- * of the rulebook.
+ * Procedure for handling the Kick-Off Event: "Quick Snap".
  *
- * Also supports the BB7 variant of the event, which is described on page 94 in Death Zone.
+ * See page 41 in the BB2020 rulebook.
+ * See page 48 in the BB2025 rulebook.
+ *
+ * Also supports the BB7 variant of the event, which is described on page 94 in
+ * Death Zone (2020).
  */
 object QuickSnap : Procedure() {
     override val initialNode: Node = RollDie
@@ -146,7 +138,7 @@ object QuickSnap : Procedure() {
     }
 
     /**
-     * Move the player into target square.
+     * Move the player into the target square.
      *
      * Developer's Commentary:
      * This takes into account all rules that might affect this, like Treacherous Trapdoors.

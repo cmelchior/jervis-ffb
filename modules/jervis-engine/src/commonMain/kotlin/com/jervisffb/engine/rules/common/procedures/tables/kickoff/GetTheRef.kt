@@ -13,8 +13,10 @@ import com.jervisffb.engine.reports.ReportGetTheRef
 import com.jervisffb.engine.rules.Rules
 
 /**
- * Procedure for handling the Kick-Off Event: "Get the Ref" as described on page 41
- * of the rulebook.
+ * Procedure for handling the Kick-Off Event: "Get the Ref".
+ *
+ * See page 41 in the BB2020 rulebook.
+ * See page 48 in the BB2025 rulebook.
  */
 object GetTheRef : Procedure() {
     override val initialNode: Node = GiveBribes

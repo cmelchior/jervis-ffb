@@ -28,7 +28,7 @@ import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.DodgySnackContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.modifiers.KickoffStatModifier
@@ -38,18 +38,9 @@ import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
 
-data class DodgySnackContext(
-    val kickingTeamRoll: D6Result,
-    val receivingTeamRoll: D6Result? = null,
-    val kickingTeamPlayerSelected: Player? = null,
-    val receivingTeamPlayerSelected: Player? = null,
-    val kickingTeamSnackRoll: D6Result? = null,
-    val receivingTeamSnackRoll: D6Result? = null,
-): ProcedureContext
-
 /**
  * Procedure for handling the Kick-Off Event: "Dodgy Snack" as described on page
- * XX of the rulebook.
+ * 48 of the BB2025 rulebook.
  *
  * Developer's Commentary:
  * It isn't defined in the rules, which team resolves their roll first, so we

@@ -25,7 +25,7 @@ import kotlin.test.assertTrue
 
 /**
  * Class responsible for testing the concepts of "Open" and "Marked" players
- * as defined on page 26 in the rulebook.
+ * as defined on page 26 in the BB2020 rulebook.
  */
 class MarkedTests: JervisGameBB2020Test() {
 

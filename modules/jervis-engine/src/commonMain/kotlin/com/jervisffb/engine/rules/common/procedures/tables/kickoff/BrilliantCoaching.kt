@@ -19,9 +19,8 @@ import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.BrilliantCoachingContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.modifiers.BrilliantCoachingModifiers
 import com.jervisffb.engine.reports.ReportBrilliantCoachingResult
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.rules.DiceRollType
@@ -30,16 +29,11 @@ import com.jervisffb.engine.rules.common.skills.BrilliantCoachingReroll
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
 
-data class BrilliantCoachingContext(
-    val kickingTeamRoll: D6Result,
-    val kickingTeamModifiers: List<BrilliantCoachingModifiers> = emptyList(),
-    val receivingTeamRoll: D6Result? = null,
-    val receivingTeamModifiers: List<BrilliantCoachingModifiers> = emptyList(),
-): ProcedureContext
-
 /**
- * Procedure for handling the Kick-Off Event: "Brilliant Coaching" as described on page 41
- * of the rulebook.
+ * Procedure for handling the Kick-Off Event: "Brilliant Coaching".
+ *
+ * See page 41 in the BB2020 rulebook.
+ * See page 48 in the BB2025 rulebook.
  */
 object BrilliantCoaching : Procedure() {
     override val initialNode: Node = KickingTeamRollDie

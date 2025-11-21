@@ -1,6 +1,7 @@
 package com.jervisffb.engine.rules
 
 import com.jervisffb.engine.InducementSettings
+import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.inducements.settings.InducementType
 import com.jervisffb.engine.rules.bb2020.DEFAULT_INDUCEMENTS_BB2020
 import com.jervisffb.engine.rules.bb2020.tables.BB7KickOffEventTable
@@ -33,6 +34,13 @@ abstract class BB2020Rules(
             foulActionBehavior = FoulActionBehavior.BB2020,
             inducements = InducementSettings(DEFAULT_INDUCEMENTS_BB2020),
         )
+    }
+
+    // In BB2020, Open status does not consider if the player is standing or not.
+    // This is probably and oversight that has been fixed in BB20205, but for
+    // now we implement those semantics faithfully.
+    override fun isOpen(player: Player): Boolean {
+        return !isMarked(player)
     }
 }
 

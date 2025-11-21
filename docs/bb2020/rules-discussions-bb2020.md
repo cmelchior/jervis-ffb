@@ -10,6 +10,11 @@ rules should be interpreted in BB2020. All of these are not implemented yet.
 This is just a list of things to keep an eye out for during development. See 
 [rules-faq.md](rules-faq.md) for rules that are already implemented.
 
+## Open Players
+Is a prone player considered Open? The rules do not mention it either way.
+But High Kick says you can move an Open player, which sounds a bit odd if they
+are prone. Also, BB2025 specify that they must be Standing as well.
+
 ## Chainsaw vs. Mighty Blow
 https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=33049
 You cannot use MB _against_ the player that has Chainsaw

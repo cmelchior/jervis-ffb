@@ -49,10 +49,24 @@ data class SolidDefenseContext(
 ): ProcedureContext
 
 /**
- * Procedure for handling the Kick-Off Event: "Solid Defense" as described on page 41
- * of the rulebook.
+ * Procedure for handling the Kick-Off Event: "Solid Defense".
  *
- * Also supports the BB7 variant of the event, which is described on page 94 in Death Zone.
+ * See page 41 in the BB2020 rulebook.
+ * See page 48 in the BB2025 rulebook.
+ *
+ * It also supports the BB7 variant of the event, which is described on page 94
+ * in Death Zone (2020).
+ *
+ * Developer's Commentary:
+ * The rules say to remove the selected players from the pitch and place them
+ * again. This feels needlessly annoying, so instead we simply track the number
+ * of players selected and allow moving them around on the pitch as much as the
+ * coach would like.
+ *
+ * Also, as a convenience, if you select a player and put it in the same
+ * location, it doesn't count against the limit. This only happens when they
+ * move to a new location (after which they can move as many times as the coach
+ * would like).
  */
 object SolidDefense : Procedure() {
     override val initialNode: Node = RollDie
@@ -87,7 +101,7 @@ object SolidDefense : Procedure() {
             val context = state.getContext<SolidDefenseContext>()
             return if (context.playersMoved.size >= context.roll.value + extraPlayerCount) {
                 // Max number of players has already been moved. So only they can move now.
-                context.playersMoved.map { SelectPlayer(it) } + EndSetupWhenReady
+                listOf(SelectPlayer.fromPlayers(context.playersMoved), EndSetupWhenReady)
             } else {
                 // All already selected players can move regardless of them being open or not.
                 // All other players must be open to be able to move
@@ -95,7 +109,7 @@ object SolidDefense : Procedure() {
                     .filter { rules.isStanding(it) }
                     .filter { rules.isOpen(it) }
                     .toSet() + context.playersMoved.toSet()
-                eligiblePlayers.map { SelectPlayer(it) } + EndSetupWhenReady
+                listOf(SelectPlayer.fromPlayers(eligiblePlayers), EndSetupWhenReady)
             }
         }
 
@@ -141,16 +155,25 @@ object SolidDefense : Procedure() {
                 }
                 val context = state.getContext<SolidDefenseContext>()
                 val movingPlayer = context.currentPlayer!!
-                compositeCommandOf(
-                    SetPlayerLocation(movingPlayer, squareSelected.coordinate),
-                    SetContext(
-                        context.copy(
-                            currentPlayer = null,
-                            playersMoved = context.playersMoved.plus(movingPlayer)
-                        )
-                    ),
-                    GotoNode(SelectPlayerOrEndSetup),
-                )
+                val isPlayerMoved = (movingPlayer.location != squareSelected.coordinate)
+                // Do not count the player if they are just placed in their original position
+                if (isPlayerMoved) {
+                    compositeCommandOf(
+                        SetPlayerLocation(movingPlayer, squareSelected.coordinate),
+                        SetContext(
+                            context.copy(
+                                currentPlayer = null,
+                                playersMoved = context.playersMoved.plus(movingPlayer)
+                            )
+                        ),
+                        GotoNode(SelectPlayerOrEndSetup),
+                    )
+                } else {
+                    compositeCommandOf(
+                        SetContext(context.copy(currentPlayer = null)),
+                        GotoNode(SelectPlayerOrEndSetup),
+                    )
+                }
             }
         }
     }

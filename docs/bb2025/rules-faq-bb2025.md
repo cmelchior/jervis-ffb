@@ -23,6 +23,24 @@ Jervis uses the interpretation that it _does_ include the End Zone as the
 Sidelines (bullet 3) include the same wording, and those clearly run the entire
 length of the pitch.
 
+### Page 48 - High Kick (No available players)
+It is unspecified what happens if you roll High Kick and no Open players are 
+available. In this case, Jervis just ignores the High Kick and nothing happens. 
+
+### Page 48 - High Kick (Move into opponent's half)
+The following scenario is not covered by the rules and thus seems legal:
+
+Following the strict ordering of the rules, the Kick-Off Event is resolved
+before "What Goes Up...". This means that the touchback rule cannot yet be 
+applied when High Kick is resolved.
+
+No-where is it stated that the high kick player cannot enter the opponent's
+side. This means it is allowed to move a player into the opponent's field and
+then resolve the ball coming down.
+
+This would result in a touchback, and the ball could then be given to the
+player that moved into the opponent's half.
+
 ### Page 50 - End Turn and Forgo Activation
 The wording around turns is a bit unclear about whether you _must_ activate all 
 players (or forgo their activation), but the wording "until they have all 

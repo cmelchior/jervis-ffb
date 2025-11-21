@@ -277,8 +277,8 @@ abstract class Rules(
      * Returns `true` if the player is considered `Open` as described on
      * page 38 in the BB2025 rulebook.
      */
-    fun isOpen(player: Player): Boolean {
-        return !isMarked(player)
+    open fun isOpen(player: Player): Boolean {
+        return isStanding(player) && !isMarked(player)
     }
 
     /**

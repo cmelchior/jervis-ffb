@@ -332,6 +332,7 @@ data class SelectPlayer(
         fun fromPlayers(players: List<Player>): SelectPlayer {
             return SelectPlayer(players.map { it.id })
         }
+        fun fromPlayers(players: Set<Player>): SelectPlayer = fromPlayers(players.toList())
     }
 }
 

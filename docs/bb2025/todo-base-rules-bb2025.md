@@ -184,23 +184,21 @@ book.
     - [x] Get the Ref
     - [x] Time-out
     - [x] Solid Defense
+      - [x] Allow picking up and placing player at the same place without counting it.
     - [x] High Kick
         - [x] Allow moving player to kicking side
-    - [x] Cheering Fans
+        - [x] No available players
+    - [ ] Cheering Fans
     - [x] Brilliant Coaching
     - [x] Changing Weather
     - [x] Quick Snap
-    - [ ] Blitz
-        - [ ] Some skills are not available
-        - [ ] Blitz ends when player Knocked Down or Falls Over, but not a TurnOver
     - [ ] Charge
         - [ ] All skills are available
         - [ ] Rerolls are available
-    - [x] Officious Ref
     - [ ] Dodgy Snack
         - [ ] On 2+, player stays on field with -1 AV, MA
-        - [ ] On 1, player is put in Reserves until end of drive
-    - [x] Pitch Invasion
+        - [ ] On 1, player is put in Reserves until end of drive.
+    - [ ] Pitch Invasion
 - [x] What goes up...
     - [x] Land on Field
     - [x] Lands on Player

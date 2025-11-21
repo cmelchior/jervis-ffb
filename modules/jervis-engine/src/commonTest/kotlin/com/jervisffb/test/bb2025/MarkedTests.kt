@@ -25,7 +25,7 @@ import kotlin.test.assertTrue
 
 /**
  * Class responsible for testing the concepts of "Open" and "Marked" players
- * as defined on page 26 in the rulebook.
+ * as defined on page 38 in the BB2025 rulebook.
  */
 class MarkedTests: JervisGameBB2025Test() {
 
@@ -44,6 +44,7 @@ class MarkedTests: JervisGameBB2025Test() {
         assertTrue(rules.isOpen(player))
     }
 
+    // In BB2025, you need to be both Standing and not Marked to be considered Open
     @Test
     fun isOpen_prone() {
         val player = awayTeam[10.playerNo]
@@ -51,7 +52,7 @@ class MarkedTests: JervisGameBB2025Test() {
         assertTrue(player.coordinates.getSurroundingCoordinates(rules, 1, false).none {
             state.field[it].isOccupied()
         })
-        assertTrue(rules.isOpen(player))
+        assertFalse(rules.isOpen(player))
         assertFalse(rules.isMarked(player))
     }
 

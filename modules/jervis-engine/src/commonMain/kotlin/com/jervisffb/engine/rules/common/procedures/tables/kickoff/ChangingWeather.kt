@@ -22,8 +22,10 @@ import com.jervisffb.engine.rules.common.procedures.WeatherRoll
 import com.jervisffb.engine.rules.common.tables.Weather
 
 /**
- * Procedure for handling the Kick-Off Event: "Changing Weather" as described on page 41
- * of the rulebook.
+ * Procedure for handling the Kick-Off Event: "Changing Weather".
+ *
+e * See page 41 in the BB2020 rulebook.
+ * See page 48 in the BB2025 rulebook.
  */
 object ChangingWeather : Procedure() {
     override val initialNode: Node = ChangeWeather
