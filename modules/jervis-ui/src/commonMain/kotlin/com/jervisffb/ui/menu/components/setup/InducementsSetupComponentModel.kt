@@ -7,7 +7,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.InducementSettings
 import com.jervisffb.engine.model.inducements.settings.InducementBuilder
 import com.jervisffb.engine.model.inducements.settings.InducementType
-import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.RulesParameterBuilder
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +28,7 @@ data class InducementData(
  * mercenaries, star players, etc. is fairly complex, and changing these will probably rarely happen. So not
  * really worth it right now.
  */
-class InducementsSetupComponentModel(initialRulesBuilder: Rules.Builder, private val menuViewModel: MenuViewModel) : ScreenModel {
+class InducementsSetupComponentModel(initialRulesBuilder: RulesParameterBuilder, private val menuViewModel: MenuViewModel) : ScreenModel {
 
     private val HEADER_RULEBOOK = "Rulebook"
     private val HEADER_DEATH_ZONE = "Death Zone"
@@ -83,7 +83,7 @@ class InducementsSetupComponentModel(initialRulesBuilder: Rules.Builder, private
         }
     }
 
-    fun updateRulesBuilder(rulesBuilder: Rules.Builder) {
+    fun updateRulesBuilder(rulesBuilder: RulesParameterBuilder) {
         this.rulesBuilder = rulesBuilder
         builders = rulesBuilder.inducements
         when (rulesBuilder.gameVersion) {

@@ -2,6 +2,7 @@ package com.jervisffb.test.bb2020
 
 import com.jervisffb.engine.actions.D6Result
 import com.jervisffb.engine.rules.BB2020Rules
+import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.common.procedures.DetermineKickingTeam
 import com.jervisffb.test.JervisGameBB2020Test
 import com.jervisffb.test.defaultDetermineKickingTeam
@@ -20,9 +21,10 @@ import kotlin.test.assertTrue
  */
 class ExtraTimeTests: JervisGameBB2020Test() {
 
-    override val rules: BB2020Rules = object: BB2020Rules() {
-        override val hasExtraTime: Boolean = true
-        override val turnsInExtraTime: Int = 8
+    override val rules: BB2020Rules = StandardBB2020Rules().toBuilder().run {
+        hasExtraTime = true
+        turnsInExtraTime = 8
+        build()
     }
 
     @BeforeTest

@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.FumbblBB2020Rules
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.RulesParameterBuilder
 import com.jervisffb.engine.rules.StandardBB2020Rules
 import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.DiceRollOwner
@@ -148,7 +149,7 @@ class GameConfigurationContainerComponentModel(val isHotseat: Boolean, private v
     // the rulesBuilder to all submodels.
     val availableRulesBase = MutableStateFlow(standardRulesBaseList)
     val selectedRulesBase = MutableStateFlow(availableRulesBase.value.first())
-    var rulesBuilder: Rules.Builder = selectedRulesBase.value.value.toBuilder()
+    var rulesBuilder: RulesParameterBuilder = selectedRulesBase.value.value.toBuilder()
 
     // Component models responsible for configuring a new game
     val rulesModel = RulesSetupComponentModel(this@GameConfigurationContainerComponentModel.rulesBuilder, this, menuViewModel)

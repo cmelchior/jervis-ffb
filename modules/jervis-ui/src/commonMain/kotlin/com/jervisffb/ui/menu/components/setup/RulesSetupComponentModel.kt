@@ -5,6 +5,7 @@ import com.jervisffb.engine.model.BallType
 import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.model.StadiumType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.RulesParameterBuilder
 import com.jervisffb.engine.rules.bb2020.tables.BB2020ArgueTheCallTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020CasualtyTable
 import com.jervisffb.engine.rules.bb2020.tables.BB2020LastingInjuryTable
@@ -53,7 +54,7 @@ import kotlinx.coroutines.flow.StateFlow
  * This component is responsible for all the UI control needed to configure the rules of a game.
  */
 class RulesSetupComponentModel(
-    initialRulesBuilder: Rules.Builder,
+    initialRulesBuilder: RulesParameterBuilder,
     private val parent: GameConfigurationContainerComponentModel,
     private val menuViewModel: MenuViewModel
 ) : ScreenModel {
@@ -331,7 +332,7 @@ class RulesSetupComponentModel(
     }
 
     // Rules Preset has been changed, reset all current configuration to match the new rules package
-    fun updateRulesBuilder(ruleBuilder: Rules.Builder) {
+    fun updateRulesBuilder(ruleBuilder: RulesParameterBuilder) {
         rulesBuilder = ruleBuilder
         updateWeatherTable(weatherTables.findEntry(rulesBuilder.weatherTable))
         updatePrayersToNuffleTable(prayersToNuffleTables.findEntry(rulesBuilder.prayersToNuffleTable))

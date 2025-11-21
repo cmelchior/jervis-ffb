@@ -1,7 +1,5 @@
 package com.jervisffb.engine.rules
 
-import com.jervisffb.engine.InducementSettings
-import com.jervisffb.engine.TimerSettings
 import com.jervisffb.engine.actions.D3Result
 import com.jervisffb.engine.actions.D8Result
 import com.jervisffb.engine.model.Ball
@@ -9,8 +7,6 @@ import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Direction
 import com.jervisffb.engine.model.FieldSquare
 import com.jervisffb.engine.model.Game
-import com.jervisffb.engine.model.IntRangeSerializer
-import com.jervisffb.engine.model.PitchType
 import com.jervisffb.engine.model.Player
 import com.jervisffb.engine.model.PlayerKeyword
 import com.jervisffb.engine.model.PlayerState
@@ -26,57 +22,22 @@ import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
 import com.jervisffb.engine.model.modifiers.StatModifier
-import com.jervisffb.engine.rules.bb2020.BB2020SkillSettings
-import com.jervisffb.engine.rules.bb2020.BB2020TeamActions
-import com.jervisffb.engine.rules.bb2020.tables.BB2020ArgueTheCallTable
-import com.jervisffb.engine.rules.bb2020.tables.BB2020CasualtyTable
-import com.jervisffb.engine.rules.bb2020.tables.BB2020LastingInjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.BB2020RangeRuler
-import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardInjuryTable
-import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardKickOffEventTable
-import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardPrayersToNuffleTable
-import com.jervisffb.engine.rules.bb2020.tables.BB2020StandardWeatherTable
-import com.jervisffb.engine.rules.bb2020.tables.BB2020StuntyInjuryTable
-import com.jervisffb.engine.rules.bb2025.DEFAULT_INDUCEMENTS_BB2025
-import com.jervisffb.engine.rules.builder.BallSelectorRule
-import com.jervisffb.engine.rules.builder.DiceRollOwner
-import com.jervisffb.engine.rules.builder.FoulActionBehavior
-import com.jervisffb.engine.rules.builder.GameType
-import com.jervisffb.engine.rules.builder.GameVersion
-import com.jervisffb.engine.rules.builder.KickingPlayerBehavior
-import com.jervisffb.engine.rules.builder.NoStadium
-import com.jervisffb.engine.rules.builder.StadiumRule
-import com.jervisffb.engine.rules.builder.StandardBall
-import com.jervisffb.engine.rules.builder.UndoActionBehavior
-import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
 import com.jervisffb.engine.rules.common.MissingPlayersOnLoS
 import com.jervisffb.engine.rules.common.SetupRule
 import com.jervisffb.engine.rules.common.TooManyPlayersInWideZone
 import com.jervisffb.engine.rules.common.WrongAmountOfPlayersOnField
 import com.jervisffb.engine.rules.common.actions.PlayerAction
-import com.jervisffb.engine.rules.common.actions.TeamActions
-import com.jervisffb.engine.rules.common.pathfinder.BB2020PathFinder
-import com.jervisffb.engine.rules.common.pathfinder.PathFinder
 import com.jervisffb.engine.rules.common.procedures.DieRoll
 import com.jervisffb.engine.rules.common.skills.Duration
 import com.jervisffb.engine.rules.common.skills.RerollSource
 import com.jervisffb.engine.rules.common.skills.Skill
-import com.jervisffb.engine.rules.common.skills.SkillSettings
 import com.jervisffb.engine.rules.common.skills.SkillType
 import com.jervisffb.engine.rules.common.skills.SpecialActionProvider
-import com.jervisffb.engine.rules.common.tables.ArgueTheCallTable
-import com.jervisffb.engine.rules.common.tables.CasualtyTable
-import com.jervisffb.engine.rules.common.tables.InjuryTable
-import com.jervisffb.engine.rules.common.tables.KickOffTable
-import com.jervisffb.engine.rules.common.tables.LastingInjuryTable
-import com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable
-import com.jervisffb.engine.rules.common.tables.RandomDirectionTemplate
-import com.jervisffb.engine.rules.common.tables.RangeRuler
 import com.jervisffb.engine.rules.common.tables.ThrowInPosition
 import com.jervisffb.engine.rules.common.tables.ThrowInTemplate
-import com.jervisffb.engine.rules.common.tables.WeatherTable
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
+import io.ktor.http.parameters
 import kotlinx.serialization.Serializable
 
 /**
@@ -98,121 +59,9 @@ import kotlinx.serialization.Serializable
  * It is also a bit unclear how well this class transcends ruleset, i.e., between BB2016 and BB2020
  */
 @Serializable
-open class Rules(
-    // Name of the rule set
-    open val name: String,
-    // Which base version of Blood Bowl is this ruleset based on
-    open val baseVersion: GameVersion,
-    // What type of game is this ruleset intended for.
-    open val gameType: GameType,
-
-    // Which timer settings are in place for this game
-    open val timers: TimerSettings = TimerSettings.Companion.BB_CLOCK,
-    // Which inducements are available in this game.
-    open val inducements: InducementSettings = InducementSettings(DEFAULT_INDUCEMENTS_BB2025),
-
-    // Characteristic limits
-    // See page 28 in the BB2020 rulebook and pxage 37 in the BB2025 rulebook
-    @Serializable(IntRangeSerializer::class)
-    open val moveRange: IntRange = 1..9,
-    @Serializable(IntRangeSerializer::class)
-    open val strengthRange: IntRange = 1..8,
-    @Serializable(IntRangeSerializer::class)
-    open val agilityRange: IntRange = 1 .. 6,
-    @Serializable(IntRangeSerializer::class)
-    open val passingRange: IntRange = 1.. 6,
-    @Serializable(IntRangeSerializer::class)
-    open val armorValueRange: IntRange = 3 .. 11,
-
-    // Game length settings
-    open val halfsPrGame: Int = 2,
-    open val turnsPrHalf: Int = 8,
-    open val hasExtraTime: Boolean = false,
-    open val turnsInExtraTime: Int = 8,
-    open val hasShootoutInExtraTime: Boolean = true,
-
-    // Field (Defined as being horizontal with a home team on the right, away team on the left)
-
-    // Total width of the field
-    open val fieldWidth: Int = 26,
-    // Total height of the field
-    open val fieldHeight: Int = 15,
-    // Height of the Wide Zone at the top and bottom of the field
-    open val wideZone: Int = 4,
-    // Width of the End Zone at each end of the field where the ball is scored.
-    open val endZone: Int = 1,
-    // X-coordinates for the line of scrimmage for the home team. It is zero-indexed.
-    open val lineOfScrimmageHome: Int = 12,
-    // X-coordinate for the line of scrimmage for the away team. It is zero-indexed.
-    open val lineOfScrimmageAway: Int = 13,
-    // During the setup, how many players must be placed on the Line of Scrimmage inside
-    // the Center Field.
-    open val playersRequiredOnLineOfScrimmage: Int = 3,
-    // How many players are allowed in each wide zone during setup
-    open val maxPlayersInWideZone: Int = 2,
-    // Default max number of players on the field. Skills and effects might change this
-    open val maxPlayersOnField: Int  = 11,
-
-    // Stadium / Pitch / Ball rules / Match Events
-    open val stadium: StadiumRule = NoStadium,
-    // How is the ball being used for the game selected
-    open val ballSelectorRule: BallSelectorRule = StandardBall,
-    // Which pitch is used for this game
-    open val pitchType: PitchType = PitchType.STANDARD,
-    // Match Events (See page XX)
-    open val matchEventsEnabled: Boolean = false,
-
-    // Tables
-    open val kickOffEventTable: KickOffTable = BB2020StandardKickOffEventTable,
-    // This defines the BB2020 behavior where Prayers To Nuffle are rolled during the Pre-game Sequence.
-    // BB2025 Prayers are defined under inducements.
-    open val prayersToNufflePrice: Int = 50_000,
-    open val prayersToNuffleEnabled: Boolean = true,
-    open val prayersToNuffleTable: PrayersToNuffleTable = BB2020StandardPrayersToNuffleTable,
-    open val weatherTable: WeatherTable = BB2020StandardWeatherTable,
-    open val injuryTable: InjuryTable = BB2020StandardInjuryTable,
-    open val stuntyInjuryTable: InjuryTable = BB2020StuntyInjuryTable,
-    open val casualtyTable: CasualtyTable = BB2020CasualtyTable,
-    open val lastingInjuryTable: LastingInjuryTable = BB2020LastingInjuryTable,
-    open val argueTheCallTable: ArgueTheCallTable = BB2020ArgueTheCallTable,
-
-    // Templates
-    open val randomDirectionTemplate: RandomDirectionTemplate = RandomDirectionTemplate,
-    open val rangeRuler: RangeRuler = BB2020RangeRuler,
-
-    // Team Actions
-    open val teamActions: TeamActions = BB2020TeamActions(),
-    open val rushesPrAction: Int = 2,
-    open val allowMultipleTeamRerollsPrTurn: Boolean = true,
-    // Dice roll targets defined in the rulebook
-    open val standingUpTarget: Int = 4, // See page 44 in the rule book
-    open val moveRequiredForStandingUp: Int = 3,
-    open val secureTheBallTarget: Int = 2, // Blood Bowl Season 3 announcement blogposts
-
-    // Behavior customization, .e.g. allow the rules to specify which Procedure should
-    // be used for certain aspects of the game
-    // Whether coaches are allowed to undo actions, and to what degree.
-    open val undoActionBehavior: UndoActionBehavior = UndoActionBehavior.ONLY_NON_RANDOM_ACTIONS,
-    // Who is responsible for rolling dice or taking random actions.
-    open val diceRollsOwner: DiceRollOwner = DiceRollOwner.ROLL_ON_SERVER,
-    // Probably need to replace this with a reference to the FoulProcedure
-    open val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.BB2025,
-    // Probably need to replace this with a reference to the KickProcedure
-    open val kickingPlayerBehavior: KickingPlayerBehavior = KickingPlayerBehavior.STRICT,
-    // Which procedure to use when deciding and using an apothecary.
-    // The rules differ between BB7 and Standard, but it is unclear if we want two different
-    // procedures for this, but as there are multiple differences (who they apply to + "Patching-up" section).
-    // Keep them separate for now.
-    open val useApothecaryBehavior: UseApothecaryBehavior = UseApothecaryBehavior.STANDARD,
-    // Configure skills available, their behaviour and which category they belong to.
-    open val skillSettings: SkillSettings = BB2020SkillSettings(),
-    // If `true`, coaches are allowed to edit their own team while the game is in progress.
-    // (For now, this is just a local setting that doesn't work in networked games)
-    open val allowPlayerEditsDuringGame: Boolean = false,
-) {
-    // Defines how the paths between locations on the field are calculated. This can be rules-specific,
-    // since it might involve the use of skills.
-    open val pathFinder: PathFinder = BB2020PathFinder()
+abstract class Rules(
+    private val parameters: RulesParametersHolder
+): RulesParameters by parameters {
 
     /**
      * Checks if a given setup is valid. If not valid, a list of broken rules
@@ -860,122 +709,6 @@ open class Rules(
         return skillSettings.createSkill(player, skill, expiresAt)
     }
 
-    fun toBuilder(): Builder {
-        return Builder(this)
-    }
+    abstract fun toBuilder(): RulesParameterBuilder
 
-    /**
-     *  Rules builder making it easier to create variants of
-     */
-    class Builder(rules: Rules) {
-        var name: String = rules.name
-        var gameVersion: GameVersion = rules.baseVersion
-        var gameType: GameType = rules.gameType
-        var timers: TimerSettings.Builder = rules.timers.toBuilder()
-        var inducements: InducementSettings.Builder = rules.inducements.toBuilder()
-        var moveRange: IntRange = rules.moveRange
-        var strengthRange: IntRange = rules.strengthRange
-        var agilityRange: IntRange = rules.agilityRange
-        var passingRange: IntRange = rules.passingRange
-        var armorValueRange: IntRange = rules.armorValueRange
-        var halfsPrGame: Int = rules.halfsPrGame
-        var turnsPrHalf: Int = rules.turnsPrHalf
-        var hasExtraTime: Boolean = rules.hasExtraTime
-        var turnsInExtraTime: Int = rules.turnsInExtraTime
-        var hasShootoutInExtraTime: Boolean = rules.hasShootoutInExtraTime
-        var fieldWidth: Int = rules.fieldWidth
-        var fieldHeight: Int = rules.fieldHeight
-        var wideZone: Int = rules.wideZone
-        var endZone: Int = rules.endZone
-        var lineOfScrimmageHome: Int = rules.lineOfScrimmageHome
-        var lineOfScrimmageAway: Int = rules.lineOfScrimmageAway
-        var playersRequiredOnLineOfScrimmage: Int = rules.playersRequiredOnLineOfScrimmage
-        var maxPlayersInWideZone: Int = rules.maxPlayersInWideZone
-        var maxPlayersOnField: Int = rules.maxPlayersOnField
-        var stadium: StadiumRule = rules.stadium
-        var ballSelectorRule: BallSelectorRule = rules.ballSelectorRule
-        var pitchType: PitchType = rules.pitchType
-        var matchEventsEnabled: Boolean = rules.matchEventsEnabled
-        var kickOffEventTable: KickOffTable = rules.kickOffEventTable
-        var prayersToNufflePrice: Int = rules.prayersToNufflePrice
-        var prayersToNuffleEnabled: Boolean = rules.prayersToNuffleEnabled
-        var prayersToNuffleTable: PrayersToNuffleTable = rules.prayersToNuffleTable
-        var weatherTable: WeatherTable = rules.weatherTable
-        var injuryTable: InjuryTable = rules.injuryTable
-        var stuntyInjuryTable: InjuryTable = rules.stuntyInjuryTable
-        var casualtyTable: CasualtyTable = rules.casualtyTable
-        var lastingInjuryTable: LastingInjuryTable = rules.lastingInjuryTable
-        var argueTheCallTable: ArgueTheCallTable = rules.argueTheCallTable
-        var randomDirectionTemplate: RandomDirectionTemplate = rules.randomDirectionTemplate
-        var rangeRuler: RangeRuler = rules.rangeRuler
-        var teamActions: TeamActions = rules.teamActions
-        var rushesPrAction: Int = rules.rushesPrAction
-        var allowMultipleTeamRerollsPrTurn: Boolean = rules.allowMultipleTeamRerollsPrTurn
-        var standingUpTarget: Int = rules.standingUpTarget
-        var moveRequiredForStandingUp: Int = rules.moveRequiredForStandingUp
-        var secureTheBallTarget: Int = rules.secureTheBallTarget
-        var undoActionBehavior: UndoActionBehavior = rules.undoActionBehavior
-        var diceRollsOwner: DiceRollOwner = rules.diceRollsOwner
-        var foulActionBehavior: FoulActionBehavior = rules.foulActionBehavior
-        var kickingPlayerBehavior: KickingPlayerBehavior = rules.kickingPlayerBehavior
-        var useApothecaryBehavior: UseApothecaryBehavior = rules.useApothecaryBehavior
-        var skillSettings: SkillSettings = rules.skillSettings
-        var allowPlayerEditsDuringGame: Boolean = rules.allowPlayerEditsDuringGame
-
-        fun build() = Rules(
-            name,
-            gameVersion,
-            gameType,
-            timers.build(),
-            inducements.build(),
-            moveRange,
-            strengthRange,
-            agilityRange,
-            passingRange,
-            armorValueRange,
-            halfsPrGame,
-            turnsPrHalf,
-            hasExtraTime,
-            turnsInExtraTime,
-            hasShootoutInExtraTime,
-            fieldWidth,
-            fieldHeight,
-            wideZone,
-            endZone,
-            lineOfScrimmageHome,
-            lineOfScrimmageAway,
-            playersRequiredOnLineOfScrimmage,
-            maxPlayersInWideZone,
-            maxPlayersOnField,
-            stadium,
-            ballSelectorRule,
-            pitchType,
-            matchEventsEnabled,
-            kickOffEventTable,
-            prayersToNufflePrice,
-            prayersToNuffleEnabled,
-            prayersToNuffleTable,
-            weatherTable,
-            injuryTable,
-            stuntyInjuryTable,
-            casualtyTable,
-            lastingInjuryTable,
-            argueTheCallTable,
-            randomDirectionTemplate,
-            rangeRuler,
-            teamActions,
-            rushesPrAction,
-            allowMultipleTeamRerollsPrTurn,
-            standingUpTarget,
-            moveRequiredForStandingUp,
-            secureTheBallTarget,
-            undoActionBehavior,
-            diceRollsOwner,
-            foulActionBehavior,
-            kickingPlayerBehavior,
-            useApothecaryBehavior,
-            skillSettings,
-            allowPlayerEditsDuringGame
-        )
-    }
 }

@@ -12,9 +12,7 @@ import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.builder.GameVersion
 import com.jervisffb.engine.rules.builder.KickingPlayerBehavior
 import com.jervisffb.engine.rules.builder.UseApothecaryBehavior
-import com.jervisffb.engine.rules.common.tables.InjuryTable
-import com.jervisffb.engine.rules.common.tables.KickOffTable
-import com.jervisffb.engine.rules.common.tables.PrayersToNuffleTable
+import io.ktor.http.parameters
 import kotlinx.serialization.Serializable
 
 /**
@@ -23,18 +21,37 @@ import kotlinx.serialization.Serializable
  * - Standard (FUMBBL-Compatible)
  * - BB7
  */
-abstract class BB2020Rules : Rules(
-    name = "Blood Bowl 2020 Rules",
-    baseVersion = GameVersion.BB2020,
-    gameType = GameType.STANDARD,
-    foulActionBehavior = FoulActionBehavior.BB2020,
-    inducements = InducementSettings(DEFAULT_INDUCEMENTS_BB2020),
-) {
+@Serializable
+abstract class BB2020Rules(
+    private val bb2020RuleParameters: RulesParametersHolder
+) : Rules(bb2020RuleParameters) {
+    companion object {
+        val DEFAULTS = RulesParametersHolder(
+            name = "Blood Bowl 2020 Rules",
+            baseVersion = GameVersion.BB2020,
+            gameType = GameType.STANDARD,
+            foulActionBehavior = FoulActionBehavior.BB2020,
+            inducements = InducementSettings(DEFAULT_INDUCEMENTS_BB2020),
+        )
+    }
 }
 
 @Serializable
-class StandardBB2020Rules : BB2020Rules() {
-    override val name: String = "Blood Bowl 2020 Rules (Strict)"
+class StandardBB2020Rules(
+    private val standardBB2020RuleParameters: RulesParametersHolder = DEFAULTS
+) : BB2020Rules(standardBB2020RuleParameters) {
+
+    companion object {
+        val DEFAULTS = BB2020Rules.DEFAULTS.copy(
+            name = "Blood Bowl 2020 Rules (Strict)",
+        )
+    }
+
+    // Builder API infrastructure
+    override fun toBuilder() = StandardBB2020RulesBuilder(standardBB2020RuleParameters)
+    class StandardBB2020RulesBuilder(parameters: RulesParameters): RulesParameterBuilder(parameters) {
+        override fun build(): StandardBB2020Rules = StandardBB2020Rules(buildParameters())
+    }
 }
 
 /**
@@ -47,11 +64,22 @@ class StandardBB2020Rules : BB2020Rules() {
  * - A more lenient timing system, so the opponents must time out each other.
  */
 @Serializable
-class FumbblBB2020Rules : BB2020Rules() {
-    override val name: String
-        get() = "Blood Bowl 2020 Rules (FUMBBL Compatible)"
-    override val kickingPlayerBehavior: KickingPlayerBehavior = KickingPlayerBehavior.FUMBBL
-    override val foulActionBehavior: FoulActionBehavior = FoulActionBehavior.BB2025
+class FumbblBB2020Rules(
+    private val fumbblBB2020RuleParameters: RulesParametersHolder = DEFAULTS
+) : BB2020Rules(fumbblBB2020RuleParameters) {
+    companion object {
+        val DEFAULTS = BB2020Rules.DEFAULTS.copy(
+            name = "Blood Bowl 2020 Rules (FUMBBL Compatible)",
+            kickingPlayerBehavior = KickingPlayerBehavior.FUMBBL,
+            foulActionBehavior = FoulActionBehavior.BB2025,
+        )
+    }
+
+    // Builder API infrastructure
+    override fun toBuilder() = FumbblBB2020RulesBuilder(fumbblBB2020RuleParameters)
+    class FumbblBB2020RulesBuilder(parameters: RulesParameters): RulesParameterBuilder(parameters) {
+        override fun build() = FumbblBB2020Rules(buildParameters())
+    }
 }
 
 /**
@@ -59,77 +87,113 @@ class FumbblBB2020Rules : BB2020Rules() {
  * See Dungeon Bowl rulebook page 90 for more information.
  */
 @Serializable
-class BB72020Rules : BB2020Rules() {
-    override val name: String = "Blood Bowl Sevens 2020 Rules"
-    override val gameType: GameType = GameType.BB7
-    override val fieldWidth: Int = 20
-    override val fieldHeight: Int = 11
-    override val wideZone: Int = 2
-    override val endZone: Int = 1
-    override val lineOfScrimmageHome: Int = 6
-    override val lineOfScrimmageAway: Int = 13
-    override val playersRequiredOnLineOfScrimmage: Int = 3
-    override val maxPlayersInWideZone: Int = 1
-    override val maxPlayersOnField: Int  = 7
-    override val turnsPrHalf: Int = 6
-    override val kickOffEventTable: KickOffTable = BB7KickOffEventTable
-    override val injuryTable: InjuryTable = BB7StandardInjuryTable
-    override val stuntyInjuryTable: InjuryTable = BB7StuntyInjuryTable
-    override val prayersToNuffleTable: PrayersToNuffleTable = BB7PrayersToNuffleTable
-    override val useApothecaryBehavior = UseApothecaryBehavior.BB7
-    override val inducements = InducementSettings(DEFAULT_INDUCEMENTS_BB2020).toBuilder().run {
-        InducementType.entries.forEach { type ->
-            when (type) {
-                InducementType.TEMP_AGENCY_CHEERLEADER -> {
-                    get(type)!!.let {
-                        it.price = 30_000
-                        it.max = 2
-                    }
-                }
-                InducementType.PART_TIME_ASSISTANT_COACH -> {
-                    get(type)!!.let {
-                        it.price = 30_000
-                        it.max = 1
-                    }
-                }
-                InducementType.WEATHER_MAGE -> get(type)!!.enabled = false
-                InducementType.BLOODWEISER_KEG -> { /* Do nothing */ }
-                InducementType.SPECIAL_PLAY -> { /* Do nothing */ }
-                InducementType.EXTRA_TEAM_TRAINING -> get(type)!!.price = 150_000
-                InducementType.BRIBE -> { /* Do nothing */ }
-                InducementType.WANDERING_APOTHECARY -> { /* Do nothing */ }
-                InducementType.MORTUARY_ASSISTANT -> { /* Do nothing */ }
-                InducementType.PLAGUE_DOCTOR -> { /* Do nothing */ }
-                InducementType.RIOTOUS_ROOKIE -> get(type)!!.enabled = false
-                InducementType.HALFLING_MASTER_CHEF -> { /* Do nothing */ }
-                InducementType.STANDARD_MERCENARY_PLAYERS -> { /* Do nothing */ }
-                InducementType.STAR_PLAYERS -> get(type)!!.enabled = false
-                InducementType.INFAMOUS_COACHING_STAFF -> get(type)!!.enabled = false
-                InducementType.WIZARD -> get(type)!!.enabled = false
-                InducementType.BIASED_REFEREE -> get(type)!!.enabled = false
-                InducementType.WAAAGH_DRUMMER -> get(type)!!.enabled = false
-                InducementType.CAVORTING_NURGLINGS -> get(type)!!.enabled = false
-                InducementType.DWARFEN_RUNESMITH -> get(type)!!.enabled = false
-                InducementType.HALFLING_HOTPOT -> get(type)!!.enabled = false
-                InducementType.MASTER_OF_BALLISTICS -> get(type)!!.enabled = false
-                InducementType.EXPANDED_MERCENARY_PLAYERS -> { /* Do nothing */ }
-                InducementType.GIANT -> get(type)!!.enabled = false
-                InducementType.DESPERATE_MEASURES -> {
-                    get(type)!!.let {
-                        it.enabled = true
-                        it.price = 50_000
-                        it.max = 5
-                    }
-                }
+class BB72020Rules(
+    private val bb72020RuleParameters: RulesParametersHolder = DEFAULTS
+) : BB2020Rules(bb72020RuleParameters) {
 
-                InducementType.PRAYERS_TO_NUFFLE,
-                InducementType.TEAM_MASCOT,
-                InducementType.BLITZERS_BEST_KEGS,
-                InducementType.BRETONNIAN_PASTRIES,
-                InducementType.BRETONNIAN_DAMSEL,
-                InducementType.CANOPIC_JAR -> { /* Ignore */ }
+    companion object {
+        val DEFAULTS = BB2020Rules.DEFAULTS.copy(
+            name = "Blood Bowl Sevens 2020 Rules",
+            gameType = GameType.BB7,
+            fieldWidth = 20,
+            fieldHeight = 11,
+            wideZone = 2,
+            endZone = 1,
+            lineOfScrimmageHome = 6,
+            lineOfScrimmageAway = 13,
+            playersRequiredOnLineOfScrimmage = 3,
+            maxPlayersInWideZone = 1,
+            maxPlayersOnField = 7,
+            turnsPrHalf = 6,
+            kickOffEventTable = BB7KickOffEventTable,
+            injuryTable = BB7StandardInjuryTable,
+            stuntyInjuryTable = BB7StuntyInjuryTable,
+            prayersToNuffleTable = BB7PrayersToNuffleTable,
+            useApothecaryBehavior = UseApothecaryBehavior.BB7,
+            inducements = InducementSettings(DEFAULT_INDUCEMENTS_BB2020).toBuilder().run {
+                InducementType.entries.forEach { type ->
+                    when (type) {
+                        InducementType.TEMP_AGENCY_CHEERLEADER -> {
+                            get(type)!!.let {
+                                it.price = 30_000
+                                it.max = 2
+                            }
+                        }
+
+                        InducementType.PART_TIME_ASSISTANT_COACH -> {
+                            get(type)!!.let {
+                                it.price = 30_000
+                                it.max = 1
+                            }
+                        }
+
+                        InducementType.WEATHER_MAGE -> get(type)!!.enabled = false
+                        InducementType.BLOODWEISER_KEG -> { /* Do nothing */
+                        }
+
+                        InducementType.SPECIAL_PLAY -> { /* Do nothing */
+                        }
+
+                        InducementType.EXTRA_TEAM_TRAINING -> get(type)!!.price = 150_000
+                        InducementType.BRIBE -> { /* Do nothing */
+                        }
+
+                        InducementType.WANDERING_APOTHECARY -> { /* Do nothing */
+                        }
+
+                        InducementType.MORTUARY_ASSISTANT -> { /* Do nothing */
+                        }
+
+                        InducementType.PLAGUE_DOCTOR -> { /* Do nothing */
+                        }
+
+                        InducementType.RIOTOUS_ROOKIE -> get(type)!!.enabled = false
+                        InducementType.HALFLING_MASTER_CHEF -> { /* Do nothing */
+                        }
+
+                        InducementType.STANDARD_MERCENARY_PLAYERS -> { /* Do nothing */
+                        }
+
+                        InducementType.STAR_PLAYERS -> get(type)!!.enabled = false
+                        InducementType.INFAMOUS_COACHING_STAFF -> get(type)!!.enabled = false
+                        InducementType.WIZARD -> get(type)!!.enabled = false
+                        InducementType.BIASED_REFEREE -> get(type)!!.enabled = false
+                        InducementType.WAAAGH_DRUMMER -> get(type)!!.enabled = false
+                        InducementType.CAVORTING_NURGLINGS -> get(type)!!.enabled = false
+                        InducementType.DWARFEN_RUNESMITH -> get(type)!!.enabled = false
+                        InducementType.HALFLING_HOTPOT -> get(type)!!.enabled = false
+                        InducementType.MASTER_OF_BALLISTICS -> get(type)!!.enabled = false
+                        InducementType.EXPANDED_MERCENARY_PLAYERS -> { /* Do nothing */
+                        }
+
+                        InducementType.GIANT -> get(type)!!.enabled = false
+                        InducementType.DESPERATE_MEASURES -> {
+                            get(type)!!.let {
+                                it.enabled = true
+                                it.price = 50_000
+                                it.max = 5
+                            }
+                        }
+
+                        InducementType.PRAYERS_TO_NUFFLE,
+                        InducementType.TEAM_MASCOT,
+                        InducementType.BLITZERS_BEST_KEGS,
+                        InducementType.BRETONNIAN_PASTRIES,
+                        InducementType.BRETONNIAN_DAMSEL,
+                        InducementType.CANOPIC_JAR -> { /* Ignore */
+                        }
+                    }
+                }
+                build()
             }
-        }
-        build()
+        )
+
+
+    }
+
+    // Builder API infrastructure
+    override fun toBuilder() = BB72020RulesBuilder(bb72020RuleParameters)
+    class BB72020RulesBuilder(parameters: RulesParameters): RulesParameterBuilder(parameters) {
+        override fun build() = BB72020Rules(buildParameters())
     }
 }

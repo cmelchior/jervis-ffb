@@ -5,7 +5,7 @@ import com.jervisffb.engine.GameLimitReachedBehaviour
 import com.jervisffb.engine.OutOfTimeBehaviour
 import com.jervisffb.engine.TimerPreset
 import com.jervisffb.engine.TimerSettings
-import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.RulesParameterBuilder
 import com.jervisffb.ui.game.viewmodel.MenuViewModel
 import com.jervisffb.ui.menu.utils.DropdownEntryWithValue
 import com.jervisffb.ui.menu.utils.InputFieldDataWithValue
@@ -39,7 +39,7 @@ val gameLimitEntries = listOf(
  * View controller for the timers setup component. This component is responsible for all the UI control needed
  * to configure the timer settings for a game.
  */
-class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val menuViewModel: MenuViewModel) : ScreenModel {
+class SetupTimersComponentModel(initialRulesBuilder: RulesParameterBuilder, private val menuViewModel: MenuViewModel) : ScreenModel {
 
     var rulesBuilder = initialRulesBuilder
     val isSetupValid: MutableStateFlow<Boolean> = MutableStateFlow(true)
@@ -399,8 +399,8 @@ class SetupTimersComponentModel(initialRulesBuilder: Rules.Builder, private val 
         return duration.toString()
     }
 
-    // Update configuration with data from the Rules.Builder
-    fun updateFromRulesBuilder(rules: Rules.Builder) {
+    // Update configuration with data from the RulesParameterBuilder
+    fun updateFromRulesBuilder(rules: RulesParameterBuilder) {
         this.rulesBuilder = rules
         // Only set the preset dialog, do not attempt to update any data based on it as we
         // want to use the timer settings from the rules builder.

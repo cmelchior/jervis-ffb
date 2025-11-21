@@ -1,7 +1,7 @@
 package com.jervisffb.ui.menu.components.setup
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.RulesParameterBuilder
 import com.jervisffb.engine.rules.builder.DiceRollOwner
 import com.jervisffb.engine.rules.builder.FoulActionBehavior
 import com.jervisffb.engine.rules.builder.KickingPlayerBehavior
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * This component model is responsible for all the UI control needed to configure the the more
  * advanced customization options under the "Customizations" tab.
  */
-class CustomizationSetupComponentModel(val isHotseat: Boolean, initialRulesBuilder: Rules.Builder, private val menuViewModel: MenuViewModel) : ScreenModel {
+class CustomizationSetupComponentModel(val isHotseat: Boolean, initialRulesBuilder: RulesParameterBuilder, private val menuViewModel: MenuViewModel) : ScreenModel {
 
     var rulesBuilder = initialRulesBuilder
     val isSetupValid: MutableStateFlow<Boolean> = MutableStateFlow(true)
@@ -157,7 +157,7 @@ class CustomizationSetupComponentModel(val isHotseat: Boolean, initialRulesBuild
         isSetupValid.value = !data.isError
     }
 
-    fun updateRulesBuilder(rulesBuilder: Rules.Builder) {
+    fun updateRulesBuilder(rulesBuilder: RulesParameterBuilder) {
         this.rulesBuilder = rulesBuilder
 
         updateFieldWidth(rulesBuilder.fieldWidth.toString())

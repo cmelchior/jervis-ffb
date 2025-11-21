@@ -1,7 +1,7 @@
 package com.jervisffb.ui.menu.components.setup
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.RulesParameterBuilder
 import com.jervisffb.engine.serialize.FILE_EXTENSION_GAME_FILE
 import com.jervisffb.engine.serialize.GameFileData
 import com.jervisffb.engine.serialize.JervisSerialization
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 /**
  * View controller responsible for loading a previous game file during setting up the game.
  */
-class LoadFileComponentModel(initialRulesBuilder: Rules.Builder, private val menuViewModel: MenuViewModel) : ScreenModel {
+class LoadFileComponentModel(initialRulesBuilder: RulesParameterBuilder, private val menuViewModel: MenuViewModel) : ScreenModel {
 
     val isSetupValid: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val fileError: MutableStateFlow<String> = MutableStateFlow("")
