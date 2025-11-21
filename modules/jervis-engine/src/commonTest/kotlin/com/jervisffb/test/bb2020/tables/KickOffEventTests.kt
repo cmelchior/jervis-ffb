@@ -663,7 +663,7 @@ class KickOffEventTests: JervisGameBB2020Test() {
                     6.d6, // Home team rolls
                     3.d6, // Away team rolls
                     2.d3, // Affected players on Receiving team
-                    RandomPlayersSelected(listOf("A1".playerId, "A2".playerId, "A3".playerId)),
+                    RandomPlayersSelected(listOf("A1".playerId, "A2".playerId)),
                 )
             )
         )

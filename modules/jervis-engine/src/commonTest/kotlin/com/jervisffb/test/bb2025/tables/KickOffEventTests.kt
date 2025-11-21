@@ -613,79 +613,6 @@ class KickOffEventTests: JervisGameBB2025Test() {
 
     }
 
-//    @Test
-//    fun officiousRef() {
-//        controller.rollForward(
-//            *defaultPregame(),
-//            *defaultSetup(),
-//            *defaultKickOffHomeTeam(
-//                kickoffEvent = arrayOf(
-//                    DiceRollResults(5.d6, 6.d6), // Roll Officious Ref
-//                    6.d6, // Home team rolls
-//                    3.d6, // Away team rolls
-//                    RandomPlayersSelected(listOf("A1".playerId)),
-//                    2.d6 // Roll for the Ref
-//                )
-//            )
-//        )
-//        assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
-//        assertFalse(state.getPlayerById("A1".playerId).hasTackleZones)
-//    }
-//
-//    @Test
-//    fun officiousRef_bothTeams() {
-//        controller.rollForward(
-//            *defaultPregame(),
-//            *defaultSetup(),
-//            *defaultKickOffHomeTeam(
-//                kickoffEvent = arrayOf(
-//                    DiceRollResults(5.d6, 6.d6), // Roll Officious Ref
-//                    6.d6, // Home team rolls
-//                    4.d6, // Away team rolls
-//                    RandomPlayersSelected(listOf("A1".playerId)),
-//                    1.d6, // Roll for the Ref
-//                    RandomPlayersSelected(listOf("H1".playerId)),
-//                    2.d6 // Roll for the Ref
-//                )
-//            )
-//        )
-//        val awayPlayer = state.getPlayerById("A1".playerId)
-//        val homePlayer = state.getPlayerById("H1".playerId)
-//        assertEquals(PlayerState.BANNED, awayPlayer.state)
-//        assertEquals(DogOut, awayPlayer.location)
-//        assertEquals(PlayerState.STUNNED, homePlayer.state)
-//    }
-//
-//    @Test
-//    fun officiousRef_noPlayersOnField() {
-//        controller.rollForward(
-//            *defaultPregame(),
-//            *defaultSetup()
-//        )
-//
-//        // Fake it, by moving all kickoff players back to Dogout after setup
-//        homeTeam.forEach {
-//            it.state = PlayerState.RESERVE
-//            it.location = DogOut
-//        }
-//        controller.rollForward(
-//            *defaultKickOffHomeTeam(
-//                kickoffEvent = arrayOf(
-//                    DiceRollResults(5.d6, 6.d6), // Roll Officious Ref
-//                    6.d6, // Home team rolls
-//                    4.d6, // Away team rolls
-//                    RandomPlayersSelected(listOf("A1".playerId)),
-//                    1.d6, // Roll for the Ref
-//                    // Skip rolls for home players as none are eligible
-//                )
-//            )
-//        )
-//        val awayPlayer = state.getPlayerById("A1".playerId)
-//        assertEquals(PlayerState.BANNED, awayPlayer.state)
-//        assertEquals(TeamTurn.SelectPlayerOrEndTurn, controller.currentNode())
-//    }
-
-
     @Test
     fun pitchInvasion() {
         controller.rollForward(
@@ -697,7 +624,7 @@ class KickOffEventTests: JervisGameBB2025Test() {
                     6.d6, // Home team rolls
                     3.d6, // Away team rolls
                     2.d3, // Affected players on Receiving team
-                    RandomPlayersSelected(listOf("A1".playerId, "A2".playerId, "A3".playerId)),
+                    RandomPlayersSelected(listOf("A1".playerId, "A2".playerId)),
                 )
             )
         )
@@ -727,6 +654,35 @@ class KickOffEventTests: JervisGameBB2025Test() {
         assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
         assertEquals(PlayerState.STUNNED, state.getPlayerById("A3".playerId).state)
         assertEquals(PlayerState.STUNNED, state.getPlayerById("H1".playerId).state)
+    }
+
+    @Test
+    fun pitchInvasion_lessAvailablePlayersOnTheField() {
+        controller.rollForward(
+            *defaultPregame(),
+            *defaultSetup()
+        )
+        // Fake it, by moving all kickoff players except 1 back to Dogout after setup
+        awayTeam.forEachIndexed { index, player ->
+            if (index > 0) {
+                player.state = PlayerState.RESERVE
+                player.location = DogOut
+            }
+        }
+        controller.rollForward(
+            *defaultKickOffHomeTeam(
+                kickoffEvent = arrayOf(
+                    DiceRollResults(6.d6, 6.d6), // Roll Officious Ref
+                    6.d6, // Home team rolls
+                    1.d6, // Away team rolls
+                    3.d3, // 3 players affected, but only 1 is available
+                    RandomPlayersSelected(listOf("A1".playerId)),
+                )
+            )
+        )
+        assertEquals(TeamTurn.SelectPlayerOrEndTurn, controller.currentNode())
+        assertEquals(1, awayTeam.count { it.state == PlayerState.STUNNED })
+        assertEquals(PlayerState.STUNNED, state.getPlayerById("A1".playerId).state)
     }
 
     @Test

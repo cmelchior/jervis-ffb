@@ -110,10 +110,10 @@ object TeamTurn : Procedure() {
                 listOf(ContinueWhenReady)
             } else {
                 val availablePlayers = getAvailablePlayers(state, rules)
-                listOf(
+                listOfNotNull(
                     EndTurnWhenReady,
-                    SelectPlayer.fromPlayers(availablePlayers),
-                    SelectForgoActivation.fromPlayers(availablePlayers)
+                    if (availablePlayers.isNotEmpty()) SelectPlayer.fromPlayers(availablePlayers) else null,
+                    if (availablePlayers.isNotEmpty()) SelectForgoActivation.fromPlayers(availablePlayers) else null
                 )
             }
         }

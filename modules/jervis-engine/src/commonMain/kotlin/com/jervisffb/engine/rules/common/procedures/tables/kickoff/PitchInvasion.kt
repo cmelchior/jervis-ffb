@@ -25,31 +25,25 @@ import com.jervisffb.engine.fsm.checkType
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.PlayerState
 import com.jervisffb.engine.model.Team
-import com.jervisffb.engine.model.context.ProcedureContext
+import com.jervisffb.engine.model.context.PitchInvasionContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.reports.ReportDiceRoll
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.reports.ReportPitchInvasionRoll
 import com.jervisffb.engine.rules.DiceRollType
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.utils.INVALID_ACTION
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
-
-data class PitchInvasionContext(
-    val kickingRoll: D6Result,
-    val kickingResult: Int = 0,
-    val kickingPlayersAffected: Int = 0,
-    val receivingRoll: D6Result? = null,
-    val receivingResult: Int = 0,
-    val receivingPlayersAffected: Int = 0
-
-): ProcedureContext
+import kotlin.math.min
 
 /**
- * Procedure for handling the Kick-Off Event: "Pitch Invasion" as described on page 41
- * of the rulebook.
+ * Procedure for handling the Kick-Off Event: "Pitch Invasion".
+ *
+ * See page 41 in the BB2020 rulebook.
+ * See page 48 in the BB2025 rulebook.
  *
  * Developer's Commentary:
- * It isn't defined in the rules, which team resolve their roll first, so we have just
+ * It isn't defined in the rules, which team resolves their roll first, so we have just
  * decided on the receiving team (it shouldn't matter either, since there is currently no
  * way to affect the rolls)
  */
@@ -130,8 +124,12 @@ object PitchInvasion : Procedure() {
                     )
                 }
                 else -> {
-                    checkType<RandomPlayersSelected>(action) {
-                        val playerCommands = it.getPlayers(state).flatMap { player ->
+                    checkType<RandomPlayersSelected>(action) { randomPlayersAction ->
+                        val requestedRandomPlayers = selectFromTeam(context.receivingPlayersAffected, state.receivingTeam, rules).first() as? SelectRandomPlayers
+                        if (requestedRandomPlayers != null && requestedRandomPlayers.count != randomPlayersAction.players.size) {
+                            INVALID_ACTION(action, "Wrong number of random players: ${randomPlayersAction.players.size} vs. ${requestedRandomPlayers.count}")
+                        }
+                        val playerCommands = randomPlayersAction.getPlayers(state).flatMap { player ->
                             listOf(
                                 SetPlayerState(player, PlayerState.STUNNED, hasTackleZones = false),
                                 ReportGameProgress("${player.name} was Stunned by the crowd")
@@ -169,6 +167,7 @@ object PitchInvasion : Procedure() {
             return selectFromTeam(context.kickingPlayersAffected, state.kickingTeam, rules)
         }
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
+            val context = state.getContext<PitchInvasionContext>()
             return when (action) {
                 is Continue -> {
                     compositeCommandOf(
@@ -177,8 +176,12 @@ object PitchInvasion : Procedure() {
                     )
                 }
                 else -> {
-                    checkType<RandomPlayersSelected>(action) {
-                        val playerCommands = it.getPlayers(state).flatMap { player ->
+                    checkType<RandomPlayersSelected>(action) { randomPlayersAction ->
+                        val requestedRandomPlayers = selectFromTeam(context.kickingPlayersAffected, state.kickingTeam, rules).first() as? SelectRandomPlayers
+                        if (requestedRandomPlayers != null && requestedRandomPlayers.count != randomPlayersAction.players.size) {
+                            INVALID_ACTION(action, "Wrong number of random players: ${randomPlayersAction.players.size} vs. ${requestedRandomPlayers.count}")
+                        }
+                        val playerCommands = randomPlayersAction.getPlayers(state).flatMap { player ->
                             listOf(
                                 SetPlayerState(player, PlayerState.STUNNED, hasTackleZones = false),
                                 ReportGameProgress("${player.name} was Stunned by the crowd")
@@ -199,8 +202,10 @@ object PitchInvasion : Procedure() {
             .filter { it.location.isOnField(rules) }
             .let { players ->
                 if (players.isNotEmpty()) {
+                    // If we have fewer players on the field than we need to select, we reduce the requested size
+                    // to be equal to all players on the field.
                     listOf(
-                        SelectRandomPlayers(affectedPlayers, players.map { it.id })
+                        SelectRandomPlayers(min(affectedPlayers, players.size), players.map { it.id })
                     )
                 } else {
                     listOf(ContinueWhenReady)

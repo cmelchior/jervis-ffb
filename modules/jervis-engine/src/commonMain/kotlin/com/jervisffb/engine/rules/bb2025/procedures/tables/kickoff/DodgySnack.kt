@@ -45,7 +45,7 @@ import com.jervisffb.engine.rules.Rules
  * Developer's Commentary:
  * It isn't defined in the rules, which team resolves their roll first, so we
  * have just decided on the receiving team (it shouldn't matter either, since
- * there is currently no way to affect the rolls)
+ * there is currently no way to affect the rolls).
  */
 object DodgySnack : Procedure() {
     override val initialNode: Node = KickingTeamRollDie

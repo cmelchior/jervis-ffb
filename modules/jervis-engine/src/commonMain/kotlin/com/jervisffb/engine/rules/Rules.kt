@@ -52,6 +52,9 @@ import kotlinx.serialization.Serializable
  * the upper-left corner with (0,0). If the UI wants to represent things differently, it is responsible
  * for swapping coordinates.
  *
+ * Methods in this class have been implemented using the standard BB2025 behavior, so subclasses only need to
+ * override them if the behavior differs from that.
+ *
  * Developer's Commentary:
  * The idea is that this class should be able to represent all game types, but that hasn't been
  * fully tested yet, e.g., Dungeon Bowl has a very different view of what the field looks

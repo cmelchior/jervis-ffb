@@ -198,7 +198,9 @@ book.
     - [ ] Dodgy Snack
         - [ ] On 2+, player stays on field with -1 AV, MA
         - [ ] On 1, player is put in Reserves until end of drive.
-    - [ ] Pitch Invasion
+    - [x] Pitch Invasion
+      - [x] No players on the field
+      - [x] Less available players than needed
 - [x] What goes up...
     - [x] Land on Field
     - [x] Lands on Player
