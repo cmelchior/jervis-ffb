@@ -13,7 +13,11 @@ This is just a list of things to keep an eye out for during development. See
 ## Open Players
 Is a prone player considered Open? The rules do not mention it either way.
 But High Kick says you can move an Open player, which sounds a bit odd if they
-are prone. Also, BB2025 specify that they must be Standing as well.
+are prone. Also, BB2025 specifies that they must be Standing as well.
+
+Open Players also do not specify that they have to be on the pitch, which
+means that a High Kick would allow you to move a player from the Dogout into
+the field.
 
 ## Chainsaw vs. Mighty Blow
 https://fumbbl.com/index.php?name=PNphpBB2&file=viewtopic&t=33049

@@ -51,7 +51,7 @@ class MarkedTests: JervisGameBB2020Test() {
         assertTrue(player.coordinates.getSurroundingCoordinates(rules, 1, false).none {
             state.field[it].isOccupied()
         })
-        assertTrue(rules.isOpen(player))
+        assertFalse(rules.isOpen(player))
         assertFalse(rules.isMarked(player))
     }
 

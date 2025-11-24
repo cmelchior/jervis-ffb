@@ -23,6 +23,18 @@ Jervis uses the interpretation that it _does_ include the End Zone as the
 Sidelines (bullet 3) include the same wording, and those clearly run the entire
 length of the pitch.
 
+### Page 38 - Player Status!
+The rulebook doesn't explicitly state that the statuses: Standing, 
+Distracted, Prone, Stunned, Tackle Zones, Marked, Being Marked and Open Players
+are only present when a player is on the pitch, but it is pretty clear from 
+context that this is assumed.
+
+If not, it leads to weird consequences, like being able to move a player unto 
+the field when rolling High Kick.
+
+So when interpreting the rules, Jervis will always assume that these statuses
+also imply that the player is on the field.
+
 ### Page 48 - High Kick (No available players)
 It is unspecified what happens if you roll High Kick and no Open players are 
 available. In this case, Jervis just ignores the High Kick and nothing happens. 

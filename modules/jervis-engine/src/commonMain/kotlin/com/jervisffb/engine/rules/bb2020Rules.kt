@@ -37,10 +37,12 @@ abstract class BB2020Rules(
     }
 
     // In BB2020, Open status does not consider if the player is standing or not.
-    // This is probably and oversight that has been fixed in BB20205, but for
-    // now we implement those semantics faithfully.
+    // This is probably and oversight that has been fixed in BB20205. To avoid
+    // too many weird edge cases in BB2020, we also assume the same semantics
+    // here.
+    @Suppress("RedundantOverride")
     override fun isOpen(player: Player): Boolean {
-        return !isMarked(player)
+        return super.isOpen(player)
     }
 }
 
