@@ -15,11 +15,13 @@ import com.jervisffb.engine.model.locations.DogOut
 import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.BB72020Rules
 import com.jervisffb.engine.rules.StandardBB2020Rules
+import com.jervisffb.engine.rules.StandardBB2025Rules
 import com.jervisffb.engine.rules.builder.GameType
 import com.jervisffb.engine.rules.common.procedures.SetupTeam
 import com.jervisffb.engine.rules.common.procedures.SetupTeamContext
 import com.jervisffb.engine.utils.createRandomAction
 import com.jervisffb.test.bb2020.createDefaultGameStateBB2020
+import com.jervisffb.test.bb2025.createDefaultGameStateBB2025
 import kotlin.random.Random
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -40,12 +42,33 @@ import kotlin.test.fail
 class FuzzTester {
 
     @Test
-    fun runRandomGames() {
+    fun runRandomBB2020Games() {
         val games = 100
         repeat(games) { gameNo ->
             val seed = Random.nextLong()
             val random = Random(seed)
             val state = createDefaultGameStateBB2020(StandardBB2020Rules())
+            val controller = GameEngineController(state)
+            controller.startManualMode(logAvailableActions = false)
+            try {
+                while (controller.stack.isNotEmpty()) {
+                    val availableActions = controller.getAvailableActions()
+                    val userAction = getSetupAction(controller) ?: createRandomAction(state, availableActions.actions, random)
+                    controller.handleAction(userAction)
+                }
+            } catch (e: Exception) {
+                fail("Game $gameNo (seed: $seed) crashed with exception:\n${e.stackTraceToString()}")
+            }
+        }
+    }
+
+    @Test
+    fun runRandomBB2025Games() {
+        val games = 10000
+        repeat(games) { gameNo ->
+            val seed = Random.nextLong()
+            val random = Random(seed)
+            val state = createDefaultGameStateBB2025(StandardBB2025Rules())
             val controller = GameEngineController(state)
             controller.startManualMode(logAvailableActions = false)
             try {
