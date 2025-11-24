@@ -731,7 +731,7 @@ object MultipleBlockAction: Procedure() {
             }
         }
         // Then Check throw-in
-        if (selectedBall == null && context.pushChain.last().to == FieldCoordinate.OUT_OF_BOUNDS) {
+        if (selectedBall == null && context.pushChain.last().to?.isOutOfBounds(state.rules) == true) {
             val ball = state.balls.singleOrNull { it.state == BallState.OUT_OF_BOUNDS }
             selectedBall = ball
         }

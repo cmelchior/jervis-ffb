@@ -30,7 +30,6 @@ import com.jervisffb.engine.model.TurnOver
 import com.jervisffb.engine.model.context.PassingInterferenceContext
 import com.jervisffb.engine.model.context.assertContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportStartingPass
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
@@ -163,8 +162,8 @@ object PassStep: Procedure() {
             return if (context.outOfBoundsAt != null) {
                 compositeCommandOf(
                     SetBallState.outOfBounds(ball, context.outOfBoundsAt),
-                    SetBallLocation(ball, FieldCoordinate.OUT_OF_BOUNDS),
-                    SetContext(passContext.copy(target = FieldCoordinate.OUT_OF_BOUNDS)),
+                    SetBallLocation(ball, context.landsAt!!),
+                    SetContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<ScatterRollContext>(),
                     GotoNode(AttemptPassingInterferenceBeforeGoingOutOfBounds)
                 )
@@ -203,8 +202,8 @@ object PassStep: Procedure() {
             return if (context.outOfBoundsAt != null) {
                 compositeCommandOf(
                     SetBallState.outOfBounds(ball, context.outOfBoundsAt),
-                    SetBallLocation(ball, FieldCoordinate.OUT_OF_BOUNDS),
-                    SetContext(passContext.copy(target = FieldCoordinate.OUT_OF_BOUNDS)),
+                    SetBallLocation(ball, context.landsAt!!),
+                    SetContext(passContext.copy(target = context.landsAt)),
                     RemoveContext<DeviateRollContext>(),
                     GotoNode(AttemptPassingInterferenceBeforeGoingOutOfBounds)
                 )

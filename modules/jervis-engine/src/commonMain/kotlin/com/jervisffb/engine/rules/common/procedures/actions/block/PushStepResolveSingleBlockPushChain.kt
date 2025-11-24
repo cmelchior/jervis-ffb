@@ -17,7 +17,6 @@ import com.jervisffb.engine.model.Ball
 import com.jervisffb.engine.model.BallState
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.ThrowIn
@@ -148,7 +147,7 @@ object PushStepResolveSingleBlockPushChain: Procedure() {
             }
 
             // Then Check throw-in
-            if (selectedBall == null && context.pushChain.last().to == FieldCoordinate.OUT_OF_BOUNDS) {
+            if (selectedBall == null && context.pushChain.last().to?.isOutOfBounds(rules) == true) {
                 val ball = state.balls.singleOrNull { it.state == BallState.OUT_OF_BOUNDS }
                 selectedBall = ball
             }

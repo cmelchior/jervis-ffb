@@ -111,6 +111,7 @@ object ThrowIn : Procedure() {
                 return if (outOfBoundsAt != null) {
                     compositeCommandOf(
                         SetContext(context.copy(distance = dice)),
+                        SetBallLocation(ball, ballPosition),
                         SetBallState.outOfBounds(ball, outOfBoundsAt),
                         GotoNode(ResolveOutOfBounds)
                     )

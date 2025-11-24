@@ -23,7 +23,7 @@ class SetPlayerLocation(
         this.originalPlayerLocation = player.location
         this.originalPlayerBeingThrown = player.isBeingThrown
         if (originalPlayerLocation is FieldCoordinate) {
-            if (player.location == FieldCoordinate.UNKNOWN || player.location == FieldCoordinate.OUT_OF_BOUNDS) {
+            if (player.location == FieldCoordinate.UNKNOWN || player.location.isOutOfBounds(state.rules)) {
                 this.originalPlayerOnField = null
                 this.originalThrownPlayerOnField = null
             } else {
@@ -34,7 +34,7 @@ class SetPlayerLocation(
 
         // Remove from old location
         val oldLocation = originalPlayerLocation
-        if (oldLocation is FieldCoordinate && oldLocation != FieldCoordinate.UNKNOWN && oldLocation != FieldCoordinate.OUT_OF_BOUNDS) {
+        if (oldLocation is FieldCoordinate && oldLocation != FieldCoordinate.UNKNOWN && !oldLocation.isOutOfBounds(state.rules)) {
             state.field[oldLocation].apply {
                 // In some cases, players are in an intermediate state, where
                 // field.location doesn't match player.location. E.g. when
@@ -52,7 +52,7 @@ class SetPlayerLocation(
         // Add to new location
         player.location = location
         player.isBeingThrown = isThrown
-        if (location is FieldCoordinate && location != FieldCoordinate.UNKNOWN && location != FieldCoordinate.OUT_OF_BOUNDS) {
+        if (location is FieldCoordinate && location != FieldCoordinate.UNKNOWN && !location.isOutOfBounds(state.rules)) {
             state.field[location].apply {
                 if (isThrown) {
                     thrownPlayer = this@SetPlayerLocation.player
@@ -64,7 +64,7 @@ class SetPlayerLocation(
     }
 
     override fun undo(state: Game) {
-        if (location is FieldCoordinate && location != FieldCoordinate.UNKNOWN && location != FieldCoordinate.OUT_OF_BOUNDS) {
+        if (location is FieldCoordinate && location != FieldCoordinate.UNKNOWN && !location.isOutOfBounds(state.rules)) {
             state.field[location].apply {
                 if (isThrown) {
                     thrownPlayer = null
@@ -76,7 +76,7 @@ class SetPlayerLocation(
         player.location = originalPlayerLocation
         player.isBeingThrown = originalPlayerBeingThrown
         val originalLoc = originalPlayerLocation
-        if (originalLoc is FieldCoordinate && originalLoc != FieldCoordinate.UNKNOWN && originalLoc != FieldCoordinate.OUT_OF_BOUNDS) {
+        if (originalLoc is FieldCoordinate && originalLoc != FieldCoordinate.UNKNOWN && !originalLoc.isOutOfBounds(state.rules)) {
             state.field[originalLoc].apply {
                 player = originalPlayerOnField
                 thrownPlayer = originalThrownPlayerOnField

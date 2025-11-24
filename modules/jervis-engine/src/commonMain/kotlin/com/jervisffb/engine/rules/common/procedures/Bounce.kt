@@ -69,6 +69,7 @@ object Bounce : Procedure() {
                 val nextNode: Command =
                     if (outOfBounds) {
                         compositeCommandOf(
+                            SetBallLocation(ball, newLocation),
                             SetBallState.outOfBounds(ball, ball.location),
                             if (state.abortIfBallOutOfBounds) {
                                 ExitProcedure()

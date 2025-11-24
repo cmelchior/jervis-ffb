@@ -703,8 +703,9 @@ class PassActionTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             DiceRollResults(2.d8, 2.d8, 2.d8),
         )
-        assertEquals(FieldCoordinate.OUT_OF_BOUNDS, state.getContext<PassContext>().target)
-        assertEquals(FieldCoordinate.OUT_OF_BOUNDS, state.singleBall().location)
+        assertEquals(FieldCoordinate(10, -1), state.getContext<PassContext>().target)
+        assertEquals(FieldCoordinate(10, -1), state.singleBall().location)
+        assertEquals(BallState.OUT_OF_BOUNDS, state.singleBall().state)
         controller.rollForward(
             PlayerSelected("H7".playerId), // Select Interceptor
             6.d6, // Deflect
@@ -735,8 +736,9 @@ class PassActionTests: JervisGameBB2025Test() {
             NoRerollSelected(),
             DiceRollResults(2.d8, 2.d8, 2.d8),
         )
-        assertEquals(FieldCoordinate.OUT_OF_BOUNDS, state.getContext<PassContext>().target)
-        assertEquals(FieldCoordinate.OUT_OF_BOUNDS, state.singleBall().location)
+        assertEquals(FieldCoordinate(10, -1), state.getContext<PassContext>().target)
+        assertEquals(FieldCoordinate(10, -1), state.singleBall().location)
+        assertEquals(BallState.OUT_OF_BOUNDS, state.singleBall().state)
         controller.rollForward(
             PlayerSelected("H7".playerId), // Select Interceptor
             6.d6, // Deflect

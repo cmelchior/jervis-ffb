@@ -231,7 +231,6 @@ interface FieldCoordinate: OnFieldLocation {
 
     companion object {
         val UNKNOWN = create(Int.MAX_VALUE, Int.MAX_VALUE)
-        val OUT_OF_BOUNDS = create(Int.MIN_VALUE, Int.MIN_VALUE)
         fun create(x: Int, y: Int): FieldCoordinate {
             return FieldCoordinateImpl(x, y)
         }

@@ -198,9 +198,9 @@ class PushbackTests: JervisGameBB2025Test() {
         )
         val actions = controller.getAvailableActions().actions
         val availableDirections = actions.firstInstanceOf<SelectDirection>()
-        assertEquals(1, availableDirections.directions.size)
+        assertEquals(3, availableDirections.directions.size)
         assertEquals(
-            FieldCoordinate.OUT_OF_BOUNDS,
+            FieldCoordinate(0, 15),
             availableDirections.origin.move(availableDirections.directions.first(), 1)
         )
         controller.rollForward(

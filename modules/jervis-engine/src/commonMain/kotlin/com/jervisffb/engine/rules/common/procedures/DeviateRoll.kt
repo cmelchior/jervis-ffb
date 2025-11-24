@@ -28,7 +28,7 @@ import com.jervisffb.engine.rules.Rules
 data class DeviateRollContext(
     val from: FieldCoordinate,
     val deviateRoll: List<DieResult> = emptyList(),
-    val landsAt: FieldCoordinate? = null, // Will be `null` if out of bounds
+    val landsAt: FieldCoordinate? = null,
     val outOfBoundsAt: FieldCoordinate? = null, // Will contain the last field before the ball went out of bounds.
 ): ProcedureContext
 
@@ -76,7 +76,7 @@ object DeviateRoll : Procedure() {
                     ReportDiceRoll(DiceRollType.DEVIATE, listOf(d8, d6), showDiceType = true),
                     SetContext(context.copy(
                         deviateRoll = listOf(d8, d6),
-                        landsAt = if (outOfBoundsAt == null) currentLocation else null,
+                        landsAt = currentLocation,
                         outOfBoundsAt = outOfBoundsAt,
                     )),
                     ExitProcedure()

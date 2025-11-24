@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.RollDice
 import com.jervisffb.engine.actions.SelectFieldLocation
 import com.jervisffb.engine.actions.TargetSquare
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetCurrentBall
 import com.jervisffb.engine.commands.SetPlayerLocation
@@ -38,7 +39,6 @@ import com.jervisffb.engine.model.context.LandingRollContext
 import com.jervisffb.engine.model.context.MovePlayerIntoSquareContext
 import com.jervisffb.engine.model.context.PickupRollContext
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.LandingModifier
 import com.jervisffb.engine.reports.ReportDiceRoll
@@ -194,10 +194,10 @@ object ThrowPlayerStep: Procedure() {
                 compositeCommandOf(
                     SetPlayerLocation(
                         player = throwContext.thrownPlayer!!,
-                        location = FieldCoordinate.OUT_OF_BOUNDS,
+                        location = deviateContext.landsAt!!,
                         isThrown = false,
                     ),
-                    SetContext(throwContext.copy(target = FieldCoordinate.OUT_OF_BOUNDS, outOfBoundsAt = deviateContext.outOfBoundsAt)),
+                    SetContext(throwContext.copy(target = deviateContext.landsAt, outOfBoundsAt = deviateContext.outOfBoundsAt)),
                     RemoveContext<DeviateRollContext>(),
                     GotoNode(ResolveLandingInTheCrowd)
                 )
@@ -235,10 +235,10 @@ object ThrowPlayerStep: Procedure() {
                 compositeCommandOf(
                     SetPlayerLocation(
                         player = thrownPlayer,
-                        location = FieldCoordinate.OUT_OF_BOUNDS,
+                        location = scatterContext.landsAt!!,
                         isThrown = false,
                     ),
-                    SetContext(throwContext.copy(target = FieldCoordinate.OUT_OF_BOUNDS, outOfBoundsAt = scatterContext.outOfBoundsAt)),
+                    SetContext(throwContext.copy(target = scatterContext.landsAt, outOfBoundsAt = scatterContext.outOfBoundsAt)),
                     RemoveContext<ScatterRollContext>(),
                     ReportThrownPlayerGoingOutOfBounds(throwContext, scatter = true),
                     GotoNode(ResolveLandingInTheCrowd)
@@ -301,22 +301,21 @@ object ThrowPlayerStep: Procedure() {
                     target.isOnField(rules) && state.field[target].isOccupied() -> ResolveLandingInOccupiedSquare
                     else -> error("Could not determine landing type at: $target")
                 }
-                val adjustedTarget = if (target.isOutOfBounds(rules)) FieldCoordinate.OUT_OF_BOUNDS else target
                 compositeCommandOf(
                     ReportDiceRoll(DiceRollType.BOUNCE, bounceRoll),
                     SetPlayerLocation(
                         player = throwContext.thrownPlayer,
-                        location = adjustedTarget,
+                        location = target,
                         isThrown = true,
                     ),
                     SetContext(throwContext.copy(
-                        target = adjustedTarget,
+                        target = target,
                         outOfBoundsAt = if (landingNode == ResolveLandingInTheCrowd) throwContext.thrownPlayer.coordinates else null
                     )),
                     if (landingNode == ResolveLandingInTheCrowd) {
                         ReportThrownPlayerGoingOutOfBounds(throwContext, scatter = false)
                     } else {
-                        ReportPlayerBounce(throwContext, adjustedTarget)
+                        ReportPlayerBounce(throwContext, target)
 
                     },
                     GotoNode(landingNode)
@@ -364,8 +363,11 @@ object ThrowPlayerStep: Procedure() {
             return buildCompositeCommand {
                 if (thrownPlayer.hasBall()) {
                     // Lose the ball before rolling for injury, so the ball doesn't end up in the Dogout.
-                    add(SetBallState.outOfBounds(thrownPlayer.ball!!, context.outOfBoundsAt!!))
-                    add(SetTurnOver(TurnOver.STANDARD))
+                    addAll(
+                        SetBallLocation(thrownPlayer.ball!!, context.target!!),
+                        SetBallState.outOfBounds(thrownPlayer.ball!!, context.outOfBoundsAt!!),
+                        SetTurnOver(TurnOver.STANDARD)
+                    )
                 }
                 add(SetContext(injuryContext))
             }

@@ -138,7 +138,7 @@ object TheKickOff : Procedure() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = DeviateRoll
         override fun onExitNode(state: Game, rules: Rules): Command {
             val context = state.getContext<DeviateRollContext>()
-            val newLocation = context.landsAt ?: FieldCoordinate.OUT_OF_BOUNDS
+            val newLocation = context.landsAt ?: error("Missing landing coordinate: $context")
             val ball = state.currentBall()
             return compositeCommandOf(
                 if (context.outOfBoundsAt != null) SetBallState.outOfBounds(ball, context.outOfBoundsAt) else SetBallState.deviating(ball),

@@ -29,7 +29,7 @@ import com.jervisffb.engine.utils.assert
 data class ScatterRollContext(
     val from: FieldCoordinate,
     val scatterRoll: List<D8Result> = emptyList(),
-    val landsAt: FieldCoordinate? = null, // Will be `null` if out of bounds
+    val landsAt: FieldCoordinate? = null,
     val outOfBoundsAt: FieldCoordinate? = null, // Will contain the last field before the ball went out of bounds.
 ): ProcedureContext
 
@@ -81,7 +81,7 @@ object ScatterRoll : Procedure() {
                     SetContext(
                         state.getContext<ScatterRollContext>().copy(
                             scatterRoll = dice,
-                            landsAt = if (outOfBoundsAt == null) scatteredLocation else null,
+                            landsAt = scatteredLocation,
                             outOfBoundsAt = outOfBoundsAt,
                         )
                     ),

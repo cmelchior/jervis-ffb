@@ -21,11 +21,11 @@ object SelectDirectionDecorator: FieldActionDecorator<SelectDirection> {
         // If pushing into the crowd is the only option, figure out how to handle this.
         // Should it just be done inside the rules engine through a "Continue" event? Are
         // there any Special Play Cards or rules that could affect this?
-        if (
-            descriptor.directions.size == 1
-            && origin.move(descriptor.directions.single(), 1) == FieldCoordinate.OUT_OF_BOUNDS
-        ) {
-            acc.addUnknownAction(descriptor.createAll().single())
+        val outOfBounds = descriptor.directions.firstOrNull {
+            origin.move(it, 1).isOutOfBounds(state.rules)
+        }
+        if (outOfBounds != null) {
+            acc.addUnknownAction(DirectionSelected(outOfBounds))
         } else {
             descriptor.directions.forEach { direction ->
                 acc.updateSquare(origin.move(direction, 1)) {

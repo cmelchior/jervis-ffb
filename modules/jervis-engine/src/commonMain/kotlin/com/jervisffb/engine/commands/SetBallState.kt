@@ -110,10 +110,6 @@ class SetBallState private constructor(
                 originalSetLocationCommand = SetBallLocation(it, FieldCoordinate.UNKNOWN)
                 originalSetLocationCommand?.execute(state)
             }
-            if (ballState == BallState.OUT_OF_BOUNDS) {
-                originalSetLocationCommand = SetBallLocation(it, FieldCoordinate.OUT_OF_BOUNDS)
-                originalSetLocationCommand?.execute(state)
-            }
             it.outOfBoundsAt = exitLocation
         }
     }

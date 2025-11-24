@@ -11,6 +11,7 @@ import com.jervisffb.engine.actions.GameAction
 import com.jervisffb.engine.actions.GameActionDescriptor
 import com.jervisffb.engine.actions.SelectDirection
 import com.jervisffb.engine.commands.Command
+import com.jervisffb.engine.commands.SetBallLocation
 import com.jervisffb.engine.commands.SetBallState
 import com.jervisffb.engine.commands.SetPlayerLocation
 import com.jervisffb.engine.commands.SetPlayerState
@@ -383,6 +384,7 @@ object PushStepInitialMoveSequence: Procedure() {
                 context.pushChain.last().pusher.team
             }
         }
+
         override fun getAvailableActions(state: Game, rules: Rules): List<GameActionDescriptor> {
             val pushContext = state.getContext<PushContext>()
             val lastPushInChain = pushContext.pushChain.last()
@@ -396,7 +398,7 @@ object PushStepInitialMoveSequence: Procedure() {
             // Calculate all push options taking into account a chain push in progress.
             // In chain pushes, only the square of Player B could be empty, but it might
             // not be in case of a circular chain.
-            val emptyFields = isSquaresEmptyForPushing(pushContext, pushOptions, state)
+            val emptyFields = getEmptySquaresForPushing(pushContext, pushOptions, state)
             return listOf(
                 if (emptyFields.isNotEmpty()) {
                     SelectDirection(
@@ -411,16 +413,15 @@ object PushStepInitialMoveSequence: Procedure() {
                 }
             )
         }
+
         override fun applyAction(action: GameAction, state: Game, rules: Rules): Command {
             // If the chosen direction results in a chain push, modify the push context
             // and redo the entire chain.
             return checkTypeAndValue<DirectionSelected>(state, action) { squareSelected ->
                 val context = state.getContext<PushContext>()
                 val origin = context.pushee().coordinates
-                val target = origin.move(squareSelected.direction, 1).let {
-                    if (it.isOnField(rules)) it else FieldCoordinate.OUT_OF_BOUNDS
-                }
-                val isEmpty = isSquaresEmptyForPushing(
+                val target = origin.move(squareSelected.direction, 1)
+                val isEmptyOptionAvailable = getEmptySquaresForPushing(
                     pushContext = state.getContext<PushContext>(),
                     pushOptions = setOf(target),
                     state = state
@@ -429,12 +430,12 @@ object PushStepInitialMoveSequence: Procedure() {
                 val updateActions = listOfNotNull(
                     SetContextProperty(PushContext.PushData::to, pushData, target),
                     if (target.isOnField(rules)) {
-                        AddContextListItem(context.looseBalls,state.field[target].balls)
+                        AddContextListItem(context.looseBalls, state.field[target].balls)
                     } else {
                         null
                     }
                 ).toTypedArray()
-                val commands = if (isEmpty) {
+                val commands = if (isEmptyOptionAvailable) {
                     // Player was moved into an empty square, which means we can start resolving
                     // the entire chain.
                     compositeCommandOf(
@@ -460,25 +461,30 @@ object PushStepInitialMoveSequence: Procedure() {
             }
         }
 
-        // Check if a square is empty while taking into account any ongoing chain pushes.
-        private fun isSquaresEmptyForPushing(
+        // Return squares considered "empty" when doing a Push. This takes into account any ongoing chain pushes.
+        private fun getEmptySquaresForPushing(
             pushContext: PushContext,
             pushOptions: Set<FieldCoordinate>,
             state: Game,
         ): List<FieldCoordinate> {
-            val filteredOptions = pushOptions.toMutableSet()
+            val options = pushOptions.toMutableSet()
 
-            // OUT_OF_BOUNDS is only allowed if it is the only option (should this constraint be in Rules?)
-            if (filteredOptions.contains(FieldCoordinate.OUT_OF_BOUNDS) && pushOptions.size > 1) {
-                filteredOptions.remove(FieldCoordinate.OUT_OF_BOUNDS)
-            }
-
+            // Find all occupied squares
             val firstPushedFromLocation = pushContext.pushChain.first().from
             val isFirstPushLocationAvailable = pushContext.pushChain.none { it.to == firstPushedFromLocation }
-            return filteredOptions.filter {
-                it == FieldCoordinate.OUT_OF_BOUNDS
-                    || state.field[it].isUnoccupied()
-                    || (it == firstPushedFromLocation && isFirstPushLocationAvailable)
+            val onFieldSquares = options.filter { it.isOnField(state.rules) }
+            val occupiedSquares = onFieldSquares.filter {
+                // This also takes into account chain-pushes. E.g. the first square in the chain
+                // might be available, but only if something else wasn't chain pushed into it.
+                state.field[it].isOccupied()
+                    || (it == firstPushedFromLocation && !isFirstPushLocationAvailable)
+            }
+
+            // All squares on the field are taken. It is only in this case anyone can be pushed out of bounds.
+            return if (onFieldSquares.size == occupiedSquares.size) {
+                options.filter { it.isOutOfBounds(state.rules) }
+            } else {
+                (onFieldSquares.toSet() - occupiedSquares.toSet()).toList()
             }
         }
     }
@@ -499,7 +505,7 @@ object PushStepInitialMoveSequence: Procedure() {
                 context.pushChain.reversed().forEach { push ->
                     val to = push.to!!
                     // If OUT_OF_BOUNDS, further processing happens in `ResolvePushedIntoTheCrowd`
-                    val outOfBounds = (to == FieldCoordinate.OUT_OF_BOUNDS)
+                    val outOfBounds = to.isOutOfBounds(rules)
                     if (outOfBounds) {
                         // See page 58 in the rulebook. If a player with the ball is pushed into the crowd,
                         // it is a turnover. The Throw-in is handled in `ResolvePushedIntoTheCrowd`
@@ -564,6 +570,7 @@ object PushStepInitialMoveSequence: Procedure() {
                         outOfBoundsAt = pushStep.from,
                     )
                     addAll(
+                        SetBallLocation(ball, pushStep.to!!),
                         SetBallState.outOfBounds(ball, pushStep.from),
                         SetContext(throwContext)
                     )

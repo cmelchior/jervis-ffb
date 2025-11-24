@@ -13,7 +13,6 @@ import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
 import com.jervisffb.engine.model.Game
 import com.jervisffb.engine.model.context.getContext
-import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.reports.ReportGameProgress
 import com.jervisffb.engine.rules.Rules
 import com.jervisffb.engine.rules.common.procedures.ScatterRoll
@@ -67,7 +66,7 @@ object ChangingWeather : Procedure() {
             return if (context.outOfBoundsAt != null) {
                 compositeCommandOf(
                     SetBallState.outOfBounds(ball, context.outOfBoundsAt),
-                    SetBallLocation(ball, FieldCoordinate.OUT_OF_BOUNDS),
+                    SetBallLocation(ball, context.landsAt!!),
                     RemoveContext<ScatterRollContext>(),
                     ExitProcedure()
                 )

@@ -433,9 +433,11 @@ open class ManualActionProvider(
             menuViewModel.isFeatureEnabled(Feature.PUSH_PLAYER_INTO_CROWD)
             && actions.size == 1
             && actions.first().let {
-                if (it is SelectDirection && it.directions.size == 1) {
-                    val target = it.origin.move(it.directions.first(), 1)
-                    target.isOutOfBounds(controller.rules)
+                if (it is SelectDirection) {
+                    it.directions.all { direction ->
+                        val target = it.origin.move(direction, 1)
+                        target.isOutOfBounds(controller.rules)
+                    }
                 } else {
                     false
                 }

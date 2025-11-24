@@ -168,12 +168,17 @@ object Catch : Procedure() {
             val ball = state.currentBall()
             val landOutOfBounds = (scatterContext.outOfBoundsAt != null)
             val landsOnCatchingPlayer = scatterContext.landsAt?.let {
-                state.field[it].player?.let { player -> rules.canCatch(state, player) }
+                if (it.isOutOfBounds(rules)) {
+                    false
+                } else {
+                    state.field[it].player?.let { player -> rules.canCatch(state, player) }
+                }
             } ?: false
             return when {
                 landOutOfBounds -> {
                     compositeCommandOf(
                         RemoveContext<ScatterRollContext>(),
+                        SetBallLocation(ball, scatterContext.landsAt!!),
                         SetBallState.outOfBounds(ball, scatterContext.outOfBoundsAt),
                         SetContext(ThrowInContext(
                             ball = ball,

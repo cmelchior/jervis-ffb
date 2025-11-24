@@ -15,7 +15,6 @@ import com.jervisffb.engine.model.Team
 import com.jervisffb.engine.model.hasSkill
 import com.jervisffb.engine.model.isSkillAvailable
 import com.jervisffb.engine.model.locations.FieldCoordinate
-import com.jervisffb.engine.model.locations.FieldCoordinate.Companion.OUT_OF_BOUNDS
 import com.jervisffb.engine.model.locations.Location
 import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.model.modifiers.CatchModifier
@@ -523,10 +522,10 @@ abstract class Rules(
      * This only returns the normal push options and doesn't take into
      * account skills or if the squares are occupied.
      *
-     * If that matters or not is up to the call of this method.
+     * If that matters or not, it is up to the caller of this method.
      *
-     * If pushing a player OUT_OF_BOUNDS is possible, it will only be reported once
-     * as [FieldCoordinate.OUT_OF_BOUNDS].
+     * If pushing a player OUT_OF_BOUNDS is possible, all options to do so will
+     * be possible and should be deteted using [FieldCoordinate.isOutOfBounds].
      */
     fun getPushOptions(pusher: Player, pushee: Player): Set<FieldCoordinate> {
         val start: FieldCoordinate = pusher.location as? FieldCoordinate ?: throw IllegalStateException("Pusher must be on field.")
@@ -540,14 +539,7 @@ abstract class Rules(
         val result = map
             .sortedByDescending { it.second }
             .subList(0, 3)
-            .map {
-                val coords = it.first
-                if (coords.isOutOfBounds(this)) {
-                    OUT_OF_BOUNDS
-                } else {
-                    coords
-                }
-            }
+            .map { it.first }
             .toSet()
         return result
     }
