@@ -257,7 +257,6 @@ class Player(
         if (!statusEffects.add(effect)) {
             INVALID_GAME_STATE("Could not add status effect: ${effect.type}")
         }
-        println(statusEffects)
     }
 
     fun removeStatusEffect(effect: PlayerStatusEffect) {
