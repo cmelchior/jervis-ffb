@@ -340,7 +340,7 @@ object PassStep: Procedure() {
         override fun onEnterNode(state: Game, rules: Rules): Command {
             val ball = state.currentBall()
             val playerInSquare = state.field[ball.location].player
-            val canCatch = playerInSquare?.let { rules.canCatch(state, it) } ?: false
+            val canCatch = playerInSquare?.let { rules.canCatch(it) } ?: false
             return if (!canCatch) {
                 SetBallState.bouncing(ball)
             } else {

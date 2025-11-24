@@ -65,7 +65,7 @@ class ScatterTests: JervisGameBB2025Test() {
             ),
         )
         val player = awayTeam["A10".playerId]
-        assertTrue(rules.canCatch(state, player))
+        assertTrue(rules.canCatch(player))
         controller.rollForward(
             6.d6 // Catch
         )
@@ -89,7 +89,7 @@ class ScatterTests: JervisGameBB2025Test() {
         )
         val player = awayTeam["A10".playerId]
         player.hasTackleZones = false
-        assertFalse(rules.canCatch(state, player))
+        assertFalse(rules.canCatch(player))
         controller.rollForward(
             DiceRollResults(2.d8, 4.d8, 8.d8), // Scatter to field with player
             7.d8 // Bounce

@@ -20,6 +20,7 @@ import com.jervisffb.engine.model.locations.OnFieldLocation
 import com.jervisffb.engine.model.modifiers.CatchModifier
 import com.jervisffb.engine.model.modifiers.DiceModifier
 import com.jervisffb.engine.model.modifiers.MarkedModifier
+import com.jervisffb.engine.model.modifiers.PlayerStatusEffectType
 import com.jervisffb.engine.model.modifiers.StatModifier
 import com.jervisffb.engine.rules.common.MissingPlayersOnLoS
 import com.jervisffb.engine.rules.common.SetupRule
@@ -36,7 +37,6 @@ import com.jervisffb.engine.rules.common.tables.ThrowInPosition
 import com.jervisffb.engine.rules.common.tables.ThrowInTemplate
 import com.jervisffb.engine.utils.INVALID_GAME_STATE
 import com.jervisffb.engine.utils.sum
-import io.ktor.http.parameters
 import kotlinx.serialization.Serializable
 
 /**
@@ -245,12 +245,10 @@ abstract class Rules(
     /**
      * Returns whether a player is eligible for catching a ball that landed in their field.
      */
-    fun canCatch(
-        state: Game,
-        player: Player,
-    ): Boolean {
+    fun canCatch(player: Player): Boolean {
         // TODO Probably need to account for difference between Bomb and Ball here
         return player.hasTackleZones
+            && player.statusEffects.none { it.type == PlayerStatusEffectType.DISTRACTED }
             && player.state == PlayerState.STANDING
             && player.location.isOnField(this)
             && !player.hasBall()

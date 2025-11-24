@@ -19,6 +19,7 @@ import com.jervisffb.engine.commands.context.SetContext
 import com.jervisffb.engine.commands.fsm.ExitProcedure
 import com.jervisffb.engine.commands.fsm.GotoNode
 import com.jervisffb.engine.fsm.ActionNode
+import com.jervisffb.engine.fsm.ComputationNode
 import com.jervisffb.engine.fsm.Node
 import com.jervisffb.engine.fsm.ParentNode
 import com.jervisffb.engine.fsm.Procedure
@@ -32,6 +33,8 @@ import com.jervisffb.engine.model.context.MoveContext
 import com.jervisffb.engine.model.context.ProcedureContext
 import com.jervisffb.engine.model.context.getContext
 import com.jervisffb.engine.rules.Rules
+import com.jervisffb.engine.rules.builder.GameVersion
+import com.jervisffb.engine.rules.common.procedures.Bounce
 import com.jervisffb.engine.rules.common.procedures.Catch
 import com.jervisffb.engine.rules.common.procedures.actions.move.ResolveMoveTypeStep
 import com.jervisffb.engine.rules.common.procedures.actions.throwteammate.ThrowTeamMateContext
@@ -46,11 +49,23 @@ data class HandOffContext(
     val thrower: Player,
     val catcher: Player? = null,
     val hasMoved: Boolean = false,
-) : ProcedureContext
+) : ProcedureContext {
+}
 
 /**
  * Procedure for controlling a player's Hand-off action.
- * See page 51 in the rulebook.
+ *
+ * See page 51 in the BB2020 rulebook (and page 26 for loosing tackle zones).
+ * See page 74 in the BB2025 rulebook.
+ *
+ * Developer's Commentary
+ * There is a subtle difference between BB2020 and BB2025. In BB2020, the
+ * target (team player) only had to be Standing, whereas in BB2025, the player
+ * must also have their tackle zone.
+ *
+ * In either case, the player cannot catch the ball, but in BB2020, you could
+ * actually do the hand-off and let the ball bounce. In BB2025, that is no
+ * longer possible.
  */
 object HandOffAction : Procedure() {
     override val initialNode: Node = MoveOrHandOffOrEndAction
@@ -86,7 +101,17 @@ object HandOffAction : Procedure() {
             if (context.thrower.hasBall()) {
                 context.thrower.coordinates.getSurroundingCoordinates(rules, 1)
                     .mapNotNull { state.field[it].player }
-                    .filter { it.team == context.thrower.team && it.state == PlayerState.STANDING }
+                    .filter {
+                        // In BB2025, the target must also have their tackle zones, unlike
+                        // BB2020, where this wasn't a requirement.
+                        val verifiedTackleZones = when (rules.baseVersion) {
+                            GameVersion.BB2020 -> true
+                            GameVersion.BB2025 -> it.hasTackleZones
+                        }
+                        it.team == context.thrower.team
+                            && it.state == PlayerState.STANDING
+                            && verifiedTackleZones
+                    }
                     .let {
                         if (it.isNotEmpty()) {
                             options.add(SelectPlayer.fromPlayers(it))
@@ -115,9 +140,10 @@ object HandOffAction : Procedure() {
                     val ball = handOffContext.thrower.ball!!
                     compositeCommandOf(
                         SetContext(handOffContext.copy(catcher = action.getPlayer(state))),
+                        SetCurrentBall(ball),
                         SetBallState.accurateThrow(ball),
                         SetBallLocation(ball, action.getPlayer(state).coordinates),
-                        GotoNode(ResolveCatch)
+                        GotoNode(ResolveBallHandedOff),
                     )
                 }
 
@@ -150,14 +176,36 @@ object HandOffAction : Procedure() {
         }
     }
 
-    object ResolveCatch : ParentNode() {
-        override fun onEnterNode(state: Game, rules: Rules): Command {
+    object ResolveBallHandedOff: ComputationNode() {
+        override fun apply(state: Game, rules: Rules): Command {
             val context = state.getContext<HandOffContext>()
-            // Only one ball should be present on the field at
-            val ball = state.field[context.catcher!!.coordinates].balls.singleOrNull() ?: INVALID_GAME_STATE("Multiple balls in ${context.catcher.location}")
-            return SetCurrentBall(ball)
+            val canCatch = rules.canCatch(context.catcher!!)
+            return when (canCatch) {
+                true -> GotoNode(ResolveCatch)
+                false -> GotoNode(ResolveBounce)
+            }
         }
+    }
+
+    object ResolveCatch : ParentNode() {
         override fun getChildProcedure(state: Game, rules: Rules): Procedure = Catch
+        override fun onExitNode(state: Game, rules: Rules): Command {
+            // If no player on the holds the ball after the hand-off is complete, it is a turnover.
+            // otherwise the action just ends
+            val context = state.getContext<HandOffContext>()
+            return compositeCommandOf(
+                SetCurrentBall(null),
+                if (!rules.teamHasBall(context.thrower.team, state.currentBall())) SetTurnOver(TurnOver.STANDARD) else null,
+                ExitProcedure()
+            )
+        }
+    }
+
+    object ResolveBounce: ParentNode() {
+        override fun onEnterNode(state: Game, rules: Rules): Command {
+            return SetBallState.bouncing(state.currentBall())
+        }
+        override fun getChildProcedure(state: Game, rules: Rules): Procedure = Bounce
         override fun onExitNode(state: Game, rules: Rules): Command {
             // If no player on the holds the ball after the hand-off is complete, it is a turnover.
             // otherwise the action just ends

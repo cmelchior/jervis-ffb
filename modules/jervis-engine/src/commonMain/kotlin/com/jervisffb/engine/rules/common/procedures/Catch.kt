@@ -80,7 +80,7 @@ object Catch : Procedure() {
         if (state.field[ballLocation].player == null) {
             INVALID_GAME_STATE("No player available to catch the ball at: $ballLocation")
         }
-        if (!rules.canCatch(state, state.field[ballLocation].player!!)) {
+        if (!rules.canCatch(state.field[ballLocation].player!!)) {
             INVALID_GAME_STATE("Player is not eligible for catching the ball at: $ballLocation")
         }
     }
@@ -171,7 +171,7 @@ object Catch : Procedure() {
                 if (it.isOutOfBounds(rules)) {
                     false
                 } else {
-                    state.field[it].player?.let { player -> rules.canCatch(state, player) }
+                    state.field[it].player?.let { player -> rules.canCatch(player) }
                 }
             } ?: false
             return when {

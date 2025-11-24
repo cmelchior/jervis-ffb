@@ -65,7 +65,7 @@ class BounceTests: JervisGameBB2025Test() {
             4.d8, // Bounce to another player
         )
         val player = awayTeam["A6".playerId]
-        assertTrue(rules.canCatch(state, player))
+        assertTrue(rules.canCatch(player))
         controller.rollForward(
             6.d6, // Forced to roll for catch
             NoRerollSelected(),
@@ -92,7 +92,7 @@ class BounceTests: JervisGameBB2025Test() {
         )
         val player = awayTeam["A6".playerId]
         player.hasTackleZones = false
-        assertFalse(rules.canCatch(state, player))
+        assertFalse(rules.canCatch(player))
         controller.rollForward(
             4.d8, // Bounce to another player
             5.d8, // Player cannot catch, so bounce back to original player

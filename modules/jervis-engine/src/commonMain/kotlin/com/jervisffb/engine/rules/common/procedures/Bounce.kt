@@ -78,7 +78,7 @@ object Bounce : Procedure() {
                             },
                         )
                     } else if (playerAtTarget != null) {
-                        val eligiblePlayerForCatching = rules.canCatch(state, playerAtTarget)
+                        val eligiblePlayerForCatching = rules.canCatch(playerAtTarget)
                         if (eligiblePlayerForCatching) {
                             GotoNode(ResolveCatch)
                         } else {

@@ -437,6 +437,7 @@ book.
     - [x] Test against agility to catch it
     - [x] Ball bounce from target player if not caught
     - [x] Cannot hand-off to opponent
+    - [ ] Target must be Standing and not have lost their tackle zones
 - [x] Argue the Call Table
     - [x] You're Outta Here - Bans Coach / Cannot argue again / Effect Brilliant Coaching
     - [x] I Don't Care

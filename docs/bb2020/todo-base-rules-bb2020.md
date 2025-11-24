@@ -412,6 +412,7 @@ rule book.
   - [x] Test against agility to catch it
   - [x] Ball bounce from target player if not caught
   - [x] Cannot hand-off to opponent
+  - [ ] Handing off to a player with no tackle zone will bounce the ball
 - [x] Argue the Call Table
   - [x] You're Outta Here - Bans Coach / Cannot argue again / Effect Brilliant Coaching
   - [x] I Don't Care

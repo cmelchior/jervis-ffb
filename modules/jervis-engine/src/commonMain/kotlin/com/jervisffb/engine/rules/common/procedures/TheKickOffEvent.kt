@@ -143,7 +143,7 @@ object TheKickOffEvent : Procedure() {
     object ResolveBallLanding : ParentNode() {
         override fun onEnterNode(state: Game, rules: Rules): Command? {
             val ballLocation = state.singleBall().location
-            val canCatch = state.field[ballLocation].player?.let { rules.canCatch(state, it) } ?: false
+            val canCatch = state.field[ballLocation].player?.let { rules.canCatch(it) } ?: false
             return if (!canCatch) {
                 SetBallState.bouncing(state.singleBall())
             } else {

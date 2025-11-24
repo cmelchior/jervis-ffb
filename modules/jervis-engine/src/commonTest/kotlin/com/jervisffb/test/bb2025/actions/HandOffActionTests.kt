@@ -14,6 +14,7 @@ import com.jervisffb.engine.model.locations.FieldCoordinate
 import com.jervisffb.engine.rules.common.actions.PlayerStandardActionType
 import com.jervisffb.engine.rules.common.skills.RegularTeamReroll
 import com.jervisffb.engine.utils.singleInstanceOf
+import com.jervisffb.engine.utils.singleInstanceOfOrNull
 import com.jervisffb.test.JervisGameBB2025Test
 import com.jervisffb.test.SmartMoveTo
 import com.jervisffb.test.activatePlayer
@@ -52,6 +53,33 @@ class HandOffActionTests: JervisGameBB2025Test() {
         assertEquals(1, playerTargets.size)
         assertEquals("A1".playerId, playerTargets.first())
     }
+
+    @Test
+    fun cannotHandOffToPlayerWithNoTackleZone() {
+        // It does not say anything about Distracted (which is probably just a mistake),
+        // but for now we only check for the Tackle Zone.
+        awayTeam["A6".playerId].hasTackleZones = false
+        awayTeam["A7".playerId].hasTackleZones = false
+
+        val player = awayTeam["A10".playerId]
+        assertEquals(1, state.awayTeam.turnData.handOffActions)
+        controller.rollForward(
+            *activatePlayer("A10", PlayerStandardActionType.HAND_OFF),
+        )
+        assertEquals(player, state.activePlayer)
+        assertFalse(player.hasBall())
+        controller.rollForward(
+            *moveTo(17, 7),
+            4.d6, // Pickup
+            NoRerollSelected(),
+            SmartMoveTo(15, 2)
+        )
+        assertEquals(FieldCoordinate(14, 1), awayTeam["A6".playerId].location)
+        assertEquals(FieldCoordinate(15, 1), awayTeam["A7".playerId].location)
+        val actions = controller.getAvailableActions()
+        assertNull(actions.singleInstanceOfOrNull<SelectPlayer>())
+    }
+
 
     @Test
     fun cancelBeforeMoveOrHandOffDoesNotUseAction() { val player = awayTeam["A10".playerId]
